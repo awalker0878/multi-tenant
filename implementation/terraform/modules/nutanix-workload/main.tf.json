@@ -1,0 +1,297 @@
+{
+  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nutanix": {
+        "source": "nutanix/nutanix",
+        "version": "= 2.4.2"
+      }
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "workload_key": {
+      "type": "string",
+      "description": "Owned workload identity",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.workload_key))}",
+          "error_message": "Invalid value for Owned workload identity."
+        }
+      ]
+    },
+    "vcpu": {
+      "type": "number",
+      "description": "Requested guest vCPU",
+      "nullable": false,
+      "default": 2,
+      "validation": [
+        {
+          "condition": "${var.vcpu >= 1 && floor(var.vcpu) == var.vcpu}",
+          "error_message": "Invalid value for Requested guest vCPU."
+        }
+      ]
+    },
+    "memory_gib": {
+      "type": "number",
+      "description": "Requested guest memory in GiB",
+      "nullable": false,
+      "default": 4,
+      "validation": [
+        {
+          "condition": "${var.memory_gib >= 1 && floor(var.memory_gib) == var.memory_gib}",
+          "error_message": "Invalid value for Requested guest memory in GiB."
+        }
+      ]
+    },
+    "boot_disk_gib": {
+      "type": "number",
+      "description": "Requested boot disk GiB; must be at least image/template size",
+      "nullable": false,
+      "default": 40,
+      "validation": [
+        {
+          "condition": "${var.boot_disk_gib >= 1 && floor(var.boot_disk_gib) == var.boot_disk_gib}",
+          "error_message": "Invalid value for Requested boot disk GiB; must be at least image/template size."
+        }
+      ]
+    },
+    "data_disk_gib": {
+      "type": "number",
+      "description": "Owned optional data disk GiB; zero omits",
+      "nullable": false,
+      "default": 0,
+      "validation": [
+        {
+          "condition": "${var.data_disk_gib >= 0 && floor(var.data_disk_gib) == var.data_disk_gib}",
+          "error_message": "Invalid value for Owned optional data disk GiB; zero omits."
+        }
+      ]
+    },
+    "accepted_quarantine_ref": {
+      "type": "string",
+      "description": "Scoped independently reviewed network/policy/placement handoff reference",
+      "nullable": false
+    },
+    "cluster_id": {
+      "type": "string",
+      "description": "Accepted zone-eligible AHV cluster UUID",
+      "nullable": false
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Accepted project UUID",
+      "nullable": false
+    },
+    "storage_container_id": {
+      "type": "string",
+      "description": "Accepted storage-container UUID",
+      "nullable": false
+    },
+    "image_id": {
+      "type": "string",
+      "description": "Approved boot-image UUID",
+      "nullable": false
+    },
+    "subnet_id": {
+      "type": "string",
+      "description": "Accepted isolated domain subnet UUID",
+      "nullable": false
+    },
+    "security_category_id": {
+      "type": "string",
+      "description": "Provider-owned category UUID from domain handoff",
+      "nullable": false
+    },
+    "ipv4_address": {
+      "type": "string",
+      "description": "Reserved endpoint IPv4 address",
+      "nullable": false
+    }
+  },
+  "resource": {
+    "nutanix_virtual_machine_v2": {
+      "workload": {
+        "name": "${var.workload_key}",
+        "description": "${var.tenant_key}/${var.domain_key}; restricted staged fixture; no activation.",
+        "cluster": [
+          {
+            "ext_id": "${var.cluster_id}"
+          }
+        ],
+        "project": [
+          {
+            "ext_id": "${var.project_id}"
+          }
+        ],
+        "categories": [
+          {
+            "ext_id": "${var.security_category_id}"
+          }
+        ],
+        "num_sockets": 1,
+        "num_cores_per_socket": "${var.vcpu}",
+        "memory_size_bytes": "${var.memory_gib * 1073741824}",
+        "power_state": "OFF",
+        "disks": [
+          {
+            "disk_address": [
+              {
+                "bus_type": "SCSI",
+                "index": 0
+              }
+            ],
+            "backing_info": [
+              {
+                "vm_disk": [
+                  {
+                    "disk_size_bytes": "${var.boot_disk_gib * 1073741824}",
+                    "storage_container": [
+                      {
+                        "ext_id": "${var.storage_container_id}"
+                      }
+                    ],
+                    "data_source": [
+                      {
+                        "reference": [
+                          {
+                            "image_reference": [
+                              {
+                                "image_ext_id": "${var.image_id}"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "dynamic": {
+          "disks": {
+            "for_each": "${var.data_disk_gib > 0 ? [var.data_disk_gib] : []}",
+            "content": {
+              "disk_address": [
+                {
+                  "bus_type": "SCSI",
+                  "index": 1
+                }
+              ],
+              "backing_info": [
+                {
+                  "vm_disk": [
+                    {
+                      "disk_size_bytes": "${disks.value * 1073741824}",
+                      "storage_container": [
+                        {
+                          "ext_id": "${var.storage_container_id}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "nics": [
+          {
+            "nic_backing_info": [
+              {
+                "virtual_ethernet_nic": [
+                  {
+                    "model": "VIRTIO",
+                    "is_connected": false
+                  }
+                ]
+              }
+            ],
+            "nic_network_info": [
+              {
+                "virtual_ethernet_nic_network_info": [
+                  {
+                    "nic_type": "NORMAL_NIC",
+                    "vlan_mode": "ACCESS",
+                    "subnet": [
+                      {
+                        "ext_id": "${var.subnet_id}"
+                      }
+                    ],
+                    "ipv4_config": [
+                      {
+                        "should_assign_ip": true,
+                        "ip_address": [
+                          {
+                            "value": "${var.ipv4_address}"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
+              "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "vm_id": {
+      "value": "${nutanix_virtual_machine_v2.workload.ext_id}"
+    },
+    "delivery_state": {
+      "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    }
+  }
+}

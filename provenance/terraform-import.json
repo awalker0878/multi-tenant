@@ -1,0 +1,261 @@
+{
+  "source": "Implementation Increment 04",
+  "transport_sha256": "d25cddaff191fcaf9fd4c0611cad615f177ab1af071ec3077323e523f03c7b27",
+  "files": [
+    {
+      "path": "implementation/terraform/modules/nsx-domain/README.md",
+      "sha256": "f0bff65697bc0124ef50835fde968a3b2e725691acddb434987d7de4f32919e8",
+      "bytes": 2190
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-domain/main.tf.json",
+      "sha256": "cb1f0f3a2a740d9f098a8a554f05d6a78626d9298352bccd758da53b3c9bbbbf",
+      "bytes": 6779
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-domain/tests/quarantine.tftest.hcl",
+      "sha256": "6742c3945755409b643fca171f8c6cbc518b0197e13d023ab9e122debe118f58",
+      "bytes": 1146
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-gateway-quarantine/README.md",
+      "sha256": "1c93e58a70bfe2ccb3c52093205da965047bf74c53983d6f5054686cb71509c3",
+      "bytes": 991
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-gateway-quarantine/main.tf.json",
+      "sha256": "92827af266fb025757140f453f3fe9bcfb0e8f5c646590b6a52f9a9bbae92479",
+      "bytes": 4090
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-gateway-quarantine/tests/quarantine.tftest.hcl",
+      "sha256": "9c5b75cbc523d68b59d6db247c031eacaf7b8533667f9cfaeac1e6f6c727fc54",
+      "bytes": 544
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-route/README.md",
+      "sha256": "4f1f41efbbb42f83db6b10cd55f3a0a571c3f2e7ff290fb7487e94ab125ea53e",
+      "bytes": 1457
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-route/main.tf.json",
+      "sha256": "10421ef1101f0989bf4ca90ddc08ff30c1915f947d4469ae93e8c1623e8b3795",
+      "bytes": 4921
+    },
+    {
+      "path": "implementation/terraform/modules/nsx-route/tests/route.tftest.hcl",
+      "sha256": "611e9bbac7aa677b27b69c570986c15b45a805b040ae823a8a5c63a40f12a912",
+      "bytes": 663
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-domain/README.md",
+      "sha256": "7651ccfd458f4256db00eba14314167ba7ad52be8c137f045841716dab2d1956",
+      "bytes": 1807
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-domain/main.tf.json",
+      "sha256": "f94f68123ad946687151f31604483060c2e9b1ab8897738f4b832f1b6d2f48bb",
+      "bytes": 7120
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-domain/tests/quarantine.tftest.hcl",
+      "sha256": "c47485d04a8db07e7a3eb1e68a7655b515e2125e3de1f5d1e4572ba58566a185",
+      "bytes": 967
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-route/README.md",
+      "sha256": "d9b6d351aa4d96ce85ed3921c88ec474b25583919a90797a80d6c102a89954a0",
+      "bytes": 1454
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-route/main.tf.json",
+      "sha256": "70fc18107a7ade61199d589c09d7f314aca7fa8c60560e6158cdee2dc64ce52c",
+      "bytes": 5003
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-route/tests/route.tftest.hcl",
+      "sha256": "de18dce249aab3edb07c1b166cc3b88a8bfaeb62419fb83f049b7ad0652f9fc0",
+      "bytes": 699
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-workload/README.md",
+      "sha256": "773ba0c0a91abe2a135fb39b5f059341688e7149d0f315c5ed96021d2da2f129",
+      "bytes": 2740
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-workload/main.tf.json",
+      "sha256": "e49da08576eb89a1f34389d648a12c4357061b059284b6281352424a5f8f9e7f",
+      "bytes": 8886
+    },
+    {
+      "path": "implementation/terraform/modules/nutanix-workload/tests/quarantine.tftest.hcl",
+      "sha256": "08b6a7f7e85f907b42b29b95f225a0bcaa7118c742b82151b6f3dec0ba4d8d95",
+      "bytes": 1344
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-domain/README.md",
+      "sha256": "5259333b665e07223c5498893d4e8ab03a49c994aee5a44e0237f8d7d577aa44",
+      "bytes": 2018
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-domain/main.tf.json",
+      "sha256": "9e81e10ea88565691069ffed683a82f70b73d1ebd4fe6b80494151371cd6364b",
+      "bytes": 6376
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-domain/tests/quarantine.tftest.hcl",
+      "sha256": "062753c52e7fe67b6d87af819068ccdcf8637c14f71aa6a7354e9e8d6e91266b",
+      "bytes": 1056
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-route/README.md",
+      "sha256": "8e3f9270ffbcb6962fa7b7f53461c71b4c66e1020aa6a49e234cccbdf6962eec",
+      "bytes": 1475
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-route/main.tf.json",
+      "sha256": "1d6b60734da452f98b272f4ac9203537b405313961d74e6c9d0b59b201d24ae8",
+      "bytes": 4430
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-route/tests/route.tftest.hcl",
+      "sha256": "0fdba9139aa7180e21a6eac6755e936978f54f25387f6414d8a20d933663068b",
+      "bytes": 651
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-workload/README.md",
+      "sha256": "376bb7e92ea15ce836f3337199a4eedad32111adfceeb25990959aa5f08ac5be",
+      "bytes": 3082
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-workload/main.tf.json",
+      "sha256": "5b66228f29523c5abc4040245bf6908778bef7dacc98904bdf9bffb6973cb205",
+      "bytes": 10377
+    },
+    {
+      "path": "implementation/terraform/modules/openstack-workload/tests/quarantine.tftest.hcl",
+      "sha256": "71127fb13e0b93850aeb3b7e726f69b8f51277a349493feb488f0fee1b9ce485",
+      "bytes": 1361
+    },
+    {
+      "path": "implementation/terraform/modules/vsphere-workload/README.md",
+      "sha256": "e6d655c32893401f194326658fd348a0ddc9bcb139c482f66a9dec41020b1d2e",
+      "bytes": 3144
+    },
+    {
+      "path": "implementation/terraform/modules/vsphere-workload/main.tf.json",
+      "sha256": "09443fed3d4d86acfb2bcc79742a4e2b936befb907c667550984bc42ad72f0ce",
+      "bytes": 7440
+    },
+    {
+      "path": "implementation/terraform/modules/vsphere-workload/tests/quarantine.tftest.hcl",
+      "sha256": "a9667cf8883acee80c6db7fb8d791f92fb0b91e16607eef5fd626c88c87d90ae",
+      "bytes": 1298
+    },
+    {
+      "path": "implementation/terraform/roots/nsx-domain/inputs.tfvars.json.example",
+      "sha256": "00895426a5cd0516860c786f3d2a45da37c27761dc4eac27f309bee1db60bf85",
+      "bytes": 431
+    },
+    {
+      "path": "implementation/terraform/roots/nsx-domain/main.tf.json",
+      "sha256": "aa467bc035829b714b33bacbd66685f3751aed8b292ad37c06ea6ac9e31fe23d",
+      "bytes": 4079
+    },
+    {
+      "path": "implementation/terraform/roots/nsx-gateway-quarantine/inputs.tfvars.json.example",
+      "sha256": "bbc58c1e84522ee01c2fede8f94ed6b374611d7e3fd3219f6af4ee1dfdad7992",
+      "bytes": 464
+    },
+    {
+      "path": "implementation/terraform/roots/nsx-gateway-quarantine/main.tf.json",
+      "sha256": "25f33b985b083365d7bcfb576dfa4168325096011b533f1e8994b4faf99e165d",
+      "bytes": 3850
+    },
+    {
+      "path": "implementation/terraform/roots/nsx-route/inputs.tfvars.json.example",
+      "sha256": "52a7b9eb84e89f4db24aeb27d5b16c4bf2681f2eda9aad00359f55daea7596f1",
+      "bytes": 545
+    },
+    {
+      "path": "implementation/terraform/roots/nsx-route/main.tf.json",
+      "sha256": "e95326b052c4bbf4c49503909c40086fcbefe0a932e651b2f3d1d5f9cbcfc1f6",
+      "bytes": 5048
+    },
+    {
+      "path": "implementation/terraform/roots/nutanix-domain/inputs.tfvars.json.example",
+      "sha256": "57d0247e3f5323b882144790fc4e34b0313e7e551b88196dd21383d99ee86181",
+      "bytes": 304
+    },
+    {
+      "path": "implementation/terraform/roots/nutanix-domain/main.tf.json",
+      "sha256": "791756aa3f11361a303f5b24249c8c340ad7a723beb338b3919927c575454a99",
+      "bytes": 3391
+    },
+    {
+      "path": "implementation/terraform/roots/nutanix-route/inputs.tfvars.json.example",
+      "sha256": "5e3ee6f3deea4fb6b732d886788b82dec8a7ec1f2f6f2c85e1b8586275fa6fc2",
+      "bytes": 597
+    },
+    {
+      "path": "implementation/terraform/roots/nutanix-route/main.tf.json",
+      "sha256": "66e3b58a5c538fe6001b2e22e30656684169f5bfcfb5c38c5c9ff3e9c036130b",
+      "bytes": 4762
+    },
+    {
+      "path": "implementation/terraform/roots/nutanix-workload/inputs.tfvars.json.example",
+      "sha256": "9712a94f66e52b3f7f822bf56d5c2493bc0f76f0657823087880de62a5295098",
+      "bytes": 774
+    },
+    {
+      "path": "implementation/terraform/roots/nutanix-workload/main.tf.json",
+      "sha256": "1904957e511e29bc0fce172c9699a5a179eb30b62567efe21ab798ebabbb7065",
+      "bytes": 6146
+    },
+    {
+      "path": "implementation/terraform/roots/openstack-domain/inputs.tfvars.json.example",
+      "sha256": "9bb44af99793e4ab2ea29e1b8b9588d9ad45feb33dae801f1960d82199385a57",
+      "bytes": 297
+    },
+    {
+      "path": "implementation/terraform/roots/openstack-domain/main.tf.json",
+      "sha256": "c033d0cd43440e6de52f02ae404124bde38688baffd620cbdeedcc5cb83de43d",
+      "bytes": 3264
+    },
+    {
+      "path": "implementation/terraform/roots/openstack-route/inputs.tfvars.json.example",
+      "sha256": "6550d4705aa9c63686193834bc202e7888e43699d43a5c9adcd09f6e8c1760a8",
+      "bytes": 482
+    },
+    {
+      "path": "implementation/terraform/roots/openstack-route/main.tf.json",
+      "sha256": "f9516d6046f4aca2a79981af3089d57b8cb773412701c4d90292d3ba99273172",
+      "bytes": 4464
+    },
+    {
+      "path": "implementation/terraform/roots/openstack-workload/inputs.tfvars.json.example",
+      "sha256": "0905ae1b8ecc822f635f628dec8040b448493dd3ce8196165ee8ca1ad69e86ff",
+      "bytes": 708
+    },
+    {
+      "path": "implementation/terraform/roots/openstack-workload/main.tf.json",
+      "sha256": "644244316fefb818ebd27fe7d1d133e3455e7e2de4d69465acd0b6296e0fa432",
+      "bytes": 5469
+    },
+    {
+      "path": "implementation/terraform/roots/vsphere-workload/inputs.tfvars.json.example",
+      "sha256": "fd4cf75ba7095bf4671b66a075b42d12b4cde186012c3f9540daf736613224a9",
+      "bytes": 710
+    },
+    {
+      "path": "implementation/terraform/roots/vsphere-workload/main.tf.json",
+      "sha256": "1b47067a8ba1d22ab36d15b50734b3d3102a8c16d15c282f6663d6f78b9556dd",
+      "bytes": 6605
+    },
+    {
+      "path": "implementation/tools/verify_terraform.py",
+      "sha256": "ad9340f5e705e2f96ef706e014445972c6c98d06ab046a807fd6753b6110a8b2",
+      "bytes": 8411
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nsxt": {
+        "source": "vmware/nsxt",
+        "version": "= 3.10.0"
+      }
+    },
+    "backend": {
+      "http": {}
+    }
+  },
+  "provider": {
+    "nsxt": {
+      "host": "${var.platform_endpoint}",
+      "username": "${var.platform_username}",
+      "password": "${var.platform_password}",
+      "allow_unverified_ssl": false
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "engineering_record_ref": {
+      "type": "string",
+      "description": "External accepted engineering change record; a string is not proof of approval",
+      "nullable": false
+    },
+    "attachment_acceptance_ref": {
+      "type": "string",
+      "description": "Evidence reference for the existing isolated target attachment and enforcement; not an automatic approval",
+      "nullable": false
+    },
+    "gateway_path": {
+      "type": "string",
+      "description": "Already accepted isolated gateway with stateful firewall support",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^/infra/tier-[01]s/[^/]+$\", var.gateway_path))}",
+          "error_message": "Invalid input: Already accepted isolated gateway with stateful firewall support"
+        }
+      ]
+    },
+    "quarantine_sequence": {
+      "type": "number",
+      "description": "Reserved Emergency policy sequence for this owner",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${var.quarantine_sequence >= 1 && floor(var.quarantine_sequence) == var.quarantine_sequence}",
+          "error_message": "Invalid input: Reserved Emergency policy sequence for this owner"
+        }
+      ]
+    },
+    "platform_endpoint": {
+      "type": "string",
+      "description": "NSX Local Manager endpoint",
+      "nullable": false
+    },
+    "platform_username": {
+      "type": "string",
+      "description": "Restricted provider account",
+      "nullable": false
+    },
+    "platform_password": {
+      "type": "string",
+      "description": "Credential injected at execution",
+      "nullable": false,
+      "sensitive": true
+    }
+  },
+  "module": {
+    "owned": {
+      "source": "../../modules/nsx-gateway-quarantine",
+      "providers": {
+        "nsxt": "nsxt"
+      },
+      "tenant_key": "${var.tenant_key}",
+      "domain_key": "${var.domain_key}",
+      "allow_restricted_build": "${var.allow_restricted_build}",
+      "test_authorization_ref": "${var.test_authorization_ref}",
+      "engineering_record_ref": "${var.engineering_record_ref}",
+      "attachment_acceptance_ref": "${var.attachment_acceptance_ref}",
+      "gateway_path": "${var.gateway_path}",
+      "quarantine_sequence": "${var.quarantine_sequence}"
+    }
+  },
+  "output": {
+    "handoff": {
+      "value": "${module.owned}"
+    }
+  }
+}

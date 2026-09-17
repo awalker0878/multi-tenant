@@ -1,0 +1,22 @@
+{
+  "tenant_key": "tenant-01",
+  "domain_key": "D01O",
+  "allow_restricted_build": false,
+  "test_authorization_ref": "",
+  "workload_key": "processor-01",
+  "vcpu": 2,
+  "memory_gib": 4,
+  "boot_disk_gib": 40,
+  "data_disk_gib": 0,
+  "accepted_quarantine_ref": "",
+  "resource_pool_id": "resgroup-mock",
+  "datastore_id": "datastore-mock",
+  "quarantine_network_id": "network-mock",
+  "template_uuid": "99999999-9999-4999-8999-999999999999",
+  "guest_id": "otherLinux64Guest",
+  "scsi_type": "pvscsi",
+  "firmware": "efi",
+  "storage_policy_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "platform_endpoint": "REQUIRED-FROM-ACCEPTED-SITE-RECORD",
+  "platform_username": "REQUIRED-FROM-ACCEPTED-SITE-RECORD"
+}

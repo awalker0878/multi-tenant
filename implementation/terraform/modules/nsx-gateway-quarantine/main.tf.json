@@ -1,0 +1,122 @@
+{
+  "//": "NSX Local Manager candidate. Enforcing gateway and policy precedence must be independently accepted; not a complete ZIP.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nsxt": {
+        "source": "vmware/nsxt",
+        "version": "= 3.10.0"
+      }
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "engineering_record_ref": {
+      "type": "string",
+      "description": "External accepted engineering change record; a string is not proof of approval",
+      "nullable": false
+    },
+    "attachment_acceptance_ref": {
+      "type": "string",
+      "description": "Evidence reference for the existing isolated target attachment and enforcement; not an automatic approval",
+      "nullable": false
+    },
+    "gateway_path": {
+      "type": "string",
+      "description": "Already accepted isolated gateway with stateful firewall support",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^/infra/tier-[01]s/[^/]+$\", var.gateway_path))}",
+          "error_message": "Invalid input: Already accepted isolated gateway with stateful firewall support"
+        }
+      ]
+    },
+    "quarantine_sequence": {
+      "type": "number",
+      "description": "Reserved Emergency policy sequence for this owner",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${var.quarantine_sequence >= 1 && floor(var.quarantine_sequence) == var.quarantine_sequence}",
+          "error_message": "Invalid input: Reserved Emergency policy sequence for this owner"
+        }
+      ]
+    }
+  },
+  "resource": {
+    "nsxt_policy_gateway_policy": {
+      "owned": {
+        "display_name": "${format(\"%s-%s-gateway-quarantine\",var.tenant_key,var.domain_key)}",
+        "description": "Restricted candidate quarantine only. No allow rule or gateway attachment.",
+        "category": "Emergency",
+        "sequence_number": "${var.quarantine_sequence}",
+        "locked": false,
+        "stateful": true,
+        "tcp_strict": true,
+        "rule": [
+          {
+            "display_name": "deny-all-in-scope",
+            "scope": [
+              "${var.gateway_path}"
+            ],
+            "action": "DROP",
+            "direction": "IN_OUT",
+            "ip_version": "IPV4_IPV6",
+            "logged": true,
+            "disabled": false
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0 && length(trimspace(var.engineering_record_ref)) > 0 && length(trimspace(var.attachment_acceptance_ref)) > 0}",
+              "error_message": "Only an independently authorized restricted build with accepted engineering and attachment records is eligible."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "policy_path": {
+      "value": "${nsxt_policy_gateway_policy.owned.path}"
+    },
+    "gateway_path": {
+      "value": "${var.gateway_path}"
+    }
+  }
+}
