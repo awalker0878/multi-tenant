@@ -1,0 +1,24 @@
+---
+- name: Validate and render an offline hosting preparation manifest
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  vars:
+    hosting_allow_network_contact: false
+    hosting_domains:
+      - {tenant: tenant-01, domain: D01O, zone: OZ, platform: nutanix, mode: quarantine}
+      - {tenant: tenant-01, domain: D01R, zone: RZ, platform: nutanix, mode: quarantine}
+      - {tenant: tenant-02, domain: D02O, zone: OZ, platform: openstack, mode: quarantine}
+      - {tenant: tenant-02, domain: D02R, zone: RZ, platform: openstack, mode: quarantine}
+  pre_tasks:
+    - name: Enforce localhost and no-contact scope
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname == 'localhost'
+          - ansible_connection == 'local'
+          - not (hosting_allow_network_contact | bool)
+          - groups['all'] | difference(['localhost']) | length == 0
+        fail_msg: This playbook is for local validation only; no native target is accepted.
+  roles:
+    - hosting_manifest

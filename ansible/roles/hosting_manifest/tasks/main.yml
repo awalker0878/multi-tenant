@@ -1,0 +1,33 @@
+---
+- name: Validate the domain collection
+  ansible.builtin.assert:
+    that:
+      - hosting_domains is sequence
+      - hosting_domains | length > 0
+      - hosting_domains | map(attribute='domain') | unique | length == hosting_domains | length
+- name: Validate each bounded domain
+  ansible.builtin.assert:
+    that:
+      - item.keys() | list | sort == ['domain', 'mode', 'platform', 'tenant', 'zone']
+      - item.tenant is match('^tenant-[0-9]{2}$')
+      - item.domain is match('^D[0-9]{2}[OR]$')
+      - item.zone in ['OZ', 'RZ']
+      - item.platform in ['nutanix', 'nsx', 'openstack']
+      - item.mode == 'quarantine'
+      - item.domain[1:3] == item.tenant[-2:]
+      - (item.domain[-1] == 'O' and item.zone == 'OZ') or (item.domain[-1] == 'R' and item.zone == 'RZ')
+  loop: '{{ hosting_domains }}'
+  loop_control:
+    label: '{{ item.domain | default("invalid") }}'
+- name: Create repository-local rendering directory
+  ansible.builtin.file:
+    path: '{{ playbook_dir }}/../../build/ansible'
+    state: directory
+    mode: '0700'
+  when: not ansible_check_mode
+- name: Render the validated preparation manifest, never infrastructure
+  ansible.builtin.copy:
+    dest: '{{ playbook_dir }}/../../build/ansible/staging-manifest.json'
+    content: "{{ {'kind': 'OFFLINE_PREPARATION_MANIFEST', 'native_contact': false, 'may_apply': false, 'may_activate': false, 'domains': hosting_domains} | to_nice_json }}\n"
+    mode: '0600'
+  when: not ansible_check_mode
