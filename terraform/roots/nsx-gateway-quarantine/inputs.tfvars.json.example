@@ -1,0 +1,12 @@
+{
+  "tenant_key": "tenant-01",
+  "domain_key": "D01O",
+  "allow_restricted_build": false,
+  "test_authorization_ref": "REQUIRED-test_authorization_ref",
+  "engineering_record_ref": "REQUIRED-engineering_record_ref",
+  "attachment_acceptance_ref": "REQUIRED-attachment_acceptance_ref",
+  "gateway_path": "REQUIRED-gateway_path",
+  "quarantine_sequence": 10,
+  "platform_endpoint": "REQUIRED-platform_endpoint",
+  "platform_username": "REQUIRED-platform_username"
+}

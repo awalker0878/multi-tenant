@@ -1,0 +1,13 @@
+{
+  "tenant_key": "tenant-01",
+  "domain_key": "D01O",
+  "allow_restricted_build": false,
+  "test_authorization_ref": "REQUIRED-test_authorization_ref",
+  "engineering_record_ref": "REQUIRED-engineering_record_ref",
+  "attachment_acceptance_ref": "REQUIRED-attachment_acceptance_ref",
+  "route_key": "service-dns",
+  "destination_cidr": "203.0.113.138/32",
+  "router_id": "REQUIRED-router_id",
+  "next_hop_address": "198.51.100.1",
+  "openstack_cloud": "REQUIRED-openstack_cloud"
+}

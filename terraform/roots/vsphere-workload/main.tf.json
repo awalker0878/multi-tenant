@@ -1,0 +1,215 @@
+{
+  "//": "Operator root: remote HTTP backend is deliberately incomplete; configure accepted HTTPS backend and lock endpoints. Credentials are injected, not checked in.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "vsphere": {
+        "source": "hashicorp/vsphere",
+        "version": "= 2.12.0"
+      }
+    },
+    "backend": {
+      "http": {}
+    }
+  },
+  "provider": {
+    "vsphere": {
+      "vsphere_server": "${var.platform_endpoint}",
+      "user": "${var.platform_username}",
+      "password": "${var.platform_password}",
+      "allow_unverified_ssl": false
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "workload_key": {
+      "type": "string",
+      "description": "Owned workload identity",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.workload_key))}",
+          "error_message": "Invalid value for Owned workload identity."
+        }
+      ]
+    },
+    "vcpu": {
+      "type": "number",
+      "description": "Requested guest vCPU",
+      "nullable": false,
+      "default": 2,
+      "validation": [
+        {
+          "condition": "${var.vcpu >= 1 && floor(var.vcpu) == var.vcpu}",
+          "error_message": "Invalid value for Requested guest vCPU."
+        }
+      ]
+    },
+    "memory_gib": {
+      "type": "number",
+      "description": "Requested guest memory in GiB",
+      "nullable": false,
+      "default": 4,
+      "validation": [
+        {
+          "condition": "${var.memory_gib >= 1 && floor(var.memory_gib) == var.memory_gib}",
+          "error_message": "Invalid value for Requested guest memory in GiB."
+        }
+      ]
+    },
+    "boot_disk_gib": {
+      "type": "number",
+      "description": "Requested boot disk GiB; must be at least image/template size",
+      "nullable": false,
+      "default": 40,
+      "validation": [
+        {
+          "condition": "${var.boot_disk_gib >= 1 && floor(var.boot_disk_gib) == var.boot_disk_gib}",
+          "error_message": "Invalid value for Requested boot disk GiB; must be at least image/template size."
+        }
+      ]
+    },
+    "data_disk_gib": {
+      "type": "number",
+      "description": "Owned optional data disk GiB; zero omits",
+      "nullable": false,
+      "default": 0,
+      "validation": [
+        {
+          "condition": "${var.data_disk_gib >= 0 && floor(var.data_disk_gib) == var.data_disk_gib}",
+          "error_message": "Invalid value for Owned optional data disk GiB; zero omits."
+        }
+      ]
+    },
+    "accepted_quarantine_ref": {
+      "type": "string",
+      "description": "Scoped independently reviewed network/policy/placement handoff reference",
+      "nullable": false
+    },
+    "resource_pool_id": {
+      "type": "string",
+      "description": "Accepted zone-eligible resource-pool managed object ID",
+      "nullable": false
+    },
+    "datastore_id": {
+      "type": "string",
+      "description": "Accepted datastore managed object ID",
+      "nullable": false
+    },
+    "quarantine_network_id": {
+      "type": "string",
+      "description": "vCenter network ID mapped to the accepted NSX quarantine segment",
+      "nullable": false
+    },
+    "template_uuid": {
+      "type": "string",
+      "description": "Approved single-boot-disk single-NIC template UUID",
+      "nullable": false
+    },
+    "guest_id": {
+      "type": "string",
+      "description": "Guest OS ID matching the approved template",
+      "nullable": false
+    },
+    "scsi_type": {
+      "type": "string",
+      "description": "SCSI controller type matching the template",
+      "nullable": false
+    },
+    "firmware": {
+      "type": "string",
+      "description": "Template firmware",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${contains([\"bios\", \"efi\"], var.firmware)}",
+          "error_message": "Invalid value for Template firmware."
+        }
+      ]
+    },
+    "storage_policy_id": {
+      "type": "string",
+      "description": "Accepted storage policy ID",
+      "nullable": false
+    },
+    "platform_endpoint": {
+      "type": "string",
+      "description": "vCenter endpoint",
+      "nullable": false
+    },
+    "platform_username": {
+      "type": "string",
+      "description": "Restricted provider account",
+      "nullable": false
+    },
+    "platform_password": {
+      "type": "string",
+      "description": "Credential injected at execution",
+      "nullable": false,
+      "sensitive": true
+    }
+  },
+  "module": {
+    "owned": {
+      "source": "../../modules/vsphere-workload",
+      "providers": {
+        "vsphere": "vsphere"
+      },
+      "tenant_key": "${var.tenant_key}",
+      "domain_key": "${var.domain_key}",
+      "allow_restricted_build": "${var.allow_restricted_build}",
+      "test_authorization_ref": "${var.test_authorization_ref}",
+      "workload_key": "${var.workload_key}",
+      "vcpu": "${var.vcpu}",
+      "memory_gib": "${var.memory_gib}",
+      "boot_disk_gib": "${var.boot_disk_gib}",
+      "data_disk_gib": "${var.data_disk_gib}",
+      "accepted_quarantine_ref": "${var.accepted_quarantine_ref}",
+      "resource_pool_id": "${var.resource_pool_id}",
+      "datastore_id": "${var.datastore_id}",
+      "quarantine_network_id": "${var.quarantine_network_id}",
+      "template_uuid": "${var.template_uuid}",
+      "guest_id": "${var.guest_id}",
+      "scsi_type": "${var.scsi_type}",
+      "firmware": "${var.firmware}",
+      "storage_policy_id": "${var.storage_policy_id}"
+    }
+  },
+  "output": {
+    "handoff": {
+      "value": "${module.owned}"
+    }
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nutanix": {
+        "source": "nutanix/nutanix",
+        "version": "= 2.4.2"
+      }
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "ipv4_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 domain prefix",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.ipv4_cidr))}",
+          "error_message": "Invalid value for Allocated canonical IPv4 domain prefix."
+        }
+      ]
+    },
+    "gateway_host_number": {
+      "type": "number",
+      "description": "Usable host offset for the native gateway",
+      "nullable": false,
+      "default": 1,
+      "validation": [
+        {
+          "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
+          "error_message": "Invalid value for Usable host offset for the native gateway."
+        }
+      ]
+    }
+  },
+  "resource": {
+    "nutanix_category_v2": {
+      "domain": {
+        "key": "hosting-domain",
+        "value": "${var.tenant_key}-${var.domain_key}",
+        "type": "USER",
+        "description": "Provider-owned security membership for an isolated test domain.",
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "nutanix_vpc_v2": {
+      "domain": {
+        "name": "${var.tenant_key}-${var.domain_key}",
+        "vpc_type": "REGULAR",
+        "description": "Restricted domain with no external-subnet attachment.",
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "nutanix_subnet_v2": {
+      "domain": {
+        "name": "${var.tenant_key}-${var.domain_key}-network",
+        "subnet_type": "OVERLAY",
+        "is_external": false,
+        "vpc_reference": "${nutanix_vpc_v2.domain.ext_id}",
+        "ip_config": [
+          {
+            "ipv4": [
+              {
+                "ip_subnet": [
+                  {
+                    "ip": [
+                      {
+                        "value": "${cidrhost(var.ipv4_cidr, 0)}"
+                      }
+                    ],
+                    "prefix_length": "${tonumber(split(\"/\", var.ipv4_cidr)[1])}"
+                  }
+                ],
+                "default_gateway_ip": [
+                  {
+                    "value": "${cidrhost(var.ipv4_cidr, var.gateway_host_number)}"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "nutanix_network_security_policy_v2": {
+      "quarantine": {
+        "name": "${var.tenant_key}-${var.domain_key}-quarantine",
+        "type": "APPLICATION",
+        "state": "ENFORCE",
+        "scope": "VPC_LIST",
+        "vpc_reference": [
+          "${nutanix_vpc_v2.domain.ext_id}"
+        ],
+        "is_hitlog_enabled": true,
+        "is_ipv6_traffic_allowed": false,
+        "rules": [
+          {
+            "type": "APPLICATION",
+            "spec": [
+              {
+                "application_rule_spec": [
+                  {
+                    "secured_group_category_associated_entity_type": "VM",
+                    "secured_group_category_references": [
+                      "${nutanix_category_v2.domain.id}"
+                    ],
+                    "src_allow_spec": "NONE",
+                    "dest_allow_spec": "NONE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "INTRA_GROUP",
+            "spec": [
+              {
+                "intra_entity_group_rule_spec": [
+                  {
+                    "secured_group_category_associated_entity_type": "VM",
+                    "secured_group_category_references": [
+                      "${nutanix_category_v2.domain.id}"
+                    ],
+                    "secured_group_action": "DENY"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "vpc_id": {
+      "value": "${nutanix_vpc_v2.domain.ext_id}"
+    },
+    "subnet_id": {
+      "value": "${nutanix_subnet_v2.domain.ext_id}"
+    },
+    "security_category_id": {
+      "value": "${nutanix_category_v2.domain.id}"
+    },
+    "quarantine_policy_id": {
+      "value": "${nutanix_network_security_policy_v2.quarantine.ext_id}"
+    },
+    "delivery_state": {
+      "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    }
+  }
+}
