@@ -2,6 +2,7 @@ name: Infrastructure source validation
 on:
   push:
     branches: [main, 'bootstrap/**']
+    paths: ['implementation/**', 'ansible/**', 'ci/**', 'docs/**', 'README.md', '.github/workflows/validation.yml']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -20,13 +21,13 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.13'
-      - name: Hydrate original sources only while bootstrap is incomplete
-        run: test -f implementation/terraform/modules/openstack-domain/main.tf.json || python ci/hydrate_terraform.py
+      - name: Verify imported source exists
+        run: test -f implementation/terraform/modules/openstack-domain/main.tf.json
       - name: Install checksum-verified Terraform
         run: bash ci/install_terraform.sh
-      - name: Validate actual providers and run plan-only mocked tests
-        run: python implementation/tools/verify_terraform.py --mock-tests --output reports/terraform-validation.json
-      - name: Preserve toolchain evidence
+      - name: Validate original source, mock module plans and export backend-free schemas
+        run: python ci/terraform_verify.py --output reports/terraform-validation.json
+      - name: Preserve toolchain evidence and actual lock content
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -44,8 +45,8 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.13'
-      - name: Hydrate original sources only while bootstrap is incomplete
-        run: test -f implementation/terraform/modules/openstack-domain/main.tf.json || python ci/hydrate_terraform.py
+      - name: Verify imported source exists
+        run: test -f implementation/terraform/modules/openstack-domain/main.tf.json
       - name: Install pinned Ansible tools
         run: |
           mkdir -p reports
