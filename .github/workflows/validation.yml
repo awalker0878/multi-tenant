@@ -1,0 +1,62 @@
+name: Infrastructure source validation
+on:
+  push:
+    branches: [main, 'bootstrap/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  terraform:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Hydrate original sources only while bootstrap is incomplete
+        run: test -f implementation/terraform/modules/openstack-domain/main.tf.json || python ci/hydrate_terraform.py
+      - name: Install checksum-verified Terraform
+        run: bash ci/install_terraform.sh
+      - name: Validate actual providers and run plan-only mocked tests
+        run: python implementation/tools/verify_terraform.py --mock-tests --output reports/terraform-validation.json
+      - name: Preserve toolchain evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: terraform-validation-${{ github.run_id }}
+          path: reports/
+          retention-days: 14
+          if-no-files-found: error
+  ansible:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Hydrate original sources only while bootstrap is incomplete
+        run: test -f implementation/terraform/modules/openstack-domain/main.tf.json || python ci/hydrate_terraform.py
+      - name: Install pinned Ansible tools
+        run: |
+          mkdir -p reports
+          python -m pip install --report reports/ansible-dependencies.json -r ci/requirements-ansible.txt
+      - name: Lint, syntax, check mode, refusal and local idempotency
+        run: python ci/ansible_verify.py
+      - name: Preserve Ansible evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ansible-validation-${{ github.run_id }}
+          path: reports/
+          retention-days: 14
+          if-no-files-found: error

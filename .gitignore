@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.retry
+.ansible/
+reports/*
+!reports/README.md
+# Commit genuine provider lockfiles; never commit providers or runtime state.

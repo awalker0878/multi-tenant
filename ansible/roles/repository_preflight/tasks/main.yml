@@ -1,0 +1,55 @@
+---
+- name: Require explicit local-only test scope
+  ansible.builtin.assert:
+    that:
+      - repository_preflight_enabled is sameas true
+      - ansible_connection == 'local'
+      - inventory_hostname == 'localhost'
+      - ansible_play_hosts_all == ['localhost']
+      - repository_preflight_output_directory is match('^/tmp/multi-tenant-[A-Za-z0-9_-]+$')
+      - repository_preflight_expected_pairs | int == 10
+    fail_msg: "Local preflight scope is not explicitly enabled or its output path is unsafe."
+
+- name: Find owned Terraform module configurations
+  ansible.builtin.find:
+    paths: "{{ repository_preflight_root }}/implementation/terraform/modules"
+    patterns: main.tf.json
+    recurse: true
+    file_type: file
+  register: repository_preflight_modules
+
+- name: Find separate Terraform execution roots
+  ansible.builtin.find:
+    paths: "{{ repository_preflight_root }}/implementation/terraform/roots"
+    patterns: main.tf.json
+    recurse: true
+    file_type: file
+  register: repository_preflight_roots
+
+- name: Verify the imported infrastructure inventory
+  ansible.builtin.assert:
+    that:
+      - repository_preflight_modules.matched == repository_preflight_expected_pairs | int
+      - repository_preflight_roots.matched == repository_preflight_expected_pairs | int
+    fail_msg: "The expected module/root inventory is missing. This is not a platform qualification test."
+
+- name: Create the private local evidence directory
+  ansible.builtin.file:
+    path: "{{ repository_preflight_output_directory }}"
+    state: directory
+    mode: '0700'
+
+- name: Write an idempotent local inventory receipt
+  ansible.builtin.copy:
+    dest: "{{ repository_preflight_output_directory }}/preflight.json"
+    mode: '0600'
+    content: |
+      {
+        "kind": "LOCAL_REPOSITORY_PREFLIGHT",
+        "module_count": {{ repository_preflight_modules.matched }},
+        "root_count": {{ repository_preflight_roots.matched }},
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "native_qualification": "NOT_RUN"
+      }

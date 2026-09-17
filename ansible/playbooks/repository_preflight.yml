@@ -1,0 +1,9 @@
+---
+- name: Validate the repository in an isolated local workspace
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  any_errors_fatal: true
+  roles:
+    - role: repository_preflight

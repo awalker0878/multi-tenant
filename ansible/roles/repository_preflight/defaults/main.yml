@@ -1,0 +1,5 @@
+---
+repository_preflight_enabled: false
+repository_preflight_root: "{{ playbook_dir | dirname | dirname }}"
+repository_preflight_output_directory: ""
+repository_preflight_expected_pairs: 10

@@ -1,0 +1,4 @@
+# Direct tool versions checked against official PyPI metadata on 2026-09-17.
+# Transitive dependencies are captured by the CI pip installation report.
+ansible-core==2.21.4
+ansible-lint==26.8.0

@@ -1,0 +1,32 @@
+name: One-time exact source import
+on:
+  push:
+    branches: [bootstrap/artifact-library-and-validation]
+    paths: ['ci/hydrate_terraform.py', 'provenance/import/**', '.github/workflows/bootstrap-source-import.yml']
+permissions:
+  contents: read
+jobs:
+  import:
+    if: github.repository == 'awalker0878/multi-tenant' && github.event.repository.private == true
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: bootstrap/artifact-library-and-validation
+          persist-credentials: true
+      - name: Materialize exact original source files
+        run: python3 ci/hydrate_terraform.py
+      - name: Commit imported files on the bootstrap branch only
+        env:
+          IMPORT_BRANCH: bootstrap/artifact-library-and-validation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add implementation/terraform implementation/tools/verify_terraform.py provenance/terraform-import.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: materialize hash-verified original Terraform modules and tests'
+            git push origin "HEAD:refs/heads/$IMPORT_BRANCH"
+          fi
