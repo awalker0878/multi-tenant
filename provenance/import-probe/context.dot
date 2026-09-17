@@ -1,0 +1,30 @@
+digraph G {
+graph [fontname="DejaVu Sans", fontsize=13, bgcolor="white", ranksep=0.48, nodesep=0.30, pad=0.18, compound=true, splines=polyline];
+node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, margin="0.16,0.11", color="#60758B", fillcolor="#F0F5F8", penwidth=1.1];
+edge [fontname="DejaVu Sans", fontsize=10, color="#32526D", arrowsize=0.65, penwidth=1.2];
+
+rankdir=TB;
+external [label="Public / partner / enterprise networks", fillcolor="#FFF4E5"];
+subgraph cluster_site {
+ label="PROVIDER SITE  |  Physical and service context"; color="#BCCBD6"; style="rounded";
+ edgeSvc [label="Controlled border and security-edge services\nSeparate logical ZIP and exposure contexts", fillcolor="#FCEFD9"];
+ transport [label="Routed physical transport fabric\nIP reachability is not tenant routing authorization",fillcolor="#E2EEF6"];
+ n [label="Nutanix cell(s)\nAHV / AOS / Flow"];
+ v [label="VMware cell(s)\nESXi / NSX / storage"];
+ o [label="OpenStack cell(s)\nNova / Neutron / data"];
+ {rank=same;n;v;o;}
+ shared [label="Scoped shared-service endpoints\nDNS / time / identity / keys / logs / backup", fillcolor="#EAF4EB"];
+ edgeSvc -> transport [label="isolated domain handoffs"];
+ transport -> n [dir=both]; transport -> v [dir=both]; transport -> o [dir=both];
+ edgeSvc -> shared [label="approved service paths"];
+}
+external -> edgeSvc [dir=both];
+mgmt [label="Protected management domains\nIndependent OOB recovery access\nNever tenant transit",fillcolor="#EEEAF7"];
+mgmt -> edgeSvc [style=dashed,constraint=false];
+mgmt -> transport [style=dashed,constraint=false];
+mgmt -> v [style=dashed,constraint=false];
+n -> mgmt [style=invis]; v -> mgmt [style=invis]; o -> mgmt [style=invis];
+legend [shape=plaintext,style="",fontsize=10,label="Solid: data / transport     Dashed: management\nActual sharing and redundancy follow the isolation profile."];
+mgmt -> legend [style=invis];
+
+}
