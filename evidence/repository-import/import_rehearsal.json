@@ -1,0 +1,81 @@
+{
+  "archive_integrity": {
+    "exit_code": 0,
+    "report": {
+      "status": "HASHES_MATCH",
+      "files_checked": 394,
+      "issues": [],
+      "scope": "Listed release file bytes only; not signature, authorization or infrastructure validation."
+    }
+  },
+  "extracted_repository": {
+    "exit_code": 0,
+    "report": {
+      "status": "PASSED_REPOSITORY_STATIC_ONLY",
+      "counts": {
+        "active_links": 129,
+        "reference_files": 139,
+        "yaml_files": 10,
+        "catalog_artifacts": 27,
+        "terraform_module_root_pairs": 10,
+        "ansible_playbooks": 2,
+        "source_files": 395
+      },
+      "issues": [],
+      "limits": [
+        "Not Terraform/Ansible engine validation",
+        "Common secret-pattern checks are not exhaustive",
+        "Frozen library byte identity, not new technical approval",
+        "GitHub workflows were not executed by this command"
+      ]
+    }
+  },
+  "extracted_regression": {
+    "exit_code": 0,
+    "report": {
+      "status": "PASSED_LOCAL_ONLY",
+      "python": "3.13.5",
+      "source_snapshot_files": 123,
+      "source_snapshot_sha256": "45a85ed8edb44ed4085a77523cd9fb7d8bd3a4ec5cd81f8198b84de0e848c386",
+      "unit_and_source_tests": {
+        "run": 446,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "modeled_route_and_intent_checks": {
+        "passed": 80,
+        "failed": 0
+      },
+      "terraform_engine_validation": "NOT_RUN_BY_THIS_COMMAND",
+      "separate_recorded_toolchain_status": "NO_REPORT",
+      "provider_mock_tests": "NOT_RUN_BY_THIS_COMMAND",
+      "ansible_engine_validation": "NOT_RUN_BY_THIS_COMMAND",
+      "live_infrastructure_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED",
+      "elapsed_seconds": 10.493,
+      "note": "Python, YAML and Jinja source tests do not run the Terraform or Ansible engines, execute provider plugins or prove native security behavior."
+    }
+  },
+  "local_git_import": {
+    "dry_run": {
+      "exit_code": 0,
+      "stdout": "{\n  \"mode\": \"DRY_RUN\",\n  \"files\": {\n    \"ADD\": 394,\n    \"REPLACE_INITIAL_README\": 1,\n    \"UNCHANGED\": 0\n  },\n  \"git_writes\": false\n}\n",
+      "stderr": ""
+    },
+    "copy": {
+      "exit_code": 0,
+      "stdout": "{\n  \"mode\": \"COPY\",\n  \"files\": {\n    \"ADD\": 394,\n    \"REPLACE_INITIAL_README\": 1,\n    \"UNCHANGED\": 0\n  },\n  \"git_writes\": false\n}\nCopied working-tree files only. Review git diff and git status; commit and push yourself.\n",
+      "stderr": ""
+    },
+    "head_unchanged_by_helper": true,
+    "index_unchanged_by_helper": true,
+    "release_hashes_match_after_copy": true,
+    "staged_files": 395,
+    "staged_path_set_matches_manifest": true,
+    "git_index_byte_changes": [],
+    "git_staged_whitespace_exit": 0,
+    "scope": "Disposable local Git repository only; configured origin never contacted. Test harness stages for verification; import helper never stages/commits/pushes."
+  },
+  "test_scope": "Rehearsal ZIP and disposable local Git fixture; no origin network contact, no real repository mutation."
+}

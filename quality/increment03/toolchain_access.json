@@ -1,0 +1,10 @@
+{
+  "status": "BLOCKED_TOOLCHAIN",
+  "terraform_executable_found": false,
+  "attempted_version": "1.11.4",
+  "official_checksum_fetch": "Failed: URLError Temporary failure in name resolution",
+  "official_binary_download": "Failed via container download",
+  "binary_installed": false,
+  "provider_packages_initialized": false,
+  "note": "Failure observed in this authoring runtime. No alternative untrusted binary was substituted."
+}

@@ -1,0 +1,20 @@
+{
+  "document_sha256": "9ca5c85333dcb51137ca694aea7b034e393fa8927831f0b475b3b88e842418f7",
+  "pages": 10,
+  "review_status": "ALL_PAGES_VISUALLY_REVIEWED",
+  "method": "All 10 full-size rendered pages inspected. Final page6 reinspected after spacing correction; other nine page PNGs matched reviewed render bytes. Relative hyperlink targets corrected; final10 PNG bytes match the reviewed render.",
+  "page_image_sha256": {
+    "page-1.png": "98468626d975da463253fcb80757333449463c85614d0c57f9e1873514ebdb4b",
+    "page-10.png": "f7ee922b21fefafe26d828456d02db8eee0b53a3fcfd77d5bd493a316e646ef7",
+    "page-2.png": "75d8eadd3ccf1850404cca72404846f3d3c6e5f7bbb939fbe84f82e295ca9603",
+    "page-3.png": "1caaf0514544a1622988c7248d398a9339ccf38218c5277d630dd30ec60b8a75",
+    "page-4.png": "a9a7f005feb014911a53539096484743e13d6e6dcf4128645bcf125dda8727de",
+    "page-5.png": "2535312dfbe59edaa5158d0ece6cc738a28ac615a75af604efdca8a8cbf1c75e",
+    "page-6.png": "a8140d7130a45c364e0d9f9b497ceaa23f555fcbe43cdc808cbd5d1317c23e8c",
+    "page-7.png": "f2a886349d0dc0be2c03d3d4c505f26d099816609e42f10d419dd4e6e1da94a7",
+    "page-8.png": "0d6967307625432f6c4deda23461ac7d199ed15150c8e91dad62dbbbf6c62e5f",
+    "page-9.png": "804a2b17e34bdbca0b78616ed5b45039ca8ea6bfcc33c897f8aace89ca01ce2a"
+  },
+  "findings": [],
+  "scope": "Current Increment04 execution guide only; frozen reference documents and workbooks not newly rendered or recalculated."
+}

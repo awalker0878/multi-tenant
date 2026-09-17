@@ -1,0 +1,39 @@
+{
+  "status": "PASSED_COMPLETED_REEXTRACTED_LOCAL_CHECKS",
+  "date": "2026-09-17",
+  "initial_release_integrity": {
+    "status": "HASHES_MATCH",
+    "files_checked": 260,
+    "issues": [],
+    "scope": "Listed release file bytes only; not signature, authorization or infrastructure validation."
+  },
+  "unit_and_source_tests": {
+    "run": 197,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "modeled_checks": {
+    "passed": 80,
+    "failed": 0
+  },
+  "package_check": {
+    "status": "PASSED_PACKAGE_CHECKS_ONLY",
+    "issues": [],
+    "links_checked": 76
+  },
+  "packet_fixture": {
+    "status": "PASSED_NAMESPACE_FIXTURE",
+    "passed": 33,
+    "failed": 0,
+    "elapsed_seconds": 18.896,
+    "original_namespace_configuration_unchanged": true
+  },
+  "toolchain": "BLOCKED_TOOLCHAIN",
+  "interrupted_attempt": {
+    "stage": "Combined packaging-wrapper command",
+    "outcome": "Outer 60-second command budget expired before a packet result was collected; not counted as a passed or completed test.",
+    "resolution": "No namespace worker processes remained. The complete packet command was rerun separately against the extracted identical source and passed all 33 observations."
+  },
+  "scope": "Same implementation source rerun after ZIP extraction. Final repackage only adds this report and refreshes manifest fingerprints. No native vendor qualification."
+}

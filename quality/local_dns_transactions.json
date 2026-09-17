@@ -1,0 +1,152 @@
+{
+  "kind": "ACTUAL_LOCAL_DNS_TRANSACTION_TESTS",
+  "status": "PASSED_LOCAL_WIRE_FIXTURE",
+  "scope": "Real TCP DNS QUERY/UPDATE and TSIG verification; disposable loopback test authority",
+  "passed": 32,
+  "failed": 0,
+  "elapsed_seconds": 1.587,
+  "observations": [
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_acknowledged_write_but_no_readback_is_inconclusive",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_actual_wire_aaaa_and_a_are_one_transaction",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_atomic_group_conflict_leaves_other_type_absent",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_authority_acl_refuses_ungranted_name",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_authority_refusal_is_not_retried",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_bad_key_never_updates",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_cross_family_name_takeover_is_blocked",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_disabled_prevents_reads_and_writes",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_exact_rrset_prerequisite_rejects_extra_value_race",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_existing_alias_is_not_followed",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_existing_foreign_record_not_adopted",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_expiry_rechecked_after_observation",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_first_name_claim_rejects_existing_unmanaged_other_type",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_foreign_marker_is_not_accepted",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_group_can_recreate_owned_tombstone",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_lost_reply_and_readback_does_not_retry_or_rollback",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_lost_reply_readback_reconciles_without_retry",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_name_tombstone_prevents_another_owner_reclaim",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_negative_without_soa_is_not_absence",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_non_authoritative_reply_is_not_evidence",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_output_does_not_contain_secret",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_owned_update_then_delete_retains_tombstone",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_pending_journal_failure_prevents_send",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_racing_cname_fails_prerequisite",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_racing_foreign_record_fails_authority_prerequisite",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_readonly_does_not_update",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_real_signed_create",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_replay_does_not_update_twice",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_simultaneous_first_claims_have_one_native_winner",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_ttl_drift_detected_by_before_read_not_prerequisite",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSWireTests.test_unsigned_reply_is_not_authority",
+      "result": "PASS"
+    },
+    {
+      "id": "tests.test_dns_transactions.DNSInputTests.test_ptr_exact_reverse_wire",
+      "result": "PASS"
+    }
+  ],
+  "source_sha256": {
+    "tools/dns_change.py": "184097c8b84b40d9af49d2d2b82a9bad28ca5e64d3fce685b6157da910a60e4a",
+    "lab/dns_authority.py": "0188a7730d246a05fc46ed5370000841d259ac87abd6e57ba31bd0040d21351f",
+    "lab/run_dns_lab.py": "7e290f4504c7d07d81ed9ef794a536a27fbb7aacf56235f9110bc2602c1d77c8",
+    "tests/test_dns_transactions.py": "d51d8b2a36eb6d98896c6f3e6be9dfda9274444731dd57a76f76a41efe41e825"
+  },
+  "native_dns_product_qualification": "NOT_RUN",
+  "infrastructure_contact": "NONE",
+  "limits": [
+    "The local authority is an implementation of this test subset, not BIND or a production DNS service",
+    "AAAA is a DNS data record, not proof of IPv6 transport or reachability",
+    "No DNSSEC, delegation/replication/cache propagation, GSS-TSIG or IPAM allocation",
+    "Forward and reverse are independent single-zone transactions, not a distributed transaction"
+  ]
+}

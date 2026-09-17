@@ -1,0 +1,16 @@
+{
+  "module": "openstack-route",
+  "valid_from": "REQUIRED-start-time",
+  "valid_until": "REQUIRED-expiry-time",
+  "attachment_cidr": "REQUIRED-accepted-attachment-prefix",
+  "route": {
+    "tenant_key": "REQUIRED-tenant_key",
+    "domain_key": "REQUIRED-domain_key",
+    "route_key": "REQUIRED-route_key",
+    "destination_cidr": "REQUIRED-destination_cidr",
+    "engineering_record_ref": "REQUIRED-engineering_record_ref",
+    "attachment_acceptance_ref": "REQUIRED-attachment_acceptance_ref",
+    "router_id": "REQUIRED-router_id",
+    "next_hop_address": "REQUIRED-next_hop_address"
+  }
+}

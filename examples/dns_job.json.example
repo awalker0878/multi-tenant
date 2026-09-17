@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "enabled": false,
+  "operation_id": "00000000-0000-4000-8000-000000000001",
+  "tenant_id": "tenant-001",
+  "resource_id": "workload-001",
+  "zone": "fixture.invalid.",
+  "server": "192.0.2.53",
+  "port": 53,
+  "key_name": "owner.fixture.invalid.",
+  "engineering_record_ref": "EXAMPLE-NOT-AN-APPROVAL",
+  "valid_until": "2030-01-01T00:00:00Z",
+  "previous_marker": null,
+  "records": [
+    {
+      "name": "app.fixture.invalid.",
+      "type": "A",
+      "before": null,
+      "after": {
+        "ttl": 60,
+        "values": [
+          "192.0.2.10"
+        ]
+      }
+    },
+    {
+      "name": "app.fixture.invalid.",
+      "type": "AAAA",
+      "before": null,
+      "after": {
+        "ttl": 60,
+        "values": [
+          "2001:db8::10"
+        ]
+      }
+    }
+  ]
+}

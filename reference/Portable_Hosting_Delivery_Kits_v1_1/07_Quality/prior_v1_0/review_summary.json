@@ -1,0 +1,183 @@
+{
+  "release": "Portable Hosting Delivery Kits v1.0",
+  "architecture_basis": "Frozen v1.4 reference library; not rewritten or requalified",
+  "new_document_pages": 82,
+  "new_documents": [
+    {
+      "file": "00_Delivery_Map.docx",
+      "returncode": 0,
+      "pages": 7,
+      "sha256": "e332c1b37e63439169adf8b105573577fa1ea61bf32f6c3ba383dd69d83a788b",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "01_Architecture/Architecture_Kit.docx",
+      "returncode": 0,
+      "pages": 9,
+      "sha256": "f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "01_Architecture/HLD_and_Architecture_Review_Template.docx",
+      "returncode": 0,
+      "pages": 11,
+      "sha256": "911b87e6a36d903a12535d16d75f1875c0cefb6b72c462895f7c2559b556708c",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "04_Shared/Worked_Delivery_Example.docx",
+      "returncode": 0,
+      "pages": 8,
+      "sha256": "ae4ea65ea564fe848f214f5154ca4b67726eb6628d07a4b4f7714210e49ccd0d",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "03_Implementation/Implementation_Kit.docx",
+      "returncode": 0,
+      "pages": 10,
+      "sha256": "b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "03_Implementation/MOP_Test_and_Handover_Template.docx",
+      "returncode": 0,
+      "pages": 9,
+      "sha256": "9a7dd8df4a5abf6482f206cae2d074444ac6fa812bbe4bace970a4de059da370",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "02_Engineering/LLD_and_Engineering_Review_Template.docx",
+      "returncode": 0,
+      "pages": 11,
+      "sha256": "b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "02_Engineering/Vendor_Realization_Cards.docx",
+      "returncode": 0,
+      "pages": 8,
+      "sha256": "5e453a432a4b6c5af7d75ba266945bdb9e01118757cbeec1e15d81f92be32ab0",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    },
+    {
+      "file": "02_Engineering/Engineering_Kit.docx",
+      "returncode": 0,
+      "pages": 9,
+      "sha256": "0aeb8ee0a114d3ed23e97c684cc9812a0fa6ea5252e49f0c902132bf4e053a7d",
+      "visual_review": "All rendered pages inspected at page-image resolution; no unresolved clipping, overlap, missing glyphs or unreadable tables identified."
+    }
+  ],
+  "visual_review_scope": "Nine newly authored documents only. Inherited reference pages were preserved, not represented as a new exhaustive visual re-audit.",
+  "workbook_review": {
+    "workbooks": 3,
+    "sheets": 45,
+    "formulas": 80,
+    "method": "artifact_tool formula inspection, cached XLSX error scan, explicit arithmetic checks and rendered previews of dashboards, requirements, fixture, capacity and MTU examples. Not an independent Excel calculation-engine certification.",
+    "unresolved_formula_errors": 0,
+    "blank_actual_calculators": "INPUT REQUIRED, never silently counted as zero",
+    "evidence": [
+      "workbook_checks.json",
+      "workbook_arithmetic.json"
+    ]
+  },
+  "editable_response_controls": 169,
+  "accessibility": {
+    "method": "Automated DOCX audit",
+    "results": [
+      {
+        "file": "00_Delivery_Map.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "01_Architecture/Architecture_Kit.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "01_Architecture/HLD_and_Architecture_Review_Template.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "02_Engineering/Engineering_Kit.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "02_Engineering/LLD_and_Engineering_Review_Template.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "02_Engineering/Vendor_Realization_Cards.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "03_Implementation/Implementation_Kit.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "03_Implementation/MOP_Test_and_Handover_Template.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      {
+        "file": "04_Shared/Worked_Delivery_Example.docx",
+        "counts": {
+          "high": 0,
+          "medium": 0,
+          "low": 0
+        }
+      }
+    ],
+    "limit": "No findings in this automated scan does not constitute formal accessibility certification."
+  },
+  "offline_tool_tests": {
+    "count": 16,
+    "result": "passed",
+    "scope": "Synthetic local saved-plan metadata and non-disclosure tests; no provider or infrastructure execution",
+    "evidence": "offline_plan_tool_tests.txt"
+  },
+  "deliverable_inventory": {
+    "architecture": 8,
+    "engineering": 9,
+    "implementation": 10,
+    "total": 27,
+    "reference_runbooks": 10,
+    "reference_build_steps": 61
+  },
+  "preservation": {
+    "unchanged_baseline_files": 21,
+    "unchanged_requirement_statements": 194
+  },
+  "infrastructure_status": "No live deployment, native adapter execution, qualification campaign, production acceptance or authorization performed. All 104 reference observations remain not run.",
+  "rebuild_limits": "Construction sources supplied and syntax-checked. No byte-identical cross-environment or complete independent clean rebuild is claimed.",
+  "package_check": "Run 06_Tools/check_package.py after extraction. Hashes concern original release files, not future edited project copies."
+}

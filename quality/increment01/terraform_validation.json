@@ -1,0 +1,11 @@
+{
+  "kind": "TERRAFORM_TOOLCHAIN_CHECK",
+  "target_infrastructure": "NOT_CONTACTED_BY_THIS_SCRIPT",
+  "live_qualification": "NOT_RUN",
+  "mock_tests_requested": true,
+  "modules": [],
+  "roots": [],
+  "status": "BLOCKED_TOOLCHAIN",
+  "reason": "terraform executable is not installed",
+  "elapsed_seconds": 0.0
+}

@@ -1,0 +1,10 @@
+﻿flow,destination_and_operation,restriction
+F14-01 / processor-01,"data-01, TCP/443, endpoint TLS validation",New reverse initiation and other tenant data endpoints denied.
+F14-02 / processor-02,"data-02, TCP/443, same service semantics",Policy is independent of F14-01.
+F14-03 / entitled tenant endpoints,"Approved resolver .138, UDP/53 and TCP/53","Other resolvers, zone administration and general provider subnet access denied."
+F14-04 / entitled time clients,"Approved time endpoint .139, selected time profile",Arbitrary external time sources and time-server administration denied.
+F14-05 / authenticated senders,"Collector .140, approved ingestion profile","No collector configuration, cross-tenant search or unrestricted reverse collection."
+F14-06 / eligible bootstrap clients,"Repository .141, approved retrieval profile",No repository publication or unrestricted Internet retrieval.
+F14-07 / protection executor,Named platform capture API and separate data-mover path,Guest does not inherit API or repository-deletion rights.
+F14-08 / storage or workload key client,"KEY-REF, only the actual selected key-use role",No implicit guest KMS route; key administration and destruction separately controlled.
+F14-09 / any base-fixture tenant,No public ingress or general Internet egress,Public PAZ and partner connectivity require a separately qualified service extension.

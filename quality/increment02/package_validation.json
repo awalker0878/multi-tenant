@@ -1,0 +1,16 @@
+{
+  "status": "PASSED_PACKAGE_CHECKS_ONLY",
+  "checked_new_document_links": 76,
+  "guide_bookmarks": 10,
+  "guide_tables": 9,
+  "frozen_reference_files_checked": 139,
+  "module_inventory_records_checked": 10,
+  "root_configs_checked": 10,
+  "plan_only_mock_source_sets_checked": 10,
+  "packet_report_scope": "Recorded local IPv4 namespace evidence only; not rerun by this check",
+  "recorded_packet_observations": 33,
+  "issues": [],
+  "terraform_validation": "NOT_PERFORMED_BY_PACKAGE_CHECK",
+  "live_infrastructure_qualification": "NOT_RUN",
+  "scope": "Local package integrity, new links and result consistency. Historical documents and workbooks were preserved, not newly rendered or recalculated."
+}

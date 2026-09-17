@@ -1,0 +1,116 @@
+{
+  "//": "Operator root: remote HTTP backend is deliberately incomplete; configure accepted HTTPS backend and lock endpoints. Credentials are injected, not checked in.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nutanix": {
+        "source": "nutanix/nutanix",
+        "version": "= 2.4.2"
+      }
+    },
+    "backend": {
+      "http": {}
+    }
+  },
+  "provider": {
+    "nutanix": {
+      "endpoint": "${var.platform_endpoint}",
+      "username": "${var.platform_username}",
+      "password": "${var.platform_password}",
+      "insecure": false
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "ipv4_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 domain prefix",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.ipv4_cidr))}",
+          "error_message": "Invalid value for Allocated canonical IPv4 domain prefix."
+        }
+      ]
+    },
+    "gateway_host_number": {
+      "type": "number",
+      "description": "Usable host offset for the native gateway",
+      "nullable": false,
+      "default": 1,
+      "validation": [
+        {
+          "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
+          "error_message": "Invalid value for Usable host offset for the native gateway."
+        }
+      ]
+    },
+    "platform_endpoint": {
+      "type": "string",
+      "description": "Prism Central endpoint",
+      "nullable": false
+    },
+    "platform_username": {
+      "type": "string",
+      "description": "Restricted provider account",
+      "nullable": false
+    },
+    "platform_password": {
+      "type": "string",
+      "description": "Credential injected at execution",
+      "nullable": false,
+      "sensitive": true
+    }
+  },
+  "module": {
+    "owned": {
+      "source": "../../modules/nutanix-domain",
+      "providers": {
+        "nutanix": "nutanix"
+      },
+      "tenant_key": "${var.tenant_key}",
+      "domain_key": "${var.domain_key}",
+      "allow_restricted_build": "${var.allow_restricted_build}",
+      "test_authorization_ref": "${var.test_authorization_ref}",
+      "ipv4_cidr": "${var.ipv4_cidr}",
+      "gateway_host_number": "${var.gateway_host_number}"
+    }
+  },
+  "output": {
+    "handoff": {
+      "value": "${module.owned}"
+    }
+  }
+}

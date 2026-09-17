@@ -1,0 +1,17 @@
+{
+  "basis": "Implementation Increment 01, frozen archive",
+  "original_archive_name": "Portable_Hosting_Implementation_Increment_01.zip",
+  "sha256": "492c5dd1c398fd968b785f2994e0194dcdd2ebc793af468c1fcb574b035dea38",
+  "current_increment": "02",
+  "original_reference_directory": "preserved unchanged",
+  "date": "2026-09-17",
+  "changes": [
+    "Four new native modules and separate roots",
+    "Exact native route-record review",
+    "Neutron read-only verified-HTTPS observations",
+    "Plan reviewer extended for route/gateway quarantine",
+    "Actual isolated IPv4 packet fixture",
+    "Toolchain verifier exports actual schemas when available",
+    "New tests, commissioning instructions and honest validation boundaries"
+  ]
+}

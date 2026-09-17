@@ -1,0 +1,21 @@
+{
+  "status": "PASSED_LOCAL_ONLY",
+  "python": "3.13.5",
+  "unit_and_source_tests": {
+    "run": 197,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "modeled_route_and_intent_checks": {
+    "passed": 80,
+    "failed": 0
+  },
+  "terraform_engine_validation": "NOT_RUN_BY_THIS_COMMAND",
+  "separate_recorded_toolchain_status": "BLOCKED_TOOLCHAIN",
+  "provider_mock_tests": "NOT_RUN_BY_THIS_COMMAND",
+  "live_infrastructure_qualification": "NOT_RUN",
+  "formal_authorization": "NOT_ISSUED",
+  "elapsed_seconds": 2.035,
+  "note": "Python tests and source inspections do not parse Terraform, execute providers or prove native security behavior."
+}

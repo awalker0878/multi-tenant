@@ -1,0 +1,101 @@
+[
+  {
+    "id": "N1",
+    "title": "NSX Local Manager: ReadIntentStatus",
+    "url": "https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/method_ReadIntentStatus.html",
+    "locator": "GET intent status; intent_version, publish_status, consolidated and per-enforcement-point status",
+    "review_scope": "API latest documentation snapshot (page identifies 9.1.1.0); not installed-release qualification",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "N2",
+    "title": "NSX: ReadGatewayPolicyForDomain",
+    "url": "https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/method_ReadGatewayPolicyForDomain.html",
+    "locator": "Exact gateway policy GET, revision and nested rule structure",
+    "review_scope": "API latest documentation snapshot; only Local Manager root implemented",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "N3",
+    "title": "NSX: ReadGatewayRule",
+    "url": "https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/method_ReadGatewayRule.html",
+    "locator": "Rule order, source/destination negation, inline services and profiles",
+    "review_scope": "Exact selected-field comparison; not effective-policy proof",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "N4",
+    "title": "NSX: ReadInfraSegment",
+    "url": "https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/method_ReadInfraSegment.html",
+    "locator": "Local Manager segment path and resource representation",
+    "review_scope": "Optional-field omission is not automatically normalized to a default",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "U1",
+    "title": "Nutanix prism Go SDK v4.3.1: TasksApi",
+    "url": "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4.3.1/prism-go-client/api/tasks_api.go",
+    "locator": "GetTaskById: GET /api/prism/v4.3/config/tasks/{extId}",
+    "review_scope": "Pinned SDK reference, no SDK package or vendor runtime executed",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "U2",
+    "title": "Nutanix prism Go SDK v4.3.1: Task model",
+    "url": "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/prism-go-client/v4.3.1/prism-go-client/models/prism/v4/config/config_model.go",
+    "locator": "Task identity/status/times, entity counts and limited subtask/entity lists",
+    "review_scope": "Composite tasks excluded rather than assumed complete",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "U3",
+    "title": "Nutanix networking Go SDK v4.3.1: VpcsApi",
+    "url": "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4.3.1/networking-go-client/api/vpcs_api.go",
+    "locator": "GetVpcById: GET /api/networking/v4.3/config/vpcs/{extId}",
+    "review_scope": "Selected networking v4.3 profile; no fallback negotiation",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "U4",
+    "title": "Nutanix networking Go SDK v4.3.1: SubnetsApi",
+    "url": "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4.3.1/networking-go-client/api/subnets_api.go",
+    "locator": "GetSubnetById: GET /api/networking/v4.3/config/subnets/{extId}",
+    "review_scope": "Selected networking v4.3 profile; exact installed support still required",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "U5",
+    "title": "Nutanix networking Go SDK v4.3.1: network models",
+    "url": "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/networking-go-client/v4.3.1/networking-go-client/models/networking/v4/config/config_model.go",
+    "locator": "Vpc and Subnet: extId, native tenantId, subnet membership and routable prefixes",
+    "review_scope": "Native tenantId is not the portable customer label; optional omission remains unknown",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "U6",
+    "title": "Nutanix Terraform provider v2.4.2 dependencies",
+    "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/go.mod",
+    "locator": "Networking and prism SDK dependency versions",
+    "review_scope": "Provenance context only; no installed-platform compatibility inferred",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "T4",
+    "title": "Terraform 1.13.5 release index",
+    "url": "https://releases.hashicorp.com/terraform/1.13.5/",
+    "locator": "Linux amd64 binary location for toolchain retry",
+    "review_scope": "Public index inspected; container DNS failed; no binary or checksum obtained",
+    "review_date": "2026-09-17",
+    "qualification": "NOT_CERTIFICATION"
+  }
+]

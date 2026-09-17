@@ -1,0 +1,9 @@
+﻿stage,deliverable,gate_and_failure
+B14-01 / G0,"Approve topology, sharing, source applicability, offered service scope and test authorization.",Unknown mandatory site or support decision blocks the affected build.
+B14-02 / P0–P1,"Trusted bootstrap, management/OOB, fabric and physical attachment capacity.",G1 acceptance before dependent platform capability is consumed.
+B14-03 / P2 install + P3 build,Native platforms and provider services installed under restricted authority.,Not yet advertised as qualified tenant capacity.
+B14-04 / restricted P4–P5 fixture,"Create the owned test domains, routes, policies and disposable endpoints; run approved observations.","Pre-production test authorization only; results remain actual observed results, not design assumptions."
+B14-05 / G2,"Accept exact platform/service tuple, operation coverage and measured service envelope.",No ordinary placement onto an unqualified offered capability.
+B14-06 / applicable G4 readiness,"Accept operating owners, keys/catalogue custody, required restore/recovery proof, support and incident paths.",These are prerequisites for the corresponding production service promise.
+B14-07 / production P4–P5 and G3,Provision approved tenant resources; verify current paths and constraints; authorize controlled activation.,"Requires G0/G1/G2, applicable G4 readiness and valid authority to operate."
+B14-08 / P6 and continuing G4,"Observe, maintain, requalify changed capabilities, exercise recovery and retire safely.",Material change can invalidate prior acceptance; historical approval is not rewritten.

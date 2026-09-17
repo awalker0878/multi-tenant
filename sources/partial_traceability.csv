@@ -1,0 +1,2 @@
+release_scope,active_register,historical_register,note
+Increment 02,increment02_traceability.csv,partial_traceability_increment01.csv,"Historical rows describe Increment 01 scope only; current observations and native limits are in the active register."

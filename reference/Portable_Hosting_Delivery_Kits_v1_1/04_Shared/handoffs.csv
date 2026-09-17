@@ -1,0 +1,8 @@
+﻿handoff,example_addresses,scope
+A01O,198.51.100.0/30: EC-01 .1; NG-D01O .2,"D01O to EC-01, independent of other domains."
+A01R,198.51.100.4/30: EC-01 .5; NG-D01R .6,D01R to EC-01; Z01 policy separates OZ and RZ.
+A02O,198.51.100.8/30: EC-02 .9; NG-D02O .10,D02O to EC-02; no tenant-01 membership.
+A02R,198.51.100.12/30: EC-02 .13; NG-D02R .14,D02R to EC-02; Z02 policy separates OZ and RZ.
+SH-01,198.51.100.16/30: EC-01 .17; SE-01 .18,Only tenant-01 approved service flows.
+SH-02,198.51.100.20/30: EC-02 .21; SE-02 .22,Only tenant-02 approved service flows.
+Service-side interfaces,SE-01 203.0.113.129; SE-02 203.0.113.130,Provider-controlled SVC-REF; no native tenant gateway shares this segment.

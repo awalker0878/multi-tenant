@@ -1,0 +1,14 @@
+{
+  "status": "NO_STATIC_VIOLATIONS",
+  "managed_resources": 1,
+  "findings": [],
+  "authorization": "NOT_EVALUATED",
+  "live_qualification": "NOT_RUN",
+  "limitations": [
+    "No signature or approval validation",
+    "No current device/API state",
+    "No actual policy precedence or packet testing",
+    "No Terraform/provider schema validation"
+  ],
+  "plan_sha256": "302078b56e968d423670d126a3df34c1cd206472df14ef8a25277ec3959d253a"
+}

@@ -1,0 +1,89 @@
+{
+  "baseline": "Architecture v1.4; historical CT and addenda recovered from v1.2 traceability as named by v1.4",
+  "files": {
+    "00_Reference_Architecture_v1_4.docx": {
+      "sha256": "e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19",
+      "bytes": 1213724
+    },
+    "02_Fabric_Security_and_Interfaces_v1_4.docx": {
+      "sha256": "9c557d7d94dbdf24630994d2676aca3ddfa80e67c2910fb1a29ea4561c591dcf",
+      "bytes": 38375
+    },
+    "03_Vendor_Stack_Realizations_v1_4.docx": {
+      "sha256": "73be32b98783bd7857be8a00928c6894bf16f6bc98c8eb016058d3cf75b9d86b",
+      "bytes": 515566
+    },
+    "06_Site_Design_Qualification_and_Operations_v1_4.docx": {
+      "sha256": "783edbba45483d0d3c3b966765589762698836320237906a0f9a60080574af37",
+      "bytes": 43411
+    },
+    "04_Provisioning_and_Commissioning_v1_4.docx": {
+      "sha256": "483df77cff70166fbdfdf711135efa3beeecc8fe1015a58290cbebff5b80bdfd",
+      "bytes": 40506
+    },
+    "01_Gap_Map_and_Decision_Register_v1_4.docx": {
+      "sha256": "26dbaac8c13797b58ca5d057f76df8b3da63ec3f4b336036f18f5c6902512207",
+      "bytes": 44963
+    },
+    "05_Shared_Services_Data_and_Recovery_v1_4.docx": {
+      "sha256": "2257e6f3badac48b07989244fbfae96643d68cc6633b28e9799a14733bccea3a",
+      "bytes": 41376
+    },
+    "07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx": {
+      "sha256": "e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db",
+      "bytes": 57152
+    },
+    "registers/conformance_tests_reference.json": {
+      "sha256": "ed230c11114bff342f3b523a8b5150cbf93f9e66607358768e7fd32ea8bf3fd5",
+      "bytes": 63240
+    },
+    "registers/v1_4_gate_dependencies.csv": {
+      "sha256": "ae24068859f897ab1b6b4c71cbeff9236e8ef7d0a5e6aa98427b0716cfe3c6a5",
+      "bytes": 1074
+    },
+    "registers/gap_register.csv": {
+      "sha256": "40044a4b9e9bf44d297feec885ba7a59def91a1c4a40cb39fe04496355d7dcf3",
+      "bytes": 20927
+    },
+    "registers/v1_4_ipv6_route_model.csv": {
+      "sha256": "ee16b40cc8aed592be0d968878809c4eab5de75deccecbf95e302db9db997071",
+      "bytes": 2210
+    },
+    "registers/realization_verification_addenda.json": {
+      "sha256": "5b6f0875cafa32f95a2afebfbbb8d2e170f42ca556d75a7b14518d0b6b0697f7",
+      "bytes": 8418
+    },
+    "registers/v1_4_ipv4_route_model.csv": {
+      "sha256": "ddc0b0b37f9bcf9a3d58db209c3459cff949ee034e74552f503b28caca4f1dab",
+      "bytes": 3634
+    },
+    "registers/site_decisions.csv": {
+      "sha256": "34de53fcfbe81d19d05fc81c963899efd17ab32ea3100322dabca046618eef20",
+      "bytes": 5077
+    },
+    "registers/v1_4_reference_handoffs.csv": {
+      "sha256": "7ee5eb1b8886f8da798ee825f772d5bb072e2948d91fe952ae61d0f31e951903",
+      "bytes": 708
+    },
+    "registers/v1_4_open_decisions.csv": {
+      "sha256": "cfb83a9ae8cc228e71dc2fa5279e4044ed53a614964fba1a988ed72b7ab9dae0",
+      "bytes": 1461
+    },
+    "registers/v1_4_reference_flows.csv": {
+      "sha256": "d53a0a01eed3d58a60175f61e820909cd3efc5100b15c051973e42f3475a4e02",
+      "bytes": 1388
+    },
+    "registers/requirement_document_crosswalk.csv": {
+      "sha256": "d9dd04a16de7fa4717ff522365baa1d6babdb880cf309ec7fd8de772c0bfe578",
+      "bytes": 62947
+    },
+    "registers/v1_4_verification_assertions.csv": {
+      "sha256": "6b36dceb3cb4f6afb666b26ad8b077a3b8ee427c79e2e104b3f41481b237fea2",
+      "bytes": 2083
+    },
+    "registers/v1_4_build_schedule.csv": {
+      "sha256": "70a87eaf475cc5cfcc231938f16ddb93b6fd6c7aacb1928d094167faf32fc4ea",
+      "bytes": 1596
+    }
+  }
+}

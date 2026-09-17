@@ -1,0 +1,16 @@
+{
+  "repository": "awalker0878/multi-tenant",
+  "visibility": "private",
+  "default_branch": "main",
+  "tree_sha": "33c318048af33a265c98f9c6855433844f5f14c1",
+  "files": [
+    {
+      "path": "README.md",
+      "git_blob_sha": "018d97997ed5e0ff61e2f1096363b3b397e2a200",
+      "size": 811
+    }
+  ],
+  "read_date": "2026-09-17",
+  "remote_writes_performed": false,
+  "note": "Observed through the GitHub connector. This ZIP is an overlay, not a clone or commit."
+}

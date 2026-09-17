@@ -1,0 +1,16 @@
+{
+  "project_id": "REQUIRED-project-id",
+  "engineering_record_ref": "REQUIRED-issued-engineering-record",
+  "resources": [
+    {
+      "kind": "network",
+      "id": "REQUIRED-resource-uuid",
+      "expected": {
+        "admin_state_up": false,
+        "shared": false,
+        "router:external": false,
+        "port_security_enabled": true
+      }
+    }
+  ]
+}

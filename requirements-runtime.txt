@@ -1,0 +1,3 @@
+# Candidate service integration dependency tested in this release.
+# Obtain verified packages from the approved dependency source/mirror.
+dnspython==2.8.0

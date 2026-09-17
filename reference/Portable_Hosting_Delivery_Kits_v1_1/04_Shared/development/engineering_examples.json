@@ -1,0 +1,72 @@
+{
+  "status": "Local planning examples; not site allocations, benchmarks or approved targets",
+  "fixture": {
+    "source": "WD \u00a711; EK \u00a76; QCP \u00a72",
+    "permanent_endpoints": 4,
+    "vcpus_each": 2,
+    "memory_gib_each": 4,
+    "virtual_disk_gib_each": 80,
+    "sequential_probes": 1,
+    "simultaneous_probes": 4,
+    "sequential_peak": {
+      "vcpus": 10,
+      "memory_gib": 20,
+      "virtual_disk_gib": 400
+    },
+    "simultaneous_peak": {
+      "vcpus": 16,
+      "memory_gib": 32,
+      "virtual_disk_gib": 640
+    },
+    "exclusions": "Provider/management/security/services, replicas, copies, rebuild and failure reserves are additional."
+  },
+  "mtu": {
+    "source": "D06; NBD \u00a74",
+    "inner_ip_bytes": 1500,
+    "inner_ethernet_bytes": 14,
+    "vxlan_bytes": 8,
+    "udp_bytes": 8,
+    "outer_ipv4_bytes": 20,
+    "outer_ipv6_bytes": 40,
+    "outer_ipv4_packet_bytes": 1550,
+    "outer_ipv6_packet_bytes": 1570,
+    "exclusions": "No inner tags, IP options, outer extension headers, encryption or nested tunnels; outer link framing additional."
+  },
+  "edge_capacity": {
+    "source": "Local NBD \u00a77 proposal",
+    "unit": "Gbit/s",
+    "surviving_capacity": "8",
+    "reserve": "1.5",
+    "existing_commitment": "5.5",
+    "additional_request": "1.2",
+    "available": "1.0",
+    "margin_after_request": "-0.2",
+    "illustrative_disposition": "Does not fit; exclude or increase qualified capacity, never bypass enforcement."
+  },
+  "recovery": {
+    "source": "Local OPS \u00a75 proposal",
+    "unit": "minutes",
+    "detect": 10,
+    "decide": 5,
+    "bootstrap": 25,
+    "network": 20,
+    "storage": 40,
+    "restore": 35,
+    "validate": 20,
+    "cutover": 5,
+    "target": 180,
+    "parallel_elapsed": 140,
+    "serial_elapsed": 160,
+    "parallel_margin": 40,
+    "serial_margin": 20,
+    "assumption": "Network and storage can run in parallel only when personnel, systems and dependencies permit."
+  },
+  "rpo": {
+    "source": "Local OPS \u00a75 proposal",
+    "service_loss": "12:00",
+    "recoverable_consistency_point": "11:45",
+    "job_finished": "11:55",
+    "data_age_minutes": 15,
+    "note": "Job completion time is not the accepted data consistency point."
+  }
+}

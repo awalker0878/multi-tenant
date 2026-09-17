@@ -1,0 +1,40 @@
+{
+  "release": "Implementation Increment 04",
+  "status": "COMPLETED_CODE_DOCUMENT_AND_LOCAL_TEST_INCREMENT",
+  "completed_at": "2026-09-17T17:38:40.944978+00:00",
+  "new_runtime_tools": [
+    "tools/nsx_observe.py",
+    "tools/nutanix_observe.py",
+    "tools/recovery_review.py"
+  ],
+  "new_shared_components": [
+    "tools/readback_core.py",
+    "tools/readback_cli.py"
+  ],
+  "native_modules": 10,
+  "native_roots": 10,
+  "unchanged_terraform_files": 50,
+  "unchanged_reference_files": 139,
+  "regression_tests": 388,
+  "new_regression_tests": 118,
+  "offline_route_checks": 80,
+  "dns_wire_cases_subset": 32,
+  "local_https_readback_cases": 16,
+  "local_ipv4_packet_observations": 47,
+  "guide_pages": 10,
+  "new_document_links_checked": 79,
+  "word_accessibility_findings": 0,
+  "terraform_engine": "BLOCKED_TOOLCHAIN",
+  "provider_mock_tests": "NOT_RUN",
+  "native_vendor_readback": "NOT_RUN",
+  "native_mutations": "NONE",
+  "formal_authorization": "NOT_ISSUED",
+  "known_limits": [
+    "NSX selected Local Manager profile only; no global/project paths or each transport node enforcement proof",
+    "Nutanix VPC/subnet and known complete single task only; no VM/Flow/route/batch readback",
+    "JSON hashes and recorded fencing are not approval signatures or actual native fencing",
+    "No speculative replay, task cancellation, state unlock/import, repair or activation",
+    "Two stable observations are not a native transaction or complete inventory/security proof",
+    "OS hostname resolution is not forcibly bounded by response-read deadline"
+  ]
+}

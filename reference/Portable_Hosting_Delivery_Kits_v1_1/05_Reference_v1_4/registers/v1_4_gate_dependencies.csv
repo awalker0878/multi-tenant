@@ -1,0 +1,6 @@
+﻿gate_scope,required_predecessors,prohibited_inference,status
+Restricted qualification,Approved non-production test scope; accepted access and installed safeguarded candidate resources,Does not advertise qualified capacity or authorize production data,Design specified; actual authorization and execution open
+G2 platform/service acceptance,G0/G1 applicable; installed P2/P3; actual applicable qualification results,Installation or provider existence alone does not qualify,Not executed
+G4 initial readiness,"Required operations, support, custody, restore/recovery and authority evidence for offered scope",Recurring exercise later does not defer initial promise,Not accepted by this document
+G3 production activation,G0/G1/G2 applicable; G4 initial readiness applicable; current workload checks; valid operating authority,No production readiness without required recovery or named owner,Not executed
+G4 continuing acceptance,Initial readiness plus recurring and material-change reviews,Historical evidence does not automatically cover changed topology,Not executed

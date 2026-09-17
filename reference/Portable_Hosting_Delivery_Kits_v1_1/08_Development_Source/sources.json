@@ -1,0 +1,74 @@
+[
+  {
+    "id": "D01",
+    "title": "Broadcom KB 442835: Tier-0 VRF and parent HA mode",
+    "url": "https://knowledge.broadcom.com/external/article/442835/cannot-add-tier0-vrf-gateway-to-a-tier0.html",
+    "locator": "Cause and Resolution; inspected full public page.",
+    "limitation": "Gateway-mode compatibility check only; no site configuration or universal release certification.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D02",
+    "title": "OpenStack Neutron networking concepts",
+    "url": "https://docs.openstack.org/neutron/latest/admin/intro-os-networking.html",
+    "locator": "Concepts: Security groups, Ports, Provider networks; inspected public development documentation.",
+    "limitation": "Additive policy, defaults and port-authority context; selected distribution/backend remains unqualified.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D03",
+    "title": "Nutanix Terraform provider official repository",
+    "url": "https://github.com/nutanix/terraform-provider-nutanix",
+    "locator": "README: compatibility, resources and lifecycle/release notes; inspected public repository.",
+    "limitation": "No provider version selected; package provenance and actual lifecycle support need a site decision.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D04",
+    "title": "HashiCorp: terraform_remote_state data source",
+    "url": "https://developer.hashicorp.com/terraform/language/state/remote-state-data",
+    "locator": "Alternative ways to share data between configurations; inspected full public page.",
+    "limitation": "State-read privilege and scoped publication context; no tool deployment prescribed.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D05",
+    "title": "RFC 7766: DNS Transport over TCP",
+    "url": "https://datatracker.ietf.org/doc/html/rfc7766",
+    "locator": "Implementation requirements and TCP support; inspected official RFC text.",
+    "limitation": "Protocol-completeness context; not a measured resolver or encrypted-DNS qualification.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D06",
+    "title": "RFC 7348: VXLAN packet format",
+    "url": "https://www.rfc-editor.org/info/rfc7348/",
+    "locator": "Sections 4.3 and 5; inspected official RFC text and packet layout.",
+    "limitation": "Informational packet-format basis; examples exclude extra tags, options and nested/encrypted encapsulation.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D07",
+    "title": "OpenStack Neutron OVN reference architecture",
+    "url": "https://docs.openstack.org/neutron/latest/admin/ovn/refarch/refarch.html",
+    "locator": "Roles and distributed/external routing; inspected public development documentation.",
+    "limitation": "Backend-specific conceptual behaviour; no distribution or supported production release selected.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  },
+  {
+    "id": "D08",
+    "title": "OpenStack Nova host aggregates",
+    "url": "https://docs.openstack.org/nova/latest/admin/aggregates.html",
+    "locator": "Tenant isolation and scheduler/Placement aggregate configuration; inspected public development documentation.",
+    "limitation": "Placement-mechanism context; not proof of actual enforced co-residency.",
+    "reviewed": "2026-09-17",
+    "basis": "Fresh external mechanism review"
+  }
+]

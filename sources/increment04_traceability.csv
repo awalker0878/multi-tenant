@@ -1,0 +1,5 @@
+work,baseline_basis,implementation,local_evidence,remaining_native_proof
+I09 actual state,Implementation Increment03 backlog I09; RA v1.4 lifecycle and platform qualification,tools/nsx_observe.py; tools/nutanix_observe.py,tests/test_native_readback.py; quality/local_native_readback.json,"Exact installed API behavior, authority and complete selection"
+I09 uncertain operations,RA interrupted change and single configuration owner,tools/recovery_review.py,Local pending/failure/race/fencing/containment/generation cases,"Actual writer fencing, native task tracking and approved state reconciliation"
+MGT/SEC authority,Separate read/modify scope; protected management,tools/readback_core.py; tools/readback_cli.py,"Verified localhost TLS, redirects/proxy/keylog/malformed-body guards","Native read-only RBAC, trusted target and evidence custody"
+I01 native toolchain,Existing no fake schema/lock policy,tools/verify_terraform.py unchanged,quality/terraform_validation.json; quality/toolchain_access.json,Approved connected toolchain and real plugins

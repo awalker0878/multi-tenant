@@ -1,0 +1,109 @@
+{
+  "//": "Operator root: remote HTTP backend is deliberately incomplete; configure accepted HTTPS backend and lock endpoints. Credentials are injected, not checked in.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "openstack": {
+        "source": "terraform-provider-openstack/openstack",
+        "version": "= 3.4.0"
+      }
+    },
+    "backend": {
+      "http": {}
+    }
+  },
+  "provider": {
+    "openstack": {
+      "cloud": "${var.openstack_cloud}",
+      "insecure": false
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "ipv4_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 domain prefix",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.ipv4_cidr))}",
+          "error_message": "Invalid value for Allocated canonical IPv4 domain prefix."
+        }
+      ]
+    },
+    "gateway_host_number": {
+      "type": "number",
+      "description": "Usable host offset for the native gateway",
+      "nullable": false,
+      "default": 1,
+      "validation": [
+        {
+          "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
+          "error_message": "Invalid value for Usable host offset for the native gateway."
+        }
+      ]
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Keystone project ID matching the execution credential scope",
+      "nullable": false
+    },
+    "openstack_cloud": {
+      "type": "string",
+      "description": "Named protected clouds.yaml profile for the correct project",
+      "nullable": false
+    }
+  },
+  "module": {
+    "owned": {
+      "source": "../../modules/openstack-domain",
+      "providers": {
+        "openstack": "openstack"
+      },
+      "tenant_key": "${var.tenant_key}",
+      "domain_key": "${var.domain_key}",
+      "allow_restricted_build": "${var.allow_restricted_build}",
+      "test_authorization_ref": "${var.test_authorization_ref}",
+      "ipv4_cidr": "${var.ipv4_cidr}",
+      "gateway_host_number": "${var.gateway_host_number}",
+      "project_id": "${var.project_id}"
+    }
+  },
+  "output": {
+    "handoff": {
+      "value": "${module.owned}"
+    }
+  }
+}

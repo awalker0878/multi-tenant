@@ -1,0 +1,45 @@
+﻿owner,destination,next_hop,next_component,restriction
+D01O,192.0.2.32/27,198.51.100.1,EC-01,Permitted inter-zone service only; routes do not grant general access
+D01O,203.0.113.138/32,198.51.100.1,EC-01,Named service only
+D01O,203.0.113.139/32,198.51.100.1,EC-01,Named service only
+D01O,203.0.113.140/32,198.51.100.1,EC-01,Named service only
+D01O,203.0.113.141/32,198.51.100.1,EC-01,Named service only
+D01R,192.0.2.0/27,198.51.100.5,EC-01,Permitted inter-zone service only; routes do not grant general access
+D01R,203.0.113.138/32,198.51.100.5,EC-01,Named service only
+D01R,203.0.113.139/32,198.51.100.5,EC-01,Named service only
+D01R,203.0.113.140/32,198.51.100.5,EC-01,Named service only
+D01R,203.0.113.141/32,198.51.100.5,EC-01,Named service only
+D02O,192.0.2.96/27,198.51.100.9,EC-02,Permitted inter-zone service only; routes do not grant general access
+D02O,203.0.113.138/32,198.51.100.9,EC-02,Named service only
+D02O,203.0.113.139/32,198.51.100.9,EC-02,Named service only
+D02O,203.0.113.140/32,198.51.100.9,EC-02,Named service only
+D02O,203.0.113.141/32,198.51.100.9,EC-02,Named service only
+D02R,192.0.2.64/27,198.51.100.13,EC-02,Permitted inter-zone service only; routes do not grant general access
+D02R,203.0.113.138/32,198.51.100.13,EC-02,Named service only
+D02R,203.0.113.139/32,198.51.100.13,EC-02,Named service only
+D02R,203.0.113.140/32,198.51.100.13,EC-02,Named service only
+D02R,203.0.113.141/32,198.51.100.13,EC-02,Named service only
+EC-01,192.0.2.0/27,198.51.100.2,D01O,Only own tenant prefixes
+EC-01,192.0.2.32/27,198.51.100.6,D01R,Only own tenant prefixes
+EC-01,203.0.113.138/32,198.51.100.18,SE-01,Approved source and service policy required
+EC-01,203.0.113.139/32,198.51.100.18,SE-01,Approved source and service policy required
+EC-01,203.0.113.140/32,198.51.100.18,SE-01,Approved source and service policy required
+EC-01,203.0.113.141/32,198.51.100.18,SE-01,Approved source and service policy required
+EC-02,192.0.2.64/27,198.51.100.10,D02O,Only own tenant prefixes
+EC-02,192.0.2.96/27,198.51.100.14,D02R,Only own tenant prefixes
+EC-02,203.0.113.138/32,198.51.100.22,SE-02,Approved source and service policy required
+EC-02,203.0.113.139/32,198.51.100.22,SE-02,Approved source and service policy required
+EC-02,203.0.113.140/32,198.51.100.22,SE-02,Approved source and service policy required
+EC-02,203.0.113.141/32,198.51.100.22,SE-02,Approved source and service policy required
+SE-01,192.0.2.0/27,198.51.100.17,EC-01,Only stateful replies or separately approved provider initiation
+SE-01,192.0.2.32/27,198.51.100.17,EC-01,Only stateful replies or separately approved provider initiation
+SE-01,203.0.113.138/32,connected,203.0.113.138,"Provider service delivery, not general transit"
+SE-01,203.0.113.139/32,connected,203.0.113.139,"Provider service delivery, not general transit"
+SE-01,203.0.113.140/32,connected,203.0.113.140,"Provider service delivery, not general transit"
+SE-01,203.0.113.141/32,connected,203.0.113.141,"Provider service delivery, not general transit"
+SE-02,192.0.2.64/27,198.51.100.21,EC-02,Only stateful replies or separately approved provider initiation
+SE-02,192.0.2.96/27,198.51.100.21,EC-02,Only stateful replies or separately approved provider initiation
+SE-02,203.0.113.138/32,connected,203.0.113.138,"Provider service delivery, not general transit"
+SE-02,203.0.113.139/32,connected,203.0.113.139,"Provider service delivery, not general transit"
+SE-02,203.0.113.140/32,connected,203.0.113.140,"Provider service delivery, not general transit"
+SE-02,203.0.113.141/32,connected,203.0.113.141,"Provider service delivery, not general transit"

@@ -1,0 +1,12 @@
+﻿id,view,question,required_content,baseline,status,artifact
+V01,Context and service boundary,What service is offered and who owns each external dependency?,"Sites, tenants, provider services, consumers, external authorities.",RA §§1–4,Not started,
+V02,Physical deployment,"Where are the equipment, links, power and shared failure dependencies?","Sites/racks, cells, OOB, host pools, storage, edges, control components.",RA §§3–6,Not started,
+V03,Logical tenancy and security,Which independent authorities and zones exist?,"Tenant/WSD/domain/instance/network, owner, sharing and trust transitions.",RA §§7–8,Not started,
+V04,End-to-end forwarding and enforcement,Where do request and reply travel and where are they enforced?,"Gateways, ZIPs, allowed prefixes, routes, NAT, policy and native bypass candidates.",RA §§8–10; WD §§4–7,Not started,
+V05,Management and administrative authority,Who can change each component and by which protected path?,"Privileged endpoint, management domain, roles, API/BMC, break-glass and logging.",RA §6,Not started,
+V06,Compute and storage,Which resources and copies share hardware/control and how is placement enforced?,"Pools, schedulers, virtual disks, file/object clients, copies, keys and protection.",RA §§11–13,Not started,
+V07,Shared-service consumption,What is the consumer allowed to do and how does the service reply?,"Service endpoint, client identity, return routes, backend authorization and admin plane.",RA §9; SVC §§1–5,Not started,
+V08,Failure and recovery,Which failures are covered and which dependencies must survive?,"Failure sets, quorum/fencing, independent trust, restored service scope and failback.",RA §14; SVC §6,Not started,
+V09,Vendor realization,Which native components realize the same requirements on each selected stack?,"Actual tuple, mechanisms, enforcement locations, support limits and alternatives.",RA §§15–19,Not started,
+V10,Provisioning and lifecycle,"What is installed, allocated, changed and retired by each owner?","P0–P6 resources, prerequisites, single-writer ownership, handoffs and safe stops.",RA §§20–25,Not started,
+V11,Transition and operational model,How does the current environment become and remain the target?,"Adoption waves, dependencies, capacity, operating responsibilities, exit and disposal.",RA §§25–30,Not started,

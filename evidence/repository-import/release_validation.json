@@ -1,0 +1,83 @@
+{
+  "kind": "COMMIT_READY_REPOSITORY_RELEASE",
+  "prepared_at": "2026-09-17T19:43:49.868018+00:00",
+  "repository": "awalker0878/multi-tenant",
+  "delivery_mode": "ZIP_FOR_USER_LOCAL_COMMIT",
+  "remote_changes": false,
+  "basis": "Implementation Increment 04 and its embedded reference library",
+  "local_results": {
+    "python_source_and_protocol_tests": {
+      "passed": 446,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "new_repository_tests": 58
+    },
+    "route_model": {
+      "passed": 80,
+      "failed": 0
+    },
+    "dns_wire_subset_rerun": {
+      "passed": 32,
+      "failed": 0
+    },
+    "https_readback_campaign": {
+      "passed": 16,
+      "failed": 0
+    },
+    "ipv4_packet_mtls_campaign": {
+      "passed": 47,
+      "failed": 0,
+      "original_namespace_configuration_unchanged": true
+    }
+  },
+  "blocked": {
+    "terraform_init_validate_schema_mock_plan": "BLOCKED_TOOLCHAIN",
+    "ansible_syntax_idempotence_check_mode": "BLOCKED_TOOLCHAIN"
+  },
+  "not_run": [
+    "GitHub Actions",
+    "Native vendor/platform API reads or mutations",
+    "Production infrastructure deployment",
+    "Formal authorization"
+  ],
+  "preserved": {
+    "reference_files": 139,
+    "native_terraform_files": 50,
+    "module_root_pairs": 10,
+    "actual_artifacts": {
+      "docx": 24,
+      "xlsx": 3
+    }
+  },
+  "new_ansible": {
+    "playbooks": 2,
+    "roles": 2,
+    "scope": "Local fixture staging and no-contact reader input validation only",
+    "pure_python_and_jinja_tests": "PASSED",
+    "engine_execution": "NOT_RUN"
+  },
+  "archive_extraction": "PASSED_LOCAL_REHEARSAL_AND_SOURCE_HASH_CHECK",
+  "local_git_overlay": {
+    "dry_run_no_changes": true,
+    "copy_preserves_HEAD_and_index": true,
+    "staging_path_set_matches_manifest": true,
+    "staging_preserves_all_file_bytes": true,
+    "staged_whitespace_check": "PASSED",
+    "remote_contact": false,
+    "fixture_scope": "Disposable local repository with exact observed initialization README; helper never commits or pushes"
+  },
+  "limitations": [
+    "Frozen Word/Excel bytes preserved; no new rendering/accessibility/recalculation claim",
+    "Only artifacts actually present in supplied archive imported; standalone RAD/TAD v1.2 archive not located",
+    "Source checks and fixture results do not qualify native modules or authorize activation",
+    "Hashes demonstrate consistency, not approval authenticity",
+    "Test campaign counts overlap; do not add them as unique test coverage"
+  ],
+  "corrections": [
+    "Removed an empty CSV row in new Jinja template; pure rendering regression added",
+    "Preserved CRLF source CSV bytes across Git staging with explicit attributes; Git-index regression added",
+    "Removed one trailing-whitespace line in active packet-fixture C source; packet campaign rerun"
+  ],
+  "completed_at": "2026-09-17T19:44:46.986516+00:00"
+}

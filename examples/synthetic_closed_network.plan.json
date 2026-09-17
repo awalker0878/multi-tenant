@@ -1,0 +1,25 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "SYNTHETIC_FIXTURE_NOT_A_TERRAFORM_RUN",
+  "resource_changes": [
+    {
+      "address": "module.owned.openstack_networking_network_v2.domain",
+      "mode": "managed",
+      "type": "openstack_networking_network_v2",
+      "provider_name": "registry.terraform.io/terraform-provider-openstack/openstack",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "admin_state_up": false,
+          "shared": false,
+          "external": false,
+          "port_security_enabled": true
+        },
+        "after_unknown": {}
+      }
+    }
+  ]
+}

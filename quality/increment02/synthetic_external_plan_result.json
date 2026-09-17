@@ -1,0 +1,21 @@
+{
+  "status": "BLOCKED",
+  "managed_resources": 1,
+  "findings": [
+    {
+      "severity": "BLOCK",
+      "code": "QUARANTINE_VALUE_CHANGED",
+      "resource": "module.owned.openstack_networking_network_v2.domain",
+      "field": "external"
+    }
+  ],
+  "authorization": "NOT_EVALUATED",
+  "live_qualification": "NOT_RUN",
+  "limitations": [
+    "No signature or approval validation",
+    "No current device/API state",
+    "No actual policy precedence or packet testing",
+    "No Terraform/provider schema validation"
+  ],
+  "plan_sha256": "c4bac8939439d3aa9b36115464fb8bffdf3345d040fffbbd8eb703b5de7b3c60"
+}

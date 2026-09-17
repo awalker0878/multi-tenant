@@ -1,0 +1,23 @@
+{
+  "status": "DOCUMENTATION_INTERFACE_PINS_NOT_LOCAL_COMPATIBILITY",
+  "review_date": "2026-09-17",
+  "pins": {
+    "nutanix": {
+      "source": "nutanix/nutanix",
+      "version": "= 2.4.2"
+    },
+    "nsxt": {
+      "source": "vmware/nsxt",
+      "version": "= 3.10.0"
+    },
+    "openstack": {
+      "source": "terraform-provider-openstack/openstack",
+      "version": "= 3.4.0"
+    },
+    "vsphere": {
+      "source": "hashicorp/vsphere",
+      "version": "= 2.12.0"
+    }
+  },
+  "terraform_runtime": "not_available_here; engine/provider validation not run"
+}
