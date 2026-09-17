@@ -1,0 +1,33 @@
+name: Original artifact renderer probe
+on:
+  push:
+    branches: [bootstrap/artifact-library-and-validation]
+    paths: ['.github/workflows/artifact-renderer-probe.yml', 'provenance/import-probe/**']
+permissions:
+  contents: read
+jobs:
+  renderer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Reproduce one original embedded PNG under its source operating-system family
+        run: |
+          mkdir -p reports/renderer
+          docker run --rm --network bridge -v "$PWD/provenance/import-probe:/input:ro" -v "$PWD/reports/renderer:/output" debian:13-slim sh -ec '
+            apt-get update -qq
+            apt-get install -y -qq --no-install-recommends graphviz fonts-dejavu-core python3 >/dev/null
+            dpkg-query -W graphviz fonts-dejavu-core libcairo2 libfreetype6 libpango-1.0-0 libpangocairo-1.0-0 zlib1g > /output/packages.txt
+            dot -Tpng -Gdpi=180 /input/context.dot -o /output/context.png
+            printf "%s  %s\n" 5220f0cc31c4f54a6e92c38768139adb18058c5dae7fd2953d65e74d1a6e35e6 /output/context.png | sha256sum --check
+          '
+      - name: Preserve actual rendering result
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: artifact-renderer-${{ github.run_id }}
+          path: reports/renderer/
+          retention-days: 14
+          if-no-files-found: error
