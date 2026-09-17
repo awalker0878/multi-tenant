@@ -1,0 +1,44 @@
+name: Inspect staged documentation sources
+on:
+  push:
+    branches: [docs/source-grounded-implementation-audit]
+    paths: [.github/workflows/documentation-source-inspection.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Inspect immutable source fragments without executing them
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import os, urllib.request, json, base64, lzma, hashlib
+          shas = ['0cbaf0e44088ae3788ab7eedd2dd794a4f107364','e8b0f8f824854dbeda52e4a499decd1d60365c7c','3a432c0a6fe73829cce7fd0f7062fdc3e8ed532f','d3f0ff89ece19fffcb619a13137ada96a77f723e','428d43f28247afea9762c6c9c49b6a00912339a3','afc7f2aac9a3d54e1a37ea07c3ea82d36cbc3adc','644a9e0d1d95752a8100dabb5560f62ed9c09239','b083152175f8c8f3b57a49b5c9e485679de39784','f78f9cc856a3116cc8b3bd6f9edddc6cb061d120','9a633e5b53b3f443976a785e70e7f3d911ec892e','a3a4d8c4fb4fe17d6f57278023155b25294d731a']
+          fragments=[]
+          for i,sha in enumerate(shas):
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['REPOSITORY']+'/git/blobs/'+sha,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as r: obj=json.load(r)
+              raw=base64.b64decode(obj['content'])
+              text=raw.decode('utf-8').strip()
+              fragments.append(text)
+              print('FRAGMENT',i,sha,len(raw),repr(text[:12]))
+          found=[]
+          for i in range(len(fragments)):
+              for j in range(i+1,len(fragments)+1):
+                  try:
+                      raw=lzma.decompress(base64.b64decode(''.join(fragments[i:j]),validate=True),memlimit=256*1024*1024)
+                      obj=json.loads(raw)
+                  except Exception: continue
+                  print('RECOVERED',i,j,'bytes',len(raw),'sha256',hashlib.sha256(raw).hexdigest(),'type',type(obj).__name__)
+                  if isinstance(obj,dict):
+                      print('KEYS',list(obj)[:25])
+                      if isinstance(obj.get('files'),dict): print('FILES',len(obj['files']),list(obj['files'])[:40])
+                      elif isinstance(obj.get('files'),list): print('FILES',len(obj['files']),str(obj['files'][:1])[:300])
+                  elif isinstance(obj,list): print('FIRST',str(obj[:1])[:300])
+                  found.append((i,j))
+          print('RECOVERABLE_GROUPS',found)
+          PY
