@@ -61,8 +61,18 @@ def plan_only_mock_tests(directory: Path) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mock-tests", action="store_true")
+    parser.add_argument("--scope", help="Validate one named module/root pair; defaults to every pair.")
     parser.add_argument("--output", type=Path, default=ROOT / "build/reports/terraform_validation.json")
     args = parser.parse_args()
+    scopes=sorted(p.parent.name for p in (ROOT/'terraform/modules').glob('*/main.tf.json'))
+    if args.scope and args.scope not in scopes:
+        parser.error('Unknown module/root scope')
+    selected=[args.scope] if args.scope else scopes
+    source_files={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in sorted((ROOT/'terraform').rglob('*')) if p.is_file()
+                  and not any(n in p.parts for n in ('.terraform','__pycache__'))
+                  and not any(p.name.endswith(x) for x in ('.tfstate','.tfplan'))}
+    source_files['tools/verify_terraform.py']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     started = time.monotonic()
     report: dict[str, Any] = {
         "kind": "TERRAFORM_TOOLCHAIN_CHECK",
@@ -71,8 +81,13 @@ def main() -> int:
         "mock_tests_requested": args.mock_tests,
         "modules": [],
         "roots": [],
-        "planned_module_count": len(list((ROOT/"terraform/modules").glob("*/main.tf.json"))),
-        "planned_root_count": len(list((ROOT/"terraform/roots").glob("*/main.tf.json"))),
+        "planned_module_count": len(selected),
+        "planned_root_count": len(selected),
+        "selected_scopes": selected,
+        "source_files": source_files,
+        "source_digest": hashlib.sha256(json.dumps(source_files,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
+        "backend_contact": "DISABLED",
+        "schema_scope": "BACKEND_FREE_MODULES_ONLY; roots require exact provider requirement match",
         "schema_export": "NOT_RUN",
     }
 
@@ -126,7 +141,7 @@ def main() -> int:
         )
         for family in ("modules", "roots"):
             for directory in sorted((work / family).iterdir()):
-                if not directory.is_dir():
+                if not directory.is_dir() or directory.name not in selected:
                     continue
                 entry: dict[str, Any] = {
                     "name": directory.name, "validation": "NOT_RUN",
@@ -157,29 +172,53 @@ def main() -> int:
                     entry["mock_tests"] = "PASSED" if tested["exit_code"] == 0 else "FAILED"
                     entry["mock_output"] = tested["stdout"][-8000:]
                     entry["mock_exit"] = tested["exit_code"]
-                schema_result = run([f"-chdir={directory}", "providers", "schema", "-json"])
-                try:
-                    schema = json.loads(schema_result["stdout"])
-                    if schema_result["exit_code"] != 0 or not schema.get("provider_schemas"):
-                        raise ValueError("Schema export unavailable")
-                    destination = args.output.parent / "toolchain-schemas" / family / directory.name
-                    destination.mkdir(parents=True, exist_ok=True)
-                    schema_path = destination / "provider-schema.json"
-                    schema_path.write_text(json.dumps(schema, indent=2) + "\n")
-                    entry["schema_export"] = "EXPORTED_FROM_ACTUAL_PLUGINS"
-                    entry["schema_sha256"] = hashlib.sha256(schema_path.read_bytes()).hexdigest()
-                    report["schema_export"] = "SEE_PER_DIRECTORY_RESULTS"
-                except (ValueError, TypeError):
-                    entry["schema_export"] = "FAILED"
+                if family == "modules":
+                    schema_result = run([f"-chdir={directory}", "providers", "schema", "-json"])
+                    try:
+                        schema = json.loads(schema_result["stdout"])
+                        if schema_result["exit_code"] != 0 or not schema.get("provider_schemas"):
+                            raise ValueError("Schema export unavailable")
+                        destination = args.output.parent / "toolchain-schemas" / family / directory.name
+                        destination.mkdir(parents=True, exist_ok=True)
+                        schema_path = destination / "provider-schema.json"
+                        schema_path.write_text(json.dumps(schema, indent=2) + "\n")
+                        entry["schema_export"] = "EXPORTED_FROM_ACTUAL_PLUGINS"
+                        entry["schema_sha256"] = hashlib.sha256(schema_path.read_bytes()).hexdigest()
+                        report["schema_export"] = "SEE_PER_DIRECTORY_RESULTS"
+                    except (ValueError, TypeError):
+                        entry["schema_export"] = "FAILED"
+                else:
+                    # providers schema resolves a configured backend; do not call it on
+                    # uninitialized HTTP roots. Validate the unchanged root and bind its
+                    # requirement set to the actual backend-free module schema instead.
+                    mod=next((x for x in report['modules'] if x['name']==directory.name),None)
+                    try:
+                        root_req=json.loads((directory/'main.tf.json').read_text())['terraform']['required_providers']
+                        mod_req=json.loads((work/'modules'/directory.name/'main.tf.json').read_text())['terraform']['required_providers']
+                        same=root_req==mod_req
+                    except (OSError,KeyError,ValueError):
+                        same=False
+                    covered=bool(same and mod and mod.get('schema_export')=='EXPORTED_FROM_ACTUAL_PLUGINS')
+                    entry['schema_export']='COVERED_BY_MATCHING_MODULE' if covered else 'FAILED_REQUIREMENT_MATCH'
+                    entry['module_schema_sha256']=mod.get('schema_sha256') if mod else None
+                    entry['provider_requirements_match']=same
+                    entry['root_schema_command']='NOT_INVOKED_BACKEND_BOUNDARY'
                 lock = directory / ".terraform.lock.hcl"
                 if lock.is_file():
                     destination = args.output.parent / "toolchain-locks" / family / directory.name
                     destination.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(lock, destination / lock.name)
+                    entry['lock_sha256']=hashlib.sha256(lock.read_bytes()).hexdigest()
+                    entry['lock_origin']='ACTUAL_TERRAFORM_INIT'
+                else:
+                    entry['lock_origin']='MISSING' 
                 report[family].append(entry)
 
-    validated = all(report[family] and all(item["validation"] == "PASSED" and item.get("schema_export") == "EXPORTED_FROM_ACTUAL_PLUGINS" for item in report[family])
-                    for family in ("modules", "roots"))
+    validated = all(len(report[family])==len(selected) and all(
+        item["validation"] == "PASSED"
+        and item.get("schema_export") == ("EXPORTED_FROM_ACTUAL_PLUGINS" if family=="modules" else "COVERED_BY_MATCHING_MODULE")
+        and item.get('lock_origin')=='ACTUAL_TERRAFORM_INIT'
+        for item in report[family]) for family in ("modules", "roots"))
     mocked = not args.mock_tests or all(item["mock_tests"] == "PASSED" for item in report["modules"])
     return finish("PASSED_TOOLCHAIN_ONLY" if validated and mocked else "INCOMPLETE_OR_FAILED_TOOLCHAIN")
 
