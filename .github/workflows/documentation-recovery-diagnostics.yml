@@ -1,0 +1,46 @@
+name: Source recovery diagnostics
+on:
+  push:
+    branches: [docs/source-grounded-implementation-audit]
+    paths: [.github/workflows/documentation-recovery-diagnostics.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import os, urllib.request, json, base64, lzma, hashlib
+          shas=['0cbaf0e44088ae3788ab7eedd2dd794a4f107364','e8b0f8f824854dbeda52e4a499decd1d60365c7c','3a432c0a6fe73829cce7fd0f7062fdc3e8ed532f','d3f0ff89ece19fffcb619a13137ada96a77f723e','428d43f28247afea9762c6c9c49b6a00912339a3','afc7f2aac9a3d54e1a37ea07c3ea82d36cbc3adc','644a9e0d1d95752a8100dabb5560f62ed9c09239','b083152175f8c8f3b57a49b5c9e485679de39784','f78f9cc856a3116cc8b3bd6f9edddc6cb061d120','9a633e5b53b3f443976a785e70e7f3d911ec892e','a3a4d8c4fb4fe17d6f57278023155b25294d731a']
+          parts=[]
+          for s in shas:
+              req=urllib.request.Request('https://api.github.com/repos/'+os.environ['REPOSITORY']+'/git/blobs/'+s,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=20) as r: o=json.load(r)
+              t=base64.b64decode(o['content']).decode().strip(); parts.append(t)
+              print('PART',s,len(t),'tail',repr(t[-12:]))
+          t=''.join(parts); raw=base64.b64decode(t[:len(t)//4*4]); dec=lzma.LZMADecompressor(memlimit=256*1024*1024); out=[]
+          for k in range(0,len(raw),256):
+              try: out.append(dec.decompress(raw[k:k+256]))
+              except Exception as e: print('ERROR_AT',k,str(e)); break
+          raw=b''.join(out); print('OUTPUT',len(raw),'EOF',dec.eof,'sha256',hashlib.sha256(raw).hexdigest()); print('PREFIX',repr(raw[:600])); print('SUFFIX',repr(raw[-300:]));
+          text=raw.decode('utf-8',errors='replace'); decoder=json.JSONDecoder(); starts=[0]
+          for needle in ['"files":{','"files": {','"text":{','"text": {']:
+              p=text.find(needle)
+              if p>=0: starts.append(p+len(needle)-1)
+          for start in starts:
+              pos=start+1; items=[]
+              try:
+                  while pos<len(text):
+                      while text[pos] in ' \r\n\t,': pos+=1
+                      key,end=decoder.raw_decode(text,pos); pos=end
+                      while text[pos] in ' \r\n\t:': pos+=1
+                      val,end=decoder.raw_decode(text,pos); pos=end; items.append((key,val))
+              except Exception: pass
+              print('COMPLETE_ITEMS',start,len(items))
+              for key,val in items: print('ITEM',key,type(val).__name__,len(str(val)),hashlib.sha256(str(val).encode()).hexdigest())
+          PY
