@@ -25,16 +25,25 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y nftables iproute2 gcc libc6-dev linux-libc-dev openssl
           python -m pip install -r requirements-repository.txt
+      - name: Stage only tracked source in a root-owned disposable directory
+        run: |
+          work=$(sudo mktemp -d /tmp/hosting-routed-ci.XXXXXX)
+          git archive --format=tar HEAD | sudo tar -xf - -C "$work"
+          echo "ROUTED_CI_WORK=$work" >> "$GITHUB_ENV"
       - name: Retained IPv4 packet and service-identity regression
-        run: sudo "$pythonLocation/bin/python" lab/run_namespace_lab.py --execute
+        run: sudo "$pythonLocation/bin/python" "$ROUTED_CI_WORK/lab/run_namespace_lab.py" --execute
       - name: Fixed IPv6 routing, denial, service replies and recovery experiment
         if: ${{ !cancelled() }}
-        run: sudo "$pythonLocation/bin/python" lab/run_ipv6_lab.py --execute
+        run: sudo "$pythonLocation/bin/python" "$ROUTED_CI_WORK/lab/run_ipv6_lab.py" --execute
       - name: Return the two private synthetic reports to the artifact uploader
         if: always()
         run: |
-          for report in build/reports/local_packet_lab.json build/reports/local_ipv6_packet_lab.json; do
-            if sudo test -f "$report"; then sudo chown "$(id -u):$(id -g)" "$report"; fi
+          mkdir -p build/reports
+          for name in local_packet_lab.json local_ipv6_packet_lab.json; do
+            if [ -n "$ROUTED_CI_WORK" ] && sudo test -f "$ROUTED_CI_WORK/build/reports/$name"; then
+              sudo cp "$ROUTED_CI_WORK/build/reports/$name" "build/reports/$name"
+              sudo chown "$(id -u):$(id -g)" "build/reports/$name"
+            fi
           done
       - name: Preserve only synthetic local laboratory results
         if: always()
@@ -46,3 +55,11 @@ jobs:
             build/reports/local_ipv6_packet_lab.json
           retention-days: 14
           if-no-files-found: error
+      - name: Remove the owned disposable source and any temporary outputs
+        if: always()
+        run: |
+          case "$ROUTED_CI_WORK" in
+            /tmp/hosting-routed-ci.*) sudo rm -rf -- "$ROUTED_CI_WORK" ;;
+            "") : ;;
+            *) echo "Unexpected cleanup path; refusing"; exit 1 ;;
+          esac
