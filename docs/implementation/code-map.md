@@ -180,6 +180,14 @@ Implementation: [active version/source provenance index](../../sources/capabilit
 
 A current native qualification now requires the same exact product/API/provider/hardware/licence tuple to have CURRENT_SUPPORTED provenance. Source review, installed compatibility and native qualification remain separate evidence states; none grants placement or activation authority.
 
+## Bounded extension adoption and qualification assurance
+
+Design: [G33 bounded extensions](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G33) · [Physical workloads and future extensions](../architecture/reference/19-physical-workloads-and-future-platform-extensions.md) · [Extensions and release maintenance](../assurance/site-qualification/8-extensions-and-release-maintenance.md)
+
+Implementation: [active extension assurance index](../../sources/capabilities/extension_adoption_assurance_index.json) · [extension adoption validator](../../scripts/check_extension_adoption_assurance.py) · [readiness preflight](../../scripts/check_extension_adoption_readiness.py) · [engineering boundary](../engineering/bounded-extension-adoption-and-qualification-assurance.md)
+
+Every accepted extension remains EXTENSION_ONLY. Current adoption requires complete design references, all qualification dimensions, kind-specific evidence, explicit unsupported capabilities, denied mandatory-control weakening and no OPEN residual gaps; CI performs no extension provisioning or activation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
