@@ -124,6 +124,14 @@ Implementation: [active capacity inventory](../../sources/capabilities/site_serv
 
 The current inventory is intentionally empty. Matching envelopes never create a reservation, select a site, allocate an address or authorize activation; one failed capacity/profile/quota dimension rejects the envelope.
 
+## Reservation preflight and reconciliation evidence
+
+Design: [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md) · [Reservation recovery](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [Concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
+
+Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../scripts/check_reservation_records.py) · [immutable intent preflight](../../scripts/check_reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
+
+The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding, owner/expiry and conflict/uncertain-outcome handling are validated, but CI never creates or releases a reservation or allocates an address.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
