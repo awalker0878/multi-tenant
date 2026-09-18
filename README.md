@@ -117,3 +117,7 @@ The [security-edge ZIP gate](docs/engineering/security-edge-zip-assurance.md) ad
 ## Native readback, writer-fencing and reconciliation assurance
 
 The [native reconciliation gate](docs/engineering/native-readback-writer-fencing-and-reconciliation-assurance.md) addresses I09 above the existing NSX, Nutanix and Neutron read-only observers. A matching readback is insufficient: current readiness also requires exact installed API/RBAC/default/version-token applicability, complete task/entity coverage, true scoped writer fencing, current containment state, exact operation generation and an attributable data-safe reconciliation decision. The active reconciliation index is intentionally empty and CI cannot list/cancel tasks, release containment, import state, repair, delete, apply or activate.
+
+## Native IPv6 and address-family assurance
+
+The [native IPv6 assurance gate](docs/engineering/native-ipv6-address-family-assurance.md) addresses I08 above the routed Linux laboratory. A current IPv6-only or dual-stack service requires exact site/platform/security-edge scope, supported addressing/local-protocol behavior, route/security parity, MTU/PMTU evidence, required shared-service paths, failure/recovery evidence and operational acceptance. IPv6-only must prove no hidden IPv4 fallback; dual-stack must retain an independent IPv4 campaign. The active native IPv6 assurance index is intentionally empty.
