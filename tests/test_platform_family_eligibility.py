@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -10,27 +12,86 @@ import unittest
 
 from scripts import check_platform_capabilities as capabilities
 from scripts import check_platform_family_eligibility as admission
+from scripts import check_platform_qualification as qualification
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / 'examples/pre_placement_capability_request.json.example'
+AS_OF = datetime(2026, 9, 18, 16, 0, tzinfo=timezone.utc)
+
+
+def dossier(platform, tuple_id, caps, assurance=()):
+    refs = [f'controlled-evidence:{platform}:{cap}:fixture' for cap in caps]
+    return {
+        'id': f'QUAL-{platform.upper().replace("-", "_")}-FIXTURE-01',
+        'state': 'CURRENT_APPROVED',
+        'platform': platform,
+        'product_tuple_id': tuple_id,
+        'product_tuple': {
+            'product': 'fixture-product',
+            'product_version': '1.0',
+            'api': 'fixture-api',
+            'api_version': '1.0',
+            'automation_providers': ['fixture/provider = 1.0'],
+            'hardware_profile_ref': 'controlled-record:fixture-hardware',
+            'feature_licenses': []
+        },
+        'assurance_profiles': list(assurance),
+        'qualified_capabilities': list(caps),
+        'applicable_test_sets': ['CT-FIXTURE'],
+        'tested_limits': [{
+            'name': 'fixture-scope',
+            'observed_bound': 'one bounded fixture',
+            'unit': 'fixture',
+            'evidence_ref': refs[0]
+        }],
+        'evidence': [{
+            'ref': ref,
+            'sha256': hashlib.sha256(ref.encode()).hexdigest(),
+            'observed_at': '2026-09-17T10:00:00Z',
+            'expires_at': '2026-12-31T23:59:59Z',
+            'test_set': 'CT-FIXTURE'
+        } for ref in refs],
+        'approval': {
+            'authority_role': 'Fixture security authority',
+            'decision_ref': 'controlled-decision:fixture-qualification',
+            'approved_at': '2026-09-17T12:00:00Z',
+            'expires_at': '2026-12-31T23:59:59Z'
+        },
+        'owners': {
+            'platform_engineering_role': 'Fixture platform engineering',
+            'security_authority_role': 'Fixture security authority'
+        },
+        'exclusions': ['Synthetic unit-test record only'],
+        'source_refs': [
+            'docs/engineering/platform-native-qualification.md',
+            'docs/engineering/platform-capability-registry.md'
+        ]
+    }
 
 
 class PlatformFamilyEligibilityTests(unittest.TestCase):
     def setUp(self):
         self.registry = capabilities.load()
+        self.qualification_index = qualification.load()
         self.request = admission.load_request(EXAMPLE)
 
     def evaluate(self):
-        return admission.evaluate(self.request, self.registry)
+        return admission.evaluate(
+            self.request, self.registry,
+            qualification_index=self.qualification_index, as_of=AS_OF)
 
-    def qualify(self, platform='nutanix'):
+    def qualify(self, platform='nutanix', assurance=()):
         profile = self.registry['profiles'][platform]
-        profile['product_tuple'] = 'fixture-selected-product-api-provider-tuple'
+        tuple_id = 'fixture-selected-product-api-provider-tuple'
+        profile['product_tuple'] = tuple_id
         for cap in self.request['mandatory_capabilities']:
             profile['capabilities'][cap]['qualification'] = 'NATIVE_QUALIFIED'
             profile['capabilities'][cap]['native_evidence_refs'] = [
                 f'controlled-evidence:{platform}:{cap}:fixture'
             ]
+        profile['assurance_profiles'] = list(assurance)
+        self.qualification_index['records'].append(
+            dossier(platform, tuple_id, self.request['mandatory_capabilities'], assurance))
 
     def test_current_registry_fails_closed(self):
         result = self.evaluate()
@@ -56,6 +117,15 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         self.assertIs(result['may_select_site'], False)
         self.assertIn('site/cell/service-class eligibility', result['remaining_gates'])
 
+    def test_registry_edit_without_dossier_cannot_create_family_match(self):
+        profile = self.registry['profiles']['nutanix']
+        profile['product_tuple'] = 'fixture-selected-product-api-provider-tuple'
+        for cap in self.request['mandatory_capabilities']:
+            profile['capabilities'][cap]['qualification'] = 'NATIVE_QUALIFIED'
+            profile['capabilities'][cap]['native_evidence_refs'] = [f'controlled-evidence:nutanix:{cap}:fixture']
+        with self.assertRaises(ValueError):
+            self.evaluate()
+
     def test_unqualified_optional_capability_does_not_weaken_mandatory_gate(self):
         self.qualify('nutanix')
         result = self.evaluate()
@@ -72,9 +142,15 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         self.assertIn('assurance_profile:PROTECTED-B-FIXTURE',
                       nutanix['mandatory_blockers'])
 
-    def test_assurance_profile_can_be_explicitly_recorded_after_qualification(self):
+    def test_assurance_profile_requires_dossier_coverage(self):
         self.qualify('nutanix')
         self.registry['profiles']['nutanix']['assurance_profiles'] = ['PROTECTED-B-FIXTURE']
+        self.request['required_assurance_profile'] = 'PROTECTED-B-FIXTURE'
+        with self.assertRaises(ValueError):
+            self.evaluate()
+
+    def test_assurance_profile_can_be_explicitly_recorded_after_qualification(self):
+        self.qualify('nutanix', assurance=['PROTECTED-B-FIXTURE'])
         self.request['required_assurance_profile'] = 'PROTECTED-B-FIXTURE'
         result = self.evaluate()
         self.assertEqual(result['eligible_platforms'], ['nutanix'])
@@ -94,50 +170,56 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         self.assertEqual([x['platform'] for x in result['evaluations']], ['vmware-nsx'])
         self.assertEqual(result['eligible_platforms'], [])
 
+    def test_expired_dossier_cannot_create_family_match(self):
+        self.qualify('nutanix')
+        self.qualification_index['records'][0]['approval']['expires_at'] = '2026-09-18T15:59:59Z'
+        with self.assertRaises(ValueError):
+            self.evaluate()
+
     def test_unknown_platform_rejected(self):
         self.request['candidate_platforms'] = ['unknown-stack']
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_unknown_capability_rejected(self):
         self.request['mandatory_capabilities'].append('vendor_magic')
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_duplicate_candidate_rejected(self):
         self.request['candidate_platforms'].append('nutanix')
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_mandatory_optional_overlap_rejected(self):
         self.request['optional_capabilities'].append('network_domain')
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_composite_mode_rejected_by_initial_profile(self):
         self.request['placement_mode'] = 'COMPOSITE_MULTI_PLATFORM'
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_site_binding_cannot_be_selected_by_precheck(self):
         self.request['site_binding']['site_ref'] = 'site-01'
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_production_authority_cannot_be_carried(self):
         self.request['production_authority'] = 'APPROVED'
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_missing_source_reference_rejected(self):
         self.request['source_refs'].append('docs/does-not-exist.md')
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_wsd_reference_must_be_in_source_set(self):
         self.request['source_refs'].remove(self.request['wsd_engineering_ref'])
         with self.assertRaises(ValueError):
-            admission.evaluate(self.request, self.registry)
+            self.evaluate()
 
     def test_cli_hold_is_nonzero_without_explicit_expected_status(self):
         run = subprocess.run(
