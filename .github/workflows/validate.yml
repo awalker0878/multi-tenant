@@ -70,12 +70,16 @@ jobs:
         with:
           terraform_version: '1.13.5'
           terraform_wrapper: false
-      - name: Backend-disabled validation, actual schemas and plan-only provider mocks
+      - name: Backend-disabled validation, module schemas and plan-only provider mocks
         run: python tools/verify_terraform.py --mock-tests
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: terraform-engine-reports
-          path: build/reports/
+          path: |
+            build/reports/terraform_validation.json
+            build/reports/toolchain-schemas/
+            build/reports/toolchain-locks/
+          include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn
