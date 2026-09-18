@@ -150,3 +150,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Authoritative DNS registration handoff
 
 `python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z` validates exported DNS registration lifecycle evidence without storing actual names or record values. `python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` verifies that DNS remains held until authoritative IPAM is confirmed. These checks do not invoke `tools/dns_change.py`, contact DNS, broaden update ACLs or establish recursive/secondary propagation unless independently evidenced.
+
+
+## Backup protection and isolated-restore assurance
+
+`python scripts/check_backup_restore_assurance.py --as-of 2026-09-18T19:00:00Z` validates exported BackupPolicy/protected-copy/isolated-restore evidence without contacting backup, storage or key services. `python scripts/check_backup_restore_readiness.py examples/backup_restore_readiness_intent.json.example --as-of 2026-09-18T19:00:00Z --expected-status HOLD_NO_CURRENT_BACKUP_ASSURANCE` verifies the current empty assurance index remains fail-closed. A backup job alone is never accepted as restore assurance, and all backup/restore/key/reconnect/apply/activation authority flags remain false.
