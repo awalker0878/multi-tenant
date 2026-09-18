@@ -164,8 +164,6 @@ def validate_record(record,*,as_of,root=ROOT):
         opaque_ref(scope[key],f'scope.{key}')
     if scope['source_endpoint_ref']==scope['destination_endpoint_ref']:
         raise ValueError('ZIP requires exactly two distinct adjacent endpoints')
-    if scope['source_authority_ref']==scope['destination_authority_ref']:
-        raise ValueError('ZIP must retain both adjacent authority identities even when coordinated')
     accepted=instant(scope['accepted_at'],'scope.accepted_at')
     review_by=instant(scope['review_by'],'scope.review_by')
     if accepted>as_of or review_by<=accepted:
