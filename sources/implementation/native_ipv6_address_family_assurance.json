@@ -1,0 +1,37 @@
+{
+  "id": "NATIVE-IPV6-ADDRESS-FAMILY-ASSURANCE-01",
+  "source_baseline_commit": "2909d235a2fcf352e9dab04dab3d617f3923a719",
+  "status": "IMPLEMENTED_ADDRESS_FAMILY_EVIDENCE_GATE_NO_NETWORK_MUTATION",
+  "backlog_ids": ["I08"],
+  "requirements": ["IPV6-001", "IPV6-002", "IPV6-003"],
+  "assurance_index": "sources/capabilities/address_family_assurance_index.json",
+  "checker": "scripts/check_address_family_assurance.py",
+  "preflight": "scripts/check_address_family_readiness.py",
+  "engineering": "docs/engineering/native-ipv6-address-family-assurance.md",
+  "existing_laboratory": [
+    "docs/engineering/routed-ipv6-qualification.md",
+    "docs/implementation/routed-ipv6-lab.md",
+    "lab/run_ipv6_lab.py",
+    ".github/workflows/routed-ipv6-lab.yml"
+  ],
+  "current_records": 0,
+  "authority": {
+    "may_allocate_address": false,
+    "may_enable_ipv6": false,
+    "may_change_route": false,
+    "may_change_policy": false,
+    "may_change_shared_service": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the exact platform/service-class address-family mode and installed platform profile",
+    "qualify native IPv6 routing, same-host enforcement, neighbor/source controls, assignment mode, local protocols and transition restrictions",
+    "prove IPv4/IPv6 security-semantic equivalence and complete negative paths through the selected ZIP realization",
+    "qualify DNS AAAA/UDP/TCP, time, trust, telemetry, image/repository, protection/recovery and origin-specific shared-service replies over the offered family",
+    "measure effective workload MTU, encapsulation budget, ICMPv6/PTB behavior and fragment/extension-header treatment",
+    "exercise route/edge/service-reply/address recovery and prove there is no hidden IPv4 fallback",
+    "obtain current monitoring/runbook/recovery re-exposure and operational acceptance evidence"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
