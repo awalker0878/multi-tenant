@@ -15,11 +15,61 @@ from scripts import check_reservation_preflight as preflight
 from scripts import check_reservation_records as records
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as sitecheck
+from scripts import check_version_source_provenance as provenance
 
 ROOT=Path(__file__).resolve().parents[1]
 AS_OF=datetime(2026,9,18,18,0,tzinfo=timezone.utc)
 INTENT=ROOT/'examples/reservation_intent.json.example'
 CAPREQ=ROOT/'examples/site_service_capacity_request.json.example'
+
+
+def provenance_record():
+    kinds=sorted(provenance.BASE_REQUIRED_KINDS)
+    return {
+        'provenance_id':'PROV-NUTANIX-SYNTHETIC-01',
+        'generation':1,
+        'state':'CURRENT_SUPPORTED',
+        'platform':'nutanix',
+        'product_tuple_id':'nutanix-res-fixture',
+        'product_tuple':{
+            'product':'fixture-product','product_version':'1.0','api':'fixture-api',
+            'api_version':'1.0','automation_providers':['fixture/provider = 1.0'],
+            'hardware_profile_ref':'controlled-record:fixture-hardware','feature_licenses':[]},
+        'source_reviews':[{
+            'source_id':f'SRC-{kind}','kind':kind,'edition':f'fixture-{kind.lower()}',
+            'review_state':'CURRENT_REVIEWED','reviewed_at':'2026-09-17T08:00:00Z',
+            'valid_until':'2026-12-31T23:59:59Z',
+            'evidence_ref':f'controlled-source-evidence:{kind.lower()}',
+            'limitation':'Synthetic unit-test source review only.'
+        } for kind in kinds],
+        'compatibility':{
+            'compatibility_record_ref':'controlled-compatibility:fixture',
+            'assessed_at':'2026-09-17T10:00:00Z','valid_until':'2026-12-31T23:59:59Z',
+            'product_api_evidence_ref':'controlled-evidence:product-api',
+            'provider_evidence_refs':['controlled-evidence:provider'],
+            'hardware_evidence_ref':'controlled-evidence:hardware',
+            'operation_coverage_ref':'controlled-evidence:operation-coverage',
+            'feature_entitlement_evidence_refs':[],'exceptions':[]},
+        'lifecycle':{
+            'support_status':'SUPPORTED','support_evidence_ref':'controlled-support:fixture',
+            'reviewed_at':'2026-09-17T11:00:00Z','review_by':'2026-12-31T23:59:59Z',
+            'support_end_at':None,'vulnerability_owner_ref':'controlled-owner:vulnerability',
+            'lifecycle_decision_ref':'controlled-decision:continue-supported'},
+        'owners':{
+            'platform_engineering_role':'Fixture platform engineering',
+            'architecture_role':'Fixture architecture',
+            'vulnerability_management_role':'Fixture vulnerability management'},
+        'exclusions':['Synthetic unit-test provenance only'],
+        'source_refs':[
+            'docs/engineering/version-source-provenance-and-lifecycle-assurance.md',
+            'docs/engineering/platform-realizations/7-implementation-tuple-and-decision-package.md']
+    }
+
+
+def provenance_index():
+    value=provenance.load()
+    value['records']=[provenance_record()]
+    return value
 
 
 def qrecord():
@@ -175,7 +225,8 @@ class ReservationPreflightTests(unittest.TestCase):
     def evaluate(self,i=None,j=None):
         return preflight.evaluate(
             i or intent(),capacity_index=cap_index(),
-            reservation_index=j or records.load(),qindex=qindex(),as_of=AS_OF)
+            reservation_index=j or records.load(),qindex=qindex(),
+            provenance_index=provenance_index(),as_of=AS_OF)
 
     def test_current_repository_example_holds_without_envelope(self):
         result=preflight.evaluate(
