@@ -1,0 +1,30 @@
+{
+  "id": "BACKUP-RESTORE-ASSURANCE-01",
+  "source_baseline_commit": "7fab83bebb7b9348c7ee0e3db330fca96eace727",
+  "status": "IMPLEMENTED_EVIDENCE_PREFLIGHT_NO_BACKUP_OR_RESTORE_MUTATION",
+  "requirements": ["BKP-001", "BKP-002", "BKP-003", "BKP-004", "STO-001", "CRY-002", "REL-001"],
+  "assurance_index": "sources/capabilities/backup_restore_assurance_index.json",
+  "record_checker": "scripts/check_backup_restore_assurance.py",
+  "preflight": "scripts/check_backup_restore_readiness.py",
+  "engineering": "docs/engineering/backup-isolated-restore-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_access_backup_management": false,
+    "may_capture_backup": false,
+    "may_delete_copy": false,
+    "may_destroy_key": false,
+    "may_restore": false,
+    "may_reconnect_restored_service": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select actual backup/storage/key/catalogue products and supported capture path",
+    "approve WSD BackupPolicy values and owners",
+    "qualify destructive-authority separation and protected-copy mechanism",
+    "perform isolated useful-data restore at accepted cadence",
+    "measure RPO/RTO under approved scope and failure model",
+    "obtain data-owner acceptance and separately authorize any reconnect"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
