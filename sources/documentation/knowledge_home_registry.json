@@ -6,7 +6,7 @@
     {
       "id": "SITE_CELL_FAILURE",
       "parent_refs": [
-        "docs/architecture/reference/3-physical-architecture-and-site-pattern.md#RA_s_003",
+        "docs/architecture/reference/3-system-context-and-physical-hosting-topology.md#RA_s_003",
         "docs/architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md#RA_s_004",
         "docs/architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014"
       ],
@@ -19,9 +19,9 @@
     {
       "id": "FABRIC_ROUTING_ATTACHMENTS",
       "parent_refs": [
-        "docs/architecture/reference/5-network-architecture-and-physical-fabric.md#RA_s_005",
-        "docs/architecture/reference/8-zone-implementation-and-handoff-patterns.md#RA_s_008",
-        "docs/architecture/reference/10-routing-policy-and-address-family-engineering.md#RA_s_010"
+        "docs/architecture/reference/5-physical-fabric-and-platform-attachment.md#RA_s_005",
+        "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md#RA_s_008",
+        "docs/architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md#RA_s_010"
       ],
       "primary_home_ref": "docs/engineering/fabric/1-transport-routing-and-overlay-ownership.md#NET_s_001",
       "related_home_refs": [
@@ -33,7 +33,7 @@
     {
       "id": "PRIVILEGED_ACCESS",
       "parent_refs": [
-        "docs/architecture/reference/6-management-security-and-recovery-planes.md#RA_s_006",
+        "docs/architecture/reference/6-management-platform-control-and-out-of-band-access.md#RA_s_006",
         "docs/architecture/reference/13-identity-cryptography-and-service-trust.md#RA_s_013"
       ],
       "primary_home_ref": "docs/engineering/fabric/6-management-paths-and-interface-handover.md#NET_s_006",
@@ -45,7 +45,7 @@
     {
       "id": "TENANCY_NATIVE_PLATFORMS",
       "parent_refs": [
-        "docs/architecture/reference/7-tenancy-workload-and-security-domain-model.md#RA_s_007",
+        "docs/architecture/reference/7-tenant-environments-and-security-domain-placement.md#RA_s_007",
         "docs/architecture/reference/15-cross-vendor-realization-model.md#RA_s_015",
         "docs/architecture/reference/16-nutanix-hosting-stack-reference-realization.md#RA_s_016",
         "docs/architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md#RA_s_017",
@@ -60,7 +60,7 @@
     {
       "id": "SERVICE_DATA_TRUST_RECOVERY",
       "parent_refs": [
-        "docs/architecture/reference/9-shared-services-and-consumption-boundaries.md#RA_s_009",
+        "docs/architecture/reference/9-shared-services-ingress-and-controlled-egress.md#RA_s_009",
         "docs/architecture/reference/12-storage-backup-and-data-isolation-architecture.md#RA_s_012",
         "docs/architecture/reference/13-identity-cryptography-and-service-trust.md#RA_s_013",
         "docs/architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014",
