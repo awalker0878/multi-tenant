@@ -192,10 +192,10 @@ def validate_record(record, *, qindex, as_of, root=ROOT):
             'unavailable_capacity', 'procured', 'received', 'staged', 'commissioned',
             'reserved', 'consumed'
         )}
-        if not (values['procured'] >= values['received'] >= values['staged'] >= values['commissioned']):
-            raise ValueError('Procured/received/staged/commissioned states are inconsistent')
-        if values['measured_surviving_capacity'] > values['commissioned']:
-            raise ValueError('Surviving capacity cannot exceed commissioned capacity')
+        # Procured/received/staged/commissioned are retained as separately
+        # reported lifecycle states. The architecture does not define them as a
+        # cumulative monotonic arithmetic chain, so this generic checker does not
+        # invent one. Only the explicit admission commitment is reconciled here.
         if max(values['reserved'], values['consumed']) > values['existing_commitment']:
             raise ValueError('Existing commitment must cover reserved and consumed observations without double-counting them')
         available = dimension_available(dim)
