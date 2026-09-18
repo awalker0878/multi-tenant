@@ -121,7 +121,7 @@ def validate_prefix_shape(family,kind,prefix_length):
             raise ValueError('PREFIX allocation requires a family-valid prefix length')
 
 
-def validate_cleanup(cleanup,*,as_of):
+def validate_cleanup(cleanup,*,observed_through):
     if not isinstance(cleanup,dict) or set(cleanup)!=CLEANUP_KEYS:
         raise ValueError('Exact release-cleanup categories are required')
     normalized={}
@@ -137,8 +137,8 @@ def validate_cleanup(cleanup,*,as_of):
         else:
             if ref is None:raise ValueError('Started cleanup requires an evidence/authority reference')
             bounded(ref,f'cleanup.{key}.evidence_ref')
-            if observed is None or observed>as_of:
-                raise ValueError('Started cleanup requires a non-future observation')
+            if observed is None or observed>observed_through:
+                raise ValueError('Started cleanup must be observed within the record chronology')
         normalized[key]={'status':item['status'],'evidence_ref':ref,
                          'observed_at':observed.isoformat() if observed else None}
     return normalized
@@ -188,8 +188,8 @@ def validate_record(record,*,as_of,root=ROOT):
     release_requested=nullable_instant(record['release_requested_at'],'release_requested_at')
     reuse_not_before=nullable_instant(record['reuse_not_before'],'reuse_not_before')
     released=nullable_instant(record['released_at'],'released_at')
-    if any(t is not None and (t<created or t>as_of) for t in (confirmed,release_requested,released)):
-        raise ValueError('IPAM lifecycle timestamp outside observed chronology')
+    if any(t is not None and (t<created or t>observed) for t in (confirmed,release_requested,released)):
+        raise ValueError('IPAM lifecycle timestamp outside the record observation chronology')
 
     if record['state']=='RESERVED':
         if hold_expires is None or as_of>=hold_expires:
@@ -210,10 +210,12 @@ def validate_record(record,*,as_of,root=ROOT):
         raise ValueError('CONFIRMED allocation requires post-realization confirmation')
     if record['state'] in ('RELEASE_PENDING','QUARANTINED','RELEASED') and release_requested is None:
         raise ValueError('Release lifecycle requires release_requested_at')
+    if record['state'] not in ('RELEASE_PENDING','QUARANTINED','RELEASED','UNCERTAIN') and release_requested is not None:
+        raise ValueError('release_requested_at requires release lifecycle or uncertain state')
     if release_requested is not None and confirmed is not None and release_requested<confirmed:
         raise ValueError('Release cannot predate confirmation')
 
-    cleanup=validate_cleanup(record['cleanup'],as_of=as_of)
+    cleanup=validate_cleanup(record['cleanup'],observed_through=observed)
     if record['state'] in ('RESERVED','CONFIRMED'):
         if any(item['status']!='NOT_STARTED' for item in cleanup.values()):
             raise ValueError('Release cleanup cannot be asserted before release lifecycle')
@@ -227,9 +229,15 @@ def validate_record(record,*,as_of,root=ROOT):
             raise ValueError('QUARANTINED requires complete cleanup and reuse-not-before, but not release')
         if release_requested is not None and reuse_not_before<release_requested:
             raise ValueError('Reuse quarantine cannot begin before release request')
+        latest_cleanup=max(item['observed_at'] for item in cleanup.values() if item['observed_at'] is not None)
+        if reuse_not_before<instant(latest_cleanup,'latest_cleanup'):
+            raise ValueError('Reuse boundary cannot precede completed cleanup evidence')
     if record['state']=='RELEASED':
         if not cleanup_complete(cleanup) or reuse_not_before is None or released is None:
             raise ValueError('RELEASED requires cleanup, quarantine and release receipt')
+        latest_cleanup=max(item['observed_at'] for item in cleanup.values() if item['observed_at'] is not None)
+        if reuse_not_before<instant(latest_cleanup,'latest_cleanup'):
+            raise ValueError('Reuse boundary cannot precede completed cleanup evidence')
         if released<reuse_not_before:
             raise ValueError('Allocation released before reuse quarantine expired')
     if record['state'] not in ('QUARANTINED','RELEASED','UNCERTAIN') and reuse_not_before is not None:
