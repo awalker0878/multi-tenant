@@ -93,3 +93,7 @@ The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-ass
 ## Control inheritance and external-dependency assurance
 
 The [control inheritance assurance gate](docs/engineering/control-inheritance-and-external-dependency-assurance.md) makes G30 fail closed until the exact WSD/site/service/platform/control-selection scope has reviewed provider/tenant/shared/inherited allocations, current evidence for all six organizational interfaces, and no unresolved residual control gaps. The active assurance index is intentionally empty. CI cannot select controls, accept inherited evidence or residual risk, issue authorization, apply infrastructure or activate production.
+
+## Operational handover and incident-readiness assurance
+
+The [operational handover assurance gate](docs/engineering/operational-handover-and-incident-readiness-assurance.md) makes G31 fail closed until the exact operating scope has attributable receiving/support/on-call ownership, privileged-access and monitoring reviews, explicit incident containment/release authority, and a current scoped incident exercise with emergency-change reconciliation. The active assurance index is intentionally empty. CI cannot change access, start or release containment, execute recovery, reconcile a live emergency change, apply infrastructure or activate production.
