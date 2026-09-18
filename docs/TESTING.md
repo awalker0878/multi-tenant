@@ -120,3 +120,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Platform capability registry
 
 `python scripts/check_platform_capabilities.py` validates the machine-readable engineering registry without contacting a platform or performing placement. Repository code, provider locks, documentation and local fixtures may support `CANDIDATE_SOURCE` or `LOCAL_FIXTURE_ONLY` states, but only a selected installed tuple with separately controlled native evidence can become `NATIVE_QUALIFIED`. The current registry intentionally has zero production-eligible platforms.
+
+
+## Pre-placement platform-family eligibility
+
+`python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM` verifies that the current WSD capability precheck remains fail-closed because no platform capability is natively qualified. Without `--expected-status`, a held request exits nonzero. This check does not validate requester authority, site/cell/pool selection, quota, surviving capacity, storage/key/recovery compatibility, native placement or production activation.
