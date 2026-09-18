@@ -79,6 +79,15 @@ def repository_ref(value,root=ROOT):
     return value
 
 
+def opaque_external_ref(value,label):
+    bounded(value,label,256)
+    if not re.fullmatch(r'[A-Za-z][A-Za-z0-9_.:-]{1,255}',value):
+        raise ValueError(f'{label}: opaque external reference required')
+    if re.search(r'(?<![0-9])(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?![0-9])',value) or '::' in value:
+        raise ValueError(f'{label}: do not embed allocation values in repository references')
+    return value
+
+
 def unique_strings(value,label,*,allow_empty=False,maximum=128):
     if not isinstance(value,list) or len(value)>maximum or (not allow_empty and not value):
         raise ValueError(f'{label}: bounded list required')
@@ -161,7 +170,7 @@ def validate_record(record,*,as_of,root=ROOT):
     family=record['family'];kind=record['allocation_kind']
     if family not in FAMILIES or kind not in KINDS:raise ValueError('Unknown address family or allocation kind')
     validate_prefix_shape(family,kind,record['requested_prefix_length'])
-    bounded(record['delegated_scope_ref'],'delegated_scope_ref')
+    opaque_external_ref(record['delegated_scope_ref'],'delegated_scope_ref')
 
     system=record['authoritative_system']
     if not isinstance(system,dict) or set(system)!=SYSTEM_KEYS:
@@ -169,7 +178,7 @@ def validate_record(record,*,as_of,root=ROOT):
     bounded(system['system_ref'],'authoritative_system.system_ref')
     bounded(system['record_ref'],'authoritative_system.record_ref')
     positive_int(system['record_version'],'authoritative_system.record_version')
-    bounded(record['allocation_ref'],'allocation_ref')
+    opaque_external_ref(record['allocation_ref'],'allocation_ref')
 
     created=instant(record['created_at'],'created_at')
     observed=instant(record['last_observed_at'],'last_observed_at')
