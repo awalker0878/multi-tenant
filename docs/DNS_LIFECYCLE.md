@@ -25,9 +25,13 @@ A job contains version, explicit enabled flag, canonical operation UUID, tenant 
 resource IDs, authoritative zone/server/port, key identity, engineering reference,
 validity, prior ownership generation, and one to eight exact A/AAAA/PTR record sets.
 A separate scope contains the same identity plus an accepted transport reference and
-exact allowed names, values and TTL ceilings. The scope should be issued/read-only
-through the existing change/engineering process, not edited to rubber-stamp a job.
-No supplied status or reference string independently proves approval.
+exact allowed names, values and TTL ceilings. **Version 2** additionally binds every
+A/AAAA/PTR RRset to an opaque authoritative-IPAM allocation reference and positive
+allocation generation. The job carries only the SHA-256 of those independently supplied
+bindings. The scope should be issued/read-only through the existing change/engineering
+process after the DNS owner resolves the exact values from authoritative IPAM; it must
+not be edited to rubber-stamp a job. No supplied status, allocation handle or reference
+string independently proves approval or IPAM authenticity.
 
 Names are lower-case ASCII absolute names. Wildcards, aliases, delegation changes,
 SOA edits, apex records, bulk deletes and unrecognized properties are excluded.
@@ -35,19 +39,23 @@ PTR names must be exact address reverse names; classless reverse alias creation 
 not implemented. There is no unowned adoption path. Existing unmanaged name data
 requires a separately reviewed ownership-transfer design, not deletion by this tool.
 
-Each record group receives an opaque generation marker, and each record owner name
-receives `_hosting-owner.<name>` with the same generation. The latter prevents a
-second owner from claiming AAAA for an existing A name or reusing the name immediately
-after its address data is retired. The native key ACL must cover only the accepted
-A/AAAA/PTR names and those exact TXT marker names, not an unrestricted zone subtree.
-Markers are concurrency/ownership records; they are not secret authentication tokens.
+Each record group receives an opaque `hosting-v2` generation marker, and each record
+owner name receives `_hosting-owner.<name>` with the same generation. The marker binds
+the owner, DNS operation ID, exact resulting RRset payload digest **and** the accepted
+IPAM-binding digest. The latter prevents a second owner from claiming AAAA for an
+existing A name or reusing the name immediately after its address data is retired.
+The native key ACL must cover only the accepted A/AAAA/PTR names and those exact TXT
+marker names, not an unrestricted zone subtree. Markers are concurrency/ownership
+records; they are not secret authentication tokens and do not replace IPAM evidence.
 
 ## Before any native write
 
 1. Accept the actual authoritative primary endpoint and its exact zone. No NS/SOA
    auto-discovery or response-link following is used.
 2. Accept the name/address assignment, resource and tenant ownership, operation
-   lifetime, TTL and reverse-zone relationship. Do not derive allocations from examples.
+   lifetime, TTL and reverse-zone relationship. For every RRset, retain the opaque
+   authoritative-IPAM allocation reference and generation that supplied the exact value.
+   Do not derive allocations from examples, documentation ranges or allocation handles.
 3. Establish scoped key custody and exact server-side update privileges, including
    the generated marker names. Verify negative access in an authorized target fixture.
 4. Establish a protected management transport. TCP+TSIG is not payload encryption;
@@ -68,8 +76,9 @@ expected current values and ownership before deciding whether to send an UPDATE.
 
 The UPDATE repeats value/existence prerequisites **at the authority**. On first claim,
 both target names and owner markers must be absent. For an owned change, the old
-marker and exact before RRset members must match. CNAME absence is explicit. All
-changes and all markers are committed in that single-zone transaction or none are.
+`hosting-v2` marker, previous IPAM-binding digest and exact before RRset members must
+match. CNAME absence is explicit. All changes and all markers are committed in that
+single-zone transaction or none are.
 A race between two first claimants produces one winning transaction, not split A/AAAA
 ownership. TTL is inspected before/after but cannot be a server-side equality
 precondition under RFC 2136; exclusive ownership remains a required operating control.
@@ -112,14 +121,18 @@ readback is not proof that all consumers see the new target. Writer fencing and
 application/data cutover remain outside DNS mutation.
 
 Retirement deletes only the exact owned address/PTR RRsets and updates tombstones.
-Retain the marker while address/name reuse, stale records, log attribution, certificates
-and retained-copy obligations are assessed. There is no automatic tombstone-release
-command. A future release/adoption design needs authority, retention checks and tests.
+Retain the `hosting-v2` marker while IPAM release cleanup/quarantine, address/name reuse,
+stale records, log attribution, certificates and retained-copy obligations are assessed.
+DNS deletion does **not** release or make the IPAM allocation reusable. There is no
+automatic tombstone-release command. A future release/adoption design needs authority,
+retention checks and tests.
 
 ## Qualification boundary
 
 The local campaign exchanges real TCP DNS/TSIG bytes with an intentionally bounded
 in-memory authority and runs the actual client. It tests transactions, races, denied
-privileges, aliases, stale TTL, tombstones, invalid trust and lost responses. It does
-not certify BIND, Windows DNS, an appliance, DNSSEC, recursion, delegation, secondary
-replication, distributed durability, GSS-TSIG or the actual server ACL.
+privileges, aliases, stale TTL, tombstones, IPAM-binding changes, invalid trust and lost
+responses. It does not certify BIND, Windows DNS, an appliance, DNSSEC, recursion,
+delegation, secondary replication, distributed durability, GSS-TSIG, the actual server
+ACL or the external IPAM service. Version 1 ownership markers are not automatically
+adopted by this candidate v2 profile; no native v1 qualification existed to preserve.
