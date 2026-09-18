@@ -1,0 +1,699 @@
+{
+  "format": "native-reference-planning/1",
+  "status": "PROPOSED_NOT_EXECUTED",
+  "basis_commit": "2a1231644f3ea0dc176616d54c584717730b7468",
+  "scope": {
+    "solution": "docs/current/internal-hosting-solution.md",
+    "topology": "examples/wd14-routing.json",
+    "families": "SELECT_AT_SITE_REVIEW",
+    "platform": "NOT_SELECTED",
+    "public_ingress": false,
+    "internet_egress": false,
+    "production_authority": "NOT_ASSESSED"
+  },
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/current/interface-agreements.md",
+    "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md",
+    "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md",
+    "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md",
+    "sources/assurance/verification_families.json",
+    "docs/engineering/routed-ipv6-qualification.md",
+    "docs/implementation/routed-ipv6-lab.md"
+  ],
+  "inputs": [
+    {
+      "id": "SITE",
+      "title": "Site and restricted test scope",
+      "owner_role": "Architecture and security authorities",
+      "question": "Which actual site/cell, permitted test scope, data restrictions and authority records govern this campaign?",
+      "hold_point": "Before any target contact",
+      "source_refs": [
+        "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md",
+        "docs/current/internal-hosting-solution.md"
+      ]
+    },
+    {
+      "id": "PLATFORM",
+      "title": "Installed platform combination",
+      "owner_role": "Platform engineering",
+      "question": "Which hardware, product, API, provider, backend, feature and licence combination is actually selected, supported and entitled?",
+      "hold_point": "Before choosing native operations",
+      "source_refs": [
+        "docs/current/internal-hosting-solution.md",
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md"
+      ]
+    },
+    {
+      "id": "EDGE",
+      "title": "Security-edge implementation and contexts",
+      "owner_role": "Security-edge engineering",
+      "question": "Which supported implementation owns each domain attachment, routing context, policy, inspection, HA and management boundary?",
+      "hold_point": "Before attaching a domain",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md"
+      ]
+    },
+    {
+      "id": "FAMILY",
+      "title": "Offered address families",
+      "owner_role": "Network and service owners",
+      "question": "Which families are actually offered, and which bootstrap, local-control, service, MTU and recovery dependencies support them?",
+      "hold_point": "Before a family is advertised",
+      "source_refs": [
+        "docs/current/internal-hosting-solution.md",
+        "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md",
+        "docs/engineering/routed-ipv6-qualification.md"
+      ]
+    },
+    {
+      "id": "OWNERS",
+      "title": "Configuration and observation ownership",
+      "owner_role": "All producing and consuming owners",
+      "question": "Who is the single writer and independent observer for each native object, service binding, state scope and handoff?",
+      "hold_point": "Before scoped changes",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md"
+      ]
+    },
+    {
+      "id": "BOOTSTRAP",
+      "title": "Bootstrap trust and transfer",
+      "owner_role": "Foundation/trust owner",
+      "question": "Which temporary name/time/identity/key/image dependencies permit installation, who controls them, and how is custody transferred safely?",
+      "hold_point": "Before installation",
+      "source_refs": [
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md",
+        "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md"
+      ]
+    },
+    {
+      "id": "MANAGEMENT",
+      "title": "Management and OOB recovery",
+      "owner_role": "Management owner",
+      "question": "Which actual administration and recovery paths remain controlled and usable under the declared outage?",
+      "hold_point": "Before dependent management",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/current/internal-hosting-solution.md"
+      ]
+    },
+    {
+      "id": "FABRIC",
+      "title": "Transport and attachment capacity",
+      "owner_role": "Network/hardware owner",
+      "question": "Which accepted transport, physical handoffs, route ownership and measured MTU budget support the selected platform and edge?",
+      "hold_point": "Before P2/P3 consumes P1",
+      "source_refs": [
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md",
+        "docs/current/interface-agreements.md"
+      ]
+    },
+    {
+      "id": "IPAM",
+      "title": "Authoritative allocation and reuse",
+      "owner_role": "Address authority",
+      "question": "Where are the real owned allocations, family selections, reservations, reuse constraints and lifecycle receipts?",
+      "hold_point": "Before endpoint initialization",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md"
+      ]
+    },
+    {
+      "id": "DNS",
+      "title": "Name and initialization services",
+      "owner_role": "Name/initialization owners",
+      "question": "Which actual clients use resolvers, authoritative registration, DHCP/metadata and image initialization, with which permitted operations and reply paths?",
+      "hold_point": "Before first client startup",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/current/internal-hosting-solution.md"
+      ]
+    },
+    {
+      "id": "TIME",
+      "title": "Time profile",
+      "owner_role": "Time-service owner",
+      "question": "Which client-specific protocol, integrity, reachability, drift/failure limits and recovery behaviour are selected?",
+      "hold_point": "Before time-dependent trust",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/current/internal-hosting-solution.md"
+      ]
+    },
+    {
+      "id": "IMAGES",
+      "title": "Image/template provenance",
+      "owner_role": "Image and platform owners",
+      "question": "Which image/template, boot mode, devices, initialization and retained-source provenance are accepted for the selected platform?",
+      "hold_point": "Before creating an endpoint",
+      "source_refs": [
+        "docs/current/internal-hosting-solution.md",
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md"
+      ]
+    },
+    {
+      "id": "PLACEMENT",
+      "title": "Placement and co-residency",
+      "owner_role": "Compute/storage engineering",
+      "question": "Which host/storage pools are eligible during allocation, restart, evacuation and restore, and what shared dependencies remain?",
+      "hold_point": "Before workload placement",
+      "source_refs": [
+        "docs/current/internal-hosting-solution.md",
+        "docs/current/interface-agreements.md"
+      ]
+    },
+    {
+      "id": "IDENTITY",
+      "title": "Client identity and resource entitlement",
+      "owner_role": "Identity and service owners",
+      "question": "Which actual guest, host, proxy, runner and administrator identities have which endpoint and data permissions?",
+      "hold_point": "Before service use",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/current/internal-hosting-solution.md"
+      ]
+    },
+    {
+      "id": "KEYS",
+      "title": "Certificates, keys and recovery custody",
+      "owner_role": "PKI/key custodians",
+      "question": "Which consumers use each credential/key, how are trust and revocation checked, and what survives loss of the protected platform?",
+      "hold_point": "Before encrypted service promise",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md"
+      ]
+    },
+    {
+      "id": "STORAGE",
+      "title": "Storage and copy lifecycle",
+      "owner_role": "Storage/data owners",
+      "question": "Which virtual-disk, guest file/object, replication, copy/export and administration paths exist, and who retains or sanitizes each copy?",
+      "hold_point": "Before data placement",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/current/internal-hosting-solution.md"
+      ]
+    },
+    {
+      "id": "BACKUP",
+      "title": "Capture, transfer and isolated restore",
+      "owner_role": "Protection/data owners",
+      "question": "Which capture method, management/data clients, independent copy authority, catalogue and key recovery paths are selected?",
+      "hold_point": "Before protection promise",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md"
+      ]
+    },
+    {
+      "id": "TELEMETRY",
+      "title": "Attribution and collection loss",
+      "owner_role": "Telemetry and security operations",
+      "question": "Which independently controlled collectors receive native events, with what attribution, latency, buffering and loss response?",
+      "hold_point": "Before observational acceptance",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+      ]
+    },
+    {
+      "id": "CAPACITY",
+      "title": "Surviving capacity and reservations",
+      "owner_role": "Capacity and service owners",
+      "question": "Do all resource commitments, temporary probes, contexts, sessions, inspection and recovery loads fit the same measured failure basis?",
+      "hold_point": "Before reservation and placement",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+      ]
+    },
+    {
+      "id": "RECOVERY",
+      "title": "Recovery target and fencing",
+      "owner_role": "Recovery and data owners",
+      "question": "Which eligible target, consistency point, positive writer exclusion and isolated useful-data checks support the promised recovery scope?",
+      "hold_point": "Before recovery promise",
+      "source_refs": [
+        "docs/current/internal-hosting-solution.md",
+        "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md"
+      ]
+    },
+    {
+      "id": "RETENTION",
+      "title": "Retirement and retained obligations",
+      "owner_role": "Lifecycle and data custodians",
+      "question": "Which live dependencies are removed, which copies/keys remain, who owns them, and when can identities/addresses be reused?",
+      "hold_point": "Before cleanup/reuse",
+      "source_refs": [
+        "docs/current/interface-agreements.md",
+        "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md"
+      ]
+    },
+    {
+      "id": "ACCEPTANCE",
+      "title": "Stage-specific readiness and authority",
+      "owner_role": "Service owner and relevant accepting authorities",
+      "question": "Where are actual G0/G1/G2 decisions, applicable initial G4 readiness, current authority and the scoped G3 decision?",
+      "hold_point": "Before production activation",
+      "source_refs": [
+        "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md",
+        "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+      ]
+    }
+  ],
+  "work_packages": [
+    {
+      "id": "NC00",
+      "source_stage": "B14-01",
+      "packages": [
+        "G0"
+      ],
+      "title": "Select the actual service and test scope",
+      "depends_on": [],
+      "input_refs": [
+        "SITE",
+        "PLATFORM",
+        "EDGE",
+        "FAMILY",
+        "OWNERS",
+        "ACCEPTANCE"
+      ],
+      "deliverable": "Owner-reviewed site design, supported combination and explicitly restricted test authority.",
+      "hold_point": "Unknown site, support, sharing or authority remains open."
+    },
+    {
+      "id": "NC10",
+      "source_stage": "B14-02",
+      "packages": [
+        "P0"
+      ],
+      "title": "Establish recoverable bootstrap",
+      "depends_on": [
+        "NC00"
+      ],
+      "input_refs": [
+        "BOOTSTRAP",
+        "MANAGEMENT",
+        "KEYS"
+      ],
+      "deliverable": "Minimum independent administration, trust and supported installation dependencies.",
+      "hold_point": "Do not revoke bootstrap custody before its replacement is demonstrated."
+    },
+    {
+      "id": "NC20",
+      "source_stage": "B14-02",
+      "packages": [
+        "P1",
+        "G1"
+      ],
+      "title": "Accept fabric and attachment capacity",
+      "depends_on": [
+        "NC10"
+      ],
+      "input_refs": [
+        "FABRIC",
+        "IPAM",
+        "CAPACITY"
+      ],
+      "deliverable": "Observed transport, inventory, physical handoffs and G1 acceptance for their offered scope.",
+      "hold_point": "No consumer counts staged or merely purchased capacity as commissioned."
+    },
+    {
+      "id": "NC30",
+      "source_stage": "B14-03",
+      "packages": [
+        "P2",
+        "P3"
+      ],
+      "title": "Install platforms and common services under restricted authority",
+      "depends_on": [
+        "NC20"
+      ],
+      "input_refs": [
+        "PLATFORM",
+        "EDGE",
+        "DNS",
+        "TIME",
+        "IMAGES",
+        "IDENTITY",
+        "STORAGE",
+        "BACKUP",
+        "TELEMETRY"
+      ],
+      "deliverable": "Installed platforms and service endpoints, jointly baselined; not yet advertised to ordinary tenants.",
+      "hold_point": "Installer completion does not replace joint P2/P3 service acceptance."
+    },
+    {
+      "id": "NC40",
+      "source_stage": "B14-04",
+      "packages": [
+        "P4"
+      ],
+      "title": "Prepare denied test domains",
+      "depends_on": [
+        "NC30"
+      ],
+      "input_refs": [
+        "OWNERS",
+        "IPAM",
+        "EDGE",
+        "FAMILY"
+      ],
+      "deliverable": "Two owned tenant scopes, four independent OZ/RZ instances and observed effective quarantine.",
+      "hold_point": "No workload connection before the actual deny mechanism is verified."
+    },
+    {
+      "id": "NC50",
+      "source_stage": "B14-04",
+      "packages": [
+        "P5"
+      ],
+      "title": "Create disposable endpoints and restricted observations",
+      "depends_on": [
+        "NC40"
+      ],
+      "input_refs": [
+        "IMAGES",
+        "PLACEMENT",
+        "DNS",
+        "TIME",
+        "IDENTITY",
+        "KEYS",
+        "STORAGE",
+        "BACKUP",
+        "TELEMETRY",
+        "CAPACITY"
+      ],
+      "deliverable": "Owned disposable endpoints, healthy positive controls and separately authorized native observations.",
+      "hold_point": "A restricted test exception is not ordinary placement or production activation."
+    },
+    {
+      "id": "NC55",
+      "source_stage": "B14-08",
+      "packages": [
+        "P6"
+      ],
+      "title": "Clean up the restricted fixture or discovered partial effects",
+      "depends_on": [
+        "NC00"
+      ],
+      "input_refs": [
+        "OWNERS",
+        "RETENTION",
+        "IPAM",
+        "KEYS",
+        "BACKUP"
+      ],
+      "deliverable": "Resource-owner reconciliation, removal of scoped temporary access/probes and transfer of retained data/key obligations. Trigger on test completion or safe stop, independently of qualification success.",
+      "hold_point": "Known owner scope and separately authorized cleanup of actual discovered effects are required; failed bootstrap, installation or test stages do not have to succeed before safe stop or cleanup."
+    },
+    {
+      "id": "NC60",
+      "source_stage": "B14-05",
+      "packages": [
+        "G2"
+      ],
+      "title": "Review exact offered capability",
+      "depends_on": [
+        "NC50"
+      ],
+      "input_refs": [
+        "PLATFORM",
+        "EDGE",
+        "FAMILY",
+        "CAPACITY",
+        "ACCEPTANCE"
+      ],
+      "deliverable": "Reviewed operation coverage, negative/positive observations, limits and offered service envelope.",
+      "hold_point": "Unknown or failed mandatory observations do not become a qualified capability."
+    },
+    {
+      "id": "NC70",
+      "source_stage": "B14-06",
+      "packages": [
+        "G4-initial"
+      ],
+      "title": "Establish initial operating and recovery readiness",
+      "depends_on": [
+        "NC60"
+      ],
+      "input_refs": [
+        "MANAGEMENT",
+        "KEYS",
+        "BACKUP",
+        "TELEMETRY",
+        "RECOVERY",
+        "RETENTION",
+        "ACCEPTANCE"
+      ],
+      "deliverable": "Operating custody, incident/support routes and observed recovery required by the actual service promise.",
+      "hold_point": "Recurring later exercises do not substitute for applicable initial readiness."
+    },
+    {
+      "id": "NC80",
+      "source_stage": "B14-07",
+      "packages": [
+        "P4",
+        "P5",
+        "G3"
+      ],
+      "title": "Review a separate production change",
+      "depends_on": [
+        "NC60",
+        "NC70"
+      ],
+      "input_refs": [
+        "SITE",
+        "OWNERS",
+        "CAPACITY",
+        "ACCEPTANCE"
+      ],
+      "deliverable": "Separately reviewed production resources, current evidence, explicit authority and reversible activation design.",
+      "hold_point": "This planning kit neither creates nor activates those resources."
+    },
+    {
+      "id": "NC90",
+      "source_stage": "B14-08",
+      "packages": [
+        "P6",
+        "G4-recurring"
+      ],
+      "title": "Operate, requalify and retire",
+      "depends_on": [
+        "NC80"
+      ],
+      "input_refs": [
+        "TELEMETRY",
+        "RECOVERY",
+        "RETENTION",
+        "ACCEPTANCE"
+      ],
+      "deliverable": "Observed lifecycle, retained-copy ownership and applicable recurring operating acceptance.",
+      "hold_point": "Use the cleanup procedure even after failed tests; never require a successful production stage to remove a hazardous test fixture."
+    }
+  ],
+  "observations": [
+    {
+      "assertion_id": "W14-01",
+      "title": "Routing completeness",
+      "owner_role": "Network, platform and edge owners",
+      "input_refs": [
+        "EDGE",
+        "FABRIC",
+        "IPAM",
+        "FAMILY"
+      ],
+      "control": "Prove permitted source-to-destination and established reply traffic with healthy endpoints before evaluating a missing or blocked path.",
+      "evidence_to_collect": "Record native route/forwarding snapshots at both ends and every handoff, packet correlation, interfaces, policy hit evidence and alternate-path review.",
+      "safe_stop": "Do not interpret missing routes as observed firewall denial. Freeze changes if ownership or the return path is uncertain.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-02",
+      "title": "Service and resource isolation",
+      "owner_role": "Service, identity and security owners",
+      "input_refs": [
+        "DNS",
+        "IDENTITY",
+        "KEYS",
+        "STORAGE",
+        "BACKUP"
+      ],
+      "control": "Show the same credential/path can reach its approved endpoint and entitled resource, while the foreign/admin target is healthy.",
+      "evidence_to_collect": "Separate endpoint reachability, protocol success, identity acceptance and resource entitlement; retain the actual denied operation and enforcement evidence.",
+      "safe_stop": "Stop exposure on a foreign resource or management success; preserve data and investigation evidence.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-03",
+      "title": "Mandatory control ownership",
+      "owner_role": "Platform and security owners",
+      "input_refs": [
+        "OWNERS",
+        "EDGE",
+        "IDENTITY"
+      ],
+      "control": "Demonstrate an approved mutation with the actual delegated tenant role before attempting forbidden mutations in the isolated scope.",
+      "evidence_to_collect": "Record role/policy scope, attempted native operation, denial, unchanged effective policy and absence of permissive alternate paths.",
+      "safe_stop": "Use a reversible test account/scope; never trial forbidden changes in an unrelated tenant or production resource.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-04",
+      "title": "Address-family completeness",
+      "owner_role": "Network and service owners",
+      "input_refs": [
+        "FAMILY",
+        "DNS",
+        "TIME",
+        "FABRIC",
+        "RECOVERY"
+      ],
+      "control": "Prove known allowed paths separately for every offered family; identify unsupported or not-offered families without calling them passed.",
+      "evidence_to_collect": "Record family-specific allocation, neighbour/source controls, PMTU/MTU, service reply and recovery observations for the actual path.",
+      "safe_stop": "Do not silently disable or translate a family to make a requested service appear complete.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-05",
+      "title": "Resolver protocol completeness",
+      "owner_role": "Name and network owners",
+      "input_refs": [
+        "DNS",
+        "EDGE",
+        "TELEMETRY"
+      ],
+      "control": "Use a healthy approved resolver and known small/large answers; verify client and resolver observability before negative cases.",
+      "evidence_to_collect": "Distinguish UDP, direct TCP and truncation/fallback, approved resolver selection, alternative resolver denial and authoritative registration.",
+      "safe_stop": "Do not infer authoritative DNS or IPAM acceptance from a recursive lookup.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-06",
+      "title": "Intra-domain controls",
+      "owner_role": "Platform and capacity owners",
+      "input_refs": [
+        "PLACEMENT",
+        "CAPACITY",
+        "EDGE"
+      ],
+      "control": "Add a separately scoped temporary probe when one endpoint per domain cannot exercise the required same-domain path.",
+      "evidence_to_collect": "Record actual same-host and cross-host placement when eligible, both allowed and denied relationships and unchanged unrelated domains.",
+      "safe_stop": "Reserve probe capacity, retain eligibility during evacuation, and remove probe resources and credentials afterward.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-07",
+      "title": "Admission accounting",
+      "owner_role": "Capacity and all service owners",
+      "input_refs": [
+        "CAPACITY",
+        "PLACEMENT",
+        "STORAGE",
+        "EDGE",
+        "BACKUP"
+      ],
+      "control": "Establish units, measurement conditions and the same covered failure before comparing demand and surviving capability.",
+      "evidence_to_collect": "Record compute, data, contexts, routing, sessions, inspection, telemetry, API and test/recovery demand without adding unlike units.",
+      "safe_stop": "Reject unsupported commitments; never relax policy or placement to fit a capacity limit.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-08",
+      "title": "Uncertain native execution",
+      "owner_role": "Resource writer and independent observer",
+      "input_refs": [
+        "OWNERS",
+        "PLATFORM",
+        "IPAM",
+        "RETENTION"
+      ],
+      "control": "Use an authorized disposable operation with recorded native identity and distinguish stopped runner from actual writer exclusion.",
+      "evidence_to_collect": "Record task and resource discovery, current scope/generation, lease/fencing evidence, partial effects and absence of duplicate allocation.",
+      "safe_stop": "No blind resubmit, forced unlock or automatic deletion; preserve current incident containment.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-09",
+      "title": "Activation dependencies",
+      "owner_role": "Service and accepting authorities",
+      "input_refs": [
+        "ACCEPTANCE",
+        "RECOVERY",
+        "BACKUP",
+        "MANAGEMENT"
+      ],
+      "control": "Use a harmless local decision rehearsal or separately authorized fixture; no production permit is created by this worksheet.",
+      "evidence_to_collect": "Record actual stage decisions and show a proposed activation is held when applicable initial readiness or current authority is absent.",
+      "safe_stop": "Any tool summary is evidence for review, not an activation token or proof of approval authenticity.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-10",
+      "title": "Shared-service and control loss",
+      "owner_role": "Service, edge and operations owners",
+      "input_refs": [
+        "EDGE",
+        "DNS",
+        "TIME",
+        "KEYS",
+        "TELEMETRY",
+        "CAPACITY"
+      ],
+      "control": "Capture healthy service/deny controls before the approved fault and recovery; maintain independent management and test observers.",
+      "evidence_to_collect": "Record affected clients, detection, retained enforcement, buffering/session/retry behaviour, surviving capacity and restored service.",
+      "safe_stop": "Honor the fault budget and stop conditions; do not disable host security or mandatory enforcement to keep the test running.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-11",
+      "title": "Retained recovery and retirement",
+      "owner_role": "Data, backup, key and lifecycle owners",
+      "input_refs": [
+        "BACKUP",
+        "KEYS",
+        "STORAGE",
+        "RECOVERY",
+        "RETENTION"
+      ],
+      "control": "Prove useful data at a named consistency point and authorized key/catalogue access in an isolated eligible target.",
+      "evidence_to_collect": "Record capture versus transfer paths, independent retention/deletion roles, restore validation, writer fencing and post-retirement retained custody.",
+      "safe_stop": "Removing a live WSD is not permission to destroy retained data or keys; preserve obligations and deny unauthorized destruction.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    },
+    {
+      "assertion_id": "W14-12",
+      "title": "Second-stack outcome and exit",
+      "owner_role": "Source and target platform/data owners",
+      "input_refs": [
+        "PLATFORM",
+        "RECOVERY",
+        "STORAGE",
+        "KEYS",
+        "FAMILY"
+      ],
+      "control": "Qualify the first stack without requiring this cross-stack proof, then repeat the declared outcomes on a separately eligible second stack.",
+      "evidence_to_collect": "Record equivalent permitted/denied paths and representative useful-data recovery/exit, including changed native identities and explicit extension limits.",
+      "safe_stop": "Do not claim portability from disk conversion, identical object names or two unrelated successful deployments.",
+      "execution_status": "NOT_RUN",
+      "source_ref": "docs/solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md"
+    }
+  ],
+  "cleanup_step": "NC55"
+}

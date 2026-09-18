@@ -21,3 +21,7 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 ## Executable verification extensions
 
 [I08 routed IPv6 packet, shared-service and recovery experiment](routed-ipv6-lab.md) · [Engineering choices and native qualification boundary](../engineering/routed-ipv6-qualification.md). This adds a local packet layer to the existing model and endpoint tests without changing native provisioning resources.
+
+## Native reference-service commissioning
+
+[Native reference-service commissioning kit](native-reference/README.md) connects actual site inputs, provider-specific build responsibilities, foundation-service interfaces, W14 observation planning, recovery and retirement. It is an unexecuted planning kit; exported worksheets do not grant deployment or operating authority.
