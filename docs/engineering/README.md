@@ -21,6 +21,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Fail-closed platform-family pre-placement eligibility](pre-placement-platform-eligibility.md)
 
+[Fail-closed site/cell/service-class surviving-capacity eligibility](site-service-capacity-eligibility.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
