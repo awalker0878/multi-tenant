@@ -1,0 +1,23 @@
+{
+  "format": "portable-hosting-backup-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-SITE-CAPACITY-01",
+  "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+  "backup_policy_ref": "controlled-backup-policy:EXAMPLE-NOT-APPROVED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-APPROVED",
+  "required_profiles": {
+    "consistency": "controlled-profile:EXAMPLE-CONSISTENCY",
+    "retention": "controlled-profile:EXAMPLE-RETENTION",
+    "location": "controlled-profile:EXAMPLE-LOCATION",
+    "key": "controlled-profile:EXAMPLE-KEY",
+    "protected_copy": "controlled-profile:EXAMPLE-PROTECTED-COPY",
+    "restore_target": "controlled-profile:EXAMPLE-RESTORE-TARGET",
+    "availability_recovery": "controlled-profile:EXAMPLE-RECOVERY"
+  },
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/architecture/shared-services/5-backup-capture-independent-protection-and-isolated-restore.md",
+    "docs/architecture/reference/12-storage-backup-and-data-isolation-architecture.md"
+  ]
+}
