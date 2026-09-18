@@ -1,0 +1,29 @@
+{
+  "id": "CONTROL-INHERITANCE-ASSURANCE-01",
+  "source_baseline_commit": "bfb7829707b6cd23b27c8f5ef879a49c6baaed9b",
+  "status": "IMPLEMENTED_EVIDENCE_PREFLIGHT_NO_CONTROL_OR_AUTHORIZATION_MUTATION",
+  "gap_ids": ["G30"],
+  "requirements": ["AUTH-001", "STD-001", "STD-002", "THR-001"],
+  "assurance_index": "sources/capabilities/control_inheritance_assurance_index.json",
+  "record_checker": "scripts/check_control_inheritance_assurance.py",
+  "preflight": "scripts/check_control_inheritance_readiness.py",
+  "engineering": "docs/engineering/control-inheritance-and-external-dependency-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_select_controls": false,
+    "may_accept_inheritance": false,
+    "may_close_residual_gap": false,
+    "may_issue_authorization": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual control catalogue, edition, parameters and applicability for the service scope",
+    "assign provider, tenant, shared and inherited responsibility to named accountable organizations",
+    "obtain current evidence for physical, personnel, maintenance, training, data/location and authorization interfaces",
+    "verify inherited evidence applies to the actual site, service, version, tenant scope and review interval",
+    "resolve or formally disposition residual gaps under the responsible external authority",
+    "issue any formal authorization separately from technical conformance and readiness evidence"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
