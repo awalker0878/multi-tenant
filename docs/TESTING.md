@@ -167,3 +167,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Version, source provenance and lifecycle assurance
 
 `python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z` validates exact product/API/provider/hardware/licence tuples, mandatory current source-review kinds, compatibility evidence and support lifecycle. `python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE` verifies the current empty provenance index remains fail-closed. Native qualification tests also prove that a CURRENT_APPROVED dossier is rejected unless the same exact tuple has one matching CURRENT_SUPPORTED provenance record.
+
+## Bounded extension adoption and qualification assurance
+
+`python scripts/check_extension_adoption_assurance.py --as-of 2026-09-18T21:00:00Z` validates extension-only scope, complete topology/lifecycle design, all seven qualification dimensions, extension-kind-specific evidence, unsupported-capability disclosure and residual-gap state. `python scripts/check_extension_adoption_readiness.py examples/extension_adoption_readiness_intent.json.example --as-of 2026-09-18T21:00:00Z --expected-status HOLD_NO_CURRENT_EXTENSION_ADOPTION` verifies the empty extension index remains fail-closed. Tests prove namespace-only and physical-VRF-only evidence is insufficient and that no result grants base-service, cluster, device, physical-fabric, apply or activation authority.
