@@ -245,6 +245,8 @@ def validate_record(record,*,as_of,root=ROOT):
         decided=instant(reconciliation['decided_at'],'reconciliation.decided_at')
         if decided>as_of:
             raise ValueError('Reconciliation decision is future-dated')
+        if decided<max(interface_observed,observation_observed,fence_observed):
+            raise ValueError('Reconciliation decision predates the native observation or writer-fence evidence')
         if reconciliation['status'] in (
             'RECONCILED_FORWARD_REPAIR_DECIDED','RECONCILED_COMPENSATION_DECIDED'
         ):
