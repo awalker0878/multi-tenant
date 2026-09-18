@@ -29,6 +29,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Authoritative DNS registration, propagation and retirement evidence](authoritative-dns-registration-handoff.md)
 
+[Backup protection, independent copy and isolated-restore assurance](backup-isolated-restore-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

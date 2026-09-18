@@ -84,3 +84,8 @@ The [IPAM allocation handoff](docs/engineering/authoritative-ipam-allocation-han
 ## Authoritative DNS registration handoff
 
 The [DNS registration handoff](docs/engineering/authoritative-dns-registration-handoff.md) binds an immutable DNS operation to a confirmed authoritative IPAM allocation and opaque name/zone scope. Git stores no actual FQDN or A/AAAA/PTR value. Required authoritative/recursive/secondary observations are explicit, uncertain outcomes stop retries, and retirement preserves tombstone/reuse controls. The existing RFC2136 client remains a separately approved service-owner mutation path and is never invoked by CI.
+
+
+## Backup protection and isolated-restore assurance
+
+The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-assurance.md) requires evidence of management separation, protected-copy retention, catalogue/key availability and a current isolated useful-data restore before the backup/recovery dependency can be considered ready. The active assurance index is intentionally empty. CI never captures, deletes or restores backup data, destroys keys, reconnects a restored service or authorizes production.

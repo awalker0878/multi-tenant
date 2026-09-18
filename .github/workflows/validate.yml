@@ -52,6 +52,10 @@ jobs:
         run: python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
       - name: DNS registration preflight must remain held without confirmed IPAM
         run: python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
+      - name: Exported backup/restore assurance remains external-service evidence
+        run: python scripts/check_backup_restore_assurance.py --as-of 2026-09-18T19:00:00Z > build/reports/backup_restore_assurance.json
+      - name: Backup/restore readiness must remain held without current assurance
+        run: python scripts/check_backup_restore_readiness.py examples/backup_restore_readiness_intent.json.example --as-of 2026-09-18T19:00:00Z --expected-status HOLD_NO_CURRENT_BACKUP_ASSURANCE > build/reports/backup_restore_readiness.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS

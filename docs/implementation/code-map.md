@@ -148,6 +148,14 @@ Implementation: [exported DNS evidence index](../../sources/capabilities/dns_reg
 
 Actual DNS names and A/AAAA/PTR values remain outside Git. REGISTERED state requires CONFIRMED IPAM evidence and every declared required observation; uncertain outcomes block retries and CI never invokes the RFC2136 writer.
 
+## Backup protection and isolated-restore assurance
+
+Design: [Backup capture and isolated restore](../architecture/shared-services/5-backup-capture-independent-protection-and-isolated-restore.md) · [Storage and backup architecture](../architecture/reference/12-storage-backup-and-data-isolation-architecture.md) · [Recovery qualification evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md)
+
+Implementation: [exported backup/restore assurance index](../../sources/capabilities/backup_restore_assurance_index.json) · [assurance evidence validator](../../scripts/check_backup_restore_assurance.py) · [readiness preflight](../../scripts/check_backup_restore_readiness.py) · [engineering boundary](../engineering/backup-isolated-restore-assurance.md)
+
+A successful backup task is insufficient. Current assurance requires protected-copy/catalogue/key evidence, destructive-authority separation and a current isolated useful-data restore witness; CI performs no backup, restore, key or reconnect mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
