@@ -1,0 +1,117 @@
+{
+  "format": "portable-hosting-knowledge-home-registry/1",
+  "status": "SOURCE_DERIVED_PRIMARY_HOMES_NOT_MAINTENANCE_AUTHORITY",
+  "reviewed_source_revision": "f12fbfd75a225414cb0eaf5bfe0b1c6c9ad71a27",
+  "topics": [
+    {
+      "id": "SITE_CELL_FAILURE",
+      "parent_refs": [
+        "docs/architecture/reference/3-system-context-and-physical-hosting-topology.md#RA_s_003",
+        "docs/architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md#RA_s_004",
+        "docs/architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014"
+      ],
+      "primary_home_ref": "docs/assurance/site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002",
+      "related_home_refs": [
+        "docs/assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md#QUAL_s_003"
+      ],
+      "change_ripple": "Eligible capacity, management recovery, co-residency and site service promises."
+    },
+    {
+      "id": "FABRIC_ROUTING_ATTACHMENTS",
+      "parent_refs": [
+        "docs/architecture/reference/5-physical-fabric-and-platform-attachment.md#RA_s_005",
+        "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md#RA_s_008",
+        "docs/architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md#RA_s_010"
+      ],
+      "primary_home_ref": "docs/engineering/fabric/1-transport-routing-and-overlay-ownership.md#NET_s_001",
+      "related_home_refs": [
+        "docs/engineering/fabric/2-isolated-attachment-units-and-bounded-capacity.md#NET_s_002",
+        "docs/engineering/fabric/5-mtu-performance-and-failure-engineering.md#NET_s_005"
+      ],
+      "change_ripple": "All vendor handoffs, address families, capacity and commissioning evidence."
+    },
+    {
+      "id": "PRIVILEGED_ACCESS",
+      "parent_refs": [
+        "docs/architecture/reference/6-management-platform-control-and-out-of-band-access.md#RA_s_006",
+        "docs/architecture/reference/13-identity-cryptography-and-service-trust.md#RA_s_013"
+      ],
+      "primary_home_ref": "docs/engineering/fabric/6-management-paths-and-interface-handover.md#NET_s_006",
+      "related_home_refs": [
+        "docs/architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md#SVC_s_003"
+      ],
+      "change_ripple": "Executor permissions, incident/recovery access and shared-service administration."
+    },
+    {
+      "id": "TENANCY_NATIVE_PLATFORMS",
+      "parent_refs": [
+        "docs/architecture/reference/7-tenant-environments-and-security-domain-placement.md#RA_s_007",
+        "docs/architecture/reference/15-cross-vendor-realization-model.md#RA_s_015",
+        "docs/architecture/reference/16-nutanix-hosting-stack-reference-realization.md#RA_s_016",
+        "docs/architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md#RA_s_017",
+        "docs/architecture/reference/18-openstack-hosting-stack-reference-realization.md#RA_s_018"
+      ],
+      "primary_home_ref": "docs/engineering/platform-realizations/1-one-reference-environment-three-native-realizations.md#VND_s_001",
+      "related_home_refs": [
+        "docs/engineering/platform-realizations/7-implementation-tuple-and-decision-package.md#VND_s_007"
+      ],
+      "change_ripple": "Same fixture outcomes, sharing, operation coverage and qualified service classes."
+    },
+    {
+      "id": "SERVICE_DATA_TRUST_RECOVERY",
+      "parent_refs": [
+        "docs/architecture/reference/9-shared-services-ingress-and-controlled-egress.md#RA_s_009",
+        "docs/architecture/reference/12-storage-backup-and-data-isolation-architecture.md#RA_s_012",
+        "docs/architecture/reference/13-identity-cryptography-and-service-trust.md#RA_s_013",
+        "docs/architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014",
+        "docs/architecture/reference/27-recovery-migration-and-retirement.md#RA_s_027"
+      ],
+      "primary_home_ref": "docs/architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md#SVC_s_001",
+      "related_home_refs": [
+        "docs/architecture/shared-services/6-failure-recovery-migration-and-failback-topology.md#SVC_s_006"
+      ],
+      "change_ripple": "Bindings, copy/key lifetime, bootstrap dependency and activation/recovery."
+    },
+    {
+      "id": "PROVISIONING_CHANGE",
+      "parent_refs": [
+        "docs/architecture/reference/20-provisioning-model-and-infrastructure-work-packages.md#RA_s_020",
+        "docs/architecture/reference/21-day-0-bootstrap-and-physical-commissioning.md#RA_s_021",
+        "docs/architecture/reference/22-vendor-platform-and-shared-service-commissioning.md#RA_s_022",
+        "docs/architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md#RA_s_023",
+        "docs/architecture/reference/24-terraform-across-the-vendor-stacks.md#RA_s_024",
+        "docs/architecture/reference/25-change-brownfield-adoption-and-configuration-ownership.md#RA_s_025"
+      ],
+      "primary_home_ref": "docs/implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md#PROV_s_001",
+      "related_home_refs": [
+        "docs/implementation/provisioning-strategy/5-concurrency-ownership-and-failed-execution.md#PROV_s_005"
+      ],
+      "change_ripple": "Authority, single writers, reservations, safe activation and brownfield lifecycle."
+    },
+    {
+      "id": "CAPACITY_OPERATIONS_ASSURANCE",
+      "parent_refs": [
+        "docs/architecture/reference/26-operating-model-capacity-and-observability.md#RA_s_026",
+        "docs/architecture/reference/28-architecture-acceptance-and-verification.md#RA_s_028",
+        "docs/architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030"
+      ],
+      "primary_home_ref": "docs/assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md#QUAL_s_003",
+      "related_home_refs": [
+        "docs/assurance/site-qualification/7-operating-accountability-handover-and-change.md#QUAL_s_007"
+      ],
+      "change_ripple": "Actual service limits, assertions, ownership, evidence and operating conditions."
+    },
+    {
+      "id": "EXCEPTIONS_FUTURE_SERVICES",
+      "parent_refs": [
+        "docs/architecture/reference/19-physical-workloads-and-future-platform-extensions.md#RA_s_019",
+        "docs/architecture/reference/29-architecture-decisions-and-alternatives.md#RA_s_029"
+      ],
+      "primary_home_ref": "docs/assurance/site-qualification/8-extensions-and-release-maintenance.md#QUAL_s_008",
+      "related_home_refs": [
+        "docs/assurance/gap-map/3-detailed-gap-register-and-treatment.md#GM_s_003"
+      ],
+      "change_ripple": "Extension scope and explicit architecture/security adoption."
+    }
+  ]
+}

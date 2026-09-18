@@ -105,3 +105,7 @@ The [version/source provenance gate](docs/engineering/version-source-provenance-
 ## Bounded extension adoption and qualification assurance
 
 The [extension adoption gate](docs/engineering/bounded-extension-adoption-and-qualification-assurance.md) makes G33 fail closed for bare metal, container hosting, accelerators/special devices, L2-stretch/cross-stack patterns, higher-assurance designs and future platforms. Every accepted record remains `EXTENSION_ONLY` and requires complete topology/lifecycle design, all qualification dimensions, kind-specific evidence, explicit unsupported capabilities and no unresolved gaps. The active extension index is intentionally empty.
+
+## Knowledge maintenance and release-integrity assurance
+
+The [knowledge-maintenance gate](docs/engineering/knowledge-maintenance-and-release-integrity-assurance.md) makes G34 fail closed beyond static link checking. It validates the eight source-derived primary knowledge homes and requires revision-specific version-set evidence, maintaining owner/cadence, release-wide link/requirement/decision consistency, duplicate-policy and parent/supplement drift review, change-ripple review and an approved change record. The active release-maintenance index is intentionally empty.

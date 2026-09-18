@@ -39,6 +39,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Bounded extension adoption and qualification assurance](bounded-extension-adoption-and-qualification-assurance.md)
 
+[Knowledge maintenance and release-integrity assurance](knowledge-maintenance-and-release-integrity-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
