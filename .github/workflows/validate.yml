@@ -44,6 +44,10 @@ jobs:
         run: python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
       - name: Reservation preflight must remain held without eligible envelope
         run: python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
+      - name: Exported IPAM allocations remain authoritative-service evidence
+        run: python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
+      - name: IPAM allocation preflight must remain held without parent reservation
+        run: python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS

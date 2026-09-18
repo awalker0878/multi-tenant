@@ -1,0 +1,29 @@
+{
+  "id": "AUTHORITATIVE-IPAM-HANDOFF-01",
+  "source_baseline_commit": "bf5e2e38be21967c45e79b053c5550c779b0b48a",
+  "status": "IMPLEMENTED_EVIDENCE_AND_PREFLIGHT_NO_IPAM_MUTATION",
+  "requirements": ["IPAM-001", "IPAM-002", "IPAM-003", "IPAM-004", "AUTO-002", "AUTO-003", "STATE-003", "EVID-002"],
+  "allocation_index": "sources/capabilities/ipam_allocation_index.json",
+  "record_checker": "scripts/check_ipam_allocation_records.py",
+  "preflight_checker": "scripts/check_ipam_allocation_preflight.py",
+  "engineering": "docs/engineering/authoritative-ipam-allocation-handoff.md",
+  "current_allocation_records": 0,
+  "actual_allocation_values_stored_in_repository": false,
+  "authority": {
+    "may_reserve_address": false,
+    "may_confirm_address": false,
+    "may_release_address": false,
+    "may_reuse_address": false,
+    "may_write_dns": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select and qualify the actual authoritative IPAM interface and delegated scopes",
+    "execute reserve/observe/confirm/release operations with the real service owner",
+    "bind downstream network and DNS changes to the authoritative allocation reference",
+    "collect route, lease, DNS, policy, logging and incident-response cleanup evidence before reuse",
+    "qualify reuse quarantine and native conflict/uncertain-outcome behavior"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

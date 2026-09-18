@@ -25,6 +25,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [External-authority reservation preflight and reconciliation evidence](reservation-preflight-and-reconciliation.md)
 
+[Authoritative IPAM allocation, confirmation, release and reuse-quarantine handoff](authoritative-ipam-allocation-handoff.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

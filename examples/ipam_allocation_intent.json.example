@@ -1,0 +1,32 @@
+{
+  "format": "portable-hosting-ipam-allocation-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "spec": {
+    "allocation_id": "EXAMPLE-IPAM-ALLOCATION-01",
+    "operation_id": "EXAMPLE-IPAM-OP-01",
+    "generation": 1,
+    "reservation_id": "EXAMPLE-RESERVATION-01",
+    "request_id": "EXAMPLE-SITE-CAPACITY-01",
+    "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+    "reservation_intent_ref": "examples/reservation_intent.json.example",
+    "allocation_policy": "UNIQUE_DEFAULT",
+    "overlap_exception_ref": null,
+    "family": "IPV4",
+    "allocation_kind": "ADDRESS",
+    "requested_prefix_length": null,
+    "delegated_scope_ref": "controlled-ipam-scope:EXAMPLE-NOT-APPROVED",
+    "hold_expires_at": "2026-09-19T00:00:00Z",
+    "owners": {
+      "ipam_owner_role": "EXAMPLE-IPAM-OWNER",
+      "network_owner_role": "EXAMPLE-NETWORK-OWNER",
+      "service_owner_role": "EXAMPLE-SERVICE-OWNER"
+    }
+  },
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/engineering/reservation-preflight-and-reconciliation.md",
+    "docs/architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md",
+    "docs/adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md"
+  ]
+}
