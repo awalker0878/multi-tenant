@@ -44,6 +44,8 @@ Treat network attachment and exposure as explicit activation boundaries. During 
 
 Post-activation verification checks the actual entry and reply path, not only the pre-activation internal fixture. An exposure change can alter DNS, NAT, load-balancer health or routing. Where public ingress is offered, use a separately approved PAZ test path and scope before production; the base fixture does not acquire public access merely to simplify testing.
 
+Use the [production activation assurance gate](../../engineering/production-activation-and-initial-readiness-assurance.md) to bind current prerequisite, initial-readiness, operating-authority, reversible-change and post-activation evidence. Failed or unknown live verification is a withdrawal condition, not permission to continue exposure.
+
 Related engineering: [Expected traffic outcomes](../../engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md#NET_s_003)  •  [Narrow service protocols](../../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md#SVC_s_002)  •  [Activation evidence](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
 
 [Previous chapter](3-terraform-native-tools-and-operation-level-support.md) · [Chapter index](README.md) · [Next chapter](5-concurrency-ownership-and-failed-execution.md)
