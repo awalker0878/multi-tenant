@@ -72,6 +72,10 @@ class NavigationIntegrationTests(unittest.TestCase):
         text = self.navigation()['docs/engineering/README.md']
         self.assertIn('version-source-provenance-and-lifecycle-assurance.md', text)
 
+    def test_bounded_extension_navigation_survives_regeneration(self):
+        text = self.navigation()['docs/engineering/README.md']
+        self.assertIn('bounded-extension-adoption-and-qualification-assurance.md', text)
+
     def test_all_three_work_packages_survive_regeneration(self):
         text = self.navigation()['docs/implementation/README.md']
         for destination in ('routed-ipv6-lab.md', 'nutanix-task-tree-readback.md', 'native-reference/README.md'):
@@ -101,6 +105,8 @@ class NavigationIntegrationTests(unittest.TestCase):
         self.assertTrue(any('scripts/check_operational_handover_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_version_source_provenance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_version_source_readiness.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_extension_adoption_assurance.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_extension_adoption_readiness.py' in s for s in commands))
         self.assertTrue(any('lab/run_task_tree_lab.py --execute' in s for s in commands))
         self.assertTrue(any('tools/check_local.py' in s for s in commands))
 
