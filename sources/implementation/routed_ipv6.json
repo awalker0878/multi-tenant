@@ -35,11 +35,12 @@
   "result_policy": "Record actual exact-revision CI/run artifacts separately; this source record does not self-declare a pass",
   "retained_ipv4": "The existing IPv4 packet/TLS campaign is rerun independently",
   "native_remaining": [
-    "Installed product/API/provider/feature combination and supported address modes",
-    "Complete native quarantine, same-host/distributed/alternate paths and management separation",
-    "SLAAC/DHCPv6 where offered, general neighbour-source controls, fragments and extension headers",
-    "Native fabric/overlay MTU, HA, inspection capacity and shared-service dependencies",
-    "Actual identity, key, backup, isolated restore, migration and acceptance evidence"
+    "Selected installed platform/profile and exact IPv6-only or dual-stack offered mode",
+    "Native routing, same-host/distributed enforcement, source/neighbor controls, assignment mode, local protocols and transition restrictions",
+    "Equivalent IPv4/IPv6 policy, inspection, logging, negative and fail-secure outcomes through the accepted ZIP",
+    "Complete DNS/time/trust/telemetry/image/protection/recovery and origin-specific reply dependencies over the offered family",
+    "Native encapsulation MTU, ICMPv6/PTB, fragment/extension-header treatment, failure/recovery and no hidden IPv4 fallback",
+    "Monitoring, runbook, controlled re-exposure and operational acceptance"
   ],
   "native_apply": "NOT_IMPLEMENTED_BY_THIS_WORK",
   "formal_authorization": "NOT_ISSUED",
@@ -55,5 +56,7 @@
     "nftables": "1.0.9",
     "original_namespace_configuration_unchanged": true,
     "scope": "Executed Linux fixtures only; later source revisions need their own passing exact-head run"
-  }
+  },
+  "native_assurance_gate": "sources/capabilities/address_family_assurance_index.json",
+  "native_assurance_checker": "scripts/check_address_family_assurance.py"
 }
