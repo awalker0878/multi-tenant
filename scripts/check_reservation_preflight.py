@@ -243,9 +243,11 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('intent',type=Path)
     p.add_argument('--expected-status',choices=(READY,HOLD_ENVELOPE,HOLD_CONFLICT,HOLD_UNCERTAIN,HOLD_TERMINAL,EXISTING_HELD,EXISTING_CONSUMED))
+    p.add_argument('--as-of',help='ISO-8601 review instant; defaults to current UTC')
     a=p.parse_args()
     try:
-        result=evaluate(load(a.intent))
+        as_of=records.instant(a.as_of,'as_of') if a.as_of else datetime.now(timezone.utc)
+        result=evaluate(load(a.intent),as_of=as_of)
         print(json.dumps(result,indent=2))
         if a.expected_status is not None:return 0 if result['status']==a.expected_status else 2
         return 0 if result['status'] in (READY,EXISTING_HELD,EXISTING_CONSUMED) else 2
