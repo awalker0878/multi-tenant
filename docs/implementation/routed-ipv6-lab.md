@@ -107,6 +107,8 @@ recording a result. A later source change needs a later successful run. Historic
 native offered-family acceptance open until the installed stack, complete dependency
 paths, management exclusion and recovery behaviour are qualified separately.
 
+The [native address-family assurance gate](../engineering/native-ipv6-address-family-assurance.md) consumes later native evidence and deliberately does not treat this Linux namespace result as production family qualification.
+
 [Engineering basis and exclusions](../engineering/routed-ipv6-qualification.md) · [Test families](../assurance/verification-families.md)
 
 ## Engineering issues demonstrated during development
