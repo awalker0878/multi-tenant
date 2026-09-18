@@ -33,6 +33,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Control inheritance and external-dependency assurance](control-inheritance-and-external-dependency-assurance.md)
 
+[Operational handover and incident-readiness assurance](operational-handover-and-incident-readiness-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
