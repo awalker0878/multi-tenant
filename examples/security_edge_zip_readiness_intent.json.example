@@ -1,0 +1,15 @@
+{
+  "format": "portable-hosting-security-edge-zip-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-ZIP-01",
+  "boundary_id": "example-zip-boundary-not-qualified",
+  "source_endpoint_ref": "controlled-domain-endpoint:EXAMPLE-SOURCE",
+  "destination_endpoint_ref": "controlled-domain-endpoint:EXAMPLE-DESTINATION",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-QUALIFIED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md",
+    "docs/engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md",
+    "docs/implementation/allocation/zip.md"
+  ]
+}
