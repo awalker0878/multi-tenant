@@ -1,8 +1,8 @@
 # Completion publication — verified merged snapshot
 
-**Review date:** 18 September 2026  
-**Tested main commit:** `b184bc629b996e1cd658c389ba707a99f89f7c07`  
-**Tested tree:** `54df3ddd7924038ad6c877249b2579ada55a59cd`  
+**Review date:** 18 September 2026<br>
+**Tested main commit:** `b184bc629b996e1cd658c389ba707a99f89f7c07`<br>
+**Tested tree:** `54df3ddd7924038ad6c877249b2579ada55a59cd`<br>
 **Result:** repository/documentation checks and the separate Terraform and Ansible jobs passed for this exact merged snapshot.
 
 [Observed post-merge run](https://github.com/awalker0878/multi-tenant/actions/runs/35300272211) · [Machine-readable observation](../../evidence/completion-publication/verification.json) · [Corrective dispositions](completion-corrections.md)
