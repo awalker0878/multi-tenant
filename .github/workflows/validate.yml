@@ -34,6 +34,8 @@ jobs:
         run: python scripts/check_platform_capabilities.py > build/reports/platform_capability_registry.json
       - name: Platform-family pre-placement must remain held without native qualification
         run: python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM > build/reports/platform_family_eligibility.json
+      - name: Current implementation status must preserve historical backlog and native holds
+        run: python scripts/check_current_implementation_status.py > build/reports/current_implementation_status.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
