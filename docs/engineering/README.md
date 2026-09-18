@@ -41,6 +41,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Knowledge maintenance and release-integrity assurance](knowledge-maintenance-and-release-integrity-assurance.md)
 
+[Security-edge and ZIP assurance](security-edge-zip-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

@@ -1,0 +1,31 @@
+{
+  "id": "SECURITY-EDGE-ZIP-ASSURANCE-01",
+  "source_baseline_commit": "64fed20b897c3bca2c80c1de67c7e4aed4e4226b",
+  "status": "IMPLEMENTED_ZIP_EVIDENCE_PREFLIGHT_NO_SECURITY_EDGE_MUTATION",
+  "backlog_ids": ["I03", "I04"],
+  "requirements": ["ZIP-001", "ZIP-002", "ZIP-003", "ZIP-004", "ZIP-005", "ZIP-006", "ZIP-007"],
+  "assurance_index": "sources/capabilities/security_edge_zip_assurance_index.json",
+  "checker": "scripts/check_security_edge_zip_assurance.py",
+  "preflight": "scripts/check_security_edge_zip_readiness.py",
+  "engineering": "docs/engineering/security-edge-zip-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_create_route": false,
+    "may_change_policy": false,
+    "may_attach_domain": false,
+    "may_change_edge": false,
+    "may_change_management_access": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual EC/SE or distributed/shared ZIP realization and exact adjacent boundary scope",
+    "record both zone authorities, joint approval and management authority",
+    "implement and observe deny-first policy, inspection, logging and session-revocation behavior",
+    "verify native connected/distributed routes, forward/reply symmetry and absence of bypass paths",
+    "exercise member loss, manager loss, route withdrawal, state synchronization and fail-secure behavior",
+    "measure session, throughput, inspection, log-export and surviving capacity for the accepted service class",
+    "resolve residual gaps and retain current attributable native evidence"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

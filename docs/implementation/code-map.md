@@ -196,6 +196,14 @@ Implementation: [primary knowledge-home registry](../../sources/documentation/kn
 
 Static links and requirement mappings are necessary but do not create a maintained-release decision. Current assurance additionally requires accountable owner/cadence, revision-specific version-set evidence, duplicate/drift review, change-ripple review, approved change control and no unresolved conflicts.
 
+## Security-edge and ZIP assurance
+
+Design: [RA §8 security-edge topology](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [NET §3 routing/enforcement schedule](../engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md) · [ZIP assertion allocation](allocation/zip.md)
+
+Implementation: [active ZIP assurance index](../../sources/capabilities/security_edge_zip_assurance_index.json) · [ZIP assurance validator](../../scripts/check_security_edge_zip_assurance.py) · [readiness preflight](../../scripts/check_security_edge_zip_readiness.py) · [engineering boundary](../engineering/security-edge-zip-assurance.md)
+
+Current qualification requires exact pairwise scope, mandatory security-function evidence, native forward/reply and bypass review, deny-first policy, management separation, HA/failure behavior and current path tests. Distributed/shared ZIPs must prove equivalent mandatory outcomes; CI performs no edge, route, policy or attachment mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
