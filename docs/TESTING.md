@@ -163,3 +163,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Operational handover and incident-readiness assurance
 
 `python scripts/check_operational_handover_assurance.py --as-of 2026-09-18T21:00:00Z` validates exported handover ownership, decision authority, privileged-access review, monitoring evidence, residual obligations and scoped incident-exercise evidence. `python scripts/check_operational_handover_readiness.py examples/operational_handover_readiness_intent.json.example --as-of 2026-09-18T21:00:00Z --expected-status HOLD_NO_CURRENT_OPERATIONAL_HANDOVER` verifies the current empty assurance index remains fail-closed. Tests require explicit containment release, emergency-change reconciliation and no unresolved stale privileged grants while all live operations/apply/activation authority flags remain false.
+
+## Version, source provenance and lifecycle assurance
+
+`python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z` validates exact product/API/provider/hardware/licence tuples, mandatory current source-review kinds, compatibility evidence and support lifecycle. `python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE` verifies the current empty provenance index remains fail-closed. Native qualification tests also prove that a CURRENT_APPROVED dossier is rejected unless the same exact tuple has one matching CURRENT_SUPPORTED provenance record.
