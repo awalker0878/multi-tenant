@@ -27,4 +27,6 @@ Baseline and related records: [RA §23](../../architecture/reference/23-tenant-d
 
 G4 initial readiness precedes G3 production activation. Continuing G4 exercises after activation do not replace the initial proof supporting a promised service. Restricted fixture permission is a separate record.
 
+The [production activation assurance gate](../../engineering/production-activation-and-initial-readiness-assurance.md) turns these dependencies into a fail-closed evidence record. A ready result still does not authorize exposure; only the accountable external authority can execute the activation change.
+
 [Previous chapter](6-restricted-qualification-and-meaningful-observations.md) · [Chapter index](README.md) · [Next chapter](8-interrupted-work-brownfield-adoption-and-change.md)
