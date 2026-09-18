@@ -130,3 +130,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Native PlatformProfile qualification dossier
 
 `python scripts/check_platform_qualification.py` validates the active exact-tuple qualification index, including owners, applicable tests, tested limits, evidence hashes/freshness and approval validity. The current index is intentionally empty. `scripts/check_platform_capabilities.py` then refuses any future `NATIVE_QUALIFIED` claim that lacks a current matching dossier for the same tuple/capability/evidence scope. Neither check contacts a platform, selects a site, reserves capacity, applies infrastructure or issues production authorization.
+
+
+## Site/service-class capacity eligibility
+
+`python scripts/check_site_service_capacity.py` validates current commissioned site/cell/service-class envelopes against exact-tuple qualification records, approved profile references, failure-model evidence, owners and time-bounded multi-resource capacity. `python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE` confirms the current empty inventory remains fail-closed. The checker compares surviving capacity, operational reserve, existing commitments, unavailable capacity and supplied quota headroom, but never creates a reservation or contacts IPAM/native platforms.
