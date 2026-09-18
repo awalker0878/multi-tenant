@@ -22,3 +22,5 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 ## Implemented laboratory work packages
 
 [Routed IPv6 path, protocol, MTU and service engineering](routed-ipv6-qualification.md) develops the declared family requirements into an executable fixed local experiment, while retaining the native-site acceptance obligations.
+
+[Bounded Nutanix task-tree readback](nutanix-task-tree-readback.md) connects native task identities, complete child/entity coverage and selected VPC/subnet observations to the existing controlled recovery handoff. It is not full native qualification or a new deployment authority.

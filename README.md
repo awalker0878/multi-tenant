@@ -46,3 +46,7 @@ See [TESTING.md](docs/TESTING.md) for independent Terraform/Ansible and disposab
 ## Routed IPv6 implementation work
 
 The [I08 packet extension](docs/implementation/routed-ipv6-lab.md) exercises the existing WD14 topology over real IPv6 sockets in disposable Linux namespaces. Its [engineering profile](docs/engineering/routed-ipv6-qualification.md) distinguishes local path evidence from the still-open native platform and offered-family acceptance. Exact current run results belong to CI artifacts, not historical reports.
+
+## Known native task-tree verification
+
+The [I09 Nutanix task-tree extension](docs/implementation/nutanix-task-tree-readback.md) observes explicitly recorded parent/child work without discovery, cancellation or mutation. Its [engineering profile](docs/engineering/nutanix-task-tree-readback.md) keeps incomplete children, failed tasks, native resource differences and actual fencing obligations separate from a successful parent label.

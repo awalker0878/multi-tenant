@@ -66,6 +66,11 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
                     raise ValueError('Missing selected-configuration digest')
                 if state['config_status']=='MATCH' and state.get('mismatch_fields')!=[]:
                     raise ValueError('Match contains contradictory mismatch information')
+        history_check=getattr(ADAPTERS[m['platform']],'validate_observation_history',None)
+        if history_check is not None:
+            # A later review clock must not validate facts that postdate the sample.
+            try:history_check(m,hist[:index-1],states,current=t)
+            except c.ObservationError:raise ValueError('Invalid task-tree witness or history') from None
         sh=c.digest(states)
         if row['snapshot_sha256']!=sh:raise ValueError('Sample digest mismatch')
         stable=stable+1 if sh==previous else 1;previous=sh

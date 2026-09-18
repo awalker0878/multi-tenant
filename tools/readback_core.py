@@ -315,6 +315,8 @@ def observe(manifest: dict, client: ReadClient, adapter, rounds=3, interval=0.1)
     for i in range(rounds):
         try:
             states=adapter.sample(manifest, client)
+            history_check=getattr(adapter,'validate_observation_history',None)
+            if history_check is not None:history_check(manifest,history,states)
         except ObservationError as error:
             states=[{'resource_key':'scope', 'config_status':'UNKNOWN', 'progress':'UNKNOWN', 'reason':error.code}]
         snapshot=digest(states)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact VPC/subnet readback and single asynchronous task observation, Nutanix v4.3.
+"""Exact VPC/subnet and explicit single-task or bounded task-tree readback, v4.3.
 
 Wire profile from published networking/prism Go SDK v4.3.1. No API negotiation,
 legacy fallback, task cancellation, response-link following, or inferred task IDs.
@@ -29,6 +29,9 @@ BASE={'extId','$objectType'}
 
 
 def validate(m):
+    if isinstance(m,dict) and m.get('profile')=='nutanix-networking-prism-v4.3-task-tree':
+        from tools import nutanix_task_tree as tree
+        return tree.validate(m)
     c.common_manifest(m,'nutanix')
     if m['profile']!=PROFILE or 'task' not in m:
         raise ValueError('This profile requires a known single task and v4.3 endpoints')
@@ -75,6 +78,9 @@ def task_target(m):
 
 def targets(m):
     validate(m)
+    if m['profile']=='nutanix-networking-prism-v4.3-task-tree':
+        from tools import nutanix_task_tree as tree
+        return tree.targets(m)
     return {task_target(m)}|{resource_target(r) for r in m['resources']}
 
 
@@ -119,8 +125,7 @@ def task_progress(body,m):
     return 'COMPLETE','TASK_SUCCESS_REPORTED',c.digest(observation)
 
 
-def sample(m,client):
-    before,_=client.get(task_target(m));bp,br,bd=task_progress(before,m)
+def sample_resources(m,client):
     result=[]
     for r in m['resources']:
         body,etag=client.get(resource_target(r));data=body.get('data')
@@ -138,6 +143,15 @@ def sample(m,client):
         if not identity:config='UNKNOWN'
         result.append({'resource_key':r['ext_id'],'identity_match':identity,'config_status':config,
             'mismatch_fields':mismatch,'config_sha256':c.digest(actual),'etag_sha256':c.digest(etag)})
+    return result
+
+
+def sample(m,client):
+    if m['profile']=='nutanix-networking-prism-v4.3-task-tree':
+        from tools import nutanix_task_tree as tree
+        return tree.sample(m,client)
+    before,_=client.get(task_target(m));bp,br,bd=task_progress(before,m)
+    result=sample_resources(m,client)
     after,_=client.get(task_target(m));ap,ar,ad=task_progress(after,m)
     # A changing task sample cannot count toward the consecutive completion threshold.
     p,reason,td=(ap,ar,ad) if (bp,br,bd)==(ap,ar,ad) else ('PENDING','TASK_CHANGED_DURING_READBACK',ad)
@@ -145,6 +159,12 @@ def sample(m,client):
     for item in result:
         item.update({'progress':p,'reason':reason,'task_sha256':td})
     return result
+
+
+def validate_observation_history(m,history,states,current=None):
+    if m['profile']=='nutanix-networking-prism-v4.3-task-tree':
+        from tools import nutanix_task_tree as tree
+        tree.validate_history(m,history,states,current=current)
 
 
 def main():

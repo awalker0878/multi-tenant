@@ -151,3 +151,7 @@ or selected-field match, depending on mode; it is not an authorization result.
 [N1–N4, U1–U6]: [Primary source register](../sources/increment04_references.json).
 See [interrupted-change triage](INTERRUPTED_CHANGE_RECOVERY.md) before any subsequent
 resource mutation.
+
+## Optional bounded Nutanix task-tree profile
+
+The original profile above retains its single-task constraint. A separate [known-tree profile](engineering/nutanix-task-tree-readback.md) now handles a fully enumerated small parent/child scope through the same transport, resource checks and recovery holds. Partial native child summaries and batch jobs remain unsupported; no automatic task listing, cancellation or version fallback is added. Follow the [explicit manifest and execution procedure](implementation/nutanix-task-tree-readback.md).
