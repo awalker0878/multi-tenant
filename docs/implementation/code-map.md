@@ -212,6 +212,14 @@ Implementation: [active native reconciliation assurance index](../../sources/cap
 
 A matching GET-only readback remains observation evidence only. Current reconciliation additionally requires exact installed-interface applicability, complete task/entity scope, verified native writer fencing, current containment state, operation-generation binding and an attributable data-safe reconciliation decision; CI performs no task mutation, state import, repair, deletion, apply or activation.
 
+## Native IPv6 and address-family assurance
+
+Design: [Routed IPv6 qualification](../engineering/routed-ipv6-qualification.md) · [Routed IPv6 execution](routed-ipv6-lab.md) · [IPv6 assertion allocation](allocation/ipv6.md)
+
+Implementation: [active native IPv6 assurance index](../../sources/capabilities/native_ipv6_assurance_index.json) · [assurance validator](../../scripts/check_native_ipv6_assurance.py) · [readiness preflight](../../scripts/check_native_ipv6_readiness.py) · [local routed-family evidence](../../sources/implementation/routed_ipv6.json) · [engineering boundary](../engineering/native-ipv6-address-family-assurance.md)
+
+Current native qualification requires exact site/service/platform/security-edge family scope, supported addressing/local-protocol behavior, route/security parity, MTU/PMTU, shared-service dependencies, failure/recovery and operational acceptance. IPv6-only requires no hidden IPv4 fallback; dual-stack requires an independent IPv4 campaign. CI performs no native family mutation or service activation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
