@@ -17,6 +17,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Machine-readable platform capability registry and evidence boundary](platform-capability-registry.md)
 
+[Fail-closed platform-family pre-placement eligibility](pre-placement-platform-eligibility.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

@@ -100,6 +100,14 @@ Implementation: [machine-readable registry](../../sources/capabilities/platform_
 
 The registry distinguishes candidate source and local fixtures from native qualification. It currently makes no platform production-eligible and does not perform placement.
 
+## Pre-placement platform-family eligibility
+
+Design: [Tenant/WSD placement](../architecture/reference/7-tenant-environments-and-security-domain-placement.md) · [Compute and workload placement](../architecture/reference/11-compute-pools-hypervisors-and-workload-placement.md) · [Provisioning admission sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md)
+
+Implementation: [fail-closed precheck](../../scripts/check_platform_family_eligibility.py) · [held WSD capability example](../../examples/pre_placement_capability_request.json.example) · [engineering boundary](../engineering/pre-placement-platform-eligibility.md)
+
+This precheck evaluates only platform-family capability evidence. It cannot select a site, reserve capacity, allocate resources or authorize activation. The current example intentionally holds because no platform capability is native-qualified.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.

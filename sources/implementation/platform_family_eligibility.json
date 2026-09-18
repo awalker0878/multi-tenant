@@ -1,0 +1,35 @@
+{
+  "id": "PREPLACEMENT-PLATFORM-FAMILY-ELIGIBILITY-01",
+  "source_baseline_commit": "cf2be9bfe4a89b9db23d4083118214b989432445",
+  "status": "IMPLEMENTED_ENGINEERING_PRECHECK_NATIVE_SITE_PLACEMENT_OPEN",
+  "architecture": [
+    "docs/architecture/reference/7-tenant-environments-and-security-domain-placement.md",
+    "docs/architecture/reference/11-compute-pools-hypervisors-and-workload-placement.md",
+    "docs/architecture/reference/15-cross-vendor-realization-model.md",
+    "docs/architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md"
+  ],
+  "maintained_wsd": "docs/current/internal-hosting-solution.md",
+  "capability_registry": "sources/capabilities/platform_registry.json",
+  "implementation": "scripts/check_platform_family_eligibility.py",
+  "example": "examples/pre_placement_capability_request.json.example",
+  "tests": "tests/test_platform_family_eligibility.py",
+  "current_expected_status": "HOLD_NO_NATIVE_QUALIFIED_PLATFORM",
+  "current_native_qualified_claims": 0,
+  "authority": {
+    "may_select_site": false,
+    "may_reserve_capacity": false,
+    "may_allocate": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "unsupported_scope": [
+    "requester authorization and full Admit decision",
+    "site/cell/service-class selection",
+    "quota, capacity and address reservation",
+    "zone-sharing/co-residency acceptance",
+    "storage/key/recovery/service compatibility",
+    "split-platform WSD placement",
+    "native provisioning or production activation"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

@@ -1,0 +1,36 @@
+{
+  "format": "portable-hosting-platform-family-eligibility/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "fixture-internal-protected-wsd-01",
+  "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+  "placement_mode": "SINGLE_PLATFORM_WSD",
+  "candidate_platforms": [
+    "nutanix",
+    "vmware-nsx",
+    "openstack"
+  ],
+  "mandatory_capabilities": [
+    "network_domain",
+    "ipv4",
+    "gateway_policy",
+    "audit_logging"
+  ],
+  "optional_capabilities": [
+    "ipv6"
+  ],
+  "required_assurance_profile": null,
+  "site_binding": {
+    "site_ref": "UNSELECTED",
+    "cell_ref": "UNSELECTED",
+    "service_class_ref": "UNSELECTED"
+  },
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/architecture/reference/7-tenant-environments-and-security-domain-placement.md",
+    "docs/architecture/reference/11-compute-pools-hypervisors-and-workload-placement.md",
+    "docs/architecture/reference/15-cross-vendor-realization-model.md",
+    "docs/architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md",
+    "docs/engineering/platform-capability-registry.md"
+  ]
+}

@@ -32,6 +32,10 @@ class NavigationIntegrationTests(unittest.TestCase):
         text = self.navigation()['docs/engineering/README.md']
         self.assertIn('platform-capability-registry.md', text)
 
+    def test_pre_placement_navigation_survives_regeneration(self):
+        text = self.navigation()['docs/engineering/README.md']
+        self.assertIn('pre-placement-platform-eligibility.md', text)
+
     def test_all_three_work_packages_survive_regeneration(self):
         text = self.navigation()['docs/implementation/README.md']
         for destination in ('routed-ipv6-lab.md', 'nutanix-task-tree-readback.md', 'native-reference/README.md'):
@@ -43,6 +47,7 @@ class NavigationIntegrationTests(unittest.TestCase):
         commands = [s.get('run', '') for s in workflow['jobs']['repository']['steps']]
         self.assertTrue(any('scripts/commissioning_pack.py check' in s for s in commands))
         self.assertTrue(any('scripts/check_platform_capabilities.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_platform_family_eligibility.py' in s for s in commands))
         self.assertTrue(any('lab/run_task_tree_lab.py --execute' in s for s in commands))
         self.assertTrue(any('tools/check_local.py' in s for s in commands))
 
