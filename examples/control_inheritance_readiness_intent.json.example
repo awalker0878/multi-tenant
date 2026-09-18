@@ -1,0 +1,20 @@
+{
+  "format": "portable-hosting-control-inheritance-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-SITE-CAPACITY-01",
+  "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+  "required_scope": {
+    "site_ref": "controlled-site:EXAMPLE-NOT-APPROVED",
+    "service_class_ref": "controlled-service-class:EXAMPLE-NOT-APPROVED",
+    "platform_profile_ref": "controlled-platform-profile:EXAMPLE-NOT-QUALIFIED",
+    "control_catalogue_ref": "controlled-catalogue:EXAMPLE-NOT-ADOPTED",
+    "control_selection_ref": "controlled-selection:EXAMPLE-NOT-ACCEPTED"
+  },
+  "required_control_ids": ["AUTH-001", "STD-001", "STD-002"],
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/assurance/site-qualification/6-control-inheritance-assurance-and-organizational-interfaces.md",
+    "docs/architecture/reference/28-architecture-acceptance-and-verification.md"
+  ]
+}

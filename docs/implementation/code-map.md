@@ -156,6 +156,14 @@ Implementation: [exported backup/restore assurance index](../../sources/capabili
 
 A successful backup task is insufficient. Current assurance requires protected-copy/catalogue/key evidence, destructive-authority separation and a current isolated useful-data restore witness; CI performs no backup, restore, key or reconnect mutation.
 
+## Control inheritance and external-dependency assurance
+
+Design: [G30 control inheritance gap](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G30) · [Control inheritance and organizational interfaces](../assurance/site-qualification/6-control-inheritance-assurance-and-organizational-interfaces.md) · [Architecture acceptance and verification](../architecture/reference/28-architecture-acceptance-and-verification.md)
+
+Implementation: [exported control inheritance assurance index](../../sources/capabilities/control_inheritance_assurance_index.json) · [assurance evidence validator](../../scripts/check_control_inheritance_assurance.py) · [readiness preflight](../../scripts/check_control_inheritance_readiness.py) · [engineering boundary](../engineering/control-inheritance-and-external-dependency-assurance.md)
+
+Current assurance requires exact scope, per-control responsibility/evidence, all six external organizational interfaces and no OPEN residual gaps. CI does not select controls, accept inheritance or residual risk, issue authorization, apply infrastructure or activate production.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
