@@ -29,3 +29,7 @@ No production exposure or service SLO is granted. Actual platform/edge selection
 Adopting authority and approval evidence: **not recorded**. Link the actual design review and its conditions when they exist; a code merge does not authorize a site or service. Keep sensitive site parameters and private credentials in their approved systems.
 
 [Maintained design register](README.md) · [Decision register](../adr/README.md)
+
+## Commissioning working material
+
+The [native reference-service kit](../implementation/native-reference/README.md) elaborates this maintained solution into site-input collection, per-stack build responsibilities, actual service-client paths and W14 observation worksheets. It changes no selected topology or approval state; actual site and native execution remain unrecorded.
