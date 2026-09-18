@@ -18,15 +18,22 @@ from lab.dns_authority import Authority
 
 
 def example(port, *, zone='fixture.invalid.', name='app.fixture.invalid.', rtype='A', value='192.0.2.10'):
-    job = dict(version=1, enabled=True, operation_id=str(uuid.uuid4()), tenant_id='tenant-001',
+    job = dict(version=2, enabled=True, operation_id=str(uuid.uuid4()), tenant_id='tenant-001',
                resource_id='workload-001', zone=zone, server='127.0.0.1', port=port,
                key_name='owner.fixture.invalid.', engineering_record_ref='LOCAL-FIXTURE-NOT-APPROVAL',
                valid_until=(datetime.now(timezone.utc)+timedelta(hours=1)).isoformat(),
-               previous_marker=None, records=[dict(name=name, type=rtype, before=None,
-                                                   after={'ttl': 60, 'values': [value]})])
-    scope = {k: copy.deepcopy(v) for k,v in job.items() if k not in ('previous_marker','records')}
+               previous_marker=None, allocation_binding_digest='0'*64,
+               previous_allocation_binding_digest=None,
+               records=[dict(name=name, type=rtype, before=None,
+                             after={'ttl': 60, 'values': [value]})])
+    scope = {k: copy.deepcopy(v) for k,v in job.items()
+             if k not in ('previous_marker','allocation_binding_digest',
+                          'previous_allocation_binding_digest','records')}
     scope.update(transport_acceptance_ref='LOCAL-LOOPBACK-TEST-ONLY', allowed_records=[
-        dict(name=name,type=rtype,values=[value],maximum_ttl=300)])
+        dict(name=name,type=rtype,values=[value],maximum_ttl=300,
+             allocation_binding_ref=f'ipam-allocation:fixture-{rtype.lower()}-01',
+             allocation_generation=1)])
+    job['allocation_binding_digest']=d.allocation_binding_digest(scope)
     return job,scope
 
 
@@ -45,12 +52,15 @@ class DNSWireTests(unittest.TestCase):
     def next_job(self, value):
         before = copy.deepcopy(self.job['records'][0]['after'])
         old = d.marker_value(self.job)
+        previous_binding = self.job['allocation_binding_digest']
         self.job['operation_id'] = self.scope['operation_id'] = str(uuid.uuid4())
         self.job['previous_marker']=old
+        self.job['previous_allocation_binding_digest']=previous_binding
         self.job['records'][0]['before']=before
         self.job['records'][0]['after']=value
         if value:
             self.scope['allowed_records'][0]['values'] = sorted(set((before or {'values':[]})['values']+value['values']))
+        self.job['allocation_binding_digest']=d.allocation_binding_digest(self.scope)
 
     def test_simultaneous_first_claims_have_one_native_winner(self):
         from concurrent.futures import ThreadPoolExecutor
@@ -191,14 +201,20 @@ class DNSWireTests(unittest.TestCase):
 
     def test_actual_wire_aaaa_and_a_are_one_transaction(self):
         self.job['records'].append(dict(name='app.fixture.invalid.',type='AAAA',before=None,after={'ttl':60,'values':['2001:db8::10']}))
-        self.scope['allowed_records'].append(dict(name='app.fixture.invalid.',type='AAAA',values=['2001:db8::10'],maximum_ttl=300))
+        self.scope['allowed_records'].append(dict(
+            name='app.fixture.invalid.',type='AAAA',values=['2001:db8::10'],maximum_ttl=300,
+            allocation_binding_ref='ipam-allocation:fixture-aaaa-01',allocation_generation=1))
+        self.job['allocation_binding_digest']=d.allocation_binding_digest(self.scope)
         self.assertEqual(self.run_change()['status'],'APPLIED_OBSERVED')
         self.assertEqual(self.server.commits,1)
         self.assertIn(('app.fixture.invalid.','AAAA'),self.server.store)
 
     def test_atomic_group_conflict_leaves_other_type_absent(self):
         self.job['records'].append(dict(name='app.fixture.invalid.',type='AAAA',before=None,after={'ttl':60,'values':['2001:db8::10']}))
-        self.scope['allowed_records'].append(dict(name='app.fixture.invalid.',type='AAAA',values=['2001:db8::10'],maximum_ttl=300))
+        self.scope['allowed_records'].append(dict(
+            name='app.fixture.invalid.',type='AAAA',values=['2001:db8::10'],maximum_ttl=300,
+            allocation_binding_ref='ipam-allocation:fixture-aaaa-01',allocation_generation=1))
+        self.job['allocation_binding_digest']=d.allocation_binding_digest(self.scope)
         self.server.before_update=lambda a:a.set('app.fixture.invalid.','AAAA',60,['2001:db8::99'])
         self.assertEqual(self.run_change()['status'],'PREREQUISITE_CONFLICT')
         self.assertNotIn(('app.fixture.invalid.','A'),self.server.store)
@@ -233,10 +249,13 @@ class DNSWireTests(unittest.TestCase):
             with self.assertRaises(d.DNSChangeError): self.run_change()
         self.assertEqual(self.server.update_requests,0)
 
-    def test_output_does_not_contain_secret(self):
+    def test_output_does_not_contain_secret_or_ipam_handle(self):
         result=self.run_change()
-        self.assertNotIn(self.secret,json.dumps(result))
-        self.assertNotIn('192.0.2.10',json.dumps(result))
+        encoded=json.dumps(result)
+        self.assertNotIn(self.secret,encoded)
+        self.assertNotIn('192.0.2.10',encoded)
+        self.assertNotIn(self.scope['allowed_records'][0]['allocation_binding_ref'],encoded)
+        self.assertEqual(result['allocation_bindings_sha256'],self.job['allocation_binding_digest'])
 
     def test_disabled_prevents_reads_and_writes(self):
         self.job['enabled']=False
@@ -263,8 +282,36 @@ class DNSInputTests(unittest.TestCase):
     def test_wildcard(self):self.job['records'][0]['name']='*.fixture.invalid.';self.reject()
     def test_outside_zone(self):self.job['records'][0]['name']='x.outside.invalid.';self.reject()
     def test_unknown_allocation(self):self.job['records'][0]['after']['values']=['192.0.2.11'];self.reject()
+    def test_scope_requires_allocation_binding_reference(self):
+        del self.scope['allowed_records'][0]['allocation_binding_ref'];self.reject()
+    def test_scope_requires_positive_allocation_generation(self):
+        self.scope['allowed_records'][0]['allocation_generation']=0;self.reject()
+    def test_scope_rejects_boolean_allocation_generation(self):
+        self.scope['allowed_records'][0]['allocation_generation']=True;self.reject()
+    def test_scope_rejects_raw_address_in_binding_reference(self):
+        self.scope['allowed_records'][0]['allocation_binding_ref']='ipam:192.0.2.10';self.reject()
+    def test_job_binding_digest_must_match_independent_scope(self):
+        self.job['allocation_binding_digest']='f'*64;self.reject()
+    def test_scope_binding_change_requires_new_job_binding_digest(self):
+        self.scope['allowed_records'][0]['allocation_generation']=2;self.reject()
+    def test_first_claim_cannot_carry_previous_binding_digest(self):
+        self.job['previous_allocation_binding_digest']=self.job['allocation_binding_digest'];self.reject()
+    def test_owned_change_requires_previous_binding_digest(self):
+        self.job['records'][0]['before']=copy.deepcopy(self.job['records'][0]['after'])
+        self.job['previous_marker']=d.marker_value(self.job)
+        self.job['previous_allocation_binding_digest']=None
+        self.reject()
+    def test_version_one_profile_is_rejected(self):
+        self.job['version']=self.scope['version']=1;self.reject()
+    def test_marker_is_v2_and_contains_binding_digest(self):
+        marker=d.marker_value(self.job)
+        self.assertTrue(marker.startswith('hosting-v2 '))
+        self.assertTrue(marker.endswith(' '+self.job['allocation_binding_digest']))
     def test_unowned_adoption(self):self.job['records'][0]['before']=copy.deepcopy(self.job['records'][0]['after']);self.reject()
-    def test_unsigned_prior_marker(self):self.job['previous_marker']='Approved';self.reject()
+    def test_unsigned_prior_marker(self):
+        self.job['previous_marker']='Approved'
+        self.job['previous_allocation_binding_digest']=self.job['allocation_binding_digest']
+        self.reject()
     def test_empty_records(self):self.job['records']=[];self.reject()
     def test_ttl_zero(self):self.job['records'][0]['after']['ttl']=0;self.reject()
     def test_values_unsorted(self):self.job['records'][0]['after']['values']=['192.0.2.11','192.0.2.10'];self.reject()
@@ -291,10 +338,11 @@ class DNSInputTests(unittest.TestCase):
     def test_ptr_bad_reverse(self):
         job,scope=example(53,rtype='PTR',value='app.fixture.invalid.')
         with self.assertRaises(d.DNSChangeError):d.validate(job,scope,fixture=True)
-    def test_marker_bound_to_owner_and_group(self):
+    def test_marker_bound_to_owner_group_and_allocation_binding(self):
         marker=d.marker_value(self.job)
         self.job['records'][0]['before']=copy.deepcopy(self.job['records'][0]['after'])
         self.job['previous_marker']=marker
+        self.job['previous_allocation_binding_digest']=self.job['allocation_binding_digest']
         self.job['resource_id']=self.scope['resource_id']='another-resource'
         self.reject()
 
