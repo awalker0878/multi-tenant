@@ -169,9 +169,18 @@ def inner() -> dict:
         dev=interface_map['EC-01','A01R'];workers['EC-01'].call('ip',args=['link','set',dev,'down'])
         result,other=probe('processor-01','data-01'),probe('processor-02','data-02')
         record('Edge-link failure has no alternate permit path and does not affect tenant02',not result['success'] and other['success'],{'affected':result,'unaffected':other})
-        workers['EC-01'].call('ip',args=['link','set',dev,'up']);time.sleep(1.2)
+        lost_addresses=json.loads(workers['EC-01'].call('ip',args=['-6','-j','addr','show','dev',dev])['stdout'])
+        workers['EC-01'].call('ip',args=['link','set',dev,'up'])
+        restored=next(i['address'] for i in f.interfaces(data,'EC-01') if i['segment']=='A01R')
+        workers['EC-01'].call('ip',args=['-6','addr','replace',restored,'dev',dev])
+        deadline=time.monotonic()+8
+        while True:
+            addresses=json.loads(workers['EC-01'].call('ip',args=['-6','-j','addr','show'])['stdout'])
+            if f.ready_addresses(data,'EC-01',addresses):break
+            if time.monotonic()>=deadline:raise RuntimeError('Exact IPv6 link address failed recovery/DAD')
+            time.sleep(.2)
         for route in f.routes(data,'EC-01'):workers['EC-01'].call('ip',args=['-6','route','replace',route['destination'],'via',route['next_hop']])
-        result=probe('processor-01','data-01');record('Link and exact IPv6 route reconciliation restore service',result['success'],result)
+        result=probe('processor-01','data-01');record('Link, exact IPv6 address and route reconciliation restore service',result['success'],{'probe':result,'before_address_recovery':lost_addresses,'restored_source_address':restored})
         # MTU reduction is only a local packet-path experiment, not VXLAN/overlay qualification.
         workers['EC-01'].call('ip',args=['link','set',dev,'mtu','1280'])
         install('NG-D01O','router',block_ptb=True);before=counters('NG-D01O');large=probe('processor-01','data-01',size=8192);after=counters('NG-D01O');small=probe('processor-01','data-01')
@@ -223,8 +232,8 @@ def main() -> int:
         result=inner();print(json.dumps(result));return 0 if result['status']=='PASSED_IPV6_FIXTURE' else 2
     if not args.execute:parser.error('No changes made. Explicit --execute is required for the fixed disposable IPv6 lab.')
     f.load_fixture();args.output.parent.mkdir(parents=True,exist_ok=True)
-    with args.output.open('x') as out:out.write('{"status":"STARTED_INCOMPLETE","native_apply":"NOT_RUN"}\n')
-    args.output.chmod(0o600)
+    descriptor=os.open(args.output,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+    with os.fdopen(descriptor,'w') as out:out.write('{"status":"STARTED_INCOMPLETE","native_apply":"NOT_RUN"}\n')
     missing=[name for name in ('ip','unshare','nft') if not shutil.which(name)]
     if sys.platform!='linux' or missing:result={'status':'BLOCKED_RUNTIME','missing':missing,'native_apply':'NOT_RUN'}
     else:
