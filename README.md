@@ -89,3 +89,7 @@ The [DNS registration handoff](docs/engineering/authoritative-dns-registration-h
 ## Backup protection and isolated-restore assurance
 
 The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-assurance.md) requires evidence of management separation, protected-copy retention, catalogue/key availability and a current isolated useful-data restore before the backup/recovery dependency can be considered ready. The active assurance index is intentionally empty. CI never captures, deletes or restores backup data, destroys keys, reconnects a restored service or authorizes production.
+
+## Control inheritance and external-dependency assurance
+
+The [control inheritance assurance gate](docs/engineering/control-inheritance-and-external-dependency-assurance.md) makes G30 fail closed until the exact WSD/site/service/platform/control-selection scope has reviewed provider/tenant/shared/inherited allocations, current evidence for all six organizational interfaces, and no unresolved residual control gaps. The active assurance index is intentionally empty. CI cannot select controls, accept inherited evidence or residual risk, issue authorization, apply infrastructure or activate production.
