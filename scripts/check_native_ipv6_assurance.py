@@ -23,6 +23,7 @@ PLATFORMS={'NUTANIX','VMWARE_NSX','OPENSTACK'}
 FAMILY_MODES={'IPV6_ONLY','DUAL_STACK'}
 ADDRESSING_MODES={'STATIC','SLAAC','DHCPV6','SLAAC_DHCPV6'}
 GAP_STATES={'OPEN','ACCEPTED'}
+QUAL_OUTCOMES={'PASSED_NATIVE_ADDRESS_FAMILY_QUALIFICATION','FAILED_NATIVE_ADDRESS_FAMILY_QUALIFICATION','UNKNOWN_OR_INCOMPLETE'}
 ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.:-]{1,191}$')
 
 INDEX_KEYS={'format','status','reviewed_source_revision','records'}
@@ -213,11 +214,11 @@ def validate_record(record,*,as_of,root=ROOT):
         'negative_tests_ref','operational_acceptance_ref'
     ):
         opaque_ref(qualification[key],f'qualification.{key}')
-    if qualification['outcome']!='PASSED_NATIVE_ADDRESS_FAMILY_QUALIFICATION':
-        raise ValueError('Native IPv6 qualification outcome is not passing')
+    if qualification['outcome'] not in QUAL_OUTCOMES:
+        raise ValueError('Unknown native IPv6 qualification outcome')
     observed=instant(qualification['observed_at'],'qualification.observed_at')
     valid_until=instant(qualification['valid_until'],'qualification.valid_until')
-    if observed>as_of or valid_until<=observed:
+    if observed>as_of or valid_until<=observed or observed<accepted:
         raise ValueError('Native IPv6 qualification chronology invalid')
 
     gaps=record['residual_gaps']
@@ -251,7 +252,10 @@ def validate_record(record,*,as_of,root=ROOT):
     review_due=(as_of>=review_by or any(as_of>=x for x in gap_reviews))
     qualification_due=as_of>=valid_until
 
+    passed=qualification['outcome']=='PASSED_NATIVE_ADDRESS_FAMILY_QUALIFICATION'
     if record['state']=='CURRENT_QUALIFIED':
+        if not passed:
+            raise ValueError('CURRENT_QUALIFIED requires a passing native address-family qualification')
         if review_due:
             raise ValueError('CURRENT_QUALIFIED IPv6 record has expired review evidence')
         if qualification_due:
@@ -259,12 +263,18 @@ def validate_record(record,*,as_of,root=ROOT):
         if open_gaps:
             raise ValueError('CURRENT_QUALIFIED IPv6 record cannot contain OPEN residual gaps')
     elif record['state']=='REVIEW_DUE':
+        if not passed:
+            raise ValueError('REVIEW_DUE requires a previously passing native qualification')
         if not review_due:
             raise ValueError('REVIEW_DUE requires expired scope or gap review')
     elif record['state']=='QUALIFICATION_DUE':
+        if not passed:
+            raise ValueError('QUALIFICATION_DUE requires a previously passing native qualification')
         if review_due or not qualification_due:
             raise ValueError('QUALIFICATION_DUE requires current review and expired native qualification')
     elif record['state']=='GAPS_OPEN':
+        if not passed:
+            raise ValueError('GAPS_OPEN requires a passing native qualification with residual gaps')
         if review_due or qualification_due or not open_gaps:
             raise ValueError('GAPS_OPEN requires current qualification and at least one OPEN gap')
     elif record['state']=='UNCERTAIN':
