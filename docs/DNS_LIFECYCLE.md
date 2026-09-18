@@ -11,6 +11,8 @@ its independently owned native infrastructure resources.
 
 The upstream [authoritative IPAM handoff](engineering/authoritative-ipam-allocation-handoff.md) records only an opaque allocation reference in this repository. The DNS owner resolves the exact assigned value through the approved IPAM/name-assignment authority before issuing a DNS scope; a repository example, allocation handle or failed IPAM call can never supply a guessed A/AAAA/PTR value.
 
+The [authoritative DNS registration handoff](engineering/authoritative-dns-registration-handoff.md) adds an evidence/preflight layer above this writer: an exported registration must bind to CONFIRMED IPAM evidence, opaque name/zone assignment, required propagation observations and retirement/tombstone state. That layer does not invoke this writer or store the resolved name/address values.
+
 The selected candidate interface is standards-based RFC 2136 UPDATE with HMAC-SHA256
 TSIG over TCP. Actual server support, key/name/type policy, management transport,
 clock synchronization, topology and secondary/cache behavior require site acceptance.

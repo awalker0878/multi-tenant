@@ -140,6 +140,14 @@ Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_a
 
 Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated without reserving/releasing an address or writing DNS.
 
+## Authoritative DNS registration handoff
+
+Design: [Name/time/initialization service profiles](../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md) · [Address/name lifecycle](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [Scoped DNS lifecycle](../DNS_LIFECYCLE.md)
+
+Implementation: [exported DNS evidence index](../../sources/capabilities/dns_registration_index.json) · [registration evidence validator](../../scripts/check_dns_registration_records.py) · [no-guess DNS preflight](../../scripts/check_dns_registration_preflight.py) · [engineering boundary](../engineering/authoritative-dns-registration-handoff.md)
+
+Actual DNS names and A/AAAA/PTR values remain outside Git. REGISTERED state requires CONFIRMED IPAM evidence and every declared required observation; uncertain outcomes block retries and CI never invokes the RFC2136 writer.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.

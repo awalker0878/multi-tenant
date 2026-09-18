@@ -27,6 +27,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Authoritative IPAM allocation, confirmation, release and reuse-quarantine handoff](authoritative-ipam-allocation-handoff.md)
 
+[Authoritative DNS registration, propagation and retirement evidence](authoritative-dns-registration-handoff.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

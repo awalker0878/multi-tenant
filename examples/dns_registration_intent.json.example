@@ -1,0 +1,32 @@
+{
+  "format": "portable-hosting-dns-registration-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "spec": {
+    "registration_id": "EXAMPLE-DNS-REGISTRATION-01",
+    "operation_id": "EXAMPLE-DNS-OP-01",
+    "generation": 1,
+    "reservation_id": "EXAMPLE-RESERVATION-01",
+    "request_id": "EXAMPLE-SITE-CAPACITY-01",
+    "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+    "ipam_allocation_id": "EXAMPLE-IPAM-ALLOCATION-01",
+    "name_assignment_ref": "controlled-name:EXAMPLE-NOT-ASSIGNED",
+    "record_types": ["A", "PTR"],
+    "forward_zone_ref": "controlled-zone:EXAMPLE-FORWARD-NOT-APPROVED",
+    "reverse_zone_ref": "controlled-zone:EXAMPLE-REVERSE-NOT-APPROVED",
+    "ttl_profile_ref": "controlled-ttl:EXAMPLE-NOT-APPROVED",
+    "required_observations": ["AUTHORITATIVE", "RECURSIVE"],
+    "valid_until": "2026-09-19T00:00:00Z",
+    "owners": {
+      "dns_owner_role": "EXAMPLE-DNS-OWNER",
+      "ipam_owner_role": "EXAMPLE-IPAM-OWNER",
+      "service_owner_role": "EXAMPLE-SERVICE-OWNER"
+    }
+  },
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/DNS_LIFECYCLE.md",
+    "docs/engineering/authoritative-ipam-allocation-handoff.md",
+    "docs/architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md"
+  ]
+}

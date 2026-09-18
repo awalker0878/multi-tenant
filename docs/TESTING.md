@@ -145,3 +145,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Authoritative IPAM allocation handoff
 
 `python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z` validates exported authoritative-IPAM lifecycle evidence without storing actual allocation values. `python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD` asserts the current fail-closed handoff. Tests cover stable operation identity, conflicts, uncertain outcomes, confirmation after realization, release cleanup, reuse quarantine, overlap-exception references and rejection of caller-supplied address fields. Neither check reserves/releases addresses or writes DNS.
+
+
+## Authoritative DNS registration handoff
+
+`python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z` validates exported DNS registration lifecycle evidence without storing actual names or record values. `python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` verifies that DNS remains held until authoritative IPAM is confirmed. These checks do not invoke `tools/dns_change.py`, contact DNS, broaden update ACLs or establish recursive/secondary propagation unless independently evidenced.
