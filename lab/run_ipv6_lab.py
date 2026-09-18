@@ -46,23 +46,53 @@ def execute(args: list[str]) -> str:
     return result.stdout
 
 
-def fingerprint() -> str:
-    # Ignore naturally changing lifetimes/counters, retain actual configuration.
-    def stable(value):
-        if isinstance(value, dict):
-            return {k:stable(v) for k,v in value.items() if k not in
-                    ('valid_life_time','preferred_life_time','expires','stats','stats64','cacheinfo','used','lastuse')}
-        if isinstance(value, list): return [stable(v) for v in value]
-        return value
-    data = {'namespace': os.readlink('/proc/self/ns/net')}
-    for label, args in [('links',['-j','link']),('addresses',['-j','addr']),
-                        ('ipv4_routes',['-4','-j','route','show','table','all']),
-                        ('ipv6_routes',['-6','-j','route','show','table','all'])]:
-        data[label] = stable(json.loads(execute(['ip',*args])))
+VOLATILE_NETWORK_KEYS = frozenset({
+    'valid_life_time','preferred_life_time','expires','stats','stats64',
+    'cacheinfo','used','lastuse'
+})
+
+
+def stable_configuration(value):
+    """Canonicalize configuration while retaining real addresses/routes/link settings.
+
+    `ip -j` arrays are sets for this preservation check; their serialization order is
+    not configuration. Volatile lifetime/counter fields are also excluded. Values,
+    list membership, MTUs, addresses, gateways, metrics, admin flags and sysctls remain.
+    """
+    if isinstance(value, dict):
+        return {k:stable_configuration(v) for k,v in value.items()
+                if k not in VOLATILE_NETWORK_KEYS}
+    if isinstance(value, list):
+        items=[stable_configuration(v) for v in value]
+        return sorted(items,key=lambda item:json.dumps(
+            item,sort_keys=True,separators=(',',':')))
+    return value
+
+
+def configuration_digest(value) -> str:
+    canonical=stable_configuration(value)
+    return hashlib.sha256(json.dumps(
+        canonical,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+
+
+def configuration_snapshot() -> dict:
+    data={'namespace':os.readlink('/proc/self/ns/net')}
+    for label,args in [('links',['-j','link']),('addresses',['-j','addr']),
+                       ('ipv4_routes',['-4','-j','route','show','table','all']),
+                       ('ipv6_routes',['-6','-j','route','show','table','all'])]:
+        data[label]=json.loads(execute(['ip',*args]))
     for family in ('ipv4','ipv6'):
         path=Path(f'/proc/sys/net/{family}/conf/all/forwarding')
         data[family+'_forwarding']=path.read_text().strip()
-    return hashlib.sha256(json.dumps(data,sort_keys=True).encode()).hexdigest()
+    return data
+
+
+def fingerprint(snapshot: dict | None = None) -> str:
+    return configuration_digest(snapshot if snapshot is not None else configuration_snapshot())
+
+
+def section_fingerprints(snapshot: dict) -> dict[str,str]:
+    return {key:configuration_digest(value) for key,value in sorted(snapshot.items())}
 
 
 def inner() -> dict:
@@ -237,7 +267,8 @@ def main() -> int:
     missing=[name for name in ('ip','unshare','nft') if not shutil.which(name)]
     if sys.platform!='linux' or missing:result={'status':'BLOCKED_RUNTIME','missing':missing,'native_apply':'NOT_RUN'}
     else:
-        before=fingerprint();original=os.readlink('/proc/self/ns/net')
+        before_snapshot=configuration_snapshot();before=fingerprint(before_snapshot)
+        before_sections=section_fingerprints(before_snapshot);original=os.readlink('/proc/self/ns/net')
         env={key:os.environ[key] for key in ('PATH','LANG','LC_ALL','LD_LIBRARY_PATH') if key in os.environ}
         env.update(HOSTING_LAB_ORIGINAL_NETNS=original,PYTHONDONTWRITEBYTECODE='1')
         proc=subprocess.Popen(['unshare','--user','--map-root-user','--net',sys.executable,str(Path(__file__).resolve()),'--inner'],
@@ -252,8 +283,12 @@ def main() -> int:
             except ProcessLookupError:pass
             try:proc.wait(4)
             except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait(4)
-        after=fingerprint();result.update(original_namespace_configuration_unchanged=before==after,
-            original_configuration_sha256_before=before,original_configuration_sha256_after=after)
+        after_snapshot=configuration_snapshot();after=fingerprint(after_snapshot)
+        after_sections=section_fingerprints(after_snapshot)
+        result.update(original_namespace_configuration_unchanged=before==after,
+            original_configuration_sha256_before=before,original_configuration_sha256_after=after,
+            original_configuration_section_sha256_before=before_sections,
+            original_configuration_section_sha256_after=after_sections)
         if before!=after:result['status']='FAILED_ORIGINAL_CONFIGURATION_CHANGED'
     fd,temp=tempfile.mkstemp(prefix='.ipv6-report-',dir=args.output.parent)
     try:
