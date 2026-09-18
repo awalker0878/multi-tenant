@@ -2,6 +2,8 @@
 
 This is the disposition of the requested corrections against main `89946420e5de173c556414f9ad1b44d783bb63cf`, whose tree exactly matched the audited 932-file ZIP. The repository changes do not convert organizational or native implementation dependencies into completed approvals.
 
+The later integrated main snapshot `b184bc629b996e1cd658c389ba707a99f89f7c07` passed its post-merge repository, Terraform and Ansible jobs in [run 35300272211](https://github.com/awalker0878/multi-tenant/actions/runs/35300272211). [Publication verification](completion-publication-verification.md) binds those observations to that exact commit; it is not a blanket pass for future revisions.
+
 | Finding | Current disposition | Implemented correction | Remaining boundary |
 |---|---|---|---|
 | CA-01 | CORRECTED_LOCAL_VERIFIED | Code parser retains breaks/tabs/indentation; five source defects repaired. Independent check covers all 13 Code paragraphs and shell argv/YAML examples. | No native command is executed by the syntax/fidelity tests. |
@@ -14,12 +16,16 @@ This is the disposition of the requested corrections against main `89946420e5de1
 | CA-08 | CORRECTED_LOCAL_VERIFIED | One index includes CT80, RA12, W14-12 and Q11-12 with original status, source and overlap mapping; full RA text is now readable in Git. | Counts overlap and are not added as executed unique tests. |
 | CA-09 | PROPOSED_ASSERTION_ALLOCATION_COMPLETE_NATIVE_EVIDENCE_OPEN | 540 obligation/facet rows cover all 194 source requirements with owner, location, exact requirement, artifact/operating-record need, verification method, evidence class and remaining dependency. | Umbrella rows preserve complete compound wording. Owner refinement/adoption, site mechanisms and actual evidence remain open; candidate links do not satisfy controls. |
 | CA-10 | CORRECTED_CONNECTED_ENGINE_PASS | Schema export is module-only; roots validate with backend disabled. Real initial Actions run passed ten modules, ten roots and all module mock tests. | Native roots are never planned/applied. Actual schemas describe plugin support, not installed-platform conformance. |
-| CA-11 | LOCKS_GENERATED_REVIEWED_FINAL_REVISION_RERUN_REQUIRED | Initial connected Actions generated actual provider locks and schemas and passed Ansible engine checks. Locks match declared versions and are committed for readonly revalidation. | Final revision must pass again before merge; source hashes and run identity are retained. No native qualification is granted. |
+| CA-11 | MERGED_SNAPSHOT_ENGINE_AND_LOCK_REVIEW_PASSED | Post-merge main commit b184bc629b996e1cd658c389ba707a99f89f7c07 passed repository, Terraform and Ansible jobs in Actions run 35300272211, attempt 1. All 20 committed provider lockfiles passed selection review. The exact run, jobs, observed results and producer-reported artifact digests are recorded in evidence/completion-publication/verification.json. | This evidence applies only to the named merged snapshot. Later revisions, including this publication-record update, require their own successful CI. Native qualification and organizational authorization are not granted; binary artifact contents were not independently downloaded during this review. |
 
 ## Current checks
 
 `python scripts/check_documentation.py` independently compares code and ordered table cells, ADR source/rendered content and lifecycle, maintained-design structure, assertion allocation and every verification family. `python tools/check_local.py` runs the existing and corrective regressions plus the offline routing checks. `python tools/check_release.py` validates a clean current Git checkout. Run engine checks on the accepted connected toolchain; no credentials are supplied for native targets.
 
-[Maintained design workspace](../current/README.md) · [Historical findings](historical-dispositions.md) · [Verification families](verification-families.md) · [Assertion allocation](../implementation/assertion-allocation.md) · [Engine evidence](../../evidence/completion-corrections/README.md)
+[Maintained design workspace](../current/README.md) · [Historical findings](historical-dispositions.md) · [Verification families](verification-families.md) · [Assertion allocation](../implementation/assertion-allocation.md) · [Initial engine evidence](../../evidence/completion-corrections/README.md) · [Post-merge verification record](../../evidence/completion-publication/verification.json)
 
-The first connected run is not attached blindly to later source. The final branch run and merge result must be checked against their actual revision and source digests; this register is updated when that evidence exists.
+## Evidence maintenance
+
+The former CA-11 final-rerun hold is resolved for the named b184bc6 snapshot by its actual post-merge run, not by the earlier preparation run. The publication record is a bounded summary of authenticated GitHub run/job metadata and decoded logs. It is not a copy of independently downloaded artifact contents, a new test execution or an organizational acceptance record. Its artifact digests are explicitly producer-reported.
+
+Every later change must pass its own exact pull-request and post-merge checks. Use the change's actual GitHub run record rather than editing this pinned historical observation to imply that it tested a later revision. CA-06, CA-07 and CA-09 retain their owner-review or native-evidence boundaries.

@@ -1,0 +1,135 @@
+{
+  "kind": "MERGED_REPOSITORY_VALIDATION_OBSERVATION",
+  "record_version": 1,
+  "reviewed_on": "2026-09-18",
+  "repository": "awalker0878/multi-tenant",
+  "tested_commit": "b184bc629b996e1cd658c389ba707a99f89f7c07",
+  "tested_tree": "54df3ddd7924038ad6c877249b2579ada55a59cd",
+  "record_is_for_named_snapshot_only": true,
+  "later_revisions_require_separate_ci": true,
+  "evidence_basis": {
+    "workflow_metadata": "AUTHENTICATED_GITHUB_GET_REVIEWED",
+    "job_steps_and_decoded_logs": "AUTHENTICATED_GITHUB_GET_REVIEWED",
+    "binary_artifact_contents": "NOT_INDEPENDENTLY_DOWNLOADED",
+    "artifact_digest_basis": "PRODUCER_REPORTED_IN_REVIEWED_JOB_LOGS",
+    "new_test_execution_by_this_review": false
+  },
+  "workflow": {
+    "id": 35300272211,
+    "attempt": 1,
+    "name": "Architecture and automation validation",
+    "path": ".github/workflows/validate.yml",
+    "head_branch": "main",
+    "head_sha": "b184bc629b996e1cd658c389ba707a99f89f7c07",
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-09-18T02:40:26Z",
+    "updated_at": "2026-09-18T02:41:05Z",
+    "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211"
+  },
+  "jobs": [
+    {
+      "name": "repository",
+      "id": 105461255702,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211/job/105461255702",
+      "observed_results": {
+        "tracked_file_integrity": {"status": "HASHES_MATCH", "files": 1100},
+        "documentation": {
+          "status": "PASSED",
+          "checks": 36281,
+          "failures": 0,
+          "source_documents": 28,
+          "source_paragraphs_compared": 12379,
+          "tables": 486,
+          "independent_table_cells": 7976,
+          "independent_code_paragraphs": 13,
+          "form_prompts": 199,
+          "figure_occurrences": 25,
+          "local_links": 10719,
+          "fragment_links": 3726,
+          "maintained_design_records": 6,
+          "implementation_allocation_rows": 540,
+          "source_derived_adrs": 36,
+          "explicit_legacy_decision_aliases": 2,
+          "markdown_pages_checked": 601
+        },
+        "unit_and_source_tests": {"run": 556, "failures": 0, "errors": 0, "skipped": 0},
+        "offline_route_checks": {"passed": 80, "failed": 0}
+      }
+    },
+    {
+      "name": "terraform",
+      "id": 105461255686,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211/job/105461255686",
+      "observed_results": {
+        "engine_version": "1.13.5",
+        "lock_review": "PASSED_LOCK_SELECTION_REVIEW",
+        "committed_lockfiles_checked": 20,
+        "verifier": "PASSED_TOOLCHAIN_ONLY",
+        "module_scopes": 10,
+        "root_scopes": 10,
+        "schema_export": "BACKEND_FREE_MODULES_ONLY",
+        "root_backend_initialization": false,
+        "provider_tests": "MOCKED_PLAN_ONLY",
+        "native_apply": false
+      }
+    },
+    {
+      "name": "ansible",
+      "id": 105461255530,
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211/job/105461255530",
+      "observed_results": {
+        "engine_version": "2.19.7",
+        "status": "PASSED_LOCAL_ANSIBLE_ONLY",
+        "checks_passed": 11,
+        "second_run_changed_tasks": 0,
+        "check_mode_non_mutation": true,
+        "invalid_opt_in_and_foreign_route_rejected": true,
+        "native_target_contacted": false,
+        "native_configuration_changed": false
+      }
+    }
+  ],
+  "artifact_receipts": [
+    {
+      "name": "repository-local-test-reports",
+      "id": 10530005529,
+      "reported_size_bytes": 212237,
+      "producer_reported_sha256": "48bd8421617b4a30baecc767efe36e57ff6ef5ff473884ac3b90cf197f19805b",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211/artifacts/10530005529"
+    },
+    {
+      "name": "terraform-engine-reports",
+      "id": 10530140176,
+      "reported_size_bytes": 831637,
+      "producer_reported_sha256": "741ece4b54beda87e4aa3cda3b520333e551d1da8457fec8f3661082cc10a6e4",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211/artifacts/10530140176"
+    },
+    {
+      "name": "ansible-local-test-reports",
+      "id": 10529820855,
+      "reported_size_bytes": 2436,
+      "producer_reported_sha256": "38c9049ad4767526c338d25c5c37f9db891384ed294fd23c6e36c13a5dcd5269",
+      "url": "https://github.com/awalker0878/multi-tenant/actions/runs/35300272211/artifacts/10529820855"
+    }
+  ],
+  "limits": {
+    "native_platform_qualification": "NOT_RUN",
+    "production_activation": "NOT_PERFORMED",
+    "organizational_acceptance": "NOT_ISSUED",
+    "missing_original_rad_tad_files": "NOT_RECOVERED",
+    "historical_finding_closure": "OWNER_REVIEW_PENDING",
+    "implementation_assertion_acceptance": "OWNER_AND_NATIVE_EVIDENCE_PENDING",
+    "external_reference_revalidation": "NOT_PERFORMED",
+    "packet_namespace_campaign_in_this_workflow": "NOT_RUN",
+    "ci_artifact_retention_days": 14,
+    "counts_are_additive_unique_security_coverage": false
+  }
+}

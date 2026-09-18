@@ -71,9 +71,9 @@
   },
   {
     "id": "CA-11",
-    "status": "LOCKS_GENERATED_REVIEWED_FINAL_REVISION_RERUN_REQUIRED",
-    "correction": "Initial connected Actions generated actual provider locks and schemas and passed Ansible engine checks. Locks match declared versions and are committed for readonly revalidation.",
-    "boundary": "Final revision must pass again before merge; source hashes and run identity are retained. No native qualification is granted.",
+    "status": "MERGED_SNAPSHOT_ENGINE_AND_LOCK_REVIEW_PASSED",
+    "correction": "Post-merge main commit b184bc629b996e1cd658c389ba707a99f89f7c07 passed repository, Terraform and Ansible jobs in Actions run 35300272211, attempt 1. All 20 committed provider lockfiles passed selection review. The exact run, jobs, observed results and producer-reported artifact digests are recorded in evidence/completion-publication/verification.json.",
+    "boundary": "This evidence applies only to the named merged snapshot. Later revisions, including this publication-record update, require their own successful CI. Native qualification and organizational authorization are not granted; binary artifact contents were not independently downloaded during this review.",
     "adoption_authority": "NOT_ISSUED_BY_THIS_CHANGE"
   }
 ]
