@@ -127,8 +127,8 @@ def validate_request(request: dict, registry: dict) -> None:
         raise ValueError('This precheck cannot carry production authority')
 
 
-def evaluate(request: dict, registry: dict, qualification_index=None, as_of=None) -> dict:
-    capabilities.validate(registry, qualification_index=qualification_index, as_of=as_of)
+def evaluate(request: dict, registry: dict, qualification_index=None, provenance_index=None, as_of=None) -> dict:
+    capabilities.validate(registry, qualification_index=qualification_index, provenance_index=provenance_index, as_of=as_of)
     validate_request(request, registry)
     mandatory = set(request['mandatory_capabilities'])
     assurance = request['required_assurance_profile']
@@ -139,7 +139,7 @@ def evaluate(request: dict, registry: dict, qualification_index=None, as_of=None
         profile = registry['profiles'][platform]
         family_ok, blockers = capabilities.eligible(
             registry, platform, mandatory, assurance_profile=assurance,
-            qualification_index=qualification_index, as_of=as_of)
+            qualification_index=qualification_index, provenance_index=provenance_index, as_of=as_of)
         optional_unavailable = sorted(
             cap for cap in request['optional_capabilities']
             if profile['capabilities'][cap]['qualification'] != 'NATIVE_QUALIFIED')
@@ -175,7 +175,7 @@ def evaluate(request: dict, registry: dict, qualification_index=None, as_of=None
             'compute, storage, network, key and recovery compatibility',
             'address and security-edge capacity',
             'shared-service dependencies',
-            'site-specific native qualification and operating acceptance'
+            'current version/source provenance, site-specific native qualification and operating acceptance'
         ],
         'limits': [
             'Platform-family capability evidence only; not complete Admit or Place-and-reserve.',
