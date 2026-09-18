@@ -172,6 +172,14 @@ Implementation: [exported operational handover assurance index](../../sources/ca
 
 Current assurance requires named operating decision owners, accepted as-built/support/recovery scope, current privileged-access and monitoring review, explicit containment release and a current scoped incident exercise. CI performs no live access, incident, recovery, change, apply or activation action.
 
+## Version, source provenance and lifecycle assurance
+
+Design: [G32 version and source provenance](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G32) · [Implementation tuple and decision package](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [Support tuple evidence checklist](../engineering/vendor-cards/7-support-tuple-variations-and-evidence-checklist.md)
+
+Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../scripts/check_version_source_provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
+
+A current native qualification now requires the same exact product/API/provider/hardware/licence tuple to have CURRENT_SUPPORTED provenance. Source review, installed compatibility and native qualification remain separate evidence states; none grants placement or activation authority.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
