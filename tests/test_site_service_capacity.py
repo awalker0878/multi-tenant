@@ -148,15 +148,17 @@ class SiteCapacityIndexTests(unittest.TestCase):
         idx=capacity.load();idx['records']=[r]
         with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
 
-    def test_procurement_state_order_is_checked(self):
-        r=site_record();r['dimensions'][0]['received']='150'
+    def test_lifecycle_inventory_states_do_not_gain_invented_monotonic_semantics(self):
+        r=site_record();r['dimensions'][0].update(received='80',staged='120',commissioned='90')
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        result=capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        self.assertEqual(result['current_service_envelopes'],1)
 
-    def test_surviving_capacity_cannot_exceed_commissioned(self):
-        r=site_record();r['dimensions'][0]['measured_surviving_capacity']='111'
+    def test_surviving_measurement_is_not_compared_to_generic_commissioned_count(self):
+        r=site_record();r['dimensions'][0].update(measured_surviving_capacity='111',commissioned='90')
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        result=capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        self.assertEqual(result['current_service_envelopes'],1)
 
     def test_overcommitted_dimension_is_rejected(self):
         r=site_record();r['dimensions'][0].update(
