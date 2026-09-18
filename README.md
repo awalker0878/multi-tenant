@@ -109,3 +109,7 @@ The [extension adoption gate](docs/engineering/bounded-extension-adoption-and-qu
 ## Knowledge maintenance and release-integrity assurance
 
 The [knowledge-maintenance gate](docs/engineering/knowledge-maintenance-and-release-integrity-assurance.md) makes G34 fail closed beyond static link checking. It validates the eight source-derived primary knowledge homes and requires revision-specific version-set evidence, maintaining owner/cadence, release-wide link/requirement/decision consistency, duplicate-policy and parent/supplement drift review, change-ripple review and an approved change record. The active release-maintenance index is intentionally empty.
+
+## Security-edge and ZIP assurance
+
+The [security-edge ZIP gate](docs/engineering/security-edge-zip-assurance.md) addresses the remaining I03/I04 native boundary dependency. A current ZIP requires an exact pairwise boundary, both adjacent authorities, joint approval, deny-first policy, native forward/reply and bypass review, inspection/logging/session evidence, management separation, HA/failure tests and measured survivor capacity. Distributed/shared realizations must prove equivalent mandatory outcomes. The active ZIP assurance index is intentionally empty.
