@@ -57,6 +57,19 @@ The checker rejects expired approval or evidence, approval that predates its req
 evidence, missing tested limits, unknown capabilities, duplicate records, missing
 owners, absent repository sources, and records without timezone-aware validity.
 
+## Version/source provenance prerequisite
+
+A current qualification dossier now also requires one matching `CURRENT_SUPPORTED`
+record in
+[`sources/capabilities/version_source_provenance_index.json`](../../sources/capabilities/version_source_provenance_index.json).
+The platform family, `product_tuple_id`, product/API versions, tested automation-provider
+versions, hardware-profile reference and feature/licence set must match exactly.
+
+This provenance record is deliberately separate from native test evidence. A reviewed
+vendor page, provider lock selection or support matrix cannot qualify a platform, while
+native test success cannot keep a tuple current after its compatibility/source/lifecycle
+record expires or becomes unsupported.
+
 ## Relationship to the capability registry
 
 The capability registry remains the small portable summary consumed by the
