@@ -101,3 +101,7 @@ The [operational handover assurance gate](docs/engineering/operational-handover-
 ## Version, source provenance and lifecycle assurance
 
 The [version/source provenance gate](docs/engineering/version-source-provenance-and-lifecycle-assurance.md) makes G32 fail closed until an exact product/API/provider/hardware/licence tuple has current official support/source reviews, dated compatibility evidence and lifecycle ownership. Source edition and review state remain separate, partial or inherited references cannot satisfy current support, and native qualification now requires a matching CURRENT_SUPPORTED provenance record. The active provenance index is intentionally empty.
+
+## Bounded extension adoption and qualification assurance
+
+The [extension adoption gate](docs/engineering/bounded-extension-adoption-and-qualification-assurance.md) makes G33 fail closed for bare metal, container hosting, accelerators/special devices, L2-stretch/cross-stack patterns, higher-assurance designs and future platforms. Every accepted record remains `EXTENSION_ONLY` and requires complete topology/lifecycle design, all qualification dimensions, kind-specific evidence, explicit unsupported capabilities and no unresolved gaps. The active extension index is intentionally empty.
