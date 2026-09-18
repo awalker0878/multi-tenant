@@ -1,0 +1,28 @@
+{
+  "id": "AUTHORITATIVE-DNS-REGISTRATION-01",
+  "source_baseline_commit": "a6cd90489a0a9842c870870341b896eae99e8e7c",
+  "status": "IMPLEMENTED_EVIDENCE_PREFLIGHT_NO_DNS_MUTATION",
+  "requirements": ["IPAM-004", "INV-004", "INV-007"],
+  "dns_index": "sources/capabilities/dns_registration_index.json",
+  "record_checker": "scripts/check_dns_registration_records.py",
+  "preflight": "scripts/check_dns_registration_preflight.py",
+  "native_writer": "tools/dns_change.py",
+  "engineering": "docs/engineering/authoritative-dns-registration-handoff.md",
+  "current_records": 0,
+  "authority": {
+    "may_write_dns": false,
+    "may_delete_dns": false,
+    "may_release_name": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select and qualify actual authoritative DNS product/update interface",
+    "accept exact name/zone/TTL scope and scoped key ACL",
+    "resolve confirmed allocation through authoritative IPAM/name owner",
+    "execute approved forward and reverse updates under DNS owner",
+    "collect required authoritative/recursive/secondary propagation evidence",
+    "retain tombstone/reuse controls through retirement"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
