@@ -1,0 +1,50 @@
+{
+  "id": "QUAL-NUTANIX-EXAMPLE-01",
+  "state": "EXAMPLE_NOT_APPROVED",
+  "platform": "nutanix",
+  "product_tuple_id": "example-nutanix-tuple",
+  "product_tuple": {
+    "product": "EXAMPLE-NOT-A-SELECTED-PRODUCT",
+    "product_version": "0.0-example",
+    "api": "EXAMPLE-API",
+    "api_version": "0.0-example",
+    "automation_providers": ["nutanix/nutanix = 2.4.2"],
+    "hardware_profile_ref": "controlled-record:EXAMPLE-NOT-APPROVED",
+    "feature_licenses": ["EXAMPLE-NOT-A-LICENSE-ASSERTION"]
+  },
+  "assurance_profiles": ["EXAMPLE-NOT-AN-APPROVED-PROFILE"],
+  "qualified_capabilities": ["network_domain", "ipv4"],
+  "applicable_test_sets": ["EXAMPLE-CT-NOT-RUN"],
+  "tested_limits": [
+    {
+      "name": "EXAMPLE-NOT-A-TESTED-LIMIT",
+      "observed_bound": "NOT-RUN",
+      "unit": "none",
+      "evidence_ref": "controlled-evidence:EXAMPLE-NOT-EVIDENCE"
+    }
+  ],
+  "evidence": [
+    {
+      "ref": "controlled-evidence:EXAMPLE-NOT-EVIDENCE",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "observed_at": "2026-01-01T00:00:00Z",
+      "expires_at": "2026-01-02T00:00:00Z",
+      "test_set": "EXAMPLE-CT-NOT-RUN"
+    }
+  ],
+  "approval": {
+    "authority_role": "EXAMPLE-SECURITY-AUTHORITY",
+    "decision_ref": "controlled-decision:EXAMPLE-NOT-APPROVED",
+    "approved_at": "2026-01-01T01:00:00Z",
+    "expires_at": "2026-01-02T00:00:00Z"
+  },
+  "owners": {
+    "platform_engineering_role": "EXAMPLE-PLATFORM-OWNER",
+    "security_authority_role": "EXAMPLE-SECURITY-AUTHORITY"
+  },
+  "exclusions": ["This example is intentionally invalid for the active qualification index."],
+  "source_refs": [
+    "docs/engineering/platform-native-qualification.md",
+    "docs/engineering/platform-capability-registry.md"
+  ]
+}
