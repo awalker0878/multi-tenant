@@ -1,0 +1,30 @@
+{
+  "id": "BOUNDED-EXTENSION-ADOPTION-01",
+  "source_baseline_commit": "90693003a9c67edaef324fddeb694639ae3c0100",
+  "status": "IMPLEMENTED_EXTENSION_ADOPTION_EVIDENCE_NO_EXTENSION_PROVISIONING",
+  "gap_ids": ["G33"],
+  "requirements": ["REF-002", "FUT-001", "FUT-002", "FUT-003"],
+  "assurance_index": "sources/capabilities/extension_adoption_assurance_index.json",
+  "checker": "scripts/check_extension_adoption_assurance.py",
+  "preflight": "scripts/check_extension_adoption_readiness.py",
+  "engineering": "docs/engineering/bounded-extension-adoption-and-qualification-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_add_to_base_service": false,
+    "may_provision_extension": false,
+    "may_change_physical_fabric": false,
+    "may_create_cluster": false,
+    "may_assign_device": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "approve a requested extension-specific service scope and accountable owner",
+    "produce extension-specific component topology, trust/failure boundaries and low-level design",
+    "select and document actual supported stack, provisioning ownership and service parameters",
+    "execute all applicable extension qualification dimensions and kind-specific evidence",
+    "declare unsupported capabilities and portability impact without weakening mandatory controls",
+    "qualify recovery, exit, retirement and sanitization/reset obligations before production offering"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

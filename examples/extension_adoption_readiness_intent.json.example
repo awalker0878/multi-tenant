@@ -1,0 +1,15 @@
+{
+  "format": "portable-hosting-extension-adoption-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-EXTENSION-01",
+  "extension_kind": "CONTAINER_HOSTING",
+  "extension_id": "example-container-extension-not-adopted",
+  "extension_profile_ref": "controlled-extension-profile:EXAMPLE-NOT-ADOPTED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-OFFERED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/architecture/reference/19-physical-workloads-and-future-platform-extensions.md",
+    "docs/assurance/site-qualification/8-extensions-and-release-maintenance.md",
+    "docs/engineering/bounded-extension-adoption-and-qualification-assurance.md"
+  ]
+}
