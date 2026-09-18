@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "enabled": false,
   "operation_id": "00000000-0000-4000-8000-000000000001",
   "tenant_id": "tenant-001",
@@ -18,7 +18,9 @@
       "values": [
         "192.0.2.10"
       ],
-      "maximum_ttl": 300
+      "maximum_ttl": 300,
+      "allocation_binding_ref": "ipam-allocation:EXAMPLE-A-01",
+      "allocation_generation": 1
     },
     {
       "name": "app.fixture.invalid.",
@@ -26,7 +28,9 @@
       "values": [
         "2001:db8::10"
       ],
-      "maximum_ttl": 300
+      "maximum_ttl": 300,
+      "allocation_binding_ref": "ipam-allocation:EXAMPLE-AAAA-01",
+      "allocation_generation": 1
     }
   ]
 }
