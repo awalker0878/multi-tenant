@@ -100,6 +100,14 @@ Implementation: [machine-readable registry](../../sources/capabilities/platform_
 
 The registry distinguishes candidate source and local fixtures from native qualification. It currently makes no platform production-eligible and does not perform placement.
 
+## Native PlatformProfile qualification dossier
+
+Design: [Site qualification and evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md) · [QUAL-001 / ASSUR-003 requirements](../assurance/requirements.md#QUAL-001)
+
+Implementation: [active qualification index](../../sources/capabilities/qualification_index.json) · [dossier validator](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/platform-native-qualification.md)
+
+A native-qualified registry claim must be backed by a current exact-tuple dossier with tested limits, evidence freshness, owners and an independent approval reference. The active index is intentionally empty and grants no placement or activation authority.
+
 ## Pre-placement platform-family eligibility
 
 Design: [Tenant/WSD placement](../architecture/reference/7-tenant-environments-and-security-domain-placement.md) · [Compute and workload placement](../architecture/reference/11-compute-pools-hypervisors-and-workload-placement.md) · [Provisioning admission sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md)

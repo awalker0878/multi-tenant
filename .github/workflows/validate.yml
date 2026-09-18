@@ -30,6 +30,8 @@ jobs:
         run: python scripts/check_documentation.py
       - name: Native reference planning inputs and original W14 associations
         run: python scripts/commissioning_pack.py check > build/reports/native_reference_planning.json
+      - name: Current exact-tuple native qualification dossiers
+        run: python scripts/check_platform_qualification.py > build/reports/platform_native_qualification.json
       - name: Platform capability registry evidence boundary
         run: python scripts/check_platform_capabilities.py > build/reports/platform_capability_registry.json
       - name: Platform-family pre-placement must remain held without native qualification

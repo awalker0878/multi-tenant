@@ -125,3 +125,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Pre-placement platform-family eligibility
 
 `python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM` verifies that the current WSD capability precheck remains fail-closed because no platform capability is natively qualified. Without `--expected-status`, a held request exits nonzero. This check does not validate requester authority, site/cell/pool selection, quota, surviving capacity, storage/key/recovery compatibility, native placement or production activation.
+
+
+## Native PlatformProfile qualification dossier
+
+`python scripts/check_platform_qualification.py` validates the active exact-tuple qualification index, including owners, applicable tests, tested limits, evidence hashes/freshness and approval validity. The current index is intentionally empty. `scripts/check_platform_capabilities.py` then refuses any future `NATIVE_QUALIFIED` claim that lacks a current matching dossier for the same tuple/capability/evidence scope. Neither check contacts a platform, selects a site, reserves capacity, applies infrastructure or issues production authorization.
