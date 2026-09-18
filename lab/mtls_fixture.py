@@ -83,7 +83,7 @@ def recv_exact(sock,n):
 class Service:
     def __init__(self,address,port,cert,key,ca,allowed):
         ip=ipaddress.ip_address(address)
-        if not ip.is_loopback and not (ip.version==4 and any(ip in ipaddress.ip_network(n) for n in ('192.0.2.0/24','198.51.100.0/24','203.0.113.0/24'))):
+        if not ip.is_loopback and not ((ip.version==4 and any(ip in ipaddress.ip_network(n) for n in ('192.0.2.0/24','198.51.100.0/24','203.0.113.0/24'))) or (ip.version==6 and ip in ipaddress.ip_network('2001:db8::/32'))):
             raise ValueError('TLS fixture can only bind loopback/documentation addresses')
         self.context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         self.context.minimum_version=ssl.TLSVersion.TLSv1_3
