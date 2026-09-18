@@ -22,7 +22,7 @@ For every dimension:
 available = measured surviving capacity - operational reserve - existing commitment - unavailable capacity
 ```
 
-Reserved and consumed are reporting observations, not quantities that are added together. Existing commitment is the authoritative already-admitted total and must be at least the larger of those observations. The validator also requires procured >= received >= staged >= commissioned, measured surviving capacity <= commissioned, and available >= 0.
+Reserved and consumed are reporting observations, not quantities that are added together. Existing commitment is the authoritative already-admitted total and must be at least the larger of those observations. The procured, received, staged and commissioned values are retained as distinct lifecycle observations; this generic checker does not invent a cumulative arithmetic relationship between them. The admission calculation requires available >= 0 and keeps its measured-survivor/reserve/commitment/unavailable quantities in one declared unit.
 
 These are consistency checks, not proof that a measurement is authentic.
 
