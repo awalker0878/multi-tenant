@@ -2,4 +2,4 @@
 # Reproducible bootstrap pins; not a complete transitive hash lock or security approval.
 PyYAML==6.0.2
 Jinja2==3.1.6
-ansible-core==2.19.7
+ansible-core==2.21.4
