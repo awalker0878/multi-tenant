@@ -13,7 +13,7 @@ from unittest.mock import patch
 import dns.flags
 import dns.message
 import dns.rrset
-from lab import ipv6_fixture as f, ipv6_worker as worker
+from lab import ipv6_fixture as f, ipv6_worker as worker, run_ipv6_lab as routed
 
 
 class FixedScopeTests(unittest.TestCase):
@@ -45,6 +45,52 @@ class FixedScopeTests(unittest.TestCase):
         self.assertEqual(f.safe_interface('v123b'),'v123b')
         for value in ('eth0','all','lo','v1b/forwarding','../all','v1000b'):
             with self.subTest(value=value),self.assertRaises(ValueError):f.safe_interface(value)
+
+
+class HostFingerprintTests(unittest.TestCase):
+    def base(self):
+        return {
+            'namespace':'net:[100]',
+            'links':[
+                {'ifindex':2,'ifname':'eth0','mtu':1500,'flags':['BROADCAST','UP','LOWER_UP'],
+                 'stats64':{'rx':1}},
+                {'ifindex':1,'ifname':'lo','mtu':65536,'flags':['LOOPBACK','UP']}],
+            'addresses':[{'ifindex':2,'addr_info':[
+                {'family':'inet6','local':'2001:db8::10','prefixlen':64,
+                 'valid_life_time':100,'preferred_life_time':50}]}],
+            'ipv4_routes':[{'dst':'default','gateway':'192.0.2.1','dev':'eth0','metric':100}],
+            'ipv6_routes':[{'dst':'2001:db8::/64','dev':'eth0','metric':100,'expires':30}],
+            'ipv4_forwarding':'0','ipv6_forwarding':'0'}
+
+    def test_equivalent_order_and_volatile_fields_have_same_digest(self):
+        one=self.base();two=deepcopy(one)
+        two['links'].reverse();two['links'][0]['flags'].reverse()
+        two['addresses'][0]['addr_info'][0]['valid_life_time']=1
+        two['addresses'][0]['addr_info'][0]['preferred_life_time']=1
+        two['ipv6_routes'][0]['expires']=1
+        self.assertEqual(routed.fingerprint(one),routed.fingerprint(two))
+
+    def test_mtu_change_is_detected(self):
+        one=self.base();two=deepcopy(one);two['links'][0]['mtu']=1400
+        self.assertNotEqual(routed.fingerprint(one),routed.fingerprint(two))
+
+    def test_address_change_is_detected(self):
+        one=self.base();two=deepcopy(one);two['addresses'][0]['addr_info'][0]['local']='2001:db8::11'
+        self.assertNotEqual(routed.fingerprint(one),routed.fingerprint(two))
+
+    def test_route_change_is_detected(self):
+        one=self.base();two=deepcopy(one);two['ipv4_routes'][0]['gateway']='192.0.2.254'
+        self.assertNotEqual(routed.fingerprint(one),routed.fingerprint(two))
+
+    def test_forwarding_change_is_detected(self):
+        one=self.base();two=deepcopy(one);two['ipv6_forwarding']='1'
+        self.assertNotEqual(routed.fingerprint(one),routed.fingerprint(two))
+
+    def test_section_fingerprints_identify_changed_area_without_raw_values(self):
+        one=self.base();two=deepcopy(one);two['links'][0]['mtu']=1400
+        before=routed.section_fingerprints(one);after=routed.section_fingerprints(two)
+        self.assertNotEqual(before['links'],after['links'])
+        for key in set(before)-{'links'}:self.assertEqual(before[key],after[key])
 
 
 class PolicyTests(unittest.TestCase):
