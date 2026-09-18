@@ -1,0 +1,19 @@
+{
+  "format": "portable-hosting-operational-handover-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-SITE-CAPACITY-01",
+  "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+  "required_scope": {
+    "site_ref": "controlled-site:EXAMPLE-NOT-ACCEPTED",
+    "service_class_ref": "controlled-service-class:EXAMPLE-NOT-ACCEPTED",
+    "platform_profile_ref": "controlled-platform-profile:EXAMPLE-NOT-QUALIFIED",
+    "operating_model_ref": "controlled-operating-model:EXAMPLE-NOT-ACCEPTED",
+    "recovery_profile_ref": "controlled-recovery-profile:EXAMPLE-NOT-ACCEPTED"
+  },
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/assurance/site-qualification/7-operating-accountability-handover-and-change.md",
+    "docs/operations/recovery-transition/8-accept-operational-responsibility-for-the-delivered-scope.md"
+  ]
+}
