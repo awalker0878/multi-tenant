@@ -188,6 +188,14 @@ Implementation: [active extension assurance index](../../sources/capabilities/ex
 
 Every accepted extension remains EXTENSION_ONLY. Current adoption requires complete design references, all qualification dimensions, kind-specific evidence, explicit unsupported capabilities, denied mandatory-control weakening and no OPEN residual gaps; CI performs no extension provisioning or activation.
 
+## Knowledge maintenance and release-integrity assurance
+
+Design: [G34 knowledge maintenance](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G34) · [Primary knowledge homes and change ripples](../assurance/gap-map/2-primary-knowledge-homes-and-cross-cutting-changes.md#GM_s_002) · [Documentation migration and maintenance](../DOCUMENTATION_MIGRATION.md)
+
+Implementation: [primary knowledge-home registry](../../sources/documentation/knowledge_home_registry.json) · [release-maintenance assurance index](../../sources/documentation/release_maintenance_assurance_index.json) · [maintenance validator](../../scripts/check_knowledge_maintenance_assurance.py) · [readiness preflight](../../scripts/check_knowledge_maintenance_readiness.py) · [engineering boundary](../engineering/knowledge-maintenance-and-release-integrity-assurance.md)
+
+Static links and requirement mappings are necessary but do not create a maintained-release decision. Current assurance additionally requires accountable owner/cadence, revision-specific version-set evidence, duplicate/drift review, change-ripple review, approved change control and no unresolved conflicts.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
