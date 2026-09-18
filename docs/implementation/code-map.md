@@ -132,6 +132,14 @@ Implementation: [exported reservation evidence index](../../sources/capabilities
 
 The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding, owner/expiry and conflict/uncertain-outcome handling are validated, but CI never creates or releases a reservation or allocates an address.
 
+## Authoritative IPAM allocation handoff
+
+Design: [Addressing and authoritative IPAM](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [Reserve/confirm/release lifecycle](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
+
+Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../scripts/check_ipam_allocation_records.py) · [no-guess allocation preflight](../../scripts/check_ipam_allocation_preflight.py) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
+
+Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated without reserving/releasing an address or writing DNS.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
