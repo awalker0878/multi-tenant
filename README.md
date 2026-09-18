@@ -54,3 +54,8 @@ The [I09 Nutanix task-tree extension](docs/implementation/nutanix-task-tree-read
 ## Platform capability evidence
 
 The [machine-readable platform capability registry](docs/engineering/platform-capability-registry.md) records candidate implementation coverage separately from native qualification. Current entries fail closed for placement because no installed platform tuple has completed native qualification; local source or fixtures are not promoted to production capability evidence.
+
+
+## Pre-placement platform-family eligibility
+
+The [platform-family eligibility precheck](docs/engineering/pre-placement-platform-eligibility.md) consumes a reviewed WSD engineering reference plus mandatory/optional portable capabilities and fails closed when no candidate family is natively qualified. It does not choose a site, reserve capacity, allocate infrastructure, run Terraform, or authorize activation. The repository example is intentionally held until native platform qualification exists.
