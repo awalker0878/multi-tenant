@@ -113,3 +113,7 @@ The [knowledge-maintenance gate](docs/engineering/knowledge-maintenance-and-rele
 ## Security-edge and ZIP assurance
 
 The [security-edge ZIP gate](docs/engineering/security-edge-zip-assurance.md) addresses the remaining I03/I04 native boundary dependency. A current ZIP requires an exact pairwise boundary, both adjacent authorities, joint approval, deny-first policy, native forward/reply and bypass review, inspection/logging/session evidence, management separation, HA/failure tests and measured survivor capacity. Distributed/shared realizations must prove equivalent mandatory outcomes. The active ZIP assurance index is intentionally empty.
+
+## Native readback, writer-fencing and reconciliation assurance
+
+The [native reconciliation gate](docs/engineering/native-readback-writer-fencing-and-reconciliation-assurance.md) addresses I09 above the existing NSX, Nutanix and Neutron read-only observers. A matching readback is insufficient: current readiness also requires exact installed API/RBAC/default/version-token applicability, complete task/entity coverage, true scoped writer fencing, current containment state, exact operation generation and an attributable data-safe reconciliation decision. The active reconciliation index is intentionally empty and CI cannot list/cancel tasks, release containment, import state, repair, delete, apply or activate.
