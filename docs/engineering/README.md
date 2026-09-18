@@ -43,6 +43,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Security-edge and ZIP assurance](security-edge-zip-assurance.md)
 
+[Native readback, writer-fencing and reconciliation assurance](native-readback-writer-fencing-and-reconciliation-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
