@@ -23,6 +23,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Fail-closed site/cell/service-class surviving-capacity eligibility](site-service-capacity-eligibility.md)
 
+[External-authority reservation preflight and reconciliation evidence](reservation-preflight-and-reconciliation.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
