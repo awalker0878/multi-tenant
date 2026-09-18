@@ -129,7 +129,7 @@ def dimension_available(dimension):
     return surviving - reserve - commitment - unavailable
 
 
-def validate_record(record, *, qindex, as_of, root=ROOT):
+def validate_record(record, *, qindex, provenance_index=None, as_of, root=ROOT):
     if not isinstance(record, dict) or set(record) != RECORD_KEYS:
         raise ValueError('Site capacity record has unexpected or missing fields')
     if record['state'] != 'CURRENT_COMMISSIONED':
@@ -140,7 +140,7 @@ def validate_record(record, *, qindex, as_of, root=ROOT):
     if record['platform'] not in PLATFORMS:
         raise ValueError('Unknown platform family')
 
-    qsummary = qualification.validate(qindex, as_of=as_of, root=root)
+    qsummary = qualification.validate(qindex, as_of=as_of, root=root, provenance_index=provenance_index)
     matches = [
         item for item in qsummary['records']
         if item['id'] == record['qualification_record_id']
@@ -234,7 +234,7 @@ def validate_record(record, *, qindex, as_of, root=ROOT):
     }
 
 
-def validate(index, *, qindex=None, as_of=None, root=ROOT):
+def validate(index, *, qindex=None, provenance_index=None, as_of=None, root=ROOT):
     if as_of is None:
         as_of = datetime.now(timezone.utc)
     if not isinstance(as_of, datetime) or as_of.tzinfo is None:
@@ -256,7 +256,7 @@ def validate(index, *, qindex=None, as_of=None, root=ROOT):
     records = []
     service_keys = set()
     for record in index['records']:
-        checked = validate_record(record, qindex=qindex, as_of=as_of, root=root)
+        checked = validate_record(record, qindex=qindex, provenance_index=provenance_index, as_of=as_of, root=root)
         if checked['id'] in seen:
             raise ValueError('Duplicate site capacity record ID')
         seen.add(checked['id'])
