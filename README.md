@@ -79,3 +79,8 @@ The [reservation preflight](docs/engineering/reservation-preflight-and-reconcili
 ## Authoritative IPAM allocation handoff
 
 The [IPAM allocation handoff](docs/engineering/authoritative-ipam-allocation-handoff.md) binds the parent reservation's stable IPAM dependency operation to exported authoritative allocation lifecycle evidence. Git stores no actual address/prefix value: unique allocation is the default, overlap requires an explicit exception reference, uncertain outcomes stop retries, and release requires route/DHCP/DNS/policy/logging/incident-response cleanup plus reuse quarantine. Actual IPAM mutation remains external.
+
+
+## Authoritative DNS registration handoff
+
+The [DNS registration handoff](docs/engineering/authoritative-dns-registration-handoff.md) binds an immutable DNS operation to a confirmed authoritative IPAM allocation and opaque name/zone scope. Git stores no actual FQDN or A/AAAA/PTR value. Required authoritative/recursive/secondary observations are explicit, uncertain outcomes stop retries, and retirement preserves tombstone/reuse controls. The existing RFC2136 client remains a separately approved service-owner mutation path and is never invoked by CI.
