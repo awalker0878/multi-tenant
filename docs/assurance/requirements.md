@@ -1485,6 +1485,8 @@ Only approved versioned images and baselines SHALL be deployed; each SHALL inclu
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-036](test-specifications.md#CT-036) · [CT-040](test-specifications.md#CT-040) · [CT-041](test-specifications.md#CT-041) |
 
+Related ADRs: [ADR-0038](../adr/0038-govern-image-and-privileged-dependency-provenance-across-their-lifecycle.md)
+
 <a id="IMG-002"></a>
 ## IMG-002
 
@@ -1499,6 +1501,8 @@ Runtime configuration SHALL be verified against the required baseline after prov
 | Wording disposition | Unchanged from v1.2 |
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-014](test-specifications.md#CT-014) · [CT-036](test-specifications.md#CT-036) · [CT-040](test-specifications.md#CT-040) |
+
+Related ADRs: [ADR-0038](../adr/0038-govern-image-and-privileged-dependency-provenance-across-their-lifecycle.md)
 
 <a id="BKP-001"></a>
 ## BKP-001
@@ -1806,6 +1810,8 @@ Every platform SHALL publish a machine-readable capability profile and a tested 
 | Wording disposition | Unchanged from v1.2 |
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-015](test-specifications.md#CT-015) · [CT-018](test-specifications.md#CT-018) · [CT-080](test-specifications.md#CT-080) |
+
+Related ADRs: [ADR-0017](../adr/0017-separate-reference-adoption-technical-qualification-and-authorization.md)
 
 <a id="PORT-002"></a>
 ## PORT-002
@@ -2246,7 +2252,7 @@ Provider versions SHALL be constrained and dependency lock files SHALL be commit
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-015](test-specifications.md#CT-015) · [CT-042](test-specifications.md#CT-042) · [CT-048](test-specifications.md#CT-048) |
 
-Related ADRs: [ADR-0013](../adr/0013-compose-provisioning-across-separate-platform-and-service-authorities.md)
+Related ADRs: [ADR-0013](../adr/0013-compose-provisioning-across-separate-platform-and-service-authorities.md) · [ADR-0038](../adr/0038-govern-image-and-privileged-dependency-provenance-across-their-lifecycle.md)
 
 <a id="TF-003"></a>
 ## TF-003
@@ -2329,6 +2335,8 @@ Remote state backends SHALL use encryption, strong authentication, locking, reco
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-043](test-specifications.md#CT-043) · [CT-044](test-specifications.md#CT-044) · [CT-055](test-specifications.md#CT-055) |
 
+Related ADRs: [ADR-0013](../adr/0013-compose-provisioning-across-separate-platform-and-service-authorities.md) · [ADR-0016](../adr/0016-assign-one-authoritative-writer-per-native-object-and-sensitive-subresource.md)
+
 <a id="STATE-003"></a>
 ## STATE-003
 
@@ -2410,6 +2418,8 @@ Static privileged provider credentials SHALL NOT be embedded in Terraform source
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-043](test-specifications.md#CT-043) |
 
+Related ADRs: [ADR-0038](../adr/0038-govern-image-and-privileged-dependency-provenance-across-their-lifecycle.md)
+
 <a id="SEC-002"></a>
 ## SEC-002
 
@@ -2439,6 +2449,8 @@ Credential rotation, revocation, and break-glass recovery SHALL be tested as par
 | Wording disposition | Unchanged from v1.2 |
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-027](test-specifications.md#CT-027) · [CT-028](test-specifications.md#CT-028) · [CT-043](test-specifications.md#CT-043) |
+
+Related ADRs: [ADR-0029](../adr/0029-keep-recovery-trust-material-independent-of-the-platform-it-unlocks.md)
 
 <a id="SEC-004"></a>
 ## SEC-004
@@ -2679,6 +2691,8 @@ Logs SHALL contain stable identifiers sufficient to correlate tenant, WSD, Secur
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-010](test-specifications.md#CT-010) · [CT-049](test-specifications.md#CT-049) |
 
+Related ADRs: [ADR-0037](../adr/0037-keep-attributable-telemetry-independent-and-define-collection-loss-behaviour.md)
+
 <a id="OBS-002"></a>
 ## OBS-002
 
@@ -2694,6 +2708,8 @@ Security control logging SHALL not depend solely on the tenant workload being he
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-010](test-specifications.md#CT-010) · [CT-050](test-specifications.md#CT-050) |
 
+Related ADRs: [ADR-0037](../adr/0037-keep-attributable-telemetry-independent-and-define-collection-loss-behaviour.md)
+
 <a id="OBS-003"></a>
 ## OBS-003
 
@@ -2708,6 +2724,8 @@ Logging profiles SHALL define event coverage, attribution, time integrity, minim
 | Wording disposition | Unchanged from v1.2 |
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-010](test-specifications.md#CT-010) · [CT-050](test-specifications.md#CT-050) · [CT-068](test-specifications.md#CT-068) |
+
+Related ADRs: [ADR-0037](../adr/0037-keep-attributable-telemetry-independent-and-define-collection-loss-behaviour.md)
 
 <a id="CAP-001"></a>
 ## CAP-001
@@ -2774,6 +2792,8 @@ Control-plane failure SHALL NOT create an implicit permit path.
 | Wording disposition | Unchanged from v1.2 |
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-011](test-specifications.md#CT-011) · [CT-012](test-specifications.md#CT-012) · [CT-024](test-specifications.md#CT-024) · [CT-052](test-specifications.md#CT-052) |
+
+Related ADRs: [ADR-0037](../adr/0037-keep-attributable-telemetry-independent-and-define-collection-loss-behaviour.md)
 
 <a id="FAIL-002"></a>
 ## FAIL-002
@@ -3007,7 +3027,7 @@ Migration and exit rehearsals SHALL validate data/application consistency, ident
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-054](test-specifications.md#CT-054) · [CT-060](test-specifications.md#CT-060) · [CT-073](test-specifications.md#CT-073) · [CT-078](test-specifications.md#CT-078) |
 
-Related ADRs: [ADR-0012](../adr/0012-distinguish-persistent-platform-transports-from-temporary-migration-access.md)
+Related ADRs: [ADR-0012](../adr/0012-distinguish-persistent-platform-transports-from-temporary-migration-access.md) · [ADR-0017](../adr/0017-separate-reference-adoption-technical-qualification-and-authorization.md)
 
 <a id="OPS-001"></a>
 ## OPS-001
@@ -3118,6 +3138,8 @@ The reference implementation SHALL demonstrate two-tenant isolation, controlled 
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-001](test-specifications.md#CT-001) · [CT-003](test-specifications.md#CT-003) · [CT-004](test-specifications.md#CT-004) · [CT-008](test-specifications.md#CT-008) · [CT-013](test-specifications.md#CT-013) · [CT-052](test-specifications.md#CT-052) · [CT-069](test-specifications.md#CT-069) |
 
+Related ADRs: [ADR-0017](../adr/0017-separate-reference-adoption-technical-qualification-and-authorization.md)
+
 <a id="DEL-002"></a>
 ## DEL-002
 
@@ -3132,6 +3154,8 @@ Multi-platform portability claims SHALL be supported by the same intent/core con
 | Wording disposition | Unchanged from v1.2 |
 | Execution status | Specified, not executed by this release |
 | Tests | [CT-016](test-specifications.md#CT-016) · [CT-060](test-specifications.md#CT-060) · [CT-073](test-specifications.md#CT-073) |
+
+Related ADRs: [ADR-0017](../adr/0017-separate-reference-adoption-technical-qualification-and-authorization.md)
 
 <a id="ACPT-001"></a>
 ## ACPT-001

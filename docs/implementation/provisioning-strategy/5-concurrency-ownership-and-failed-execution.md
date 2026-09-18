@@ -6,12 +6,26 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 483df77cff70166fbdfdf711135efa3beeecc8fe1015a58290cbebff5b80bdfd -->
+<!-- SOURCE-BLOCK PROV:65 BEGIN -->
+
 <a id="__RefHeading___Toc7820_1525915568"></a>
 <a id="PROV_s_005"></a>
 
+<!-- SOURCE-BLOCK PROV:65 END -->
+
+<!-- SOURCE-BLOCK PROV:66 BEGIN -->
+
 Parent architecture: [RA §24](../../architecture/reference/24-terraform-across-the-vendor-stacks.md#RA_s_024)  •  [RA §25](../../architecture/reference/25-change-brownfield-adoption-and-configuration-ownership.md#RA_s_025)
 
+<!-- SOURCE-BLOCK PROV:66 END -->
+
+<!-- SOURCE-BLOCK PROV:67 BEGIN -->
+
 One authoritative tool/owner controls a native resource at a time. State boundaries help organize that ownership, but a lock on one state file is not a lock over every API, shared gateway or external address service involved in a delivery. Shared edge or service objects need an explicitly serialized owner where concurrent changes could conflict. Independent per-WSD resources can proceed concurrently only within accepted shared limits.
+
+<!-- SOURCE-BLOCK PROV:67 END -->
+
+<!-- SOURCE-BLOCK PROV:68 BEGIN -->
 
 
 <a id="source-table-68"></a>
@@ -25,11 +39,29 @@ One authoritative tool/owner controls a native resource at a time. State boundar
 | State backend unavailable/corrupt | Pause untracked changes; recover protected state/configuration and reconcile real objects. | Known writer status, ownership and native resource comparison. |
 | Incident containment conflicts with normal desired state | Containment remains higher priority until the incident authority releases it. | Approved override/release and reconciled source, rules and sessions. |
 
+<!-- SOURCE-BLOCK PROV:68 END -->
+
+<!-- SOURCE-BLOCK PROV:69 BEGIN -->
+
+<!-- SOURCE-BLOCK PROV:69 END -->
+
+<!-- SOURCE-BLOCK PROV:70 BEGIN -->
+
 An ambiguous outcome is a controlled stop point, not permission to guess. Query by stable native identity and operation correlation, examine outstanding tasks, and determine whether the intended resource already exists. Where the target cannot provide adequate observation or cancellation, the supported recovery procedure and residual limitations are part of the service class. Do not claim exactly-once multi-system changes from a single successful pipeline run.
+
+<!-- SOURCE-BLOCK PROV:70 END -->
+
+<!-- SOURCE-BLOCK PROV:71 BEGIN -->
 
 Compensation is resource-specific. Releasing an unused reservation can be safe; deleting a newly written volume may not be. Removing a failed tenant’s private policy object differs from removing a shared edge context. The accepted recovery record identifies data impact, shared dependencies, approval authority and the checks required before retries. This is an operational strategy; no particular transaction engine is mandated.
 
+<!-- SOURCE-BLOCK PROV:71 END -->
+
+<!-- SOURCE-BLOCK PROV:72 BEGIN -->
+
 Related engineering: [Copy ownership and retained data](../../architecture/shared-services/4-storage-copies-and-retained-data-ownership.md#SVC_s_004)  •  [Incident and operational authority](../../assurance/site-qualification/7-operating-accountability-handover-and-change.md#QUAL_s_007)
+
+<!-- SOURCE-BLOCK PROV:72 END -->
 
 [Previous chapter](4-end-to-end-fixture-provisioning-and-safe-activation.md) · [Chapter index](README.md) · [Next chapter](6-brownfield-adoption-growth-and-retirement.md)
 

@@ -19,19 +19,45 @@
 - [v1.4 — Connected infrastructure design and acceptance](08-v1-4-connected-infrastructure-design-and-acceptance.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK SVC:0 BEGIN -->
+
 <a id="V14_SVC_START"></a>
 
 INFRASTRUCTURE ARCHITECTURE  /  SVC
 
+<!-- SOURCE-BLOCK SVC:0 END -->
+
+<!-- SOURCE-BLOCK SVC:1 BEGIN -->
+
 v1.4 linked worked design: [WD — resources, paths, build receipts and acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
+
+<!-- SOURCE-BLOCK SVC:1 END -->
+
+<!-- SOURCE-BLOCK SVC:2 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
+<!-- SOURCE-BLOCK SVC:2 END -->
+
+<!-- SOURCE-BLOCK SVC:3 BEGIN -->
+
 *Shared Services, Data Protection and Recovery Architecture*
+
+<!-- SOURCE-BLOCK SVC:3 END -->
+
+<!-- SOURCE-BLOCK SVC:4 BEGIN -->
 
 Draft v1.4  \|  16 September 2026
 
+<!-- SOURCE-BLOCK SVC:4 END -->
+
+<!-- SOURCE-BLOCK SVC:5 BEGIN -->
+
 The infrastructure behind shared consumption endpoints, data copies, key custody, protection and recovery, with clear operational and administrative boundaries.
+
+<!-- SOURCE-BLOCK SVC:5 END -->
+
+<!-- SOURCE-BLOCK SVC:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -45,10 +71,40 @@ The infrastructure behind shared consumption endpoints, data copies, key custody
 | Authority | Applicable external obligations and adopted controls prevail; supplements cannot silently weaken the parent. |
 | Release boundary | Documentation and local document checks only. No live infrastructure deployment, qualification or authorization asserted. |
 
+<!-- SOURCE-BLOCK SVC:6 END -->
+
+<!-- SOURCE-BLOCK SVC:7 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:7 END -->
+
+<!-- SOURCE-BLOCK SVC:8 BEGIN -->
+
 Start here: [Parent architecture — RA](../reference/1-purpose-scope-and-architectural-authority.md#RA_s_001)  •  [Document family and gap map — GM](../../assurance/gap-map/1-document-family-scope-and-precedence.md#GM_s_001)
+
+<!-- SOURCE-BLOCK SVC:8 END -->
+
+<!-- SOURCE-BLOCK SVC:9 BEGIN -->
 
 Keep the eight Word files together after extracting the release package. Cross-document links use sibling filenames and stable bookmarks. START\_HERE.html provides an additional navigation index.
 
+<!-- SOURCE-BLOCK SVC:9 END -->
+
+<!-- SOURCE-BLOCK SVC:10 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:10 END -->
+
 <a id="SVC_contents"></a>
 
+<!-- SOURCE-BLOCK SVC:20 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:20 END -->
+
+<!-- SOURCE-BLOCK SVC:21 BEGIN -->
+
 Use the contents and named section links to navigate. After later edits, update Word fields and verify pagination before release.
+
+<!-- SOURCE-BLOCK SVC:21 END -->
+
+<!-- SOURCE-BLOCK SVC:22 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:22 END -->

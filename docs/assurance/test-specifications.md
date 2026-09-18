@@ -1523,3 +1523,9 @@ Requirement links: [MGT-004](requirements.md#MGT-004) · [IAM-002](requirements.
 **executionStatus:** not-run
 
 Requirement links: [INV-002](requirements.md#INV-002) · [THR-001](requirements.md#THR-001) · [ZIP-001](requirements.md#ZIP-001) · [ZIP-005](requirements.md#ZIP-005) · [ZIP-006](requirements.md#ZIP-006) · [ZIP-007](requirements.md#ZIP-007) · [OVL-001](requirements.md#OVL-001) · [EDGE-002](requirements.md#EDGE-002) · [PORT-001](requirements.md#PORT-001) · [NUT-004](requirements.md#NUT-004) · [NSX-003](requirements.md#NSX-003) · [OS-003](requirements.md#OS-003) · [FUT-001](requirements.md#FUT-001)
+
+<!-- BEGIN ASSURANCE ALLOCATION LINKS -->
+
+[Assertion-level allocation](implementation-allocation.md) · [All verification families](verification-families.md) · [Historical finding dispositions](historical-findings.md) · [Completion-audit corrections](completion-audit.md)
+
+<!-- END ASSURANCE ALLOCATION LINKS -->

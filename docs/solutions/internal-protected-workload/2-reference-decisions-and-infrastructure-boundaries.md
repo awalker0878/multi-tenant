@@ -6,15 +6,37 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
+<!-- SOURCE-BLOCK WD:36 BEGIN -->
+
 <a id="WD14_S02"></a>
+
+<!-- SOURCE-BLOCK WD:36 END -->
+
+<!-- SOURCE-BLOCK WD:37 BEGIN -->
 
 The selected example uses unique tenant addresses, native isolated domain routing, a separately controlled stateful edge context for each tenant, and dedicated routed service handoffs. A tenant context can implement several pairwise ZIP relationships; neither a logical ZIP relationship nor an attachment is a physical appliance count.
 
+<!-- SOURCE-BLOCK WD:37 END -->
+
+<!-- SOURCE-BLOCK WD:38 BEGIN -->
+
 The provider service domain contains service endpoints, not tenant gateways. Each tenant reaches that domain through its own service-edge context. This makes the point at which paths may share a service network explicit: after the provider security controls, never as an uninspected shared external subnet between native tenant gateways.
+
+<!-- SOURCE-BLOCK WD:38 END -->
+
+<!-- SOURCE-BLOCK WD:39 BEGIN -->
 
 A centralized shared service is not automatically safe merely because the incoming routes are filtered. The design also controls service-side identity, return routing, source validation and the ability of a compromised endpoint to originate new traffic. Service hosts are not general-purpose transit routers. The shared service remains a disclosed compromise and availability dependency.
 
+<!-- SOURCE-BLOCK WD:39 END -->
+
+<!-- SOURCE-BLOCK WD:40 BEGIN -->
+
 For the base OpenStack service, provider-owned roles retain network-policy and attachment mutation authority. Tenant self-service requests can use existing approved service and change tooling; a custom controller is not required. Direct delegated security-group, port-security, router or external-network editing is a separate optional service with its own effective-policy proof. Additive allow groups must not be described as a mandatory deny hierarchy. \[R14-05\]
+
+<!-- SOURCE-BLOCK WD:40 END -->
+
+<!-- SOURCE-BLOCK WD:41 BEGIN -->
 
 
 <a id="source-table-41"></a>
@@ -27,7 +49,21 @@ For the base OpenStack service, provider-owned roles retain network-policy and a
 | RD14-04 / activation | Production G3 requires the applicable G4 readiness evidence and valid authority to operate. | Restricted, non-production qualification is a distinct authorized activity. |
 | RD14-05 / resource ownership | Each native object and sensitive subresource has one authoritative writer and a defined handoff. | Shared objects are not recreated independently by each tenant workflow. |
 
+<!-- SOURCE-BLOCK WD:41 END -->
+
+<!-- SOURCE-BLOCK WD:42 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:42 END -->
+
+<!-- SOURCE-BLOCK WD:43 BEGIN -->
+
 Related documents: [RA — Selected design and variations](../../architecture/reference/README.md#V14_RA_START)  \|  [NET — Routing and attachment mechanics](../../engineering/fabric/README.md#V14_NET_START)  \|  [VND — Native implementation choices](../../engineering/platform-realizations/README.md#V14_VND_START)
+
+<!-- SOURCE-BLOCK WD:43 END -->
+
+<!-- SOURCE-BLOCK WD:44 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:44 END -->
 
 [Previous chapter](1-purpose-status-and-reading-order.md) · [Chapter index](README.md) · [Next chapter](3-component-and-dependency-schedule.md)
 

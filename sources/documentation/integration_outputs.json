@@ -34,6 +34,8 @@
   "docs/adr/0034-classify-change-by-architectural-impact-rather-than-file-location.md",
   "docs/adr/0035-make-shared-service-replies-select-the-originating-security-context.md",
   "docs/adr/0036-require-initial-operational-and-recovery-readiness-before-production-activation.md",
+  "docs/adr/0037-keep-attributable-telemetry-independent-and-define-collection-loss-behaviour.md",
+  "docs/adr/0038-govern-image-and-privileged-dependency-provenance-across-their-lifecycle.md",
   "docs/adr/README.md",
   "docs/adr/template.md",
   "docs/assurance/requirements.md",

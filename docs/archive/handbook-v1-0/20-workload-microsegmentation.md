@@ -8,7 +8,17 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:180 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:180 END -->
+
+<!-- SOURCE-BLOCK HB10:181 BEGIN -->
+
 A security zone may contain multiple internetworks. Microsegmentation is therefore the primary mechanism for separating applications and tiers that are allowed to reside in the same Security Domain Instance. Identity/metadata-based controls are preferred where platform capabilities support them because policy follows workload identity instead of depending only on addresses.
+
+<!-- SOURCE-BLOCK HB10:181 END -->
+
+<!-- SOURCE-BLOCK HB10:182 BEGIN -->
 
 
 <a id="source-table-182"></a>
@@ -16,10 +26,16 @@ A security zone may contain multiple internetworks. Microsegmentation is therefo
 | MICRO-001 | WSD-to-WSD and tier-to-tier communication inside a shared Security Domain SHOULD default to deny unless an approved policy permits it. |
 | --- | --- |
 
+<!-- SOURCE-BLOCK HB10:182 END -->
+
+<!-- SOURCE-BLOCK HB10:183 BEGIN -->
+
 
 <a id="source-table-183"></a>
 
 | MICRO-002 | Platform metadata used for security policy SHALL be managed, validated, and protected from unauthorized tenant modification. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:183 END -->
 
 [Previous chapter](19-public-ingress-and-internet-egress.md) · [Chapter index](README.md) · [Next chapter](21-multi-site-and-disaster-recovery-network-design.md)

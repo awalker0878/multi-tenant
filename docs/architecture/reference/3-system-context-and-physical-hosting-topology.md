@@ -6,18 +6,40 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19 -->
+<!-- SOURCE-BLOCK RA:84 BEGIN -->
+
 <a id="__RefHeading___Toc3644_865363315"></a>
 <a id="RA_s_003"></a>
 
+<!-- SOURCE-BLOCK RA:84 END -->
+
+<!-- SOURCE-BLOCK RA:85 BEGIN -->
+
 A hosting service comprises one or more sites. Each site contains a transport fabric, a protected management environment, shared security and service infrastructure, and one or more hosting cells. A cell provides a bounded pool of vendor-platform capacity. The provider operates these foundations; tenants consume allocated compute, storage, networks and service access within them. A tenant is not a site, a cell or a physical fabric partition.
 
+<!-- SOURCE-BLOCK RA:85 END -->
+
+<!-- SOURCE-BLOCK RA:86 BEGIN -->
+
 ![Reference hosting topology: common infrastructure with separate vendor realizations External networks connect through provider security edges. Nutanix, VMware and OpenStack hosting cells attach to a common routed transport fabric. Shared service endpoints are separated from their administration. An independent management and OOB plane controls the fabric, edges, services and cells through scoped management paths.](../../assets/diagrams/5220f0cc31c4f54a6e92.png)
+
+<!-- SOURCE-BLOCK RA:86 END -->
+
+<!-- SOURCE-BLOCK RA:87 BEGIN -->
 
 <a id="fig_context"></a>
 
 Figure 1. Reference hosting topology: common infrastructure with separate vendor realizations
 
+<!-- SOURCE-BLOCK RA:87 END -->
+
+<!-- SOURCE-BLOCK RA:88 BEGIN -->
+
 External networks terminate at provider-controlled border/security interfaces. Workload traffic enters or leaves a domain only through its authorized attachment. The physical fabric supplies transport between platform tunnel endpoints and service attachments; it does not become an implicit inter-tenant router. A platform-local routing boundary therefore remains meaningful even when two cells use the same physical leaf switches.
+
+<!-- SOURCE-BLOCK RA:88 END -->
+
+<!-- SOURCE-BLOCK RA:89 BEGIN -->
 
 
 <a id="source-table-89"></a>
@@ -30,9 +52,23 @@ External networks terminate at provider-controlled border/security interfaces. W
 | Management foundation | Privileged access, platform managers, infrastructure tooling and recovery access | A workload network carrying privileged administration |
 | Physical transport | Redundant IP connectivity, optional fabric EVPN and controlled physical attachments | A universal security-zone VRF taxonomy or a common vendor overlay |
 
+<!-- SOURCE-BLOCK RA:89 END -->
+
+<!-- SOURCE-BLOCK RA:90 BEGIN -->
+
+<!-- SOURCE-BLOCK RA:90 END -->
+
+<!-- SOURCE-BLOCK RA:91 BEGIN -->
+
 The topology is a functional deployment view, not a cable diagram. Components shown separately have separate authority and interface requirements; physical separation is determined by the adopted isolation profile. A shared edge or shared storage backend must disclose that dependency. The low-level design records the exact power, rack, host, storage, switching and controller failure domains behind every apparently redundant symbol.
 
+<!-- SOURCE-BLOCK RA:91 END -->
+
+<!-- SOURCE-BLOCK RA:92 BEGIN -->
+
 Related engineering: [QUAL §2 — Site low-level design and dependency schedule](../../assurance/site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002)
+
+<!-- SOURCE-BLOCK RA:92 END -->
 
 [Previous chapter](2-design-drivers-and-selected-reference-pattern.md) · [Chapter index](README.md) · [Next chapter](4-hosting-cells-resource-pools-and-failure-boundaries.md)
 

@@ -8,14 +8,28 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:1531 BEGIN -->
+
 <a id="__RefHeading___Toc13437_1645000677"></a>
 <a id="app_E"></a>
+
+<!-- SOURCE-BLOCK HB11:1531 END -->
+
+<!-- SOURCE-BLOCK HB11:1532 BEGIN -->
 
 <a id="__RefHeading___Toc13439_1645000677"></a>
 
 ## Tailoring and assessment
 
+<!-- SOURCE-BLOCK HB11:1532 END -->
+
+<!-- SOURCE-BLOCK HB11:1533 BEGIN -->
+
 The register below uses control families as candidate tailoring and allocation aids. It does not certify implementation of individual ITSP.10.033 controls, enhancements, assurance activities or organization-defined parameters. The adopting assessor completes a version-aware selected-control crosswalk and records inheritance and residual gaps. ITSP.10.033 supersedes ITSG-33 Annex 3A; Canadian-specific identifier changes must be mapped by edition rather than guessed numerically. \[[S05](77-appendix-h-primary-sources-and-implementation-references.md#S05)\]
+
+<!-- SOURCE-BLOCK HB11:1533 END -->
+
+<!-- SOURCE-BLOCK HB11:1534 BEGIN -->
 
 
 <a id="source-table-1534"></a>
@@ -37,7 +51,15 @@ The register below uses control families as candidate tailoring and allocation a
 | SI — System and information integrity | 6 requirement mappings | [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00), [S03](77-appendix-h-primary-sources-and-implementation-references.md#S03), [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05), [S07](77-appendix-h-primary-sources-and-implementation-references.md#S07), [S14](77-appendix-h-primary-sources-and-implementation-references.md#S14) |
 | SR — Supply-chain risk management | 4 requirement mappings | [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00), [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05), [S07](77-appendix-h-primary-sources-and-implementation-references.md#S07), [S14](77-appendix-h-primary-sources-and-implementation-references.md#S14) |
 
+<!-- SOURCE-BLOCK HB11:1534 END -->
+
+<!-- SOURCE-BLOCK HB11:1535 BEGIN -->
+
 ### Assessment record required for each selected control
+
+<!-- SOURCE-BLOCK HB11:1535 END -->
+
+<!-- SOURCE-BLOCK HB11:1536 BEGIN -->
 
 
 <a id="source-table-1536"></a>
@@ -51,8 +73,18 @@ The register below uses control families as candidate tailoring and allocation a
 | Verification | Test/examination/interview method, actual result, observed generation, evidence integrity and freshness |
 | Disposition | Implemented, partially implemented, not applicable with approved rationale, or gap/risk; formal authority and expiry when relevant |
 
+<!-- SOURCE-BLOCK HB11:1536 END -->
+
+<!-- SOURCE-BLOCK HB11:1537 BEGIN -->
+
 Example trace: ZIP-003 is the handbook’s deny-by-default inter-zone requirement. [S01](77-appendix-h-primary-sources-and-implementation-references.md#S01)/[S02](77-appendix-h-primary-sources-and-implementation-references.md#S02) inform the boundary model; the assessor selects applicable control IDs and parameters from the adopted catalogue. The implementation record names the two endpoint instances and effective enforcement policy. CT-003 and CT-007 produce denied/allowed path evidence against that generation. The EvidenceRecord binds those results; the authorizing official independently decides whether the complete system may operate. This is a trace template, not a completed control assessment.
 
+<!-- SOURCE-BLOCK HB11:1537 END -->
+
+<!-- SOURCE-BLOCK HB11:1538 BEGIN -->
+
 Inherited controls are time- and scope-bound. A shared DNS, KMS or backup service exposes an agreed control interface and evidence, not a blanket inheritance claim. Tenant application controls and data-owner obligations remain explicitly assigned even when underlying infrastructure controls are inherited.
+
+<!-- SOURCE-BLOCK HB11:1538 END -->
 
 [Previous chapter](73-appendix-d-conformance-test-catalogue.md) · [Chapter index](README.md) · [Next chapter](75-appendix-f-proposed-local-engineering-parameters.md)

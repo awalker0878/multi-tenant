@@ -8,9 +8,23 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:110 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:110 END -->
+
+<!-- SOURCE-BLOCK HB10:111 BEGIN -->
+
 ![Image: image2.png](../../assets/diagrams/2d483234dc8657309acf.png)
 
+<!-- SOURCE-BLOCK HB10:111 END -->
+
+<!-- SOURCE-BLOCK HB10:112 BEGIN -->
+
 Figure 3. Zone classes and explicit ZIP-mediated transitions.
+
+<!-- SOURCE-BLOCK HB10:112 END -->
+
+<!-- SOURCE-BLOCK HB10:113 BEGIN -->
 
 
 <a id="source-table-113"></a>
@@ -25,10 +39,16 @@ Figure 3. Zone classes and explicit ZIP-mediated transitions.
 | MZ | Dedicated administration environment separate from business service activity. |
 | ZIP | Boundary system between two zones that enforces inter-zone communication policy. |
 
+<!-- SOURCE-BLOCK HB10:113 END -->
+
+<!-- SOURCE-BLOCK HB10:114 BEGIN -->
+
 
 <a id="source-table-114"></a>
 
 | INTERPRETATION<br>The zone class describes required trust semantics. The physical or virtual mechanism that realizes it is selected by the implementation profile and assurance requirements. |
 | --- |
+
+<!-- SOURCE-BLOCK HB10:114 END -->
 
 [Previous chapter](9-security-domain-instance.md) · [Chapter index](README.md) · [Next chapter](11-zip-and-security-edge-architecture.md)

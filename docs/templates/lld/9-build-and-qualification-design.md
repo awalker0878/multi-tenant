@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d -->
+<!-- SOURCE-BLOCK ET:75 BEGIN -->
+
 <a id="ET_09"></a>
+
+<!-- SOURCE-BLOCK ET:75 END -->
+
+<!-- SOURCE-BLOCK ET:76 BEGIN -->
 
 Actual site values are required. Complete the response fields and identify controlled schedule/diagram references. Unknown or unsupported items remain blocking for their affected scope.
 
+<!-- SOURCE-BLOCK ET:76 END -->
+
+<!-- SOURCE-BLOCK ET:77 BEGIN -->
+
 Baseline and related records: [PROV §4](../../implementation/provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md#PROV_s_004)  •  [QUAL §5](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
+
+<!-- SOURCE-BLOCK ET:77 END -->
+
+<!-- SOURCE-BLOCK ET:78 BEGIN -->
 
 
 <a id="source-table-78"></a>
@@ -24,6 +38,20 @@ Baseline and related records: [PROV §4](../../implementation/provisioning-strat
 | Evidence handling | Capture method, sensitivity, integrity, retention and independent reviewer. | {{ET\_EVIDENCE}} |
 | Activation conditions | G2, applicable initial G4, current tenant checks and operating authority. | {{ET\_ACTIVATE}} |
 
+<!-- SOURCE-BLOCK ET:78 END -->
+
+<!-- SOURCE-BLOCK ET:79 BEGIN -->
+
+<!-- SOURCE-BLOCK ET:79 END -->
+
+<!-- SOURCE-BLOCK ET:80 BEGIN -->
+
 Review disposition: Draft until the actual engineering authority accepts the named scope. A checked form or calculator result does not establish live support, qualification or authorization.
+
+<!-- SOURCE-BLOCK ET:80 END -->
+
+<!-- SOURCE-BLOCK ET:81 BEGIN -->
+
+<!-- SOURCE-BLOCK ET:81 END -->
 
 [Previous chapter](8-exact-platform-and-tool-operation-coverage.md) · [Chapter index](README.md) · [Next chapter](10-engineering-review-and-controlled-handoff.md)

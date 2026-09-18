@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 0aeb8ee0a114d3ed23e97c684cc9812a0fa6ea5252e49f0c902132bf4e053a7d -->
+<!-- SOURCE-BLOCK EK:66 BEGIN -->
+
 <a id="EK_07"></a>
+
+<!-- SOURCE-BLOCK EK:66 END -->
+
+<!-- SOURCE-BLOCK EK:67 BEGIN -->
 
 Use one support record for the exact installed combination and a separate operation matrix for what the tools can actually manage. Documentation availability is not measured qualification.
 
+<!-- SOURCE-BLOCK EK:67 END -->
+
+<!-- SOURCE-BLOCK EK:68 BEGIN -->
+
 Baseline and related records: [VND §7](../platform-realizations/7-implementation-tuple-and-decision-package.md#VND_s_007)  •  [PROV §3](../../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md#PROV_s_003)  •  [VC §7](../vendor-cards/7-support-tuple-variations-and-evidence-checklist.md#VC_07)  •  [ET §8](../../templates/lld/8-exact-platform-and-tool-operation-coverage.md#ET_08)
+
+<!-- SOURCE-BLOCK EK:68 END -->
+
+<!-- SOURCE-BLOCK EK:69 BEGIN -->
 
 
 <a id="source-table-69"></a>
@@ -24,8 +38,26 @@ Baseline and related records: [VND §7](../platform-realizations/7-implementatio
 | Reproducibility | Trusted package provenance, reviewed provider lock, separately fixed module/runner versions, artifact integrity and controlled credentials. |
 | Unsupported case | Supported native alternative with owner/evidence, or excluded capability. No shim or empty root is called complete provisioning. |
 
+<!-- SOURCE-BLOCK EK:69 END -->
+
+<!-- SOURCE-BLOCK EK:70 BEGIN -->
+
+<!-- SOURCE-BLOCK EK:70 END -->
+
+<!-- SOURCE-BLOCK EK:71 BEGIN -->
+
 HashiCorp documents provider configurations and inheritance within modules, while provider dependency locks do not lock remote module versions. Keep those controls separate in the engineering release. \[K03, K04\]
 
+<!-- SOURCE-BLOCK EK:71 END -->
+
+<!-- SOURCE-BLOCK EK:72 BEGIN -->
+
 External mechanism context: [K03 — Terraform providers within modules](https://developer.hashicorp.com/terraform/language/modules/develop/providers)  •  [K04 — Terraform dependency lock file](https://developer.hashicorp.com/terraform/language/files/dependency-lock)
+
+<!-- SOURCE-BLOCK EK:72 END -->
+
+<!-- SOURCE-BLOCK EK:73 BEGIN -->
+
+<!-- SOURCE-BLOCK EK:73 END -->
 
 [Previous chapter](6-capacity-mtu-performance-and-failure-analysis.md) · [Chapter index](README.md) · [Next chapter](8-build-test-and-implementation-handoff.md)

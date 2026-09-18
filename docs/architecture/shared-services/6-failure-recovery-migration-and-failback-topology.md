@@ -6,12 +6,26 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 2257e6f3badac48b07989244fbfae96643d68cc6633b28e9799a14733bccea3a -->
+<!-- SOURCE-BLOCK SVC:78 BEGIN -->
+
 <a id="__RefHeading___Toc8885_1525915568"></a>
 <a id="SVC_s_006"></a>
 
+<!-- SOURCE-BLOCK SVC:78 END -->
+
+<!-- SOURCE-BLOCK SVC:79 BEGIN -->
+
 Parent architecture: [RA §14](../reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014)  •  [RA §27](../reference/27-recovery-migration-and-retirement.md#RA_s_027)
 
+<!-- SOURCE-BLOCK SVC:79 END -->
+
+<!-- SOURCE-BLOCK SVC:80 BEGIN -->
+
 Recovery follows the dependency and authority graph, not just the order in which VMs appear in inventory. Declare the failure scope, prevent ambiguous writers, and establish trusted management before restoring dependent platforms and workloads. A control-plane outage, security-edge outage, storage partition and complete site loss have different effects. The actual versioned implementation must support the claimed behaviour. \[[B2](07-references-parent-basis-and-external-context.md#SVC_src_B2) §§14, 27\]
+
+<!-- SOURCE-BLOCK SVC:80 END -->
+
+<!-- SOURCE-BLOCK SVC:81 BEGIN -->
 
 
 <a id="source-table-81"></a>
@@ -24,7 +38,19 @@ Recovery follows the dependency and authority graph, not just the order in which
 | KMS/identity/name dependency lost | No uncontrolled substitute credentials, plaintext or guessed name/address allocation. | Relevant service owner invokes approved continuity/recovery path. |
 | Site lost | Recover in an already authorized target footprint; no emergency route leaking. | Incident/continuity authority coordinates data, trust, platform and exposure owners. |
 
+<!-- SOURCE-BLOCK SVC:81 END -->
+
+<!-- SOURCE-BLOCK SVC:82 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:82 END -->
+
+<!-- SOURCE-BLOCK SVC:83 BEGIN -->
+
 The dependency order is: authority and writer exclusion; independent console/privileged access and minimum time/name/trust/key access; trusted configuration/state/catalogue recovery; transport/platform/storage baseline; edge and necessary service endpoints under deny; data and endpoints in approved recovery domains; positive/negative and recovered-data acceptance; controlled exposure/name activation; observation and cleanup. Some tasks can run in parallel, but a dependent activation cannot precede its accepted prerequisite.
+
+<!-- SOURCE-BLOCK SVC:83 END -->
+
+<!-- SOURCE-BLOCK SVC:84 BEGIN -->
 
 
 <a id="source-table-84"></a>
@@ -37,9 +63,23 @@ The dependency order is: authority and writer exclusion; independent console/pri
 | Post-target writes | Data owner decides forward repair, reverse synchronization or another restore. | Revert to stale source by restarting it or restoring an old state file. |
 | Failback and cleanup | New consistency point, reverse direction, accepted source health and withdrawal of obsolete access/copies. | Leave temporary keys, routes, permissions or old external endpoints active. |
 
+<!-- SOURCE-BLOCK SVC:84 END -->
+
+<!-- SOURCE-BLOCK SVC:85 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:85 END -->
+
+<!-- SOURCE-BLOCK SVC:86 BEGIN -->
+
 Persistent hypervisor mobility and storage replication transports may remain after the migration. Temporary cross-domain transfer grants do not. Track these separately in the interface and lifecycle records so cleanup does not break normal platform operation or leave an enduring transition bypass. Measure recovery and exit effort against the service definition; record excluded dependencies and actual breaches honestly.
 
+<!-- SOURCE-BLOCK SVC:86 END -->
+
+<!-- SOURCE-BLOCK SVC:87 BEGIN -->
+
 Related engineering: [Stateful failure paths](../../engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md#NET_s_003)  •  [Independent bootstrap](../../implementation/provisioning-strategy/2-day-0-and-steady-state-commissioning-without-circular-dependencies.md#PROV_s_002)  •  [Failure and portability qualification](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
+
+<!-- SOURCE-BLOCK SVC:87 END -->
 
 [Previous chapter](5-backup-capture-independent-protection-and-isolated-restore.md) · [Chapter index](README.md) · [Next chapter](07-references-parent-basis-and-external-context.md)
 

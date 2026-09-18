@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: ae4ea65ea564fe848f214f5154ca4b67726eb6628d07a4b4f7714210e49ccd0d -->
+<!-- SOURCE-BLOCK WDE:33 BEGIN -->
+
 <a id="EX_03"></a>
+
+<!-- SOURCE-BLOCK WDE:33 END -->
+
+<!-- SOURCE-BLOCK WDE:34 BEGIN -->
 
 The following path shows one tenant application service and a shared resolver. Forwarding and policy are distinct.
 
+<!-- SOURCE-BLOCK WDE:34 END -->
+
+<!-- SOURCE-BLOCK WDE:35 BEGIN -->
+
 Baseline and related records: [WD §6](../internal-protected-workload/6-worked-forwarding-and-return-route-schedule.md#WD14_S06)  •  [WD §7](../internal-protected-workload/7-service-permissions-and-non-ip-storage-paths.md#WD14_S07)  •  [NET §3](../../engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md#NET_s_003)
+
+<!-- SOURCE-BLOCK WDE:35 END -->
+
+<!-- SOURCE-BLOCK WDE:36 BEGIN -->
 
 
 <a id="source-table-36"></a>
@@ -23,8 +37,26 @@ Baseline and related records: [WD §6](../internal-protected-workload/6-worked-f
 | Resolver → tenant-01 reply | The service endpoint sends tenant-01 prefixes through SE-01 .129; SE-01 returns through EC-01 .17. | Correct origin context and source identity; no tenant-02 transit through EC-01. |
 | Management and other services | Not supplied by the application route; published service/admin interfaces remain separate. | No router administration, arbitrary KMS access, repository publication or provider-wide reachability. |
 
+<!-- SOURCE-BLOCK WDE:36 END -->
+
+<!-- SOURCE-BLOCK WDE:37 BEGIN -->
+
+<!-- SOURCE-BLOCK WDE:37 END -->
+
+<!-- SOURCE-BLOCK WDE:38 BEGIN -->
+
 For actual implementation, observe connected routes and the effective forwarding table as well as declared static routes. Required route advertisements, HA next-hop ownership and service endpoint return routing belong in the LLD. A firewall downstream cannot inspect a path that has already bypassed it.
 
+<!-- SOURCE-BLOCK WDE:38 END -->
+
+<!-- SOURCE-BLOCK WDE:39 BEGIN -->
+
 No packet has been sent by this worked example. These are intended paths and expected restrictions, not observed results.
+
+<!-- SOURCE-BLOCK WDE:39 END -->
+
+<!-- SOURCE-BLOCK WDE:40 BEGIN -->
+
+<!-- SOURCE-BLOCK WDE:40 END -->
 
 [Previous chapter](2-resource-and-boundary-schedule.md) · [Chapter index](README.md) · [Next chapter](4-native-realization-and-provisioning-ownership.md)

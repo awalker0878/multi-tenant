@@ -8,8 +8,14 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:1683 BEGIN -->
+
 <a id="__RefHeading___Toc13451_1645000677"></a>
 <a id="app_I"></a>
+
+<!-- SOURCE-BLOCK HB11:1683 END -->
+
+<!-- SOURCE-BLOCK HB11:1684 BEGIN -->
 
 
 <a id="source-table-1684"></a>
@@ -78,5 +84,7 @@
 | VXLAN | Virtual extensible LAN encapsulation; used only with a qualified underlay/overlay profile. |
 | WSD | Workload Security Domain: primary workload lifecycle and desired security/service intent object. |
 | ZIP | Zone Interface Point: jointly governed boundary function between two domains; can be a qualified composed/distributed realization. |
+
+<!-- SOURCE-BLOCK HB11:1684 END -->
 
 [Previous chapter](77-appendix-h-primary-sources-and-implementation-references.md) · [Chapter index](README.md) · [Next chapter](79-appendix-j-audit-closure-migration-and-release-checks.md)

@@ -8,16 +8,44 @@
 <!-- source-sha256: cd901aaf004d45cf29ffe14ff955a0c9cf81f668be674e8d4de8c590303c62d8 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK AUD11:99 BEGIN -->
+
+<!-- SOURCE-BLOCK AUD11:99 END -->
+
+<!-- SOURCE-BLOCK AUD11:100 BEGIN -->
+
 High priority • Confirmed prose/schema coverage gap<br>Location: Chapter 29 p26, PLACE-002; Appendix A p58; PlacementProfile
+
+<!-- SOURCE-BLOCK AUD11:100 END -->
+
+<!-- SOURCE-BLOCK AUD11:101 BEGIN -->
 
 Observed. PLACE-002 separately names data, backup, telemetry, diagnostics, control plane, administrative access and key constraints. The schema exposes only dataLocations and controlLocations, with free-text support/key policies.
 
+<!-- SOURCE-BLOCK AUD11:101 END -->
+
+<!-- SOURCE-BLOCK AUD11:102 BEGIN -->
+
 Why it matters. The intended placement decision cannot mechanically distinguish a permitted primary-data site from an impermissible backup, diagnostic or administrative location.
+
+<!-- SOURCE-BLOCK AUD11:102 END -->
+
+<!-- SOURCE-BLOCK AUD11:103 BEGIN -->
 
 Improve. Add a typed constraints map by asset/access category, with enforcement and evidence references. Distinguish location, jurisdiction/control, access path and key custody; do not pretend a location field resolves legal sovereignty.
 
+<!-- SOURCE-BLOCK AUD11:103 END -->
+
+<!-- SOURCE-BLOCK AUD11:104 BEGIN -->
+
 Close when. Independently reject fixtures violating only backup, telemetry, diagnostics, key or administrative-access constraints while the primary site remains allowed.
 
+<!-- SOURCE-BLOCK AUD11:104 END -->
+
+<!-- SOURCE-BLOCK AUD11:105 BEGIN -->
+
 Owner: Placement, security and data governance
+
+<!-- SOURCE-BLOCK AUD11:105 END -->
 
 [Previous chapter](12-f10-per-control-evidence-trace-is-described-but-not-contracted.md) · [Chapter index](README.md) · [Next chapter](14-f12-api-lifecycle-is-not-closed-over-the-required-object-graph.md)

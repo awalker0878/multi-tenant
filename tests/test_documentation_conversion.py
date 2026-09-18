@@ -103,7 +103,8 @@ class DecisionTraceTests(unittest.TestCase):
         actual={x for r in self.records for x in r['source_decision_ids']}
         self.assertTrue({f'RD14-{i:02d}' for i in range(1,6)}|{'DEV-ADR-01'}<=actual)
     def test_no_acceptance_fabricated(self):
-        self.assertTrue(all(r['status'].startswith('Proposed') for r in self.records))
+        from documentation_controls import lifecycle_errors
+        self.assertEqual(lifecycle_errors(self.records), [])
     def test_every_decision_has_substantive_traceability(self):
         for r in self.records:
             for field in ('context','decision','alternatives','consequences','engineering_obligations','open_work'):

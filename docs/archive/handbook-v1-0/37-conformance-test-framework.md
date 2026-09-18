@@ -8,7 +8,17 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:286 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:286 END -->
+
+<!-- SOURCE-BLOCK HB10:287 BEGIN -->
+
 A platform is conformant only when it can prove the required outcomes. The conformance suite should run both at platform-certification time and in reduced form for every WSD deployment.
+
+<!-- SOURCE-BLOCK HB10:287 END -->
+
+<!-- SOURCE-BLOCK HB10:288 BEGIN -->
 
 
 <a id="source-table-288"></a>
@@ -27,16 +37,26 @@ A platform is conformant only when it can prove the required outcomes. The confo
 | Failure | HA/control-plane failure preserves enforcement. |
 | Lifecycle | Modification and deletion remove old connectivity and identity. |
 
+<!-- SOURCE-BLOCK HB10:288 END -->
+
+<!-- SOURCE-BLOCK HB10:289 BEGIN -->
+
 
 <a id="source-table-289"></a>
 
 | TEST-001 | Negative tests SHALL be first-class acceptance criteria; proving that an allowed flow works is insufficient. |
 | --- | --- |
 
+<!-- SOURCE-BLOCK HB10:289 END -->
+
+<!-- SOURCE-BLOCK HB10:290 BEGIN -->
+
 
 <a id="source-table-290"></a>
 
 | TEST-002 | A platform upgrade SHALL trigger an appropriate regression/conformance test set before broad production rollout. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:290 END -->
 
 [Previous chapter](36-assurance-profiles.md) · [Chapter index](README.md) · [Next chapter](38-deployment-evidence.md)

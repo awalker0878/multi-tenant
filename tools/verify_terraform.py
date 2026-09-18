@@ -91,7 +91,7 @@ def main() -> int:
         return finish("BLOCKED_TOOLCHAIN", "terraform executable is not installed")
 
     # Keep approved mirror/trust settings, but remove ambient cloud/CLI credentials.
-    forbidden_prefixes = ("TF_VAR_", "TF_CLI_ARGS", "OS_", "NUTANIX_", "NSXT_", "VSPHERE_", "TF_HTTP_")
+    forbidden_prefixes = ("TF_VAR_", "TF_CLI_ARGS", "OS_", "NUTANIX_", "NSXT_", "VSPHERE_", "TF_HTTP_", "NSX_", "AWS_", "ARM_", "GOOGLE_")
     env = {key: value for key, value in os.environ.items() if not key.startswith(forbidden_prefixes)}
     env.update(TF_IN_AUTOMATION="true", TF_INPUT="0", CHECKPOINT_DISABLE="1")
 
@@ -157,28 +157,45 @@ def main() -> int:
                     entry["mock_tests"] = "PASSED" if tested["exit_code"] == 0 else "FAILED"
                     entry["mock_output"] = tested["stdout"][-8000:]
                     entry["mock_exit"] = tested["exit_code"]
-                schema_result = run([f"-chdir={directory}", "providers", "schema", "-json"])
-                try:
-                    schema = json.loads(schema_result["stdout"])
-                    if schema_result["exit_code"] != 0 or not schema.get("provider_schemas"):
-                        raise ValueError("Schema export unavailable")
-                    destination = args.output.parent / "toolchain-schemas" / family / directory.name
-                    destination.mkdir(parents=True, exist_ok=True)
-                    schema_path = destination / "provider-schema.json"
-                    schema_path.write_text(json.dumps(schema, indent=2) + "\n")
-                    entry["schema_export"] = "EXPORTED_FROM_ACTUAL_PLUGINS"
-                    entry["schema_sha256"] = hashlib.sha256(schema_path.read_bytes()).hexdigest()
-                    report["schema_export"] = "SEE_PER_DIRECTORY_RESULTS"
-                except (ValueError, TypeError):
-                    entry["schema_export"] = "FAILED"
+                if family == "modules":
+                    schema_result = run([f"-chdir={directory}", "providers", "schema", "-json"])
+                    try:
+                        schema = json.loads(schema_result["stdout"])
+                        if schema_result["exit_code"] != 0 or not schema.get("provider_schemas"):
+                            raise ValueError("Schema export unavailable")
+                        destination = args.output.parent / "toolchain-schemas" / family / directory.name
+                        destination.mkdir(parents=True, exist_ok=True)
+                        schema_path = destination / "provider-schema.json"
+                        schema_path.write_text(json.dumps(schema, indent=2) + "\n")
+                        entry["schema_export"] = "EXPORTED_FROM_ACTUAL_PLUGINS"
+                        entry["schema_sha256"] = hashlib.sha256(schema_path.read_bytes()).hexdigest()
+                        report["schema_export"] = "SEE_PER_DIRECTORY_RESULTS"
+                    except (ValueError, TypeError):
+                        entry["schema_export"] = "FAILED"
+                else:
+                    # Root HTTP backends deliberately remain uninitialized. Schema
+                    # export resolves the backend and is not a backend-free command.
+                    # Reuse only the matching source module's *actual* provider schema.
+                    module = work / "modules" / directory.name / "main.tf.json"
+                    root_providers = json.loads((directory/"main.tf.json").read_text())["terraform"]["required_providers"]
+                    module_providers = json.loads(module.read_text())["terraform"]["required_providers"]
+                    match = next((m for m in report["modules"] if m["name"] == directory.name), {})
+                    if root_providers == module_providers and match.get("schema_export") == "EXPORTED_FROM_ACTUAL_PLUGINS":
+                        entry["schema_export"] = "MATCHING_MODULE_SCHEMA_REVIEWED_ROOT_BACKEND_NOT_INITIALIZED"
+                        entry["module_schema_sha256"] = match["schema_sha256"]
+                    else:
+                        entry["schema_export"] = "FAILED_MODULE_PROVIDER_MATCH"
                 lock = directory / ".terraform.lock.hcl"
                 if lock.is_file():
                     destination = args.output.parent / "toolchain-locks" / family / directory.name
                     destination.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(lock, destination / lock.name)
+                    entry["lock_sha256"] = hashlib.sha256(lock.read_bytes()).hexdigest()
+                else:
+                    entry["lock_missing"] = True
                 report[family].append(entry)
 
-    validated = all(report[family] and all(item["validation"] == "PASSED" and item.get("schema_export") == "EXPORTED_FROM_ACTUAL_PLUGINS" for item in report[family])
+    validated = all(report[family] and all(item["validation"] == "PASSED" and item.get("schema_export") == ("EXPORTED_FROM_ACTUAL_PLUGINS" if family == "modules" else "MATCHING_MODULE_SCHEMA_REVIEWED_ROOT_BACKEND_NOT_INITIALIZED") and bool(item.get("lock_sha256")) for item in report[family])
                     for family in ("modules", "roots"))
     mocked = not args.mock_tests or all(item["mock_tests"] == "PASSED" for item in report["modules"])
     return finish("PASSED_TOOLCHAIN_ONLY" if validated and mocked else "INCOMPLETE_OR_FAILED_TOOLCHAIN")

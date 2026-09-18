@@ -8,6 +8,12 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:390 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:390 END -->
+
+<!-- SOURCE-BLOCK HB10:391 BEGIN -->
+
 
 <a id="source-table-391"></a>
 
@@ -21,5 +27,7 @@
 | 6 — Additional platforms | Second and third implementation profiles | Same WSD contract passes conformance on multiple platforms |
 | 7 — Policy-driven placement | Capability registry and platform:auto | Authorized placement selected without consumer vendor dependency |
 | 8 — Continuous authorization | Drift, evidence, exceptions, lifecycle automation | Ongoing compliance state visible and actionable |
+
+<!-- SOURCE-BLOCK HB10:391 END -->
 
 [Previous chapter](49-tenant-wsd-onboarding-checklist.md) · [Chapter index](README.md) · [Next chapter](51-initial-reference-implementation.md)

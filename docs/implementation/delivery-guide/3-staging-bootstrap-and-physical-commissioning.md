@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41 -->
+<!-- SOURCE-BLOCK IK:32 BEGIN -->
+
 <a id="IK_03"></a>
+
+<!-- SOURCE-BLOCK IK:32 END -->
+
+<!-- SOURCE-BLOCK IK:33 BEGIN -->
 
 Use RB-00 and RB-01. Staging is part of implementation readiness, not evidence that equipment has been commissioned.
 
+<!-- SOURCE-BLOCK IK:33 END -->
+
+<!-- SOURCE-BLOCK IK:34 BEGIN -->
+
 Baseline and related records: [RA §21](../../architecture/reference/21-day-0-bootstrap-and-physical-commissioning.md#RA_s_021)  •  [ET §2](../../templates/lld/2-physical-inventory-facility-and-port-schedule.md#ET_02)  •  [PROV §2](../provisioning-strategy/2-day-0-and-steady-state-commissioning-without-circular-dependencies.md#PROV_s_002)
+
+<!-- SOURCE-BLOCK IK:34 END -->
+
+<!-- SOURCE-BLOCK IK:35 BEGIN -->
 
 
 <a id="source-table-35"></a>
@@ -25,6 +39,20 @@ Baseline and related records: [RA §21](../../architecture/reference/21-day-0-bo
 | Foundation observation | Use the approved configuration mechanism; observe links, control policy, MTU, allowed adjacency and surviving access. | Unexpected route/port, missing policy or failed recovery access. |
 | Handover | Store actual configuration, ownership, recovery copy, telemetry and open deviations; obtain G1 scope acceptance. | Required observations absent or unresolved critical deviations. |
 
+<!-- SOURCE-BLOCK IK:35 END -->
+
+<!-- SOURCE-BLOCK IK:36 BEGIN -->
+
+<!-- SOURCE-BLOCK IK:36 END -->
+
+<!-- SOURCE-BLOCK IK:37 BEGIN -->
+
 Do not store production secrets in this kit. Record a protected custody reference and the authorized role. A temporary bootstrap credential is not a permanent exception to separation of duties.
+
+<!-- SOURCE-BLOCK IK:37 END -->
+
+<!-- SOURCE-BLOCK IK:38 BEGIN -->
+
+<!-- SOURCE-BLOCK IK:38 END -->
 
 [Previous chapter](2-work-packages-dependencies-and-authority.md) · [Chapter index](README.md) · [Next chapter](4-native-platform-commissioning-tracks.md)

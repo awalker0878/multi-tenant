@@ -30,28 +30,51 @@ The standalone RAD/TAD/solution-design v1.2 package described earlier in the con
 
 The v1.0 and v1.1 handbook and the v1.2 content-review branch retain historical differences. [The archive](archive/README.md) warns against using them as the active baseline. Removing old schemas from a main narrative does not repair their implementation. Earlier audit findings remain findings against their stated source edition; this migration makes no new closure claim.
 
-## Edit and regenerate safely
+## Maintained Markdown and preserved source
 
-Markdown is the working Git review surface. Make substantive changes in a review branch, link the affected ADR and requirement, and update engineering, implementation and verification consequences. Do not modify frozen originals or retroactively edit their evidence.
+The original Word files and source block ledger are immutable provenance. Converted
+chapters are the maintained review surface, not a file regenerated over edits. Each
+source block has explicit `SOURCE-BLOCK <source>:<number>` delimiters. An unmodified
+block is checked against its original code structure, ordered cells or paragraph text.
+A deliberate maintained change is checked against a separately reviewed amendment
+record with original identity, exact replacement, reason, accountable role, date,
+requirement/ADR trace and status. This is a baseline/delta model, not two live authors.
 
-Source refresh is deliberately explicit and replaces converted chapter text. Run it only in a clean review worktree where the resulting diff can be assessed:
+To revise a paragraph or table, edit its existing block in a branch, then preview a
+proposed record and explicitly write it. For example (select the actual source/block):
 
 ```sh
-python scripts/convert_word_docs.py --refresh-from-frozen-sources
+python scripts/record_doc_amendment.py RA 177 --reason "Describe the reviewed change" --role "Responsible architecture role" --requirement CMP-001 --adr ADR-0024
+python scripts/record_doc_amendment.py RA 177 --reason "Describe the reviewed change" --role "Responsible architecture role" --requirement CMP-001 --adr ADR-0024 --write-record
 python scripts/build_documentation.py
-python scripts/catalog_artifacts.py
+python scripts/build_assurance.py
 python scripts/check_documentation.py
-python scripts/check_repository.py
 ```
 
-The converter reads local sources only and never contacts infrastructure. `build_documentation.py` generates reviewed navigation/ADR material from the checked-in records and adds decision backlinks. It is not an acceptance engine. CI checks documentation and never automatically regenerates or commits source refreshes.
+The helper creates only Proposed records; it never invents approval. Review the source
+block, record and affected ADR/engineering/verification references together. Accepted
+amendments require actual deciding authority/date/evidence in a separate reviewed edit.
+A previously recorded amendment is revised deliberately, not silently overwritten.
+A source refresh is permitted only in a scratch source-only tree with no existing
+chapter output and no amendments. The converter refuses a maintained tree even when
+its refresh flag is supplied. The audit repair used a one-time local migration to add
+block markers and restore the original code line breaks; it did not approve new source.
 
-Generated navigation is described in `sources/documentation/integration_outputs.json`; source prose remains separate from source-derived ADR synthesis. A future adopted source revision should get an explicit new source record and reviewed migration—not an ambiguous replacement under an old hash.
+## ADR lifecycle
+
+The canonical decision record is `sources/documentation/adr_records.json`; generated
+pages, index and crosswalk must match it exactly. Proposed, Accepted, Rejected and
+Superseded are supported. Every record has an accountable role and scope. Non-proposed
+states require actual decision authority, date and evidence. Rejected/Superseded also
+require a rationale; supersession is reciprocal and cycle-free. All current records
+remain Proposed. Passing lifecycle validation does not authenticate a signer or their
+jurisdiction. [The ADR template](adr/template.md) and [index](adr/README.md) describe
+this review workflow.
 
 ## Validation boundaries
 
-The documentation checker independently renders Markdown, checks source paragraph/cell text, table dimensions, field placeholders, image bytes, local file and anchor links, unique destinations, requirement references and decision crosswalks. It checks publishing consistency only. External URLs are not crawled. Existing native code and historical evidence are retained; no Terraform/Ansible engine run, remote CI result, target observation, deployment or authorization is implied.
+The documentation checker independently renders Markdown, checks source paragraph text, exact code line breaks/tabs, ordered table cells, field placeholders, image bytes, local file and anchor links, unique destinations, requirement references and decision crosswalks. It checks publishing consistency only. External URLs are not crawled. Existing native code and historical evidence are retained; no Terraform/Ansible engine run, remote CI result, target observation, deployment or authorization is implied.
 
 ## Local commit
 
-This deliverable is a repository snapshot, not a `.git` checkout. No remote branch was modified. Existing users should use the documentation update procedure in [LOCAL_IMPORT.md](LOCAL_IMPORT.md), not blindly overwrite a working tree or run the original first-import helper against an already populated repository.
+This deliverable is a repository snapshot, not a `.git` checkout. The original delivery used a local import. This corrective release is being applied through a reviewed GitHub branch; its merge status is recorded by Git, not inferred by this source page. Existing users of an archive should use the documentation update procedure in [LOCAL_IMPORT.md](LOCAL_IMPORT.md), not blindly overwrite a working tree or run the original first-import helper against an already populated repository.

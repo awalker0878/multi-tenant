@@ -20,19 +20,45 @@
 - [v1.4 — Connected infrastructure design and acceptance](09-v1-4-connected-infrastructure-design-and-acceptance.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK VND:0 BEGIN -->
+
 <a id="V14_VND_START"></a>
 
 INFRASTRUCTURE ARCHITECTURE  /  VND
 
+<!-- SOURCE-BLOCK VND:0 END -->
+
+<!-- SOURCE-BLOCK VND:1 BEGIN -->
+
 v1.4 linked worked design: [WD — resources, paths, build receipts and acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
+
+<!-- SOURCE-BLOCK VND:1 END -->
+
+<!-- SOURCE-BLOCK VND:2 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
+<!-- SOURCE-BLOCK VND:2 END -->
+
+<!-- SOURCE-BLOCK VND:3 BEGIN -->
+
 *Vendor-Stack Realizations and Common Reference Environment*
+
+<!-- SOURCE-BLOCK VND:3 END -->
+
+<!-- SOURCE-BLOCK VND:4 BEGIN -->
 
 Draft v1.4  \|  16 September 2026
 
+<!-- SOURCE-BLOCK VND:4 END -->
+
+<!-- SOURCE-BLOCK VND:5 BEGIN -->
+
 A common two-tenant reference environment and its native component, routing, data and lifecycle realization on Nutanix, VMware/NSX and OpenStack.
+
+<!-- SOURCE-BLOCK VND:5 END -->
+
+<!-- SOURCE-BLOCK VND:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -46,10 +72,40 @@ A common two-tenant reference environment and its native component, routing, dat
 | Authority | Applicable external obligations and adopted controls prevail; supplements cannot silently weaken the parent. |
 | Release boundary | Documentation and local document checks only. No live infrastructure deployment, qualification or authorization asserted. |
 
+<!-- SOURCE-BLOCK VND:6 END -->
+
+<!-- SOURCE-BLOCK VND:7 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:7 END -->
+
+<!-- SOURCE-BLOCK VND:8 BEGIN -->
+
 Start here: [Parent architecture — RA](../../architecture/reference/1-purpose-scope-and-architectural-authority.md#RA_s_001)  •  [Document family and gap map — GM](../../assurance/gap-map/1-document-family-scope-and-precedence.md#GM_s_001)
+
+<!-- SOURCE-BLOCK VND:8 END -->
+
+<!-- SOURCE-BLOCK VND:9 BEGIN -->
 
 Keep the eight Word files together after extracting the release package. Cross-document links use sibling filenames and stable bookmarks. START\_HERE.html provides an additional navigation index.
 
+<!-- SOURCE-BLOCK VND:9 END -->
+
+<!-- SOURCE-BLOCK VND:10 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:10 END -->
+
 <a id="VND_contents"></a>
 
+<!-- SOURCE-BLOCK VND:21 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:21 END -->
+
+<!-- SOURCE-BLOCK VND:22 BEGIN -->
+
 Use the contents and named section links to navigate. After later edits, update Word fields and verify pagination before release.
+
+<!-- SOURCE-BLOCK VND:22 END -->
+
+<!-- SOURCE-BLOCK VND:23 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:23 END -->

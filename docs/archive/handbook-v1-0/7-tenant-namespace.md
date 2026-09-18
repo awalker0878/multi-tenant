@@ -8,7 +8,17 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:94 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:94 END -->
+
+<!-- SOURCE-BLOCK HB10:95 BEGIN -->
+
 A Tenant Namespace establishes administrative isolation. It is the root for RBAC assignments, quotas, ownership metadata, chargeback/showback, policy ownership, and service inventory. It is not automatically a single network or security zone.
+
+<!-- SOURCE-BLOCK HB10:95 END -->
+
+<!-- SOURCE-BLOCK HB10:96 BEGIN -->
 
 
 <a id="source-table-96"></a>
@@ -22,16 +32,26 @@ A Tenant Namespace establishes administrative isolation. It is the root for RBAC
 | Ownership metadata | Service owner, technical owner, security authority, cost centre/service code as applicable. |
 | Lifecycle state | Requested, Active, Restricted, Suspended, Retiring, Retired. |
 
+<!-- SOURCE-BLOCK HB10:96 END -->
+
+<!-- SOURCE-BLOCK HB10:97 BEGIN -->
+
 
 <a id="source-table-97"></a>
 
 | TEN-001 | Cross-tenant routing SHALL be denied by default even when two tenants use the same zone class. |
 | --- | --- |
 
+<!-- SOURCE-BLOCK HB10:97 END -->
+
+<!-- SOURCE-BLOCK HB10:98 BEGIN -->
+
 
 <a id="source-table-98"></a>
 
 | TEN-002 | Tenant administrators SHALL NOT have authority to modify provider management, security-edge infrastructure, physical fabric, or another tenant namespace. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:98 END -->
 
 [Previous chapter](6-high-level-reference-architecture.md) · [Chapter index](README.md) · [Next chapter](8-workload-security-domain.md)

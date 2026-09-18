@@ -1,0 +1,241 @@
+# Completion audit — Portable Multi-Tenant Secure Hosting repository
+
+**Audit date:** 17 September 2026  
+**Audited delivery:** `multi-tenant_documented_repository.zip`  
+**SHA-256:** `c7665663bfd349abec261452b531b661d46d756fb6b902f6ea8dccd91edf3d9b`  
+**Scope:** The 932-file ZIP snapshot, its included original documents, converted chapters, decisions, implementation sources, verification scripts and recorded evidence. This is not an assertion about the current remote GitHub branch.
+
+## 1. Determination
+
+**The repository is substantially developed and suitable for continued architecture and code review, but it should not yet be described as a fully complete, lossless and maintainable documentation/implementation delivery.**
+
+The conversion has broad, demonstrable coverage. All 28 included Word documents have a conversion record; the 411 resulting chapters contain substantial infrastructure, engineering, solution, implementation and assurance material. The original source bytes and diagrams are preserved. The 36 ADR pages expose decisions that previously lived inside the narrative. The existing source checks and all 471 local tests pass.
+
+Those successes do not close the remaining issues. This audit found five code paragraphs with lost line breaks, a published integrity-check command that fails against the intact delivered archive, and completion checks that accept deliberately changed table relationships and ADR meaning. The authoring and ADR-generation workflow also needs an explicit lifecycle for maintained Git content. Separately, the current Terraform verifier repeats a backend/schema command-boundary defect, and neither Terraform nor Ansible could be executed in this audit runtime.
+
+There are **11 findings: five P1 and six P2**. P1 means a blocker to the particular completion claim identified in the register, not a live-system vulnerability rating. CA-11 is a known open implementation acceptance dependency; CA-10 is confirmed by code and exact-version upstream source inspection, not a newly executed Terraform failure. No CVSS score or production compromise is asserted.
+
+### Acceptance by layer
+
+| Layer | Determination |
+| --- | --- |
+| Conversion of the included library | Extensive coverage; correct the five code-format defects before claiming lossless conversion. |
+| Infrastructure reference architecture | A coherent proposed architecture remains central. This audit does not recommend returning to a custom-controller application design. |
+| Git knowledge base and ADRs | Useful organization and source links; source-of-truth, maintenance and decision-lifecycle rules remain incomplete. |
+| Entire previously described RAD/TAD document family | Not all original files were included. The present RAD/TAD pages are explicitly composed reading views. |
+| Site engineering release | Templates and worked examples exist; actual supported topology, interfaces, parameters and authority are not supplied. |
+| Implementation release | Candidate native code and local evidence exist; current engine gates, reviewed dependency locks and significant native integrations remain open. |
+| Operational acceptance | Not established. Native qualification, measured service capability and authorization remain separate work. |
+
+**The immediate action is a targeted corrective release, not another wholesale architecture rewrite.** The source documents, implementation code and original archive were not modified during this audit. Tests wrote only disposable or ignored report output. All 932 original extracted file bytes still match the archive.
+
+## 2. Basis, method and limits
+
+The primary basis is the delivered repository and the Word documents it actually includes. Its active library consists of the v1.4 reference architecture, delivery-kit v1.1 material and Implementation Increment 04; earlier handbooks and audits are explicitly historical. The newly surfaced original v1.0 handbook was treated as lineage, not substituted for the current baseline.
+
+The audit combined four kinds of examination. First, it reran the supplied documentation and repository checks and the full local regression suite. Second, it independently parsed the original Word XML, retaining structural breaks that the existing text helper omits, and compared code and table positions against rendered Markdown. Third, it changed controlled copies of selected documentation to evaluate whether the completion checker catches semantic drift. Fourth, it reviewed the architecture-to-engineering handoff, ADR records and generator, audit archive, test-family navigation, active instructions, Terraform/Ansible verifiers and their CI entry points.
+
+This is not a comprehensive security review of every Python function, every native resource argument, every diagram’s engineering correctness, or the applicable government control set. Original workbook bytes were retained; their formulas were not recalculated. The complete namespace packet campaign and native platforms were not exercised. Existing packet and native-readback histories retain their original scope and dates; they are not relabelled as new observations.
+
+External verification was deliberately narrow. Official HashiCorp documentation was used for validation and dependency-lock semantics. The Terraform **v1.13.5** implementation was inspected to check the exact schema/backend behaviour relevant to the pinned CI version. Public source retrieval was read-only. No user repository was changed or its current remote state asserted. Source locators and review limits are in [external_sources.json](external_sources.json).
+
+### Fresh results
+
+| Check | Fresh result and limit |
+| --- | --- |
+| ZIP integrity and identity | 932 files; archive checksum matches the preceding delivery; no unsafe archive entries. |
+| Supplied documentation checker | Passed 33,941 checks; 28 sources, 5,551 body blocks, 12,379 paragraph comparisons, 486 tables, 199 prompts. |
+| Supplied local links and images | 8,589 local links, including 3,633 fragment links; 25 figure occurrences. External links were retained, not comprehensively revalidated. |
+| Independent table-position review | 486 tables and **7,976 cells** checked at their actual row/cell positions, including paragraph order within cells; no positional text issue found. |
+| Independent code-format review | 13 code-style paragraphs examined; **five** lose internal Word breaks: one active and four historical. |
+| Local unit/source/protocol suite | **471 tests passed** in the fresh run, with no failures, errors or skips. This is not Terraform/Ansible engine execution. |
+| Offline routing/permission model | **80 checks passed**. Time, logs, repository, backup and key-service profiles remain explicitly unresolved in the model report. |
+| Semantic mutation probes | Three incorrect semantic/display changes passed the checker; an ordinary prose revision and a hypothetical future accepted status were rejected. |
+| Published legacy integrity command | Failed: **15 digest mismatches** among 397 listed files, all in the unchanged delivered snapshot. |
+| Terraform and Ansible engine gates | Both freshly reported `BLOCKED_TOOLCHAIN`; neither executable is installed. No provider/schema/mock or actual Ansible success is inferred. |
+
+The 33,941 publishing checks, 471 tests and 80 modeled observations are different evidence classes. They should not be added into a single “complete assurance” count. See [verification.json](verification.json) and the [evidence directory](evidence/).
+
+## 3. Findings that should block a final documentation-complete label
+
+### CA-01 — Code-block transcription is not lossless — P1
+
+The converter uses a helper that concatenates Word text nodes only. Its code-style branch calls that helper instead of preserving Word breaks and tabs. The effect is concrete: a three-line NSX command in the original execution guide is rendered as one line with backslashes followed by spaces. Shell tokenization adds two spurious space-only arguments.
+
+The active defect is at:
+
+`docs/implementation/increment-04/06-transport-credentials-and-protected-evidence.md:29–33`
+
+The source expresses this command across three lines:
+
+```text
+python tools/nsx_observe.py /secure/nsx-expected.json \
+  --read-authorized-target --expected-origin https://nsx.site.invalid \
+  --ca-file /secure/approved-ca.pem --output /secure/new-readback.json
+```
+
+The converted text instead joins the lines around `\  --read-authorized-target` and `\  --ca-file`. The audit compared tokenization only; it did not execute the native read command. The `.invalid` endpoint remains illustrative.
+
+Four code paragraphs in the archived v1.1 handbook have the same loss: a directory tree, WSD YAML, FlowIntent YAML and a Terraform example. These are historical sources, not active deployment inputs, but an archive claiming fidelity still needs to preserve their syntax. Adjacent one-line source paragraphs are intentionally grouped into a common fence; that grouping was accounted for and is not counted as a defect.
+
+**Close when:** all code paragraphs preserve line breaks, indentation and tabs; the original NSX command yields the same argument sequence; suitable YAML/HCL examples receive syntax-only checks where a parser is available. Add an independent structural check rather than normalizing away the characters whose loss matters.
+
+**Evidence:** [independent_fidelity.json](evidence/independent_fidelity.json). Relevant converter code: `scripts/convert_word_docs.py:39,297–298`.
+
+### CA-02 — The completion gate does not verify the relationships it appears to cover — P1
+
+Three controlled changes were made in temporary copies, not the delivered files:
+
+| Probe | Deliberate change | Existing checker result |
+| --- | --- | --- |
+| P01 | Swap the Public/PAZ and management-interface treatment cells while retaining every paragraph and table dimension. | **PASSED** |
+| P02 | Replace ADR-0006’s decision with the opposite instruction: unrestricted transit instead of the governed boundary. | **PASSED** |
+| P03 | Mark the rendered ADR page “Accepted” without changing its source record or supplying acceptance evidence. | **PASSED** |
+
+The checker compares normalized paragraph text by searching an entire destination page. It checks table shape but not the meaning of each row/cell binding. For source-derived ADRs it checks the JSON records and link destinations but does not reconcile the displayed decision and status with those records. Its text normalization also shares the converter’s lossy extraction helper.
+
+**The current delivered table is not being reported as swapped.** The independent position-aware check found no issue in its current row/cell associations. The finding concerns a blind spot that prevents the successful gate from establishing the asserted degree of preservation.
+
+**Close when:** the checker rejects the three demonstrated changes, compares source/rendered table associations and code structure, and reconciles ADR fields across authoritative records and generated pages. These tests belong to documentation integrity—not a new hosting policy engine.
+
+**Evidence:** [mutation_probes.json](evidence/mutation_probes.json), P01–P03.
+
+### CA-03 — An active published command fails on the intact release — P1
+
+The converted Increment 04 commissioning chapter tells the reader to run `python tools/check_release.py` before other checks. That command reads `sources/release_manifest.json`, which still describes the earlier 397-file release. On this unchanged 932-file archive it reports 15 digest mismatches, including the updated root README, workflow, documentation indexes and repository dependency list.
+
+The outer archive hash matches the preceding delivery. **This result indicates a stale manifest, not tampering.** The active instructions and the internal integrity scope disagree. A valid link to an existing executable did not establish that the instruction works.
+
+**Close when:** old manifests are explicitly historical; the release supplies a current manifest or another clearly defined integrity entry point; and the maintained execution instructions refer to that entry point. Preserve source transcriptions, but add a conspicuous current-operation overlay where inherited commands are no longer valid. Rehearse the sequence on a fresh extraction before release.
+
+**Evidence:** [legacy-release-check.json](evidence/legacy-release-check.json). Source instruction: `docs/implementation/increment-04/08-native-commissioning-and-stopping-conditions.md:26–37`.
+
+## 4. Git authoring and decision-governance completion
+
+### CA-04 — Decide which content is immutable transcription and which is maintained design — P2
+
+The migration document says Markdown is the working review surface and invites substantive changes in a branch. Its checker simultaneously requires the old source paragraphs to remain. Probe P04 rewrote the ZIP definition without changing its meaning; it failed because the original paragraph was no longer present. Explicit source refresh rebuilds the converted chapters from the frozen Word files and overwrites edited text.
+
+These behaviours are reasonable for a frozen transcription archive. They do not, by themselves, provide a complete maintained-design workflow. The current page banners honestly identify transcriptions; the ambiguity is in how an architect subsequently changes the actual accepted Git design while retaining provenance.
+
+Two viable approaches are available: retain immutable transcriptions and maintain current designs separately, or make Markdown the maintained source and record explicit reviewed deltas and versions from the frozen import. Select one rather than forcing editors to preserve superseded prose solely to pass a string-presence test.
+
+**Close when:** an ordinary reviewed design change can pass the correct current-design gate, old source bytes remain intact, source refresh cannot silently replace authoritative edits, and readers can identify which version controls an implementation. Do not turn this into a custom application-schema project.
+
+### CA-05 — Proposed ADRs need a working future lifecycle — P2
+
+All existing source-derived ADRs should remain Proposed until real adoption occurs. No acceptance is requested or fabricated by this audit.
+
+The problem is the generated workflow. The checker categorically rejects an Accepted record; P05 demonstrates that result. The builder hardcodes missing acceptance authority/evidence and Proposed labels in its index/crosswalk. The 34 source-derived records contain no structured accountable owner/authority field. Meanwhile, P03 shows that changing only the displayed page to Accepted is not detected.
+
+The original ADR template already anticipates proposed, accepted, superseded and rejected decisions. A source-backed Git register needs to handle those states without issuing approval itself.
+
+**Close when:** accountable role, decision date, scope, acceptance evidence and supersession relationships have defined fields and validation rules; display and records agree; and a legitimate future transition can be represented without weakening tests. A placeholder authority is not actual approval.
+
+See [adr_review.csv](adr_review.csv) for all 36 records. This is an editorial/governance review, not an approval list.
+
+### Additional ADR development that is worthwhile
+
+The 36 records already capture the main hosting, domain, routing, ownership and readiness decisions. More ADRs should be added only for materially distinct choices. Five source-backed topics merit explicit treatment:
+
+| Topic | Recommended treatment |
+| --- | --- |
+| Versioned cryptographic policy and protocol configuration | Extend ADR-0029 or add a separately owned record; the current record focuses on recovery material, not the full key/protocol lifecycle. |
+| Independent telemetry and collection-loss behaviour | Consider a scoped record based on RA §26 and SVC §2: attribution, collector independence, access, buffering, loss indication and operating restrictions. |
+| Images and privileged dependency provenance | Extend lifecycle/change decisions to identify accepted artifacts, revocation, firmware/provider/module origin and qualification on change. |
+| Protected state and minimal cross-owner handoffs | Extend ADR-0013/0016 rather than duplicating their ownership choices; document backend recovery and state-versus-infrastructure rollback explicitly. |
+| Qualification, cross-stack deployment and real exit | Extend ADR-0017 to distinguish first-stack acceptance, equivalent second-stack outcomes and actual image/data/service portability. |
+
+These are recommendations drawn from existing source sections, not invented past decisions. [adr_extension_candidates.csv](adr_extension_candidates.csv) records the relevant parent sections and limits. No mandatory ADR count is proposed.
+
+## 5. Source scope, audit lineage and assurance coverage
+
+### CA-06 — The missing standalone design family remains a scope decision — P2
+
+The 28 included Word files have been converted. That is different from proving that every artifact described in previous releases is present. The standalone v1.2 RAD/TAD/solution/transition/as-built package is absent from this snapshot. `docs/architecture/RAD.md` and `docs/engineering/TAD.md` clearly state that they are composition/navigation views.
+
+This disclosure is correct and should be retained. A composed TAD can be useful; the issue is whether it satisfies the user’s intended deliverable scope. Either recover the original files or consciously accept the available views and author any remaining needed designs as new documents with new provenance. In particular, do not claim a missing worked public-service solution was imported merely because general ingress guidance exists.
+
+**Close when:** the document owner accepts an explicit inventory and each previously described missing artifact is recovered, replaced under a new identity, or excluded with a recorded rationale.
+
+### CA-07 — Historical audit retention is not a current closure record — P2
+
+The old F01–F24 findings are preserved and the active audit map correctly says conversion did not repair the old contract package. However, there is no finding-by-finding current disposition distinguishing continuing requirements, retired custom-contract scope, reference-level treatment, native proof still needed and genuinely closed work.
+
+That distinction is essential to avoid reintroducing the application architecture the user rejected. An old JSON-schema defect may remain a historical defect in software no longer reissued; its underlying tenancy or evidence requirement can still apply to the infrastructure. It should not be labelled either “fixed” or “missing from the current architecture” without this scope analysis.
+
+A proposed [historical audit disposition register](historical_audit_dispositions.csv) is included with 24 rows. For example, the DNS finding now has a reference and local protocol treatment but still needs native resolver qualification. First-stack versus portability sequencing has a documented reference treatment. Full assertion-to-implementation allocation remains open. Every row remains **not closed by this audit** pending owner review.
+
+### CA-08 — Integrate every verification family into the active assurance index — P2
+
+The active test-specifications page contains the 80 inherited CT procedures. Twelve RA-01–RA-12 realization addenda are retained in reference JSON but have no active Markdown ID/file reference, despite the qualification narrative requiring them. The W14 assertions are not missing: their contents appear in the worked-design chapter. The Q11 observation material also belongs to its existing campaign scope.
+
+**Close when:** one index identifies CT procedures, RA realization addenda, W14 assertions and Q11 observations with links, original status, applicability and overlap. Do not sum these families into an inflated executed-test count. The requirement is discoverability and selection, not duplicate storage or another evidence service.
+
+### CA-09 — Complete the implementation allocation, not merely its hyperlinks — P2
+
+The code map is valuable and honest about candidate code. It does not prove that a linked module implements every referenced requirement. The source qualification guidance explicitly requires observations for individual assertions inside compound requirements.
+
+For example, management separation can require route isolation, native API authorization and a recoverable OOB path. A reader module that checks a selected API object does not establish all three. A workload module can place a VM without implementing the approved physical co-residency policy or backup service. A link to the implementation-scope document cannot supply those controls.
+
+**Close when:** applicable assertions have a named implementation/enforcement owner, location, exact artifact or operating procedure, verification method, evidence class and remaining dependency. “External service,” “manual approved control,” “not implemented” and “not applicable with rationale” are legitimate dispositions. Inventing a controller, no-op module or unsupported Terraform resource is not.
+
+## 6. Terraform, Ansible and actual implementation completion
+
+### CA-10 — Root provider-schema export crosses the disabled-backend boundary — P1
+
+The current CI script calls `tools/verify_terraform.py --mock-tests`. That verifier copies the source to a temporary directory, initializes with `-backend=false`, validates modules and roots, and exports schemas from **both**. All ten execution roots declare an HTTP backend; the final pass predicate requires their schema export to succeed.
+
+This is not equivalent to backend-disabled `validate`. In the pinned Terraform v1.13.5 code, the schema command calls backend resolution before obtaining schemas. Default backend options do not enable initialization. The backend path for a configured backend with no initialized state returns an initialization error. Exact-version upstream sources were inspected through the read-only GitHub connector after ordinary web retrieval failed; locators and blob identities are retained in [external_sources.json](external_sources.json), T03–T05.
+
+**The repository/upstream command-path defect is confirmed by source inspection. A fresh Terraform failure was not executed here**, because Terraform is absent. Installing it should not be represented as the sole remaining fix.
+
+**Close when:** root validation remains backend-disabled; actual schema export uses matching backend-free modules or a reviewed backend-free harness; the result record describes that scope honestly; and all ten module/root pairs and plan-only mocks pass on the exact candidate tree. Do not initialize a production backend to make a source validation job pass.
+
+Official validation guidance supports backend-disabled initialization for `validate`, and separately warns that validation does not assess remote services. It should not be stretched into a claim about the different schema command. [T01]
+
+### CA-11 — Bind engine evidence and dependency locks to this exact release — P1
+
+Both fresh engine gates report `BLOCKED_TOOLCHAIN`. The archive contains no `.terraform.lock.hcl`. Existing pins and source tests are useful, but not actual plugin-schema validation, mocked Terraform plans or Ansible execution. A successful historical workflow on a different commit/workflow must not be attached to this ZIP without demonstrating equivalence.
+
+The verifier is prepared to save generated locks as build reports. The engineering release still needs reviewed lock files for its execution roots and actual current results. HashiCorp identifies the root dependency lock as the record of provider selections/checksums and recommends including it in version control; module version references are a separate concern. [T02]
+
+**Close when:** CA-10 is corrected, exact-current engine runs succeed, real provider schemas and reviewed root lockfiles are retained, and both Ansible playbooks pass actual syntax, idempotence, check-mode and negative cases. None of this issues native-platform or production authorization.
+
+### What remains beyond documentation and engine gates
+
+The current implementation correctly identifies substantial target-specific work as open. It does not yet supply a fully commissioned physical fabric and vendor cell, a complete selected EC/SE firewall and attachment topology, all production shared-service integrations, native IPv6 paths, true writer fencing, all data-protection operations, or an accepted activation workflow.
+
+The correct next engineering milestone is one **complete, bounded reference service on a chosen actual platform**, not an indiscriminate increase in module count. It needs the accepted site and version tuple, routing/enforcement path, required initialization services, storage and protection, ownership, failed-operation recovery and actual positive/negative/failure/restore/retirement observations. A second platform then demonstrates equivalent outcomes; actual image/data/service movement is a separately measured portability claim.
+
+No detailed site inventory, firewall product choice, encryption algorithm approval or operating authority is invented by this audit. Those are explicit implementation decisions, not omissions to fill with plausible defaults.
+
+## 7. Recommended corrective release sequence
+
+| Work package | Scope | Acceptance evidence |
+| --- | --- | --- |
+| 1 — Transcription and active instructions | CA-01/02/03: restore code whitespace, strengthen semantic negatives, correct manifest scope and current runbook entry points. | Fresh extraction passes new code/table/ADR tests; supplied semantic mutations are rejected; current integrity command succeeds. |
+| 2 — Authoring and ADR governance | CA-04/05: define maintained versus frozen content and structured future decision lifecycle. | A reviewed prose change and a properly documented hypothetical lifecycle fixture round-trip; no current ADR is automatically accepted. |
+| 3 — Source and assurance completeness | CA-06/07/08: resolve missing-source scope, review historical dispositions and index all verification families. | Explicit owner-approved inventory and dispositions; no orphan test family or false closure. |
+| 4 — Engineering and engine release | CA-09/10/11: complete assertion allocation, repair backend-free validation, run real engines and review root locks. | Exact-source result package with per-scope outcomes, actual schemas and locks, and named unimplemented/external dependencies. |
+| 5 — Native service qualification | Site-specific scope outside this document audit. | First complete actual service with security, lifecycle, failure, recovery and operational acceptance; later cross-stack/exit evidence. |
+
+The first three packages concern repository/documentation completion and do not require a production deployment. The fourth concerns an implementation-ready code/engineering release. The fifth concerns an actual offered service. Keeping these boundaries separate avoids calling a document incomplete solely because a reference design has no site values, and avoids calling a service complete because its documents are extensive.
+
+## 8. Reproduction and artifact contents
+
+[README.md](README.md) explains how to run the independent local probes against a clean extraction. They require the repository’s documented text-rendering dependencies. Mutation tests execute the supplied documentation checker only inside temporary copies. They do not invoke Terraform, Ansible, live readers or native APIs.
+
+The package contains the full [findings register](findings.csv), [completion matrix](completion_matrix.csv), [ADR review](adr_review.csv), [ADR extension candidates](adr_extension_candidates.csv), [historical finding dispositions](historical_audit_dispositions.csv), exact [local source excerpts](evidence/source_excerpts.json), fresh check logs, independent fidelity results and mutation results.
+
+The reproduced failures were preserved, not removed or relabelled. The source ZIP, original documents, current chapters, ADRs and implementation files remain unchanged. This package is an audit artifact, not a corrected repository or an acceptance decision.
+
+**Final recommendation:** continue using the repository as a proposed design and candidate implementation workspace; hold the blanket completion label. Correct the concrete conversion, release and CI defects, establish maintainable document/ADR authority, and finish the explicit scope and evidence allocations. Preserve the infrastructure-first design throughout.
+
+## External source notes
+
+T01: HashiCorp, *terraform validate command* — [official documentation](https://developer.hashicorp.com/terraform/cli/commands/validate). Limited use: internal consistency and backend-disabled validation.
+
+T02: HashiCorp, *Dependency Lock File* — [official documentation](https://developer.hashicorp.com/terraform/language/files/dependency-lock). Limited use: provider selection/checksum provenance and root lockfile ownership.
+
+T03–T05: HashiCorp Terraform **v1.13.5**, [providers_schema.go](https://github.com/hashicorp/terraform/blob/v1.13.5/internal/command/providers_schema.go) and [meta_backend.go](https://github.com/hashicorp/terraform/blob/v1.13.5/internal/command/meta_backend.go). Limited use: exact-version schema/backend command flow. Source was inspected, not executed or republished in full.

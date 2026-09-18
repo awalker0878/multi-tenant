@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802 -->
+<!-- SOURCE-BLOCK AK:26 BEGIN -->
+
 <a id="AK_02"></a>
+
+<!-- SOURCE-BLOCK AK:26 END -->
+
+<!-- SOURCE-BLOCK AK:27 BEGIN -->
 
 Start with the required service and information context, then select topology and capability. Keep security categorization separate from uptime, recovery objectives and performance.
 
+<!-- SOURCE-BLOCK AK:27 END -->
+
+<!-- SOURCE-BLOCK AK:28 BEGIN -->
+
 Baseline and related records: [RA §2](../reference/2-design-drivers-and-selected-reference-pattern.md#RA_s_002)  •  [RA §14](../reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014)  •  [AT §2](../../templates/hld/2-requirements-and-applicability.md#AT_02)
+
+<!-- SOURCE-BLOCK AK:28 END -->
+
+<!-- SOURCE-BLOCK AK:29 BEGIN -->
 
 
 <a id="source-table-29"></a>
@@ -24,12 +38,38 @@ Baseline and related records: [RA §2](../reference/2-design-drivers-and-selecte
 | Lifecycle | Growth, maintenance, migration/exit, support horizon, retention, disposal and operating ownership. |
 | Evidence and applicability | Each selected requirement maps to its design home, control owner, verification method and exception policy. |
 
+<!-- SOURCE-BLOCK AK:29 END -->
+
+<!-- SOURCE-BLOCK AK:30 BEGIN -->
+
+<!-- SOURCE-BLOCK AK:30 END -->
+
+<!-- SOURCE-BLOCK AK:31 BEGIN -->
+
 The workbook preserves all 194 inherited requirement statements as reference text. It does not automatically adopt them for a new project. For each row choose applicable, not applicable with rationale, or unresolved; retain the exact source identifier and edition when assigning selected controls.
+
+<!-- SOURCE-BLOCK AK:31 END -->
+
+<!-- SOURCE-BLOCK AK:32 BEGIN -->
 
 The current ITSP.10.033 introduction explicitly supersedes ITSG-33 Annex 3A. Keep any legacy assessment linkage version-aware; do not infer that matching control numbers establish equivalence. \[K02\]
 
+<!-- SOURCE-BLOCK AK:32 END -->
+
+<!-- SOURCE-BLOCK AK:33 BEGIN -->
+
 External mechanism context: [K02 — ITSP.10.033 foreword, overview and introduction](https://www.cyber.gc.ca/en/guidance/cyber-security-privacy-risk-management/itsp10033/foreword-overview-introduction)
 
+<!-- SOURCE-BLOCK AK:33 END -->
+
+<!-- SOURCE-BLOCK AK:34 BEGIN -->
+
 Acceptance test: no offered service depends on a mandatory requirement whose owner, applicability or implementation boundary is still unknown.
+
+<!-- SOURCE-BLOCK AK:34 END -->
+
+<!-- SOURCE-BLOCK AK:35 BEGIN -->
+
+<!-- SOURCE-BLOCK AK:35 END -->
 
 [Previous chapter](1-architecture-work-plan-and-definition-of-done.md) · [Chapter index](README.md) · [Next chapter](3-required-architecture-views.md)

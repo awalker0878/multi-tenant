@@ -6,10 +6,20 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 26dbaac8c13797b58ca5d057f76df8b3da63ec3f4b336036f18f5c6902512207 -->
+<!-- SOURCE-BLOCK GM:31 BEGIN -->
+
 <a id="__RefHeading___Toc1261_342027687"></a>
 <a id="GM_s_002"></a>
 
+<!-- SOURCE-BLOCK GM:31 END -->
+
+<!-- SOURCE-BLOCK GM:32 BEGIN -->
+
 Parent architecture: [RA §1](../../architecture/reference/1-purpose-scope-and-architectural-authority.md#RA_s_001)  •  [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)
+
+<!-- SOURCE-BLOCK GM:32 END -->
+
+<!-- SOURCE-BLOCK GM:33 BEGIN -->
 
 
 <a id="source-table-33"></a>
@@ -25,9 +35,25 @@ Parent architecture: [RA §1](../../architecture/reference/1-purpose-scope-and-a
 | Capacity/operations/assurance · RA §§26, 28, 30 | QUAL §§3–7 | Actual service limits, assertions, ownership, evidence and operating conditions. |
 | Exceptions and future services · RA §§19, 29 | QUAL §8 and GM §3 | Extension scope and explicit architecture/security adoption. |
 
+<!-- SOURCE-BLOCK GM:33 END -->
+
+<!-- SOURCE-BLOCK GM:34 BEGIN -->
+
+<!-- SOURCE-BLOCK GM:34 END -->
+
+<!-- SOURCE-BLOCK GM:35 BEGIN -->
+
 Use the parent for the selected architectural decision, not as a dumping ground for every detailed table. Use the primary supplement for the detailed explanation, then point to it rather than duplicating it in several files. Vendor-specific mechanisms may differ while the named security/service outcome stays constant. A shared-service change must be reviewed across all vendor realizations that consume it.
 
+<!-- SOURCE-BLOCK GM:35 END -->
+
+<!-- SOURCE-BLOCK GM:36 BEGIN -->
+
 Three kinds of completeness are tracked independently. Documentation coverage means the issue has a stated design, location and owner. Decision completion means the responsible authority has selected actual values and accepted the design. Qualification completion means observations on the actual implementation support the promised outcome. A gap can be documented here and still block production because the latter two have not occurred.
+
+<!-- SOURCE-BLOCK GM:36 END -->
+
+<!-- SOURCE-BLOCK GM:37 BEGIN -->
 
 
 <a id="source-table-37"></a>
@@ -38,6 +64,16 @@ Three kinds of completeness are tracked independently. Documentation coverage me
 | P1 | Complete the engineering/operation detail before advertising or scaling the affected capability. | A universal urgency or remediation deadline. |
 | P2 | Maintain document governance or qualify a deliberately excluded extension when it is offered. | Permission to ignore a requirement once the extension becomes in scope. |
 
+<!-- SOURCE-BLOCK GM:37 END -->
+
+<!-- SOURCE-BLOCK GM:38 BEGIN -->
+
+<!-- SOURCE-BLOCK GM:38 END -->
+
+<!-- SOURCE-BLOCK GM:39 BEGIN -->
+
 Release maintenance includes link targets, source review status, requirement coverage, gate definitions, and representative scenario consistency. Preserve stable IDs when wording changes; record source and rationale. Stale site assumptions must not become reference architecture defaults. The registers support this process without mandating a new application or database.
+
+<!-- SOURCE-BLOCK GM:39 END -->
 
 [Previous chapter](1-document-family-scope-and-precedence.md) · [Chapter index](README.md) · [Next chapter](3-detailed-gap-register-and-treatment.md)

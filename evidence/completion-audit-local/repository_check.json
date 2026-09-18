@@ -1,0 +1,19 @@
+{
+  "status": "PASSED_REPOSITORY_STATIC_ONLY",
+  "counts": {
+    "active_links": 9482,
+    "reference_files": 139,
+    "yaml_files": 10,
+    "catalog_artifacts": 31,
+    "terraform_module_root_pairs": 10,
+    "ansible_playbooks": 2,
+    "source_files": 961
+  },
+  "issues": [],
+  "limits": [
+    "Not Terraform/Ansible engine validation",
+    "Common secret-pattern checks are not exhaustive",
+    "Frozen library byte identity, not new technical approval",
+    "GitHub workflows were not executed by this command"
+  ]
+}

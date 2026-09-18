@@ -40,8 +40,20 @@
 - [Evidence inventory and external checks](27-evidence-inventory-and-external-checks.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK AUD11:0 BEGIN -->
+
 *Independent audit*
+
+<!-- SOURCE-BLOCK AUD11:0 END -->
+
+<!-- SOURCE-BLOCK AUD11:1 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
+<!-- SOURCE-BLOCK AUD11:1 END -->
+
+<!-- SOURCE-BLOCK AUD11:2 BEGIN -->
+
 *Handbook v1.1 and companion package<br>Architecture, contract consistency and completeness*
+
+<!-- SOURCE-BLOCK AUD11:2 END -->

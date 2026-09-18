@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: d8c2790ff7bb408283a9156a369cc6c4394131e7d44bfd130bfa27e7d82b5783 -->
+<!-- SOURCE-BLOCK DEL:45 BEGIN -->
+
 <a id="DEL_04"></a>
+
+<!-- SOURCE-BLOCK DEL:45 END -->
+
+<!-- SOURCE-BLOCK DEL:46 BEGIN -->
 
 Reference documents, examples, live site records and observed evidence serve different purposes. Keep their ownership clear.
 
+<!-- SOURCE-BLOCK DEL:46 END -->
+
+<!-- SOURCE-BLOCK DEL:47 BEGIN -->
+
 Design basis and related records: [RA §28](../../architecture/reference/28-architecture-acceptance-and-verification.md#RA_s_028)  •  [WD §13](../../solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md#WD14_S13)  •  [IT §4](../../templates/implementation-mop/4-test-procedure-and-actual-execution-record.md#IT_04)
+
+<!-- SOURCE-BLOCK DEL:47 END -->
+
+<!-- SOURCE-BLOCK DEL:48 BEGIN -->
 
 
 <a id="source-table-48"></a>
@@ -24,10 +38,32 @@ Design basis and related records: [RA §28](../../architecture/reference/28-arch
 | Development CSVs | New navigation, proposed treatment, observation and calculation records. | Reference snapshots; do not treat expected results or open decisions as actual evidence. |
 | Quality and build source | Prior v1.0 checks separated from current v1.1 document checks. | Rebuild developed documents and run current structural checks; neither set qualifies infrastructure. |
 
+<!-- SOURCE-BLOCK DEL:48 END -->
+
+<!-- SOURCE-BLOCK DEL:49 BEGIN -->
+
+<!-- SOURCE-BLOCK DEL:49 END -->
+
+<!-- SOURCE-BLOCK DEL:50 BEGIN -->
+
 The existing workbook and project change system remain the chosen sources for real implementation status. New record fields identify what must be entered; they are not an automated approval mechanism. Preserve actual observation, not-run, blocked and approved not-applicable as distinct dispositions.
+
+<!-- SOURCE-BLOCK DEL:50 END -->
+
+<!-- SOURCE-BLOCK DEL:51 BEGIN -->
 
 Source handling: parent-derived architecture is linked by document/section. New worked elaborations are local proposals. D01–D08 identify mechanism references checked for this release, not a selected product tuple.
 
+<!-- SOURCE-BLOCK DEL:51 END -->
+
+<!-- SOURCE-BLOCK DEL:52 BEGIN -->
+
 Continue with: [QCP §6](../../assurance/qualification-campaign/6-build-an-evidence-packet-a-reviewer-can-challenge.md#QCP_06)
+
+<!-- SOURCE-BLOCK DEL:52 END -->
+
+<!-- SOURCE-BLOCK DEL:53 BEGIN -->
+
+<!-- SOURCE-BLOCK DEL:53 END -->
 
 [Previous chapter](3-apply-gate-dependencies-rather-than-numerical-order.md) · [Chapter index](README.md) · [Next chapter](5-review-the-design-through-realistic-change-and-failure.md)

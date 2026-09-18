@@ -21,19 +21,45 @@
 - [v1.4 — Connected infrastructure design and acceptance](10-v1-4-connected-infrastructure-design-and-acceptance.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK QUAL:0 BEGIN -->
+
 <a id="V14_QUAL_START"></a>
 
 INFRASTRUCTURE ARCHITECTURE  /  QUAL
 
+<!-- SOURCE-BLOCK QUAL:0 END -->
+
+<!-- SOURCE-BLOCK QUAL:1 BEGIN -->
+
 v1.4 linked worked design: [WD — resources, paths, build receipts and acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
+
+<!-- SOURCE-BLOCK QUAL:1 END -->
+
+<!-- SOURCE-BLOCK QUAL:2 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
+<!-- SOURCE-BLOCK QUAL:2 END -->
+
+<!-- SOURCE-BLOCK QUAL:3 BEGIN -->
+
 *Site Design, Qualification and Operational Acceptance*
+
+<!-- SOURCE-BLOCK QUAL:3 END -->
+
+<!-- SOURCE-BLOCK QUAL:4 BEGIN -->
 
 Draft v1.4  \|  16 September 2026
 
+<!-- SOURCE-BLOCK QUAL:4 END -->
+
+<!-- SOURCE-BLOCK QUAL:5 BEGIN -->
+
 The actual site decisions, measurements, evidence and operating responsibilities required to turn the reference design into an accepted service.
+
+<!-- SOURCE-BLOCK QUAL:5 END -->
+
+<!-- SOURCE-BLOCK QUAL:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -47,10 +73,40 @@ The actual site decisions, measurements, evidence and operating responsibilities
 | Authority | Applicable external obligations and adopted controls prevail; supplements cannot silently weaken the parent. |
 | Release boundary | Documentation and local document checks only. No live infrastructure deployment, qualification or authorization asserted. |
 
+<!-- SOURCE-BLOCK QUAL:6 END -->
+
+<!-- SOURCE-BLOCK QUAL:7 BEGIN -->
+
+<!-- SOURCE-BLOCK QUAL:7 END -->
+
+<!-- SOURCE-BLOCK QUAL:8 BEGIN -->
+
 Start here: [Parent architecture — RA](../../architecture/reference/1-purpose-scope-and-architectural-authority.md#RA_s_001)  •  [Document family and gap map — GM](../gap-map/1-document-family-scope-and-precedence.md#GM_s_001)
+
+<!-- SOURCE-BLOCK QUAL:8 END -->
+
+<!-- SOURCE-BLOCK QUAL:9 BEGIN -->
 
 Keep the eight Word files together after extracting the release package. Cross-document links use sibling filenames and stable bookmarks. START\_HERE.html provides an additional navigation index.
 
+<!-- SOURCE-BLOCK QUAL:9 END -->
+
+<!-- SOURCE-BLOCK QUAL:10 BEGIN -->
+
+<!-- SOURCE-BLOCK QUAL:10 END -->
+
 <a id="QUAL_contents"></a>
 
+<!-- SOURCE-BLOCK QUAL:22 BEGIN -->
+
+<!-- SOURCE-BLOCK QUAL:22 END -->
+
+<!-- SOURCE-BLOCK QUAL:23 BEGIN -->
+
 Use the contents and named section links to navigate. After later edits, update Word fields and verify pagination before release.
+
+<!-- SOURCE-BLOCK QUAL:23 END -->
+
+<!-- SOURCE-BLOCK QUAL:24 BEGIN -->
+
+<!-- SOURCE-BLOCK QUAL:24 END -->

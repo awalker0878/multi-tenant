@@ -25,4 +25,10 @@ Read [the inter-domain boundary](architecture/reference/8-zone-interfaces-routin
 
 [Conversion coverage and maintenance](DOCUMENTATION_MIGRATION.md) records what was moved, what is historical and what source artifacts were unavailable. [The binary catalogue](ARTIFACT_CATALOG.md) remains for provenance and workbook access. The [implementation coverage map](implementation/code-map.md) distinguishes candidate code from actual platform qualification.
 
-Do not silently change inherited requirements while copying them into an ADR. Source-derived ADRs have no recorded organizational acceptance. Initial operational and promised recovery readiness remains a prerequisite to production activation—not a later paperwork step.
+Do not silently change inherited requirements while copying them into an ADR. Source-derived ADRs do not gain organizational acceptance merely by being published. Initial operational and promised recovery readiness remains a prerequisite to production activation—not a later paperwork step.
+
+<!-- BEGIN ASSURANCE ALLOCATION LINKS -->
+
+[Assertion-level allocation](assurance/implementation-allocation.md) · [All verification families](assurance/verification-families.md) · [Historical finding dispositions](assurance/historical-findings.md) · [Completion-audit corrections](assurance/completion-audit.md)
+
+<!-- END ASSURANCE ALLOCATION LINKS -->

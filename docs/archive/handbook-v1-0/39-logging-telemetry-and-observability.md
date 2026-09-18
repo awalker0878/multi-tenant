@@ -8,7 +8,17 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:295 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:295 END -->
+
+<!-- SOURCE-BLOCK HB10:296 BEGIN -->
+
 Observability must cross control planes without collapsing their trust boundaries. Workload flow telemetry, security-edge logs, platform audit logs, automation logs, route changes, IPAM changes, identity events and management access should be correlated using stable tenant/WSD/domain identifiers.
+
+<!-- SOURCE-BLOCK HB10:296 END -->
+
+<!-- SOURCE-BLOCK HB10:297 BEGIN -->
 
 
 <a id="source-table-297"></a>
@@ -22,16 +32,26 @@ Observability must cross control planes without collapsing their trust boundarie
 | IPAM | Who owns this address/prefix and when was it allocated? |
 | Management plane | Who administered which infrastructure component? |
 
+<!-- SOURCE-BLOCK HB10:297 END -->
+
+<!-- SOURCE-BLOCK HB10:298 BEGIN -->
+
 
 <a id="source-table-298"></a>
 
 | OBS-001 | Logs SHALL contain stable identifiers sufficient to correlate tenant, WSD, Security Domain, policy, and deployment evidence. |
 | --- | --- |
 
+<!-- SOURCE-BLOCK HB10:298 END -->
+
+<!-- SOURCE-BLOCK HB10:299 BEGIN -->
+
 
 <a id="source-table-299"></a>
 
 | OBS-002 | Security control logging SHALL not depend solely on the tenant workload being healthy or cooperative. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:299 END -->
 
 [Previous chapter](38-deployment-evidence.md) · [Chapter index](README.md) · [Next chapter](40-capacity-and-performance-engineering.md)

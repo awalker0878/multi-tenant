@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: d935614ed1639f56859dfe29bc226af4cfced35bafeb7d544440577ddaa95a09 -->
+<!-- SOURCE-BLOCK OPS:35 BEGIN -->
+
 <a id="OPS_03"></a>
+
+<!-- SOURCE-BLOCK OPS:35 END -->
+
+<!-- SOURCE-BLOCK OPS:36 BEGIN -->
 
 Classify a change by its effects on service, boundaries and data—not by the repository or tool that performs it.
 
+<!-- SOURCE-BLOCK OPS:36 END -->
+
+<!-- SOURCE-BLOCK OPS:37 BEGIN -->
+
 Design basis and related records: [RA §25](../../architecture/reference/25-change-brownfield-adoption-and-configuration-ownership.md#RA_s_025)  •  [PROV §5](../../implementation/provisioning-strategy/5-concurrency-ownership-and-failed-execution.md#PROV_s_005)  •  [IK §8](../../implementation/delivery-guide/8-interrupted-work-brownfield-adoption-and-change.md#IK_08)
+
+<!-- SOURCE-BLOCK OPS:37 END -->
+
+<!-- SOURCE-BLOCK OPS:38 BEGIN -->
 
 
 <a id="source-table-38"></a>
@@ -23,13 +37,39 @@ Design basis and related records: [RA §25](../../architecture/reference/25-chan
 | Resolve uncertainty | Freeze competing writes; inspect native tasks, resources and data state; choose resume, forward repair or supported compensation. | A delayed task can still complete or compensation might delete shared or newly written data. |
 | Reaccept and hand over | Recheck affected controls, capacity and data; record as-built and remaining defects. | Required observations are stale or incident containment has not been explicitly released. |
 
+<!-- SOURCE-BLOCK OPS:38 END -->
+
+<!-- SOURCE-BLOCK OPS:39 BEGIN -->
+
+<!-- SOURCE-BLOCK OPS:39 END -->
+
+<!-- SOURCE-BLOCK OPS:40 BEGIN -->
+
 A prior state snapshot does not revert the actual infrastructure. Similarly, credential revocation may prevent a new API call without cancelling work already accepted by a native system. Record the remaining task and resource identity, then obtain the owning team’s recovery decision before a new execution competes with it.
+
+<!-- SOURCE-BLOCK OPS:40 END -->
+
+<!-- SOURCE-BLOCK OPS:41 BEGIN -->
 
 For brownfield adoption, discover current routes, policies, data attachments, ownership and dependencies first. Review the non-destructive import/adoption scope and remove conflicting writers deliberately. Adoption is not conformance, and it is not permission to replace existing VMs, disks or gateways.
 
+<!-- SOURCE-BLOCK OPS:41 END -->
+
+<!-- SOURCE-BLOCK OPS:42 BEGIN -->
+
 An authorized incident block takes precedence over ordinary configuration reconciliation until the incident authority releases it. Repair must not restore an old allow path merely because it remains in source.
 
+<!-- SOURCE-BLOCK OPS:42 END -->
+
+<!-- SOURCE-BLOCK OPS:43 BEGIN -->
+
 Continue with: [PBS §9](../../engineering/platform-build/9-release-a-native-build-package-that-can-be-independently-reviewed.md#PBS_09)  •  [QCP §5](../../assurance/qualification-campaign/5-separate-safe-failure-service-continuity-and-recovery.md#QCP_05)
+
+<!-- SOURCE-BLOCK OPS:43 END -->
+
+<!-- SOURCE-BLOCK OPS:44 BEGIN -->
+
+<!-- SOURCE-BLOCK OPS:44 END -->
 
 [Previous chapter](2-specify-dependency-loss-before-it-becomes-an-incident.md) · [Chapter index](README.md) · [Next chapter](4-recover-the-service-in-dependency-order.md)
 

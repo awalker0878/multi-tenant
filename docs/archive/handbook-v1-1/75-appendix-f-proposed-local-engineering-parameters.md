@@ -8,14 +8,28 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:1539 BEGIN -->
+
 <a id="__RefHeading___Toc13441_1645000677"></a>
 <a id="app_F"></a>
+
+<!-- SOURCE-BLOCK HB11:1539 END -->
+
+<!-- SOURCE-BLOCK HB11:1540 BEGIN -->
 
 <a id="__RefHeading___Toc13443_1645000677"></a>
 
 ## Reference parameter set
 
+<!-- SOURCE-BLOCK HB11:1540 END -->
+
+<!-- SOURCE-BLOCK HB11:1541 BEGIN -->
+
 These values are starting proposals for an implementation workshop. They are not government-mandated thresholds, approved cryptoperiods, purchased capacity commitments or measurements of a deployed service. Each production profile needs an owner, authority approval, version, applicability and measured feasibility; higher-authority or system-specific obligations override these examples.
+
+<!-- SOURCE-BLOCK HB11:1541 END -->
+
+<!-- SOURCE-BLOCK HB11:1542 BEGIN -->
 
 
 <a id="source-table-1542"></a>
@@ -37,8 +51,18 @@ These values are starting proposals for an implementation workshop. They are not
 | Example backup retention / evidence retention | 30 days backup; 365 days evidence | Data-owner retention/hold and applicable obligations override examples |
 | Example key rotation review | 365-day maximum planned interval as a design placeholder | Actual key type, cryptoperiod and current crypto policy determine the approved value |
 
+<!-- SOURCE-BLOCK HB11:1542 END -->
+
+<!-- SOURCE-BLOCK HB11:1543 BEGIN -->
+
 ### Profile adoption record
 
+<!-- SOURCE-BLOCK HB11:1543 END -->
+
+<!-- SOURCE-BLOCK HB11:1544 BEGIN -->
+
 Record profile ID/version; offered service class; information envelope; proposed and approved parameters; rationale; measurement method; exact target implementation; evidence; capacity cost; operator owner; approving authority; effective/review dates; exceptions and migration consequences. A numeric default is not “approved” just because it exists in a schema example.
+
+<!-- SOURCE-BLOCK HB11:1544 END -->
 
 [Previous chapter](74-appendix-e-source-control-traceability-and-responsibility.md) · [Chapter index](README.md) · [Next chapter](76-appendix-g-operational-records-and-decision-templates.md)

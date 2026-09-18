@@ -83,12 +83,36 @@
 - [Closing Architecture Statement](70-closing-architecture-statement.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK HB10:0 BEGIN -->
+
 PORTABLE MULTI-TENANT<br>SECURE HOSTING
+
+<!-- SOURCE-BLOCK HB10:0 END -->
+
+<!-- SOURCE-BLOCK HB10:1 BEGIN -->
 
 Architecture Standard, Engineering Handbook, and Zero-Touch Automation Blueprint
 
+<!-- SOURCE-BLOCK HB10:1 END -->
+
+<!-- SOURCE-BLOCK HB10:2 BEGIN -->
+
 Greenfield Reference Architecture
+
+<!-- SOURCE-BLOCK HB10:2 END -->
+
+<!-- SOURCE-BLOCK HB10:3 BEGIN -->
 
 Government-aligned security zoning • vendor-neutral service contract • platform adapters • secure by default
 
+<!-- SOURCE-BLOCK HB10:3 END -->
+
+<!-- SOURCE-BLOCK HB10:4 BEGIN -->
+
 Draft v1.0  \|  September 2026
+
+<!-- SOURCE-BLOCK HB10:4 END -->
+
+<!-- SOURCE-BLOCK HB10:5 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:5 END -->

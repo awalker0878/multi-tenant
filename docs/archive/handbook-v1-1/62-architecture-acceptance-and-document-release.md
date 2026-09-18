@@ -8,20 +8,46 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:797 BEGIN -->
+
 <a id="__RefHeading___Toc13421_1645000677"></a>
 <a id="sec_62"></a>
 
+<!-- SOURCE-BLOCK HB11:797 END -->
+
+<!-- SOURCE-BLOCK HB11:798 BEGIN -->
+
 The original thirteen acceptance criteria are preserved as an acceptance register, with clarified scope for routine overlay lifecycle and separation of technical readiness from formal authorization. Additional criteria close the hosting, recovery, identity, supply-chain and traceability gaps. Acceptance of this document package means the specified architecture and supporting artefacts are internally complete for their declared reference scope; it does not mean the tests have run on a production system. \[[S00](77-appendix-h-primary-sources-and-implementation-references.md#S00), section 52\]
 
+<!-- SOURCE-BLOCK HB11:798 END -->
+
+<!-- SOURCE-BLOCK HB11:799 BEGIN -->
+
 A production acceptance decision requires applicable criteria to pass with current evidence, unsupported capabilities to be excluded, residual risks to be authorized and named operational owners to accept the service. Candidate profiles and not-run tests intentionally remain visible. Appendix J records the changes from v1.0 and the closure status of the audit findings; Appendix C and the machine catalogue are generated from the same normative records, preventing the previous partial-index defect.
+
+<!-- SOURCE-BLOCK HB11:799 END -->
+
+<!-- SOURCE-BLOCK HB11:800 BEGIN -->
 
 <a id="req_ACPT_001"></a>
 
 ACPT-001  Production acceptance SHALL require current evidence for every applicable acceptance criterion, explicit exclusions and risk decisions, operational owner acceptance and a valid separately issued authorization decision.
 
+<!-- SOURCE-BLOCK HB11:800 END -->
+
+<!-- SOURCE-BLOCK HB11:801 BEGIN -->
+
 Security authority  \|  Verify: [CT-018](73-appendix-d-conformance-test-catalogue.md#test_CT_018), [CT-049](73-appendix-d-conformance-test-catalogue.md#test_CT_049), [CT-062](73-appendix-d-conformance-test-catalogue.md#test_CT_062), [CT-069](73-appendix-d-conformance-test-catalogue.md#test_CT_069)  \|  Basis: [S04](77-appendix-h-primary-sources-and-implementation-references.md#S04) / [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05)  \|  new-v1.1
 
+<!-- SOURCE-BLOCK HB11:801 END -->
+
+<!-- SOURCE-BLOCK HB11:802 BEGIN -->
+
 The evidence/authorization distinction is illustrated in Figure [5](49-evidence-controls-and-authorization-records.md#fig_evidence). The complete implementation acceptance register follows; none is marked as passed by this document release.
+
+<!-- SOURCE-BLOCK HB11:802 END -->
+
+<!-- SOURCE-BLOCK HB11:803 BEGIN -->
 
 
 <a id="source-table-803"></a>
@@ -48,5 +74,7 @@ The evidence/authorization distinction is illustrated in Figure [5](49-evidence-
 | AC-18 | Capacity, patch, image and supply-chain processes operate against the exact inventory and supported tuple.<br>Tests: CT-040 CT-041 CT-042 CT-056 CT-074 |
 | AC-19 | Every active requirement has an owner, source basis and verification procedure; generated catalogues have no omissions.<br>Tests: CT-075 |
 | AC-20 | Operational owners, selected controls, actual profile parameters and separate formal authorization are in place before production.<br>Tests: CT-018 CT-049 CT-062 CT-069 |
+
+<!-- SOURCE-BLOCK HB11:803 END -->
 
 [Previous chapter](61-delivery-roadmap-and-reference-implementation.md) · [Chapter index](README.md) · [Next chapter](70-appendix-a-canonical-object-contract-and-api-surface.md)

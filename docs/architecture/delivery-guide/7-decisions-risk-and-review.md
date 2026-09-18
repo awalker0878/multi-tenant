@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802 -->
+<!-- SOURCE-BLOCK AK:70 BEGIN -->
+
 <a id="AK_07"></a>
+
+<!-- SOURCE-BLOCK AK:70 END -->
+
+<!-- SOURCE-BLOCK AK:71 BEGIN -->
 
 Use an architecture decision record for choices with material consequences. A decision records why an option is suitable for the offered scope, not merely that a product has a feature.
 
+<!-- SOURCE-BLOCK AK:71 END -->
+
+<!-- SOURCE-BLOCK AK:72 BEGIN -->
+
 Baseline and related records: [RA §29](../reference/29-architecture-decisions-and-alternatives.md#RA_s_029)  •  [GM §4](../../assurance/gap-map/4-open-decision-package-for-implementation.md#GM_s_004)  •  [AT §6](../../templates/hld/6-architecture-decision-record.md#AT_06)
+
+<!-- SOURCE-BLOCK AK:72 END -->
+
+<!-- SOURCE-BLOCK AK:73 BEGIN -->
 
 
 <a id="source-table-73"></a>
@@ -24,10 +38,32 @@ Baseline and related records: [RA §29](../reference/29-architecture-decisions-a
 | Authority and validity | Proposed/accepted/rejected status, actual decision owner, date, applicable scope and review triggers. |
 | Follow-through | LLD schedule IDs, build ownership, qualification assertions, remaining blockers and superseded decisions. |
 
+<!-- SOURCE-BLOCK AK:73 END -->
+
+<!-- SOURCE-BLOCK AK:74 BEGIN -->
+
+<!-- SOURCE-BLOCK AK:74 END -->
+
+<!-- SOURCE-BLOCK AK:75 BEGIN -->
+
 The risk register separates a design concern from an observed implementation defect. A proposed mitigating control remains proposed until implemented and evidenced. Risk acceptance records residual risk and conditions; it does not assert the missing control exists.
+
+<!-- SOURCE-BLOCK AK:75 END -->
+
+<!-- SOURCE-BLOCK AK:76 BEGIN -->
 
 ## Review challenge
 
+<!-- SOURCE-BLOCK AK:76 END -->
+
+<!-- SOURCE-BLOCK AK:77 BEGIN -->
+
 Ask another discipline to identify the broadest route, most privileged credential, largest shared failure domain, weakest return-path assumption and hardest recovery dependency. Resolve the answer in the design and records rather than adding another generic assurance statement.
+
+<!-- SOURCE-BLOCK AK:77 END -->
+
+<!-- SOURCE-BLOCK AK:78 BEGIN -->
+
+<!-- SOURCE-BLOCK AK:78 END -->
 
 [Previous chapter](6-vendor-realization-and-provisioning-strategy.md) · [Chapter index](README.md) · [Next chapter](8-engineering-handoff-and-change-impact.md)

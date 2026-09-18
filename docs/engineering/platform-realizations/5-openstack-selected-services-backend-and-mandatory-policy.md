@@ -6,20 +6,46 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 73be32b98783bd7857be8a00928c6894bf16f6bc98c8eb016058d3cf75b9d86b -->
+<!-- SOURCE-BLOCK VND:69 BEGIN -->
+
 <a id="__RefHeading___Toc4816_865363315"></a>
 <a id="VND_s_005"></a>
 
+<!-- SOURCE-BLOCK VND:69 END -->
+
+<!-- SOURCE-BLOCK VND:70 BEGIN -->
+
 Selected base authority model: provider-owned identities mutate the mandatory network baseline, security groups used for that baseline, port-security settings, permitted address pairs and external attachments. Ordinary tenant direct mutation of those controls is not enabled by the base service. Existing approved request tooling may coordinate changes. Bounded direct delegation is an extension requiring effective-policy and alternate-path qualification; additive allow groups are not a mandatory deny hierarchy.
+
+<!-- SOURCE-BLOCK VND:70 END -->
+
+<!-- SOURCE-BLOCK VND:71 BEGIN -->
 
 Parent architecture: [RA §18](../../architecture/reference/18-openstack-hosting-stack-reference-realization.md#RA_s_018)  •  [RA §22](../../architecture/reference/22-vendor-platform-and-shared-service-commissioning.md#RA_s_022)  •  [RA §24](../../architecture/reference/24-terraform-across-the-vendor-stacks.md#RA_s_024)
 
+<!-- SOURCE-BLOCK VND:71 END -->
+
+<!-- SOURCE-BLOCK VND:72 BEGIN -->
+
 ![OpenStack reference realization inherited from the parent architecture Protected Keystone, Nova, Placement and Neutron control services manage eligible KVM/OVN pools; independent routing handoffs connect through the provider ZIP; Glance, Cinder and other data services have separate authority.](../../assets/diagrams/aee0a3b446528b1d1513.png)
+
+<!-- SOURCE-BLOCK VND:72 END -->
+
+<!-- SOURCE-BLOCK VND:73 BEGIN -->
 
 <a id="fig_openstack"></a>
 
 Figure 3. OpenStack reference realization inherited from the parent architecture
 
+<!-- SOURCE-BLOCK VND:73 END -->
+
+<!-- SOURCE-BLOCK VND:74 BEGIN -->
+
 The reference selects a distribution with Keystone, Nova/Placement, Neutron, Glance and Cinder and illustrates ML2/OVN as its networking backend. These are an architectural candidate, not a claim that all distributions install the same service set. The official OVN reference separates control, compute and gateway roles and distinguishes distributed routing from external gateway traffic. The site must identify the actual release/backend/extensions and their failure dependencies. \[[B2](08-references-parent-basis-and-external-context.md#VND_src_B2) §18; [S35](08-references-parent-basis-and-external-context.md#VND_src_S35)\]
+
+<!-- SOURCE-BLOCK VND:74 END -->
+
+<!-- SOURCE-BLOCK VND:75 BEGIN -->
 
 
 <a id="source-table-75"></a>
@@ -33,9 +59,25 @@ The reference selects a distribution with Keystone, Nova/Placement, Neutron, Gla
 | Mandatory endpoint policy | Qualified provider-controlled baseline plus entitled tenant policy. | Security-group changes must not override mandatory isolation. |
 | Storage and images | Glance, Cinder and selected storage/key/protection backends. | Ownership, allowed attachment/copy, consistency and recovery are independent of network reachability. |
 
+<!-- SOURCE-BLOCK VND:75 END -->
+
+<!-- SOURCE-BLOCK VND:76 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:76 END -->
+
+<!-- SOURCE-BLOCK VND:77 BEGIN -->
+
 Neutron security-group policy is allow-based and groups are additive; ordinary defaults can permit egress. The reviewed official networking documentation supports treating these defaults as something to normalize, not as proof of the parent’s mandatory deny baseline. The implementation must identify a durable provider-owned enforcement or authority mechanism and test that tenant changes cannot expand the protected baseline. Direct competing edits to Neutron-owned backend objects are not an acceptable substitute. \[[S36](08-references-parent-basis-and-external-context.md#VND_src_S36)\]
 
+<!-- SOURCE-BLOCK VND:77 END -->
+
+<!-- SOURCE-BLOCK VND:78 BEGIN -->
+
 For the common fixture, each domain has its own authorized routing context and isolated external handoff. Enumerate native logical routes, distributed paths and gateway/external paths. Sending some traffic through a gateway chassis does not prove that traffic between two subnets on a native logical router traverses that chassis or the ZIP. Include metadata, DHCP/DNS and narrow image/identity initialization requirements without creating general provider-network access.
+
+<!-- SOURCE-BLOCK VND:78 END -->
+
+<!-- SOURCE-BLOCK VND:79 BEGIN -->
 
 
 <a id="source-table-79"></a>
@@ -48,9 +90,23 @@ For the common fixture, each domain has its own authorized routing context and i
 | Instance/volume creation | Nova/Cinder and image/protection integrations. | Correct owner, placement, image, volume and service attachments. |
 | Observe/update/delete/recover | Authoritative service owner, not competing raw backend automation. | Asynchronous ports/routers/volumes reconcile; no stale routes or orphan grants. |
 
+<!-- SOURCE-BLOCK VND:79 END -->
+
+<!-- SOURCE-BLOCK VND:80 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:80 END -->
+
+<!-- SOURCE-BLOCK VND:81 BEGIN -->
+
 The open implementation decisions are the exact distribution and service versions, configured scheduling isolation, Neutron backend/extension support, mandatory-policy protection, address-family support, external gateway topology, Cinder/key/backup integration and provider operation coverage. Qualification must also include control database/messaging/OVN and storage quorum dependencies; a healthy API endpoint alone does not establish a resilient hosting service.
 
+<!-- SOURCE-BLOCK VND:81 END -->
+
+<!-- SOURCE-BLOCK VND:82 BEGIN -->
+
 Related engineering: [Native operation coverage](../../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md#PROV_s_003)  •  [Address-family acceptance](../fabric/4-address-naming-and-protocol-family-decisions.md#NET_s_004)  •  [Platform-aware backup and restore](../../architecture/shared-services/5-backup-capture-independent-protection-and-isolated-restore.md#SVC_s_005)
+
+<!-- SOURCE-BLOCK VND:82 END -->
 
 [Previous chapter](4-vmware-nsx-isolated-upstream-routing-and-enforcement.md) · [Chapter index](README.md) · [Next chapter](6-portable-composite-and-migrated-service-choices.md)
 

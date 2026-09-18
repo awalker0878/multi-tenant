@@ -1,20 +1,23 @@
 # ADR-0022 — Treat public access and egress as explicit service extensions
 
-**Status:** Proposed — source-derived; organizational acceptance not recorded<br>
-**Original decision identifiers:** No standalone source ID; extracted from the explicitly linked chapter decisions.<br>
+**Status:** Proposed<br>
+**Accountable role:** Security-edge operations / Service owner<br>
+**Scope:** Reusable reference decision; actual site adoption remains unissued<br>
+**Record date:** 2026-09-17 (not an approval date)<br>
+**Original decision identifiers:** Chapter-derived; no invented source decision identifier.<br>
 **Source chapters:** [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [RA §9](../architecture/reference/9-shared-services-ingress-and-controlled-egress.md) · [SDP §1](../solutions/design-method/1-define-the-offered-service-before-choosing-the-build.md)
 
-Source-derived synthesis; not a new source standard or a reconstructed approval meeting. The original source remains linked below; this ADR does not record an approval meeting or invent an acceptance date.
+Source-derived synthesis; not a new source standard or a reconstructed approval meeting.
 
 ## Context
 
 A private circuit, floating address or external attachment can introduce access that bypasses the intended internal service boundary.
 
-## Decision recorded in the source
+## Decision
 
 Keep the base internal offer free of implicit public access and Internet egress. Public traffic uses an approved perimeter/PAZ service and a separately approved backend flow; partner and enterprise relationships retain named external authority.
 
-## Alternatives and limits recorded in the source
+## Alternatives and source limitations
 
 Proxy, routed edge, translation and qualified combinations are possible explicit egress designs. NAT alone is not an access-control policy.
 
@@ -30,21 +33,26 @@ Record the external authority, ingress/egress service, TLS and backend trust, pe
 
 [ING-001](../assurance/requirements.md#ING-001) · [ING-002](../assurance/requirements.md#ING-002) · [EGR-001](../assurance/requirements.md#EGR-001) · [EGR-002](../assurance/requirements.md#EGR-002) · [EXP-001](../assurance/requirements.md#EXP-001)
 
-The following implementation areas are traceability targets, not proof that this decision has been qualified:
+These are related implementation areas, not assertion-level evidence of native qualification:
 
 - [terraform/modules/openstack-domain](../../terraform/modules/openstack-domain)
 - [terraform/modules/nsx-gateway-quarantine](../../terraform/modules/nsx-gateway-quarantine)
 
-Review [the implementation coverage map](../implementation/code-map.md) and the target-specific evidence before asserting completion. A local fixture or static source check does not establish deployed behaviour.
+[Requirement/assertion allocation](../assurance/implementation-allocation.md) records partial, external and unimplemented controls separately.
 
-## Open decisions and acceptance
+## Open work
 
 A dedicated public-service solution document from the previously described RAD/TAD package is not present in the source bundle; this ADR uses only the available scope guidance.
 
-Accepting authority: **not recorded**.<br>
-Acceptance evidence: **not supplied by this conversion**.<br>
-Supersession: no new source supersession is asserted. Record a future change explicitly rather than silently editing an accepted decision.
+## Decision lifecycle and authority
 
----
+- Deciding authority: Not recorded.
+- Decision date: Not recorded.
+- Decision evidence: Not supplied; no acceptance claim.
+- Disposition rationale: No rejection or supersession recorded.
+- Supersedes: None.
+- Superseded by: None.
 
-[Decision register](README.md) · [Source and maintenance rules](../DOCUMENTATION_MIGRATION.md)
+Record authenticity and the deciding authority's jurisdiction require independent review. Passing a record-schema check does not issue or authenticate an approval. The current record status is declared above; publication never grants decision authority.
+
+[Decision register](README.md) · [Maintenance rules](../DOCUMENTATION_MIGRATION.md)

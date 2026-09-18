@@ -8,6 +8,12 @@
 <!-- source-sha256: 8ddf5ff71f4779a15e56ed3708ace1f8315116ed1e6c9ce1f6a73276d7101a89 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK REV12:59 BEGIN -->
+
+<!-- SOURCE-BLOCK REV12:59 END -->
+
+<!-- SOURCE-BLOCK REV12:60 BEGIN -->
+
 
 <a id="source-table-60"></a>
 
@@ -26,6 +32,16 @@
 | Source and design distinction | Appendix B | Retained B1 source, primary-source checks and new reference-design synthesis are distinguished. |
 | Historical package status | This review | Old schemas and validator are unchanged and not reissued as complete or fixed. |
 
+<!-- SOURCE-BLOCK REV12:60 END -->
+
+<!-- SOURCE-BLOCK REV12:61 BEGIN -->
+
+<!-- SOURCE-BLOCK REV12:61 END -->
+
+<!-- SOURCE-BLOCK REV12:62 BEGIN -->
+
 The review above checks document direction and architectural coverage. Publishing/structural checks and rendered-page review are performed on the final deliverables. They do not establish live platform conformance, control effectiveness or formal accessibility certification.
+
+<!-- SOURCE-BLOCK REV12:62 END -->
 
 [Previous chapter](3-prior-requirement-identifier-disposition.md) · [Chapter index](README.md) · [Next chapter](5-remaining-implementation-boundaries.md)

@@ -19,34 +19,102 @@
 - [8. Close defects and issue a scoped campaign disposition](8-close-defects-and-issue-a-scoped-campaign-disposition.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK QCP:0 BEGIN -->
+
 DESIGN DEVELOPMENT  /  QCP
+
+<!-- SOURCE-BLOCK QCP:0 END -->
+
+<!-- SOURCE-BLOCK QCP:1 BEGIN -->
 
 ## Qualification Campaign and Evidence Procedures
 
+<!-- SOURCE-BLOCK QCP:1 END -->
+
+<!-- SOURCE-BLOCK QCP:2 BEGIN -->
+
 *Turn requirements into healthy controls, meaningful observations and accountable acceptance.*
+
+<!-- SOURCE-BLOCK QCP:2 END -->
+
+<!-- SOURCE-BLOCK QCP:3 BEGIN -->
 
 Kit release v1.1 • 17 September 2026 • Parent architecture v1.4 retained
 
+<!-- SOURCE-BLOCK QCP:3 END -->
+
+<!-- SOURCE-BLOCK QCP:4 BEGIN -->
+
 Proposed engineering development. Reference examples, site decisions, actual observations and approval remain separate.
+
+<!-- SOURCE-BLOCK QCP:4 END -->
+
+<!-- SOURCE-BLOCK QCP:5 BEGIN -->
 
 This supplement develops a qualification campaign for the common fixture and its actual native realization. Q11 observation cards elaborate existing requirements and test references; they are not new government controls or executed results. Keep real execution records in the implementation tracker and test template.
 
+<!-- SOURCE-BLOCK QCP:5 END -->
+
+<!-- SOURCE-BLOCK QCP:6 BEGIN -->
+
 ## Section navigation
+
+<!-- SOURCE-BLOCK QCP:6 END -->
+
+<!-- SOURCE-BLOCK QCP:7 BEGIN -->
 
 [1. Select the qualification scope and acceptance claim](1-select-the-qualification-scope-and-acceptance-claim.md#QCP_01)
 
+<!-- SOURCE-BLOCK QCP:7 END -->
+
+<!-- SOURCE-BLOCK QCP:8 BEGIN -->
+
 [2. Size and control the qualification fixture](2-size-and-control-the-qualification-fixture.md#QCP_02)
+
+<!-- SOURCE-BLOCK QCP:8 END -->
+
+<!-- SOURCE-BLOCK QCP:9 BEGIN -->
 
 [3. Observe network paths and boundary enforcement](3-observe-network-paths-and-boundary-enforcement.md#QCP_03)
 
+<!-- SOURCE-BLOCK QCP:9 END -->
+
+<!-- SOURCE-BLOCK QCP:10 BEGIN -->
+
 [4. Observe identity, storage and protocol completeness](4-observe-identity-storage-and-protocol-completeness.md#QCP_04)
+
+<!-- SOURCE-BLOCK QCP:10 END -->
+
+<!-- SOURCE-BLOCK QCP:11 BEGIN -->
 
 [5. Separate safe failure, service continuity and recovery](5-separate-safe-failure-service-continuity-and-recovery.md#QCP_05)
 
+<!-- SOURCE-BLOCK QCP:11 END -->
+
+<!-- SOURCE-BLOCK QCP:12 BEGIN -->
+
 [6. Build an evidence packet a reviewer can challenge](6-build-an-evidence-packet-a-reviewer-can-challenge.md#QCP_06)
+
+<!-- SOURCE-BLOCK QCP:12 END -->
+
+<!-- SOURCE-BLOCK QCP:13 BEGIN -->
 
 [7. Compare vendor realizations without assuming migration](7-compare-vendor-realizations-without-assuming-migration.md#QCP_07)
 
+<!-- SOURCE-BLOCK QCP:13 END -->
+
+<!-- SOURCE-BLOCK QCP:14 BEGIN -->
+
 [8. Close defects and issue a scoped campaign disposition](8-close-defects-and-issue-a-scoped-campaign-disposition.md#QCP_08)
 
+<!-- SOURCE-BLOCK QCP:14 END -->
+
+<!-- SOURCE-BLOCK QCP:15 BEGIN -->
+
 Basis: linked RA/WD and role-kit sections retain their original authority. The elaborations, record formats and calculations in this supplement are local proposals, not new government requirements. D-source references identify freshly checked public mechanisms, not installed compatibility. Exact source locators are in 04\_Shared/development/source\_reviews.csv.
+
+<!-- SOURCE-BLOCK QCP:15 END -->
+
+<!-- SOURCE-BLOCK QCP:16 BEGIN -->
+
+<!-- SOURCE-BLOCK QCP:16 END -->

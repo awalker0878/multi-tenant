@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: d935614ed1639f56859dfe29bc226af4cfced35bafeb7d544440577ddaa95a09 -->
+<!-- SOURCE-BLOCK OPS:45 BEGIN -->
+
 <a id="OPS_04"></a>
+
+<!-- SOURCE-BLOCK OPS:45 END -->
+
+<!-- SOURCE-BLOCK OPS:46 BEGIN -->
 
 Recovery begins with authority and trusted access, not with powering on every available copy of a VM.
 
+<!-- SOURCE-BLOCK OPS:46 END -->
+
+<!-- SOURCE-BLOCK OPS:47 BEGIN -->
+
 Design basis and related records: [SVC §6](../../architecture/shared-services/6-failure-recovery-migration-and-failback-topology.md#SVC_s_006)  •  [RA §27](../../architecture/reference/27-recovery-migration-and-retirement.md#RA_s_027)  •  [IT §5](../../templates/implementation-mop/5-recovery-exercise-and-data-acceptance.md#IT_05)
+
+<!-- SOURCE-BLOCK OPS:47 END -->
+
+<!-- SOURCE-BLOCK OPS:48 BEGIN -->
 
 
 <a id="source-table-48"></a>
@@ -24,11 +38,33 @@ Design basis and related records: [SVC §6](../../architecture/shared-services/6
 | 5. Activate and observe | Obtain required acceptance, switch approved service access and observe the live path. | Writer control, service outcome and achieved recovery targets are recorded. |
 | 6. Stabilize and plan return | Re-establish protection, reconcile emergency grants, and plan failback separately. | No temporary path or stale privilege remains without an accountable approved lifetime. |
 
+<!-- SOURCE-BLOCK OPS:48 END -->
+
+<!-- SOURCE-BLOCK OPS:49 BEGIN -->
+
+<!-- SOURCE-BLOCK OPS:49 END -->
+
+<!-- SOURCE-BLOCK OPS:50 BEGIN -->
+
 An isolated restore may reveal compromised configuration, missing keys, stale identities or an unusable consistency point. Keep the result restricted until the responsible owners resolve those conditions. A successful file read is not application acceptance; the service/data owner supplies meaningful restored-state checks.
+
+<!-- SOURCE-BLOCK OPS:50 END -->
+
+<!-- SOURCE-BLOCK OPS:51 BEGIN -->
 
 Avoid recovery loops: the only key to unlock storage cannot be stored only on that locked storage; the sole backup catalogue cannot be reachable only through a destroyed controller. Record a tested dependency cut and custodial recovery method, without publishing secrets in the kit.
 
+<!-- SOURCE-BLOCK OPS:51 END -->
+
+<!-- SOURCE-BLOCK OPS:52 BEGIN -->
+
 Continue with: [OPS §5](5-calculate-the-recovery-critical-path-and-data-point.md#OPS_05)  •  [QCP §5](../../assurance/qualification-campaign/5-separate-safe-failure-service-continuity-and-recovery.md#QCP_05)
+
+<!-- SOURCE-BLOCK OPS:52 END -->
+
+<!-- SOURCE-BLOCK OPS:53 BEGIN -->
+
+<!-- SOURCE-BLOCK OPS:53 END -->
 
 [Previous chapter](3-run-maintenance-and-recover-interrupted-changes.md) · [Chapter index](README.md) · [Next chapter](5-calculate-the-recovery-critical-path-and-data-point.md)
 

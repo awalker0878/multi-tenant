@@ -6,10 +6,20 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19 -->
+<!-- SOURCE-BLOCK RA:302 BEGIN -->
+
 <a id="__RefHeading___Toc3680_865363315"></a>
 <a id="RA_s_021"></a>
 
+<!-- SOURCE-BLOCK RA:302 END -->
+
+<!-- SOURCE-BLOCK RA:303 BEGIN -->
+
 An empty site cannot be provisioned by assuming that the platform APIs, identity service, DNS, certificate trust and Terraform state backend already exist. Day 0 establishes a minimum trusted management and recovery path first. The bootstrap procedure has an accountable owner, a restricted temporary execution environment, verified artifacts and a recorded handover to steady-state management.
+
+<!-- SOURCE-BLOCK RA:303 END -->
+
+<!-- SOURCE-BLOCK RA:304 BEGIN -->
 
 
 <a id="source-table-304"></a>
@@ -23,17 +33,47 @@ An empty site cannot be provisioned by assuming that the platform APIs, identity
 | 5 | Commission transport routing, multihoming, platform transport and physical service attachments | Routing, MTU, failure and management-isolation checks pass |
 | 6 | Hand over the physical foundation to its steady-state owner | Configuration source, inventory, credentials, monitoring and safe maintenance procedure accepted |
 
+<!-- SOURCE-BLOCK RA:304 END -->
+
+<!-- SOURCE-BLOCK RA:305 BEGIN -->
+
+<!-- SOURCE-BLOCK RA:305 END -->
+
+<!-- SOURCE-BLOCK RA:306 BEGIN -->
+
 Use supported switch/hardware configuration interfaces and platform installation methods. Terraform may manage a resource once its relevant API/provider capability is qualified; it is not assumed to configure every switch operating system or install every hypervisor. A provider coverage gap must be recorded with its supported alternative, owner, error handling and evidence. An arbitrary command embedded in a Terraform run does not become a supported declarative resource merely because the run exits successfully.
+
+<!-- SOURCE-BLOCK RA:306 END -->
+
+<!-- SOURCE-BLOCK RA:307 BEGIN -->
 
 Bootstrap services may be temporarily external to the new hosting cell. Their location, access scope, lifetime and transition are documented. When steady-state identity, names, keys and automation are established, migrate ownership without losing recovery access, revoke temporary grants and reconcile configurations. Do not destroy the only recovery material as part of a bootstrap cleanup step.
 
+<!-- SOURCE-BLOCK RA:307 END -->
+
+<!-- SOURCE-BLOCK RA:308 BEGIN -->
+
 ## Foundation changes after Day 0
+
+<!-- SOURCE-BLOCK RA:308 END -->
+
+<!-- SOURCE-BLOCK RA:309 BEGIN -->
 
 Adding hosts, new attachment pools, service leaves or another cell follows the same foundation controls without becoming an ordinary tenant operation. Drain or isolate affected resources, verify compatibility and surviving capacity, apply the approved change and requalify impacted paths. A new switch or host is not eligible simply because its management API is reachable. It becomes eligible after its baseline, inventory and operational ownership are accepted.
 
+<!-- SOURCE-BLOCK RA:309 END -->
+
+<!-- SOURCE-BLOCK RA:310 BEGIN -->
+
 The commissioning record includes the physical topology, device and firmware inventory, management dependencies, addresses/ASNs, allowed interfaces/neighbours, MTU budget, backup configuration, test evidence and explicit limitations. Those are the inputs Terraform and other provisioning tools consume; they are not values that a workload request invents.
 
+<!-- SOURCE-BLOCK RA:310 END -->
+
+<!-- SOURCE-BLOCK RA:311 BEGIN -->
+
 Related engineering: [PROV §2 — Day-0 and steady-state commissioning without circular dependencies](../../implementation/provisioning-strategy/2-day-0-and-steady-state-commissioning-without-circular-dependencies.md#PROV_s_002)
+
+<!-- SOURCE-BLOCK RA:311 END -->
 
 [Previous chapter](20-provisioning-model-and-infrastructure-work-packages.md) · [Chapter index](README.md) · [Next chapter](22-vendor-platform-and-shared-service-commissioning.md)
 

@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: d935614ed1639f56859dfe29bc226af4cfced35bafeb7d544440577ddaa95a09 -->
+<!-- SOURCE-BLOCK OPS:76 BEGIN -->
+
 <a id="OPS_07"></a>
+
+<!-- SOURCE-BLOCK OPS:76 END -->
+
+<!-- SOURCE-BLOCK OPS:77 BEGIN -->
 
 A retired WSD can leave legitimate protected copies. Make those obligations explicit rather than declaring all data destroyed because live resources were removed.
 
+<!-- SOURCE-BLOCK OPS:77 END -->
+
+<!-- SOURCE-BLOCK OPS:78 BEGIN -->
+
 Design basis and related records: [RA §27](../../architecture/reference/27-recovery-migration-and-retirement.md#RA_s_027)  •  [SVC §4](../../architecture/shared-services/4-storage-copies-and-retained-data-ownership.md#SVC_s_004)  •  [IK §9](../../implementation/delivery-guide/9-operational-handover-recovery-migration-and-retirement.md#IK_09)
+
+<!-- SOURCE-BLOCK OPS:78 END -->
+
+<!-- SOURCE-BLOCK OPS:79 BEGIN -->
 
 
 <a id="source-table-79"></a>
@@ -23,12 +37,38 @@ Design basis and related records: [RA §27](../../architecture/reference/27-reco
 | Keys and recovery catalogue | Retain what authorized copies still require; separate use, recovery and destruction authority. | Verified recoverability and custody until approved final disposal. |
 | Media and resource reuse | Use the applicable approved sanitization method and qualified handling process. | Method, scope, verification and exceptions before reassignment. A deleted volume record is insufficient. |
 
+<!-- SOURCE-BLOCK OPS:79 END -->
+
+<!-- SOURCE-BLOCK OPS:80 BEGIN -->
+
+<!-- SOURCE-BLOCK OPS:80 END -->
+
+<!-- SOURCE-BLOCK OPS:81 BEGIN -->
+
 A retained-copy record includes former WSD identity, copy identity, category/location, owner, hold/retention, key/catalogue dependencies, authorized recovery access, review date and final disposition authority. It does not retain unnecessary live tenant access merely because a backup still exists.
+
+<!-- SOURCE-BLOCK OPS:81 END -->
+
+<!-- SOURCE-BLOCK OPS:82 BEGIN -->
 
 If an offline copy, supplier-held media or shared key prevents immediate disposal proof, record the unresolved obligation and its owner. Do not label total destruction complete. Conversely, do not delete a shared key to satisfy one workload’s retirement while other retained data still depends on it.
 
+<!-- SOURCE-BLOCK OPS:82 END -->
+
+<!-- SOURCE-BLOCK OPS:83 BEGIN -->
+
 Physical media handling and equipment disposal use the organization’s approved process and qualified personnel. This playbook records scope, authority and evidence; it does not replace handling or safety procedures.
 
+<!-- SOURCE-BLOCK OPS:83 END -->
+
+<!-- SOURCE-BLOCK OPS:84 BEGIN -->
+
 Continue with: [IT §8](../../templates/implementation-mop/8-migration-retirement-and-retained-data.md#IT_08)  •  [OPS §8](8-accept-operational-responsibility-for-the-delivered-scope.md#OPS_08)
+
+<!-- SOURCE-BLOCK OPS:84 END -->
+
+<!-- SOURCE-BLOCK OPS:85 BEGIN -->
+
+<!-- SOURCE-BLOCK OPS:85 END -->
 
 [Previous chapter](6-migrate-and-fail-back-without-conflicting-writers.md) · [Chapter index](README.md) · [Next chapter](8-accept-operational-responsibility-for-the-delivered-scope.md)

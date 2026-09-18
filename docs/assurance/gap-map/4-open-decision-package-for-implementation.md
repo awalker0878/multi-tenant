@@ -6,12 +6,26 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 26dbaac8c13797b58ca5d057f76df8b3da63ec3f4b336036f18f5c6902512207 -->
+<!-- SOURCE-BLOCK GM:247 BEGIN -->
+
 <a id="__RefHeading___Toc1265_342027687"></a>
 <a id="GM_s_004"></a>
 
+<!-- SOURCE-BLOCK GM:247 END -->
+
+<!-- SOURCE-BLOCK GM:248 BEGIN -->
+
 Parent architecture: [RA §29](../../architecture/reference/29-architecture-decisions-and-alternatives.md#RA_s_029)  •  [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)
 
+<!-- SOURCE-BLOCK GM:248 END -->
+
+<!-- SOURCE-BLOCK GM:249 BEGIN -->
+
 The parent’s AD-01 through AD-15 choices remain proposed architectural decisions. The following implementation decisions instantiate those choices without silently changing them. Each record needs an actual owner, selected option, source/support evidence, affected interfaces/resources, approval and review trigger. The supplied site-decisions register leaves unknown selections explicitly open.
+
+<!-- SOURCE-BLOCK GM:249 END -->
+
+<!-- SOURCE-BLOCK GM:250 BEGIN -->
 
 
 <a id="source-table-250"></a>
@@ -31,8 +45,22 @@ The parent’s AD-01 through AD-15 choices remain proposed architectural decisio
 | D11 · qualification and operation | First-stack then second-stack portability; actual evidence and responsible authority. | Assertion/applicability plan, executed results, owners and authorization; G29–G31. |
 | D12 · extensions | Excluded until a separate complete realization is accepted. | Scope and qualification for bare metal/containers/special patterns; G33. |
 
+<!-- SOURCE-BLOCK GM:250 END -->
+
+<!-- SOURCE-BLOCK GM:251 BEGIN -->
+
+<!-- SOURCE-BLOCK GM:251 END -->
+
+<!-- SOURCE-BLOCK GM:252 BEGIN -->
+
 A vendor or site choice that cannot meet the selected reference outcome is not filled in as “equivalent” without analysis. Either choose another qualified realization, exclude the capability, or submit an explicit parent architecture variation. A missing service target is likewise an open service decision, not a reason to advertise a default number.
 
+<!-- SOURCE-BLOCK GM:252 END -->
+
+<!-- SOURCE-BLOCK GM:253 BEGIN -->
+
 Related engineering: [Site design deliverables](../site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002)  •  [Service parameter records](../site-qualification/4-service-parameter-and-requirement-decisions.md#QUAL_s_004)  •  [Vendor confirmation records](../../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md#VND_s_007)
+
+<!-- SOURCE-BLOCK GM:253 END -->
 
 [Previous chapter](3-detailed-gap-register-and-treatment.md) · [Chapter index](README.md) · [Next chapter](5-completion-and-ongoing-closure.md)

@@ -8,12 +8,24 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:446 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:446 END -->
+
+<!-- SOURCE-BLOCK HB10:447 BEGIN -->
+
 
 <a id="source-table-447"></a>
 
 | END STATE<br>Standardize the security, connectivity, assurance, lifecycle, and evidence semantics of hosting. Allow each platform to implement those semantics using its native capabilities. Keep the physical fabric stable, make trust transitions explicit, and require automated proof before declaring a workload ready. |
 | --- |
 
+<!-- SOURCE-BLOCK HB10:447 END -->
+
+<!-- SOURCE-BLOCK HB10:448 BEGIN -->
+
 This design intentionally separates the durable enterprise architecture from today’s product choices. A platform can be replaced, upgraded, or added without changing what a consumer asks for—provided the new implementation satisfies the same conformance profile. That is the foundation for secure multi-tenancy, operational scale, and long-term hosting portability.
+
+<!-- SOURCE-BLOCK HB10:448 END -->
 
 [Previous chapter](69-appendix-i-references.md) · [Chapter index](README.md)

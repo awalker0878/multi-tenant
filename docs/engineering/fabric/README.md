@@ -19,19 +19,45 @@
 - [v1.4 — Connected infrastructure design and acceptance](08-v1-4-connected-infrastructure-design-and-acceptance.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK NET:0 BEGIN -->
+
 <a id="V14_NET_START"></a>
 
 INFRASTRUCTURE ARCHITECTURE  /  NET
 
+<!-- SOURCE-BLOCK NET:0 END -->
+
+<!-- SOURCE-BLOCK NET:1 BEGIN -->
+
 v1.4 linked worked design: [WD — resources, paths, build receipts and acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
+
+<!-- SOURCE-BLOCK NET:1 END -->
+
+<!-- SOURCE-BLOCK NET:2 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
+<!-- SOURCE-BLOCK NET:2 END -->
+
+<!-- SOURCE-BLOCK NET:3 BEGIN -->
+
 *Fabric, Security Boundaries and Infrastructure Interfaces*
+
+<!-- SOURCE-BLOCK NET:3 END -->
+
+<!-- SOURCE-BLOCK NET:4 BEGIN -->
 
 Draft v1.4  \|  16 September 2026
 
+<!-- SOURCE-BLOCK NET:4 END -->
+
+<!-- SOURCE-BLOCK NET:5 BEGIN -->
+
 Buildable routing, attachment, traffic-path, protocol-family, MTU and management-interface guidance, subordinate to the parent architecture.
+
+<!-- SOURCE-BLOCK NET:5 END -->
+
+<!-- SOURCE-BLOCK NET:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -45,10 +71,40 @@ Buildable routing, attachment, traffic-path, protocol-family, MTU and management
 | Authority | Applicable external obligations and adopted controls prevail; supplements cannot silently weaken the parent. |
 | Release boundary | Documentation and local document checks only. No live infrastructure deployment, qualification or authorization asserted. |
 
+<!-- SOURCE-BLOCK NET:6 END -->
+
+<!-- SOURCE-BLOCK NET:7 BEGIN -->
+
+<!-- SOURCE-BLOCK NET:7 END -->
+
+<!-- SOURCE-BLOCK NET:8 BEGIN -->
+
 Start here: [Parent architecture — RA](../../architecture/reference/1-purpose-scope-and-architectural-authority.md#RA_s_001)  •  [Document family and gap map — GM](../../assurance/gap-map/1-document-family-scope-and-precedence.md#GM_s_001)
+
+<!-- SOURCE-BLOCK NET:8 END -->
+
+<!-- SOURCE-BLOCK NET:9 BEGIN -->
 
 Keep the eight Word files together after extracting the release package. Cross-document links use sibling filenames and stable bookmarks. START\_HERE.html provides an additional navigation index.
 
+<!-- SOURCE-BLOCK NET:9 END -->
+
+<!-- SOURCE-BLOCK NET:10 BEGIN -->
+
+<!-- SOURCE-BLOCK NET:10 END -->
+
 <a id="NET_contents"></a>
 
+<!-- SOURCE-BLOCK NET:20 BEGIN -->
+
+<!-- SOURCE-BLOCK NET:20 END -->
+
+<!-- SOURCE-BLOCK NET:21 BEGIN -->
+
 Use the contents and named section links to navigate. After later edits, update Word fields and verify pagination before release.
+
+<!-- SOURCE-BLOCK NET:21 END -->
+
+<!-- SOURCE-BLOCK NET:22 BEGIN -->
+
+<!-- SOURCE-BLOCK NET:22 END -->

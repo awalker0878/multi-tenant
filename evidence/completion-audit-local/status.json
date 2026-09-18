@@ -1,0 +1,72 @@
+{
+  "kind": "COMPLETION_AUDIT_LOCAL_CORRECTION_CHECKPOINT",
+  "at": "2026-09-18T01:05:33.301617+00:00",
+  "repository": "awalker0878/multi-tenant",
+  "last_read_main_commit": "89946420e5de173c556414f9ad1b44d783bb63cf",
+  "last_read_main_tree": "6882008a58d1c47313b88286564654728e9ae9cf",
+  "remote_branch_created": "fix/completion-audit",
+  "correction_commit_published": false,
+  "pull_request_created": false,
+  "merged_to_main": false,
+  "publication_blocker": {
+    "repo_by_name": "404",
+    "repo_by_id": "404",
+    "accessible_owner_repositories": 0,
+    "visible_installations": 0,
+    "cause": "Unknown; permissions/connection must be restored before remote work can continue"
+  },
+  "regressions": {
+    "run": 492,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "offline_model": {
+    "passed": 80,
+    "failed": 0
+  },
+  "documentation": {
+    "source_documents": 28,
+    "body_blocks": 5551,
+    "source_paragraphs_compared": 12379,
+    "tables": 486,
+    "source_bookmarks": 932,
+    "form_prompts": 199,
+    "navigation_blocks_replaced": 182,
+    "figure_occurrences": 25,
+    "local_links": 10087,
+    "external_links_retained_not_contacted": 131,
+    "fragment_links": 4491,
+    "source_derived_adrs": 36,
+    "markdown_pages_checked": 517,
+    "checks": 47844,
+    "passed": 47844,
+    "failed": 0
+  },
+  "terraform_engine": "BLOCKED_TOOLCHAIN",
+  "ansible_engine": "BLOCKED_TOOLCHAIN",
+  "provider_locks": "NOT_GENERATED",
+  "hosted_ci": "NOT_RUN",
+  "assertion_allocation": {
+    "requirements": 194,
+    "proposed_assertion_focuses": 370,
+    "native_evidence": "NOT_SUPPLIED"
+  },
+  "historical_findings": {
+    "individual_dispositions": 24,
+    "closure_authority": "NOT_RECORDED"
+  },
+  "adr_records": {
+    "total": 38,
+    "current_source_derived": 36,
+    "source_derived_status": "Proposed"
+  },
+  "source_rad_tad_family": "UNRECOVERED; scope/adoption decision still requires owner",
+  "native_infrastructure_contact": "NONE",
+  "organizational_acceptance": "NOT_ISSUED",
+  "limits": [
+    "Local corrections are preserved; no remote merge claimed",
+    "The branch creation and unreferenced blob writes do not publish a correction commit",
+    "No bypass of GitHub permissions or required checks attempted"
+  ]
+}

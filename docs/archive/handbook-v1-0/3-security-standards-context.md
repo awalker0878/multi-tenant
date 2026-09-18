@@ -8,16 +8,36 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:66 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:66 END -->
+
+<!-- SOURCE-BLOCK HB10:67 BEGIN -->
+
 ITSP.80.022 defines baseline network security zones including PAZ, OZ, RZ, HRZ, MZ and ZIPs. It also states that a zone does not need to map to a business function and that multiple zones may exist. The architecture therefore models security zones as reusable trust domains rather than organizational or service silos.
+
+<!-- SOURCE-BLOCK HB10:67 END -->
+
+<!-- SOURCE-BLOCK HB10:68 BEGIN -->
 
 The handbook treats ITSG-33 as the lifecycle framework: security requirements are identified early, implemented through engineering controls, tested, operated, monitored, reassessed, and eventually disposed of securely. The architecture therefore includes evidence, drift, exception, change, and destruction workflows rather than ending at provisioning.
 
+<!-- SOURCE-BLOCK HB10:68 END -->
+
+<!-- SOURCE-BLOCK HB10:69 BEGIN -->
+
 Where PBMM is applicable, it is treated as a security-control baseline that must be reused only in an appropriate context and tailored following analysis. The architecture therefore carries a Security Profile and Assurance Profile as explicit metadata instead of assuming that a single “Protected B network” topology is universally sufficient.
+
+<!-- SOURCE-BLOCK HB10:69 END -->
+
+<!-- SOURCE-BLOCK HB10:70 BEGIN -->
 
 
 <a id="source-table-70"></a>
 
 | IMPORTANT<br>Network zoning is one component of the control set. The handbook does not claim that correct zoning alone establishes authorization for Protected B or any other security category. |
 | --- |
+
+<!-- SOURCE-BLOCK HB10:70 END -->
 
 [Previous chapter](2-normative-language-and-architectural-invariants.md) · [Chapter index](README.md) · [Next chapter](4-core-conceptual-model.md)

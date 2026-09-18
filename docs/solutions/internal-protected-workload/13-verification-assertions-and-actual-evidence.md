@@ -6,13 +6,31 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
+<!-- SOURCE-BLOCK WD:133 BEGIN -->
+
 <a id="WD14_S13"></a>
+
+<!-- SOURCE-BLOCK WD:133 END -->
+
+<!-- SOURCE-BLOCK WD:134 BEGIN -->
 
 The assertion IDs below are additions to the architecture verification plan, not renamed or pre-passed CT tests. The inherited 80 CT procedures and 12 realization addenda remain unchanged as historical specifications and remain not-run in this release. Applicability and actual evidence must be recorded for the selected topology.
 
+<!-- SOURCE-BLOCK WD:134 END -->
+
+<!-- SOURCE-BLOCK WD:135 BEGIN -->
+
 For a denied-path test, demonstrate healthy endpoints and a permitted control path. For a routing claim, compare both intended routing and actual forwarding/enforcement. For a recovery claim, validate useful recovered data and all necessary trust dependencies. A successful Terraform process verifies none of these by itself.
 
+<!-- SOURCE-BLOCK WD:135 END -->
+
+<!-- SOURCE-BLOCK WD:136 BEGIN -->
+
 Record each result as passed, failed, blocked, not run, or not applicable with its approved rationale. The evidence names the exact component tuple, topology, observed state, time, owner, procedure and artifact. No support declaration, example address or architecture diagram supplies an observed result.
+
+<!-- SOURCE-BLOCK WD:136 END -->
+
+<!-- SOURCE-BLOCK WD:137 BEGIN -->
 
 
 <a id="source-table-137"></a>
@@ -32,6 +50,20 @@ Record each result as passed, failed, blocked, not run, or not applicable with i
 | W14-11 / retained recovery | Required copy, catalogue and key access survive live WSD retirement; unauthorized destruction denies. | CT-051, CT-052, CT-053, CT-078 / NOT RUN |
 | W14-12 / second-stack outcome | Repeat the declared environment and representative data recovery on a second eligible stack. | CT-016, CT-060, CT-073 / NOT RUN |
 
+<!-- SOURCE-BLOCK WD:137 END -->
+
+<!-- SOURCE-BLOCK WD:138 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:138 END -->
+
+<!-- SOURCE-BLOCK WD:139 BEGIN -->
+
 Related documents: [QUAL — Applicability and observed results](../../assurance/site-qualification/README.md#V14_QUAL_START)  \|  [GM — Open evidence and decisions](../../assurance/gap-map/README.md#V14_GM_START)
+
+<!-- SOURCE-BLOCK WD:139 END -->
+
+<!-- SOURCE-BLOCK WD:140 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:140 END -->
 
 [Previous chapter](12-failure-and-partition-decision-schedule.md) · [Chapter index](README.md) · [Next chapter](14-remaining-decisions-and-release-boundaries.md)

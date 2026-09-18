@@ -8,16 +8,34 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:1545 BEGIN -->
+
 <a id="__RefHeading___Toc13445_1645000677"></a>
 <a id="app_G"></a>
+
+<!-- SOURCE-BLOCK HB11:1545 END -->
+
+<!-- SOURCE-BLOCK HB11:1546 BEGIN -->
 
 <a id="__RefHeading___Toc13447_1645000677"></a>
 
 ## Operational templates
 
+<!-- SOURCE-BLOCK HB11:1546 END -->
+
+<!-- SOURCE-BLOCK HB11:1547 BEGIN -->
+
 These templates complete the operational interfaces without duplicating the full runbooks in sections 53, 55–57. Their fields are minimum record content, not an instruction to bypass the adopting organization’s incident/change system.
 
+<!-- SOURCE-BLOCK HB11:1547 END -->
+
+<!-- SOURCE-BLOCK HB11:1548 BEGIN -->
+
 ### Architecture decision record
+
+<!-- SOURCE-BLOCK HB11:1548 END -->
+
+<!-- SOURCE-BLOCK HB11:1549 BEGIN -->
 
 
 <a id="source-table-1549"></a>
@@ -30,7 +48,15 @@ These templates complete the operational interfaces without duplicating the full
 | Decision | Chosen design, boundary/authority model, dependencies, approved conditions |
 | Consequences | Security and operational risks, capacity/cost, qualification tests, migration/exit, review trigger |
 
+<!-- SOURCE-BLOCK HB11:1549 END -->
+
+<!-- SOURCE-BLOCK HB11:1550 BEGIN -->
+
 ### Partial-apply recovery record
+
+<!-- SOURCE-BLOCK HB11:1550 END -->
+
+<!-- SOURCE-BLOCK HB11:1551 BEGIN -->
 
 
 <a id="source-table-1551"></a>
@@ -43,7 +69,15 @@ These templates complete the operational interfaces without duplicating the full
 | Decide | Authorized converge/compensate/manual intervention; expected data impact and approval |
 | Close | Run changed-path tests, bind new evidence, release reservations/locks safely and record root cause |
 
+<!-- SOURCE-BLOCK HB11:1551 END -->
+
+<!-- SOURCE-BLOCK HB11:1552 BEGIN -->
+
 ### Key or identity dependency outage record
+
+<!-- SOURCE-BLOCK HB11:1552 END -->
+
+<!-- SOURCE-BLOCK HB11:1553 BEGIN -->
 
 
 <a id="source-table-1553"></a>
@@ -56,7 +90,15 @@ These templates complete the operational interfaces without duplicating the full
 | Revoke/reconcile | Rotate or revoke compromised/recovery credentials, reassess grants and retained copies |
 | Accept | Actual application/service validation, security owner approval and incident closure |
 
+<!-- SOURCE-BLOCK HB11:1553 END -->
+
+<!-- SOURCE-BLOCK HB11:1554 BEGIN -->
+
 ### Retention and sanitization record
+
+<!-- SOURCE-BLOCK HB11:1554 END -->
+
+<!-- SOURCE-BLOCK HB11:1555 BEGIN -->
 
 
 <a id="source-table-1555"></a>
@@ -69,6 +111,12 @@ These templates complete the operational interfaces without duplicating the full
 | Verification | Technical sanitization evidence or explicit retained exceptions; no fabricated total-destruction assertion |
 | Closure | Tombstone, remaining obligations, evidence retention and final access revocation |
 
+<!-- SOURCE-BLOCK HB11:1555 END -->
+
+<!-- SOURCE-BLOCK HB11:1556 BEGIN -->
+
 Change/exception approvals, ZIP endpoint-authority approvals, platform qualification and operational handover records use the same identity/version/evidence conventions. Their signed decisions are stored in the approved system of record; a string labelled approvalRef is not proof that approval actually exists.
+
+<!-- SOURCE-BLOCK HB11:1556 END -->
 
 [Previous chapter](75-appendix-f-proposed-local-engineering-parameters.md) · [Chapter index](README.md) · [Next chapter](77-appendix-h-primary-sources-and-implementation-references.md)

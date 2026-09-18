@@ -21,3 +21,9 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 [Historical audits and source lineage](../archive/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
+
+<!-- BEGIN ASSURANCE ALLOCATION LINKS -->
+
+[Assertion-level allocation](implementation-allocation.md) · [All verification families](verification-families.md) · [Historical finding dispositions](historical-findings.md) · [Completion-audit corrections](completion-audit.md)
+
+<!-- END ASSURANCE ALLOCATION LINKS -->

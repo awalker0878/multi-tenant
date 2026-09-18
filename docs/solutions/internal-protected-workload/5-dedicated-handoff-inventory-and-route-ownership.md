@@ -6,15 +6,37 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
+<!-- SOURCE-BLOCK WD:61 BEGIN -->
+
 <a id="WD14_S05"></a>
+
+<!-- SOURCE-BLOCK WD:61 END -->
+
+<!-- SOURCE-BLOCK WD:62 BEGIN -->
 
 The illustrative IPv6 handoffs are A01O = 2001:db8:200:1::/64, A01R = :2::/64, A02O = :3::/64, A02R = :4::/64, SH-01 = :5::/64 and SH-02 = :6::/64, all under 2001:db8:200::. On A links, the EC address is ::1 and native gateway is ::2; on SH links, EC is ::1 and SE is ::2. Use the full prefixes in the accompanying IPv6 schedule; the abbreviated notation in this paragraph is explanatory only. These link sizes and addresses require actual platform support before implementation.
 
+<!-- SOURCE-BLOCK WD:62 END -->
+
+<!-- SOURCE-BLOCK WD:63 BEGIN -->
+
 The complete illustrated network has four tenant domain attachments A01O, A01R, A02O and A02R; two dedicated service-facing transit handoffs SH-01 and SH-02; and the service-side connections of SE-01 and SE-02. These are different accounting units. Physical redundant members, management interfaces and provider storage/protection paths are additional resources.
+
+<!-- SOURCE-BLOCK WD:63 END -->
+
+<!-- SOURCE-BLOCK WD:64 BEGIN -->
 
 All link endpoint values below are illustrative interface identities. EC is the security edge and NG is the native domain gateway. The /30 link choices are an explanatory IPv4 example, not a statement that every product accepts the same subnet size or static-route configuration.
 
+<!-- SOURCE-BLOCK WD:64 END -->
+
+<!-- SOURCE-BLOCK WD:65 BEGIN -->
+
 The tenant domain gateway is allowed to route its own networks locally. Routes to its other approved tenant zone and approved service endpoints point only at EC. EC knows only its own tenant prefixes and permitted service destinations. SE knows only the corresponding tenant return prefixes and the provider service network. No ordinary default route is required by this example. A supported default-route alternative must have equally constrained effective policy and no more-specific bypass.
+
+<!-- SOURCE-BLOCK WD:65 END -->
+
+<!-- SOURCE-BLOCK WD:66 BEGIN -->
 
 
 <a id="source-table-66"></a>
@@ -29,7 +51,21 @@ The tenant domain gateway is allowed to route its own networks locally. Routes t
 | SH-02 | 198.51.100.20/30: EC-02 .21; SE-02 .22 | Only tenant-02 approved service flows. |
 | Service-side interfaces | SE-01 203.0.113.129; SE-02 203.0.113.130 | Provider-controlled SVC-REF; no native tenant gateway shares this segment. |
 
+<!-- SOURCE-BLOCK WD:66 END -->
+
+<!-- SOURCE-BLOCK WD:67 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:67 END -->
+
+<!-- SOURCE-BLOCK WD:68 BEGIN -->
+
 Related documents: [NET — Attachment accounting and bypass analysis](../../engineering/fabric/README.md#V14_NET_START)
+
+<!-- SOURCE-BLOCK WD:68 END -->
+
+<!-- SOURCE-BLOCK WD:69 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:69 END -->
 
 [Previous chapter](4-tenant-attachment-and-address-schedule.md) · [Chapter index](README.md) · [Next chapter](6-worked-forwarding-and-return-route-schedule.md)
 

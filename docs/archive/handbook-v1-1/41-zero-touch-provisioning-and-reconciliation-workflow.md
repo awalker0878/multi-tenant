@@ -8,16 +8,34 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:569 BEGIN -->
+
 <a id="__RefHeading___Toc13375_1645000677"></a>
 <a id="sec_41"></a>
 
+<!-- SOURCE-BLOCK HB11:569 END -->
+
+<!-- SOURCE-BLOCK HB11:570 BEGIN -->
+
 Zero-touch means routine approved intent can be realized without manual device editing; it does not remove risk-based approval, initial platform commissioning or safe failure handling. Placement, IPAM and route compilation are mutually constrained: first resolve candidate site/domain/address eligibility, reserve the selected resources, then compile the final graph. Do not allocate a site-specific address before knowing that the selected platform can satisfy it.
 
+<!-- SOURCE-BLOCK HB11:570 END -->
+
+<!-- SOURCE-BLOCK HB11:571 BEGIN -->
+
 ![Request enters authorization/schema/profile admission, then candidate placement and reservation. Policy and route compilation precede immutable planning and approval. Authority-specific actuators create deny-protected resources, then realization tests and evidence complete. Only the final readiness gate enables exposure. Failures return to journaled reconciliation or restricted state, not an alternate permissive path.](../../assets/diagrams/79b6906a685db0397303.png)
+
+<!-- SOURCE-BLOCK HB11:571 END -->
+
+<!-- SOURCE-BLOCK HB11:572 BEGIN -->
 
 <a id="fig_pipeline"></a>
 
 Figure 4. A journaled reconciliation pipeline with readiness as a gated state
+
+<!-- SOURCE-BLOCK HB11:572 END -->
+
+<!-- SOURCE-BLOCK HB11:573 BEGIN -->
 
 
 <a id="source-table-573"></a>
@@ -33,24 +51,54 @@ Figure 4. A journaled reconciliation pipeline with readiness as a gated state
 | 7. Activate service | Evaluate technical and authorization conditions, then enable approved exposure and mark Ready. |
 | 8. Reconcile continuously | Detect drift/dependency changes; journal retries, compensation or operator intervention. |
 
+<!-- SOURCE-BLOCK HB11:573 END -->
+
+<!-- SOURCE-BLOCK HB11:574 BEGIN -->
+
 The controller owns an operation journal containing idempotency keys, resource identities, reservation leases, intended steps, executed actions, state generations, native request IDs and evidence. Retrying reuses identities and discovers actual state; it does not assume the previous operation failed because its response was lost. A failed operation enters Restricted or Failed with a resumable plan. Partial infrastructure remains denied and owned until safely converged or removed.
+
+<!-- SOURCE-BLOCK HB11:574 END -->
+
+<!-- SOURCE-BLOCK HB11:575 BEGIN -->
 
 <a id="req_AUTO_001"></a>
 
 AUTO-001  If security admission, IPAM, route authority, or mandatory policy validation is unavailable, new provisioning SHALL stop rather than inventing or bypassing required state.
 
+<!-- SOURCE-BLOCK HB11:575 END -->
+
+<!-- SOURCE-BLOCK HB11:576 BEGIN -->
+
 Automation platform  \|  Verify: [CT-011](73-appendix-d-conformance-test-catalogue.md#test_CT_011), [CT-029](73-appendix-d-conformance-test-catalogue.md#test_CT_029), [CT-045](73-appendix-d-conformance-test-catalogue.md#test_CT_045)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  retained-v1.0
+
+<!-- SOURCE-BLOCK HB11:576 END -->
+
+<!-- SOURCE-BLOCK HB11:577 BEGIN -->
 
 <a id="req_AUTO_002"></a>
 
 AUTO-002  Provisioning SHALL be journaled and idempotent, reserve only eligible capacity/addresses, enforce deny before attachment/exposure, and gate activation on realized current-generation evidence and authorization.
 
+<!-- SOURCE-BLOCK HB11:577 END -->
+
+<!-- SOURCE-BLOCK HB11:578 BEGIN -->
+
 Automation platform  \|  Verify: [CT-045](73-appendix-d-conformance-test-catalogue.md#test_CT_045), [CT-046](73-appendix-d-conformance-test-catalogue.md#test_CT_046), [CT-048](73-appendix-d-conformance-test-catalogue.md#test_CT_048), [CT-069](73-appendix-d-conformance-test-catalogue.md#test_CT_069)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
+
+<!-- SOURCE-BLOCK HB11:578 END -->
+
+<!-- SOURCE-BLOCK HB11:579 BEGIN -->
 
 <a id="req_AUTO_003"></a>
 
 AUTO-003  Retries SHALL distinguish transient, permanent and conflict failures, use bounded backoff/deadlines and preserve resource identity; uncertain outcomes SHALL be discovered and reconciled rather than duplicated.
 
+<!-- SOURCE-BLOCK HB11:579 END -->
+
+<!-- SOURCE-BLOCK HB11:580 BEGIN -->
+
 Automation platform  \|  Verify: [CT-045](73-appendix-d-conformance-test-catalogue.md#test_CT_045), [CT-046](73-appendix-d-conformance-test-catalogue.md#test_CT_046), [CT-047](73-appendix-d-conformance-test-catalogue.md#test_CT_047)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
+
+<!-- SOURCE-BLOCK HB11:580 END -->
 
 [Previous chapter](40-admission-flow-intention-and-policy-compilation.md) · [Chapter index](README.md) · [Next chapter](42-terraform-roots-adapters-and-reproducible-inputs.md)

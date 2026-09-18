@@ -8,6 +8,12 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:282 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:282 END -->
+
+<!-- SOURCE-BLOCK HB10:283 BEGIN -->
+
 
 <a id="source-table-283"></a>
 
@@ -17,12 +23,22 @@
 | Enhanced | Dedicated routing/security contexts, stronger inspection/telemetry, constrained sharing, additional tests | Higher sensitivity or threat exposure |
 | Dedicated | Dedicated or independently assured infrastructure where justified | Exceptional cases requiring physical or strong dedicated separation |
 
+<!-- SOURCE-BLOCK HB10:283 END -->
+
+<!-- SOURCE-BLOCK HB10:284 BEGIN -->
+
 The assurance profile determines realization choices such as shared vs dedicated Security Domain, shared vs dedicated security-edge context, management separation, telemetry, encryption, platform eligibility, test depth, and whether physical controls are required.
+
+<!-- SOURCE-BLOCK HB10:284 END -->
+
+<!-- SOURCE-BLOCK HB10:285 BEGIN -->
 
 
 <a id="source-table-285"></a>
 
 | ASSUR-001 | Assurance profile selection SHALL be based on system security requirements and risk analysis rather than tenant preference alone. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:285 END -->
 
 [Previous chapter](42-part-v-assurance-testing-and-operations.md) · [Chapter index](README.md) · [Next chapter](37-conformance-test-framework.md)

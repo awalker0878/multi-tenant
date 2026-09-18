@@ -6,12 +6,26 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 73be32b98783bd7857be8a00928c6894bf16f6bc98c8eb016058d3cf75b9d86b -->
+<!-- SOURCE-BLOCK VND:35 BEGIN -->
+
 <a id="__RefHeading___Toc4810_865363315"></a>
 <a id="VND_s_002"></a>
 
+<!-- SOURCE-BLOCK VND:35 END -->
+
+<!-- SOURCE-BLOCK VND:36 BEGIN -->
+
 Parent architecture: [RA §4](../../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md#RA_s_004)  •  [RA §7](../../architecture/reference/7-tenant-environments-and-security-domain-placement.md#RA_s_007)  •  [RA §11](../../architecture/reference/11-compute-pools-hypervisors-and-workload-placement.md#RA_s_011)  •  [RA §12](../../architecture/reference/12-storage-backup-and-data-isolation-architecture.md#RA_s_012)  •  [RA §14](../../architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014)
 
+<!-- SOURCE-BLOCK VND:36 END -->
+
+<!-- SOURCE-BLOCK VND:37 BEGIN -->
+
 A security-domain boundary is logical, but compromise and failure can cross shared physical or administrative dependencies. Document sharing separately for compute hosts, cluster control, storage controllers/media, transport, security-edge hardware, management, backup and keys. The parent retains zone-specific host pools as its baseline. Any alternative requires the appropriate security decision; an isolation label or platform project is not sufficient evidence. \[[B2](08-references-parent-basis-and-external-context.md#VND_src_B2) §§7, 11–14; [S03](08-references-parent-basis-and-external-context.md#VND_src_S03)\]
+
+<!-- SOURCE-BLOCK VND:37 END -->
+
+<!-- SOURCE-BLOCK VND:38 BEGIN -->
 
 
 <a id="source-table-38"></a>
@@ -25,11 +39,29 @@ A security-domain boundary is logical, but compromise and failure can cross shar
 | Transport | Shared fabric may carry isolated platform and service paths. | No route/connected-path bypass; actual rack/uplink common failures. |
 | Recovery infrastructure | Preauthorized target with usable keys, names, catalogues and eligible capacity. | No dependency on the sole failed primary resource to recover itself. |
 
+<!-- SOURCE-BLOCK VND:38 END -->
+
+<!-- SOURCE-BLOCK VND:39 BEGIN -->
+
+<!-- SOURCE-BLOCK VND:39 END -->
+
+<!-- SOURCE-BLOCK VND:40 BEGIN -->
+
 Choose a sharing outcome at each layer: dedicated physical, dedicated logical on shared hardware, or explicitly approved shared service. Record who can administer the layer and what a compromise at that layer can affect. Physical dedication of hosts does not make shared identity, storage, security edge or backup independent. Failure-domain independence and administrative independence are two different observations.
+
+<!-- SOURCE-BLOCK VND:40 END -->
+
+<!-- SOURCE-BLOCK VND:41 BEGIN -->
 
 The low-level design translates the decision into scheduler restrictions, host/cluster membership, service placement, credentials and fail actions. Test normal placement, resize, live mobility where offered, evacuation, HA restart and restore. A lack of eligible spare capacity should produce a defined service degradation or rejection, not an unapproved move across a zone or dedication boundary.
 
+<!-- SOURCE-BLOCK VND:41 END -->
+
+<!-- SOURCE-BLOCK VND:42 BEGIN -->
+
 Related engineering: [Physical dependency worksheet](../../assurance/site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002)  •  [Control inheritance](../../assurance/site-qualification/6-control-inheritance-assurance-and-organizational-interfaces.md#QUAL_s_006)
+
+<!-- SOURCE-BLOCK VND:42 END -->
 
 [Previous chapter](1-one-reference-environment-three-native-realizations.md) · [Chapter index](README.md) · [Next chapter](3-nutanix-component-path-and-lifecycle-realization.md)
 

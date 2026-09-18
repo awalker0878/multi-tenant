@@ -8,7 +8,17 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:208 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:208 END -->
+
+<!-- SOURCE-BLOCK HB10:209 BEGIN -->
+
 The complete portable networking/security profile requires NSX or an equivalent SDN/security layer; plain vSphere networking alone should not be assumed to provide the same tenant and policy semantics. NSX projects, Tier-1 contexts, segments, distributed security policy and gateway policy can be mapped to the portable model.
+
+<!-- SOURCE-BLOCK HB10:209 END -->
+
+<!-- SOURCE-BLOCK HB10:210 BEGIN -->
 
 
 <a id="source-table-210"></a>
@@ -23,16 +33,26 @@ The complete portable networking/security profile requires NSX or an equivalent 
 | Metadata | Tags / Groups |
 | Workload placement | vSphere compute + NSX network context |
 
+<!-- SOURCE-BLOCK HB10:210 END -->
+
+<!-- SOURCE-BLOCK HB10:211 BEGIN -->
+
 
 <a id="source-table-211"></a>
 
 | NSX-001 | An NSX implementation SHALL keep tenant/project policy distinct from provider/global management and security policy. |
 | --- | --- |
 
+<!-- SOURCE-BLOCK HB10:211 END -->
+
+<!-- SOURCE-BLOCK HB10:212 BEGIN -->
+
 
 <a id="source-table-212"></a>
 
 | NSX-002 | Gateway policy used for zone transitions SHALL be generated from portable Flow/ZIP intent rather than manually duplicated per workload. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:212 END -->
 
 [Previous chapter](23-nutanix-implementation-profile.md) · [Chapter index](README.md) · [Next chapter](25-openstack-implementation-profile.md)

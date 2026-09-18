@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d -->
+<!-- SOURCE-BLOCK ET:61 BEGIN -->
+
 <a id="ET_07"></a>
+
+<!-- SOURCE-BLOCK ET:61 END -->
+
+<!-- SOURCE-BLOCK ET:62 BEGIN -->
 
 Actual site values are required. Complete the response fields and identify controlled schedule/diagram references. Unknown or unsupported items remain blocking for their affected scope.
 
+<!-- SOURCE-BLOCK ET:62 END -->
+
+<!-- SOURCE-BLOCK ET:63 BEGIN -->
+
 Baseline and related records: [QUAL §3](../../assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md#QUAL_s_003)  •  [WD §11](../../solutions/internal-protected-workload/11-test-resource-capacity-and-mtu-accounting.md#WD14_S11)
+
+<!-- SOURCE-BLOCK ET:63 END -->
+
+<!-- SOURCE-BLOCK ET:64 BEGIN -->
 
 
 <a id="source-table-64"></a>
@@ -24,6 +38,20 @@ Baseline and related records: [QUAL §3](../../assurance/site-qualification/3-ca
 | Recovery targets | Approved RTO/RPO and measurement boundaries; restore/failback method. | {{ET\_RTO}} |
 | Margins/expansion | Binding bottleneck, growth/lead time, trigger and assigned owner. | {{ET\_GROWTH}} |
 
+<!-- SOURCE-BLOCK ET:64 END -->
+
+<!-- SOURCE-BLOCK ET:65 BEGIN -->
+
+<!-- SOURCE-BLOCK ET:65 END -->
+
+<!-- SOURCE-BLOCK ET:66 BEGIN -->
+
 Review disposition: Draft until the actual engineering authority accepts the named scope. A checked form or calculator result does not establish live support, qualification or authorization.
+
+<!-- SOURCE-BLOCK ET:66 END -->
+
+<!-- SOURCE-BLOCK ET:67 BEGIN -->
+
+<!-- SOURCE-BLOCK ET:67 END -->
 
 [Previous chapter](6-management-services-and-trust.md) · [Chapter index](README.md) · [Next chapter](8-exact-platform-and-tool-operation-coverage.md)

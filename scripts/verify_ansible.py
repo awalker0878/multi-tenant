@@ -31,7 +31,8 @@ def main():
             try:r=subprocess.run(argv,cwd=ROOT/'ansible',env=env,capture_output=True,text=True,timeout=120);stdout=r.stdout;code=r.returncode;stderr=r.stderr
             except subprocess.TimeoutExpired:stdout='';code=124;stderr='Timeout'
             recap=re.findall(r'localhost\s*:\s*ok=\d+\s+changed=(\d+)\s+unreachable=(\d+)\s+failed=(\d+)',stdout)
-            passed=(code!=0) if expect_failure else (code==0 and (not zero_changes or (bool(recap) and recap[-1]==('0','0','0'))))
+            expected_reason={'disabled-opt-in-rejected':'Only explicit localhost reference staging is supported.','foreign-route-rejected':'Route belongs to a different domain'}.get(name,'')
+            passed=(code not in (0,124,126) and bool(expected_reason) and expected_reason in (stdout+stderr)) if expect_failure else (code==0 and (not zero_changes or (bool(recap) and recap[-1]==('0','0','0'))))
             report['checks'].append({'name':name,'passed':passed,'exit_code':code,'expect_failure':expect_failure,'stdout':stdout[-7000:],'stderr':stderr[-2000:]})
             return passed
         version=subprocess.run([binary,'--version'],capture_output=True,text=True,env=env,timeout=30)

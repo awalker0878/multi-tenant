@@ -6,15 +6,37 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
+<!-- SOURCE-BLOCK WD:79 BEGIN -->
+
 <a id="WD14_S07"></a>
+
+<!-- SOURCE-BLOCK WD:79 END -->
+
+<!-- SOURCE-BLOCK WD:80 BEGIN -->
 
 The permissions are proposed test-service selections. They are not a blanket firewall configuration. DNS recursion, authoritative changes, time service, logging administration, repository publication and protection management each have their own authority. Only the consumption operations explicitly selected here are part of the tenant path.
 
+<!-- SOURCE-BLOCK WD:80 END -->
+
+<!-- SOURCE-BLOCK WD:81 BEGIN -->
+
 DNS over TCP and UDP is tested, including truncated-response fallback. RFC 7766 provides the general-purpose DNS TCP requirement. \[R14-04\] Log ingestion uses the selected authenticated collector protocol; the example does not guess a product-specific port or substitute ingestion permission for search or administrative rights.
+
+<!-- SOURCE-BLOCK WD:81 END -->
+
+<!-- SOURCE-BLOCK WD:82 BEGIN -->
 
 Virtual-disk encryption does not imply that a guest needs a KMS network binding. The hypervisor/storage service may be the key-service client. Likewise, backup orchestration may use protected platform APIs while data moves through a different supported interface. Those management and data paths must be designed separately, rather than adding them to the guest permit list.
 
+<!-- SOURCE-BLOCK WD:82 END -->
+
+<!-- SOURCE-BLOCK WD:83 BEGIN -->
+
 Required provider-initiated health checks or collection must identify the exact source, destination, operation and reason. Stateful response permission is not permission to initiate a new reverse session. Unapproved extra NICs, address-pair changes, native routers and service-host forwarding remain excluded.
+
+<!-- SOURCE-BLOCK WD:83 END -->
+
+<!-- SOURCE-BLOCK WD:84 BEGIN -->
 
 
 <a id="source-table-84"></a>
@@ -31,7 +53,21 @@ Required provider-initiated health checks or collection must identify the exact 
 | F14-08 / storage or workload key client | KEY-REF, only the actual selected key-use role | No implicit guest KMS route; key administration and destruction separately controlled. |
 | F14-09 / any base-fixture tenant | No public ingress or general Internet egress | Public PAZ and partner connectivity require a separately qualified service extension. |
 
+<!-- SOURCE-BLOCK WD:84 END -->
+
+<!-- SOURCE-BLOCK WD:85 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:85 END -->
+
+<!-- SOURCE-BLOCK WD:86 BEGIN -->
+
 Related documents: [SVC — Service, key and backup paths](../../architecture/shared-services/README.md#V14_SVC_START)  \|  [RA — Storage and security boundaries](../../architecture/reference/README.md#V14_RA_START)
+
+<!-- SOURCE-BLOCK WD:86 END -->
+
+<!-- SOURCE-BLOCK WD:87 BEGIN -->
+
+<!-- SOURCE-BLOCK WD:87 END -->
 
 [Previous chapter](6-worked-forwarding-and-return-route-schedule.md) · [Chapter index](README.md) · [Next chapter](8-mapping-the-schedules-into-each-vendor-stack.md)
 

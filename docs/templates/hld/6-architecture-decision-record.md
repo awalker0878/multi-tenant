@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 911b87e6a36d903a12535d16d75f1875c0cefb6b72c462895f7c2559b556708c -->
+<!-- SOURCE-BLOCK AT:59 BEGIN -->
+
 <a id="AT_06"></a>
+
+<!-- SOURCE-BLOCK AT:59 END -->
+
+<!-- SOURCE-BLOCK AT:60 BEGIN -->
 
 Working record for AK-04. Complete the responses and attach the referenced evidence or drawing; do not replace an unresolved item with an unsupported assumption.
 
+<!-- SOURCE-BLOCK AT:60 END -->
+
+<!-- SOURCE-BLOCK AT:61 BEGIN -->
+
 Baseline and related records: [RA §29](../../architecture/reference/29-architecture-decisions-and-alternatives.md#RA_s_029)  •  [GM §4](../../assurance/gap-map/4-open-decision-package-for-implementation.md#GM_s_004)
+
+<!-- SOURCE-BLOCK AT:61 END -->
+
+<!-- SOURCE-BLOCK AT:62 BEGIN -->
 
 
 <a id="source-table-62"></a>
@@ -25,8 +39,26 @@ Baseline and related records: [RA §29](../../architecture/reference/29-architec
 | Decision authority | Actual decision, approver/date/reference, conditions and review triggers. | {{AT\_ADR\_APPROVAL}} |
 | Downstream links | LLD records, work packages, tests, gaps and superseded decisions. | {{AT\_ADR\_LINKS}} |
 
+<!-- SOURCE-BLOCK AT:62 END -->
+
+<!-- SOURCE-BLOCK AT:63 BEGIN -->
+
+<!-- SOURCE-BLOCK AT:63 END -->
+
+<!-- SOURCE-BLOCK AT:64 BEGIN -->
+
 Default decision state is PROPOSED. A completed template does not issue organizational adoption or authorization.
 
+<!-- SOURCE-BLOCK AT:64 END -->
+
+<!-- SOURCE-BLOCK AT:65 BEGIN -->
+
 Record status: Draft / In review / Accepted for stated scope / Returned for revision. Use the actual review record, not this prompt, as authority.
+
+<!-- SOURCE-BLOCK AT:65 END -->
+
+<!-- SOURCE-BLOCK AT:66 BEGIN -->
+
+<!-- SOURCE-BLOCK AT:66 END -->
 
 [Previous chapter](5-management-data-and-service-dependencies.md) · [Chapter index](README.md) · [Next chapter](7-threat-sharing-and-responsibility-review.md)

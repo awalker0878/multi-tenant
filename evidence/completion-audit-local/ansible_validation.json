@@ -1,0 +1,9 @@
+{
+  "kind": "ANSIBLE_ENGINE_CHECK",
+  "status": "BLOCKED_TOOLCHAIN",
+  "checks": [],
+  "native_target_contacted": false,
+  "native_configuration_changed": false,
+  "elapsed_seconds": 0.0,
+  "reason": "ansible-playbook executable is not installed"
+}

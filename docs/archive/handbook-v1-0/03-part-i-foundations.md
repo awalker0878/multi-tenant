@@ -8,6 +8,14 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:38 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:38 END -->
+
+<!-- SOURCE-BLOCK HB10:39 BEGIN -->
+
 Part I establishes the terminology, standards context, trust model, and architectural invariants that every implementation profile must preserve.
+
+<!-- SOURCE-BLOCK HB10:39 END -->
 
 [Previous chapter](02-executive-summary.md) · [Chapter index](README.md) · [Next chapter](1-purpose-scope-and-intended-use.md)

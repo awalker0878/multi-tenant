@@ -1,0 +1,22 @@
+{
+  "source_archive_sha256": "5a969bfb75f6c99c689e409175a38455b6eeb407edf15f83bd174f69c9602e7d",
+  "retained_unchanged_records": {
+    "COMPLETION_AUDIT.txt": {
+      "source_name": "COMPLETION_AUDIT.md",
+      "sha256": "4eb914eebe80be6778f0088888c432486862fc599894e5e4ddc23287188ffbe0"
+    },
+    "findings.csv": {
+      "source_name": "findings.csv",
+      "sha256": "d46a47023a9780451486db880acdac9659a529a959cd4392c7cc0a8f695109fd"
+    },
+    "historical_audit_dispositions.csv": {
+      "source_name": "historical_audit_dispositions.csv",
+      "sha256": "19e4efcf9bc6313f598296a8df8baafa619b78f328044b566fcab571128a5c09"
+    },
+    "adr_extension_candidates.csv": {
+      "source_name": "adr_extension_candidates.csv",
+      "sha256": "7f162bae9aca8e9a60d583c847cbbbedc83e9d84faaa90e27bed10fa01f82235"
+    }
+  },
+  "note": "The original report is retained byte-for-byte as a plain-text provenance export; its original evidence-relative links require the separate original audit ZIP. Current validation evidence is produced by the corrective CI job."
+}

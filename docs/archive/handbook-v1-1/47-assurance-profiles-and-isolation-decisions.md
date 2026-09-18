@@ -8,10 +8,20 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:642 BEGIN -->
+
 <a id="__RefHeading___Toc13389_1645000677"></a>
 <a id="sec_47"></a>
 
+<!-- SOURCE-BLOCK HB11:642 END -->
+
+<!-- SOURCE-BLOCK HB11:643 BEGIN -->
+
 Assurance Profiles are local realization policies, not official security categorization levels or a substitute for a system assurance determination. Standard, Enhanced and Dedicated select explicit separation and verification requirements. Their definitions must be versioned; a change to their meaning triggers re-evaluation of placements. All profiles retain tenant isolation, deny-by-default communication, independent management, attributable logging, protected credentials and tested recovery. \[[S03](77-appendix-h-primary-sources-and-implementation-references.md#S03); [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05)\]
+
+<!-- SOURCE-BLOCK HB11:643 END -->
+
+<!-- SOURCE-BLOCK HB11:644 BEGIN -->
 
 
 <a id="source-table-644"></a>
@@ -25,26 +35,60 @@ Assurance Profiles are local realization policies, not official security categor
 | Testing and recovery | Mandatory deployment subset; full qualification and scheduled recovery tests | Additional compromise, failure, privilege and shared-component tests | All required tests plus verification of physical dedication and independent recovery |
 | Telemetry and review | Profile-defined event coverage, detection and retention objectives | Tighter locally approved detection/review objectives and additional sensors | Profile-defined objectives; physical dedication never replaces monitoring |
 
+<!-- SOURCE-BLOCK HB11:644 END -->
+
+<!-- SOURCE-BLOCK HB11:645 BEGIN -->
+
 Dedicated is a vector, not a single checkbox: host, cluster, storage, edge, management, backup, key custody and site can each be shared or dedicated. Record which are actually dedicated. Dedicated hosts connected to a shared management or backup plane do not make the whole service physically independent. Any alternative to the zone-specific host-pool baseline needs explicit risk acceptance and evidence addressing the virtualization guidance; an assurance label alone is insufficient. \[[S03](77-appendix-h-primary-sources-and-implementation-references.md#S03)\]
 
+<!-- SOURCE-BLOCK HB11:645 END -->
+
+<!-- SOURCE-BLOCK HB11:646 BEGIN -->
+
 The profile fixes mandatory test sets, evidence freshness, operator review, maximum exception age and recovery cadence. Numeric values in Appendix F are proposed engineering starting points, not statements of government policy or delivered service guarantees. A production profile cannot be Qualified while mandatory numeric parameters, owners or approval references are missing.
+
+<!-- SOURCE-BLOCK HB11:646 END -->
+
+<!-- SOURCE-BLOCK HB11:647 BEGIN -->
 
 <a id="req_ASSUR_001"></a>
 
 ASSUR-001  Assurance profile selection SHALL be based on system security requirements and risk analysis rather than tenant preference alone.
 
+<!-- SOURCE-BLOCK HB11:647 END -->
+
+<!-- SOURCE-BLOCK HB11:648 BEGIN -->
+
 Security authority  \|  Verify: [CT-035](73-appendix-d-conformance-test-catalogue.md#test_CT_035), [CT-062](73-appendix-d-conformance-test-catalogue.md#test_CT_062)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) / [S03](77-appendix-h-primary-sources-and-implementation-references.md#S03) / [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05)  \|  retained-v1.0
+
+<!-- SOURCE-BLOCK HB11:648 END -->
+
+<!-- SOURCE-BLOCK HB11:649 BEGIN -->
 
 <a id="req_ASSUR_002"></a>
 
 ASSUR-002  Assurance profiles SHALL define explicit isolation for compute, storage, routing, edge, management, backup and keys, with measurable verification and exception rules; “dedicated” SHALL identify its actual resource scope.
 
+<!-- SOURCE-BLOCK HB11:649 END -->
+
+<!-- SOURCE-BLOCK HB11:650 BEGIN -->
+
 Security authority  \|  Verify: [CT-018](73-appendix-d-conformance-test-catalogue.md#test_CT_018), [CT-035](73-appendix-d-conformance-test-catalogue.md#test_CT_035), [CT-037](73-appendix-d-conformance-test-catalogue.md#test_CT_037), [CT-062](73-appendix-d-conformance-test-catalogue.md#test_CT_062)  \|  Basis: [S03](77-appendix-h-primary-sources-and-implementation-references.md#S03) / [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05)  \|  new-v1.1
+
+<!-- SOURCE-BLOCK HB11:650 END -->
+
+<!-- SOURCE-BLOCK HB11:651 BEGIN -->
 
 <a id="req_ASSUR_003"></a>
 
 ASSUR-003  A production profile SHALL have approved parameter values, owners, applicable test sets and evidence freshness limits; incomplete or expired profiles SHALL be ineligible for new production placement.
 
+<!-- SOURCE-BLOCK HB11:651 END -->
+
+<!-- SOURCE-BLOCK HB11:652 BEGIN -->
+
 Security authority  \|  Verify: [CT-018](73-appendix-d-conformance-test-catalogue.md#test_CT_018), [CT-058](73-appendix-d-conformance-test-catalogue.md#test_CT_058), [CT-069](73-appendix-d-conformance-test-catalogue.md#test_CT_069)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
+
+<!-- SOURCE-BLOCK HB11:652 END -->
 
 [Previous chapter](52-part-vi-assurance-and-operations.md) · [Chapter index](README.md) · [Next chapter](48-conformance-framework-and-test-execution.md)

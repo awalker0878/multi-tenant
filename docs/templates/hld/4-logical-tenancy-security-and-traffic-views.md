@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 911b87e6a36d903a12535d16d75f1875c0cefb6b72c462895f7c2559b556708c -->
+<!-- SOURCE-BLOCK AT:43 BEGIN -->
+
 <a id="AT_04"></a>
+
+<!-- SOURCE-BLOCK AT:43 END -->
+
+<!-- SOURCE-BLOCK AT:44 BEGIN -->
 
 Working record for AK-03. Complete the responses and attach the referenced evidence or drawing; do not replace an unresolved item with an unsupported assumption.
 
+<!-- SOURCE-BLOCK AT:44 END -->
+
+<!-- SOURCE-BLOCK AT:45 BEGIN -->
+
 Baseline and related records: [RA §7](../../architecture/reference/7-tenant-environments-and-security-domain-placement.md#RA_s_007)  •  [RA §8](../../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md#RA_s_008)  •  [WD §6](../../solutions/internal-protected-workload/6-worked-forwarding-and-return-route-schedule.md#WD14_S06)
+
+<!-- SOURCE-BLOCK AT:45 END -->
+
+<!-- SOURCE-BLOCK AT:46 BEGIN -->
 
 
 <a id="source-table-46"></a>
@@ -24,8 +38,26 @@ Baseline and related records: [RA §7](../../architecture/reference/7-tenant-env
 | Exposure model | Public, enterprise/partner and egress mediation; none unless explicitly selected. | {{AT\_EXPOSURE}} |
 | Path schedule reference | Engineering flow/route records that will implement these views. | {{AT\_PATH\_REF}} |
 
+<!-- SOURCE-BLOCK AT:46 END -->
+
+<!-- SOURCE-BLOCK AT:47 BEGIN -->
+
+<!-- SOURCE-BLOCK AT:47 END -->
+
+<!-- SOURCE-BLOCK AT:48 BEGIN -->
+
 Reviewer: every required trust transition has forwarding and enforcement explained; same zone class does not imply shared reachability.
 
+<!-- SOURCE-BLOCK AT:48 END -->
+
+<!-- SOURCE-BLOCK AT:49 BEGIN -->
+
 Record status: Draft / In review / Accepted for stated scope / Returned for revision. Use the actual review record, not this prompt, as authority.
+
+<!-- SOURCE-BLOCK AT:49 END -->
+
+<!-- SOURCE-BLOCK AT:50 BEGIN -->
+
+<!-- SOURCE-BLOCK AT:50 END -->
 
 [Previous chapter](3-context-and-physical-deployment-views.md) · [Chapter index](README.md) · [Next chapter](5-management-data-and-service-dependencies.md)

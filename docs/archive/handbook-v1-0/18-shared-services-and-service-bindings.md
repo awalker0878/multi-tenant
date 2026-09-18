@@ -8,7 +8,17 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB10:166 BEGIN -->
+
+<!-- SOURCE-BLOCK HB10:166 END -->
+
+<!-- SOURCE-BLOCK HB10:167 BEGIN -->
+
 Shared infrastructure functions such as DNS, NTP, identity, PKI, logging, monitoring, backup and KMS should be published as service endpoints rather than broad routable networks. A Service Binding is an explicit relationship between a consumer Security Domain and an approved service endpoint.
+
+<!-- SOURCE-BLOCK HB10:167 END -->
+
+<!-- SOURCE-BLOCK HB10:168 BEGIN -->
 
 
 <a id="source-table-168"></a>
@@ -24,16 +34,26 @@ Shared infrastructure functions such as DNS, NTP, identity, PKI, logging, monito
 | Availability | Local, redundant, multi-site, or service-defined |
 | Evidence | Reachability test + policy/config references |
 
+<!-- SOURCE-BLOCK HB10:168 END -->
+
+<!-- SOURCE-BLOCK HB10:169 BEGIN -->
+
 
 <a id="source-table-169"></a>
 
 | SVC-001 | Consumers SHALL NOT receive broad routing to a shared-services supernet solely because they consume one shared service. |
 | --- | --- |
 
+<!-- SOURCE-BLOCK HB10:169 END -->
+
+<!-- SOURCE-BLOCK HB10:170 BEGIN -->
+
 
 <a id="source-table-170"></a>
 
 | SVC-002 | Where useful, shared services SHOULD expose zone-aligned endpoints so that consumption does not force unnecessary cross-zone routing. |
 | --- | --- |
+
+<!-- SOURCE-BLOCK HB10:170 END -->
 
 [Previous chapter](17-ipv6-and-dual-stack.md) · [Chapter index](README.md) · [Next chapter](19-public-ingress-and-internet-egress.md)

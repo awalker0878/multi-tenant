@@ -6,9 +6,19 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9ca5c85333dcb51137ca694aea7b034e393fa8927831f0b475b3b88e842418f7 -->
+<!-- SOURCE-BLOCK IMP04:85 BEGIN -->
+
 <a id="chapter_8"></a>
 
+<!-- SOURCE-BLOCK IMP04:85 END -->
+
+<!-- SOURCE-BLOCK IMP04:86 BEGIN -->
+
 [Contents and release status](01-implementation-increment-04.md#chapter_1)
+
+<!-- SOURCE-BLOCK IMP04:86 END -->
+
+<!-- SOURCE-BLOCK IMP04:87 BEGIN -->
 
 
 <a id="source-table-87"></a>
@@ -23,21 +33,82 @@
 | 6. Independent verification | Assess actual packet paths, rule precedence, host placement, data access, DNS/identity/protection and failure behavior under the accepted profile. |
 | 7. Service activation | Required initial operational/recovery readiness and applicable authorization precede production. No new tool sets service readiness or releases quarantine. |
 
+<!-- SOURCE-BLOCK IMP04:87 END -->
+
+<!-- SOURCE-BLOCK IMP04:88 BEGIN -->
+
 ## Local commands after extraction
+
+<!-- SOURCE-BLOCK IMP04:88 END -->
+
+<!-- SOURCE-BLOCK IMP04:89 BEGIN -->
 
 ```text
 python tools/check_release.py
+```
+
+<!-- SOURCE-BLOCK IMP04:89 END -->
+
+<!-- SOURCE-BLOCK IMP04:90 BEGIN -->
+
+```text
 python tools/check_local.py
+```
+
+<!-- SOURCE-BLOCK IMP04:90 END -->
+
+<!-- SOURCE-BLOCK IMP04:91 BEGIN -->
+
+```text
 python lab/run_readback_lab.py --execute
+```
+
+<!-- SOURCE-BLOCK IMP04:91 END -->
+
+<!-- SOURCE-BLOCK IMP04:92 BEGIN -->
+
+```text
 python lab/run_dns_lab.py --execute
+```
+
+<!-- SOURCE-BLOCK IMP04:92 END -->
+
+<!-- SOURCE-BLOCK IMP04:93 BEGIN -->
+
+```text
 python lab/run_namespace_lab.py --execute
+```
+
+<!-- SOURCE-BLOCK IMP04:93 END -->
+
+<!-- SOURCE-BLOCK IMP04:94 BEGIN -->
+
+```text
 python tools/check_package.py
 ```
 
+<!-- SOURCE-BLOCK IMP04:94 END -->
+
+<!-- SOURCE-BLOCK IMP04:95 BEGIN -->
+
 Run release integrity first: test commands intentionally refresh quality files. The local labs accept only their bounded fixtures. Runtime readers use the standard library; fixture certificates use the retained tested cryptography dependency. Existing DNS and packet tests need the documented additional libraries and Linux namespace tools.
+
+<!-- SOURCE-BLOCK IMP04:95 END -->
+
+<!-- SOURCE-BLOCK IMP04:96 BEGIN -->
 
 [Commissioning sequence](../../COMMISSIONING.md)
 
+<!-- SOURCE-BLOCK IMP04:96 END -->
+
+<!-- SOURCE-BLOCK IMP04:97 BEGIN -->
+
 [Native operation and integration backlog](../../../sources/implementation_backlog.csv)
+
+<!-- SOURCE-BLOCK IMP04:97 END -->
+
+<!-- SOURCE-BLOCK IMP04:98 BEGIN -->
+
+<!-- SOURCE-BLOCK IMP04:98 END -->
 
 [Previous chapter](07-local-execution-and-observed-results.md) · [Chapter index](README.md) · [Next chapter](09-primary-native-interface-sources.md)

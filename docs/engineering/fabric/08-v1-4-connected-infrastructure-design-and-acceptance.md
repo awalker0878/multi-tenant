@@ -6,15 +6,35 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9c557d7d94dbdf24630994d2676aca3ddfa80e67c2910fb1a29ea4561c591dcf -->
+<!-- SOURCE-BLOCK NET:91 BEGIN -->
+
 <a id="__RefHeading___Toc6071_1692646980"></a>
 <a id="V14_NET_REVISION"></a>
 
+<!-- SOURCE-BLOCK NET:91 END -->
+
+<!-- SOURCE-BLOCK NET:92 BEGIN -->
+
 ## Worked route schedule and service-side return control
+
+<!-- SOURCE-BLOCK NET:92 END -->
+
+<!-- SOURCE-BLOCK NET:93 BEGIN -->
 
 WD §§4–7 provides one internally connected illustrative IPv4 schedule and separately qualified IPv6 treatment. It identifies four tenant attachments, two dedicated service handoffs, separate EC/SE routing scopes, exact service endpoints and service-side return routes. Shared service placement does not authorize a native tenant gateway to share an uninspected connected network. The actual realization must verify source validation, connected routes, native distributed forwarding, stateful replies, service-side initiation and failure paths.
 
+<!-- SOURCE-BLOCK NET:93 END -->
+
+<!-- SOURCE-BLOCK NET:94 BEGIN -->
+
 Authoritative linked treatment: [WD — Worked Infrastructure Design, Build Schedules and Acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
 
+<!-- SOURCE-BLOCK NET:94 END -->
+
+<!-- SOURCE-BLOCK NET:95 BEGIN -->
+
 Read this clarification with the original chapter. It does not create an exemption to an adopted requirement, waive a mandatory control, select an unknown site value or report a live test as passed.
+
+<!-- SOURCE-BLOCK NET:95 END -->
 
 [Previous chapter](07-references-parent-basis-and-external-context.md) · [Chapter index](README.md)

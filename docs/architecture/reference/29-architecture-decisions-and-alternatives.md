@@ -6,10 +6,20 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19 -->
+<!-- SOURCE-BLOCK RA:402 BEGIN -->
+
 <a id="__RefHeading___Toc3696_865363315"></a>
 <a id="RA_s_029"></a>
 
+<!-- SOURCE-BLOCK RA:402 END -->
+
+<!-- SOURCE-BLOCK RA:403 BEGIN -->
+
 The following decisions make the reference design specific without pretending to select an unknown site’s product versions or hardware counts. They are proposed for architecture adoption. Each implementation records acceptance or an explicit variation, its rationale and the controls and tests affected. The terms cell and work package are architecture concepts; they do not require corresponding software services.
+
+<!-- SOURCE-BLOCK RA:403 END -->
+
+<!-- SOURCE-BLOCK RA:404 BEGIN -->
 
 
 <a id="source-table-404"></a>
@@ -32,9 +42,23 @@ The following decisions make the reference design specific without pretending to
 | AD-14 — Single configuration owner | One accountable controller/tool owns each native object; brownfield adoption is reviewed before mutation. | Ownership transfer requires explicit reconciliation and removal of dual writers |
 | AD-15 — Evidence, not counts | Qualification depends on actual outcomes and current topology; page/schema/test counts are not security proof. | Reference documentation, live conformance and formal authorization remain distinct |
 
+<!-- SOURCE-BLOCK RA:404 END -->
+
+<!-- SOURCE-BLOCK RA:405 BEGIN -->
+
+<!-- SOURCE-BLOCK RA:405 END -->
+
+<!-- SOURCE-BLOCK RA:406 BEGIN -->
+
 These decisions intentionally separate a stable target architecture from choices that belong in a low-level implementation. A permitted variation does not silently alter the common service promise. Where an alternative cannot satisfy the mandatory outcome, either exclude that service class or obtain an explicit change to the approved architecture and its assurance basis.
 
+<!-- SOURCE-BLOCK RA:406 END -->
+
+<!-- SOURCE-BLOCK RA:407 BEGIN -->
+
 Related engineering: [GM §4 — Open decision package for implementation](../../assurance/gap-map/4-open-decision-package-for-implementation.md#GM_s_004)
+
+<!-- SOURCE-BLOCK RA:407 END -->
 
 [Previous chapter](28-architecture-acceptance-and-verification.md) · [Chapter index](README.md) · [Next chapter](30-implementation-handoff-and-delivery-sequence.md)
 

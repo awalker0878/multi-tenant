@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41 -->
+<!-- SOURCE-BLOCK IK:57 BEGIN -->
+
 <a id="IK_06"></a>
+
+<!-- SOURCE-BLOCK IK:57 END -->
+
+<!-- SOURCE-BLOCK IK:58 BEGIN -->
 
 Use RB-06 under an explicit non-production test authorization. Candidate capacity can host a restricted disposable fixture to obtain qualification evidence; that permission is not production acceptance.
 
+<!-- SOURCE-BLOCK IK:58 END -->
+
+<!-- SOURCE-BLOCK IK:59 BEGIN -->
+
 Baseline and related records: [WD §11](../../solutions/internal-protected-workload/11-test-resource-capacity-and-mtu-accounting.md#WD14_S11)  •  [WD §13](../../solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md#WD14_S13)  •  [QUAL §5](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
+
+<!-- SOURCE-BLOCK IK:59 END -->
+
+<!-- SOURCE-BLOCK IK:60 BEGIN -->
 
 
 <a id="source-table-60"></a>
@@ -24,8 +38,26 @@ Baseline and related records: [WD §11](../../solutions/internal-protected-workl
 | Observe outcomes | Capture intended versus realized path, native roles, policy, resource/copy ownership, fault and recovery result. | Distinguish security continuity, availability and actual recovery; no success inferred from tool exit alone. |
 | Review and release | Record passed, failed, blocked, not-run or justified not-applicable; reviewer and immutable artifact references. | Unexecuted or missing mandatory evidence blocks the corresponding qualification. |
 
+<!-- SOURCE-BLOCK IK:60 END -->
+
+<!-- SOURCE-BLOCK IK:61 BEGIN -->
+
+<!-- SOURCE-BLOCK IK:61 END -->
+
+<!-- SOURCE-BLOCK IK:62 BEGIN -->
+
 The kit carries 80 historical CT procedures, 12 realization addenda and 12 W14 assertions as reference material. They are not 104 executed tests. Applicability must be resolved for the target, and individual assertions may require several observations.
 
+<!-- SOURCE-BLOCK IK:62 END -->
+
+<!-- SOURCE-BLOCK IK:63 BEGIN -->
+
 Use IT §4 for each test execution and IT §5 for recovery. Include the actual tuple, observation time, topology revision and target identity; never prefill an observed result from an expected result.
+
+<!-- SOURCE-BLOCK IK:63 END -->
+
+<!-- SOURCE-BLOCK IK:64 BEGIN -->
+
+<!-- SOURCE-BLOCK IK:64 END -->
 
 [Previous chapter](5-shared-security-services-and-protection.md) · [Chapter index](README.md) · [Next chapter](7-tenant-provisioning-and-controlled-production-activation.md)

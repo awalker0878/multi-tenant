@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41 -->
+<!-- SOURCE-BLOCK IK:65 BEGIN -->
+
 <a id="IK_07"></a>
+
+<!-- SOURCE-BLOCK IK:65 END -->
+
+<!-- SOURCE-BLOCK IK:66 BEGIN -->
 
 Normal tenant allocation consumes accepted capacity. Production activation has additional prerequisites that a successful infrastructure build cannot waive.
 
+<!-- SOURCE-BLOCK IK:66 END -->
+
+<!-- SOURCE-BLOCK IK:67 BEGIN -->
+
 Baseline and related records: [RA §23](../../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md#RA_s_023)  •  [WD §9](../../solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md#WD14_S09)  •  [IT §7](../../templates/implementation-mop/7-gate-decision-and-production-activation.md#IT_07)
+
+<!-- SOURCE-BLOCK IK:67 END -->
+
+<!-- SOURCE-BLOCK IK:68 BEGIN -->
 
 
 <a id="source-table-68"></a>
@@ -25,6 +39,20 @@ Baseline and related records: [RA §23](../../architecture/reference/23-tenant-d
 | 6 — Controlled activation | Authorized service owner accepts the exact scope; enable only approved exposure and verify the live path. | On failed activation, withdraw exposure while preserving owned data and evidence. |
 | 7 — Confirm as-built | Record native identities, actual state, acceptance and support handover. | This confirms already assigned owners; it is not where readiness is first discovered. |
 
+<!-- SOURCE-BLOCK IK:68 END -->
+
+<!-- SOURCE-BLOCK IK:69 BEGIN -->
+
+<!-- SOURCE-BLOCK IK:69 END -->
+
+<!-- SOURCE-BLOCK IK:70 BEGIN -->
+
 G4 initial readiness precedes G3 production activation. Continuing G4 exercises after activation do not replace the initial proof supporting a promised service. Restricted fixture permission is a separate record.
+
+<!-- SOURCE-BLOCK IK:70 END -->
+
+<!-- SOURCE-BLOCK IK:71 BEGIN -->
+
+<!-- SOURCE-BLOCK IK:71 END -->
 
 [Previous chapter](6-restricted-qualification-and-meaningful-observations.md) · [Chapter index](README.md) · [Next chapter](8-interrupted-work-brownfield-adoption-and-change.md)

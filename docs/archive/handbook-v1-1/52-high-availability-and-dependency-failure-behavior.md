@@ -8,10 +8,20 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK HB11:701 BEGIN -->
+
 <a id="__RefHeading___Toc13399_1645000677"></a>
 <a id="sec_52"></a>
 
+<!-- SOURCE-BLOCK HB11:701 END -->
+
+<!-- SOURCE-BLOCK HB11:702 BEGIN -->
+
 A control-plane outage and a data-plane outage are different events. The system must not create a new permit path when a dependency is unavailable. Existing traffic continues only to the extent that the qualified implementation can preserve the required controls. A controller cannot guarantee continuity simply by declaring it. Test enforcement, session behavior and recovery against the actual versioned implementation.
+
+<!-- SOURCE-BLOCK HB11:702 END -->
+
+<!-- SOURCE-BLOCK HB11:703 BEGIN -->
 
 
 <a id="source-table-703"></a>
@@ -29,24 +39,54 @@ A control-plane outage and a data-plane outage are different events. The system 
 | Storage/site partition | Quorum/fencing prevents conflicting writers; choose recovery authority before promotion |
 | Partial apply or API timeout | Journal the unknown outcome, query ownership/readiness and converge or compensate safely; do not duplicate resources |
 
+<!-- SOURCE-BLOCK HB11:703 END -->
+
+<!-- SOURCE-BLOCK HB11:704 BEGIN -->
+
 Test asymmetrical partitions, not only a clean node shutdown. Confirm failure detection and fencing do not depend on the failed path, and that emergency access survives the failure it is meant to repair. Stateful security devices require explicit connection-state handling and return-path symmetry. Availability targets distinguish established-session survival, new-session success and recovery after enforcement returns.
+
+<!-- SOURCE-BLOCK HB11:704 END -->
+
+<!-- SOURCE-BLOCK HB11:705 BEGIN -->
 
 <a id="req_FAIL_001"></a>
 
 FAIL-001  Control-plane failure SHALL NOT create an implicit permit path.
 
+<!-- SOURCE-BLOCK HB11:705 END -->
+
+<!-- SOURCE-BLOCK HB11:706 BEGIN -->
+
 Platform operations  \|  Verify: [CT-011](73-appendix-d-conformance-test-catalogue.md#test_CT_011), [CT-012](73-appendix-d-conformance-test-catalogue.md#test_CT_012), [CT-024](73-appendix-d-conformance-test-catalogue.md#test_CT_024), [CT-052](73-appendix-d-conformance-test-catalogue.md#test_CT_052)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  retained-v1.0
+
+<!-- SOURCE-BLOCK HB11:706 END -->
+
+<!-- SOURCE-BLOCK HB11:707 BEGIN -->
 
 <a id="req_FAIL_002"></a>
 
 FAIL-002  Failover and control-plane-loss scenarios SHALL be included in platform conformance testing.
 
+<!-- SOURCE-BLOCK HB11:707 END -->
+
+<!-- SOURCE-BLOCK HB11:708 BEGIN -->
+
 Assurance engineering  \|  Verify: [CT-011](73-appendix-d-conformance-test-catalogue.md#test_CT_011), [CT-012](73-appendix-d-conformance-test-catalogue.md#test_CT_012), [CT-027](73-appendix-d-conformance-test-catalogue.md#test_CT_027), [CT-038](73-appendix-d-conformance-test-catalogue.md#test_CT_038), [CT-050](73-appendix-d-conformance-test-catalogue.md#test_CT_050), [CT-054](73-appendix-d-conformance-test-catalogue.md#test_CT_054), [CT-055](73-appendix-d-conformance-test-catalogue.md#test_CT_055)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  retained-v1.0
+
+<!-- SOURCE-BLOCK HB11:708 END -->
+
+<!-- SOURCE-BLOCK HB11:709 BEGIN -->
 
 <a id="req_FAIL_003"></a>
 
 FAIL-003  Every critical dependency SHALL have a qualified loss/partition/recovery behavior, including credential/key continuity, logging loss, state recovery and split-brain prevention; unavailable authority SHALL NOT authorize fallback bypass.
 
+<!-- SOURCE-BLOCK HB11:709 END -->
+
+<!-- SOURCE-BLOCK HB11:710 BEGIN -->
+
 Platform operations  \|  Verify: [CT-027](73-appendix-d-conformance-test-catalogue.md#test_CT_027), [CT-038](73-appendix-d-conformance-test-catalogue.md#test_CT_038), [CT-044](73-appendix-d-conformance-test-catalogue.md#test_CT_044), [CT-050](73-appendix-d-conformance-test-catalogue.md#test_CT_050), [CT-054](73-appendix-d-conformance-test-catalogue.md#test_CT_054), [CT-055](73-appendix-d-conformance-test-catalogue.md#test_CT_055)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
+
+<!-- SOURCE-BLOCK HB11:710 END -->
 
 [Previous chapter](51-capacity-performance-and-capacity-on-demand-operations.md) · [Chapter index](README.md) · [Next chapter](53-recovery-bootstrap-and-failback-runbooks.md)

@@ -8,16 +8,48 @@
 <!-- source-sha256: cd901aaf004d45cf29ffe14ff955a0c9cf81f668be674e8d4de8c590303c62d8 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK AUD11:91 BEGIN -->
+
+<!-- SOURCE-BLOCK AUD11:91 END -->
+
+<!-- SOURCE-BLOCK AUD11:92 BEGIN -->
+
 High priority • Confirmed structured-contract omission<br>Location: Chapter 49 p44; Appendix E pp91-92; EvidenceRecord schema
+
+<!-- SOURCE-BLOCK AUD11:92 END -->
+
+<!-- SOURCE-BLOCK AUD11:93 BEGIN -->
 
 Observed. The handbook describes requirement/source/control-to-owner-to-realized-object-to-test traceability. EvidenceRecord has generic artifact/realization strings but no defined per-control result contract. Adding a controlResults structure is rejected. External artifacts may hold detail, but their schema and resolver are unspecified.
 
+<!-- SOURCE-BLOCK AUD11:93 END -->
+
+<!-- SOURCE-BLOCK AUD11:94 BEGIN -->
+
 Why it matters. An assessor can receive files but cannot rely on a standardized machine-readable chain or completeness query.
+
+<!-- SOURCE-BLOCK AUD11:94 END -->
+
+<!-- SOURCE-BLOCK AUD11:95 BEGIN -->
 
 Improve. Define a ControlImplementation/ControlResult record or a versioned external evidence schema. Include catalogue edition, selected control/enhancement, parameters, owner, implementation IDs, test executions, artifact digests, inheritance and residual gaps.
 
+<!-- SOURCE-BLOCK AUD11:95 END -->
+
+<!-- SOURCE-BLOCK AUD11:96 BEGIN -->
+
 Close when. From one requirement or selected control, resolve the exact implementation, applicable tests, actual outcomes and accountable decision without free-text inference.
 
+<!-- SOURCE-BLOCK AUD11:96 END -->
+
+<!-- SOURCE-BLOCK AUD11:97 BEGIN -->
+
 Owner: Assurance architecture  \|  Local probes: M17
+
+<!-- SOURCE-BLOCK AUD11:97 END -->
+
+<!-- SOURCE-BLOCK AUD11:98 BEGIN -->
+
+<!-- SOURCE-BLOCK AUD11:98 END -->
 
 [Previous chapter](11-f09-evidence-validation-accepts-incomplete-readiness-assertions.md) · [Chapter index](README.md) · [Next chapter](13-f11-placementprofile-does-not-express-required-location-distinctions.md)

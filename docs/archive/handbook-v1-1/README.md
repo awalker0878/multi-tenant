@@ -92,17 +92,43 @@
 - [Appendix J — Audit closure, migration and release checks](79-appendix-j-audit-closure-migration-and-release-checks.md)
 
 ## Source front matter
+<!-- SOURCE-BLOCK HB11:0 BEGIN -->
+
 ARCHITECTURE STANDARD + ENGINEERING HANDBOOK
+
+<!-- SOURCE-BLOCK HB11:0 END -->
+
+<!-- SOURCE-BLOCK HB11:1 BEGIN -->
 
 ## Portable<br>Multi-Tenant<br>Secure Hosting
 
+<!-- SOURCE-BLOCK HB11:1 END -->
+
+<!-- SOURCE-BLOCK HB11:2 BEGIN -->
+
 *Complete architecture baseline<br>and zero-touch service contract*
+
+<!-- SOURCE-BLOCK HB11:2 END -->
+
+<!-- SOURCE-BLOCK HB11:3 BEGIN -->
 
 Draft v1.1  \|  16 September 2026
 
+<!-- SOURCE-BLOCK HB11:3 END -->
+
+<!-- SOURCE-BLOCK HB11:4 BEGIN -->
+
 Security outcomes that survive platform change.
 
+<!-- SOURCE-BLOCK HB11:4 END -->
+
+<!-- SOURCE-BLOCK HB11:5 BEGIN -->
+
 A vendor-neutral model for workload intent, controlled trust transitions, protected hosting services, scoped automation, measured recovery and attributable evidence.
+
+<!-- SOURCE-BLOCK HB11:5 END -->
+
+<!-- SOURCE-BLOCK HB11:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -111,11 +137,31 @@ A vendor-neutral model for workload intent, controlled trust transitions, protec
 | --- | --- | --- |
 | Seven architecture parts | All 99 original IDs mapped | 33 typed contract objects |
 
+<!-- SOURCE-BLOCK HB11:6 END -->
+
+<!-- SOURCE-BLOCK HB11:7 BEGIN -->
+
 DOCUMENT BASELINE COMPLETE • IMPLEMENTATION QUALIFICATION SEPARATE
+
+<!-- SOURCE-BLOCK HB11:7 END -->
+
+<!-- SOURCE-BLOCK HB11:8 BEGIN -->
 
 This release defines and validates the reference documentation and contract package. Live platform qualification, tailored control assessment, site parameters and formal authorization remain implementation responsibilities. Candidate examples and unexecuted tests are explicitly identified.
 
+<!-- SOURCE-BLOCK HB11:8 END -->
+
+<!-- SOURCE-BLOCK HB11:9 BEGIN -->
+
+<!-- SOURCE-BLOCK HB11:9 END -->
+
+<!-- SOURCE-BLOCK HB11:10 BEGIN -->
+
 Document control and how to use this release
+
+<!-- SOURCE-BLOCK HB11:10 END -->
+
+<!-- SOURCE-BLOCK HB11:11 BEGIN -->
 
 
 <a id="source-table-11"></a>
@@ -131,14 +177,48 @@ Document control and how to use this release
 | Companion package | Closed schemas, examples, generated requirements/tests/sources, audit/migration records, offline validator and editable diagrams |
 | Release limits | No actual infrastructure conformance execution, provider certification, production approval or named site values are asserted |
 
+<!-- SOURCE-BLOCK HB11:11 END -->
+
+<!-- SOURCE-BLOCK HB11:12 BEGIN -->
+
 ### Reading paths
+
+<!-- SOURCE-BLOCK HB11:12 END -->
+
+<!-- SOURCE-BLOCK HB11:13 BEGIN -->
 
 Architecture and security reviewers: Parts I–III, sections 34 and 47–49, and Appendices C/E/J. Implementers: Parts II–V and the typed schema package. Operators: sections 27–30 and Parts VI–VII. All roles use the generated requirement/test links rather than a manually curated subset.
 
+<!-- SOURCE-BLOCK HB11:13 END -->
+
+<!-- SOURCE-BLOCK HB11:14 BEGIN -->
+
 ### Revision provenance
+
+<!-- SOURCE-BLOCK HB11:14 END -->
+
+<!-- SOURCE-BLOCK HB11:15 BEGIN -->
 
 The original WSD, SDI, ZIP, service-binding, route-authority and stable-fabric thesis is retained. Research-backed corrections and locally proposed extensions are identified by source references and the migration/audit registers. Numerical examples are not presented as government-mandated thresholds. The exact revised text for every original requirement is included in the companion migration catalogue. \[[S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)\]
 
+<!-- SOURCE-BLOCK HB11:15 END -->
+
+<!-- SOURCE-BLOCK HB11:16 BEGIN -->
+
 ### Navigation
 
+<!-- SOURCE-BLOCK HB11:16 END -->
+
+<!-- SOURCE-BLOCK HB11:17 BEGIN -->
+
 The contents below are a populated Word TOC field. Headings, figure numbers, bookmarks and source links remain editable. After later edits, update fields in Word and save before distributing a new reading copy. Appendix C indexes every normative requirement to its defining chapter, owner, test and source basis.
+
+<!-- SOURCE-BLOCK HB11:17 END -->
+
+<!-- SOURCE-BLOCK HB11:18 BEGIN -->
+
+<!-- SOURCE-BLOCK HB11:18 END -->
+
+<!-- SOURCE-BLOCK HB11:106 BEGIN -->
+
+<!-- SOURCE-BLOCK HB11:106 END -->

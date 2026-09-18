@@ -6,12 +6,26 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 2257e6f3badac48b07989244fbfae96643d68cc6633b28e9799a14733bccea3a -->
+<!-- SOURCE-BLOCK SVC:34 BEGIN -->
+
 <a id="__RefHeading___Toc8877_1525915568"></a>
 <a id="SVC_s_002"></a>
 
+<!-- SOURCE-BLOCK SVC:34 END -->
+
+<!-- SOURCE-BLOCK SVC:35 BEGIN -->
+
 Parent architecture: [RA §9](../reference/9-shared-services-ingress-and-controlled-egress.md#RA_s_009)  •  [RA §10](../reference/10-addressing-name-services-and-end-to-end-traffic.md#RA_s_010)  •  [RA §23](../reference/23-tenant-domain-and-workload-provisioning-sequence.md#RA_s_023)  •  [RA §26](../reference/26-operating-model-capacity-and-observability.md#RA_s_026)
 
+<!-- SOURCE-BLOCK SVC:35 END -->
+
+<!-- SOURCE-BLOCK SVC:36 BEGIN -->
+
 A service-connectivity schedule records endpoint identity, initiating party, protocol behaviour, address families, authentication, route/ZIP, replies, logs and revocation. The rows below are proposed reference profiles, not a blanket port list to apply to every workload. Names and time required for secure initialization should work before activation; that does not justify unrestricted access to provider infrastructure.
+
+<!-- SOURCE-BLOCK SVC:36 END -->
+
+<!-- SOURCE-BLOCK SVC:37 BEGIN -->
 
 
 <a id="source-table-37"></a>
@@ -25,11 +39,31 @@ A service-connectivity schedule records endpoint identity, initiating party, pro
 | Log ingestion | Named infrastructure/workload sender → authenticated collector interface on the selected service port. | Bound tenant/source identity, protect transport, minimize payload and separate search/admin permissions. |
 | Monitoring collection | Explicit push endpoint or authorized collector → named monitored target. | Required metrics only; no broad management reachability granted to tenant workloads. |
 
+<!-- SOURCE-BLOCK SVC:37 END -->
+
+<!-- SOURCE-BLOCK SVC:38 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:38 END -->
+
+<!-- SOURCE-BLOCK SVC:39 BEGIN -->
+
 DNS needs more than a successful small UDP answer. RFC 7766 requires TCP support for general-purpose DNS implementations and describes failures caused by blocking it. Qualify TCP directly and the transition from a truncated UDP response; test the selected resolver path for each offered address family. Encrypted DNS alternatives are separate approved profiles rather than an ungoverned bypass. \[[S38](07-references-parent-basis-and-external-context.md#SVC_src_S38)\]
+
+<!-- SOURCE-BLOCK SVC:39 END -->
+
+<!-- SOURCE-BLOCK SVC:40 BEGIN -->
 
 Separate recursive resolution, authoritative hosting, dynamic updates and transfer/replication duties. The address/name owner controls registration and deletion; workloads do not automatically gain zone-administration authority. The lifecycle records forward/reverse entries, delegation, TTLs, leases, source address history and reuse conditions. During migration, lower or change TTLs only through an accepted cutover plan and retain rollback/recovery identity information.
 
+<!-- SOURCE-BLOCK SVC:40 END -->
+
+<!-- SOURCE-BLOCK SVC:41 BEGIN -->
+
 A loss of trusted time can affect event correlation and certificate operation even where network forwarding continues. Record both event time and collector receipt time, clock-source health and an approved tolerance. The numeric tolerance is a site/service decision, not invented here. Define buffer capacity, export delay, sequence/loss indication, retention and alarms for telemetry; central collection failure must be visible without creating a network permit path.
+
+<!-- SOURCE-BLOCK SVC:41 END -->
+
+<!-- SOURCE-BLOCK SVC:42 BEGIN -->
 
 
 <a id="source-table-42"></a>
@@ -41,6 +75,16 @@ A loss of trusted time can affect event correlation and certificate operation ev
 | Collector unavailable | Preserve enforcement, buffer as supported and report loss/overflow. | Apply the accepted operating restriction; do not disable logging obligations silently. |
 | Repository unavailable | Existing approved images remain governed by lifecycle policy. | Do not substitute unverified images or open unrestricted egress to finish a build. |
 
+<!-- SOURCE-BLOCK SVC:42 END -->
+
+<!-- SOURCE-BLOCK SVC:43 BEGIN -->
+
+<!-- SOURCE-BLOCK SVC:43 END -->
+
+<!-- SOURCE-BLOCK SVC:44 BEGIN -->
+
 Related engineering: [Address-family and ownership decisions](../../engineering/fabric/4-address-naming-and-protocol-family-decisions.md#NET_s_004)  •  [Service parameter approval](../../assurance/site-qualification/4-service-parameter-and-requirement-decisions.md#QUAL_s_004)  •  [Activation services](../../implementation/provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md#PROV_s_004)
+
+<!-- SOURCE-BLOCK SVC:44 END -->
 
 [Previous chapter](1-shared-service-placement-and-consumption-boundaries.md) · [Chapter index](README.md) · [Next chapter](3-identity-certificates-keys-and-independent-recovery.md)

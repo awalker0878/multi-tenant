@@ -8,16 +8,44 @@
 <!-- source-sha256: cd901aaf004d45cf29ffe14ff955a0c9cf81f668be674e8d4de8c590303c62d8 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK AUD11:144 BEGIN -->
+
+<!-- SOURCE-BLOCK AUD11:144 END -->
+
+<!-- SOURCE-BLOCK AUD11:145 BEGIN -->
+
 Medium priority • Design inconsistency requiring applicability decision<br>Location: Chapter 48 p43; Chapter 61 pp54-55; CT-016 pp77-78
+
+<!-- SOURCE-BLOCK AUD11:145 END -->
+
+<!-- SOURCE-BLOCK AUD11:146 BEGIN -->
 
 Observed. Qualification calls for all applicable tests, while CT-016 requires two independently qualified adapters. The delivery roadmap first qualifies one platform and adds a second later. No machine-readable applicability rule explains when the two-platform test is required.
 
+<!-- SOURCE-BLOCK AUD11:146 END -->
+
+<!-- SOURCE-BLOCK AUD11:147 BEGIN -->
+
 Why it matters. A literal reading produces a circular prerequisite for first-platform qualification or encourages an undocumented N/A decision.
+
+<!-- SOURCE-BLOCK AUD11:147 END -->
+
+<!-- SOURCE-BLOCK AUD11:148 BEGIN -->
 
 Improve. Define stage/profile applicability: contract/offline checks, single-platform qualification, per-deployment checks, cross-platform portability qualification and operational exercises. First-platform approval must not imply cross-platform portability.
 
+<!-- SOURCE-BLOCK AUD11:148 END -->
+
+<!-- SOURCE-BLOCK AUD11:149 BEGIN -->
+
 Close when. The first platform qualifies without circular prerequisites; a portability claim is blocked until the separate two-platform test succeeds.
 
+<!-- SOURCE-BLOCK AUD11:149 END -->
+
+<!-- SOURCE-BLOCK AUD11:150 BEGIN -->
+
 Owner: Qualification and delivery owners
+
+<!-- SOURCE-BLOCK AUD11:150 END -->
 
 [Previous chapter](18-f16-requirement-to-test-links-do-not-yet-prove-assertion-level-coverage.md) · [Chapter index](README.md) · [Next chapter](20-f18-cadence-and-execution-status-records-need-reconciliation.md)

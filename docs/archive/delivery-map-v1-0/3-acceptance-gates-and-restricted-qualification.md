@@ -8,11 +8,25 @@
 <!-- source-sha256: e332c1b37e63439169adf8b105573577fa1ea61bf32f6c3ba383dd69d83a788b -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
+<!-- SOURCE-BLOCK DEL10:37 BEGIN -->
+
 <a id="DEL_03"></a>
+
+<!-- SOURCE-BLOCK DEL10:37 END -->
+
+<!-- SOURCE-BLOCK DEL10:38 BEGIN -->
 
 Gate numbers are identifiers, not an automatic chronological ladder. v1.4 requires applicable initial G4 readiness before G3 production activation. Qualification can use a separately authorized non-production fixture before G2 is complete.
 
+<!-- SOURCE-BLOCK DEL10:38 END -->
+
+<!-- SOURCE-BLOCK DEL10:39 BEGIN -->
+
 Baseline and related records: [WD §9](../../solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md#WD14_S09)  •  [QUAL §5](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
+
+<!-- SOURCE-BLOCK DEL10:39 END -->
+
+<!-- SOURCE-BLOCK DEL10:40 BEGIN -->
 
 
 <a id="source-table-40"></a>
@@ -27,6 +41,20 @@ Baseline and related records: [WD §9](../../solutions/internal-protected-worklo
 | G3 — Production activation | G0, G1, G2, applicable G4 initial; valid authority | Neither a workbook nor a Terraform exit code grants authority. |
 | G4 continuing — Continuing operations and reacceptance | Activated service; approved cadence and change triggers | Historical approval is not evidence for changed topology. |
 
+<!-- SOURCE-BLOCK DEL10:40 END -->
+
+<!-- SOURCE-BLOCK DEL10:41 BEGIN -->
+
+<!-- SOURCE-BLOCK DEL10:41 END -->
+
+<!-- SOURCE-BLOCK DEL10:42 BEGIN -->
+
 A gate record names the actual service/site/version scope, decision authority, evidence and conditions. Failed or missing evidence cannot be converted into acceptance merely by changing a spreadsheet status. Applicability decisions also require an accountable rationale.
+
+<!-- SOURCE-BLOCK DEL10:42 END -->
+
+<!-- SOURCE-BLOCK DEL10:43 BEGIN -->
+
+<!-- SOURCE-BLOCK DEL10:43 END -->
 
 [Previous chapter](2-deliverable-ownership-and-handoffs.md) · [Chapter index](README.md) · [Next chapter](4-working-records-examples-and-evidence.md)

@@ -78,7 +78,7 @@ Extract documented architecture choices into proposed ADRs, preserving original 
 
 A catalogue alone was insufficient for the requested Git documentation. One large Markdown file per original would preserve text but make review and linking cumbersome. Rewriting from general knowledge would obscure lineage and could change the supplied architecture. Chapter decomposition preserves the source organization while subject indexes connect related content.
 
-Markdown is the working review surface for this package. A future normative change must update the applicable architecture, ADR, engineering and verification references together. Frozen Word originals remain provenance, not a second automatically synchronized live authoring surface. Explicit source refresh overwrites converted chapter text and therefore belongs in a clean review branch, never an unattended production pipeline.
+Markdown is the working review surface for this package. A future normative change must update the applicable architecture, ADR, engineering and verification references together. Frozen Word originals remain provenance, not a second automatically synchronized live authoring surface. Source transcriptions are the initial baseline. Maintained Markdown changes use a reviewed block-amendment record. The converter refuses existing maintained chapters or nonempty amendments rather than overwriting them; regenerate source-only copies in a scratch directory.
 
 ## Scope and exclusions
 
@@ -88,85 +88,8 @@ This is not a new architecture approval, site design, live qualification, or ass
 
 Use {self.link(p,'docs/DOCUMENTATION_MIGRATION.md','the migration procedure')} and `python scripts/check_documentation.py` to verify source hashes, block coverage, images, tables, fields, links, decision identifiers and source-derived ADR status. Review architecture status separately from passing documentation checks.
 ''')
-        cross=[]; backlinks={}
-        for a in self.adrs:
-            p=self.adrpath(a);refs=' · '.join(self.slink(p,s,n) for s,n in a['source_sections'])
-            sourceids=', '.join('`'+x+'`' for x in a['source_decision_ids']) or 'No standalone source ID; extracted from the explicitly linked chapter decisions.'
-            reqs=' · '.join(self.link(p,'docs/assurance/requirements.md',x,x) for x in a['requirements'])
-            code='\n'.join('- '+self.link(p,x,x) for x in a['implementation_paths'])
-            text=f'''# {a['id']} — {a['title']}
-
-**Status:** {a['status']}<br>
-**Original decision identifiers:** {sourceids}<br>
-**Source chapters:** {refs}
-
-{a['derivation']} The original source remains linked below; this ADR does not record an approval meeting or invent an acceptance date.
-
-## Context
-
-{a['context']}
-
-## Decision recorded in the source
-
-{a['decision']}
-
-## Alternatives and limits recorded in the source
-
-{a['alternatives']}
-
-## Consequences
-
-{a['consequences']}
-
-## Engineering and implementation obligations
-
-{a['engineering_obligations']}
-
-## Requirement and code traceability
-
-{reqs}
-
-The following implementation areas are traceability targets, not proof that this decision has been qualified:
-
-{code}
-
-Review {self.link(p,'docs/implementation/code-map.md','the implementation coverage map')} and the target-specific evidence before asserting completion. A local fixture or static source check does not establish deployed behaviour.
-
-## Open decisions and acceptance
-
-{a['open_work']}
-
-Accepting authority: **not recorded**.<br>
-Acceptance evidence: **not supplied by this conversion**.<br>
-Supersession: no new source supersession is asserted. Record a future change explicitly rather than silently editing an accepted decision.
-
----
-
-{self.link(p,'docs/adr/README.md','Decision register')} · {self.link(p,'docs/DOCUMENTATION_MIGRATION.md','Source and maintenance rules')}
-'''
-            self.write(p,text)
-            for s,n in a['source_sections']:
-                target=self.section(s,n);backlinks.setdefault(target,[]).append(a)
-                cross.append({'adr':a['id'],'title':a['title'],'status':'Proposed','originalDecisionIds':'; '.join(a['source_decision_ids']), 'sourceId':s,'sourceSection':str(n),'markdownSource':target,'adrPath':p})
-        for target,items in backlinks.items():
-            p=self.root/target;txt=p.read_text()
-            txt=re.sub(re.escape(BEGIN)+r'.*?'+re.escape(END),'',txt,flags=re.S).rstrip()
-            block='\n\n'+BEGIN+'\n\n## Related decision records\n\n'+'\n'.join('- '+self.link(target,self.adrpath(a),a['id']+' — '+a['title']) for a in items)+'\n\n'+END+'\n'
-            p.write_text(txt+block)
-        path=self.root/'sources/documentation/adr_crosswalk.csv'
-        with path.open('w',newline='',encoding='utf-8') as f:
-            w=csv.DictWriter(f,fieldnames=list(cross[0]));w.writeheader();w.writerows(cross)
-        idx='docs/adr/README.md'
-        lines=['# Architecture decision register','',
-          'These are decisions from the architecture and engineering sources, not a generic list of software choices. Source-derived ADRs remain **proposed**. No organizational acceptance, product approval or live qualification is created by moving them into Git.',
-          '', 'The repository numbering and original source numbering are separate. AD-01–AD-15, RD14-01–RD14-05 and DEV-ADR-01 are mapped below; thematic decisions are linked to their source chapters without inventing a historical identifier.',
-          '', '| Record | Source decision | Source / status |','| --- | --- | --- |',
-          '| '+self.link(idx,'docs/adr/0001-architecture-first-repository.md','ADR-0001 — Repository structure')+' | Existing repository decision | Proposed; preserved |',
-          '| '+self.link(idx,'docs/adr/0002-markdown-first-source-backed-documentation.md','ADR-0002 — Markdown-first migration')+' | New editorial decision | Proposed publishing convention |']
-        for a in self.adrs:
-            lines.append('| '+self.link(idx,self.adrpath(a),a['id']+' — '+a['title'])+' | '+(', '.join(a['source_decision_ids']) or 'Chapter-derived')+' | '+self.slink(idx,*a['source_sections'][0])+'; proposed |')
-        lines+=['','## Add or change a decision','',self.link(idx,'docs/adr/template.md','Use the source-grounded ADR template')+'. Keep decision ownership, source basis, alternatives, constraints, implementation effects and approval status distinct. Add evidence only when it actually exists. See the '+self.link(idx,'sources/documentation/adr_crosswalk.csv','machine-readable crosswalk')+'.']
-        self.write(idx,'\n'.join(lines))
+        from documentation_controls import render_adrs
+        render_adrs(self)
         self.write('docs/adr/template.md','''# ADR-NNNN — Decision title
 
 Status: Proposed<br>
@@ -201,6 +124,8 @@ Link the exact requirement IDs, test assertions, code and actual evidence. Keep 
 ## Acceptance and supersession
 
 Record an actual accepting authority, scope, date and evidence only when supplied. Reference any superseded ADR; do not reuse an ID for a different decision.
+
+Canonical `governance` fields: `accountable_role`, `scope`, `recorded_date`, `decision_date`, `accepting_authority`, `evidence`, `rationale`, `supersedes`, `superseded_by`. Non-proposed states require actual authority/date/evidence; rejected or superseded decisions also require rationale. The successor must be adopted, and references reciprocal and cycle-free.
 ''')
         existing=self.root/'docs/adr/0001-architecture-first-repository.md'
         s=existing.read_text()
@@ -341,7 +266,7 @@ Read {self.slink(p,'RA',8,'the inter-domain boundary')} → {self.slink(p,'NBD',
 
 [Conversion coverage and maintenance](DOCUMENTATION_MIGRATION.md) records what was moved, what is historical and what source artifacts were unavailable. [The binary catalogue](ARTIFACT_CATALOG.md) remains for provenance and workbook access. The [implementation coverage map](implementation/code-map.md) distinguishes candidate code from actual platform qualification.
 
-Do not silently change inherited requirements while copying them into an ADR. Source-derived ADRs have no recorded organizational acceptance. Initial operational and promised recovery readiness remains a prerequisite to production activation—not a later paperwork step.
+Do not silently change inherited requirements while copying them into an ADR. Source-derived ADRs do not gain organizational acceptance merely by being published. Initial operational and promised recovery readiness remains a prerequisite to production activation—not a later paperwork step.
 ''')
 
     def code_map(self):

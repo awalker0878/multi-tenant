@@ -6,8 +6,14 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19 -->
+<!-- SOURCE-BLOCK RA:440 BEGIN -->
+
 <a id="__RefHeading___Toc3704_865363315"></a>
 <a id="RA_app_C"></a>
+
+<!-- SOURCE-BLOCK RA:440 END -->
+
+<!-- SOURCE-BLOCK RA:441 BEGIN -->
 
 
 <a id="source-table-441"></a>
@@ -37,5 +43,11 @@
 | Provisioning work package | An owned infrastructure change scope with prerequisites, execution authority, handoff and completion evidence |
 | Qualification / authorization | Evidence that a specific implementation meets an offered profile / a separately issued acceptance of system security risk |
 | Portable / composite / migrated | Equivalent deployment on another stack / one delivery using several stacks or shared services / transfer and cutover of actual workload/data state |
+
+<!-- SOURCE-BLOCK RA:441 END -->
+
+<!-- SOURCE-BLOCK RA:442 BEGIN -->
+
+<!-- SOURCE-BLOCK RA:442 END -->
 
 [Previous chapter](32-appendix-b-infrastructure-interface-schedule.md) · [Chapter index](README.md) · [Next chapter](34-appendix-d-sources-and-review-status.md)

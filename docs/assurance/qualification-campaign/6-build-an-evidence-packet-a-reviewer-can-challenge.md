@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 910b84a7b1772f27a456df31a09a96878a72e0f66c8f38cb7e5daaf79254007c -->
+<!-- SOURCE-BLOCK QCP:65 BEGIN -->
+
 <a id="QCP_06"></a>
+
+<!-- SOURCE-BLOCK QCP:65 END -->
+
+<!-- SOURCE-BLOCK QCP:66 BEGIN -->
 
 Evidence supports an assertion only when its target, scope, time and observation method match the claim.
 
+<!-- SOURCE-BLOCK QCP:66 END -->
+
+<!-- SOURCE-BLOCK QCP:67 BEGIN -->
+
 Design basis and related records: [RA §28](../../architecture/reference/28-architecture-acceptance-and-verification.md#RA_s_028)  •  [QUAL §5](../site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)  •  [IT §4](../../templates/implementation-mop/4-test-procedure-and-actual-execution-record.md#IT_04)
+
+<!-- SOURCE-BLOCK QCP:67 END -->
+
+<!-- SOURCE-BLOCK QCP:68 BEGIN -->
 
 
 <a id="source-table-68"></a>
@@ -23,12 +37,38 @@ Design basis and related records: [RA §28](../../architecture/reference/28-arch
 | Artifact integrity | Protected artifact reference, collection time, integrity identifier, custodian and access scope. | A filename or signature-reference string is treated as verified authenticity. |
 | Disposition | Passed, failed, blocked, not-run or approved not-applicable; reviewer, reasons and residual gaps. | Missing required evidence is reclassified as not-applicable merely to close a gate. |
 
+<!-- SOURCE-BLOCK QCP:68 END -->
+
+<!-- SOURCE-BLOCK QCP:69 BEGIN -->
+
+<!-- SOURCE-BLOCK QCP:69 END -->
+
+<!-- SOURCE-BLOCK QCP:70 BEGIN -->
+
 ## Worked review example
+
+<!-- SOURCE-BLOCK QCP:70 END -->
+
+<!-- SOURCE-BLOCK QCP:71 BEGIN -->
 
 A cross-tenant connection times out, but the same-tenant positive control also fails. The correct disposition is blocked pending a healthy control, not passed. After the endpoint is restored, repeat both observations and retain the original blocked record. A subsequent passing test is a new result; it does not rewrite what happened earlier.
 
+<!-- SOURCE-BLOCK QCP:71 END -->
+
+<!-- SOURCE-BLOCK QCP:72 BEGIN -->
+
 Evidence freshness follows material change as well as the approved interval. Recheck affected observations after routing, roles, group membership, backend, key custody or placement changes. Keep historical authorization separate from current technical status. A reviewer accepts the supported scope; software or a workbook does not issue risk authority.
 
+<!-- SOURCE-BLOCK QCP:72 END -->
+
+<!-- SOURCE-BLOCK QCP:73 BEGIN -->
+
 Continue with: [QCP §8](8-close-defects-and-issue-a-scoped-campaign-disposition.md#QCP_08)  •  [OPS §8](../../operations/recovery-transition/8-accept-operational-responsibility-for-the-delivered-scope.md#OPS_08)
+
+<!-- SOURCE-BLOCK QCP:73 END -->
+
+<!-- SOURCE-BLOCK QCP:74 BEGIN -->
+
+<!-- SOURCE-BLOCK QCP:74 END -->
 
 [Previous chapter](5-separate-safe-failure-service-continuity-and-recovery.md) · [Chapter index](README.md) · [Next chapter](7-compare-vendor-realizations-without-assuming-migration.md)

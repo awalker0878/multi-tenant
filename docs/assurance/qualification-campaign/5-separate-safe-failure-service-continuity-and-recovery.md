@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 910b84a7b1772f27a456df31a09a96878a72e0f66c8f38cb7e5daaf79254007c -->
+<!-- SOURCE-BLOCK QCP:56 BEGIN -->
+
 <a id="QCP_05"></a>
+
+<!-- SOURCE-BLOCK QCP:56 END -->
+
+<!-- SOURCE-BLOCK QCP:57 BEGIN -->
 
 Authorize the fault scope, workload limit and restoration plan before using these cards. Do not perform intrusive tests against unrelated production tenants.
 
+<!-- SOURCE-BLOCK QCP:57 END -->
+
+<!-- SOURCE-BLOCK QCP:58 BEGIN -->
+
 Design basis and related records: [NBD §7](../../engineering/network-boundaries/7-release-the-network-design-under-an-explicit-failure-model.md#NBD_07)  •  [QUAL §5](../site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)  •  [OPS §2](../../operations/recovery-transition/2-specify-dependency-loss-before-it-becomes-an-incident.md#OPS_02)
+
+<!-- SOURCE-BLOCK QCP:58 END -->
+
+<!-- SOURCE-BLOCK QCP:59 BEGIN -->
 
 
 <a id="source-table-59"></a>
@@ -22,10 +36,32 @@ Design basis and related records: [NBD §7](../../engineering/network-boundaries
 | Q11-11: uncertain provisioning outcome<br>CT-045, CT-046, CT-048 | In a disposable scope, interrupt a response or executor at an approved point. Freeze competing writes; discover actual native tasks and resources before recovery. | No duplicate allocation or unsafe deletion. Denied unfinished resources remain owned. Retain task, plan, state and actual-outcome reconciliation. |
 | Q11-12: isolated restore and cutover<br>CT-052, CT-053, CT-054, CT-060 | Restore a known disposable dataset and dependencies into the authorized recovery domain; validate consistency, identity/keys and paths before controlled activation. | Useful data and measured RTO/RPO; no ambiguous simultaneous writer; protection, return path and operating ownership survive cutover. |
 
+<!-- SOURCE-BLOCK QCP:59 END -->
+
+<!-- SOURCE-BLOCK QCP:60 BEGIN -->
+
+<!-- SOURCE-BLOCK QCP:60 END -->
+
+<!-- SOURCE-BLOCK QCP:61 BEGIN -->
+
 An edge can preserve security by denying traffic while failing its availability target. A backup can produce readable files while failing the required consistency point. Report these outcomes separately; do not collapse them into one green status.
+
+<!-- SOURCE-BLOCK QCP:61 END -->
+
+<!-- SOURCE-BLOCK QCP:62 BEGIN -->
 
 The safety envelope defines which failure is covered, who may stop the test, required surviving access, maximum permitted impact and restoration authority. A clean node shutdown does not represent every partition or overload; record the specific tested condition and any remaining untested scope.
 
+<!-- SOURCE-BLOCK QCP:62 END -->
+
+<!-- SOURCE-BLOCK QCP:63 BEGIN -->
+
 Continue with: [OPS §4](../../operations/recovery-transition/4-recover-the-service-in-dependency-order.md#OPS_04)  •  [OPS §5](../../operations/recovery-transition/5-calculate-the-recovery-critical-path-and-data-point.md#OPS_05)  •  [IT §5](../../templates/implementation-mop/5-recovery-exercise-and-data-acceptance.md#IT_05)
+
+<!-- SOURCE-BLOCK QCP:63 END -->
+
+<!-- SOURCE-BLOCK QCP:64 BEGIN -->
+
+<!-- SOURCE-BLOCK QCP:64 END -->
 
 [Previous chapter](4-observe-identity-storage-and-protocol-completeness.md) · [Chapter index](README.md) · [Next chapter](6-build-an-evidence-packet-a-reviewer-can-challenge.md)

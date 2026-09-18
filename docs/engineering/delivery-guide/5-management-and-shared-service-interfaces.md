@@ -6,11 +6,25 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 0aeb8ee0a114d3ed23e97c684cc9812a0fa6ea5252e49f0c902132bf4e053a7d -->
+<!-- SOURCE-BLOCK EK:49 BEGIN -->
+
 <a id="EK_05"></a>
+
+<!-- SOURCE-BLOCK EK:49 END -->
+
+<!-- SOURCE-BLOCK EK:50 BEGIN -->
 
 Every shared service needs a consumption interface, an administrative interface, an authorization model and a recovery dependency. Record the actual client; it may be a host, service appliance, data mover or workload.
 
+<!-- SOURCE-BLOCK EK:50 END -->
+
+<!-- SOURCE-BLOCK EK:51 BEGIN -->
+
 Baseline and related records: [SVC §1](../../architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md#SVC_s_001)  •  [SVC §2](../../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md#SVC_s_002)  •  [SVC §3](../../architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md#SVC_s_003)  •  [ET §6](../../templates/lld/6-management-services-and-trust.md#ET_06)
+
+<!-- SOURCE-BLOCK EK:51 END -->
+
+<!-- SOURCE-BLOCK EK:52 BEGIN -->
 
 
 <a id="source-table-52"></a>
@@ -24,10 +38,32 @@ Baseline and related records: [SVC §1](../../architecture/shared-services/1-sha
 | Backup and software supply | Capture API and transfer path; protected repository/catalogue; trusted images/packages and update source; publication versus retrieval authority. |
 | Bootstrap transition | Temporary service location, permitted scope, owner/expiry, steady-state migration and independent recovery retained after cleanup. |
 
+<!-- SOURCE-BLOCK EK:52 END -->
+
+<!-- SOURCE-BLOCK EK:53 BEGIN -->
+
+<!-- SOURCE-BLOCK EK:53 END -->
+
+<!-- SOURCE-BLOCK EK:54 BEGIN -->
+
 Define exact protocol configurations against the adopted security profile and applicable source editions. ITSP.40.062 is protocol-configuration guidance; use it with the selected algorithms and actual product modes rather than assuming an encryption checkbox proves a safe channel. \[K10\]
+
+<!-- SOURCE-BLOCK EK:54 END -->
+
+<!-- SOURCE-BLOCK EK:55 BEGIN -->
 
 External mechanism context: [K10 — Guidance on securely configuring network protocols (ITSP.40.062)](https://www.cyber.gc.ca/en/guidance/guidance-securely-configuring-network-protocols-itsp40062)
 
+<!-- SOURCE-BLOCK EK:55 END -->
+
+<!-- SOURCE-BLOCK EK:56 BEGIN -->
+
 A service handoff must include failure behaviour and operational ownership. “Another team will configure it later” is not an accepted dependency.
+
+<!-- SOURCE-BLOCK EK:56 END -->
+
+<!-- SOURCE-BLOCK EK:57 BEGIN -->
+
+<!-- SOURCE-BLOCK EK:57 END -->
 
 [Previous chapter](4-compute-storage-and-protected-data.md) · [Chapter index](README.md) · [Next chapter](6-capacity-mtu-performance-and-failure-analysis.md)

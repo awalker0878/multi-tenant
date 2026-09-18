@@ -6,12 +6,26 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 783edbba45483d0d3c3b966765589762698836320237906a0f9a60080574af37 -->
+<!-- SOURCE-BLOCK QUAL:92 BEGIN -->
+
 <a id="__RefHeading___Toc10047_1525915568"></a>
 <a id="QUAL_s_008"></a>
 
+<!-- SOURCE-BLOCK QUAL:92 END -->
+
+<!-- SOURCE-BLOCK QUAL:93 BEGIN -->
+
 Parent architecture: [RA §19](../../architecture/reference/19-physical-workloads-and-future-platform-extensions.md#RA_s_019)  •  [RA §29](../../architecture/reference/29-architecture-decisions-and-alternatives.md#RA_s_029)  •  [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)
 
+<!-- SOURCE-BLOCK QUAL:93 END -->
+
+<!-- SOURCE-BLOCK QUAL:94 BEGIN -->
+
 Bare metal, containers, accelerators, cross-vendor overlay federation, L2 stretch and higher-assurance extensions are not silently promoted into the base offered service. An extension supplies its own component topology, trust/failure boundaries, actual supported stack, provisioning ownership, service parameters and applicable qualification. Reusing the WSD terminology does not make a container namespace or physical port a complete security boundary. \[[B2](09-references-parent-basis-and-external-context.md#QUAL_src_B2) §19\]
+
+<!-- SOURCE-BLOCK QUAL:94 END -->
+
+<!-- SOURCE-BLOCK QUAL:95 BEGIN -->
 
 
 <a id="source-table-95"></a>
@@ -24,10 +38,28 @@ Bare metal, containers, accelerators, cross-vendor overlay federation, L2 stretc
 | L2 stretch or composite cross-stack | Actual gateway/partition/fencing, latency, failure coupling and ownership. | Accepted variation with no bypass or unsupported availability promise. |
 | HRZ/higher assurance | Source applicability, infrastructure dedication/control scope and explicit approval. | Not a base portable cloud offering; separate authorized design. |
 
+<!-- SOURCE-BLOCK QUAL:95 END -->
+
+<!-- SOURCE-BLOCK QUAL:96 BEGIN -->
+
+<!-- SOURCE-BLOCK QUAL:96 END -->
+
+<!-- SOURCE-BLOCK QUAL:97 BEGIN -->
+
 Maintain the document family as one versioned architecture release. Change the parent when a durable design decision changes; update the relevant supplement when an engineering pattern or evidence interface changes; update the site/as-built record when actual values or resources change. A supplement must not silently weaken the parent. A detected conflict remains open until resolved by the appropriate architecture/security authority.
+
+<!-- SOURCE-BLOCK QUAL:97 END -->
+
+<!-- SOURCE-BLOCK QUAL:98 BEGIN -->
 
 The release package includes the gap map, primary-home crosswalk, source review status, baseline requirements/tests and reproducible document-generation source. Automated package checks verify identifiers and links, not deployed safety. Future maintainers should update fields after editing and rerun rendering/link checks before release, then re-evaluate which installed environments are affected.
 
+<!-- SOURCE-BLOCK QUAL:98 END -->
+
+<!-- SOURCE-BLOCK QUAL:99 BEGIN -->
+
 Related engineering: [Document precedence](../gap-map/1-document-family-scope-and-precedence.md#GM_s_001)  •  [Knowledge ownership and maintenance](../gap-map/2-primary-knowledge-homes-and-cross-cutting-changes.md#GM_s_002)
+
+<!-- SOURCE-BLOCK QUAL:99 END -->
 
 [Previous chapter](7-operating-accountability-handover-and-change.md) · [Chapter index](README.md) · [Next chapter](09-references-parent-basis-and-external-context.md)
