@@ -48,6 +48,10 @@ jobs:
         run: python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
       - name: IPAM allocation preflight must remain held without parent reservation
         run: python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
+      - name: Exported DNS registrations remain authoritative-service evidence
+        run: python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
+      - name: DNS registration preflight must remain held without confirmed IPAM
+        run: python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
