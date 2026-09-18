@@ -30,6 +30,8 @@ The current registry intentionally yields no production-eligible platform becaus
 
 When a native campaign is completed, update the selected product tuple, attach controlled external evidence references, and record only the capabilities actually demonstrated for that tuple. Assurance-profile eligibility must be recorded separately and cannot be inferred from a product family name.
 
+Before any such update is accepted, the exact tuple must have a current [native PlatformProfile qualification dossier](platform-native-qualification.md). The registry checker cross-validates native-qualified claims and assurance profiles against that active dossier index; directly editing a qualification flag is insufficient.
+
 ## Relationship to implementation work
 
 This registry complements, rather than replaces, the implementation backlog and commissioning kit. The backlog identifies still-open native edge, service, IPv6, recovery, and activation work. The commissioning kit identifies the site inputs and acceptance sequence. The registry provides a machine-readable place to record the resulting qualified capabilities once that evidence exists.
