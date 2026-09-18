@@ -50,3 +50,7 @@ The [I08 packet extension](docs/implementation/routed-ipv6-lab.md) exercises the
 ## Known native task-tree verification
 
 The [I09 Nutanix task-tree extension](docs/implementation/nutanix-task-tree-readback.md) observes explicitly recorded parent/child work without discovery, cancellation or mutation. Its [engineering profile](docs/engineering/nutanix-task-tree-readback.md) keeps incomplete children, failed tasks, native resource differences and actual fencing obligations separate from a successful parent label.
+
+## Platform capability evidence
+
+The [machine-readable platform capability registry](docs/engineering/platform-capability-registry.md) records candidate implementation coverage separately from native qualification. Current entries fail closed for placement because no installed platform tuple has completed native qualification; local source or fixtures are not promoted to production capability evidence.

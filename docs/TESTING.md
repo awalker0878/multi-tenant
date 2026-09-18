@@ -116,3 +116,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Known-task-tree readback campaign
 
 `python lab/run_task_tree_lab.py --execute` runs 18 fixed loopback-HTTPS readback/recovery cases, including the actual CLI and private report handling. `tests/test_nutanix_task_tree.py` adds the overlapping unit and negative cases. Task/resource bodies and external control records are scripted; no native target, task submission/cancellation or real writer fencing is involved. See the [candidate profile and limits](engineering/nutanix-task-tree-readback.md). The repository CI job executes this campaign and uploads its exact-source report alongside other local results.
+
+## Platform capability registry
+
+`python scripts/check_platform_capabilities.py` validates the machine-readable engineering registry without contacting a platform or performing placement. Repository code, provider locks, documentation and local fixtures may support `CANDIDATE_SOURCE` or `LOCAL_FIXTURE_ONLY` states, but only a selected installed tuple with separately controlled native evidence can become `NATIVE_QUALIFIED`. The current registry intentionally has zero production-eligible platforms.

@@ -1,0 +1,19 @@
+{
+  "id": "PORT-REGISTRY-01",
+  "status": "IMPLEMENTED_ENGINEERING_REGISTRY_NATIVE_QUALIFICATION_OPEN",
+  "parent_requirements": ["PORT-001", "PORT-002"],
+  "registry": "sources/capabilities/platform_registry.json",
+  "checker": "scripts/check_platform_capabilities.py",
+  "documentation": "docs/engineering/platform-capability-registry.md",
+  "current_native_qualified_claims": 0,
+  "production_eligible_platforms": [],
+  "native_remaining": [
+    "Select exact installed platform/API/provider/licence tuple",
+    "Execute applicable native conformance and failure tests",
+    "Bind controlled native evidence references to demonstrated capabilities",
+    "Record assurance-profile eligibility without inferring it from product family"
+  ],
+  "placement_authority": "NOT_IMPLEMENTED_BY_THIS_WORK",
+  "native_contact": "NOT_RUN",
+  "formal_authorization": "NOT_ISSUED"
+}

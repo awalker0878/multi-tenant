@@ -1,0 +1,74 @@
+{
+  "format": "portable-hosting-capability-registry/1",
+  "status": "ENGINEERING_EVIDENCE_REGISTRY_NOT_PLACEMENT_AUTHORITY",
+  "reviewed_source_revision": "c2d7bd95286553a2f1d46dde9a911910341561b4",
+  "qualification_rule": "Only NATIVE_QUALIFIED capabilities may satisfy mandatory placement requirements.",
+  "capability_ids": [
+    "network_domain",
+    "ipv4",
+    "ipv6",
+    "distributed_firewall",
+    "gateway_policy",
+    "dynamic_routing",
+    "service_insertion",
+    "native_load_balancer",
+    "dedicated_edge_context",
+    "audit_logging"
+  ],
+  "profiles": {
+    "nutanix": {
+      "platform_family": "Nutanix AHV / Flow",
+      "product_tuple": "UNSELECTED",
+      "terraform_providers": ["nutanix/nutanix = 2.4.2"],
+      "assurance_profiles": [],
+      "capabilities": {
+        "network_domain": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/nutanix-domain","docs/engineering/platform-build/3-nutanix-realize-a-tenant-and-its-workload-domains.md"],"native_evidence_refs":[]},
+        "ipv4": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/nutanix-domain","terraform/modules/nutanix-route"],"native_evidence_refs":[]},
+        "ipv6": {"source_state":"LOCAL_FIXTURE_ONLY","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/routed-ipv6-qualification.md"],"native_evidence_refs":[]},
+        "distributed_firewall": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/platform-build/3-nutanix-realize-a-tenant-and-its-workload-domains.md"],"native_evidence_refs":[]},
+        "gateway_policy": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/16-nutanix-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "dynamic_routing": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/16-nutanix-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "service_insertion": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/16-nutanix-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "native_load_balancer": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/16-nutanix-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "dedicated_edge_context": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/vendor-cards/2-nutanix-realization-card.md"],"native_evidence_refs":[]},
+        "audit_logging": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md"],"native_evidence_refs":[]}
+      }
+    },
+    "vmware-nsx": {
+      "platform_family": "VMware vSphere / NSX",
+      "product_tuple": "UNSELECTED",
+      "terraform_providers": ["hashicorp/vsphere = 2.12.0","vmware/nsxt = 3.10.0"],
+      "assurance_profiles": [],
+      "capabilities": {
+        "network_domain": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/nsx-domain","docs/engineering/platform-build/5-vmware-nsx-bind-domain-workload-and-policy-lifecycles.md"],"native_evidence_refs":[]},
+        "ipv4": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/nsx-domain","terraform/modules/nsx-route"],"native_evidence_refs":[]},
+        "ipv6": {"source_state":"LOCAL_FIXTURE_ONLY","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/routed-ipv6-qualification.md"],"native_evidence_refs":[]},
+        "distributed_firewall": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/nsx-domain"],"native_evidence_refs":[]},
+        "gateway_policy": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/nsx-gateway-quarantine"],"native_evidence_refs":[]},
+        "dynamic_routing": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/platform-build/4-vmware-nsx-commission-transport-compute-and-edge-roles.md"],"native_evidence_refs":[]},
+        "service_insertion": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "native_load_balancer": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "dedicated_edge_context": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/vendor-cards/3-vmware-and-nsx-realization-card.md"],"native_evidence_refs":[]},
+        "audit_logging": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md"],"native_evidence_refs":[]}
+      }
+    },
+    "openstack": {
+      "platform_family": "OpenStack",
+      "product_tuple": "UNSELECTED",
+      "terraform_providers": ["terraform-provider-openstack/openstack = 3.4.0"],
+      "assurance_profiles": [],
+      "capabilities": {
+        "network_domain": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/openstack-domain","docs/engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md"],"native_evidence_refs":[]},
+        "ipv4": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/openstack-domain","terraform/modules/openstack-route"],"native_evidence_refs":[]},
+        "ipv6": {"source_state":"LOCAL_FIXTURE_ONLY","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/routed-ipv6-qualification.md"],"native_evidence_refs":[]},
+        "distributed_firewall": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md"],"native_evidence_refs":[]},
+        "gateway_policy": {"source_state":"CANDIDATE_SOURCE","qualification":"NOT_QUALIFIED","evidence_refs":["terraform/modules/openstack-domain","terraform/modules/openstack-route"],"native_evidence_refs":[]},
+        "dynamic_routing": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/18-openstack-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "service_insertion": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/18-openstack-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "native_load_balancer": {"source_state":"UNASSESSED","qualification":"NOT_QUALIFIED","evidence_refs":["docs/architecture/reference/18-openstack-hosting-stack-reference-realization.md"],"native_evidence_refs":[]},
+        "dedicated_edge_context": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/engineering/vendor-cards/4-openstack-realization-card.md"],"native_evidence_refs":[]},
+        "audit_logging": {"source_state":"DOCUMENTED_EXPECTATION","qualification":"NOT_QUALIFIED","evidence_refs":["docs/assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md"],"native_evidence_refs":[]}
+      }
+    }
+  }
+}
