@@ -64,6 +64,10 @@ class NavigationIntegrationTests(unittest.TestCase):
         text = self.navigation()['docs/engineering/README.md']
         self.assertIn('control-inheritance-and-external-dependency-assurance.md', text)
 
+    def test_operational_handover_navigation_survives_regeneration(self):
+        text = self.navigation()['docs/engineering/README.md']
+        self.assertIn('operational-handover-and-incident-readiness-assurance.md', text)
+
     def test_all_three_work_packages_survive_regeneration(self):
         text = self.navigation()['docs/implementation/README.md']
         for destination in ('routed-ipv6-lab.md', 'nutanix-task-tree-readback.md', 'native-reference/README.md'):
@@ -89,6 +93,8 @@ class NavigationIntegrationTests(unittest.TestCase):
         self.assertTrue(any('scripts/check_backup_restore_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_control_inheritance_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_control_inheritance_readiness.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_operational_handover_assurance.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_operational_handover_readiness.py' in s for s in commands))
         self.assertTrue(any('lab/run_task_tree_lab.py --execute' in s for s in commands))
         self.assertTrue(any('tools/check_local.py' in s for s in commands))
 
