@@ -40,6 +40,10 @@ jobs:
         run: python scripts/check_site_service_capacity.py > build/reports/site_service_capacity_index.json
       - name: Site service-capacity precheck must remain held without commissioned envelopes
         run: python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
+      - name: Exported reservation records remain external-authority evidence
+        run: python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
+      - name: Reservation preflight must remain held without eligible envelope
+        run: python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
