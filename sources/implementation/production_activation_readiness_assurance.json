@@ -1,0 +1,30 @@
+{
+  "id": "PRODUCTION-ACTIVATION-READINESS-ASSURANCE-01",
+  "source_baseline_commit": "330fdd053ff1809519094857cf3cc06576381184",
+  "status": "IMPLEMENTED_ACTIVATION_LIFECYCLE_EVIDENCE_GATE_NO_PRODUCTION_MUTATION",
+  "backlog_ids": ["I10"],
+  "requirements": ["AUTO-002", "ONB-001", "REL-001", "REC-002", "ACPT-001", "EXP-001"],
+  "assurance_index": "sources/capabilities/production_activation_assurance_index.json",
+  "checker": "scripts/check_production_activation_assurance.py",
+  "preflight": "scripts/check_production_activation_readiness.py",
+  "engineering": "docs/engineering/production-activation-and-initial-readiness-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_release_quarantine": false,
+    "may_change_exposure": false,
+    "may_activate": false,
+    "may_withdraw_sessions": false,
+    "may_apply": false,
+    "may_delete": false
+  },
+  "remaining_native_work": [
+    "bind the exact site/service/platform/workload/exposure scope to accepted G0/G1/G2 and applicable initial G4 evidence",
+    "obtain current operating authority and attributable activation decision",
+    "retain current capacity/reservation/address/security-edge/control/protection/reconciliation/family/handover prerequisite evidence",
+    "prove recovery, monitoring, owner/on-call, credential custody and incident readiness before G3",
+    "prepare and test reversible exposure withdrawal that preserves owned data/evidence",
+    "execute any activation outside this repository under the authorized change",
+    "record immediate live entry/reply, dependency and telemetry observations; withdraw failed/unknown exposure"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
