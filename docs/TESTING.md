@@ -125,3 +125,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Pre-placement platform-family eligibility
 
 `python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM` verifies that the current WSD capability precheck remains fail-closed because no platform capability is natively qualified. Without `--expected-status`, a held request exits nonzero. This check does not validate requester authority, site/cell/pool selection, quota, surviving capacity, storage/key/recovery compatibility, native placement or production activation.
+
+
+## Current implementation status overlay
+
+`python scripts/check_current_implementation_status.py` validates the maintained I01–I10 status source, exact historical backlog Git blob, repository evidence references and checked-in rendered page. It rejects missing/reordered items, broken references, non-open/hold states and any claim of native target contact, native qualification or formal authorization. This is a repository-status consistency gate; it does not contact infrastructure.
