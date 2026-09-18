@@ -13,10 +13,60 @@ import unittest
 from scripts import check_platform_qualification as qualification
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as eligibility
+from scripts import check_version_source_provenance as provenance
 
 ROOT=Path(__file__).resolve().parents[1]
 AS_OF=datetime(2026,9,18,18,0,tzinfo=timezone.utc)
 EXAMPLE=ROOT/'examples/site_service_capacity_request.json.example'
+
+
+def provenance_record():
+    kinds=sorted(provenance.BASE_REQUIRED_KINDS)
+    return {
+        'provenance_id':'PROV-NUTANIX-SYNTHETIC-01',
+        'generation':1,
+        'state':'CURRENT_SUPPORTED',
+        'platform':'nutanix',
+        'product_tuple_id':'nutanix-fixture-tuple',
+        'product_tuple':{
+            'product':'fixture-product','product_version':'1.0','api':'fixture-api',
+            'api_version':'1.0','automation_providers':['fixture/provider = 1.0'],
+            'hardware_profile_ref':'controlled-record:fixture-hardware','feature_licenses':[]},
+        'source_reviews':[{
+            'source_id':f'SRC-{kind}','kind':kind,'edition':f'fixture-{kind.lower()}',
+            'review_state':'CURRENT_REVIEWED','reviewed_at':'2026-09-17T08:00:00Z',
+            'valid_until':'2026-12-31T23:59:59Z',
+            'evidence_ref':f'controlled-source-evidence:{kind.lower()}',
+            'limitation':'Synthetic unit-test source review only.'
+        } for kind in kinds],
+        'compatibility':{
+            'compatibility_record_ref':'controlled-compatibility:fixture',
+            'assessed_at':'2026-09-17T10:00:00Z','valid_until':'2026-12-31T23:59:59Z',
+            'product_api_evidence_ref':'controlled-evidence:product-api',
+            'provider_evidence_refs':['controlled-evidence:provider'],
+            'hardware_evidence_ref':'controlled-evidence:hardware',
+            'operation_coverage_ref':'controlled-evidence:operation-coverage',
+            'feature_entitlement_evidence_refs':[],'exceptions':[]},
+        'lifecycle':{
+            'support_status':'SUPPORTED','support_evidence_ref':'controlled-support:fixture',
+            'reviewed_at':'2026-09-17T11:00:00Z','review_by':'2026-12-31T23:59:59Z',
+            'support_end_at':None,'vulnerability_owner_ref':'controlled-owner:vulnerability',
+            'lifecycle_decision_ref':'controlled-decision:continue-supported'},
+        'owners':{
+            'platform_engineering_role':'Fixture platform engineering',
+            'architecture_role':'Fixture architecture',
+            'vulnerability_management_role':'Fixture vulnerability management'},
+        'exclusions':['Synthetic unit-test provenance only'],
+        'source_refs':[
+            'docs/engineering/version-source-provenance-and-lifecycle-assurance.md',
+            'docs/engineering/platform-realizations/7-implementation-tuple-and-decision-package.md']
+    }
+
+
+def provenance_index():
+    value=provenance.load()
+    value['records']=[provenance_record()]
+    return value
 
 
 def qrecord():
@@ -129,7 +179,7 @@ class SiteCapacityIndexTests(unittest.TestCase):
         self.assertEqual(result['current_service_envelopes'],0)
 
     def test_complete_synthetic_envelope_is_valid(self):
-        result=capacity.validate(index(),qindex=qindex(),as_of=AS_OF)
+        result=capacity.validate(index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['current_service_envelopes'],1)
         dims={x['id']:x for x in result['records'][0]['dimensions']}
         self.assertEqual(dims['memory_gib']['available_after_failure_and_reserve'],'65')
@@ -139,25 +189,25 @@ class SiteCapacityIndexTests(unittest.TestCase):
         r=site_record();d=r['dimensions'][0]
         d.update(existing_commitment='20',reserved='20',consumed='20')
         idx=capacity.load();idx['records']=[r]
-        result=capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        result=capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         dim=next(x for x in result['records'][0]['dimensions'] if x['id']=='memory_gib')
         self.assertEqual(dim['available_after_failure_and_reserve'],'65')
 
     def test_existing_commitment_must_cover_reporting_observations(self):
         r=site_record();r['dimensions'][0]['existing_commitment']='9'
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
 
     def test_lifecycle_inventory_states_do_not_gain_invented_monotonic_semantics(self):
         r=site_record();r['dimensions'][0].update(received='80',staged='120',commissioned='90')
         idx=capacity.load();idx['records']=[r]
-        result=capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        result=capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['current_service_envelopes'],1)
 
     def test_surviving_measurement_is_not_compared_to_generic_commissioned_count(self):
         r=site_record();r['dimensions'][0].update(measured_surviving_capacity='111',commissioned='90')
         idx=capacity.load();idx['records']=[r]
-        result=capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        result=capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['current_service_envelopes'],1)
 
     def test_overcommitted_dimension_is_rejected(self):
@@ -165,27 +215,27 @@ class SiteCapacityIndexTests(unittest.TestCase):
             measured_surviving_capacity='30',operational_reserve='10',
             existing_commitment='20',unavailable_capacity='1')
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
 
     def test_expired_measurement_is_rejected(self):
         r=site_record();r['capacity_expires_at']='2026-09-18T17:59:59Z'
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
 
     def test_wrong_qualification_record_is_rejected(self):
         r=site_record();r['qualification_record_id']='QUAL-OTHER'
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
 
     def test_assurance_cannot_exceed_qualification_scope(self):
         r=site_record();r['assurance_profiles'].append('UNQUALIFIED')
         idx=capacity.load();idx['records']=[r]
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
 
     def test_duplicate_active_envelope_rejected(self):
         idx=capacity.load();idx['records']=[site_record(),deepcopy(site_record())]
         idx['records'][1]['id']='SITE-CELL-SC-FIXTURE-02'
-        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),as_of=AS_OF)
+        with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
 
 
 class SiteEligibilityTests(unittest.TestCase):
@@ -196,7 +246,7 @@ class SiteEligibilityTests(unittest.TestCase):
         self.assertEqual(result['matching_envelopes'],[])
 
     def test_complete_envelope_matches_without_reservation(self):
-        result=eligibility.evaluate(request(),index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(request(),index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['status'],eligibility.MATCH)
         self.assertEqual(result['matching_envelopes'],['SITE-CELL-SC-FIXTURE-01'])
         for key in ('may_select_site','may_reserve_capacity','may_allocate',
@@ -206,41 +256,41 @@ class SiteEligibilityTests(unittest.TestCase):
 
     def test_one_capacity_bottleneck_blocks_whole_envelope(self):
         r=request();next(x for x in r['capacity_demands'] if x['id']=='edge_sessions')['quantity']='4000'
-        result=eligibility.evaluate(r,index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(r,index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['status'],eligibility.HOLD)
         self.assertIn('surviving_capacity:edge_sessions',result['evaluations'][0]['blockers'])
 
     def test_quota_bottleneck_blocks_even_when_capacity_fits(self):
         r=request();d=next(x for x in r['capacity_demands'] if x['id']=='memory_gib')
         d['quota_remaining']='5'
-        result=eligibility.evaluate(r,index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(r,index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['status'],eligibility.HOLD)
         self.assertIn('quota:memory_gib',result['evaluations'][0]['blockers'])
 
     def test_missing_dimension_blocks(self):
         idx=index();idx['records'][0]['dimensions']=[
             d for d in idx['records'][0]['dimensions'] if d['id']!='attachment_slots']
-        result=eligibility.evaluate(request(),idx,qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(request(),idx,qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertIn('capacity_dimension:attachment_slots:missing',result['evaluations'][0]['blockers'])
 
     def test_unit_mismatch_blocks(self):
         r=request();r['capacity_demands'][0]['unit']='MiB'
-        result=eligibility.evaluate(r,index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(r,index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertIn('capacity_dimension:memory_gib:unit',result['evaluations'][0]['blockers'])
 
     def test_profile_mismatch_blocks(self):
         r=request();r['required_profile_refs']['storage']='controlled-profile:different-storage'
-        result=eligibility.evaluate(r,index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(r,index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertIn('profile:storage',result['evaluations'][0]['blockers'])
 
     def test_assurance_mismatch_blocks(self):
         r=request();r['required_assurance_profile']='OTHER'
-        result=eligibility.evaluate(r,index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(r,index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertIn('assurance_profile:OTHER',result['evaluations'][0]['blockers'])
 
     def test_candidate_site_filter_does_not_expand_scope(self):
         r=request();r['candidate_sites']=['other-site']
-        result=eligibility.evaluate(r,index(),qindex=qindex(),as_of=AS_OF)
+        result=eligibility.evaluate(r,index(),qindex=qindex(),provenance_index=provenance_index(),as_of=AS_OF)
         self.assertEqual(result['evaluations'],[])
         self.assertEqual(result['status'],eligibility.HOLD)
 
