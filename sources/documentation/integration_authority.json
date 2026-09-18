@@ -1,0 +1,64 @@
+{
+  "kind": "DOCUMENTATION_INTEGRATION_AUTHORITY",
+  "status": "Repository consistency map, not architecture approval",
+  "audited_main": "5230619fa3e4dbb997166aaeb76473d87a8ed880",
+  "canonical": {
+    "adr_records": "sources/documentation/adr_records.json",
+    "adr_logic": "scripts/adr_lifecycle.py",
+    "maintained_design_records": "sources/documentation/current_design_records.json",
+    "maintained_design_directory": "docs/current",
+    "source_structure_checker": "scripts/documentation_structure.py",
+    "allocation": "sources/assurance/implementation_assertions.json",
+    "assurance_builder": "scripts/build_assurance_indexes.py",
+    "history": "sources/assurance/historical_audit_dispositions.csv"
+  },
+  "path_aliases": [
+    {
+      "id": "ADR-0037",
+      "path": "docs/adr/0037-keep-attributable-telemetry-independent-and-define-collection-loss-behaviour.md",
+      "target": "docs/adr/0037-define-independent-telemetry-and-collection-loss-behaviour.md",
+      "previous_blob_sha256": "7960cb027c094f821e9ca707a21411ef1b04ff5b6e536ffecfb22ad88cf4f0be"
+    },
+    {
+      "id": "ADR-0038",
+      "path": "docs/adr/0038-govern-image-and-privileged-dependency-provenance-across-their-lifecycle.md",
+      "target": "docs/adr/0038-govern-images-and-privileged-dependency-provenance-across-their-lifecycle.md",
+      "previous_blob_sha256": "ce7acf55cf4e2a733bd2b561c567aa15ebb7e62d44eb20365966c7889d508540"
+    }
+  ],
+  "historical_views": [
+    {
+      "path": "docs/assurance/implementation-allocation.md",
+      "target": "docs/implementation/assertion-allocation.md",
+      "reason": "Earlier 370-row allocation proposal; the maintained allocation is the 540-row implementation_assertions record.",
+      "previous_blob_sha256": "336d63dd01241649f73f3de5b99e54cc4b2f695851c26665423a29a36dd710cb",
+      "archived_path": "sources/assurance/history/implementation-allocation.md.txt"
+    },
+    {
+      "path": "docs/assurance/historical-findings.md",
+      "target": "docs/assurance/historical-dispositions.md",
+      "reason": "Earlier finding-disposition view; use the maintained CSV-backed view and its unchanged not-closed status.",
+      "previous_blob_sha256": "b980f0c78be45bed462a163e6794c95d51e1c1ab9bf3b5753aacc1ae53c0afe6",
+      "archived_path": "sources/assurance/history/historical-findings.md.txt"
+    },
+    {
+      "path": "docs/assurance/completion-audit.md",
+      "target": "docs/assurance/completion-corrections.md",
+      "reason": "Earlier corrective proposal and preparation state; not the current merged revision or current engine evidence.",
+      "previous_blob_sha256": "d4cc366b285cef4763325ec72a0e64fd69c1bc81f3b71e96e2a8926bb0dc83cd",
+      "archived_path": "sources/assurance/history/completion-audit.md.txt"
+    }
+  ],
+  "retained_inactive_records": [
+    "sources/assurance/implementation_allocation.json",
+    "sources/assurance/implementation_allocation.csv",
+    "sources/assurance/historical_findings.json"
+  ],
+  "retired_writer": "scripts/record_doc_amendment.py",
+  "inactive_amendments": "sources/documentation/amendments.json",
+  "historical_evidence": [
+    "evidence/completion-audit-local",
+    "evidence/completion-corrections"
+  ],
+  "note": "No schema alias is silently converted into an acceptance. Original Word sources and native infrastructure code remain unchanged."
+}

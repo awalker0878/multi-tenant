@@ -17,31 +17,63 @@ def substantive(value):
 
 
 def validate(records):
-    errors=[]; byid={a['id']:a for a in records}
-    if len(byid)!=len(records): errors.append('Duplicate ADR identifier')
+    """Validate the single maintained record format without inventing authority.
+
+    Proposed records cannot carry a completed lifecycle decision. Historical field
+    aliases are rejected rather than silently translated into acceptance metadata.
+    The directed superseded_by link must resolve and terminate at an Accepted ADR;
+    its inverse is derived, not maintained as a second conflicting list.
+    """
+    errors=[]; byid={}
+    if not isinstance(records,list) or not records:
+        return ['ADR records must be a nonempty list']
+    allowed={'accountable_role','scope','deciding_authority','decision_date',
+             'decision_record','evidence_refs','decision_rationale','superseded_by'}
     for a in records:
-        key=a['id']; state=a.get('status'); meta=a.get('governance',{})
-        if state not in STATES: errors.append(key+': unknown lifecycle state')
+        if not isinstance(a,dict) or not isinstance(a.get('id'),str) or not re.fullmatch(r'ADR-\d{4}',a['id']):
+            errors.append('Invalid ADR record identity');continue
+        key=a['id']
+        if key in byid:errors.append(key+': duplicate ADR identifier')
+        byid[key]=a
+    for key,a in byid.items():
+        state=a.get('status');meta=a.get('governance')
+        if not isinstance(state,str) or state not in STATES:
+            errors.append(key+': unknown lifecycle state');continue
+        if not isinstance(meta,dict):errors.append(key+': governance object required');continue
+        if set(meta)!=allowed:errors.append(key+': missing or unrecognized governance fields')
         for name in ('accountable_role','scope'):
             if not substantive(meta.get(name)):errors.append(key+': missing '+name)
-        if state in {'Accepted','Superseded','Rejected'}:
+        evidence=meta.get('evidence_refs')
+        if not isinstance(evidence,list) or not all(substantive(x) for x in evidence):
+            errors.append(key+': evidence references must be a list of non-placeholder strings')
+        elif len(evidence)!=len(set(evidence)):
+            errors.append(key+': duplicate evidence reference')
+        if state=='Proposed':
+            if any(meta.get(name) is not None for name in
+                   ('deciding_authority','decision_record','decision_date','decision_rationale')) or evidence!=[]:
+                errors.append(key+': Proposed record cannot contain a recorded lifecycle decision')
+        else:
             for name in ('deciding_authority','decision_record','decision_date','decision_rationale'):
                 if not substantive(meta.get(name)):errors.append(key+': missing '+name)
             try:
                 value=date.fromisoformat(meta.get('decision_date',''))
                 if value>date.today():errors.append(key+': decision date in the future')
             except (ValueError,TypeError):errors.append(key+': invalid decision date')
-            if not isinstance(meta.get('evidence_refs'),list) or not meta['evidence_refs'] or not all(substantive(x) for x in meta['evidence_refs']):
-                errors.append(key+': evidence references required')
+            if not evidence:errors.append(key+': evidence references required')
         successor=meta.get('superseded_by')
+        if successor is not None and (not isinstance(successor,str) or not re.fullmatch(r'ADR-\d{4}',successor)):
+            errors.append(key+': invalid successor type');continue
         if state=='Superseded':
             if successor==key or successor not in byid:errors.append(key+': invalid successor')
-            elif byid[successor]['status'] not in {'Accepted','Superseded'}:errors.append(key+': successor not accepted')
-        elif successor:errors.append(key+': only a superseded record can name a successor')
+            elif byid[successor].get('status') not in ('Accepted','Superseded'):errors.append(key+': successor not accepted')
+        elif successor is not None:errors.append(key+': only a superseded record can name a successor')
+    # Shape errors are reported above. Walk only well-typed edges, with a finite bound.
+    for key in byid:
         chain=set();at=key
-        while at in byid:
+        while isinstance(at,str) and at in byid:
             if at in chain:errors.append(key+': supersession cycle');break
-            chain.add(at);at=byid[at].get('governance',{}).get('superseded_by')
+            chain.add(at);meta=byid[at].get('governance')
+            at=meta.get('superseded_by') if isinstance(meta,dict) else None
     return errors
 
 

@@ -20,7 +20,7 @@ The source set contains no unresolved tracked edits, embedded objects, text boxe
 
 ## Decisions and status
 
-[ADR-0003 through ADR-0036](adr/README.md) are source-derived decision records. They preserve the original AD-01–AD-15, RD14-01–RD14-05 and DEV-ADR-01 relationships while adding chapter-derived decisions for architecture and engineering concerns already present in the sources. They remain proposed, with accepting authority and evidence **not recorded**. Alternatives are not invented as past meetings. Context and consequences are identified as source-derived synthesis.
+[ADR-0003 through ADR-0038](adr/README.md) are source-derived proposed decision records. The initial migration introduced records through ADR-0036; the completion correction subsequently added the telemetry and dependency-provenance records. They preserve the original AD-01–AD-15, RD14-01–RD14-05 and DEV-ADR-01 relationships while adding chapter-derived decisions for architecture and engineering concerns already present in the sources. They remain proposed, with accepting authority and evidence **not recorded**. Alternatives are not invented as past meetings. Context and consequences are identified as source-derived synthesis.
 
 ADR-0001 is the original repository-organization decision. ADR-0002 is the new proposed publishing convention. It does not issue an architecture or security approval.
 
@@ -32,31 +32,42 @@ The v1.0 and v1.1 handbook and the v1.2 content-review branch retain historical 
 
 ## Edit and regenerate safely
 
-Markdown is the working Git review surface. Make substantive changes in a review branch, link the affected ADR and requirement, and update engineering, implementation and verification consequences. Do not modify frozen originals or retroactively edit their evidence.
+Converted source chapters are immutable transcriptions. The editable architecture,
+engineering and solution records are under [docs/current](current/README.md), with
+owner, version, status, parent sections and a change history. Update prose through
+review without retaining superseded wording merely to satisfy the transcription
+check. The rendered record header must agree with its metadata; Proposed is not an
+approval and cannot carry acceptance authority or evidence.
 
-Source refresh is deliberately explicit and replaces converted chapter text. Run it only in a clean review worktree where the resulting diff can be assessed:
+Source refresh is a separate publication operation. Use a scratch source-only tree,
+review its diff and retain the unchanged originals. The converter cannot target
+`docs/current`. Do not use the retired block-amendment helper; it stops before writing.
+There is no second active annotation schema or alternate ADR renderer.
+
+For maintained-record navigation and assurance regeneration:
 
 ```sh
-python scripts/convert_word_docs.py --refresh-from-frozen-sources
 python scripts/build_documentation.py
+python scripts/build_assurance_indexes.py
 python scripts/catalog_artifacts.py
 python scripts/check_documentation.py
 python scripts/check_repository.py
 ```
 
-The converter reads local sources only and never contacts infrastructure. `build_documentation.py` generates reviewed navigation/ADR material from the checked-in records and adds decision backlinks. It is not an acceptance engine. CI checks documentation and never automatically regenerates or commits source refreshes.
+ADR source records own the deterministic pages and index. Their valid lifecycle is
+Proposed, Accepted, Rejected or Superseded. Non-Proposed states need actual authority,
+date, decision record, rationale and evidence; supersession is a typed, cycle-free
+successor link. The inverse relation is derived rather than maintained as a competing
+list. This validates consistency, not signer authenticity or authorization jurisdiction.
 
-Generated navigation is described in `sources/documentation/integration_outputs.json`; source prose remains separate from source-derived ADR synthesis. A future adopted source revision should get an explicit new source record and reviewed migration—not an ambiguous replacement under an old hash.
+The [main integration audit](assurance/main-integration-audit.md) identifies retired
+proposal views, canonical records and old-path aliases. Historical reports and missing
+originals remain explicitly scoped. No current ADR has been automatically accepted.
 
 ## Validation boundaries
 
-The documentation checker independently renders Markdown, checks source paragraph/cell text, table dimensions, field placeholders, image bytes, local file and anchor links, unique destinations, requirement references and decision crosswalks. It checks publishing consistency only. External URLs are not crawled. Existing native code and historical evidence are retained; no Terraform/Ansible engine run, remote CI result, target observation, deployment or authorization is implied.
+The documentation checker independently renders Markdown, checks source paragraph/cell text, exact code whitespace, ordered table cells, field placeholders, image bytes, local file and anchor links, unique destinations, requirement references and decision crosswalks. It checks publishing consistency only. External URLs are not crawled. Existing native code and historical evidence are retained; no Terraform/Ansible engine run, remote CI result, target observation, deployment or authorization is implied.
 
 ## Local commit
 
-This deliverable is a repository snapshot, not a `.git` checkout. No remote branch was modified. Existing users should use the documentation update procedure in [LOCAL_IMPORT.md](LOCAL_IMPORT.md), not blindly overwrite a working tree or run the original first-import helper against an already populated repository.
-
-
-## Corrective authoring model — CA-04/05
-
-Converted chapters are immutable transcriptions, including original proposal and historical evidence states. Maintained designs live under [docs/current](current/README.md), with owner role, scope, version, parent sections and change history. They can be edited without repeating superseded source paragraphs; their structural gate does not claim semantic or organizational approval. Frozen-source refresh is explicitly prohibited from targeting those maintained paths. ADR source records own the generated ADR pages and lifecycle; the checker reconciles exact rendering, indexes and valid governance fields. Non-Proposed states need real decision authority/date/record/evidence and supersession consistency. No current ADR was automatically accepted.
+This deliverable is a repository snapshot, not a `.git` checkout. The original ZIP preparation did not change a remote branch. Subsequent publication is recorded by Git and the exact workflow run, not by that historical ZIP statement. Existing archive users should use the documentation update procedure in [LOCAL_IMPORT.md](LOCAL_IMPORT.md), not blindly overwrite a working tree or run the original first-import helper against an already populated repository.

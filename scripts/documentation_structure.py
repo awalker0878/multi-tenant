@@ -22,6 +22,30 @@ def visible(node):
 def norm(text):return re.sub(r'\s+','',text.replace('\u00ad','').replace('\ufeff',''))
 
 
+def compare_table(source, output):
+    """Compare ordered cells, not merely text presence or row dimensions."""
+    errors=[];cells=0
+    before=source.findall(W+'tr');after=output.find_all('tr') if output is not None else []
+    if len(before)!=len(after):return 0,['table rows differ']
+    for ri,(sr,dr) in enumerate(zip(before,after)):
+        sc=sr.findall(W+'tc');dc=dr.find_all(['th','td'],recursive=False)
+        if len(sc)!=len(dc):errors.append(f'{ri}: cell count differs');continue
+        for ci,(a,z) in enumerate(zip(sc,dc)):
+            cells+=1
+            if norm(visible(a))!=norm(z.get_text()):errors.append(f'{ri}/{ci}: ordered cell text differs')
+    return cells,errors
+
+
+def compare_code(expected, page):
+    """Require exact code and paragraph grouping, including tabs and newlines."""
+    actual=[c.get_text()[:-1] if c.get_text().endswith('\n') else c.get_text() for c in page.select('pre > code')]
+    groups=[]
+    for index,text in expected:
+        if groups and index==groups[-1][0]+1:groups[-1]=(index,groups[-1][1]+'\n'+text)
+        else:groups.append((index,text))
+    return [] if [text for _,text in groups]==actual else ['code structure differs']
+
+
 def check(root:Path):
     sources=json.loads((root/'sources/documentation/conversion_manifest.json').read_text())['documents']
     ledger={(x['source_id'],x['block']):x for x in json.loads((root/'sources/documentation/block_coverage.json').read_text())}
@@ -50,20 +74,9 @@ def check(root:Path):
                     codes+=1;code_groups.setdefault(dest,[]).append((i,visible(b)))
             else:
                 tables+=1;marker=page.find(id=f'source-table-{i}');out=marker.find_next('table') if marker else None
-                before=b.findall(W+'tr');after=out.find_all('tr') if out else []
-                if len(before)!=len(after):errors.append(f'{source["id"]}/{i}: table rows differ');continue
-                for ri,(sr,dr) in enumerate(zip(before,after)):
-                    sc=sr.findall(W+'tc');dc=dr.find_all(['th','td'],recursive=False)
-                    if len(sc)!=len(dc):errors.append(f'{source["id"]}/{i}/{ri}: cell count differs');continue
-                    for ci,(a,z) in enumerate(zip(sc,dc)):
-                        cells+=1;want=norm(visible(a));actual=norm(z.get_text())
-                        if want!=actual:errors.append(f'{source["id"]}/{i}/{ri}/{ci}: ordered cell text differs')
+                count,differences=compare_table(b,out);cells+=count
+                errors.extend(f'{source["id"]}/{i}: {message}' for message in differences)
         for path,expected in code_groups.items():
-            actual=[c.get_text()[:-1] if c.get_text().endswith('\n') else c.get_text() for c in soup(path).select('pre > code')]
-            # Contiguous source code paragraphs are intentionally joined by one newline.
-            groups=[]
-            for index,text in expected:
-                if groups and index==groups[-1][0]+1:groups[-1]=(index,groups[-1][1]+'\n'+text)
-                else:groups.append((index,text))
-            if [text for _,text in groups]!=actual:errors.append(f'{source["id"]}: code structure differs in {path.relative_to(root)}')
+            errors.extend(f'{source["id"]}: {message} in {path.relative_to(root)}'
+                          for message in compare_code(expected,soup(path)))
     return {'tables':tables,'cells':cells,'code_paragraphs':codes,'errors':errors}

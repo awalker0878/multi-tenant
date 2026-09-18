@@ -22,7 +22,7 @@ The Word library is now available as full linked Markdown chapters, tables, diag
 
 The infrastructure architecture remains authoritative. Terraform and Ansible implement separately owned resource and verification responsibilities; they do not define a new hosting application. Native code remains candidate implementation until its actual supported target and evidence are accepted. The supplied source records distinguish local fixtures, native readback and formal operating authorization.
 
-The ten native Terraform module/root pairs, Ansible source, observation tools, tests and packet fixtures are retained. This release changes the documentation organization and publishing checks, not production connectivity or code semantics. Historical test reports remain historical. No infrastructure or remote repository was changed while preparing the ZIP.
+The ten native Terraform module/root pairs, Ansible source, observation tools, tests and packet fixtures are retained. The integrated audit correction preserves production connectivity and resource semantics. Current source publication is recorded by Git and exact CI results; ZIP-era statements describe their original delivery only. Historical test reports remain historical, and no infrastructure is deployed by this repository review.
 
 ## Local review
 
@@ -38,3 +38,7 @@ See [TESTING.md](docs/TESTING.md) for independent Terraform/Ansible and disposab
 ## Completion-audit corrections
 
 [Corrective disposition register](docs/assurance/completion-corrections.md) records code-fidelity, semantic-negative, current-integrity, ADR lifecycle, test-family and assertion-allocation work. [Maintained design records](docs/current/README.md) are distinct from immutable Word transcriptions. Actual initial Terraform/Ansible engine results and provider locks are recorded in [engine evidence](evidence/completion-corrections/README.md); final-revision CI and native qualification are separate gates.
+
+## Current main integration follow-up
+
+[Main integration audit](docs/assurance/main-integration-audit.md) records the mixed-correction test failures and their canonical-record resolution. The complete regression suite remains required alongside real Terraform/Ansible checks; no failing tests are skipped and no native acceptance is issued.

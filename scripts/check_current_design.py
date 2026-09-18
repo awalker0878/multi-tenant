@@ -1,7 +1,7 @@
 """Validate maintained-design metadata and parent links, not frozen source wording."""
 from pathlib import Path
 from datetime import date
-import json
+import json,re
 
 
 def check(root):
@@ -26,6 +26,13 @@ def check(root):
                 try:date.fromisoformat(h.get('date',''))
                 except (TypeError,ValueError):errors.append(str(ident)+': invalid record date')
         text=p.read_text()
+        header=f"**Version:** {record.get('version')} · **Status:** {record.get('status')} · **Accountable role:** {record.get('owner_role')}."
+        metadata_lines=[line for line in text.splitlines() if line.startswith('**Version:**')]
+        if metadata_lines!=[header]:errors.append(str(ident)+': rendered status/version/owner differs from maintained record')
+        if record.get('status') in ('Draft','Proposed') and (record.get('decision_authority') is not None or record.get('acceptance_evidence') is not None):
+            errors.append(str(ident)+': unaccepted design must not assert acceptance authority/evidence')
+        if isinstance(history,list) and history and isinstance(history[-1],dict) and history[-1].get('version')!=record.get('version'):
+            errors.append(str(ident)+': current version differs from latest change history')
         for heading in ('## Scope and authority','## Design content','## Engineering and implementation handoff','## Acceptance and open work'):
             if heading not in text:errors.append(str(ident)+': missing '+heading)
     return {'records':len(records),'errors':errors,'scope':'Maintained design structure and source links; editorial changes do not need to repeat frozen text. Approval authenticity remains external.'}
