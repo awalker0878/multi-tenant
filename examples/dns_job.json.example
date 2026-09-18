@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "enabled": false,
   "operation_id": "00000000-0000-4000-8000-000000000001",
   "tenant_id": "tenant-001",
@@ -11,6 +11,8 @@
   "engineering_record_ref": "EXAMPLE-NOT-AN-APPROVAL",
   "valid_until": "2030-01-01T00:00:00Z",
   "previous_marker": null,
+  "allocation_binding_digest": "b8a07d76fd37f9aa42be913c49cb3f9192d04359da0716ffd6d075d30f9cf7b0",
+  "previous_allocation_binding_digest": null,
   "records": [
     {
       "name": "app.fixture.invalid.",
