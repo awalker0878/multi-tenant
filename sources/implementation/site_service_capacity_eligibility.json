@@ -1,0 +1,33 @@
+{
+  "id": "SITE-SERVICE-CAPACITY-ELIGIBILITY-01",
+  "source_baseline_commit": "c997f42a3f7de1bb1a577bf0cb99a4bc7703dbdf",
+  "status": "IMPLEMENTED_ENGINEERING_PRECHECK_NO_ACTIVE_SITE_ENVELOPES",
+  "requirements": [
+    "PLACE-001",
+    "SVCM-001",
+    "SVCM-002",
+    "CAP-001",
+    "CAP-002"
+  ],
+  "capacity_index": "sources/capabilities/site_service_capacity_index.json",
+  "index_checker": "scripts/check_site_service_capacity.py",
+  "eligibility_checker": "scripts/check_site_service_eligibility.py",
+  "engineering": "docs/engineering/site-service-capacity-eligibility.md",
+  "current_service_envelopes": 0,
+  "authority": {
+    "may_select_site": false,
+    "may_reserve_capacity": false,
+    "may_allocate": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_work": [
+    "commission actual site/cell/service-class envelopes",
+    "bind each envelope to a current exact-tuple qualification record",
+    "record approved placement/service profiles and failure model evidence",
+    "measure surviving capacity and operational reserves by bottleneck",
+    "integrate tenant quota and authoritative address/service capacity",
+    "create reservations only under a separate accountable reservation owner"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

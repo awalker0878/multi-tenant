@@ -116,6 +116,14 @@ Implementation: [fail-closed precheck](../../scripts/check_platform_family_eligi
 
 This precheck evaluates only platform-family capability evidence. It cannot select a site, reserve capacity, allocate resources or authorize activation. The current example intentionally holds because no platform capability is native-qualified.
 
+## Site, cell and service-class capacity eligibility
+
+Design: [Hosting cells and failure boundaries](../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md) · [Capacity and service envelopes](../assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md) · [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md)
+
+Implementation: [active capacity inventory](../../sources/capabilities/site_service_capacity_index.json) · [capacity-envelope validator](../../scripts/check_site_service_capacity.py) · [read-only site/service precheck](../../scripts/check_site_service_eligibility.py) · [engineering boundary](../engineering/site-service-capacity-eligibility.md)
+
+The current inventory is intentionally empty. Matching envelopes never create a reservation, select a site, allocate an address or authorize activation; one failed capacity/profile/quota dimension rejects the envelope.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.

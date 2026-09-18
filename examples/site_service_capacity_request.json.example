@@ -1,0 +1,35 @@
+{
+  "format": "portable-hosting-site-service-demand/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-SITE-CAPACITY-01",
+  "wsd_engineering_ref": "docs/current/internal-hosting-solution.md",
+  "candidate_platforms": ["nutanix", "vmware-nsx", "openstack"],
+  "candidate_sites": [],
+  "candidate_cells": [],
+  "candidate_service_classes": [],
+  "required_assurance_profile": null,
+  "required_profile_refs": {
+    "co_residency": "controlled-profile:EXAMPLE-NOT-APPROVED-CORESIDENCY",
+    "compute": "controlled-profile:EXAMPLE-NOT-APPROVED-COMPUTE",
+    "storage": "controlled-profile:EXAMPLE-NOT-APPROVED-STORAGE",
+    "network": "controlled-profile:EXAMPLE-NOT-APPROVED-NETWORK",
+    "security_edge": "controlled-profile:EXAMPLE-NOT-APPROVED-EDGE",
+    "availability": "controlled-profile:EXAMPLE-NOT-APPROVED-AVAILABILITY",
+    "recovery": "controlled-profile:EXAMPLE-NOT-APPROVED-RECOVERY",
+    "location": "controlled-profile:EXAMPLE-NOT-APPROVED-LOCATION",
+    "key": "controlled-profile:EXAMPLE-NOT-APPROVED-KEY",
+    "backup": "controlled-profile:EXAMPLE-NOT-APPROVED-BACKUP"
+  },
+  "capacity_demands": [
+    {"id": "memory_gib", "unit": "GiB", "quantity": "1", "quota_remaining": "1"},
+    {"id": "storage_gib", "unit": "GiB", "quantity": "1", "quota_remaining": "1"},
+    {"id": "edge_sessions", "unit": "sessions", "quantity": "1", "quota_remaining": "1"},
+    {"id": "attachment_slots", "unit": "slots", "quantity": "1", "quota_remaining": "1"}
+  ],
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/current/internal-hosting-solution.md",
+    "docs/architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md",
+    "docs/assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md"
+  ]
+}
