@@ -65,6 +65,8 @@ protection remain prerequisites.
 
 Every result has `may_apply=false`, `may_delete=false`, and `may_activate=false`.
 There is no success branch that executes Terraform or calls a native mutation API.
+
+A `READY_FOR_OPERATOR_RECOVERY_REVIEW` result is still below the [native reconciliation assurance gate](engineering/native-readback-writer-fencing-and-reconciliation-assurance.md). Before a repair/import/resume decision can be treated as current, the separate assurance record must prove exact installed-interface applicability, accepted task/entity coverage, real scoped writer fencing, current containment state and the same operation generation. The gate records an accountable reconciliation decision but never executes it.
 The default freshness cap is 300 seconds, configurable 1–900 seconds: a local tool
 bound, not a policy mandate. Site owners must set a suitable stricter campaign and
 check whether configuration changed again after observation.

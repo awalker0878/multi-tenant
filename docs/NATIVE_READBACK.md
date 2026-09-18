@@ -152,6 +152,9 @@ or selected-field match, depending on mode; it is not an authorization result.
 See [interrupted-change triage](INTERRUPTED_CHANGE_RECOVERY.md) before any subsequent
 resource mutation.
 
+The [native reconciliation assurance gate](engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
+sits above this observer. A matching report is insufficient for recovery readiness until the exact installed API/RBAC/default/version-token behavior, accepted task/entity scope, current writer fence, containment state, operation generation and accountable reconciliation decision are separately evidenced. The active assurance index is intentionally empty.
+
 ## Optional bounded Nutanix task-tree profile
 
 The original profile above retains its single-task constraint. A separate [known-tree profile](engineering/nutanix-task-tree-readback.md) now handles a fully enumerated small parent/child scope through the same transport, resource checks and recovery holds. Partial native child summaries and batch jobs remain unsupported; no automatic task listing, cancellation or version fallback is added. Follow the [explicit manifest and execution procedure](implementation/nutanix-task-tree-readback.md).

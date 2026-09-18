@@ -204,6 +204,14 @@ Implementation: [active ZIP assurance index](../../sources/capabilities/security
 
 Current qualification requires exact pairwise scope, mandatory security-function evidence, native forward/reply and bypass review, deny-first policy, management separation, HA/failure behavior and current path tests. Distributed/shared ZIPs must prove equivalent mandatory outcomes; CI performs no edge, route, policy or attachment mutation.
 
+## Native readback, writer-fencing and reconciliation assurance
+
+Design: [Native readback](../NATIVE_READBACK.md) · [Interrupted-change recovery](../INTERRUPTED_CHANGE_RECOVERY.md) · [PROV §5 concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
+
+Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../tools/readback_core.py) · [offline recovery reviewer](../../tools/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
+
+A matching GET-only readback remains observation evidence only. Current reconciliation additionally requires exact installed-interface applicability, complete task/entity scope, verified native writer fencing, current containment state, operation-generation binding and an attributable data-safe reconciliation decision; CI performs no task mutation, state import, repair, deletion, apply or activation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.

@@ -1,0 +1,17 @@
+{
+  "format": "portable-hosting-native-reconciliation-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-NATIVE-RECONCILIATION-01",
+  "operation_id": "example-native-operation-not-reconciled",
+  "platform": "NUTANIX",
+  "engineering_record_ref": "docs/NATIVE_READBACK.md",
+  "operation_scope_ref": "controlled-operation-scope:EXAMPLE-NOT-ACCEPTED",
+  "resource_set_ref": "controlled-resource-set:EXAMPLE-NOT-OBSERVED",
+  "operation_generation": 1,
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/NATIVE_READBACK.md",
+    "docs/INTERRUPTED_CHANGE_RECOVERY.md",
+    "docs/engineering/native-readback-writer-fencing-and-reconciliation-assurance.md"
+  ]
+}
