@@ -110,4 +110,4 @@ This precheck evaluates only platform-family capability evidence. It cannot sele
 
 ## Open native work
 
-[The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
+[The maintained current-status overlay](current-status.md) records repository/local progress while keeping all native qualification and authorization open. [The inherited implementation backlog](../../sources/implementation_backlog.csv) is preserved as the historical Increment02–04 source record and is not rewritten to represent later work.

@@ -1,0 +1,224 @@
+{
+  "format": "portable-hosting-current-implementation-status/1",
+  "status": "CURRENT_REPOSITORY_STATE_NOT_NATIVE_AUTHORIZATION",
+  "historical_backlog_ref": "sources/implementation_backlog.csv",
+  "historical_backlog_policy": "PRESERVE_ORIGINAL_INCREMENT_ROWS",
+  "reviewed_baseline_commit": "fb2316e8aee3469e7e52ee4887fa6b972806f44b",
+  "items": [
+    {
+      "id": "I01",
+      "current_state": "ENGINE_VALIDATED_NATIVE_TARGET_OPEN",
+      "evidence_levels": [
+        "ENGINE_CI"
+      ],
+      "evidence_refs": [
+        "tools/verify_terraform.py",
+        "scripts/check_dependency_locks.py",
+        ".github/workflows/validate.yml"
+      ],
+      "remaining_evidence": [
+        "selected installed target tuple and permitted scope",
+        "live provider/API compatibility and native defaults",
+        "approved native plan/apply procedure and target evidence"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I02",
+      "current_state": "SITE_SELECTION_OPEN",
+      "evidence_levels": [
+        "OPEN_DECISION",
+        "PLANNING_ONLY"
+      ],
+      "evidence_refs": [
+        "docs/implementation/native-reference/site-inputs.md",
+        "sources/commissioning/native_reference_plan.json"
+      ],
+      "remaining_evidence": [
+        "installed hardware/product/API/provider/licence tuple",
+        "security-edge implementation and permitted disposable target scope",
+        "owner-reviewed site/cell/service-class decision"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I03",
+      "current_state": "LOCAL_QUARANTINE_FIXTURE_NATIVE_OPEN",
+      "evidence_levels": [
+        "CANDIDATE_SOURCE",
+        "LOCAL_PACKET_FIXTURE"
+      ],
+      "evidence_refs": [
+        "terraform/modules/nsx-gateway-quarantine",
+        "lab/run_namespace_lab.py",
+        "lab/run_ipv6_lab.py"
+      ],
+      "remaining_evidence": [
+        "native same-host and distributed enforcement",
+        "policy precedence and protected identity selectors",
+        "native failure and recovery observations on the selected stack"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I04",
+      "current_state": "EDGE_CANDIDATE_NATIVE_OPEN",
+      "evidence_levels": [
+        "CANDIDATE_SOURCE",
+        "LOCAL_PACKET_FIXTURE"
+      ],
+      "evidence_refs": [
+        "terraform/modules/nsx-gateway-quarantine",
+        "terraform/modules/nutanix-route",
+        "terraform/modules/nsx-route",
+        "terraform/modules/openstack-route",
+        "lab/run_namespace_lab.py",
+        "lab/run_ipv6_lab.py"
+      ],
+      "remaining_evidence": [
+        "selected production security-edge/context implementation",
+        "actual interfaces, identity controls, inspection and management separation",
+        "HA and complete ZIP/security-boundary equivalence"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I05",
+      "current_state": "LOCAL_REPLY_ROUTE_FIXTURE_NATIVE_SERVICE_OPEN",
+      "evidence_levels": [
+        "CANDIDATE_SOURCE",
+        "LOCAL_PACKET_FIXTURE"
+      ],
+      "evidence_refs": [
+        "tools/route_audit.py",
+        "lab/run_namespace_lab.py",
+        "lab/run_ipv6_lab.py"
+      ],
+      "remaining_evidence": [
+        "implementation in the actual service/gateway owner tools",
+        "origin-specific native return paths",
+        "native telemetry and failure/recovery evidence"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I06",
+      "current_state": "LOCAL_DNS_INTEGRATION_NATIVE_IPAM_OPEN",
+      "evidence_levels": [
+        "CANDIDATE_SOURCE",
+        "LOCAL_PROTOCOL_FIXTURE"
+      ],
+      "evidence_refs": [
+        "tools/dns_change.py",
+        "lab/run_dns_lab.py",
+        "docs/DNS_LIFECYCLE.md"
+      ],
+      "remaining_evidence": [
+        "authoritative IPAM allocation and reuse controls",
+        "actual DNS update ACLs, propagation and resolver behavior",
+        "DHCP/metadata/bootstrap and name/time/image service integration"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I07",
+      "current_state": "LOCAL_IDENTITY_FIXTURE_NATIVE_TRUST_PROTECTION_OPEN",
+      "evidence_levels": [
+        "LOCAL_PROTOCOL_FIXTURE",
+        "LOCAL_PACKET_FIXTURE"
+      ],
+      "evidence_refs": [
+        "lab/mtls_fixture.py",
+        "lab/run_namespace_lab.py",
+        "lab/run_ipv6_lab.py"
+      ],
+      "remaining_evidence": [
+        "actual identity/PKI/KMS clients and trust lifecycle",
+        "storage/protection integration",
+        "isolated useful-data restore with independent key/catalogue dependencies"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I08",
+      "current_state": "ROUTED_DUAL_STACK_FIXTURE_NATIVE_STACK_OPEN",
+      "evidence_levels": [
+        "LOCAL_PACKET_FIXTURE",
+        "LOCAL_PROTOCOL_FIXTURE"
+      ],
+      "evidence_refs": [
+        "lab/run_ipv6_lab.py",
+        "docs/engineering/routed-ipv6-qualification.md",
+        "sources/implementation/routed_ipv6.json"
+      ],
+      "remaining_evidence": [
+        "native IPv6 routing, local protocols and enforcement for each offered stack",
+        "native edge/shared-service path and overlay MTU behavior",
+        "vendor HA and complete offered-family qualification"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I09",
+      "current_state": "READBACK_CANDIDATES_LOCAL_FIXTURE_NATIVE_OPEN",
+      "evidence_levels": [
+        "CANDIDATE_SOURCE",
+        "LOCAL_HTTPS_FIXTURE"
+      ],
+      "evidence_refs": [
+        "tools/nsx_observe.py",
+        "tools/nutanix_observe.py",
+        "tools/neutron_observe.py",
+        "tools/recovery_review.py",
+        "sources/implementation/nutanix_task_tree.json"
+      ],
+      "remaining_evidence": [
+        "actual API/RBAC/default and version-token qualification",
+        "complete inventory/VM/Flow/route/composite-task coverage where required",
+        "true scoped writer fencing and authorized repair/import/retirement"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    },
+    {
+      "id": "I10",
+      "current_state": "READINESS_PLANNING_ACTIVATION_OPEN",
+      "evidence_levels": [
+        "PLANNING_ONLY",
+        "ENGINEERING_PRECHECK"
+      ],
+      "evidence_refs": [
+        "scripts/commissioning_pack.py",
+        "sources/commissioning/native_reference_plan.json",
+        "scripts/check_platform_family_eligibility.py",
+        "sources/implementation/platform_family_eligibility.json"
+      ],
+      "remaining_evidence": [
+        "accepted G0/G1/G2 and applicable initial G4 evidence",
+        "selected site/cell/pool and reversible G3 activation procedure",
+        "post-activation checks, ownership, service objectives and formal authorization"
+      ],
+      "native_target_contact": "NOT_RUN",
+      "native_qualification": "NOT_RUN",
+      "formal_authorization": "NOT_ISSUED"
+    }
+  ],
+  "historical_backlog_git_blob_sha": "b7cc1dd095a96ca1832a698d49d9ee4182806e01"
+}

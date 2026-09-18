@@ -59,3 +59,8 @@ The [machine-readable platform capability registry](docs/engineering/platform-ca
 ## Pre-placement platform-family eligibility
 
 The [platform-family eligibility precheck](docs/engineering/pre-placement-platform-eligibility.md) consumes a reviewed WSD engineering reference plus mandatory/optional portable capabilities and fails closed when no candidate family is natively qualified. It does not choose a site, reserve capacity, allocate infrastructure, run Terraform, or authorize activation. The repository example is intentionally held until native platform qualification exists.
+
+
+## Current implementation status
+
+[Maintained I01–I10 current status](docs/implementation/current-status.md) separates current repository, engine and local-fixture evidence from the preserved Increment02–04 backlog. Every item remains **NOT_RUN** for native target contact and native qualification and **NOT_ISSUED** for formal authorization; use [NEXT_WORK](docs/NEXT_WORK.md) for the remaining site/native work.

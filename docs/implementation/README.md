@@ -10,6 +10,8 @@ Infrastructure work packages and ownership lead. Tool descriptions remain subord
 
 These links open the full converted narrative, tables, placeholders, diagrams and cross-references—not a summary of the Word files. Source metadata and originals remain linked in every chapter.
 
+[Current I01–I10 implementation status and remaining native evidence](current-status.md)
+
 [Architecture / decision / implementation map](code-map.md)
 
 [Method-of-procedure and handover templates](../templates/implementation-mop/README.md)
