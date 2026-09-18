@@ -9,6 +9,8 @@ It belongs to shared-service commissioning and workload service attachment (P3/P
 with retention and safe reuse handled during P6. Terraform remains responsible for
 its independently owned native infrastructure resources.
 
+The upstream [authoritative IPAM handoff](engineering/authoritative-ipam-allocation-handoff.md) records only an opaque allocation reference in this repository. The DNS owner resolves the exact assigned value through the approved IPAM/name-assignment authority before issuing a DNS scope; a repository example, allocation handle or failed IPAM call can never supply a guessed A/AAAA/PTR value.
+
 The selected candidate interface is standards-based RFC 2136 UPDATE with HMAC-SHA256
 TSIG over TCP. Actual server support, key/name/type policy, management transport,
 clock synchronization, topology and secondary/cache behavior require site acceptance.
