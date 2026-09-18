@@ -135,3 +135,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Site/service-class capacity eligibility
 
 `python scripts/check_site_service_capacity.py` validates current commissioned site/cell/service-class envelopes against exact-tuple qualification records, approved profile references, failure-model evidence, owners and time-bounded multi-resource capacity. `python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE` confirms the current empty inventory remains fail-closed. The checker compares surviving capacity, operational reserve, existing commitments, unavailable capacity and supplied quota headroom, but never creates a reservation or contacts IPAM/native platforms.
+
+
+## Reservation preflight and exported records
+
+`python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z` validates exported reservation evidence without becoming the authoritative reservation database. `python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE` confirms the current example remains held. The preflight checks immutable reservation/operation IDs, generation, exact capacity-demand binding, owner/expiry, dependency operation identities and existing conflict/uncertain outcomes. It cannot create, extend, consume or release reservations, allocate addresses, apply infrastructure or activate service.
