@@ -1,0 +1,31 @@
+{
+  "id": "KNOWLEDGE-MAINTENANCE-INTEGRITY-01",
+  "source_baseline_commit": "f12fbfd75a225414cb0eaf5bfe0b1c6c9ad71a27",
+  "status": "IMPLEMENTED_PRIMARY_HOME_AND_RELEASE_EVIDENCE_NO_PUBLICATION_AUTHORITY",
+  "gap_ids": ["G34"],
+  "requirements": ["DOC-001", "STD-001", "STD-002"],
+  "knowledge_home_registry": "sources/documentation/knowledge_home_registry.json",
+  "assurance_index": "sources/documentation/release_maintenance_assurance_index.json",
+  "checker": "scripts/check_knowledge_maintenance_assurance.py",
+  "preflight": "scripts/check_knowledge_maintenance_readiness.py",
+  "engineering": "docs/engineering/knowledge-maintenance-and-release-integrity-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_publish_release": false,
+    "may_approve_change": false,
+    "may_reassign_primary_home": false,
+    "may_accept_conflict": false,
+    "may_authorize_architecture": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "assign an accountable architecture/document maintaining owner and release cadence",
+    "record a revision-specific consistent version set for architecture, engineering, requirements, tests, gaps, sources and generator",
+    "retain successful release-wide link, anchor, requirement-map, decision-crosswalk and scenario-consistency evidence",
+    "perform attributable duplicate-policy and supplement/parent drift review",
+    "record affected knowledge topics and change-ripple review for each release change",
+    "obtain and retain the approved change/publication record separately from automated validation"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
