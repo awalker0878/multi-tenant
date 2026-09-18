@@ -1,0 +1,39 @@
+{
+  "id": "OPERATIONAL-HANDOVER-ASSURANCE-01",
+  "source_baseline_commit": "6e0faf3a2ded14b9e7c5fcaf83d848f725ed292b",
+  "status": "IMPLEMENTED_EVIDENCE_PREFLIGHT_NO_OPERATIONS_OR_INCIDENT_MUTATION",
+  "gap_ids": ["G31"],
+  "requirements": [
+    "OPS-002",
+    "DRIFT-001",
+    "DRIFT-002",
+    "DRIFT-003",
+    "IR-001",
+    "IR-002",
+    "ONB-001",
+    "ACPT-001"
+  ],
+  "assurance_index": "sources/capabilities/operational_handover_assurance_index.json",
+  "record_checker": "scripts/check_operational_handover_assurance.py",
+  "preflight": "scripts/check_operational_handover_readiness.py",
+  "engineering": "docs/engineering/operational-handover-and-incident-readiness-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_change_privileged_access": false,
+    "may_start_containment": false,
+    "may_release_containment": false,
+    "may_execute_recovery": false,
+    "may_reconcile_emergency_change": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "name actual receiving, support, escalation, on-call and accountable decision owners",
+    "accept the as-built service envelope, dependencies, monitoring, capacity, runbooks and recovery obligations",
+    "review privileged access and credential custody against the actual authority model",
+    "exercise scoped incident containment, evidence custody, recovery acceptance and explicit containment release",
+    "reconcile emergency changes back into the authoritative source after the exercise or real incident",
+    "integrate local incident/change processes and separately issue any production operating authorization"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

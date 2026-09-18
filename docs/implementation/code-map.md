@@ -164,6 +164,14 @@ Implementation: [exported control inheritance assurance index](../../sources/cap
 
 Current assurance requires exact scope, per-control responsibility/evidence, all six external organizational interfaces and no OPEN residual gaps. CI does not select controls, accept inheritance or residual risk, issue authorization, apply infrastructure or activate production.
 
+## Operational handover and incident-readiness assurance
+
+Design: [G31 operating ownership and incident behaviour](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G31) · [Operating accountability, handover and change](../assurance/site-qualification/7-operating-accountability-handover-and-change.md) · [Operational responsibility acceptance](../operations/recovery-transition/8-accept-operational-responsibility-for-the-delivered-scope.md)
+
+Implementation: [exported operational handover assurance index](../../sources/capabilities/operational_handover_assurance_index.json) · [assurance evidence validator](../../scripts/check_operational_handover_assurance.py) · [readiness preflight](../../scripts/check_operational_handover_readiness.py) · [engineering boundary](../engineering/operational-handover-and-incident-readiness-assurance.md)
+
+Current assurance requires named operating decision owners, accepted as-built/support/recovery scope, current privileged-access and monitoring review, explicit containment release and a current scoped incident exercise. CI performs no live access, incident, recovery, change, apply or activation action.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
