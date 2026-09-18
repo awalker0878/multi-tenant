@@ -1,0 +1,17 @@
+{
+  "format": "portable-hosting-native-ipv6-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-NATIVE-IPV6-01",
+  "site_ref": "controlled-site:EXAMPLE-NOT-QUALIFIED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-IPV6-NOT-OFFERED",
+  "platform": "NUTANIX",
+  "platform_profile_ref": "controlled-platform-profile:EXAMPLE-NOT-QUALIFIED",
+  "security_edge_profile_ref": "controlled-security-edge-profile:EXAMPLE-NOT-QUALIFIED",
+  "family_mode": "IPV6_ONLY",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/engineering/routed-ipv6-qualification.md",
+    "docs/implementation/routed-ipv6-lab.md",
+    "docs/engineering/native-ipv6-address-family-assurance.md"
+  ]
+}

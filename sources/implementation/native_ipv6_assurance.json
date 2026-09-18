@@ -1,0 +1,32 @@
+{
+  "id": "NATIVE-IPV6-ADDRESS-FAMILY-ASSURANCE-01",
+  "source_baseline_commit": "2909d235a2fcf352e9dab04dab3d617f3923a719",
+  "status": "IMPLEMENTED_NATIVE_IPV6_EVIDENCE_GATE_NO_ADDRESS_FAMILY_MUTATION",
+  "backlog_ids": ["I08"],
+  "requirements": ["IPV6-001", "IPV6-002", "IPV6-003", "ZIP-001", "RTE-002", "SVC-001", "FAIL-001", "TEST-003"],
+  "assurance_index": "sources/capabilities/native_ipv6_assurance_index.json",
+  "checker": "scripts/check_native_ipv6_assurance.py",
+  "preflight": "scripts/check_native_ipv6_readiness.py",
+  "engineering": "docs/engineering/native-ipv6-address-family-assurance.md",
+  "local_lab": "docs/engineering/routed-ipv6-qualification.md",
+  "current_records": 0,
+  "authority": {
+    "may_offer_ipv6": false,
+    "may_change_addressing": false,
+    "may_change_routes": false,
+    "may_change_security_policy": false,
+    "may_change_mtu": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual site, platform tuple, service class, security-edge profile and IPv6-only or dual-stack mode",
+    "qualify the supported native addressing mode including DAD, source/address validation, ND, RA/DHCPv6/redirect and transition behavior",
+    "prove same-host/distributed/routed security outcomes, route authority, management exclusion, bypass review and origin-specific replies",
+    "qualify native MTU/encapsulation/handoff arithmetic, ICMPv6 Packet Too Big and PMTUD black-hole behavior",
+    "qualify required shared-service protocols and identity/protection dependencies over the offered family",
+    "exercise route withdrawal, edge/link failure, address/DAD recovery and surviving capacity",
+    "record current operational acceptance and resolve residual family-specific gaps"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

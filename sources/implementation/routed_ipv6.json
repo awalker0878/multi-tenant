@@ -35,11 +35,12 @@
   "result_policy": "Record actual exact-revision CI/run artifacts separately; this source record does not self-declare a pass",
   "retained_ipv4": "The existing IPv4 packet/TLS campaign is rerun independently",
   "native_remaining": [
-    "Installed product/API/provider/feature combination and supported address modes",
-    "Complete native quarantine, same-host/distributed/alternate paths and management separation",
-    "SLAAC/DHCPv6 where offered, general neighbour-source controls, fragments and extension headers",
-    "Native fabric/overlay MTU, HA, inspection capacity and shared-service dependencies",
-    "Actual identity, key, backup, isolated restore, migration and acceptance evidence"
+    "Select actual site, product/API/provider/feature combination and IPv6-only or dual-stack service mode",
+    "Populate current native IPv6 assurance for supported addressing/local protocols, route/security parity and management exclusion",
+    "Qualify actual fabric/overlay/security-edge MTU and PMTU behavior including Packet Too Big black-hole recovery",
+    "Qualify required shared-service protocols, identity, telemetry, repository and protection/recovery dependencies",
+    "Exercise route withdrawal, edge/link failure, address/DAD recovery, surviving capacity and operational acceptance",
+    "Keep IPv6-only free of hidden IPv4 fallback or retain an independent current IPv4 campaign for dual-stack"
   ],
   "native_apply": "NOT_IMPLEMENTED_BY_THIS_WORK",
   "formal_authorization": "NOT_ISSUED",
@@ -55,5 +56,7 @@
     "nftables": "1.0.9",
     "original_namespace_configuration_unchanged": true,
     "scope": "Executed Linux fixtures only; later source revisions need their own passing exact-head run"
-  }
+  },
+  "native_assurance_gate": "sources/capabilities/native_ipv6_assurance_index.json",
+  "native_readiness_preflight": "scripts/check_native_ipv6_readiness.py"
 }

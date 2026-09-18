@@ -140,4 +140,11 @@ ND spoofing, fragment/extension-header handling, SLAAC/DHCPv6, NAT/PBR/BGP, nati
 management exclusion, overlay MTU, HA and backup recovery remain explicitly outside
 this local experiment.
 
+The [native IPv6/address-family assurance gate](native-ipv6-address-family-assurance.md)
+sits above this laboratory. Before an IPv6-only or dual-stack service is treated as current,
+the selected site/platform/security-edge scope must separately prove supported addressing
+modes, local protocol behavior, route/security parity, native MTU/PMTU, required shared
+services, failure/recovery and operational acceptance. The active native assurance index
+is intentionally empty.
+
 [Run procedure](../implementation/routed-ipv6-lab.md) · [Implementation work record](../../sources/implementation/routed_ipv6.json)
