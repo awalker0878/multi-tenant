@@ -74,3 +74,8 @@ The [site/service capacity precheck](docs/engineering/site-service-capacity-elig
 ## Reservation preflight and reconciliation
 
 The [reservation preflight](docs/engineering/reservation-preflight-and-reconciliation.md) binds stable reservation/operation identities, generation, exact admitted demand, owner roles and expiry to exported records from the authoritative reservation system. Git remains evidence-only: same-operation retries are idempotent only when the spec is unchanged, conflicts and uncertain outcomes stop, and IPAM/external reservations remain under their own owners. No reservation is created or released by CI.
+
+
+## Authoritative IPAM allocation handoff
+
+The [IPAM allocation handoff](docs/engineering/authoritative-ipam-allocation-handoff.md) binds the parent reservation's stable IPAM dependency operation to exported authoritative allocation lifecycle evidence. Git stores no actual address/prefix value: unique allocation is the default, overlap requires an explicit exception reference, uncertain outcomes stop retries, and release requires route/DHCP/DNS/policy/logging/incident-response cleanup plus reuse quarantine. Actual IPAM mutation remains external.
