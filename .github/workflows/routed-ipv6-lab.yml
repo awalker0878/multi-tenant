@@ -1,0 +1,69 @@
+name: Routed IPv6 laboratory
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: routed-ipv6-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  routed-families:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Install disposable fixture dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nftables iproute2 gcc libc6-dev linux-libc-dev openssl
+          python -m pip install -r requirements-repository.txt
+      - name: Stage only tracked source in a root-owned disposable directory
+        run: |
+          work=$(sudo mktemp -d /tmp/hosting-routed-ci.XXXXXX)
+          git archive --format=tar HEAD | sudo tar -xf - -C "$work"
+          echo "ROUTED_CI_WORK=$work" >> "$GITHUB_ENV"
+      - name: Retained IPv4 packet and service-identity regression
+        run: sudo "$pythonLocation/bin/python" "$ROUTED_CI_WORK/lab/run_namespace_lab.py" --execute
+      - name: Fixed IPv6 routing, denial, service replies and recovery experiment
+        if: ${{ !cancelled() }}
+        run: sudo "$pythonLocation/bin/python" "$ROUTED_CI_WORK/lab/run_ipv6_lab.py" --execute
+      - name: Return the two private synthetic reports to the artifact uploader
+        if: always()
+        run: |
+          mkdir -p build/reports
+          for name in local_packet_lab.json local_ipv6_packet_lab.json; do
+            if [ -n "$ROUTED_CI_WORK" ] && sudo test -f "$ROUTED_CI_WORK/build/reports/$name"; then
+              sudo cp "$ROUTED_CI_WORK/build/reports/$name" "build/reports/$name"
+              sudo chown "$(id -u):$(id -g)" "build/reports/$name"
+            fi
+          done
+      - name: Check complete reports and exact-source identities
+        if: ${{ !cancelled() }}
+        run: python scripts/check_routed_lab_results.py
+      - name: Preserve only synthetic local laboratory results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: routed-family-fixtures
+          path: |
+            build/reports/local_packet_lab.json
+            build/reports/local_ipv6_packet_lab.json
+            build/reports/routed_family_review.json
+          retention-days: 14
+          if-no-files-found: error
+      - name: Remove the owned disposable source and any temporary outputs
+        if: always()
+        run: |
+          case "$ROUTED_CI_WORK" in
+            /tmp/hosting-routed-ci.*) sudo rm -rf -- "$ROUTED_CI_WORK" ;;
+            "") : ;;
+            *) echo "Unexpected cleanup path; refusing"; exit 1 ;;
+          esac

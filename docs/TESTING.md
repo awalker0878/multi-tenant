@@ -28,7 +28,8 @@ python tools/verify_terraform.py --mock-tests
 | Local regressions | Python functions and disposable loopback HTTPS/DNS/TLS fixtures; route-model cases | Native product behaviour, routed IPv6 or full ZIP qualification |
 | Ansible engine | Actual syntax checks, local template/file tasks, second-run zero-change, check-mode non-mutation and negative fixtures | Remote host configuration, switch support, native contacts |
 | Terraform engine | Backend-disabled init/validate, real plugin schemas and plan-only provider mocks on ten module/root pairs | Live provider API support, infrastructure conformance, safe production apply |
-| Manual labs | Fixed disposable HTTPS/DNS and network-namespace campaigns | Vendor HA, production DNS/PKI or authorization |
+| Routed-family laboratory | Separate fixed IPv4 and IPv6 namespace packet/TLS campaigns, plus exact-source report completeness | Native IPv6, vendor HA, production DNS/PKI or authorization |
+| Other manual labs | Additional fixed disposable protocol campaigns | Native product qualification or authorization |
 | Native qualification | Separate approved target and engineering procedure | Not executed or automated by repository CI |
 
 `make test` means the first two gates only. `make test-all` additionally requires both
@@ -67,10 +68,13 @@ afterwards. Unsupported/skipped actions are not real observations. [R2; R3]
 ## CI and cost/safety boundaries
 
 The regular workflow has independent repository, Terraform and Ansible jobs, using
-GitHub-hosted Ubuntu 24.04. The longer packet campaigns are manual dispatch only.
+GitHub-hosted Ubuntu 24.04. The routed-family laboratory runs on pull requests, `main` pushes and manual dispatch.
+Other retained laboratory workflows keep their separate manual-dispatch scope.
 All actions are pinned to observed full commit IDs, repository permissions are read-only,
 checkout credentials are not persisted and no native secrets or deploy job are used.
-The workflow files are authored but were **not executed on GitHub** during this delivery.
+The original import did not execute the workflows. Subsequent runs and the current
+change are tracked by their exact Git revision and Actions artifacts, not by treating
+that historical delivery note as current status.
 Jobs may consume your private repository's Actions allowance when pushed or dispatched.
 
 Do not run unreviewed pull-request code on privileged self-hosted infrastructure.
@@ -104,3 +108,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Completion-corrective release verification
 
 `python tools/check_release.py` checks a clean current Git checkout, not the historical file list. Exported releases require their explicit snapshot manifest. `python scripts/check_documentation.py` adds independently parsed code/tab/break fidelity, ordered table cells, exact ADR rendering/lifecycle, maintained design records and complete test/allocation indexes. `tools/verify_terraform.py --mock-tests` exports schemas from backend-free modules only, validates roots with `-backend=false`, and validates committed locks read-only. Passing that job does not contact native services. Ansible negative checks require genuine failed local assertions, not timeouts. Current CI source hashes and run identity are recorded in reports.
+
+## Routed IPv6 local packet extension
+
+[Run the fixed IPv6 campaign](implementation/routed-ipv6-lab.md) after the [engineering scope](engineering/routed-ipv6-qualification.md) is understood. `python lab/run_ipv6_lab.py --execute` requires nftables and authorized namespace/sysctl capabilities and produces a new private `build/reports/local_ipv6_packet_lab.json`. The hosted disposable lab job supplies explicit privilege; it does not disable host security settings. The ordinary unit suite covers its message/guard/source logic separately. A blocked runtime is nonzero, not a skipped pass, and native IPv6 remains unqualified.
