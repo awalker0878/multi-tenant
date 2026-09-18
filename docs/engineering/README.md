@@ -45,6 +45,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Native readback, writer-fencing and reconciliation assurance](native-readback-writer-fencing-and-reconciliation-assurance.md)
 
+[Native IPv6 and address-family assurance](native-ipv6-address-family-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
