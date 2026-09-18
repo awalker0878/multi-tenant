@@ -1,12 +1,16 @@
 # Disabled DNS illustrations
 
 [dns_job.json.example](dns_job.json.example) and [dns_scope.json.example](dns_scope.json.example)
-show one A/AAAA record group with explicit before/after values. They are disabled and
-contain documentation names, addresses and non-approval references. They intentionally
-fail actual-target screening, even if someone toggles the enabled fields alone.
+show one version-2 A/AAAA record group with explicit before/after values and opaque
+authoritative-IPAM allocation bindings. They are disabled and contain documentation
+names, addresses and non-approval/non-allocation references. They intentionally fail
+actual-target screening, even if someone toggles the enabled fields alone.
 
 Create actual inputs only from accepted name/address assignments and authorized
-management endpoints. The secret is not part of either file. Replace the illustrative
+management endpoints. Each allowed RRset must carry the authoritative IPAM allocation
+reference and generation from the owner-issued handoff; the job carries the resulting
+binding digest. The secret and authoritative IPAM credentials are not part of either
+file. Replace the illustrative
 validity with an approved current operation interval. Reuse the operation ID only to
 reconcile the same intended operation; a new desired state has a new ID and the exact
 previous marker. The record group's member names/types are immutable for its lifetime.
