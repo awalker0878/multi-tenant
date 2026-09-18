@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 5e453a432a4b6c5af7d75ba266945bdb9e01118757cbeec1e15d81f92be32ab0 -->
-<!-- SOURCE-BLOCK VRC:51 BEGIN -->
-
 <a id="VC_05"></a>
-
-<!-- SOURCE-BLOCK VRC:51 END -->
-
-<!-- SOURCE-BLOCK VRC:52 BEGIN -->
 
 Reference mapping: provider-owned routed transport, qualified host/appliance attachment, optional EVPN/VXLAN where needed, and separately protected hardware recovery and management.
 
-<!-- SOURCE-BLOCK VRC:52 END -->
-
-<!-- SOURCE-BLOCK VRC:53 BEGIN -->
-
 Baseline and related records: [RA §5](../../architecture/reference/5-physical-fabric-and-platform-attachment.md#RA_s_005)  •  [RA §6](../../architecture/reference/6-management-platform-control-and-out-of-band-access.md#RA_s_006)  •  [NET §1](../fabric/1-transport-routing-and-overlay-ownership.md#NET_s_001)  •  [NET §5](../fabric/5-mtu-performance-and-failure-engineering.md#NET_s_005)
-
-<!-- SOURCE-BLOCK VRC:53 END -->
-
-<!-- SOURCE-BLOCK VRC:54 BEGIN -->
 
 
 <a id="source-table-54"></a>
@@ -38,26 +24,8 @@ Baseline and related records: [RA §5](../../architecture/reference/5-physical-f
 | Platform/edge transport | Owned tunnel endpoint networks, dedicated/qualified handoffs, actual encapsulation and minimum surviving MTU. |
 | Commission and recover | Supported network configuration owner, safe staged change, snapshots, constrained management, fault/recovery observations and accepted G1 receipt. |
 
-<!-- SOURCE-BLOCK VRC:54 END -->
-
-<!-- SOURCE-BLOCK VRC:55 BEGIN -->
-
-<!-- SOURCE-BLOCK VRC:55 END -->
-
-<!-- SOURCE-BLOCK VRC:56 BEGIN -->
-
 Use a site-specific network-OS annex after hardware selection. A Dell OS10 or other switch implementation must supply its actual provider or native configuration coverage and release-specific commands. The kit does not assert an unverified universal Terraform switch provider.
 
-<!-- SOURCE-BLOCK VRC:56 END -->
-
-<!-- SOURCE-BLOCK VRC:57 BEGIN -->
-
 Physical placement and cabling execution use approved facility/manufacturer procedures and qualified personnel. Do not infer physical independence from two logical links terminating on the same failure dependency.
-
-<!-- SOURCE-BLOCK VRC:57 END -->
-
-<!-- SOURCE-BLOCK VRC:58 BEGIN -->
-
-<!-- SOURCE-BLOCK VRC:58 END -->
 
 [Previous chapter](4-openstack-realization-card.md) · [Chapter index](README.md) · [Next chapter](6-shared-services-and-security-edge-realization-card.md)

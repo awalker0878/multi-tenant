@@ -8,23 +8,9 @@
 <!-- source-sha256: 8ddf5ff71f4779a15e56ed3708ace1f8315116ed1e6c9ce1f6a73276d7101a89 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK REV12:36 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:36 END -->
-
-<!-- SOURCE-BLOCK REV12:37 BEGIN -->
-
 The following index accounts for every one of the 194 source requirement identifiers. It does not claim that their exact normative wording is reproduced. Requirements were consolidated into architectural decisions, component descriptions, provisioning responsibilities and acceptance outcomes. Each entry identifies its treatment and destination. “Retained intent” preserves the relevant infrastructure concern, not every field-level software prescription.
 
-<!-- SOURCE-BLOCK REV12:37 END -->
-
-<!-- SOURCE-BLOCK REV12:38 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 1–10
-
-<!-- SOURCE-BLOCK REV12:38 END -->
-
-<!-- SOURCE-BLOCK REV12:39 BEGIN -->
 
 
 <a id="source-table-39"></a>
@@ -45,19 +31,7 @@ The following index accounts for every one of the 194 source requirement identif
 | SDI-001, SDI-002, SDI-003, SDI-004 | Consolidated / retained intent | 9, 15–18 |
 | ZONE-001, ZONE-002 | Consolidated / retained intent | 10 |
 
-<!-- SOURCE-BLOCK REV12:39 END -->
-
-<!-- SOURCE-BLOCK REV12:40 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:40 END -->
-
-<!-- SOURCE-BLOCK REV12:41 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 11–21
-
-<!-- SOURCE-BLOCK REV12:41 END -->
-
-<!-- SOURCE-BLOCK REV12:42 BEGIN -->
 
 
 <a id="source-table-42"></a>
@@ -76,19 +50,7 @@ The following index accounts for every one of the 194 source requirement identif
 | EDGE-001, EDGE-002 | Consolidated / retained intent | 11, 15–18 |
 | SITE-001, SITE-002, SITE-003, SITE-004 | Consolidated / retained intent | 4, 14 |
 
-<!-- SOURCE-BLOCK REV12:42 END -->
-
-<!-- SOURCE-BLOCK REV12:43 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:43 END -->
-
-<!-- SOURCE-BLOCK REV12:44 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 22–31
-
-<!-- SOURCE-BLOCK REV12:44 END -->
-
-<!-- SOURCE-BLOCK REV12:45 BEGIN -->
 
 
 <a id="source-table-45"></a>
@@ -106,19 +68,7 @@ The following index accounts for every one of the 194 source requirement identif
 | SVCM-001, SVCM-002 | Consolidated / retained intent | 1, 19, 21, 25 |
 | RESP-001 | Consolidated / retained intent | 1, 13, 21, 25 |
 
-<!-- SOURCE-BLOCK REV12:45 END -->
-
-<!-- SOURCE-BLOCK REV12:46 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:46 END -->
-
-<!-- SOURCE-BLOCK REV12:47 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 32–38
-
-<!-- SOURCE-BLOCK REV12:47 END -->
-
-<!-- SOURCE-BLOCK REV12:48 BEGIN -->
 
 
 <a id="source-table-48"></a>
@@ -135,19 +85,7 @@ The following index accounts for every one of the 194 source requirement identif
 | FUT-001, FUT-002 | Scope reduced | 11, 18, 26 |
 | FUT-003 | Scope reduced | 11, 18, 26 |
 
-<!-- SOURCE-BLOCK REV12:48 END -->
-
-<!-- SOURCE-BLOCK REV12:49 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:49 END -->
-
-<!-- SOURCE-BLOCK REV12:50 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 39–46
-
-<!-- SOURCE-BLOCK REV12:50 END -->
-
-<!-- SOURCE-BLOCK REV12:51 BEGIN -->
 
 
 <a id="source-table-51"></a>
@@ -169,19 +107,7 @@ The following index accounts for every one of the 194 source requirement identif
 | SEC-004 | Reframed / reduced | 6, 13, 22 |
 | DRIFT-001, DRIFT-002, DRIFT-003 | Reframed / retained intent | 23, 25 |
 
-<!-- SOURCE-BLOCK REV12:51 END -->
-
-<!-- SOURCE-BLOCK REV12:52 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:52 END -->
-
-<!-- SOURCE-BLOCK REV12:53 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 47–57
-
-<!-- SOURCE-BLOCK REV12:53 END -->
-
-<!-- SOURCE-BLOCK REV12:54 BEGIN -->
 
 
 <a id="source-table-54"></a>
@@ -203,19 +129,7 @@ The following index accounts for every one of the 194 source requirement identif
 | LIFE-001, LIFE-002, LIFE-003 | Consolidated / retained intent | 13, 23 |
 | MIG-001, MIG-002, MIG-003 | Consolidated / retained intent | 14, 18, 23–24 |
 
-<!-- SOURCE-BLOCK REV12:54 END -->
-
-<!-- SOURCE-BLOCK REV12:55 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:55 END -->
-
-<!-- SOURCE-BLOCK REV12:56 BEGIN -->
-
 ## Requirements originating in v1.1 chapters 58–62
-
-<!-- SOURCE-BLOCK REV12:56 END -->
-
-<!-- SOURCE-BLOCK REV12:57 BEGIN -->
 
 
 <a id="source-table-57"></a>
@@ -227,11 +141,5 @@ The following index accounts for every one of the 194 source requirement identif
 | ONB-001 | Reframed / retained intent | 20–21, 26 |
 | DEL-001, DEL-002 | Reframed / retained intent | 20, 24, 26 |
 | ACPT-001 | Reframed / retained intent | 26 |
-
-<!-- SOURCE-BLOCK REV12:57 END -->
-
-<!-- SOURCE-BLOCK REV12:58 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:58 END -->
 
 [Previous chapter](2-appendix-disposition.md) · [Chapter index](README.md) · [Next chapter](4-architectural-review-and-scope-checks.md)

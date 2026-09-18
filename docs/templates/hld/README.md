@@ -21,114 +21,38 @@
 - [10. Architecture review and engineering handoff](10-architecture-review-and-engineering-handoff.md)
 
 ## Source front matter
-<!-- SOURCE-BLOCK AT:0 BEGIN -->
-
 DELIVERY KIT  /  AT
-
-<!-- SOURCE-BLOCK AT:0 END -->
-
-<!-- SOURCE-BLOCK AT:1 BEGIN -->
 
 ## High-Level Design and Architecture Review Template
 
-<!-- SOURCE-BLOCK AT:1 END -->
-
-<!-- SOURCE-BLOCK AT:2 BEGIN -->
-
 *Editable high-level design record. Copy once per adopted service/site scope.*
-
-<!-- SOURCE-BLOCK AT:2 END -->
-
-<!-- SOURCE-BLOCK AT:3 BEGIN -->
 
 Kit v1.0 • 16 September 2026 • Aligned to the frozen v1.4 reference architecture
 
-<!-- SOURCE-BLOCK AT:3 END -->
-
-<!-- SOURCE-BLOCK AT:4 BEGIN -->
-
 Working kit, not an approved site design or deployed platform. Templates, reference examples and live evidence are separate records.
-
-<!-- SOURCE-BLOCK AT:4 END -->
-
-<!-- SOURCE-BLOCK AT:5 BEGIN -->
 
 Enter responses in the tagged fields; attach the actual drawings and controlled register snapshots. Do not copy illustrative addresses or mark unknown evidence as complete. Repeat a page or schedule where multiple decisions require separate records.
 
-<!-- SOURCE-BLOCK AT:5 END -->
-
-<!-- SOURCE-BLOCK AT:6 BEGIN -->
-
 ## Section links
-
-<!-- SOURCE-BLOCK AT:6 END -->
-
-<!-- SOURCE-BLOCK AT:7 BEGIN -->
 
 [1. Mandate and service envelope](1-mandate-and-service-envelope.md#AT_01)
 
-<!-- SOURCE-BLOCK AT:7 END -->
-
-<!-- SOURCE-BLOCK AT:8 BEGIN -->
-
 [2. Requirements and applicability](2-requirements-and-applicability.md#AT_02)
-
-<!-- SOURCE-BLOCK AT:8 END -->
-
-<!-- SOURCE-BLOCK AT:9 BEGIN -->
 
 [3. Context and physical deployment views](3-context-and-physical-deployment-views.md#AT_03)
 
-<!-- SOURCE-BLOCK AT:9 END -->
-
-<!-- SOURCE-BLOCK AT:10 BEGIN -->
-
 [4. Logical tenancy, security and traffic views](4-logical-tenancy-security-and-traffic-views.md#AT_04)
-
-<!-- SOURCE-BLOCK AT:10 END -->
-
-<!-- SOURCE-BLOCK AT:11 BEGIN -->
 
 [5. Management, data and service dependencies](5-management-data-and-service-dependencies.md#AT_05)
 
-<!-- SOURCE-BLOCK AT:11 END -->
-
-<!-- SOURCE-BLOCK AT:12 BEGIN -->
-
 [6. Architecture decision record](6-architecture-decision-record.md#AT_06)
-
-<!-- SOURCE-BLOCK AT:12 END -->
-
-<!-- SOURCE-BLOCK AT:13 BEGIN -->
 
 [7. Threat, sharing and responsibility review](7-threat-sharing-and-responsibility-review.md#AT_07)
 
-<!-- SOURCE-BLOCK AT:13 END -->
-
-<!-- SOURCE-BLOCK AT:14 BEGIN -->
-
 [8. Reliability, capacity and exit design](8-reliability-capacity-and-exit-design.md#AT_08)
-
-<!-- SOURCE-BLOCK AT:14 END -->
-
-<!-- SOURCE-BLOCK AT:15 BEGIN -->
 
 [9. Vendor realization and provisioning strategy](9-vendor-realization-and-provisioning-strategy.md#AT_09)
 
-<!-- SOURCE-BLOCK AT:15 END -->
-
-<!-- SOURCE-BLOCK AT:16 BEGIN -->
-
 [10. Architecture review and engineering handoff](10-architecture-review-and-engineering-handoff.md#AT_10)
 
-<!-- SOURCE-BLOCK AT:16 END -->
-
-<!-- SOURCE-BLOCK AT:17 BEGIN -->
-
 All additional process guidance is proposed kit practice. RA/WD references identify baseline-derived architecture; K references identify external mechanism checks. No site values or approval signatures are supplied.
-
-<!-- SOURCE-BLOCK AT:17 END -->
-
-<!-- SOURCE-BLOCK AT:18 BEGIN -->
-
-<!-- SOURCE-BLOCK AT:18 END -->

@@ -12,3 +12,5 @@ This is a new **composition / navigation view of available source content**, not
 | Decisions, adoption and acceptance | [RA §28](reference/28-architecture-acceptance-and-verification.md) · [RA §29](reference/29-architecture-decisions-and-alternatives.md) · [RA §30](reference/30-implementation-handoff-and-delivery-sequence.md) · [SDP §3](../solutions/design-method/3-develop-a-boundary-architecture-decision.md) |
 
 [Decision register](../adr/README.md) · [Solution design](../solutions/README.md) · [Working templates](../templates/README.md)
+
+[Maintained design workspace](../current/README.md) — current editable records, separately versioned from frozen transcriptions. See [completion-audit dispositions](../assurance/completion-corrections.md).

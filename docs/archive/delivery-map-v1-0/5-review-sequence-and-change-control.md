@@ -8,25 +8,11 @@
 <!-- source-sha256: e332c1b37e63439169adf8b105573577fa1ea61bf32f6c3ba383dd69d83a788b -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK DEL10:52 BEGIN -->
-
 <a id="DEL_05"></a>
-
-<!-- SOURCE-BLOCK DEL10:52 END -->
-
-<!-- SOURCE-BLOCK DEL10:53 BEGIN -->
 
 Use focused reviews at the point where a decision becomes expensive to reverse. Do not use document length or a green dashboard as the quality measure.
 
-<!-- SOURCE-BLOCK DEL10:53 END -->
-
-<!-- SOURCE-BLOCK DEL10:54 BEGIN -->
-
 Baseline and related records: [RA §25](../../architecture/reference/25-change-brownfield-adoption-and-configuration-ownership.md#RA_s_025)  •  [RA §29](../../architecture/reference/29-architecture-decisions-and-alternatives.md#RA_s_029)  •  [QUAL §7](../../assurance/site-qualification/7-operating-accountability-handover-and-change.md#QUAL_s_007)
-
-<!-- SOURCE-BLOCK DEL10:54 END -->
-
-<!-- SOURCE-BLOCK DEL10:55 BEGIN -->
 
 
 <a id="source-table-55"></a>
@@ -40,20 +26,6 @@ Baseline and related records: [RA §25](../../architecture/reference/25-change-b
 | Readiness / activation | Confirm support and required restore proof, operating authority and current tenant checks. | Service, operations, data/security authorities; initial G4 then G3. |
 | Post-change / ongoing | Capture as-built differences, residual defects, measurement trends, expiry and renewed tests. | Operations and lifecycle owners; continuing G4 and change impact. |
 
-<!-- SOURCE-BLOCK DEL10:55 END -->
-
-<!-- SOURCE-BLOCK DEL10:56 BEGIN -->
-
-<!-- SOURCE-BLOCK DEL10:56 END -->
-
-<!-- SOURCE-BLOCK DEL10:57 BEGIN -->
-
 If a requirement or topology changes, identify affected decisions, engineering schedules, modules/configurations, test cases, service promises and deployed environments. Record whether the change is a variation, a new service class or a revision to the adopted architecture. Retain the former baseline and actual historical decision.
-
-<!-- SOURCE-BLOCK DEL10:57 END -->
-
-<!-- SOURCE-BLOCK DEL10:58 BEGIN -->
-
-<!-- SOURCE-BLOCK DEL10:58 END -->
 
 [Previous chapter](4-working-records-examples-and-evidence.md) · [Chapter index](README.md) · [Next chapter](6-inputs-still-required-for-an-actual-deployment.md)

@@ -8,17 +8,7 @@
 <!-- source-sha256: 8ddf5ff71f4779a15e56ed3708ace1f8315116ed1e6c9ce1f6a73276d7101a89 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK REV12:11 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:11 END -->
-
-<!-- SOURCE-BLOCK REV12:12 BEGIN -->
-
 ## Prior chapters 1–10
-
-<!-- SOURCE-BLOCK REV12:12 END -->
-
-<!-- SOURCE-BLOCK REV12:13 BEGIN -->
 
 
 <a id="source-table-13"></a>
@@ -36,19 +26,7 @@
 | 9. Security Domains and site/platform instances | Retained / expanded; v1.2 9, 15–18 | Logical authority and site/platform realization remain distinct. |
 | 10. Zone classes, external domains and adjacency | Retained / clarified; v1.2 10 | External authority retained; HRZ eligibility caveat made explicit for portable cloud scope. |
 
-<!-- SOURCE-BLOCK REV12:13 END -->
-
-<!-- SOURCE-BLOCK REV12:14 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:14 END -->
-
-<!-- SOURCE-BLOCK REV12:15 BEGIN -->
-
 ## Prior chapters 11–21
-
-<!-- SOURCE-BLOCK REV12:15 END -->
-
-<!-- SOURCE-BLOCK REV12:16 BEGIN -->
 
 
 <a id="source-table-16"></a>
@@ -67,19 +45,7 @@
 | 20. Provider-internal Edge Attachment contract | Rewritten; v1.2 11, 15–18 | Physical/logical handoff patterns replace a field-level EdgeAttachment contract. |
 | 21. Multi-site domains and recovery connectivity | Retained / expanded; v1.2 4, 14 | Site-local dependencies, replication, recovery and fencing shown as infrastructure. |
 
-<!-- SOURCE-BLOCK REV12:16 END -->
-
-<!-- SOURCE-BLOCK REV12:17 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:17 END -->
-
-<!-- SOURCE-BLOCK REV12:18 BEGIN -->
-
 ## Prior chapters 22–31
-
-<!-- SOURCE-BLOCK REV12:18 END -->
-
-<!-- SOURCE-BLOCK REV12:19 BEGIN -->
 
 
 <a id="source-table-19"></a>
@@ -97,19 +63,7 @@
 | 30. Service catalogue, quotas and capacity on demand | Retained / integrated; v1.2 1, 19, 21, 25 | Capacity-on-demand and inventory distinctions remain; catalogue application design excluded. |
 | 31. Application responsibilities and end-to-end service readiness | Reduced to interface; v1.2 1, 13, 21, 25 | Application design removed; guest/data-owner handover and acceptance responsibilities retained. |
 
-<!-- SOURCE-BLOCK REV12:19 END -->
-
-<!-- SOURCE-BLOCK REV12:20 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:20 END -->
-
-<!-- SOURCE-BLOCK REV12:21 BEGIN -->
-
 ## Prior chapters 32–38
-
-<!-- SOURCE-BLOCK REV12:21 END -->
-
-<!-- SOURCE-BLOCK REV12:22 BEGIN -->
 
 
 <a id="source-table-22"></a>
@@ -124,19 +78,7 @@
 | 37. OpenStack implementation profile | Expanded; v1.2 17, 22 | OpenStack backend, project/router/port authority and foundation/provider distinction added. |
 | 38. Bare metal, containers and future platforms | Scope reduced; v1.2 11, 18, 26 | Fabric-routed physical extension retained. Detailed container platform design deferred to its own qualified profile. |
 
-<!-- SOURCE-BLOCK REV12:22 END -->
-
-<!-- SOURCE-BLOCK REV12:23 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:23 END -->
-
-<!-- SOURCE-BLOCK REV12:24 BEGIN -->
-
 ## Prior chapters 39–46
-
-<!-- SOURCE-BLOCK REV12:24 END -->
-
-<!-- SOURCE-BLOCK REV12:25 BEGIN -->
 
 
 <a id="source-table-25"></a>
@@ -152,19 +94,7 @@
 | 45. Secrets and automation credentials | Reduced / integrated; v1.2 6, 13, 22 | Credential/state protection retained at architectural level; ephemeral syntax examples removed. |
 | 46. Drift, emergency overrides and desired-state convergence | Retained / reframed; v1.2 23, 25 | Actual-state comparison and incident precedence retained; controller object lifecycle excluded. |
 
-<!-- SOURCE-BLOCK REV12:25 END -->
-
-<!-- SOURCE-BLOCK REV12:26 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:26 END -->
-
-<!-- SOURCE-BLOCK REV12:27 BEGIN -->
-
 ## Prior chapters 47–57
-
-<!-- SOURCE-BLOCK REV12:27 END -->
-
-<!-- SOURCE-BLOCK REV12:28 BEGIN -->
 
 
 <a id="source-table-28"></a>
@@ -183,19 +113,7 @@
 | 56. Lifecycle, retirement and secure disposal | Retained / integrated; v1.2 13, 23 | Data-aware infrastructure retirement retained; software finalizer details removed. |
 | 57. Migration, portability and exit rehearsal | Retained / integrated; v1.2 14, 18, 23–24 | Rebuild/data-transfer/exit boundaries retained without pretending Terraform migrates data. |
 
-<!-- SOURCE-BLOCK REV12:28 END -->
-
-<!-- SOURCE-BLOCK REV12:29 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:29 END -->
-
-<!-- SOURCE-BLOCK REV12:30 BEGIN -->
-
 ## Prior chapters 58–62
-
-<!-- SOURCE-BLOCK REV12:30 END -->
-
-<!-- SOURCE-BLOCK REV12:31 BEGIN -->
 
 
 <a id="source-table-31"></a>
@@ -207,11 +125,5 @@
 | 60. Architecture review and onboarding gates | Rewritten; v1.2 20–21, 26 | Commissioning, tenant/WSD and activation gates are concrete infrastructure stages. |
 | 61. Delivery roadmap and reference implementation | Rewritten; v1.2 20, 24, 26 | First-platform then multi-platform delivery, without custom application prerequisite. |
 | 62. Architecture acceptance and document release | Rewritten; v1.2 26 | Architectural and operational acceptance replaces document/contract completeness claims. |
-
-<!-- SOURCE-BLOCK REV12:31 END -->
-
-<!-- SOURCE-BLOCK REV12:32 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:32 END -->
 
 [Chapter index](README.md) · [Next chapter](2-appendix-disposition.md)

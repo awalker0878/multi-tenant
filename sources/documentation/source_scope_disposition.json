@@ -1,0 +1,55 @@
+{
+  "review_basis": "Available 28 originals plus current explicit correction request",
+  "scope_decision": "Use frozen available transcriptions with newly identified maintained records; no missing-original recovery asserted",
+  "owner_acceptance": "NOT_RECORDED",
+  "missing_originals": [
+    {
+      "name": "RAD_Adoption_and_Conformance.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "RAD-M01",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "TAD_Technical_Architecture.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "TAD-M01",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "Solution_Design_Method_and_Template.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "Existing HLD template plus SOL-M01",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "Solution_Design_Internal_Protected_Workload.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "SOL-M01",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "Solution_Design_Public_Digital_Service.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "SOL-M02 design profile; detailed installed solution remains open",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "Interface_Control_and_Service_Agreements.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "ICD-M01",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "Transition_Architecture_and_Migration_Design.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "TRANS-M01",
+      "approval": "OWNER_REVIEW_PENDING"
+    },
+    {
+      "name": "As_Built_Architecture_and_Operational_Acceptance.docx",
+      "disposition": "NOT_RECOVERED_NEW_IDENTIFIED_COVERAGE",
+      "new_coverage": "TRANS-M01 with actual values/evidence still unfilled",
+      "approval": "OWNER_REVIEW_PENDING"
+    }
+  ]
+}

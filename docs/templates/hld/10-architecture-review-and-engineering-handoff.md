@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 911b87e6a36d903a12535d16d75f1875c0cefb6b72c462895f7c2559b556708c -->
-<!-- SOURCE-BLOCK AT:91 BEGIN -->
-
 <a id="AT_10"></a>
-
-<!-- SOURCE-BLOCK AT:91 END -->
-
-<!-- SOURCE-BLOCK AT:92 BEGIN -->
 
 Working record for AK-08. Complete the responses and attach the referenced evidence or drawing; do not replace an unresolved item with an unsupported assumption.
 
-<!-- SOURCE-BLOCK AT:92 END -->
-
-<!-- SOURCE-BLOCK AT:93 BEGIN -->
-
 Baseline and related records: [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)  •  [EK §1](../../engineering/delivery-guide/1-engineering-work-plan-and-release-boundary.md#EK_01)
-
-<!-- SOURCE-BLOCK AT:93 END -->
-
-<!-- SOURCE-BLOCK AT:94 BEGIN -->
 
 
 <a id="source-table-94"></a>
@@ -38,22 +24,8 @@ Baseline and related records: [RA §30](../../architecture/reference/30-implemen
 | Conditions/review date | Conditions before further gates, expiry and material-change triggers. | {{AT\_CONDITIONS}} |
 | Receipt acknowledgement | Engineering owner and date acknowledging complete controlled inputs. | {{AT\_RECEIPT}} |
 
-<!-- SOURCE-BLOCK AT:94 END -->
-
-<!-- SOURCE-BLOCK AT:95 BEGIN -->
-
-<!-- SOURCE-BLOCK AT:95 END -->
-
-<!-- SOURCE-BLOCK AT:96 BEGIN -->
-
 No acceptance is prefilled. When any mandatory decision is unresolved, identify the blocked scope instead of signing a blanket approval.
 
-<!-- SOURCE-BLOCK AT:96 END -->
-
-<!-- SOURCE-BLOCK AT:97 BEGIN -->
-
 Record status: Draft / In review / Accepted for stated scope / Returned for revision. Use the actual review record, not this prompt, as authority.
-
-<!-- SOURCE-BLOCK AT:97 END -->
 
 [Previous chapter](9-vendor-realization-and-provisioning-strategy.md) · [Chapter index](README.md)

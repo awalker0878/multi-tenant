@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 5e453a432a4b6c5af7d75ba266945bdb9e01118757cbeec1e15d81f92be32ab0 -->
-<!-- SOURCE-BLOCK VRC:67 BEGIN -->
-
 <a id="VC_07"></a>
-
-<!-- SOURCE-BLOCK VRC:67 END -->
-
-<!-- SOURCE-BLOCK VRC:68 BEGIN -->
 
 Complete this review for each selected platform and all dependencies used by the offered service. A moving “latest” documentation page is context; retain the exact supported release evidence for the actual installation.
 
-<!-- SOURCE-BLOCK VRC:68 END -->
-
-<!-- SOURCE-BLOCK VRC:69 BEGIN -->
-
 Baseline and related records: [VND §7](../platform-realizations/7-implementation-tuple-and-decision-package.md#VND_s_007)  •  [ET §8](../../templates/lld/8-exact-platform-and-tool-operation-coverage.md#ET_08)  •  [IK §4](../../implementation/delivery-guide/4-native-platform-commissioning-tracks.md#IK_04)
-
-<!-- SOURCE-BLOCK VRC:69 END -->
-
-<!-- SOURCE-BLOCK VRC:70 BEGIN -->
 
 
 <a id="source-table-70"></a>
@@ -39,22 +25,8 @@ Baseline and related records: [VND §7](../platform-realizations/7-implementatio
 | Variations and residual gaps | Changed design requires appropriate approval and new assertions; no automatic portability claim. |
 | Readiness | Qualification scoped by class/family; required operational recovery evidence before production; ongoing requalification triggers. |
 
-<!-- SOURCE-BLOCK VRC:70 END -->
-
-<!-- SOURCE-BLOCK VRC:71 BEGIN -->
-
-<!-- SOURCE-BLOCK VRC:71 END -->
-
-<!-- SOURCE-BLOCK VRC:72 BEGIN -->
-
 Use source IDs K05–K09 as current research entry points and the frozen RA/VND as architecture lineage. Source discovery does not approve a product combination. A feature gap should become a documented alternative, a limited service offer or a blocking issue.
 
-<!-- SOURCE-BLOCK VRC:72 END -->
-
-<!-- SOURCE-BLOCK VRC:73 BEGIN -->
-
 These cards are implementation specifications and checklists. Actual modules, native installation/configuration artifacts, environment values and live evidence are separate required outputs—not represented as already delivered.
-
-<!-- SOURCE-BLOCK VRC:73 END -->
 
 [Previous chapter](6-shared-services-and-security-edge-realization-card.md) · [Chapter index](README.md)

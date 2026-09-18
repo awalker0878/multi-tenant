@@ -8,17 +8,7 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:276 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:276 END -->
-
-<!-- SOURCE-BLOCK HB10:277 BEGIN -->
-
 Continuous reconciliation compares declared intent, Terraform state, platform state, route/security policy, and evidence. Manual changes should be detected and either reverted or converted into an approved change. Drift is not merely a configuration hygiene issue; it can invalidate authorization evidence.
-
-<!-- SOURCE-BLOCK HB10:277 END -->
-
-<!-- SOURCE-BLOCK HB10:278 BEGIN -->
 
 
 <a id="source-table-278"></a>
@@ -26,20 +16,10 @@ Continuous reconciliation compares declared intent, Terraform state, platform st
 | DRIFT-001 | Security-significant drift SHALL generate an actionable event and SHALL affect the compliance/authorization state of the WSD until resolved or accepted. |
 | --- | --- |
 
-<!-- SOURCE-BLOCK HB10:278 END -->
-
-<!-- SOURCE-BLOCK HB10:279 BEGIN -->
-
 
 <a id="source-table-279"></a>
 
 | DRIFT-002 | Emergency changes SHALL be reconciled back into the source of truth after the incident or maintenance action. |
 | --- | --- |
-
-<!-- SOURCE-BLOCK HB10:279 END -->
-
-<!-- SOURCE-BLOCK HB10:280 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:280 END -->
 
 [Previous chapter](34-ci-cd-and-change-gates.md) · [Chapter index](README.md) · [Next chapter](42-part-v-assurance-testing-and-operations.md)

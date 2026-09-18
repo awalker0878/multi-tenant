@@ -64,6 +64,10 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=ROOT / "build/reports/terraform_validation.json")
     args = parser.parse_args()
     started = time.monotonic()
+    source_digests = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                      for p in sorted((ROOT / "terraform").rglob("*"))
+                      if p.is_file() and ".terraform" not in p.parts}
+    source_digests["tools/verify_terraform.py"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     report: dict[str, Any] = {
         "kind": "TERRAFORM_TOOLCHAIN_CHECK",
         "target_infrastructure": "NOT_CONTACTED_BY_THIS_SCRIPT",
@@ -74,6 +78,11 @@ def main() -> int:
         "planned_module_count": len(list((ROOT/"terraform/modules").glob("*/main.tf.json"))),
         "planned_root_count": len(list((ROOT/"terraform/roots").glob("*/main.tf.json"))),
         "schema_export": "NOT_RUN",
+        "source_files_sha256": source_digests,
+        "tested_source_sha256": hashlib.sha256(json.dumps(source_digests, sort_keys=True).encode()).hexdigest(),
+        "ci_head_sha": os.environ.get("GITHUB_SHA"),
+        "ci_run_id": os.environ.get("GITHUB_RUN_ID"),
+        "backend_policy": "No state backend is initialized; roots are validated, not planned or schema-exported.",
     }
 
     def finish(status: str, reason: str | None = None) -> int:
@@ -91,7 +100,7 @@ def main() -> int:
         return finish("BLOCKED_TOOLCHAIN", "terraform executable is not installed")
 
     # Keep approved mirror/trust settings, but remove ambient cloud/CLI credentials.
-    forbidden_prefixes = ("TF_VAR_", "TF_CLI_ARGS", "OS_", "NUTANIX_", "NSXT_", "VSPHERE_", "TF_HTTP_", "NSX_", "AWS_", "ARM_", "GOOGLE_")
+    forbidden_prefixes = ("TF_VAR_", "TF_CLI_ARGS", "OS_", "NUTANIX_", "NSXT_", "NSX_", "VSPHERE_", "TF_HTTP_", "AWS_", "AZURE_", "ARM_", "GOOGLE_", "GCLOUD_")
     env = {key: value for key, value in os.environ.items() if not key.startswith(forbidden_prefixes)}
     env.update(TF_IN_AUTOMATION="true", TF_INPUT="0", CHECKPOINT_DISABLE="1")
 
@@ -132,7 +141,10 @@ def main() -> int:
                     "name": directory.name, "validation": "NOT_RUN",
                     "mock_tests": "NOT_RUN" if family == "modules" else "NOT_APPLICABLE_ROOT",
                 }
-                init = run([f"-chdir={directory}", "init", "-backend=false", "-input=false"])
+                init_args = [f"-chdir={directory}", "init", "-backend=false", "-input=false"]
+                if (directory / ".terraform.lock.hcl").is_file():
+                    init_args.append("-lockfile=readonly")
+                init = run(init_args)
                 if init["exit_code"] != 0:
                     entry.update(
                         validation="BLOCKED_INITIALIZATION", init_exit=init["exit_code"],
@@ -173,30 +185,30 @@ def main() -> int:
                     except (ValueError, TypeError):
                         entry["schema_export"] = "FAILED"
                 else:
-                    # Root HTTP backends deliberately remain uninitialized. Schema
-                    # export resolves the backend and is not a backend-free command.
-                    # Reuse only the matching source module's *actual* provider schema.
-                    module = work / "modules" / directory.name / "main.tf.json"
-                    root_providers = json.loads((directory/"main.tf.json").read_text())["terraform"]["required_providers"]
-                    module_providers = json.loads(module.read_text())["terraform"]["required_providers"]
-                    match = next((m for m in report["modules"] if m["name"] == directory.name), {})
-                    if root_providers == module_providers and match.get("schema_export") == "EXPORTED_FROM_ACTUAL_PLUGINS":
-                        entry["schema_export"] = "MATCHING_MODULE_SCHEMA_REVIEWED_ROOT_BACKEND_NOT_INITIALIZED"
-                        entry["module_schema_sha256"] = match["schema_sha256"]
-                    else:
-                        entry["schema_export"] = "FAILED_MODULE_PROVIDER_MATCH"
+                    entry["schema_export"] = "NOT_RUN_ROOT_BACKEND_BOUNDARY"
+                    entry["schema_source"] = "matching backend-free module; provider constraints must match"
+                    module_config = json.loads((work / "modules" / directory.name / "main.tf.json").read_text())
+                    root_config = json.loads((directory / "main.tf.json").read_text())
+                    entry["matching_module_provider_requirements"] = (module_config["terraform"]["required_providers"] == root_config["terraform"]["required_providers"])
                 lock = directory / ".terraform.lock.hcl"
                 if lock.is_file():
                     destination = args.output.parent / "toolchain-locks" / family / directory.name
                     destination.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(lock, destination / lock.name)
                     entry["lock_sha256"] = hashlib.sha256(lock.read_bytes()).hexdigest()
-                else:
-                    entry["lock_missing"] = True
+                    entry["lock_origin"] = "SOURCE_LOCK_VALIDATED_READONLY" if (ROOT / "terraform" / family / directory.name / lock.name).is_file() else "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
                 report[family].append(entry)
 
-    validated = all(report[family] and all(item["validation"] == "PASSED" and item.get("schema_export") == ("EXPORTED_FROM_ACTUAL_PLUGINS" if family == "modules" else "MATCHING_MODULE_SCHEMA_REVIEWED_ROOT_BACKEND_NOT_INITIALIZED") and bool(item.get("lock_sha256")) for item in report[family])
-                    for family in ("modules", "roots"))
+    validated = (
+        len(report["modules"]) == report["planned_module_count"] == 10
+        and len(report["roots"]) == report["planned_root_count"] == 10
+        and all(item["validation"] == "PASSED"
+                and item.get("schema_export") == "EXPORTED_FROM_ACTUAL_PLUGINS"
+                and item.get("lock_sha256") for item in report["modules"])
+        and all(item["validation"] == "PASSED"
+                and item.get("schema_export") == "NOT_RUN_ROOT_BACKEND_BOUNDARY"
+                and item.get("matching_module_provider_requirements") is True
+                and item.get("lock_sha256") for item in report["roots"]))
     mocked = not args.mock_tests or all(item["mock_tests"] == "PASSED" for item in report["modules"])
     return finish("PASSED_TOOLCHAIN_ONLY" if validated and mocked else "INCOMPLETE_OR_FAILED_TOOLCHAIN")
 

@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802 -->
-<!-- SOURCE-BLOCK AK:79 BEGIN -->
-
 <a id="AK_08"></a>
-
-<!-- SOURCE-BLOCK AK:79 END -->
-
-<!-- SOURCE-BLOCK AK:80 BEGIN -->
 
 Release the architecture only with a clear contract for engineering: decisions made, decisions delegated, prohibited shortcuts and evidence needed at each gate.
 
-<!-- SOURCE-BLOCK AK:80 END -->
-
-<!-- SOURCE-BLOCK AK:81 BEGIN -->
-
 Baseline and related records: [RA §30](../reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)  •  [QUAL §2](../../assurance/site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002)  •  [AT §10](../../templates/hld/10-architecture-review-and-engineering-handoff.md#AT_10)
-
-<!-- SOURCE-BLOCK AK:81 END -->
-
-<!-- SOURCE-BLOCK AK:82 BEGIN -->
 
 
 <a id="source-table-82"></a>
@@ -38,22 +24,8 @@ Baseline and related records: [RA §30](../reference/30-implementation-handoff-a
 | Verification design | Each material requirement can be inspected, tested or independently assessed at an identified stage. |
 | Unresolved issues | A named owner, blocking gate, due/review trigger and closure evidence exist for each unresolved choice. |
 
-<!-- SOURCE-BLOCK AK:82 END -->
-
-<!-- SOURCE-BLOCK AK:83 BEGIN -->
-
-<!-- SOURCE-BLOCK AK:83 END -->
-
-<!-- SOURCE-BLOCK AK:84 BEGIN -->
-
 Changes to the adopted architecture require impact review across all dependent engineering and implementation records. A change only to a site address may remain LLD scope; a change to zone sharing, required enforcement, recovery promise or supported service envelope requires architecture/security review.
 
-<!-- SOURCE-BLOCK AK:84 END -->
-
-<!-- SOURCE-BLOCK AK:85 BEGIN -->
-
 Architecture kit completion: AK-01–AK-08 reviewed and handed over. This is G0 design adoption for a defined scope—not proof of platform support, commissioning or authorization to operate.
-
-<!-- SOURCE-BLOCK AK:85 END -->
 
 [Previous chapter](7-decisions-risk-and-review.md) · [Chapter index](README.md)

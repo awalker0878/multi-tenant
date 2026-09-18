@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643 -->
-<!-- SOURCE-BLOCK PBS:72 BEGIN -->
-
 <a id="PBS_06"></a>
-
-<!-- SOURCE-BLOCK PBS:72 END -->
-
-<!-- SOURCE-BLOCK PBS:73 BEGIN -->
 
 The selected distribution, backend and enabled services define the real hosting platform. A generic provider cannot make missing services or unsupported capabilities exist.
 
-<!-- SOURCE-BLOCK PBS:73 END -->
-
-<!-- SOURCE-BLOCK PBS:74 BEGIN -->
-
 Design basis and related records: [RA §18](../../architecture/reference/18-openstack-hosting-stack-reference-realization.md#RA_s_018)  •  [VND §5](../platform-realizations/5-openstack-selected-services-backend-and-mandatory-policy.md#VND_s_005)  •  [VC §4](../vendor-cards/4-openstack-realization-card.md#VC_04)
-
-<!-- SOURCE-BLOCK PBS:74 END -->
-
-<!-- SOURCE-BLOCK PBS:75 BEGIN -->
 
 
 <a id="source-table-75"></a>
@@ -36,51 +22,17 @@ Design basis and related records: [RA §18](../../architecture/reference/18-open
 | Neutron backend | Named ML2/OVN or approved alternative, compute/controller/gateway roles, transport and provider mappings. | Distributed routes, external handoff and all enabled direct-attachment alternatives. |
 | Glance/Cinder and data services | Approved images, owned volumes, storage types/backends and selected keys/protection. | Foreign attachment denied, eligible placement, retained copies and useful restore. |
 
-<!-- SOURCE-BLOCK PBS:75 END -->
-
-<!-- SOURCE-BLOCK PBS:76 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:76 END -->
-
-<!-- SOURCE-BLOCK PBS:77 BEGIN -->
-
 For the OVN reference pattern, OpenStack documents distributed east-west forwarding separately from external gateway handling. A gateway on an external path is therefore not proof that every internal routed flow visits that gateway. Include distributed and provider-network candidates in boundary analysis. \[D07\]
-
-<!-- SOURCE-BLOCK PBS:77 END -->
-
-<!-- SOURCE-BLOCK PBS:78 BEGIN -->
 
 Verified mechanism source: [D07 — OpenStack Neutron OVN reference architecture](https://docs.openstack.org/neutron/latest/admin/ovn/refarch/refarch.html)
 
-<!-- SOURCE-BLOCK PBS:78 END -->
-
-<!-- SOURCE-BLOCK PBS:79 BEGIN -->
-
 Nova’s host-aggregate guidance requires actual scheduler/Placement configuration for the selected isolation model. An aggregate or availability-zone label alone is not enforcement or physical independence. Bind the design to the named configuration and observation that rejects ineligible placement. \[D08\]
-
-<!-- SOURCE-BLOCK PBS:79 END -->
-
-<!-- SOURCE-BLOCK PBS:80 BEGIN -->
 
 Verified mechanism source: [D08 — OpenStack Nova host aggregates](https://docs.openstack.org/nova/latest/admin/aggregates.html)
 
-<!-- SOURCE-BLOCK PBS:80 END -->
-
-<!-- SOURCE-BLOCK PBS:81 BEGIN -->
-
 The accepted handoff names the exact distribution services and versions, backend, enabled extensions, API policy, controller ownership and tested operating limits. Do not directly manage controller-owned OVS/OVN backend objects with a second tool. A backend replacement is an architecture-impacting change with a new failure and policy analysis.
 
-<!-- SOURCE-BLOCK PBS:81 END -->
-
-<!-- SOURCE-BLOCK PBS:82 BEGIN -->
-
 Continue with: [PBS §7](7-openstack-protect-mandatory-network-mutation.md#PBS_07)  •  [QCP §4](../../assurance/qualification-campaign/4-observe-identity-storage-and-protocol-completeness.md#QCP_04)
-
-<!-- SOURCE-BLOCK PBS:82 END -->
-
-<!-- SOURCE-BLOCK PBS:83 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:83 END -->
 
 [Previous chapter](5-vmware-nsx-bind-domain-workload-and-policy-lifecycles.md) · [Chapter index](README.md) · [Next chapter](7-openstack-protect-mandatory-network-mutation.md)
 

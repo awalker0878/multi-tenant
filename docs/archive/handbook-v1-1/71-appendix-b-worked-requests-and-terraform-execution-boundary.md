@@ -8,28 +8,14 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB11:938 BEGIN -->
-
 <a id="__RefHeading___Toc13427_1645000677"></a>
 <a id="app_B"></a>
-
-<!-- SOURCE-BLOCK HB11:938 END -->
-
-<!-- SOURCE-BLOCK HB11:939 BEGIN -->
 
 <a id="__RefHeading___Toc13429_1645000677"></a>
 
 ## Reference examples and migration
 
-<!-- SOURCE-BLOCK HB11:939 END -->
-
-<!-- SOURCE-BLOCK HB11:940 BEGIN -->
-
 This sample request is schema-validated and references the consistent example bundle in the companion package. It is not production-ready: its associated profiles are Proposed/Candidate, no authorization has been issued and no live evidence exists. The application has OZ and RZ intent, one declared database flow, a DNS binding and no public/Internet exposure. The entire bundle supplies the profile, domain, flow and binding definitions needed to interpret it.
-
-<!-- SOURCE-BLOCK HB11:940 END -->
-
-<!-- SOURCE-BLOCK HB11:941 BEGIN -->
 
 ```text
 apiVersion: hosting.platform/v1.1
@@ -115,15 +101,7 @@ spec:
 
 ```
 
-<!-- SOURCE-BLOCK HB11:941 END -->
-
-<!-- SOURCE-BLOCK HB11:942 BEGIN -->
-
 ### Reading a FlowIntent
-
-<!-- SOURCE-BLOCK HB11:942 END -->
-
-<!-- SOURCE-BLOCK HB11:943 BEGIN -->
 
 ```text
 kind: FlowIntent
@@ -150,27 +128,11 @@ spec:
 
 ```
 
-<!-- SOURCE-BLOCK HB11:943 END -->
-
-<!-- SOURCE-BLOCK HB11:944 BEGIN -->
-
 The referenced FlowProfile specifies TCP/5432, stateful request/reply, required TLS and logging. Admission still resolves identities, checks both zone authorities, selects a qualified ZIP path and tests effective policy. A flow reference is not itself evidence that connectivity has been approved or configured.
-
-<!-- SOURCE-BLOCK HB11:944 END -->
-
-<!-- SOURCE-BLOCK HB11:945 BEGIN -->
 
 ### Terraform root configuration pattern
 
-<!-- SOURCE-BLOCK HB11:945 END -->
-
-<!-- SOURCE-BLOCK HB11:946 BEGIN -->
-
 The following is a syntactically concrete configuration pattern, not a deployable adapter or a certified stack. Provider version 2.4.2 is used only as the documentation snapshot example recorded in [S17](77-appendix-h-primary-sources-and-implementation-references.md#S17). Replace it through an approved compatibility/qualification decision, initialize and review the actual lock file, and supply a supported endpoint and credentials through the approved runner. The password input is ephemeral in a compatible Terraform runtime; provider behavior and all persisted artifacts still require verification. \[[S13](77-appendix-h-primary-sources-and-implementation-references.md#S13)–[S17](77-appendix-h-primary-sources-and-implementation-references.md#S17)\]
-
-<!-- SOURCE-BLOCK HB11:946 END -->
-
-<!-- SOURCE-BLOCK HB11:947 BEGIN -->
 
 ```text
 terraform {
@@ -200,24 +162,10 @@ provider "nutanix" {
 # No production credentials or native resources are included here.
 ```
 
-<!-- SOURCE-BLOCK HB11:947 END -->
-
-<!-- SOURCE-BLOCK HB11:948 BEGIN -->
-
 A provider lock file covers provider selections and checksums, not remote module versions. Pin module versions or immutable source commits separately. Do not replace missing adapters with an empty root and label its successful plan a hosting deployment. The orchestrator manages admission, placement, approval, staged authority-specific apply, realization and evidence; Terraform is only one actuator. \[[S14](77-appendix-h-primary-sources-and-implementation-references.md#S14)\]
-
-<!-- SOURCE-BLOCK HB11:948 END -->
-
-<!-- SOURCE-BLOCK HB11:949 BEGIN -->
 
 ### Contract migration from the illustrative v1.0 draft
 
-<!-- SOURCE-BLOCK HB11:949 END -->
-
-<!-- SOURCE-BLOCK HB11:950 BEGIN -->
-
 Move the original top-level intent fields under spec; replace ambiguous protected-b-medium and availability strings with independent impact classification and typed profile references. Split logical domains from site/platform instances, replace REZ internal enums with ExternalDomain, replace boolean service/exposure flags with typed binding/exposure references, and deny consumer writes to observed status. These are breaking semantic changes requiring controlled translation, dependency resolution, validation and re-admission. Do not silently mutate a deployed API or relabel v1.0 records as validated v1.1.
-
-<!-- SOURCE-BLOCK HB11:950 END -->
 
 [Previous chapter](70-appendix-a-canonical-object-contract-and-api-surface.md) · [Chapter index](README.md) · [Next chapter](72-appendix-c-complete-normative-requirement-and-verification-index.md)

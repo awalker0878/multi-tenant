@@ -6,20 +6,10 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 783edbba45483d0d3c3b966765589762698836320237906a0f9a60080574af37 -->
-<!-- SOURCE-BLOCK QUAL:83 BEGIN -->
-
 <a id="__RefHeading___Toc10045_1525915568"></a>
 <a id="QUAL_s_007"></a>
 
-<!-- SOURCE-BLOCK QUAL:83 END -->
-
-<!-- SOURCE-BLOCK QUAL:84 BEGIN -->
-
 Parent architecture: [RA §25](../../architecture/reference/25-change-brownfield-adoption-and-configuration-ownership.md#RA_s_025)  •  [RA §26](../../architecture/reference/26-operating-model-capacity-and-observability.md#RA_s_026)  •  [RA §27](../../architecture/reference/27-recovery-migration-and-retirement.md#RA_s_027)  •  [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)
-
-<!-- SOURCE-BLOCK QUAL:84 END -->
-
-<!-- SOURCE-BLOCK QUAL:85 BEGIN -->
 
 
 <a id="source-table-85"></a>
@@ -35,25 +25,9 @@ Parent architecture: [RA §25](../../architecture/reference/25-change-brownfield
 | Execute shared foundation change | Assigned infrastructure change authority | Authoritative resource owners; compatibility, survivor capacity and recovery plan. |
 | Issue formal system authorization | Designated authorizing official | Assessor and responsible owners; selected controls, evidence, residual risk and operating conditions. |
 
-<!-- SOURCE-BLOCK QUAL:85 END -->
-
-<!-- SOURCE-BLOCK QUAL:86 BEGIN -->
-
-<!-- SOURCE-BLOCK QUAL:86 END -->
-
-<!-- SOURCE-BLOCK QUAL:87 BEGIN -->
-
 These are roles, not invented personnel assignments. The site must name actual teams and escalation contacts and map the reference decisions into its existing process. Separate approval and execution for high-impact changes as required by the adopted control set. One routine workload executor must not acquire unrestricted fabric, management, security-edge and tenant authority.
 
-<!-- SOURCE-BLOCK QUAL:87 END -->
-
-<!-- SOURCE-BLOCK QUAL:88 BEGIN -->
-
 Handover covers as-built topology, component/owner inventory, offered class and limits, current support/patch state, monitoring questions and alerts, credential/custody arrangements, backup and key dependencies, recovery and failback runbooks, remaining gaps and accepted variations. The operator accepts this specific service, not merely receipt of a generic reference document.
-
-<!-- SOURCE-BLOCK QUAL:88 END -->
-
-<!-- SOURCE-BLOCK QUAL:89 BEGIN -->
 
 
 <a id="source-table-89"></a>
@@ -66,16 +40,6 @@ Handover covers as-built topology, component/owner inventory, offered class and 
 | What changed outside approved configuration? | Before/after observed state, actor/time, service impact and current containment. | Preserve incident override, assign repair and reconcile source deliberately. |
 | What is overdue or unsupported? | Asset/software support status, findings, remediation authority and accepted exception. | Escalate through adopted risk policy; do not invent universal deadlines. |
 
-<!-- SOURCE-BLOCK QUAL:89 END -->
-
-<!-- SOURCE-BLOCK QUAL:90 BEGIN -->
-
-<!-- SOURCE-BLOCK QUAL:90 END -->
-
-<!-- SOURCE-BLOCK QUAL:91 BEGIN -->
-
 Related engineering: [Writer and containment handling](../../implementation/provisioning-strategy/5-concurrency-ownership-and-failed-execution.md#PROV_s_005)  •  [Recovery/retirement accountability](../../architecture/shared-services/6-failure-recovery-migration-and-failback-topology.md#SVC_s_006)
-
-<!-- SOURCE-BLOCK QUAL:91 END -->
 
 [Previous chapter](6-control-inheritance-assurance-and-organizational-interfaces.md) · [Chapter index](README.md) · [Next chapter](8-extensions-and-release-maintenance.md)

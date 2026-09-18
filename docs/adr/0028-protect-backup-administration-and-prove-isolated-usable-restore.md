@@ -1,23 +1,22 @@
 # ADR-0028 — Protect backup administration and prove isolated usable restore
 
 **Status:** Proposed<br>
-**Accountable role:** Backup operations / Continuity management<br>
-**Scope:** Reusable reference decision; actual site adoption remains unissued<br>
-**Record date:** 2026-09-17 (not an approval date)<br>
-**Original decision identifiers:** Chapter-derived; no invented source decision identifier.<br>
+**Accountable role:** Architecture authority and responsible infrastructure service owner<br>
+**Scope:** Portable hosting reference pattern; site/service adoption remains unrecorded<br>
+**Original decision identifiers:** Chapter-derived; no standalone source ID asserted.<br>
 **Source chapters:** [RA §12](../architecture/reference/12-storage-backup-and-data-isolation-architecture.md) · [SVC §5](../architecture/shared-services/5-backup-capture-independent-protection-and-isolated-restore.md) · [OPS §3](../operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md)
 
-Source-derived synthesis; not a new source standard or a reconstructed approval meeting.
+Source-derived synthesis; not a new source standard or a reconstructed approval meeting. The linked record is not made authoritative by rendering it. Real adoption needs the stated scope, actual authority and independently protected decision evidence.
 
 ## Context
 
 Successful capture does not establish useful recovery. A compromised production identity should not gain authority to delete the copies intended to survive it.
 
-## Decision
+## Decision recorded in the source
 
 Separate capture orchestration, data movement and backup administration. Protect the required independent copies, catalogue, configuration and keys, and verify restore in an isolated eligible recovery domain before reconnection.
 
-## Alternatives and source limitations
+## Alternatives and limits recorded in the source
 
 Capture may use supported snapshot/API/proxy or guest-agent paths. The actual method follows service consistency and platform support, not a universally assumed data flow.
 
@@ -33,25 +32,25 @@ Assign capture, deletion, hold, restore and data-validation authorities; prove p
 
 [BKP-001](../assurance/requirements.md#BKP-001) · [BKP-002](../assurance/requirements.md#BKP-002) · [BKP-003](../assurance/requirements.md#BKP-003) · [BKP-004](../assurance/requirements.md#BKP-004) · [REC-001](../assurance/requirements.md#REC-001)
 
-These are related implementation areas, not assertion-level evidence of native qualification:
+Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [docs/IMPLEMENTATION_SCOPE.md](../IMPLEMENTATION_SCOPE.md)
 
-[Requirement/assertion allocation](../assurance/implementation-allocation.md) records partial, external and unimplemented controls separately.
+Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 
-## Open work
+## Open decisions and acceptance
 
 No production backup product, catalogue recovery or KMS integration is implemented by this documentation release.
 
-## Decision lifecycle and authority
+**Deciding authority:** Not recorded<br>
+**Decision date:** Not recorded<br>
+**Decision record:** Not supplied<br>
+**Evidence references:** Not supplied<br>
+**Decision rationale:** No lifecycle decision recorded<br>
+**Superseded by:** None
 
-- Deciding authority: Not recorded.
-- Decision date: Not recorded.
-- Decision evidence: Not supplied; no acceptance claim.
-- Disposition rationale: No rejection or supersession recorded.
-- Supersedes: None.
-- Superseded by: None.
+Evidence references require owner verification; this repository does not authenticate a signatory or issue native operating authorization. Source-derived Proposed records remain proposed until their genuine decision is recorded. Accepted and rejected records are retained, not overwritten out of history.
 
-Record authenticity and the deciding authority's jurisdiction require independent review. Passing a record-schema check does not issue or authenticate an approval. The current record status is declared above; publication never grants decision authority.
+---
 
-[Decision register](README.md) · [Maintenance rules](../DOCUMENTATION_MIGRATION.md)
+[Decision register](README.md) · [Maintained design workspace](../current/README.md)

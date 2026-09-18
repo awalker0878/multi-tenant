@@ -1,257 +1,161 @@
-# RA realization addenda
+# Native realization addenda — RA-01 to RA-12
 
-Original fields are rendered below without rewriting their procedure, scope or not-run status. These are not newly executed results. [Family index](verification-families.md).
+These are the retained supplemental procedures, not a new set of executed tests. Each elaborates the CT references shown and retains its original not-run state. Select by actual stack, offered service and accepted test safety envelope.
 
-[Original records](../../reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json)
+[Unchanged source JSON](../../reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json)
 
 <a id="RA-01"></a>
 ## RA-01 — Independent native domain routing
 
-**id:** RA-01
+**State:** not-run. **Base procedures:** CT-003, CT-009, CT-023, CT-025.
 
-**title:** Independent native domain routing
+For the selected stack, enumerate native connected/distributed routes, defaults, provider/external attachments and upstream advertisements. Exercise the approved flow and its forbidden direct alternatives in both directions.
 
-**baseTests:** CT-003; CT-009; CT-023; CT-025
+**Expected:** Only the approved logical ZIP path is usable; native forwarding cannot bypass it.
 
-**chapters:** 8; 16; 17; 18
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** For the selected stack, enumerate native connected/distributed routes, defaults, provider/external attachments and upstream advertisements. Exercise the approved flow and its forbidden direct alternatives in both directions.
-
-**expected:** Only the approved logical ZIP path is usable; native forwarding cannot bypass it.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-003](test-specifications.md#CT-003) · [CT-009](test-specifications.md#CT-009) · [CT-023](test-specifications.md#CT-023) · [CT-025](test-specifications.md#CT-025)
+**Parent architecture:** [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [RA §16](../architecture/reference/16-nutanix-hosting-stack-reference-realization.md) · [RA §17](../architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md) · [RA §18](../architecture/reference/18-openstack-hosting-stack-reference-realization.md)
 
 <a id="RA-02"></a>
 ## RA-02 — NSX isolated upstream reference
 
-**id:** RA-02
+**State:** not-run. **Base procedures:** CT-003, CT-024, CT-080.
 
-**title:** NSX isolated upstream reference
+Verify the exact Tier-1, parent/VRF Tier-0, Edge and uplink topology. Review all route propagation and any inter-VRF leaking. Repeat through Edge failure and established-session changes.
 
-**baseTests:** CT-003; CT-024; CT-080
+**Expected:** Independent domains remain isolated; the approved stateful path and session behaviour match the profile.
 
-**chapters:** 17
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Verify the exact Tier-1, parent/VRF Tier-0, Edge and uplink topology. Review all route propagation and any inter-VRF leaking. Repeat through Edge failure and established-session changes.
-
-**expected:** Independent domains remain isolated; the approved stateful path and session behaviour match the profile.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-003](test-specifications.md#CT-003) · [CT-024](test-specifications.md#CT-024) · [CT-080](test-specifications.md#CT-080)
+**Parent architecture:** [RA §17](../architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md)
 
 <a id="RA-03"></a>
 ## RA-03 — Nutanix external attachment reference
 
-**id:** RA-03
+**State:** not-run. **Base procedures:** CT-023, CT-024, CT-031.
 
-**title:** Nutanix external attachment reference
+Check external subnet connected paths, gateway reachability, NAT/no-NAT behaviour and return routing for each domain. Include neighbours and both offered address families.
 
-**baseTests:** CT-023; CT-024; CT-031
+**Expected:** Sharing physical transport does not create direct VPC-to-VPC or workload-to-management access.
 
-**chapters:** 16
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Check external subnet connected paths, gateway reachability, NAT/no-NAT behaviour and return routing for each domain. Include neighbours and both offered address families.
-
-**expected:** Sharing physical transport does not create direct VPC-to-VPC or workload-to-management access.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-023](test-specifications.md#CT-023) · [CT-024](test-specifications.md#CT-024) · [CT-031](test-specifications.md#CT-031)
+**Parent architecture:** [RA §16](../architecture/reference/16-nutanix-hosting-stack-reference-realization.md)
 
 <a id="RA-04"></a>
 ## RA-04 — OpenStack backend and authority reference
 
-**id:** RA-04
+**State:** not-run. **Base procedures:** CT-017, CT-021, CT-022, CT-066.
 
-**title:** OpenStack backend and authority reference
+Verify chosen backend, Neutron policy, mandatory port/group controls, internal distributed routing and any floating/provider-network alternatives. Recheck after relocation.
 
-**baseTests:** CT-017; CT-021; CT-022; CT-066
+**Expected:** Tenant operations cannot remove mandatory isolation, create an unapproved external path or bypass the intended boundary.
 
-**chapters:** 18
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Verify chosen backend, Neutron policy, mandatory port/group controls, internal distributed routing and any floating/provider-network alternatives. Recheck after relocation.
-
-**expected:** Tenant operations cannot remove mandatory isolation, create an unapproved external path or bypass the intended boundary.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-017](test-specifications.md#CT-017) · [CT-021](test-specifications.md#CT-021) · [CT-022](test-specifications.md#CT-022) · [CT-066](test-specifications.md#CT-066)
+**Parent architecture:** [RA §18](../architecture/reference/18-openstack-hosting-stack-reference-realization.md)
 
 <a id="RA-05"></a>
 ## RA-05 — Physical and platform overlay demarcation
 
-**id:** RA-05
+**State:** not-run. **Base procedures:** CT-032, CT-033, CT-034.
 
-**title:** Physical and platform overlay demarcation
+Verify platform tunnel reachability and effective MTU, fabric route/EVPN imports, multihoming failure and vendor handoff. Document all physical versus logical separation assumptions.
 
-**baseTests:** CT-032; CT-033; CT-034
+**Expected:** Fabric interoperability does not import tenant routes or federate vendor overlays outside approved scope.
 
-**chapters:** 5
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Verify platform tunnel reachability and effective MTU, fabric route/EVPN imports, multihoming failure and vendor handoff. Document all physical versus logical separation assumptions.
-
-**expected:** Fabric interoperability does not import tenant routes or federate vendor overlays outside approved scope.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-032](test-specifications.md#CT-032) · [CT-033](test-specifications.md#CT-033) · [CT-034](test-specifications.md#CT-034)
+**Parent architecture:** [RA §5](../architecture/reference/5-physical-fabric-and-platform-attachment.md)
 
 <a id="RA-06"></a>
 ## RA-06 — Bootstrap ownership transition
 
-**id:** RA-06
+**State:** not-run. **Base procedures:** CT-026, CT-027, CT-055.
 
-**title:** Bootstrap ownership transition
+Recover initial access using only the declared independent bootstrap material. Transition to steady-state identity/tooling; revoke temporary credentials and recheck access.
 
-**baseTests:** CT-026; CT-027; CT-055
+**Expected:** No circular recovery dependency or untracked residual bootstrap privilege remains.
 
-**chapters:** 21; 22
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Recover initial access using only the declared independent bootstrap material. Transition to steady-state identity/tooling; revoke temporary credentials and recheck access.
-
-**expected:** No circular recovery dependency or untracked residual bootstrap privilege remains.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-026](test-specifications.md#CT-026) · [CT-027](test-specifications.md#CT-027) · [CT-055](test-specifications.md#CT-055)
+**Parent architecture:** [RA §21](../architecture/reference/21-day-0-bootstrap-and-physical-commissioning.md) · [RA §22](../architecture/reference/22-vendor-platform-and-shared-service-commissioning.md)
 
 <a id="RA-07"></a>
 ## RA-07 — Composite provider authority
 
-**id:** RA-07
+**State:** not-run. **Base procedures:** CT-019, CT-043, CT-044, CT-045.
 
-**title:** Composite provider authority
+Provision one environment using the hosting, edge and name/address/protection scopes. Demonstrate each identity is denied changes outside its package and a downstream failure is recoverable.
 
-**baseTests:** CT-019; CT-043; CT-044; CT-045
+**Expected:** Coordination does not create a shared all-powerful state/identity or destroy shared/data resources on failure.
 
-**chapters:** 20; 24
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Provision one environment using the hosting, edge and name/address/protection scopes. Demonstrate each identity is denied changes outside its package and a downstream failure is recoverable.
-
-**expected:** Coordination does not create a shared all-powerful state/identity or destroy shared/data resources on failure.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-019](test-specifications.md#CT-019) · [CT-043](test-specifications.md#CT-043) · [CT-044](test-specifications.md#CT-044) · [CT-045](test-specifications.md#CT-045)
+**Parent architecture:** [RA §20](../architecture/reference/20-provisioning-model-and-infrastructure-work-packages.md) · [RA §24](../architecture/reference/24-terraform-across-the-vendor-stacks.md)
 
 <a id="RA-08"></a>
 ## RA-08 — Persistent platform versus temporary transfer networks
 
-**id:** RA-08
+**State:** not-run. **Base procedures:** CT-035, CT-054, CT-060, CT-076.
 
-**title:** Persistent platform versus temporary transfer networks
+Exercise supported live mobility/replication on provider transport and independently activate/expire a bounded cross-domain transfer connection.
 
-**baseTests:** CT-035; CT-054; CT-060; CT-076
+**Expected:** Persistent platform operation remains within its authority; temporary transfer access is removed without dismantling platform foundations.
 
-**chapters:** 10; 27
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Exercise supported live mobility/replication on provider transport and independently activate/expire a bounded cross-domain transfer connection.
-
-**expected:** Persistent platform operation remains within its authority; temporary transfer access is removed without dismantling platform foundations.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-035](test-specifications.md#CT-035) · [CT-054](test-specifications.md#CT-054) · [CT-060](test-specifications.md#CT-060) · [CT-076](test-specifications.md#CT-076)
+**Parent architecture:** [RA §10](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [RA §27](../architecture/reference/27-recovery-migration-and-retirement.md)
 
 <a id="RA-09"></a>
 ## RA-09 — Brownfield non-destructive adoption
 
-**id:** RA-09
+**State:** not-run. **Base procedures:** CT-044, CT-048, CT-070.
 
-**title:** Brownfield non-destructive adoption
+Inventory an authorized representative existing scope, confirm single configuration ownership, import/adopt and review the initial plan before mutation.
 
-**baseTests:** CT-044; CT-048; CT-070
+**Expected:** No unapproved replacement or competing writer is introduced; adoption does not falsely assert compliance.
 
-**chapters:** 25
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Inventory an authorized representative existing scope, confirm single configuration ownership, import/adopt and review the initial plan before mutation.
-
-**expected:** No unapproved replacement or competing writer is introduced; adoption does not falsely assert compliance.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-044](test-specifications.md#CT-044) · [CT-048](test-specifications.md#CT-048) · [CT-070](test-specifications.md#CT-070)
+**Parent architecture:** [RA §25](../architecture/reference/25-change-brownfield-adoption-and-configuration-ownership.md)
 
 <a id="RA-10"></a>
 ## RA-10 — Activation sequencing
 
-**id:** RA-10
+**State:** not-run. **Base procedures:** CT-006, CT-007, CT-045, CT-069, CT-077.
 
-**title:** Activation sequencing
+Observe resource creation from reservation through denied network attachment, mandatory controls, internal checks and explicit exposure activation. Introduce a controlled failed activation check.
 
-**baseTests:** CT-006; CT-007; CT-045; CT-069; CT-077
+**Expected:** No unprotected creation window; failed activation withdraws exposure while preserving data-safe recovery.
 
-**chapters:** 23
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Observe resource creation from reservation through denied network attachment, mandatory controls, internal checks and explicit exposure activation. Introduce a controlled failed activation check.
-
-**expected:** No unprotected creation window; failed activation withdraws exposure while preserving data-safe recovery.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-006](test-specifications.md#CT-006) · [CT-007](test-specifications.md#CT-007) · [CT-045](test-specifications.md#CT-045) · [CT-069](test-specifications.md#CT-069) · [CT-077](test-specifications.md#CT-077)
+**Parent architecture:** [RA §23](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md)
 
 <a id="RA-11"></a>
 ## RA-11 — Compute, management and storage sharing
 
-**id:** RA-11
+**State:** not-run. **Base procedures:** CT-026, CT-035, CT-037, CT-078.
 
-**title:** Compute, management and storage sharing
+Inspect actual host, management, storage/controller and transport sharing against adopted source tailoring. Test evacuation and copy operations without relying on labels alone.
 
-**baseTests:** CT-026; CT-035; CT-037; CT-078
+**Expected:** Actual co-residency and shared dependencies match the approved isolation design, including recovery states.
 
-**chapters:** 6; 7; 11; 12
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Inspect actual host, management, storage/controller and transport sharing against adopted source tailoring. Test evacuation and copy operations without relying on labels alone.
-
-**expected:** Actual co-residency and shared dependencies match the approved isolation design, including recovery states.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-026](test-specifications.md#CT-026) · [CT-035](test-specifications.md#CT-035) · [CT-037](test-specifications.md#CT-037) · [CT-078](test-specifications.md#CT-078)
+**Parent architecture:** [RA §6](../architecture/reference/6-management-platform-control-and-out-of-band-access.md) · [RA §7](../architecture/reference/7-tenant-environments-and-security-domain-placement.md) · [RA §11](../architecture/reference/11-compute-pools-hypervisors-and-workload-placement.md) · [RA §12](../architecture/reference/12-storage-backup-and-data-isolation-architecture.md)
 
 <a id="RA-12"></a>
 ## RA-12 — Commissioned capacity and growth boundary
 
-**id:** RA-12
+**State:** not-run. **Base procedures:** CT-056, CT-071, CT-072, CT-074.
 
-**title:** Commissioned capacity and growth boundary
+Provision within capacity, then exhaust a permitted attachment/resource pool in the test envelope. Follow the separate foundation growth path and reconcile inventory states.
 
-**baseTests:** CT-056; CT-071; CT-072; CT-074
+**Expected:** The workflow queues/rejects or selects eligible capacity; it does not rewire the fabric or weaken isolation as an undocumented tenant operation.
 
-**chapters:** 4; 22; 26
+**Safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
 
-**procedure:** Provision within capacity, then exhaust a permitted attachment/resource pool in the test envelope. Follow the separate foundation growth path and reconcile inventory states.
-
-**expected:** The workflow queues/rejects or selects eligible capacity; it does not rewire the fabric or weaken isolation as an undocumented tenant operation.
-
-**executionStatus:** not-run
-
-**safety:** Execute only within an authorized representative test environment or explicitly approved production safety envelope.
-
-Related baseline procedures: [CT-056](test-specifications.md#CT-056) · [CT-071](test-specifications.md#CT-071) · [CT-072](test-specifications.md#CT-072) · [CT-074](test-specifications.md#CT-074)
+**Parent architecture:** [RA §4](../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md) · [RA §22](../architecture/reference/22-vendor-platform-and-shared-service-commissioning.md) · [RA §26](../architecture/reference/26-operating-model-capacity-and-observability.md)

@@ -41,17 +41,15 @@
     ],
     "open_work": "Actual site architecture adoption and the selected delivery-tool responsibility model remain implementation decisions.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Architecture authority / Automation platform",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -95,17 +93,15 @@
     ],
     "open_work": "Site inventory, failure groups, usable capacities and expansion lead times are not supplied by the reference example.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Architecture authority / Network engineering / Capacity management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -151,17 +147,15 @@
     ],
     "open_work": "Actual multivendor interoperability, encapsulation behaviour and release-specific limitations need target qualification.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering / Network engineering / Architecture authority",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -210,17 +204,15 @@
     ],
     "open_work": "The selected native firewall/context implementation, complete inspection functions and HA qualification remain open. A quarantine policy or Linux fixture is not a full ZIP.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Architecture authority / Security-edge operations / Security authority",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -270,17 +262,15 @@
     ],
     "open_work": "Actual attachment construction and isolation measurements remain native engineering work; the route modules do not create or qualify their attachments.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Network engineering / Security authority / Platform engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -327,17 +317,15 @@
     ],
     "open_work": "Co-residency approval, physical pool assignment and native scheduler enforcement have not been established by document conversion.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering / Architecture authority / Security authority",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -380,17 +368,15 @@
     ],
     "open_work": "Management/OOB independence, accepted principals, real access paths and break-glass exercises require the actual site.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Architecture authority / Management operations / Identity operations",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Management infrastructure and security architecture owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -431,17 +417,15 @@
     ],
     "open_work": "Actual service endpoints, native authorization and backing-service resilience remain to be accepted; protocol fixtures are not production services.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Service operations / Architecture authority",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -482,17 +466,15 @@
     ],
     "open_work": "Recovery sites, actual RTO/RPO, supported replication and witnessed partition/failback results remain open.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering / Architecture authority / Recovery operations",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -534,17 +516,15 @@
     ],
     "open_work": "Supported native mobility transport and the approved migration connection remain site-specific records.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Architecture authority / Migration owner",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -575,16 +555,15 @@
     "context": "One hosting request consumes resources from the selected hypervisor stack and independently owned edge, address, name, protection and trust services.",
     "decision": "Compose the required native platform and shared-service work packages. Scope credentials and Terraform state by authority, lifecycle and blast radius instead of one all-tenant, all-provider state.",
     "alternatives": "The source rejects assuming one provider or a giant conditional module covers every dependency. It does not prescribe a fixed number of state files or a new orchestration application.",
-    "consequences": "Cross-state operations are not atomic. A shared edge can require serialized ownership even while tenant workload changes proceed independently. Downstream teams need bounded handoffs, not broad state or credential access.\n\nState services and cross-owner handoffs remain separate resource/authority scopes. Their design must identify protected backend access, recoverable state, locking/versioning and minimal versioned outputs; state restoration is not infrastructure rollback.",
-    "engineering_obligations": "Define every package's prerequisites, owned objects, accepted outputs, completion evidence and data-safe recovery action. Pin providers separately from immutable module and execution-image references. Validate these dependencies and record their owner, accepted configuration and failure/recovery observations before the affected service is offered.",
+    "consequences": "Cross-state operations are not atomic. A shared edge can require serialized ownership even while tenant workload changes proceed independently. Downstream teams need bounded handoffs, not broad state or credential access.",
+    "engineering_obligations": "Define every package's prerequisites, owned objects, accepted outputs, completion evidence and data-safe recovery action. Pin providers separately from immutable module and execution-image references.",
     "requirements": [
       "TF-001",
       "TF-002",
       "TF-003",
       "TF-005",
       "STATE-001",
-      "STATE-003",
-      "STATE-002"
+      "STATE-003"
     ],
     "implementation_paths": [
       "terraform/roots",
@@ -594,29 +573,30 @@
     ],
     "open_work": "The actual execution platform, state backends and shared-service acceptance records remain engineering inputs.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Automation platform",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Infrastructure automation and state-service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     },
-    "editorial_extensions": [
+    "proposed_extensions": [
       {
-        "change": "Completion audit extension proposal",
-        "date": "2026-09-17",
-        "source_basis": [
+        "title": "Protected state and minimal cross-owner handoffs",
+        "text": "The accepted backend must demonstrate encryption, authentication, lock ownership, audit/version history and recovery under the declared failure. Export minimal non-secret immutable references between owners rather than share unrestricted state. Restoring state bytes is not native infrastructure rollback.",
+        "source_sections": [
           [
             "RA",
             24
+          ],
+          [
+            "PROV",
+            3
           ]
-        ],
-        "status": "Proposed; no source approval claimed"
+        ]
       }
     ]
   },
@@ -662,17 +642,15 @@
     ],
     "open_work": "Actual installer artifacts, initial trust material and management recovery paths are not supplied by the generic modules.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Automation platform / Management operations / Continuity management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -718,17 +696,15 @@
     ],
     "open_work": "No source module or conversion supplies production authorization or release of quarantine.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Automation platform / Service management / Security authority",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -760,13 +736,12 @@
     "context": "Two tools managing the same native object can undo security controls or cause destructive replacement. Adopting an existing object is not authority to reconstruct it.",
     "decision": "Assign one accountable tool/controller to each object and sensitive subresource. Reconcile actual configuration and remove competing writers before a reviewed ownership transfer or import.",
     "alternatives": "Keep an object under its existing native controller when a safe ownership handover is not established. Import is a distinct controlled lifecycle operation, not proof of compliance.",
-    "consequences": "A resource shared by several WSDs must survive retirement of one consumer. Per-route and aggregate-route writers must not compete for the same router configuration.\n\nA handoff records which writer owns each native object and which process can still finish after interruption. Recovery of state or runner does not itself fence a native operation; scoped completion and data-safe compensation need evidence.",
-    "engineering_obligations": "Supply the ownership schedule, expected immutable identities, non-destructive adoption plan, data-retention scope and actual writer-fencing evidence for interrupted work. Validate these dependencies and record their owner, accepted configuration and failure/recovery observations before the affected service is offered.",
+    "consequences": "A resource shared by several WSDs must survive retirement of one consumer. Per-route and aggregate-route writers must not compete for the same router configuration.",
+    "engineering_obligations": "Supply the ownership schedule, expected immutable identities, non-destructive adoption plan, data-retention scope and actual writer-fencing evidence for interrupted work.",
     "requirements": [
       "STATE-003",
       "TEN-003",
-      "LIFE-002",
-      "STATE-002"
+      "LIFE-002"
     ],
     "implementation_paths": [
       "tools/recovery_review.py",
@@ -775,31 +750,16 @@
     ],
     "open_work": "Actual native writer exclusion and transfer acceptance remain external controls; an offline record checker does not implement fencing.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Automation platform / Service owner / Service management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Native configuration owner and change authority",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
-    },
-    "editorial_extensions": [
-      {
-        "change": "Completion audit extension proposal",
-        "date": "2026-09-17",
-        "source_basis": [
-          [
-            "RA",
-            25
-          ]
-        ],
-        "status": "Proposed; no source approval claimed"
-      }
-    ]
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
+    }
   },
   {
     "id": "ADR-0017",
@@ -823,31 +783,19 @@
       [
         "QCP",
         1
-      ],
-      [
-        "RA",
-        15
-      ],
-      [
-        "RA",
-        27
       ]
     ],
     "status": "Proposed",
     "context": "Page counts, schema checks, resource creation and test counts establish different things from effective infrastructure control and accepted residual risk.",
     "decision": "Qualify the actual service, versions and topology with applicable observations. Keep document quality, technical conformance, operational readiness and formal authorization distinct and attributable.",
     "alternatives": "The first stack is qualified with applicable single-stack observations; cross-platform comparison and actual exit recovery establish separate additional claims. Two pre-qualified stacks are not a prerequisite to qualifying the first.",
-    "consequences": "Blocked, not-run and unjustified not-applicable results cannot satisfy required observations. Historical source results remain historical and do not automatically apply to changed configurations.\n\nReference adoption, first-platform qualification, an additional platform meeting the same outcomes, and a representative usable-data/application exit rehearsal are separate claims. Local mocks and a successful disk conversion do not complete the latter.",
-    "engineering_obligations": "Link each applicable requirement assertion to its actual target, healthy control, observation, artifact, reviewer and separate operating decision. Validate these dependencies and record their owner, accepted configuration and failure/recovery observations before the affected service is offered.",
+    "consequences": "Blocked, not-run and unjustified not-applicable results cannot satisfy required observations. Historical source results remain historical and do not automatically apply to changed configurations.",
+    "engineering_obligations": "Link each applicable requirement assertion to its actual target, healthy control, observation, artifact, reviewer and separate operating decision.",
     "requirements": [
       "AUTH-001",
       "TEST-003",
       "EVID-003",
-      "ACPT-001",
-      "DEL-001",
-      "DEL-002",
-      "PORT-001",
-      "MIG-003"
+      "ACPT-001"
     ],
     "implementation_paths": [
       "tools/check_local.py",
@@ -857,33 +805,30 @@
     ],
     "open_work": "Live platform evidence, selected controls, independent review and issued authorization remain outside this documentation migration.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Security authority / Assurance engineering / Delivery owner",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture, assurance and service-acceptance authorities",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     },
-    "editorial_extensions": [
+    "proposed_extensions": [
       {
-        "change": "Completion audit extension proposal",
-        "date": "2026-09-17",
-        "source_basis": [
+        "title": "First qualification, equivalent deployment and actual exit",
+        "text": "Accept the first platform against applicable single-stack assertions without a circular second-platform prerequisite. Qualify the second platform independently; then separately measure image/data/service exit and its consistency, identity/key dependencies, rollback limits and exceptions before making that portability claim.",
+        "source_sections": [
           [
             "RA",
             15
           ],
           [
-            "RA",
-            27
+            "QUAL",
+            5
           ]
-        ],
-        "status": "Proposed; no source approval claimed"
+        ]
       }
     ]
   },
@@ -920,17 +865,15 @@
     ],
     "open_work": "The actual tenant identities, approved shared-domain ownership and lifecycle integration remain unassigned.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Architecture authority / Automation platform / Service owner",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -971,17 +914,15 @@
     ],
     "open_work": "No production SLO, RTO, RPO, retention interval or assurance approval is supplied by the reference figures.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Security authority / Service owner / Continuity management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1020,17 +961,15 @@
     ],
     "open_work": "Authoritative IPAM allocation and native DNS propagation remain external integration work; DNS change code does not allocate addresses.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Network engineering / Automation platform",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1068,17 +1007,15 @@
     ],
     "open_work": "The native source and routed fixture remain IPv4-focused; offline IPv6 or loopback evidence does not satisfy native routed qualification.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Network engineering / Platform engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1118,17 +1055,15 @@
     ],
     "open_work": "A dedicated public-service solution document from the previously described RAD/TAD package is not present in the source bundle; this ADR uses only the available scope guidance.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Security-edge operations / Service owner",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1177,17 +1112,15 @@
     ],
     "open_work": "Native RBAC/API policy and the real immutable baseline need platform qualification; the source modules do not prove that tenant operators cannot bypass them.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1232,17 +1165,15 @@
     ],
     "open_work": "Actual VPC attachments, full Flow/VM observation and target failover/restore evidence remain outside the current candidate integration.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1287,17 +1218,15 @@
     ],
     "open_work": "Tier-0/VRF/Edge/interface construction and effective per-node enforcement are not provided or qualified by the current static-route and readback scopes.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1341,17 +1270,15 @@
     ],
     "open_work": "Actual distribution policy, gateway/OVN failure behaviour, storage/key integrations and supported native lifecycle remain target qualification work.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Platform engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1390,17 +1317,15 @@
     ],
     "open_work": "Actual backend isolation, object/file semantics, copy policy and media sanitization remain independent engineering and qualification responsibilities.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Storage operations",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1439,17 +1364,15 @@
     ],
     "open_work": "No production backup product, catalogue recovery or KMS integration is implemented by this documentation release.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Backup operations / Continuity management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1478,16 +1401,15 @@
     "context": "The only identity or key needed to recover a failed encrypted platform cannot depend exclusively on that same unavailable platform.",
     "decision": "Separate human, automation, workload and recovery identities; distinguish key use, administration, recovery and destruction. Provide a controlled independent path to minimum bootstrap trust material.",
     "alternatives": "Qualified cache and emergency behaviour must be explicitly recorded. Plaintext fallback, disabled certificate validation or an unrestricted replacement key is not a recovery design.",
-    "consequences": "Key destruction can make retained copies unrecoverable. Administrative access, data location, support access, diagnostics and key custody remain independently constrained.\n\nAdopt a versioned cryptographic configuration for actual clients, protocols, trust stores and key custody. Separate key use from administration/destruction; record rotation, revocation, unsupported-protocol handling and recoverable key availability. Example algorithms or a local TLS test are not a qualified cryptographic module or enterprise KMS.",
-    "engineering_obligations": "Map trust dependencies and authority, actual credential rotation/revocation, approved emergency access and independent key/state/catalogue recovery. Validate these dependencies and record their owner, accepted configuration and failure/recovery observations before the affected service is offered.",
+    "consequences": "Key destruction can make retained copies unrecoverable. Administrative access, data location, support access, diagnostics and key custody remain independently constrained.",
+    "engineering_obligations": "Map trust dependencies and authority, actual credential rotation/revocation, approved emergency access and independent key/state/catalogue recovery.",
     "requirements": [
       "IAM-001",
       "IAM-002",
       "CRY-001",
       "CRY-002",
       "CRY-003",
-      "REC-001",
-      "SEC-003"
+      "REC-001"
     ],
     "implementation_paths": [
       "lab/mtls_fixture.py",
@@ -1496,29 +1418,30 @@
     ],
     "open_work": "Local certificate and service-identity fixtures do not establish enterprise federation, revocation infrastructure, HSM/KMS or actual bootstrap custody.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Identity operations / Security authority / Key-management operations",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Cryptographic policy and key-service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     },
-    "editorial_extensions": [
+    "proposed_extensions": [
       {
-        "change": "Completion audit extension proposal",
-        "date": "2026-09-17",
-        "source_basis": [
+        "title": "Versioned cryptographic policy and service protocol lifecycle",
+        "text": "Specify the adopted algorithm/protocol versions, actual clients, key ownership, certificate issuance/renewal, revocation, independent recovery and destruction/retention responsibilities. Select concrete parameters only through the applicable policy and native support review. Recovery material alone does not complete cryptographic service design.",
+        "source_sections": [
           [
             "RA",
             13
+          ],
+          [
+            "SVC",
+            3
           ]
-        ],
-        "status": "Proposed; no source approval claimed"
+        ]
       }
     ]
   },
@@ -1565,17 +1488,15 @@
     ],
     "open_work": "All actual inputs and measured safe limits remain unresolved; illustrative calculator values are not a purchased or qualified capacity promise.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Capacity management / Service management / Service owner",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1619,17 +1540,15 @@
     ],
     "open_work": "True native fencing, automatic repair and actual approval authentication remain unimplemented; the reviewer never authorizes apply, delete or activation.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Automation platform",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1673,17 +1592,15 @@
     ],
     "open_work": "The local containment fixture and offline context review do not establish the actual incident process or production policy precedence.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Operations/SRE / Incident response",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1726,17 +1643,15 @@
     ],
     "open_work": "Actual retention decisions, media methods and verified native cleanup remain data-owner and service-owner work.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Service management / Data owner / Storage operations",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1776,17 +1691,15 @@
     ],
     "open_work": "Actual change classification, approval authority, installed support status and operational ownership are not supplied by CI success.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Change authority / Automation platform / Vulnerability management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1835,17 +1748,15 @@
     ],
     "open_work": "Native service/gateway configuration and real endpoint no-transit/source-validation controls still require the chosen implementation.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Service operations / Security authority / Network engineering",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
@@ -1890,22 +1801,20 @@
     ],
     "open_work": "No production activation or authorization is issued by an ADR extraction; actual initial readiness remains a target-specific acceptance gate.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
-    "source_status": "Proposed — source-derived; organizational acceptance not recorded",
     "governance": {
-      "accountable_role": "Service management / Service owner / Continuity management",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Architecture authority and responsible infrastructure service owner",
+      "scope": "Portable hosting reference pattern; site/service adoption remains unrecorded",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
     }
   },
   {
     "id": "ADR-0037",
-    "title": "Keep attributable telemetry independent and define collection-loss behaviour",
+    "title": "Define independent telemetry and collection-loss behaviour",
     "source_decision_ids": [],
     "source_sections": [
       [
@@ -1913,102 +1822,80 @@
         26
       ],
       [
-        "RA",
-        13
+        "SVC",
+        2
       ]
     ],
     "status": "Proposed",
-    "context": "Tenant health and a shared logging transport cannot alone establish independent enforcement evidence. Collection can fail while data-plane controls continue.",
-    "decision": "Collect provider-controlled policy, route, identity, data-copy and privileged-action evidence with stable scope identifiers. Define separate source and receipt time, controlled access/minimization/retention, buffering, visible loss and safe operating restrictions when collection is unavailable.",
-    "alternatives": "The source does not select a logging product or mandate payload capture. Monitoring solely inside the tenant or treating the absence of logs as successful enforcement is not accepted evidence.",
-    "consequences": "A shared collector remains a security and recovery dependency with its own authority and capacity. An outage must not silently enable a permit path; the accepted profile determines whether new changes pause and how buffering/loss are handled.",
-    "engineering_obligations": "Name actual collectors, routes, role scopes, integrity/retention controls, identifiers, time handling, queue/loss limits and escalation. Test the defined collection outage and recovery separately from the data path.",
+    "context": "A healthy tenant or a reachable collector does not establish independently attributable, retained security telemetry. Logging loss can invalidate evidence while enforcement continues.",
+    "decision": "Use versioned logging profiles identifying event coverage, stable identities, time integrity, minimization, forwarding delay, buffering, loss indication, retention and operator access. Define the permitted operation and restricted-change response during loss; never create a permissive fallback.",
+    "alternatives": "This record makes an existing source obligation explicit; it does not claim a previously held alternatives meeting. A vendor-specific implementation is accepted only with supported native evidence and the relevant owner decision.",
+    "consequences": "Capacity and recovery design must include collectors, time sources and buffering. Separate consumption, collector administration and evidence authority. A local packet counter is not the central telemetry service.",
+    "engineering_obligations": "Assign the actual service owner, native mechanism, failure/recovery path, scoped access and independent verification for each requirement. Record unimplemented/external controls rather than linking a generic module as proof.",
     "requirements": [
       "OBS-001",
       "OBS-002",
-      "OBS-003",
-      "FAIL-001"
+      "OBS-003"
     ],
     "implementation_paths": [
-      "docs/operations/README.md",
-      "lab/run_namespace_lab.py"
+      "docs/architecture/reference/26-operating-model-capacity-and-observability.md",
+      "sources/implementation_backlog.csv"
     ],
-    "open_work": "Native telemetry, access controls, buffering and operating restrictions remain external implementation/qualification work. No collection availability or incident authority is established by this ADR.",
-    "derivation": "New source-derived synthesis for an audit-identified implicit decision, not a recovered prior meeting or an issued approval.",
-    "source_status": "New source-derived proposal in completion audit remediation",
+    "open_work": "Concrete service parameters, installed components and organizational acceptance remain open. Local tests and repository merge do not qualify the native capability.",
+    "derivation": "New source-backed proposed clarification from the named architecture sections; no historical acceptance is asserted.",
     "governance": {
-      "accountable_role": "Platform, telemetry and security service owners",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Observability service and security operations owners",
+      "scope": "Portable hosting infrastructure service and supporting privileged execution",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
-    },
-    "editorial_extensions": [
-      {
-        "status": "Proposed",
-        "recorded_date": "2026-09-17",
-        "source": "Completion audit ADR extension candidates; linked parent sections"
-      }
-    ]
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
+    }
   },
   {
     "id": "ADR-0038",
-    "title": "Govern image and privileged dependency provenance across their lifecycle",
+    "title": "Govern images and privileged dependency provenance across their lifecycle",
     "source_decision_ids": [],
     "source_sections": [
       [
         "RA",
-        11
+        22
       ],
       [
         "RA",
-        13
-      ],
-      [
-        "RA",
-        24
+        25
       ]
     ],
     "status": "Proposed",
-    "context": "Images, modules, plugins and runner artifacts influence privileged execution and can invalidate hardening or portability without changing the consumer request.",
-    "decision": "Version and govern image/template publishing, provenance, support, hardening, vulnerability disposition and retirement. Keep builder, approver, signer and publisher authority explicit. Pin/review provider selections separately from module, runner and image identities, and reject untrusted or revoked artifacts from promotion.",
-    "alternatives": "The source permits platform-specific image variants with declared compatibility and exit limits. A product name, tag or image ID is not by itself proof of provenance, support or a valid baseline.",
-    "consequences": "Trust material, artifact availability, revocation and recovery paths need independent owners. Committing a lock file records actual provider selections/checksums, not organization-wide supply-chain approval or native image security.",
-    "engineering_obligations": "Record allowed sources, identities/digests, signing/trust policy, approved platform variants, runtime configuration checks and rebuild/retirement conditions. Review the exact artifact change and affected native qualification.",
+    "context": "A version pin does not alone establish a trusted artifact, continuing support or a safe response after a compromised package has already run.",
+    "decision": "Accept source provenance, digests, support/compatibility and revocation procedures for images, firmware, provider/module packages and privileged runner dependencies. Bind actual package identities to qualified change records and assess already-executed artifacts/credentials when trust is withdrawn.",
+    "alternatives": "This record makes an existing source obligation explicit; it does not claim a previously held alternatives meeting. A vendor-specific implementation is accepted only with supported native evidence and the relevant owner decision.",
+    "consequences": "Keep approved root provider locks in Git and module/runner versions pinned separately. Quarantine revoked images at new-placement admission, stage upgrades and test recovery; do not declare all pinned dependencies permanently safe.",
+    "engineering_obligations": "Assign the actual service owner, native mechanism, failure/recovery path, scoped access and independent verification for each requirement. Record unimplemented/external controls rather than linking a generic module as proof.",
     "requirements": [
-      "IMG-001",
-      "IMG-002",
-      "TF-002",
-      "SEC-001"
+      "SUP-001",
+      "VULN-001",
+      "VULN-002",
+      "TF-005"
     ],
     "implementation_paths": [
-      "tools/verify_terraform.py",
-      "terraform/modules/vsphere-workload/main.tf.json"
+      "terraform",
+      "config/toolchain.json",
+      "tools/verify_terraform.py"
     ],
-    "open_work": "Actual approved image registries, signing policy, provenance service, guest hardening and vulnerability handling remain to be implemented and accepted. CI pins alone do not satisfy the whole decision.",
-    "derivation": "New source-derived synthesis for an audit-identified implicit decision, not a recovered prior meeting or an issued approval.",
-    "source_status": "New source-derived proposal in completion audit remediation",
+    "open_work": "Concrete service parameters, installed components and organizational acceptance remain open. Local tests and repository merge do not qualify the native capability.",
+    "derivation": "New source-backed proposed clarification from the named architecture sections; no historical acceptance is asserted.",
     "governance": {
-      "accountable_role": "Platform/image, execution and supply-chain service owners",
-      "scope": "Reusable reference decision; actual site adoption remains unissued",
-      "recorded_date": "2026-09-17",
+      "accountable_role": "Platform lifecycle and software supply-chain owners",
+      "scope": "Portable hosting infrastructure service and supporting privileged execution",
+      "deciding_authority": null,
       "decision_date": null,
-      "accepting_authority": null,
-      "evidence": [],
-      "rationale": null,
-      "supersedes": [],
-      "superseded_by": []
-    },
-    "editorial_extensions": [
-      {
-        "status": "Proposed",
-        "recorded_date": "2026-09-17",
-        "source": "Completion audit ADR extension candidates; linked parent sections"
-      }
-    ]
+      "decision_record": null,
+      "decision_rationale": null,
+      "evidence_refs": [],
+      "superseded_by": null
+    }
   }
 ]

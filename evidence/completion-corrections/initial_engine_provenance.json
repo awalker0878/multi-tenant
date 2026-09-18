@@ -1,0 +1,75 @@
+{
+  "run_id": 35294495699,
+  "head_sha": "2bb69be80f58304bb39cbaefd85935da2d2eba7a",
+  "run_url": "https://github.com/awalker0878/multi-tenant/actions/runs/35294495699",
+  "terraform_artifact_id": 10526544566,
+  "ansible_artifact_id": 10528060255,
+  "artifact_digest": "sha256:07f214f1b5d75f70c937d304dc1cc955d8b5f23e57096b89a4816f94b7cda1f7",
+  "terraform": "1.13.5",
+  "provider_selections": {
+    "vmware/nsxt": "3.10.0",
+    "nutanix/nutanix": "2.4.2",
+    "terraform-provider-openstack/openstack": "3.4.0",
+    "hashicorp/vsphere": "2.12.0"
+  },
+  "review": "Actual generated selections matched the unchanged required_providers declarations; locks retained for subsequent readonly init. This is dependency consistency review, not supplier security certification.",
+  "lock_sha256": {
+    "terraform/modules/openstack-domain/.terraform.lock.hcl": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+    "terraform/modules/nsx-gateway-quarantine/.terraform.lock.hcl": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+    "terraform/modules/nsx-domain/.terraform.lock.hcl": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+    "terraform/modules/openstack-route/.terraform.lock.hcl": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+    "terraform/modules/nutanix-workload/.terraform.lock.hcl": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+    "terraform/modules/nutanix-domain/.terraform.lock.hcl": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+    "terraform/modules/nsx-route/.terraform.lock.hcl": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+    "terraform/modules/openstack-workload/.terraform.lock.hcl": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+    "terraform/modules/vsphere-workload/.terraform.lock.hcl": "51c991f1272f91046f0c5c3c13b90a838a64ded5684e6fabcd85c2744381b682",
+    "terraform/modules/nutanix-route/.terraform.lock.hcl": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+    "terraform/roots/openstack-domain/.terraform.lock.hcl": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+    "terraform/roots/nsx-gateway-quarantine/.terraform.lock.hcl": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+    "terraform/roots/nsx-domain/.terraform.lock.hcl": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+    "terraform/roots/openstack-route/.terraform.lock.hcl": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+    "terraform/roots/nutanix-workload/.terraform.lock.hcl": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+    "terraform/roots/nutanix-domain/.terraform.lock.hcl": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+    "terraform/roots/nsx-route/.terraform.lock.hcl": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+    "terraform/roots/openstack-workload/.terraform.lock.hcl": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+    "terraform/roots/vsphere-workload/.terraform.lock.hcl": "51c991f1272f91046f0c5c3c13b90a838a64ded5684e6fabcd85c2744381b682",
+    "terraform/roots/nutanix-route/.terraform.lock.hcl": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0"
+  },
+  "schemas": [
+    {
+      "uncompressed_sha256": "3c95d59f39806948f73bbea24ed4e8e87244978ecd7a17a205e274327f937a20",
+      "path": "evidence/completion-corrections/schemas/3c95d59f39806948f73bbea24ed4e8e87244978ecd7a17a205e274327f937a20.json",
+      "modules": [
+        "openstack-domain",
+        "openstack-route",
+        "openstack-workload"
+      ]
+    },
+    {
+      "uncompressed_sha256": "e95e0e6e03638ad48c1358d75ba188904d472fe3c608a9719d93bdba1c0f9da1",
+      "path": "evidence/completion-corrections/schemas/e95e0e6e03638ad48c1358d75ba188904d472fe3c608a9719d93bdba1c0f9da1.json",
+      "modules": [
+        "nsx-gateway-quarantine",
+        "nsx-domain",
+        "nsx-route"
+      ]
+    },
+    {
+      "uncompressed_sha256": "f4fc4ea533fe51a829b2e05292737f548dfec9b2f7374aafd1f9feab1ed43ad3",
+      "path": "evidence/completion-corrections/schemas/f4fc4ea533fe51a829b2e05292737f548dfec9b2f7374aafd1f9feab1ed43ad3.json",
+      "modules": [
+        "nutanix-workload",
+        "nutanix-domain",
+        "nutanix-route"
+      ]
+    },
+    {
+      "uncompressed_sha256": "69e2fc36c382ef1251a6360fbfcc319c88909ff92b942d7136c71c3a049c9dad",
+      "path": "evidence/completion-corrections/schemas/69e2fc36c382ef1251a6360fbfcc319c88909ff92b942d7136c71c3a049c9dad.json",
+      "modules": [
+        "vsphere-workload"
+      ]
+    }
+  ],
+  "scope": "Initial corrected engine implementation only; final source needs its own run"
+}

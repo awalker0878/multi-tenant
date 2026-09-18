@@ -6,26 +6,12 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 2257e6f3badac48b07989244fbfae96643d68cc6633b28e9799a14733bccea3a -->
-<!-- SOURCE-BLOCK SVC:56 BEGIN -->
-
 <a id="__RefHeading___Toc8881_1525915568"></a>
 <a id="SVC_s_004"></a>
 
-<!-- SOURCE-BLOCK SVC:56 END -->
-
-<!-- SOURCE-BLOCK SVC:57 BEGIN -->
-
 Parent architecture: [RA §11](../reference/11-compute-pools-hypervisors-and-workload-placement.md#RA_s_011)  •  [RA §12](../reference/12-storage-backup-and-data-isolation-architecture.md#RA_s_012)  •  [RA §27](../reference/27-recovery-migration-and-retirement.md#RA_s_027)
 
-<!-- SOURCE-BLOCK SVC:57 END -->
-
-<!-- SOURCE-BLOCK SVC:58 BEGIN -->
-
 A virtual disk has a different data path from a guest file or object client. The first is mediated by the hypervisor/storage stack; the second sends packets through the guest network and service boundary. Backend replication, rebuild and snapshot orchestration are additional provider paths. A single firewall rule cannot stand in for storage attachment, copy authorization and key scope. \[[B2](07-references-parent-basis-and-external-context.md#SVC_src_B2) §12\]
-
-<!-- SOURCE-BLOCK SVC:58 END -->
-
-<!-- SOURCE-BLOCK SVC:59 BEGIN -->
 
 
 <a id="source-table-59"></a>
@@ -39,19 +25,7 @@ A virtual disk has a different data path from a guest file or object client. The
 | Export/import | Supported format/subset, integrity record, target authorization and ACL/identity mapping. | No implicit downgrade or assumption that format conversion restores a working service. |
 | Retire/reuse | All known copies, hold/retention, method, key exclusivity and verifying authority. | No premature loss of retained recovery; no prior tenant data accessible on reassignment. |
 
-<!-- SOURCE-BLOCK SVC:59 END -->
-
-<!-- SOURCE-BLOCK SVC:60 BEGIN -->
-
-<!-- SOURCE-BLOCK SVC:60 END -->
-
-<!-- SOURCE-BLOCK SVC:61 BEGIN -->
-
 The example ledger below is symbolic: no real volume, backup or key has been created. It demonstrates why stopping a WSD and deleting all of its data are different completion states.
-
-<!-- SOURCE-BLOCK SVC:61 END -->
-
-<!-- SOURCE-BLOCK SVC:62 BEGIN -->
 
 
 <a id="source-table-62"></a>
@@ -64,29 +38,11 @@ The example ledger below is symbolic: no real volume, backup or key has been cre
 | REP-01R-a | Optional approved recovery-site copy, only when that service is offered. | Record writer role and fencing; no accidental concurrent writable source/target. |
 | HOLD-01 | Illustrative retained-copy obligation assigned to the data owner. | Blocks affected disposal, not necessarily retirement of all live compute. |
 
-<!-- SOURCE-BLOCK SVC:62 END -->
-
-<!-- SOURCE-BLOCK SVC:63 BEGIN -->
-
-<!-- SOURCE-BLOCK SVC:63 END -->
-
-<!-- SOURCE-BLOCK SVC:64 BEGIN -->
-
 The ledger contains actual copy locations, access identities, encryption/key versions, creation/consistency point, retention or hold authority, and the operational owner who can recover it. A volume name or WSD tag alone is not sufficient where copies are exported or retained outside the primary platform. Shared-key destruction is not an acceptable proxy for deleting one tenant’s eligible copy.
-
-<!-- SOURCE-BLOCK SVC:64 END -->
-
-<!-- SOURCE-BLOCK SVC:65 BEGIN -->
 
 For disposal, use an approved media-appropriate method and record its scope, verification, remaining copies and exceptions. NIST SP 800-88 Revision 2 is retained as supporting technical guidance, not a replacement for applicable organizational media handling. Deletion of a control-plane record alone does not demonstrate that all data was sanitized. \[[B2](07-references-parent-basis-and-external-context.md#SVC_src_B2) §12; [S27](07-references-parent-basis-and-external-context.md#SVC_src_S27)\]
 
-<!-- SOURCE-BLOCK SVC:65 END -->
-
-<!-- SOURCE-BLOCK SVC:66 BEGIN -->
-
 Related engineering: [Capture and restore architecture](5-backup-capture-independent-protection-and-isolated-restore.md#SVC_s_005)  •  [Retirement sequence](../../implementation/provisioning-strategy/6-brownfield-adoption-growth-and-retirement.md#PROV_s_006)
-
-<!-- SOURCE-BLOCK SVC:66 END -->
 
 [Previous chapter](3-identity-certificates-keys-and-independent-recovery.md) · [Chapter index](README.md) · [Next chapter](5-backup-capture-independent-protection-and-isolated-restore.md)
 

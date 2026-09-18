@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9a7dd8df4a5abf6482f206cae2d074444ac6fa812bbe4bace970a4de059da370 -->
-<!-- SOURCE-BLOCK IT:66 BEGIN -->
-
 <a id="IT_08"></a>
-
-<!-- SOURCE-BLOCK IT:66 END -->
-
-<!-- SOURCE-BLOCK IT:67 BEGIN -->
 
 Keep live-service retirement distinct from disposal of all retained data.
 
-<!-- SOURCE-BLOCK IT:67 END -->
-
-<!-- SOURCE-BLOCK IT:68 BEGIN -->
-
 Baseline and related records: [IK §9](../../implementation/delivery-guide/9-operational-handover-recovery-migration-and-retirement.md#IK_09)  •  [WD §12](../../solutions/internal-protected-workload/12-failure-and-partition-decision-schedule.md#WD14_S12)
-
-<!-- SOURCE-BLOCK IT:68 END -->
-
-<!-- SOURCE-BLOCK IT:69 BEGIN -->
 
 
 <a id="source-table-69"></a>
@@ -38,16 +24,6 @@ Baseline and related records: [IK §9](../../implementation/delivery-guide/9-ope
 | Sanitization and reuse | Approved method, media/key scope, actual verification and receipt; record retained exceptions truthfully. | {{IT\_SANITIZE}} |
 | Final acceptance | Data/operations/security disposition, continuing obligations, retained evidence and final service closure. | {{IT\_LIFE\_ACCEPT}} |
 
-<!-- SOURCE-BLOCK IT:69 END -->
-
-<!-- SOURCE-BLOCK IT:70 BEGIN -->
-
-<!-- SOURCE-BLOCK IT:70 END -->
-
-<!-- SOURCE-BLOCK IT:71 BEGIN -->
-
 Blank fields and unissued decisions are blockers for the affected action. Record actual evidence and authority; examples elsewhere in the library do not populate these fields.
-
-<!-- SOURCE-BLOCK IT:71 END -->
 
 [Previous chapter](7-gate-decision-and-production-activation.md) · [Chapter index](README.md)

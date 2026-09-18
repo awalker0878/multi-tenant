@@ -1,0 +1,90 @@
+{
+  "kind": "ANSIBLE_ENGINE_CHECK",
+  "status": "PASSED_LOCAL_ANSIBLE_ONLY",
+  "checks": [
+    {
+      "name": "syntax-stage_reference.yml",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nplaybook: /home/runner/work/multi-tenant/multi-tenant/ansible/playbooks/stage_reference.yml\n",
+      "stderr": ""
+    },
+    {
+      "name": "syntax-validate_readback.yml",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nplaybook: /home/runner/work/multi-tenant/multi-tenant/ansible/playbooks/validate_readback.yml\n",
+      "stderr": ""
+    },
+    {
+      "name": "stage-first",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nPLAY [Stage a reference engineering package locally] ***************************\n\nTASK [configuration_bundle : Require explicit local staging authority] *********\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nTASK [configuration_bundle : Validate engineering fixture and closed route ownership] ***\nok: [localhost]\n\nTASK [configuration_bundle : Validate caller-created staging root] *************\nok: [localhost]\n\nTASK [configuration_bundle : Create the owned local bundle directory] **********\nchanged: [localhost]\n\nTASK [configuration_bundle : Render the reference handoff without granting activation] ***\nchanged: [localhost]\n\nTASK [configuration_bundle : Render exact reference routes] ********************\nchanged: [localhost]\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=6    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "stage-second-idempotent",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nPLAY [Stage a reference engineering package locally] ***************************\n\nTASK [configuration_bundle : Require explicit local staging authority] *********\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nTASK [configuration_bundle : Validate engineering fixture and closed route ownership] ***\nok: [localhost]\n\nTASK [configuration_bundle : Validate caller-created staging root] *************\nok: [localhost]\n\nTASK [configuration_bundle : Create the owned local bundle directory] **********\nok: [localhost]\n\nTASK [configuration_bundle : Render the reference handoff without granting activation] ***\nok: [localhost]\n\nTASK [configuration_bundle : Render exact reference routes] ********************\nok: [localhost]\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=6    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "check-mode-drift",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nPLAY [Stage a reference engineering package locally] ***************************\n\nTASK [configuration_bundle : Require explicit local staging authority] *********\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nTASK [configuration_bundle : Validate engineering fixture and closed route ownership] ***\nok: [localhost]\n\nTASK [configuration_bundle : Validate caller-created staging root] *************\nok: [localhost]\n\nTASK [configuration_bundle : Create the owned local bundle directory] **********\nok: [localhost]\n\nTASK [configuration_bundle : Render the reference handoff without granting activation] ***\nchanged: [localhost]\n\nTASK [configuration_bundle : Render exact reference routes] ********************\nok: [localhost]\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=6    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "check-mode-does-not-mutate",
+      "passed": true
+    },
+    {
+      "name": "disabled-opt-in-rejected",
+      "passed": true,
+      "exit_code": 2,
+      "expect_failure": true,
+      "stdout": "\nPLAY [Stage a reference engineering package locally] ***************************\n\nTASK [configuration_bundle : Require explicit local staging authority] *********\n[ERROR]: Task failed: Action failed: Only explicit localhost reference staging is supported.\nOrigin: /home/runner/work/multi-tenant/multi-tenant/ansible/roles/configuration_bundle/tasks/main.yml:1:3\n\n1 - name: Require explicit local staging authority\n    ^ column 3\n\nfatal: [localhost]: FAILED! => {\n    \"assertion\": \"hosting_stage_enabled\",\n    \"changed\": false,\n    \"evaluated_to\": false,\n    \"msg\": \"Only explicit localhost reference staging is supported.\"\n}\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=0    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "foreign-route-rejected",
+      "passed": true,
+      "exit_code": 2,
+      "expect_failure": true,
+      "stdout": "\nPLAY [Stage a reference engineering package locally] ***************************\n\nTASK [configuration_bundle : Require explicit local staging authority] *********\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nTASK [configuration_bundle : Validate engineering fixture and closed route ownership] ***\n[ERROR]: Task failed: Finalization of task args for 'ansible.builtin.set_fact' failed: Error while resolving value for 'hosting_normalized': The filter plugin 'hosting_validate_bundle' failed: Route belongs to a different domain\n\nTask failed.\nOrigin: /home/runner/work/multi-tenant/multi-tenant/ansible/roles/configuration_bundle/tasks/main.yml:10:3\n\n 8     fail_msg: 'Only explicit localhost reference staging is supported.'\n 9\n10 - name: Validate engineering fixture and closed route ownership\n     ^ column 3\n\n<<< caused by >>>\n\nFinalization of task args for 'ansible.builtin.set_fact' failed.\nOrigin: /home/runner/work/multi-tenant/multi-tenant/ansible/roles/configuration_bundle/tasks/main.yml:11:3\n\n 9\n10 - name: Validate engineering fixture and closed route ownership\n11   ansible.builtin.set_fact:\n     ^ column 3\n\n<<< caused by >>>\n\nError while resolving value for 'hosting_normalized': The filter plugin 'hosting_validate_bundle' failed: Route belongs to a different domain\nOrigin: /home/runner/work/multi-tenant/multi-tenant/ansible/roles/configuration_bundle/tasks/main.yml:12:25\n\n10 - name: Validate engineering fixture and closed route ownership\n11   ansible.builtin.set_fact:\n12     hosting_normalized: '{{ hosting_bundle | hosting_validate_bundle }}'\n                           ^ column 25\n\nfatal: [localhost]: FAILED! => {\"changed\": false, \"msg\": \"Task failed: Finalization of task args for 'ansible.builtin.set_fact' failed: Error while resolving value for 'hosting_normalized': The filter plugin 'hosting_validate_bundle' failed: Route belongs to a different domain\"}\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "nsx-validation-no-contact",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nPLAY [Validate an observation manifest without native contact] *****************\n\nTASK [readback_validate : Restrict validation to fixed local reader tools] *****\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nTASK [readback_validate : Validate input without contacting any platform] ******\nok: [localhost]\n\nTASK [readback_validate : Confirm the no-contact result] ***********************\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "nutanix-validation-no-contact",
+      "passed": true,
+      "exit_code": 0,
+      "expect_failure": false,
+      "stdout": "\nPLAY [Validate an observation manifest without native contact] *****************\n\nTASK [readback_validate : Restrict validation to fixed local reader tools] *****\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nTASK [readback_validate : Validate input without contacting any platform] ******\nok: [localhost]\n\nTASK [readback_validate : Confirm the no-contact result] ***********************\nok: [localhost] => {\n    \"changed\": false,\n    \"msg\": \"All assertions passed\"\n}\n\nPLAY RECAP *********************************************************************\nlocalhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   \n\n",
+      "stderr": ""
+    },
+    {
+      "name": "staged-handoff-never-authorizes",
+      "passed": true
+    }
+  ],
+  "native_target_contacted": false,
+  "native_configuration_changed": false,
+  "version_output": "ansible-playbook [core 2.19.7]",
+  "elapsed_seconds": 10.355
+}

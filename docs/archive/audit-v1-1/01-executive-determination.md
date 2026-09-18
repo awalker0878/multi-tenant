@@ -8,23 +8,9 @@
 <!-- source-sha256: cd901aaf004d45cf29ffe14ff955a0c9cf81f668be674e8d4de8c590303c62d8 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK AUD11:3 BEGIN -->
-
-<!-- SOURCE-BLOCK AUD11:3 END -->
-
-<!-- SOURCE-BLOCK AUD11:4 BEGIN -->
-
 The revised handbook has materially stronger and broader architecture coverage. Its central Tenant / WSD / Security Domain / ZIP model should be preserved. The remaining high-priority work is to make the prose, closed schemas, examples, validation rules and qualification evidence agree. Adding more pages alone will not close these gaps.
 
-<!-- SOURCE-BLOCK AUD11:4 END -->
-
-<!-- SOURCE-BLOCK AUD11:5 BEGIN -->
-
 The supplied 50-check suite reproduces successfully. Independent mutation checks nevertheless reveal inconsistencies the suite does not evaluate, including tenant-reference scope, IPv6-only realization, DNS protocol coverage, incomplete readiness evidence and contradictory relationship graphs. These are findings against a reference document/package, not demonstrated vulnerabilities in a deployed platform.
-
-<!-- SOURCE-BLOCK AUD11:5 END -->
-
-<!-- SOURCE-BLOCK AUD11:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -37,22 +23,8 @@ The supplied 50-check suite reproduces successfully. Independent mutation checks
 | Findings | 24 findings: 12 High, 11 Medium, 1 Low. Priority is remediation urgency for this reference baseline, not a CVSS score. |
 | Implementation status | No live platform, provider API, Terraform deployment, or authorization process was exercised. |
 
-<!-- SOURCE-BLOCK AUD11:6 END -->
-
-<!-- SOURCE-BLOCK AUD11:7 BEGIN -->
-
 ## Recommended release treatment
 
-<!-- SOURCE-BLOCK AUD11:7 END -->
-
-<!-- SOURCE-BLOCK AUD11:8 BEGIN -->
-
 Retain Draft v1.1 as the reviewed reference baseline. Resolve the contract-consistency findings in a focused next revision. Keep separate status for document quality, executable contract conformance, platform qualification and formal security authorization. This audit does not alter the original handbook or companion package.
-
-<!-- SOURCE-BLOCK AUD11:8 END -->
-
-<!-- SOURCE-BLOCK AUD11:9 BEGIN -->
-
-<!-- SOURCE-BLOCK AUD11:9 END -->
 
 [Chapter index](README.md) · [Next chapter](02-scope-method-and-confirmed-improvements.md)

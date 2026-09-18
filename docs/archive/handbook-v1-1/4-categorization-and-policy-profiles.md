@@ -8,20 +8,10 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB11:157 BEGIN -->
-
 <a id="__RefHeading___Toc13293_1645000677"></a>
 <a id="sec_4"></a>
 
-<!-- SOURCE-BLOCK HB11:157 END -->
-
-<!-- SOURCE-BLOCK HB11:158 BEGIN -->
-
 Confidentiality, integrity and availability are independent impact assessments. “Protected B” is not a network topology, and “Medium availability” in a security categorization is not a service uptime target. The request records the three category fields separately, selects a SecurityProfile for controls, selects an AssuranceProfile for isolation and evidence, and selects AvailabilityProfile and RecoveryProfile for service behavior. A profile reference is immutable by name/version and resolves to a controlled digest. \[[S00](77-appendix-h-primary-sources-and-implementation-references.md#S00), sections 3 and 8; [S06](77-appendix-h-primary-sources-and-implementation-references.md#S06)\]
-
-<!-- SOURCE-BLOCK HB11:158 END -->
-
-<!-- SOURCE-BLOCK HB11:159 BEGIN -->
 
 
 <a id="source-table-159"></a>
@@ -35,40 +25,18 @@ Confidentiality, integrity and availability are independent impact assessments. 
 | PlacementProfile | Eligible sites, location/access restrictions, capacity and platform capabilities | Residency automatically resolving jurisdiction or control |
 | CryptographicProfile | Algorithms/modes, key custody, certificate lifecycle and crypto agility | A product logo or unchecked encryption flag |
 
-<!-- SOURCE-BLOCK HB11:159 END -->
-
-<!-- SOURCE-BLOCK HB11:160 BEGIN -->
-
 Profile definitions are provider/security-authority controlled. Consumers can select entitled profiles, not edit their mandatory controls. Requested optional features may strengthen requirements; they cannot reduce a mandatory minimum. A request with contradictory requirements is rejected with a specific explanation rather than placed on a weaker profile. The reference defaults in Appendix F are proposed service-design values, not government-mandated time limits or a claim of measured capability.
-
-<!-- SOURCE-BLOCK HB11:160 END -->
-
-<!-- SOURCE-BLOCK HB11:161 BEGIN -->
 
 <a id="req_CAT_001"></a>
 
 CAT-001  Each WSD SHALL record confidentiality, integrity and availability separately and SHALL reference the exact adopted SecurityProfile, AssuranceProfile, AvailabilityProfile, RecoveryProfile and PlacementProfile.
 
-<!-- SOURCE-BLOCK HB11:161 END -->
-
-<!-- SOURCE-BLOCK HB11:162 BEGIN -->
-
 Security authority  \|  Verify: [CT-017](73-appendix-d-conformance-test-catalogue.md#test_CT_017), [CT-062](73-appendix-d-conformance-test-catalogue.md#test_CT_062), [CT-069](73-appendix-d-conformance-test-catalogue.md#test_CT_069)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) / [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05) / [S06](77-appendix-h-primary-sources-and-implementation-references.md#S06)  \|  new-v1.1
-
-<!-- SOURCE-BLOCK HB11:162 END -->
-
-<!-- SOURCE-BLOCK HB11:163 BEGIN -->
 
 <a id="req_CAT_002"></a>
 
 CAT-002  Profile resolution SHALL be immutable and authorized; a consumer SHALL NOT lower mandatory requirements by editing a profile, forging a status field or choosing an unsupported category.
 
-<!-- SOURCE-BLOCK HB11:163 END -->
-
-<!-- SOURCE-BLOCK HB11:164 BEGIN -->
-
 Automation platform  \|  Verify: [CT-017](73-appendix-d-conformance-test-catalogue.md#test_CT_017), [CT-018](73-appendix-d-conformance-test-catalogue.md#test_CT_018)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
-
-<!-- SOURCE-BLOCK HB11:164 END -->
 
 [Previous chapter](3-standards-hierarchy-and-the-2026-baseline.md) · [Chapter index](README.md) · [Next chapter](5-threat-model-and-trust-boundaries.md)

@@ -6,31 +6,13 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:53 BEGIN -->
-
 <a id="WD14_S04"></a>
-
-<!-- SOURCE-BLOCK WD:53 END -->
-
-<!-- SOURCE-BLOCK WD:54 BEGIN -->
 
 IPv4 uses the TEST-NET ranges defined for documentation; IPv6 uses 2001:db8::/32. These are not allocations for a connected production or laboratory deployment. The .example naming convention likewise illustrates service identity rather than a registered operational domain. \[R14-01, R14-02, R14-03\]
 
-<!-- SOURCE-BLOCK WD:54 END -->
-
-<!-- SOURCE-BLOCK WD:55 BEGIN -->
-
 Four independent tenant prefixes remain distinct from link prefixes, provider service addresses and management scope. No repeated zone label grants reachability. Gateway addresses below denote the logical native gateway role; exact realization may be distributed, virtual or appliance-based.
 
-<!-- SOURCE-BLOCK WD:55 END -->
-
-<!-- SOURCE-BLOCK WD:56 BEGIN -->
-
 For IPv6, the same logical route and policy schedule applies using the selected family-specific prefixes and next hops. The illustrative /64 handoffs are not a prescription of platform link-prefix support. Native next-hop, RA, neighbour, MTU and service support must be confirmed before that family is offered.
-
-<!-- SOURCE-BLOCK WD:56 END -->
-
-<!-- SOURCE-BLOCK WD:57 BEGIN -->
 
 
 <a id="source-table-57"></a>
@@ -44,20 +26,6 @@ For IPv6, the same logical route and policy schedule applies using the selected 
 | Provider service domain | 203.0.113.128/27; SE-01 .129; SE-02 .130 | 2001:db8:300:1::/64; SE-01 ::129; SE-02 ::130; provider-owned scope |
 | Resolver / time / logs / repository | 203.0.113.138 / .139 / .140 / .141 | 2001:db8:300:1::138 / ::139 / ::140 / ::141 respectively; offered families remain separately qualified. |
 
-<!-- SOURCE-BLOCK WD:57 END -->
-
-<!-- SOURCE-BLOCK WD:58 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:58 END -->
-
-<!-- SOURCE-BLOCK WD:59 BEGIN -->
-
 Related documents: [NET — Address-family and allocation decisions](../../engineering/fabric/README.md#V14_NET_START)  \|  [PROV — Reservations and registration](../../implementation/provisioning-strategy/README.md#V14_PROV_START)
-
-<!-- SOURCE-BLOCK WD:59 END -->
-
-<!-- SOURCE-BLOCK WD:60 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:60 END -->
 
 [Previous chapter](3-component-and-dependency-schedule.md) · [Chapter index](README.md) · [Next chapter](5-dedicated-handoff-inventory-and-route-ownership.md)

@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: ae4ea65ea564fe848f214f5154ca4b67726eb6628d07a4b4f7714210e49ccd0d -->
-<!-- SOURCE-BLOCK WDE:56 BEGIN -->
-
 <a id="EX_06"></a>
-
-<!-- SOURCE-BLOCK WDE:56 END -->
-
-<!-- SOURCE-BLOCK WDE:57 BEGIN -->
 
 Reference demand and actual deliverable capacity are different quantities. The engineering workbook separates them.
 
-<!-- SOURCE-BLOCK WDE:57 END -->
-
-<!-- SOURCE-BLOCK WDE:58 BEGIN -->
-
 Baseline and related records: [WD §11](../internal-protected-workload/11-test-resource-capacity-and-mtu-accounting.md#WD14_S11)  •  [QUAL §3](../../assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md#QUAL_s_003)  •  [EK §6](../../engineering/delivery-guide/6-capacity-mtu-performance-and-failure-analysis.md#EK_06)
-
-<!-- SOURCE-BLOCK WDE:58 END -->
-
-<!-- SOURCE-BLOCK WDE:59 BEGIN -->
 
 
 <a id="source-table-59"></a>
@@ -37,32 +23,10 @@ Baseline and related records: [WD §11](../internal-protected-workload/11-test-r
 | Provider infrastructure | Additional, not quantified by the four guest VMs. | Controllers, edge/services, protection, replicas, hypervisor overhead and required reserves must be included. |
 | Surviving capacity | Accepted load plus increment must fit each remaining dimension after failure and reserve. | Memory, storage, edge throughput/sessions, routes, attachments and service/API limits cannot substitute for one another. |
 
-<!-- SOURCE-BLOCK WDE:59 END -->
-
-<!-- SOURCE-BLOCK WDE:60 BEGIN -->
-
-<!-- SOURCE-BLOCK WDE:60 END -->
-
-<!-- SOURCE-BLOCK WDE:61 BEGIN -->
-
 ## MTU example
-
-<!-- SOURCE-BLOCK WDE:61 END -->
-
-<!-- SOURCE-BLOCK WDE:62 BEGIN -->
 
 For basic VXLAN carrying an untagged inner Ethernet frame, a 1450-byte workload IP packet adds 14 + 8 + 8 + 20 bytes for inner Ethernet, VXLAN, UDP and outer IPv4: 1500 bytes of outer IP packet. With outer IPv6, use 40 rather than 20: 1520 bytes. An inner VLAN tag adds another 4 bytes. Outer link framing and actual device MTU definitions are separate.
 
-<!-- SOURCE-BLOCK WDE:62 END -->
-
-<!-- SOURCE-BLOCK WDE:63 BEGIN -->
-
 The workbook exposes these inputs and arithmetic. Geneve options, IPsec, nested tunnels and other headers need their actual byte budget. An illustrative fit does not establish that every active and surviving path supports the selected workload MTU.
-
-<!-- SOURCE-BLOCK WDE:63 END -->
-
-<!-- SOURCE-BLOCK WDE:64 BEGIN -->
-
-<!-- SOURCE-BLOCK WDE:64 END -->
 
 [Previous chapter](5-commission-qualify-prepare-and-activate.md) · [Chapter index](README.md) · [Next chapter](7-observe-recover-and-retire-without-invented-results.md)

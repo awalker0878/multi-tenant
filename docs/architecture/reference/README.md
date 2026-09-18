@@ -47,45 +47,19 @@
 - [v1.4 — Connected infrastructure design and acceptance](36-v1-4-connected-infrastructure-design-and-acceptance.md)
 
 ## Source front matter
-<!-- SOURCE-BLOCK RA:0 BEGIN -->
-
 <a id="V14_RA_START"></a>
 
 INFRASTRUCTURE ARCHITECTURE  /  RA
 
-<!-- SOURCE-BLOCK RA:0 END -->
-
-<!-- SOURCE-BLOCK RA:1 BEGIN -->
-
 v1.4 linked worked design: [WD — resources, paths, build receipts and acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
-
-<!-- SOURCE-BLOCK RA:1 END -->
-
-<!-- SOURCE-BLOCK RA:2 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
-<!-- SOURCE-BLOCK RA:2 END -->
-
-<!-- SOURCE-BLOCK RA:3 BEGIN -->
-
 *Infrastructure Reference Architecture and Cross-Platform Provisioning Strategy*
-
-<!-- SOURCE-BLOCK RA:3 END -->
-
-<!-- SOURCE-BLOCK RA:4 BEGIN -->
 
 Draft v1.4  \|  16 September 2026
 
-<!-- SOURCE-BLOCK RA:4 END -->
-
-<!-- SOURCE-BLOCK RA:5 BEGIN -->
-
 The selected infrastructure topology, trust boundaries, vendor realizations and provisioning strategy. Engineering detail is delegated to the linked supplements without making a custom automation application mandatory.
-
-<!-- SOURCE-BLOCK RA:5 END -->
-
-<!-- SOURCE-BLOCK RA:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -99,49 +73,17 @@ The selected infrastructure topology, trust boundaries, vendor realizations and 
 | Authority | Applicable external obligations and adopted controls prevail; supplements cannot silently weaken the parent. |
 | Release boundary | Documentation and local document checks only. No live infrastructure deployment, qualification or authorization asserted. |
 
-<!-- SOURCE-BLOCK RA:6 END -->
-
-<!-- SOURCE-BLOCK RA:7 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:7 END -->
-
-<!-- SOURCE-BLOCK RA:8 BEGIN -->
-
 Engineering supplements: [GM — Architecture Gap Map and Design Decision Register](../../assurance/gap-map/1-document-family-scope-and-precedence.md#GM_s_001)  •  [NET — Fabric, Security Boundaries and Infrastructure Interfaces](../../engineering/fabric/1-transport-routing-and-overlay-ownership.md#NET_s_001)  •  [VND — Vendor-Stack Realizations and Common Reference Environment](../../engineering/platform-realizations/1-one-reference-environment-three-native-realizations.md#VND_s_001)  •  [PROV — Cross-Stack Provisioning and Commissioning Strategy](../../implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md#PROV_s_001)  •  [SVC — Shared Services, Data Protection and Recovery Architecture](../shared-services/1-shared-service-placement-and-consumption-boundaries.md#SVC_s_001)  •  [QUAL — Site Design, Qualification and Operational Acceptance](../../assurance/site-qualification/1-from-proposed-architecture-to-accepted-service.md#QUAL_s_001)
 
-<!-- SOURCE-BLOCK RA:8 END -->
-
-<!-- SOURCE-BLOCK RA:9 BEGIN -->
-
 Keep the eight Word files together after extracting the release package. Cross-document links use sibling filenames and stable bookmarks. START\_HERE.html provides an additional navigation index.
-
-<!-- SOURCE-BLOCK RA:9 END -->
-
-<!-- SOURCE-BLOCK RA:10 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:10 END -->
-
-<!-- SOURCE-BLOCK RA:11 BEGIN -->
 
 <a id="RA_summary"></a>
 
 *Architecture summary*
 
-<!-- SOURCE-BLOCK RA:11 END -->
-
-<!-- SOURCE-BLOCK RA:12 BEGIN -->
-
 The hosting service is a set of governed infrastructure environments. Sites contain resilient transport, protected management, provider-operated security and shared services, and bounded pools of native platform capacity. Tenants consume isolated compute, data and network resources within those foundations. A tenant, a workload security domain, a vendor cluster and a site are different boundaries. \[[B2](34-appendix-d-sources-and-review-status.md#RA_src_B2) §§3–7\]
 
-<!-- SOURCE-BLOCK RA:12 END -->
-
-<!-- SOURCE-BLOCK RA:13 BEGIN -->
-
 The selected large-site pattern uses routed leaf/spine transport and independent Nutanix, VMware/NSX or OpenStack realizations. Each independent security-domain instance has its own routing and policy authority and an isolated handoff to the applicable ZIP/security service. Shared equipment does not imply shared routing, administrative permission or a proven independent failure domain. Privileged administration and recovery access remain separate from workload and service-consumption paths. \[[B2](34-appendix-d-sources-and-review-status.md#RA_src_B2) §§5–8, 15–18\]
-
-<!-- SOURCE-BLOCK RA:13 END -->
-
-<!-- SOURCE-BLOCK RA:14 BEGIN -->
 
 
 <a id="source-table-14"></a>
@@ -153,52 +95,14 @@ The selected large-site pattern uses routed leaf/spine transport and independent
 | Provider service and ZIP | Deliver selected service endpoints and governed trust transitions. | Consumption is distinct from administration and backend data entitlement. |
 | Provisioning work packages | Establish foundations, allocate resources, verify and activate. | Supported tools execute under the appropriate infrastructure owner. |
 
-<!-- SOURCE-BLOCK RA:14 END -->
-
-<!-- SOURCE-BLOCK RA:15 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:15 END -->
-
-<!-- SOURCE-BLOCK RA:16 BEGIN -->
-
 Provisioning commissions physical and management foundations, then native platform and common-service capability, before ordinary tenant allocation. Terraform provisions supported resources across the selected hosting stack and required edge, address/name, data-protection and trust integrations. Native installers and lifecycle tools retain operations they own. A new custom portal, routing compiler or controller application is not a prerequisite. \[[B2](34-appendix-d-sources-and-review-status.md#RA_src_B2) §§20–24\]
-
-<!-- SOURCE-BLOCK RA:16 END -->
-
-<!-- SOURCE-BLOCK RA:17 BEGIN -->
 
 The linked supplements turn remaining design questions into engineering records: NET explains actual paths and attachment accounting; VND maps the common reference environment to native stacks; PROV defines ownership and build order; SVC explains service/data/recovery dependencies; QUAL defines site measurements and acceptance; GM records the gaps and open decisions. None substitutes for actual supported versions, site values, executable integrations, measured qualification or formal authorization.
 
-<!-- SOURCE-BLOCK RA:17 END -->
-
-<!-- SOURCE-BLOCK RA:18 BEGIN -->
-
 Read next: [System topology](3-system-context-and-physical-hosting-topology.md#RA_s_003)  •  [Vendor realization](15-cross-vendor-realization-model.md#RA_s_015)  •  [Provisioning work packages](20-provisioning-model-and-infrastructure-work-packages.md#RA_s_020)  •  [Gap and decision map](../../assurance/gap-map/3-detailed-gap-register-and-treatment.md#GM_s_003)
-
-<!-- SOURCE-BLOCK RA:18 END -->
-
-<!-- SOURCE-BLOCK RA:19 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:19 END -->
 
 <a id="RA_contents"></a>
 
-<!-- SOURCE-BLOCK RA:57 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:57 END -->
-
-<!-- SOURCE-BLOCK RA:58 BEGIN -->
-
 Use the contents and named section links to navigate. After later edits, update Word fields and verify pagination before release.
 
-<!-- SOURCE-BLOCK RA:58 END -->
-
-<!-- SOURCE-BLOCK RA:59 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:59 END -->
-
-<!-- SOURCE-BLOCK RA:60 BEGIN -->
-
 PART 1  /  Infrastructure purpose and topology
-
-<!-- SOURCE-BLOCK RA:60 END -->

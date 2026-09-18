@@ -8,12 +8,6 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:354 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:354 END -->
-
-<!-- SOURCE-BLOCK HB10:355 BEGIN -->
-
 
 <a id="source-table-355"></a>
 
@@ -28,16 +22,10 @@
 | Service owner | Own WSD business/service requirements and lifecycle. |
 | Operations/SRE | Monitor, respond, reconcile, capacity plan and restore services. |
 
-<!-- SOURCE-BLOCK HB10:355 END -->
-
-<!-- SOURCE-BLOCK HB10:356 BEGIN -->
-
 
 <a id="source-table-356"></a>
 
 | GOVERNANCE PRINCIPLE<br>No single routine role should need unrestricted authority over the physical fabric, management plane, security edge, platform tenancy, and workload configuration. |
 | --- |
-
-<!-- SOURCE-BLOCK HB10:356 END -->
 
 [Previous chapter](54-part-vi-governance-and-delivery.md) · [Chapter index](README.md) · [Next chapter](48-architecture-review-checklist.md)

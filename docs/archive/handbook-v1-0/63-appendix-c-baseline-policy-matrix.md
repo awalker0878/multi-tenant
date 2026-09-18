@@ -8,12 +8,6 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:422 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:422 END -->
-
-<!-- SOURCE-BLOCK HB10:423 BEGIN -->
-
 
 <a id="source-table-423"></a>
 
@@ -29,7 +23,5 @@
 | Workload | Backup management | Management | DENY | No normal exception |
 | Workload | Backup data service | Service binding | DENY unless bound | Approved backup profile |
 | Tenant automation | Physical fabric | Control plane | DENY | Foundation identity only |
-
-<!-- SOURCE-BLOCK HB10:423 END -->
 
 [Previous chapter](62-appendix-b-terraform-root-and-module-patterns.md) · [Chapter index](README.md) · [Next chapter](64-appendix-d-conformance-test-catalogue.md)

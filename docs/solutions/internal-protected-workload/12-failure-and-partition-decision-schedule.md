@@ -6,31 +6,13 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:125 BEGIN -->
-
 <a id="WD14_S12"></a>
-
-<!-- SOURCE-BLOCK WD:125 END -->
-
-<!-- SOURCE-BLOCK WD:126 BEGIN -->
 
 Availability and security are separate observations. A denied flow during a fault is not evidence that the offered availability target was met. Conversely, continued traffic is not acceptable if it survived by bypassing the required security boundary. Record both outcomes, including the accepted interval for established sessions and new connections.
 
-<!-- SOURCE-BLOCK WD:126 END -->
-
-<!-- SOURCE-BLOCK WD:127 BEGIN -->
-
 Test only under an approved scope with restoration procedures and protection for unrelated tenants. This document supplies expected behavior and evidence targets; it does not perform fault injection or claim observed results.
 
-<!-- SOURCE-BLOCK WD:127 END -->
-
-<!-- SOURCE-BLOCK WD:128 BEGIN -->
-
 For every failure scenario, identify the failed components and the dependencies assumed to survive. A recovery path that depends on the failed management, identity or key service has not survived merely because a backup file is located on a different disk. A network partition requires writer ownership and fencing decisions, not just a lost-host alarm.
-
-<!-- SOURCE-BLOCK WD:128 END -->
-
-<!-- SOURCE-BLOCK WD:129 BEGIN -->
 
 
 <a id="source-table-129"></a>
@@ -46,20 +28,6 @@ For every failure scenario, identify the failed components and the dependencies 
 | Policy revoked during a live session | Deny new sessions; terminate or drain existing sessions within the approved bound. | Edge/service owners retain policy and session timestamps and resulting probes. |
 | A tenant retires while backups remain held | Remove live reachability and grants; preserve authorized retained-data and key custody. | Data/protection owners account for every retained copy, disposition and required recovery access. |
 
-<!-- SOURCE-BLOCK WD:129 END -->
-
-<!-- SOURCE-BLOCK WD:130 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:130 END -->
-
-<!-- SOURCE-BLOCK WD:131 BEGIN -->
-
 Related documents: [SVC — Recovery and failback](../../architecture/shared-services/README.md#V14_SVC_START)  \|  [PROV — Interrupted operations](../../implementation/provisioning-strategy/README.md#V14_PROV_START)  \|  [QUAL — Observed acceptance](../../assurance/site-qualification/README.md#V14_QUAL_START)
-
-<!-- SOURCE-BLOCK WD:131 END -->
-
-<!-- SOURCE-BLOCK WD:132 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:132 END -->
 
 [Previous chapter](11-test-resource-capacity-and-mtu-accounting.md) · [Chapter index](README.md) · [Next chapter](13-verification-assertions-and-actual-evidence.md)

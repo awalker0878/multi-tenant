@@ -6,37 +6,15 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:27 BEGIN -->
-
 <a id="WD14_S01"></a>
-
-<!-- SOURCE-BLOCK WD:27 END -->
-
-<!-- SOURCE-BLOCK WD:28 BEGIN -->
 
 This is a worked infrastructure design for the reference architecture, not a site configuration, an approved bill of materials, or a claim that a vendor combination has passed qualification. It connects the same resource identities across topology, routing, policy, shared services, provisioning, failure handling and acceptance. The host-platform choice changes the native realization, not the required outcomes.
 
-<!-- SOURCE-BLOCK WD:28 END -->
-
-<!-- SOURCE-BLOCK WD:29 BEGIN -->
-
 The starting fixture remains two tenants, two WSDs, four tenant domain instances, four permanent disposable workload endpoints and two tenant OZ-to-RZ relationships. This book explicitly adds the infrastructure that the small fixture previously left outside its count: service-facing handoffs, provider service endpoints, management paths, protection dependencies and temporary test capacity.
-
-<!-- SOURCE-BLOCK WD:29 END -->
-
-<!-- SOURCE-BLOCK WD:30 BEGIN -->
 
 Treat every IP address, capacity value and next hop in this book as an illustrative design value. They use documentation address space and must be replaced through an approved site address plan. The IPv6 column is a separate qualification candidate; it does not assert that every selected platform offers dual-stack or IPv6-only service. \[R14-01, R14-02\]
 
-<!-- SOURCE-BLOCK WD:30 END -->
-
-<!-- SOURCE-BLOCK WD:31 BEGIN -->
-
 Read RA for the architecture; NET and VND for mechanism choices; this book for the connected example; PROV for execution ownership; SVC for data and trust dependencies; and QUAL for actual acceptance. The working schedules do not authorize production changes.
-
-<!-- SOURCE-BLOCK WD:31 END -->
-
-<!-- SOURCE-BLOCK WD:32 BEGIN -->
 
 
 <a id="source-table-32"></a>
@@ -48,20 +26,6 @@ Read RA for the architecture; NET and VND for mechanism choices; this book for t
 | Site decision | An actual selection requiring an accountable owner and approval. | A value supplied by copying an illustrative table. |
 | Observed qualification | Measurements against actual components, versions and an approved test scope. | Any result in this documentation-only release. |
 
-<!-- SOURCE-BLOCK WD:32 END -->
-
-<!-- SOURCE-BLOCK WD:33 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:33 END -->
-
-<!-- SOURCE-BLOCK WD:34 BEGIN -->
-
 Related documents: [RA — Architecture and authority](../../architecture/reference/README.md#V14_RA_START)  \|  [GM — Gap and decision ownership](../../assurance/gap-map/README.md#V14_GM_START)
-
-<!-- SOURCE-BLOCK WD:34 END -->
-
-<!-- SOURCE-BLOCK WD:35 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:35 END -->
 
 [Chapter index](README.md) · [Next chapter](2-reference-decisions-and-infrastructure-boundaries.md)

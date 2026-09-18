@@ -37,15 +37,6 @@ def rel_link(source: Path, target: Path, anchor=''):
     return out + ('#'+quote(anchor,safe='_-:.') if anchor else '')
 def clean_text(s): return (s or '').replace('\u00ad','').replace('\u200b','').replace('\xa0',' ')
 def plain(el): return clean_text(''.join(n.text or '' for n in el.iter(q('w:t'))))
-def code_text(el):
-    """Preserve Word code text, explicit breaks and tabs; never collapse indentation."""
-    parts=[]
-    for n in el.iter():
-        if n.tag==q('w:t'):parts.append(n.text or '')
-        elif n.tag==q('w:tab'):parts.append('\t')
-        elif n.tag in (q('w:br'),q('w:cr')) and n.get(q('w:type')) not in ('page','column'):parts.append('\n')
-        elif n.tag==q('w:noBreakHyphen'):parts.append('‑')
-    return ''.join(parts).replace('\r\n','\n').replace('\r','\n')
 def escape(s):
     s=html.escape(clean_text(s),quote=False)
     return re.sub(r'([\\`*_\[\]|])',r'\\\1',s)
@@ -59,6 +50,16 @@ def walk_blocks(parent):
             content=c.find(q('w:sdtContent'))
             if content is not None: yield from walk_blocks(content)
         elif c.tag in (q('w:customXml'),): yield from walk_blocks(c)
+def code_text(element):
+    """Preserve significant Word line breaks, carriage returns, tabs and indentation."""
+    parts=[]
+    for node in element.iter():
+        if node.tag==q('w:t'):parts.append(node.text or '')
+        elif node.tag in (q('w:br'),q('w:cr')) and node.get(q('w:type')) not in ('page','column'):parts.append('\n')
+        elif node.tag==q('w:tab'):parts.append('\t')
+    return ''.join(parts)
+
+
 def field_instruction(s):
     s=s.strip()
     if re.match(r'HYPERLINK\b',s,re.I):
@@ -340,11 +341,8 @@ class Source:
                 else:rendered=''
                 anchor_markup+=f'\n<a id="source-table-{i}"></a>'
                 row['rows']=len(lines);row['cells']=sum(len(tr.findall(q('w:tc'))) for tr in b.findall(q('w:tr')))
-            pages[page].append(f'<!-- SOURCE-BLOCK {self.spec["id"]}:{i} BEGIN -->')
             if anchor_markup:pages[page].append(anchor_markup)
             if rendered:pages[page].append(rendered)
-            pages[page].append(f'<!-- SOURCE-BLOCK {self.spec["id"]}:{i} END -->')
-            if b.tag==q('w:p') and 'code' in style(b).lower():row['source_code_sha256']=digest(code_text(b).encode())
             row['markdown_sha256']=digest(rendered.encode());row['markdown_text']=rendered
             self.rows.append(row)
         for page,parts in pages.items():
@@ -366,7 +364,7 @@ class Source:
                 if first_heading is not None:parts.pop(first_heading)
             text='\n\n'.join(parts)
             # Join adjacent source code paragraphs into one text fence.
-            # Keep individual source-code block boundaries for independent fidelity checks.
+            text=text.replace('\n```\n\n```text\n','\n')
             tail=[]
             if not is_index:
                 ci=next(j for j,c in enumerate(self.chapters) if c['path']==page)
@@ -384,13 +382,11 @@ class Source:
                 'images':self.media,'links':self.links,'warnings':self.warnings,
                 'bookmarks':{k:{'path':str(p.relative_to(self.root)),'anchor':a} for k,(p,a) in self.bookmarks.items()}}
 
-def build(root=ROOT, *, allow_existing=False):
+def build(root=ROOT):
     cfg=json.loads((root/'sources/documentation/source_inventory.json').read_text())
-    if not allow_existing and any((root/s['destination']/'README.md').exists() for s in cfg['documents']):
-        raise ValueError('Refusing to overwrite maintained chapters. Refresh into a clean scratch copy and reconcile explicit amendment records.')
-    amendment_file=root/'sources/documentation/amendments.json'
-    if amendment_file.exists() and json.loads(amendment_file.read_text()):
-        raise ValueError('Source refresh cannot overwrite maintained amendments. Use a source-only scratch tree and reviewed rebase.')
+    for spec in cfg['documents']:
+        if Path(spec['destination']).as_posix().startswith('docs/current'):
+            raise ValueError('Frozen-source refresh cannot target maintained design records')
     sources=[Source(root,s) for s in cfg['documents']]
     lookup={s.path.resolve():s for s in sources}
     rows=[s.render(lookup) for s in sources]
@@ -405,7 +401,7 @@ def build(root=ROOT, *, allow_existing=False):
 
 def main():
     a=argparse.ArgumentParser(description=__doc__);a.add_argument('--root',type=Path,default=ROOT)
-    a.add_argument('--refresh-from-frozen-sources',action='store_true',help='Explicitly regenerate Markdown in a review working tree. Never changes the DOCX sources.')
+    a.add_argument('--refresh-from-frozen-sources',action='store_true',help='Regenerate immutable transcription paths only; never docs/current. Review all output changes.')
     args=a.parse_args()
     if not args.refresh_from_frozen_sources:a.error('Use --refresh-from-frozen-sources in a clean review branch; regeneration replaces chapter Markdown.')
     rows,_=build(args.root.resolve())

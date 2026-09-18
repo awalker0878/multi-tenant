@@ -8,12 +8,6 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:430 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:430 END -->
-
-<!-- SOURCE-BLOCK HB10:431 BEGIN -->
-
 
 <a id="source-table-431"></a>
 
@@ -35,7 +29,5 @@
 | Tenant Namespace | Administrative ownership/RBAC/quota boundary; not automatically a security zone. |
 | WSD | Workload Security Domain; the primary workload lifecycle and security-intent object. |
 | ZIP | Zone Interface Point; security boundary system between two zones that enforces inter-zone policy. |
-
-<!-- SOURCE-BLOCK HB10:431 END -->
 
 [Previous chapter](66-appendix-f-architecture-decision-record-template.md) · [Chapter index](README.md) · [Next chapter](68-appendix-h-normative-requirement-catalogue.md)

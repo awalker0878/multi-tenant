@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: ae4ea65ea564fe848f214f5154ca4b67726eb6628d07a4b4f7714210e49ccd0d -->
-<!-- SOURCE-BLOCK WDE:49 BEGIN -->
-
 <a id="EX_05"></a>
-
-<!-- SOURCE-BLOCK WDE:49 END -->
-
-<!-- SOURCE-BLOCK WDE:50 BEGIN -->
 
 Use the gate dependency rather than assuming that numeric gate order grants chronological permission.
 
-<!-- SOURCE-BLOCK WDE:50 END -->
-
-<!-- SOURCE-BLOCK WDE:51 BEGIN -->
-
 Baseline and related records: [WD §9](../internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md#WD14_S09)  •  [DEL §3](../../governance/delivery-framework/3-apply-gate-dependencies-rather-than-numerical-order.md#DEL_03)  •  [IK §7](../../implementation/delivery-guide/7-tenant-provisioning-and-controlled-production-activation.md#IK_07)
-
-<!-- SOURCE-BLOCK WDE:51 END -->
-
-<!-- SOURCE-BLOCK WDE:52 BEGIN -->
 
 
 <a id="source-table-52"></a>
@@ -40,20 +26,6 @@ Baseline and related records: [WD §9](../internal-protected-workload/9-build-se
 | Production P4/P5 / G3 | New authorized tenant instance; current tests, controlled exposure and handover confirmation. | Current prerequisite decisions, valid operating authority and reversible activation record. |
 | P6 / continuing G4 | Changes, recovery exercises, migration or retirement. | Current as-built and requalification of materially changed scope. |
 
-<!-- SOURCE-BLOCK WDE:52 END -->
-
-<!-- SOURCE-BLOCK WDE:53 BEGIN -->
-
-<!-- SOURCE-BLOCK WDE:53 END -->
-
-<!-- SOURCE-BLOCK WDE:54 BEGIN -->
-
 STEP-EX-01 cannot be executed from this book alone. The implementation copy must name the approved site LLD, actual resources, tool artifact, executor, credential custody, expected result, stop condition and data-safe recovery step.
-
-<!-- SOURCE-BLOCK WDE:54 END -->
-
-<!-- SOURCE-BLOCK WDE:55 BEGIN -->
-
-<!-- SOURCE-BLOCK WDE:55 END -->
 
 [Previous chapter](4-native-realization-and-provisioning-ownership.md) · [Chapter index](README.md) · [Next chapter](6-capacity-and-test-resource-accounting.md)

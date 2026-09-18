@@ -6,32 +6,14 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 483df77cff70166fbdfdf711135efa3beeecc8fe1015a58290cbebff5b80bdfd -->
-<!-- SOURCE-BLOCK PROV:54 BEGIN -->
-
 <a id="__RefHeading___Toc7818_1525915568"></a>
 <a id="PROV_s_004"></a>
 
-<!-- SOURCE-BLOCK PROV:54 END -->
-
-<!-- SOURCE-BLOCK PROV:55 BEGIN -->
-
 Activation scope is explicit. A restricted non-production fixture can be built under its approved test authorization before platform qualification is complete, solely to produce the required evidence. Production activation requires accepted platform/service capability, current workload checks, applicable operational/recovery readiness and valid authority. The post-activation handover records the accepted as-built service; it does not defer selecting its owner, protection or recovery obligations.
-
-<!-- SOURCE-BLOCK PROV:55 END -->
-
-<!-- SOURCE-BLOCK PROV:56 BEGIN -->
 
 Parent architecture: [RA §23](../../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md#RA_s_023)  •  [RA §24](../../architecture/reference/24-terraform-across-the-vendor-stacks.md#RA_s_024)
 
-<!-- SOURCE-BLOCK PROV:56 END -->
-
-<!-- SOURCE-BLOCK PROV:57 BEGIN -->
-
 This sequence builds the VND §1 reference fixture on one chosen stack. It assumes P0–P3 are accepted for the offered class; it does not silently perform procurement or platform installation. Repeat the same outcome on a second stack for portability evidence. The native resources differ, while the domain ownership, service paths and activation conditions remain the same.
-
-<!-- SOURCE-BLOCK PROV:57 END -->
-
-<!-- SOURCE-BLOCK PROV:58 BEGIN -->
 
 
 <a id="source-table-58"></a>
@@ -48,19 +30,7 @@ This sequence builds the VND §1 reference fixture on one chosen stack. It assum
 | 8 · controlled activation | Activate only the approved access and mode. Production requires applicable G4 readiness and operating authority; a qualification fixture remains restricted and non-production. | Failed immediate live-path check withdraws new exposure and sessions according to policy. |
 | 9 · hand over | As-built resources, service parameters, operating owner and required authorization recorded. | The final record confirms already accepted ownership and authorization; neither may first be obtained after production exposure. |
 
-<!-- SOURCE-BLOCK PROV:58 END -->
-
-<!-- SOURCE-BLOCK PROV:59 BEGIN -->
-
-<!-- SOURCE-BLOCK PROV:59 END -->
-
-<!-- SOURCE-BLOCK PROV:60 BEGIN -->
-
 Treat network attachment and exposure as explicit activation boundaries. During assembly, endpoints may be absent, disconnected or held in a verified quarantine policy. A temporary bootstrap permit needs a named endpoint, reason, protocol set, owner and withdrawal condition. It must not permit arbitrary access to management or the whole shared-services network. Retain essential service access after activation only where it is part of the approved steady-state design.
-
-<!-- SOURCE-BLOCK PROV:60 END -->
-
-<!-- SOURCE-BLOCK PROV:61 BEGIN -->
 
 
 <a id="source-table-61"></a>
@@ -72,23 +42,9 @@ Treat network attachment and exposure as explicit activation boundaries. During 
 | After exposure or writes | Withdraw affected access, retain evidence and choose forward repair or recovery with the data owner. | Assume reverting Terraform state restores old infrastructure or old data. |
 | During shared-service change | Coordinate consumer impact and retain an accepted previous service path where safe. | Delete shared domains or keys merely because one WSD failed. |
 
-<!-- SOURCE-BLOCK PROV:61 END -->
-
-<!-- SOURCE-BLOCK PROV:62 BEGIN -->
-
-<!-- SOURCE-BLOCK PROV:62 END -->
-
-<!-- SOURCE-BLOCK PROV:63 BEGIN -->
-
 Post-activation verification checks the actual entry and reply path, not only the pre-activation internal fixture. An exposure change can alter DNS, NAT, load-balancer health or routing. Where public ingress is offered, use a separately approved PAZ test path and scope before production; the base fixture does not acquire public access merely to simplify testing.
 
-<!-- SOURCE-BLOCK PROV:63 END -->
-
-<!-- SOURCE-BLOCK PROV:64 BEGIN -->
-
 Related engineering: [Expected traffic outcomes](../../engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md#NET_s_003)  •  [Narrow service protocols](../../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md#SVC_s_002)  •  [Activation evidence](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
-
-<!-- SOURCE-BLOCK PROV:64 END -->
 
 [Previous chapter](3-terraform-native-tools-and-operation-level-support.md) · [Chapter index](README.md) · [Next chapter](5-concurrency-ownership-and-failed-execution.md)
 

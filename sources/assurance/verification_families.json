@@ -1,1433 +1,454 @@
 {
-  "CT": {
-    "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/tests.csv",
-    "records": [
-      {
-        "id": "CT-001",
-        "title": "Cross-tenant IPv4 isolation",
-        "preconditions": "Two authorized test tenants; live endpoints and a same-tenant positive control.",
-        "procedure": "Probe disallowed TCP/UDP services in both directions, including same-host and different-host placements. Compare platform policy and edge telemetry.",
-        "expected": "All unapproved flows are denied; positive controls succeed; no misleading pass caused by a dead endpoint.",
-        "evidence": "Probe results, endpoint health, routing/policy snapshots and attribution.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "TEN-001; SDI-002; TEST-001; DEL-001"
-      },
-      {
-        "id": "CT-002",
-        "title": "Cross-tenant IPv6 isolation",
-        "preconditions": "IPv6-qualified test endpoints; both tenants have allocated prefixes.",
-        "procedure": "Repeat CT-001 over global/unique-local IPv6; inspect link-local exposure at each segment boundary.",
-        "expected": "Unapproved IPv6 flows are denied without breaking required local IPv6 operation.",
-        "evidence": "IPv6 probes, neighbor state, policy and deny telemetry.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "TEN-001; SDI-002; IPV6-001; IPV6-002; TEST-001"
-      },
-      {
-        "id": "CT-003",
-        "title": "Zone-boundary bypass prevention",
-        "preconditions": "Two distinct zone domains with one approved test flow.",
-        "procedure": "Inspect all native, static, policy-based and external-network paths; test same-host, cross-host and shared-attachment cases. Correlate the allowed flow at the declared logical ZIP.",
-        "expected": "No undeclared path exists; allowed traffic is enforced by the ZIP realization; removing that authorization denies it.",
-        "evidence": "Topology graph, routes, packet-path or enforcement trace and policy digests.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-003; ZIP-001; ZIP-007; OVL-002; RTE-002; IPV6-002; NUT-002; NSX-002; NSX-003; TEST-001; MIG-002; DEL-001"
-      },
-      {
-        "id": "CT-004",
-        "title": "Infrastructure management isolation",
-        "preconditions": "Inventory of management APIs, BMCs, consoles, storage administration and backup administration.",
-        "procedure": "From test workloads, attempt the enumerated management endpoints over all enabled families. Separately verify approved management access.",
-        "expected": "Workloads cannot access infrastructure management; dedicated authorized administration still works.",
-        "evidence": "Inventory coverage, negative probes and management access audit.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-004; MODEL-002; ZIP-004; MGT-001; MGT-005; BKP-001; DEL-001"
-      },
-      {
-        "id": "CT-005",
-        "title": "Default Internet denial",
-        "preconditions": "WSD has no egress Exposure; a provider-controlled external test endpoint is available.",
-        "procedure": "Attempt direct and proxy-mediated external access, including IPv6, alternate DNS and common tunnel paths allowed by the test plan.",
-        "expected": "No unapproved egress succeeds; no default-route or NAT shortcut defeats policy.",
-        "evidence": "Route/NAT inventory, probes and egress logs.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "EGR-001; OS-001"
-      },
-      {
-        "id": "CT-006",
-        "title": "Public ingress protection",
-        "preconditions": "Internal test service and a controlled external test client.",
-        "procedure": "Probe an internal workload directly, then exercise a separately approved PAZ ingress service.",
-        "expected": "Direct exposure is denied; the approved ingress reaches only its declared backend and port.",
-        "evidence": "Exposure object, DNS/certificate records and ingress/backend traces.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ING-001; ING-002"
-      },
-      {
-        "id": "CT-007",
-        "title": "Approved stateful flow",
-        "preconditions": "Versioned FlowProfile and approved source/destination identities.",
-        "procedure": "Open the authorized application session and its reply path; test unsolicited reverse sessions and a nearby disallowed service.",
-        "expected": "Intended request/reply works; reverse initiation is allowed only when separately declared.",
-        "evidence": "Flow intent, compiled rule and application-level probe results.",
-        "mode": "automated",
-        "cadence": "each deployment; flow change",
-        "executionStatus": "not-run",
-        "requirements": "ZIP-003; NSX-002; FLOW-001; TEST-001"
-      },
-      {
-        "id": "CT-008",
-        "title": "Service-binding scope",
-        "preconditions": "One bound and one unbound provider service endpoint.",
-        "procedure": "Exercise required DNS, time, identity or backup consumption; probe the rest of the service subnet and administrative interface.",
-        "expected": "Only declared service endpoints/directions are reachable; consuming one service does not expose its subnet or management.",
-        "evidence": "Binding resolution, probes and service-side attribution.",
-        "mode": "automated",
-        "cadence": "each deployment; binding change",
-        "executionStatus": "not-run",
-        "requirements": "INV-004; MODEL-002; SVC-001; SVC-002; SVC-003; DEL-001"
-      },
-      {
-        "id": "CT-009",
-        "title": "Route-authority integrity",
-        "preconditions": "Approved route graph and realized routing snapshots.",
-        "procedure": "Compare imported/exported prefixes, defaults, next hops and BGP neighbors with the compiled plan; check recursive next-hop reachability and summaries.",
-        "expected": "No unauthorized route or advertisement exists; summaries cannot expose excluded domains.",
-        "evidence": "Compiler output, RIB/FIB snapshots and semantic diff.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "INV-003; RTE-001; RTE-002; RTE-003; RTE-004; FAB-002; EVPN-001; NSX-002; POL-002"
-      },
-      {
-        "id": "CT-010",
-        "title": "Security-event attribution",
-        "preconditions": "Central collector reachable and time synchronization healthy.",
-        "procedure": "Generate an allowed and denied flow plus an administrative change; find the correlated records centrally.",
-        "expected": "Records identify tenant, WSD/domain, policy, actor, timestamp and deployment; timestamps satisfy the logging profile.",
-        "evidence": "Events, correlation query and collection-delay measurement.",
-        "mode": "automated",
-        "cadence": "each deployment; scheduled synthetic",
-        "executionStatus": "not-run",
-        "requirements": "EGR-002; OBS-001; OBS-002; OBS-003"
-      },
-      {
-        "id": "CT-011",
-        "title": "Control-plane loss",
-        "preconditions": "Approved isolated test environment; outage and restoration plan.",
-        "procedure": "Remove catalogue/controller or platform-management connectivity independently; observe existing enforcement and attempts to provision.",
-        "expected": "Existing approved paths retain enforcement; new unsafe changes stop; recovery converges without bypass.",
-        "evidence": "Before/during/after policy snapshots, alerts and operation journal.",
-        "mode": "controlled-fault",
-        "cadence": "qualification; relevant upgrade",
-        "executionStatus": "not-run",
-        "requirements": "INV-007; AUTO-001; TEST-004; FAIL-001; FAIL-002"
-      },
-      {
-        "id": "CT-012",
-        "title": "Security-edge node failure",
-        "preconditions": "Measured production-like load within the selected profile; spare capacity available.",
-        "procedure": "Fail one edge node or its uplink under an approved test plan and measure sessions, drops, recovery and policy continuity.",
-        "expected": "No unauthorized traffic is permitted; recovery and remaining capacity meet the accepted profile.",
-        "evidence": "Time-series traffic, failover timeline and enforcement traces.",
-        "mode": "controlled-fault",
-        "cadence": "qualification; scheduled resilience exercise",
-        "executionStatus": "not-run",
-        "requirements": "REL-001; REL-002; TEST-004; CAP-001; FAIL-001; FAIL-002"
-      },
-      {
-        "id": "CT-013",
-        "title": "Offboarding residuals",
-        "preconditions": "Disposable WSD, retention policy and resource graph recorded.",
-        "procedure": "Run retirement; query routes, policy, identities, addresses, DNS, certificates and storage/backup records by stable WSD ID.",
-        "expected": "Active connectivity and grants are removed; retained copies are explicitly owned/locked; the tombstone explains every remaining object.",
-        "evidence": "Deletion ledger, scans, retention receipts and sanitization references.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "IPAM-003; LIFE-001; LIFE-002; DEL-001"
-      },
-      {
-        "id": "CT-014",
-        "title": "Security drift detection",
-        "preconditions": "Non-production object with a known authorized baseline.",
-        "procedure": "Introduce a reversible out-of-band security change; observe detection, containment decision and reconciliation.",
-        "expected": "Drift changes technical compliance status and alerts the owner; incident containment is not silently reverted.",
-        "evidence": "Drift event, policy generation and recovery journal.",
-        "mode": "controlled-fault",
-        "cadence": "qualification; drift-engine change",
-        "executionStatus": "not-run",
-        "requirements": "IMG-002; DRIFT-001; DRIFT-002"
-      },
-      {
-        "id": "CT-015",
-        "title": "Platform/provider upgrade regression",
-        "preconditions": "Exact old/new tuples, release notes and canary tenant.",
-        "procedure": "Run the applicable suite against the new tuple, including create/update/import/delete and failure paths; evaluate rollback or forward repair.",
-        "expected": "No mandatory outcome regresses; the new certification is approved before broad placement.",
-        "evidence": "Tuple manifest, test reports, limitations and promotion decision.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "PORT-001; QUAL-001; NUT-001; NUT-004; NSX-003; OS-003; FUT-001; TF-002; TEST-002; VULN-002"
-      },
-      {
-        "id": "CT-016",
-        "title": "Portable contract and object identity",
-        "preconditions": "Same versioned request and two independently qualified adapters.",
-        "procedure": "Validate stable consumer fields and compile for both targets; compare semantic outputs without requiring matching topology or vendor IDs.",
-        "expected": "Equivalent mandatory intent is preserved; unsupported capabilities reject placement rather than silently degrade.",
-        "evidence": "Normalized requests, adapter plans and semantic comparison.",
-        "mode": "design-and-automated",
-        "cadence": "qualification; contract change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-001; INV-001; INV-005; REF-001; REF-002; WSD-002; OVL-001; PORT-003; API-001; TF-003; DEL-002"
-      },
-      {
-        "id": "CT-017",
-        "title": "Admission and authorization negatives",
-        "preconditions": "Schema/profile registry and scoped test identities.",
-        "procedure": "Submit unknown fields, unresolved profile versions, forged approval references, foreign-tenant references and consumer-supplied status.",
-        "expected": "All invalid or unauthorized requests are rejected before any allocation or provider action.",
-        "evidence": "Admission decisions and zero-side-effect audit.",
-        "mode": "automated",
-        "cadence": "each contract/policy change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-001; CAT-001; CAT-002; MODEL-001; WSD-001; WSD-002; ZONE-001; API-002; API-003; POL-001; EXC-003; ONB-001"
-      },
-      {
-        "id": "CT-018",
-        "title": "Unsupported capability and expired certification",
-        "preconditions": "Candidate and expired platform profiles.",
-        "procedure": "Request dual-stack, inspection or dedicated placement on a profile lacking that qualified capability.",
-        "expected": "Placement fails with an actionable capability reason; candidate/expired records cannot authorize production.",
-        "evidence": "Placement decisions, capability digests and status.",
-        "mode": "automated",
-        "cadence": "each placement-engine change",
-        "executionStatus": "not-run",
-        "requirements": "SCOPE-001; REF-002; CAT-002; SDI-003; OVL-001; IPV6-003; PLACE-001; PORT-001; PORT-002; QUAL-001; NUT-001; OS-003; FUT-001; FUT-002; ASSUR-002; ASSUR-003; TEST-002; ONB-001; ACPT-001"
-      },
-      {
-        "id": "CT-019",
-        "title": "Ownership, quota and separation of duties",
-        "preconditions": "Tenant quotas and identity/control-plane roles are defined.",
-        "procedure": "Test permitted workload operations and forbidden foundation/edge/profile edits; race two allocations against the same quota.",
-        "expected": "Only allowed roles succeed; quota reservation is atomic; no resource is created above a hard entitlement.",
-        "evidence": "Authorization matrix, concurrent request results and allocation journal.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "TEN-001; TEN-002; TEN-003; MGT-003; IAM-001; SVCM-001; NSX-001; OS-002; API-002; STATE-001; SEC-002; OPS-001; OPS-002"
-      },
-      {
-        "id": "CT-020",
-        "title": "Security-label integrity",
-        "preconditions": "Provider-owned selectors and tenant-editable labels are distinguishable.",
-        "procedure": "Attempt to add/remove security labels, impersonate another group or move a workload to a privileged selector.",
-        "expected": "Tenant changes cannot expand effective permissions; mandatory policy precedence is preserved.",
-        "evidence": "RBAC results, label audit and effective-rule evaluation.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "MICRO-002; MICRO-003; NUT-003; NSX-001; FLOW-001"
-      },
-      {
-        "id": "CT-021",
-        "title": "Same-domain east-west isolation",
-        "preconditions": "Two WSDs deliberately share one approved Security Domain Instance.",
-        "procedure": "Test same-subnet and cross-subnet traffic with and without explicit FlowIntent; verify traffic on one hypervisor as well as between hosts.",
-        "expected": "Unapproved east-west communication is denied; allowed flows and required local services function.",
-        "evidence": "Enforcement location, probes and applied policy.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "SDI-002; OVL-002; MICRO-001; MICRO-003; OS-001"
-      },
-      {
-        "id": "CT-022",
-        "title": "Spoofing and virtual NIC controls",
-        "preconditions": "Provider-approved packet tests on dedicated non-production endpoints.",
-        "procedure": "Exercise incorrect source addressing, unauthorized address pairs and additional NIC attachments within the bounded test plan.",
-        "expected": "Source identities cannot impersonate another domain; platform exceptions have explicit owners and expiration.",
-        "evidence": "Port/NIC policy, bounded test output and exception records.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "OVL-003; MICRO-003; OS-002; OS-003"
-      },
-      {
-        "id": "CT-023",
-        "title": "Shared edge-attachment isolation",
-        "preconditions": "Two domains use an intentionally shared provider attachment network.",
-        "procedure": "Exercise direct same-segment paths, ARP/ND interaction, external gateway routing and NAT hairpin in both directions.",
-        "expected": "No path bypasses per-domain identity and ZIP enforcement; otherwise the shared attachment is ineligible.",
-        "evidence": "Attachment topology, neighbor state, routes and bidirectional probes.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ZIP-002; ZIP-007; OVL-002; RTE-002; RTE-004; EDGE-001; EDGE-002; NUT-002; NUT-004; OS-002"
-      },
-      {
-        "id": "CT-024",
-        "title": "Stateful symmetry and policy routing",
-        "preconditions": "Multiple eligible edge paths and asymmetric-failure scenario.",
-        "procedure": "Verify forward/return ownership before and during failover; change PBR to a permitted alternative in the test environment.",
-        "expected": "Stateful enforcement remains correct; unsupported asymmetry is denied, not resolved by permissive bypass.",
-        "evidence": "Session traces, PBR precedence and HA counters.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "RTE-004; EDGE-001; EDGE-002; EVPN-002; NUT-002; NSX-003; FAIL-001"
-      },
-      {
-        "id": "CT-025",
-        "title": "Zone adjacency and joint authority",
-        "preconditions": "Versioned zone graph and authority registry.",
-        "procedure": "Submit prohibited adjacencies, RZ public attachment, REZ without partner agreement, and a ZIP without both authority approvals.",
-        "expected": "Invalid graphs are rejected; valid bindings resolve to the explicitly authorized adjacent domains.",
-        "evidence": "Graph decision report and approval provenance.",
-        "mode": "design-and-automated",
-        "cadence": "each policy/profile change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-003; INV-002; MODEL-001; SDI-001; SDI-004; ZONE-001; ZONE-002; ZIP-002; ZIP-003; SVC-002; ING-001; FAB-003; POL-001"
-      },
-      {
-        "id": "CT-026",
-        "title": "MZ, OOB and remote administration",
-        "preconditions": "Approved management architecture and recovery credentials.",
-        "procedure": "Trace remote privileged access through its authorized boundary; test workload isolation, ordinary browsing restriction and BMC access controls.",
-        "expected": "MZ semantics and OOB transport remain distinct; only approved privileged paths reach management targets.",
-        "evidence": "Management diagrams, endpoint policy and session audit.",
-        "mode": "design-and-automated",
-        "cadence": "qualification; management change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-004; MODEL-002; TEN-002; ZIP-004; ZIP-005; MGT-001; MGT-002; MGT-005; IAM-002; FAB-004"
-      },
-      {
-        "id": "CT-027",
-        "title": "Break-glass and identity-provider loss",
-        "preconditions": "Approved emergency identity, dual-custodian procedure and test window.",
-        "procedure": "Make normal federation unavailable; exercise limited emergency access, alerting, revocation and post-use credential rotation.",
-        "expected": "Access remains accountable and scoped; no shared anonymous administrator or permanent bypass is created.",
-        "evidence": "Emergency access log, custodial approval and revocation evidence.",
-        "mode": "controlled-fault",
-        "cadence": "quarterly; identity change",
-        "executionStatus": "not-run",
-        "requirements": "MGT-002; MGT-004; IAM-001; IAM-002; SEC-003; FAIL-002; FAIL-003"
-      },
-      {
-        "id": "CT-028",
-        "title": "Workload identity and certificate lifecycle",
-        "preconditions": "Scoped service identity, trusted CA and rotatable certificate.",
-        "procedure": "Rotate credentials/certificates; revoke the old identity and test an expired/untrusted certificate.",
-        "expected": "Approved service continues with new material; old/revoked credentials are unusable within the accepted propagation interval.",
-        "evidence": "Issuer records, endpoint TLS results and revocation timeline.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "SVC-003; IAM-001; IAM-003; CRY-001; CRY-003; SEC-003"
-      },
-      {
-        "id": "CT-029",
-        "title": "IPAM concurrency, overlap and exhaustion",
-        "preconditions": "Small disposable address pool and approved overlap policy.",
-        "procedure": "Issue concurrent allocations, exhaust the pool, retry requests and request a conflicting prefix.",
-        "expected": "One authoritative reservation per allocation; retries are idempotent; exhaustion/unauthorized overlap stops provisioning.",
-        "evidence": "Allocation ledger, request IDs and conflict decisions.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "IPAM-001; IPAM-002; IPAM-004; AUTO-001"
-      },
-      {
-        "id": "CT-030",
-        "title": "DNS/DHCP lifecycle and reuse",
-        "preconditions": "Forward/reverse zones, address lease policy and reusable test address.",
-        "procedure": "Provision, rename, recover and retire a network endpoint; confirm lease/DNS reconciliation and address quarantine.",
-        "expected": "No duplicate active ownership or premature reuse; stale records disappear within the approved timing profile.",
-        "evidence": "DNS/DHCP/IPAM timelines and ownership comparisons.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "IPAM-001; IPAM-003; IPAM-004"
-      },
-      {
-        "id": "CT-031",
-        "title": "IPv6 local control and IPv4-only posture",
-        "preconditions": "Platform offers either a dual-stack or explicit IPv4-only profile.",
-        "procedure": "Check router advertisements, neighbor discovery, DHCPv6, source validation and unapproved transition paths; preserve required ICMPv6.",
-        "expected": "No alternate-protocol bypass; enabled IPv6 works correctly and disabled service does not create ungoverned reachability.",
-        "evidence": "Protocol-specific controls, probes and qualification result.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "RTE-004; IPV6-001; IPV6-002; IPV6-003"
-      },
-      {
-        "id": "CT-032",
-        "title": "MTU and path-MTU discovery",
-        "preconditions": "Known encapsulation stack and both local/remote paths.",
-        "procedure": "Test supported workload packet sizes end-to-end, including security edge, nested overlay if offered and recovery site.",
-        "expected": "Accepted MTU is reachable without silent black holes; required PMTU feedback is delivered or a documented alternative works.",
-        "evidence": "Packet-size matrix, encapsulation budget and loss traces.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "IPV6-001; IPV6-003; EDGE-001; FAB-004; EVPN-002"
-      },
-      {
-        "id": "CT-033",
-        "title": "BGP and EVPN import/export boundaries",
-        "preconditions": "Provider-owned non-production peers and known approved routes.",
-        "procedure": "Validate neighbor authentication/control-plane limits; advertise bounded unauthorized test prefixes/route targets through the test fixture.",
-        "expected": "Only authorized advertisements install; route leaks, excess prefixes and unapproved defaults are rejected and alerted.",
-        "evidence": "Neighbor config, route-policy results and RIB/FIB diff.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "INV-003; RTE-001; FAB-004; EVPN-001"
-      },
-      {
-        "id": "CT-034",
-        "title": "Leaf/link and multihoming failures",
-        "preconditions": "Approved MLAG or EVPN multihoming profile; topology-specific rollback.",
-        "procedure": "Fail an uplink, peer link, keepalive or Ethernet-segment member individually, then restore it; test split-brain containment.",
-        "expected": "No loop, unintended duplicate forwarding or security bypass; measured convergence meets the fabric profile.",
-        "evidence": "Fault timeline, MAC/route state, packet-loss and control-plane telemetry.",
-        "mode": "controlled-fault",
-        "cadence": "qualification; fabric upgrade",
-        "executionStatus": "not-run",
-        "requirements": "FAB-004; EVPN-002; TEST-004"
-      },
-      {
-        "id": "CT-035",
-        "title": "Compute co-residency and evacuation",
-        "preconditions": "Placement policy names tenant/domain/zone host-sharing boundaries.",
-        "procedure": "Attempt disallowed placement and evacuate a host; repeat after a scheduler restart.",
-        "expected": "Placement, migration and HA restart all preserve the approved co-residency rules; insufficient eligible capacity rejects the action.",
-        "evidence": "Scheduler decisions, host inventory and policy references.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "THR-001; SDI-001; SDI-003; SDI-004; ZIP-005; SITE-004; CMP-001; CMP-003; PLACE-001; FUT-003; ASSUR-001; ASSUR-002"
-      },
-      {
-        "id": "CT-036",
-        "title": "Hypervisor and firmware baseline",
-        "preconditions": "Supported hardware/software tuple and security baseline.",
-        "procedure": "Verify secure boot/attestation where required, disabled unnecessary services, administrative separation and inventory of firmware/drivers.",
-        "expected": "All mandatory baseline items are enforced; unsupported or unattested hosts are ineligible for the affected profile.",
-        "evidence": "Baseline report, attestation/config output and exception ledger.",
-        "mode": "design-and-automated",
-        "cadence": "qualification; host onboarding; scheduled",
-        "executionStatus": "not-run",
-        "requirements": "CMP-002; IMG-001; IMG-002"
-      },
-      {
-        "id": "CT-037",
-        "title": "Storage tenant isolation",
-        "preconditions": "Two tenants with block/file/object resources and separate access identities.",
-        "procedure": "Attempt foreign volume attachment, snapshot clone, file access and object access; include backup/export paths.",
-        "expected": "Only the owning or explicitly authorized scope accesses data; no clone or mount circumvents zone/categorization policy.",
-        "evidence": "API decisions, storage ACLs and data-path tests.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "SVC-001; STO-001; FUT-003; ASSUR-002"
-      },
-      {
-        "id": "CT-038",
-        "title": "Encryption, key isolation and KMS outage",
-        "preconditions": "Qualified cryptographic profile; disposable encrypted data and test key.",
-        "procedure": "Validate encryption context and key-use permissions; rotate a test key and remove KMS connectivity under the approved runbook.",
-        "expected": "No unauthorized decrypt or plaintext fallback; documented cache/restart behavior matches policy; recovery preserves authorized data.",
-        "evidence": "Crypto configuration, key audit, outage timeline and recovery test.",
-        "mode": "controlled-fault",
-        "cadence": "qualification; key-service change",
-        "executionStatus": "not-run",
-        "requirements": "SITE-004; CRY-001; CRY-002; CRY-003; BKP-004; FAIL-002; FAIL-003"
-      },
-      {
-        "id": "CT-039",
-        "title": "Storage performance and contention",
-        "preconditions": "Defined capacity/latency/throughput class and bounded load generators.",
-        "procedure": "Measure steady load, contention and rebuild/degraded state with the same workload data pattern.",
-        "expected": "Class limits and protected minimums hold under the accepted failure budget; overload rejects growth rather than bypassing controls.",
-        "evidence": "Latency percentiles, IOPS/throughput, capacity and noisy-neighbor results.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "CMP-002; STO-002; REL-002; CAP-002"
-      },
-      {
-        "id": "CT-040",
-        "title": "Golden image provenance",
-        "preconditions": "Approved image digest, build manifest and denied image fixture.",
-        "procedure": "Verify signature/provenance, scan status, boot mode and hardening; attempt deployment of retired/tampered images.",
-        "expected": "Only eligible images deploy; exceptions are explicit; rebuild output links to its source and component inventory.",
-        "evidence": "Image manifest, signature validation, scan and admission decisions.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "IMG-001; IMG-002; VULN-002"
-      },
-      {
-        "id": "CT-041",
-        "title": "Patch and vulnerability lifecycle",
-        "preconditions": "Inventory, severity policy and an approved non-production patch scenario.",
-        "procedure": "Create a finding, classify exposure, execute canary remediation, verify fix and record time against the selected deadline.",
-        "expected": "No asset or firmware layer is omitted; overdue risk escalates; roll-forward/rollback preserves service and security.",
-        "evidence": "Finding-to-change-to-verification chain and deadline report.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "IMG-001; SUP-001; VULN-001; VULN-002"
-      },
-      {
-        "id": "CT-042",
-        "title": "Supply-chain and package provenance",
-        "preconditions": "Approved provider/module mirror and a tampered package fixture.",
-        "procedure": "Verify package checksums, immutable module references and execution image; test rejection of an unapproved provider/module source.",
-        "expected": "Tampered/unapproved artifacts never reach a privileged apply; lockfile changes require reviewed provenance.",
-        "evidence": "Package manifests, verification output and CI policy decision.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "TF-001; TF-002; TF-005; CICD-002; SUP-001; VULN-001; VULN-002"
-      },
-      {
-        "id": "CT-043",
-        "title": "Terraform plan and state confidentiality",
-        "preconditions": "Disposable secrets and restricted plan/state storage.",
-        "procedure": "Inspect source, logs, binary/JSON plan and state using controlled test values; verify supported ephemeral/write-only behavior.",
-        "expected": "Secrets are absent where promised; unavoidable secret-bearing artifacts remain encrypted, access-controlled and redacted from logs.",
-        "evidence": "Secret-handling scan, backend ACLs and artifact classification.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "TF-001; STATE-002; SEC-001; SEC-003; SEC-004"
-      },
-      {
-        "id": "CT-044",
-        "title": "State locking, recovery and grants",
-        "preconditions": "Two authorized runners, versioned state and documented lock recovery.",
-        "procedure": "Race updates to one state, restore a known state version in isolation and test a workload runner against foundation state.",
-        "expected": "Only one writer operates; restore is auditable; unauthorized state reads/writes fail; state rollback is not misrepresented as resource rollback.",
-        "evidence": "Lock timeline, recovery report and access decisions.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "MGT-003; TF-003; TF-004; STATE-001; STATE-002; STATE-003; SEC-002; SEC-004; FAIL-003"
-      },
-      {
-        "id": "CT-045",
-        "title": "Partial apply and compensation",
-        "preconditions": "Disposable multi-stage deployment and a failure-injection point.",
-        "procedure": "Interrupt after allocation or one provider action; restart with the same operation ID and observe discovery/repair.",
-        "expected": "No duplicate allocation or accidental destruction; unfinished resources remain quarantined; the journal supports safe resume or controlled compensation.",
-        "evidence": "Operation journal, state generations and residual-resource scan.",
-        "mode": "controlled-fault",
-        "cadence": "controller/adapter change",
-        "executionStatus": "not-run",
-        "requirements": "INV-007; IPAM-004; NUT-004; AUTO-001; AUTO-002; AUTO-003; STATE-003"
-      },
-      {
-        "id": "CT-046",
-        "title": "Retries, optimistic concurrency and idempotency",
-        "preconditions": "Controller accepts request ID and expected resource generation.",
-        "procedure": "Replay an operation, submit stale updates, and interrupt response delivery after successful allocation.",
-        "expected": "Replay returns the existing operation; stale updates conflict; one desired generation yields one accountable realization.",
-        "evidence": "API responses, generation history and allocation counts.",
-        "mode": "automated",
-        "cadence": "each controller change",
-        "executionStatus": "not-run",
-        "requirements": "IPAM-004; API-003; AUTO-002; AUTO-003"
-      },
-      {
-        "id": "CT-047",
-        "title": "API rate limit and backpressure",
-        "preconditions": "Finite controller queue and test provider throttling.",
-        "procedure": "Increase authorized test demand to the configured limit; inject retryable throttling/timeouts and permanent errors.",
-        "expected": "Backpressure is visible and bounded; retry honors policy/jitter; permanent errors do not loop indefinitely or consume unbounded capacity.",
-        "evidence": "Queue metrics, retries, deadlines and final operation states.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "AUTO-003; CAP-002"
-      },
-      {
-        "id": "CT-048",
-        "title": "Approved-plan freshness",
-        "preconditions": "Signed plan, immutable inputs and an intervening policy or state change.",
-        "procedure": "Change state generation, policy bundle or approval-sensitive intent after planning; try to apply the old artifact.",
-        "expected": "Stale/unapproved plans are rejected and replanned; approved artifacts bind source, inputs, policy, identity and expiration.",
-        "evidence": "Plan digest, approvals and rejected apply audit.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "SDI-004; POL-002; AUTO-002; TF-002; TF-005; CICD-001; CICD-002; EVID-002"
-      },
-      {
-        "id": "CT-049",
-        "title": "Evidence integrity and authorization separation",
-        "preconditions": "Signed evidence manifest and separately signed authorization decision.",
-        "procedure": "Tamper with an artifact; expire a decision; fail a technical test while preserving the historical authorization record.",
-        "expected": "Tampering is detected; technical status never self-issues authorization; readiness follows current evidence and decision conditions.",
-        "evidence": "Digests/signature checks, readiness evaluation and decision history.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "INV-006; AUTH-001; DRIFT-001; TEST-003; EVID-001; EVID-002; EVID-003; OBS-001; IR-002; ONB-001; ACPT-001"
-      },
-      {
-        "id": "CT-050",
-        "title": "Telemetry outage, buffering and retention",
-        "preconditions": "Logging profile specifies export latency, buffer limits and retention/disposal policy.",
-        "procedure": "Disconnect the collector; generate bounded events; restore connectivity and reconcile sequence/time gaps.",
-        "expected": "Loss/overflow is alerted; buffering behavior matches profile; mandatory evidence gaps are visible; no silent control bypass.",
-        "evidence": "Buffer metrics, event reconciliation and retention configuration.",
-        "mode": "controlled-fault",
-        "cadence": "qualification; logging change",
-        "executionStatus": "not-run",
-        "requirements": "OBS-002; OBS-003; FAIL-002; FAIL-003"
-      },
-      {
-        "id": "CT-051",
-        "title": "Backup administrative separation and immutability",
-        "preconditions": "Test backup policy includes an isolated locked copy.",
-        "procedure": "Try deletion or retention reduction with production and backup-operator identities; test approved custodial operations separately.",
-        "expected": "Compromised production authority cannot alter the protected copy or its retention; authorized actions are separately accountable.",
-        "evidence": "Role tests, object-lock/immutability configuration and audit.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "BKP-001; BKP-003; BKP-004"
-      },
-      {
-        "id": "CT-052",
-        "title": "Application-consistent isolated restore",
-        "preconditions": "Known application dataset, consistency markers and accepted RTO/RPO.",
-        "procedure": "Restore to an isolated recovery domain; verify integrity, application start and required dependencies before controlled reconnection.",
-        "expected": "Recovered data meets consistency/RPO and recovery timing; no production connection appears until authorized.",
-        "evidence": "Recovery timestamps, integrity markers, application checks and isolation probes.",
-        "mode": "controlled-recovery",
-        "cadence": "quarterly; material application change",
-        "executionStatus": "not-run",
-        "requirements": "SITE-003; STO-002; BKP-002; BKP-003; REL-001; FAIL-001; REC-001; REC-002; DEL-001"
-      },
-      {
-        "id": "CT-053",
-        "title": "Backup retention, holds and key survival",
-        "preconditions": "A test hold, expiring backup and keys needed by retained copies.",
-        "procedure": "Retire the WSD while retaining the held copy; attempt key deletion and validate an authorized restore of retained data.",
-        "expected": "Hold and retention are enforced; key lifetime supports required recovery; data is not prematurely destroyed.",
-        "evidence": "Hold/retention decision, key dependencies and restore evidence.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "STO-001; STO-003; CRY-002; BKP-003; BKP-004; LIFE-002; LIFE-003"
-      },
-      {
-        "id": "CT-054",
-        "title": "Site loss, fencing and failback",
-        "preconditions": "Two qualified sites; isolated exercise scope and owner-approved recovery plan.",
-        "procedure": "Declare simulated primary loss, fence writers, restore/promote at recovery site, verify DNS/identity/policy, then perform controlled failback.",
-        "expected": "No split-brain or policy relaxation; measured RTO/RPO and data ownership match the recovery profile.",
-        "evidence": "Failure timeline, fencing proof, replication checkpoints and end-to-end tests.",
-        "mode": "controlled-recovery",
-        "cadence": "qualification; scheduled recovery exercise",
-        "executionStatus": "not-run",
-        "requirements": "SITE-001; SITE-002; SITE-003; SITE-004; BKP-002; REL-001; REL-002; TEST-004; FAIL-002; FAIL-003; REC-001; REC-002; MIG-003"
-      },
-      {
-        "id": "CT-055",
-        "title": "Management/control-plane bootstrap recovery",
-        "preconditions": "Offline recovery manifest and independent access to state, DNS/time, trust and keys.",
-        "procedure": "Recover essential management/controller services in the documented dependency order in an isolated environment.",
-        "expected": "Recovery does not require the unavailable production service it is restoring; credentials and old state remain accountable.",
-        "evidence": "Dependency graph, recovery steps, integrity checks and measured recovery time.",
-        "mode": "controlled-recovery",
-        "cadence": "annual; foundation redesign",
-        "executionStatus": "not-run",
-        "requirements": "MGT-005; SITE-001; CRY-003; STATE-002; FAIL-002; FAIL-003; REC-001; REC-002"
-      },
-      {
-        "id": "CT-056",
-        "title": "Resource and address capacity exhaustion",
-        "preconditions": "Hard quotas, reservations and admission thresholds.",
-        "procedure": "Exhaust test compute/storage/edge context/address capacity, then request both ordinary and dedicated service classes.",
-        "expected": "Requests stop with an explicit reason; required HA/security headroom is not consumed or silently weakened.",
-        "evidence": "Reservation ledger, rejected decisions and remaining-headroom report.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "CMP-001; REL-002; PLACE-001; SVCM-001; CAP-001; CAP-002"
-      },
-      {
-        "id": "CT-057",
-        "title": "Incident quarantine and reconciler precedence",
-        "preconditions": "Scoped incident role and expiring emergency override.",
-        "procedure": "Quarantine one WSD, remove exposure and run normal reconciliation; test unaffected tenants.",
-        "expected": "Containment persists under higher-priority incident policy until released; unrelated tenants remain available.",
-        "evidence": "Override object, effective policy, reconciliation audit and tenant probes.",
-        "mode": "controlled-fault",
-        "cadence": "quarterly; containment change",
-        "executionStatus": "not-run",
-        "requirements": "TEN-003; SUP-001; DRIFT-001; DRIFT-002; DRIFT-003; IR-001; IR-002"
-      },
-      {
-        "id": "CT-058",
-        "title": "Exception approval and expiry",
-        "preconditions": "Versioned exception with risk owner, affected requirement and end time.",
-        "procedure": "Test unapproved, expired and valid exceptions; expire one during a running operation.",
-        "expected": "No unapproved exception grants access; expiry changes posture and triggers the documented action without indiscriminate destruction.",
-        "evidence": "Approval records, admission results and expiry event.",
-        "mode": "automated",
-        "cadence": "each policy/controller change",
-        "executionStatus": "not-run",
-        "requirements": "RTE-003; CICD-001; DRIFT-003; ASSUR-003; EVID-003; IR-002; MIG-001; EXC-001; EXC-002; EXC-003"
-      },
-      {
-        "id": "CT-059",
-        "title": "Data sanitization and resource reuse",
-        "preconditions": "Disposable data, snapshot/clone inventory and approved media method.",
-        "procedure": "Retire the storage object, verify retained copies, sanitize according to the approved method and allocate to another test tenant.",
-        "expected": "New tenant cannot recover prior data; retained evidence identifies method, scope, exceptions and all surviving copies.",
-        "evidence": "Sanitization receipt, reuse test and copy/dependency ledger.",
-        "mode": "design-and-automated",
-        "cadence": "qualification; storage lifecycle change",
-        "executionStatus": "not-run",
-        "requirements": "STO-003; CRY-002; FUT-003; LIFE-001; LIFE-002; LIFE-003"
-      },
-      {
-        "id": "CT-060",
-        "title": "Portability and exit rehearsal",
-        "preconditions": "Two target profiles plus an exit manifest containing data and application dependencies.",
-        "procedure": "Export/rebuild the workload, convert only supported formats, import data and rebind identity/network/keys; run functional and security checks.",
-        "expected": "Consumer semantics survive; downtime, data loss, format limitations and cost drivers are recorded; no untested live-migration claim.",
-        "evidence": "Exit manifest, conversion logs, reconciliation report and conformance results.",
-        "mode": "controlled-recovery",
-        "cadence": "qualification; annual representative rehearsal",
-        "executionStatus": "not-run",
-        "requirements": "INV-005; REF-001; STO-002; PLACE-003; PORT-003; REC-002; MIG-001; MIG-002; MIG-003; DEL-002"
-      },
-      {
-        "id": "CT-061",
-        "title": "Location, privacy and support access",
-        "preconditions": "PlacementProfile states permitted data, backup, telemetry, key and administrative locations.",
-        "procedure": "Compare all components and support paths to those constraints; test a placement or support session outside allowed scope.",
-        "expected": "Nonconforming placement/access is rejected; exceptions require the designated authority; residency is not asserted to settle jurisdiction.",
-        "evidence": "Location inventory, access logs and approval decisions.",
-        "mode": "design-and-automated",
-        "cadence": "qualification; provider/location change",
-        "executionStatus": "not-run",
-        "requirements": "IPAM-002; SITE-004; PLACE-001; PLACE-002; PORT-002"
-      },
-      {
-        "id": "CT-062",
-        "title": "Shared responsibility and control inheritance",
-        "preconditions": "System control profile, service ownership and inheritance declarations.",
-        "procedure": "For each applicable control, identify provider, tenant or shared implementation, evidence and unresolved dependency.",
-        "expected": "No control is ownerless; inherited evidence is scoped, current and accepted; gaps block required readiness.",
-        "evidence": "Control allocation matrix and assessor review.",
-        "mode": "manual-review",
-        "cadence": "onboarding; major change; periodic review",
-        "executionStatus": "not-run",
-        "requirements": "SCOPE-001; STD-001; STD-002; CAT-001; THR-001; WSD-003; CMP-003; REL-001; SVCM-001; RESP-001; ASSUR-001; ASSUR-002; OPS-001; OPS-002; EXC-001; ONB-001; ACPT-001"
-      },
-      {
-        "id": "CT-063",
-        "title": "Public certificate and trusted proxy identity",
-        "preconditions": "Approved ingress with backend encryption and trusted proxy policy.",
-        "procedure": "Rotate the certificate, test expiry/incorrect hostname and submit forged client-identity headers through the controlled test client.",
-        "expected": "TLS identity is validated; backend trust is explicit; untrusted headers cannot impersonate the originating client.",
-        "evidence": "TLS checks, proxy policy and attributed requests.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ING-002; EXP-001; CRY-001"
-      },
-      {
-        "id": "CT-064",
-        "title": "Egress policy and service-specific protocols",
-        "preconditions": "Approved egress service includes protocol, destination and DNS resolution policy.",
-        "procedure": "Test permitted and nearby disallowed destinations; verify NAT identity logs and stateful return traffic.",
-        "expected": "Only approved egress semantics work; DNS/FQDN changes cannot silently widen policy; NAT is not treated as a security control by itself.",
-        "evidence": "Egress rules, DNS resolution history, NAT mappings and probes.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "EGR-001; EGR-002"
-      },
-      {
-        "id": "CT-065",
-        "title": "Privileged workload and container isolation",
-        "preconditions": "A container/bare-metal profile with explicit isolation capabilities.",
-        "procedure": "Test namespace/project boundaries, node access, privileged workloads and host-network access against the approved baseline.",
-        "expected": "Unapproved privilege escalation or host access is denied; namespace alone is not accepted as a qualified zone boundary.",
-        "evidence": "Admission/RBAC policy, runtime posture and cross-scope tests.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "MICRO-003; FUT-001; FUT-002; FUT-003"
-      },
-      {
-        "id": "CT-066",
-        "title": "Policy precedence and immutable baseline",
-        "preconditions": "Mandatory provider rules plus lower-priority tenant and service rules.",
-        "procedure": "Compile overlapping allow/deny intents and update membership while a test workload is running.",
-        "expected": "Mandatory denies cannot be overridden by tenant policy; membership changes do not create a transient unrestricted interval.",
-        "evidence": "Effective-rule order, membership transitions and timed probes.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ZONE-002; ZIP-003; OVL-003; MICRO-001; MICRO-002; NUT-003; NSX-001; OS-001; POL-001; POL-002; FLOW-001; DRIFT-003; IR-002"
-      },
-      {
-        "id": "CT-067",
-        "title": "ZIP sensors, heightened posture and authority",
-        "preconditions": "ZIP profile identifies both zone authorities, inspection/sensor policy and heightened mode.",
-        "procedure": "Verify access-control and telemetry placement; activate heightened posture, test essential flows and restore under approved authority.",
-        "expected": "Posture change restricts intended flows, preserves declared essentials, and leaves a complete joint-authority record.",
-        "evidence": "ZIP profile, sensor coverage, change approval and test traces.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ZIP-006; IR-001"
-      },
-      {
-        "id": "CT-068",
-        "title": "Time synchronization and correlation",
-        "preconditions": "Approved independent time sources and skew threshold.",
-        "procedure": "Measure time across hosts, controllers, edge and collectors; introduce bounded skew in a disposable node.",
-        "expected": "Excess skew is detected; certificate/evidence validation follows defined failure behavior; record ordering remains explainable.",
-        "evidence": "Skew metrics, alerts and signed/ordered event samples.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "OBS-003"
-      },
-      {
-        "id": "CT-069",
-        "title": "Technical readiness gate",
-        "preconditions": "Healthy and deliberately failed evidence fixtures at the same desired generation.",
-        "procedure": "Evaluate readiness with missing/expired evidence, unsupported capability, unresolved owner and absent authorization.",
-        "expected": "Service Ready is false unless every mandatory condition for the current generation is satisfied.",
-        "evidence": "Condition evaluation, policy version and blocked exposure events.",
-        "mode": "automated",
-        "cadence": "each controller/policy change",
-        "executionStatus": "not-run",
-        "requirements": "INV-006; AUTH-001; CAT-001; WSD-003; OVL-003; EXP-001; RESP-001; QUAL-001; AUTO-002; ASSUR-003; TEST-003; EVID-001; EVID-002; EVID-003; OPS-002; EXC-002; EXC-003; ONB-001; DEL-001; ACPT-001"
-      },
-      {
-        "id": "CT-070",
-        "title": "Contract upgrades and deletion finalizers",
-        "preconditions": "Objects at old schema version; shared domain has two dependent WSDs.",
-        "procedure": "Convert schema with explicit defaults; delete one WSD; test removal with outstanding retention/evidence finalizers.",
-        "expected": "No silent security expansion; shared resources survive while referenced; deletion cannot bypass approved finalizers.",
-        "evidence": "Conversion diff, ownership graph and tombstones.",
-        "mode": "automated",
-        "cadence": "contract/lifecycle engine change",
-        "executionStatus": "not-run",
-        "requirements": "INV-001; MODEL-001; TEN-003; WSD-001; API-001; API-003; TF-004; STATE-003; LIFE-001; LIFE-002"
-      },
-      {
-        "id": "CT-071",
-        "title": "Foundation stability for overlay lifecycle",
-        "preconditions": "Commissioned overlay capacity and physical fabric configuration snapshot.",
-        "procedure": "Create, update and retire a routine overlay WSD; compare leaf/spine configuration before and after.",
-        "expected": "No per-WSD switch change occurs; physical-capacity growth is classified as a separate foundation operation.",
-        "evidence": "Switch config digests, service class and operation audit.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-002; EDGE-001; FAB-001"
-      },
-      {
-        "id": "CT-072",
-        "title": "Bare-metal/fabric-routed service boundary",
-        "preconditions": "Explicit fabric-routed service class and authorized foundation workflow.",
-        "procedure": "Provision a test physical attachment under separate authority; inspect VRF/RT/interface ownership and retire it.",
-        "expected": "Consumer contract remains portable; exceptions to overlay workflow are explicit; no unrestricted cross-domain route is introduced.",
-        "evidence": "Service-class declaration, foundation change and isolation tests.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ARCH-002; FAB-001; FAB-002; FAB-003; EVPN-001; FUT-003"
-      },
-      {
-        "id": "CT-073",
-        "title": "Image/data export compatibility",
-        "preconditions": "Supported boot mode, drivers, virtual hardware and encrypted-disk context.",
-        "procedure": "Recreate the workload on the target with a test image; verify guest drivers, time, certificates, application checks and unsupported device handling.",
-        "expected": "Incompatibilities reject the selected exit path; data/identity are not assumed portable merely because a disk file converts.",
-        "evidence": "Compatibility checklist, boot logs, application and security tests.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "CMP-002; PLACE-003; PORT-003; MIG-003; DEL-002"
-      },
-      {
-        "id": "CT-074",
-        "title": "Procured-capacity and service inventory reconciliation",
-        "preconditions": "Procurement/asset inventory, installed capacity and tenant reservations.",
-        "procedure": "Reconcile ordered, received, staged, commissioned, available, reserved and consumed quantities with accountable owners.",
-        "expected": "No orphaned or double-counted capacity; unused procured capacity and support expiry are visible for planning.",
-        "evidence": "Inventory reconciliation and allocation/age report.",
-        "mode": "manual-and-automated",
-        "cadence": "monthly; capacity change",
-        "executionStatus": "not-run",
-        "requirements": "SVCM-002; CAP-003; VULN-001"
-      },
-      {
-        "id": "CT-075",
-        "title": "Document and catalogue completeness",
-        "preconditions": "Handbook source, schemas, examples, requirements and tests in the release package.",
-        "procedure": "Check unique IDs, full original-ID migration, references, source links, test mappings, schema validation and generated catalogue parity.",
-        "expected": "No missing or dangling item; counts and release digest agree; document status does not claim unexecuted platform tests passed.",
-        "evidence": "Package validation report and manifest.",
-        "mode": "automated",
-        "cadence": "each document release",
-        "executionStatus": "not-run",
-        "requirements": "DOC-001; STD-001; STD-002; TEST-003; EVID-001"
-      },
-      {
-        "id": "CT-076",
-        "title": "External partner agreement and revocation",
-        "preconditions": "ExternalDomain has trust basis, authenticated endpoints and named agreement owner.",
-        "procedure": "Admit an approved binding, then revoke the agreement and check active/new session handling under its profile.",
-        "expected": "Revocation removes intended access within the agreed interval; no REZ assumption is inferred merely from a private circuit.",
-        "evidence": "Agreement revision, revocation event and connectivity checks.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ZONE-001; MIG-001"
-      },
-      {
-        "id": "CT-077",
-        "title": "Flow revocation and live session semantics",
-        "preconditions": "Approved long-lived test flow with a revocation profile.",
-        "procedure": "Revoke permission and measure established sessions, cached policies and newly attempted sessions across enforcement points.",
-        "expected": "New sessions are denied immediately upon committed policy; existing sessions are terminated or drained within the explicitly approved interval.",
-        "evidence": "Rule generation timeline, session table and probes.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "ZIP-006; RTE-003; SVC-003; EXP-001; IAM-003; FLOW-001"
-      },
-      {
-        "id": "CT-078",
-        "title": "Storage clone, snapshot and export classification",
-        "preconditions": "Protected test volume with snapshot and clone operations enabled.",
-        "procedure": "Attempt cross-zone clone/export and a lower-categorization target using both tenant and service identities.",
-        "expected": "Data copies preserve classification and key/access constraints; unapproved downgrade or public export is denied.",
-        "evidence": "Copy lineage, target checks, key references and audit.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "STO-001; STO-003; LIFE-002; MIG-003"
-      },
-      {
-        "id": "CT-079",
-        "title": "Provider/support access time limit",
-        "preconditions": "Support role, approved session and export/logging rules.",
-        "procedure": "Open a time-bound support session, test scoped capabilities, expire it and verify all delegated grants are revoked.",
-        "expected": "No unattended permanent privileged access remains; transferred diagnostics follow approved location and redaction rules.",
-        "evidence": "Session record, approval, scope tests and revocation receipts.",
-        "mode": "automated",
-        "cadence": "qualification; security-significant change",
-        "executionStatus": "not-run",
-        "requirements": "MGT-004; IAM-002; IAM-003; PLACE-002; SEC-002; OPS-001"
-      },
-      {
-        "id": "CT-080",
-        "title": "Distributed ZIP equivalence",
-        "preconditions": "A proposed distributed-enforcement profile and the required ZIP function list.",
-        "procedure": "Map every required boundary function to its actual enforcement/control component; test same-host and bypass paths plus controller/agent failure.",
-        "expected": "Logical ZIP semantics are fully met; missing inspection, attribution, failure isolation or authority support rejects qualification.",
-        "evidence": "Function coverage, topology, policy and fault-test evidence.",
-        "mode": "design-and-automated",
-        "cadence": "qualification; enforcement-stack change",
-        "executionStatus": "not-run",
-        "requirements": "INV-002; THR-001; ZIP-001; ZIP-005; ZIP-006; ZIP-007; OVL-001; EDGE-002; PORT-001; NUT-004; NSX-003; OS-003; FUT-001"
-      }
-    ]
+  "families": {
+    "CT": 80,
+    "RA": 12,
+    "W14": 12,
+    "Q11": 12
   },
-  "RA": {
-    "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
-    "records": [
-      {
-        "id": "RA-01",
-        "title": "Independent native domain routing",
-        "baseTests": [
-          "CT-003",
-          "CT-009",
-          "CT-023",
-          "CT-025"
-        ],
-        "chapters": [
-          8,
-          16,
-          17,
-          18
-        ],
-        "procedure": "For the selected stack, enumerate native connected/distributed routes, defaults, provider/external attachments and upstream advertisements. Exercise the approved flow and its forbidden direct alternatives in both directions.",
-        "expected": "Only the approved logical ZIP path is usable; native forwarding cannot bypass it.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-02",
-        "title": "NSX isolated upstream reference",
-        "baseTests": [
-          "CT-003",
-          "CT-024",
-          "CT-080"
-        ],
-        "chapters": [
-          17
-        ],
-        "procedure": "Verify the exact Tier-1, parent/VRF Tier-0, Edge and uplink topology. Review all route propagation and any inter-VRF leaking. Repeat through Edge failure and established-session changes.",
-        "expected": "Independent domains remain isolated; the approved stateful path and session behaviour match the profile.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-03",
-        "title": "Nutanix external attachment reference",
-        "baseTests": [
-          "CT-023",
-          "CT-024",
-          "CT-031"
-        ],
-        "chapters": [
-          16
-        ],
-        "procedure": "Check external subnet connected paths, gateway reachability, NAT/no-NAT behaviour and return routing for each domain. Include neighbours and both offered address families.",
-        "expected": "Sharing physical transport does not create direct VPC-to-VPC or workload-to-management access.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-04",
-        "title": "OpenStack backend and authority reference",
-        "baseTests": [
-          "CT-017",
-          "CT-021",
-          "CT-022",
-          "CT-066"
-        ],
-        "chapters": [
-          18
-        ],
-        "procedure": "Verify chosen backend, Neutron policy, mandatory port/group controls, internal distributed routing and any floating/provider-network alternatives. Recheck after relocation.",
-        "expected": "Tenant operations cannot remove mandatory isolation, create an unapproved external path or bypass the intended boundary.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-05",
-        "title": "Physical and platform overlay demarcation",
-        "baseTests": [
-          "CT-032",
-          "CT-033",
-          "CT-034"
-        ],
-        "chapters": [
-          5
-        ],
-        "procedure": "Verify platform tunnel reachability and effective MTU, fabric route/EVPN imports, multihoming failure and vendor handoff. Document all physical versus logical separation assumptions.",
-        "expected": "Fabric interoperability does not import tenant routes or federate vendor overlays outside approved scope.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-06",
-        "title": "Bootstrap ownership transition",
-        "baseTests": [
-          "CT-026",
-          "CT-027",
-          "CT-055"
-        ],
-        "chapters": [
-          21,
-          22
-        ],
-        "procedure": "Recover initial access using only the declared independent bootstrap material. Transition to steady-state identity/tooling; revoke temporary credentials and recheck access.",
-        "expected": "No circular recovery dependency or untracked residual bootstrap privilege remains.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-07",
-        "title": "Composite provider authority",
-        "baseTests": [
-          "CT-019",
-          "CT-043",
-          "CT-044",
-          "CT-045"
-        ],
-        "chapters": [
-          20,
-          24
-        ],
-        "procedure": "Provision one environment using the hosting, edge and name/address/protection scopes. Demonstrate each identity is denied changes outside its package and a downstream failure is recoverable.",
-        "expected": "Coordination does not create a shared all-powerful state/identity or destroy shared/data resources on failure.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-08",
-        "title": "Persistent platform versus temporary transfer networks",
-        "baseTests": [
-          "CT-035",
-          "CT-054",
-          "CT-060",
-          "CT-076"
-        ],
-        "chapters": [
-          10,
-          27
-        ],
-        "procedure": "Exercise supported live mobility/replication on provider transport and independently activate/expire a bounded cross-domain transfer connection.",
-        "expected": "Persistent platform operation remains within its authority; temporary transfer access is removed without dismantling platform foundations.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-09",
-        "title": "Brownfield non-destructive adoption",
-        "baseTests": [
-          "CT-044",
-          "CT-048",
-          "CT-070"
-        ],
-        "chapters": [
-          25
-        ],
-        "procedure": "Inventory an authorized representative existing scope, confirm single configuration ownership, import/adopt and review the initial plan before mutation.",
-        "expected": "No unapproved replacement or competing writer is introduced; adoption does not falsely assert compliance.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-10",
-        "title": "Activation sequencing",
-        "baseTests": [
-          "CT-006",
-          "CT-007",
-          "CT-045",
-          "CT-069",
-          "CT-077"
-        ],
-        "chapters": [
-          23
-        ],
-        "procedure": "Observe resource creation from reservation through denied network attachment, mandatory controls, internal checks and explicit exposure activation. Introduce a controlled failed activation check.",
-        "expected": "No unprotected creation window; failed activation withdraws exposure while preserving data-safe recovery.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-11",
-        "title": "Compute, management and storage sharing",
-        "baseTests": [
-          "CT-026",
-          "CT-035",
-          "CT-037",
-          "CT-078"
-        ],
-        "chapters": [
-          6,
-          7,
-          11,
-          12
-        ],
-        "procedure": "Inspect actual host, management, storage/controller and transport sharing against adopted source tailoring. Test evacuation and copy operations without relying on labels alone.",
-        "expected": "Actual co-residency and shared dependencies match the approved isolation design, including recovery states.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      },
-      {
-        "id": "RA-12",
-        "title": "Commissioned capacity and growth boundary",
-        "baseTests": [
-          "CT-056",
-          "CT-071",
-          "CT-072",
-          "CT-074"
-        ],
-        "chapters": [
-          4,
-          22,
-          26
-        ],
-        "procedure": "Provision within capacity, then exhaust a permitted attachment/resource pool in the test envelope. Follow the separate foundation growth path and reconcile inventory states.",
-        "expected": "The workflow queues/rejects or selects eligible capacity; it does not rewire the fabric or weaken isolation as an undocumented tenant operation.",
-        "executionStatus": "not-run",
-        "safety": "Execute only within an authorized representative test environment or explicitly approved production safety envelope."
-      }
-    ]
-  },
-  "W14": {
-    "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
-    "records": [
-      {
+  "supplemental_mappings": [
+    {
+      "id": "RA-01",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-003",
+        "CT-009",
+        "CT-023",
+        "CT-025"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-02",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-003",
+        "CT-024",
+        "CT-080"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-03",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-023",
+        "CT-024",
+        "CT-031"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-04",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-017",
+        "CT-021",
+        "CT-022",
+        "CT-066"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-05",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-032",
+        "CT-033",
+        "CT-034"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-06",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-026",
+        "CT-027",
+        "CT-055"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-07",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-019",
+        "CT-043",
+        "CT-044",
+        "CT-045"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-08",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-035",
+        "CT-054",
+        "CT-060",
+        "CT-076"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-09",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-044",
+        "CT-048",
+        "CT-070"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-10",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-006",
+        "CT-007",
+        "CT-045",
+        "CT-069",
+        "CT-077"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-11",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-026",
+        "CT-035",
+        "CT-037",
+        "CT-078"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "RA-12",
+      "family": "RA",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "base_tests": [
+        "CT-056",
+        "CT-071",
+        "CT-072",
+        "CT-074"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Selected native realization and covered failure; owner-approved scope required"
+    },
+    {
+      "id": "Q11-01",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-003",
+        "CT-007",
+        "CT-024"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-02",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-001",
+        "CT-002"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-03",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-021",
+        "CT-022"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-04",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-008",
+        "CT-023",
+        "CT-024"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-05",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-019",
+        "CT-020",
+        "CT-022",
+        "CT-066"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-06",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-037",
+        "CT-078"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-07",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-028",
+        "CT-038",
+        "CT-079"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-08",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-008",
+        "CT-030",
+        "CT-031",
+        "CT-032"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-09",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-012",
+        "CT-024",
+        "CT-034"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-10",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-011",
+        "CT-027",
+        "CT-038",
+        "CT-050",
+        "CT-055"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-11",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-045",
+        "CT-046",
+        "CT-048"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "Q11-12",
+      "family": "Q11",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
+      "base_tests": [
+        "CT-052",
+        "CT-053",
+        "CT-054",
+        "CT-060"
+      ],
+      "execution_status": "not-run",
+      "applicability": "Elaboration of inherited procedures, not a new control or executed result."
+    },
+    {
+      "id": "W14-01",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-01 / routing completeness",
         "observation": "Every domain, edge, service next hop and return path matches the approved schedule.",
         "mapped_procedures_and_status": "CT-003, CT-009, CT-023, CT-024 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-02",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-02 / service isolation",
         "observation": "Only named service endpoints and authorized resource scope are reachable; router/admin and other tenant targets deny.",
         "mapped_procedures_and_status": "CT-004, CT-008, CT-037 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-03",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-03 / mandatory policy authority",
         "observation": "Tenant roles cannot attach a permissive group, disable port security or create an alternative native path.",
         "mapped_procedures_and_status": "CT-019, CT-020, CT-022, CT-066 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-04",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-04 / family completeness",
         "observation": "Each offered address family has working allocation, routes, service replies, local controls and recovery.",
         "mapped_procedures_and_status": "CT-002, CT-031, CT-032 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-05",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-05 / DNS completeness",
         "observation": "UDP, direct TCP and truncation/fallback work only against approved resolvers.",
         "mapped_procedures_and_status": "CT-008 plus explicit protocol observations / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-06",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-06 / intra-domain fixture",
         "observation": "Temporary probe verifies same-host and cross-host controls where that placement is approved.",
         "mapped_procedures_and_status": "CT-021, CT-035 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-07",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-07 / admission accounting",
         "observation": "Compute, data, context, service and edge commitments fit the same accepted failure basis.",
         "mapped_procedures_and_status": "CT-039, CT-056, CT-074 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-08",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-08 / lost executor",
         "observation": "Accepted native tasks and side effects are discovered; no duplicate allocation or competing writer appears.",
         "mapped_procedures_and_status": "CT-044, CT-045, CT-046 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-09",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-09 / activation dependencies",
         "observation": "Production activation rejects missing applicable operating or promised recovery readiness.",
         "mapped_procedures_and_status": "CT-062, CT-069 plus G3/G4 review / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-10",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-10 / shared-service failure",
         "observation": "Permitted and denied paths retain the selected policy and declared service behavior during approved failure.",
         "mapped_procedures_and_status": "CT-011, CT-012, CT-024, CT-050 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-11",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-11 / retained recovery",
         "observation": "Required copy, catalogue and key access survive live WSD retirement; unauthorized destruction denies.",
         "mapped_procedures_and_status": "CT-051, CT-052, CT-053, CT-078 / NOT RUN"
       },
-      {
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    },
+    {
+      "id": "W14-12",
+      "family": "W14",
+      "source_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "original_record": {
         "assertion": "W14-12 / second-stack outcome",
         "observation": "Repeat the declared environment and representative data recovery on a second eligible stack.",
         "mapped_procedures_and_status": "CT-016, CT-060, CT-073 / NOT RUN"
-      }
-    ]
-  },
-  "Q11": {
-    "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/development/qualification_observation_cards.csv",
-    "records": [
-      {
-        "id": "Q11-01",
-        "title": "approved path and reply",
-        "existing_test_ids": "CT-003; CT-007; CT-024",
-        "procedure_and_control": "Verify both endpoints; exercise F14-01. Locate the effective forward and reply path at native gateways and EC-01. Try a separately scoped reverse initiation.",
-        "expected_result_and_artifacts": "Declared TCP/443 operation and reply work; unapproved new reverse initiation is denied. Retain path/rule/session evidence, not only an application success.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_03",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
       },
-      {
-        "id": "Q11-02",
-        "title": "tenant isolation",
-        "existing_test_ids": "CT-001; CT-002",
-        "procedure_and_control": "Prove each tenant’s local approved service. Observe bounded disallowed cross-tenant attempts in both directions and each offered family.",
-        "expected_result_and_artifacts": "No unauthorized communication. Record endpoints, intended control, actual routing/policy and attributable denials. Unhealthy controls block the result.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_03",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-03",
-        "title": "same-domain policy",
-        "existing_test_ids": "CT-021; CT-022",
-        "procedure_and_control": "Place the temporary probe in one approved domain; verify same-host/cross-host cases where applicable. Compare approved and unapproved communication.",
-        "expected_result_and_artifacts": "Mandatory policy applies without requiring a physical gateway hop. Retain placement and enforcement evidence and the probe cleanup receipt.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_03",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-04",
-        "title": "shared-service return",
-        "existing_test_ids": "CT-008; CT-023; CT-024",
-        "procedure_and_control": "Exercise the same resolver from both tenants. Trace each reply through its own SE/EC chain; check unbound service/admin targets and alternative connected paths.",
-        "expected_result_and_artifacts": "Only entitled service use and origin-specific replies succeed. Retain service-side and edge observations; a shared endpoint is not tenant transit.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_03",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-05",
-        "title": "mandatory mutation authority",
-        "existing_test_ids": "CT-019; CT-020; CT-022; CT-066",
-        "procedure_and_control": "With the actual tenant role, request forbidden baseline/group/port/external changes. Separately perform one approved workload operation.",
-        "expected_result_and_artifacts": "Forbidden native mutations fail; entitled operation works. Record principal, target, operation and effective permission without storing secrets.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_04",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-06",
-        "title": "data attachment and copy scope",
-        "existing_test_ids": "CT-037; CT-078",
-        "procedure_and_control": "Create disposable owned data and a known integrity marker. Test authorized access and bounded foreign attachment/clone/export attempts.",
-        "expected_result_and_artifacts": "Owned access works; unauthorized data or lower-scope copy access fails. Retain data-service decisions, copy lineage and cleanup.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_04",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-07",
-        "title": "identity and key lifecycle",
-        "existing_test_ids": "CT-028; CT-038; CT-079",
-        "procedure_and_control": "Use disposable credentials/key material in an approved scope. Observe valid use, rotation/revocation and denied foreign or revoked use.",
-        "expected_result_and_artifacts": "Required use remains attributable; old authority expires as designed. Retain issuer/service logs and timestamps; no plaintext fallback.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_04",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-08",
-        "title": "service protocols and MTU",
-        "existing_test_ids": "CT-008; CT-030; CT-031; CT-032",
-        "procedure_and_control": "Exercise DNS UDP/TCP and controlled fallback; check authorized resolver only. Test actual workload packet budget, PMTU and offered families end to end.",
-        "expected_result_and_artifacts": "Necessary protocol behaviour works without broad egress or alternate-path bypass. Retain family/path matrix, packet budget and observed outcomes.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_04",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-09",
-        "title": "edge or link loss",
-        "existing_test_ids": "CT-012; CT-024; CT-034",
-        "procedure_and_control": "Under approved representative load, observe the selected node/link failure and restoration using the site MOP. Capture new and established sessions.",
-        "expected_result_and_artifacts": "Security: no bypass. Service: actual interruption and surviving load. Recovery: correct route/state after restoration.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_05",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-10",
-        "title": "dependency loss",
-        "existing_test_ids": "CT-011; CT-027; CT-038; CT-050; CT-055",
-        "procedure_and_control": "Observe one scoped management, identity, key, logging or state dependency loss at a time; follow its accepted recovery procedure.",
-        "expected_result_and_artifacts": "No fallback privilege/permit/plaintext. Existing and new operations match the documented limits. Evidence gaps and recovery time remain visible.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_05",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-11",
-        "title": "uncertain provisioning outcome",
-        "existing_test_ids": "CT-045; CT-046; CT-048",
-        "procedure_and_control": "In a disposable scope, interrupt a response or executor at an approved point. Freeze competing writes; discover actual native tasks and resources before recovery.",
-        "expected_result_and_artifacts": "No duplicate allocation or unsafe deletion. Denied unfinished resources remain owned. Retain task, plan, state and actual-outcome reconciliation.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_05",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      },
-      {
-        "id": "Q11-12",
-        "title": "isolated restore and cutover",
-        "existing_test_ids": "CT-052; CT-053; CT-054; CT-060",
-        "procedure_and_control": "Restore a known disposable dataset and dependencies into the authorized recovery domain; validate consistency, identity/keys and paths before controlled activation.",
-        "expected_result_and_artifacts": "Useful data and measured RTO/RPO; no ambiguous simultaneous writer; protection, return path and operating ownership survive cutover.",
-        "document_path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
-        "bookmark": "QCP_05",
-        "execution_status": "not-run",
-        "actual_target": "",
-        "observed_result": "",
-        "evidence_reference": "",
-        "reviewer": "",
-        "scope_note": "Elaboration of inherited procedures, not a new control or executed result."
-      }
-    ]
-  }
+      "execution_status": "not-run",
+      "applicability": "Connected W14 design; applicability and current native observation must be assessed"
+    }
+  ],
+  "execution": "SPECIFICATIONS_NOT_EXECUTED",
+  "counts_are_not_additive_unique_tests": true
 }

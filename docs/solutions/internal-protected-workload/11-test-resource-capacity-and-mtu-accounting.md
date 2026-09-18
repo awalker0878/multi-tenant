@@ -6,43 +6,17 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:115 BEGIN -->
-
 <a id="WD14_S11"></a>
-
-<!-- SOURCE-BLOCK WD:115 END -->
-
-<!-- SOURCE-BLOCK WD:116 BEGIN -->
 
 The permanent fixture has one endpoint per domain. That cannot alone prove isolation between two endpoints inside the same domain. Add one controlled temporary probe to a domain, test the applicable same-host and cross-host placements, then retire or move the probe through an authorized re-creation sequence. Peak test endpoint count is five for sequential testing; four simultaneous extra probes would make eight. Tests on disallowed co-residency use the actual permitted topology rather than forcing a forbidden host placement.
 
-<!-- SOURCE-BLOCK WD:116 END -->
-
-<!-- SOURCE-BLOCK WD:117 BEGIN -->
-
 Illustrative requested guest capacity is four endpoints at 2 vCPU, 4 GiB memory and a 40 GiB boot disk each, plus a 100 GiB test data disk on each data endpoint: 8 vCPU, 16 GiB guest memory and 360 GiB requested virtual disk capacity. One sequential probe adds 2 vCPU, 4 GiB and 40 GiB: peak 10 vCPU, 20 GiB and 400 GiB. These are example fixture demands, not production sizes, host counts, physical storage requirements or qualified platform minima.
-
-<!-- SOURCE-BLOCK WD:117 END -->
-
-<!-- SOURCE-BLOCK WD:118 BEGIN -->
 
 Provider services, managers, edges, replicas, snapshots, backup retention, rebuild/maintenance headroom and hypervisor overhead are additional. Reservation accounting must not count the same allocation again as consumption. Admission is the conjunction of all applicable resource limits; a spare domain attachment cannot compensate for insufficient inspected session or storage-rebuild capacity.
 
-<!-- SOURCE-BLOCK WD:118 END -->
-
-<!-- SOURCE-BLOCK WD:119 BEGIN -->
-
 The MTU example uses a workload IP packet carried in an untagged inner Ethernet frame, basic VXLAN and UDP. For outer IPv4 without options, the additional outer-IP packet budget relative to the workload IP packet is 14 + 8 + 8 + 20 = 50 bytes. Outer IPv6 makes it 70 bytes. An inner VLAN tag adds another 4 bytes. Outer link framing is handled separately according to the equipment's MTU definition. The example is derived from packet fields, not a vendor setting. \[R14-06\]
 
-<!-- SOURCE-BLOCK WD:119 END -->
-
-<!-- SOURCE-BLOCK WD:120 BEGIN -->
-
 Geneve options, IPsec, nested tunnels, outer extension headers or other encapsulations require their own budget. Do not reuse a fixed VXLAN value. Qualify the smallest effective MTU across every active and surviving path, including gateway, security edge and recovery connections.
-
-<!-- SOURCE-BLOCK WD:120 END -->
-
-<!-- SOURCE-BLOCK WD:121 BEGIN -->
 
 
 <a id="source-table-121"></a>
@@ -56,21 +30,7 @@ Geneve options, IPsec, nested tunnels, outer extension headers or other encapsul
 | 1500 outer IP limit; IPv6 VXLAN | 1500 − 70 = 1430-byte maximum workload IP packet | Illustrative bound; confirm actual encapsulation, tagging and product behavior. |
 | 1450 workload; tagged inner Ethernet; IPv4 outer | 1450 + 50 + 4 = 1504 bytes | An unaccounted inner tag changes the result; do not silently drop or fragment. |
 
-<!-- SOURCE-BLOCK WD:121 END -->
-
-<!-- SOURCE-BLOCK WD:122 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:122 END -->
-
-<!-- SOURCE-BLOCK WD:123 BEGIN -->
-
 Related documents: [QUAL — Surviving capacity and admission](../../assurance/site-qualification/README.md#V14_QUAL_START)  \|  [NET — Layer-specific MTU method](../../engineering/fabric/README.md#V14_NET_START)  \|  [VND — Fixture and co-residency](../../engineering/platform-realizations/README.md#V14_VND_START)
-
-<!-- SOURCE-BLOCK WD:123 END -->
-
-<!-- SOURCE-BLOCK WD:124 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:124 END -->
 
 [Previous chapter](10-resource-ownership-protection-and-change-receipts.md) · [Chapter index](README.md) · [Next chapter](12-failure-and-partition-decision-schedule.md)
 

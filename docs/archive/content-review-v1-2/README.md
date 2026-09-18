@@ -18,49 +18,19 @@
 - [5. Remaining implementation boundaries](5-remaining-implementation-boundaries.md)
 
 ## Source front matter
-<!-- SOURCE-BLOCK REV12:0 BEGIN -->
-
 CONTENT REVIEW AND DISPOSITION
-
-<!-- SOURCE-BLOCK REV12:0 END -->
-
-<!-- SOURCE-BLOCK REV12:1 BEGIN -->
 
 ## Architecture-led<br>revision review
 
-<!-- SOURCE-BLOCK REV12:1 END -->
-
-<!-- SOURCE-BLOCK REV12:2 BEGIN -->
-
 *Portable Multi-Tenant Secure Hosting<br>Draft v1.1 → Draft v1.2*
-
-<!-- SOURCE-BLOCK REV12:2 END -->
-
-<!-- SOURCE-BLOCK REV12:3 BEGIN -->
 
 16 September 2026
 
-<!-- SOURCE-BLOCK REV12:3 END -->
-
-<!-- SOURCE-BLOCK REV12:4 BEGIN -->
-
 This record explains the completed editorial restructuring of the supplied v1.1 handbook. The main deliverable is the Reference Architecture and Cross-Platform Provisioning Strategy. This review is not another application-contract audit and is not a security assessment of a deployed environment.
-
-<!-- SOURCE-BLOCK REV12:4 END -->
-
-<!-- SOURCE-BLOCK REV12:5 BEGIN -->
 
 Every prior chapter and appendix was reviewed against the user’s direction: describe the infrastructure, explain its native vendor-stack realizations and define the provisioning strategy. Material useful only for designing a custom provisioning application was removed from the main document. Architectural control intent was retained where it remained applicable.
 
-<!-- SOURCE-BLOCK REV12:5 END -->
-
-<!-- SOURCE-BLOCK REV12:6 BEGIN -->
-
 The v1.1 source files and companion package were left unchanged. The old schemas, validator and API examples are not reissued, repaired, certified or made normative by v1.2. Previously identified defects in that software-oriented package must not be represented as fixed by removing them from this architecture document.
-
-<!-- SOURCE-BLOCK REV12:6 END -->
-
-<!-- SOURCE-BLOCK REV12:7 BEGIN -->
 
 
 <a id="source-table-7"></a>
@@ -73,20 +43,6 @@ The v1.1 source files and companion package were left unchanged. The old schemas
 | Not silently discarded | Infrastructure safety, least privilege, actual-state checks, data-aware deletion, evidence/authorization distinction and relevant operational responsibilities. |
 | Design additions identified | R1–R3 pattern labels, ML2/OVN illustrative backend, topology diagrams and worked resource demand are explicit reference-design synthesis or illustrative inputs. |
 
-<!-- SOURCE-BLOCK REV12:7 END -->
-
-<!-- SOURCE-BLOCK REV12:8 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:8 END -->
-
-<!-- SOURCE-BLOCK REV12:9 BEGIN -->
-
 Review basis
 
-<!-- SOURCE-BLOCK REV12:9 END -->
-
-<!-- SOURCE-BLOCK REV12:10 BEGIN -->
-
 Supplied Portable\_Multi\_Tenant\_Secure\_Hosting\_Handbook\_v1\_1.docx and its source catalogues. The prior audit informs the distinction between software-contract and infrastructure concerns. Primary-source checks are identified in Appendix B of the main document.
-
-<!-- SOURCE-BLOCK REV12:10 END -->

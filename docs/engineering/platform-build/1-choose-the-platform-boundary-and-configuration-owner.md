@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643 -->
-<!-- SOURCE-BLOCK PBS:18 BEGIN -->
-
 <a id="PBS_01"></a>
-
-<!-- SOURCE-BLOCK PBS:18 END -->
-
-<!-- SOURCE-BLOCK PBS:19 BEGIN -->
 
 One WSD delivery spans several infrastructure owners. The selected hypervisor provider does not automatically establish the fabric, security edge, identity, addressing, backup and recovery services.
 
-<!-- SOURCE-BLOCK PBS:19 END -->
-
-<!-- SOURCE-BLOCK PBS:20 BEGIN -->
-
 Design basis and related records: [RA §15](../../architecture/reference/15-cross-vendor-realization-model.md#RA_s_015)  •  [RA §20](../../architecture/reference/20-provisioning-model-and-infrastructure-work-packages.md#RA_s_020)  •  [VC §1](../vendor-cards/1-common-scope-and-native-implementation-contract.md#VC_01)  •  [PROV §3](../../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md#PROV_s_003)
-
-<!-- SOURCE-BLOCK PBS:20 END -->
-
-<!-- SOURCE-BLOCK PBS:21 BEGIN -->
 
 
 <a id="source-table-21"></a>
@@ -37,39 +23,13 @@ Design basis and related records: [RA §15](../../architecture/reference/15-cros
 | Tenant and workload | P4/P5 resource owners using approved modules/API operations. | Owned networks, compute/data attachments, protection and current activation evidence. |
 | Lifecycle | P6 owner of each affected native resource, with coordinated dependencies. | Changed as-built, retained obligations, requalification and cleanup evidence. |
 
-<!-- SOURCE-BLOCK PBS:21 END -->
-
-<!-- SOURCE-BLOCK PBS:22 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:22 END -->
-
-<!-- SOURCE-BLOCK PBS:23 BEGIN -->
-
 A native installer may own controller databases, platform certificates, host configuration and transport setup. A Terraform module may own tenant VMs, networks or a supported policy resource. Record ownership at the smallest supported independent resource boundary; do not place overlapping controllers over the same field or object.
-
-<!-- SOURCE-BLOCK PBS:23 END -->
-
-<!-- SOURCE-BLOCK PBS:24 BEGIN -->
 
 The operation specification contains create, read/observe, update, adoption, replacement, deletion and uncertain-outcome recovery separately. For each operation identify its input artifact, privilege scope, completion signal and possible data effect. Read access to a product API cannot establish full lifecycle coverage.
 
-<!-- SOURCE-BLOCK PBS:24 END -->
-
-<!-- SOURCE-BLOCK PBS:25 BEGIN -->
-
 Build sequence is dependency-driven, not tool-driven. P2 can use accepted temporary P0 services; P2/P3 offered-service acceptance is resolved before ordinary tenant allocation.
 
-<!-- SOURCE-BLOCK PBS:25 END -->
-
-<!-- SOURCE-BLOCK PBS:26 BEGIN -->
-
 Continue with: [PBS §8](8-publish-shared-service-handoffs-without-sharing-authority.md#PBS_08)  •  [PBS §9](9-release-a-native-build-package-that-can-be-independently-reviewed.md#PBS_09)
-
-<!-- SOURCE-BLOCK PBS:26 END -->
-
-<!-- SOURCE-BLOCK PBS:27 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:27 END -->
 
 [Chapter index](README.md) · [Next chapter](2-nutanix-commission-the-hosting-cell.md)
 

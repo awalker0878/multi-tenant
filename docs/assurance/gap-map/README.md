@@ -18,45 +18,19 @@
 - [v1.4 — Connected infrastructure design and acceptance](07-v1-4-connected-infrastructure-design-and-acceptance.md)
 
 ## Source front matter
-<!-- SOURCE-BLOCK GM:0 BEGIN -->
-
 <a id="V14_GM_START"></a>
 
 INFRASTRUCTURE ARCHITECTURE  /  GM
 
-<!-- SOURCE-BLOCK GM:0 END -->
-
-<!-- SOURCE-BLOCK GM:1 BEGIN -->
-
 v1.4 linked worked design: [WD — resources, paths, build receipts and acceptance](../../solutions/internal-protected-workload/README.md#V14_WD_START)
-
-<!-- SOURCE-BLOCK GM:1 END -->
-
-<!-- SOURCE-BLOCK GM:2 BEGIN -->
 
 ## Portable Multi-Tenant<br>Secure Hosting
 
-<!-- SOURCE-BLOCK GM:2 END -->
-
-<!-- SOURCE-BLOCK GM:3 BEGIN -->
-
 *Architecture Gap Map and Design Decision Register*
-
-<!-- SOURCE-BLOCK GM:3 END -->
-
-<!-- SOURCE-BLOCK GM:4 BEGIN -->
 
 Draft v1.4  \|  16 September 2026
 
-<!-- SOURCE-BLOCK GM:4 END -->
-
-<!-- SOURCE-BLOCK GM:5 BEGIN -->
-
 A traceable map from remaining v1.2 design/knowledge gaps to new documentation, accountable decisions, blocking gates and still-required implementation evidence.
-
-<!-- SOURCE-BLOCK GM:5 END -->
-
-<!-- SOURCE-BLOCK GM:6 BEGIN -->
 
 
 <a id="source-table-6"></a>
@@ -70,40 +44,10 @@ A traceable map from remaining v1.2 design/knowledge gaps to new documentation, 
 | Authority | Applicable external obligations and adopted controls prevail; supplements cannot silently weaken the parent. |
 | Release boundary | Documentation and local document checks only. No live infrastructure deployment, qualification or authorization asserted. |
 
-<!-- SOURCE-BLOCK GM:6 END -->
-
-<!-- SOURCE-BLOCK GM:7 BEGIN -->
-
-<!-- SOURCE-BLOCK GM:7 END -->
-
-<!-- SOURCE-BLOCK GM:8 BEGIN -->
-
 Start here: [Parent architecture — RA](../../architecture/reference/1-purpose-scope-and-architectural-authority.md#RA_s_001)  •  [Document family and gap map — GM](1-document-family-scope-and-precedence.md#GM_s_001)
-
-<!-- SOURCE-BLOCK GM:8 END -->
-
-<!-- SOURCE-BLOCK GM:9 BEGIN -->
 
 Keep the eight Word files together after extracting the release package. Cross-document links use sibling filenames and stable bookmarks. START\_HERE.html provides an additional navigation index.
 
-<!-- SOURCE-BLOCK GM:9 END -->
-
-<!-- SOURCE-BLOCK GM:10 BEGIN -->
-
-<!-- SOURCE-BLOCK GM:10 END -->
-
 <a id="GM_contents"></a>
 
-<!-- SOURCE-BLOCK GM:19 BEGIN -->
-
-<!-- SOURCE-BLOCK GM:19 END -->
-
-<!-- SOURCE-BLOCK GM:20 BEGIN -->
-
 Use the contents and named section links to navigate. After later edits, update Word fields and verify pagination before release.
-
-<!-- SOURCE-BLOCK GM:20 END -->
-
-<!-- SOURCE-BLOCK GM:21 BEGIN -->
-
-<!-- SOURCE-BLOCK GM:21 END -->

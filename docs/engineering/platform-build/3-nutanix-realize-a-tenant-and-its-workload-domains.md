@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643 -->
-<!-- SOURCE-BLOCK PBS:39 BEGIN -->
-
 <a id="PBS_03"></a>
-
-<!-- SOURCE-BLOCK PBS:39 END -->
-
-<!-- SOURCE-BLOCK PBS:40 BEGIN -->
 
 The domain routing, tenant entitlement and mandatory security selectors are different controls even when they are operated through related management services.
 
-<!-- SOURCE-BLOCK PBS:40 END -->
-
-<!-- SOURCE-BLOCK PBS:41 BEGIN -->
-
 Design basis and related records: [RA §16](../../architecture/reference/16-nutanix-hosting-stack-reference-realization.md#RA_s_016)  •  [WD §8](../../solutions/internal-protected-workload/8-mapping-the-schedules-into-each-vendor-stack.md#WD14_S08)  •  [PROV §4](../../implementation/provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md#PROV_s_004)
-
-<!-- SOURCE-BLOCK PBS:41 END -->
-
-<!-- SOURCE-BLOCK PBS:42 BEGIN -->
 
 
 <a id="source-table-42"></a>
@@ -37,45 +23,15 @@ Design basis and related records: [RA §16](../../architecture/reference/16-nuta
 | 4. Compute and data | Approved image, eligible host policy, VM/disks and only assigned networks. | P5 resource IDs, storage/key authority, required initialization and protection. |
 | 5. Verify and activate | Native realization observed, service bindings verified, required readiness and authority current. | Actual observations and reversible activation; no success inferred solely from API acceptance. |
 
-<!-- SOURCE-BLOCK PBS:42 END -->
-
-<!-- SOURCE-BLOCK PBS:43 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:43 END -->
-
-<!-- SOURCE-BLOCK PBS:44 BEGIN -->
-
 A common connected external subnet is not accepted simply because two VPCs are distinct. Native internal routing must not join OZ and RZ around the declared ZIP. No-NAT is an option only where the selected combination preserves the architecture; translation changes source attribution and return-path analysis and must be stated explicitly.
-
-<!-- SOURCE-BLOCK PBS:44 END -->
-
-<!-- SOURCE-BLOCK PBS:45 BEGIN -->
 
 ## Update and removal
 
-<!-- SOURCE-BLOCK PBS:45 END -->
-
-<!-- SOURCE-BLOCK PBS:46 BEGIN -->
-
 Before resize, image/customization change or network reassignment, review whether the selected resource operation updates in place, requires interruption or replaces the VM. A lost response triggers task/resource discovery under the original owner. Never interpret “unknown” as permission to create another copy or delete potentially written data.
-
-<!-- SOURCE-BLOCK PBS:46 END -->
-
-<!-- SOURCE-BLOCK PBS:47 BEGIN -->
 
 Retire only exclusively owned eligible resources. Withdraw obsolete routes and policy, reconcile outstanding tasks and address/DNS reuse, and preserve shared domains and retained copies. The actual protection and data owners decide when copy/key disposal is permissible.
 
-<!-- SOURCE-BLOCK PBS:47 END -->
-
-<!-- SOURCE-BLOCK PBS:48 BEGIN -->
-
 Continue with: [NBD §2](../network-boundaries/2-walk-f14-01-through-the-forward-and-reply-routes.md#NBD_02)  •  [OPS §3](../../operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md#OPS_03)  •  [OPS §7](../../operations/recovery-transition/7-retire-live-service-separately-from-retained-data.md#OPS_07)
-
-<!-- SOURCE-BLOCK PBS:48 END -->
-
-<!-- SOURCE-BLOCK PBS:49 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:49 END -->
 
 [Previous chapter](2-nutanix-commission-the-hosting-cell.md) · [Chapter index](README.md) · [Next chapter](4-vmware-nsx-commission-transport-compute-and-edge-roles.md)
 

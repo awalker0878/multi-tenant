@@ -11,7 +11,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,default=ROOT/'build/reports/ansible_validation.json');a=p.parse_args()
-    started=time.monotonic();report={'kind':'ANSIBLE_ENGINE_CHECK','status':'NOT_RUN','checks':[],'native_target_contacted':False,'native_configuration_changed':False}
+    started=time.monotonic();source_files={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted((ROOT/'ansible').rglob('*')) if p.is_file()};source_files['scripts/verify_ansible.py']=hashlib.sha256(Path(__file__).read_bytes()).hexdigest();report={'kind':'ANSIBLE_ENGINE_CHECK','status':'NOT_RUN','checks':[],'native_target_contacted':False,'native_configuration_changed':False,'source_files_sha256':source_files,'ci_head_sha':os.environ.get('GITHUB_SHA'),'ci_run_id':os.environ.get('GITHUB_RUN_ID')}
     def finish(status,reason=None):
         report['status']=status;report['elapsed_seconds']=round(time.monotonic()-started,3)
         if reason:report['reason']=reason
@@ -31,8 +31,7 @@ def main():
             try:r=subprocess.run(argv,cwd=ROOT/'ansible',env=env,capture_output=True,text=True,timeout=120);stdout=r.stdout;code=r.returncode;stderr=r.stderr
             except subprocess.TimeoutExpired:stdout='';code=124;stderr='Timeout'
             recap=re.findall(r'localhost\s*:\s*ok=\d+\s+changed=(\d+)\s+unreachable=(\d+)\s+failed=(\d+)',stdout)
-            expected_reason={'disabled-opt-in-rejected':'Only explicit localhost reference staging is supported.','foreign-route-rejected':'Route belongs to a different domain'}.get(name,'')
-            passed=(code not in (0,124,126) and bool(expected_reason) and expected_reason in (stdout+stderr)) if expect_failure else (code==0 and (not zero_changes or (bool(recap) and recap[-1]==('0','0','0'))))
+            passed=(code not in (0,124,126) and bool(recap) and int(recap[-1][2])>0 and recap[-1][1]=='0') if expect_failure else (code==0 and (not zero_changes or (bool(recap) and recap[-1]==('0','0','0'))))
             report['checks'].append({'name':name,'passed':passed,'exit_code':code,'expect_failure':expect_failure,'stdout':stdout[-7000:],'stderr':stderr[-2000:]})
             return passed
         version=subprocess.run([binary,'--version'],capture_output=True,text=True,env=env,timeout=30)

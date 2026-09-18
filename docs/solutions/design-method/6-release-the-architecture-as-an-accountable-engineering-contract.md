@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 133c2512e904737c1f410106fd1b421fba8309965af0621785b250402fb9214e -->
-<!-- SOURCE-BLOCK SDP:66 BEGIN -->
-
 <a id="SDP_06"></a>
-
-<!-- SOURCE-BLOCK SDP:66 END -->
-
-<!-- SOURCE-BLOCK SDP:67 BEGIN -->
 
 The HLD remains the project design record. Use this completion record to attach the developed decisions to that record, rather than creating another conflicting source of truth.
 
-<!-- SOURCE-BLOCK SDP:67 END -->
-
-<!-- SOURCE-BLOCK SDP:68 BEGIN -->
-
 Design basis and related records: [AK §8](../../architecture/delivery-guide/8-engineering-handoff-and-change-impact.md#AK_08)  •  [AT §10](../../templates/hld/10-architecture-review-and-engineering-handoff.md#AT_10)  •  [DEL §2](../../governance/delivery-framework/2-preserve-stable-deliverables-and-explicit-handoffs.md#DEL_02)
-
-<!-- SOURCE-BLOCK SDP:68 END -->
-
-<!-- SOURCE-BLOCK SDP:69 BEGIN -->
 
 
 <a id="source-table-69"></a>
@@ -38,35 +24,13 @@ Design basis and related records: [AK §8](../../architecture/delivery-guide/8-e
 | Acceptance allocation | Assertions, qualification stage, evidence owner and appropriate decision authority. | \[Enter sdp acceptance allocation\] |
 | Open decisions | Named owner, blocking gate, due/review trigger and evidence needed to close. | \[Enter sdp open decisions\] |
 
-<!-- SOURCE-BLOCK SDP:69 END -->
-
-<!-- SOURCE-BLOCK SDP:70 BEGIN -->
-
-<!-- SOURCE-BLOCK SDP:70 END -->
-
-<!-- SOURCE-BLOCK SDP:71 BEGIN -->
-
 At the walkthrough, trace one approved application path, one denied cross-tenant path, one virtual-disk attachment, one privileged management action and one recovery dependency. Use consistent identities across views and schedules. Differences become tracked dispositions, not explanatory comments lost inside a drawing.
-
-<!-- SOURCE-BLOCK SDP:71 END -->
-
-<!-- SOURCE-BLOCK SDP:72 BEGIN -->
 
 A changed address normally belongs to detailed engineering. Changed zone sharing, inspection obligations, administrative authority, recovery promise or external exposure can change the architecture. The architecture owner determines which records and deployed services must be re-evaluated.
 
-<!-- SOURCE-BLOCK SDP:72 END -->
-
-<!-- SOURCE-BLOCK SDP:73 BEGIN -->
-
 Actual status for this release: developed reference method supplied; project scope, approving authorities and engineering acceptance remain unassigned.
 
-<!-- SOURCE-BLOCK SDP:73 END -->
-
-<!-- SOURCE-BLOCK SDP:74 BEGIN -->
-
 Continue with: [NBD §6](../../engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md#NBD_06)  •  [PBS §9](../../engineering/platform-build/9-release-a-native-build-package-that-can-be-independently-reviewed.md#PBS_09)
-
-<!-- SOURCE-BLOCK SDP:74 END -->
 
 [Previous chapter](5-make-capacity-on-demand-and-exit-economically-explainable.md) · [Chapter index](README.md)
 

@@ -6,31 +6,13 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:141 BEGIN -->
-
 <a id="WD14_S14"></a>
-
-<!-- SOURCE-BLOCK WD:141 END -->
-
-<!-- SOURCE-BLOCK WD:142 BEGIN -->
 
 This book resolves the missing worked connection between the guides and clarifies the acceptance dependency. It does not select a user's actual switch models, rack counts, firewall platform, installed versions, licensing, site addresses, service targets or cryptographic configuration. Those are actual implementation decisions, not documentation defects that can be closed by making up values.
 
-<!-- SOURCE-BLOCK WD:142 END -->
-
-<!-- SOURCE-BLOCK WD:143 BEGIN -->
-
 Before commissioning this particular reference realization, the responsible owners must accept the native gateway/handoff mechanism, EC/SE context implementation, service-side return routing, supported protocol families, provider policy authority, co-residency, actual capacity and independent protection/trust dependencies. A product limitation may require a different qualified realization; record the variation at the parent architecture boundary.
 
-<!-- SOURCE-BLOCK WD:143 END -->
-
-<!-- SOURCE-BLOCK WD:144 BEGIN -->
-
 The v1.4 change register distinguishes documentation addressed, proposed reference choice, site decision open, implementation not delivered, and verification not run. A statement that the documentation treatment exists is not a statement that the architecture has been deployed or authorized.
-
-<!-- SOURCE-BLOCK WD:144 END -->
-
-<!-- SOURCE-BLOCK WD:145 BEGIN -->
 
 
 <a id="source-table-145"></a>
@@ -44,20 +26,6 @@ The v1.4 change register distinguishes documentation addressed, proposed referen
 | Production readiness | Named owners, promised restore/recovery evidence, support, incident paths and valid authorization. | Production G3; never deferred by calling it later G4 work. |
 | Live results | Actual observations for every applicable assertion and retained CT procedure. | Qualification or service acceptance, according to scope. |
 
-<!-- SOURCE-BLOCK WD:145 END -->
-
-<!-- SOURCE-BLOCK WD:146 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:146 END -->
-
-<!-- SOURCE-BLOCK WD:147 BEGIN -->
-
 Related documents: [GM — Gap progress and actual site decisions](../../assurance/gap-map/README.md#V14_GM_START)  \|  [QUAL — Acceptance requirements](../../assurance/site-qualification/README.md#V14_QUAL_START)
-
-<!-- SOURCE-BLOCK WD:147 END -->
-
-<!-- SOURCE-BLOCK WD:148 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:148 END -->
 
 [Previous chapter](13-verification-assertions-and-actual-evidence.md) · [Chapter index](README.md) · [Next chapter](15-references-and-source-status.md)

@@ -6,26 +6,12 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 783edbba45483d0d3c3b966765589762698836320237906a0f9a60080574af37 -->
-<!-- SOURCE-BLOCK QUAL:33 BEGIN -->
-
 <a id="__RefHeading___Toc10035_1525915568"></a>
 <a id="QUAL_s_002"></a>
 
-<!-- SOURCE-BLOCK QUAL:33 END -->
-
-<!-- SOURCE-BLOCK QUAL:34 BEGIN -->
-
 Parent architecture: [RA §3](../../architecture/reference/3-system-context-and-physical-hosting-topology.md#RA_s_003)  •  [RA §4](../../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md#RA_s_004)  •  [RA §5](../../architecture/reference/5-physical-fabric-and-platform-attachment.md#RA_s_005)  •  [RA §6](../../architecture/reference/6-management-platform-control-and-out-of-band-access.md#RA_s_006)  •  [RA §14](../../architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014)  •  [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)
 
-<!-- SOURCE-BLOCK QUAL:34 END -->
-
-<!-- SOURCE-BLOCK QUAL:35 BEGIN -->
-
 A buildable site design resolves actual components and relationships rather than filling example IP addresses into a diagram. Record hardware and software inventories, component roles, physical fault groups, logical authorities, interface IDs, capacity, management ownership and recovery dependency. The parent topology symbols are functional roles, not assumed counts or independent failure domains. \[[B2](09-references-parent-basis-and-external-context.md#QUAL_src_B2) §§3–6, 14, 30\]
-
-<!-- SOURCE-BLOCK QUAL:35 END -->
-
-<!-- SOURCE-BLOCK QUAL:36 BEGIN -->
 
 
 <a id="source-table-36"></a>
@@ -40,19 +26,7 @@ A buildable site design resolves actual components and relationships rather than
 | Data and recovery schedule | Owned data/copies, keys, consistency, retention, fencing, target eligibility and restoring order. | Data/protection/continuity owners. |
 | As-built and evidence references | Actual configuration and resource identities, approved changes, tests, variations and operating restrictions. | Operations and assurance owners. |
 
-<!-- SOURCE-BLOCK QUAL:36 END -->
-
-<!-- SOURCE-BLOCK QUAL:37 BEGIN -->
-
-<!-- SOURCE-BLOCK QUAL:37 END -->
-
-<!-- SOURCE-BLOCK QUAL:38 BEGIN -->
-
 For every claim of redundancy, enumerate the common components that can defeat it. Two VMs can share a host; two hosts can share power or a storage controller; two sites can share the sole identity/KMS or security management dependency. Conversely, a shared fabric can be acceptable when the service’s stated failure scope and isolation controls account for it. The design must disclose the dependency rather than mandate physical duplication of every component.
-
-<!-- SOURCE-BLOCK QUAL:38 END -->
-
-<!-- SOURCE-BLOCK QUAL:39 BEGIN -->
 
 
 <a id="source-table-39"></a>
@@ -65,23 +39,9 @@ For every claim of redundancy, enumerate the common components that can defeat i
 | Management recovery | Surviving OOB/privileged access, protected configuration and trust material. | Control recovery remains blocked even if workload disks survive. |
 | Site recovery | Independent usable target, trust/key/catalogue access, routed connectivity and writer exclusion. | A replication job alone is not a complete recovery service. |
 
-<!-- SOURCE-BLOCK QUAL:39 END -->
-
-<!-- SOURCE-BLOCK QUAL:40 BEGIN -->
-
-<!-- SOURCE-BLOCK QUAL:40 END -->
-
-<!-- SOURCE-BLOCK QUAL:41 BEGIN -->
-
 A site-specific design record remains open until values are supplied and the appropriate owner accepts them. The supplied decision CSV gives the question, required evidence and gate, rather than presenting fabricated environment values as approved. Additional rows are added for genuine local requirements; they do not silently amend the parent’s security semantics.
 
-<!-- SOURCE-BLOCK QUAL:41 END -->
-
-<!-- SOURCE-BLOCK QUAL:42 BEGIN -->
-
 Related engineering: [Interface ownership](../../engineering/fabric/6-management-paths-and-interface-handover.md#NET_s_006)  •  [Sharing decisions](../../engineering/platform-realizations/2-physical-placement-and-the-sharing-decision.md#VND_s_002)  •  [Recovery dependencies](../../architecture/shared-services/6-failure-recovery-migration-and-failback-topology.md#SVC_s_006)
-
-<!-- SOURCE-BLOCK QUAL:42 END -->
 
 [Previous chapter](1-from-proposed-architecture-to-accepted-service.md) · [Chapter index](README.md) · [Next chapter](3-capacity-service-envelopes-and-growth-triggers.md)
 

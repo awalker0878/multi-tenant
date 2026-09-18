@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643 -->
-<!-- SOURCE-BLOCK PBS:105 BEGIN -->
-
 <a id="PBS_09"></a>
-
-<!-- SOURCE-BLOCK PBS:105 END -->
-
-<!-- SOURCE-BLOCK PBS:106 BEGIN -->
 
 This record sits beside the existing LLD and operation-coverage schedule. It is a specification for real build artifacts, not a substitute for them.
 
-<!-- SOURCE-BLOCK PBS:106 END -->
-
-<!-- SOURCE-BLOCK PBS:107 BEGIN -->
-
 Design basis and related records: [ET §8](../../templates/lld/8-exact-platform-and-tool-operation-coverage.md#ET_08)  •  [ET §9](../../templates/lld/9-build-and-qualification-design.md#ET_09)  •  [EK §8](../delivery-guide/8-build-test-and-implementation-handoff.md#EK_08)  •  [IK §1](../../implementation/delivery-guide/1-implementation-workplan-and-required-inputs.md#IK_01)
-
-<!-- SOURCE-BLOCK PBS:107 END -->
-
-<!-- SOURCE-BLOCK PBS:108 BEGIN -->
 
 
 <a id="source-table-108"></a>
@@ -38,34 +24,12 @@ Design basis and related records: [ET §8](../../templates/lld/8-exact-platform-
 | Qualification | Applicable observations, actual test resources, fault safety envelope and artifact collection. | \[Enter pbs qualification plan\] |
 | Handoff decision | Recipient, unresolved blockers, accepted revision and signed scope decision. | \[Enter pbs handoff decision\] |
 
-<!-- SOURCE-BLOCK PBS:108 END -->
-
-<!-- SOURCE-BLOCK PBS:109 BEGIN -->
-
-<!-- SOURCE-BLOCK PBS:109 END -->
-
-<!-- SOURCE-BLOCK PBS:110 BEGIN -->
-
 Review one creation, one policy change, one resource update, one uncertain task and one retirement before releasing the package. For each, identify the last safe stopping point and the data or authority that must be preserved. If no supported recovery or forward-repair path exists, narrow or defer the capability instead of calling a placeholder complete.
-
-<!-- SOURCE-BLOCK PBS:110 END -->
-
-<!-- SOURCE-BLOCK PBS:111 BEGIN -->
 
 The actual MOP records native commands/API artifacts only after the configuration source and support combination are accepted. The reusable runbooks remain references. Permission to run a restricted qualification fixture is not permission to activate production, and a build receipt is not a passing test report.
 
-<!-- SOURCE-BLOCK PBS:111 END -->
-
-<!-- SOURCE-BLOCK PBS:112 BEGIN -->
-
 This release supplies engineering specifications and record fields. All installed values, native execution artifacts and platform qualification evidence remain implementation inputs.
 
-<!-- SOURCE-BLOCK PBS:112 END -->
-
-<!-- SOURCE-BLOCK PBS:113 BEGIN -->
-
 Continue with: [QCP §1](../../assurance/qualification-campaign/1-select-the-qualification-scope-and-acceptance-claim.md#QCP_01)  •  [IT §1](../../templates/implementation-mop/1-change-and-method-of-procedure-cover.md#IT_01)
-
-<!-- SOURCE-BLOCK PBS:113 END -->
 
 [Previous chapter](8-publish-shared-service-handoffs-without-sharing-authority.md) · [Chapter index](README.md)

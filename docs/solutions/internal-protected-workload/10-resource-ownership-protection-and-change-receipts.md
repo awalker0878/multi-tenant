@@ -6,31 +6,13 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:107 BEGIN -->
-
 <a id="WD14_S10"></a>
-
-<!-- SOURCE-BLOCK WD:107 END -->
-
-<!-- SOURCE-BLOCK WD:108 BEGIN -->
 
 One environment spans several resource owners. It does not require one executor with all their credentials. The schedule below names the minimum accepted handoffs that join the design. An existing catalogue, change platform, workflow engine and inventory can carry these records without a custom provisioning application.
 
-<!-- SOURCE-BLOCK WD:108 END -->
-
-<!-- SOURCE-BLOCK WD:109 BEGIN -->
-
 Observe, create, update, adopt, replace, delete and reconcile uncertain outcomes are separate coverage decisions. A provider that can create an object but cannot reliably find it after a timeout does not provide a complete managed lifecycle. Native installers and service owners retain the resources they actually control.
 
-<!-- SOURCE-BLOCK WD:109 END -->
-
-<!-- SOURCE-BLOCK WD:110 BEGIN -->
-
 Late platform tasks are especially important. Losing an executor lease, revoking a credential or interrupting a pipeline does not prove that a previously accepted native operation has stopped. Before restarting or transferring ownership, the responsible owner discovers active tasks and their completed side effects. Data-safe forward repair can be preferable to reversal.
-
-<!-- SOURCE-BLOCK WD:110 END -->
-
-<!-- SOURCE-BLOCK WD:111 BEGIN -->
 
 
 <a id="source-table-111"></a>
@@ -46,21 +28,7 @@ Late platform tasks are especially important. Losing an executor lease, revoking
 | Capture, backups and keys | Protection/key owners under separated use and disposition authority. | Recoverable copy and catalogue/key references, retention, actual restore evidence and custody. |
 | Activation and retirement | Named service/data/security authorities and the current owning executors. | Current approved scope, observed result, retained obligations and no obsolete live authority. |
 
-<!-- SOURCE-BLOCK WD:111 END -->
-
-<!-- SOURCE-BLOCK WD:112 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:112 END -->
-
-<!-- SOURCE-BLOCK WD:113 BEGIN -->
-
 Related documents: [PROV — Single writer and failure recovery](../../implementation/provisioning-strategy/README.md#V14_PROV_START)  \|  [SVC — Copy and key lifecycle](../../architecture/shared-services/README.md#V14_SVC_START)
-
-<!-- SOURCE-BLOCK WD:113 END -->
-
-<!-- SOURCE-BLOCK WD:114 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:114 END -->
 
 [Previous chapter](9-build-sequence-with-explicit-acceptance-dependencies.md) · [Chapter index](README.md) · [Next chapter](11-test-resource-capacity-and-mtu-accounting.md)
 

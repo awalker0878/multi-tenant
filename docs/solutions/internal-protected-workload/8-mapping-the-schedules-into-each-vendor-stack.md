@@ -6,43 +6,17 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:88 BEGIN -->
-
 <a id="WD14_S08"></a>
-
-<!-- SOURCE-BLOCK WD:88 END -->
-
-<!-- SOURCE-BLOCK WD:89 BEGIN -->
 
 The address and route schedules are architectural invariants. A native gateway can implement them through supported static routing, dynamic routing, policy routing or an equivalent qualified construction. The implementation record must show which method is selected; a Terraform resource name is not a substitute for that topology.
 
-<!-- SOURCE-BLOCK WD:89 END -->
-
-<!-- SOURCE-BLOCK WD:90 BEGIN -->
-
 On Nutanix, VPC ownership, external subnet attachment, Flow policy and AHV/AOS placement are distinct controls. A shared external subnet is not presumed isolated; use the dedicated handoff pattern until the actual source, connected-route, NAT and return-path behavior is demonstrated. The no-NAT preference remains conditional on the selected supported release.
-
-<!-- SOURCE-BLOCK WD:90 END -->
-
-<!-- SOURCE-BLOCK WD:91 BEGIN -->
 
 On VMware/NSX, identify the distributed router, service router, Tier-1 and isolated upstream context actually implementing each next hop. A Tier-0 VRF or another supported isolated construction can be a candidate. No claim about release-specific feature support, scale or licensing follows from the diagram. Verify both native route propagation and the path through stateful enforcement.
 
-<!-- SOURCE-BLOCK WD:91 END -->
-
-<!-- SOURCE-BLOCK WD:92 BEGIN -->
-
 On OpenStack, each independent domain uses its own controlled Neutron routing/network context. The provider owns the baseline security groups, port-security settings, permitted address pairs, external attachments and applicable role policy for the base service. Neutron owns its backend objects; raw conflicting OVN changes are not an acceptable enforcement layer. Delegated tenant mutation remains an extension because security-group allows are additive. \[R14-05\]
 
-<!-- SOURCE-BLOCK WD:92 END -->
-
-<!-- SOURCE-BLOCK WD:93 BEGIN -->
-
 Where the installed platform cannot represent an essential operation or path, choose a documented qualified alternative or exclude the affected service. Do not preserve a portability claim by silently weakening the security or recovery requirement.
-
-<!-- SOURCE-BLOCK WD:93 END -->
-
-<!-- SOURCE-BLOCK WD:94 BEGIN -->
 
 
 <a id="source-table-94"></a>
@@ -56,20 +30,6 @@ Where the installed platform cannot represent an essential operation or path, ch
 | Compute and disk realization | Eligible AHV pools and AOS/storage policy with actual copy/key ownership. | Eligible ESXi/datastores or Nova/Placement/Cinder backends, with the same required outcome. |
 | Shared services and ZIPs | Separate service owners provision EC/SE, IPAM/DNS, trust and protection. | Identical ownership requirement; not automatically created by the selected hosting provider. |
 
-<!-- SOURCE-BLOCK WD:94 END -->
-
-<!-- SOURCE-BLOCK WD:95 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:95 END -->
-
-<!-- SOURCE-BLOCK WD:96 BEGIN -->
-
 Related documents: [VND — Detailed vendor realization and source limitations](../../engineering/platform-realizations/README.md#V14_VND_START)  \|  [PROV — Operation-level tool ownership](../../implementation/provisioning-strategy/README.md#V14_PROV_START)
-
-<!-- SOURCE-BLOCK WD:96 END -->
-
-<!-- SOURCE-BLOCK WD:97 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:97 END -->
 
 [Previous chapter](7-service-permissions-and-non-ip-storage-paths.md) · [Chapter index](README.md) · [Next chapter](9-build-sequence-with-explicit-acceptance-dependencies.md)

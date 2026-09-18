@@ -8,20 +8,10 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB11:762 BEGIN -->
-
 <a id="__RefHeading___Toc13413_1645000677"></a>
 <a id="sec_58"></a>
 
-<!-- SOURCE-BLOCK HB11:762 END -->
-
-<!-- SOURCE-BLOCK HB11:763 BEGIN -->
-
 Adopt a service-based operating model with accountable ownership of the durable contract, shared service products, foundation capacity, security policy and assurance. Tenant teams own workload requirements and application controls; provider teams own the qualified infrastructure and inherited controls. The precise split is recorded for each service rather than assumed from a platform brand or hosting location. \[[S05](77-appendix-h-primary-sources-and-implementation-references.md#S05); [S28](77-appendix-h-primary-sources-and-implementation-references.md#S28)\]
-
-<!-- SOURCE-BLOCK HB11:763 END -->
-
-<!-- SOURCE-BLOCK HB11:764 BEGIN -->
 
 
 <a id="source-table-764"></a>
@@ -37,46 +27,20 @@ Adopt a service-based operating model with accountable ownership of the durable 
 | Assurance / security operations | Test execution, independent review, event correlation, evidence freshness and incident coordination |
 | Tenant service/data owner | Workload intent, application/data lifecycle, acceptance, retention, recovery requirements and declared extensions |
 
-<!-- SOURCE-BLOCK HB11:764 END -->
-
-<!-- SOURCE-BLOCK HB11:765 BEGIN -->
-
 A requestor cannot approve their own high-risk privilege or exposure change merely because they operate the pipeline. Define who is responsible, accountable, consulted and informed for onboarding, profile changes, edge changes, emergency containment, risk acceptance, backup retention, restore and disposal. A single accountable role owns each decision, even when several teams execute it. Access reviews compare actual API/native roles with this model, not just job titles.
 
-<!-- SOURCE-BLOCK HB11:765 END -->
-
-<!-- SOURCE-BLOCK HB11:766 BEGIN -->
-
 Operations handover includes ownership/contact escalation, service dependencies, SLO and recovery profiles, capacity, monitoring, credentials/break-glass, runbooks, known limitations, supported versions, costs and qualification evidence. No unresolved operational responsibility is silently assigned to a tenant at Service Ready.
-
-<!-- SOURCE-BLOCK HB11:766 END -->
-
-<!-- SOURCE-BLOCK HB11:767 BEGIN -->
 
 <a id="req_OPS_001"></a>
 
 OPS-001  Each service SHALL publish a provider/tenant/shared control responsibility matrix and accountable decision owners for its complete lifecycle, including inherited controls, support access and data disposal.
 
-<!-- SOURCE-BLOCK HB11:767 END -->
-
-<!-- SOURCE-BLOCK HB11:768 BEGIN -->
-
 Service management  \|  Verify: [CT-019](73-appendix-d-conformance-test-catalogue.md#test_CT_019), [CT-062](73-appendix-d-conformance-test-catalogue.md#test_CT_062), [CT-079](73-appendix-d-conformance-test-catalogue.md#test_CT_079)  \|  Basis: [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05) / [S28](77-appendix-h-primary-sources-and-implementation-references.md#S28)  \|  new-v1.1
-
-<!-- SOURCE-BLOCK HB11:768 END -->
-
-<!-- SOURCE-BLOCK HB11:769 BEGIN -->
 
 <a id="req_OPS_002"></a>
 
 OPS-002  Production handover SHALL include owner/escalation, dependency, SLO/recovery, capacity, monitoring, runbook, support/version and evidence records; privileged access SHALL be reviewed against the actual authority model.
 
-<!-- SOURCE-BLOCK HB11:769 END -->
-
-<!-- SOURCE-BLOCK HB11:770 BEGIN -->
-
 Service management  \|  Verify: [CT-019](73-appendix-d-conformance-test-catalogue.md#test_CT_019), [CT-062](73-appendix-d-conformance-test-catalogue.md#test_CT_062), [CT-069](73-appendix-d-conformance-test-catalogue.md#test_CT_069)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
-
-<!-- SOURCE-BLOCK HB11:770 END -->
 
 [Previous chapter](64-part-vii-governance-and-delivery.md) · [Chapter index](README.md) · [Next chapter](59-change-exceptions-and-risk-decisions.md)

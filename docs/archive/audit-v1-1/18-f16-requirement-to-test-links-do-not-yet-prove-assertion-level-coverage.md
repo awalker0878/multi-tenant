@@ -8,48 +8,16 @@
 <!-- source-sha256: cd901aaf004d45cf29ffe14ff955a0c9cf81f668be674e8d4de8c590303c62d8 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK AUD11:136 BEGIN -->
-
-<!-- SOURCE-BLOCK AUD11:136 END -->
-
-<!-- SOURCE-BLOCK AUD11:137 BEGIN -->
-
 Medium priority • Assurance-completeness improvement<br>Location: Appendices C-D; 194 requirements and 80 procedures
-
-<!-- SOURCE-BLOCK AUD11:137 END -->
-
-<!-- SOURCE-BLOCK AUD11:138 BEGIN -->
 
 Observed. All requirement-to-test and reverse links resolve. Procedures are broad execution specifications, however, and a single test can be linked to many distinct clauses. Numeric thresholds, individual assertions and evidence targets are not normalized in the test contract.
 
-<!-- SOURCE-BLOCK AUD11:138 END -->
-
-<!-- SOURCE-BLOCK AUD11:139 BEGIN -->
-
 Why it matters. Counting linked IDs proves traceability presence, not that every SHALL clause has a pass/fail observation.
-
-<!-- SOURCE-BLOCK AUD11:139 END -->
-
-<!-- SOURCE-BLOCK AUD11:140 BEGIN -->
 
 Improve. Split compound requirements into identifiable assertions without renumbering stable parent IDs. Give tests assertion IDs, profile parameters, vantage points, preconditions, expected observations, failure/cleanup rules and evidence targets. Permit examination/interview where automation is inappropriate.
 
-<!-- SOURCE-BLOCK AUD11:140 END -->
-
-<!-- SOURCE-BLOCK AUD11:141 BEGIN -->
-
 Close when. Every mandatory assertion has a verification method; each test result identifies which assertions it actually covered and which were blocked or inapplicable.
 
-<!-- SOURCE-BLOCK AUD11:141 END -->
-
-<!-- SOURCE-BLOCK AUD11:142 BEGIN -->
-
 Owner: Assurance engineering
-
-<!-- SOURCE-BLOCK AUD11:142 END -->
-
-<!-- SOURCE-BLOCK AUD11:143 BEGIN -->
-
-<!-- SOURCE-BLOCK AUD11:143 END -->
 
 [Previous chapter](17-f15-printed-control-family-crosswalk-omits-existing-catalogue-mappings.md) · [Chapter index](README.md) · [Next chapter](19-f17-qualification-and-portability-need-separate-test-applicability-rules.md)

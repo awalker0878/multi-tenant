@@ -8,17 +8,7 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:392 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:392 END -->
-
-<!-- SOURCE-BLOCK HB10:393 BEGIN -->
-
 The first production-grade proof should stay intentionally small while exercising every major architecture boundary. A useful scope is two tenant namespaces, each with an Operations-zone and Restricted-zone Security Domain, a multi-tenant data ZIP service, separate management/OOB, DNS/NTP/logging/backup service bindings, IPv4 plus an IPv6 test path, and no direct Internet exposure. The goal is to prove the contract and controls, not maximize feature count.
-
-<!-- SOURCE-BLOCK HB10:393 END -->
-
-<!-- SOURCE-BLOCK HB10:394 BEGIN -->
 
 
 <a id="source-table-394"></a>
@@ -34,7 +24,5 @@ The first production-grade proof should stay intentionally small while exercisin
 | Restricted → backup data endpoint | ALLOW |
 | Security-edge logs attributable to WSD/domain | PASS |
 | Provision new WSD without switch configuration | PASS |
-
-<!-- SOURCE-BLOCK HB10:394 END -->
 
 [Previous chapter](50-delivery-roadmap.md) · [Chapter index](README.md) · [Next chapter](52-architecture-acceptance-criteria.md)

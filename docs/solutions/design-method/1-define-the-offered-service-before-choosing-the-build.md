@@ -6,31 +6,13 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 133c2512e904737c1f410106fd1b421fba8309965af0621785b250402fb9214e -->
-<!-- SOURCE-BLOCK SDP:15 BEGIN -->
-
 <a id="SDP_01"></a>
-
-<!-- SOURCE-BLOCK SDP:15 END -->
-
-<!-- SOURCE-BLOCK SDP:16 BEGIN -->
 
 An offer is a bounded combination of resources, connectivity, operating responsibility and recoverability—not the name of a hypervisor.
 
-<!-- SOURCE-BLOCK SDP:16 END -->
-
-<!-- SOURCE-BLOCK SDP:17 BEGIN -->
-
 Design basis and related records: [RA §2](../../architecture/reference/2-design-drivers-and-selected-reference-pattern.md#RA_s_002)  •  [RA §14](../../architecture/reference/14-availability-multi-site-operation-and-recovery-topology.md#RA_s_014)  •  [AK §2](../../architecture/delivery-guide/2-service-requirements-and-applicability.md#AK_02)
 
-<!-- SOURCE-BLOCK SDP:17 END -->
-
-<!-- SOURCE-BLOCK SDP:18 BEGIN -->
-
 Develop the initial offer around an internal VM environment with independent tenant OZ/RZ domains, declared shared-service consumption and no implicit public access. Describe the smallest unit that can be accepted: the WSD, its networks and data, the provider dependencies, and the agreed operating boundary. The same description becomes the input to each vendor realization.
-
-<!-- SOURCE-BLOCK SDP:18 END -->
-
-<!-- SOURCE-BLOCK SDP:19 BEGIN -->
 
 
 <a id="source-table-19"></a>
@@ -42,33 +24,11 @@ Develop the initial offer around an internal VM environment with independent ten
 | Continuity | A named local failure model and protection/restore method. | Site recovery is offered only with an eligible target, independent dependencies and measured recovery evidence. |
 | Operations | Named infrastructure, guest, application and data owners. | Managed guest services change responsibility only when explicitly agreed. |
 
-<!-- SOURCE-BLOCK SDP:19 END -->
-
-<!-- SOURCE-BLOCK SDP:20 BEGIN -->
-
-<!-- SOURCE-BLOCK SDP:20 END -->
-
-<!-- SOURCE-BLOCK SDP:21 BEGIN -->
-
 For every offered item record a measurement boundary and an exclusion. “Resilient” must identify the failed resources and the service that continues. A security availability-impact label cannot supply an uptime target. A backup schedule cannot supply an RPO until its recoverable consistency point and failure behaviour are understood.
-
-<!-- SOURCE-BLOCK SDP:21 END -->
-
-<!-- SOURCE-BLOCK SDP:22 BEGIN -->
 
 Output: a proposed service envelope and explicit exclusions. No hardware order, provider selection or production activation follows solely from this record.
 
-<!-- SOURCE-BLOCK SDP:22 END -->
-
-<!-- SOURCE-BLOCK SDP:23 BEGIN -->
-
 Continue with: [SDP §5](5-make-capacity-on-demand-and-exit-economically-explainable.md#SDP_05)  •  [AT §1](../../templates/hld/1-mandate-and-service-envelope.md#AT_01)
-
-<!-- SOURCE-BLOCK SDP:23 END -->
-
-<!-- SOURCE-BLOCK SDP:24 BEGIN -->
-
-<!-- SOURCE-BLOCK SDP:24 END -->
 
 [Chapter index](README.md) · [Next chapter](2-choose-sharing-at-each-infrastructure-layer.md)
 

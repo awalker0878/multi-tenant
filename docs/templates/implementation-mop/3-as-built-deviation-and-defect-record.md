@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9a7dd8df4a5abf6482f206cae2d074444ac6fa812bbe4bace970a4de059da370 -->
-<!-- SOURCE-BLOCK IT:31 BEGIN -->
-
 <a id="IT_03"></a>
-
-<!-- SOURCE-BLOCK IT:31 END -->
-
-<!-- SOURCE-BLOCK IT:32 BEGIN -->
 
 Record what exists, not merely what the deployment intended to create.
 
-<!-- SOURCE-BLOCK IT:32 END -->
-
-<!-- SOURCE-BLOCK IT:33 BEGIN -->
-
 Baseline and related records: [ET §10](../lld/10-engineering-review-and-controlled-handoff.md#ET_10)  •  [IK §8](../../implementation/delivery-guide/8-interrupted-work-brownfield-adoption-and-change.md#IK_08)
-
-<!-- SOURCE-BLOCK IT:33 END -->
-
-<!-- SOURCE-BLOCK IT:34 BEGIN -->
 
 
 <a id="source-table-34"></a>
@@ -38,20 +24,6 @@ Baseline and related records: [ET §10](../lld/10-engineering-review-and-control
 | Decision and retest | Accepted variation or correction reference, residual risk authority and relevant re-verification. | {{IT\_RETEST}} |
 | Closure | Actual evidence and reviewer; retained issue or confirmed resolution with timestamps. | {{IT\_CLOSE}} |
 
-<!-- SOURCE-BLOCK IT:34 END -->
-
-<!-- SOURCE-BLOCK IT:35 BEGIN -->
-
-<!-- SOURCE-BLOCK IT:35 END -->
-
-<!-- SOURCE-BLOCK IT:36 BEGIN -->
-
 Blank fields and unissued decisions are blockers for the affected action. Record actual evidence and authority; examples elsewhere in the library do not populate these fields.
-
-<!-- SOURCE-BLOCK IT:36 END -->
-
-<!-- SOURCE-BLOCK IT:37 BEGIN -->
-
-<!-- SOURCE-BLOCK IT:37 END -->
 
 [Previous chapter](2-repeatable-execution-step-record.md) · [Chapter index](README.md) · [Next chapter](4-test-procedure-and-actual-execution-record.md)

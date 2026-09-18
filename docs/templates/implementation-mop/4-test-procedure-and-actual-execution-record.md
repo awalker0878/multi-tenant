@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9a7dd8df4a5abf6482f206cae2d074444ac6fa812bbe4bace970a4de059da370 -->
-<!-- SOURCE-BLOCK IT:38 BEGIN -->
-
 <a id="IT_04"></a>
-
-<!-- SOURCE-BLOCK IT:38 END -->
-
-<!-- SOURCE-BLOCK IT:39 BEGIN -->
 
 Expected outcomes and observations are different fields. A not-run test is never a successful test.
 
-<!-- SOURCE-BLOCK IT:39 END -->
-
-<!-- SOURCE-BLOCK IT:40 BEGIN -->
-
 Baseline and related records: [IK §6](../../implementation/delivery-guide/6-restricted-qualification-and-meaningful-observations.md#IK_06)  •  [WD §13](../../solutions/internal-protected-workload/13-verification-assertions-and-actual-evidence.md#WD14_S13)
-
-<!-- SOURCE-BLOCK IT:40 END -->
-
-<!-- SOURCE-BLOCK IT:41 BEGIN -->
 
 
 <a id="source-table-41"></a>
@@ -38,20 +24,6 @@ Baseline and related records: [IK §6](../../implementation/delivery-guide/6-res
 | Result | Not run / passed / failed / blocked / not applicable. Not applicable needs a scoped reason and approval; never infer pass from timeout. | {{IT\_RESULT}} |
 | Review and impact | Reviewer, discrepancy/defect IDs, applicability decision, evidence freshness and dependent gate. | {{IT\_TEST\_REVIEW}} |
 
-<!-- SOURCE-BLOCK IT:41 END -->
-
-<!-- SOURCE-BLOCK IT:42 BEGIN -->
-
-<!-- SOURCE-BLOCK IT:42 END -->
-
-<!-- SOURCE-BLOCK IT:43 BEGIN -->
-
 Blank fields and unissued decisions are blockers for the affected action. Record actual evidence and authority; examples elsewhere in the library do not populate these fields.
-
-<!-- SOURCE-BLOCK IT:43 END -->
-
-<!-- SOURCE-BLOCK IT:44 BEGIN -->
-
-<!-- SOURCE-BLOCK IT:44 END -->
 
 [Previous chapter](3-as-built-deviation-and-defect-record.md) · [Chapter index](README.md) · [Next chapter](5-recovery-exercise-and-data-acceptance.md)

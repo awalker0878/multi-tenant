@@ -6,32 +6,14 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9c557d7d94dbdf24630994d2676aca3ddfa80e67c2910fb1a29ea4561c591dcf -->
-<!-- SOURCE-BLOCK NET:32 BEGIN -->
-
 <a id="__RefHeading___Toc5747_1525915568"></a>
 <a id="NET_s_002"></a>
 
-<!-- SOURCE-BLOCK NET:32 END -->
-
-<!-- SOURCE-BLOCK NET:33 BEGIN -->
-
 Parent architecture: [RA §4](../../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md#RA_s_004)  •  [RA §5](../../architecture/reference/5-physical-fabric-and-platform-attachment.md#RA_s_005)  •  [RA §8](../../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md#RA_s_008)  •  [RA §16](../../architecture/reference/16-nutanix-hosting-stack-reference-realization.md#RA_s_016)  •  [RA §17](../../architecture/reference/17-vmware-and-nsx-hosting-stack-reference-realization.md#RA_s_017)  •  [RA §18](../../architecture/reference/18-openstack-hosting-stack-reference-realization.md#RA_s_018)
-
-<!-- SOURCE-BLOCK NET:33 END -->
-
-<!-- SOURCE-BLOCK NET:34 BEGIN -->
 
 An attachment unit is one allocated routing and enforcement identity connecting a domain instance to its approved boundary service. It includes the domain-facing association, the security-service-facing association, address-family policy, permitted prefixes, lifecycle owner and its actual redundant transport members. An attachment unit is not inherently one VLAN, one cable, one firewall port or one vendor object. The chosen realization may require several of those resources.
 
-<!-- SOURCE-BLOCK NET:34 END -->
-
-<!-- SOURCE-BLOCK NET:35 BEGIN -->
-
 Use a separately isolated attachment as the baseline until sharing is proven. Sharing physical links is different from sharing a connected IP subnet. Where a shared segment exists, show how neighbour discovery, connected routes, gateway forwarding, NAT hairpin and source spoofing are constrained before a packet can reach another domain. A downstream firewall cannot protect traffic that never reaches it. \[[B2](07-references-parent-basis-and-external-context.md#NET_src_B2) §§8, 16–18\]
-
-<!-- SOURCE-BLOCK NET:35 END -->
-
-<!-- SOURCE-BLOCK NET:36 BEGIN -->
 
 
 <a id="source-table-36"></a>
@@ -45,19 +27,7 @@ Use a separately isolated attachment as the baseline until sharing is proven. Sh
 | Security identity | Tenant/domain/WSD attribution preserved across translation if present. | Native anti-spoofing, tags, interfaces and log correlation. |
 | Lifecycle | Reserved → configured under deny → verified → allocated → drained → quarantined/reusable. | Reservation timeout, reuse condition and authoritative inventory. |
 
-<!-- SOURCE-BLOCK NET:36 END -->
-
-<!-- SOURCE-BLOCK NET:37 BEGIN -->
-
-<!-- SOURCE-BLOCK NET:37 END -->
-
-<!-- SOURCE-BLOCK NET:38 BEGIN -->
-
 For the common fixture, four independent domain instances require four logical domain attachments: A01O, A01R, A02O and A02R. This is not a count of physical links or device instances. Two tenant OZ↔RZ relations are required. Shared services may require additional boundary associations; these are counted from their actual placement and cannot be hidden inside the four-domain number. Redundant members and management attachments are accounted for separately.
-
-<!-- SOURCE-BLOCK NET:38 END -->
-
-<!-- SOURCE-BLOCK NET:39 BEGIN -->
 
 
 <a id="source-table-39"></a>
@@ -69,23 +39,9 @@ For the common fixture, four independent domain instances require four logical d
 | Policy/session capacity | Measure policy objects, connections and inspected traffic under failure. | A free context does not justify accepting workload load beyond surviving capacity. |
 | Physical attachment inventory | Precommission only supported contexts/ports/identifiers; retain ownership of spare slots. | Expansion is a P1/P3 foundation change, not a tenant workaround. |
 
-<!-- SOURCE-BLOCK NET:39 END -->
-
-<!-- SOURCE-BLOCK NET:40 BEGIN -->
-
-<!-- SOURCE-BLOCK NET:40 END -->
-
-<!-- SOURCE-BLOCK NET:41 BEGIN -->
-
 Allocation reserves the whole required bundle, not merely the first free VLAN. Failed provisioning leaves the reservation owned while native task outcomes are reconciled. Reuse follows withdrawal of routes, sessions, addresses and policy plus the selected quarantine checks. Spare capacity is a service-design cost and should be measured against delivery latency and failure reserve, not presented as free scalability.
 
-<!-- SOURCE-BLOCK NET:41 END -->
-
-<!-- SOURCE-BLOCK NET:42 BEGIN -->
-
 Related engineering: [Provisioning handoff contents](../../implementation/provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md#PROV_s_001)  •  [Capacity admission example](../../assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md#QUAL_s_003)
-
-<!-- SOURCE-BLOCK NET:42 END -->
 
 [Previous chapter](1-transport-routing-and-overlay-ownership.md) · [Chapter index](README.md) · [Next chapter](3-worked-inter-zone-routing-and-enforcement-schedule.md)
 

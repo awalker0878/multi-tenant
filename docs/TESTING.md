@@ -99,3 +99,8 @@ Reviewed for repository design; exact installed component qualification remains 
 ## Documentation migration gate
 
 Run `python scripts/check_documentation.py` to verify full source conversion, table and field retention, diagram bytes, local Markdown anchors and source-backed ADRs. This does not rewrite documents, fetch sources, execute Terraform/Ansible, contact a target, or issue architecture acceptance. Reports are written only below `build/reports/`.
+
+
+## Completion-corrective release verification
+
+`python tools/check_release.py` checks a clean current Git checkout, not the historical file list. Exported releases require their explicit snapshot manifest. `python scripts/check_documentation.py` adds independently parsed code/tab/break fidelity, ordered table cells, exact ADR rendering/lifecycle, maintained design records and complete test/allocation indexes. `tools/verify_terraform.py --mock-tests` exports schemas from backend-free modules only, validates roots with `-backend=false`, and validates committed locks read-only. Passing that job does not contact native services. Ansible negative checks require genuine failed local assertions, not timeouts. Current CI source hashes and run identity are recorded in reports.

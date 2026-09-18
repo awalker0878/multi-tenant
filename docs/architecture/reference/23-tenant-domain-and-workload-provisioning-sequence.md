@@ -6,20 +6,10 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19 -->
-<!-- SOURCE-BLOCK RA:323 BEGIN -->
-
 <a id="__RefHeading___Toc3684_865363315"></a>
 <a id="RA_s_023"></a>
 
-<!-- SOURCE-BLOCK RA:323 END -->
-
-<!-- SOURCE-BLOCK RA:324 BEGIN -->
-
 The consumer supplies the required hosting environment, not the vendor topology. Minimum inputs are accountable tenant/service ownership; confidentiality, integrity and availability context; requested compute/storage classes; zone membership; permitted service flows; shared-service needs; external exposure; availability/recovery and location constraints; and lifecycle/retention requirements. These can be captured in a human-readable deployment specification and translated to automation inputs. Detailed schema design belongs to the implementation annex.
-
-<!-- SOURCE-BLOCK RA:324 END -->
-
-<!-- SOURCE-BLOCK RA:325 BEGIN -->
 
 
 <a id="source-table-325"></a>
@@ -37,53 +27,19 @@ The consumer supplies the required hosting environment, not the vendor topology.
 | 9 — Activate | Enable only the approved external exposure/production connections; verify the live service path | Activation is reversible; failed external checks withdraw exposure without destroying data |
 | 10 — Hand over | Record as-built resources, responsibilities, evidence and accepted operating conditions | Service Ready only when the delivered scope and required authorization conditions are satisfied |
 
-<!-- SOURCE-BLOCK RA:325 END -->
-
-<!-- SOURCE-BLOCK RA:326 BEGIN -->
-
-<!-- SOURCE-BLOCK RA:326 END -->
-
-<!-- SOURCE-BLOCK RA:327 BEGIN -->
-
 The forward sequence is not one atomic transaction. A cloud API may accept a request before routing or policy is realized, and a runner can lose a response after a resource was created. Operations therefore keep stable request/resource identities, discover actual state and resume or safely compensate. Capacity, address and attachment reservations are reconciled rather than leaked or duplicated.
-
-<!-- SOURCE-BLOCK RA:327 END -->
-
-<!-- SOURCE-BLOCK RA:328 BEGIN -->
 
 ## Cross-stack example
 
-<!-- SOURCE-BLOCK RA:328 END -->
-
-<!-- SOURCE-BLOCK RA:329 BEGIN -->
-
 Consider a tenant requesting one internal OZ network, one RZ network, compute in both, protected storage, DNS/time/logging/backup and one approved OZ-to-RZ service flow, with no Internet exposure. On Nutanix, the domain realization uses separate qualified VPC contexts and Flow policy. On VMware/NSX, it uses segments, Tier-1s and isolated upstream contexts. On OpenStack, it uses separate Neutron domain contexts, ports and baseline security controls. All three also require the provider ZIP, authoritative addresses/names, protection service and evidence under their respective owners.
-
-<!-- SOURCE-BLOCK RA:329 END -->
-
-<!-- SOURCE-BLOCK RA:330 BEGIN -->
 
 The requirement and acceptance outcome remain the same; the native build steps differ. Creating VMs successfully on each platform is not enough. The deployment must also demonstrate that the intended inter-zone flow works, unapproved paths are denied, management is unreachable from workloads, storage/protection ownership is correct, and later changes and retirement clean up the associated resources.
 
-<!-- SOURCE-BLOCK RA:330 END -->
-
-<!-- SOURCE-BLOCK RA:331 BEGIN -->
-
 ## Updates to an existing environment
-
-<!-- SOURCE-BLOCK RA:331 END -->
-
-<!-- SOURCE-BLOCK RA:332 BEGIN -->
 
 A resize within entitled pools follows the normal resource-change path. Adding a zone, new partner relationship, public exposure or a different isolation profile requires renewed architecture/security evaluation. Changed plans must match current resource state and approval. An emergency containment action remains authoritative until explicitly released; ordinary reconciliation must not restore the old allow path behind the incident owner’s back.
 
-<!-- SOURCE-BLOCK RA:332 END -->
-
-<!-- SOURCE-BLOCK RA:333 BEGIN -->
-
 Related engineering: [PROV §4 — End-to-end fixture provisioning and safe activation](../../implementation/provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md#PROV_s_004)  •  [VND §1 — One reference environment, three native realizations](../../engineering/platform-realizations/1-one-reference-environment-three-native-realizations.md#VND_s_001)
-
-<!-- SOURCE-BLOCK RA:333 END -->
 
 [Previous chapter](22-vendor-platform-and-shared-service-commissioning.md) · [Chapter index](README.md) · [Next chapter](24-terraform-across-the-vendor-stacks.md)
 

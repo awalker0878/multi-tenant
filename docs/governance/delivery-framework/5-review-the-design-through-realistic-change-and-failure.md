@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: d8c2790ff7bb408283a9156a369cc6c4394131e7d44bfd130bfa27e7d82b5783 -->
-<!-- SOURCE-BLOCK DEL:54 BEGIN -->
-
 <a id="DEL_05"></a>
-
-<!-- SOURCE-BLOCK DEL:54 END -->
-
-<!-- SOURCE-BLOCK DEL:55 BEGIN -->
 
 Cross-discipline review should expose the assumptions a build would otherwise discover late.
 
-<!-- SOURCE-BLOCK DEL:55 END -->
-
-<!-- SOURCE-BLOCK DEL:56 BEGIN -->
-
 Design basis and related records: [AK §7](../../architecture/delivery-guide/7-decisions-risk-and-review.md#AK_07)  •  [EK §8](../../engineering/delivery-guide/8-build-test-and-implementation-handoff.md#EK_08)  •  [IK §8](../../implementation/delivery-guide/8-interrupted-work-brownfield-adoption-and-change.md#IK_08)
-
-<!-- SOURCE-BLOCK DEL:56 END -->
-
-<!-- SOURCE-BLOCK DEL:57 BEGIN -->
 
 
 <a id="source-table-57"></a>
@@ -37,32 +23,10 @@ Design basis and related records: [AK §7](../../architecture/delivery-guide/7-d
 | Qualification | Show a healthy control, one meaningful failure and an independently reviewable artifact. | Campaign scope, assertion coverage, defect and retest plan. |
 | Readiness and lifecycle | Recover a known dataset and explain cutover, return after new writes and retained-copy disposal. | Initial readiness, operating acceptance and P6 obligations. |
 
-<!-- SOURCE-BLOCK DEL:57 END -->
-
-<!-- SOURCE-BLOCK DEL:58 BEGIN -->
-
-<!-- SOURCE-BLOCK DEL:58 END -->
-
-<!-- SOURCE-BLOCK DEL:59 BEGIN -->
-
 A design change needs impact review across linked views, schedules, native artifacts, test observations, service promises and deployed scopes. Reuse prior evidence only when its scope and freshness remain valid. A change to the source document alone does not alter a running environment.
-
-<!-- SOURCE-BLOCK DEL:59 END -->
-
-<!-- SOURCE-BLOCK DEL:60 BEGIN -->
 
 Each review yields an accepted disposition or an assigned blocker with owner, gate and evidence needed for closure. Do not use document length, test counts or the absence of schema errors as proof of architectural completeness.
 
-<!-- SOURCE-BLOCK DEL:60 END -->
-
-<!-- SOURCE-BLOCK DEL:61 BEGIN -->
-
 Continue with: [SDP §3](../../solutions/design-method/3-develop-a-boundary-architecture-decision.md#SDP_03)  •  [QCP §6](../../assurance/qualification-campaign/6-build-an-evidence-packet-a-reviewer-can-challenge.md#QCP_06)  •  [OPS §3](../../operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md#OPS_03)
-
-<!-- SOURCE-BLOCK DEL:61 END -->
-
-<!-- SOURCE-BLOCK DEL:62 BEGIN -->
-
-<!-- SOURCE-BLOCK DEL:62 END -->
 
 [Previous chapter](4-use-working-records-without-creating-duplicate-truth.md) · [Chapter index](README.md) · [Next chapter](6-resolve-the-actual-inputs-before-execution.md)

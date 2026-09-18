@@ -8,40 +8,18 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB11:951 BEGIN -->
-
 <a id="__RefHeading___Toc13431_1645000677"></a>
 <a id="app_C"></a>
 
-<!-- SOURCE-BLOCK HB11:951 END -->
-
-<!-- SOURCE-BLOCK HB11:952 BEGIN -->
-
 This index is generated from the same 194 records used for the full normative text in the chapters and in catalogues/requirements.json. All 99 original requirement/invariant IDs are retained or explicitly revised. Each record includes applicability, source basis, owner, verification procedures, exception policy and origin. The machine-readable catalogue contains the full text and metadata; the compact index below points to its defining chapter.
 
-<!-- SOURCE-BLOCK HB11:952 END -->
-
-<!-- SOURCE-BLOCK HB11:953 BEGIN -->
-
 Default applicability is all offered service classes, subject to the particular requirement’s capability or conditional wording. Every deviation follows section 59. A cited source is the documented basis/context of a local translation, not an assertion that the source uses the exact handbook wording. Verification remains specified-not-executed until target-environment evidence exists. Acceptance criteria AC-01–AC-20 are separate decision gates, not duplicate normative IDs.
-
-<!-- SOURCE-BLOCK HB11:953 END -->
-
-<!-- SOURCE-BLOCK HB11:954 BEGIN -->
 
 <a id="__RefHeading___Toc13433_1645000677"></a>
 
 ## Generated requirement index
 
-<!-- SOURCE-BLOCK HB11:954 END -->
-
-<!-- SOURCE-BLOCK HB11:955 BEGIN -->
-
 ### Part I requirements
-
-<!-- SOURCE-BLOCK HB11:955 END -->
-
-<!-- SOURCE-BLOCK HB11:956 BEGIN -->
 
 
 <a id="source-table-956"></a>
@@ -72,15 +50,7 @@ Default applicability is all offered service classes, subject to the particular 
 | MODEL-001<br>§6 | Architecture authority<br>SHALL / new-v1.1 | CT-017, CT-025, CT-070<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | MODEL-002<br>§6 | Architecture authority<br>SHALL / new-v1.1 | CT-004, CT-008, CT-026<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00), [S01](77-appendix-h-primary-sources-and-implementation-references.md#S01), [S02](77-appendix-h-primary-sources-and-implementation-references.md#S02) |
 
-<!-- SOURCE-BLOCK HB11:956 END -->
-
-<!-- SOURCE-BLOCK HB11:957 BEGIN -->
-
 ### Part II requirements
-
-<!-- SOURCE-BLOCK HB11:957 END -->
-
-<!-- SOURCE-BLOCK HB11:958 BEGIN -->
 
 
 <a id="source-table-958"></a>
@@ -143,15 +113,7 @@ Default applicability is all offered service classes, subject to the particular 
 | SITE-003<br>§21 | Recovery operations<br>SHALL / retained-v1.0 | CT-052, CT-054<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | SITE-004<br>§21 | Recovery operations<br>SHALL / new-v1.1 | CT-035, CT-038, CT-054, CT-061<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 
-<!-- SOURCE-BLOCK HB11:958 END -->
-
-<!-- SOURCE-BLOCK HB11:959 BEGIN -->
-
 ### Part III requirements
-
-<!-- SOURCE-BLOCK HB11:959 END -->
-
-<!-- SOURCE-BLOCK HB11:960 BEGIN -->
 
 
 <a id="source-table-960"></a>
@@ -185,15 +147,7 @@ Default applicability is all offered service classes, subject to the particular 
 | SVCM-002<br>§30 | Capacity management<br>SHALL / new-v1.1 | CT-074<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | RESP-001<br>§31 | Service owner<br>SHALL / new-v1.1 | CT-062, CT-069<br>Basis: [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05), [S08](77-appendix-h-primary-sources-and-implementation-references.md#S08) |
 
-<!-- SOURCE-BLOCK HB11:960 END -->
-
-<!-- SOURCE-BLOCK HB11:961 BEGIN -->
-
 ### Part IV requirements
-
-<!-- SOURCE-BLOCK HB11:961 END -->
-
-<!-- SOURCE-BLOCK HB11:962 BEGIN -->
 
 
 <a id="source-table-962"></a>
@@ -224,15 +178,7 @@ Default applicability is all offered service classes, subject to the particular 
 | FUT-002<br>§38 | Platform engineering<br>SHALL / retained-v1.0 | CT-018, CT-065<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | FUT-003<br>§38 | Platform engineering<br>SHALL / new-v1.1 | CT-035, CT-037, CT-059, CT-065, CT-072<br>Basis: [S25](77-appendix-h-primary-sources-and-implementation-references.md#S25), [S26](77-appendix-h-primary-sources-and-implementation-references.md#S26) |
 
-<!-- SOURCE-BLOCK HB11:962 END -->
-
-<!-- SOURCE-BLOCK HB11:963 BEGIN -->
-
 ### Part V requirements
-
-<!-- SOURCE-BLOCK HB11:963 END -->
-
-<!-- SOURCE-BLOCK HB11:964 BEGIN -->
 
 
 <a id="source-table-964"></a>
@@ -267,15 +213,7 @@ Default applicability is all offered service classes, subject to the particular 
 | DRIFT-002<br>§46 | Operations/SRE<br>SHALL / retained-v1.0 | CT-014, CT-057<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | DRIFT-003<br>§46 | Incident response<br>SHALL / new-v1.1 | CT-057, CT-058, CT-066<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 
-<!-- SOURCE-BLOCK HB11:964 END -->
-
-<!-- SOURCE-BLOCK HB11:965 BEGIN -->
-
 ### Part VI requirements
-
-<!-- SOURCE-BLOCK HB11:965 END -->
-
-<!-- SOURCE-BLOCK HB11:966 BEGIN -->
 
 
 <a id="source-table-966"></a>
@@ -314,15 +252,7 @@ Default applicability is all offered service classes, subject to the particular 
 | MIG-002<br>§57 | Migration owner<br>SHALL / retained-v1.0 | CT-003, CT-060<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | MIG-003<br>§57 | Migration owner<br>SHALL / new-v1.1 | CT-054, CT-060, CT-073, CT-078<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 
-<!-- SOURCE-BLOCK HB11:966 END -->
-
-<!-- SOURCE-BLOCK HB11:967 BEGIN -->
-
 ### Part VII requirements
-
-<!-- SOURCE-BLOCK HB11:967 END -->
-
-<!-- SOURCE-BLOCK HB11:968 BEGIN -->
 
 
 <a id="source-table-968"></a>
@@ -338,7 +268,5 @@ Default applicability is all offered service classes, subject to the particular 
 | DEL-001<br>§61 | Delivery owner<br>SHALL / new-v1.1 | CT-001, CT-003, CT-004, CT-008, CT-013, CT-052, CT-069<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | DEL-002<br>§61 | Delivery owner<br>SHALL / new-v1.1 | CT-016, CT-060, CT-073<br>Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00) |
 | ACPT-001<br>§62 | Security authority<br>SHALL / new-v1.1 | CT-018, CT-049, CT-062, CT-069<br>Basis: [S04](77-appendix-h-primary-sources-and-implementation-references.md#S04), [S05](77-appendix-h-primary-sources-and-implementation-references.md#S05) |
-
-<!-- SOURCE-BLOCK HB11:968 END -->
 
 [Previous chapter](71-appendix-b-worked-requests-and-terraform-execution-boundary.md) · [Chapter index](README.md) · [Next chapter](73-appendix-d-conformance-test-catalogue.md)

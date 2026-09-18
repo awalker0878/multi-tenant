@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: d935614ed1639f56859dfe29bc226af4cfced35bafeb7d544440577ddaa95a09 -->
-<!-- SOURCE-BLOCK OPS:66 BEGIN -->
-
 <a id="OPS_06"></a>
-
-<!-- SOURCE-BLOCK OPS:66 END -->
-
-<!-- SOURCE-BLOCK OPS:67 BEGIN -->
 
 Provisioning target infrastructure and transferring existing workload state are separate activities with separate owners.
 
-<!-- SOURCE-BLOCK OPS:67 END -->
-
-<!-- SOURCE-BLOCK OPS:68 BEGIN -->
-
 Design basis and related records: [RA §27](../../architecture/reference/27-recovery-migration-and-retirement.md#RA_s_027)  •  [PROV §6](../../implementation/provisioning-strategy/6-brownfield-adoption-growth-and-retirement.md#PROV_s_006)  •  [QCP §7](../../assurance/qualification-campaign/7-compare-vendor-realizations-without-assuming-migration.md#QCP_07)
-
-<!-- SOURCE-BLOCK OPS:68 END -->
-
-<!-- SOURCE-BLOCK OPS:69 BEGIN -->
 
 
 <a id="source-table-69"></a>
@@ -37,39 +23,13 @@ Design basis and related records: [RA §27](../../architecture/reference/27-reco
 | Cut over and observe | Change only approved DNS/exposure/service access; verify the actual client path and protection. | Operating owner accepts current evidence and the point at which simple rollback ceases to be safe. |
 | Return or retire | Reconcile new writes before failback; otherwise retire the source under retention policy. | Reverse synchronization/recovery is supported; old data is not restarted as a competing current copy. |
 
-<!-- SOURCE-BLOCK OPS:69 END -->
-
-<!-- SOURCE-BLOCK OPS:70 BEGIN -->
-
-<!-- SOURCE-BLOCK OPS:70 END -->
-
-<!-- SOURCE-BLOCK OPS:71 BEGIN -->
-
 Before target writes, return to the source may be possible if the original state and authority remain valid. After target writes, restarting the old copy can lose or fork data. The runbook identifies that point of no simple rollback and the required reverse transfer or recovery process. “Rollback” must state its data implications.
-
-<!-- SOURCE-BLOCK OPS:71 END -->
-
-<!-- SOURCE-BLOCK OPS:72 BEGIN -->
 
 Temporary cross-domain transfer access is time-bound and reviewed. Persistent vendor live-mobility and storage-replication transports remain provider infrastructure with their own controlled membership; they are not recreated for each migration just to satisfy a temporary-access rule.
 
-<!-- SOURCE-BLOCK OPS:72 END -->
-
-<!-- SOURCE-BLOCK OPS:73 BEGIN -->
-
 A composite service actively using several stacks is a distinct architecture. Account for cross-stack latency, security edges, identity, shared-service loss and ownership before claiming it provides the same resilience as one bounded cell.
 
-<!-- SOURCE-BLOCK OPS:73 END -->
-
-<!-- SOURCE-BLOCK OPS:74 BEGIN -->
-
 Continue with: [OPS §7](7-retire-live-service-separately-from-retained-data.md#OPS_07)  •  [IT §8](../../templates/implementation-mop/8-migration-retirement-and-retained-data.md#IT_08)
-
-<!-- SOURCE-BLOCK OPS:74 END -->
-
-<!-- SOURCE-BLOCK OPS:75 BEGIN -->
-
-<!-- SOURCE-BLOCK OPS:75 END -->
 
 [Previous chapter](5-calculate-the-recovery-critical-path-and-data-point.md) · [Chapter index](README.md) · [Next chapter](7-retire-live-service-separately-from-retained-data.md)
 

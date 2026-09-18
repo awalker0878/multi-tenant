@@ -6,37 +6,15 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:70 BEGIN -->
-
 <a id="WD14_S06"></a>
-
-<!-- SOURCE-BLOCK WD:70 END -->
-
-<!-- SOURCE-BLOCK WD:71 BEGIN -->
 
 Each destination service /32 means a specifically approved endpoint, not the whole provider subnet. The table states intended routing; stateful policy separately constrains sources, destinations, protocols and initiation. Neither a route nor a successful ping constitutes permission.
 
-<!-- SOURCE-BLOCK WD:71 END -->
-
-<!-- SOURCE-BLOCK WD:72 BEGIN -->
-
 For processor-01 to data-01, the forward route is NG-D01O to EC-01 via .1, then EC-01 to NG-D01R via .6. The reply travels NG-D01R to EC-01 via .5, then EC-01 to NG-D01O via .2. The stateful enforcement point is EC-01 for Z01. A new unsolicited reverse connection remains denied.
-
-<!-- SOURCE-BLOCK WD:72 END -->
-
-<!-- SOURCE-BLOCK WD:73 BEGIN -->
 
 For processor-01 to the resolver, the path is NG-D01O, EC-01, SH-01, SE-01 and the named resolver. The resolver must return tenant-01 prefixes through SE-01, not whichever service-edge default is convenient. The service hosts require the supported return-routing or equivalent service-mediation design. Missing return control disqualifies this realization.
 
-<!-- SOURCE-BLOCK WD:73 END -->
-
-<!-- SOURCE-BLOCK WD:74 BEGIN -->
-
 The shared service segment is behind the security boundaries. EC and SE policies deny tenant access to service-router administrative addresses, all unlisted provider destinations and other tenant prefixes. Service endpoints do not forward arbitrary traffic and cannot initiate general connections back to tenants. This limits network transit, but does not remove the risk of a compromised shared service misusing the legitimate sessions or data entitlements it has; those residual risks belong in the service threat analysis.
-
-<!-- SOURCE-BLOCK WD:74 END -->
-
-<!-- SOURCE-BLOCK WD:75 BEGIN -->
 
 
 <a id="source-table-75"></a>
@@ -55,21 +33,7 @@ The shared service segment is behind the security boundaries. EC and SE policies
 | SE-02 | Tenant-02 exact /27 prefixes | 198.51.100.21; no routes to tenant-01 through this context. |
 | Service endpoint return routes | Tenant-01 /27s; tenant-02 /27s | 203.0.113.129 and .130 respectively; validate supported host/service routing. |
 
-<!-- SOURCE-BLOCK WD:75 END -->
-
-<!-- SOURCE-BLOCK WD:76 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:76 END -->
-
-<!-- SOURCE-BLOCK WD:77 BEGIN -->
-
 Related documents: [NET — Forward/reply and session semantics](../../engineering/fabric/README.md#V14_NET_START)  \|  [SVC — Shared-service authorizations](../../architecture/shared-services/README.md#V14_SVC_START)
-
-<!-- SOURCE-BLOCK WD:77 END -->
-
-<!-- SOURCE-BLOCK WD:78 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:78 END -->
 
 [Previous chapter](5-dedicated-handoff-inventory-and-route-ownership.md) · [Chapter index](README.md) · [Next chapter](7-service-permissions-and-non-ip-storage-paths.md)
 

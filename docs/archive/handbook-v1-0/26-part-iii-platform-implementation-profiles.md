@@ -8,8 +8,6 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:192 BEGIN -->
 
-<!-- SOURCE-BLOCK HB10:192 END -->
 
 [Previous chapter](21-multi-site-and-disaster-recovery-network-design.md) · [Chapter index](README.md) · [Next chapter](22-portability-and-platform-conformance.md)

@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 5e453a432a4b6c5af7d75ba266945bdb9e01118757cbeec1e15d81f92be32ab0 -->
-<!-- SOURCE-BLOCK VRC:24 BEGIN -->
-
 <a id="VC_02"></a>
-
-<!-- SOURCE-BLOCK VRC:24 END -->
-
-<!-- SOURCE-BLOCK VRC:25 BEGIN -->
 
 Reference mapping: AHV/AOS with protected Prism/Flow administration, separate domain routing contexts, protected endpoint policy and independently owned edge and shared-service integrations.
 
-<!-- SOURCE-BLOCK VRC:25 END -->
-
-<!-- SOURCE-BLOCK VRC:26 BEGIN -->
-
 Baseline and related records: [RA §16](../../architecture/reference/16-nutanix-hosting-stack-reference-realization.md#RA_s_016)  •  [VND §3](../platform-realizations/3-nutanix-component-path-and-lifecycle-realization.md#VND_s_003)  •  [WD §8](../../solutions/internal-protected-workload/8-mapping-the-schedules-into-each-vendor-stack.md#WD14_S08)
-
-<!-- SOURCE-BLOCK VRC:26 END -->
-
-<!-- SOURCE-BLOCK VRC:27 BEGIN -->
 
 
 <a id="source-table-27"></a>
@@ -38,32 +24,10 @@ Baseline and related records: [RA §16](../../architecture/reference/16-nutanix-
 | Provisioning sequence | Installer-owned P2 foundation → address/attachment reservation → denied domain networks → edge/routes/policy → VM/disks → services and tests. |
 | Acceptance / failure | Same-host/cross-host controls, native routing, return symmetry, lost task response, protected data, HA placement and isolated restore. |
 
-<!-- SOURCE-BLOCK VRC:27 END -->
-
-<!-- SOURCE-BLOCK VRC:28 BEGIN -->
-
-<!-- SOURCE-BLOCK VRC:28 END -->
-
-<!-- SOURCE-BLOCK VRC:29 BEGIN -->
-
 The official provider repository publishes compatibility and resource-specific lifecycle notes. Use the exact supported combination and inspect replacement/update behaviour; a v2 resource name does not prove every needed operation. No provider release is selected by this kit. \[K05\]
-
-<!-- SOURCE-BLOCK VRC:29 END -->
-
-<!-- SOURCE-BLOCK VRC:30 BEGIN -->
 
 External mechanism context: [K05 — Official Nutanix Terraform provider repository](https://github.com/nutanix/terraform-provider-nutanix)
 
-<!-- SOURCE-BLOCK VRC:30 END -->
-
-<!-- SOURCE-BLOCK VRC:31 BEGIN -->
-
 Stop when the actual gateway/handoff mechanism, required policy authority or resource lifecycle is unsupported or unproven. Use a reviewed alternative or exclude the capability; do not weaken the boundary to complete the run.
-
-<!-- SOURCE-BLOCK VRC:31 END -->
-
-<!-- SOURCE-BLOCK VRC:32 BEGIN -->
-
-<!-- SOURCE-BLOCK VRC:32 END -->
 
 [Previous chapter](1-common-scope-and-native-implementation-contract.md) · [Chapter index](README.md) · [Next chapter](3-vmware-and-nsx-realization-card.md)

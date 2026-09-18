@@ -8,12 +8,6 @@
 <!-- source-sha256: 8ddf5ff71f4779a15e56ed3708ace1f8315116ed1e6c9ce1f6a73276d7101a89 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK REV12:33 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:33 END -->
-
-<!-- SOURCE-BLOCK REV12:34 BEGIN -->
-
 
 <a id="source-table-34"></a>
 
@@ -29,11 +23,5 @@
 | H — Sources | Replaced / focused | Appendix B includes the source baseline and primary technical references used in this revision. |
 | I — Glossary | Replaced / focused | Appendix A retains infrastructure terminology; software-specific vocabulary removed. |
 | J — Audit/release machinery | Removed from main | Review provenance is here, not repeated as architecture content or new completion claims. |
-
-<!-- SOURCE-BLOCK REV12:34 END -->
-
-<!-- SOURCE-BLOCK REV12:35 BEGIN -->
-
-<!-- SOURCE-BLOCK REV12:35 END -->
 
 [Previous chapter](1-chapter-by-chapter-content-disposition.md) · [Chapter index](README.md) · [Next chapter](3-prior-requirement-identifier-disposition.md)

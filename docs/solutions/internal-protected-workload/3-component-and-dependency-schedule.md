@@ -6,31 +6,13 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db -->
-<!-- SOURCE-BLOCK WD:45 BEGIN -->
-
 <a id="WD14_S03"></a>
-
-<!-- SOURCE-BLOCK WD:45 END -->
-
-<!-- SOURCE-BLOCK WD:46 BEGIN -->
 
 The component IDs below are architecture identities, not mandated product object names. Where a security platform combines EC and SE functions, it must preserve their routing, policy and management scopes. Where it separates them, both members of the composed boundary belong in the path and failure record.
 
-<!-- SOURCE-BLOCK WD:46 END -->
-
-<!-- SOURCE-BLOCK WD:47 BEGIN -->
-
 Choose one hosting stack per qualification campaign. Repeating the same fixture on the next stack is portable alternative placement. Simultaneously splitting a production WSD between stacks is composite delivery and requires additional latency, dependency and recovery design.
 
-<!-- SOURCE-BLOCK WD:47 END -->
-
-<!-- SOURCE-BLOCK WD:48 BEGIN -->
-
 The provider service network and security contexts may be shared physical infrastructure. Its endpoints, managers, storage, keys and power dependencies remain in the failure and co-residency analysis. No row implies that one VM, two hosts or a named cluster satisfies a product minimum or a promised failure model.
-
-<!-- SOURCE-BLOCK WD:48 END -->
-
-<!-- SOURCE-BLOCK WD:49 BEGIN -->
 
 
 <a id="source-table-49"></a>
@@ -47,20 +29,6 @@ The provider service network and security contexts may be shared physical infras
 | BKP-REF / KEY-REF | Qualified protection catalogue/repository and key/trust service dependencies. | Protection and key custodians; routine tenant identities cannot destroy retained recovery. |
 | SITE-REF-B | Optional prequalified recovery target when the offered class includes site recovery. | Not automatically available; actual target capacity, keys, data and fencing must be accepted. |
 
-<!-- SOURCE-BLOCK WD:49 END -->
-
-<!-- SOURCE-BLOCK WD:50 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:50 END -->
-
-<!-- SOURCE-BLOCK WD:51 BEGIN -->
-
 Related documents: [QUAL — Actual site and failure records](../../assurance/site-qualification/README.md#V14_QUAL_START)  \|  [SVC — Service and recovery dependencies](../../architecture/shared-services/README.md#V14_SVC_START)
-
-<!-- SOURCE-BLOCK WD:51 END -->
-
-<!-- SOURCE-BLOCK WD:52 BEGIN -->
-
-<!-- SOURCE-BLOCK WD:52 END -->
 
 [Previous chapter](2-reference-decisions-and-infrastructure-boundaries.md) · [Chapter index](README.md) · [Next chapter](4-tenant-attachment-and-address-schedule.md)

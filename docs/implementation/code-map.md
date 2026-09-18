@@ -95,9 +95,3 @@ Current documentation checks are separate from native engine/CI or platform runs
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
-
-<!-- BEGIN ASSURANCE ALLOCATION LINKS -->
-
-[Assertion-level allocation](../assurance/implementation-allocation.md) · [All verification families](../assurance/verification-families.md) · [Historical finding dispositions](../assurance/historical-findings.md) · [Completion-audit corrections](../assurance/completion-audit.md)
-
-<!-- END ASSURANCE ALLOCATION LINKS -->

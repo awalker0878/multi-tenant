@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802 -->
-<!-- SOURCE-BLOCK AK:36 BEGIN -->
-
 <a id="AK_03"></a>
-
-<!-- SOURCE-BLOCK AK:36 END -->
-
-<!-- SOURCE-BLOCK AK:37 BEGIN -->
 
 Create views that answer distinct questions but share component and interface IDs. Combine diagrams where useful; completeness is coverage, not a required count of separate drawings.
 
-<!-- SOURCE-BLOCK AK:37 END -->
-
-<!-- SOURCE-BLOCK AK:38 BEGIN -->
-
 Baseline and related records: [RA §3](../reference/3-system-context-and-physical-hosting-topology.md#RA_s_003)  •  [RA §10](../reference/10-addressing-name-services-and-end-to-end-traffic.md#RA_s_010)  •  [AT §3](../../templates/hld/3-context-and-physical-deployment-views.md#AT_03)
-
-<!-- SOURCE-BLOCK AK:38 END -->
-
-<!-- SOURCE-BLOCK AK:39 BEGIN -->
 
 
 <a id="source-table-39"></a>
@@ -43,20 +29,6 @@ Baseline and related records: [RA §3](../reference/3-system-context-and-physica
 | V10 Provisioning and lifecycle | What is installed, allocated, changed and retired by each owner? P0–P6 resources, prerequisites, single-writer ownership, handoffs and safe stops. |
 | V11 Transition and operational model | How does the current environment become and remain the target? Adoption waves, dependencies, capacity, operating responsibilities, exit and disposal. |
 
-<!-- SOURCE-BLOCK AK:39 END -->
-
-<!-- SOURCE-BLOCK AK:40 BEGIN -->
-
-<!-- SOURCE-BLOCK AK:40 END -->
-
-<!-- SOURCE-BLOCK AK:41 BEGIN -->
-
 Use a legend for data, management and dependency relationships. Show administrative and failure boundaries separately from routing boundaries. Identify shared equipment explicitly. A redundant icon does not establish independent power, storage, controller, uplink or key dependencies.
-
-<!-- SOURCE-BLOCK AK:41 END -->
-
-<!-- SOURCE-BLOCK AK:42 BEGIN -->
-
-<!-- SOURCE-BLOCK AK:42 END -->
 
 [Previous chapter](2-service-requirements-and-applicability.md) · [Chapter index](README.md) · [Next chapter](4-security-management-and-co-residency-decisions.md)

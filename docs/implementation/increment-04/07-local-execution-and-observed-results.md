@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 9ca5c85333dcb51137ca694aea7b034e393fa8927831f0b475b3b88e842418f7 -->
-<!-- SOURCE-BLOCK IMP04:73 BEGIN -->
-
 <a id="chapter_7"></a>
-
-<!-- SOURCE-BLOCK IMP04:73 END -->
-
-<!-- SOURCE-BLOCK IMP04:74 BEGIN -->
 
 [Contents and release status](01-implementation-increment-04.md#chapter_1)
 
-<!-- SOURCE-BLOCK IMP04:74 END -->
-
-<!-- SOURCE-BLOCK IMP04:75 BEGIN -->
-
 The new fixture uses actual loopback TLS and HTTP GET exchanges with scripted published response shapes. It is not a vendor emulator. Task responses, fencing and quarantine records are controlled fault fixtures; actual native task execution, RBAC, fencing and HA were not exercised.
-
-<!-- SOURCE-BLOCK IMP04:75 END -->
-
-<!-- SOURCE-BLOCK IMP04:76 BEGIN -->
 
 
 <a id="source-table-76"></a>
@@ -38,52 +24,18 @@ The new fixture uses actual loopback TLS and HTTP GET exchanges with scripted pu
 | Offline dual-family route checks | 80 passed. Model calculations, not native or routed IPv6 execution. |
 | Terraform and native qualification | BLOCKED / NOT RUN. No actual plugin schema, lockfile, mocked-plan pass or vendor-side read claimed. |
 
-<!-- SOURCE-BLOCK IMP04:76 END -->
-
-<!-- SOURCE-BLOCK IMP04:77 BEGIN -->
-
 ## Faults that change the recovery decision
-
-<!-- SOURCE-BLOCK IMP04:77 END -->
-
-<!-- SOURCE-BLOCK IMP04:78 BEGIN -->
 
 The campaign exercises delayed task/publication completion, NSX configuration changing around status reads, stale intent versions, incomplete enforcing-system span, a failed Nutanix task with an existing resource, HTTP 404, wrong native tenant, changed ETag and incomplete affected entities. Unverified writer fencing, active containment and superseding generations remain holds even after selected-state match.
 
-<!-- SOURCE-BLOCK IMP04:78 END -->
-
-<!-- SOURCE-BLOCK IMP04:79 BEGIN -->
-
 Additional regressions cover untrusted TLS, redirects, proxy/keylog inheritance, malformed/ambiguous data, absent optional fields, rule order/negation/inline services, slow body delivery, exclusive journal creation, stale/future observations and tampered history. Passing local fixtures proves the implemented handling of those cases, not truthfulness or completeness of a real management plane.
-
-<!-- SOURCE-BLOCK IMP04:79 END -->
-
-<!-- SOURCE-BLOCK IMP04:80 BEGIN -->
 
 [Current local regression record](../../../quality/local_validation.json)
 
-<!-- SOURCE-BLOCK IMP04:80 END -->
-
-<!-- SOURCE-BLOCK IMP04:81 BEGIN -->
-
 [Native-readback campaign observations](../../../quality/local_native_readback.json)
-
-<!-- SOURCE-BLOCK IMP04:81 END -->
-
-<!-- SOURCE-BLOCK IMP04:82 BEGIN -->
 
 [Retained routed packet and identity campaign](../../../quality/local_packet_lab.json)
 
-<!-- SOURCE-BLOCK IMP04:82 END -->
-
-<!-- SOURCE-BLOCK IMP04:83 BEGIN -->
-
 [Actual Terraform blocker and download attempt](../../../quality/toolchain_access.json)
-
-<!-- SOURCE-BLOCK IMP04:83 END -->
-
-<!-- SOURCE-BLOCK IMP04:84 BEGIN -->
-
-<!-- SOURCE-BLOCK IMP04:84 END -->
 
 [Previous chapter](06-transport-credentials-and-protected-evidence.md) · [Chapter index](README.md) · [Next chapter](08-native-commissioning-and-stopping-conditions.md)

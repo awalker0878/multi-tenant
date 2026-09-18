@@ -8,20 +8,10 @@
 <!-- source-sha256: afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB11:711 BEGIN -->
-
 <a id="__RefHeading___Toc13401_1645000677"></a>
 <a id="sec_53"></a>
 
-<!-- SOURCE-BLOCK HB11:711 END -->
-
-<!-- SOURCE-BLOCK HB11:712 BEGIN -->
-
 Protect the control plane as a recoverable service. A platform whose backup catalog, keys, DNS, source repositories and privileged access can only be reached through the destroyed platform has a circular recovery dependency. Maintain controlled independent access to the minimum bootstrap material and exercise recovery from that condition. Independence does not require every service to be physically duplicated; it does require a tested path that survives the defined failure.
-
-<!-- SOURCE-BLOCK HB11:712 END -->
-
-<!-- SOURCE-BLOCK HB11:713 BEGIN -->
 
 
 <a id="source-table-713"></a>
@@ -37,46 +27,20 @@ Protect the control plane as a recoverable service. A platform whose backup cata
 | 7 | Run critical positive/negative tests, record achieved RTO/RPO, obtain activation authority and switch DNS/ingress through the approved cutover. |
 | 8 | Observe stability; plan failback with a new consistency point, reverse replication and fencing; remove temporary recovery connectivity after validation. |
 
-<!-- SOURCE-BLOCK HB11:713 END -->
-
-<!-- SOURCE-BLOCK HB11:714 BEGIN -->
-
 RPO is measured at the last recoverable consistent state, not merely the last completed replication job. RTO includes detection, decision, dependency recovery and application/service acceptance as defined by the service profile. Record what was excluded so comparisons remain meaningful. Recovery exercises cover unavailable keys, corrupted backups, missing identity dependencies and a failed primary control plane, not only a successful VM restore.
 
-<!-- SOURCE-BLOCK HB11:714 END -->
-
-<!-- SOURCE-BLOCK HB11:715 BEGIN -->
-
 Failback is a controlled migration, not a reversal performed during an unresolved partition. Verify data ownership and replication direction before any writes resume at the original site. Retain recovery evidence, temporary grants and final cleanup records. Update the runbook when the exercise reveals hidden dependencies.
-
-<!-- SOURCE-BLOCK HB11:715 END -->
-
-<!-- SOURCE-BLOCK HB11:716 BEGIN -->
 
 <a id="req_REC_001"></a>
 
 REC-001  Recovery procedures SHALL include independent bootstrap access, protected key/state/catalog recovery, dependency ordering, writer fencing, isolated validation and attributable activation authority.
 
-<!-- SOURCE-BLOCK HB11:716 END -->
-
-<!-- SOURCE-BLOCK HB11:717 BEGIN -->
-
 Continuity management  \|  Verify: [CT-052](73-appendix-d-conformance-test-catalogue.md#test_CT_052), [CT-054](73-appendix-d-conformance-test-catalogue.md#test_CT_054), [CT-055](73-appendix-d-conformance-test-catalogue.md#test_CT_055)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
-
-<!-- SOURCE-BLOCK HB11:717 END -->
-
-<!-- SOURCE-BLOCK HB11:718 BEGIN -->
 
 <a id="req_REC_002"></a>
 
 REC-002  Recovery and failback exercises SHALL measure actual service RTO/RPO, data consistency and security outcomes and SHALL remove temporary routes, grants and exposures after authorized completion.
 
-<!-- SOURCE-BLOCK HB11:718 END -->
-
-<!-- SOURCE-BLOCK HB11:719 BEGIN -->
-
 Continuity management  \|  Verify: [CT-052](73-appendix-d-conformance-test-catalogue.md#test_CT_052), [CT-054](73-appendix-d-conformance-test-catalogue.md#test_CT_054), [CT-055](73-appendix-d-conformance-test-catalogue.md#test_CT_055), [CT-060](73-appendix-d-conformance-test-catalogue.md#test_CT_060)  \|  Basis: [S00](77-appendix-h-primary-sources-and-implementation-references.md#S00)  \|  new-v1.1
-
-<!-- SOURCE-BLOCK HB11:719 END -->
 
 [Previous chapter](52-high-availability-and-dependency-failure-behavior.md) · [Chapter index](README.md) · [Next chapter](54-vulnerability-patch-and-support-lifecycle.md)

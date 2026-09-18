@@ -8,17 +8,7 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:227 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:227 END -->
-
-<!-- SOURCE-BLOCK HB10:228 BEGIN -->
-
 The portable API is the consumer-facing contract. It is versioned independently of platform modules and expresses desired outcomes. A schema registry validates syntax and semantic compatibility before platform selection.
-
-<!-- SOURCE-BLOCK HB10:228 END -->
-
-<!-- SOURCE-BLOCK HB10:229 BEGIN -->
 
 
 <a id="source-table-229"></a>
@@ -26,26 +16,16 @@ The portable API is the consumer-facing contract. It is versioned independently 
 | apiVersion: hosting.platform/v1<br>kind: WorkloadSecurityDomain<br>metadata:<br>  tenant: tenant-001<br>  name: application-prod<br>security:<br>  profile: protected-b-medium<br>  assurance: standard<br>placement:<br>  platform: auto<br>  availability: medium<br>zones:<br>  operations: { enabled: true }<br>  restricted: { enabled: true }<br>networks:<br>  frontend:   { zone: operations,  ipv4PrefixSize: 24, ipv6: true }<br>  database:   { zone: restricted, ipv4PrefixSize: 24, ipv6: true }<br>services:<br>  dns: true<br>  ntp: true<br>  identity: true<br>  logging: true<br>  backup: true<br>flows:<br>  - { source: frontend, destination: database, service: database }<br>exposure:<br>  publicIngress: false<br>  internetEgress: false<br> |
 | --- |
 
-<!-- SOURCE-BLOCK HB10:229 END -->
-
-<!-- SOURCE-BLOCK HB10:230 BEGIN -->
-
 
 <a id="source-table-230"></a>
 
 | API-001 | The portable API SHALL be versioned and backward-compatibility rules SHALL be published. |
 | --- | --- |
 
-<!-- SOURCE-BLOCK HB10:230 END -->
-
-<!-- SOURCE-BLOCK HB10:231 BEGIN -->
-
 
 <a id="source-table-231"></a>
 
 | API-002 | Vendor identifiers, VLAN/VNI/VRF details, route targets, raw firewall rules and raw next-hop routes SHALL NOT be part of the normal consumer contract. |
 | --- | --- |
-
-<!-- SOURCE-BLOCK HB10:231 END -->
 
 [Previous chapter](33-part-iv-zero-touch-automation-and-terraform.md) · [Chapter index](README.md) · [Next chapter](29-zero-touch-provisioning-workflow.md)

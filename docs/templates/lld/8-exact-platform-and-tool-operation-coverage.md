@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d -->
-<!-- SOURCE-BLOCK ET:68 BEGIN -->
-
 <a id="ET_08"></a>
-
-<!-- SOURCE-BLOCK ET:68 END -->
-
-<!-- SOURCE-BLOCK ET:69 BEGIN -->
 
 Actual site values are required. Complete the response fields and identify controlled schedule/diagram references. Unknown or unsupported items remain blocking for their affected scope.
 
-<!-- SOURCE-BLOCK ET:69 END -->
-
-<!-- SOURCE-BLOCK ET:70 BEGIN -->
-
 Baseline and related records: [VND §7](../../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md#VND_s_007)  •  [PROV §3](../../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md#PROV_s_003)
-
-<!-- SOURCE-BLOCK ET:70 END -->
-
-<!-- SOURCE-BLOCK ET:71 BEGIN -->
 
 
 <a id="source-table-71"></a>
@@ -38,20 +24,6 @@ Baseline and related records: [VND §7](../../engineering/platform-realizations/
 | Artifact provenance | Provider lock, immutable module/runner/artifact references and protected credential source. | {{ET\_PROVENANCE}} |
 | Unsupported operation | Accepted native alternative, owner, observation/cleanup or excluded capability. | {{ET\_ALTERNATIVE}} |
 
-<!-- SOURCE-BLOCK ET:71 END -->
-
-<!-- SOURCE-BLOCK ET:72 BEGIN -->
-
-<!-- SOURCE-BLOCK ET:72 END -->
-
-<!-- SOURCE-BLOCK ET:73 BEGIN -->
-
 Review disposition: Draft until the actual engineering authority accepts the named scope. A checked form or calculator result does not establish live support, qualification or authorization.
-
-<!-- SOURCE-BLOCK ET:73 END -->
-
-<!-- SOURCE-BLOCK ET:74 BEGIN -->
-
-<!-- SOURCE-BLOCK ET:74 END -->
 
 [Previous chapter](7-capacity-mtu-and-failure-calculations.md) · [Chapter index](README.md) · [Next chapter](9-build-and-qualification-design.md)

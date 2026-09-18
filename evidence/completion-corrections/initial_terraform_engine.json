@@ -1,0 +1,424 @@
+{
+  "kind": "TERRAFORM_TOOLCHAIN_CHECK",
+  "target_infrastructure": "NOT_CONTACTED_BY_THIS_SCRIPT",
+  "live_qualification": "NOT_RUN",
+  "mock_tests_requested": true,
+  "modules": [
+    {
+      "name": "nsx-domain",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"quarantine_configuration\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "e95e0e6e03638ad48c1358d75ba188904d472fe3c608a9719d93bdba1c0f9da1",
+      "lock_sha256": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nsx-gateway-quarantine",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"scoped_drop_plan\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "e95e0e6e03638ad48c1358d75ba188904d472fe3c608a9719d93bdba1c0f9da1",
+      "lock_sha256": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nsx-route",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/route.tftest.hcl... in progress\n  run \"restricted_route_plan\"... pass\ntests/route.tftest.hcl... tearing down\ntests/route.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "e95e0e6e03638ad48c1358d75ba188904d472fe3c608a9719d93bdba1c0f9da1",
+      "lock_sha256": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nutanix-domain",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"quarantine_configuration\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "f4fc4ea533fe51a829b2e05292737f548dfec9b2f7374aafd1f9feab1ed43ad3",
+      "lock_sha256": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nutanix-route",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/route.tftest.hcl... in progress\n  run \"restricted_route_plan\"... pass\ntests/route.tftest.hcl... tearing down\ntests/route.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "f4fc4ea533fe51a829b2e05292737f548dfec9b2f7374aafd1f9feab1ed43ad3",
+      "lock_sha256": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nutanix-workload",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"quarantine_configuration\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "f4fc4ea533fe51a829b2e05292737f548dfec9b2f7374aafd1f9feab1ed43ad3",
+      "lock_sha256": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "openstack-domain",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"quarantine_configuration\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "3c95d59f39806948f73bbea24ed4e8e87244978ecd7a17a205e274327f937a20",
+      "lock_sha256": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "openstack-route",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/route.tftest.hcl... in progress\n  run \"restricted_route_plan\"... pass\ntests/route.tftest.hcl... tearing down\ntests/route.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "3c95d59f39806948f73bbea24ed4e8e87244978ecd7a17a205e274327f937a20",
+      "lock_sha256": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "openstack-workload",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"quarantine_configuration\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "3c95d59f39806948f73bbea24ed4e8e87244978ecd7a17a205e274327f937a20",
+      "lock_sha256": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "vsphere-workload",
+      "validation": "PASSED",
+      "mock_tests": "PASSED",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "mock_output": "tests/quarantine.tftest.hcl... in progress\n  run \"quarantine_configuration\"... pass\ntests/quarantine.tftest.hcl... tearing down\ntests/quarantine.tftest.hcl... pass\n\nSuccess! 1 passed, 0 failed.\n",
+      "mock_exit": 0,
+      "schema_export": "EXPORTED_FROM_ACTUAL_PLUGINS",
+      "schema_sha256": "69e2fc36c382ef1251a6360fbfcc319c88909ff92b942d7136c71c3a049c9dad",
+      "lock_sha256": "51c991f1272f91046f0c5c3c13b90a838a64ded5684e6fabcd85c2744381b682",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    }
+  ],
+  "roots": [
+    {
+      "name": "nsx-domain",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nsx-gateway-quarantine",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nsx-route",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "005ec4f1531811596e440fdbdf91cd43d9f9bf09cdeb1a39a325268a77084ce2",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nutanix-domain",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nutanix-route",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "nutanix-workload",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "7b0b7f0cd2d23447f39e12d2e075a57d66a35ab9d27d5da4a053fe365b6bd7a0",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "openstack-domain",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "openstack-route",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "openstack-workload",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "3f5d84a3d983b34c0a93ba6f8c175b701fe0123a7b38cbbc55a414eb977a5596",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    },
+    {
+      "name": "vsphere-workload",
+      "validation": "PASSED",
+      "mock_tests": "NOT_APPLICABLE_ROOT",
+      "validation_report": {
+        "format_version": "1.0",
+        "valid": true,
+        "error_count": 0,
+        "warning_count": 0,
+        "diagnostics": []
+      },
+      "schema_export": "NOT_RUN_ROOT_BACKEND_BOUNDARY",
+      "schema_source": "matching backend-free module; provider constraints must match",
+      "matching_module_provider_requirements": true,
+      "lock_sha256": "51c991f1272f91046f0c5c3c13b90a838a64ded5684e6fabcd85c2744381b682",
+      "lock_origin": "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+    }
+  ],
+  "planned_module_count": 10,
+  "planned_root_count": 10,
+  "schema_export": "SEE_PER_DIRECTORY_RESULTS",
+  "source_files_sha256": {
+    "terraform/README.md": "f24968ee6d69c53d7ab8efae930dd7a021ed4437eb1e78640c65c757cac81844",
+    "terraform/modules/nsx-domain/README.md": "f0bff65697bc0124ef50835fde968a3b2e725691acddb434987d7de4f32919e8",
+    "terraform/modules/nsx-domain/main.tf.json": "cb1f0f3a2a740d9f098a8a554f05d6a78626d9298352bccd758da53b3c9bbbbf",
+    "terraform/modules/nsx-domain/tests/quarantine.tftest.hcl": "6742c3945755409b643fca171f8c6cbc518b0197e13d023ab9e122debe118f58",
+    "terraform/modules/nsx-gateway-quarantine/README.md": "1c93e58a70bfe2ccb3c52093205da965047bf74c53983d6f5054686cb71509c3",
+    "terraform/modules/nsx-gateway-quarantine/main.tf.json": "92827af266fb025757140f453f3fe9bcfb0e8f5c646590b6a52f9a9bbae92479",
+    "terraform/modules/nsx-gateway-quarantine/tests/quarantine.tftest.hcl": "9c5b75cbc523d68b59d6db247c031eacaf7b8533667f9cfaeac1e6f6c727fc54",
+    "terraform/modules/nsx-route/README.md": "4f1f41efbbb42f83db6b10cd55f3a0a571c3f2e7ff290fb7487e94ab125ea53e",
+    "terraform/modules/nsx-route/main.tf.json": "10421ef1101f0989bf4ca90ddc08ff30c1915f947d4469ae93e8c1623e8b3795",
+    "terraform/modules/nsx-route/tests/route.tftest.hcl": "611e9bbac7aa677b27b69c570986c15b45a805b040ae823a8a5c63a40f12a912",
+    "terraform/modules/nutanix-domain/README.md": "7651ccfd458f4256db00eba14314167ba7ad52be8c137f045841716dab2d1956",
+    "terraform/modules/nutanix-domain/main.tf.json": "f94f68123ad946687151f31604483060c2e9b1ab8897738f4b832f1b6d2f48bb",
+    "terraform/modules/nutanix-domain/tests/quarantine.tftest.hcl": "c47485d04a8db07e7a3eb1e68a7655b515e2125e3de1f5d1e4572ba58566a185",
+    "terraform/modules/nutanix-route/README.md": "d9b6d351aa4d96ce85ed3921c88ec474b25583919a90797a80d6c102a89954a0",
+    "terraform/modules/nutanix-route/main.tf.json": "70fc18107a7ade61199d589c09d7f314aca7fa8c60560e6158cdee2dc64ce52c",
+    "terraform/modules/nutanix-route/tests/route.tftest.hcl": "de18dce249aab3edb07c1b166cc3b88a8bfaeb62419fb83f049b7ad0652f9fc0",
+    "terraform/modules/nutanix-workload/README.md": "773ba0c0a91abe2a135fb39b5f059341688e7149d0f315c5ed96021d2da2f129",
+    "terraform/modules/nutanix-workload/main.tf.json": "e49da08576eb89a1f34389d648a12c4357061b059284b6281352424a5f8f9e7f",
+    "terraform/modules/nutanix-workload/tests/quarantine.tftest.hcl": "08b6a7f7e85f907b42b29b95f225a0bcaa7118c742b82151b6f3dec0ba4d8d95",
+    "terraform/modules/openstack-domain/README.md": "5259333b665e07223c5498893d4e8ab03a49c994aee5a44e0237f8d7d577aa44",
+    "terraform/modules/openstack-domain/main.tf.json": "9e81e10ea88565691069ffed683a82f70b73d1ebd4fe6b80494151371cd6364b",
+    "terraform/modules/openstack-domain/tests/quarantine.tftest.hcl": "062753c52e7fe67b6d87af819068ccdcf8637c14f71aa6a7354e9e8d6e91266b",
+    "terraform/modules/openstack-route/README.md": "8e3f9270ffbcb6962fa7b7f53461c71b4c66e1020aa6a49e234cccbdf6962eec",
+    "terraform/modules/openstack-route/main.tf.json": "1d6b60734da452f98b272f4ac9203537b405313961d74e6c9d0b59b201d24ae8",
+    "terraform/modules/openstack-route/tests/route.tftest.hcl": "0fdba9139aa7180e21a6eac6755e936978f54f25387f6414d8a20d933663068b",
+    "terraform/modules/openstack-workload/README.md": "376bb7e92ea15ce836f3337199a4eedad32111adfceeb25990959aa5f08ac5be",
+    "terraform/modules/openstack-workload/main.tf.json": "5b66228f29523c5abc4040245bf6908778bef7dacc98904bdf9bffb6973cb205",
+    "terraform/modules/openstack-workload/tests/quarantine.tftest.hcl": "71127fb13e0b93850aeb3b7e726f69b8f51277a349493feb488f0fee1b9ce485",
+    "terraform/modules/vsphere-workload/README.md": "e6d655c32893401f194326658fd348a0ddc9bcb139c482f66a9dec41020b1d2e",
+    "terraform/modules/vsphere-workload/main.tf.json": "09443fed3d4d86acfb2bcc79742a4e2b936befb907c667550984bc42ad72f0ce",
+    "terraform/modules/vsphere-workload/tests/quarantine.tftest.hcl": "a9667cf8883acee80c6db7fb8d791f92fb0b91e16607eef5fd626c88c87d90ae",
+    "terraform/roots/nsx-domain/inputs.tfvars.json.example": "00895426a5cd0516860c786f3d2a45da37c27761dc4eac27f309bee1db60bf85",
+    "terraform/roots/nsx-domain/main.tf.json": "aa467bc035829b714b33bacbd66685f3751aed8b292ad37c06ea6ac9e31fe23d",
+    "terraform/roots/nsx-gateway-quarantine/inputs.tfvars.json.example": "bbc58c1e84522ee01c2fede8f94ed6b374611d7e3fd3219f6af4ee1dfdad7992",
+    "terraform/roots/nsx-gateway-quarantine/main.tf.json": "25f33b985b083365d7bcfb576dfa4168325096011b533f1e8994b4faf99e165d",
+    "terraform/roots/nsx-route/inputs.tfvars.json.example": "52a7b9eb84e89f4db24aeb27d5b16c4bf2681f2eda9aad00359f55daea7596f1",
+    "terraform/roots/nsx-route/main.tf.json": "e95326b052c4bbf4c49503909c40086fcbefe0a932e651b2f3d1d5f9cbcfc1f6",
+    "terraform/roots/nutanix-domain/inputs.tfvars.json.example": "57d0247e3f5323b882144790fc4e34b0313e7e551b88196dd21383d99ee86181",
+    "terraform/roots/nutanix-domain/main.tf.json": "791756aa3f11361a303f5b24249c8c340ad7a723beb338b3919927c575454a99",
+    "terraform/roots/nutanix-route/inputs.tfvars.json.example": "5e3ee6f3deea4fb6b732d886788b82dec8a7ec1f2f6f2c85e1b8586275fa6fc2",
+    "terraform/roots/nutanix-route/main.tf.json": "66e3b58a5c538fe6001b2e22e30656684169f5bfcfb5c38c5c9ff3e9c036130b",
+    "terraform/roots/nutanix-workload/inputs.tfvars.json.example": "9712a94f66e52b3f7f822bf56d5c2493bc0f76f0657823087880de62a5295098",
+    "terraform/roots/nutanix-workload/main.tf.json": "1904957e511e29bc0fce172c9699a5a179eb30b62567efe21ab798ebabbb7065",
+    "terraform/roots/openstack-domain/inputs.tfvars.json.example": "9bb44af99793e4ab2ea29e1b8b9588d9ad45feb33dae801f1960d82199385a57",
+    "terraform/roots/openstack-domain/main.tf.json": "c033d0cd43440e6de52f02ae404124bde38688baffd620cbdeedcc5cb83de43d",
+    "terraform/roots/openstack-route/inputs.tfvars.json.example": "6550d4705aa9c63686193834bc202e7888e43699d43a5c9adcd09f6e8c1760a8",
+    "terraform/roots/openstack-route/main.tf.json": "f9516d6046f4aca2a79981af3089d57b8cb773412701c4d90292d3ba99273172",
+    "terraform/roots/openstack-workload/inputs.tfvars.json.example": "0905ae1b8ecc822f635f628dec8040b448493dd3ce8196165ee8ca1ad69e86ff",
+    "terraform/roots/openstack-workload/main.tf.json": "644244316fefb818ebd27fe7d1d133e3455e7e2de4d69465acd0b6296e0fa432",
+    "terraform/roots/vsphere-workload/inputs.tfvars.json.example": "fd4cf75ba7095bf4671b66a075b42d12b4cde186012c3f9540daf736613224a9",
+    "terraform/roots/vsphere-workload/main.tf.json": "1b47067a8ba1d22ab36d15b50734b3d3102a8c16d15c282f6663d6f78b9556dd",
+    "tools/verify_terraform.py": "299b93b8c0d09bdf6735569ba9b0eeb1aa4ff1ff0020eb4a36c69824bf6246e0"
+  },
+  "tested_source_sha256": "95f6b051f8c9ae87d0622f5326689a553aad0046b3829e9ed09322b708c5b534",
+  "ci_head_sha": "4c2dc7288152f4ad48c715aa86b6bb69ce859090",
+  "ci_run_id": "35294495699",
+  "backend_policy": "No state backend is initialized; roots are validated, not planned or schema-exported.",
+  "terraform_version": "1.13.5",
+  "status": "PASSED_TOOLCHAIN_ONLY",
+  "elapsed_seconds": 20.133
+}

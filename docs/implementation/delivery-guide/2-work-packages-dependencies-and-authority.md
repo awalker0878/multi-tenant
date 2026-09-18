@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41 -->
-<!-- SOURCE-BLOCK IK:25 BEGIN -->
-
 <a id="IK_02"></a>
-
-<!-- SOURCE-BLOCK IK:25 END -->
-
-<!-- SOURCE-BLOCK IK:26 BEGIN -->
 
 Maintain separate execution scopes even when one delivery workflow coordinates the whole environment. Handoffs pass only the identities, capacity and configuration facts the next owner needs.
 
-<!-- SOURCE-BLOCK IK:26 END -->
-
-<!-- SOURCE-BLOCK IK:27 BEGIN -->
-
 Baseline and related records: [RA §20](../../architecture/reference/20-provisioning-model-and-infrastructure-work-packages.md#RA_s_020)  •  [PROV §1](../provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md#PROV_s_001)  •  [WD §10](../../solutions/internal-protected-workload/10-resource-ownership-protection-and-change-receipts.md#WD14_S10)
-
-<!-- SOURCE-BLOCK IK:27 END -->
-
-<!-- SOURCE-BLOCK IK:28 BEGIN -->
 
 
 <a id="source-table-28"></a>
@@ -39,20 +25,6 @@ Baseline and related records: [RA §20](../../architecture/reference/20-provisio
 | P5 — resources/activation | Create owned VMs/disks, bind services, verify and activate within authority. | Current test evidence, initial operational readiness and accepted live path. |
 | P6 — lifecycle | Maintain, expand, recover, migrate or retire under the owning scopes. | Changed as-built records, requalification and retained-data obligations. |
 
-<!-- SOURCE-BLOCK IK:28 END -->
-
-<!-- SOURCE-BLOCK IK:29 BEGIN -->
-
-<!-- SOURCE-BLOCK IK:29 END -->
-
-<!-- SOURCE-BLOCK IK:30 BEGIN -->
-
 P2 installation can depend on accepted P0 bootstrap services. Complete P2/P3 offered-service acceptance together before ordinary tenant allocation. Record and retire temporary trust deliberately; do not create a circular recovery dependency.
-
-<!-- SOURCE-BLOCK IK:30 END -->
-
-<!-- SOURCE-BLOCK IK:31 BEGIN -->
-
-<!-- SOURCE-BLOCK IK:31 END -->
 
 [Previous chapter](1-implementation-workplan-and-required-inputs.md) · [Chapter index](README.md) · [Next chapter](3-staging-bootstrap-and-physical-commissioning.md)

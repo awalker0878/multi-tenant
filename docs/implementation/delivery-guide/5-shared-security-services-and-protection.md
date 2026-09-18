@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41 -->
-<!-- SOURCE-BLOCK IK:50 BEGIN -->
-
 <a id="IK_05"></a>
-
-<!-- SOURCE-BLOCK IK:50 END -->
-
-<!-- SOURCE-BLOCK IK:51 BEGIN -->
 
 Use RB-05. Shared services and ZIP capacity are provider infrastructure, not incidental tenant modules.
 
-<!-- SOURCE-BLOCK IK:51 END -->
-
-<!-- SOURCE-BLOCK IK:52 BEGIN -->
-
 Baseline and related records: [RA §9](../../architecture/reference/9-shared-services-ingress-and-controlled-egress.md#RA_s_009)  •  [RA §12](../../architecture/reference/12-storage-backup-and-data-isolation-architecture.md#RA_s_012)  •  [SVC §1](../../architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md#SVC_s_001)  •  [WD §7](../../solutions/internal-protected-workload/7-service-permissions-and-non-ip-storage-paths.md#WD14_S07)
-
-<!-- SOURCE-BLOCK IK:52 END -->
-
-<!-- SOURCE-BLOCK IK:53 BEGIN -->
 
 
 <a id="source-table-53"></a>
@@ -38,20 +24,6 @@ Baseline and related records: [RA §9](../../architecture/reference/9-shared-ser
 | Logging and monitoring | Events carry usable domain/workload identity; approved collection and time; loss/buffering visible; no broad management access. | Event examples, coverage and alert routing / operations owner. |
 | Storage and protection | Owned attachments/copies, supported capture path, separate transfer/admin, retained catalogue and protected keys; actual isolated restore. | Copy lineage, protection assignment and restore result / storage and backup owners. |
 
-<!-- SOURCE-BLOCK IK:53 END -->
-
-<!-- SOURCE-BLOCK IK:54 BEGIN -->
-
-<!-- SOURCE-BLOCK IK:54 END -->
-
-<!-- SOURCE-BLOCK IK:55 BEGIN -->
-
 Service reachability is not service entitlement. A shared resolver or repository must not forward tenant traffic or grant administrative rights. For the dedicated service-handoff example, service replies must select the originating tenant context; a convenient default route is not proof of symmetric enforcement.
-
-<!-- SOURCE-BLOCK IK:55 END -->
-
-<!-- SOURCE-BLOCK IK:56 BEGIN -->
-
-<!-- SOURCE-BLOCK IK:56 END -->
 
 [Previous chapter](4-native-platform-commissioning-tracks.md) · [Chapter index](README.md) · [Next chapter](6-restricted-qualification-and-meaningful-observations.md)

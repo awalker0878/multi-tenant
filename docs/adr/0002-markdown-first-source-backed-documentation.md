@@ -20,7 +20,7 @@ Extract documented architecture choices into proposed ADRs, preserving original 
 
 A catalogue alone was insufficient for the requested Git documentation. One large Markdown file per original would preserve text but make review and linking cumbersome. Rewriting from general knowledge would obscure lineage and could change the supplied architecture. Chapter decomposition preserves the source organization while subject indexes connect related content.
 
-Markdown is the working review surface for this package. A future normative change must update the applicable architecture, ADR, engineering and verification references together. Frozen Word originals remain provenance, not a second automatically synchronized live authoring surface. Source transcriptions are the initial baseline. Maintained Markdown changes use a reviewed block-amendment record. The converter refuses existing maintained chapters or nonempty amendments rather than overwriting them; regenerate source-only copies in a scratch directory.
+Converted chapter paths are immutable source transcriptions. Maintained design records live under `docs/current/`, with explicit parent sections, versions and change history. Edit current records through review without preserving superseded source wording merely to pass the transcription gate. Frozen-source refresh is prohibited from targeting `docs/current/`. ADR records and their governance fields are authoritative for generated ADR pages; no approval is inferred from a merge.
 
 ## Scope and exclusions
 

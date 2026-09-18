@@ -1,0 +1,142 @@
+[
+  {
+    "id": "RAD-M01",
+    "path": "docs/current/RAD-adoption.md",
+    "version": "0.1",
+    "status": "Proposed",
+    "owner_role": "Architecture authority",
+    "scope": "Reference adoption for a portable infrastructure service; no site-specific control assessment is implied.",
+    "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
+    "parent_sections": [
+      "docs/architecture/reference/1-purpose-scope-and-architectural-authority.md",
+      "docs/architecture/reference/7-tenant-environments-and-security-domain-placement.md",
+      "docs/architecture/reference/29-architecture-decisions-and-alternatives.md"
+    ],
+    "decision_authority": null,
+    "acceptance_evidence": null,
+    "change_history": [
+      {
+        "version": "0.1",
+        "date": "2026-09-18",
+        "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      }
+    ]
+  },
+  {
+    "id": "TAD-M01",
+    "path": "docs/current/TAD-infrastructure.md",
+    "version": "0.1",
+    "status": "Proposed",
+    "owner_role": "Platform, network and security engineering",
+    "scope": "Technical decomposition across the fabric, hosting stacks, security edge and shared services.",
+    "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
+    "parent_sections": [
+      "docs/architecture/reference/3-system-context-and-physical-hosting-topology.md",
+      "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md",
+      "docs/architecture/reference/15-cross-vendor-realization-model.md",
+      "docs/implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md"
+    ],
+    "decision_authority": null,
+    "acceptance_evidence": null,
+    "change_history": [
+      {
+        "version": "0.1",
+        "date": "2026-09-18",
+        "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      }
+    ]
+  },
+  {
+    "id": "SOL-M01",
+    "path": "docs/current/internal-hosting-solution.md",
+    "version": "0.1",
+    "status": "Proposed",
+    "owner_role": "Hosting solution architect",
+    "scope": "A newly maintained selection view of the existing two-tenant OZ/RZ reference fixture; no fresh addresses or service promises are invented.",
+    "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
+    "parent_sections": [
+      "docs/solutions/internal-protected-workload/2-reference-decisions-and-infrastructure-boundaries.md",
+      "docs/solutions/internal-protected-workload/5-dedicated-handoff-inventory-and-route-ownership.md",
+      "docs/solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md",
+      "docs/architecture/reference/28-architecture-acceptance-and-verification.md"
+    ],
+    "decision_authority": null,
+    "acceptance_evidence": null,
+    "change_history": [
+      {
+        "version": "0.1",
+        "date": "2026-09-18",
+        "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      }
+    ]
+  },
+  {
+    "id": "SOL-M02",
+    "path": "docs/current/public-hosting-design-profile.md",
+    "version": "0.1",
+    "status": "Proposed",
+    "owner_role": "Security and hosting solution architects",
+    "scope": "New design profile for a proposed PAZ/OZ/RZ extension; not the missing worked public-service solution and not an amendment enabling the internal fixture.",
+    "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
+    "parent_sections": [
+      "docs/architecture/reference/9-shared-services-ingress-and-controlled-egress.md",
+      "docs/architecture/reference/7-tenant-environments-and-security-domain-placement.md",
+      "docs/engineering/fabric/2-isolated-attachment-units-and-bounded-capacity.md"
+    ],
+    "decision_authority": null,
+    "acceptance_evidence": null,
+    "change_history": [
+      {
+        "version": "0.1",
+        "date": "2026-09-18",
+        "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      }
+    ]
+  },
+  {
+    "id": "ICD-M01",
+    "path": "docs/current/interface-agreements.md",
+    "version": "0.1",
+    "status": "Proposed",
+    "owner_role": "Producing and consuming infrastructure owners",
+    "scope": "Per-interface working design obligations across independently governed infrastructure.",
+    "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
+    "parent_sections": [
+      "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md",
+      "docs/engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md",
+      "docs/architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md"
+    ],
+    "decision_authority": null,
+    "acceptance_evidence": null,
+    "change_history": [
+      {
+        "version": "0.1",
+        "date": "2026-09-18",
+        "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      }
+    ]
+  },
+  {
+    "id": "TRANS-M01",
+    "path": "docs/current/transition-and-as-built.md",
+    "version": "0.1",
+    "status": "Proposed",
+    "owner_role": "Implementation and operations owners",
+    "scope": "New maintained transition/as-built record replacing no historical original; current and intermediate states must be observed.",
+    "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
+    "parent_sections": [
+      "docs/operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md",
+      "docs/operations/recovery-transition/6-migrate-and-fail-back-without-conflicting-writers.md",
+      "docs/assurance/site-qualification/7-operating-accountability-handover-and-change.md"
+    ],
+    "decision_authority": null,
+    "acceptance_evidence": null,
+    "change_history": [
+      {
+        "version": "0.1",
+        "date": "2026-09-18",
+        "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      }
+    ]
+  }
+]

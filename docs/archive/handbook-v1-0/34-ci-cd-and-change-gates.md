@@ -8,12 +8,6 @@
 <!-- source-sha256: 100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190 -->
 
 > **Historical only.** Use the [v1.4 reference architecture](../../architecture/reference/README.md) for the active design baseline. Conflicting historical text has not been silently reconciled.
-<!-- SOURCE-BLOCK HB10:273 BEGIN -->
-
-<!-- SOURCE-BLOCK HB10:273 END -->
-
-<!-- SOURCE-BLOCK HB10:274 BEGIN -->
-
 
 <a id="source-table-274"></a>
 
@@ -27,16 +21,10 @@
 | Verification | Connectivity/security/logging tests |
 | Evidence | Immutable/tamper-evident record and deployment provenance |
 
-<!-- SOURCE-BLOCK HB10:274 END -->
-
-<!-- SOURCE-BLOCK HB10:275 BEGIN -->
-
 
 <a id="source-table-275"></a>
 
 | CICD-001 | A change that modifies inter-zone policy, external exposure, route authority, management access, or assurance profile SHALL receive a higher change classification than an ordinary workload scale operation. |
 | --- | --- |
-
-<!-- SOURCE-BLOCK HB10:275 END -->
 
 [Previous chapter](33-secrets-and-automation-credentials.md) · [Chapter index](README.md) · [Next chapter](35-drift-and-reconciliation.md)

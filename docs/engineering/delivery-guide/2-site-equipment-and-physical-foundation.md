@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 0aeb8ee0a114d3ed23e97c684cc9812a0fa6ea5252e49f0c902132bf4e053a7d -->
-<!-- SOURCE-BLOCK EK:25 BEGIN -->
-
 <a id="EK_02"></a>
-
-<!-- SOURCE-BLOCK EK:25 END -->
-
-<!-- SOURCE-BLOCK EK:26 BEGIN -->
 
 The physical design supplies the inventory behind the logical diagrams. Shared power, rack, uplink, storage or management dependencies must be visible before redundancy is claimed.
 
-<!-- SOURCE-BLOCK EK:26 END -->
-
-<!-- SOURCE-BLOCK EK:27 BEGIN -->
-
 Baseline and related records: [RA §3](../../architecture/reference/3-system-context-and-physical-hosting-topology.md#RA_s_003)  •  [RA §4](../../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md#RA_s_004)  •  [RA §5](../../architecture/reference/5-physical-fabric-and-platform-attachment.md#RA_s_005)  •  [ET §2](../../templates/lld/2-physical-inventory-facility-and-port-schedule.md#ET_02)
-
-<!-- SOURCE-BLOCK EK:27 END -->
-
-<!-- SOURCE-BLOCK EK:28 BEGIN -->
 
 
 <a id="source-table-28"></a>
@@ -38,26 +24,8 @@ Baseline and related records: [RA §3](../../architecture/reference/3-system-con
 | OOB and management | Independent access path, actual switches/interfaces, permitted targets, privileged path and recovery dependency. |
 | Staging and support | Trusted firmware/images, secured initial configuration, asset matching, diagnostic handling and manufacturer-specific install/replacement method. |
 
-<!-- SOURCE-BLOCK EK:28 END -->
-
-<!-- SOURCE-BLOCK EK:29 BEGIN -->
-
-<!-- SOURCE-BLOCK EK:29 END -->
-
-<!-- SOURCE-BLOCK EK:30 BEGIN -->
-
 Choose qualified MLAG, EVPN multihoming or another supported host attachment pattern. Document peer-link/keepalive or Ethernet-segment behaviour, orphan endpoints, split-brain containment and supported drain/reload order. Do not equate matching feature names with interoperability.
 
-<!-- SOURCE-BLOCK EK:30 END -->
-
-<!-- SOURCE-BLOCK EK:31 BEGIN -->
-
 Physical installation and electrical/facility work are performed by qualified personnel following site and manufacturer procedures. This kit records approvals, labels and acceptance; it does not replace lifting, electrical, optical or equipment safety instructions.
-
-<!-- SOURCE-BLOCK EK:31 END -->
-
-<!-- SOURCE-BLOCK EK:32 BEGIN -->
-
-<!-- SOURCE-BLOCK EK:32 END -->
 
 [Previous chapter](1-engineering-work-plan-and-release-boundary.md) · [Chapter index](README.md) · [Next chapter](3-addressing-routing-policy-and-attachment-schedules.md)

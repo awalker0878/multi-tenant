@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d -->
-<!-- SOURCE-BLOCK ET:19 BEGIN -->
-
 <a id="ET_01"></a>
-
-<!-- SOURCE-BLOCK ET:19 END -->
-
-<!-- SOURCE-BLOCK ET:20 BEGIN -->
 
 Actual site values are required. Complete the response fields and identify controlled schedule/diagram references. Unknown or unsupported items remain blocking for their affected scope.
 
-<!-- SOURCE-BLOCK ET:20 END -->
-
-<!-- SOURCE-BLOCK ET:21 BEGIN -->
-
 Baseline and related records: [RA §30](../../architecture/reference/30-implementation-handoff-and-delivery-sequence.md#RA_s_030)  •  [AK §8](../../architecture/delivery-guide/8-engineering-handoff-and-change-impact.md#AK_08)
-
-<!-- SOURCE-BLOCK ET:21 END -->
-
-<!-- SOURCE-BLOCK ET:22 BEGIN -->
 
 
 <a id="source-table-22"></a>
@@ -38,20 +24,6 @@ Baseline and related records: [RA §30](../../architecture/reference/30-implemen
 | Known constraints | Explicit unresolved site inputs, owners and blocked build scopes. | {{ET\_GAPS}} |
 | Release boundary | What is buildable now versus candidate or excluded. | {{ET\_RELEASE}} |
 
-<!-- SOURCE-BLOCK ET:22 END -->
-
-<!-- SOURCE-BLOCK ET:23 BEGIN -->
-
-<!-- SOURCE-BLOCK ET:23 END -->
-
-<!-- SOURCE-BLOCK ET:24 BEGIN -->
-
 Review disposition: Draft until the actual engineering authority accepts the named scope. A checked form or calculator result does not establish live support, qualification or authorization.
-
-<!-- SOURCE-BLOCK ET:24 END -->
-
-<!-- SOURCE-BLOCK ET:25 BEGIN -->
-
-<!-- SOURCE-BLOCK ET:25 END -->
 
 [Chapter index](README.md) · [Next chapter](2-physical-inventory-facility-and-port-schedule.md)

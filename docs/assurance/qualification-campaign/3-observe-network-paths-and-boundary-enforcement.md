@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: 910b84a7b1772f27a456df31a09a96878a72e0f66c8f38cb7e5daaf79254007c -->
-<!-- SOURCE-BLOCK QCP:38 BEGIN -->
-
 <a id="QCP_03"></a>
-
-<!-- SOURCE-BLOCK QCP:38 END -->
-
-<!-- SOURCE-BLOCK QCP:39 BEGIN -->
 
 These four cards are controlled observations against the approved fixture. Bind native resource identities and actual configuration before execution.
 
-<!-- SOURCE-BLOCK QCP:39 END -->
-
-<!-- SOURCE-BLOCK QCP:40 BEGIN -->
-
 Design basis and related records: [NBD §2](../../engineering/network-boundaries/2-walk-f14-01-through-the-forward-and-reply-routes.md#NBD_02)  •  [NBD §3](../../engineering/network-boundaries/3-make-service-replies-choose-the-originating-context.md#NBD_03)  •  [NET §3](../../engineering/fabric/3-worked-inter-zone-routing-and-enforcement-schedule.md#NET_s_003)
-
-<!-- SOURCE-BLOCK QCP:40 END -->
-
-<!-- SOURCE-BLOCK QCP:41 BEGIN -->
 
 
 <a id="source-table-41"></a>
@@ -36,32 +22,10 @@ Design basis and related records: [NBD §2](../../engineering/network-boundaries
 | Q11-03: same-domain policy<br>CT-021, CT-022 | Place the temporary probe in one approved domain; verify same-host/cross-host cases where applicable. Compare approved and unapproved communication. | Mandatory policy applies without requiring a physical gateway hop. Retain placement and enforcement evidence and the probe cleanup receipt. |
 | Q11-04: shared-service return<br>CT-008, CT-023, CT-024 | Exercise the same resolver from both tenants. Trace each reply through its own SE/EC chain; check unbound service/admin targets and alternative connected paths. | Only entitled service use and origin-specific replies succeed. Retain service-side and edge observations; a shared endpoint is not tenant transit. |
 
-<!-- SOURCE-BLOCK QCP:41 END -->
-
-<!-- SOURCE-BLOCK QCP:42 BEGIN -->
-
-<!-- SOURCE-BLOCK QCP:42 END -->
-
-<!-- SOURCE-BLOCK QCP:43 BEGIN -->
-
 Inspect both configured and effective forwarding. A flow seen at the intended ZIP proves that flow’s observation point; it does not alone eliminate another native path. Include connected routes, summaries, alternate interfaces, NAT/PBR and failure next hops that could change enforcement.
-
-<!-- SOURCE-BLOCK QCP:43 END -->
-
-<!-- SOURCE-BLOCK QCP:44 BEGIN -->
 
 Every card records separate security and service outcomes. Unauthorized reachability fails the security assertion. An allowed connection that cannot operate fails its service assertion or is blocked by failed preconditions. Neither result is rescued by a successful Terraform run.
 
-<!-- SOURCE-BLOCK QCP:44 END -->
-
-<!-- SOURCE-BLOCK QCP:45 BEGIN -->
-
 Continue with: [QCP §6](6-build-an-evidence-packet-a-reviewer-can-challenge.md#QCP_06)  •  [IT §4](../../templates/implementation-mop/4-test-procedure-and-actual-execution-record.md#IT_04)
-
-<!-- SOURCE-BLOCK QCP:45 END -->
-
-<!-- SOURCE-BLOCK QCP:46 BEGIN -->
-
-<!-- SOURCE-BLOCK QCP:46 END -->
 
 [Previous chapter](2-size-and-control-the-qualification-fixture.md) · [Chapter index](README.md) · [Next chapter](4-observe-identity-storage-and-protocol-completeness.md)

@@ -13,3 +13,5 @@ This is a new **composition / navigation view of available source content**, not
 | Capacity, failure, build release and acceptance | [WD §9](../solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md) · [WD §11](../solutions/internal-protected-workload/11-test-resource-capacity-and-mtu-accounting.md) · [WD §12](../solutions/internal-protected-workload/12-failure-and-partition-decision-schedule.md) · [PBS §9](platform-build/9-release-a-native-build-package-that-can-be-independently-reviewed.md) · [QUAL §5](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md) |
 
 [Decision register](../adr/README.md) · [Solution design](../solutions/README.md) · [Working templates](../templates/README.md)
+
+[Maintained design workspace](../current/README.md) — current editable records, separately versioned from frozen transcriptions. See [completion-audit dispositions](../assurance/completion-corrections.md).

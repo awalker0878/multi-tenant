@@ -2,8 +2,8 @@
   "python": "3.13",
   "terraform": "1.13.5",
   "ansible_core": "2.19.7",
-  "status": "Candidate CI bootstrap pins; engine execution in authoring runtime blocked",
+  "status": "Actual initial GitHub Actions engine validation passed; final-source and installed-platform gates remain separate",
   "provider_pins": "sources/provider_interface_pins.json",
-  "lock_policy": "Commit actual generated .terraform.lock.hcl after checksum/provenance review; do not invent locks.",
+  "lock_policy": "Actual reviewed provider locks are committed; source locks initialize readonly. Module schemas export without state backends; native roots validate only.",
   "target_contact": "No native infrastructure credentials are used by CI."
 }

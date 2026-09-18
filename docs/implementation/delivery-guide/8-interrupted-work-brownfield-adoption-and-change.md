@@ -6,25 +6,11 @@
 > This is a source-content transcription, not a new approval or a current platform-validation result.
 
 <!-- source-sha256: b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41 -->
-<!-- SOURCE-BLOCK IK:72 BEGIN -->
-
 <a id="IK_08"></a>
-
-<!-- SOURCE-BLOCK IK:72 END -->
-
-<!-- SOURCE-BLOCK IK:73 BEGIN -->
 
 Use RB-07. A timeout, lost executor lease or revoked credential does not prove that an accepted native operation stopped.
 
-<!-- SOURCE-BLOCK IK:73 END -->
-
-<!-- SOURCE-BLOCK IK:74 BEGIN -->
-
 Baseline and related records: [PROV §5](../provisioning-strategy/5-concurrency-ownership-and-failed-execution.md#PROV_s_005)  •  [PROV §6](../provisioning-strategy/6-brownfield-adoption-growth-and-retirement.md#PROV_s_006)  •  [WD §10](../../solutions/internal-protected-workload/10-resource-ownership-protection-and-change-receipts.md#WD14_S10)
-
-<!-- SOURCE-BLOCK IK:74 END -->
-
-<!-- SOURCE-BLOCK IK:75 BEGIN -->
 
 
 <a id="source-table-75"></a>
@@ -38,26 +24,8 @@ Baseline and related records: [PROV §5](../provisioning-strategy/5-concurrency-
 | Emergency containment | Preserve the authorized containment action while reconciling ordinary desired configuration. | Only the designated authority releases the block; record before/after evidence. |
 | Upgrade or capacity expansion | Recheck support tuple, survivor capacity, actual rollback limits and changed assurance paths. | Qualify/canary the changed scope before broad promotion; preserve a recovery path. |
 
-<!-- SOURCE-BLOCK IK:75 END -->
-
-<!-- SOURCE-BLOCK IK:76 BEGIN -->
-
-<!-- SOURCE-BLOCK IK:76 END -->
-
-<!-- SOURCE-BLOCK IK:77 BEGIN -->
-
 A saved Terraform plan can be reviewed offline using the supplied review\_tfplan.py. It reports selected review triggers without inspecting secret-bearing before/after values. It does not evaluate all policy semantics, qualify the provider or approve an apply.
 
-<!-- SOURCE-BLOCK IK:77 END -->
-
-<!-- SOURCE-BLOCK IK:78 BEGIN -->
-
 External mechanism context: [K03 — Terraform providers within modules](https://developer.hashicorp.com/terraform/language/modules/develop/providers)  •  [K04 — Terraform dependency lock file](https://developer.hashicorp.com/terraform/language/files/dependency-lock)  •  [K11 — Terraform plan command reference](https://developer.hashicorp.com/terraform/cli/commands/plan)
-
-<!-- SOURCE-BLOCK IK:78 END -->
-
-<!-- SOURCE-BLOCK IK:79 BEGIN -->
-
-<!-- SOURCE-BLOCK IK:79 END -->
 
 [Previous chapter](7-tenant-provisioning-and-controlled-production-activation.md) · [Chapter index](README.md) · [Next chapter](9-operational-handover-recovery-migration-and-retirement.md)

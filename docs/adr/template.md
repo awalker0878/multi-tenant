@@ -1,8 +1,11 @@
 # ADR-NNNN — Decision title
 
-Status: Proposed<br>
-Date of actual decision: Not recorded<br>
-Accountable role / authority: To be assigned<br>
+Status: Proposed | Accepted | Superseded | Rejected (choose one)<br>
+Date of actual decision: Not recorded; required for a non-Proposed transition<br>
+Accountable role / authority: Assign the accountable role; do not invent an approving person<br>
+Scope: Define applicability<br>
+Decision record, rationale and evidence references: Required for non-Proposed states<br>
+Superseded by: Required only for Superseded; must refer to an accepted successor without cycles<br>
 Original source decision ID, version and chapter: To be linked
 
 ## Context
@@ -32,5 +35,3 @@ Link the exact requirement IDs, test assertions, code and actual evidence. Keep 
 ## Acceptance and supersession
 
 Record an actual accepting authority, scope, date and evidence only when supplied. Reference any superseded ADR; do not reuse an ID for a different decision.
-
-Canonical `governance` fields: `accountable_role`, `scope`, `recorded_date`, `decision_date`, `accepting_authority`, `evidence`, `rationale`, `supersedes`, `superseded_by`. Non-proposed states require actual authority/date/evidence; rejected or superseded decisions also require rationale. The successor must be adopted, and references reciprocal and cycle-free.

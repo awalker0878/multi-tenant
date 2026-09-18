@@ -23,8 +23,11 @@ from bs4 import BeautifulSoup
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from convert_word_docs import Source, q, plain, clean_text, digest
-from documentation_controls import block_checks, lifecycle_errors, adr_text, amendment_records
+from documentation_structure import check as check_structure
+from adr_lifecycle import validate as validate_adrs, render as render_adr
 from build_documentation import Builder
+from check_current_design import check as check_current
+from check_assurance_allocation import check as check_allocation
 
 MD=mistune.create_markdown(escape=False,plugins=['table','strikethrough','task_lists'])
 def normalized(s):return re.sub(r'\s+','',clean_text(s))
@@ -43,14 +46,6 @@ def run(root=ROOT):
     check('one manifest per source',set(bysource)==set(specs) and len(bysource)==len(manifest))
     actualdocx={str(p.relative_to(root)) for p in root.rglob('*.docx') if not any(x in p.parts for x in ('build','.git','.venv','evidence'))}
     check('all repository Word files converted',actualdocx=={d['source'] for d in manifest})
-    records=json.loads((root/'sources/documentation/adr_records.json').read_text())
-    reqs=list(csv.DictReader((root/'reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/requirements.csv').open(encoding='utf-8-sig',newline='')))
-    reqids={r['requirementId'] for r in reqs}
-    try:
-        amendments=amendment_records(root,specs,ledger,{a['id'] for a in records},reqids)
-        check('maintained amendment records valid',True)
-    except (ValueError,KeyError,TypeError) as exc:
-        amendments={};check('maintained amendment records valid',False,str(exc))
     cache={};ids={}
     def soup(path):
         if path not in cache:
@@ -88,12 +83,6 @@ def run(root=ROOT):
             if row['status']=='publication-navigation-replaced':
                 check(f'navigation-only exclusion: {d["id"]}/{row["block"]}',row['block'] in s.omitted)
                 metrics['navigation_blocks_replaced']+=1;continue
-            amendment=amendments.get((d['id'],row['block']))
-            for name,passed in block_checks(b,d['id'],row['block'],p.read_text(),parse,amendment):
-                check(name,passed)
-            if amendment:
-                metrics['explicitly_amended_blocks']+=1
-                continue
             textnorm=normalized(soup(p).get_text())
             # Compare each actual paragraph independently, including every table cell.
             paras=[b] if b.tag==q('w:p') else list(b.iter(q('w:p')))
@@ -147,19 +136,22 @@ def run(root=ROOT):
     allsourceids={x for a in records for x in a['source_decision_ids']}
     required={f'AD-{i:02d}' for i in range(1,16)}|{f'RD14-{i:02d}' for i in range(1,6)}|{'DEV-ADR-01'}
     check('all explicit architecture decision IDs mapped',required<=allsourceids)
-    lifecycle=lifecycle_errors(records)
-    check('ADR lifecycle records consistent',not lifecycle,lifecycle or None)
+    lifecycle_errors=validate_adrs(records)
+    check('ADR lifecycle validity',not lifecycle_errors,lifecycle_errors or None)
     builder=Builder(root)
+    crosswalk=list(csv.DictReader((root/'sources/documentation/adr_crosswalk.csv').open(newline='')))
+    index_text=(root/'docs/adr/README.md').read_text()
     for a in records:
-        p=root/builder.adrpath(a)
-        check('ADR rendered content and status match record: '+a['id'],p.is_file() and p.read_text()==adr_text(builder,a))
-    cross=list(csv.DictReader((root/'sources/documentation/adr_crosswalk.csv').open(newline='')))
-    byadr={a['id']:a for a in records}
-    check('ADR crosswalk status agrees',all(r['adr'] in byadr and r['status']==byadr[r['adr']]['status'] for r in cross))
-    index=(root/'docs/adr/README.md').read_text()
-    for a in records:
-        line=next((line for line in index.splitlines() if a['id']+' — '+a['title'] in line),'')
-        check('ADR index status agrees: '+a['id'],f'| {a["status"]} |' in line)
+        row=next((line for line in index_text.splitlines() if a['id']+' — ' in line), '')
+        check('ADR index state agrees: '+a['id'], '; '+a['status']+' |' in row)
+        mapped=[row for row in crosswalk if row['adr']==a['id']]
+        check('ADR crosswalk state agrees: '+a['id'],bool(mapped) and all(row['status']==a['status'] for row in mapped))
+        target=root/builder.adrpath(a)
+        check('ADR rendering agrees with record: '+a['id'], target.is_file() and target.read_text()==render_adr(a,builder))
+    structural=check_structure(root)
+    check('Independent code and ordered table structure',not structural['errors'],structural['errors'] or None)
+    metrics['independent_table_cells']=structural['cells']
+    metrics['independent_code_paragraphs']=structural['code_paragraphs']
     check('unique source-derived ADR IDs',len({a['id'] for a in records})==len(records))
     for a in records:
         check('ADR requirements resolve: '+a['id'],set(a['requirements'])<=reqids)
@@ -172,6 +164,12 @@ def run(root=ROOT):
         check('test status retained: '+row['id'],row['executionStatus']=='not-run')
         for field in ('preconditions','procedure','expected','evidence','cadence'):
             check('test wording: '+row['id']+' '+field,normalized(row[field]) in testtext)
+    current=check_current(root)
+    check('Maintained design metadata and source links',not current['errors'],current['errors'] or None)
+    allocation=check_allocation(root)
+    check('Assertion and test-family completeness',not allocation['errors'],allocation['errors'] or None)
+    metrics['maintained_design_records']=current['records']
+    metrics['implementation_allocation_rows']=allocation['allocation_rows']
     metrics['source_derived_adrs']=len(records)
     metrics['markdown_pages_checked']=len(paths)
     metrics['checks']=len(checks)
