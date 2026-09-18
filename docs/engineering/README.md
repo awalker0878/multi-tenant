@@ -37,6 +37,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Version, source provenance and lifecycle assurance](version-source-provenance-and-lifecycle-assurance.md)
 
+[Bounded extension adoption and qualification assurance](bounded-extension-adoption-and-qualification-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
