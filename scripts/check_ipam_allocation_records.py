@@ -189,8 +189,8 @@ def validate_record(record,*,as_of,root=ROOT):
             raise ValueError('RESERVED allocation has later lifecycle fields')
         if record['realization_ref'] is not None:raise ValueError('RESERVED allocation cannot claim realization')
     else:
-        if hold_expires is not None:
-            raise ValueError('Only RESERVED allocations carry a hold expiry')
+        if record['state']!='UNCERTAIN' and hold_expires is not None:
+            raise ValueError('Only RESERVED/UNCERTAIN allocations may carry a hold expiry')
 
     if confirmed is not None:
         if record['realization_ref'] is None:raise ValueError('Confirmed allocation requires realization reference')
@@ -205,7 +205,7 @@ def validate_record(record,*,as_of,root=ROOT):
         raise ValueError('Release cannot predate confirmation')
 
     cleanup=validate_cleanup(record['cleanup'],as_of=as_of)
-    if record['state'] in ('RESERVED','CONFIRMED','UNCERTAIN'):
+    if record['state'] in ('RESERVED','CONFIRMED'):
         if any(item['status']!='NOT_STARTED' for item in cleanup.values()):
             raise ValueError('Release cleanup cannot be asserted before release lifecycle')
     if record['state']=='RELEASE_PENDING':
@@ -223,8 +223,8 @@ def validate_record(record,*,as_of,root=ROOT):
             raise ValueError('RELEASED requires cleanup, quarantine and release receipt')
         if released<reuse_not_before:
             raise ValueError('Allocation released before reuse quarantine expired')
-    if record['state'] not in ('QUARANTINED','RELEASED') and reuse_not_before is not None:
-        raise ValueError('reuse_not_before only belongs to quarantine/released state')
+    if record['state'] not in ('QUARANTINED','RELEASED','UNCERTAIN') and reuse_not_before is not None:
+        raise ValueError('reuse_not_before only belongs to quarantine/released/uncertain state')
     if record['state']!='RELEASED' and released is not None:
         raise ValueError('released_at only belongs to RELEASED state')
 
