@@ -140,3 +140,8 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Reservation preflight and exported records
 
 `python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z` validates exported reservation evidence without becoming the authoritative reservation database. `python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE` confirms the current example remains held. The preflight checks immutable reservation/operation IDs, generation, exact capacity-demand binding, owner/expiry, dependency operation identities and existing conflict/uncertain outcomes. It cannot create, extend, consume or release reservations, allocate addresses, apply infrastructure or activate service.
+
+
+## Authoritative IPAM allocation handoff
+
+`python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z` validates exported authoritative-IPAM lifecycle evidence without storing actual allocation values. `python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD` asserts the current fail-closed handoff. Tests cover stable operation identity, conflicts, uncertain outcomes, confirmation after realization, release cleanup, reuse quarantine, overlap-exception references and rejection of caller-supplied address fields. Neither check reserves/releases addresses or writes DNS.
