@@ -72,6 +72,10 @@ jobs:
         run: python scripts/check_extension_adoption_assurance.py --as-of 2026-09-18T21:00:00Z > build/reports/extension_adoption_assurance.json
       - name: Extension readiness must remain held without adopted extension scope
         run: python scripts/check_extension_adoption_readiness.py examples/extension_adoption_readiness_intent.json.example --as-of 2026-09-18T21:00:00Z --expected-status HOLD_NO_CURRENT_EXTENSION_ADOPTION > build/reports/extension_adoption_readiness.json
+      - name: Knowledge-home and release-maintenance evidence remains non-authoritative
+        run: python scripts/check_knowledge_maintenance_assurance.py --as-of 2026-09-18T21:05:00Z > build/reports/knowledge_maintenance_assurance.json
+      - name: Knowledge maintenance must remain held without owner cadence and approved release record
+        run: python scripts/check_knowledge_maintenance_readiness.py examples/knowledge_maintenance_readiness_intent.json.example --as-of 2026-09-18T21:05:00Z --expected-status HOLD_NO_CURRENT_RELEASE_MAINTENANCE > build/reports/knowledge_maintenance_readiness.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
