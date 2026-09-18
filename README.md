@@ -64,3 +64,8 @@ The [platform-family eligibility precheck](docs/engineering/pre-placement-platfo
 ## Native PlatformProfile qualification
 
 The [native qualification dossier](docs/engineering/platform-native-qualification.md) binds an exact product/API/provider/hardware tuple to tested capabilities, assurance profiles, limits, current evidence, owners and a controlled approval reference. The active qualification index is intentionally empty; registry claims cannot become `NATIVE_QUALIFIED` merely by editing the capability file. Production authorization remains separate.
+
+
+## Site and service-class capacity eligibility
+
+The [site/service capacity precheck](docs/engineering/site-service-capacity-eligibility.md) evaluates current commissioned envelopes against required profiles, the accepted failure model, surviving capacity, operational reserve, commitments, unavailable capacity and supplied quota headroom. The active inventory is intentionally empty. A match identifies candidate envelopes only; it does not select a site, reserve capacity, allocate addresses, run Terraform or authorize activation.
