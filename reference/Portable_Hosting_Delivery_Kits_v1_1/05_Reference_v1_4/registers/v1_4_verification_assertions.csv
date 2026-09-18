@@ -1,0 +1,13 @@
+﻿assertion,observation,mapped_procedures_and_status
+W14-01 / routing completeness,"Every domain, edge, service next hop and return path matches the approved schedule.","CT-003, CT-009, CT-023, CT-024 / NOT RUN"
+W14-02 / service isolation,Only named service endpoints and authorized resource scope are reachable; router/admin and other tenant targets deny.,"CT-004, CT-008, CT-037 / NOT RUN"
+W14-03 / mandatory policy authority,"Tenant roles cannot attach a permissive group, disable port security or create an alternative native path.","CT-019, CT-020, CT-022, CT-066 / NOT RUN"
+W14-04 / family completeness,"Each offered address family has working allocation, routes, service replies, local controls and recovery.","CT-002, CT-031, CT-032 / NOT RUN"
+W14-05 / DNS completeness,"UDP, direct TCP and truncation/fallback work only against approved resolvers.",CT-008 plus explicit protocol observations / NOT RUN
+W14-06 / intra-domain fixture,Temporary probe verifies same-host and cross-host controls where that placement is approved.,"CT-021, CT-035 / NOT RUN"
+W14-07 / admission accounting,"Compute, data, context, service and edge commitments fit the same accepted failure basis.","CT-039, CT-056, CT-074 / NOT RUN"
+W14-08 / lost executor,Accepted native tasks and side effects are discovered; no duplicate allocation or competing writer appears.,"CT-044, CT-045, CT-046 / NOT RUN"
+W14-09 / activation dependencies,Production activation rejects missing applicable operating or promised recovery readiness.,"CT-062, CT-069 plus G3/G4 review / NOT RUN"
+W14-10 / shared-service failure,Permitted and denied paths retain the selected policy and declared service behavior during approved failure.,"CT-011, CT-012, CT-024, CT-050 / NOT RUN"
+W14-11 / retained recovery,"Required copy, catalogue and key access survive live WSD retirement; unauthorized destruction denies.","CT-051, CT-052, CT-053, CT-078 / NOT RUN"
+W14-12 / second-stack outcome,Repeat the declared environment and representative data recovery on a second eligible stack.,"CT-016, CT-060, CT-073 / NOT RUN"

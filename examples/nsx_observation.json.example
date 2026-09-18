@@ -1,0 +1,59 @@
+{
+  "platform": "nsx",
+  "origin": "https://nsx.site.invalid",
+  "operation_id": "replace-with-accepted-operation",
+  "tenant_id": "tenant-001",
+  "scope_id": "D01O",
+  "engineering_record_ref": "REPLACE-WITH-ACCEPTED-ENGINEERING",
+  "target_binding_ref": "REPLACE-WITH-ACCEPTED-TARGET-BINDING",
+  "contact_enabled": false,
+  "profile": "nsx-local-policy-v1-selected-fields",
+  "resources": [
+    {
+      "kind": "gateway_policy",
+      "path": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+      "expected": {
+        "id": "tenant-001-quarantine",
+        "path": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+        "resource_type": "GatewayPolicy",
+        "_revision": 7,
+        "category": "Emergency",
+        "sequence_number": 10,
+        "stateful": true,
+        "rules": [
+          {
+            "id": "deny-all",
+            "sequence_number": 10,
+            "action": "DROP",
+            "direction": "IN_OUT",
+            "ip_protocol": "IPV4_IPV6",
+            "logged": true,
+            "disabled": false,
+            "source_groups": [
+              "ANY"
+            ],
+            "destination_groups": [
+              "ANY"
+            ],
+            "sources_excluded": false,
+            "destinations_excluded": false,
+            "services": [
+              "ANY"
+            ],
+            "service_entries": [],
+            "profiles": [],
+            "scope": [
+              "/infra/tier-1s/domain-01"
+            ]
+          }
+        ]
+      },
+      "realization": {
+        "intent_version": "intent-23",
+        "enforcement_points": [
+          "/infra/sites/default/enforcement-points/default"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "//": "Candidate native exact-route resource. Terraform engine/provider tests remain required. Routing does not grant permission.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nsxt": {
+        "source": "vmware/nsxt",
+        "version": "= 3.10.0"
+      }
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "engineering_record_ref": {
+      "type": "string",
+      "description": "External accepted engineering change record; a string is not proof of approval",
+      "nullable": false
+    },
+    "attachment_acceptance_ref": {
+      "type": "string",
+      "description": "Evidence reference for the existing isolated target attachment and enforcement; not an automatic approval",
+      "nullable": false
+    },
+    "route_key": {
+      "type": "string",
+      "description": "Stable native route identity",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,31}$\", var.route_key))}",
+          "error_message": "Invalid input: Stable native route identity"
+        }
+      ]
+    },
+    "destination_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 destination; no default route in this increment",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.destination_cidr)) && try(tonumber(split(\"/\", var.destination_cidr)[1]) > 0, false)}",
+          "error_message": "Invalid input: Allocated canonical IPv4 destination; no default route in this increment"
+        },
+        {
+          "condition": "${try(format(\"%s/%s\", cidrhost(var.destination_cidr, 0), split(\"/\", var.destination_cidr)[1]) == var.destination_cidr, false)}",
+          "error_message": "Destination must be a canonical IPv4 network."
+        }
+      ]
+    },
+    "gateway_path": {
+      "type": "string",
+      "description": "Existing isolated Tier-0/VRF or Tier-1 gateway policy path",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^/infra/tier-[01]s/[^/]+$\", var.gateway_path))}",
+          "error_message": "Invalid input: Existing isolated Tier-0/VRF or Tier-1 gateway policy path"
+        }
+      ]
+    },
+    "next_hop_address": {
+      "type": "string",
+      "description": "Accepted directly reachable IPv4 next hop",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(format(\"%s/32\", var.next_hop_address)))}",
+          "error_message": "Invalid input: Accepted directly reachable IPv4 next hop"
+        }
+      ]
+    }
+  },
+  "resource": {
+    "nsxt_policy_static_route": {
+      "owned": {
+        "display_name": "${format(\"%s-%s-%s\", var.tenant_key, var.domain_key, var.route_key)}",
+        "description": "Owned exact IPv4 route on an accepted isolated Local Manager gateway.",
+        "gateway_path": "${var.gateway_path}",
+        "network": "${var.destination_cidr}",
+        "next_hop": [
+          {
+            "ip_address": "${var.next_hop_address}",
+            "admin_distance": 1
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0 && length(trimspace(var.engineering_record_ref)) > 0 && length(trimspace(var.attachment_acceptance_ref)) > 0}",
+              "error_message": "Only an independently authorized restricted build with accepted engineering and attachment records is eligible."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "route_reference": {
+      "value": "${nsxt_policy_static_route.owned.path}"
+    },
+    "destination_cidr": {
+      "value": "${var.destination_cidr}"
+    },
+    "engineering_record_ref": {
+      "value": "${var.engineering_record_ref}"
+    }
+  }
+}

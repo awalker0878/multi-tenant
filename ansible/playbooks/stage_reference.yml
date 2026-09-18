@@ -1,0 +1,8 @@
+---
+- name: Stage a reference engineering package locally
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  roles:
+    - role: configuration_bundle

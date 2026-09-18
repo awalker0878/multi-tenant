@@ -1,0 +1,999 @@
+{
+  "kind": "LOCAL_NAMESPACE_PACKET_FIXTURE",
+  "status": "PASSED_NAMESPACE_FIXTURE",
+  "scope": "IPv4 only; fixed documentation addresses; Linux routing/netfilter/socket fixture",
+  "fixture_sha256": "8b7fd1df0ce826b77bdae8360ecff6235999949b22f8eb8dabf9f3a2c1477cc9",
+  "source_sha256": {
+    "lab/run_namespace_lab.py": "9d9d606884ac3b01bba464800b974a5b51ff73481b8769d31bf911e21567687b",
+    "lab/worker.py": "d372aa807951f51ef2be93de1b6a6b11e87149e3333cff7730fcc000dc365664",
+    "lab/mini_filter.c": "159e3f096701069a76c6f0be703b278b5e57346a7445376ba5aa3410f6f8045f",
+    "lab/link_config.py": "140e47133c3844ca492d8c56bfa099685a5ae403225d4293d9030c1fa0fd7771",
+    "lab/mtls_fixture.py": "69bf43a93968a8b930deb995dddf8e8b9bf39d26c4f1e832af97e247024a6410",
+    "lab/mtls_scenarios.py": "67b10a1429f84938488ce9382fc6534b30d273b407c21400b868db361670095c"
+  },
+  "native_vendor_qualification": "NOT_RUN",
+  "ipv6_packet_execution": "NOT_IMPLEMENTED_IN_THIS_FIXTURE",
+  "production_firewall_selected": false,
+  "namespace_count": 17,
+  "kernel": "6.18.44",
+  "elapsed_seconds": 20.364,
+  "checks": [
+    {
+      "id": "PKT-001",
+      "name": "All challenge servers healthy before negative testing",
+      "status": "PASS",
+      "observed": {
+        "processor-01": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "data-01": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "processor-02": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "data-02": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "resolver": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "time": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "logs": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "repository": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        }
+      }
+    },
+    {
+      "id": "PKT-002",
+      "name": "Initial quarantine blocks an otherwise intended application path",
+      "status": "PASS",
+      "observed": {
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 0,
+          "forward_accepted_packets": 0
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 1,
+          "forward_accepted_packets": 0
+        }
+      }
+    },
+    {
+      "id": "PKT-003",
+      "name": "Tenant 01 permitted TCP request/reply",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "CHALLENGE_ECHO"
+      }
+    },
+    {
+      "id": "PKT-004",
+      "name": "Tenant 02 permitted TCP request/reply",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "CHALLENGE_ECHO"
+      }
+    },
+    {
+      "id": "PKT-005",
+      "name": "processor-01 DNS udp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-006",
+      "name": "processor-01 DNS tcp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "tcp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-007",
+      "name": "processor-01 DNS fallback",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp",
+          "tcp"
+        ],
+        "truncated_udp": true
+      }
+    },
+    {
+      "id": "PKT-008",
+      "name": "data-01 DNS udp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-009",
+      "name": "data-01 DNS tcp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "tcp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-010",
+      "name": "data-01 DNS fallback",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp",
+          "tcp"
+        ],
+        "truncated_udp": true
+      }
+    },
+    {
+      "id": "PKT-011",
+      "name": "processor-02 DNS udp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-012",
+      "name": "processor-02 DNS tcp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "tcp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-013",
+      "name": "processor-02 DNS fallback",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp",
+          "tcp"
+        ],
+        "truncated_udp": true
+      }
+    },
+    {
+      "id": "PKT-014",
+      "name": "data-02 DNS udp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-015",
+      "name": "data-02 DNS tcp",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "tcp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-016",
+      "name": "data-02 DNS fallback",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "udp",
+          "tcp"
+        ],
+        "truncated_udp": true
+      }
+    },
+    {
+      "id": "PKT-017",
+      "name": "Edge denies unapproved processor-01 to data-01:444",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-01",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 0,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 1,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-018",
+      "name": "Edge denies unapproved data-01 to processor-01:443",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-01",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 1,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 2,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-019",
+      "name": "Edge denies unapproved processor-02 to data-02:444",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-02",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 0,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 1,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-020",
+      "name": "Edge denies unapproved processor-01 to resolver:443",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-01",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 2,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 3,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-021",
+      "name": "Edge denies unapproved data-01 to time:443",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-01",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 3,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 4,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-022",
+      "name": "Edge denies unapproved data-02 to logs:443",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-02",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 1,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 2,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-023",
+      "name": "Edge denies unapproved processor-02 to repository:443",
+      "status": "PASS",
+      "observed": {
+        "healthy_control": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "probe": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "edge": "EC-02",
+        "before": {
+          "family": 4,
+          "forward_dropped_packets": 2,
+          "forward_accepted_packets": 58
+        },
+        "after": {
+          "family": 4,
+          "forward_dropped_packets": 3,
+          "forward_accepted_packets": 58
+        }
+      }
+    },
+    {
+      "id": "PKT-024",
+      "name": "Cross-tenant path absent processor-01 to data-02",
+      "status": "PASS",
+      "observed": {
+        "probe": {
+          "success": false,
+          "observation": "OSError",
+          "errno": 101
+        },
+        "routing_table": [
+          {
+            "dst": "192.0.2.0/27",
+            "dev": "v0b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "192.0.2.1",
+            "flags": []
+          },
+          {
+            "dst": "192.0.2.32/27",
+            "gateway": "198.51.100.1",
+            "dev": "v2b",
+            "flags": []
+          },
+          {
+            "dst": "198.51.100.0/30",
+            "dev": "v2b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "198.51.100.2",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.138",
+            "gateway": "198.51.100.1",
+            "dev": "v2b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.139",
+            "gateway": "198.51.100.1",
+            "dev": "v2b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.140",
+            "gateway": "198.51.100.1",
+            "dev": "v2b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.141",
+            "gateway": "198.51.100.1",
+            "dev": "v2b",
+            "flags": []
+          }
+        ],
+        "basis": "NO_ROUTE_NOT_FIREWALL_TIMEOUT"
+      }
+    },
+    {
+      "id": "PKT-025",
+      "name": "Cross-tenant path absent data-02 to processor-01",
+      "status": "PASS",
+      "observed": {
+        "probe": {
+          "success": false,
+          "observation": "OSError",
+          "errno": 101
+        },
+        "routing_table": [
+          {
+            "dst": "192.0.2.64/27",
+            "gateway": "198.51.100.13",
+            "dev": "v22b",
+            "flags": []
+          },
+          {
+            "dst": "192.0.2.96/27",
+            "dev": "v20b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "192.0.2.97",
+            "flags": []
+          },
+          {
+            "dst": "198.51.100.12/30",
+            "dev": "v22b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "198.51.100.14",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.138",
+            "gateway": "198.51.100.13",
+            "dev": "v22b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.139",
+            "gateway": "198.51.100.13",
+            "dev": "v22b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.140",
+            "gateway": "198.51.100.13",
+            "dev": "v22b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.141",
+            "gateway": "198.51.100.13",
+            "dev": "v22b",
+            "flags": []
+          }
+        ],
+        "basis": "NO_ROUTE_NOT_FIREWALL_TIMEOUT"
+      }
+    },
+    {
+      "id": "PKT-026",
+      "name": "Missing origin-specific DNS return route fails tenant01 but not tenant02",
+      "status": "PASS",
+      "observed": {
+        "affected": {
+          "success": false,
+          "transports": [],
+          "observation": "TimeoutError"
+        },
+        "unaffected": {
+          "success": true,
+          "transports": [
+            "tcp"
+          ],
+          "truncated_udp": false
+        }
+      }
+    },
+    {
+      "id": "PKT-027",
+      "name": "DNS recovers after exact return route restoration",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "transports": [
+          "tcp"
+        ],
+        "truncated_udp": false
+      }
+    },
+    {
+      "id": "PKT-028",
+      "name": "Established fixture session before containment",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "CHALLENGE_ECHO"
+      }
+    },
+    {
+      "id": "PKT-029",
+      "name": "Containment blocks existing and new traffic without affecting tenant02",
+      "status": "PASS",
+      "observed": {
+        "existing": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "new": {
+          "success": false,
+          "observation": "TimeoutError",
+          "errno": null
+        },
+        "unaffected": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "edge": {
+          "family": 4,
+          "forward_dropped_packets": 5,
+          "forward_accepted_packets": 0
+        },
+        "semantics": "Traffic stopped; no assertion of TCP reset or connection-table deletion"
+      }
+    },
+    {
+      "id": "PKT-030",
+      "name": "New session works after authorized fixture containment release",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "CHALLENGE_ECHO"
+      }
+    },
+    {
+      "id": "PKT-031",
+      "name": "Tenant01 edge link failure has no substitute permitted path; tenant02 remains available",
+      "status": "PASS",
+      "observed": {
+        "affected": {
+          "success": false,
+          "observation": "OSError",
+          "errno": 101
+        },
+        "unaffected": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        }
+      }
+    },
+    {
+      "id": "PKT-032",
+      "name": "Link and exact route reconciliation recover permitted traffic",
+      "status": "PASS",
+      "observed": {
+        "probe": {
+          "success": true,
+          "observation": "CHALLENGE_ECHO"
+        },
+        "routes_after_link_up_before_reconcile": [
+          {
+            "dst": "192.0.2.0/27",
+            "gateway": "198.51.100.2",
+            "dev": "v3b",
+            "flags": []
+          },
+          {
+            "dst": "198.51.100.0/30",
+            "dev": "v3b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "198.51.100.1",
+            "flags": []
+          },
+          {
+            "dst": "198.51.100.4/30",
+            "dev": "v7b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "198.51.100.5",
+            "flags": []
+          },
+          {
+            "dst": "198.51.100.16/30",
+            "dev": "v8b",
+            "protocol": "kernel",
+            "scope": "link",
+            "prefsrc": "198.51.100.17",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.138",
+            "gateway": "198.51.100.18",
+            "dev": "v8b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.139",
+            "gateway": "198.51.100.18",
+            "dev": "v8b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.140",
+            "gateway": "198.51.100.18",
+            "dev": "v8b",
+            "flags": []
+          },
+          {
+            "dst": "203.0.113.141",
+            "gateway": "198.51.100.18",
+            "dev": "v8b",
+            "flags": []
+          }
+        ]
+      }
+    },
+    {
+      "id": "PKT-033",
+      "name": "Service hosts do not forward packets",
+      "status": "PASS",
+      "observed": {
+        "forwarding": false,
+        "scope": "Fixture service hosts only; not native multi-tenant service authorization"
+      }
+    },
+    {
+      "id": "PKT-034",
+      "name": "mTLS accepted client over the routed OZ-to-RZ path",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+        "tls_version": "TLSv1.3",
+        "cipher": "TLS_AES_256_GCM_SHA384",
+        "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+      }
+    },
+    {
+      "id": "PKT-035",
+      "name": "Trusted other-tenant certificate denied by service resource authority on an allowed network path",
+      "status": "PASS",
+      "observed": {
+        "probe": {
+          "success": false,
+          "observation": "RESOURCE_DENIED",
+          "tls_version": "TLSv1.3"
+        },
+        "server_before": {
+          "authenticated": 1,
+          "authorized": 1,
+          "resource_denied": 0,
+          "handshake_failed": 0,
+          "withdrawn_connections": 0,
+          "active_sessions": 0,
+          "allowed_fingerprints": [
+            "ac67c19013402695404eeebd37e33c8c97c976ec7b68c21838df494fe1438506"
+          ]
+        },
+        "server_after": {
+          "authenticated": 2,
+          "authorized": 1,
+          "resource_denied": 1,
+          "handshake_failed": 0,
+          "withdrawn_connections": 0,
+          "active_sessions": 0,
+          "allowed_fingerprints": [
+            "ac67c19013402695404eeebd37e33c8c97c976ec7b68c21838df494fe1438506"
+          ]
+        },
+        "test_origin": "processor-01 with tenant-002 test identity"
+      }
+    },
+    {
+      "id": "PKT-036",
+      "name": "Missing client certificate rejected while valid identity still works",
+      "status": "PASS",
+      "observed": {
+        "denied": {
+          "success": false,
+          "observation": "SSLError"
+        },
+        "control": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-037",
+      "name": "Expired client certificate rejected while valid identity still works",
+      "status": "PASS",
+      "observed": {
+        "denied": {
+          "success": false,
+          "observation": "SSLError"
+        },
+        "control": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-038",
+      "name": "Untrusted issuer client certificate rejected while valid identity still works",
+      "status": "PASS",
+      "observed": {
+        "denied": {
+          "success": false,
+          "observation": "SSLError"
+        },
+        "control": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-039",
+      "name": "Incorrect server hostname rejected",
+      "status": "PASS",
+      "observed": {
+        "denied": {
+          "success": false,
+          "observation": "SSLCertVerificationError"
+        },
+        "control": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-040",
+      "name": "Untrusted server root rejected",
+      "status": "PASS",
+      "observed": {
+        "denied": {
+          "success": false,
+          "observation": "SSLCertVerificationError"
+        },
+        "control": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-041",
+      "name": "No plaintext fallback on the mTLS endpoint",
+      "status": "PASS",
+      "observed": {
+        "plaintext": {
+          "success": false,
+          "observation": "ConnectionResetError",
+          "errno": 104
+        },
+        "tls_control": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-042",
+      "name": "Old credential has an established authorized session before rotation",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+        "tls_version": "TLSv1.3",
+        "cipher": "TLS_AES_256_GCM_SHA384",
+        "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+      }
+    },
+    {
+      "id": "PKT-043",
+      "name": "Bounded credential overlap supports new and existing identities",
+      "status": "PASS",
+      "observed": {
+        "new": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        },
+        "old": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        }
+      }
+    },
+    {
+      "id": "PKT-044",
+      "name": "Credential withdrawal closes existing old session and denies new use without losing new session",
+      "status": "PASS",
+      "observed": {
+        "old_existing": {
+          "success": false,
+          "observation": "BrokenPipeError"
+        },
+        "old_new": {
+          "success": false,
+          "observation": "RESOURCE_DENIED",
+          "tls_version": "TLSv1.3"
+        },
+        "new_existing": {
+          "success": true,
+          "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+          "tls_version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+        },
+        "service": {
+          "authenticated": 10,
+          "authorized": 10,
+          "resource_denied": 1,
+          "handshake_failed": 6,
+          "withdrawn_connections": 1,
+          "active_sessions": 1,
+          "allowed_fingerprints": [
+            "15efa31c88b69ff714041c6e52531bc0f055701cdceabe3c5e6963b1b8cf862e"
+          ]
+        },
+        "meaning": "Resource grant withdrawal; not a CRL/OCSP claim"
+      }
+    },
+    {
+      "id": "PKT-045",
+      "name": "Resource entitlement withdrawal stops established and new sessions",
+      "status": "PASS",
+      "observed": {
+        "existing": {
+          "success": false,
+          "observation": "BrokenPipeError"
+        },
+        "new": {
+          "success": false,
+          "observation": "RESOURCE_DENIED",
+          "tls_version": "TLSv1.3"
+        }
+      }
+    },
+    {
+      "id": "PKT-046",
+      "name": "Explicit resource grant restoration recovers valid access",
+      "status": "PASS",
+      "observed": {
+        "success": true,
+        "observation": "AUTHENTICATED_RESOURCE_CHALLENGE",
+        "tls_version": "TLSv1.3",
+        "cipher": "TLS_AES_256_GCM_SHA384",
+        "server_certificate_sha256": "0bb2769ced6c59f7e10cd9af56c5eb19fb14e784b1ae27730c0daf31f6635531"
+      }
+    },
+    {
+      "id": "PKT-047",
+      "name": "Temporary TLS credential files removed after the exercise",
+      "status": "PASS",
+      "observed": {
+        "temporary_directory_exists": false
+      }
+    }
+  ],
+  "passed": 47,
+  "failed": 0,
+  "limitations": [
+    "No vendor overlay/hypervisor/API realization",
+    "No HA or full ZIP inspection equivalence",
+    "No NAT/PBR/ECMP/BGP or spoofing qualification",
+    "TLS1.3 and fingerprint resource authorization are ephemeral fixture mechanisms, not managed PKI or KMS",
+    "No enterprise identity federation, CRL/OCSP, encrypted storage or backup integration",
+    "No production changes"
+  ],
+  "original_namespace_configuration_unchanged": true
+}

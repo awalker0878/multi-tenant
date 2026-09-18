@@ -1,0 +1,7 @@
+{
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+  "python-docx": "1.2.0",
+  "lxml": "6.1.1",
+  "rendering": "Canonical DOCX render workflow in authoring environment; renderer not redistributed.",
+  "date": "2026-09-17"
+}

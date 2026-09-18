@@ -1,0 +1,182 @@
+{
+  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "openstack": {
+        "source": "terraform-provider-openstack/openstack",
+        "version": "= 3.4.0"
+      }
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "ipv4_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 domain prefix",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.ipv4_cidr))}",
+          "error_message": "Invalid value for Allocated canonical IPv4 domain prefix."
+        }
+      ]
+    },
+    "gateway_host_number": {
+      "type": "number",
+      "description": "Usable host offset for the native gateway",
+      "nullable": false,
+      "default": 1,
+      "validation": [
+        {
+          "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
+          "error_message": "Invalid value for Usable host offset for the native gateway."
+        }
+      ]
+    },
+    "project_id": {
+      "type": "string",
+      "description": "Keystone project ID matching the execution credential scope",
+      "nullable": false
+    }
+  },
+  "resource": {
+    "openstack_networking_network_v2": {
+      "domain": {
+        "name": "${var.tenant_key}-${var.domain_key}",
+        "tenant_id": "${var.project_id}",
+        "admin_state_up": false,
+        "shared": false,
+        "external": false,
+        "port_security_enabled": true,
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "openstack_networking_subnet_v2": {
+      "domain": {
+        "name": "${var.tenant_key}-${var.domain_key}-subnet",
+        "tenant_id": "${var.project_id}",
+        "network_id": "${openstack_networking_network_v2.domain.id}",
+        "cidr": "${var.ipv4_cidr}",
+        "ip_version": 4,
+        "gateway_ip": "${cidrhost(var.ipv4_cidr, var.gateway_host_number)}",
+        "enable_dhcp": false,
+        "dns_nameservers": [],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "openstack_networking_router_v2": {
+      "domain": {
+        "name": "${var.tenant_key}-${var.domain_key}-router",
+        "tenant_id": "${var.project_id}",
+        "admin_state_up": false,
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "openstack_networking_router_interface_v2": {
+      "domain": {
+        "router_id": "${openstack_networking_router_v2.domain.id}",
+        "subnet_id": "${openstack_networking_subnet_v2.domain.id}",
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "openstack_networking_secgroup_v2": {
+      "quarantine": {
+        "name": "${var.tenant_key}-${var.domain_key}-quarantine",
+        "tenant_id": "${var.project_id}",
+        "description": "No user traffic rules; explicit ports must use this group.",
+        "delete_default_rules": true,
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "network_id": {
+      "value": "${openstack_networking_network_v2.domain.id}"
+    },
+    "subnet_id": {
+      "value": "${openstack_networking_subnet_v2.domain.id}"
+    },
+    "router_id": {
+      "value": "${openstack_networking_router_v2.domain.id}"
+    },
+    "security_group_id": {
+      "value": "${openstack_networking_secgroup_v2.quarantine.id}"
+    },
+    "delivery_state": {
+      "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    }
+  }
+}

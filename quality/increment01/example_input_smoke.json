@@ -1,0 +1,44 @@
+[
+  {
+    "root": "nsx-domain",
+    "exit_code": 2,
+    "status": "BLOCKED_INPUTS",
+    "expected": "BLOCKED_INPUTS",
+    "observed_as_expected": true
+  },
+  {
+    "root": "nutanix-domain",
+    "exit_code": 2,
+    "status": "BLOCKED_INPUTS",
+    "expected": "BLOCKED_INPUTS",
+    "observed_as_expected": true
+  },
+  {
+    "root": "nutanix-workload",
+    "exit_code": 2,
+    "status": "BLOCKED_INPUTS",
+    "expected": "BLOCKED_INPUTS",
+    "observed_as_expected": true
+  },
+  {
+    "root": "openstack-domain",
+    "exit_code": 2,
+    "status": "BLOCKED_INPUTS",
+    "expected": "BLOCKED_INPUTS",
+    "observed_as_expected": true
+  },
+  {
+    "root": "openstack-workload",
+    "exit_code": 2,
+    "status": "BLOCKED_INPUTS",
+    "expected": "BLOCKED_INPUTS",
+    "observed_as_expected": true
+  },
+  {
+    "root": "vsphere-workload",
+    "exit_code": 2,
+    "status": "BLOCKED_INPUTS",
+    "expected": "BLOCKED_INPUTS",
+    "observed_as_expected": true
+  }
+]

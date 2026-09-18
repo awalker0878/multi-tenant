@@ -1,0 +1,4037 @@
+{
+  "SDP": {
+    "path": "01_Architecture/Service_Design_and_Decision_Development.docx",
+    "title": "Service Design and Architecture Decisions",
+    "subtitle": "Develop a service offer that engineering can translate into a bounded infrastructure design.",
+    "intro": "This supplement develops the decisions behind AK-01–AK-08. It supplies worked alternatives, a service-envelope method and an engineering handoff. It does not replace the HLD template or pre-approve any site. Use the existing architecture register as the project record; the examples here explain how to complete it.",
+    "sections": [
+      {
+        "title": "Define the offered service before choosing the build",
+        "lead": "An offer is a bounded combination of resources, connectivity, operating responsibility and recoverability—not the name of a hypervisor.",
+        "refs": [
+          [
+            "RA",
+            2
+          ],
+          [
+            "RA",
+            14
+          ],
+          [
+            "AK",
+            2
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Develop the initial offer around an internal VM environment with independent tenant OZ/RZ domains, declared shared-service consumption and no implicit public access. Describe the smallest unit that can be accepted: the WSD, its networks and data, the provider dependencies, and the agreed operating boundary. The same description becomes the input to each vendor realization."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Offer decision",
+              "Proposed internal baseline",
+              "Explicit additional decision"
+            ],
+            "rows": [
+              [
+                "Resources",
+                "Eligible VM and storage classes; capacity is allocated from accepted pools.",
+                "Accelerators, unusual virtual devices or bare-metal attachment require a separate service design."
+              ],
+              [
+                "Connectivity",
+                "Named intra-domain and ZIP-mediated inter-domain flows; scoped service endpoints.",
+                "Public ingress, partner access or Internet egress requires its own boundary and operational acceptance."
+              ],
+              [
+                "Continuity",
+                "A named local failure model and protection/restore method.",
+                "Site recovery is offered only with an eligible target, independent dependencies and measured recovery evidence."
+              ],
+              [
+                "Operations",
+                "Named infrastructure, guest, application and data owners.",
+                "Managed guest services change responsibility only when explicitly agreed."
+              ]
+            ],
+            "widths": [
+              1.22,
+              2.96,
+              2.96
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "For every offered item record a measurement boundary and an exclusion. “Resilient” must identify the failed resources and the service that continues. A security availability-impact label cannot supply an uptime target. A backup schedule cannot supply an RPO until its recoverable consistency point and failure behaviour are understood."
+          },
+          {
+            "kind": "note",
+            "text": "Output: a proposed service envelope and explicit exclusions. No hardware order, provider selection or production activation follows solely from this record."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "SDP",
+                5
+              ],
+              [
+                "AT",
+                1
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Choose sharing at each infrastructure layer",
+        "lead": "The sharing decision changes security exposure, eligible capacity, operating authority and the failure model simultaneously.",
+        "refs": [
+          [
+            "RA",
+            7
+          ],
+          [
+            "RA",
+            11
+          ],
+          [
+            "AK",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Retain the parent’s zone-aware host-pool baseline. Do not infer that independent domains may share a host merely because both carry an RZ label. Where an alternative is proposed, evaluate the actual host, HCI controllers, storage, management and recovery placement together. Record the variation rather than silently relaxing the baseline."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Design alternative",
+              "What remains shared",
+              "Consequence to evaluate"
+            ],
+            "rows": [
+              [
+                "Compatible-domain pooled capacity",
+                "Only layers permitted by the adopted sharing decision. Routing and policy authority remain distinct.",
+                "Higher utilization may be possible, but host/controller compromise and correlated failure remain assessed dependencies."
+              ],
+              [
+                "Dedicated workload host pool",
+                "Potentially storage, edge, management, backup and key services.",
+                "Host dedication does not create an independently administered service. Reserve replacement and evacuation capacity in eligible pools."
+              ],
+              [
+                "Dedicated wider service scope",
+                "Only specifically accepted external dependencies.",
+                "More independent capacity, management and recovery may be needed; define exactly what is dedicated and why."
+              ]
+            ],
+            "widths": [
+              1.58,
+              2.78,
+              2.78
+            ]
+          },
+          {
+            "kind": "h",
+            "text": "Worked decision boundary"
+          },
+          {
+            "kind": "p",
+            "text": "Suppose a workload requires dedicated hosts but accepts the provider’s separately controlled backup service. Record hosts as dedicated, backup infrastructure as shared with isolated authority, and retained-copy/key controls as mandatory. A later host failure cannot move the VM into an unrelated shared pool simply because a scheduler finds free memory. If eligible capacity is exhausted, the declared service degrades or uses another already approved pool."
+          },
+          {
+            "kind": "p",
+            "text": "The engineering handoff names the rule the scheduler must enforce, the components it does not isolate, the reserve needed during maintenance, and the test demonstrating restart and restore eligibility. Do not represent this as a single “dedicated=true” checkbox."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                1
+              ],
+              [
+                "QCP",
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Develop a boundary architecture decision",
+        "lead": "Use an explicit option record when choosing where inter-domain enforcement occurs. This worked decision is proposed, not accepted.",
+        "refs": [
+          [
+            "RA",
+            8
+          ],
+          [
+            "RA",
+            29
+          ],
+          [
+            "AT",
+            6
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Decision DEV-ADR-01 concerns OZ-to-RZ communication for the common internal fixture. The required outcome is an attributable, jointly governed trust transition with controlled forward and reply paths, required inspection and safe failure behaviour. One useful criterion is whether another team can identify every enforcement function and every route that could avoid it."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Option",
+              "Architectural benefit",
+              "Conditions and cost of acceptance"
+            ],
+            "rows": [
+              [
+                "Provider routed security edge",
+                "One explicit boundary service separates vendor-native domain routing from approved trust transitions.",
+                "Requires isolated attachments, sufficient inspection/session capacity and no connected-route or return-path bypass."
+              ],
+              [
+                "Qualified native or distributed boundary",
+                "May avoid additional centralized hops for some paths.",
+                "Must locate all required ZIP functions, protect provider authority and prove same-host, failure and inspection behaviour. A distributed firewall alone is not the complete argument."
+              ],
+              [
+                "Common unrestricted transit",
+                "Simple connectivity and fewer visible contexts.",
+                "Rejected for the base service: it introduces reachability without the required boundary authority and can bypass downstream enforcement."
+              ]
+            ],
+            "widths": [
+              1.55,
+              2.65,
+              2.94
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Proposed disposition: retain the parent’s explicit edge pattern for the first qualification campaign. Evaluate a native/distributed alternative as a separately scoped variation only where it delivers the required functions. This is not a vendor ranking; the site’s supported release, traffic and assurance requirements determine feasibility."
+          },
+          {
+            "kind": "p",
+            "text": "Record consequences in the LLD: domain and edge context identities, service-facing attachments, permitted prefixes, return routing, policy ownership, failure load and qualification observations. Any new variation must also change the relevant build and test records; an ADR title alone does not change the architecture."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "NBD",
+                1
+              ],
+              [
+                "NBD",
+                2
+              ],
+              [
+                "QCP",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Turn dependencies into explicit service interfaces",
+        "lead": "A dependency is not complete until its consumer, producer, permitted operation, failure effect and recovery owner are identified.",
+        "refs": [
+          [
+            "RA",
+            9
+          ],
+          [
+            "RA",
+            13
+          ],
+          [
+            "SVC",
+            1
+          ],
+          [
+            "EK",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Actual consumer",
+              "Consumed function",
+              "Separate authority / failure question"
+            ],
+            "rows": [
+              [
+                "Guest resolver client",
+                "Approved DNS endpoint and required transports.",
+                "Who administers resolver policy, supplies the reply path and recovers name service?"
+              ],
+              [
+                "Host or storage service",
+                "Key use needed for encrypted storage or restart.",
+                "Is key recovery independent of the encrypted resources it must unlock? Do not invent a guest KMS flow."
+              ],
+              [
+                "Backup executor / data mover",
+                "Scoped capture API and the selected data-transfer path.",
+                "Which identity can delete retained copies or reduce protection? Which catalogue and keys survive a primary loss?"
+              ],
+              [
+                "Infrastructure administrator",
+                "Management API or controlled hardware recovery.",
+                "Which protected origin, target scope and emergency authority apply? Workload reachability does not grant this authority."
+              ]
+            ],
+            "widths": [
+              1.5,
+              2.56,
+              3.08
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "For each row supply the producer’s accepted service statement: endpoint identity, consumed resource scope, protocol/authentication profile, capacity and limits, loss behaviour, supported versions, change notification, recovery ownership and acceptance evidence. The consumer receives the facts it needs, not the producer’s administrator credential or full state file."
+          },
+          {
+            "kind": "p",
+            "text": "Record location constraints separately for live data, copies, telemetry, diagnostics, management, support access and keys. The architecture enforces decisions supplied by the responsible authorities; a site name or private circuit is not a substitute for those decisions. Shared endpoint addresses also do not prove independent service backends."
+          },
+          {
+            "kind": "note",
+            "text": "Handoff quality test: the dependent team can explain what stops, what continues and who can restore the service when this producer is unavailable."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                8
+              ],
+              [
+                "OPS",
+                2
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Make capacity-on-demand and exit economically explainable",
+        "lead": "Capacity is consumable only when the whole offered service can be delivered inside its failure and security constraints.",
+        "refs": [
+          [
+            "RA",
+            4
+          ],
+          [
+            "RA",
+            26
+          ],
+          [
+            "QUAL",
+            3
+          ],
+          [
+            "AK",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Keep ordered, received, staged, commissioned, available, reserved, consumed and retiring capacity distinct. A purchased server without accepted transport, storage, edge slots, entitlement or operating ownership is not service-ready capacity. A tenant quota limits consumption rights; it is not proof that the provider can honour every concurrent request."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Decision",
+              "Engineering consequence",
+              "Operating record"
+            ],
+            "rows": [
+              [
+                "Reserve for the covered failure",
+                "Calculate demand against surviving qualified capacity in each limiting unit.",
+                "Track compute, storage, sessions, inspected throughput, address pools and dependency limits separately."
+              ],
+              [
+                "Expand before exhaustion",
+                "Use actual procurement, staging, commissioning and qualification lead time.",
+                "Record the trigger, owner, forecast confidence and time to usable service—not only delivery date."
+              ],
+              [
+                "Charge or show service consumption",
+                "State the unit, period and boundary; separate dedicated scope and protection retention.",
+                "Do not disguise idle stock or duplicate reservations as consumed tenant capacity."
+              ],
+              [
+                "Maintain a viable exit",
+                "Include target capacity, copy volume, conversion, downtime, skills and retained obligations.",
+                "Rehearsal evidence distinguishes deployment portability from successful data/service recovery."
+              ]
+            ],
+            "widths": [
+              1.5,
+              2.85,
+              2.79
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A local cost model can separate shared fixed service costs, metered resource consumption, retained-copy costs and dedicated isolation costs. No rates or savings are asserted here. Record assumptions and measurement periods before using the model to justify consolidation or replacement."
+          },
+          {
+            "kind": "p",
+            "text": "The next commitment decision is therefore not “which stack has free CPU?” It is “which eligible service envelope has enough surviving capacity, current support, accepted dependencies and a usable exit path?”"
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "NBD",
+                7
+              ],
+              [
+                "OPS",
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Release the architecture as an accountable engineering contract",
+        "lead": "The HLD remains the project design record. Use this completion record to attach the developed decisions to that record, rather than creating another conflicting source of truth.",
+        "refs": [
+          [
+            "AK",
+            8
+          ],
+          [
+            "AT",
+            10
+          ],
+          [
+            "DEL",
+            2
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Decision / response",
+              "What the architect hands over",
+              "Working reference"
+            ],
+            "rows": [
+              [
+                "Offered scope",
+                "Service boundary, excluded extensions, categorization and actual responsibility split.",
+                {
+                  "field": "SDP_SERVICE_SCOPE"
+                }
+              ],
+              [
+                "Approved sharing",
+                "Per-layer dedicated/shared disposition, exceptions and eligible recovery placement.",
+                {
+                  "field": "SDP_SHARING_DECISION"
+                }
+              ],
+              [
+                "Boundary realization",
+                "Selected option, rejected alternatives and required forward/reply enforcement.",
+                {
+                  "field": "SDP_BOUNDARY_DECISION"
+                }
+              ],
+              [
+                "Required dependencies",
+                "Producer acceptance, client scope, recovery and location constraints.",
+                {
+                  "field": "SDP_DEPENDENCIES"
+                }
+              ],
+              [
+                "Acceptance allocation",
+                "Assertions, qualification stage, evidence owner and appropriate decision authority.",
+                {
+                  "field": "SDP_ACCEPTANCE_ALLOCATION"
+                }
+              ],
+              [
+                "Open decisions",
+                "Named owner, blocking gate, due/review trigger and evidence needed to close.",
+                {
+                  "field": "SDP_OPEN_DECISIONS"
+                }
+              ]
+            ],
+            "widths": [
+              1.35,
+              3.64,
+              2.15
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "At the walkthrough, trace one approved application path, one denied cross-tenant path, one virtual-disk attachment, one privileged management action and one recovery dependency. Use consistent identities across views and schedules. Differences become tracked dispositions, not explanatory comments lost inside a drawing."
+          },
+          {
+            "kind": "p",
+            "text": "A changed address normally belongs to detailed engineering. Changed zone sharing, inspection obligations, administrative authority, recovery promise or external exposure can change the architecture. The architecture owner determines which records and deployed services must be re-evaluated."
+          },
+          {
+            "kind": "note",
+            "text": "Actual status for this release: developed reference method supplied; project scope, approving authorities and engineering acceptance remain unassigned."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "NBD",
+                6
+              ],
+              [
+                "PBS",
+                9
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "NBD": {
+    "path": "02_Engineering/Network_and_Boundary_Detailed_Engineering.docx",
+    "title": "Network, Boundary and Shared-Service Detailed Engineering",
+    "subtitle": "Connect addressing, forwarding, policy, return paths and failure behaviour in one buildable design.",
+    "intro": "This supplement develops EK-03, EK-05 and EK-06 using the frozen WD fixture. Addresses remain documentation examples, not allocations for a site. Native resource syntax is deliberately left to the selected supported platform. The worked routes explain what the implementation must realize and observe.",
+    "sections": [
+      {
+        "title": "Count and assign the actual isolation units",
+        "lead": "A routing context, a logical ZIP relationship, an attachment and a physical appliance are different units. Count each before choosing a topology.",
+        "refs": [
+          [
+            "WD",
+            3
+          ],
+          [
+            "WD",
+            4
+          ],
+          [
+            "NET",
+            2
+          ],
+          [
+            "EK",
+            3
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "The fixture contains D01O, D01R, D02O and D02R. Four domain-to-edge handoffs attach these domains to EC-01 or EC-02. Two further service handoffs attach EC-01 to SE-01 and EC-02 to SE-02. EC and SE identify logical ownership/forwarding roles in the worked design, not a purchase quantity or a claim that one firewall implements every role."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Unit",
+              "Fixture identity / count",
+              "Engineering owner and restriction"
+            ],
+            "rows": [
+              [
+                "Domain handoff",
+                "A01O, A01R, A02O, A02R: four.",
+                "Platform and edge owners agree both endpoints; no unrelated connected context."
+              ],
+              [
+                "Service handoff",
+                "SH-01, SH-02: two.",
+                "Edge and shared-service owners agree source scope, service route and reply."
+              ],
+              [
+                "Tenant edge context",
+                "EC-01 and EC-02: two logical contexts.",
+                "Independent routing/policy authority; physical sharing and HA are separately qualified."
+              ],
+              [
+                "Service-side context",
+                "SE-01 and SE-02: two logical return-path scopes.",
+                "Only named service delivery; no unapproved transit between tenant contexts."
+              ],
+              [
+                "Physical capacity",
+                "Not determined by these counts.",
+                "Add actual interface members, HA/synchronization, hosts, licences and reserved spare slots."
+              ]
+            ],
+            "widths": [
+              1.43,
+              2.44,
+              3.27
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Allocate attachment slots from commissioned pools with an owner, capacity class, lifecycle and quarantine/reuse condition. A slot is unavailable while an old route, neighbour entry, policy association or native task can still refer to its previous owner. Pool expansion is a foundation change, not an excuse to share a connected network without qualification."
+          },
+          {
+            "kind": "note",
+            "text": "Release criterion: every logical unit resolves to its native objects and physical dependencies, with one configuration writer and an accepted boundary owner."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                8
+              ],
+              [
+                "NBD",
+                6
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Walk F14-01 through the forward and reply routes",
+        "lead": "The example preserves the WD IPv4 route schedule. It is a reasoning fixture; no route in this table has been installed or tested.",
+        "refs": [
+          [
+            "WD",
+            5
+          ],
+          [
+            "WD",
+            6
+          ],
+          [
+            "RA",
+            10
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "F14-01 permits processor-01 in D01O to initiate the declared TCP/443 service at data-01 in D01R. D01O uses 192.0.2.0/27 and D01R uses 192.0.2.32/27. The route establishes reachability to a prefix; the identity/service policy narrows which endpoint and operation may use it."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Route owner",
+              "Destination",
+              "Next hop / receiving role"
+            ],
+            "rows": [
+              [
+                "D01O",
+                "192.0.2.32/27",
+                "198.51.100.1 — EC-01, via A01O"
+              ],
+              [
+                "EC-01",
+                "192.0.2.32/27",
+                "198.51.100.6 — D01R gateway, via A01R"
+              ],
+              [
+                "D01R, reply",
+                "192.0.2.0/27",
+                "198.51.100.5 — EC-01, via A01R"
+              ],
+              [
+                "EC-01, reply",
+                "192.0.2.0/27",
+                "198.51.100.2 — D01O gateway, via A01O"
+              ]
+            ],
+            "widths": [
+              1.22,
+              2.04,
+              3.88
+            ]
+          },
+          {
+            "kind": "h",
+            "text": "What the LLD must prove"
+          },
+          {
+            "kind": "p",
+            "text": "Map the native gateway’s connected and learned routes, its selected outgoing interface and the effective enforcement point. The edge observes the permitted new session and its stateful reply. A new session initiated from data-01 toward processor-01 remains denied unless independently approved. Returning through EC-02 or a shared upstream route is not an equivalent implementation."
+          },
+          {
+            "kind": "p",
+            "text": "Inspect alternatives at each forwarding component: an additional NIC, a common external subnet, native inter-domain route propagation, an imported summary, PBR or a failure next hop. Record why each is absent or constrained. A permitted connection appearing in edge logs is necessary evidence but does not by itself prove that no second path exists."
+          },
+          {
+            "kind": "p",
+            "text": "Repeat the same logical analysis against the inherited IPv6 schedule when dual-stack is offered. Preserve the address-family-specific neighbour and MTU behaviour instead of mechanically copying IPv4 syntax."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                3
+              ],
+              [
+                "PBS",
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Make service replies choose the originating context",
+        "lead": "The shared-service endpoint needs an explicit return-path decision as well as a permitted incoming connection.",
+        "refs": [
+          [
+            "WD",
+            7
+          ],
+          [
+            "SVC",
+            2
+          ],
+          [
+            "NET",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "For a DNS query from D01O, the fixture routes the resolver host address 203.0.113.138/32 through EC-01 to SE-01. EC-01’s next hop is 198.51.100.18 over SH-01. SE-01 reaches the named service on its service-facing network. The reply must select the tenant-01 return path; a default through the other tenant context is not acceptable."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Reply stage",
+              "Required WD decision",
+              "What remains denied"
+            ],
+            "rows": [
+              [
+                "Resolver to tenant-01 source",
+                "Return 192.0.2.0/27 or 192.0.2.32/27 through SE-01 at 203.0.113.129, using the qualified service-side method.",
+                "A broad default or host forwarding that bridges tenant contexts."
+              ],
+              [
+                "SE-01 to EC-01",
+                "Own tenant prefixes via 198.51.100.17.",
+                "Routes to tenant-02 and general service-subnet access."
+              ],
+              [
+                "EC-01 to source domain",
+                "192.0.2.0/27 via .2; 192.0.2.32/27 via .6 on the corresponding 198.51.100.x handoff.",
+                "Unsolicited service initiation except where separately approved."
+              ]
+            ],
+            "widths": [
+              1.35,
+              3.58,
+              2.21
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Implement the service-side decision with a supported routing or mediation design. Record route ownership, endpoint source validation, authentication, backend tenant entitlement and whether the service terminates and originates separate sessions. A proxy alternative changes client attribution and session semantics and therefore needs an explicit design, not silent substitution."
+          },
+          {
+            "kind": "p",
+            "text": "DNS qualification includes UDP and TCP to the approved resolver and a controlled response that exercises TCP fallback. RFC 7766 requires TCP support for general-purpose DNS implementations; one successful small UDP lookup is not full protocol evidence. Encrypted DNS variants remain separately selected profiles. [D05]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D05"
+            ]
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                4
+              ],
+              [
+                "PBS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Budget address families and encapsulation precisely",
+        "lead": "An offered family must work along the entire path, including service consumption and recovery. The MTU budget must describe which packet or frame a product limit measures.",
+        "refs": [
+          [
+            "NET",
+            5
+          ],
+          [
+            "WD",
+            11
+          ],
+          [
+            "EK",
+            6
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Keep IPv4-only, IPv6-only and dual-stack as distinct engineering choices. Do not assign a fictitious IPv4 prefix to an IPv6-only service or assume an IPv4-only dependency is reachable. Any family translation is a separately engineered dependency with explicit enforcement, name resolution and recovery behaviour."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Basic VXLAN example",
+              "Bytes",
+              "Interpretation"
+            ],
+            "rows": [
+              [
+                "Workload IP packet",
+                "1500",
+                "Local example input, not a universal service target."
+              ],
+              [
+                "Inner Ethernet header + VXLAN + UDP",
+                "14 + 8 + 8 = 30",
+                "No inner VLAN tag, options or additional encapsulation in this example."
+              ],
+              [
+                "Outer IPv4 IP header",
+                "20",
+                "Outer IP packet: 1500 + 30 + 20 = 1550 bytes."
+              ],
+              [
+                "Outer IPv6 IP header",
+                "40",
+                "Outer IP packet: 1500 + 30 + 40 = 1570 bytes."
+              ],
+              [
+                "Outer link-frame overhead",
+                "Additional",
+                "Do not compare these IP totals directly with a frame limit that includes outer Ethernet, tags or FCS."
+              ]
+            ],
+            "widths": [
+              2.13,
+              0.94,
+              4.07
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "RFC 7348 supplies the VXLAN packet-format context for this arithmetic. It does not select a vendor MTU setting or qualify the path. Geneve options, inner tags, encryption and nested encapsulation require separate budgets; use the actual configured combination rather than reusing the numbers above. [D06]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D06"
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "For each normal and surviving path, compare the packet budget with its smallest supported limit and observe required PMTU feedback. The commissioning plan also checks permitted ICMPv6, router advertisement/neighbor controls and local-link management exclusion. A transport ping with small packets does not prove workload-sized packets survive a security edge or recovery path."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                3
+              ],
+              [
+                "NBD",
+                7
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Keep fabric authority separate from tenant routing",
+        "lead": "The physical fabric carries transport and explicitly assigned physical routing services; it does not inherit every tenant route merely because it connects the platform hosts.",
+        "refs": [
+          [
+            "RA",
+            5
+          ],
+          [
+            "NET",
+            1
+          ],
+          [
+            "VC",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Publish the underlay’s device/link inventory, address and ASN authority, allowed peers, explicit import/export policy, route limits, control-plane protection and maintenance method. Specify which platform tunnel endpoints and service attachments consume that transport. A tenant request consumes accepted capacity; a new physical attachment class or an exhausted pool returns to foundation engineering."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Engineering question",
+              "Required design answer",
+              "Observation before acceptance"
+            ],
+            "rows": [
+              [
+                "What routing belongs here?",
+                "List transport and approved physical-domain prefixes; exclude unintended tenant imports.",
+                "Compare accepted and actual advertisements, next hops and selected forwarding."
+              ],
+              [
+                "Where is EVPN needed?",
+                "Select only the fabric services requiring it; assign RD/RT/VNI scope and gateway ownership.",
+                "Inspect imports and connected paths rather than trusting common identifier conventions."
+              ],
+              [
+                "How are endpoints multihomed?",
+                "Choose the supported host/appliance mechanism and its peer/segment dependencies.",
+                "Observe link and peer failure, orphan behaviour, restoration and management reachability."
+              ],
+              [
+                "How do vendor stacks connect?",
+                "Use the approved routed/security handoff; direct overlay federation is not the base service.",
+                "Confirm transport reachability without unapproved routing or policy authority crossing stacks."
+              ]
+            ],
+            "widths": [
+              1.55,
+              2.91,
+              2.68
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Assign one writer to each switch configuration or independently owned subresource. A vendor installer, a network automation system and Terraform must not each believe they own the same routing or interface object. Before adoption, compare intended configuration with the live inventory and review a non-destructive change scope."
+          },
+          {
+            "kind": "p",
+            "text": "Physical installation, power, optics and cabling are accepted through qualified site personnel and manufacturer procedures. This document supplies ownership and acceptance records, not hazardous installation instructions or unverified network-OS commands."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                1
+              ],
+              [
+                "OPS",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Issue an interface control and handoff record",
+        "lead": "Use this record for each material interface. Link it to the existing LLD network/route/flow schedules so the same facts are not maintained independently.",
+        "refs": [
+          [
+            "ET",
+            3
+          ],
+          [
+            "ET",
+            4
+          ],
+          [
+            "PROV",
+            1
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Field",
+              "Required interpretation",
+              "Working response"
+            ],
+            "rows": [
+              [
+                "Identity / endpoints",
+                "Stable interface ID; producer and consumer native objects; both endpoint owners.",
+                {
+                  "field": "NBD_INTERFACE_ID"
+                }
+              ],
+              [
+                "Authority / membership",
+                "Domain and zone scope; who changes route, policy and endpoint membership.",
+                {
+                  "field": "NBD_AUTHORITY"
+                }
+              ],
+              [
+                "Forward and reply",
+                "Actual family, prefix, next hop, interface, route source and reverse-path owner.",
+                {
+                  "field": "NBD_ROUTING"
+                }
+              ],
+              [
+                "Security and identity",
+                "Permitted initiator/service, effective control, source validation and service entitlement.",
+                {
+                  "field": "NBD_ENFORCEMENT"
+                }
+              ],
+              [
+                "Capacity / failure",
+                "Accepted MTU, limits, HA mode, failure dependencies and safe loss behaviour.",
+                {
+                  "field": "NBD_FAILURE_BUDGET"
+                }
+              ],
+              [
+                "Acceptance / lifecycle",
+                "Configuration revision, observations, both owners’ handoff, reuse and withdrawal.",
+                {
+                  "field": "NBD_ACCEPTANCE"
+                }
+              ]
+            ],
+            "widths": [
+              1.42,
+              3.57,
+              2.15
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The producer signs off the available capability and permitted use; the consumer verifies that its own dependency is satisfied. A network handoff is incomplete when only one endpoint is known, the return path is unowned, or the selected feature lacks release-specific support."
+          },
+          {
+            "kind": "p",
+            "text": "Publish minimal accepted outputs for dependent packages: identities, scope, supported operation, limits and current restrictions. Keep credential custody and sensitive native configuration inside the owning administrative boundary. This record may be stored in an existing change/inventory system; it does not require a new API service."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                8
+              ],
+              [
+                "IT",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Release the network design under an explicit failure model",
+        "lead": "Security continuity and availability are separate acceptance dimensions. A denied unauthorized flow may be correct while an allowed flow’s outage still fails the service target.",
+        "refs": [
+          [
+            "NET",
+            6
+          ],
+          [
+            "QUAL",
+            3
+          ],
+          [
+            "QCP",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Failure or change",
+              "Secure design expectation",
+              "Separate service evidence"
+            ],
+            "rows": [
+              [
+                "One edge member or uplink lost",
+                "No uninspected backup route or implicit permit; approved state handling remains enforced.",
+                "Established and new-session interruption, surviving load and convergence against the adopted target."
+              ],
+              [
+                "Routing or attachment inconsistency",
+                "Unverified endpoints remain restricted; no temporary shared transit to finish commissioning.",
+                "Which dependent services are unavailable and how the correct path is restored."
+              ],
+              [
+                "Service-side return path lost",
+                "Do not use another tenant context as a generic fallback.",
+                "Loss scope, detection, safe repair and successful post-repair replies."
+              ],
+              [
+                "Management or telemetry loss",
+                "No new privilege or permit path; invoke the approved access/logging loss policy.",
+                "Existing operation, buffers, evidence gaps and recoverability of the required control."
+              ]
+            ],
+            "widths": [
+              1.65,
+              2.84,
+              2.65
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A proposed capacity example illustrates the release decision. If surviving inspected capacity is 8 Gbit/s, an explicitly defined operating reserve is 1.5 Gbit/s, and existing commitment is 5.5 Gbit/s, only 1 Gbit/s remains for new demand. A 1.2 Gbit/s request is 0.2 Gbit/s above that bound even when compute is available. These are local example values, not product benchmarks."
+          },
+          {
+            "kind": "p",
+            "text": "Repeat admission for packets per second, sessions, route/context limits, NAT ports where used, log rate and service dependencies. Do not add unlike units or subtract commitments twice. The actual engineering record uses measured sustained performance with enabled security features under the selected failure/load scenario."
+          },
+          {
+            "kind": "note",
+            "text": "Release stops when any mandatory path, return route, limit, owner or observation is unresolved. Intrusive testing requires a separately authorized scope and restoration procedure."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                5
+              ],
+              [
+                "OPS",
+                2
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "PBS": {
+    "path": "02_Engineering/Platform_Engineering_and_Build_Specifications.docx",
+    "title": "Platform Engineering and Build Specifications",
+    "subtitle": "Assign native resource ownership, dependencies, build outputs and acceptance for each vendor stack.",
+    "intro": "This supplement develops the earlier vendor cards into build specifications. Select one platform track plus the required shared infrastructure. Every native object still needs the actual supported release and environment values from the LLD. No commands, provider versions, platform installation or live test result are invented.",
+    "sections": [
+      {
+        "title": "Choose the platform boundary and configuration owner",
+        "lead": "One WSD delivery spans several infrastructure owners. The selected hypervisor provider does not automatically establish the fabric, security edge, identity, addressing, backup and recovery services.",
+        "refs": [
+          [
+            "RA",
+            15
+          ],
+          [
+            "RA",
+            20
+          ],
+          [
+            "VC",
+            1
+          ],
+          [
+            "PROV",
+            3
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Resource family",
+              "Commissioning / mutation owner",
+              "Accepted consumer output"
+            ],
+            "rows": [
+              [
+                "Physical transport and OOB",
+                "P0/P1 foundation owner and selected network/hardware mechanism.",
+                "Actual paths, permitted transport, interface capacity and recovery access."
+              ],
+              [
+                "Native platform",
+                "P2 owner using the supported installer/lifecycle method and qualified APIs.",
+                "Healthy supported cluster/control scope, eligible pools, storage and network capability."
+              ],
+              [
+                "ZIP and common services",
+                "P3 security, network-service, identity, storage and protection owners.",
+                "Scoped attachments, endpoints, permissions, capacity, support and loss behaviour."
+              ],
+              [
+                "Tenant and workload",
+                "P4/P5 resource owners using approved modules/API operations.",
+                "Owned networks, compute/data attachments, protection and current activation evidence."
+              ],
+              [
+                "Lifecycle",
+                "P6 owner of each affected native resource, with coordinated dependencies.",
+                "Changed as-built, retained obligations, requalification and cleanup evidence."
+              ]
+            ],
+            "widths": [
+              1.4,
+              2.91,
+              2.83
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A native installer may own controller databases, platform certificates, host configuration and transport setup. A Terraform module may own tenant VMs, networks or a supported policy resource. Record ownership at the smallest supported independent resource boundary; do not place overlapping controllers over the same field or object."
+          },
+          {
+            "kind": "p",
+            "text": "The operation specification contains create, read/observe, update, adoption, replacement, deletion and uncertain-outcome recovery separately. For each operation identify its input artifact, privilege scope, completion signal and possible data effect. Read access to a product API cannot establish full lifecycle coverage."
+          },
+          {
+            "kind": "note",
+            "text": "Build sequence is dependency-driven, not tool-driven. P2 can use accepted temporary P0 services; P2/P3 offered-service acceptance is resolved before ordinary tenant allocation."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                8
+              ],
+              [
+                "PBS",
+                9
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Nutanix: commission the hosting cell",
+        "lead": "P2 establishes AHV/AOS and protected Prism/Flow management for a defined cell. Cluster installation is distinct from allocating a tenant’s VPC, VM or data.",
+        "refs": [
+          [
+            "RA",
+            16
+          ],
+          [
+            "VND",
+            3
+          ],
+          [
+            "VC",
+            2
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "The engineering release supplies hardware and firmware compatibility, cluster membership, management and recovery paths, adopted co-residency, supported storage/protection classes, actual licences, and the selected AOS/Prism/Flow/API/provider combination. Treat controller/storage sharing as part of the security and failure analysis, not merely an internal implementation detail."
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Commissioned output",
+              "Build specification",
+              "Acceptance observation"
+            ],
+            "rows": [
+              [
+                "Cluster and management",
+                "Accepted installation artifacts; named management interfaces, trust and scoped roles.",
+                "Native health, expected membership, protected administrative access and recoverable configuration."
+              ],
+              [
+                "Eligible host/storage pools",
+                "Enforced workload placement, supported images/boot modes, data/key scope and reserve.",
+                "Disallowed placement rejected; intended disk access and protection prerequisites available."
+              ],
+              [
+                "Network and external capacity",
+                "Overlay transport plus isolated or explicitly qualified external handoff slots.",
+                "Transport MTU, actual gateway behaviour, route ownership and no common-connected bypass."
+              ],
+              [
+                "Mandatory policy foundation",
+                "Provider-controlled selectors, baseline rules and authorization limits.",
+                "Tenant identity cannot alter mandatory membership or expand baseline permissions."
+              ],
+              [
+                "Operational dependencies",
+                "Accepted names, time, logging, keys, images and backup/recovery interfaces.",
+                "Correct clients, scope and independent recovery of the dependencies needed to restart the cell."
+              ]
+            ],
+            "widths": [
+              1.57,
+              2.8,
+              2.77
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The official provider repository publishes version-specific compatibility and resource/lifecycle notes. Use these as inputs to the actual support decision, not as proof that a named resource supports every intended update or recovery action. This document does not select a provider release. [D03]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D03"
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The cell remains a safeguarded candidate until applicable qualification is complete. Record installation receipts separately from the later test campaign, and stop advertising any service class whose required attachment or policy behaviour remains unresolved."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                1
+              ],
+              [
+                "PBS",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Nutanix: realize a tenant and its workload domains",
+        "lead": "The domain routing, tenant entitlement and mandatory security selectors are different controls even when they are operated through related management services.",
+        "refs": [
+          [
+            "RA",
+            16
+          ],
+          [
+            "WD",
+            8
+          ],
+          [
+            "PROV",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Dependency order",
+              "Native realization to specify",
+              "Owning receipt"
+            ],
+            "rows": [
+              [
+                "1. Scope and reservation",
+                "Entitled project/RBAC scope, eligible pool, actual IPAM allocation and available attachment slot.",
+                "P4 identity, capacity and address references; no public default."
+              ],
+              [
+                "2. Denied domain networks",
+                "Separate qualified VPC/routing context for each independent domain and its overlay subnets.",
+                "Native IDs, domain membership and effective baseline before endpoint access."
+              ],
+              [
+                "3. Edge and forwarding",
+                "Supported external handoff with matching EC routes, policy and reply path.",
+                "P3/P4 handoff acceptance; selected NAT/no-NAT behaviour and source identity."
+              ],
+              [
+                "4. Compute and data",
+                "Approved image, eligible host policy, VM/disks and only assigned networks.",
+                "P5 resource IDs, storage/key authority, required initialization and protection."
+              ],
+              [
+                "5. Verify and activate",
+                "Native realization observed, service bindings verified, required readiness and authority current.",
+                "Actual observations and reversible activation; no success inferred solely from API acceptance."
+              ]
+            ],
+            "widths": [
+              1.4,
+              3.02,
+              2.72
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A common connected external subnet is not accepted simply because two VPCs are distinct. Native internal routing must not join OZ and RZ around the declared ZIP. No-NAT is an option only where the selected combination preserves the architecture; translation changes source attribution and return-path analysis and must be stated explicitly."
+          },
+          {
+            "kind": "h",
+            "text": "Update and removal"
+          },
+          {
+            "kind": "p",
+            "text": "Before resize, image/customization change or network reassignment, review whether the selected resource operation updates in place, requires interruption or replaces the VM. A lost response triggers task/resource discovery under the original owner. Never interpret “unknown” as permission to create another copy or delete potentially written data."
+          },
+          {
+            "kind": "p",
+            "text": "Retire only exclusively owned eligible resources. Withdraw obsolete routes and policy, reconcile outstanding tasks and address/DNS reuse, and preserve shared domains and retained copies. The actual protection and data owners decide when copy/key disposal is permissible."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "NBD",
+                2
+              ],
+              [
+                "OPS",
+                3
+              ],
+              [
+                "OPS",
+                7
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "VMware/NSX: commission transport, compute and edge roles",
+        "lead": "The platform foundation identifies distributed forwarding, Edge-hosted service functions and external boundary enforcement separately.",
+        "refs": [
+          [
+            "RA",
+            17
+          ],
+          [
+            "VND",
+            4
+          ],
+          [
+            "VC",
+            3
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Foundation",
+              "Required engineering release",
+              "Acceptance focus"
+            ],
+            "rows": [
+              [
+                "vCenter/ESXi and storage",
+                "Actual supported hosts, images, eligible pools, datastore policies and maintenance constraints.",
+                "Placement and restart remain eligible; data/key access is scoped and recoverable."
+              ],
+              [
+                "NSX management and transport",
+                "Manager placement, administrative roles, transport-node/zone membership, TEP and uplink networks.",
+                "Management separation, transport reachability and full-size path behaviour."
+              ],
+              [
+                "Routing and service nodes",
+                "Domain Tier-1, isolated upstream context, Edge placement, route advertisements and gateway mode.",
+                "Actual native/distributed routes and the intended external ZIP path."
+              ],
+              [
+                "Policy and operations",
+                "Provider-owned groups/rule hierarchy, protected changes, logs, backup and recovery.",
+                "Mandatory policy cannot be widened by tenant labels or lower-authority rules."
+              ]
+            ],
+            "widths": [
+              1.5,
+              2.91,
+              2.73
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Fresh mechanism check: Broadcom KB 442835 states that Tier-0 VRF gateways are not supported on an Active-Active Stateful parent Tier-0. It identifies Active-Active Stateless and Active-Standby alternatives for the stated use cases. Reconcile this constraint with the selected release, stateful services and availability requirement. The KB also warns that changing HA mode disrupts stateful contexts and routing; this is not an instruction to change a live gateway. [D01]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D01"
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A shared parent or Edge cluster can be a common capacity/failure dependency without being a common routing authority. Record precisely what is shared. Select the stateful inspection location before choosing the HA mode; a topology that has enough throughput but bypasses required inspection is not eligible."
+          },
+          {
+            "kind": "note",
+            "text": "Stop when the actual gateway mode, isolation pattern or required stateful function is unsupported. A qualified alternative or excluded service capability is preferable to a misleading “equivalent” diagram."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "NBD",
+                7
+              ],
+              [
+                "PBS",
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "VMware/NSX: bind domain, workload and policy lifecycles",
+        "lead": "The provisioning workflow coordinates vSphere resources, NSX resources and independently owned shared services; it does not merge their privileges into one unrestricted state.",
+        "refs": [
+          [
+            "RA",
+            17
+          ],
+          [
+            "RA",
+            24
+          ],
+          [
+            "WD",
+            8
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Object group",
+              "Create / change responsibility",
+              "Required cross-owner evidence"
+            ],
+            "rows": [
+              [
+                "Domain networking",
+                "NSX owner allocates segments, per-domain Tier-1 and the approved isolated upstream association.",
+                "Actual upstream route context and no unintended propagation between domains."
+              ],
+              [
+                "Mandatory segmentation",
+                "Security/platform owner establishes protected groups, membership and effective policy.",
+                "Same-host and cross-host denial plus the specifically approved flow."
+              ],
+              [
+                "ZIP handoff",
+                "Edge owner configures paired attachments, routes, stateful policy and required services.",
+                "F14-01 request and reply follow the accepted native and external enforcement path."
+              ],
+              [
+                "VM and storage",
+                "vSphere/data owners allocate approved image, eligible placement and owned disks.",
+                "Correct host eligibility, storage/key policy and protection assignment."
+              ],
+              [
+                "Activation",
+                "Service owner checks current technical evidence, initial G4 and authority.",
+                "Approved live endpoint works; failure withdraws exposure without deleting data."
+              ]
+            ],
+            "widths": [
+              1.39,
+              2.85,
+              2.9
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The LLD maps each logical WD domain to its actual native gateway, segment, route advertisement and external attachment. Do not infer an appliance hop merely from a Tier-1 object. Compare connected routes, distributed routing, service-router functions, gateway policies and the chosen external security path."
+          },
+          {
+            "kind": "p",
+            "text": "Live mobility and HA restart remain inside the accepted compute, storage and zone/co-residency boundaries. A shared datastore does not automatically make every host an eligible recovery target. Review route/policy membership after relocation and include required keys and virtual-device compatibility in restore and exit testing."
+          },
+          {
+            "kind": "h",
+            "text": "Lifecycle release record"
+          },
+          {
+            "kind": "p",
+            "text": "Supply separate operation coverage for VM customization, resize, disk replacement, segment changes, routing-policy changes and gateway mode changes. State import is only ownership adoption after review, not proof of conformance or authorization to replace a live gateway. Preserve former configuration and supported recovery choices before an irreversible change."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                3
+              ],
+              [
+                "QCP",
+                7
+              ],
+              [
+                "OPS",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "OpenStack: commission a distribution, not a generic label",
+        "lead": "The selected distribution, backend and enabled services define the real hosting platform. A generic provider cannot make missing services or unsupported capabilities exist.",
+        "refs": [
+          [
+            "RA",
+            18
+          ],
+          [
+            "VND",
+            5
+          ],
+          [
+            "VC",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Foundation scope",
+              "Build specification",
+              "Qualification boundary"
+            ],
+            "rows": [
+              [
+                "Control and service dependencies",
+                "Keystone and selected APIs, databases/messaging, certificates, privileged access and installer ownership.",
+                "Control/service health, authority boundaries and recoverability of actual dependencies."
+              ],
+              [
+                "Nova and Placement",
+                "Eligible hosts, placement policy, aggregates/traits, image/virtual-device classes and resource reserve.",
+                "Actual scheduler decisions before and after restart, evacuation or maintenance."
+              ],
+              [
+                "Neutron backend",
+                "Named ML2/OVN or approved alternative, compute/controller/gateway roles, transport and provider mappings.",
+                "Distributed routes, external handoff and all enabled direct-attachment alternatives."
+              ],
+              [
+                "Glance/Cinder and data services",
+                "Approved images, owned volumes, storage types/backends and selected keys/protection.",
+                "Foreign attachment denied, eligible placement, retained copies and useful restore."
+              ]
+            ],
+            "widths": [
+              1.47,
+              3.0,
+              2.67
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "For the OVN reference pattern, OpenStack documents distributed east-west forwarding separately from external gateway handling. A gateway on an external path is therefore not proof that every internal routed flow visits that gateway. Include distributed and provider-network candidates in boundary analysis. [D07]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D07"
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Nova’s host-aggregate guidance requires actual scheduler/Placement configuration for the selected isolation model. An aggregate or availability-zone label alone is not enforcement or physical independence. Bind the design to the named configuration and observation that rejects ineligible placement. [D08]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D08"
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The accepted handoff names the exact distribution services and versions, backend, enabled extensions, API policy, controller ownership and tested operating limits. Do not directly manage controller-owned OVS/OVN backend objects with a second tool. A backend replacement is an architecture-impacting change with a new failure and policy analysis."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                7
+              ],
+              [
+                "QCP",
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "OpenStack: protect mandatory network mutation",
+        "lead": "The base service uses provider-owned control of mandatory network policy and external attachment. Tenant self-service is bounded by the offered capability, not by permissive native defaults.",
+        "refs": [
+          [
+            "RA",
+            18
+          ],
+          [
+            "WD",
+            8
+          ],
+          [
+            "VC",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "p",
+            "text": "Neutron describes security groups as additive allow rules, including default egress permissions. It also documents the effect of disabling port security and notes that removing egress may prevent metadata access. Accordingly, preserve required initialization explicitly and verify effective permission across every attached group; do not treat an added group as a mandatory deny layer. [D02]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D02"
+            ]
+          },
+          {
+            "kind": "table",
+            "headers": [
+              "Mutation surface",
+              "Base design ownership",
+              "Required negative and positive observation"
+            ],
+            "rows": [
+              [
+                "Groups and membership",
+                "Provider controls mandatory group rules and which groups protect each port.",
+                "Tenant cannot add a broader rule or group; the approved workload flow still operates."
+              ],
+              [
+                "Port security / address pairs",
+                "Provider controls disabling security, additional source identities and relevant exceptions.",
+                "Unapproved changes fail through actual API roles; legitimate configured service behaviour remains functional."
+              ],
+              [
+                "External attachments",
+                "Provider controls external router, provider network, additional NIC and floating-address paths.",
+                "Tenant cannot create an escape route; authorized service exposure follows its own design."
+              ],
+              [
+                "Initialization",
+                "Named metadata/DHCP/DNS and identity needs are allowed only for their actual consumers.",
+                "Secure bootstrapping succeeds without broad Internet or provider-management access."
+              ]
+            ],
+            "widths": [
+              1.46,
+              2.79,
+              2.89
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Build sequence: establish project/roles and quotas; reserve addresses and attachment capacity; create denied domain networks, subnets, ports and separate router contexts; establish the qualified ZIP routes and policy; then attach instances, owned volumes and required services. Observe native readiness before relying on asynchronous deletion or route changes."
+          },
+          {
+            "kind": "p",
+            "text": "Test with the actual delegated tenant role, not an administrator account labelled “tenant”. An inability to enforce the baseline at the selected API/policy boundary blocks that delegated capability. Direct tenant network editing can be a separately qualified extension, but it does not silently become the base service."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                4
+              ],
+              [
+                "OPS",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Publish shared-service handoffs without sharing authority",
+        "lead": "Each integration is a producer/consumer agreement about usable infrastructure. It is not a reason to grant the consumer every privilege held by the producer.",
+        "refs": [
+          [
+            "PROV",
+            1
+          ],
+          [
+            "PROV",
+            3
+          ],
+          [
+            "SVC",
+            1
+          ],
+          [
+            "EK",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Producer",
+              "Minimum accepted output",
+              "Consumer action / limit"
+            ],
+            "rows": [
+              [
+                "Fabric / attachment owner",
+                "Actual interface, transport class, allowed use, capacity, MTU and acceptance revision.",
+                "Platform owner consumes the attachment; does not change spine policy."
+              ],
+              [
+                "Security-edge owner",
+                "Approved domain pair, route/policy references, handoff identities and enforcement restrictions.",
+                "Domain owner configures its side; does not receive edge administrator credentials."
+              ],
+              [
+                "IPAM and naming owner",
+                "Reserved prefix/address ownership, DNS/DHCP policy and confirmed lifecycle receipt.",
+                "Workload owner registers only accepted assignments; no independent competing allocator."
+              ],
+              [
+                "Data/trust/protection owner",
+                "Tenant data scope, key/client identity, capture/restore path and retained obligations.",
+                "Actual client receives only its entitled use; producer administration stays separate."
+              ],
+              [
+                "Operations owner",
+                "Required events, health scope, alert routing, loss handling and accepted recovery interface.",
+                "Service handover proves observation and support, not merely installation of an agent."
+              ]
+            ],
+            "widths": [
+              1.49,
+              3.0,
+              2.65
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "HashiCorp notes that terraform_remote_state output access requires access to the underlying state snapshot and recommends separate publication where different access controls are needed. A handoff can therefore publish narrowly scoped accepted facts rather than granting broad state access. The implementation chooses its existing controlled inventory or publication mechanism. [D04]"
+          },
+          {
+            "kind": "external",
+            "ids": [
+              "D04"
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Acceptance is bidirectional: producer confirms the offered capability, consumer confirms its dependency is met. A change in service version, allowed prefix, key scope or failure behaviour invalidates affected downstream assumptions. Notify consumers and re-evaluate the corresponding paths before using the changed handoff."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "NBD",
+                6
+              ],
+              [
+                "OPS",
+                2
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Release a native build package that can be independently reviewed",
+        "lead": "This record sits beside the existing LLD and operation-coverage schedule. It is a specification for real build artifacts, not a substitute for them.",
+        "refs": [
+          [
+            "ET",
+            8
+          ],
+          [
+            "ET",
+            9
+          ],
+          [
+            "EK",
+            8
+          ],
+          [
+            "IK",
+            1
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Release item",
+              "What must be resolved",
+              "Working reference"
+            ],
+            "rows": [
+              [
+                "Exact implementation",
+                "Hardware/firmware, stack/API/provider/installer versions, features, entitlements and support evidence.",
+                {
+                  "field": "PBS_IMPLEMENTATION_TUPLE"
+                }
+              ],
+              [
+                "Native mapping",
+                "Logical components/interfaces mapped to actual resources; one writer per supported boundary.",
+                {
+                  "field": "PBS_NATIVE_MAPPING"
+                }
+              ],
+              [
+                "Build artifacts",
+                "Reviewed configuration/module/installer inputs, provenance, integrity and privileged custody references.",
+                {
+                  "field": "PBS_BUILD_ARTIFACTS"
+                }
+              ],
+              [
+                "Lifecycle behaviour",
+                "Operation coverage, completion signals, replacement risk, task discovery and supported recovery.",
+                {
+                  "field": "PBS_LIFECYCLE_COVERAGE"
+                }
+              ],
+              [
+                "Qualification",
+                "Applicable observations, actual test resources, fault safety envelope and artifact collection.",
+                {
+                  "field": "PBS_QUALIFICATION_PLAN"
+                }
+              ],
+              [
+                "Handoff decision",
+                "Recipient, unresolved blockers, accepted revision and signed scope decision.",
+                {
+                  "field": "PBS_HANDOFF_DECISION"
+                }
+              ]
+            ],
+            "widths": [
+              1.4,
+              3.63,
+              2.11
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Review one creation, one policy change, one resource update, one uncertain task and one retirement before releasing the package. For each, identify the last safe stopping point and the data or authority that must be preserved. If no supported recovery or forward-repair path exists, narrow or defer the capability instead of calling a placeholder complete."
+          },
+          {
+            "kind": "p",
+            "text": "The actual MOP records native commands/API artifacts only after the configuration source and support combination are accepted. The reusable runbooks remain references. Permission to run a restricted qualification fixture is not permission to activate production, and a build receipt is not a passing test report."
+          },
+          {
+            "kind": "note",
+            "text": "This release supplies engineering specifications and record fields. All installed values, native execution artifacts and platform qualification evidence remain implementation inputs."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                1
+              ],
+              [
+                "IT",
+                1
+              ]
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "QCP": {
+    "path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
+    "title": "Qualification Campaign and Evidence Procedures",
+    "subtitle": "Turn requirements into healthy controls, meaningful observations and accountable acceptance.",
+    "intro": "This supplement develops a qualification campaign for the common fixture and its actual native realization. Q11 observation cards elaborate existing requirements and test references; they are not new government controls or executed results. Keep real execution records in the implementation tracker and test template.",
+    "sections": [
+      {
+        "title": "Select the qualification scope and acceptance claim",
+        "lead": "Qualification is evidence for a named service, topology, version and failure model. It is not a blanket certification of a product brand.",
+        "refs": [
+          [
+            "QUAL",
+            5
+          ],
+          [
+            "IK",
+            6
+          ],
+          [
+            "DEL",
+            3
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Campaign scope",
+              "Select observations for",
+              "Permitted conclusion"
+            ],
+            "rows": [
+              [
+                "First platform",
+                "Actual foundations, domain isolation, service interfaces, lifecycle, failure/load and useful restore.",
+                "Only the tested service classes, families, topology and limits. A second qualified stack is not a prerequisite."
+              ],
+              [
+                "Second platform comparison",
+                "Same logical service outcomes on another eligible native realization.",
+                "Deployment equivalence for the compared scope, not automatic live migration."
+              ],
+              [
+                "Portability / exit",
+                "Actual image/data recovery, drivers/boot, identity/keys, network rebinding, cutover and operation.",
+                "Only the supported transfer and recovered-service claim demonstrated."
+              ],
+              [
+                "Routine change",
+                "Changed objects/paths and dependent critical controls under the accepted service envelope.",
+                "Acceptance of the changed scope; not a rerun of every destructive foundation test."
+              ]
+            ],
+            "widths": [
+              1.38,
+              3.0,
+              2.76
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Begin with an applicability record identifying requirement assertions, current component and design revisions, enabled address families, sharing, expected load and covered failure. Select test procedures because they observe those assertions, not because the catalogue has a fixed number of entries. Approved not-applicable dispositions need a reason tied to the offered scope."
+          },
+          {
+            "kind": "p",
+            "text": "A restricted non-production fixture may generate evidence while the platform remains a safeguarded candidate. Its permission names disposable data, allowed probes/faults, restoration, window and stop authority. It cannot supply production authority. Complete the relevant G2 qualification and initial G4 readiness before G3 production activation."
+          },
+          {
+            "kind": "note",
+            "text": "All Q11 cards in this document are NOT RUN. An expected result, source reference or document check is never an observed platform result."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                8
+              ],
+              [
+                "PBS",
+                9
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Size and control the qualification fixture",
+        "lead": "Four permanent endpoints provide one endpoint per domain. Additional controlled endpoints are required to test communication within a single domain.",
+        "refs": [
+          [
+            "WD",
+            2
+          ],
+          [
+            "WD",
+            11
+          ],
+          [
+            "EK",
+            6
+          ],
+          [
+            "IK",
+            6
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Fixture allocation",
+              "vCPU",
+              "Guest memory",
+              "Requested virtual disks"
+            ],
+            "rows": [
+              [
+                "Four permanent endpoints",
+                "8",
+                "16 GiB",
+                "320 GiB"
+              ],
+              [
+                "One sequential temporary probe",
+                "2",
+                "4 GiB",
+                "80 GiB"
+              ],
+              [
+                "Sequential test peak",
+                "10",
+                "20 GiB",
+                "400 GiB"
+              ],
+              [
+                "Alternative: four simultaneous probes",
+                "8 additional",
+                "16 GiB additional",
+                "320 GiB additional"
+              ],
+              [
+                "Simultaneous test peak",
+                "16",
+                "32 GiB",
+                "640 GiB"
+              ]
+            ],
+            "widths": [
+              3.1,
+              0.82,
+              1.49,
+              1.73
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The permanent and sequential peak totals are inherited from WD. The simultaneous alternative is a local calculation using the same 2-vCPU, 4-GiB, 80-GiB probe assumption for each domain. Neither case represents host sizing, physical storage consumption or a delivered service guarantee. Platform controllers, edges, service appliances, replicas, backups and failure reserve are additional."
+          },
+          {
+            "kind": "p",
+            "text": "For sequential testing, instantiate or reassign the probe only through the supported controlled lifecycle, one domain at a time. Before moving it, remove old credentials, identities, policy and data; verify no stale attachment remains. Never attach one unrestricted probe simultaneously to independent domains. Simultaneous testing needs separately scoped probes and its own capacity reservation."
+          },
+          {
+            "kind": "p",
+            "text": "Same-host coverage is applicable only where the adopted sharing and placement permit both test endpoints on that host. Cross-host coverage requires actual placement evidence, not an assumed scheduler choice. Record temporary resources in inventory and verify their cleanup after the campaign."
+          },
+          {
+            "kind": "note",
+            "text": "Healthy-control prerequisite: prove the actual source, destination service and permitted path work before interpreting a denied probe. A dead endpoint produces a blocked test, not isolation evidence."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                3
+              ],
+              [
+                "QCP",
+                6
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Observe network paths and boundary enforcement",
+        "lead": "These four cards are controlled observations against the approved fixture. Bind native resource identities and actual configuration before execution.",
+        "refs": [
+          [
+            "NBD",
+            2
+          ],
+          [
+            "NBD",
+            3
+          ],
+          [
+            "NET",
+            3
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Card / existing tests",
+              "Procedure and healthy control",
+              "Expected result / required artifact"
+            ],
+            "rows": [
+              [
+                "Q11-01: approved path and reply\nCT-003, CT-007, CT-024",
+                "Verify both endpoints; exercise F14-01. Locate the effective forward and reply path at native gateways and EC-01. Try a separately scoped reverse initiation.",
+                "Declared TCP/443 operation and reply work; unapproved new reverse initiation is denied. Retain path/rule/session evidence, not only an application success."
+              ],
+              [
+                "Q11-02: tenant isolation\nCT-001, CT-002",
+                "Prove each tenant’s local approved service. Observe bounded disallowed cross-tenant attempts in both directions and each offered family.",
+                "No unauthorized communication. Record endpoints, intended control, actual routing/policy and attributable denials. Unhealthy controls block the result."
+              ],
+              [
+                "Q11-03: same-domain policy\nCT-021, CT-022",
+                "Place the temporary probe in one approved domain; verify same-host/cross-host cases where applicable. Compare approved and unapproved communication.",
+                "Mandatory policy applies without requiring a physical gateway hop. Retain placement and enforcement evidence and the probe cleanup receipt."
+              ],
+              [
+                "Q11-04: shared-service return\nCT-008, CT-023, CT-024",
+                "Exercise the same resolver from both tenants. Trace each reply through its own SE/EC chain; check unbound service/admin targets and alternative connected paths.",
+                "Only entitled service use and origin-specific replies succeed. Retain service-side and edge observations; a shared endpoint is not tenant transit."
+              ]
+            ],
+            "widths": [
+              1.5,
+              2.92,
+              2.72
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Inspect both configured and effective forwarding. A flow seen at the intended ZIP proves that flow’s observation point; it does not alone eliminate another native path. Include connected routes, summaries, alternate interfaces, NAT/PBR and failure next hops that could change enforcement."
+          },
+          {
+            "kind": "p",
+            "text": "Every card records separate security and service outcomes. Unauthorized reachability fails the security assertion. An allowed connection that cannot operate fails its service assertion or is blocked by failed preconditions. Neither result is rescued by a successful Terraform run."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                6
+              ],
+              [
+                "IT",
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Observe identity, storage and protocol completeness",
+        "lead": "Test the actual native principal and data scope. A request made with administrator credentials is not evidence that a delegated tenant is restricted.",
+        "refs": [
+          [
+            "PBS",
+            7
+          ],
+          [
+            "SVC",
+            3
+          ],
+          [
+            "SVC",
+            4
+          ],
+          [
+            "IK",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Card / existing tests",
+              "Procedure and healthy control",
+              "Expected result / required artifact"
+            ],
+            "rows": [
+              [
+                "Q11-05: mandatory mutation authority\nCT-019, CT-020, CT-022, CT-066",
+                "With the actual tenant role, request forbidden baseline/group/port/external changes. Separately perform one approved workload operation.",
+                "Forbidden native mutations fail; entitled operation works. Record principal, target, operation and effective permission without storing secrets."
+              ],
+              [
+                "Q11-06: data attachment and copy scope\nCT-037, CT-078",
+                "Create disposable owned data and a known integrity marker. Test authorized access and bounded foreign attachment/clone/export attempts.",
+                "Owned access works; unauthorized data or lower-scope copy access fails. Retain data-service decisions, copy lineage and cleanup."
+              ],
+              [
+                "Q11-07: identity and key lifecycle\nCT-028, CT-038, CT-079",
+                "Use disposable credentials/key material in an approved scope. Observe valid use, rotation/revocation and denied foreign or revoked use.",
+                "Required use remains attributable; old authority expires as designed. Retain issuer/service logs and timestamps; no plaintext fallback."
+              ],
+              [
+                "Q11-08: service protocols and MTU\nCT-008, CT-030, CT-031, CT-032",
+                "Exercise DNS UDP/TCP and controlled fallback; check authorized resolver only. Test actual workload packet budget, PMTU and offered families end to end.",
+                "Necessary protocol behaviour works without broad egress or alternate-path bypass. Retain family/path matrix, packet budget and observed outcomes."
+              ]
+            ],
+            "widths": [
+              1.56,
+              2.86,
+              2.72
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "For block storage, identify whether the operation is hypervisor-mediated or guest-initiated. Do not assume a guest firewall denied a virtual-disk attachment that never used the guest NIC. For keys, distinguish the actual host, storage service or workload client from the administrator who manages key lifecycle."
+          },
+          {
+            "kind": "p",
+            "text": "These observations elaborate the inherited test methods. Apply current source and approved site protocol profiles through engineering; do not infer that an “encrypted” flag proves endpoint identity, current cryptographic suitability or successful retained-data recovery."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "OPS",
+                4
+              ],
+              [
+                "IT",
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Separate safe failure, service continuity and recovery",
+        "lead": "Authorize the fault scope, workload limit and restoration plan before using these cards. Do not perform intrusive tests against unrelated production tenants.",
+        "refs": [
+          [
+            "NBD",
+            7
+          ],
+          [
+            "QUAL",
+            5
+          ],
+          [
+            "OPS",
+            2
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Card / existing tests",
+              "Controlled observation",
+              "Independent result dimensions"
+            ],
+            "rows": [
+              [
+                "Q11-09: edge or link loss\nCT-012, CT-024, CT-034",
+                "Under approved representative load, observe the selected node/link failure and restoration using the site MOP. Capture new and established sessions.",
+                "Security: no bypass. Service: actual interruption and surviving load. Recovery: correct route/state after restoration."
+              ],
+              [
+                "Q11-10: dependency loss\nCT-011, CT-027, CT-038, CT-050, CT-055",
+                "Observe one scoped management, identity, key, logging or state dependency loss at a time; follow its accepted recovery procedure.",
+                "No fallback privilege/permit/plaintext. Existing and new operations match the documented limits. Evidence gaps and recovery time remain visible."
+              ],
+              [
+                "Q11-11: uncertain provisioning outcome\nCT-045, CT-046, CT-048",
+                "In a disposable scope, interrupt a response or executor at an approved point. Freeze competing writes; discover actual native tasks and resources before recovery.",
+                "No duplicate allocation or unsafe deletion. Denied unfinished resources remain owned. Retain task, plan, state and actual-outcome reconciliation."
+              ],
+              [
+                "Q11-12: isolated restore and cutover\nCT-052, CT-053, CT-054, CT-060",
+                "Restore a known disposable dataset and dependencies into the authorized recovery domain; validate consistency, identity/keys and paths before controlled activation.",
+                "Useful data and measured RTO/RPO; no ambiguous simultaneous writer; protection, return path and operating ownership survive cutover."
+              ]
+            ],
+            "widths": [
+              1.53,
+              2.95,
+              2.66
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "An edge can preserve security by denying traffic while failing its availability target. A backup can produce readable files while failing the required consistency point. Report these outcomes separately; do not collapse them into one green status."
+          },
+          {
+            "kind": "p",
+            "text": "The safety envelope defines which failure is covered, who may stop the test, required surviving access, maximum permitted impact and restoration authority. A clean node shutdown does not represent every partition or overload; record the specific tested condition and any remaining untested scope."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "OPS",
+                4
+              ],
+              [
+                "OPS",
+                5
+              ],
+              [
+                "IT",
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Build an evidence packet a reviewer can challenge",
+        "lead": "Evidence supports an assertion only when its target, scope, time and observation method match the claim.",
+        "refs": [
+          [
+            "RA",
+            28
+          ],
+          [
+            "QUAL",
+            5
+          ],
+          [
+            "IT",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Record area",
+              "Minimum content",
+              "Review rejection example"
+            ],
+            "rows": [
+              [
+                "Identity and scope",
+                "Case/assertion, actual tenant/domain/resource, topology and component/API/provider revision.",
+                "A passing result refers to yesterday’s gateway or another service class."
+              ],
+              [
+                "Preconditions",
+                "Healthy allowed controls, actual placement, required services, load and authorized test scope.",
+                "A timeout is labelled isolation success while the target service is stopped."
+              ],
+              [
+                "Observation",
+                "Actual requests/results, native policy/path decisions, timestamps and relevant dependency state.",
+                "Expected wording was copied into the observed-result field."
+              ],
+              [
+                "Artifact integrity",
+                "Protected artifact reference, collection time, integrity identifier, custodian and access scope.",
+                "A filename or signature-reference string is treated as verified authenticity."
+              ],
+              [
+                "Disposition",
+                "Passed, failed, blocked, not-run or approved not-applicable; reviewer, reasons and residual gaps.",
+                "Missing required evidence is reclassified as not-applicable merely to close a gate."
+              ]
+            ],
+            "widths": [
+              1.44,
+              3.09,
+              2.61
+            ]
+          },
+          {
+            "kind": "h",
+            "text": "Worked review example"
+          },
+          {
+            "kind": "p",
+            "text": "A cross-tenant connection times out, but the same-tenant positive control also fails. The correct disposition is blocked pending a healthy control, not passed. After the endpoint is restored, repeat both observations and retain the original blocked record. A subsequent passing test is a new result; it does not rewrite what happened earlier."
+          },
+          {
+            "kind": "p",
+            "text": "Evidence freshness follows material change as well as the approved interval. Recheck affected observations after routing, roles, group membership, backend, key custody or placement changes. Keep historical authorization separate from current technical status. A reviewer accepts the supported scope; software or a workbook does not issue risk authority."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                8
+              ],
+              [
+                "OPS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Compare vendor realizations without assuming migration",
+        "lead": "The architecture is portable when the required outcomes can be realized and operated on another eligible implementation. Transfer of existing data and workload state is a separate claim.",
+        "refs": [
+          [
+            "RA",
+            15
+          ],
+          [
+            "RA",
+            27
+          ],
+          [
+            "VC",
+            1
+          ],
+          [
+            "OPS",
+            6
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Comparison dimension",
+              "Hold constant",
+              "Allow to differ and verify"
+            ],
+            "rows": [
+              [
+                "Service requirements",
+                "Tenant authority, zones, approved operations, resource/protection needs and recovery scope.",
+                "Native projects, VPCs, routers, segments and gateway arrangements."
+              ],
+              [
+                "Security outcome",
+                "Denied cross-tenant/management access; explicit boundary and service entitlement.",
+                "Distributed versus centralized enforcement locations, with required functions fully evidenced."
+              ],
+              [
+                "Resource behaviour",
+                "Eligible placement, owned data, image baseline, support and service limits.",
+                "Virtual hardware, storage implementation and supported lifecycle mechanisms."
+              ],
+              [
+                "Operating acceptance",
+                "Monitoring, owner, restore, maintenance and retirement obligations.",
+                "Native logs, task models, capture/restore tooling and operational procedures."
+              ],
+              [
+                "Exit / transfer",
+                "Integrity, consistency, authorized target, identity/keys and controlled cutover.",
+                "Conversion method, downtime and supported format/driver changes; no assumed live migration."
+              ]
+            ],
+            "widths": [
+              1.37,
+              2.89,
+              2.88
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Use the same logical fixture and acceptance assertions for the second stack, then record every material difference. A product-specific extension remains visible with its effect on exit. The target cannot pass by silently dropping inspection, dedicated placement, data protection or another mandatory outcome."
+          },
+          {
+            "kind": "p",
+            "text": "For a representative transfer rehearsal, capture source state, target preparation, final consistency point, transfer integrity, recovered-service tests and authority for the writer switch. Measure effort, elapsed interruption and remaining dependencies. Successful creation of an empty target VM is not evidence that the source workload has been migrated."
+          },
+          {
+            "kind": "note",
+            "text": "Do not require all three stacks to exist for first-stack qualification. A simultaneous composite service across stacks has an additional latency, dependency and failure design."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                9
+              ],
+              [
+                "QCP",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Close defects and issue a scoped campaign disposition",
+        "lead": "Use an independent review where the adopted assurance model requires it. A test author’s expected outcome is not the final acceptance decision.",
+        "refs": [
+          [
+            "DEL",
+            3
+          ],
+          [
+            "IK",
+            7
+          ],
+          [
+            "IT",
+            4
+          ],
+          [
+            "IT",
+            7
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Campaign decision",
+              "What must be recorded",
+              "Working response"
+            ],
+            "rows": [
+              [
+                "Scope and applicability",
+                "Exact offered service, tuple, topology, assertion set, families and approved exclusions.",
+                {
+                  "field": "QCP_CAMPAIGN_SCOPE"
+                }
+              ],
+              [
+                "Evidence result",
+                "Execution IDs, artifact references, observed results and freshness after changes.",
+                {
+                  "field": "QCP_EVIDENCE_SET"
+                }
+              ],
+              [
+                "Defects / retests",
+                "Impact, owner, affected service, correction, targeted regression and retained original result.",
+                {
+                  "field": "QCP_DEFECT_DISPOSITION"
+                }
+              ],
+              [
+                "Limits / residual work",
+                "Measured limits, untested conditions and capabilities not qualified.",
+                {
+                  "field": "QCP_REMAINING_LIMITS"
+                }
+              ],
+              [
+                "Qualified scope",
+                "Actual technical review authority, decision reference, validity and review triggers.",
+                {
+                  "field": "QCP_QUALIFICATION_DECISION"
+                }
+              ],
+              [
+                "Activation prerequisites",
+                "Required initial G4 evidence and separately valid service/security authority before G3.",
+                {
+                  "field": "QCP_ACTIVATION_DEPENDENCIES"
+                }
+              ]
+            ],
+            "widths": [
+              1.43,
+              3.59,
+              2.12
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A corrected defect is not closed until the changed assertion and its affected neighbours are observed again. An altered shared edge may invalidate more than the single failed case. A change in test scope or an approved not-applicable decision is recorded explicitly and cannot disguise a missing mandatory outcome."
+          },
+          {
+            "kind": "p",
+            "text": "The release disposition can be qualified for a narrow service, restricted with explicit exclusions, or blocked. Existing workloads follow their actual continuity/risk conditions; do not automatically destroy data because a new qualification is withheld. Initial operational/recovery readiness precedes production activation; recurring exercises after activation do not replace it."
+          },
+          {
+            "kind": "note",
+            "text": "Current release record: procedures and editable campaign fields supplied; all platform observations NOT RUN and all real qualification/activation decisions unissued."
+          }
+        ]
+      }
+    ]
+  },
+  "OPS": {
+    "path": "03_Implementation/Operations_Recovery_and_Transition_Playbook.docx",
+    "title": "Operations, Recovery and Transition Playbook",
+    "subtitle": "Operate the actual service envelope, recover dependencies, and retire without losing data or authority.",
+    "intro": "This supplement develops IK-07 and IK-10 and the existing recovery/retirement runbooks. It supplies dependency decisions, change handling, a worked recovery timeline and operational records. It does not replace an approved incident process, native product procedure or data-owner decision.",
+    "sections": [
+      {
+        "title": "Operate service outcomes rather than isolated components",
+        "lead": "The operator needs to know what the service promises, which controls make that promise valid and which team can repair each dependency.",
+        "refs": [
+          [
+            "RA",
+            26
+          ],
+          [
+            "QUAL",
+            7
+          ],
+          [
+            "IK",
+            9
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Operating question",
+              "Required current record",
+              "Decision when the record is missing"
+            ],
+            "rows": [
+              [
+                "Can new demand be accepted?",
+                "Service-class quota, actual commitments and all surviving capacity bottlenecks.",
+                "Queue, restrict or choose another already eligible placement; no borrowing security reserve."
+              ],
+              [
+                "Is the service still supported?",
+                "Installed versions, support horizon, vulnerabilities, exceptions and available recovery method.",
+                "Escalate and limit affected capability under the approved lifecycle policy."
+              ],
+              [
+                "Why does connectivity exist?",
+                "Domain authorities, approved operation, actual route and effective policy.",
+                "Investigate or restrict through the responsible authority; reachability is not permission."
+              ],
+              [
+                "Can this service be recovered?",
+                "Current copy/catalogue/key dependencies, useful restore evidence and accountable recovery owner.",
+                "Withdraw an unsupported promise or remediate; a completed backup job is insufficient."
+              ],
+              [
+                "Who accepts a change?",
+                "Scope owner, affected consumers, operating conditions and evidence dependencies.",
+                "Resolve authority before execution; a technical role name is not an assigned approver."
+              ]
+            ],
+            "widths": [
+              1.61,
+              2.96,
+              2.57
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Define an observation cadence and material-change triggers for each service parameter. This playbook does not invent organization-wide maintenance or incident deadlines. Use the actual service agreement to set response objectives, review intervals, support coverage and escalation contacts."
+          },
+          {
+            "kind": "p",
+            "text": "Monitoring spans data-path success, denied-path enforcement, controller health, storage/copy integrity, identity/key use, native task completion and capacity. Tenant-provided logs alone do not establish provider enforcement. Account for collection loss, clock quality and protected access to cross-tenant evidence."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "OPS",
+                2
+              ],
+              [
+                "OPS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Specify dependency loss before it becomes an incident",
+        "lead": "Loss behaviour is different for established traffic, new operations and recovery. Record all three using the actual supported implementation.",
+        "refs": [
+          [
+            "RA",
+            14
+          ],
+          [
+            "SVC",
+            6
+          ],
+          [
+            "IK",
+            8
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Dependency loss",
+              "Existing / new operation",
+              "Recovery and authority condition"
+            ],
+            "rows": [
+              [
+                "Platform manager or runner",
+                "Existing data plane follows the qualified behaviour; new uncertain changes pause.",
+                "Discover accepted native tasks before restart. Do not infer that a timed-out action stopped."
+              ],
+              [
+                "IPAM / naming",
+                "Existing addresses and records follow their accepted lease/continuity policy; no guessed new allocation.",
+                "Restore authoritative history and reconcile reservations, DNS and actual resources before reuse."
+              ],
+              [
+                "Identity / privileged access",
+                "No automatic unrestricted local-account fallback for new administrative work.",
+                "Use the approved scoped emergency path; retain logs and revoke recovery grants after use."
+              ],
+              [
+                "KMS / certificate trust",
+                "Running access, cached keys and restart behaviour follow measured scope; no plaintext fallback.",
+                "Recover authorized keys/trust independently of resources that require them; preserve retained-copy access."
+              ],
+              [
+                "Logging / evidence collection",
+                "Enforcement remains; buffering and loss alerts follow the selected profile.",
+                "Record missing intervals and apply approved operating restrictions, rather than fabricate complete logs."
+              ],
+              [
+                "Storage, edge or site partition",
+                "Fail-safe enforcement and writer control precede any promotion or alternate path.",
+                "Select the authorized survivor/restore scope; verify capacity, consistency and current policy."
+              ]
+            ],
+            "widths": [
+              1.37,
+              3.05,
+              2.72
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "For each dependency record a named recovery owner, invocation conditions, observable safe state, local evidence location, dependent services and the point at which fresh acceptance is needed. A common identity or key service can couple otherwise separate sites; different site labels do not remove that dependency."
+          },
+          {
+            "kind": "note",
+            "text": "“Fail closed” does not mean destroy workloads or data. It means unavailable authority must not create new permission or bypass. Existing-service continuity follows the approved control and risk conditions."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                5
+              ],
+              [
+                "OPS",
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Run maintenance and recover interrupted changes",
+        "lead": "Classify a change by its effects on service, boundaries and data—not by the repository or tool that performs it.",
+        "refs": [
+          [
+            "RA",
+            25
+          ],
+          [
+            "PROV",
+            5
+          ],
+          [
+            "IK",
+            8
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Stage",
+              "Owner action",
+              "Stop or re-evaluate when"
+            ],
+            "rows": [
+              [
+                "Bound the change",
+                "Identify affected native objects, consumers, supported tuple, surviving load and approved window.",
+                "Authority is missing, a shared dependency is undisclosed, or recovery is unproven."
+              ],
+              [
+                "Freeze artifacts and ownership",
+                "Bind the accepted configuration/plan, actual state and credentials to one execution owner.",
+                "Another writer changes the target or approval-sensitive input after review."
+              ],
+              [
+                "Observe execution",
+                "Use supported native completion signals and capture actual side effects.",
+                "The response is lost, timeout expires or the executor lease ends without confirmed native completion."
+              ],
+              [
+                "Resolve uncertainty",
+                "Freeze competing writes; inspect native tasks, resources and data state; choose resume, forward repair or supported compensation.",
+                "A delayed task can still complete or compensation might delete shared or newly written data."
+              ],
+              [
+                "Reaccept and hand over",
+                "Recheck affected controls, capacity and data; record as-built and remaining defects.",
+                "Required observations are stale or incident containment has not been explicitly released."
+              ]
+            ],
+            "widths": [
+              1.35,
+              3.1,
+              2.69
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A prior state snapshot does not revert the actual infrastructure. Similarly, credential revocation may prevent a new API call without cancelling work already accepted by a native system. Record the remaining task and resource identity, then obtain the owning team’s recovery decision before a new execution competes with it."
+          },
+          {
+            "kind": "p",
+            "text": "For brownfield adoption, discover current routes, policies, data attachments, ownership and dependencies first. Review the non-destructive import/adoption scope and remove conflicting writers deliberately. Adoption is not conformance, and it is not permission to replace existing VMs, disks or gateways."
+          },
+          {
+            "kind": "p",
+            "text": "An authorized incident block takes precedence over ordinary configuration reconciliation until the incident authority releases it. Repair must not restore an old allow path merely because it remains in source."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                9
+              ],
+              [
+                "QCP",
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Recover the service in dependency order",
+        "lead": "Recovery begins with authority and trusted access, not with powering on every available copy of a VM.",
+        "refs": [
+          [
+            "SVC",
+            6
+          ],
+          [
+            "RA",
+            27
+          ],
+          [
+            "IT",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Recovery stage",
+              "Required action",
+              "Exit observation"
+            ],
+            "rows": [
+              [
+                "1. Establish authority",
+                "Declare scope and recovery owner; preserve evidence and prevent ambiguous concurrent writers.",
+                "The selected data/service recovery point and writer authority are explicit."
+              ],
+              [
+                "2. Recover minimum trust",
+                "Establish approved management/OOB, name/time/identity and access to protected keys and recovery material.",
+                "Recovery does not depend solely on the failed encrypted or management platform."
+              ],
+              [
+                "3. Rebuild foundations",
+                "Recover accepted configuration, inventory/state, transport, storage and platform control; then denied security and service paths.",
+                "Actual resources, support tuple, routes, quorum and shared dependencies match the recovery design."
+              ],
+              [
+                "4. Restore isolated service",
+                "Recover owned data, images and required identities/services into eligible domains.",
+                "Useful consistency markers, valid credentials/keys and permitted/denied paths are verified."
+              ],
+              [
+                "5. Activate and observe",
+                "Obtain required acceptance, switch approved service access and observe the live path.",
+                "Writer control, service outcome and achieved recovery targets are recorded."
+              ],
+              [
+                "6. Stabilize and plan return",
+                "Re-establish protection, reconcile emergency grants, and plan failback separately.",
+                "No temporary path or stale privilege remains without an accountable approved lifetime."
+              ]
+            ],
+            "widths": [
+              1.39,
+              3.1,
+              2.65
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "An isolated restore may reveal compromised configuration, missing keys, stale identities or an unusable consistency point. Keep the result restricted until the responsible owners resolve those conditions. A successful file read is not application acceptance; the service/data owner supplies meaningful restored-state checks."
+          },
+          {
+            "kind": "p",
+            "text": "Avoid recovery loops: the only key to unlock storage cannot be stored only on that locked storage; the sole backup catalogue cannot be reachable only through a destroyed controller. Record a tested dependency cut and custodial recovery method, without publishing secrets in the kit."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "OPS",
+                5
+              ],
+              [
+                "QCP",
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Calculate the recovery critical path and data point",
+        "lead": "The following schedule is a local planning example. It is not measured performance, an approved target or a prediction for any vendor platform.",
+        "refs": [
+          [
+            "QUAL",
+            4
+          ],
+          [
+            "SVC",
+            6
+          ],
+          [
+            "EK",
+            6
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Example activity",
+              "Minutes",
+              "Dependency / elapsed finish"
+            ],
+            "rows": [
+              [
+                "Detect and declare",
+                "10",
+                "Start 0 → finish 10"
+              ],
+              [
+                "Select recovery authority",
+                "5",
+                "After detection → finish 15"
+              ],
+              [
+                "Recover minimum trust / bootstrap",
+                "25",
+                "After decision → finish 40"
+              ],
+              [
+                "Network foundation / storage foundation",
+                "20 / 40",
+                "Illustratively parallel after bootstrap → finish 60 / 80"
+              ],
+              [
+                "Restore service data",
+                "35",
+                "After both foundations → finish 115"
+              ],
+              [
+                "Validate security and useful data",
+                "20",
+                "After restore → finish 135"
+              ],
+              [
+                "Controlled access cutover",
+                "5",
+                "After validation → finish 140"
+              ]
+            ],
+            "widths": [
+              3.45,
+              0.75,
+              2.94
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "With those dependencies, elapsed recovery is 10 + 5 + 25 + max(20, 40) + 35 + 20 + 5 = 140 minutes. Against an illustrative 180-minute target, planning margin is 40 minutes. Do not add both parallel branches or assume independence when they share people, storage, credentials or network recovery. If the two foundation tasks must run serially, the same example becomes 160 minutes with 20 minutes of margin."
+          },
+          {
+            "kind": "p",
+            "text": "Include decision, queue, transfer, validation and exposure time when they fall inside the agreed RTO boundary. The actual service defines the start and end events. Rehearsal evidence determines feasibility; the calculation only reveals assumptions and dependencies."
+          },
+          {
+            "kind": "h",
+            "text": "RPO is a data-state measurement"
+          },
+          {
+            "kind": "p",
+            "text": "If service loss occurs at 12:00 and the latest verified recoverable consistency point is 11:45, the recovered-data age is 15 minutes. A job that finished at 11:55 does not prove an 11:55 data point. Record capture/transaction consistency, replication lag, copy integrity and the actual accepted state. These timestamps are illustrative."
+          },
+          {
+            "kind": "note",
+            "text": "A recovery target can be met while an availability objective is breached. Report both; RTO is not an automatic exclusion from service downtime."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                5
+              ],
+              [
+                "OPS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Migrate and fail back without conflicting writers",
+        "lead": "Provisioning target infrastructure and transferring existing workload state are separate activities with separate owners.",
+        "refs": [
+          [
+            "RA",
+            27
+          ],
+          [
+            "PROV",
+            6
+          ],
+          [
+            "QCP",
+            7
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Transition stage",
+              "Controlled work",
+              "Decision before proceeding"
+            ],
+            "rows": [
+              [
+                "Discover and prepare",
+                "Map current data, drivers/boot, virtual devices, identity/keys, network dependencies and accepted target.",
+                "The target supports the required service and recoverable data format; unresolved extensions are explicit."
+              ],
+              [
+                "Transfer under bounded access",
+                "Use the approved capture/transfer method, scoped temporary route/policy and integrity checks.",
+                "Data consistency method, bandwidth/window, authority and cleanup owner are accepted."
+              ],
+              [
+                "Final consistency and writer change",
+                "Select final data point; control old writers; validate target state and service dependencies.",
+                "One attributable writer authority exists before target production writes."
+              ],
+              [
+                "Cut over and observe",
+                "Change only approved DNS/exposure/service access; verify the actual client path and protection.",
+                "Operating owner accepts current evidence and the point at which simple rollback ceases to be safe."
+              ],
+              [
+                "Return or retire",
+                "Reconcile new writes before failback; otherwise retire the source under retention policy.",
+                "Reverse synchronization/recovery is supported; old data is not restarted as a competing current copy."
+              ]
+            ],
+            "widths": [
+              1.57,
+              2.97,
+              2.6
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Before target writes, return to the source may be possible if the original state and authority remain valid. After target writes, restarting the old copy can lose or fork data. The runbook identifies that point of no simple rollback and the required reverse transfer or recovery process. “Rollback” must state its data implications."
+          },
+          {
+            "kind": "p",
+            "text": "Temporary cross-domain transfer access is time-bound and reviewed. Persistent vendor live-mobility and storage-replication transports remain provider infrastructure with their own controlled membership; they are not recreated for each migration just to satisfy a temporary-access rule."
+          },
+          {
+            "kind": "p",
+            "text": "A composite service actively using several stacks is a distinct architecture. Account for cross-stack latency, security edges, identity, shared-service loss and ownership before claiming it provides the same resilience as one bounded cell."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "OPS",
+                7
+              ],
+              [
+                "IT",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Retire live service separately from retained data",
+        "lead": "A retired WSD can leave legitimate protected copies. Make those obligations explicit rather than declaring all data destroyed because live resources were removed.",
+        "refs": [
+          [
+            "RA",
+            27
+          ],
+          [
+            "SVC",
+            4
+          ],
+          [
+            "IK",
+            9
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Object / obligation",
+              "Retirement decision",
+              "Evidence of safe completion"
+            ],
+            "rows": [
+              [
+                "Shared domains and services",
+                "Remove only the departing consumer’s authority; retain objects with other approved dependents.",
+                "Dependency review and absence of unintended impact on remaining consumers."
+              ],
+              [
+                "Routes, policies, names and addresses",
+                "Withdraw obsolete live access, reconcile caches/leases/sessions and quarantine reuse.",
+                "Actual residual scan and ownership history, not only a destroy command’s exit status."
+              ],
+              [
+                "Snapshots, replicas and backups",
+                "Reconcile retention, holds, approved copy locations and data owner.",
+                "Known copy inventory, current access boundary and explicit disposal/review date."
+              ],
+              [
+                "Keys and recovery catalogue",
+                "Retain what authorized copies still require; separate use, recovery and destruction authority.",
+                "Verified recoverability and custody until approved final disposal."
+              ],
+              [
+                "Media and resource reuse",
+                "Use the applicable approved sanitization method and qualified handling process.",
+                "Method, scope, verification and exceptions before reassignment. A deleted volume record is insufficient."
+              ]
+            ],
+            "widths": [
+              1.48,
+              2.97,
+              2.69
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A retained-copy record includes former WSD identity, copy identity, category/location, owner, hold/retention, key/catalogue dependencies, authorized recovery access, review date and final disposition authority. It does not retain unnecessary live tenant access merely because a backup still exists."
+          },
+          {
+            "kind": "p",
+            "text": "If an offline copy, supplier-held media or shared key prevents immediate disposal proof, record the unresolved obligation and its owner. Do not label total destruction complete. Conversely, do not delete a shared key to satisfy one workload’s retirement while other retained data still depends on it."
+          },
+          {
+            "kind": "note",
+            "text": "Physical media handling and equipment disposal use the organization’s approved process and qualified personnel. This playbook records scope, authority and evidence; it does not replace handling or safety procedures."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "IT",
+                8
+              ],
+              [
+                "OPS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Accept operational responsibility for the delivered scope",
+        "lead": "Operations accepts an actual service and its boundaries—not a generic document package or a green installation status.",
+        "refs": [
+          [
+            "QUAL",
+            7
+          ],
+          [
+            "IT",
+            6
+          ],
+          [
+            "IT",
+            7
+          ],
+          [
+            "DEL",
+            3
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Acceptance area",
+              "What the receiving owner confirms",
+              "Working response"
+            ],
+            "rows": [
+              [
+                "Service and as-built",
+                "Actual service scope, native identities, topology, data/management boundaries and accepted variation.",
+                {
+                  "field": "OPS_AS_BUILT_SCOPE"
+                }
+              ],
+              [
+                "Support and escalation",
+                "Assigned teams, contacts, coverage, supplier access and supported component versions.",
+                {
+                  "field": "OPS_SUPPORT_OWNER"
+                }
+              ],
+              [
+                "Monitoring and capacity",
+                "Observable service/security indicators, alerts, loss handling, reserves and growth triggers.",
+                {
+                  "field": "OPS_MONITORING_CAPACITY"
+                }
+              ],
+              [
+                "Recovery and protection",
+                "Current copy/key/catalogue custody, useful restore evidence and approved RTO/RPO scope.",
+                {
+                  "field": "OPS_RECOVERY_EVIDENCE"
+                }
+              ],
+              [
+                "Residual obligations",
+                "Defects, exceptions, excluded capabilities, retained data and due/review triggers.",
+                {
+                  "field": "OPS_RESIDUAL_OBLIGATIONS"
+                }
+              ],
+              [
+                "Decision and conditions",
+                "Actual receiving authority, initial G4 acceptance, production dependencies and ongoing review.",
+                {
+                  "field": "OPS_ACCEPTANCE_DECISION"
+                }
+              ]
+            ],
+            "widths": [
+              1.47,
+              3.5,
+              2.17
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Initial G4 operational and recovery readiness precedes G3 production activation. The later as-built confirmation records what was activated and handed over; it must not be the first occasion on which support or recovery ownership is discovered. Continuing exercises confirm that the service remains inside its accepted envelope."
+          },
+          {
+            "kind": "p",
+            "text": "A material change can invalidate only part of a qualification or a wider inherited dependency. Record the affected scope, conditions for existing operation, restrictions on new placement and the evidence required for reacceptance. Keep historical authorization and actual current technical status separately attributable."
+          },
+          {
+            "kind": "note",
+            "text": "Current release status: developed operational procedures and editable records supplied. No site acceptance, real recovery measurement, supplier approval or operating authorization is asserted."
+          }
+        ]
+      }
+    ]
+  },
+  "DEL": {
+    "path": "00_Delivery_Map.docx",
+    "title": "Delivery Map and Acceptance Gates",
+    "subtitle": "Architecture decisions → detailed engineering → controlled implementation → accepted operations.",
+    "intro": "This v1.1 delivery release adds five developed specifications to the existing architecture, engineering and implementation kits. The eight parent v1.4 documents, existing role guides/templates, workbooks and inherited requirement/test catalogues remain unchanged. This map is the current entry point; the retained documents keep their own version labels.",
+    "sections": [
+      {
+        "title": "Three kits, one architecture-led delivery",
+        "lead": "The architecture defines what exists and why. Engineering makes it buildable. Implementation provides actual observations and an accountable operating handoff.",
+        "refs": [
+          [
+            "RA",
+            1
+          ],
+          [
+            "RA",
+            30
+          ],
+          [
+            "AK",
+            1
+          ],
+          [
+            "EK",
+            1
+          ],
+          [
+            "IK",
+            1
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Work",
+              "Primary question",
+              "Current developed companion"
+            ],
+            "rows": [
+              [
+                "Architecture",
+                "What service is offered, which boundaries and sharing are accepted, and what must survive or recover?",
+                "SDP develops service envelopes, alternatives, dependencies and the engineering decision contract."
+              ],
+              [
+                "Engineering",
+                "Which exact components, routes, policies, pools, supported mechanisms and failure budgets realize the design?",
+                "NBD develops network/boundary schedules; PBS develops native platform builds and shared handoffs."
+              ],
+              [
+                "Implementation",
+                "How is the accepted design commissioned, qualified, activated, maintained and retired?",
+                "QCP develops campaign observations; OPS develops dependency loss, recovery, transition and operating acceptance."
+              ]
+            ],
+            "widths": [
+              1.35,
+              3.04,
+              2.75
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Start with the service and physical/logical design, then choose native realizations and provisioning packages. Terraform manages supported infrastructure operations alongside native installers, lifecycle and service tooling. No custom controller, schema registry or new application architecture is required by this release."
+          },
+          {
+            "kind": "p",
+            "text": "Use one selected stack and the necessary shared foundations for first qualification. Repeat the required service outcomes on a second stack for deployment comparison, then rehearse representative data/image recovery for the separate portability claim. A simultaneous multi-stack service is an explicit additional design."
+          },
+          {
+            "kind": "note",
+            "text": "This is a reusable reference and delivery-development package. It does not contain actual site allocations, native deployment modules, executed qualification evidence or authority to operate."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "SDP",
+                1
+              ],
+              [
+                "PBS",
+                1
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Preserve stable deliverables and explicit handoffs",
+        "lead": "The 27 AK/EK/IK output IDs and 194 inherited requirement records are not renumbered. New development records provide detail and navigation, not replacement requirements.",
+        "refs": [
+          [
+            "AK",
+            8
+          ],
+          [
+            "EK",
+            8
+          ],
+          [
+            "IK",
+            1
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Handoff",
+              "Sender supplies",
+              "Receiver verifies"
+            ],
+            "rows": [
+              [
+                "Architecture → engineering",
+                "Service envelope, linked views, accepted sharing/boundary decisions, obligations and unresolved scope.",
+                "No contradiction or missing decision affects the intended build; each delegated engineering choice has a bounded outcome."
+              ],
+              [
+                "Engineering → implementation",
+                "Actual LLD, native mapping, supported tuple, configuration artifacts, interface receipts, MOP and observation plan.",
+                "No guessed address, competing writer, unsafe replacement or unsupported required operation."
+              ],
+              [
+                "Implementation → operations",
+                "As-built identities, actual tests, supported limits, current protection/recovery and retained obligations.",
+                "The service is supportable and recoverable; initial readiness existed before production activation."
+              ]
+            ],
+            "widths": [
+              1.65,
+              2.84,
+              2.65
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Carry a decision ID into its engineering schedule, native build package, assertion and evidence record. Diagrams use the same component/interface identities. Use the existing deliverables catalogue and role workbooks as working records; the new development register points to the supporting detail."
+          },
+          {
+            "kind": "p",
+            "text": "A handoff passes the minimum facts needed to consume a service: identities, permitted use, limits, support, acceptance revision and remaining restrictions. It does not transfer unrestricted credentials or change configuration ownership. Both producer and consumer must acknowledge the dependency."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "SDP",
+                6
+              ],
+              [
+                "NBD",
+                6
+              ],
+              [
+                "PBS",
+                8
+              ],
+              [
+                "PBS",
+                9
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Apply gate dependencies rather than numerical order",
+        "lead": "G0–G4 remain the parent’s acceptance identifiers. They are not a simple chronological ladder: applicable G4 initial readiness precedes G3 production activation.",
+        "refs": [
+          [
+            "WD",
+            9
+          ],
+          [
+            "QUAL",
+            5
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Decision",
+              "Required preceding condition",
+              "What it does not authorize"
+            ],
+            "rows": [
+              [
+                "G0: design adoption",
+                "Accepted scope and design decisions.",
+                "Does not itself authorize a build or production operation."
+              ],
+              [
+                "G1: foundation acceptance",
+                "G0 for affected scope; actual trusted access and transport evidence.",
+                "API reachability is not complete commissioning."
+              ],
+              [
+                "Restricted fixture permission",
+                "G1 and safeguarded installed candidate resources; authorized test scope.",
+                "Does not permit production data or claim platform qualification."
+              ],
+              [
+                "G2: platform/service qualification",
+                "Applicable single-stack observations, supported tuple and actual limits.",
+                "Does not automatically grant operational or security authorization."
+              ],
+              [
+                "G4 initial: readiness",
+                "Relevant qualified service; required owners, protection and recovery evidence.",
+                "Cannot be deferred until after the service promise is activated."
+              ],
+              [
+                "G3: production activation",
+                "G0/G1/G2, applicable G4 initial, current tenant evidence and valid authority.",
+                "Neither a workbook nor tool exit code grants this decision."
+              ],
+              [
+                "G4 continuing: reacceptance",
+                "Activated scope, approved cadence and material-change triggers.",
+                "Historical evidence does not validate a changed topology."
+              ]
+            ],
+            "widths": [
+              1.79,
+              3.08,
+              2.27
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Resolve service-level qualification and workload-specific acceptance at their actual scopes. Controlled preproduction validation can build the evidence needed for readiness without creating a circular requirement for an already active production service. Record that permission separately and restrict the fixture accordingly."
+          },
+          {
+            "kind": "p",
+            "text": "The gate record identifies the actual approver, scope, evidence and conditions. Missing or blocked evidence remains visible; changing a cell status cannot create the authority or control it references."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                1
+              ],
+              [
+                "QCP",
+                8
+              ],
+              [
+                "OPS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Use working records without creating duplicate truth",
+        "lead": "Reference documents, examples, live site records and observed evidence serve different purposes. Keep their ownership clear.",
+        "refs": [
+          [
+            "RA",
+            28
+          ],
+          [
+            "WD",
+            13
+          ],
+          [
+            "IT",
+            4
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Material",
+              "Version / role",
+              "How to use it"
+            ],
+            "rows": [
+              [
+                "05_Reference_v1_4",
+                "Eight frozen parent documents and reference registers.",
+                "Read and cite; record variations separately."
+              ],
+              [
+                "Original role guides and templates",
+                "Retained v1.0 material; active within this v1.1 kit.",
+                "Complete HLD, LLD and MOP/test/handover records for a named project."
+              ],
+              [
+                "Three workbooks",
+                "Retained unchanged; project registers/calculators with labelled examples.",
+                "Enter actual values/evidence; no new formula or measurement validation is claimed in this release."
+              ],
+              [
+                "Five developed specifications",
+                "New v1.1 SDP, NBD, PBS, QCP and OPS.",
+                "Use worked reasoning, native build specifications and observation/operating records to complete the role outputs."
+              ],
+              [
+                "Development CSVs",
+                "New navigation, proposed treatment, observation and calculation records.",
+                "Reference snapshots; do not treat expected results or open decisions as actual evidence."
+              ],
+              [
+                "Quality and build source",
+                "Prior v1.0 checks separated from current v1.1 document checks.",
+                "Rebuild developed documents and run current structural checks; neither set qualifies infrastructure."
+              ]
+            ],
+            "widths": [
+              1.66,
+              2.53,
+              2.95
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The existing workbook and project change system remain the chosen sources for real implementation status. New record fields identify what must be entered; they are not an automated approval mechanism. Preserve actual observation, not-run, blocked and approved not-applicable as distinct dispositions."
+          },
+          {
+            "kind": "note",
+            "text": "Source handling: parent-derived architecture is linked by document/section. New worked elaborations are local proposals. D01–D08 identify mechanism references checked for this release, not a selected product tuple."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "QCP",
+                6
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Review the design through realistic change and failure",
+        "lead": "Cross-discipline review should expose the assumptions a build would otherwise discover late.",
+        "refs": [
+          [
+            "AK",
+            7
+          ],
+          [
+            "EK",
+            8
+          ],
+          [
+            "IK",
+            8
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Walkthrough",
+              "Challenge to demonstrate",
+              "Resulting record"
+            ],
+            "rows": [
+              [
+                "Service and sharing",
+                "Explain the offer, excluded capabilities and the consequences of one unavailable shared dependency.",
+                "HLD decision and service-envelope disposition."
+              ],
+              [
+                "Network and data",
+                "Walk F14-01 forward/reply, shared DNS replies, one denied route and one virtual-disk access.",
+                "Native mapping, route/policy schedule and control-location evidence plan."
+              ],
+              [
+                "Build and interruption",
+                "Explain which owner can create, update, adopt, replace or retire each resource, including a late native task.",
+                "Operation matrix, MOP stopping points and data-safe recovery."
+              ],
+              [
+                "Qualification",
+                "Show a healthy control, one meaningful failure and an independently reviewable artifact.",
+                "Campaign scope, assertion coverage, defect and retest plan."
+              ],
+              [
+                "Readiness and lifecycle",
+                "Recover a known dataset and explain cutover, return after new writes and retained-copy disposal.",
+                "Initial readiness, operating acceptance and P6 obligations."
+              ]
+            ],
+            "widths": [
+              1.43,
+              3.44,
+              2.27
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "A design change needs impact review across linked views, schedules, native artifacts, test observations, service promises and deployed scopes. Reuse prior evidence only when its scope and freshness remain valid. A change to the source document alone does not alter a running environment."
+          },
+          {
+            "kind": "p",
+            "text": "Each review yields an accepted disposition or an assigned blocker with owner, gate and evidence needed for closure. Do not use document length, test counts or the absence of schema errors as proof of architectural completeness."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "SDP",
+                3
+              ],
+              [
+                "QCP",
+                6
+              ],
+              [
+                "OPS",
+                3
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Resolve the actual inputs before execution",
+        "lead": "The kit develops the method and expected infrastructure outcomes. Actual site facts remain the responsibility of the named project and infrastructure owners.",
+        "refs": [
+          [
+            "GM",
+            4
+          ],
+          [
+            "WD",
+            14
+          ],
+          [
+            "ET",
+            1
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Required input",
+              "Responsible role",
+              "Dependent decision"
+            ],
+            "rows": [
+              [
+                "Site, cells and physical dependencies",
+                "Site/facility/platform owners.",
+                "Actual inventory, power/rack/link groups and accepted commissioning."
+              ],
+              [
+                "Sharing, management and selected obligations",
+                "Architecture and security authorities.",
+                "Eligible compute/storage/control and recovery boundaries."
+              ],
+              [
+                "Exact supported implementation",
+                "Platform/network/service engineering.",
+                "Hardware, firmware, releases, features, licences and native operation support."
+              ],
+              [
+                "Actual addressing and interfaces",
+                "Network/edge/service owners.",
+                "IPAM, routes, policy, reply paths and single configuration ownership."
+              ],
+              [
+                "Service, capacity and data constraints",
+                "Service/data/operations owners.",
+                "Performance, failure model, retention, location, RTO/RPO and support."
+              ],
+              [
+                "Native execution artifacts and real evidence",
+                "Implementers, assurance and designated approvers.",
+                "Reviewed MOP, actual observation, scoped qualification, readiness and activation."
+              ]
+            ],
+            "widths": [
+              2.12,
+              2.18,
+              2.84
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Unknown values do not become vendor defaults. Assign a blocking gate and an owner. Engineering exploration and safeguarded qualification preparation can continue in parallel where authorized, but production construction and activation cannot depend on unaccepted boundaries or support assumptions."
+          },
+          {
+            "kind": "p",
+            "text": "Native configuration, installation and data-movement artifacts are separate build deliverables. This release does not invent a universal Terraform implementation or turn reference addresses into a deployable network. Physical work uses qualified personnel and accepted site/manufacturer procedures."
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "PBS",
+                9
+              ],
+              [
+                "OPS",
+                8
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Navigate the developed document family",
+        "lead": "The five new documents deepen existing outputs rather than adding another unrelated methodology.",
+        "refs": [
+          [
+            "RA",
+            30
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Document",
+              "Primary purpose",
+              "Role outputs developed"
+            ],
+            "rows": [
+              [
+                "SDP: Service Design and Architecture Decisions",
+                "Service offer, sharing alternatives, worked boundary decision, dependency/capacity/exit reasoning.",
+                "AK-01–AK-08"
+              ],
+              [
+                "NBD: Network, Boundary and Shared-Service Detailed Engineering",
+                "Isolation-unit ownership, concrete routes, service return paths, family/MTU budgets and interface release.",
+                "EK-03, EK-05, EK-06, EK-09"
+              ],
+              [
+                "PBS: Platform Engineering and Build Specifications",
+                "Foundation and tenant build specifications per stack, supported-operation ownership and shared handoffs.",
+                "EK-04, EK-07–EK-09; IK-03–IK-05"
+              ],
+              [
+                "QCP: Qualification Campaign and Evidence Procedures",
+                "Fixture resources, twelve Q11 observation cards, evidence review and scoped qualification.",
+                "IK-06–IK-09"
+              ],
+              [
+                "OPS: Operations, Recovery and Transition Playbook",
+                "Dependency loss, controlled maintenance, recovery timing, migration, retirement and acceptance.",
+                "AK-06; IK-07, IK-09, IK-10"
+              ]
+            ],
+            "widths": [
+              2.35,
+              3.18,
+              1.61
+            ]
+          },
+          {
+            "kind": "refs",
+            "refs": [
+              [
+                "SDP",
+                1
+              ],
+              [
+                "NBD",
+                1
+              ],
+              [
+                "PBS",
+                1
+              ],
+              [
+                "QCP",
+                1
+              ],
+              [
+                "OPS",
+                1
+              ]
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "Begin with the document matching the decision in front of you, then follow its parent and related-section links. Complete real project responses in the existing role templates or controlled records; copy only the necessary developed response blocks rather than duplicating the whole library for each decision."
+          },
+          {
+            "kind": "p",
+            "text": "The new development register uses DD identifiers for documentation treatment and remaining implementation work. Q11 cards reference inherited CT procedures and do not renumber them. Example calculations are stored separately for transparent arithmetic checks."
+          },
+          {
+            "kind": "note",
+            "text": "Extract the complete ZIP and retain the folder structure. Relative DOCX links identify the target document and section; external links require normal browser access."
+          }
+        ]
+      },
+      {
+        "title": "Understand release scope and residual work",
+        "lead": "Document development, implementation qualification and formal authorization remain separate completion layers.",
+        "refs": [
+          [
+            "RA",
+            28
+          ],
+          [
+            "QUAL",
+            8
+          ]
+        ],
+        "blocks": [
+          {
+            "kind": "table",
+            "headers": [
+              "Layer",
+              "Supplied in v1.1",
+              "Still requires actual implementation"
+            ],
+            "rows": [
+              [
+                "Architecture",
+                "Developed decision methods and worked local alternatives linked to the frozen parent.",
+                "Adopted scope, actual authorities, approved sharing and selected controls."
+              ],
+              [
+                "Engineering",
+                "Detailed path reasoning, native build specifications, ownership and handoff records.",
+                "Site values, exact supported tuple, configuration artifacts and measured limits."
+              ],
+              [
+                "Implementation",
+                "Observation cards, evidence review, recovery/change procedures and acceptance records.",
+                "Authorized execution, actual outcomes, defects/retests, operational and security decisions."
+              ],
+              [
+                "Publishing",
+                "Current links, content/lineage checks and rendered review of new/modified documents.",
+                "Maintainers rerun these checks after their own edits; publishing checks do not prove deployed safety."
+              ]
+            ],
+            "widths": [
+              1.4,
+              2.94,
+              2.8
+            ]
+          },
+          {
+            "kind": "p",
+            "text": "The original architecture and role material is retained with its provenance. The delivery map is updated; it does not silently supersede architectural requirements. No prior live test result is imported as a pass. The inherited CT procedures, realization addenda and W14 assertions retain their original reference status."
+          },
+          {
+            "kind": "p",
+            "text": "Use 04_Shared/development for the new treatment map, campaign cards, source reviews and example calculations. Use 07_Quality/v1_1 for current validation; prior_v1_0 reports describe only the earlier release. The fresh source directory rebuilds the six new/modified Word documents without rewriting the frozen workbooks or architecture."
+          },
+          {
+            "kind": "note",
+            "text": "Completed output: a linked document-development release. Not claimed: approved site engineering, executable cross-vendor provisioning, live infrastructure qualification, real recovery performance or authorization."
+          }
+        ]
+      }
+    ]
+  }
+}

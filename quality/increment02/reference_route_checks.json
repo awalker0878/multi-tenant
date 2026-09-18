@@ -1,0 +1,900 @@
+{
+  "status": "MODEL_CHECKS_ONLY",
+  "checks": [
+    {
+      "id": "F14-01-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-01",
+          "NG-D01O",
+          "EC-01",
+          "NG-D01R",
+          "data-01"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "data-01",
+          "NG-D01R",
+          "EC-01",
+          "NG-D01O",
+          "processor-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-01-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-01-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-01",
+          "NG-D01O",
+          "EC-01",
+          "NG-D01R",
+          "data-01"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "data-01",
+          "NG-D01R",
+          "EC-01",
+          "NG-D01O",
+          "processor-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-01-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-O-tcp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-01",
+          "NG-D01O",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01O",
+          "processor-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-O-tcp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-O-tcp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-01",
+          "NG-D01O",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01O",
+          "processor-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-O-tcp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-O-udp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-01",
+          "NG-D01O",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01O",
+          "processor-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-O-udp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-O-udp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-01",
+          "NG-D01O",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01O",
+          "processor-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-O-udp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-R-tcp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-01",
+          "NG-D01R",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01R",
+          "data-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-R-tcp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-R-tcp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-01",
+          "NG-D01R",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01R",
+          "data-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-R-tcp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-R-udp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-01",
+          "NG-D01R",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01R",
+          "data-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-R-udp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-1-R-udp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-01",
+          "NG-D01R",
+          "EC-01",
+          "SE-01",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-01",
+          "EC-01",
+          "NG-D01R",
+          "data-01"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-1-R-udp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-02-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-02",
+          "NG-D02O",
+          "EC-02",
+          "NG-D02R",
+          "data-02"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "data-02",
+          "NG-D02R",
+          "EC-02",
+          "NG-D02O",
+          "processor-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-02-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-02-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-02",
+          "NG-D02O",
+          "EC-02",
+          "NG-D02R",
+          "data-02"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "data-02",
+          "NG-D02R",
+          "EC-02",
+          "NG-D02O",
+          "processor-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-02-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-O-tcp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-02",
+          "NG-D02O",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02O",
+          "processor-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-O-tcp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-O-tcp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-02",
+          "NG-D02O",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02O",
+          "processor-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-O-tcp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-O-udp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-02",
+          "NG-D02O",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02O",
+          "processor-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-O-udp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-O-udp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "processor-02",
+          "NG-D02O",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02O",
+          "processor-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-O-udp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-R-tcp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-02",
+          "NG-D02R",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02R",
+          "data-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-R-tcp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-R-tcp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-02",
+          "NG-D02R",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02R",
+          "data-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-R-tcp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-R-udp-ipv4",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-02",
+          "NG-D02R",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02R",
+          "data-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-R-udp-unsolicited-reverse-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "F14-03-2-R-udp-ipv6",
+      "passed": true,
+      "outcome": "MODEL_PATH_AND_INTENT_MATCH",
+      "forward": {
+        "outcome": "REACHED",
+        "path": [
+          "data-02",
+          "NG-D02R",
+          "EC-02",
+          "SE-02",
+          "resolver"
+        ]
+      },
+      "reverse": {
+        "outcome": "REACHED",
+        "path": [
+          "resolver",
+          "SE-02",
+          "EC-02",
+          "NG-D02R",
+          "data-02"
+        ]
+      }
+    },
+    {
+      "id": "F14-03-2-R-udp-unsolicited-reverse-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-01-to-processor-02-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-01",
+        "NG-D01O"
+      ]
+    },
+    {
+      "id": "processor-01-to-processor-02-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-01",
+        "NG-D01O"
+      ]
+    },
+    {
+      "id": "processor-01-to-data-02-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-01",
+        "NG-D01O"
+      ]
+    },
+    {
+      "id": "processor-01-to-data-02-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-01",
+        "NG-D01O"
+      ]
+    },
+    {
+      "id": "data-01-to-processor-02-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-01",
+        "NG-D01R"
+      ]
+    },
+    {
+      "id": "data-01-to-processor-02-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-01",
+        "NG-D01R"
+      ]
+    },
+    {
+      "id": "data-01-to-data-02-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-01",
+        "NG-D01R"
+      ]
+    },
+    {
+      "id": "data-01-to-data-02-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-01",
+        "NG-D01R"
+      ]
+    },
+    {
+      "id": "processor-02-to-processor-01-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-02",
+        "NG-D02O"
+      ]
+    },
+    {
+      "id": "processor-02-to-processor-01-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-02",
+        "NG-D02O"
+      ]
+    },
+    {
+      "id": "processor-02-to-data-01-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-02",
+        "NG-D02O"
+      ]
+    },
+    {
+      "id": "processor-02-to-data-01-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "processor-02",
+        "NG-D02O"
+      ]
+    },
+    {
+      "id": "data-02-to-processor-01-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-02",
+        "NG-D02R"
+      ]
+    },
+    {
+      "id": "data-02-to-processor-01-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-02",
+        "NG-D02R"
+      ]
+    },
+    {
+      "id": "data-02-to-data-01-ipv4",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-02",
+        "NG-D02R"
+      ]
+    },
+    {
+      "id": "data-02-to-data-01-ipv6",
+      "passed": true,
+      "outcome": "NO_ROUTE",
+      "path": [
+        "data-02",
+        "NG-D02R"
+      ]
+    },
+    {
+      "id": "processor-01-unselected-time-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-01-unselected-time-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-01-unselected-logs-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-01-unselected-logs-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-01-unselected-repository-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-01-unselected-repository-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-01-unselected-time-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-01-unselected-time-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-01-unselected-logs-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-01-unselected-logs-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-01-unselected-repository-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-01-unselected-repository-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-02-unselected-time-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-02-unselected-time-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-02-unselected-logs-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-02-unselected-logs-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-02-unselected-repository-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "processor-02-unselected-repository-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-02-unselected-time-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-02-unselected-time-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-02-unselected-logs-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-02-unselected-logs-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-02-unselected-repository-ipv4",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    },
+    {
+      "id": "data-02-unselected-repository-ipv6",
+      "passed": true,
+      "outcome": "MODEL_POLICY_DENY"
+    }
+  ],
+  "passed": 80,
+  "failed": 0,
+  "live_qualification": "NOT_RUN",
+  "policy_engine": "Abstract allow-list with reply semantics; not a vendor firewall evaluation.",
+  "unresolved_profiles": [
+    {
+      "id": "F14-04",
+      "service": "time",
+      "status": "BLOCKED_PROFILE_REQUIRED"
+    },
+    {
+      "id": "F14-05",
+      "service": "logs",
+      "status": "BLOCKED_PROFILE_REQUIRED"
+    },
+    {
+      "id": "F14-06",
+      "service": "repository",
+      "status": "BLOCKED_PROFILE_REQUIRED"
+    },
+    {
+      "id": "F14-07",
+      "service": "backup",
+      "status": "BLOCKED_CLIENT_AND_CAPTURE_PATH_REQUIRED"
+    },
+    {
+      "id": "F14-08",
+      "service": "keys",
+      "status": "BLOCKED_ACTUAL_KEY_CLIENT_REQUIRED"
+    }
+  ]
+}

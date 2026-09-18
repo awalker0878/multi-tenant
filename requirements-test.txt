@@ -1,0 +1,3 @@
+-r requirements-runtime.txt
+# Used only for temporary test credentials, not a deployed PKI.
+cryptography==46.0.4

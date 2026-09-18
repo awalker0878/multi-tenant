@@ -1,0 +1,136 @@
+{
+  "//": "Separate restricted-build route root; HTTPS remote backend and target credentials are external inputs.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "openstack": {
+        "source": "terraform-provider-openstack/openstack",
+        "version": "= 3.4.0"
+      }
+    },
+    "backend": {
+      "http": {}
+    }
+  },
+  "provider": {
+    "openstack": {
+      "cloud": "${var.openstack_cloud}",
+      "insecure": false
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "engineering_record_ref": {
+      "type": "string",
+      "description": "External accepted engineering change record; a string is not proof of approval",
+      "nullable": false
+    },
+    "attachment_acceptance_ref": {
+      "type": "string",
+      "description": "Evidence reference for the existing isolated target attachment and enforcement; not an automatic approval",
+      "nullable": false
+    },
+    "route_key": {
+      "type": "string",
+      "description": "Stable native route identity",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,31}$\", var.route_key))}",
+          "error_message": "Invalid input: Stable native route identity"
+        }
+      ]
+    },
+    "destination_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 destination; no default route in this increment",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.destination_cidr)) && try(tonumber(split(\"/\", var.destination_cidr)[1]) > 0, false)}",
+          "error_message": "Invalid input: Allocated canonical IPv4 destination; no default route in this increment"
+        },
+        {
+          "condition": "${try(format(\"%s/%s\", cidrhost(var.destination_cidr, 0), split(\"/\", var.destination_cidr)[1]) == var.destination_cidr, false)}",
+          "error_message": "Destination must be a canonical IPv4 network."
+        }
+      ]
+    },
+    "router_id": {
+      "type": "string",
+      "description": "Accepted existing isolated Neutron router UUID",
+      "nullable": false
+    },
+    "next_hop_address": {
+      "type": "string",
+      "description": "Accepted directly reachable IPv4 next hop",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(format(\"%s/32\", var.next_hop_address)))}",
+          "error_message": "Invalid input: Accepted directly reachable IPv4 next hop"
+        }
+      ]
+    },
+    "openstack_cloud": {
+      "type": "string",
+      "description": "Named protected clouds.yaml profile for the correct project",
+      "nullable": false
+    }
+  },
+  "module": {
+    "owned": {
+      "source": "../../modules/openstack-route",
+      "providers": {
+        "openstack": "openstack"
+      },
+      "tenant_key": "${var.tenant_key}",
+      "domain_key": "${var.domain_key}",
+      "allow_restricted_build": "${var.allow_restricted_build}",
+      "test_authorization_ref": "${var.test_authorization_ref}",
+      "engineering_record_ref": "${var.engineering_record_ref}",
+      "attachment_acceptance_ref": "${var.attachment_acceptance_ref}",
+      "route_key": "${var.route_key}",
+      "destination_cidr": "${var.destination_cidr}",
+      "router_id": "${var.router_id}",
+      "next_hop_address": "${var.next_hop_address}"
+    }
+  },
+  "output": {
+    "handoff": {
+      "value": "${module.owned}"
+    }
+  }
+}

@@ -1,0 +1,281 @@
+[
+  {
+    "id": "ART-8e92ea28cabe",
+    "path": "Implementation_Execution_Guide.docx",
+    "role": "implementation",
+    "title": "Implementation Execution Guide",
+    "bytes": 50556,
+    "sha256": "9ca5c85333dcb51137ca694aea7b034e393fa8927831f0b475b3b88e842418f7",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-92d21bd1bb90",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/00_Delivery_Map.docx",
+    "role": "shared",
+    "title": "00 Delivery Map",
+    "bytes": 48235,
+    "sha256": "d8c2790ff7bb408283a9156a369cc6c4394131e7d44bfd130bfa27e7d82b5783",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-c6b1881b49a6",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/Architecture_Kit.docx",
+    "role": "architecture",
+    "title": "Architecture Kit",
+    "bytes": 47489,
+    "sha256": "f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-a61f0334f510",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/Architecture_Registers.xlsx",
+    "role": "architecture",
+    "title": "Architecture Registers",
+    "bytes": 50566,
+    "sha256": "90ede61cfba5e404a0c3450e229c33fd31dcd9024fd0098261321fefa3241a57",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-b8914ff652d7",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/HLD_and_Architecture_Review_Template.docx",
+    "role": "architecture",
+    "title": "HLD and Architecture Review Template",
+    "bytes": 46566,
+    "sha256": "911b87e6a36d903a12535d16d75f1875c0cefb6b72c462895f7c2559b556708c",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-115cab097352",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/Service_Design_and_Decision_Development.docx",
+    "role": "architecture",
+    "title": "Service Design and Decision Development",
+    "bytes": 46537,
+    "sha256": "133c2512e904737c1f410106fd1b421fba8309965af0621785b250402fb9214e",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-a929afe0edf4",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Engineering_Kit.docx",
+    "role": "engineering",
+    "title": "Engineering Kit",
+    "bytes": 47726,
+    "sha256": "0aeb8ee0a114d3ed23e97c684cc9812a0fa6ea5252e49f0c902132bf4e053a7d",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-e73d33219a44",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Engineering_Schedules.xlsx",
+    "role": "engineering",
+    "title": "Engineering Schedules",
+    "bytes": 62321,
+    "sha256": "03db116552d7f51f3155bf6c3944521208a8962834ee0642b3ceb5a2edff9dbd",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-1b7123476985",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/LLD_and_Engineering_Review_Template.docx",
+    "role": "engineering",
+    "title": "LLD and Engineering Review Template",
+    "bytes": 46048,
+    "sha256": "b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-fbbe7e978a4d",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Network_and_Boundary_Detailed_Engineering.docx",
+    "role": "engineering",
+    "title": "Network and Boundary Detailed Engineering",
+    "bytes": 47804,
+    "sha256": "7a86351d7f4be320e48d3112485bbab4b0f5b4a79cd0e420a823c793a708733a",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-f9a0cc753d5c",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Platform_Engineering_and_Build_Specifications.docx",
+    "role": "engineering",
+    "title": "Platform Engineering and Build Specifications",
+    "bytes": 51027,
+    "sha256": "8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-32f0831b2418",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Vendor_Realization_Cards.docx",
+    "role": "engineering",
+    "title": "Vendor Realization Cards",
+    "bytes": 46238,
+    "sha256": "5e453a432a4b6c5af7d75ba266945bdb9e01118757cbeec1e15d81f92be32ab0",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-b98999c10120",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Implementation_Kit.docx",
+    "role": "implementation",
+    "title": "Implementation Kit",
+    "bytes": 50113,
+    "sha256": "b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-e03d0868d139",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Implementation_Tracker.xlsx",
+    "role": "implementation",
+    "title": "Implementation Tracker",
+    "bytes": 60837,
+    "sha256": "1b1ffac56f41e7f3d0b4c5f7dccf9f56e8f7b914bf0f72df78a7dec042e36c87",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-bfcda4d5b9d7",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/MOP_Test_and_Handover_Template.docx",
+    "role": "implementation",
+    "title": "MOP Test and Handover Template",
+    "bytes": 45393,
+    "sha256": "9a7dd8df4a5abf6482f206cae2d074444ac6fa812bbe4bace970a4de059da370",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-74ac4b3cdb56",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Operations_Recovery_and_Transition_Playbook.docx",
+    "role": "implementation",
+    "title": "Operations Recovery and Transition Playbook",
+    "bytes": 49329,
+    "sha256": "d935614ed1639f56859dfe29bc226af4cfced35bafeb7d544440577ddaa95a09",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-827b9fa62c74",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
+    "role": "implementation",
+    "title": "Qualification Campaign and Evidence Procedures",
+    "bytes": 49418,
+    "sha256": "910b84a7b1772f27a456df31a09a96878a72e0f66c8f38cb7e5daaf79254007c",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-5d97f66dd7ad",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/Worked_Delivery_Example.docx",
+    "role": "shared",
+    "title": "Worked Delivery Example",
+    "bytes": 47146,
+    "sha256": "ae4ea65ea564fe848f214f5154ca4b67726eb6628d07a4b4f7714210e49ccd0d",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-aea49d150d93",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/00_Reference_Architecture_v1_4.docx",
+    "role": "architecture",
+    "title": "00 Reference Architecture v1 4",
+    "bytes": 1213724,
+    "sha256": "e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-377ccc783ae3",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/01_Gap_Map_and_Decision_Register_v1_4.docx",
+    "role": "architecture",
+    "title": "01 Gap Map and Decision Register v1 4",
+    "bytes": 44963,
+    "sha256": "26dbaac8c13797b58ca5d057f76df8b3da63ec3f4b336036f18f5c6902512207",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-de3b73d1d884",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/02_Fabric_Security_and_Interfaces_v1_4.docx",
+    "role": "architecture",
+    "title": "02 Fabric Security and Interfaces v1 4",
+    "bytes": 38375,
+    "sha256": "9c557d7d94dbdf24630994d2676aca3ddfa80e67c2910fb1a29ea4561c591dcf",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-9fa777e53d43",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/03_Vendor_Stack_Realizations_v1_4.docx",
+    "role": "architecture",
+    "title": "03 Vendor Stack Realizations v1 4",
+    "bytes": 515566,
+    "sha256": "73be32b98783bd7857be8a00928c6894bf16f6bc98c8eb016058d3cf75b9d86b",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-a2a0e7763299",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/04_Provisioning_and_Commissioning_v1_4.docx",
+    "role": "architecture",
+    "title": "04 Provisioning and Commissioning v1 4",
+    "bytes": 40506,
+    "sha256": "483df77cff70166fbdfdf711135efa3beeecc8fe1015a58290cbebff5b80bdfd",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-83f544d8eacd",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/05_Shared_Services_Data_and_Recovery_v1_4.docx",
+    "role": "architecture",
+    "title": "05 Shared Services Data and Recovery v1 4",
+    "bytes": 41376,
+    "sha256": "2257e6f3badac48b07989244fbfae96643d68cc6633b28e9799a14733bccea3a",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-6dcd1a19e80f",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/06_Site_Design_Qualification_and_Operations_v1_4.docx",
+    "role": "architecture",
+    "title": "06 Site Design Qualification and Operations v1 4",
+    "bytes": 43411,
+    "sha256": "783edbba45483d0d3c3b966765589762698836320237906a0f9a60080574af37",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-940930b0f218",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx",
+    "role": "architecture",
+    "title": "07 Worked Infrastructure Design and Acceptance v1 4",
+    "bytes": 57152,
+    "sha256": "e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-e83205404442",
+    "path": "reference/Portable_Hosting_Delivery_Kits_v1_1/07_Quality/prior_v1_0/00_Delivery_Map.docx",
+    "role": "shared",
+    "title": "00 Delivery Map",
+    "bytes": 45578,
+    "sha256": "e332c1b37e63439169adf8b105573577fa1ea61bf32f6c3ba383dd69d83a788b",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-d88481a656b6",
+    "path": "reference/migration-source-documents/Content_Review_v1_2.docx",
+    "role": "shared",
+    "title": "Content Review v1 2",
+    "bytes": 37187,
+    "sha256": "8ddf5ff71f4779a15e56ed3708ace1f8315116ed1e6c9ce1f6a73276d7101a89",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-4ff70b022c6d",
+    "path": "reference/migration-source-documents/Handbook_v1_0.docx",
+    "role": "shared",
+    "title": "Handbook v1 0",
+    "bytes": 829673,
+    "sha256": "100c760003b9ff956ae369ece65c5ffe7736f6d481496d8df4c99dd6105d4190",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-bee3887a6241",
+    "path": "reference/migration-source-documents/Handbook_v1_1.docx",
+    "role": "shared",
+    "title": "Handbook v1 1",
+    "bytes": 836209,
+    "sha256": "afbe9313dda4c68d5bb3af9ae6e9fcb5f098894c59e5f443270795bf2f9c21a1",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  },
+  {
+    "id": "ART-bc51217b78ce",
+    "path": "reference/migration-source-documents/Independent_Audit_v1_1.docx",
+    "role": "shared",
+    "title": "Independent Audit v1 1",
+    "bytes": 51988,
+    "sha256": "cd901aaf004d45cf29ffe14ff955a0c9cf81f668be674e8d4de8c590303c62d8",
+    "status": "IMPORTED_UNCHANGED_NOT_REAPPROVED"
+  }
+]

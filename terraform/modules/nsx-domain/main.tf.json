@@ -1,0 +1,207 @@
+{
+  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "nsxt": {
+        "source": "vmware/nsxt",
+        "version": "= 3.10.0"
+      }
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "ipv4_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 domain prefix",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(var.ipv4_cidr))}",
+          "error_message": "Invalid value for Allocated canonical IPv4 domain prefix."
+        }
+      ]
+    },
+    "gateway_host_number": {
+      "type": "number",
+      "description": "Usable host offset for the native gateway",
+      "nullable": false,
+      "default": 1,
+      "validation": [
+        {
+          "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
+          "error_message": "Invalid value for Usable host offset for the native gateway."
+        }
+      ]
+    },
+    "transport_zone_path": {
+      "type": "string",
+      "description": "Accepted NSX Local Manager overlay transport-zone path",
+      "nullable": false
+    },
+    "quarantine_sequence": {
+      "type": "number",
+      "description": "Provider-reserved Emergency policy sequence",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${var.quarantine_sequence >= 1 && floor(var.quarantine_sequence) == var.quarantine_sequence}",
+          "error_message": "Invalid value for Provider-reserved Emergency policy sequence."
+        }
+      ]
+    }
+  },
+  "resource": {
+    "nsxt_policy_tier1_gateway": {
+      "domain": {
+        "display_name": "${var.tenant_key}-${var.domain_key}",
+        "description": "Distributed-only, no Tier-0 connection or advertisements.",
+        "ha_mode": "NONE",
+        "route_advertisement_types": [],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "nsxt_policy_segment": {
+      "domain": {
+        "display_name": "${var.tenant_key}-${var.domain_key}-network",
+        "connectivity_path": "${nsxt_policy_tier1_gateway.domain.path}",
+        "transport_zone_path": "${var.transport_zone_path}",
+        "subnet": [
+          {
+            "cidr": "${cidrhost(var.ipv4_cidr, var.gateway_host_number)}/${split(\"/\", var.ipv4_cidr)[1]}"
+          }
+        ],
+        "advanced_config": [
+          {
+            "connectivity": "OFF",
+            "urpf_mode": "STRICT"
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "nsxt_policy_group": {
+      "domain": {
+        "display_name": "${var.tenant_key}-${var.domain_key}-members",
+        "criteria": [
+          {
+            "path_expression": [
+              {
+                "member_paths": [
+                  "${nsxt_policy_segment.domain.path}"
+                ]
+              }
+            ]
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    },
+    "nsxt_policy_security_policy": {
+      "quarantine": {
+        "display_name": "${var.tenant_key}-${var.domain_key}-quarantine",
+        "category": "Emergency",
+        "sequence_number": "${var.quarantine_sequence}",
+        "stateful": true,
+        "tcp_strict": true,
+        "scope": [
+          "${nsxt_policy_group.domain.path}"
+        ],
+        "rule": [
+          {
+            "display_name": "deny-scoped-ip-traffic",
+            "source_groups": [],
+            "destination_groups": [],
+            "action": "DROP",
+            "direction": "IN_OUT",
+            "ip_version": "IPV4_IPV6",
+            "logged": true,
+            "disabled": false
+          }
+        ],
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
+              "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "output": {
+    "tier1_path": {
+      "value": "${nsxt_policy_tier1_gateway.domain.path}"
+    },
+    "segment_path": {
+      "value": "${nsxt_policy_segment.domain.path}"
+    },
+    "group_path": {
+      "value": "${nsxt_policy_group.domain.path}"
+    },
+    "quarantine_policy_path": {
+      "value": "${nsxt_policy_security_policy.quarantine.path}"
+    },
+    "delivery_state": {
+      "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    }
+  }
+}

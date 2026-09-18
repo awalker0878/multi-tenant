@@ -1,0 +1,29 @@
+{
+  "kind": "INTERRUPTED_CHANGE_CONTEXT_V1",
+  "operation_id": "replace-with-accepted-operation",
+  "tenant_id": "tenant-001",
+  "scope_id": "D01O",
+  "manifest_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "report_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "accepted_plan_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "change_record_ref": "REPLACE-WITH-ACCEPTED-CHANGE",
+  "attempted_at": "2026-09-17T00:00:00+00:00",
+  "last_security_change_at": "2026-09-17T00:00:00+00:00",
+  "attempted_generation": 0,
+  "current_generation": 0,
+  "executor_state": "UNKNOWN",
+  "containment": "UNKNOWN",
+  "data_disposition": "PRESERVE",
+  "writer_fence": {
+    "state": "UNVERIFIED",
+    "scope_id": "D01O",
+    "observed_at": "2026-09-17T00:00:00+00:00",
+    "evidence_ref": "NOT-VERIFIED"
+  },
+  "quarantine": {
+    "state": "UNKNOWN",
+    "scope_id": "D01O",
+    "observed_at": "2026-09-17T00:00:00+00:00",
+    "evidence_ref": "NOT-VERIFIED"
+  }
+}

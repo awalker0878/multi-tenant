@@ -1,0 +1,13 @@
+{
+  "kind": "TOOLCHAIN_ACCESS_ATTEMPT",
+  "recorded_at": "2026-09-17T17:27:15.314725+00:00",
+  "terraform_executable": "NOT_FOUND",
+  "tofu_executable": "NOT_FOUND",
+  "attempted_binary": "https://releases.hashicorp.com/terraform/1.13.5/terraform_1.13.5_linux_amd64.zip",
+  "curl_result": "Exit 6: Could not resolve host: releases.hashicorp.com",
+  "container_download_result": "download_failed",
+  "binary_received": false,
+  "checksum_verification": "NOT_RUN",
+  "provider_download": "NOT_RUN",
+  "scope": "Actual runtime attempts; no user computer or native platform used to bypass the limitation."
+}

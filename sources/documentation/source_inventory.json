@@ -1,0 +1,257 @@
+{
+  "basis": "Current commit-ready ZIP plus four explicitly identified historical conversation sources",
+  "documents": [
+    {
+      "source": "Implementation_Execution_Guide.docx",
+      "id": "IMP04",
+      "title": "Implementation execution and readback guide",
+      "destination": "docs/implementation/increment-04",
+      "version": "Implementation Increment 04",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/00_Delivery_Map.docx",
+      "id": "DEL",
+      "title": "Delivery map and acceptance gates",
+      "destination": "docs/governance/delivery-framework",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/Architecture_Kit.docx",
+      "id": "AK",
+      "title": "Architecture delivery kit",
+      "destination": "docs/architecture/delivery-guide",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/HLD_and_Architecture_Review_Template.docx",
+      "id": "AT",
+      "title": "High-level design and architecture review template",
+      "destination": "docs/templates/hld",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/01_Architecture/Service_Design_and_Decision_Development.docx",
+      "id": "SDP",
+      "title": "Service design and architecture decisions",
+      "destination": "docs/solutions/design-method",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Engineering_Kit.docx",
+      "id": "EK",
+      "title": "Engineering delivery kit",
+      "destination": "docs/engineering/delivery-guide",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/LLD_and_Engineering_Review_Template.docx",
+      "id": "ET",
+      "title": "Low-level design and engineering review template",
+      "destination": "docs/templates/lld",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Network_and_Boundary_Detailed_Engineering.docx",
+      "id": "NBD",
+      "title": "Network and boundary detailed engineering",
+      "destination": "docs/engineering/network-boundaries",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Platform_Engineering_and_Build_Specifications.docx",
+      "id": "PBS",
+      "title": "Platform engineering and build specifications",
+      "destination": "docs/engineering/platform-build",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Vendor_Realization_Cards.docx",
+      "id": "VRC",
+      "title": "Vendor and shared-infrastructure realization cards",
+      "destination": "docs/engineering/vendor-cards",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Implementation_Kit.docx",
+      "id": "IK",
+      "title": "Implementation delivery kit",
+      "destination": "docs/implementation/delivery-guide",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/MOP_Test_and_Handover_Template.docx",
+      "id": "IT",
+      "title": "Method of procedure, test and handover template",
+      "destination": "docs/templates/implementation-mop",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Operations_Recovery_and_Transition_Playbook.docx",
+      "id": "OPS",
+      "title": "Operations, recovery and transition playbook",
+      "destination": "docs/operations/recovery-transition",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
+      "id": "QCP",
+      "title": "Qualification campaign and evidence procedures",
+      "destination": "docs/assurance/qualification-campaign",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/Worked_Delivery_Example.docx",
+      "id": "WDE",
+      "title": "Worked delivery example",
+      "destination": "docs/solutions/worked-delivery",
+      "version": "Delivery-kit v1.1 collection; original document version retained in the front matter",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/00_Reference_Architecture_v1_4.docx",
+      "id": "RA",
+      "title": "Infrastructure reference architecture and cross-platform provisioning strategy",
+      "destination": "docs/architecture/reference",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/01_Gap_Map_and_Decision_Register_v1_4.docx",
+      "id": "GM",
+      "title": "Architecture gap map and decision register",
+      "destination": "docs/assurance/gap-map",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/02_Fabric_Security_and_Interfaces_v1_4.docx",
+      "id": "NET",
+      "title": "Fabric, security boundaries and infrastructure interfaces",
+      "destination": "docs/engineering/fabric",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/03_Vendor_Stack_Realizations_v1_4.docx",
+      "id": "VND",
+      "title": "Vendor-stack realizations and reference environment",
+      "destination": "docs/engineering/platform-realizations",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/04_Provisioning_and_Commissioning_v1_4.docx",
+      "id": "PROV",
+      "title": "Cross-stack provisioning and commissioning strategy",
+      "destination": "docs/implementation/provisioning-strategy",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/05_Shared_Services_Data_and_Recovery_v1_4.docx",
+      "id": "SVC",
+      "title": "Shared services, data protection and recovery architecture",
+      "destination": "docs/architecture/shared-services",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/06_Site_Design_Qualification_and_Operations_v1_4.docx",
+      "id": "QUAL",
+      "title": "Site design, qualification and operational acceptance",
+      "destination": "docs/assurance/site-qualification",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx",
+      "id": "WD",
+      "title": "Worked infrastructure design, build schedules and acceptance",
+      "destination": "docs/solutions/internal-protected-workload",
+      "version": "Draft v1.4",
+      "historical": false,
+      "status": "Proposed reference or working template; site adoption is not recorded by conversion."
+    },
+    {
+      "source": "reference/Portable_Hosting_Delivery_Kits_v1_1/07_Quality/prior_v1_0/00_Delivery_Map.docx",
+      "id": "DEL10",
+      "title": "Historical delivery map",
+      "destination": "docs/archive/delivery-map-v1-0",
+      "version": "Delivery kits v1.0",
+      "historical": true,
+      "status": "Historical source; not the active design."
+    },
+    {
+      "source": "reference/migration-source-documents/Handbook_v1_0.docx",
+      "id": "HB10",
+      "title": "Original secure-hosting handbook",
+      "destination": "docs/archive/handbook-v1-0",
+      "version": "Draft v1.0",
+      "historical": true,
+      "status": "Historical source; not the active design."
+    },
+    {
+      "source": "reference/migration-source-documents/Handbook_v1_1.docx",
+      "id": "HB11",
+      "title": "Expanded secure-hosting handbook",
+      "destination": "docs/archive/handbook-v1-1",
+      "version": "Draft v1.1",
+      "historical": true,
+      "status": "Historical source; not the active design."
+    },
+    {
+      "source": "reference/migration-source-documents/Independent_Audit_v1_1.docx",
+      "id": "AUD11",
+      "title": "Independent audit of the v1.1 handbook and contract package",
+      "destination": "docs/archive/audit-v1-1",
+      "version": "Audit of Draft v1.1",
+      "historical": true,
+      "status": "Historical source; not the active design."
+    },
+    {
+      "source": "reference/migration-source-documents/Content_Review_v1_2.docx",
+      "id": "REV12",
+      "title": "Architecture-led content review and disposition",
+      "destination": "docs/archive/content-review-v1-2",
+      "version": "Review of the 45-page v1.2 editorial branch",
+      "historical": true,
+      "status": "Historical source; not the active design."
+    }
+  ]
+}

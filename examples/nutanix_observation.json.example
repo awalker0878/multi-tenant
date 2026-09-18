@@ -1,0 +1,35 @@
+{
+  "platform": "nutanix",
+  "origin": "https://nutanix.site.invalid",
+  "operation_id": "replace-with-accepted-operation",
+  "tenant_id": "tenant-001",
+  "scope_id": "D01O",
+  "engineering_record_ref": "REPLACE-WITH-ACCEPTED-ENGINEERING",
+  "target_binding_ref": "REPLACE-WITH-ACCEPTED-TARGET-BINDING",
+  "contact_enabled": false,
+  "profile": "nutanix-networking-prism-v4.3",
+  "resources": [
+    {
+      "kind": "vpc",
+      "ext_id": "11111111-1111-4111-8111-111111111111",
+      "expected_etag": "\"replace-with-accepted-etag\"",
+      "expected": {
+        "extId": "11111111-1111-4111-8111-111111111111",
+        "$objectType": "networking.v4.config.Vpc",
+        "tenantId": "33333333-3333-4333-8333-333333333333",
+        "name": "tenant-001-domain-01",
+        "vpcType": "REGULAR",
+        "externalSubnets": [],
+        "externallyRoutablePrefixes": []
+      }
+    }
+  ],
+  "task": {
+    "ext_id": "ZXJnb24=:22222222-2222-4222-8222-222222222222",
+    "operation": "Create VPC",
+    "created_after": "2026-09-17T00:00:00+00:00",
+    "entity_ids": [
+      "11111111-1111-4111-8111-111111111111"
+    ]
+  }
+}

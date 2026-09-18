@@ -1,0 +1,7 @@
+﻿decision,record_to_complete,blocking_point,status
+Native domain and service handoff support,"Exact component/API/provider/installer tuple, enabled features and actual context/interface mapping.",Platform/service qualification.,Open — actual site/support/authority evidence not supplied
+Service frontends and return routing,"Supported endpoint routing, tenant authorization, management segregation and failure behavior.",Shared-service acceptance and dependent activation.,Open — actual site/support/authority evidence not supplied
+Offered families and protocol profiles,"Actual addresses, source/target identities, local controls, crypto and service configuration.",Advertising the service class.,Open — actual site/support/authority evidence not supplied
+Co-residency and physical failure scope,"Actual hosts, controllers, media, racks, edge and trust dependencies with approved sharing.",Relevant design and capacity acceptance.,Open — actual site/support/authority evidence not supplied
+Production readiness,"Named owners, promised restore/recovery evidence, support, incident paths and valid authorization.",Production G3; never deferred by calling it later G4 work.,Open — actual site/support/authority evidence not supplied
+Live results,Actual observations for every applicable assertion and retained CT procedure.,"Qualification or service acceptance, according to scope.",Open — actual site/support/authority evidence not supplied

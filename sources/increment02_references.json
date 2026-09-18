@@ -1,0 +1,65 @@
+[
+  {
+    "id": "R1",
+    "title": "Nutanix routes v2 resource, provider 2.4.2",
+    "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/website/docs/r/routes_v2.html.markdown",
+    "reviewed": "2026-09-17",
+    "scope": "Tagged documentation reviewed; route table, destination and external-subnet handoff; no installed tuple selected."
+  },
+  {
+    "id": "R2",
+    "title": "Nutanix routes v2 provider implementation, tag 2.4.2",
+    "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/nutanix/services/networkingv2/resource_nutanix_routes_v2.go",
+    "reviewed": "2026-09-17",
+    "scope": "Tagged source inspected for nested field types, route_type and next-hop enum. Not compiled or vendor-qualified here."
+  },
+  {
+    "id": "R3",
+    "title": "NSX Policy static route, provider 3.10.0",
+    "url": "https://raw.githubusercontent.com/vmware/terraform-provider-nsxt/v3.10.0/docs/resources/policy_static_route.md",
+    "reviewed": "2026-09-17",
+    "scope": "Tagged native route fields and gateway/next-hop structure reviewed."
+  },
+  {
+    "id": "R4",
+    "title": "NSX gateway policy, provider 3.10.0",
+    "url": "https://raw.githubusercontent.com/vmware/terraform-provider-nsxt/v3.10.0/docs/resources/policy_gateway_policy.md",
+    "reviewed": "2026-09-17",
+    "scope": "Tagged scope, rule, stateful, TCP-strict and Emergency category fields reviewed; actual topology/precedence still require qualification."
+  },
+  {
+    "id": "R5",
+    "title": "OpenStack router route, provider 3.4.0",
+    "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_router_route_v2.md",
+    "reviewed": "2026-09-17",
+    "scope": "Tagged route operation, directly reachable next-hop prerequisite and replacement semantics reviewed."
+  },
+  {
+    "id": "R6",
+    "title": "OpenStack Networking API v2",
+    "url": "https://docs.openstack.org/api-ref/network/v2/index.html",
+    "reviewed": "2026-09-17",
+    "scope": "Exact-ID GET operations for networks, routers, ports, subnets and security groups; actual extension support is site-specific."
+  },
+  {
+    "id": "R7",
+    "title": "Terraform providers schema command",
+    "url": "https://developer.hashicorp.com/terraform/cli/commands/providers/schema",
+    "reviewed": "2026-09-17",
+    "scope": "Official schema export interface; verifier writes only real plugin-produced schemas when execution becomes available."
+  },
+  {
+    "id": "R8",
+    "title": "RFC 7766: DNS transport over TCP",
+    "url": "https://www.rfc-editor.org/rfc/rfc7766.html",
+    "reviewed": "2026-09-17",
+    "scope": "TCP DNS context. The packet fixture implements a tiny deterministic authoritative test responder, not a recursive DNS service."
+  },
+  {
+    "id": "R9",
+    "title": "Linux IPv4 device configuration, v6.12 source",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.12/net/ipv4/devinet.c",
+    "reviewed": "2026-09-17",
+    "scope": "Public rtnetlink configuration semantics used as implementation reference. Local kernel 6.18.44 was actually tested; this is not a kernel compatibility certification."
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "hosting_bundle": {
+    "purpose": "REFERENCE_FIXTURE",
+    "tenant": "tenant-01",
+    "domain": "D01O",
+    "zone_class": "OZ",
+    "engineering_record_ref": "EXAMPLE-ENG-01",
+    "network_cidr": "192.0.2.0/27",
+    "attachment_cidr": "192.0.2.128/30",
+    "routes": [
+      {
+        "destination": "192.0.2.32/27",
+        "next_hop": "192.0.2.130",
+        "owner": "D01O"
+      }
+    ]
+  },
+  "hosting_stage_enabled": false
+}

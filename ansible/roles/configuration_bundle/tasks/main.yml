@@ -1,0 +1,34 @@
+- name: Require explicit local staging authority
+  ansible.builtin.assert:
+    that:
+      - hosting_stage_enabled | type_debug == 'bool'
+      - hosting_stage_enabled
+      - inventory_hostname == 'localhost'
+      - ansible_connection == 'local'
+    fail_msg: 'Only explicit localhost reference staging is supported.'
+
+- name: Validate engineering fixture and closed route ownership
+  ansible.builtin.set_fact:
+    hosting_normalized: '{{ hosting_bundle | hosting_validate_bundle }}'
+
+- name: Validate caller-created staging root
+  ansible.builtin.set_fact:
+    hosting_output_directory: '{{ hosting_staging_root | hosting_staging_directory(hosting_normalized.tenant, hosting_normalized.domain) }}'
+
+- name: Create the owned local bundle directory
+  ansible.builtin.file:
+    path: '{{ hosting_output_directory }}'
+    state: directory
+    mode: '0700'
+
+- name: Render the reference handoff without granting activation
+  ansible.builtin.template:
+    src: engineering-handoff.json.j2
+    dest: '{{ hosting_output_directory }}/engineering-handoff.json'
+    mode: '0600'
+
+- name: Render exact reference routes
+  ansible.builtin.template:
+    src: routes.csv.j2
+    dest: '{{ hosting_output_directory }}/routes.csv'
+    mode: '0600'

@@ -1,0 +1,54 @@
+{
+  "release": "Implementation Increment 03",
+  "release_date": "2026-09-17",
+  "new_native_integration": "Candidate bounded RFC2136/TSIG DNS service-owner client",
+  "local_regression_tests": {
+    "run": 270,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "dns_wire_cases": {
+    "passed": 32,
+    "failed": 0,
+    "counting_note": "Subset rerun of regression suite; not additional unique test coverage"
+  },
+  "routed_ipv4_observations": {
+    "passed": 47,
+    "failed": 0,
+    "inherited": 33,
+    "new_service_identity": 14
+  },
+  "offline_ipv4_ipv6_model_checks": {
+    "passed": 80,
+    "failed": 0
+  },
+  "unchanged_native_terraform": {
+    "modules": 10,
+    "roots": 10,
+    "files": 50
+  },
+  "unchanged_reference_files": 139,
+  "execution_guide_pages": 9,
+  "new_document_links_checked": 63,
+  "terraform_toolchain_status": "BLOCKED_TOOLCHAIN",
+  "native_dns_product_qualification": "NOT_RUN",
+  "native_vendor_qualification": "NOT_RUN",
+  "customer_infrastructure_changed": false,
+  "formal_authorization": "NOT_ISSUED",
+  "evidence_files": [
+    "quality/local_validation.json",
+    "quality/local_dns_transactions.json",
+    "quality/local_packet_lab.json",
+    "quality/terraform_validation.json",
+    "quality/package_validation.json",
+    "quality/visual_review.json"
+  ],
+  "boundaries": [
+    "DNS update protocol authentication does not encrypt transport",
+    "Local DNS test authority is not a production DNS implementation",
+    "Fixture mTLS resource grants are not enterprise PKI, CRL/OCSP or KMS",
+    "AAAA records and IPv6 loopback tests do not prove routed/native IPv6",
+    "Ten retained Terraform module/root pairs are unvalidated candidate source"
+  ]
+}

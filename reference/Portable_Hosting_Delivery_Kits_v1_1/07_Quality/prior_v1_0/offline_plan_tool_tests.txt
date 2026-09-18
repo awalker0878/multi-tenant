@@ -1,0 +1,21 @@
+test_bad_action (test_review_tfplan.ReviewTests.test_bad_action) ... ok
+test_create_does_not_approve (test_review_tfplan.ReviewTests.test_create_does_not_approve) ... ok
+test_delete_flagged (test_review_tfplan.ReviewTests.test_delete_flagged) ... ok
+test_drift_flagged (test_review_tfplan.ReviewTests.test_drift_flagged) ... ok
+test_duplicate_address (test_review_tfplan.ReviewTests.test_duplicate_address) ... ok
+test_empty_array_is_metadata_only (test_review_tfplan.ReviewTests.test_empty_array_is_metadata_only) ... ok
+test_forget_flagged (test_review_tfplan.ReviewTests.test_forget_flagged) ... ok
+test_format_major (test_review_tfplan.ReviewTests.test_format_major) ... ok
+test_incomplete_and_deferred_flagged (test_review_tfplan.ReviewTests.test_incomplete_and_deferred_flagged) ... ok
+test_invalid_actions_container (test_review_tfplan.ReviewTests.test_invalid_actions_container) ... ok
+test_malformed_root (test_review_tfplan.ReviewTests.test_malformed_root) ... ok
+test_missing_changes_is_not_empty_success (test_review_tfplan.ReviewTests.test_missing_changes_is_not_empty_success) ... ok
+test_replace_flagged (test_review_tfplan.ReviewTests.test_replace_flagged) ... ok
+test_state_not_plan (test_review_tfplan.ReviewTests.test_state_not_plan) ... ok
+test_unknown_flagged (test_review_tfplan.ReviewTests.test_unknown_flagged) ... ok
+test_values_never_printed (test_review_tfplan.ReviewTests.test_values_never_printed) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.001s
+
+OK

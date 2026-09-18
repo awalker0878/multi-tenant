@@ -1,0 +1,176 @@
+{
+  "//": "Operator root: remote HTTP backend is deliberately incomplete; configure accepted HTTPS backend and lock endpoints. Credentials are injected, not checked in.",
+  "terraform": {
+    "required_version": ">= 1.7.0, < 2.0.0",
+    "required_providers": {
+      "openstack": {
+        "source": "terraform-provider-openstack/openstack",
+        "version": "= 3.4.0"
+      }
+    },
+    "backend": {
+      "http": {}
+    }
+  },
+  "provider": {
+    "openstack": {
+      "cloud": "${var.openstack_cloud}",
+      "insecure": false
+    }
+  },
+  "variable": {
+    "tenant_key": {
+      "type": "string",
+      "description": "Stable tenant identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,23}$\", var.tenant_key))}",
+          "error_message": "Invalid value for Stable tenant identifier."
+        }
+      ]
+    },
+    "domain_key": {
+      "type": "string",
+      "description": "Stable domain identifier",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,23}$\", var.domain_key))}",
+          "error_message": "Invalid value for Stable domain identifier."
+        }
+      ]
+    },
+    "allow_restricted_build": {
+      "type": "bool",
+      "description": "Explicit operator opt-in for an authorized non-production build",
+      "nullable": false,
+      "default": false
+    },
+    "test_authorization_ref": {
+      "type": "string",
+      "description": "Reference to separately issued test-scope authorization",
+      "nullable": false
+    },
+    "workload_key": {
+      "type": "string",
+      "description": "Owned workload identity",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.workload_key))}",
+          "error_message": "Invalid value for Owned workload identity."
+        }
+      ]
+    },
+    "boot_disk_gib": {
+      "type": "number",
+      "description": "Requested boot disk GiB; must be at least image/template size",
+      "nullable": false,
+      "default": 40,
+      "validation": [
+        {
+          "condition": "${var.boot_disk_gib >= 1 && floor(var.boot_disk_gib) == var.boot_disk_gib}",
+          "error_message": "Invalid value for Requested boot disk GiB; must be at least image/template size."
+        }
+      ]
+    },
+    "data_disk_gib": {
+      "type": "number",
+      "description": "Owned optional data disk GiB; zero omits",
+      "nullable": false,
+      "default": 0,
+      "validation": [
+        {
+          "condition": "${var.data_disk_gib >= 0 && floor(var.data_disk_gib) == var.data_disk_gib}",
+          "error_message": "Invalid value for Owned optional data disk GiB; zero omits."
+        }
+      ]
+    },
+    "accepted_quarantine_ref": {
+      "type": "string",
+      "description": "Scoped independently reviewed network/policy/placement handoff reference",
+      "nullable": false
+    },
+    "network_id": {
+      "type": "string",
+      "description": "Accepted quarantine network UUID",
+      "nullable": false
+    },
+    "subnet_id": {
+      "type": "string",
+      "description": "Accepted quarantine subnet UUID",
+      "nullable": false
+    },
+    "security_group_id": {
+      "type": "string",
+      "description": "Accepted no-user-flow group UUID",
+      "nullable": false
+    },
+    "ipv4_address": {
+      "type": "string",
+      "description": "Authoritatively reserved IPv4 address",
+      "nullable": false
+    },
+    "image_id": {
+      "type": "string",
+      "description": "Approved Glance image UUID",
+      "nullable": false
+    },
+    "flavor_id": {
+      "type": "string",
+      "description": "Approved flavor ID matching requested capacity and placement",
+      "nullable": false
+    },
+    "compute_availability_zone": {
+      "type": "string",
+      "description": "Accepted Nova availability zone",
+      "nullable": false
+    },
+    "storage_availability_zone": {
+      "type": "string",
+      "description": "Accepted Cinder availability zone",
+      "nullable": false
+    },
+    "volume_type": {
+      "type": "string",
+      "description": "Accepted storage/encryption type",
+      "nullable": false
+    },
+    "openstack_cloud": {
+      "type": "string",
+      "description": "Named protected clouds.yaml profile for the correct project",
+      "nullable": false
+    }
+  },
+  "module": {
+    "owned": {
+      "source": "../../modules/openstack-workload",
+      "providers": {
+        "openstack": "openstack"
+      },
+      "tenant_key": "${var.tenant_key}",
+      "domain_key": "${var.domain_key}",
+      "allow_restricted_build": "${var.allow_restricted_build}",
+      "test_authorization_ref": "${var.test_authorization_ref}",
+      "workload_key": "${var.workload_key}",
+      "boot_disk_gib": "${var.boot_disk_gib}",
+      "data_disk_gib": "${var.data_disk_gib}",
+      "accepted_quarantine_ref": "${var.accepted_quarantine_ref}",
+      "network_id": "${var.network_id}",
+      "subnet_id": "${var.subnet_id}",
+      "security_group_id": "${var.security_group_id}",
+      "ipv4_address": "${var.ipv4_address}",
+      "image_id": "${var.image_id}",
+      "flavor_id": "${var.flavor_id}",
+      "compute_availability_zone": "${var.compute_availability_zone}",
+      "storage_availability_zone": "${var.storage_availability_zone}",
+      "volume_type": "${var.volume_type}"
+    }
+  },
+  "output": {
+    "handoff": {
+      "value": "${module.owned}"
+    }
+  }
+}

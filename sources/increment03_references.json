@@ -1,0 +1,62 @@
+[
+  {
+    "id": "D1",
+    "title": "RFC 2136 \u2014 Dynamic Updates in the Domain Name System",
+    "url": "https://www.rfc-editor.org/rfc/rfc2136.html",
+    "locator": "Sections 1.1.1, 2.3\u20132.5 and 3.2",
+    "basis": "Single-zone UPDATE and prerequisite semantics; TTL excluded from equality",
+    "review_date": "2026-09-17",
+    "kind": "Primary implementation/protocol context",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "D2",
+    "title": "RFC 8945 \u2014 Secret Key Transaction Authentication for DNS (TSIG)",
+    "url": "https://www.rfc-editor.org/rfc/rfc8945.html",
+    "locator": "Message authentication and security considerations",
+    "basis": "TSIG request/reply authentication; not payload confidentiality",
+    "review_date": "2026-09-17",
+    "kind": "Primary implementation/protocol context",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "D3",
+    "title": "dnspython update message interfaces",
+    "url": "https://dnspython.readthedocs.io/en/latest/message-update.html",
+    "locator": "UpdateMessage absent/present/add/delete/replace",
+    "basis": "Current public API documentation; installed 2.8.0 was inspected and exercised; version-specific URL unavailable",
+    "review_date": "2026-09-17",
+    "kind": "Primary implementation/protocol context",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "D4",
+    "title": "dnspython query transport interfaces",
+    "url": "https://dnspython.readthedocs.io/en/latest/query.html",
+    "locator": "tcp() and receive_tcp()",
+    "basis": "Fixed-address TCP transport and TSIG response parsing; installed 2.8.0 tested",
+    "review_date": "2026-09-17",
+    "kind": "Primary implementation/protocol context",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "T1",
+    "title": "Python 3.13 ssl",
+    "url": "https://docs.python.org/3.13/library/ssl.html",
+    "locator": "SSLContext, CERT_REQUIRED, check_hostname, keylog_filename and minimum_version",
+    "basis": "TLS peer/hostname verification and ambient keylogging behavior; Python 3.13.5/OpenSSL 3.5.5 tested",
+    "review_date": "2026-09-17",
+    "kind": "Primary implementation/protocol context",
+    "qualification": "NOT_CERTIFICATION"
+  },
+  {
+    "id": "T2",
+    "title": "cryptography 46.0.4 X.509 tutorial",
+    "url": "https://cryptography.io/en/46.0.4/x509/tutorial/",
+    "locator": "CertificateBuilder and extensions",
+    "basis": "Temporary certificate construction in local tests; no production certificate-service claim",
+    "review_date": "2026-09-17",
+    "kind": "Primary implementation/protocol context",
+    "qualification": "NOT_CERTIFICATION"
+  }
+]

@@ -1,0 +1,67 @@
+{
+  "review_date": "2026-09-17",
+  "method": "Each full rendered page image of the six new/modified documents was visually inspected; unchanged baseline pages were not re-rendered for this increment.",
+  "checks": [
+    "Readable text and table content",
+    "No cropped or overlapping content",
+    "Section breaks, page identity and footer",
+    "Visible internal and cross-document link labels",
+    "Response controls and distinct example/reference status"
+  ],
+  "documents": {
+    "SDP": {
+      "path": "01_Architecture/Service_Design_and_Decision_Development.docx",
+      "document_sha256": "133c2512e904737c1f410106fd1b421fba8309965af0621785b250402fb9214e",
+      "rendered_pages": 7,
+      "pages_reviewed": 7,
+      "all_pages_visually_reviewed": true,
+      "result": "No visible defect found",
+      "note": ""
+    },
+    "NBD": {
+      "path": "02_Engineering/Network_and_Boundary_Detailed_Engineering.docx",
+      "document_sha256": "7a86351d7f4be320e48d3112485bbab4b0f5b4a79cd0e420a823c793a708733a",
+      "rendered_pages": 8,
+      "pages_reviewed": 8,
+      "all_pages_visually_reviewed": true,
+      "result": "No visible defect found",
+      "note": "NBD section 2 wording was clarified and its changed rendered page re-inspected."
+    },
+    "PBS": {
+      "path": "02_Engineering/Platform_Engineering_and_Build_Specifications.docx",
+      "document_sha256": "8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643",
+      "rendered_pages": 10,
+      "pages_reviewed": 10,
+      "all_pages_visually_reviewed": true,
+      "result": "No visible defect found",
+      "note": ""
+    },
+    "QCP": {
+      "path": "03_Implementation/Qualification_Campaign_and_Evidence_Procedures.docx",
+      "document_sha256": "910b84a7b1772f27a456df31a09a96878a72e0f66c8f38cb7e5daaf79254007c",
+      "rendered_pages": 9,
+      "pages_reviewed": 9,
+      "all_pages_visually_reviewed": true,
+      "result": "No visible defect found",
+      "note": ""
+    },
+    "OPS": {
+      "path": "03_Implementation/Operations_Recovery_and_Transition_Playbook.docx",
+      "document_sha256": "d935614ed1639f56859dfe29bc226af4cfced35bafeb7d544440577ddaa95a09",
+      "rendered_pages": 9,
+      "pages_reviewed": 9,
+      "all_pages_visually_reviewed": true,
+      "result": "No visible defect found",
+      "note": ""
+    },
+    "DEL": {
+      "path": "00_Delivery_Map.docx",
+      "document_sha256": "d8c2790ff7bb408283a9156a369cc6c4394131e7d44bfd130bfa27e7d82b5783",
+      "rendered_pages": 9,
+      "pages_reviewed": 9,
+      "all_pages_visually_reviewed": true,
+      "result": "No visible defect found",
+      "note": ""
+    }
+  }
+}

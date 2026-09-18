@@ -1,0 +1,12 @@
+{
+  "status": "PASSED_PACKAGE_CHECKS_ONLY",
+  "checked_new_document_links": 57,
+  "guide_bookmarks": 9,
+  "guide_tables": 10,
+  "frozen_reference_files_checked": 139,
+  "module_inventory_records_checked": 6,
+  "issues": [],
+  "terraform_validation": "NOT_PERFORMED_BY_PACKAGE_CHECK",
+  "live_infrastructure_qualification": "NOT_RUN",
+  "scope": "Local package integrity, new links and result consistency. Historical documents and workbooks were preserved, not newly rendered or recalculated."
+}

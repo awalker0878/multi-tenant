@@ -1,0 +1,108 @@
+{
+  "scope": "Disabled documentation inputs only; no target or Terraform contacted",
+  "examples": [
+    {
+      "root": "nsx-domain",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "DOCUMENTATION_ADDRESS_NOT_DEPLOYABLE",
+        "EMPTY_REQUIRED_VALUE",
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "nsx-gateway-quarantine",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "nsx-route",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "nutanix-domain",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "DOCUMENTATION_ADDRESS_NOT_DEPLOYABLE",
+        "EMPTY_REQUIRED_VALUE",
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "nutanix-route",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "nutanix-workload",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "DOCUMENTATION_ADDRESS_NOT_DEPLOYABLE",
+        "EMPTY_REQUIRED_VALUE",
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "openstack-domain",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "DOCUMENTATION_ADDRESS_NOT_DEPLOYABLE",
+        "EMPTY_REQUIRED_VALUE",
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "openstack-route",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "openstack-workload",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "DOCUMENTATION_ADDRESS_NOT_DEPLOYABLE",
+        "EMPTY_REQUIRED_VALUE",
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    },
+    {
+      "root": "vsphere-workload",
+      "exit": 2,
+      "status": "BLOCKED_INPUTS",
+      "error_codes": [
+        "EMPTY_REQUIRED_VALUE",
+        "PLACEHOLDER_NOT_SITE_VALUE",
+        "RESTRICTED_BUILD_NOT_OPTED_IN"
+      ]
+    }
+  ],
+  "passed": 10,
+  "failed": 0
+}

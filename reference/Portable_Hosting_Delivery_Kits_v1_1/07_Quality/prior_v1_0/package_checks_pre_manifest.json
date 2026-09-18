@@ -1,0 +1,442 @@
+{
+  "scope": "Local package/document/record checks only. No deployed infrastructure, native provider or authorization evaluated.",
+  "passed": 82,
+  "failed": 0,
+  "checks": [
+    {
+      "check": "required 00_Delivery_Map.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required START_HERE.html",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required README.md",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 01_Architecture/Architecture_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 01_Architecture/HLD_and_Architecture_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 01_Architecture/Architecture_Registers.xlsx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 02_Engineering/Engineering_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 02_Engineering/LLD_and_Engineering_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 02_Engineering/Vendor_Realization_Cards.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 02_Engineering/Engineering_Schedules.xlsx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 03_Implementation/Implementation_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 03_Implementation/MOP_Test_and_Handover_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 03_Implementation/Implementation_Tracker.xlsx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "required 04_Shared/Worked_Delivery_Example.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks 00_Delivery_Map.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers 00_Delivery_Map.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags 00_Delivery_Map.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks Architecture_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers Architecture_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags Architecture_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks HLD_and_Architecture_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers HLD_and_Architecture_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags HLD_and_Architecture_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks Worked_Delivery_Example.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers Worked_Delivery_Example.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags Worked_Delivery_Example.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks Implementation_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers Implementation_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags Implementation_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks MOP_Test_and_Handover_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers MOP_Test_and_Handover_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags MOP_Test_and_Handover_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks LLD_and_Engineering_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers LLD_and_Engineering_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags LLD_and_Engineering_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks Vendor_Realization_Cards.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers Vendor_Realization_Cards.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags Vendor_Realization_Cards.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique bookmarks Engineering_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "table headers Engineering_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "unique response tags Engineering_Kit.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "HTML and Markdown local links resolve",
+      "passed": true,
+      "detail": "90 links"
+    },
+    {
+      "check": "no shipped font files",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "new DOCX count",
+      "passed": true,
+      "detail": "9"
+    },
+    {
+      "check": "all new response tags unique",
+      "passed": true,
+      "detail": "169"
+    },
+    {
+      "check": "editable response controls HLD_and_Architecture_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "editable response controls LLD_and_Engineering_Review_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "editable response controls MOP_Test_and_Handover_Template.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "new local hyperlink targets resolve",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "194 requirement IDs retained",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "exact inherited requirement text",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "27 delivery outputs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "61 unique runbook steps",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "10 runbooks",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "conformance_tests_reference.json not-run",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "realization_verification_addenda.json not-run",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "12 W14 assertions not run",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 00_Reference_Architecture_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 02_Fabric_Security_and_Interfaces_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 03_Vendor_Stack_Realizations_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 06_Site_Design_Qualification_and_Operations_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 04_Provisioning_and_Commissioning_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 01_Gap_Map_and_Decision_Register_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 05_Shared_Services_Data_and_Recovery_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline 07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/conformance_tests_reference.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_gate_dependencies.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/gap_register.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_ipv6_route_model.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/realization_verification_addenda.json",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_ipv4_route_model.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/site_decisions.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_reference_handoffs.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_open_decisions.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_reference_flows.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/requirement_document_crosswalk.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_verification_assertions.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "frozen baseline registers/v1_4_build_schedule.csv",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "xlsx cached error cells Architecture_Registers.xlsx",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "xlsx cached error cells Implementation_Tracker.xlsx",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "xlsx cached error cells Engineering_Schedules.xlsx",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "check": "three workbooks",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "inherited_link_warnings": [],
+  "link_counts": {
+    "internal": 299,
+    "cross_file": 253,
+    "web_not_network_checked": 63
+  },
+  "text_navigation_links": 90,
+  "new_response_controls": 169,
+  "workbooks": [
+    {
+      "file": "01_Architecture/Architecture_Registers.xlsx",
+      "sheets": 8,
+      "formulas": 4
+    },
+    {
+      "file": "03_Implementation/Implementation_Tracker.xlsx",
+      "sheets": 13,
+      "formulas": 5
+    },
+    {
+      "file": "02_Engineering/Engineering_Schedules.xlsx",
+      "sheets": 24,
+      "formulas": 71
+    }
+  ]
+}

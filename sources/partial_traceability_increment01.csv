@@ -1,0 +1,12 @@
+source_locator,architectural_intent,implementation,local_verification,remaining_boundary
+PBS §1; WD §10,Separate native owners and operations,terraform/roots/,test_native_sources.py,"Source boundary checked; actual credentials, backend ACLs and native task discovery not tested"
+PBS §3; WD §8,Nutanix separate domain and protected selectors,terraform/modules/nutanix-domain/main.tf.json,test_native_sources.py,Source only; effective Flow policy and permissions not observed
+PBS §§4–5; WD §8,NSX independent routing and endpoint enforcement,terraform/modules/nsx-domain/main.tf.json,test_native_sources.py,No T0 or external ZIP built; native precedence/exclusions not observed
+PBS §7; WD §2,Provider-owned OpenStack mandatory network mutation,terraform/modules/openstack-domain/main.tf.json,test_plans.py,Source creates closed staging resources; API policy/implicit paths remain external
+WD §§4–6; W14-01,Reference forward/reply routing,tools/route_audit.py,test_routes.py,Illustrative graph only; not device RIB/FIB or packet observations
+WD §7; W14-05,DNS UDP/TCP reference allowlist,examples/wd14-routing.json,test_routes.py,"Modeled ports only; DNS exchange, truncation and fallback not exercised"
+WD §7,Do not guess unresolved service clients or protocols,examples/wd14-routing.json,test_routes.py,Time/log/repository/backup/KMS remain blocked profiles
+PBS §9; WD §10,Data-safe changed plans and owned resources,tools/plan_review.py,test_plans.py,Static review cannot approve change or prove actual retention/restore
+WD §4,Documentation prefixes are not allocations,tools/input_review.py,test_inputs.py,IPAM authority and global allocation uniqueness not implemented
+WD §9; W14-09,Initial readiness before production activation,docs/COMMISSIONING.md,No live test,No production activation in source; G3/G4 remain externally issued/evaluated
+WD §11,Image/placement and fixture capacity,terraform/modules/*-workload/,test_native_sources.py,"Actual flavor, host eligibility, template, storage policy and capacity not observed"

@@ -1,0 +1,6 @@
+work_id,implementation,requirement_context,work_package,treatment,owner_role,evidence_boundary
+I06-DNS,tools/dns_change.py,IPAM-001; IPAM-004; SVC-003; LIFE-002; AUTO-003,P3/P5/P6; IF08,"Exact accepted DNS names, marker ownership, atomic prerequisites, no blind retry",DNS service owner,Local wire tests; real DNS product/ACL/transport/propagation open
+I07-IDENTITY,lab/mtls_fixture.py; lab/mtls_scenarios.py,IAM-001; IAM-003; CRY-001; CRY-003; SVC-003,P3/P5/P6; IF08,Network permission separated from peer trust and resource entitlement; grant withdrawal,Identity and service owners,"Actual local TLS; managed PKI, CRL, KMS and backup integration open"
+I09-READBACK,tools/neutron_observe.py,SEC-004; OBS-003,P2/P4; IF05,Explicit TLS context avoids ambient session-secret logging,Platform assurance,Local HTTPS regression only; user platform not contacted
+I08-FAMILY,tests/test_mtls_identity.py; tests/test_dns_transactions.py,IPV6-001; IPV6-002,Qualification subset,AAAA and IPv6 loopback endpoint tests explicitly separated from routed/native IPv6,Network and assurance owners,Native IPv6 and routed lab extension remain open
+I01-TOOLCHAIN,tools/verify_terraform.py,TF-001; TF-002; TEST-002,Before native apply,No false schema/mock success while executable missing,Execution toolchain owner,BLOCKED_TOOLCHAIN

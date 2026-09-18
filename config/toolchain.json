@@ -1,0 +1,9 @@
+{
+  "python": "3.13",
+  "terraform": "1.13.5",
+  "ansible_core": "2.19.7",
+  "status": "Candidate CI bootstrap pins; engine execution in authoring runtime blocked",
+  "provider_pins": "sources/provider_interface_pins.json",
+  "lock_policy": "Commit actual generated .terraform.lock.hcl after checksum/provenance review; do not invent locks.",
+  "target_contact": "No native infrastructure credentials are used by CI."
+}

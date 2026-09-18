@@ -1,0 +1,47 @@
+{
+  "stage": "isolated_copy_before_final_zip",
+  "results": [
+    {
+      "command": "python tools/check_local.py",
+      "exit_code": 0,
+      "report": {
+        "status": "PASSED_LOCAL_ONLY",
+        "python": "3.13.5",
+        "unit_and_source_tests": {
+          "run": 128,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "modeled_route_and_intent_checks": {
+          "passed": 80,
+          "failed": 0
+        },
+        "terraform_engine_validation": "NOT_RUN_BY_THIS_COMMAND",
+        "separate_recorded_toolchain_status": "BLOCKED_TOOLCHAIN",
+        "provider_mock_tests": "NOT_RUN_BY_THIS_COMMAND",
+        "live_infrastructure_qualification": "NOT_RUN",
+        "formal_authorization": "NOT_ISSUED",
+        "elapsed_seconds": 0.132,
+        "note": "Python tests and source inspections do not parse Terraform, execute providers or prove native security behavior."
+      }
+    },
+    {
+      "command": "python tools/check_package.py",
+      "exit_code": 0,
+      "report": {
+        "status": "PASSED_PACKAGE_CHECKS_ONLY",
+        "checked_new_document_links": 57,
+        "guide_bookmarks": 9,
+        "guide_tables": 10,
+        "frozen_reference_files_checked": 139,
+        "module_inventory_records_checked": 6,
+        "issues": [],
+        "terraform_validation": "NOT_PERFORMED_BY_PACKAGE_CHECK",
+        "live_infrastructure_qualification": "NOT_RUN",
+        "scope": "Local package integrity, new links and result consistency. Historical documents and workbooks were preserved, not newly rendered or recalculated."
+      }
+    }
+  ],
+  "live_infrastructure": "NOT_CONTACTED"
+}

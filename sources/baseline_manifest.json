@@ -1,0 +1,25 @@
+{
+  "review_date": "2026-09-17",
+  "basis": [
+    {
+      "document": "00_Reference_Architecture_v1_4.docx",
+      "package_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/00_Reference_Architecture_v1_4.docx",
+      "sha256": "e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19",
+      "role": "READ SOURCE BASIS; NOT NEWLY AUTHORED OR REQUALIFIED"
+    },
+    {
+      "document": "07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx",
+      "package_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/05_Reference_v1_4/07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx",
+      "sha256": "e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db",
+      "role": "READ SOURCE BASIS; NOT NEWLY AUTHORED OR REQUALIFIED"
+    },
+    {
+      "document": "Platform_Engineering_and_Build_Specifications.docx",
+      "package_path": "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Platform_Engineering_and_Build_Specifications.docx",
+      "sha256": "8c2dd9e86b4ea021922777a963534c6b52d85dff8ee398c3a12cc81287356643",
+      "role": "READ SOURCE BASIS; NOT NEWLY AUTHORED OR REQUALIFIED"
+    }
+  ],
+  "frozen_archive_sha256": "9d3a700a1b47d2094922e63e47e6cb6502c37887440184414285b9cb359d1060",
+  "note": "Latest accessible build source used is delivery kits v1.1 with reference architecture v1.4. No claim of inspecting an unavailable RAD/TAD v1.2 package. Reference-family quality reports are historical, not this increment results."
+}

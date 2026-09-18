@@ -1,0 +1,26 @@
+- name: Restrict validation to fixed local reader tools
+  ansible.builtin.assert:
+    that:
+      - inventory_hostname == 'localhost'
+      - ansible_connection == 'local'
+      - hosting_platform in ['nsx', 'nutanix']
+      - hosting_manifest_path | length > 0
+    fail_msg: 'Use an exact local manifest and a supported read-only adapter.'
+
+- name: Validate input without contacting any platform
+  ansible.builtin.command:
+    argv:
+      - '{{ ansible_playbook_python }}'
+      - '{{ playbook_dir }}/../../tools/{{ hosting_platform }}_observe.py'
+      - '{{ hosting_manifest_path }}'
+  register: hosting_readback_validation
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Confirm the no-contact result
+  ansible.builtin.assert:
+    that:
+      - (hosting_readback_validation.stdout | from_json).status == 'INPUT_VALID_NO_CONTACT'
+      - not (hosting_readback_validation.stdout | from_json).target_contacted
+      - not (hosting_readback_validation.stdout | from_json).may_activate
+  when: not ansible_check_mode

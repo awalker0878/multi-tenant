@@ -1,0 +1,6 @@
+{
+  "fixture_totals": "{\"kind\":\"table\",\"sheet\":\"EX_Fixture\",\"address\":\"G12:I14\",\"rows\":3,\"cols\":3,\"values\":[[8,16,360],[10,20,400],[16,32,520]]}",
+  "capacity_example": "{\"kind\":\"table\",\"sheet\":\"EX_Capacity\",\"address\":\"G6:H8\",\"rows\":3,\"cols\":2,\"values\":[[32,\"WITHIN MODEL\"],[500,\"WITHIN MODEL\"],[-1,\"EXCEEDS CAPACITY\"]]}",
+  "mtu_example": "{\"kind\":\"table\",\"sheet\":\"EX_MTU\",\"address\":\"H6:K8\",\"rows\":3,\"cols\":4,\"values\":[[1500,1500,0,\"WITHIN MODEL\"],[1520,1500,-20,\"EXCEEDS PATH\"],[1504,1500,-4,\"EXCEEDS PATH\"]]}",
+  "blank_actual_inputs": "{\"kind\":\"table\",\"sheet\":\"Capacity_Calc\",\"address\":\"G6:H11\",\"rows\":6,\"cols\":2,\"values\":[[\"INPUT REQUIRED\",\"INPUT REQUIRED\"],[\"INPUT REQUIRED\",\"INPUT REQUIRED\"],[\"INPUT REQUIRED\",\"INPUT REQUIRED\"],[\"INPUT REQUIRED\",\"INPUT REQUIRED\"],[\"INPUT REQUIRED\",\"INPUT REQUIRED\"],[\"INPUT REQUIRED\",\"INPUT REQUIRED\"]]}"
+}

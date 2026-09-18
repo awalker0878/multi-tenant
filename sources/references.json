@@ -1,0 +1,167 @@
+{
+  "review_date": "2026-09-17",
+  "sources": [
+    {
+      "id": "TF-JSON",
+      "title": "Terraform JSON configuration syntax",
+      "url": "https://developer.hashicorp.com/terraform/language/syntax/json",
+      "basis": "Official configuration language documentation",
+      "usage_and_limit": "Expression and nested-block mapping; .tf.json is configuration, not a custom service API."
+    },
+    {
+      "id": "TF-PLAN",
+      "title": "Terraform JSON output format",
+      "url": "https://developer.hashicorp.com/terraform/internals/json-format",
+      "basis": "Official configuration/tool documentation",
+      "usage_and_limit": "Saved-plan actions, unknown values, import/move/drift and checks; file review is not native-state evidence."
+    },
+    {
+      "id": "TF-MOCK",
+      "title": "Terraform test mocking",
+      "url": "https://developer.hashicorp.com/terraform/language/tests/mocking",
+      "basis": "Official test documentation",
+      "usage_and_limit": "Provider-mocked tests are supplied, not executed in this runtime."
+    },
+    {
+      "id": "NUT-vpc_v2",
+      "title": "Nutanix vpc_v2",
+      "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/website/docs/r/vpc_v2.html.markdown",
+      "basis": "Official provider repository tag v2.4.2",
+      "usage_and_limit": "Specific argument and output shape; no installed compatibility, privilege or lifecycle qualification implied."
+    },
+    {
+      "id": "NUT-subnet_v2",
+      "title": "Nutanix subnet_v2",
+      "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/website/docs/r/subnet_v2.html.markdown",
+      "basis": "Official provider repository tag v2.4.2",
+      "usage_and_limit": "Specific argument and output shape; no installed compatibility, privilege or lifecycle qualification implied."
+    },
+    {
+      "id": "NUT-category_v2",
+      "title": "Nutanix category_v2",
+      "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/website/docs/r/category_v2.html.markdown",
+      "basis": "Official provider repository tag v2.4.2",
+      "usage_and_limit": "Specific argument and output shape; no installed compatibility, privilege or lifecycle qualification implied."
+    },
+    {
+      "id": "NUT-network_security_policy_v2",
+      "title": "Nutanix network_security_policy_v2",
+      "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/website/docs/r/network_security_policy_v2.html.markdown",
+      "basis": "Official provider repository tag v2.4.2",
+      "usage_and_limit": "Specific argument and output shape; no installed compatibility, privilege or lifecycle qualification implied."
+    },
+    {
+      "id": "NUT-virtual_machine_v2",
+      "title": "Nutanix virtual_machine_v2",
+      "url": "https://raw.githubusercontent.com/nutanix/terraform-provider-nutanix/v2.4.2/website/docs/r/virtual_machine_v2.html.markdown",
+      "basis": "Official provider repository tag v2.4.2",
+      "usage_and_limit": "Specific argument and output shape; no installed compatibility, privilege or lifecycle qualification implied."
+    },
+    {
+      "id": "NSX-policy_tier1_gateway",
+      "title": "NSX policy_tier1_gateway",
+      "url": "https://raw.githubusercontent.com/vmware/terraform-provider-nsxt/v3.10.0/docs/resources/policy_tier1_gateway.md",
+      "basis": "Official provider repository tag v3.10.0",
+      "usage_and_limit": "Local Manager resource shape; no production HA, policy hierarchy or transport qualification implied."
+    },
+    {
+      "id": "NSX-policy_segment",
+      "title": "NSX policy_segment",
+      "url": "https://raw.githubusercontent.com/vmware/terraform-provider-nsxt/v3.10.0/docs/resources/policy_segment.md",
+      "basis": "Official provider repository tag v3.10.0",
+      "usage_and_limit": "Local Manager resource shape; no production HA, policy hierarchy or transport qualification implied."
+    },
+    {
+      "id": "NSX-policy_group",
+      "title": "NSX policy_group",
+      "url": "https://raw.githubusercontent.com/vmware/terraform-provider-nsxt/v3.10.0/docs/resources/policy_group.md",
+      "basis": "Official provider repository tag v3.10.0",
+      "usage_and_limit": "Local Manager resource shape; no production HA, policy hierarchy or transport qualification implied."
+    },
+    {
+      "id": "NSX-policy_security_policy",
+      "title": "NSX policy_security_policy",
+      "url": "https://raw.githubusercontent.com/vmware/terraform-provider-nsxt/v3.10.0/docs/resources/policy_security_policy.md",
+      "basis": "Official provider repository tag v3.10.0",
+      "usage_and_limit": "Local Manager resource shape; no production HA, policy hierarchy or transport qualification implied."
+    },
+    {
+      "id": "OS-networking_network_v2",
+      "title": "OpenStack networking_network_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_network_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-networking_subnet_v2",
+      "title": "OpenStack networking_subnet_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_subnet_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-networking_router_v2",
+      "title": "OpenStack networking_router_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_router_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-networking_router_interface_v2",
+      "title": "OpenStack networking_router_interface_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_router_interface_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-networking_secgroup_v2",
+      "title": "OpenStack networking_secgroup_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_secgroup_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-networking_port_v2",
+      "title": "OpenStack networking_port_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/networking_port_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-blockstorage_volume_v3",
+      "title": "OpenStack blockstorage_volume_v3",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/blockstorage_volume_v3.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-compute_instance_v2",
+      "title": "OpenStack compute_instance_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/compute_instance_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "OS-compute_volume_attach_v2",
+      "title": "OpenStack compute_volume_attach_v2",
+      "url": "https://raw.githubusercontent.com/terraform-provider-openstack/terraform-provider-openstack/v3.4.0/docs/resources/compute_volume_attach_v2.md",
+      "basis": "Official provider repository tag v3.4.0",
+      "usage_and_limit": "Resource structure is not evidence for an installed distribution/backend; shutoff may follow an initial boot."
+    },
+    {
+      "id": "VSP-VM",
+      "title": "vSphere virtual machine",
+      "url": "https://raw.githubusercontent.com/vmware/terraform-provider-vsphere/v2.12.0/docs/resources/virtual_machine.md",
+      "basis": "Official provider repository tag v2.12.0",
+      "usage_and_limit": "Power state is computed; clone may start. Disk storage policy and retention are separate from VM-home policy."
+    },
+    {
+      "id": "VSP-NAMESPACE",
+      "title": "vSphere tag README",
+      "url": "https://raw.githubusercontent.com/vmware/terraform-provider-vsphere/v2.12.0/README.md",
+      "basis": "Official provider repository tag v2.12.0",
+      "usage_and_limit": "This tag references registry namespace hashicorp/vsphere; no binary download or registry initialization succeeded here."
+    }
+  ],
+  "source_scope": "Tagged provider documentation and Terraform documentation informed this original implementation. Source locators are not cryptographic snapshots or proof of installed compatibility."
+}

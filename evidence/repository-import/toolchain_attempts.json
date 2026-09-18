@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-09-17T19:43:49.867712+00:00",
+  "terraform_executable": null,
+  "ansible_playbook_executable": null,
+  "terraform_download": {
+    "url": "https://releases.hashicorp.com/terraform/1.13.5/terraform_1.13.5_linux_amd64.zip",
+    "result": "FAILED_DOWNLOAD",
+    "additional_host_probe": "curl could not resolve releases.hashicorp.com"
+  },
+  "ansible_package_install": {
+    "requirement": "ansible-core==2.19.7",
+    "result": "FAILED_PACKAGE_RETRIEVAL",
+    "diagnostic": "ERROR: Could not find a version that satisfies the requirement ansible-core==2.19.7 (from versions: none)\nERROR: No matching distribution found for ansible-core==2.19.7"
+  },
+  "engines_executed": false,
+  "github_workflows_executed": false
+}

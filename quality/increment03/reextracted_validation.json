@@ -1,0 +1,70 @@
+{
+  "status": "PASSED_REEXTRACTED_CHECKS",
+  "verified_archive_before_addition_of_this_report": "5cf50f18dd82c6d5f7c9d90979b4aa1ffafebb04e0601c48216c8a1ae0aeddcd",
+  "finalization_note": "Only this verification report and release metadata were added/refreshed after fresh-extraction execution. Implementation source and guide bytes were unchanged.",
+  "commands": [
+    {
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "tools/check_release.py"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.617
+    },
+    {
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "tools/check_local.py"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 6.995
+    },
+    {
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "lab/run_dns_lab.py",
+        "--execute"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 2.692
+    },
+    {
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "lab/run_namespace_lab.py",
+        "--execute"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 22.651
+    },
+    {
+      "command": [
+        "/opt/pyvenv/bin/python",
+        "tools/check_package.py"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.787
+    }
+  ],
+  "release_integrity_checked_before_rerun": true,
+  "regression": {
+    "run": 270,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "tested_source_snapshot_sha256": "bfc96006e0a22128a90ffc94edbc01f39398a17eb01653744e3603445185c886",
+  "dns_wire": {
+    "passed": 32,
+    "failed": 0,
+    "scope": "Real TCP DNS QUERY/UPDATE and TSIG verification; disposable loopback test authority"
+  },
+  "packet": {
+    "passed": 47,
+    "failed": 0,
+    "original_namespace_configuration_unchanged": true
+  },
+  "package_issues": [],
+  "native_qualification": "NOT_RUN",
+  "formal_authorization": "NOT_ISSUED"
+}

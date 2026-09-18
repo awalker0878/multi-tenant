@@ -1,0 +1,3 @@
+tenant,domain,destination,next_hop,owner,status
+{% for route in hosting_normalized.routes %}{{ hosting_normalized.tenant }},{{ hosting_normalized.domain }},{{ route.destination }},{{ route.next_hop }},{{ route.owner }},STAGED_REFERENCE_NOT_QUALIFIED
+{% endfor %}

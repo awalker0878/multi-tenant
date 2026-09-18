@@ -1,0 +1,70 @@
+{
+  "release": "Implementation Increment 04",
+  "status": "PASSED_REEXTRACTED_CODE_AND_LOCAL_PROTOCOL_CHECKS",
+  "completed_at": "2026-09-17T17:38:40.943407+00:00",
+  "pre_test_archive_integrity": {
+    "status": "HASHES_MATCH",
+    "files_checked": 327,
+    "issues": [],
+    "scope": "Listed release file bytes only; not signature, authorization or infrastructure validation."
+  },
+  "commands_exit_codes": {
+    "local_regressions": 0,
+    "readback_campaign": 0,
+    "dns_campaign": 0,
+    "packet_campaign": 0,
+    "package_check": 0
+  },
+  "unit_and_source_tests": {
+    "run": 388,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "offline_route_checks": {
+    "passed": 80,
+    "failed": 0
+  },
+  "native_readback_campaign": {
+    "status": "PASSED_LOCAL_HTTPS_FIXTURE",
+    "passed": 16,
+    "failed": 0,
+    "scope": "Real localhost TLS and HTTP GET exchanges against scripted published response shapes; not a Nutanix/NSX server, native task execution, native RBAC or packet qualification."
+  },
+  "dns_campaign": {
+    "status": "PASSED_LOCAL_WIRE_FIXTURE",
+    "passed": 32,
+    "failed": 0
+  },
+  "packet_campaign": {
+    "status": "PASSED_NAMESPACE_FIXTURE",
+    "passed": 47,
+    "failed": 0,
+    "original_namespace_configuration_unchanged": true
+  },
+  "package_check": {
+    "status": "PASSED_PACKAGE_CHECKS_ONLY",
+    "checked_new_document_links": 79,
+    "guide_bookmarks": 10,
+    "guide_tables": 9,
+    "frozen_reference_files_checked": 139,
+    "module_inventory_records_checked": 10,
+    "root_configs_checked": 10,
+    "plan_only_mock_source_sets_checked": 10,
+    "packet_report_scope": "Recorded local IPv4 namespace evidence only; not rerun by this check",
+    "recorded_packet_observations": 47,
+    "recorded_dns_wire_tests": 32,
+    "recorded_native_readback_cases": 16,
+    "tested_source_files_checked": 87,
+    "unchanged_native_source_files_checked": 50,
+    "issues": [],
+    "terraform_validation": "NOT_PERFORMED_BY_PACKAGE_CHECK",
+    "live_infrastructure_qualification": "NOT_RUN",
+    "scope": "Local package integrity, new links and result consistency. Historical documents and workbooks were preserved, not newly rendered or recalculated."
+  },
+  "source_files_confirmed_identical_to_shipping_root": 87,
+  "toolchain": "BLOCKED_TOOLCHAIN",
+  "native_vendor_contact": "NONE",
+  "qualification": "NOT_RUN",
+  "note": "Local tests ran from an extracted archive. Final packaging adds only this extraction record, completion metadata and refreshed release manifest; executed source bytes remain identical."
+}

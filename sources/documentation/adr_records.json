@@ -1,0 +1,1427 @@
+[
+  {
+    "id": "ADR-0003",
+    "title": "Let the infrastructure architecture lead the tooling",
+    "source_decision_ids": [
+      "AD-01"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        1
+      ],
+      [
+        "RA",
+        2
+      ],
+      [
+        "RA",
+        29
+      ],
+      [
+        "SDP",
+        6
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "The material must describe sites, resources, trust transitions and ownership before specifying automation. Otherwise a custom control application becomes the de facto architecture.",
+    "decision": "Keep the physical and logical infrastructure design authoritative. Terraform and existing delivery systems implement defined resource responsibilities; a new portal, routing compiler or controller is not a prerequisite.",
+    "alternatives": "The source permits existing delivery tools. It explicitly rejects making a custom-controller project a prerequisite, without forbidding an independently justified future interface.",
+    "consequences": "Architecture reviews can be performed without reading an API schema. Implementation still has to supply authorization, reservation, ordered execution and evidence; those functions do not disappear when their software design is kept subordinate.",
+    "engineering_obligations": "Trace every automated operation to a component, authority boundary and lifecycle work package. Keep detailed API and validation internals outside the main architecture narrative.",
+    "requirements": [
+      "ARCH-001",
+      "TF-003",
+      "API-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules",
+      "terraform/roots",
+      "ansible"
+    ],
+    "open_work": "Actual site architecture adoption and the selected delivery-tool responsibility model remain implementation decisions.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0004",
+    "title": "Scale through commissioned hosting cells and capacity pools",
+    "source_decision_ids": [
+      "AD-02"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        3
+      ],
+      [
+        "RA",
+        4
+      ],
+      [
+        "RA",
+        5
+      ],
+      [
+        "QUAL",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Tenant growth should not routinely force physical topology changes. A hosting cell groups qualified capacity, release control and disclosed failure dependencies; it is not a synonym for a vendor cluster or Nova cell.",
+    "decision": "Commission transport, eligible compute/storage pools, security capacity and isolated attachments before routine allocations. Grow those foundations through separately owned infrastructure changes.",
+    "alternatives": "A smaller consolidated site is a documented variation only when its isolation and recovery design supports the offered scope.",
+    "consequences": "Precommissioning requires reserve capacity and forecasting. An installed server without accepted storage, edge capacity, addressing, support or operational ownership is not allocatable service capacity.",
+    "engineering_obligations": "Record the cell boundary, bottlenecks, attachment slots, measured surviving capacity and expansion trigger. Classify a physical attachment or new host pool as a foundation change.",
+    "requirements": [
+      "ARCH-002",
+      "FAB-001",
+      "CAP-002",
+      "SVCM-002"
+    ],
+    "implementation_paths": [
+      "terraform/roots"
+    ],
+    "open_work": "Site inventory, failure groups, usable capacities and expansion lead times are not supplied by the reference example.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0005",
+    "title": "Keep vendor overlays local and connect through controlled handoffs",
+    "source_decision_ids": [
+      "AD-03"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        5
+      ],
+      [
+        "RA",
+        15
+      ],
+      [
+        "NET",
+        1
+      ],
+      [
+        "VND",
+        6
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Matching encapsulation names do not establish interoperability or shared routing authority between native platforms.",
+    "decision": "Keep each platform overlay under its native owner. Use qualified routed/security handoffs between platforms rather than importing vendor VNIs or route targets into a common overlay.",
+    "alternatives": "Direct overlay federation is a separately qualified interoperability architecture, not the baseline. Fabric EVPN remains an optional provider transport or physical-attachment mechanism.",
+    "consequences": "Equivalent service and security outcomes do not require identical network objects. Cross-stack communication, portable deployment and migration remain distinct capabilities with distinct evidence.",
+    "engineering_obligations": "Document tunnel endpoint membership, underlay reachability, encapsulation budgets and the actual cross-vendor handoff. Do not infer route authority from a shared physical fabric.",
+    "requirements": [
+      "OVL-001",
+      "EVPN-001",
+      "EVPN-002",
+      "PORT-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nutanix-domain",
+      "terraform/modules/nsx-domain",
+      "terraform/modules/openstack-domain"
+    ],
+    "open_work": "Actual multivendor interoperability, encapsulation behaviour and release-specific limitations need target qualification.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0006",
+    "title": "Use an explicit governed ZIP for inter-domain trust transitions",
+    "source_decision_ids": [
+      "AD-04",
+      "DEV-ADR-01",
+      "RD14-01"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        8
+      ],
+      [
+        "RA",
+        29
+      ],
+      [
+        "SDP",
+        3
+      ],
+      [
+        "WD",
+        2
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Native domain routing can create a path before a downstream firewall ever evaluates traffic. The required boundary includes policy, authority, attribution, inspection where required and failure behaviour.",
+    "decision": "Use the reference routed stateful security-edge service with independent logical contexts and explicit adjacent-domain authority. No unrestricted general-purpose transit replaces that boundary.",
+    "alternatives": "The service-design example compares a provider routed edge, a qualified native/distributed boundary and common unrestricted transit. It retains the explicit edge, conditionally permits a complete native/distributed equivalent, and rejects unrestricted transit for the base service.",
+    "consequences": "The edge consumes inspected throughput, session and logging capacity. A physical security cluster may host several pairwise relationships; the logical relationship is not a physical two-port or appliance-count rule.",
+    "engineering_obligations": "Trace forward, reverse, same-host, connected-route and failed-edge paths. Identify every required ZIP function and the component and authority that implement it.",
+    "requirements": [
+      "ARCH-003",
+      "ZIP-001",
+      "ZIP-002",
+      "ZIP-003",
+      "ZIP-006",
+      "ZIP-007"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nsx-gateway-quarantine",
+      "lab/run_namespace_lab.py"
+    ],
+    "open_work": "The selected native firewall/context implementation, complete inspection functions and HA qualification remain open. A quarantine policy or Linux fixture is not a full ZIP.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0007",
+    "title": "Allocate isolated domain attachments and qualify sharing",
+    "source_decision_ids": [
+      "AD-05"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        5
+      ],
+      [
+        "RA",
+        8
+      ],
+      [
+        "NET",
+        2
+      ],
+      [
+        "NET",
+        3
+      ],
+      [
+        "WD",
+        5
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Separate VPC or router names do not prevent direct traffic between connected interfaces on a shared external segment.",
+    "decision": "Allocate independently isolated domain-to-edge handoffs from controlled capacity. A shared attachment is eligible only after its neighbour, connected-route, gateway, translation and failure behaviour preserve the boundary.",
+    "alternatives": "The source permits a shared attachment or proxy arrangement only through explicit path and identity analysis. Dedicated isolated contexts are the default where that evidence is absent.",
+    "consequences": "Isolation contexts are finite resources with their own ownership and reuse lifecycle. Logical attachments, service-facing handoffs, firewall contexts and physical interfaces must not be counted as interchangeable units.",
+    "engineering_obligations": "Maintain the handoff inventory, allowed prefixes, route ownership, source validation, return path, capacity and safe reuse conditions. Reject or queue allocations when accepted isolated capacity is exhausted.",
+    "requirements": [
+      "EDGE-001",
+      "EDGE-002",
+      "ZIP-002",
+      "NUT-002"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nutanix-route",
+      "terraform/modules/nsx-route",
+      "terraform/modules/openstack-route"
+    ],
+    "open_work": "Actual attachment construction and isolation measurements remain native engineering work; the route modules do not create or qualify their attachments.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0008",
+    "title": "Preserve zone-aware host placement and disclose every shared layer",
+    "source_decision_ids": [
+      "AD-06"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        7
+      ],
+      [
+        "RA",
+        11
+      ],
+      [
+        "VND",
+        2
+      ],
+      [
+        "SDP",
+        2
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A routing boundary does not establish a host-compromise boundary. HCI controllers, storage and management can remain shared when guest placement is separated.",
+    "decision": "Retain the source zone-specific host-pool baseline. Express dedication and approved sharing separately for hosts, storage, edge, management, backup and key custody; enforce the same eligibility during placement, migration, restart and restore.",
+    "alternatives": "Cross-zone co-residency or wider consolidation requires explicit security analysis and authorized variation. Matching an RZ label is not that approval.",
+    "consequences": "A dedicated workload host is not an independently administered platform. Failure reserve must exist in eligible pools; an unavailable compliant host cannot be replaced with an ineligible one just to preserve uptime.",
+    "engineering_obligations": "Provide the per-layer sharing matrix, scheduler constraints, disclosed controller/backend dependencies and migration/restart/restore tests.",
+    "requirements": [
+      "CMP-001",
+      "CMP-003",
+      "ASSUR-001",
+      "ASSUR-002",
+      "SDI-004"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nutanix-workload",
+      "terraform/modules/vsphere-workload",
+      "terraform/modules/openstack-workload"
+    ],
+    "open_work": "Co-residency approval, physical pool assignment and native scheduler enforcement have not been established by document conversion.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0009",
+    "title": "Separate management security, platform control and OOB recovery",
+    "source_decision_ids": [
+      "AD-07"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        6
+      ],
+      [
+        "NET",
+        6
+      ],
+      [
+        "SVC",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Workload access, infrastructure administration and recovery have different authority and availability needs. A management VLAN name does not prove physical independence.",
+    "decision": "Use separately controlled management domains and privileged access paths. Treat MZ as security semantics, platform APIs as control interfaces and OOB as an explicitly designed transport/recovery property.",
+    "alternatives": "Shared transport or consolidated management is a disclosed variation; it cannot be labelled physically independent or become unrestricted MZ-to-MZ routing.",
+    "consequences": "Shared tools and appliances may still expose distinct consumption and administration interfaces. Emergency access must survive its specified failure without becoming a standing unaccountable bypass.",
+    "engineering_obligations": "Map human, automation, tenant-guest and supplier administration separately. Document actual routes, role permissions, hardware recovery dependencies and post-use credential revocation.",
+    "requirements": [
+      "ARCH-004",
+      "MGT-001",
+      "MGT-002",
+      "MGT-005",
+      "IAM-002"
+    ],
+    "implementation_paths": [
+      "tools/nsx_observe.py",
+      "tools/nutanix_observe.py",
+      "tools/neutron_observe.py"
+    ],
+    "open_work": "Management/OOB independence, accepted principals, real access paths and break-glass exercises require the actual site.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0010",
+    "title": "Expose shared services through scoped consumption endpoints",
+    "source_decision_ids": [
+      "AD-08"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        9
+      ],
+      [
+        "SVC",
+        1
+      ],
+      [
+        "SDP",
+        4
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A tenant can need DNS, backup or key-use services without needing the service subnet, other tenants' data or the service's administrative API.",
+    "decision": "Publish explicit service consumption interfaces with named consumers, operations, identity scope, directions and recovery expectations. Keep backing infrastructure and management separately governed.",
+    "alternatives": "Zone-aligned frontends or a shared backend are possible when their authorization, return-path and dependency boundaries are documented. Broad common-services supernet access is not the baseline.",
+    "consequences": "Network reachability and data authorization are separate controls. Several endpoints sharing one backend are not independent failure domains. The true client may be a host, storage controller or backup executor rather than a guest.",
+    "engineering_obligations": "Issue the producer/consumer interface agreement: endpoint, permitted operation, resource scope, protocol, limits, failure effect, change owner and recovery owner.",
+    "requirements": [
+      "SVC-001",
+      "SVC-002",
+      "SVC-003",
+      "MODEL-002"
+    ],
+    "implementation_paths": [
+      "tools/dns_change.py",
+      "lab/mtls_fixture.py"
+    ],
+    "open_work": "Actual service endpoints, native authorization and backing-service resilience remain to be accepted; protocol fixtures are not production services.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0011",
+    "title": "Default to site-local domains and routed recovery",
+    "source_decision_ids": [
+      "AD-09"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        14
+      ],
+      [
+        "SVC",
+        6
+      ],
+      [
+        "QUAL",
+        2
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Two site labels do not prove independence when power, storage, control or trust dependencies are shared. Layer-2 stretch extends failure and consistency responsibilities.",
+    "decision": "Use site-local domain instances and explicit routed inter-site services for replication, recovery and declared access. Preserve the workload security purpose while recreating its site-specific realization.",
+    "alternatives": "Layer-2 stretch requires a demonstrated service need and separate partition, gateway-ownership, fencing and failback analysis.",
+    "consequences": "Active multi-site service needs explicit data/application consistency supplied by its owner; VM restart alone does not provide it. Recovery is constrained by the target's own capacity and security eligibility.",
+    "engineering_obligations": "Record common dependencies, consistency points, failover authority, writer fencing, target validation and controlled service/DNS cutover.",
+    "requirements": [
+      "SITE-001",
+      "SITE-002",
+      "SITE-003",
+      "SITE-004",
+      "REC-002"
+    ],
+    "implementation_paths": [
+      "docs/COMMISSIONING.md"
+    ],
+    "open_work": "Recovery sites, actual RTO/RPO, supported replication and witnessed partition/failback results remain open.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0012",
+    "title": "Distinguish persistent platform transports from temporary migration access",
+    "source_decision_ids": [
+      "AD-10"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        5
+      ],
+      [
+        "RA",
+        10
+      ],
+      [
+        "RA",
+        27
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "The time-bound migration rule can be misread as requiring a new hypervisor mobility or storage-replication network for every operation.",
+    "decision": "Allow persistent provider-owned live-mobility and replication transports where the platform needs them. Bound temporary cross-domain or cross-platform transfer access by purpose, authority, duration and teardown.",
+    "alternatives": "A physical routing context is justified by actual forwarding and isolation responsibility, not the function name migration, backup or platform.",
+    "consequences": "Guest networks must not gain access to persistent privileged transports. A temporary connection becomes steady state only through an explicit new acceptance decision.",
+    "engineering_obligations": "Keep endpoint membership and transport ownership distinct from the temporary grant schedule. Verify relocation eligibility and removal of obsolete transfer routes and credentials.",
+    "requirements": [
+      "FAB-003",
+      "MIG-001",
+      "MIG-002",
+      "MIG-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nutanix-route",
+      "terraform/modules/nsx-route",
+      "terraform/modules/openstack-route"
+    ],
+    "open_work": "Supported native mobility transport and the approved migration connection remain site-specific records.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0013",
+    "title": "Compose provisioning across separate platform and service authorities",
+    "source_decision_ids": [
+      "AD-11"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        20
+      ],
+      [
+        "RA",
+        24
+      ],
+      [
+        "PROV",
+        1
+      ],
+      [
+        "PROV",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "One hosting request consumes resources from the selected hypervisor stack and independently owned edge, address, name, protection and trust services.",
+    "decision": "Compose the required native platform and shared-service work packages. Scope credentials and Terraform state by authority, lifecycle and blast radius instead of one all-tenant, all-provider state.",
+    "alternatives": "The source rejects assuming one provider or a giant conditional module covers every dependency. It does not prescribe a fixed number of state files or a new orchestration application.",
+    "consequences": "Cross-state operations are not atomic. A shared edge can require serialized ownership even while tenant workload changes proceed independently. Downstream teams need bounded handoffs, not broad state or credential access.",
+    "engineering_obligations": "Define every package's prerequisites, owned objects, accepted outputs, completion evidence and data-safe recovery action. Pin providers separately from immutable module and execution-image references.",
+    "requirements": [
+      "TF-001",
+      "TF-002",
+      "TF-003",
+      "TF-005",
+      "STATE-001",
+      "STATE-003"
+    ],
+    "implementation_paths": [
+      "terraform/roots",
+      "terraform/modules",
+      "tools/dns_change.py",
+      "ansible"
+    ],
+    "open_work": "The actual execution platform, state backends and shared-service acceptance records remain engineering inputs.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0014",
+    "title": "Bootstrap management and trust before consuming native APIs",
+    "source_decision_ids": [
+      "AD-12"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        21
+      ],
+      [
+        "RA",
+        22
+      ],
+      [
+        "PROV",
+        2
+      ],
+      [
+        "PBS",
+        1
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "An empty site cannot already depend on the APIs, identity, DNS, key service and state backend that it is being asked to build.",
+    "decision": "Use supported hardware/platform installers and lifecycle tools to establish restricted management, trust and native APIs. Let Terraform manage supported resource operations after those prerequisites exist.",
+    "alternatives": "Temporary external bootstrap dependencies are allowed with named owners and a controlled transfer to steady state. An unsupported shell action inside Terraform is not equivalent to a supported declarative resource.",
+    "consequences": "Some installation tasks can proceed in parallel, but tenant allocation must not consume unaccepted security, storage or management foundations. Bootstrap cleanup must not erase the only usable recovery material.",
+    "engineering_obligations": "Document dependency cuts, temporary credentials, verified artifacts, native operation coverage and accepted handover; revoke temporary grants after successful transfer.",
+    "requirements": [
+      "AUTO-001",
+      "MGT-005",
+      "REC-001",
+      "QUAL-001"
+    ],
+    "implementation_paths": [
+      "terraform/README.md",
+      "docs/COMMISSIONING.md"
+    ],
+    "open_work": "Actual installer artifacts, initial trust material and management recovery paths are not supplied by the generic modules.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0015",
+    "title": "Build under deny and verify before and after activation",
+    "source_decision_ids": [
+      "AD-13"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        23
+      ],
+      [
+        "RA",
+        28
+      ],
+      [
+        "PROV",
+        4
+      ],
+      [
+        "WD",
+        9
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A successful create response does not establish effective policy, service dependencies or accepted operating readiness.",
+    "decision": "Create infrastructure with mandatory controls effective before endpoint connection. Verify permitted and forbidden paths internally, satisfy required initial readiness, then enable only approved exposure and verify the live path.",
+    "alternatives": "Restricted non-production qualification can generate acceptance evidence before production is offered. It must not be relabelled production-ready merely because resources exist.",
+    "consequences": "Activation has its own reversible boundary. Failed external checks withdraw exposure without destroying owned data. Required bootstrap flows must be narrow and attributable rather than an unrestricted temporary allow.",
+    "engineering_obligations": "Record stage completion, actual realization, independent path controls, protection ownership, initial readiness and the accepted production connection change.",
+    "requirements": [
+      "AUTO-002",
+      "ONB-001",
+      "ACPT-001",
+      "EXP-001"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nsx-gateway-quarantine",
+      "terraform/modules/openstack-domain",
+      "docs/COMMISSIONING.md"
+    ],
+    "open_work": "No source module or conversion supplies production authorization or release of quarantine.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0016",
+    "title": "Assign one authoritative writer per native object and sensitive subresource",
+    "source_decision_ids": [
+      "AD-14",
+      "RD14-05"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        24
+      ],
+      [
+        "RA",
+        25
+      ],
+      [
+        "PROV",
+        5
+      ],
+      [
+        "WD",
+        10
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Two tools managing the same native object can undo security controls or cause destructive replacement. Adopting an existing object is not authority to reconstruct it.",
+    "decision": "Assign one accountable tool/controller to each object and sensitive subresource. Reconcile actual configuration and remove competing writers before a reviewed ownership transfer or import.",
+    "alternatives": "Keep an object under its existing native controller when a safe ownership handover is not established. Import is a distinct controlled lifecycle operation, not proof of compliance.",
+    "consequences": "A resource shared by several WSDs must survive retirement of one consumer. Per-route and aggregate-route writers must not compete for the same router configuration.",
+    "engineering_obligations": "Supply the ownership schedule, expected immutable identities, non-destructive adoption plan, data-retention scope and actual writer-fencing evidence for interrupted work.",
+    "requirements": [
+      "STATE-003",
+      "TEN-003",
+      "LIFE-002"
+    ],
+    "implementation_paths": [
+      "tools/recovery_review.py",
+      "tools/route_record_review.py",
+      "terraform/roots"
+    ],
+    "open_work": "Actual native writer exclusion and transfer acceptance remain external controls; an offline record checker does not implement fencing.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0017",
+    "title": "Separate reference adoption, technical qualification and authorization",
+    "source_decision_ids": [
+      "AD-15"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        28
+      ],
+      [
+        "QUAL",
+        5
+      ],
+      [
+        "QUAL",
+        6
+      ],
+      [
+        "QCP",
+        1
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Page counts, schema checks, resource creation and test counts establish different things from effective infrastructure control and accepted residual risk.",
+    "decision": "Qualify the actual service, versions and topology with applicable observations. Keep document quality, technical conformance, operational readiness and formal authorization distinct and attributable.",
+    "alternatives": "The first stack is qualified with applicable single-stack observations; cross-platform comparison and actual exit recovery establish separate additional claims. Two pre-qualified stacks are not a prerequisite to qualifying the first.",
+    "consequences": "Blocked, not-run and unjustified not-applicable results cannot satisfy required observations. Historical source results remain historical and do not automatically apply to changed configurations.",
+    "engineering_obligations": "Link each applicable requirement assertion to its actual target, healthy control, observation, artifact, reviewer and separate operating decision.",
+    "requirements": [
+      "AUTH-001",
+      "TEST-003",
+      "EVID-003",
+      "ACPT-001"
+    ],
+    "implementation_paths": [
+      "tools/check_local.py",
+      "tools/verify_terraform.py",
+      "scripts/verify_ansible.py",
+      "quality"
+    ],
+    "open_work": "Live platform evidence, selected controls, independent review and issued authorization remain outside this documentation migration.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0018",
+    "title": "Separate tenant administration, WSD lifecycle and domain realization",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        7
+      ],
+      [
+        "VND",
+        1
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "One tenant can own several services and security domains. Treating the tenant, zone, routing context and deployment lifecycle as the same object causes ownership and deletion ambiguity.",
+    "decision": "Use a tenant for administrative entitlement; a WSD for a bounded hosting environment; a logical Security Domain for zone class and authority; and an instance for the site/platform realization. Give each network one instance owner.",
+    "alternatives": "A shared domain is permitted only with an approved sharing policy and independent lifecycle owner. The source does not make a WSD synonymous with one Terraform state or one custom API object.",
+    "consequences": "Identical zone labels across tenants grant no connectivity. A domain can outlive a WSD and be recreated on another platform without changing its security purpose.",
+    "engineering_obligations": "Carry stable ownership through network/resource attachment, shared dependencies, migration and retirement. Prevent an extra NIC or a tenant-controlled label from changing authority.",
+    "requirements": [
+      "INV-001",
+      "TEN-001",
+      "WSD-001",
+      "SDI-001",
+      "MODEL-001"
+    ],
+    "implementation_paths": [
+      "terraform/modules",
+      "tools/input_review.py"
+    ],
+    "open_work": "The actual tenant identities, approved shared-domain ownership and lifecycle integration remain unassigned.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0019",
+    "title": "Separate information impacts from service-level and recovery promises",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        2
+      ],
+      [
+        "RA",
+        14
+      ],
+      [
+        "SDP",
+        1
+      ],
+      [
+        "QUAL",
+        4
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A Protected B or Medium availability-impact label does not specify host topology, uptime, measured recovery time or a usable recovery point.",
+    "decision": "Record confidentiality, integrity and availability impacts separately from control selection, isolation dimensions, resource classes, measured availability and recovery objectives.",
+    "alternatives": "The sources do not prescribe one numerical uptime or RTO/RPO for all workloads. Different offers require explicit measured parameters and exclusions.",
+    "consequences": "Stronger service promises can require different dependencies and additional capacity, not merely a changed profile name. Backup scheduling alone does not establish an application-consistent RPO.",
+    "engineering_obligations": "Define each service indicator, measurement interval, tolerated failures, exclusions, recoverable consistency point and accepting service/data owner.",
+    "requirements": [
+      "CAT-001",
+      "REL-001",
+      "REC-002"
+    ],
+    "implementation_paths": [
+      "docs/IMPLEMENTATION_SCOPE.md"
+    ],
+    "open_work": "No production SLO, RTO, RPO, retention interval or assurance approval is supplied by the reference figures.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0020",
+    "title": "Use authoritative unique-by-default address allocation and controlled reuse",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        10
+      ],
+      [
+        "NET",
+        4
+      ],
+      [
+        "PROV",
+        4
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Independent address writers and early reuse create conflicting ownership, stale DNS and ambiguous security attribution.",
+    "decision": "Allocate tenant addresses uniquely by default through an authoritative delegated scope. Reserve before dependent creation, reconcile native allocations and release only after route, DNS/DHCP and policy cleanup with the approved reuse controls.",
+    "alternatives": "Overlap is a declared migration or service exception with translation and unambiguous ownership, not the standard tenancy model.",
+    "consequences": "Platform IPAM must either own its delegated pool or reconcile with the enterprise allocator. Documentation prefixes in worked examples never become actual reservations.",
+    "engineering_obligations": "Identify prefix and name authority, reservation lifetime, confirmation, stale-record cleanup, reverse records and reuse quarantine. Preserve ownership of retained service records.",
+    "requirements": [
+      "IPAM-001",
+      "IPAM-002",
+      "IPAM-003",
+      "IPAM-004"
+    ],
+    "implementation_paths": [
+      "tools/input_review.py",
+      "tools/dns_change.py"
+    ],
+    "open_work": "Authoritative IPAM allocation and native DNS propagation remain external integration work; DNS change code does not allocate addresses.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0021",
+    "title": "Offer address families explicitly across the whole service path",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        10
+      ],
+      [
+        "NET",
+        4
+      ],
+      [
+        "WD",
+        11
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Testing IPv4 alone can leave an alternative protocol path uncontrolled. A stored AAAA record is not proof of routed IPv6 support.",
+    "decision": "Explicitly offer IPv4-only, IPv6-only or dual-stack only when every required transport, gateway, boundary, service and recovery path supports that offer. Govern IPv6 local and transition behaviour even in an IPv4-only class.",
+    "alternatives": "The reference allows service-specific family choices; it does not require pretending an unsupported platform is dual-stack or inventing an IPv4 allocation for IPv6-only intent.",
+    "consequences": "MTU and protocol control are path-specific. Required ICMPv6 and path-MTU behaviour must survive the selected policy. Encapsulation assumptions need actual packet-field accounting.",
+    "engineering_obligations": "Record enabled families, source validation, local control, effective MTU and positive/negative evidence per offered path and failure state.",
+    "requirements": [
+      "IPV6-001",
+      "IPV6-002",
+      "IPV6-003"
+    ],
+    "implementation_paths": [
+      "tools/route_audit.py",
+      "lab/run_namespace_lab.py"
+    ],
+    "open_work": "The native source and routed fixture remain IPv4-focused; offline IPv6 or loopback evidence does not satisfy native routed qualification.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0022",
+    "title": "Treat public access and egress as explicit service extensions",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        8
+      ],
+      [
+        "RA",
+        9
+      ],
+      [
+        "SDP",
+        1
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A private circuit, floating address or external attachment can introduce access that bypasses the intended internal service boundary.",
+    "decision": "Keep the base internal offer free of implicit public access and Internet egress. Public traffic uses an approved perimeter/PAZ service and a separately approved backend flow; partner and enterprise relationships retain named external authority.",
+    "alternatives": "Proxy, routed edge, translation and qualified combinations are possible explicit egress designs. NAT alone is not an access-control policy.",
+    "consequences": "Exposure brings certificate, DNS, client-attribution, health-check, denial-of-service and operating dependencies. These are not enabled merely by setting a native public address.",
+    "engineering_obligations": "Record the external authority, ingress/egress service, TLS and backend trust, permitted flows, stateful reply and withdrawal behaviour before activation.",
+    "requirements": [
+      "ING-001",
+      "ING-002",
+      "EGR-001",
+      "EGR-002",
+      "EXP-001"
+    ],
+    "implementation_paths": [
+      "terraform/modules/openstack-domain",
+      "terraform/modules/nsx-gateway-quarantine"
+    ],
+    "open_work": "A dedicated public-service solution document from the previously described RAD/TAD package is not present in the source bundle; this ADR uses only the available scope guidance.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0023",
+    "title": "Protect mandatory policy and identity selectors from tenant mutation",
+    "source_decision_ids": [
+      "RD14-03"
+    ],
+    "source_sections": [
+      [
+        "RA",
+        7
+      ],
+      [
+        "RA",
+        18
+      ],
+      [
+        "WD",
+        2
+      ],
+      [
+        "PBS",
+        7
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Tenant-editable selectors, additive security groups, port-security changes or extra attachments can widen the effective policy even when a baseline rule exists.",
+    "decision": "Keep provider mutation authority over the mandatory network/policy/attachment envelope for the base service. Permit declared self-service through accepted workflows rather than unrestricted native edits.",
+    "alternatives": "Direct delegation is a separately qualified service extension whose permissions cannot expand the mandatory envelope. An additive allow mechanism must not be described as a deny hierarchy.",
+    "consequences": "Administrative tenancy and effective network enforcement are separate. Same-host and same-subnet traffic needs enforcement even when no physical edge is traversed.",
+    "engineering_obligations": "Test selector changes, default rules, additional groups, address pairs, NICs and external-network permissions. Prove policy persists through relocation and supported lifecycle changes.",
+    "requirements": [
+      "MICRO-001",
+      "MICRO-002",
+      "MICRO-003",
+      "OS-001",
+      "OS-002",
+      "NSX-001",
+      "NUT-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules/openstack-domain",
+      "terraform/modules/nutanix-domain",
+      "terraform/modules/nsx-domain"
+    ],
+    "open_work": "Native RBAC/API policy and the real immutable baseline need platform qualification; the source modules do not prove that tenant operators cannot bypass them.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0024",
+    "title": "Use independent Nutanix VPC domain realizations with qualified handoffs",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        16
+      ],
+      [
+        "VND",
+        3
+      ],
+      [
+        "PBS",
+        2
+      ],
+      [
+        "PBS",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Generally routed OZ and RZ networks inside one VPC can communicate without the diagrammed external inspection hop.",
+    "decision": "Realize independent domain instances with separate VPC or equivalently qualified routing contexts. Keep project/RBAC, protected categories and external handoff controls distinct. Prefer routed no-NAT internal handoff where the actual stack supports its required isolation and source identity.",
+    "alternatives": "NAT can support an explicit overlap or service need. Shared external subnets require separate qualification; otherwise use isolated attachment capacity.",
+    "consequences": "Prism/Flow readiness and AOS/controller/storage sharing remain real dependencies. A v2/v4 resource name alone does not establish platform compatibility or complete operation coverage.",
+    "engineering_obligations": "Record exact AOS/Prism/Flow/provider releases, entitlement, host/storage scope, external-subnet behaviour, route symmetry and create/update/delete completion.",
+    "requirements": [
+      "NUT-001",
+      "NUT-002",
+      "NUT-003",
+      "NUT-004"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nutanix-domain",
+      "terraform/modules/nutanix-route",
+      "terraform/modules/nutanix-workload",
+      "tools/nutanix_observe.py"
+    ],
+    "open_work": "Actual VPC attachments, full Flow/VM observation and target failover/restore evidence remain outside the current candidate integration.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0025",
+    "title": "Use isolated NSX upstream routing rather than a common unrestricted table",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        17
+      ],
+      [
+        "VND",
+        4
+      ],
+      [
+        "PBS",
+        4
+      ],
+      [
+        "PBS",
+        5
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Independent Tier-1 names do not prevent routing between their prefixes through a common unrestricted Tier-0. Distributed routing and Edge-hosted service routing have different packet paths.",
+    "decision": "Use a domain Tier-1 with an isolated upstream context, such as a supported Tier-0 VRF, toward the security edge. Do not enable unrestricted native inter-VRF route leaking. Keep mandatory endpoint policy distinct from the ZIP function.",
+    "alternatives": "Another isolated upstream pattern is possible when qualified for the selected release. Native or distributed ZIP alternatives require complete functional equivalence, not just a Tier-1 object.",
+    "consequences": "Shared Edge or parent-gateway resources are shared capacity/failure dependencies, not shared authorization. A conceptual Edge drawing does not prove every relevant packet receives stateful inspection.",
+    "engineering_obligations": "Record advertisements, connected/distributed routes, gateway service components, uplinks, return paths, group hierarchy and exact vSphere/NSX/provider support.",
+    "requirements": [
+      "NSX-001",
+      "NSX-002",
+      "NSX-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nsx-domain",
+      "terraform/modules/nsx-route",
+      "terraform/modules/nsx-gateway-quarantine",
+      "terraform/modules/vsphere-workload",
+      "tools/nsx_observe.py"
+    ],
+    "open_work": "Tier-0/VRF/Edge/interface construction and effective per-node enforcement are not provided or qualified by the current static-route and readback scopes.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0026",
+    "title": "Choose and own the actual OpenStack backend and domain boundaries",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        18
+      ],
+      [
+        "VND",
+        5
+      ],
+      [
+        "PBS",
+        6
+      ],
+      [
+        "PBS",
+        7
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "OpenStack distributions and Neutron backends differ. A project, router or availability-zone label does not establish a security boundary or actual physical independence.",
+    "decision": "Record the selected service/distribution/backend combination; ML2/OVN is the illustrated reference. Keep independent domains in distinct Neutron routing/network contexts with controlled external attachments and provider-owned mandatory policy.",
+    "alternatives": "Other backends and delegated services require their own realization evidence. Direct edits to OVN/OVS must not compete with Neutron ownership.",
+    "consequences": "Internal routing can be distributed independently of external gateway handling. Default groups, allowed address pairs, floating-IP paths, scheduler constraints and Cinder attachment authority need distinct controls.",
+    "engineering_obligations": "Specify controller/database/messaging, gateway and compute placement; API policy; mandatory mutation authority; approved metadata/bootstrap access; and full port/router retirement.",
+    "requirements": [
+      "OS-001",
+      "OS-002",
+      "OS-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules/openstack-domain",
+      "terraform/modules/openstack-route",
+      "terraform/modules/openstack-workload",
+      "tools/neutron_observe.py"
+    ],
+    "open_work": "Actual distribution policy, gateway/OVN failure behaviour, storage/key integrations and supported native lifecycle remain target qualification work.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0027",
+    "title": "Separate virtual-disk, guest-data, replication and administration paths",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        12
+      ],
+      [
+        "SVC",
+        4
+      ],
+      [
+        "WD",
+        7
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Virtual disk I/O can reach storage through the hypervisor without traversing the guest NIC or guest-network ZIP. Copies and exports can bypass intended data-placement restrictions if treated only as storage capacity.",
+    "decision": "Define controls at each actual data path: authorized hypervisor disk attachment, guest block/file/object access, backend replication/rebuild, management and copy/export. Preserve tenant ownership, classification, location, retention and key scope across copies.",
+    "alternatives": "Block, file and object services are separately qualified behaviours, not interchangeable because they store bytes. A shared backend is acceptable only under its declared access and dependency controls.",
+    "consequences": "Separating guest placement does not isolate shared HCI controllers, storage media or management. Snapshot creation is not proof of an independently recoverable backup.",
+    "engineering_obligations": "Record the storage service class, performance/failure envelope, actual client identity, copy lineage, destination checks and sanitization/reuse evidence.",
+    "requirements": [
+      "STO-001",
+      "STO-002",
+      "STO-003"
+    ],
+    "implementation_paths": [
+      "terraform/modules/nutanix-workload",
+      "terraform/modules/vsphere-workload",
+      "terraform/modules/openstack-workload"
+    ],
+    "open_work": "Actual backend isolation, object/file semantics, copy policy and media sanitization remain independent engineering and qualification responsibilities.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0028",
+    "title": "Protect backup administration and prove isolated usable restore",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        12
+      ],
+      [
+        "SVC",
+        5
+      ],
+      [
+        "OPS",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Successful capture does not establish useful recovery. A compromised production identity should not gain authority to delete the copies intended to survive it.",
+    "decision": "Separate capture orchestration, data movement and backup administration. Protect the required independent copies, catalogue, configuration and keys, and verify restore in an isolated eligible recovery domain before reconnection.",
+    "alternatives": "Capture may use supported snapshot/API/proxy or guest-agent paths. The actual method follows service consistency and platform support, not a universally assumed data flow.",
+    "consequences": "Retained copies can outlive the live WSD and require continuing key and access custody. Recovery acceptance includes usable data and dependency restoration, not just a completed VM restore.",
+    "engineering_obligations": "Assign capture, deletion, hold, restore and data-validation authorities; prove production credentials cannot alter protected retention; measure the recovered consistency point and service time.",
+    "requirements": [
+      "BKP-001",
+      "BKP-002",
+      "BKP-003",
+      "BKP-004",
+      "REC-001"
+    ],
+    "implementation_paths": [
+      "docs/IMPLEMENTATION_SCOPE.md"
+    ],
+    "open_work": "No production backup product, catalogue recovery or KMS integration is implemented by this documentation release.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0029",
+    "title": "Keep recovery trust material independent of the platform it unlocks",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        13
+      ],
+      [
+        "SVC",
+        3
+      ],
+      [
+        "PROV",
+        2
+      ],
+      [
+        "OPS",
+        2
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "The only identity or key needed to recover a failed encrypted platform cannot depend exclusively on that same unavailable platform.",
+    "decision": "Separate human, automation, workload and recovery identities; distinguish key use, administration, recovery and destruction. Provide a controlled independent path to minimum bootstrap trust material.",
+    "alternatives": "Qualified cache and emergency behaviour must be explicitly recorded. Plaintext fallback, disabled certificate validation or an unrestricted replacement key is not a recovery design.",
+    "consequences": "Key destruction can make retained copies unrecoverable. Administrative access, data location, support access, diagnostics and key custody remain independently constrained.",
+    "engineering_obligations": "Map trust dependencies and authority, actual credential rotation/revocation, approved emergency access and independent key/state/catalogue recovery.",
+    "requirements": [
+      "IAM-001",
+      "IAM-002",
+      "CRY-001",
+      "CRY-002",
+      "CRY-003",
+      "REC-001"
+    ],
+    "implementation_paths": [
+      "lab/mtls_fixture.py",
+      "tools/nsx_observe.py",
+      "tools/nutanix_observe.py"
+    ],
+    "open_work": "Local certificate and service-identity fixtures do not establish enterprise federation, revocation infrastructure, HSM/KMS or actual bootstrap custody.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0030",
+    "title": "Admit demand against every surviving-capacity bottleneck",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        4
+      ],
+      [
+        "RA",
+        26
+      ],
+      [
+        "QUAL",
+        3
+      ],
+      [
+        "SDP",
+        5
+      ],
+      [
+        "WD",
+        11
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Free compute is insufficient when the required inspected edge, storage rebuild reserve, addresses, licences or operational dependency is exhausted.",
+    "decision": "Evaluate accepted demand in each limiting unit against measured surviving qualified capacity minus operational reserve. Distinguish ordered, staged, commissioned, available, reserved and consumed capacity.",
+    "alternatives": "Queue the request or select another already eligible placement when the offer cannot be delivered. Do not weaken inspection or co-residency to make an allocation fit.",
+    "consequences": "Quotas describe entitlement, not guaranteed aggregate capacity. Protection copies, provider overhead and temporary test probes consume resources separately from guest allocations.",
+    "engineering_obligations": "Maintain unit-specific calculations, workload/failure assumptions, capacity ownership, lead time and growth triggers. Explain service costs without inventing prices or savings.",
+    "requirements": [
+      "CAP-001",
+      "CAP-002",
+      "CAP-003",
+      "SVCM-001"
+    ],
+    "implementation_paths": [
+      "reference/Portable_Hosting_Delivery_Kits_v1_1/02_Engineering/Engineering_Schedules.xlsx"
+    ],
+    "open_work": "All actual inputs and measured safe limits remain unresolved; illustrative calculator values are not a purchased or qualified capacity promise.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0031",
+    "title": "Discover uncertain native outcomes instead of blind replay or rollback",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        23
+      ],
+      [
+        "RA",
+        24
+      ],
+      [
+        "PROV",
+        5
+      ],
+      [
+        "OPS",
+        4
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A lost response or stopped runner does not prove that a native task failed or stopped. Replaying or deleting can duplicate resources or destroy data already written.",
+    "decision": "Retain stable operation/resource identities and scoped records. Discover current native configuration and progress, preserve quarantine, and choose an authorized data-safe converge or compensation path only after resolving uncertainty.",
+    "alternatives": "The source allows operator intervention for ambiguous outcomes. It does not require a particular saga engine or make an old Terraform state file into infrastructure rollback.",
+    "consequences": "Native task completion, selected configuration agreement, aggregate realization and effective packet-path evidence remain different observations. Compensations must preserve shared and held resources.",
+    "engineering_obligations": "Record actual writer exclusion, task identity, current generations, reservations, active containment and retained data before proposing further mutations.",
+    "requirements": [
+      "AUTO-002",
+      "AUTO-003",
+      "STATE-003"
+    ],
+    "implementation_paths": [
+      "tools/recovery_review.py",
+      "tools/nsx_observe.py",
+      "tools/nutanix_observe.py",
+      "tools/dns_change.py"
+    ],
+    "open_work": "True native fencing, automatic repair and actual approval authentication remain unimplemented; the reviewer never authorizes apply, delete or activation.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0032",
+    "title": "Keep incident containment above routine reconciliation",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        25
+      ],
+      [
+        "RA",
+        27
+      ],
+      [
+        "PROV",
+        5
+      ],
+      [
+        "OPS",
+        2
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Ordinary desired-state repair can reopen a connection deliberately blocked by an incident authority.",
+    "decision": "Preserve scoped emergency containment until its explicit authorized release and reconciliation. Investigate security-significant drift without rewriting the historical authorization record.",
+    "alternatives": "Contain the narrowest effective workload, domain, service binding, exposure or capability while evaluating shared dependencies. Broad unrelated outages are not the default.",
+    "consequences": "Current readiness and conformance can change while historical risk decisions remain immutable evidence. A generic emergency label is not permission to create unrestricted access.",
+    "engineering_obligations": "Record the incident authority, scope, precedence, required service dependencies, evidence, review/expiry and separate release decision.",
+    "requirements": [
+      "DRIFT-001",
+      "DRIFT-002",
+      "DRIFT-003",
+      "IR-001",
+      "IR-002"
+    ],
+    "implementation_paths": [
+      "tools/recovery_review.py",
+      "lab/run_namespace_lab.py"
+    ],
+    "open_work": "The local containment fixture and offline context review do not establish the actual incident process or production policy precedence.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0033",
+    "title": "Separate live-service retirement from retained-data disposal",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        27
+      ],
+      [
+        "SVC",
+        4
+      ],
+      [
+        "PROV",
+        6
+      ],
+      [
+        "OPS",
+        6
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A resource destroy can remove the paths and keys needed to meet retention obligations, or delete a shared object still required by another service.",
+    "decision": "Retire live access through a dependency-aware workflow. Preserve required exports, holds, copies and keys; remove obsolete routes, DNS and authority; sanitize only data approved for reuse or disposal.",
+    "alternatives": "Held data remains in a separately accountable retention scope. It is not labelled destroyed merely because the live VM or volume record was removed.",
+    "consequences": "Address, name and storage reuse must not inherit stale permissions. A shared key cannot be destroyed as though it were exclusive to one retiring workload.",
+    "engineering_obligations": "Maintain copy lineage, remaining obligations, disposal method/evidence, key dependency, final access revocation and a retained service identity/tombstone.",
+    "requirements": [
+      "LIFE-001",
+      "LIFE-002",
+      "LIFE-003",
+      "STO-003"
+    ],
+    "implementation_paths": [
+      "tools/dns_change.py",
+      "tools/recovery_review.py"
+    ],
+    "open_work": "Actual retention decisions, media methods and verified native cleanup remain data-owner and service-owner work.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0034",
+    "title": "Classify change by architectural impact rather than file location",
+    "source_decision_ids": [],
+    "source_sections": [
+      [
+        "RA",
+        25
+      ],
+      [
+        "RA",
+        26
+      ],
+      [
+        "SDP",
+        6
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "A tenant repository can target a shared gateway or platform, but its file location does not lower the authority or blast radius of that change.",
+    "decision": "Separate routine consumption changes from security connectivity, shared foundation, profile/trust, emergency and retirement changes. Bind the relevant resource owners, review and recovery requirements to the actual effect.",
+    "alternatives": "Preauthorization can cover routine scale inside an accepted envelope. New zone sharing, exposure, inspection obligations, management authority or recovery promises require the corresponding architecture/security decision.",
+    "consequences": "A material change can invalidate inherited evidence or affect several consumers. Unsupported rollback can require forward repair or restore rather than an assumed software downgrade.",
+    "engineering_obligations": "Trace affected interfaces, service parameters, dependencies, current state, supported versions and operating conditions; update the accepted design and as-built records deliberately.",
+    "requirements": [
+      "CICD-001",
+      "CICD-002",
+      "VULN-001",
+      "VULN-002",
+      "OPS-001"
+    ],
+    "implementation_paths": [
+      "tools/plan_review.py",
+      ".github/workflows/validate.yml"
+    ],
+    "open_work": "Actual change classification, approval authority, installed support status and operational ownership are not supplied by CI success.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0035",
+    "title": "Make shared-service replies select the originating security context",
+    "source_decision_ids": [
+      "RD14-02"
+    ],
+    "source_sections": [
+      [
+        "WD",
+        2
+      ],
+      [
+        "WD",
+        5
+      ],
+      [
+        "WD",
+        6
+      ],
+      [
+        "WD",
+        7
+      ],
+      [
+        "NBD",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Filtering traffic on the way into a shared service is insufficient when replies can use another tenant's path or a compromised service can become a transit router.",
+    "decision": "Use the worked design's dedicated tenant-to-service handoffs and origin-specific service-side return routes. Keep provider service endpoints separate from tenant gateways and prohibit general-purpose transit through service hosts.",
+    "alternatives": "A shared attachment, frontend or proxy design requires its own path, identity, management and failure analysis. The example does not choose a universal production routing product.",
+    "consequences": "The service backend remains a disclosed shared availability and compromise dependency. Per-tenant route ownership, source validation and resource authorization must persist at that sharing point.",
+    "engineering_obligations": "Record the actual initiating client, endpoint, forward/reply route chain, authorised service and unavailable-next-hop behaviour. Exercise a missing reply route without borrowing another tenant's default.",
+    "requirements": [
+      "SVC-001",
+      "SVC-003",
+      "EDGE-002",
+      "RTE-004"
+    ],
+    "implementation_paths": [
+      "lab/run_namespace_lab.py",
+      "tools/route_audit.py"
+    ],
+    "open_work": "Native service/gateway configuration and real endpoint no-transit/source-validation controls still require the chosen implementation.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  },
+  {
+    "id": "ADR-0036",
+    "title": "Require initial operational and recovery readiness before production activation",
+    "source_decision_ids": [
+      "RD14-04"
+    ],
+    "source_sections": [
+      [
+        "WD",
+        9
+      ],
+      [
+        "RA",
+        28
+      ],
+      [
+        "QUAL",
+        1
+      ],
+      [
+        "DEL",
+        3
+      ]
+    ],
+    "status": "Proposed — source-derived; organizational acceptance not recorded",
+    "context": "Reading gate numbers as a sequence can incorrectly put production activation before the operating and recovery evidence needed to support the offered service.",
+    "decision": "Treat gates as dependency types. Production G3 requires current platform/service qualification, valid operating authority and applicable initial G4 operational/recovery readiness. Separate later recurring exercises from initial prerequisites.",
+    "alternatives": "Restricted authorized non-production fixtures may precede G2 to generate qualification evidence. They are not production-ready environments and do not waive initial readiness.",
+    "consequences": "The same dependency applies to public and internal production access. A recorded test specification or promised future recovery drill is not current readiness evidence.",
+    "engineering_obligations": "Identify initial versus continuing obligations, the exact offered service promise, actual recovery results, named owners and the reversible activation/post-activation checks.",
+    "requirements": [
+      "ONB-001",
+      "REL-001",
+      "REC-002",
+      "ACPT-001"
+    ],
+    "implementation_paths": [
+      "docs/COMMISSIONING.md",
+      "tools/recovery_review.py"
+    ],
+    "open_work": "No production activation or authorization is issued by an ADR extraction; actual initial readiness remains a target-specific acceptance gate.",
+    "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting."
+  }
+]

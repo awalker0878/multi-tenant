@@ -1,0 +1,1659 @@
+{
+  "kind": "LOCAL_NATIVE_READBACK_PROTOCOL_CAMPAIGN",
+  "status": "PASSED_LOCAL_HTTPS_FIXTURE",
+  "completed_at": "2026-09-17T19:36:58.778579+00:00",
+  "passed": 16,
+  "failed": 0,
+  "source_sha256": {
+    "tools/readback_core.py": "095985b1b86f6ca8daca052232292cb05fb9f1532c21f7db8b81e3fcce336162",
+    "tools/nsx_observe.py": "b6fc54118c233ffb3ebcb0f6b4ed34b096a41b62391805e081add2814216bf65",
+    "tools/nutanix_observe.py": "3fd87dad27975786a119d8df1b03fa8d9af26696c7b38c1b186a9d1605093817",
+    "tools/readback_cli.py": "0f6a9d94629697944bfe15f8e7a6384086e9ff21008bc62b5768fe848df1ba8d",
+    "tools/recovery_review.py": "a81e37dce29517d29e1109069204efaa7b0153448eb76e9eb3d9536620cae314",
+    "lab/native_readback_fixture.py": "1005cae19fae6619128fad1f9d3741c9e433ce720571b462c0a204eb160fa23d",
+    "lab/run_readback_lab.py": "60690d22c7a12cbbebcebd347ed571b7b6ecdfe3ccbb7cc1ce7136a9c156de70"
+  },
+  "cases": [
+    {
+      "case": "nsx-current-config-and-realization",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.584052+00:00",
+        "completed_at": "2026-09-17T19:36:58.597991+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 6,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.591314+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.597963+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "b3cebd240fee4ec0aeb0f4d956607cca8868e7d07ea0244ecc67aaa1b99d20a7"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "READY_FOR_OPERATOR_RECOVERY_REVIEW",
+        "reasons": [
+          "NO_REPLAY_NEEDED_BY_OBSERVED_FIELDS",
+          "RECONCILE_STATE_AND_INDEPENDENT_VERIFICATION_BEFORE_ANY_NEW_CHANGE"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.598076+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nsx-realization-lag-then-completes",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.598845+00:00",
+        "completed_at": "2026-09-17T19:36:58.618292+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 9,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.604646+00:00",
+            "snapshot_sha256": "911136a20900853ee7d20f577ed267897ad2a7c5e18fdad5c6ff2d12fa5fe569",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "PENDING",
+                "reason": "REALIZATION_PENDING",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "d1af7d2155efd039823adfe6820d6f0466a82b4ea0fe14927143313025b6b8af"
+              }
+            ],
+            "outcome": "HOLD_NATIVE_PENDING"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.611191+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 3,
+            "observed_at": "2026-09-17T19:36:58.618264+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "4d98c65726f72cd30b7b17c398169ad1f6ce2ebd71c27c517910d3e5d59202ea"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "READY_FOR_OPERATOR_RECOVERY_REVIEW",
+        "reasons": [
+          "NO_REPLAY_NEEDED_BY_OBSERVED_FIELDS",
+          "RECONCILE_STATE_AND_INDEPENDENT_VERIFICATION_BEFORE_ANY_NEW_CHANGE"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.618377+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nsx-config-races-status-read",
+      "result": "PASSED",
+      "expected_readback": "HOLD_UNCERTAIN",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.619246+00:00",
+        "completed_at": "2026-09-17T19:36:58.625536+00:00",
+        "outcome": "HOLD_UNCERTAIN",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.625512+00:00",
+            "snapshot_sha256": "3e47a1754f0938d9caf4c92a87e8bba4a4e4ba1a7379d114d27bed318e9306e0",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "UNKNOWN",
+                "progress": "UNKNOWN",
+                "reason": "CONFIG_CHANGED_DURING_REALIZATION_READ",
+                "mismatch_fields": [
+                  "/_revision:value"
+                ],
+                "config_sha256": "3c19616af875be89ffa944bc73e399f944e783d783cd255088711fbe88c8b9a8",
+                "revision": 8,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "HOLD_UNCERTAIN"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "83ca70b447cc72ada03c1bc02105867f5504c6140f93d76c59c8ec57a77ab800"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_NATIVE_UNCERTAINTY",
+        "reasons": [
+          "CURRENT_STABLE_NATIVE_COMPLETION_NOT_ESTABLISHED"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.625602+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nsx-permission-drift",
+      "result": "PASSED",
+      "expected_readback": "HOLD_DIFFERENCE",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.626286+00:00",
+        "completed_at": "2026-09-17T19:36:58.632204+00:00",
+        "outcome": "HOLD_DIFFERENCE",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.632178+00:00",
+            "snapshot_sha256": "6b573786cb9d7af6237ea48f4b918bab7dcbb434c6aa7b4c3035215dc49e7e7a",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "DIFFERENT",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [
+                  "/rules/0/action:value"
+                ],
+                "config_sha256": "44140021f1f5e5bc74bd9f73ee476490da8b5c8967e1443ab1cd71f2035fabfa",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "HOLD_DIFFERENCE"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "29ede2cdd79c362f8addfadfaea7a25e08bbb5e208e6c4637de8700943d2f566"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "RECONCILE_DIVERGENCE",
+        "reasons": [
+          "NATIVE_CONFIG_DIFFERS_PRESERVE_DATA_AND_REVIEW_OWNERSHIP"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.632266+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nsx-stale-intent-version",
+      "result": "PASSED",
+      "expected_readback": "HOLD_NATIVE_PENDING",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.632884+00:00",
+        "completed_at": "2026-09-17T19:36:58.655752+00:00",
+        "outcome": "HOLD_NATIVE_PENDING",
+        "stable_rounds": 4,
+        "request_count": 12,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.638569+00:00",
+            "snapshot_sha256": "4dc9b9a9dcab8f85aed691f7ef6e87b3afa0e290bb168314fb87b4efe73440e9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "PENDING",
+                "reason": "REALIZATION_VERSION_NOT_EXPECTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": null
+              }
+            ],
+            "outcome": "HOLD_NATIVE_PENDING"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.644075+00:00",
+            "snapshot_sha256": "4dc9b9a9dcab8f85aed691f7ef6e87b3afa0e290bb168314fb87b4efe73440e9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "PENDING",
+                "reason": "REALIZATION_VERSION_NOT_EXPECTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": null
+              }
+            ],
+            "outcome": "HOLD_NATIVE_PENDING"
+          },
+          {
+            "round": 3,
+            "observed_at": "2026-09-17T19:36:58.649713+00:00",
+            "snapshot_sha256": "4dc9b9a9dcab8f85aed691f7ef6e87b3afa0e290bb168314fb87b4efe73440e9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "PENDING",
+                "reason": "REALIZATION_VERSION_NOT_EXPECTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": null
+              }
+            ],
+            "outcome": "HOLD_NATIVE_PENDING"
+          },
+          {
+            "round": 4,
+            "observed_at": "2026-09-17T19:36:58.655727+00:00",
+            "snapshot_sha256": "4dc9b9a9dcab8f85aed691f7ef6e87b3afa0e290bb168314fb87b4efe73440e9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "PENDING",
+                "reason": "REALIZATION_VERSION_NOT_EXPECTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": null
+              }
+            ],
+            "outcome": "HOLD_NATIVE_PENDING"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "725fd15b699999bf18142b885a2e3b0fb00ae890fb27ef60f1576c1b2d8b58aa"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "WAIT_FOR_NATIVE_TASK",
+        "reasons": [
+          "DO_NOT_REPLAY_OR_CANCEL_FROM_THIS_TOOL"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.655825+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nsx-missing-realization-span",
+      "result": "PASSED",
+      "expected_readback": "HOLD_UNCERTAIN",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.656676+00:00",
+        "completed_at": "2026-09-17T19:36:58.662531+00:00",
+        "outcome": "HOLD_UNCERTAIN",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.662507+00:00",
+            "snapshot_sha256": "dca88f133f0dd6cf8d019ced073a157fa4359cba932f91b2f2a11d1671eae890",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "UNKNOWN",
+                "reason": "REALIZATION_SPAN_MISSING",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": null
+              }
+            ],
+            "outcome": "HOLD_UNCERTAIN"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "7b4af9b1873f4325d95602d7a29c3e8aecceed28df9b43d73e7078b7cce517f6"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_NATIVE_UNCERTAINTY",
+        "reasons": [
+          "CURRENT_STABLE_NATIVE_COMPLETION_NOT_ESTABLISHED"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.662593+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-completed-task-matching-vpc",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "6c06a1db2297ed7ab9a8a051d190a4968223bcaf3fde6ec095a3d469d51a6f25",
+        "started_at": "2026-09-17T19:36:58.663340+00:00",
+        "completed_at": "2026-09-17T19:36:58.674622+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 6,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.668799+00:00",
+            "snapshot_sha256": "f1e356c4f9e35d2330472d7570a8a226b04e21550961e322f233c037ac1208f8",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "1bb93638e6c397552d1bccc0f0e52afa2a03cd21976d4b299f986153e2aaccdc"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.674601+00:00",
+            "snapshot_sha256": "f1e356c4f9e35d2330472d7570a8a226b04e21550961e322f233c037ac1208f8",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "1bb93638e6c397552d1bccc0f0e52afa2a03cd21976d4b299f986153e2aaccdc"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "028c93ae2cfd6f3330f23a25b9da37c67069a26379fa63f65631d66b7f0ac341"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "READY_FOR_OPERATOR_RECOVERY_REVIEW",
+        "reasons": [
+          "NO_REPLAY_NEEDED_BY_OBSERVED_FIELDS",
+          "RECONCILE_STATE_AND_INDEPENDENT_VERIFICATION_BEFORE_ANY_NEW_CHANGE"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.674682+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-delayed-task-no-resubmit",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "be35cd83b02fe99310ce2dd4869fecd6ddcac4d3496153d797ab6840ff2b4519",
+        "started_at": "2026-09-17T19:36:58.675347+00:00",
+        "completed_at": "2026-09-17T19:36:58.692558+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 9,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.681128+00:00",
+            "snapshot_sha256": "f8c7e6bc122b75427a0017e74bcb9aa31095d10e71ab419cb8fe2d7abae8c899",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "PENDING",
+                "reason": "TASK_RUNNING",
+                "task_sha256": "f9b7118ce21e069653eb0598370b55c4194c81774618c4401319ef2bbbe861fb"
+              }
+            ],
+            "outcome": "HOLD_NATIVE_PENDING"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.686698+00:00",
+            "snapshot_sha256": "43cb2d9fe1feed65ab52af12903ed084f6be6231b0974b435e6d597f2ce9fd13",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "12d19807592ea2efafe1f3f18be04b34185926aab3c945c0bf2d3860e4dc1cf5"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 3,
+            "observed_at": "2026-09-17T19:36:58.692536+00:00",
+            "snapshot_sha256": "43cb2d9fe1feed65ab52af12903ed084f6be6231b0974b435e6d597f2ce9fd13",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "12d19807592ea2efafe1f3f18be04b34185926aab3c945c0bf2d3860e4dc1cf5"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "a677706a99504a90bf363cd67beee98227a8ae19e1b4f35c33d8e9c36cab5be3"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "READY_FOR_OPERATOR_RECOVERY_REVIEW",
+        "reasons": [
+          "NO_REPLAY_NEEDED_BY_OBSERVED_FIELDS",
+          "RECONCILE_STATE_AND_INDEPENDENT_VERIFICATION_BEFORE_ANY_NEW_CHANGE"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.692623+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-failed-task-with-existing-vpc",
+      "result": "PASSED",
+      "expected_readback": "HOLD_NATIVE_FAILURE",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "89f56d9ac8785ff2f454d781d93513e645a40373279af3067eb41ceb1c032297",
+        "started_at": "2026-09-17T19:36:58.693322+00:00",
+        "completed_at": "2026-09-17T19:36:58.699508+00:00",
+        "outcome": "HOLD_NATIVE_FAILURE",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.699487+00:00",
+            "snapshot_sha256": "aa3151596268c41d5ae2deee65af4c16912270a009765aa06a5f1f9d8d524d3b",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "FAILED",
+                "reason": "TASK_FAILED",
+                "task_sha256": "1dd6c879488b2742f4d7a56b2485cd338c7eed3fad813364e4bd235999491526"
+              }
+            ],
+            "outcome": "HOLD_NATIVE_FAILURE"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "db9587927125e8d9fbb3f9e230e89813c300d18aabf3b3642322c839fb4cdce8"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "INSPECT_PARTIAL_FAILURE",
+        "reasons": [
+          "FAILED_OR_CANCELED_TASK_DOES_NOT_MEAN_NOTHING_CHANGED"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.699606+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-task-404",
+      "result": "PASSED",
+      "expected_readback": "HOLD_UNCERTAIN",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "c524c85c5241648004385ef1a11d92d4bea7b5ed8effa199234b4a349e356ca8",
+        "started_at": "2026-09-17T19:36:58.700218+00:00",
+        "completed_at": "2026-09-17T19:36:58.702066+00:00",
+        "outcome": "HOLD_UNCERTAIN",
+        "stable_rounds": 1,
+        "request_count": 1,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.702042+00:00",
+            "snapshot_sha256": "0952b0604b97c58ba9536a584f85cbe0adc1ef2e162580ffdbf4bb9242bbd102",
+            "states": [
+              {
+                "resource_key": "scope",
+                "config_status": "UNKNOWN",
+                "progress": "UNKNOWN",
+                "reason": "HTTP_404"
+              }
+            ],
+            "outcome": "HOLD_UNCERTAIN"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "efbe8c35040fba1ec9052c421b37c268151f2d2d6650a43a1925c9099ddd2c04"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_NATIVE_UNCERTAINTY",
+        "reasons": [
+          "CURRENT_STABLE_NATIVE_COMPLETION_NOT_ESTABLISHED"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.702117+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-foreign-native-tenant",
+      "result": "PASSED",
+      "expected_readback": "HOLD_UNCERTAIN",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "d384c73dfcb6e49ba675bb1e4aee5dea4035a1996b17738bcba849a2a442cf26",
+        "started_at": "2026-09-17T19:36:58.702695+00:00",
+        "completed_at": "2026-09-17T19:36:58.708550+00:00",
+        "outcome": "HOLD_UNCERTAIN",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.708528+00:00",
+            "snapshot_sha256": "0334df865ad17bde804c6b832ec6de439fd813f14499428d34886befde71a484",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": false,
+                "config_status": "UNKNOWN",
+                "mismatch_fields": [
+                  "/tenantId:value"
+                ],
+                "config_sha256": "73b80f65fae15d52d417b1c6bd1352df1664783e11bd62eee751389b94a87191",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "0b56ceef6e9d1a0a260a2181dab4c670029141c004197de582ba9aabd00c38b9"
+              }
+            ],
+            "outcome": "HOLD_UNCERTAIN"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "2347760279c8e1193b31b6f3cf22a86fff46ec797f50f075b9124f84f061810f"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_NATIVE_UNCERTAINTY",
+        "reasons": [
+          "CURRENT_STABLE_NATIVE_COMPLETION_NOT_ESTABLISHED"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.708608+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-etag-conflict",
+      "result": "PASSED",
+      "expected_readback": "HOLD_DIFFERENCE",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "c15d432de418a3819ea041c5adea17af710c832b41b8206cacec9ad395fffe1c",
+        "started_at": "2026-09-17T19:36:58.709222+00:00",
+        "completed_at": "2026-09-17T19:36:58.715411+00:00",
+        "outcome": "HOLD_DIFFERENCE",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.715390+00:00",
+            "snapshot_sha256": "4957ed42449cb54c0e090521ba1a4e15277b99115a025861d92635f1acec61e9",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "DIFFERENT",
+                "mismatch_fields": [
+                  "/ETag:value"
+                ],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "b68dbb7f65d9599bade23bdddd39f0e8015315c52270f272d05967a982edbed8",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "b4c8f34b52e4379ca2d72fac872583e73a85f817d6d70313a6cf4119fae766b8"
+              }
+            ],
+            "outcome": "HOLD_DIFFERENCE"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "15b734e1c3272951e22f6e58e1d01b6e8d7e653c4304ec4e09eed3d7acc479a5"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "RECONCILE_DIVERGENCE",
+        "reasons": [
+          "NATIVE_CONFIG_DIFFERS_PRESERVE_DATA_AND_REVIEW_OWNERSHIP"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.715467+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "nutanix-unenumerated-affected-entity",
+      "result": "PASSED",
+      "expected_readback": "HOLD_UNCERTAIN",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "244c16d4e21632ef56c21ae71bfe51d9aecfac31f2d06dab13ddbed9ff345b83",
+        "started_at": "2026-09-17T19:36:58.716188+00:00",
+        "completed_at": "2026-09-17T19:36:58.721865+00:00",
+        "outcome": "HOLD_UNCERTAIN",
+        "stable_rounds": 1,
+        "request_count": 3,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.721842+00:00",
+            "snapshot_sha256": "549c72732e867a4c04e6bc291da9cb9c25b58817ba9a986c963eae0b5a1dc435",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "UNKNOWN",
+                "reason": "TASK_ENTITY_COVERAGE_INCOMPLETE",
+                "task_sha256": null
+              }
+            ],
+            "outcome": "HOLD_UNCERTAIN"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "9931f264bd24042ed4a3a1ae860dc6baccba88b135c772163da404f2be7e9630"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_NATIVE_UNCERTAINTY",
+        "reasons": [
+          "CURRENT_STABLE_NATIVE_COMPLETION_NOT_ESTABLISHED"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.721919+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "stop-runner-is-not-proof-of-fencing",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nutanix",
+        "profile": "nutanix-networking-prism-v4.3",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "6cff7fbaac7e994aa53a97ceb56450d039a90009c1148cca316980a3ac1ccd1e",
+        "started_at": "2026-09-17T19:36:58.722618+00:00",
+        "completed_at": "2026-09-17T19:36:58.734537+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 6,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.728765+00:00",
+            "snapshot_sha256": "2a87e3f25b17a5ed0014a598d3a0110b138cc5e654dbb633669233cf78f15966",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "ea09835435e7fc27779f9e624bf7ccfec14db5e78aa18fa37c55d85a16343c49"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.734516+00:00",
+            "snapshot_sha256": "2a87e3f25b17a5ed0014a598d3a0110b138cc5e654dbb633669233cf78f15966",
+            "states": [
+              {
+                "resource_key": "11111111-1111-4111-8111-111111111111",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "mismatch_fields": [],
+                "config_sha256": "83227e6322ad6292b87ed51eca477342c056e80c559a8fe9bee900a2465c6946",
+                "etag_sha256": "07cfb4b13d6aedb60f9d835f4d18b58ec691ead7bb463fd987c342055074308b",
+                "progress": "COMPLETE",
+                "reason": "TASK_SUCCESS_REPORTED",
+                "task_sha256": "ea09835435e7fc27779f9e624bf7ccfec14db5e78aa18fa37c55d85a16343c49"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "b940c3cd6abcccb149ca7f7dd7c0a8749820da7ca5f712b53236040025a3e6ad"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_WRITER_NOT_FENCED",
+        "reasons": [
+          "OBSERVE_AND_FENCE_EXISTING_WRITERS_BEFORE_RECOVERY_REVIEW"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.734598+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/networking/v4.3/config/vpcs/11111111-1111-4111-8111-111111111111",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/prism/v4.3/config/tasks/ZXJnb24%3D%3A22222222-2222-4222-8222-222222222222",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "incident-containment-survives-readback",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.735348+00:00",
+        "completed_at": "2026-09-17T19:36:58.746596+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 6,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.740917+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.746573+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "bbcbdcbc3a1943076a26d0ad4b16983d4a67772bc94b48f9088b646364f565b4"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "KEEP_INCIDENT_CONTAINMENT",
+        "reasons": [
+          "INCIDENT_AUTHORITY_REMAINS_IN_FORCE"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.746662+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    },
+    {
+      "case": "new-generation-needs-new-review",
+      "result": "PASSED",
+      "expected_readback": "READBACK_MATCH_NOT_QUALIFIED",
+      "readback": {
+        "kind": "NATIVE_READBACK_V1",
+        "platform": "nsx",
+        "profile": "nsx-local-policy-v1-selected-fields",
+        "origin": "https://127.0.0.1:41001",
+        "operation_id": "op-lab-004",
+        "tenant_id": "tenant-001",
+        "scope_id": "D01O",
+        "target_binding_ref": "LAB-TARGET-ONLY",
+        "manifest_sha256": "497732952d87d125479b3fcd79901440e18a77f304e239372ffdbfd5f95e6854",
+        "started_at": "2026-09-17T19:36:58.747326+00:00",
+        "completed_at": "2026-09-17T19:36:58.758248+00:00",
+        "outcome": "READBACK_MATCH_NOT_QUALIFIED",
+        "stable_rounds": 2,
+        "request_count": 6,
+        "history": [
+          {
+            "round": 1,
+            "observed_at": "2026-09-17T19:36:58.752697+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "HOLD_UNSTABLE"
+          },
+          {
+            "round": 2,
+            "observed_at": "2026-09-17T19:36:58.758223+00:00",
+            "snapshot_sha256": "f070ede412e49851006d8ad9e035e722ef7b158b302a1aa708cdf486b98b84f9",
+            "states": [
+              {
+                "resource_key": "/infra/domains/default/gateway-policies/tenant-001-quarantine",
+                "identity_match": true,
+                "config_status": "MATCH",
+                "progress": "COMPLETE",
+                "reason": "EXPECTED_REALIZATION_REPORTED",
+                "mismatch_fields": [],
+                "config_sha256": "bf8c9d7a0e94ce4de442562dfb2b674e365c1056fbb51eebaf38c664adc9ddad",
+                "revision": 7,
+                "realization_sha256": "f1ba405056de1a9937fe3291981120e9c63dc1a7fffacdfeaa8ce11ff4253406"
+              }
+            ],
+            "outcome": "READBACK_MATCH_NOT_QUALIFIED"
+          }
+        ],
+        "coverage": "Exact enumerated resources and selected fields; not inventory completeness, RBAC, packet-path or live qualification.",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "content_sha256": "bbf19464501abc8005a8b9519864715cb7c3332f9101043924c1895f26252351"
+      },
+      "recovery_review": {
+        "kind": "INTERRUPTED_CHANGE_TRIAGE_V1",
+        "result": "HOLD_SUPERSEDED_CHANGE",
+        "reasons": [
+          "REPLAN_AGAINST_CURRENT_APPROVED_ENGINEERING"
+        ],
+        "evaluated_at": "2026-09-17T19:36:58.758316+00:00",
+        "may_apply": false,
+        "may_delete": false,
+        "may_activate": false,
+        "proof_limit": "Record consistency only. Signatures, true writer fencing, native RBAC, data ownership and operational authorization require their respective authorities."
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/realized-state/status?intent_path=%2Finfra%2Fdomains%2Fdefault%2Fgateway-policies%2Ftenant-001-quarantine",
+          "has_basic_auth": true
+        },
+        {
+          "method": "GET",
+          "path": "/policy/api/v1/infra/domains/default/gateway-policies/tenant-001-quarantine",
+          "has_basic_auth": true
+        }
+      ],
+      "operator_control_records": "SIMULATED; actual writer fencing and quarantine not proven by this fixture"
+    }
+  ],
+  "scope": "Real localhost TLS and HTTP GET exchanges against scripted published response shapes; not a Nutanix/NSX server, native task execution, native RBAC or packet qualification.",
+  "target_infrastructure_contacted": false,
+  "production_mutations": 0,
+  "writes_to_fixture_api": 0
+}

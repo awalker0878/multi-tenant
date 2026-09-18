@@ -1,0 +1,33 @@
+{
+  "kind": "SOURCE_TO_GIT_DOCUMENTATION_CHECK",
+  "status": "PASSED",
+  "metrics": {
+    "source_documents": 28,
+    "body_blocks": 5551,
+    "source_paragraphs_compared": 12379,
+    "tables": 486,
+    "source_bookmarks": 932,
+    "form_prompts": 199,
+    "navigation_blocks_replaced": 182,
+    "figure_occurrences": 25,
+    "local_links": 8589,
+    "external_links_retained_not_contacted": 131,
+    "fragment_links": 3633,
+    "source_derived_adrs": 34,
+    "markdown_pages_checked": 507,
+    "checks": 33941,
+    "passed": 33941,
+    "failed": 0
+  },
+  "failures": [],
+  "external_sources": "RETAINED_NOT_REVALIDATED",
+  "terraform_ansible_engine": "NOT_RUN_BY_THIS_CHECK",
+  "native_infrastructure": "NOT_CONTACTED",
+  "architecture_approval": "NOT_ISSUED",
+  "reviewed_markdown_examples": [
+    "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md",
+    "docs/templates/hld/6-architecture-decision-record.md",
+    "docs/adr/0006-use-an-explicit-governed-zip-for-inter-domain-trust-transitions.md"
+  ],
+  "visual_review_scope": "Three selected full-page Markdown previews inspected; all Markdown pages parsed and links/text/tables checked mechanically. Not a GitHub-hosted renderer or accessibility certification."
+}

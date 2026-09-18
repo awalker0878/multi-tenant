@@ -1,0 +1,8 @@
+---
+- name: Validate an observation manifest without native contact
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  roles:
+    - role: readback_validate

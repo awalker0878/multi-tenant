@@ -1,0 +1,498 @@
+{
+  "release": "Portable Hosting Architecture, Engineering and Implementation Delivery Kits v1.0",
+  "architecture_baseline": "v1.4 — frozen reference, no new qualification claimed",
+  "declared_date": "2026-09-16",
+  "excluded_paths": [
+    "07_Quality/package_checks.json",
+    "RELEASE_MANIFEST.json",
+    "SHA256SUMS"
+  ],
+  "exclusion_reason": "Manifest/checksum files and the regenerable final package-check report are excluded from their own payload hashes to avoid recursion. SHA256SUMS includes the manifest hash.",
+  "files": [
+    {
+      "path": "00_Delivery_Map.docx",
+      "bytes": 45578,
+      "sha256": "e332c1b37e63439169adf8b105573577fa1ea61bf32f6c3ba383dd69d83a788b"
+    },
+    {
+      "path": "01_Architecture/Architecture_Kit.docx",
+      "bytes": 47489,
+      "sha256": "f0cd99f187d5f883e0f752e07de20f8878bef02fa1d0b36817674ef59bfd9802"
+    },
+    {
+      "path": "01_Architecture/Architecture_Registers.xlsx",
+      "bytes": 50566,
+      "sha256": "90ede61cfba5e404a0c3450e229c33fd31dcd9024fd0098261321fefa3241a57"
+    },
+    {
+      "path": "01_Architecture/HLD_and_Architecture_Review_Template.docx",
+      "bytes": 46566,
+      "sha256": "911b87e6a36d903a12535d16d75f1875c0cefb6b72c462895f7c2559b556708c"
+    },
+    {
+      "path": "01_Architecture/README.md",
+      "bytes": 1839,
+      "sha256": "ced3ba837df7f813df22ad574e4b3cdb6a7b8ca3d5c081e65130ccc622d53c88"
+    },
+    {
+      "path": "02_Engineering/Engineering_Kit.docx",
+      "bytes": 47726,
+      "sha256": "0aeb8ee0a114d3ed23e97c684cc9812a0fa6ea5252e49f0c902132bf4e053a7d"
+    },
+    {
+      "path": "02_Engineering/Engineering_Schedules.xlsx",
+      "bytes": 62321,
+      "sha256": "03db116552d7f51f3155bf6c3944521208a8962834ee0642b3ceb5a2edff9dbd"
+    },
+    {
+      "path": "02_Engineering/LLD_and_Engineering_Review_Template.docx",
+      "bytes": 46048,
+      "sha256": "b25a109f59a09baebb4dfc8c7f5069e9e98421ae5b009dba0e4b08117280511d"
+    },
+    {
+      "path": "02_Engineering/README.md",
+      "bytes": 2210,
+      "sha256": "4980501fbab2bda8ed84654cb015f95a2ab93ad22159cf711808f999e20b7671"
+    },
+    {
+      "path": "02_Engineering/Vendor_Realization_Cards.docx",
+      "bytes": 46238,
+      "sha256": "5e453a432a4b6c5af7d75ba266945bdb9e01118757cbeec1e15d81f92be32ab0"
+    },
+    {
+      "path": "03_Implementation/Implementation_Kit.docx",
+      "bytes": 50113,
+      "sha256": "b16b8843bfbafd1b417d611903f5b8038f4794efd4f22c995bee1cb36f9ebb41"
+    },
+    {
+      "path": "03_Implementation/Implementation_Tracker.xlsx",
+      "bytes": 60837,
+      "sha256": "1b1ffac56f41e7f3d0b4c5f7dccf9f56e8f7b914bf0f72df78a7dec042e36c87"
+    },
+    {
+      "path": "03_Implementation/MOP_Test_and_Handover_Template.docx",
+      "bytes": 45393,
+      "sha256": "9a7dd8df4a5abf6482f206cae2d074444ac6fa812bbe4bace970a4de059da370"
+    },
+    {
+      "path": "03_Implementation/README.md",
+      "bytes": 2178,
+      "sha256": "98f1828c0b70a4784c2953ca516c37be774ea5393b6a420d1d2528f5f1cefa28"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-00_Release_Preflight.md",
+      "bytes": 4733,
+      "sha256": "5b2060d0f6e06dab3b657b0fc35303f6006105c83d7aaf0390c34489449dcd0c"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-01_P0_P1_Foundation.md",
+      "bytes": 4977,
+      "sha256": "804decfc5297e949c67b99b8797c20b8a5c4ca79c555efb5c194eec97a761875"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-02_Nutanix_P2.md",
+      "bytes": 4989,
+      "sha256": "22437bdcb7fa51ff380a362ca1d7351d9076f2ad5e018c82c18ecfa1d5c46d12"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-03_VMware_NSX_P2.md",
+      "bytes": 5106,
+      "sha256": "60a4a708f5da7d515f9045c1b66bec149255668ed93583ec2858bde8cac3ccd7"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-04_OpenStack_P2.md",
+      "bytes": 5109,
+      "sha256": "ebb1bbf92eba41583eafdc3fb732302d639cbe0152d644d5cb53dd46b93edfee"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-05_P3_Shared_Security_Services.md",
+      "bytes": 5094,
+      "sha256": "a2c99b155e1968a0107e3f384ac121e48b594eee26ad2f61ef31f0d3f9122a9c"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-06_P4_P5_Tenant_and_Activation.md",
+      "bytes": 5483,
+      "sha256": "2cb5e778a270dead38dbccf9147638d1194804cb09865bb4238f40ebdae68d84"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-07_Failure_and_Change_Recovery.md",
+      "bytes": 4797,
+      "sha256": "6096b35256d8f6ee9f661d265f0d20dbf33b145a7d8a6b2f2f0a7497aad314d2"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-08_Data_Recovery_and_Migration.md",
+      "bytes": 4953,
+      "sha256": "3ca28243aa9bb30b7d26cf7bd88804650938485a8090f3d7696c5e8300a7c9f3"
+    },
+    {
+      "path": "03_Implementation/runbooks/RB-09_Retirement_and_Handover.md",
+      "bytes": 4886,
+      "sha256": "c81de7373b4619354331360b118fa43e653a886ed26d16d450572baca47783fe"
+    },
+    {
+      "path": "04_Shared/KIT-TN-01_NSX_Gateway_Mode_Check.md",
+      "bytes": 1652,
+      "sha256": "d1353dc02b86849acf2cc3a3992e9ec1462b19b3c341d05b58bb41100ebce4b8"
+    },
+    {
+      "path": "04_Shared/Sources_and_Lineage.md",
+      "bytes": 3574,
+      "sha256": "3c4672e4e317dc4ab55f4f53f4d2b147b62c0a6fff207976c36439a5f74c7021"
+    },
+    {
+      "path": "04_Shared/Worked_Delivery_Example.docx",
+      "bytes": 47146,
+      "sha256": "ae4ea65ea564fe848f214f5154ca4b67726eb6628d07a4b4f7714210e49ccd0d"
+    },
+    {
+      "path": "04_Shared/addenda.csv",
+      "bytes": 5998,
+      "sha256": "618e991224adc331a58d72a49db69011daf0bf4bfbf7ba227ad935b0a0d3d5ed"
+    },
+    {
+      "path": "04_Shared/assertions.csv",
+      "bytes": 2083,
+      "sha256": "6b36dceb3cb4f6afb666b26ad8b077a3b8ee427c79e2e104b3f41481b237fea2"
+    },
+    {
+      "path": "04_Shared/baseline_fingerprints.json",
+      "bytes": 3513,
+      "sha256": "b16764da32584bdd31c21fc79d94d97fdf40c41e2b4d91ebe9d5eb7738423b9d"
+    },
+    {
+      "path": "04_Shared/build_step_catalogue.csv",
+      "bytes": 25452,
+      "sha256": "9a573a5658744b724a54c3330d386542f7071ef707a835ccdf5b1de693a97984"
+    },
+    {
+      "path": "04_Shared/deliverables.csv",
+      "bytes": 6728,
+      "sha256": "c9f284b20a85f5e94ee41b0f9824c091328a46b797cafc2e5524a171eac7f485"
+    },
+    {
+      "path": "04_Shared/delivery_inventory.json",
+      "bytes": 17761,
+      "sha256": "0998cf772a6f379a63a0793bcf9af44ae9286ea15ee710a6da8765bc19db678f"
+    },
+    {
+      "path": "04_Shared/flows.csv",
+      "bytes": 1388,
+      "sha256": "d53a0a01eed3d58a60175f61e820909cd3efc5100b15c051973e42f3475a4e02"
+    },
+    {
+      "path": "04_Shared/gates.csv",
+      "bytes": 1872,
+      "sha256": "9a5a4ffe9ef00c97867bf58c8e27cfb7fa9ed8faaa26e2a8bcfd520d7d89fe77"
+    },
+    {
+      "path": "04_Shared/handoffs.csv",
+      "bytes": 708,
+      "sha256": "7ee5eb1b8886f8da798ee825f772d5bb072e2948d91fe952ae61d0f31e951903"
+    },
+    {
+      "path": "04_Shared/open_v14_decisions.csv",
+      "bytes": 1461,
+      "sha256": "cfb83a9ae8cc228e71dc2fa5279e4044ed53a614964fba1a988ed72b7ab9dae0"
+    },
+    {
+      "path": "04_Shared/requirements.csv",
+      "bytes": 62947,
+      "sha256": "d9dd04a16de7fa4717ff522365baa1d6babdb880cf309ec7fd8de772c0bfe578"
+    },
+    {
+      "path": "04_Shared/routes4.csv",
+      "bytes": 3634,
+      "sha256": "ddc0b0b37f9bcf9a3d58db209c3459cff949ee034e74552f503b28caca4f1dab"
+    },
+    {
+      "path": "04_Shared/routes6.csv",
+      "bytes": 2210,
+      "sha256": "ee16b40cc8aed592be0d968878809c4eab5de75deccecbf95e302db9db997071"
+    },
+    {
+      "path": "04_Shared/site_decisions.csv",
+      "bytes": 5077,
+      "sha256": "34de53fcfbe81d19d05fc81c963899efd17ab32ea3100322dabca046618eef20"
+    },
+    {
+      "path": "04_Shared/sources.csv",
+      "bytes": 2666,
+      "sha256": "5cfbf52436abf39774e7f61f83194ce47ac95e5544f68d3ce226c8867c08f4a9"
+    },
+    {
+      "path": "04_Shared/tests.csv",
+      "bytes": 42961,
+      "sha256": "197e769fecb5ec445e7e4a07bc0bc7e32dd1d29c1a5bf4533a8a1416063cb292"
+    },
+    {
+      "path": "04_Shared/views.csv",
+      "bytes": 2376,
+      "sha256": "c5e3059a24a9fdb5220e1e3f0263f9f03ce1f044430d3e2e353a2bb12d766431"
+    },
+    {
+      "path": "05_Reference_v1_4/00_Reference_Architecture_v1_4.docx",
+      "bytes": 1213724,
+      "sha256": "e50894d7f7b87cef50a283399b85925c8a96c5b9cd0428ce71ca0143d9be8d19"
+    },
+    {
+      "path": "05_Reference_v1_4/01_Gap_Map_and_Decision_Register_v1_4.docx",
+      "bytes": 44963,
+      "sha256": "26dbaac8c13797b58ca5d057f76df8b3da63ec3f4b336036f18f5c6902512207"
+    },
+    {
+      "path": "05_Reference_v1_4/02_Fabric_Security_and_Interfaces_v1_4.docx",
+      "bytes": 38375,
+      "sha256": "9c557d7d94dbdf24630994d2676aca3ddfa80e67c2910fb1a29ea4561c591dcf"
+    },
+    {
+      "path": "05_Reference_v1_4/03_Vendor_Stack_Realizations_v1_4.docx",
+      "bytes": 515566,
+      "sha256": "73be32b98783bd7857be8a00928c6894bf16f6bc98c8eb016058d3cf75b9d86b"
+    },
+    {
+      "path": "05_Reference_v1_4/04_Provisioning_and_Commissioning_v1_4.docx",
+      "bytes": 40506,
+      "sha256": "483df77cff70166fbdfdf711135efa3beeecc8fe1015a58290cbebff5b80bdfd"
+    },
+    {
+      "path": "05_Reference_v1_4/05_Shared_Services_Data_and_Recovery_v1_4.docx",
+      "bytes": 41376,
+      "sha256": "2257e6f3badac48b07989244fbfae96643d68cc6633b28e9799a14733bccea3a"
+    },
+    {
+      "path": "05_Reference_v1_4/06_Site_Design_Qualification_and_Operations_v1_4.docx",
+      "bytes": 43411,
+      "sha256": "783edbba45483d0d3c3b966765589762698836320237906a0f9a60080574af37"
+    },
+    {
+      "path": "05_Reference_v1_4/07_Worked_Infrastructure_Design_and_Acceptance_v1_4.docx",
+      "bytes": 57152,
+      "sha256": "e4a2e42888349b5967f7b3174c78e53171728b13e99e4c78bc3cfb53310f68db"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/conformance_tests_reference.json",
+      "bytes": 63240,
+      "sha256": "ed230c11114bff342f3b523a8b5150cbf93f9e66607358768e7fd32ea8bf3fd5"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/gap_register.csv",
+      "bytes": 20927,
+      "sha256": "40044a4b9e9bf44d297feec885ba7a59def91a1c4a40cb39fe04496355d7dcf3"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/realization_verification_addenda.json",
+      "bytes": 8418,
+      "sha256": "5b6f0875cafa32f95a2afebfbbb8d2e170f42ca556d75a7b14518d0b6b0697f7"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/requirement_document_crosswalk.csv",
+      "bytes": 62947,
+      "sha256": "d9dd04a16de7fa4717ff522365baa1d6babdb880cf309ec7fd8de772c0bfe578"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/site_decisions.csv",
+      "bytes": 5077,
+      "sha256": "34de53fcfbe81d19d05fc81c963899efd17ab32ea3100322dabca046618eef20"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_build_schedule.csv",
+      "bytes": 1596,
+      "sha256": "70a87eaf475cc5cfcc231938f16ddb93b6fd6c7aacb1928d094167faf32fc4ea"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_gate_dependencies.csv",
+      "bytes": 1074,
+      "sha256": "ae24068859f897ab1b6b4c71cbeff9236e8ef7d0a5e6aa98427b0716cfe3c6a5"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_ipv4_route_model.csv",
+      "bytes": 3634,
+      "sha256": "ddc0b0b37f9bcf9a3d58db209c3459cff949ee034e74552f503b28caca4f1dab"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_ipv6_route_model.csv",
+      "bytes": 2210,
+      "sha256": "ee16b40cc8aed592be0d968878809c4eab5de75deccecbf95e302db9db997071"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_open_decisions.csv",
+      "bytes": 1461,
+      "sha256": "cfb83a9ae8cc228e71dc2fa5279e4044ed53a614964fba1a988ed72b7ab9dae0"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_reference_flows.csv",
+      "bytes": 1388,
+      "sha256": "d53a0a01eed3d58a60175f61e820909cd3efc5100b15c051973e42f3475a4e02"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_reference_handoffs.csv",
+      "bytes": 708,
+      "sha256": "7ee5eb1b8886f8da798ee825f772d5bb072e2948d91fe952ae61d0f31e951903"
+    },
+    {
+      "path": "05_Reference_v1_4/registers/v1_4_verification_assertions.csv",
+      "bytes": 2083,
+      "sha256": "6b36dceb3cb4f6afb666b26ad8b077a3b8ee427c79e2e104b3f41481b237fea2"
+    },
+    {
+      "path": "06_Tools/README.md",
+      "bytes": 2124,
+      "sha256": "e94b7127ca578229d484d7259a9246f77a928e6ddf077e139c09e333e313878b"
+    },
+    {
+      "path": "06_Tools/check_package.py",
+      "bytes": 10942,
+      "sha256": "b8d6d39f7829c35ac08a1d6bf0cf8c8abdb608f847821616c9cd32f1b94ae792"
+    },
+    {
+      "path": "06_Tools/review_tfplan.py",
+      "bytes": 6927,
+      "sha256": "b2d0b0ca497ddd2f77fb5c8370cd0648c2749c0f43d93590f8fd0cf134e66819"
+    },
+    {
+      "path": "06_Tools/tests/test_review_tfplan.py",
+      "bytes": 2877,
+      "sha256": "03caf57af99b67f97068f51f9bb7abe5539769934dd25be136d63fb57981f1bf"
+    },
+    {
+      "path": "07_Quality/README.md",
+      "bytes": 2154,
+      "sha256": "922c67f5c93ce6701bf252615dfb69846bd0ea2af70bf13318a9a5424a8be8f3"
+    },
+    {
+      "path": "07_Quality/a11y_00_Delivery_Map.json",
+      "bytes": 119,
+      "sha256": "857badecf81cc8bd1823fcc6815b5f1cd098ad0767632256542d5a5d7148935b"
+    },
+    {
+      "path": "07_Quality/a11y_Architecture_Kit.json",
+      "bytes": 136,
+      "sha256": "5f6e22548b08232be025109cc3a4ed3dda20a8971c962e4629802429a2137956"
+    },
+    {
+      "path": "07_Quality/a11y_Engineering_Kit.json",
+      "bytes": 134,
+      "sha256": "cbd8ef668e5b651a14fec90bc4f218c95bc486686698f58f2ebb27cfa830a3d8"
+    },
+    {
+      "path": "07_Quality/a11y_HLD_and_Architecture_Review_Template.json",
+      "bytes": 156,
+      "sha256": "4c2a8d2c7ef0b563013ceebb0cd86da9bce8b5a52ee3dad9129e8ad78d32cc91"
+    },
+    {
+      "path": "07_Quality/a11y_Implementation_Kit.json",
+      "bytes": 140,
+      "sha256": "a3a4051b797a18eee3a36dba6ae1e3166b31878c6359a85f90677e3937e6dccd"
+    },
+    {
+      "path": "07_Quality/a11y_LLD_and_Engineering_Review_Template.json",
+      "bytes": 154,
+      "sha256": "29a71b92f1edf8b890768fd5ffa56a4e79a24819f7634fc1862e89bfd01f8e35"
+    },
+    {
+      "path": "07_Quality/a11y_MOP_Test_and_Handover_Template.json",
+      "bytes": 152,
+      "sha256": "701858ccfec8369693378dfa1f783af049776d6eb9b5f0eaec8345a334f90be8"
+    },
+    {
+      "path": "07_Quality/a11y_Vendor_Realization_Cards.json",
+      "bytes": 143,
+      "sha256": "2ac0ed898c61cca1f76bc0fb65dfb35913db15e59f6e5135a79d85ee934917c8"
+    },
+    {
+      "path": "07_Quality/a11y_Worked_Delivery_Example.json",
+      "bytes": 137,
+      "sha256": "7cbcf7b725b1bc899e08ee90145094cb10f25d8b52782ccc94a2007796de7eea"
+    },
+    {
+      "path": "07_Quality/offline_plan_tool_tests.txt",
+      "bytes": 1533,
+      "sha256": "1aa30adc15d23d03c226c4ae6a2c8d4569508746006832eb6476fee52476f0cb"
+    },
+    {
+      "path": "07_Quality/package_checks_pre_manifest.json",
+      "bytes": 10530,
+      "sha256": "0695da3793997940c68d09a940d9fc16fd96a8680dc37047efd67c97151d11b9"
+    },
+    {
+      "path": "07_Quality/review_summary.json",
+      "bytes": 6933,
+      "sha256": "6d40d34fe081f144f94a02e3f9986e757ba76ed338e3edd28f2445cd4b9eae03"
+    },
+    {
+      "path": "07_Quality/workbook_arithmetic.json",
+      "bytes": 955,
+      "sha256": "b6353377fa34e4a25dcfeb3426abc2395d8d005668131f5ab105bf53ac6a45ad"
+    },
+    {
+      "path": "07_Quality/workbook_checks.json",
+      "bytes": 6035,
+      "sha256": "43d7617445c71c9999850ae13f08dcaac15350e016abb998141301ced4cc8627"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4677,
+      "sha256": "e4f4047958e019418b411bc34eaf4c05104e76de518b59b85fb98100b80e35ae"
+    },
+    {
+      "path": "START_HERE.html",
+      "bytes": 7299,
+      "sha256": "98346d32056755f38ae9b7d47b988953505d6dccca21d8c3cfb596905a891788"
+    },
+    {
+      "path": "source/README.md",
+      "bytes": 1954,
+      "sha256": "2214341ac2d3fbe01ef57e79f174d707e4f2679bc38f7c88320b5d70b750f87a"
+    },
+    {
+      "path": "source/build_architecture.py",
+      "bytes": 33073,
+      "sha256": "857715ec0be0ac873deb283fe9a2f739f9e622823b6e80a1407bc70ad30d6549"
+    },
+    {
+      "path": "source/build_engineering.py",
+      "bytes": 36772,
+      "sha256": "95eeef135883fa7c6f24f40d82de1a41fa77044ece67dc07115597e275436fff"
+    },
+    {
+      "path": "source/build_implementation.py",
+      "bytes": 40094,
+      "sha256": "0a4a4ff22689c38268f000eaea87548b50577eeff3cfb938abd26515a02ece3c"
+    },
+    {
+      "path": "source/build_navigation.py",
+      "bytes": 18758,
+      "sha256": "c0607c01cfbb4fb448345f75b95393d1b34762d8e4819d1c36bdfe69cff12275"
+    },
+    {
+      "path": "source/build_runbooks.py",
+      "bytes": 25316,
+      "sha256": "57a3dfdb42f8cc7bb9afe7d83200dc43b70d2729a14bb7d37f812614fd568eef"
+    },
+    {
+      "path": "source/build_workbooks.py",
+      "bytes": 45381,
+      "sha256": "3735ffcd0f0cfb9403de4f350f4bd46769c8fc4283061313369ec82bcbb7247e"
+    },
+    {
+      "path": "source/catalogue.py",
+      "bytes": 17333,
+      "sha256": "28fb6ceb2bf40a73d7f25dfbe07e7903e79e9dcafbd8867a61a60c8d4c72b539"
+    },
+    {
+      "path": "source/doc_engine.py",
+      "bytes": 7943,
+      "sha256": "ddf041f2e70f169793a0a78e94d57d043c401bfbd43edc5afc923e00993ee72d"
+    },
+    {
+      "path": "source/kit_catalogue.json",
+      "bytes": 238810,
+      "sha256": "d1fabb2dc6ebb8884d05a30a33e00c2a450fa805b551ae8aa4be0dcfbe807489"
+    },
+    {
+      "path": "source/runbook_catalogue.json",
+      "bytes": 41021,
+      "sha256": "1c1c17785145ee7db1dd72c68c659f0f249d274d82078517f3325f6192ce9f14"
+    }
+  ]
+}
