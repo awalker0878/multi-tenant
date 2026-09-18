@@ -201,6 +201,10 @@ class IPAMRecordTests(unittest.TestCase):
         r=allocation_record();r['allocation_ref']='ipam:192.0.2.10'
         with self.assertRaises(ValueError):ipam.validate(allocation_index(r),as_of=AS_OF)
 
+    def test_opaque_allocation_ref_rejects_uncompressed_ipv6_suffix(self):
+        r=allocation_record();r['allocation_ref']='ipam:2001:db8:0:0:0:0:0:10'
+        with self.assertRaises(ValueError):ipam.validate(allocation_index(r),as_of=AS_OF)
+
     def test_duplicate_operation_identity_rejected(self):
         one=allocation_record();two=deepcopy(one);two['allocation_id']='EXAMPLE-IPAM-ALLOCATION-02'
         with self.assertRaises(ValueError):ipam.validate(allocation_index(one,two),as_of=AS_OF)
