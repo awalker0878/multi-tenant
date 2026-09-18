@@ -26,9 +26,16 @@ jobs:
           sudo apt-get install -y nftables iproute2 gcc libc6-dev linux-libc-dev openssl
           python -m pip install -r requirements-repository.txt
       - name: Retained IPv4 packet and service-identity regression
-        run: python lab/run_namespace_lab.py --execute
+        run: sudo "$pythonLocation/bin/python" lab/run_namespace_lab.py --execute
       - name: Fixed IPv6 routing, denial, service replies and recovery experiment
-        run: python lab/run_ipv6_lab.py --execute
+        if: ${{ !cancelled() }}
+        run: sudo "$pythonLocation/bin/python" lab/run_ipv6_lab.py --execute
+      - name: Return the two private synthetic reports to the artifact uploader
+        if: always()
+        run: |
+          for report in build/reports/local_packet_lab.json build/reports/local_ipv6_packet_lab.json; do
+            if sudo test -f "$report"; then sudo chown "$(id -u):$(id -g)" "$report"; fi
+          done
       - name: Preserve only synthetic local laboratory results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
