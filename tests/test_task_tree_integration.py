@@ -44,6 +44,10 @@ class NavigationIntegrationTests(unittest.TestCase):
         text = self.navigation()['docs/engineering/README.md']
         self.assertIn('site-service-capacity-eligibility.md', text)
 
+    def test_reservation_navigation_survives_regeneration(self):
+        text = self.navigation()['docs/engineering/README.md']
+        self.assertIn('reservation-preflight-and-reconciliation.md', text)
+
     def test_all_three_work_packages_survive_regeneration(self):
         text = self.navigation()['docs/implementation/README.md']
         for destination in ('routed-ipv6-lab.md', 'nutanix-task-tree-readback.md', 'native-reference/README.md'):
@@ -59,6 +63,8 @@ class NavigationIntegrationTests(unittest.TestCase):
         self.assertTrue(any('scripts/check_platform_family_eligibility.py' in s for s in commands))
         self.assertTrue(any('scripts/check_site_service_capacity.py' in s for s in commands))
         self.assertTrue(any('scripts/check_site_service_eligibility.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_reservation_records.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_reservation_preflight.py' in s for s in commands))
         self.assertTrue(any('lab/run_task_tree_lab.py --execute' in s for s in commands))
         self.assertTrue(any('tools/check_local.py' in s for s in commands))
 

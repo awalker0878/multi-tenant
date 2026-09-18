@@ -69,3 +69,8 @@ The [native qualification dossier](docs/engineering/platform-native-qualificatio
 ## Site and service-class capacity eligibility
 
 The [site/service capacity precheck](docs/engineering/site-service-capacity-eligibility.md) evaluates current commissioned envelopes against required profiles, the accepted failure model, surviving capacity, operational reserve, commitments, unavailable capacity and supplied quota headroom. The active inventory is intentionally empty. A match identifies candidate envelopes only; it does not select a site, reserve capacity, allocate addresses, run Terraform or authorize activation.
+
+
+## Reservation preflight and reconciliation
+
+The [reservation preflight](docs/engineering/reservation-preflight-and-reconciliation.md) binds stable reservation/operation identities, generation, exact admitted demand, owner roles and expiry to exported records from the authoritative reservation system. Git remains evidence-only: same-operation retries are idempotent only when the spec is unchanged, conflicts and uncertain outcomes stop, and IPAM/external reservations remain under their own owners. No reservation is created or released by CI.
