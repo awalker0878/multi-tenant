@@ -1,0 +1,23 @@
+{
+  "format": "portable-hosting-knowledge-maintenance-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-KNOWLEDGE-MAINTENANCE-01",
+  "release_id": "example-release-not-maintained",
+  "reviewed_revision": "f12fbfd75a225414cb0eaf5bfe0b1c6c9ad71a27",
+  "required_topic_ids": [
+    "SITE_CELL_FAILURE",
+    "FABRIC_ROUTING_ATTACHMENTS",
+    "PRIVILEGED_ACCESS",
+    "TENANCY_NATIVE_PLATFORMS",
+    "SERVICE_DATA_TRUST_RECOVERY",
+    "PROVISIONING_CHANGE",
+    "CAPACITY_OPERATIONS_ASSURANCE",
+    "EXCEPTIONS_FUTURE_SERVICES"
+  ],
+  "publication_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/assurance/gap-map/2-primary-knowledge-homes-and-cross-cutting-changes.md",
+    "docs/assurance/gap-map/3-detailed-gap-register-and-treatment.md",
+    "sources/documentation/knowledge_home_registry.json"
+  ]
+}
