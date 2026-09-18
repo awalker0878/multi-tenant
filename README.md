@@ -121,3 +121,7 @@ The [native reconciliation gate](docs/engineering/native-readback-writer-fencing
 ## Native IPv6 and address-family assurance
 
 The [native IPv6 assurance gate](docs/engineering/native-ipv6-address-family-assurance.md) addresses I08 above the routed Linux laboratory. A current IPv6-only or dual-stack service requires exact site/platform/security-edge scope, supported addressing/local-protocol behavior, route/security parity, MTU/PMTU evidence, required shared-service paths, failure/recovery evidence and operational acceptance. IPv6-only must prove no hidden IPv4 fallback; dual-stack must retain an independent IPv4 campaign. The active native IPv6 assurance index is intentionally empty.
+
+## Production activation and initial-readiness assurance
+
+The [production activation gate](docs/engineering/production-activation-and-initial-readiness-assurance.md) addresses I10 without granting activation authority. It binds exact site/service/platform/workload/exposure scope to current G0/G1/G2 prerequisites, applicable initial G4 recovery/operations readiness, valid operating authority, a reversible G3 exposure plan, tested withdrawal readiness, and post-activation live-path evidence. Failed or unknown live verification requires withdrawal rather than optimistic continuation. The active activation index is intentionally empty.

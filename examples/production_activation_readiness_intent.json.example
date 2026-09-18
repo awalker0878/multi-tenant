@@ -1,0 +1,17 @@
+{
+  "format": "portable-hosting-production-activation-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-PRODUCTION-ACTIVATION-01",
+  "activation_id": "example-activation-not-ready",
+  "site_ref": "controlled-site:EXAMPLE-NOT-ACCEPTED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-ACCEPTED",
+  "platform_profile_ref": "controlled-platform-profile:EXAMPLE-NOT-QUALIFIED",
+  "workload_scope_ref": "controlled-workload-scope:EXAMPLE-NOT-ACTIVATED",
+  "exposure_profile_ref": "controlled-exposure-profile:EXAMPLE-NOT-APPROVED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/implementation/delivery-guide/7-tenant-provisioning-and-controlled-production-activation.md",
+    "docs/adr/0036-require-initial-operational-and-recovery-readiness-before-production-activation.md",
+    "docs/engineering/production-activation-and-initial-readiness-assurance.md"
+  ]
+}

@@ -220,6 +220,14 @@ Implementation: [active native IPv6 assurance index](../../sources/capabilities/
 
 Current native qualification requires exact site/service/platform/security-edge family scope, supported addressing/local-protocol behavior, route/security parity, MTU/PMTU, shared-service dependencies, failure/recovery and operational acceptance. IPv6-only requires no hidden IPv4 fallback; dual-stack requires an independent IPv4 campaign. CI performs no native family mutation or service activation.
 
+## Production activation and initial-readiness assurance
+
+Design: [IK §7 controlled production activation](../implementation/delivery-guide/7-tenant-provisioning-and-controlled-production-activation.md) · [PROV §4 safe activation](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [IT §7 gate decision](../templates/implementation-mop/7-gate-decision-and-production-activation.md)
+
+Implementation: [active production activation assurance index](../../sources/capabilities/production_activation_assurance_index.json) · [assurance validator](../../scripts/check_production_activation_assurance.py) · [readiness preflight](../../scripts/check_production_activation_readiness.py) · [engineering boundary](../engineering/production-activation-and-initial-readiness-assurance.md)
+
+A pre-activation ready state requires current G0/G1/G2, applicable initial G4 readiness, valid operating authority, reversible G3 exposure and tested withdrawal readiness. Current activated state additionally requires a real activation receipt and passing live-path/dependency/telemetry observations; failed or unknown live checks require withdrawal. CI performs no exposure, withdrawal, apply or activation mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
