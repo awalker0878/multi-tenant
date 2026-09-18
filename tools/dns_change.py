@@ -174,9 +174,6 @@ def validate(job: dict, scope: dict, *, now: datetime | None = None,
             raise DNSChangeError(f'A bounded non-secret {key} is required')
     if not isinstance(job['allocation_binding_digest'], str) or not HEX64.fullmatch(job['allocation_binding_digest']):
         raise DNSChangeError('Current allocation-binding SHA-256 is required')
-    expected_binding = allocation_binding_digest(scope)
-    if job['allocation_binding_digest'] != expected_binding:
-        raise DNSChangeError('Job allocation binding differs from independently supplied DNS scope')
     zone = fqdn(job['zone'])
     fqdn(job['key_name'])
     try:
@@ -214,6 +211,9 @@ def validate(job: dict, scope: dict, *, now: datetime | None = None,
                 or any(not isinstance(x, str) for x in item['values']) or len(set(item['values'])) != len(item['values']):
             raise DNSChangeError('Exact allocated addresses or PTR targets are required')
         accepted[pair] = item
+    expected_binding = allocation_binding_digest(scope)
+    if job['allocation_binding_digest'] != expected_binding:
+        raise DNSChangeError('Job allocation binding differs from independently supplied DNS scope')
     seen = set()
     for record in records:
         if not isinstance(record, dict) or set(record) != {'name', 'type', 'before', 'after'}:
