@@ -35,6 +35,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Operational handover and incident-readiness assurance](operational-handover-and-incident-readiness-assurance.md)
 
+[Version, source provenance and lifecycle assurance](version-source-provenance-and-lifecycle-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
