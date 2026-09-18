@@ -127,8 +127,8 @@ def validate_request(request: dict, registry: dict) -> None:
         raise ValueError('This precheck cannot carry production authority')
 
 
-def evaluate(request: dict, registry: dict) -> dict:
-    capabilities.validate(registry)
+def evaluate(request: dict, registry: dict, qualification_index=None, as_of=None) -> dict:
+    capabilities.validate(registry, qualification_index=qualification_index, as_of=as_of)
     validate_request(request, registry)
     mandatory = set(request['mandatory_capabilities'])
     assurance = request['required_assurance_profile']
@@ -138,7 +138,8 @@ def evaluate(request: dict, registry: dict) -> dict:
     for platform in request['candidate_platforms']:
         profile = registry['profiles'][platform]
         family_ok, blockers = capabilities.eligible(
-            registry, platform, mandatory, assurance_profile=assurance)
+            registry, platform, mandatory, assurance_profile=assurance,
+            qualification_index=qualification_index, as_of=as_of)
         optional_unavailable = sorted(
             cap for cap in request['optional_capabilities']
             if profile['capabilities'][cap]['qualification'] != 'NATIVE_QUALIFIED')
