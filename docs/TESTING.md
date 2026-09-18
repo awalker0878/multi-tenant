@@ -155,3 +155,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Backup protection and isolated-restore assurance
 
 `python scripts/check_backup_restore_assurance.py --as-of 2026-09-18T19:00:00Z` validates exported BackupPolicy/protected-copy/isolated-restore evidence without contacting backup, storage or key services. `python scripts/check_backup_restore_readiness.py examples/backup_restore_readiness_intent.json.example --as-of 2026-09-18T19:00:00Z --expected-status HOLD_NO_CURRENT_BACKUP_ASSURANCE` verifies the current empty assurance index remains fail-closed. A backup job alone is never accepted as restore assurance, and all backup/restore/key/reconnect/apply/activation authority flags remain false.
+
+## Control inheritance and external-dependency assurance
+
+`python scripts/check_control_inheritance_assurance.py --as-of 2026-09-18T20:00:00Z` validates exported per-control allocation, inherited-service applicability, external-interface evidence and residual-gap decisions. `python scripts/check_control_inheritance_readiness.py examples/control_inheritance_readiness_intent.json.example --as-of 2026-09-18T20:00:00Z --expected-status HOLD_NO_CURRENT_CONTROL_ALLOCATION` verifies the current empty assurance index remains fail-closed. Tests require all six QUAL §6 interfaces, current evidence, explicit inherited-service references, and attributable decisions for accepted gaps while all control-selection/risk-acceptance/authorization/apply/activation authority flags remain false.
