@@ -2,6 +2,37 @@
 import csv,json
 
 
+def verification_errors(root, index):
+    """Compare generated procedure mappings with the original records, not counts alone."""
+    base=root/'reference/Portable_Hosting_Delivery_Kits_v1_1'
+    def csv_rows(path):
+        with path.open(encoding='utf-8-sig',newline='') as f:return list(csv.DictReader(f))
+    ra_path=base/'05_Reference_v1_4/registers/realization_verification_addenda.json'
+    q_path=base/'04_Shared/development/qualification_observation_cards.csv'
+    w_path=base/'05_Reference_v1_4/registers/v1_4_verification_assertions.csv'
+    ra=json.loads(ra_path.read_text());q=csv_rows(q_path);w=csv_rows(w_path)
+    ct=csv_rows(base/'04_Shared/tests.csv')
+    expected=[]
+    for row in ra:
+        expected.append({'id':row['id'],'family':'RA','source_path':str(ra_path.relative_to(root)),
+            'base_tests':row['baseTests'],'execution_status':row['executionStatus'],
+            'applicability':'Selected native realization and covered failure; owner-approved scope required'})
+    for row in q:
+        expected.append({'id':row['id'],'family':'Q11','source_path':str(q_path.relative_to(root)),
+            'base_tests':[x.strip() for x in row['existing_test_ids'].split(';')],
+            'execution_status':row['execution_status'],'applicability':row['scope_note']})
+    for row in w:
+        expected.append({'id':row['assertion'].split(' / ',1)[0],'family':'W14',
+            'source_path':str(w_path.relative_to(root)),'original_record':row,'execution_status':'not-run',
+            'applicability':'Connected W14 design; applicability and current native observation must be assessed'})
+    wanted={'families':{'CT':len(ct),'RA':len(ra),'W14':len(w),'Q11':len(q)},
+        'supplemental_mappings':expected,'execution':'SPECIFICATIONS_NOT_EXECUTED',
+        'counts_are_not_additive_unique_tests':True}
+    # JSON equality also distinguishes a Boolean from an integer. Preserve source order.
+    return [] if json.dumps(index,sort_keys=True)==json.dumps(wanted,sort_keys=True) else [
+        'Verification index differs from exact original procedure references, scope or status']
+
+
 def check(root):
     errors=[]
     shared=root/'reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared'
@@ -21,6 +52,7 @@ def check(root):
     if covered!=set(requirements):errors.append('Not all requirements have an allocation')
     families=json.loads((root/'sources/assurance/verification_families.json').read_text())
     if families['families']!={'CT':80,'RA':12,'W14':12,'Q11':12}:errors.append('Verification family count mismatch')
+    errors.extend(verification_errors(root,families))
     mappings=families['supplemental_mappings'];ids=[r['id'] for r in mappings]
     expected={f'RA-{i:02d}' for i in range(1,13)}|{f'Q11-{i:02d}' for i in range(1,13)}|{f'W14-{i:02d}' for i in range(1,13)}
     if len(ids)!=len(set(ids)) or set(ids)!=expected:errors.append('Supplemental family ID coverage mismatch')

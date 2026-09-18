@@ -27,6 +27,7 @@ from documentation_structure import check as check_structure
 from adr_lifecycle import validate as validate_adrs, render as render_adr
 from build_documentation import Builder
 from check_current_design import check as check_current
+from check_documentation_integration import check as check_integration
 from check_assurance_allocation import check as check_allocation
 
 MD=mistune.create_markdown(escape=False,plugins=['table','strikethrough','task_lists'])
@@ -164,6 +165,9 @@ def run(root=ROOT):
         check('test status retained: '+row['id'],row['executionStatus']=='not-run')
         for field in ('preconditions','procedure','expected','evidence','cadence'):
             check('test wording: '+row['id']+' '+field,normalized(row[field]) in testtext)
+    integration=check_integration(root)
+    check('Single documentation authority and explicit legacy aliases',not integration['errors'],integration['errors'] or None)
+    metrics['explicit_legacy_decision_aliases']=integration['decision_aliases']
     current=check_current(root)
     check('Maintained design metadata and source links',not current['errors'],current['errors'] or None)
     allocation=check_allocation(root)
