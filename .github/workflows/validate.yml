@@ -60,6 +60,10 @@ jobs:
         run: python scripts/check_control_inheritance_assurance.py --as-of 2026-09-18T20:00:00Z > build/reports/control_inheritance_assurance.json
       - name: Control inheritance readiness must remain held without current allocation
         run: python scripts/check_control_inheritance_readiness.py examples/control_inheritance_readiness_intent.json.example --as-of 2026-09-18T20:00:00Z --expected-status HOLD_NO_CURRENT_CONTROL_ALLOCATION > build/reports/control_inheritance_readiness.json
+      - name: Exported operational handover assurance remains external-operations evidence
+        run: python scripts/check_operational_handover_assurance.py --as-of 2026-09-18T21:00:00Z > build/reports/operational_handover_assurance.json
+      - name: Operational handover readiness must remain held without current acceptance
+        run: python scripts/check_operational_handover_readiness.py examples/operational_handover_readiness_intent.json.example --as-of 2026-09-18T21:00:00Z --expected-status HOLD_NO_CURRENT_OPERATIONAL_HANDOVER > build/reports/operational_handover_readiness.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
