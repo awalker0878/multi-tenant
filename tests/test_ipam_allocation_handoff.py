@@ -112,7 +112,7 @@ def allocation_record(state='RESERVED'):
                                 'record_ref':'ipam-record:fixture','record_version':1},
         'allocation_ref':'ipam-allocation:fixture-01',
         'created_at':'2026-09-18T17:10:00Z',
-        'last_observed_at':'2026-09-18T17:45:00Z',
+        'last_observed_at':'2026-09-18T17:55:00Z',
         'hold_expires_at':hold,'confirmed_at':confirmed,'realization_ref':realization,
         'release_requested_at':release,'cleanup':clean,'reuse_not_before':reuse,
         'released_at':released,
@@ -167,6 +167,14 @@ class IPAMRecordTests(unittest.TestCase):
     def test_released_after_cleanup_and_quarantine_is_valid(self):
         result=ipam.validate(allocation_index(allocation_record('RELEASED')),as_of=AS_OF)
         self.assertEqual(result['release_lifecycle_count'],1)
+
+    def test_lifecycle_timestamp_after_last_observation_is_rejected(self):
+        r=allocation_record('RELEASED');r['last_observed_at']='2026-09-18T17:45:00Z'
+        with self.assertRaises(ValueError):ipam.validate(allocation_index(r),as_of=AS_OF)
+
+    def test_reuse_boundary_cannot_precede_cleanup_observation(self):
+        r=allocation_record('QUARANTINED');r['reuse_not_before']='2026-09-18T17:34:00Z'
+        with self.assertRaises(ValueError):ipam.validate(allocation_index(r),as_of=AS_OF)
 
     def test_uncertain_can_preserve_partial_release_evidence(self):
         r=allocation_record('UNCERTAIN')
