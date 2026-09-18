@@ -1,0 +1,45 @@
+{
+  "id": "I09-NUTANIX-KNOWN-TASK-TREE-01",
+  "parent_work_item": "I09",
+  "baseline_commit": "2a1231644f3ea0dc176616d54c584717730b7468",
+  "status": "CANDIDATE_READ_ONLY_IMPLEMENTATION_REQUIRE_EXACT_RUN_EVIDENCE",
+  "historical_backlog_mutation": "NONE",
+  "profile": "nutanix-networking-prism-v4.3-task-tree",
+  "supported_scope": "2-16 recorded tasks, four parent/child levels, exact selected VPC/subnet entities and complete native child summaries",
+  "engineering": "docs/engineering/nutanix-task-tree-readback.md",
+  "procedure": "docs/implementation/nutanix-task-tree-readback.md",
+  "source_files": [
+    "tools/nutanix_task_tree.py",
+    "tools/nutanix_observe.py",
+    "tools/readback_core.py",
+    "tools/recovery_review.py"
+  ],
+  "tests": [
+    "tests/test_nutanix_task_tree.py",
+    "lab/run_task_tree_lab.py"
+  ],
+  "requirements": [
+    "AUTO-003",
+    "INV-006",
+    "EVID-002",
+    "STATE-003",
+    "NUT-004"
+  ],
+  "native_remaining": [
+    "Installed API/version and least-privileged read-role qualification",
+    "Native operation/task-reference/count/default semantics",
+    "Full or partial large-tree discovery and batch-job profile",
+    "Actual writer fencing, controlled native repair and infrastructure/data-path qualification"
+  ],
+  "native_contact": "NOT_RUN",
+  "native_apply": "NOT_IMPLEMENTED_BY_THIS_WORK",
+  "formal_authorization": "NOT_ISSUED",
+  "result_policy": "Record exact CI head/run artifacts separately; local scripted HTTPS is not native product evidence",
+  "primary_sources": [
+    "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/prism-go-client%2Fv4.3.1/prism-go-client/models/prism/v4/config/config_model.go",
+    "https://raw.githubusercontent.com/nutanix/ntnx-api-golang-clients/prism-go-client%2Fv4.3.1/prism-go-client/api/tasks_api.go"
+  ],
+  "integration_baseline_commit": "1d50765345e747d972950a91f839e8adbace3c0f",
+  "integration_tests": "tests/test_task_tree_integration.py",
+  "offline_time_boundary": "Each witness must be consistent at its own recorded observation timestamp, not only at a later review time."
+}

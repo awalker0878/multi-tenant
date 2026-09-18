@@ -112,3 +112,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 ## Routed IPv6 local packet extension
 
 [Run the fixed IPv6 campaign](implementation/routed-ipv6-lab.md) after the [engineering scope](engineering/routed-ipv6-qualification.md) is understood. `python lab/run_ipv6_lab.py --execute` requires nftables and authorized namespace/sysctl capabilities and produces a new private `build/reports/local_ipv6_packet_lab.json`. The hosted disposable lab job supplies explicit privilege; it does not disable host security settings. The ordinary unit suite covers its message/guard/source logic separately. A blocked runtime is nonzero, not a skipped pass, and native IPv6 remains unqualified.
+
+## Known-task-tree readback campaign
+
+`python lab/run_task_tree_lab.py --execute` runs 18 fixed loopback-HTTPS readback/recovery cases, including the actual CLI and private report handling. `tests/test_nutanix_task_tree.py` adds the overlapping unit and negative cases. Task/resource bodies and external control records are scripted; no native target, task submission/cancellation or real writer fencing is involved. See the [candidate profile and limits](engineering/nutanix-task-tree-readback.md). The repository CI job executes this campaign and uploads its exact-source report alongside other local results.

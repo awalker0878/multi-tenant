@@ -1,0 +1,79 @@
+{
+  "platform": "nutanix",
+  "origin": "https://pc.fixture.invalid",
+  "operation_id": "fixture-task-tree-01",
+  "tenant_id": "tenant-001",
+  "scope_id": "D01O",
+  "engineering_record_ref": "EXAMPLE-NOT-ACCEPTED",
+  "target_binding_ref": "EXAMPLE-NOT-A-TARGET-APPROVAL",
+  "contact_enabled": false,
+  "profile": "nutanix-networking-prism-v4.3-task-tree",
+  "resources": [
+    {
+      "kind": "vpc",
+      "ext_id": "11111111-1111-4111-8111-111111111111",
+      "expected_etag": "\"etag-7\"",
+      "expected": {
+        "extId": "11111111-1111-4111-8111-111111111111",
+        "$objectType": "networking.v4.config.Vpc",
+        "tenantId": "33333333-3333-4333-8333-333333333333",
+        "name": "tenant-001-domain-01",
+        "vpcType": "REGULAR",
+        "externalSubnets": [],
+        "externallyRoutablePrefixes": []
+      }
+    },
+    {
+      "kind": "subnet",
+      "ext_id": "44444444-4444-4444-8444-444444444444",
+      "expected_etag": "\"fixture-subnet-1\"",
+      "expected": {
+        "extId": "44444444-4444-4444-8444-444444444444",
+        "$objectType": "networking.v4.config.Subnet",
+        "tenantId": "33333333-3333-4333-8333-333333333333",
+        "name": "fixture-subnet",
+        "subnetType": "OVERLAY",
+        "vpcReference": "11111111-1111-4111-8111-111111111111",
+        "isExternal": false,
+        "isNatEnabled": false,
+        "ipConfig": []
+      }
+    }
+  ],
+  "task": {
+    "ext_id": "ZXJnb24=:22222222-2222-4222-8222-222222222222",
+    "operation": "Fixture create domain",
+    "created_after": "2026-09-18T11:58:00+00:00",
+    "created_before": "2026-09-18T11:59:55+00:00",
+    "entity_ids": [
+      "11111111-1111-4111-8111-111111111111",
+      "44444444-4444-4444-8444-444444444444"
+    ],
+    "descendants": [
+      {
+        "ext_id": "ZXJnb24=:55555555-5555-4555-8555-555555555555",
+        "parent_ext_id": "ZXJnb24=:22222222-2222-4222-8222-222222222222",
+        "operation": "Fixture allocate VPC",
+        "entity_ids": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      },
+      {
+        "ext_id": "ZXJnb24=:66666666-6666-4666-8666-666666666666",
+        "parent_ext_id": "ZXJnb24=:22222222-2222-4222-8222-222222222222",
+        "operation": "Fixture allocate subnet",
+        "entity_ids": [
+          "44444444-4444-4444-8444-444444444444"
+        ]
+      },
+      {
+        "ext_id": "ZXJnb24=:77777777-7777-4777-8777-777777777777",
+        "parent_ext_id": "ZXJnb24=:55555555-5555-4555-8555-555555555555",
+        "operation": "Fixture validate VPC",
+        "entity_ids": [
+          "11111111-1111-4111-8111-111111111111"
+        ]
+      }
+    ]
+  }
+}
