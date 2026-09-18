@@ -97,3 +97,7 @@ The [control inheritance assurance gate](docs/engineering/control-inheritance-an
 ## Operational handover and incident-readiness assurance
 
 The [operational handover assurance gate](docs/engineering/operational-handover-and-incident-readiness-assurance.md) makes G31 fail closed until the exact operating scope has attributable receiving/support/on-call ownership, privileged-access and monitoring reviews, explicit incident containment/release authority, and a current scoped incident exercise with emergency-change reconciliation. The active assurance index is intentionally empty. CI cannot change access, start or release containment, execute recovery, reconcile a live emergency change, apply infrastructure or activate production.
+
+## Version, source provenance and lifecycle assurance
+
+The [version/source provenance gate](docs/engineering/version-source-provenance-and-lifecycle-assurance.md) makes G32 fail closed until an exact product/API/provider/hardware/licence tuple has current official support/source reviews, dated compatibility evidence and lifecycle ownership. Source edition and review state remain separate, partial or inherited references cannot satisfy current support, and native qualification now requires a matching CURRENT_SUPPORTED provenance record. The active provenance index is intentionally empty.

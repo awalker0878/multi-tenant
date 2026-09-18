@@ -13,8 +13,13 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from scripts import check_version_source_provenance as provenance
+
 INDEX = ROOT / 'sources/capabilities/qualification_index.json'
 FORMAT = 'portable-hosting-native-qualification-index/1'
 STATUS = 'ENGINEERING_QUALIFICATION_RECORDS_NOT_PRODUCTION_AUTHORITY'
@@ -192,6 +197,7 @@ def validate_record(record, *, as_of, root=ROOT):
         'id': record['id'],
         'platform': record['platform'],
         'product_tuple_id': record['product_tuple_id'],
+        'product_tuple': dict(record['product_tuple']),
         'qualified_capabilities': sorted(caps),
         'assurance_profiles': sorted(assurance),
         'evidence_refs': sorted(evidence_by_ref),
@@ -199,7 +205,7 @@ def validate_record(record, *, as_of, root=ROOT):
     }
 
 
-def validate(index, *, as_of=None, root=ROOT):
+def validate(index, *, as_of=None, root=ROOT, provenance_index=None):
     if as_of is None:
         as_of = datetime.now(timezone.utc)
     if not isinstance(as_of, datetime) or as_of.tzinfo is None:
@@ -214,12 +220,27 @@ def validate(index, *, as_of=None, root=ROOT):
         raise ValueError('Reviewed source revision must be an exact Git SHA')
     if not isinstance(index['records'], list) or len(index['records']) > 64:
         raise ValueError('Qualification records must be a bounded list')
+    if provenance_index is None:
+        provenance_index = provenance.load()
+    provenance_summary = provenance.validate(provenance_index, as_of=as_of, root=root)
+    provenance_records = provenance_summary['records']
     seen = set()
     records = []
     for record in index['records']:
         checked = validate_record(record, as_of=as_of, root=root)
         if checked['id'] in seen:
             raise ValueError('Duplicate qualification record ID')
+        supporting = [
+            item for item in provenance_records
+            if item['state'] == 'CURRENT_SUPPORTED'
+            and item['platform'] == checked['platform']
+            and item['product_tuple_id'] == checked['product_tuple_id']
+        ]
+        if len(supporting) != 1:
+            raise ValueError('Current qualification requires one matching CURRENT_SUPPORTED version/source provenance record')
+        if supporting[0]['product_tuple'] != checked['product_tuple']:
+            raise ValueError('Qualification product tuple differs from current version/source provenance record')
+        checked['provenance_id'] = supporting[0]['provenance_id']
         seen.add(checked['id'])
         records.append(checked)
     return {
@@ -230,8 +251,8 @@ def validate(index, *, as_of=None, root=ROOT):
     }
 
 
-def records_for(index, platform, product_tuple_id, *, as_of=None, root=ROOT):
-    summary = validate(index, as_of=as_of, root=root)
+def records_for(index, platform, product_tuple_id, *, as_of=None, root=ROOT, provenance_index=None):
+    summary = validate(index, as_of=as_of, root=root, provenance_index=provenance_index)
     return [r for r in summary['records']
             if r['platform'] == platform and r['product_tuple_id'] == product_tuple_id]
 
@@ -256,6 +277,7 @@ def main():
             'may_activate': False,
             'limits': [
                 'Qualification-record consistency only; no platform contact occurs.',
+                'A current qualification record requires a matching CURRENT_SUPPORTED version/source provenance record.',
                 'A current qualification record is not production placement or service authorization.',
                 'Site/cell capacity, requester authority, recovery and operating acceptance remain separate.'
             ]

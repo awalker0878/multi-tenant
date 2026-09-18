@@ -30,6 +30,10 @@ jobs:
         run: python scripts/check_documentation.py
       - name: Native reference planning inputs and original W14 associations
         run: python scripts/commissioning_pack.py check > build/reports/native_reference_planning.json
+      - name: Current exact-tuple version, source provenance and lifecycle records
+        run: python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
+      - name: Version/source readiness must remain held without a selected supported tuple
+        run: python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE > build/reports/version_source_readiness.json
       - name: Current exact-tuple native qualification dossiers
         run: python scripts/check_platform_qualification.py > build/reports/platform_native_qualification.json
       - name: Platform capability registry evidence boundary

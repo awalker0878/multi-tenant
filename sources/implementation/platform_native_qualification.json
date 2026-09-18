@@ -2,7 +2,12 @@
   "id": "PLATFORM-NATIVE-QUALIFICATION-DOSSIER-01",
   "source_baseline_commit": "fb2316e8aee3469e7e52ee4887fa6b972806f44b",
   "status": "IMPLEMENTED_EVIDENCE_VALIDATION_NO_NATIVE_RECORDS",
-  "requirements": ["QUAL-001", "ASSUR-003", "PLACE-001", "ACPT-001"],
+  "requirements": [
+    "QUAL-001",
+    "ASSUR-003",
+    "PLACE-001",
+    "ACPT-001"
+  ],
   "qualification_index": "sources/capabilities/qualification_index.json",
   "checker": "scripts/check_platform_qualification.py",
   "engineering": "docs/engineering/platform-native-qualification.md",
@@ -18,10 +23,12 @@
   },
   "remaining_native_work": [
     "select exact installed product/API/provider/hardware tuples",
+    "establish a matching current supported version/source provenance record",
     "execute applicable native test sets and tested-limit campaigns",
     "store controlled evidence and independent approval decisions",
     "publish only current demonstrated capabilities and assurance profiles",
     "complete site/capacity/recovery/operating acceptance separately"
   ],
-  "formal_authorization": "NOT_ISSUED"
+  "formal_authorization": "NOT_ISSUED",
+  "provenance_prerequisite": "sources/capabilities/version_source_provenance_index.json"
 }

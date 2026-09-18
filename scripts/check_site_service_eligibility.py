@@ -143,9 +143,9 @@ def validate_request(request,index_summary):
         raise ValueError('This precheck cannot carry production authority')
 
 
-def evaluate(request,index,*,qindex=None,as_of=None):
+def evaluate(request,index,*,qindex=None,provenance_index=None,as_of=None):
     if qindex is None:qindex=qualification.load()
-    summary=capacity.validate(index,qindex=qindex,as_of=as_of)
+    summary=capacity.validate(index,qindex=qindex,provenance_index=provenance_index,as_of=as_of)
     validate_request(request,summary)
     site_filter=set(request['candidate_sites'])
     cell_filter=set(request['candidate_cells'])

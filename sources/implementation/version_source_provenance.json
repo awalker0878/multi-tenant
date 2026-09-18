@@ -1,0 +1,30 @@
+{
+  "id": "VERSION-SOURCE-PROVENANCE-01",
+  "source_baseline_commit": "a50e433eba174c72be614caba91d21a5bc6c6a7e",
+  "status": "IMPLEMENTED_PROVENANCE_PREREQUISITE_NO_NATIVE_QUALIFICATION",
+  "gap_ids": ["G32"],
+  "requirements": ["QUAL-001", "NUT-001", "SUP-001", "VULN-001", "VULN-002"],
+  "provenance_index": "sources/capabilities/version_source_provenance_index.json",
+  "checker": "scripts/check_version_source_provenance.py",
+  "preflight": "scripts/check_version_source_readiness.py",
+  "engineering": "docs/engineering/version-source-provenance-and-lifecycle-assurance.md",
+  "qualification_integration": "scripts/check_platform_qualification.py",
+  "current_records": 0,
+  "authority": {
+    "may_claim_native_qualification": false,
+    "may_select_site": false,
+    "may_reserve_capacity": false,
+    "may_allocate": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select exact installed product, API, provider, hardware and licensed-feature tuples",
+    "obtain current official product support, API, provider, hardware and release evidence",
+    "record access-limited or inherited sources without treating them as current tuple support",
+    "establish dated compatibility and operation-coverage records for the selected tuple",
+    "maintain vulnerability ownership, support lifecycle review and accountable upgrade/retirement decisions",
+    "execute native qualification only after the exact tuple has a current supported provenance record"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

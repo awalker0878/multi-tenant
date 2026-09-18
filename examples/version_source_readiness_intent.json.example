@@ -1,0 +1,22 @@
+{
+  "format": "portable-hosting-version-source-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-VERSION-SOURCE-01",
+  "platform": "nutanix",
+  "product_tuple_id": "example-nutanix-tuple-not-selected",
+  "required_product_tuple": {
+    "product": "EXAMPLE-NOT-A-SELECTED-PRODUCT",
+    "product_version": "0.0-example",
+    "api": "EXAMPLE-API",
+    "api_version": "0.0-example",
+    "automation_providers": ["nutanix/nutanix = 2.4.2"],
+    "hardware_profile_ref": "controlled-record:EXAMPLE-NOT-APPROVED",
+    "feature_licenses": []
+  },
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/engineering/platform-realizations/7-implementation-tuple-and-decision-package.md",
+    "docs/engineering/version-source-provenance-and-lifecycle-assurance.md",
+    "docs/engineering/platform-native-qualification.md"
+  ]
+}
