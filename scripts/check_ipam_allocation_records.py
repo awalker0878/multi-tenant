@@ -85,6 +85,14 @@ def opaque_external_ref(value,label):
         raise ValueError(f'{label}: opaque external reference required')
     if re.search(r'(?<![0-9])(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?![0-9])',value) or '::' in value:
         raise ValueError(f'{label}: do not embed allocation values in repository references')
+    candidates={value}
+    if ':' in value:candidates.add(value.split(':',1)[1])
+    for candidate in candidates:
+        try:
+            ipaddress.ip_address(candidate)
+        except ValueError:
+            continue
+        raise ValueError(f'{label}: do not embed allocation values in repository references')
     return value
 
 
