@@ -33,7 +33,7 @@ python scripts/check_repository.py
 python tools/check_local.py
 ```
 
-See [TESTING.md](docs/TESTING.md) for independent Terraform/Ansible and disposable-lab gates. This documentation change does not claim those engines or native platforms were revalidated. See [LOCAL_IMPORT.md](docs/LOCAL_IMPORT.md) before importing into your own checkout.
+See [TESTING.md](docs/TESTING.md) for independent Terraform/Ansible and disposable-lab gates. Read the exact CI revision for actual engine and local packet results; none of those checks qualifies a native platform. See [LOCAL_IMPORT.md](docs/LOCAL_IMPORT.md) before importing into your own checkout.
 
 ## Completion-audit corrections
 
@@ -42,3 +42,7 @@ See [TESTING.md](docs/TESTING.md) for independent Terraform/Ansible and disposab
 ## Current main integration follow-up
 
 [Main integration audit](docs/assurance/main-integration-audit.md) records the mixed-correction test failures and their canonical-record resolution. The complete regression suite remains required alongside real Terraform/Ansible checks; no failing tests are skipped and no native acceptance is issued.
+
+## Routed IPv6 implementation work
+
+The [I08 packet extension](docs/implementation/routed-ipv6-lab.md) exercises the existing WD14 topology over real IPv6 sockets in disposable Linux namespaces. Its [engineering profile](docs/engineering/routed-ipv6-qualification.md) distinguishes local path evidence from the still-open native platform and offered-family acceptance. Exact current run results belong to CI artifacts, not historical reports.

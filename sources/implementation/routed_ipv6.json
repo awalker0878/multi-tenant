@@ -1,0 +1,59 @@
+{
+  "id": "I08-LOCAL-ROUTED-V6-01",
+  "parent_work_item": "I08",
+  "source_baseline_commit": "3449df88516d454ce0c6cf5e3b663d88d128bfa2",
+  "parent_backlog": "sources/implementation_backlog.csv",
+  "status": "IMPLEMENTED_LOCAL_LAB_REQUIRES_EXACT_RUN_EVIDENCE",
+  "historical_backlog_mutation": "NONE",
+  "scope": "IPv6-only Linux WD14 packet fixture, not native platform realization",
+  "architecture": "docs/adr/0021-offer-address-families-explicitly-across-the-whole-service-path.md",
+  "engineering": "docs/engineering/routed-ipv6-qualification.md",
+  "procedure": "docs/implementation/routed-ipv6-lab.md",
+  "fixture": "examples/wd14-routing.json",
+  "fixture_sha256": "8b7fd1df0ce826b77bdae8360ecff6235999949b22f8eb8dabf9f3a2c1477cc9",
+  "implementation": [
+    "lab/ipv6_fixture.py",
+    "lab/ipv6_worker.py",
+    "lab/run_ipv6_lab.py",
+    "lab/mtls_fixture.py"
+  ],
+  "tests": [
+    "tests/test_ipv6_packet_fixture.py",
+    ".github/workflows/routed-ipv6-lab.yml",
+    "tests/test_routed_report_review.py",
+    "scripts/check_routed_lab_results.py"
+  ],
+  "requirements": [
+    "IPV6-001",
+    "IPV6-002",
+    "IPV6-003",
+    "ZIP-001",
+    "RTE-002",
+    "SVC-001",
+    "FAIL-001"
+  ],
+  "result_policy": "Record actual exact-revision CI/run artifacts separately; this source record does not self-declare a pass",
+  "retained_ipv4": "The existing IPv4 packet/TLS campaign is rerun independently",
+  "native_remaining": [
+    "Installed product/API/provider/feature combination and supported address modes",
+    "Complete native quarantine, same-host/distributed/alternate paths and management separation",
+    "SLAAC/DHCPv6 where offered, general neighbour-source controls, fragments and extension headers",
+    "Native fabric/overlay MTU, HA, inspection capacity and shared-service dependencies",
+    "Actual identity, key, backup, isolated restore, migration and acceptance evidence"
+  ],
+  "native_apply": "NOT_IMPLEMENTED_BY_THIS_WORK",
+  "formal_authorization": "NOT_ISSUED",
+  "initial_local_packet_evidence": {
+    "commit": "95305d1eea341bfa5530a475c80119de40961d23",
+    "run_id": 35334038221,
+    "artifact_id": 10542138930,
+    "artifact_sha256": "2d982ac9561b373f7153a5c25fe1cccc071044d09cd28d8dd7b13e95d678b52b",
+    "ipv6_observations": 49,
+    "ipv4_observations": 47,
+    "failures": 0,
+    "kernel": "6.17.0-1022-azure",
+    "nftables": "1.0.9",
+    "original_namespace_configuration_unchanged": true,
+    "scope": "Executed Linux fixtures only; later source revisions need their own passing exact-head run"
+  }
+}

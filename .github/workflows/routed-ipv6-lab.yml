@@ -45,6 +45,9 @@ jobs:
               sudo chown "$(id -u):$(id -g)" "build/reports/$name"
             fi
           done
+      - name: Check complete reports and exact-source identities
+        if: ${{ !cancelled() }}
+        run: python scripts/check_routed_lab_results.py
       - name: Preserve only synthetic local laboratory results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -53,6 +56,7 @@ jobs:
           path: |
             build/reports/local_packet_lab.json
             build/reports/local_ipv6_packet_lab.json
+            build/reports/routed_family_review.json
           retention-days: 14
           if-no-files-found: error
       - name: Remove the owned disposable source and any temporary outputs

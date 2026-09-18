@@ -18,3 +18,7 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
+
+## Implemented laboratory work packages
+
+[Routed IPv6 path, protocol, MTU and service engineering](routed-ipv6-qualification.md) develops the declared family requirements into an executable fixed local experiment, while retaining the native-site acceptance obligations.
