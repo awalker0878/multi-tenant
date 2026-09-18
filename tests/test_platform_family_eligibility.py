@@ -13,10 +13,72 @@ import unittest
 from scripts import check_platform_capabilities as capabilities
 from scripts import check_platform_family_eligibility as admission
 from scripts import check_platform_qualification as qualification
+from scripts import check_version_source_provenance as provenance
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / 'examples/pre_placement_capability_request.json.example'
 AS_OF = datetime(2026, 9, 18, 16, 0, tzinfo=timezone.utc)
+
+
+def provenance_record(platform, tuple_id):
+    product={
+        'product':'fixture-product',
+        'product_version':'1.0',
+        'api':'fixture-api',
+        'api_version':'1.0',
+        'automation_providers':['fixture/provider = 1.0'],
+        'hardware_profile_ref':'controlled-record:fixture-hardware',
+        'feature_licenses':[]
+    }
+    kinds=sorted(provenance.BASE_REQUIRED_KINDS)
+    return {
+        'provenance_id':f'PROV-{platform.upper().replace("-", "_")}-FIXTURE-01',
+        'generation':1,
+        'state':'CURRENT_SUPPORTED',
+        'platform':platform,
+        'product_tuple_id':tuple_id,
+        'product_tuple':product,
+        'source_reviews':[{
+            'source_id':f'SRC-{kind}',
+            'kind':kind,
+            'edition':f'fixture-{kind.lower()}',
+            'review_state':'CURRENT_REVIEWED',
+            'reviewed_at':'2026-09-17T08:00:00Z',
+            'valid_until':'2026-12-31T23:59:59Z',
+            'evidence_ref':f'controlled-source-evidence:{kind.lower()}',
+            'limitation':'Synthetic unit-test source review only.'
+        } for kind in kinds],
+        'compatibility':{
+            'compatibility_record_ref':'controlled-compatibility:fixture',
+            'assessed_at':'2026-09-17T10:00:00Z',
+            'valid_until':'2026-12-31T23:59:59Z',
+            'product_api_evidence_ref':'controlled-evidence:product-api',
+            'provider_evidence_refs':['controlled-evidence:provider'],
+            'hardware_evidence_ref':'controlled-evidence:hardware',
+            'operation_coverage_ref':'controlled-evidence:operation-coverage',
+            'feature_entitlement_evidence_refs':[],
+            'exceptions':[]
+        },
+        'lifecycle':{
+            'support_status':'SUPPORTED',
+            'support_evidence_ref':'controlled-support:fixture',
+            'reviewed_at':'2026-09-17T11:00:00Z',
+            'review_by':'2026-12-31T23:59:59Z',
+            'support_end_at':None,
+            'vulnerability_owner_ref':'controlled-owner:vulnerability',
+            'lifecycle_decision_ref':'controlled-decision:continue-supported'
+        },
+        'owners':{
+            'platform_engineering_role':'Fixture platform engineering',
+            'architecture_role':'Fixture architecture',
+            'vulnerability_management_role':'Fixture vulnerability management'
+        },
+        'exclusions':['Synthetic unit-test provenance only'],
+        'source_refs':[
+            'docs/engineering/version-source-provenance-and-lifecycle-assurance.md',
+            'docs/engineering/platform-realizations/7-implementation-tuple-and-decision-package.md'
+        ]
+    }
 
 
 def dossier(platform, tuple_id, caps, assurance=()):
@@ -73,12 +135,14 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
     def setUp(self):
         self.registry = capabilities.load()
         self.qualification_index = qualification.load()
+        self.provenance_index = provenance.load()
         self.request = admission.load_request(EXAMPLE)
 
     def evaluate(self):
         return admission.evaluate(
             self.request, self.registry,
-            qualification_index=self.qualification_index, as_of=AS_OF)
+            qualification_index=self.qualification_index,
+            provenance_index=self.provenance_index, as_of=AS_OF)
 
     def qualify(self, platform='nutanix', assurance=()):
         profile = self.registry['profiles'][platform]
@@ -90,6 +154,8 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
                 f'controlled-evidence:{platform}:{cap}:fixture'
             ]
         profile['assurance_profiles'] = list(assurance)
+        self.provenance_index['records'].append(
+            provenance_record(platform, tuple_id))
         self.qualification_index['records'].append(
             dossier(platform, tuple_id, self.request['mandatory_capabilities'], assurance))
 
@@ -169,6 +235,12 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         result = self.evaluate()
         self.assertEqual([x['platform'] for x in result['evaluations']], ['vmware-nsx'])
         self.assertEqual(result['eligible_platforms'], [])
+
+    def test_expired_provenance_cannot_create_family_match(self):
+        self.qualify('nutanix')
+        self.provenance_index['records'][0]['compatibility']['valid_until']='2026-09-18T15:59:59Z'
+        with self.assertRaises(ValueError):
+            self.evaluate()
 
     def test_expired_dossier_cannot_create_family_match(self):
         self.qualify('nutanix')
