@@ -1,0 +1,20 @@
+{
+  "id": "RESERVATION-PREFLIGHT-01",
+  "source_baseline_commit": "db82cb3a1856b3de415fa2e3eb5f9f2474cc6740",
+  "status": "IMPLEMENTED_RECORD_VALIDATION_AND_PREFLIGHT_NO_RESERVATION_MUTATION",
+  "requirements": ["SVCM-001", "API-003", "AUTO-002", "AUTO-003", "STATE-003", "EVID-002"],
+  "reservation_index": "sources/capabilities/reservation_record_index.json",
+  "record_checker": "scripts/check_reservation_records.py",
+  "preflight_checker": "scripts/check_reservation_preflight.py",
+  "engineering": "docs/engineering/reservation-preflight-and-reconciliation.md",
+  "authority": {
+    "may_create_reservation": false,
+    "may_extend_reservation": false,
+    "may_consume_reservation": false,
+    "may_release_reservation": false,
+    "may_allocate_address": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "formal_authorization": "NOT_ISSUED"
+}
