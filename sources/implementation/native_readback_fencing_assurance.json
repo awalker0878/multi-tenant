@@ -1,0 +1,38 @@
+{
+  "id": "NATIVE-READBACK-FENCING-ASSURANCE-01",
+  "source_baseline_commit": "547e6efeb5888a63b8d19b1e8c80555bd60740dd",
+  "status": "IMPLEMENTED_RECONCILIATION_EVIDENCE_GATE_NO_NATIVE_MUTATION",
+  "backlog_ids": ["I09"],
+  "requirements": ["AUTO-002", "AUTO-003", "STATE-003", "DRIFT-001", "DRIFT-002", "DRIFT-003"],
+  "assurance_index": "sources/capabilities/native_reconciliation_assurance_index.json",
+  "checker": "scripts/check_native_reconciliation_assurance.py",
+  "preflight": "scripts/check_native_reconciliation_readiness.py",
+  "engineering": "docs/engineering/native-readback-writer-fencing-and-reconciliation-assurance.md",
+  "existing_native_readers": [
+    "tools/nsx_observe.py",
+    "tools/nutanix_observe.py",
+    "tools/neutron_observe.py",
+    "tools/recovery_review.py"
+  ],
+  "current_records": 0,
+  "authority": {
+    "may_list_tasks": false,
+    "may_cancel_task": false,
+    "may_release_containment": false,
+    "may_import_state": false,
+    "may_repair": false,
+    "may_apply": false,
+    "may_delete": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "qualify the exact installed APIs, RBAC, default/omission behavior and native version tokens for the selected target",
+    "prove accepted task/entity coverage and resource identity for the complete operation scope",
+    "establish real scoped writer fencing across all native writers and delayed tasks",
+    "bind current containment/quarantine state and explicit release authority",
+    "observe and classify pending, failed, divergent or uncertain native outcomes without blind replay",
+    "record the accountable data-safe source-of-truth reconciliation and any forward-repair or compensation decision",
+    "execute any subsequent repair only under a new separately approved mutation plan"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
