@@ -112,7 +112,7 @@ def normalized_spec(intent,*,as_of):
     if spec['family'] not in ipam.FAMILIES or spec['allocation_kind'] not in ipam.KINDS:
         raise ValueError('Unknown family or allocation kind')
     ipam.validate_prefix_shape(spec['family'],spec['allocation_kind'],spec['requested_prefix_length'])
-    bounded(spec['delegated_scope_ref'],'delegated_scope_ref')
+    ipam.opaque_external_ref(spec['delegated_scope_ref'],'delegated_scope_ref')
     expires=ipam.instant(spec['hold_expires_at'],'hold_expires_at')
     if expires<=as_of:raise ValueError('Requested IPAM hold expiry must be future-dated')
 
