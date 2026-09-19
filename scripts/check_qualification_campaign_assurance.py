@@ -412,6 +412,7 @@ def validate(index, as_of=None, root=ROOT, target_selection_index=None):
             raise ValueError('Qualification campaign starts before the target selection became effective')
         if campaign_authorized_until > selected_contact_until:
             raise ValueError('Qualification campaign claims a longer contact window than the target selection')
+        item['target_selection_state'] = selected['state']
         campaign_ids.add(item['campaign_id'])
         selection_ids.add(item['selection_id'])
         out.append(item)
