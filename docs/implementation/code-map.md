@@ -146,7 +146,7 @@ Design: [Name/time/initialization service profiles](../architecture/shared-servi
 
 Implementation: [exported DNS evidence index](../../sources/capabilities/dns_registration_index.json) · [registration evidence validator](../../scripts/check_dns_registration_records.py) · [no-guess DNS preflight](../../scripts/check_dns_registration_preflight.py) · [engineering boundary](../engineering/authoritative-dns-registration-handoff.md)
 
-Actual DNS names and A/AAAA/PTR values remain outside Git. REGISTERED state requires CONFIRMED IPAM evidence and every declared required observation; uncertain outcomes block retries and CI never invokes the RFC2136 writer.
+Actual DNS names and A/AAAA/PTR values remain outside Git. DNS evidence pins the stable SHA-256 of the confirmed IPAM allocation/realization plus the full normalized DNS-intent SHA-256; reused parent or DNS IDs cannot hide confirmation, TTL, zone, owner or scope drift. REGISTERED still requires CONFIRMED IPAM evidence and every declared required observation, and CI never invokes the RFC2136 writer.
 
 ## Backup protection and isolated-restore assurance
 
