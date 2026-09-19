@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 from scripts import check_target_selection_assurance as target
 
 INDEX = ROOT / 'sources/capabilities/qualification_campaign_evidence_index.json'
-FORMAT = 'portable-hosting-qualification-campaign-evidence-index/1'
+FORMAT = 'portable-hosting-qualification-campaign-evidence-index/2'
 STATUS = 'EXPORTED_CAMPAIGN_EVIDENCE_NOT_QUALIFICATION_OR_PRODUCTION_AUTHORITY'
 STATES = {'CURRENT_EVIDENCE_COMPLETE', 'REVIEW_DUE', 'GAPS_OPEN', 'UNCERTAIN'}
 RESULTS = {'PASSED', 'FAILED', 'BLOCKED', 'NOT_RUN'}
