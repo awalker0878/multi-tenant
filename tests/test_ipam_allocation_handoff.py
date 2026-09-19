@@ -34,11 +34,17 @@ def cleanup(status='NOT_STARTED'):
     return result
 
 
+def fixture_envelope_digest():
+    return reservation_records.canonical_digest({'fixture':'commissioned-envelope'})
+
+
 def parent_spec():
     parent=reservation_preflight.load(RES_INTENT)
     cap_ref=parent['spec']['capacity_request_ref']
     cap=sitecheck.load_request(ROOT/cap_ref)
-    return reservation_preflight.normalized_spec(parent,cap,as_of=AS_OF)
+    return reservation_preflight.normalized_spec(
+        parent,cap,as_of=AS_OF,
+        envelope_record_sha256=fixture_envelope_digest())
 
 
 def parent_record(state='HELD'):
@@ -51,6 +57,7 @@ def parent_record(state='HELD'):
         'reservation_id':spec['reservation_id'],'operation_id':spec['operation_id'],
         'generation':spec['generation'],'state':state,'request_id':spec['request_id'],
         'wsd_engineering_ref':spec['wsd_engineering_ref'],'envelope_id':spec['envelope_id'],
+        'envelope_record_sha256':spec['envelope_record_sha256'],
         'spec_sha256':reservation_records.canonical_digest(spec),
         'authoritative_system':{'system_ref':'external-reservation-system:fixture',
                                 'record_ref':'reservation-record:fixture','record_version':1},
@@ -74,7 +81,9 @@ def intent():
 
 
 def normalized(i=None):
-    return preflight.normalized_spec(i or intent(),as_of=AS_OF)
+    return preflight.normalized_spec(
+        i or intent(),as_of=AS_OF,
+        parent_envelope_record_sha256=fixture_envelope_digest())
 
 
 def allocation_record(state='RESERVED'):
