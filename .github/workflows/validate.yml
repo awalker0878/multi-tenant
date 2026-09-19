@@ -96,6 +96,10 @@ jobs:
         run: python scripts/check_identity_crypto_assurance.py --as-of 2026-09-18T23:00:00Z > build/reports/identity_crypto_assurance.json
       - name: Identity and cryptographic trust readiness must remain held without current native trust evidence
         run: python scripts/check_identity_crypto_readiness.py examples/identity_crypto_readiness_intent.json.example --as-of 2026-09-18T23:00:00Z --expected-status HOLD_NO_CURRENT_IDENTITY_CRYPTO_ASSURANCE > build/reports/identity_crypto_readiness.json
+      - name: Exported storage data lifecycle assurance remains non-authoritative
+        run: python scripts/check_storage_data_lifecycle_assurance.py --as-of 2026-09-19T01:50:00Z > build/reports/storage_data_lifecycle_assurance.json
+      - name: Storage lifecycle readiness must remain held without current native storage evidence
+        run: python scripts/check_storage_data_lifecycle_readiness.py examples/storage_data_lifecycle_readiness_intent.json.example --as-of 2026-09-19T01:50:00Z --expected-status HOLD_NO_CURRENT_STORAGE_LIFECYCLE_ASSURANCE > build/reports/storage_data_lifecycle_readiness.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
