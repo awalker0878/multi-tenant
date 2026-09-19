@@ -68,7 +68,7 @@ The supporting campaign must already be bound to a `CURRENT_SELECTED` target and
 - the same observation time; and
 - a dossier evidence expiry that is **no later** than the campaign packet's current freshness limit.
 
-Earlier failed or blocked campaign attempts remain campaign history; the qualification dossier can rely only on the current latest passing evidence exported by that packet. If the campaign is stale, has open gaps, becomes uncertain, loses its current target binding, or no longer contains the referenced artifact, the qualification record is ineligible even when its own approval date has not expired.
+Earlier failed or blocked campaign attempts remain campaign history; the qualification dossier can rely only on the current latest passing evidence exported by that packet. If the campaign is stale, has open gaps, becomes uncertain, loses its reviewed target/authorization binding, or no longer contains the referenced artifact, the qualification record is ineligible even when its own approval date has not expired. Expiry of target-contact authority alone does not erase evidence already collected inside the authorized window; it prevents new contact or retesting until authority is refreshed.
 
 This prevents an independent approval record from laundering arbitrary evidence references into a native-qualified PlatformProfile. The approval may narrow validity or qualified scope, but it cannot invent observations or extend their freshness.
 
