@@ -47,7 +47,7 @@ A record admitted to the active index must be `CURRENT_APPROVED` and contains:
 | `assurance_profiles` | Only assurance profiles actually included in the qualification scope. |
 | `applicable_test_sets` | Test/verification sets included in the review. |
 | `tested_limits` | Explicit observed bounds linked to native evidence. |
-| `evidence` | Controlled evidence references, SHA-256 values, observation time, expiry time and test-set association. |
+| `evidence` | Controlled evidence references, SHA-256 values, observation time, expiry time and test-set association; every entry must trace to a current target-bound campaign packet. |
 | `approval` | Accountable role, controlled decision reference and approval validity interval. |
 | `owners` | Platform-engineering and security-authority roles responsible for the profile. |
 | `exclusions` | Explicitly excluded capabilities, paths, limits or environments. |
@@ -56,6 +56,21 @@ A record admitted to the active index must be `CURRENT_APPROVED` and contains:
 The checker rejects expired approval or evidence, approval that predates its required
 evidence, missing tested limits, unknown capabilities, duplicate records, missing
 owners, absent repository sources, and records without timezone-aware validity.
+
+## Qualification-campaign evidence prerequisite
+
+A `CURRENT_APPROVED` dossier now also requires its native evidence to be contained in one or more current `CURRENT_EVIDENCE_COMPLETE` records from the [qualification campaign evidence gate](qualification-campaign-evidence-assurance.md).
+
+The supporting campaign must already be bound to a `CURRENT_SELECTED` target and must match the qualification dossier's exact platform family and `product_tuple_id`. For every evidence reference used by the dossier, the qualification checker requires:
+
+- the same controlled evidence reference;
+- the same SHA-256 digest;
+- the same observation time; and
+- a dossier evidence expiry that is **no later** than the campaign packet's current freshness limit.
+
+Earlier failed or blocked campaign attempts remain campaign history; the qualification dossier can rely only on the current latest passing evidence exported by that packet. If the campaign is stale, has open gaps, becomes uncertain, loses its current target binding, or no longer contains the referenced artifact, the qualification record is ineligible even when its own approval date has not expired.
+
+This prevents an independent approval record from laundering arbitrary evidence references into a native-qualified PlatformProfile. The approval may narrow validity or qualified scope, but it cannot invent observations or extend their freshness.
 
 ## Version/source provenance prerequisite
 
