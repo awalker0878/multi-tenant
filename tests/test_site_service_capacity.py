@@ -283,7 +283,7 @@ class SiteCapacityIndexTests(unittest.TestCase):
         with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),**qualification_chain(),as_of=AS_OF)
 
     def test_wrong_qualification_record_is_rejected(self):
-        r=site_record();r['qualification_record_id']='QUAL-OTHER'
+        r=site_record();r['qualification_binding']['qualification_record_id']='QUAL-OTHER'
         idx=capacity.load();idx['records']=[r]
         with self.assertRaises(ValueError):capacity.validate(idx,qindex=qindex(),provenance_index=provenance_index(),**qualification_chain(),as_of=AS_OF)
 
