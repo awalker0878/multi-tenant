@@ -68,7 +68,7 @@ For \`NEGATIVE_CONTROL\`, the packet must explicitly reference a retained \`PASS
 
 \`CURRENT_EVIDENCE_COMPLETE\` requires:
 
-- a current matching target selection;
+- a current reviewed matching target selection and exact restricted campaign authorization;
 - all required assertions either covered by a current latest \`PASSED\` attempt or explicitly reviewed not-applicable;
 - no stale latest passing evidence;
 - no due campaign/applicability/gap review; and
