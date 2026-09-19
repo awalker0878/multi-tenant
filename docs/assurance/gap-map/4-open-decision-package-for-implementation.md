@@ -33,6 +33,8 @@ The parent’s AD-01 through AD-15 choices remain proposed architectural decisio
 
 A vendor or site choice that cannot meet the selected reference outcome is not filled in as “equivalent” without analysis. Either choose another qualified realization, exclude the capability, or submit an explicit parent architecture variation. A missing service target is likewise an open service decision, not a reason to advertise a default number.
 
+When the accountable owners make the actual site/platform choice, record it through the [target-selection assurance gate](../../engineering/actual-target-selection-assurance.md) rather than filling unknowns in this reference package. The gate records the external decision and restricted contact scope; it does not make or approve the decision.
+
 Related engineering: [Site design deliverables](../site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002)  •  [Service parameter records](../site-qualification/4-service-parameter-and-requirement-decisions.md#QUAL_s_004)  •  [Vendor confirmation records](../../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md#VND_s_007)
 
 [Previous chapter](3-detailed-gap-register-and-treatment.md) · [Chapter index](README.md) · [Next chapter](5-completion-and-ongoing-closure.md)
