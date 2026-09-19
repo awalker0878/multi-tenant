@@ -388,6 +388,7 @@ class QualificationCampaignReadinessTests(unittest.TestCase):
             target_selection_index=target_index(selected), as_of=AS_OF
         )
         self.assertEqual(result['status'], readiness.READY)
+        self.assertEqual(result['target_selection_state'], 'CONTACT_AUTHORITY_DUE')
         self.assertFalse(result['may_contact_target'])
         self.assertFalse(result['may_run_native_tests'])
 
