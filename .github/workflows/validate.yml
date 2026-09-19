@@ -104,6 +104,10 @@ jobs:
         run: python scripts/check_service_reply_assurance.py --as-of 2026-09-19T12:30:00Z > build/reports/service_reply_assurance.json
       - name: Service-reply readiness must remain held without current native reply-path evidence
         run: python scripts/check_service_reply_readiness.py examples/service_reply_readiness_intent.json.example --as-of 2026-09-19T12:30:00Z --expected-status HOLD_NO_CURRENT_SERVICE_REPLY_ASSURANCE > build/reports/service_reply_readiness.json
+      - name: Exported bootstrap service assurance remains non-authoritative
+        run: python scripts/check_bootstrap_service_assurance.py --as-of 2026-09-19T14:30:00Z > build/reports/bootstrap_service_assurance.json
+      - name: Bootstrap service readiness must remain held without current target dependencies
+        run: python scripts/check_bootstrap_service_readiness.py examples/bootstrap_service_readiness_intent.json.example --as-of 2026-09-19T14:30:00Z --expected-status HOLD_NO_CURRENT_BOOTSTRAP_SERVICE_ASSURANCE > build/reports/bootstrap_service_readiness.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
