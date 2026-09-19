@@ -110,6 +110,7 @@ def evaluate(intent, index=None, target_selection_index=None, as_of=None):
         'request_id': intent['request_id'],
         'campaign_id': intent['campaign_id'],
         'selection_id': intent['selection_id'],
+        'target_selection_state': record.get('target_selection_state') if record else None,
         'required_assertions': record['required_assertions'] if record else [],
         'not_applicable_assertions': record['not_applicable_assertions'] if record else [],
         'latest_passing_assertions': record['latest_passing_assertions'] if record else [],

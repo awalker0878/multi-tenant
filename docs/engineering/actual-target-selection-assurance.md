@@ -78,7 +78,7 @@ Supported states are:
 
 - `CURRENT_SELECTED` — selection review and target-contact authority are current with no OPEN gaps;
 - `REVIEW_DUE` — selection or residual-gap review expired;
-- `CONTACT_AUTHORITY_DUE` — selection remains reviewed but target-contact authority expired;
+- `CONTACT_AUTHORITY_DUE` — selection remains reviewed but target-contact authority expired; no new target interaction is allowed, although already collected campaign evidence may remain valid when its attempts are proven to have occurred inside the prior authorized window;
 - `GAPS_OPEN` — current selection/contact evidence exists but unresolved selection gaps remain;
 - `UNCERTAIN` — authoritative target/scope/owner/contact state requires reconciliation.
 
