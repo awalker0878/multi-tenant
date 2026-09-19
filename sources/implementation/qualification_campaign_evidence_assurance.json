@@ -31,5 +31,25 @@
     "allow the PlatformProfile dossier to publish only evidence that still matches the current campaign packet"
   ],
   "formal_authorization": "NOT_ISSUED",
-  "qualification_integration": "scripts/check_platform_qualification.py"
+  "qualification_integration": "scripts/check_platform_qualification.py",
+  "authorization_binding": {
+    "target_selection": "sources/capabilities/target_selection_assurance_index.json",
+    "exact_refs": [
+      "change authority",
+      "target-contact authority",
+      "stop authority",
+      "qualification campaign",
+      "native API scope",
+      "observer scope",
+      "writer scope",
+      "credential custody",
+      "evidence workspace",
+      "data restrictions",
+      "permitted operations",
+      "prohibited operations",
+      "cleanup",
+      "contact window"
+    ],
+    "contact_expiry_semantics": "Completed evidence remains eligible only for observations collected within the authorized window; expiry blocks new target interaction but does not erase prior observations."
+  }
 }
