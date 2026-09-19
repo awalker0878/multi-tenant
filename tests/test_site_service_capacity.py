@@ -11,6 +11,7 @@ import sys
 import unittest
 
 from scripts import check_platform_qualification as qualification
+from scripts import check_qualification_campaign_assurance as campaign
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as eligibility
 from scripts import check_version_source_provenance as provenance
@@ -195,6 +196,14 @@ class SiteCapacityIndexTests(unittest.TestCase):
         dims={x['id']:x for x in result['records'][0]['dimensions']}
         self.assertEqual(dims['memory_gib']['available_after_failure_and_reserve'],'65')
         self.assertEqual(dims['attachment_slots']['available_after_failure_and_reserve'],'4')
+
+    def test_envelope_rejects_qualification_without_current_campaign_evidence(self):
+        chain=qualification_chain()
+        chain['campaign_evidence_index']=campaign.load()
+        with self.assertRaises(ValueError):
+            capacity.validate(
+                index(),qindex=qindex(),provenance_index=provenance_index(),
+                **chain,as_of=AS_OF)
 
     def test_reserved_and_consumed_are_not_summed_for_admission(self):
         r=site_record();d=r['dimensions'][0]
