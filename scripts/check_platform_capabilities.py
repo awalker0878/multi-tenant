@@ -42,7 +42,8 @@ def load(path: Path = REGISTRY) -> dict:
     return json.loads(raw, object_pairs_hook=pairs)
 
 
-def validate(registry: dict, root: Path = ROOT, qualification_index=None, provenance_index=None, as_of=None) -> dict:
+def validate(registry: dict, root: Path = ROOT, qualification_index=None, provenance_index=None,
+             campaign_evidence_index=None, target_selection_index=None, as_of=None) -> dict:
     if set(registry) != {'format', 'status', 'reviewed_source_revision', 'qualification_rule', 'capability_ids', 'profiles'}:
         raise ValueError('Unexpected registry fields')
     if registry['format'] != 'portable-hosting-capability-registry/1':
@@ -56,7 +57,11 @@ def validate(registry: dict, root: Path = ROOT, qualification_index=None, proven
 
     if qualification_index is None:
         qualification_index = qualification.load()
-    qsummary = qualification.validate(qualification_index, as_of=as_of, root=root, provenance_index=provenance_index)
+    qsummary = qualification.validate(
+        qualification_index, as_of=as_of, root=root, provenance_index=provenance_index,
+        campaign_evidence_index=campaign_evidence_index,
+        target_selection_index=target_selection_index
+    )
     qrecords = qsummary['records']
 
     source_refs = set()
@@ -120,8 +125,13 @@ def validate(registry: dict, root: Path = ROOT, qualification_index=None, proven
 
 
 def eligible(registry: dict, platform: str, required: set[str], assurance_profile: str | None = None,
-             qualification_index=None, provenance_index=None, as_of=None) -> tuple[bool, list[str]]:
-    validate(registry, qualification_index=qualification_index, provenance_index=provenance_index, as_of=as_of)
+             qualification_index=None, provenance_index=None, campaign_evidence_index=None,
+             target_selection_index=None, as_of=None) -> tuple[bool, list[str]]:
+    validate(
+        registry, qualification_index=qualification_index, provenance_index=provenance_index,
+        campaign_evidence_index=campaign_evidence_index,
+        target_selection_index=target_selection_index, as_of=as_of
+    )
     if platform not in PLATFORMS or not required <= CAPABILITIES:
         raise ValueError('Unknown platform or capability requirement')
     profile = registry['profiles'][platform]
@@ -145,7 +155,7 @@ def main() -> int:
             ],
             'limits': [
                 'Repository/source evidence is not native qualification.',
-                'NATIVE_QUALIFIED requires a current exact-tuple qualification dossier backed by CURRENT_SUPPORTED version/source provenance.',
+                'NATIVE_QUALIFIED requires a current exact-tuple qualification dossier backed by CURRENT_SUPPORTED provenance and current target-bound campaign evidence.',
                 'This check never performs platform placement or contacts infrastructure.'
             ]
         }
