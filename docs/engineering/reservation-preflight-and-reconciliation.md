@@ -12,9 +12,15 @@ The record-state vocabulary `HELD`, `CONSUMED`, `RELEASED`, `EXPIRED` and `UNCER
 
 ## Stable reservation identity
 
-A reservation intent binds an immutable `reservation_id`, stable `operation_id`, generation, WSD/request identity, exact eligible envelope ID, exact capacity-request content digest, owner roles, resource dimensions/units/quantities, dependency operation IDs and expiry.
+A reservation intent binds an immutable `reservation_id`, stable `operation_id`, generation, WSD/request identity, exact eligible envelope ID, the current commissioned-envelope SHA-256, exact capacity-request content digest, owner roles, resource dimensions/units/quantities, dependency operation IDs and expiry. The envelope digest is derived from the validated current site/service inventory; callers do not invent it.
 
-The preflight recomputes the capacity request and requires the reservation resource set to match it exactly. A changed quantity, unit, envelope or generation under the same operation identity is a conflict rather than an idempotent retry.
+The preflight recomputes the capacity request and current commissioned envelope and requires the reservation resource set to match exactly. The normalized spec hash includes the envelope SHA-256. A changed quantity, unit, envelope ID, envelope contents or generation under the same operation identity is therefore a conflict rather than an idempotent retry.
+
+## Envelope-drift boundary
+
+The exported reservation record also retains the commissioned-envelope SHA-256. Reusing the same `envelope_id` is insufficient: an existing HELD/CONSUMED record is idempotent only when the current envelope digest still matches the digest incorporated into the original immutable reservation spec.
+
+If a capacity measurement, qualification binding, profile, failure model or other envelope content changes under the same ID, the recomputed spec differs and the preflight returns a conflict requiring authoritative reconciliation. It does not reinterpret the old reservation as covering the new envelope.
 
 ## Retry and uncertain-outcome rules
 
