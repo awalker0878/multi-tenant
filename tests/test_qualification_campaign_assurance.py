@@ -114,6 +114,23 @@ def campaign_record(state='CURRENT_EVIDENCE_COMPLETE'):
             'started_at': '2026-09-19T16:00:00Z',
             'review_by': '2026-12-31T23:59:59Z'
         },
+        'authorization': {
+            'change_authority_ref': 'controlled-authority:change',
+            'target_contact_authority_ref': 'controlled-authority:target-contact',
+            'target_contact_valid_until': '2026-12-31T23:59:59Z',
+            'stop_authority_ref': 'controlled-authority:stop',
+            'qualification_campaign_ref': 'controlled-campaign:qualification',
+            'native_api_scope_ref': 'controlled-campaign:native-api',
+            'observer_scope_ref': 'controlled-campaign:observer',
+            'writer_scope_ref': 'controlled-campaign:writer',
+            'credential_custody_ref': 'controlled-campaign:credential-custody',
+            'evidence_workspace_ref': 'controlled-campaign:evidence-workspace',
+            'data_restriction_ref': 'controlled-campaign:no-production-data',
+            'permitted_operations_ref': 'controlled-campaign:permitted',
+            'prohibited_operations_ref': 'controlled-campaign:prohibited',
+            'cleanup_ref': 'controlled-campaign:cleanup',
+            'contact_window_ref': 'controlled-campaign:window'
+        },
         'governance': {
             'applicability_ref': 'controlled-campaign:applicability',
             'run_sheet_ref': 'controlled-campaign:run-sheet',
@@ -184,6 +201,55 @@ class QualificationCampaignAssuranceTests(unittest.TestCase):
         record['scope']['product_tuple_id'] = 'other-tuple'
         with self.assertRaises(ValueError):
             assurance.validate(campaign_index(record), AS_OF, target_selection_index=self.targets)
+
+    def test_campaign_authorization_must_match_target_selection(self):
+        record = campaign_record()
+        record['authorization']['qualification_campaign_ref'] = 'controlled-campaign:other'
+        with self.assertRaises(ValueError):
+            assurance.validate(campaign_index(record), AS_OF, target_selection_index=self.targets)
+
+    def test_campaign_workspace_must_match_authorized_workspace(self):
+        record = campaign_record()
+        record['governance']['evidence_workspace_ref'] = 'controlled-campaign:other-workspace'
+        with self.assertRaises(ValueError):
+            assurance.validate(campaign_index(record), AS_OF, target_selection_index=self.targets)
+
+    def test_attempt_after_authorized_contact_window_is_rejected(self):
+        record = campaign_record()
+        record['authorization']['target_contact_valid_until'] = '2026-09-19T16:15:00Z'
+        with self.assertRaises(ValueError):
+            assurance.validate(campaign_index(record), AS_OF, target_selection_index=self.targets)
+
+    def test_completed_evidence_survives_later_contact_authority_expiry(self):
+        selected = target_record()
+        selected['state'] = 'CONTACT_AUTHORITY_DUE'
+        selected['scope']['target_contact_valid_until'] = '2026-09-19T16:25:00Z'
+        record = campaign_record()
+        record['authorization']['target_contact_valid_until'] = '2026-09-19T16:25:00Z'
+        result = assurance.validate(
+            campaign_index(record), AS_OF,
+            target_selection_index=target_index(selected))
+        self.assertEqual(result['current_evidence_complete_count'], 1)
+
+    def test_completed_evidence_rejects_review_due_target(self):
+        selected = target_record()
+        selected['state'] = 'REVIEW_DUE'
+        selected['scope']['review_by'] = '2026-09-19T16:29:59Z'
+        with self.assertRaises(ValueError):
+            assurance.validate(
+                campaign_index(campaign_record()), AS_OF,
+                target_selection_index=target_index(selected))
+
+    def test_campaign_cannot_claim_longer_contact_window_than_target(self):
+        selected = target_record()
+        selected['scope']['target_contact_valid_until'] = '2026-09-19T16:25:00Z'
+        record = campaign_record()
+        record['authorization']['target_contact_valid_until'] = '2026-09-19T16:26:00Z'
+        record['attempts'][-1]['observed_at'] = '2026-09-19T16:20:00Z'
+        with self.assertRaises(ValueError):
+            assurance.validate(
+                campaign_index(record), AS_OF,
+                target_selection_index=target_index(selected))
 
     def test_current_complete_rejects_missing_assertion(self):
         record = campaign_record()
