@@ -1,0 +1,34 @@
+{
+  "id": "BOOTSTRAP-SERVICE-INITIALIZATION-ASSURANCE-01",
+  "source_baseline_commit": "3e2cc52ffbedfd0fcf7a44bcbc72671a6291f0d4",
+  "status": "IMPLEMENTED_BOOTSTRAP_EVIDENCE_GATE_NO_INITIALIZATION_MUTATION",
+  "backlog_ids": ["I06"],
+  "requirements": ["IPAM-004", "SVC-001", "SVC-002", "SVC-003", "IMG-001", "IMG-002", "OBS-001", "OBS-002", "OBS-003", "AUTO-001"],
+  "assurance_index": "sources/capabilities/bootstrap_service_assurance_index.json",
+  "checker": "scripts/check_bootstrap_service_assurance.py",
+  "preflight": "scripts/check_bootstrap_service_readiness.py",
+  "engineering": "docs/engineering/bootstrap-service-initialization-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_allocate_address": false,
+    "may_register_name": false,
+    "may_change_dhcp_metadata": false,
+    "may_change_time_source": false,
+    "may_issue_bootstrap_credential": false,
+    "may_fetch_artifact": false,
+    "may_change_telemetry": false,
+    "may_retire_temporary_dependency": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "bind current authoritative IPAM allocation, DNS registration, trust, address-family and service-reply evidence to the exact bootstrap profile",
+    "qualify the selected address-assignment and DHCP/metadata or static initialization mode without guessed fallback",
+    "qualify approved resolver, time, artifact repository, trust/key bootstrap and initialization network scope",
+    "verify approved image/baseline provenance, support, hardening, vulnerability disposition and post-provision runtime baseline",
+    "qualify bootstrap telemetry identity, time integrity, buffering/loss alerts and collection-failure behavior",
+    "exercise IPAM, resolver, time, repository and collector loss while prohibiting arbitrary fallback",
+    "record and retire temporary endpoints, credentials, routes and exceptions only after steady-state replacement and recovery-dependency verification"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
