@@ -2,7 +2,16 @@
   "id": "AUTHORITATIVE-IPAM-HANDOFF-01",
   "source_baseline_commit": "bf5e2e38be21967c45e79b053c5550c779b0b48a",
   "status": "IMPLEMENTED_EVIDENCE_AND_PREFLIGHT_NO_IPAM_MUTATION",
-  "requirements": ["IPAM-001", "IPAM-002", "IPAM-003", "IPAM-004", "AUTO-002", "AUTO-003", "STATE-003", "EVID-002"],
+  "requirements": [
+    "IPAM-001",
+    "IPAM-002",
+    "IPAM-003",
+    "IPAM-004",
+    "AUTO-002",
+    "AUTO-003",
+    "STATE-003",
+    "EVID-002"
+  ],
   "allocation_index": "sources/capabilities/ipam_allocation_index.json",
   "record_checker": "scripts/check_ipam_allocation_records.py",
   "preflight_checker": "scripts/check_ipam_allocation_preflight.py",
@@ -25,5 +34,11 @@
     "collect route, lease, DNS, policy, logging and incident-response cleanup evidence before reuse",
     "qualify reuse quarantine and native conflict/uncertain-outcome behavior"
   ],
-  "formal_authorization": "NOT_ISSUED"
+  "formal_authorization": "NOT_ISSUED",
+  "confirmation_binding": {
+    "stable_confirmation_sha256": true,
+    "excludes_release_cleanup_quarantine_fields": true,
+    "contains_no_allocation_value": true,
+    "intended_for_dependent_evidence_binding": true
+  }
 }
