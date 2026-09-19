@@ -260,6 +260,14 @@ Implementation: [active bootstrap assurance index](../../sources/capabilities/bo
 
 Current bootstrap qualification requires authoritative reservation/IPAM/DNS lifecycle, selected address-assignment/DHCP-metadata behavior, resolver/time/trust/artifact/telemetry/service-reply dependencies, restricted OOB/management execution, dependency-loss behavior with no unrestricted fallback, recoverable configuration/state and verified temporary-to-steady-state handover. CI performs no bootstrap mutation.
 
+## Actual target selection and restricted native-campaign assurance
+
+Design: [IK §1 implementation workplan](delivery-guide/1-implementation-workplan-and-required-inputs.md) · [VND §7 implementation tuple](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [GM §4 open decision package](../assurance/gap-map/4-open-decision-package-for-implementation.md)
+
+Implementation: [active target-selection assurance index](../../sources/capabilities/target_selection_assurance_index.json) · [assurance validator](../../scripts/check_target_selection_assurance.py) · [readiness preflight](../../scripts/check_target_selection_readiness.py) · [engineering boundary](../engineering/actual-target-selection-assurance.md)
+
+Current target selection records the externally chosen site/cell, exact platform tuple references, security-edge/management/backend realization, restricted native API/observer/writer campaign scope, credential custody, evidence workspace, permitted/prohibited operations, cleanup and time-bounded target-contact authority. CI does not select or contact a target, retrieve credentials, run native tests, apply or activate.
+
 ## Open native work
 
-[The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
+[The implementation backlog](../../sources/implementation_backlog.csv) remains the source record for **actual owner decisions and native evidence**. I01–I10 now have repository-side verification, handoff or assurance mechanisms; that does not select a target, populate any active assurance index, contact a native system, issue authorization or turn synthetic evidence into native qualification.
