@@ -137,3 +137,7 @@ The [storage lifecycle gate](docs/engineering/storage-data-lifecycle-assurance.m
 ## Origin-specific shared-service reply assurance
 
 The [service-reply assurance gate](docs/engineering/origin-specific-service-reply-assurance.md) addresses I05 above the routed packet fixture. A current binding requires exact service entitlement, endpoint identity/authentication, forward and origin-specific reply ownership, accepted ZIP evidence, connected/summary/NAT/PBR/alternate-interface review, source validation, no-transit proof, missing-reply-route and edge-failure tests, reverse-initiation denial, recovery, telemetry, survivor capacity, and binding/version revocation evidence. The active service-reply index is intentionally empty.
+
+## Bootstrap service and steady-state transition assurance
+
+The [bootstrap service gate](docs/engineering/bootstrap-service-readiness-assurance.md) addresses I06 by composing the existing authoritative IPAM/DNS handoffs with the minimum initialization dependencies required for safe Day-0 and endpoint bootstrap. Current readiness requires selected address-assignment/DHCP-metadata behavior, resolver/time/trust/certificate/key/artifact/telemetry/service-reply paths, restricted OOB/management execution, dependency-loss behavior with no unrestricted fallback, recoverable configuration/state, and verified transition from temporary dependencies to steady-state services. The active bootstrap index is intentionally empty.
