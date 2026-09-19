@@ -1,0 +1,30 @@
+{
+  "id": "QUALIFICATION-CAMPAIGN-EVIDENCE-ASSURANCE-01",
+  "source_baseline_commit": "12730e1ef3102da12487c5f7d9da30754b679945",
+  "status": "IMPLEMENTED_CAMPAIGN_EVIDENCE_VALIDATION_NO_NATIVE_EXECUTION_OR_QUALIFICATION_AUTHORITY",
+  "requirements": ["QUAL-001", "ASSUR-003", "ACPT-001"],
+  "assurance_index": "sources/capabilities/qualification_campaign_evidence_index.json",
+  "checker": "scripts/check_qualification_campaign_assurance.py",
+  "preflight": "scripts/check_qualification_campaign_readiness.py",
+  "engineering": "docs/engineering/qualification-campaign-evidence-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_contact_target": false,
+    "may_retrieve_credentials": false,
+    "may_run_native_tests": false,
+    "may_issue_qualification": false,
+    "may_update_platform_registry": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual target and obtain the separately controlled campaign authority",
+    "execute applicable native observations against the exact selected tuple and topology",
+    "retain failed, blocked and superseded attempts rather than overwriting history",
+    "collect controlled evidence, provenance, positive controls, freshness and reviewer records",
+    "record explicit not-applicable decisions and every residual campaign gap",
+    "submit the current complete packet to the independent qualification authority",
+    "populate the separate PlatformProfile qualification index only after an accountable decision"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
