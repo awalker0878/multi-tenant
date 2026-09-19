@@ -14,6 +14,9 @@ from scripts import check_platform_capabilities as capabilities
 from scripts import check_platform_family_eligibility as admission
 from scripts import check_platform_qualification as qualification
 from scripts import check_version_source_provenance as provenance
+from scripts import check_qualification_campaign_assurance as campaign
+from scripts import check_target_selection_assurance as target
+from tests.qualification_fixture_support import campaign_record, target_record
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / 'examples/pre_placement_capability_request.json.example'
@@ -136,13 +139,17 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         self.registry = capabilities.load()
         self.qualification_index = qualification.load()
         self.provenance_index = provenance.load()
+        self.campaign_evidence_index = campaign.load()
+        self.target_selection_index = target.load()
         self.request = admission.load_request(EXAMPLE)
 
     def evaluate(self):
         return admission.evaluate(
             self.request, self.registry,
             qualification_index=self.qualification_index,
-            provenance_index=self.provenance_index, as_of=AS_OF)
+            provenance_index=self.provenance_index,
+            campaign_evidence_index=self.campaign_evidence_index,
+            target_selection_index=self.target_selection_index, as_of=AS_OF)
 
     def qualify(self, platform='nutanix', assurance=()):
         profile = self.registry['profiles'][platform]
@@ -158,6 +165,16 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
             provenance_record(platform, tuple_id))
         self.qualification_index['records'].append(
             dossier(platform, tuple_id, self.request['mandatory_capabilities'], assurance))
+        selection_id=f'selection-{platform}-fixture'
+        evidence_refs=[f'controlled-evidence:{platform}:{cap}:fixture'
+                       for cap in self.request['mandatory_capabilities']]
+        self.target_selection_index['records'].append(
+            target_record(platform, tuple_id, selection_id=selection_id))
+        self.campaign_evidence_index['records'].append(
+            campaign_record(
+                evidence_refs, platform, tuple_id,
+                campaign_id=f'CAMPAIGN-{platform.upper().replace("-", "_")}-FIXTURE-01',
+                selection_id=selection_id))
 
     def test_current_registry_fails_closed(self):
         result = self.evaluate()
