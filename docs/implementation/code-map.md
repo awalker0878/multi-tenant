@@ -106,7 +106,7 @@ Design: [Site qualification and evidence](../assurance/site-qualification/5-qual
 
 Implementation: [active qualification index](../../sources/capabilities/qualification_index.json) · [dossier validator](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/platform-native-qualification.md)
 
-A native-qualified registry claim must be backed by a current exact-tuple dossier with tested limits, evidence freshness, owners and an independent approval reference. The active index is intentionally empty and grants no placement or activation authority.
+A native-qualified registry claim must be backed by a current exact-tuple dossier with tested limits, owners, independent approval, matching CURRENT_SUPPORTED provenance and native evidence that exactly matches current latest-passing artifacts from a target-bound qualification campaign. The dossier cannot extend evidence validity beyond campaign freshness. The active index is intentionally empty and grants no placement or activation authority.
 
 ## Pre-placement platform-family eligibility
 

@@ -11,11 +11,13 @@ import sys
 import unittest
 
 from scripts import check_platform_qualification as qualification
+from scripts import check_qualification_campaign_assurance as campaign
 from scripts import check_reservation_preflight as preflight
 from scripts import check_reservation_records as records
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as sitecheck
 from scripts import check_version_source_provenance as provenance
+from tests.qualification_fixture_support import campaign_index, target_index
 
 ROOT=Path(__file__).resolve().parents[1]
 AS_OF=datetime(2026,9,18,18,0,tzinfo=timezone.utc)
@@ -99,6 +101,16 @@ def qrecord():
 
 def qindex():
     x=qualification.load();x['records']=[qrecord()];return x
+
+
+def qualification_chain():
+    ref='controlled-evidence:nutanix:fixture'
+    return {
+        'campaign_evidence_index': campaign_index(
+            [ref], 'nutanix', 'nutanix-res-fixture'),
+        'target_selection_index': target_index(
+            'nutanix', 'nutanix-res-fixture')
+    }
 
 
 def cap_request():
@@ -226,7 +238,7 @@ class ReservationPreflightTests(unittest.TestCase):
         return preflight.evaluate(
             i or intent(),capacity_index=cap_index(),
             reservation_index=j or records.load(),qindex=qindex(),
-            provenance_index=provenance_index(),as_of=AS_OF)
+            provenance_index=provenance_index(),**qualification_chain(),as_of=AS_OF)
 
     def test_current_repository_example_holds_without_envelope(self):
         result=preflight.evaluate(
@@ -240,6 +252,15 @@ class ReservationPreflightTests(unittest.TestCase):
         for key in ('may_create_reservation','may_extend_reservation','may_consume_reservation',
                     'may_release_reservation','may_allocate_address','may_apply','may_activate'):
             self.assertIs(result[key],False)
+
+    def test_reservation_preflight_rejects_campaignless_qualification(self):
+        chain=qualification_chain()
+        chain['campaign_evidence_index']=campaign.load()
+        with self.assertRaises(ValueError):
+            preflight.evaluate(
+                intent(),capacity_index=cap_index(),reservation_index=records.load(),
+                qindex=qindex(),provenance_index=provenance_index(),
+                **chain,as_of=AS_OF)
 
     def test_same_operation_same_spec_is_idempotent_existing_hold(self):
         i=intent();result=self.evaluate(i,journal(reservation_record(i)))

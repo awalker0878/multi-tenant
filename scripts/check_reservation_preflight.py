@@ -162,7 +162,8 @@ def normalized_spec(intent,capacity_request,*,as_of):
     }
 
 
-def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,provenance_index=None,as_of=None):
+def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,provenance_index=None,
+             campaign_evidence_index=None,target_selection_index=None,as_of=None):
     if as_of is None:as_of=datetime.now(timezone.utc)
     if not isinstance(as_of,datetime) or as_of.tzinfo is None:
         raise ValueError('Timezone-aware as_of required')
@@ -179,7 +180,9 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
     spec_sha=records.canonical_digest(spec)
 
     cap_result=sitecheck.evaluate(
-        capacity_request,capacity_index,qindex=qindex,provenance_index=provenance_index,as_of=as_of)
+        capacity_request,capacity_index,qindex=qindex,provenance_index=provenance_index,
+        campaign_evidence_index=campaign_evidence_index,
+        target_selection_index=target_selection_index,as_of=as_of)
     journal=records.validate(reservation_index,as_of=as_of)
     existing_by_op={x['operation_id']:x for x in journal['records']}
     existing_by_id={x['reservation_id']:x for x in journal['records']}

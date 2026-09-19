@@ -63,7 +63,7 @@ The [platform-family eligibility precheck](docs/engineering/pre-placement-platfo
 
 ## Native PlatformProfile qualification
 
-The [native qualification dossier](docs/engineering/platform-native-qualification.md) binds an exact product/API/provider/hardware tuple to tested capabilities, assurance profiles, limits, current evidence, owners and a controlled approval reference. The active qualification index is intentionally empty; registry claims cannot become `NATIVE_QUALIFIED` merely by editing the capability file. Production authorization remains separate.
+The [native qualification dossier](docs/engineering/platform-native-qualification.md) binds an exact product/API/provider/hardware tuple to tested capabilities, assurance profiles, limits, current evidence, owners and a controlled approval reference. Every native evidence entry must now trace to current latest-passing evidence from a target-bound qualification campaign packet with matching digest/observation time, and dossier validity cannot outlive the campaign evidence freshness. The active qualification index is intentionally empty; registry claims cannot become `NATIVE_QUALIFIED` merely by editing the capability file. Production authorization remains separate.
 
 
 ## Site and service-class capacity eligibility

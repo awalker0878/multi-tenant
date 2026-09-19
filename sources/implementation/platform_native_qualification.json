@@ -24,11 +24,13 @@
   "remaining_native_work": [
     "select exact installed product/API/provider/hardware tuples",
     "establish a matching current supported version/source provenance record",
-    "execute applicable native test sets and tested-limit campaigns",
-    "store controlled evidence and independent approval decisions",
+    "execute the authorized native campaign and retain current target-bound evidence",
+    "submit only campaign-backed evidence to the independent qualification authority",
     "publish only current demonstrated capabilities and assurance profiles",
     "complete site/capacity/recovery/operating acceptance separately"
   ],
   "formal_authorization": "NOT_ISSUED",
-  "provenance_prerequisite": "sources/capabilities/version_source_provenance_index.json"
+  "provenance_prerequisite": "sources/capabilities/version_source_provenance_index.json",
+  "campaign_evidence_prerequisite": "sources/capabilities/qualification_campaign_evidence_index.json",
+  "target_selection_prerequisite": "sources/capabilities/target_selection_assurance_index.json"
 }

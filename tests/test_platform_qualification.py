@@ -12,6 +12,8 @@ import unittest
 from scripts import check_platform_capabilities as capabilities
 from scripts import check_platform_qualification as q
 from scripts import check_version_source_provenance as provenance
+from scripts import check_qualification_campaign_assurance as campaign
+from tests.qualification_fixture_support import campaign_index, target_index
 
 ROOT = Path(__file__).resolve().parents[1]
 AS_OF = datetime(2026, 9, 18, 16, 0, tzinfo=timezone.utc)
@@ -134,9 +136,28 @@ class QualificationIndexTests(unittest.TestCase):
         self.index=q.load()
         self.provenance_index=provenance.load()
         self.provenance_index['records']=[provenance_record()]
+        refs=[f'controlled-evidence:nutanix:{cap}:fixture' for cap in ('network_domain','ipv4')]
+        self.campaign_evidence_index=campaign_index(refs)
+        self.target_selection_index=target_index()
+
+    def validate(self, *, provenance_index=None, campaign_evidence_index=None,
+                 target_selection_index=None):
+        return q.validate(
+            self.index, as_of=AS_OF,
+            provenance_index=self.provenance_index if provenance_index is None else provenance_index,
+            campaign_evidence_index=self.campaign_evidence_index if campaign_evidence_index is None else campaign_evidence_index,
+            target_selection_index=self.target_selection_index if target_selection_index is None else target_selection_index
+        )
+
+    def validate_registry(self, registry):
+        return capabilities.validate(
+            registry, qualification_index=self.index, provenance_index=self.provenance_index,
+            campaign_evidence_index=self.campaign_evidence_index,
+            target_selection_index=self.target_selection_index, as_of=AS_OF
+        )
 
     def test_current_index_is_valid_and_empty(self):
-        result=q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        result=self.validate()
         self.assertEqual(result['current_records'],0)
         self.assertEqual(result['qualified_capability_claims'],0)
 
@@ -153,61 +174,97 @@ class QualificationIndexTests(unittest.TestCase):
 
     def test_complete_current_record_is_valid(self):
         self.index['records']=[record()]
-        result=q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        result=self.validate()
         self.assertEqual(result['current_records'],1)
         self.assertEqual(result['qualified_capability_claims'],2)
+
+    def test_current_record_reports_supporting_campaign(self):
+        self.index['records']=[record()]
+        result=self.validate()
+        self.assertEqual(result['records'][0]['campaign_evidence_ids'],['CAMPAIGN-FIXTURE-01'])
+
+    def test_current_qualification_requires_current_campaign_evidence(self):
+        self.index['records']=[record()]
+        with self.assertRaises(ValueError):
+            self.validate(campaign_evidence_index=campaign.load())
+
+    def test_qualification_evidence_must_exist_in_current_campaign(self):
+        self.index['records']=[record()]
+        other=campaign_index(['controlled-evidence:other:fixture'])
+        with self.assertRaises(ValueError):
+            self.validate(campaign_evidence_index=other)
+
+    def test_qualification_evidence_digest_must_match_campaign(self):
+        self.index['records']=[record()]
+        self.index['records'][0]['evidence'][0]['sha256']='f'*64
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_qualification_evidence_observation_time_must_match_campaign(self):
+        self.index['records']=[record()]
+        self.index['records'][0]['evidence'][0]['observed_at']='2026-09-17T10:01:00Z'
+        with self.assertRaises(ValueError):
+            self.validate()
+
+    def test_qualification_validity_cannot_exceed_campaign_freshness(self):
+        self.index['records']=[record()]
+        limited=deepcopy(self.campaign_evidence_index)
+        for attempt in limited['records'][0]['attempts']:
+            attempt['fresh_until']='2026-10-01T00:00:00Z'
+        with self.assertRaises(ValueError):
+            self.validate(campaign_evidence_index=limited)
 
     def test_current_qualification_requires_matching_current_provenance(self):
         self.index['records']=[record()]
         empty=provenance.load()
         with self.assertRaises(ValueError):
-            q.validate(self.index,as_of=AS_OF,provenance_index=empty)
+            self.validate(provenance_index=empty)
 
     def test_qualification_tuple_must_equal_provenance_tuple(self):
         self.index['records']=[record()]
         self.provenance_index['records'][0]['product_tuple']['api_version']='2.0'
         with self.assertRaises(ValueError):
-            q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+            self.validate()
 
     def test_example_not_approved_state_is_rejected(self):
         r=record();r['state']='EXAMPLE_NOT_APPROVED';self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_expired_approval_is_rejected(self):
         r=record();r['approval']['expires_at']='2026-09-18T15:59:59Z';self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_expired_evidence_is_rejected(self):
         r=record();r['evidence'][0]['expires_at']='2026-09-18T15:59:59Z';self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_approval_cannot_predate_required_evidence(self):
         r=record();r['approval']['approved_at']='2026-09-17T09:00:00Z';self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_missing_tested_limits_rejected(self):
         r=record();r['tested_limits']=[];self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_limit_must_bind_existing_evidence(self):
         r=record();r['tested_limits'][0]['evidence_ref']='controlled-evidence:missing';self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_evidence_test_set_must_be_applicable(self):
         r=record();r['evidence'][0]['test_set']='CT-UNREVIEWED';self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_unknown_capability_rejected(self):
         r=record();r['qualified_capabilities'].append('vendor_magic');self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_missing_source_reference_rejected(self):
         r=record();r['source_refs'].append('docs/missing.md');self.index['records']=[r]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_duplicate_record_id_rejected(self):
         r=record();self.index['records']=[r,deepcopy(r)]
-        with self.assertRaises(ValueError):q.validate(self.index,as_of=AS_OF,provenance_index=self.provenance_index)
+        with self.assertRaises(ValueError):self.validate()
 
     def test_registry_native_claim_requires_matching_current_record(self):
         registry=capabilities.load()
@@ -216,9 +273,9 @@ class QualificationIndexTests(unittest.TestCase):
         p['capabilities']['network_domain']['native_evidence_refs']=[
             'controlled-evidence:nutanix:network_domain:fixture']
         with self.assertRaises(ValueError):
-            capabilities.validate(registry,qualification_index=self.index,provenance_index=self.provenance_index,as_of=AS_OF)
+            self.validate_registry(registry)
         self.index['records']=[record(caps=('network_domain',))]
-        result=capabilities.validate(registry,qualification_index=self.index,provenance_index=self.provenance_index,as_of=AS_OF)
+        result=self.validate_registry(registry)
         self.assertEqual(result['native_qualified_claims'],1)
 
     def test_registry_evidence_must_be_inside_dossier(self):
@@ -227,7 +284,7 @@ class QualificationIndexTests(unittest.TestCase):
         p['capabilities']['network_domain']['qualification']='NATIVE_QUALIFIED'
         p['capabilities']['network_domain']['native_evidence_refs']=['controlled-evidence:other']
         with self.assertRaises(ValueError):
-            capabilities.validate(registry,qualification_index=self.index,provenance_index=self.provenance_index,as_of=AS_OF)
+            self.validate_registry(registry)
 
     def test_registry_tuple_must_match_dossier(self):
         registry=capabilities.load();self.index['records']=[record(caps=('network_domain',))]
@@ -236,14 +293,14 @@ class QualificationIndexTests(unittest.TestCase):
         p['capabilities']['network_domain']['native_evidence_refs']=[
             'controlled-evidence:nutanix:network_domain:fixture']
         with self.assertRaises(ValueError):
-            capabilities.validate(registry,qualification_index=self.index,provenance_index=self.provenance_index,as_of=AS_OF)
+            self.validate_registry(registry)
 
     def test_assurance_profile_must_be_dossier_qualified(self):
         registry=capabilities.load();self.index['records']=[record(caps=('network_domain',))]
         p=registry['profiles']['nutanix'];p['product_tuple']='fixture-tuple'
         p['assurance_profiles']=['PROTECTED-B-FIXTURE']
         with self.assertRaises(ValueError):
-            capabilities.validate(registry,qualification_index=self.index,provenance_index=self.provenance_index,as_of=AS_OF)
+            self.validate_registry(registry)
 
 
 if __name__=='__main__':
