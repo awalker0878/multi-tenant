@@ -175,8 +175,12 @@ def evaluate(intent,*,reservation_index=None,allocation_index=None,as_of=None):
         intent,as_of=as_of,
         parent_envelope_record_sha256=parent_envelope_digest)
     intent_sha=reservation_records.canonical_digest(spec)
+    parent_spec_matches=(
+        parent_record is not None
+        and parent_record['spec_sha256']==spec['parent_reservation_spec_sha256']
+    )
     parent_held=(parent_record is not None and parent_record['state']=='HELD'
-                 and not parent_record['unresolved'])
+                 and not parent_record['unresolved'] and parent_spec_matches)
 
     allocations=ipam.validate(allocation_index,as_of=as_of)
     by_op={x['operation_id']:x for x in allocations['records']}
