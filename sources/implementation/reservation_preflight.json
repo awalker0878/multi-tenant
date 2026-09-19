@@ -2,7 +2,14 @@
   "id": "RESERVATION-PREFLIGHT-01",
   "source_baseline_commit": "db82cb3a1856b3de415fa2e3eb5f9f2474cc6740",
   "status": "IMPLEMENTED_RECORD_VALIDATION_AND_PREFLIGHT_NO_RESERVATION_MUTATION",
-  "requirements": ["SVCM-001", "API-003", "AUTO-002", "AUTO-003", "STATE-003", "EVID-002"],
+  "requirements": [
+    "SVCM-001",
+    "API-003",
+    "AUTO-002",
+    "AUTO-003",
+    "STATE-003",
+    "EVID-002"
+  ],
   "reservation_index": "sources/capabilities/reservation_record_index.json",
   "record_checker": "scripts/check_reservation_records.py",
   "preflight_checker": "scripts/check_reservation_preflight.py",
@@ -16,5 +23,13 @@
     "may_apply": false,
     "may_activate": false
   },
-  "formal_authorization": "NOT_ISSUED"
+  "formal_authorization": "NOT_ISSUED",
+  "reservation_index_format": "portable-hosting-reservation-record-index/2",
+  "envelope_binding": {
+    "derived_from_current_site_service_inventory": true,
+    "stored_in_normalized_spec": true,
+    "stored_in_exported_reservation_record": true,
+    "same_id_drift_is_conflict": true,
+    "propagated_to_ipam_parent_binding": true
+  }
 }
