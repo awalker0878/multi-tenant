@@ -2,7 +2,11 @@
   "id": "AUTHORITATIVE-DNS-REGISTRATION-01",
   "source_baseline_commit": "a6cd90489a0a9842c870870341b896eae99e8e7c",
   "status": "IMPLEMENTED_EVIDENCE_PREFLIGHT_NO_DNS_MUTATION",
-  "requirements": ["IPAM-004", "INV-004", "INV-007"],
+  "requirements": [
+    "IPAM-004",
+    "INV-004",
+    "INV-007"
+  ],
   "dns_index": "sources/capabilities/dns_registration_index.json",
   "record_checker": "scripts/check_dns_registration_records.py",
   "preflight": "scripts/check_dns_registration_preflight.py",
@@ -20,9 +24,19 @@
     "select and qualify actual authoritative DNS product/update interface",
     "accept exact name/zone/TTL scope and scoped key ACL",
     "resolve confirmed allocation through authoritative IPAM/name owner",
+    "retain the confirmed-IPAM digest and immutable DNS intent digest",
     "execute approved forward and reverse updates under DNS owner",
     "collect required authoritative/recursive/secondary propagation evidence",
     "retain tombstone/reuse controls through retirement"
   ],
-  "formal_authorization": "NOT_ISSUED"
+  "formal_authorization": "NOT_ISSUED",
+  "dns_index_format": "portable-hosting-dns-registration-index/2",
+  "parent_binding": {
+    "parent": "confirmed authoritative IPAM allocation",
+    "stable_confirmation_sha256": true,
+    "dns_intent_sha256": true,
+    "same_allocation_id_confirmation_drift_is_invalid": true,
+    "same_dns_ids_scope_drift_is_conflict": true,
+    "survives_later_ipam_release_lifecycle": true
+  }
 }
