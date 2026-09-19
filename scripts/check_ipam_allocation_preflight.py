@@ -80,7 +80,7 @@ def load(path:Path):
     return value
 
 
-def normalized_spec(intent,*,as_of):
+def normalized_spec(intent,*,as_of,parent_envelope_record_sha256=None):
     if set(intent)!=INTENT_KEYS or intent['format']!=FORMAT or intent['status']!=STATUS:
         raise ValueError('Unsupported IPAM intent shape or authority boundary')
     if intent['production_authority']!='NOT_ASSESSED':
@@ -126,7 +126,9 @@ def normalized_spec(intent,*,as_of):
     if not isinstance(capacity_request_ref,str):raise ValueError('Parent reservation intent lacks capacity request')
     repository_ref(capacity_request_ref)
     capacity_request=sitecheck.load_request(ROOT/capacity_request_ref)
-    parent_spec=reservation_preflight.normalized_spec(parent,capacity_request,as_of=as_of)
+    parent_spec=reservation_preflight.normalized_spec(
+        parent,capacity_request,as_of=as_of,
+        envelope_record_sha256=parent_envelope_record_sha256)
 
     if spec['reservation_id']!=parent_spec['reservation_id']:
         raise ValueError('IPAM intent reservation_id differs from parent reservation')
@@ -162,11 +164,17 @@ def evaluate(intent,*,reservation_index=None,allocation_index=None,as_of=None):
     if reservation_index is None:reservation_index=reservation_records.load()
     if allocation_index is None:allocation_index=ipam.load()
 
-    spec=normalized_spec(intent,as_of=as_of)
-    intent_sha=reservation_records.canonical_digest(spec)
     parent=reservation_records.validate(reservation_index,as_of=as_of)
+    requested_parent_id=intent.get('spec',{}).get('reservation_id')
     parent_record=next((x for x in parent['records']
-                        if x['reservation_id']==spec['reservation_id']),None)
+                        if x['reservation_id']==requested_parent_id),None)
+    parent_envelope_digest=(
+        parent_record['envelope_record_sha256'] if parent_record is not None else None
+    )
+    spec=normalized_spec(
+        intent,as_of=as_of,
+        parent_envelope_record_sha256=parent_envelope_digest)
+    intent_sha=reservation_records.canonical_digest(spec)
     parent_held=(parent_record is not None and parent_record['state']=='HELD'
                  and not parent_record['unresolved'])
 
