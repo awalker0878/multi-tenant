@@ -44,6 +44,8 @@ For disposal, use an approved media-appropriate method and record its scope, ver
 
 Related engineering: [Capture and restore architecture](5-backup-capture-independent-protection-and-isolated-restore.md#SVC_s_005)  •  [Retirement sequence](../../implementation/provisioning-strategy/6-brownfield-adoption-growth-and-retirement.md#PROV_s_006)
 
+The [storage data-lifecycle assurance gate](../../engineering/storage-data-lifecycle-assurance.md) turns the ownership/lineage, service-semantics, copy/hold and sanitization-procedure obligations into a fail-closed service-profile record. It does not replace the separate backup/restore assurance gate or the resource-specific sanitization receipt required at actual release/reuse.
+
 [Previous chapter](3-identity-certificates-keys-and-independent-recovery.md) · [Chapter index](README.md) · [Next chapter](5-backup-capture-independent-protection-and-isolated-restore.md)
 
 <!-- BEGIN GENERATED DECISION LINKS -->
