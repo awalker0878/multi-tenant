@@ -105,6 +105,20 @@ def qindex():
     return result
 
 
+def qualification_binding():
+    record=qrecord()
+    return {
+        'qualification_record_id':record['id'],
+        'qualification_record_sha256':hashlib.sha256(json.dumps(record,sort_keys=True,separators=(',', ':'),ensure_ascii=False).encode('utf-8')).hexdigest(),
+        'approval_decision_ref':record['approval']['decision_ref'],
+        'supporting_campaign_id':'CAMPAIGN-FIXTURE-01',
+        'selection_id':'selection-fixture',
+        'site_ref':'controlled-site:fixture',
+        'cell_ref':'controlled-cell:fixture',
+        'campaign_scope_ref':'controlled-campaign-scope:fixture'
+    }
+
+
 def qualification_chain():
     refs=['controlled-evidence:nutanix:network_domain','controlled-evidence:nutanix:ipv4']
     return {
@@ -136,7 +150,7 @@ def site_record():
         'id':'SITE-CELL-SC-FIXTURE-01','state':'CURRENT_COMMISSIONED',
         'site_id':'site-fixture','cell_id':'cell-fixture','service_class_id':'sc-fixture',
         'platform':'nutanix','product_tuple_id':'nutanix-fixture-tuple',
-        'qualification_record_id':'QUAL-NUTANIX-FIXTURE-01',
+        'qualification_binding':qualification_binding(),
         'assurance_profiles':['PROTECTED-B-FIXTURE'],
         'profile_refs':profiles(),
         'failure_model':{'id':'FAIL-HOST-FIXTURE','description':'Synthetic one-host failure model',
@@ -204,6 +218,32 @@ class SiteCapacityIndexTests(unittest.TestCase):
             capacity.validate(
                 index(),qindex=qindex(),provenance_index=provenance_index(),
                 **chain,as_of=AS_OF)
+
+    def test_envelope_rejects_same_id_with_changed_qualification_digest(self):
+        q=qindex()
+        q['records'][0]['exclusions'].append('changed-after-commissioning')
+        with self.assertRaises(ValueError):
+            capacity.validate(
+                index(),qindex=q,provenance_index=provenance_index(),
+                **qualification_chain(),as_of=AS_OF)
+
+    def test_envelope_rejects_changed_approval_decision(self):
+        r=site_record()
+        r['qualification_binding']['approval_decision_ref']='controlled-decision:other'
+        idx=capacity.load();idx['records']=[r]
+        with self.assertRaises(ValueError):
+            capacity.validate(
+                idx,qindex=qindex(),provenance_index=provenance_index(),
+                **qualification_chain(),as_of=AS_OF)
+
+    def test_envelope_rejects_wrong_supporting_campaign_scope(self):
+        r=site_record()
+        r['qualification_binding']['site_ref']='controlled-site:other'
+        idx=capacity.load();idx['records']=[r]
+        with self.assertRaises(ValueError):
+            capacity.validate(
+                idx,qindex=qindex(),provenance_index=provenance_index(),
+                **qualification_chain(),as_of=AS_OF)
 
     def test_reserved_and_consumed_are_not_summed_for_admission(self):
         r=site_record();d=r['dimensions'][0]
