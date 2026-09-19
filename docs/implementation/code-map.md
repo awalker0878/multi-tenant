@@ -130,7 +130,7 @@ Design: [Place and reserve sequence](../architecture/reference/23-tenant-domain-
 
 Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../scripts/check_reservation_records.py) · [immutable intent preflight](../../scripts/check_reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
 
-The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding, owner/expiry and conflict/uncertain-outcome handling are validated, but CI never creates or releases a reservation or allocates an address.
+The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding and the current commissioned-envelope SHA-256 are validated together; drift under the same envelope ID is a reconciliation conflict and the digest is propagated into the parent binding consumed by IPAM. CI never creates or releases a reservation or allocates an address.
 
 ## Authoritative IPAM allocation handoff
 
