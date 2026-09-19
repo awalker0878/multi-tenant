@@ -12,13 +12,14 @@ The repository therefore keeps actual DNS names and A/AAAA/PTR values outside Gi
 
 ## Active evidence index
 
-The active index is `sources/capabilities/dns_registration_index.json` and is intentionally empty today.
+The active index is `sources/capabilities/dns_registration_index.json` and is intentionally empty today. Schema v2 adds the stable confirmed-IPAM digest and full normalized DNS-intent digest so registration evidence cannot silently follow reused parent or operation IDs.
 
 A future registration record must bind:
 
 - immutable registration and operation identities plus generation;
 - reservation/request/WSD scope;
-- one authoritative IPAM allocation ID;
+- one authoritative IPAM allocation ID plus the stable SHA-256 of its confirmed allocation/realization binding;
+- the SHA-256 of the full normalized DNS registration intent;
 - an opaque name-assignment reference;
 - A, AAAA and/or PTR record types, but never literal values;
 - opaque forward/reverse zone-scope references;
@@ -29,6 +30,14 @@ A future registration record must bind:
 - evidence/source references.
 
 One registration binds one confirmed IPAM family. A and AAAA therefore use separate registrations when dual-stack allocations are independently authoritative.
+
+## Immutable parent and intent binding
+
+The IPAM validator derives a stable confirmation SHA-256 from the allocation identity, parent reservation/request scope, normalized IPAM intent, family/kind/delegated scope, authoritative system/record handle, allocation reference, confirmation time and realization reference. Release-request, cleanup, quarantine and final release fields are deliberately excluded so later retirement lifecycle can advance without erasing the original confirmed allocation identity.
+
+Every DNS registration record pins that confirmation digest. Reusing the same `ipam_allocation_id` is insufficient: if any confirmation-defining field changes, the DNS record is invalid until reconciled.
+
+The preflight also hashes the **entire normalized DNS intent**, including name-assignment reference, forward/reverse zone scope, TTL profile, required observations, owners and validity. Same registration/operation IDs therefore remain idempotent only when the full intent and confirmed-IPAM digest are unchanged.
 
 ## Observation semantics
 

@@ -24,6 +24,14 @@ The parent reservation specification now includes the SHA-256 of the exact commi
 
 This keeps the address-allocation handoff chained to the same commissioned capacity/qualification state. A reservation created against one envelope revision cannot be silently reused as the parent of IPAM work after that envelope changes under the same ID.
 
+## Stable confirmation binding for dependent services
+
+Once an allocation is confirmed against its realization, the validator derives a stable SHA-256 over the confirmation-defining scope: allocation/operation/generation identity, parent reservation/request/WSD, normalized IPAM intent, family/kind/delegated scope, authoritative system and record handle, allocation reference, confirmation time and realization reference.
+
+That digest intentionally excludes later release-request, cleanup, quarantine and final-release fields. Dependent services such as DNS can therefore prove which confirmed allocation they consumed without becoming coupled to every later retirement-state update. Changing any confirmation-defining field changes the digest and requires reconciliation.
+
+The digest is evidence identity only. It does not reveal the actual address/prefix, authorize DNS/network mutation or replace authoritative IPAM ownership.
+
 ## Exported lifecycle evidence
 
 The repository implementation model uses `RESERVED`, `CONFIRMED`, `RELEASE_PENDING`, `QUARANTINED`, `RELEASED`, and `UNCERTAIN`. These are repository record states, not a requirement that a selected IPAM product expose those exact names.

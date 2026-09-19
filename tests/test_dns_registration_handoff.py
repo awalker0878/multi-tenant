@@ -23,8 +23,17 @@ def intent():
     return preflight.load(INTENT)
 
 
-def normalized(i=None):
-    return preflight.normalized_spec(i or intent(),as_of=AS_OF)
+def confirmed_ipam_digest():
+    result=ipam.validate(confirmed_ipam(),as_of=AS_OF)
+    return result['records'][0]['confirmation_sha256']
+
+
+def normalized(i=None,confirmation_sha=None):
+    return preflight.normalized_spec(
+        i or intent(),as_of=AS_OF,
+        ipam_confirmation_sha256=(
+            confirmed_ipam_digest() if confirmation_sha is None else confirmation_sha
+        ))
 
 
 def observations(required=('AUTHORITATIVE','RECURSIVE')):
@@ -55,6 +64,8 @@ def dns_record(state='REGISTERED'):
         'reservation_id':spec['reservation_id'],'request_id':spec['request_id'],
         'wsd_engineering_ref':spec['wsd_engineering_ref'],
         'ipam_allocation_id':spec['ipam_allocation_id'],
+        'ipam_confirmation_sha256':spec['ipam_confirmation_sha256'],
+        'intent_sha256':preflight.canonical_digest(spec),
         'name_assignment_ref':spec['name_assignment_ref'],
         'record_types':deepcopy(spec['record_types']),
         'forward_zone_ref':spec['forward_zone_ref'],'reverse_zone_ref':spec['reverse_zone_ref'],
@@ -100,6 +111,22 @@ class DNSRecordTests(unittest.TestCase):
             dnsrecords.validate(dns_index(dns_record()),
                                 ipam_index=allocation_index(allocation_record('RESERVED')),
                                 as_of=AS_OF)
+
+    def test_registered_record_rejects_same_allocation_id_with_changed_confirmation(self):
+        alloc=allocation_record('CONFIRMED')
+        alloc['realization_ref']='controlled-realization:different-fixture'
+        with self.assertRaises(ValueError):
+            dnsrecords.validate(
+                dns_index(dns_record()),
+                ipam_index=allocation_index(alloc),
+                as_of=AS_OF)
+
+    def test_dns_release_lifecycle_retains_stable_ipam_confirmation_binding(self):
+        result=dnsrecords.validate(
+            dns_index(dns_record('RELEASE_PENDING')),
+            ipam_index=allocation_index(allocation_record('RELEASE_PENDING')),
+            as_of=AS_OF)
+        self.assertEqual(result['release_lifecycle_count'],1)
 
     def test_required_recursive_observation_cannot_be_pending(self):
         r=dns_record();r['observations']['RECURSIVE']={
@@ -185,6 +212,17 @@ class DNSPreflightTests(unittest.TestCase):
     def test_existing_registered_is_idempotent(self):
         result=self.evaluate(didx=dns_index(dns_record()),iidx=confirmed_ipam())
         self.assertEqual(result['status'],preflight.EXISTING_REGISTERED)
+
+    def test_same_dns_ids_with_changed_ttl_scope_is_conflict(self):
+        i=intent()
+        i['spec']['ttl_profile_ref']='controlled-ttl:changed-fixture'
+        result=self.evaluate(i,didx=dns_index(dns_record()),iidx=confirmed_ipam())
+        self.assertEqual(result['status'],preflight.HOLD_CONFLICT)
+
+    def test_preflight_reports_confirmed_ipam_digest(self):
+        result=self.evaluate(iidx=confirmed_ipam())
+        self.assertEqual(result['status'],preflight.READY)
+        self.assertEqual(result['ipam_confirmation_sha256'],confirmed_ipam_digest())
 
     def test_uncertain_dns_stops_retry(self):
         r=dns_record('UNCERTAIN');r['registered_at']=None

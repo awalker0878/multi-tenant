@@ -84,7 +84,7 @@ def canonical_digest(value):
     ).encode()).hexdigest()
 
 
-def normalized_spec(intent,*,as_of):
+def normalized_spec(intent,*,as_of,ipam_confirmation_sha256=None):
     if set(intent)!=INTENT_KEYS or intent['format']!=FORMAT or intent['status']!=STATUS:
         raise ValueError('Unsupported DNS intent shape or authority boundary')
     if intent['production_authority']!='NOT_ASSESSED':
@@ -132,6 +132,7 @@ def normalized_spec(intent,*,as_of):
         'generation':spec['generation'],'reservation_id':spec['reservation_id'],
         'request_id':spec['request_id'],'wsd_engineering_ref':spec['wsd_engineering_ref'],
         'ipam_allocation_id':spec['ipam_allocation_id'],
+        'ipam_confirmation_sha256':ipam_confirmation_sha256,
         'name_assignment_ref':spec['name_assignment_ref'],'record_types':sorted(types),
         'forward_zone_ref':forward,'reverse_zone_ref':reverse,
         'ttl_profile_ref':spec['ttl_profile_ref'],
@@ -148,11 +149,15 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
     if ipam_index is None:ipam_index=ipam.load()
     if dns_index is None:dns_index=dnsrecords.load()
 
-    spec=normalized_spec(intent,as_of=as_of)
-    intent_sha=canonical_digest(spec)
     ipam_summary=ipam.validate(ipam_index,as_of=as_of)
+    requested_allocation_id=intent.get('spec',{}).get('ipam_allocation_id')
     allocation=next((x for x in ipam_summary['records']
-                     if x['allocation_id']==spec['ipam_allocation_id']),None)
+                     if x['allocation_id']==requested_allocation_id),None)
+    confirmation_sha=allocation['confirmation_sha256'] if allocation is not None else None
+    spec=normalized_spec(
+        intent,as_of=as_of,
+        ipam_confirmation_sha256=confirmation_sha)
+    intent_sha=canonical_digest(spec)
     dns_summary=dnsrecords.validate(dns_index,ipam_index=ipam_index,as_of=as_of)
     by_op={x['operation_id']:x for x in dns_summary['records']}
     by_id={x['registration_id']:x for x in dns_summary['records']}
@@ -163,13 +168,12 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
         record=current or same_id
         same_identity=(record['registration_id']==spec['registration_id']
                        and record['operation_id']==spec['operation_id'])
-        same_scope=(record['generation']==spec['generation']
+        same_scope=(record['intent_sha256']==intent_sha
+                    and record['ipam_confirmation_sha256']==spec['ipam_confirmation_sha256']
+                    and record['generation']==spec['generation']
                     and record['reservation_id']==spec['reservation_id']
                     and record['request_id']==spec['request_id']
-                    and record['ipam_allocation_id']==spec['ipam_allocation_id']
-                    and record['name_assignment_ref']==spec['name_assignment_ref']
-                    and record['record_types']==spec['record_types']
-                    and record['required_observations']==spec['required_observations'])
+                    and record['ipam_allocation_id']==spec['ipam_allocation_id'])
         if not (same_identity and same_scope):
             result=HOLD_CONFLICT
         elif record['unresolved']:
@@ -180,7 +184,7 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
             result=HOLD_RELEASE
         else:
             result=HOLD_TERMINAL
-    elif allocation is None or allocation['state']!='CONFIRMED':
+    elif allocation is None or allocation['state']!='CONFIRMED' or spec['ipam_confirmation_sha256'] is None:
         result=HOLD_IPAM
     elif allocation['reservation_id']!=spec['reservation_id'] or allocation['request_id']!=spec['request_id']:
         result=HOLD_CONFLICT
@@ -194,7 +198,9 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
         'kind':'AUTHORITATIVE_DNS_REGISTRATION_PREFLIGHT','status':result,
         'registration_id':spec['registration_id'],'operation_id':spec['operation_id'],
         'generation':spec['generation'],'reservation_id':spec['reservation_id'],
-        'ipam_allocation_id':spec['ipam_allocation_id'],'intent_sha256':intent_sha,
+        'ipam_allocation_id':spec['ipam_allocation_id'],
+        'ipam_confirmation_sha256':spec['ipam_confirmation_sha256'],
+        'intent_sha256':intent_sha,
         'record_types':spec['record_types'],'required_observations':spec['required_observations'],
         'actual_dns_name':None,'actual_record_values':None,
         'actual_name_value_source':'AUTHORITATIVE_IPAM_AND_DNS_NAME_AUTHORITY_ONLY',
@@ -213,7 +219,7 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
             'No literal DNS name or A/AAAA/PTR value is accepted or returned by this repository preflight.',
             'The existing tools/dns_change.py remains the separately scoped mutation mechanism and is never invoked by this check.',
             'Authoritative readback does not prove recursive/secondary propagation unless those observations are explicitly required and evidenced.',
-            'DNS failure never authorizes guessed address values, alternate names, broader key ACLs, or production activation.'
+            'DNS intent identity includes the exact confirmed-IPAM digest and full normalized registration scope; parent or TTL/zone/owner drift under the same IDs is not idempotent.'
         ]
     }
 

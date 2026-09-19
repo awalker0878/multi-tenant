@@ -22,17 +22,19 @@ if str(ROOT) not in sys.path:
 from scripts import check_ipam_allocation_records as ipam
 
 INDEX=ROOT/'sources/capabilities/dns_registration_index.json'
-FORMAT='portable-hosting-dns-registration-index/1'
+FORMAT='portable-hosting-dns-registration-index/2'
 STATUS='EXPORTED_AUTHORITATIVE_DNS_EVIDENCE_NOT_DNS_AUTHORITY'
 STATES={'REGISTERED','RELEASE_PENDING','TOMBSTONED','RELEASED','UNCERTAIN'}
 RECORD_TYPES={'A','AAAA','PTR'}
 OBSERVATIONS={'AUTHORITATIVE','RECURSIVE','SECONDARY'}
 OBS_STATES={'COMPLETE','PENDING','FAILED','UNKNOWN','NOT_APPLICABLE'}
 ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.:-]{1,191}$')
+SHA=re.compile(r'^[0-9a-f]{64}$')
 INDEX_KEYS={'format','status','reviewed_source_revision','records'}
 RECORD_KEYS={
     'registration_id','operation_id','generation','state','reservation_id','request_id',
-    'wsd_engineering_ref','ipam_allocation_id','name_assignment_ref','record_types',
+    'wsd_engineering_ref','ipam_allocation_id','ipam_confirmation_sha256',
+    'intent_sha256','name_assignment_ref','record_types',
     'forward_zone_ref','reverse_zone_ref','ttl_profile_ref','required_observations',
     'authoritative_system','created_at','last_observed_at','registered_at',
     'release_requested_at','tombstone_until','released_at','observations','owners',
@@ -157,6 +159,10 @@ def validate_record(record,*,ipam_index,as_of,root=ROOT):
     if record['state'] not in STATES:raise ValueError('Unknown DNS registration state')
     repository_ref(record['wsd_engineering_ref'],root)
     identifier(record['ipam_allocation_id'],'ipam_allocation_id')
+    if not isinstance(record['ipam_confirmation_sha256'],str) or not SHA.fullmatch(record['ipam_confirmation_sha256']):
+        raise ValueError('DNS registration requires confirmed-IPAM SHA-256 binding')
+    if not isinstance(record['intent_sha256'],str) or not SHA.fullmatch(record['intent_sha256']):
+        raise ValueError('DNS registration intent SHA-256 required')
     opaque_ref(record['name_assignment_ref'],'name_assignment_ref')
     types=unique_strings(record['record_types'],'record_types')
     if not set(types)<=RECORD_TYPES:raise ValueError('Unsupported DNS record type')
@@ -200,6 +206,10 @@ def validate_record(record,*,ipam_index,as_of,root=ROOT):
     if allocation is None:raise ValueError('DNS registration lacks matching authoritative IPAM allocation evidence')
     if allocation['reservation_id']!=record['reservation_id'] or allocation['request_id']!=record['request_id']:
         raise ValueError('DNS registration and IPAM allocation parent scope differ')
+    if allocation['confirmation_sha256'] is None:
+        raise ValueError('DNS registration requires attributable confirmed-IPAM evidence')
+    if allocation['confirmation_sha256']!=record['ipam_confirmation_sha256']:
+        raise ValueError('DNS registration confirmed-IPAM digest differs from authoritative allocation evidence')
     expected_family='IPV4' if 'A' in types else ('IPV6' if 'AAAA' in types else allocation['family'])
     if allocation['family']!=expected_family:raise ValueError('DNS record type conflicts with confirmed IPAM family')
 
@@ -235,6 +245,8 @@ def validate_record(record,*,ipam_index,as_of,root=ROOT):
         'generation':record['generation'],'state':record['state'],
         'reservation_id':record['reservation_id'],'request_id':record['request_id'],
         'ipam_allocation_id':record['ipam_allocation_id'],
+        'ipam_confirmation_sha256':record['ipam_confirmation_sha256'],
+        'intent_sha256':record['intent_sha256'],
         'name_assignment_ref':record['name_assignment_ref'],'record_types':sorted(types),
         'required_observations':sorted(required),'observations':observations,
         'unresolved':record['state']=='UNCERTAIN','evidence_refs':sorted(evidence)
