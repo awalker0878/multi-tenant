@@ -242,6 +242,7 @@ class QualificationCampaignAssuranceTests(unittest.TestCase):
 
     def test_campaign_cannot_claim_longer_contact_window_than_target(self):
         selected = target_record()
+        selected['state'] = 'CONTACT_AUTHORITY_DUE'
         selected['scope']['target_contact_valid_until'] = '2026-09-19T16:25:00Z'
         record = campaign_record()
         record['authorization']['target_contact_valid_until'] = '2026-09-19T16:26:00Z'
@@ -374,6 +375,20 @@ class QualificationCampaignReadinessTests(unittest.TestCase):
         )
         self.assertEqual(result['status'], readiness.READY)
         self.assertFalse(result['may_issue_qualification'])
+        self.assertFalse(result['may_run_native_tests'])
+
+    def test_completed_packet_can_be_review_ready_after_contact_expiry_without_contact_authority(self):
+        selected = target_record()
+        selected['state'] = 'CONTACT_AUTHORITY_DUE'
+        selected['scope']['target_contact_valid_until'] = '2026-09-19T16:25:00Z'
+        record = campaign_record()
+        record['authorization']['target_contact_valid_until'] = '2026-09-19T16:25:00Z'
+        result = readiness.evaluate(
+            intent(), campaign_index(record),
+            target_selection_index=target_index(selected), as_of=AS_OF
+        )
+        self.assertEqual(result['status'], readiness.READY)
+        self.assertFalse(result['may_contact_target'])
         self.assertFalse(result['may_run_native_tests'])
 
     def test_scope_mismatch_holds(self):
