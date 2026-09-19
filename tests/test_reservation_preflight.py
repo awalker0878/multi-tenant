@@ -173,9 +173,15 @@ def intent():
     return x
 
 
-def normalized(i):
+def envelope_digest(record=None):
+    return records.canonical_digest(record or cap_record())
+
+
+def normalized(i,record=None):
     req=sitecheck.load_request(ROOT/i['spec']['capacity_request_ref'])
-    return preflight.normalized_spec(i,req,as_of=AS_OF)
+    return preflight.normalized_spec(
+        i,req,as_of=AS_OF,
+        envelope_record_sha256=envelope_digest(record))
 
 
 def reservation_record(i,state='HELD',dependency_state='NOT_STARTED'):
@@ -189,6 +195,7 @@ def reservation_record(i,state='HELD',dependency_state='NOT_STARTED'):
         'reservation_id':spec['reservation_id'],'operation_id':spec['operation_id'],
         'generation':spec['generation'],'state':state,'request_id':spec['request_id'],
         'wsd_engineering_ref':spec['wsd_engineering_ref'],'envelope_id':spec['envelope_id'],
+        'envelope_record_sha256':spec['envelope_record_sha256'],
         'spec_sha256':records.canonical_digest(spec),
         'authoritative_system':{'system_ref':'external-reservation-system:fixture',
                                 'record_ref':'reservation-record:fixture','record_version':1},
@@ -248,9 +255,9 @@ class ReservationRecordTests(unittest.TestCase):
 
 
 class ReservationPreflightTests(unittest.TestCase):
-    def evaluate(self,i=None,j=None):
+    def evaluate(self,i=None,j=None,c=None):
         return preflight.evaluate(
-            i or intent(),capacity_index=cap_index(),
+            i or intent(),capacity_index=c or cap_index(),
             reservation_index=j or records.load(),qindex=qindex(),
             provenance_index=provenance_index(),**qualification_chain(),as_of=AS_OF)
 
@@ -279,6 +286,16 @@ class ReservationPreflightTests(unittest.TestCase):
     def test_same_operation_same_spec_is_idempotent_existing_hold(self):
         i=intent();result=self.evaluate(i,journal(reservation_record(i)))
         self.assertEqual(result['status'],preflight.EXISTING_HELD)
+
+    def test_same_envelope_id_with_changed_envelope_digest_is_conflict(self):
+        i=intent()
+        existing=reservation_record(i)
+        changed=cap_record()
+        changed['dimensions'][0]['procured']='11'
+        current=capacity.load();current['records']=[changed]
+        result=self.evaluate(i,journal(existing),current)
+        self.assertEqual(result['status'],preflight.HOLD_CONFLICT)
+        self.assertNotEqual(result['envelope_record_sha256'],existing['envelope_record_sha256'])
 
     def test_same_operation_changed_generation_is_conflict(self):
         i=intent();r=reservation_record(i);i['spec']['generation']=2

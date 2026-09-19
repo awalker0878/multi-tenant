@@ -81,7 +81,7 @@ def load(path:Path):
     return value
 
 
-def normalized_spec(intent,capacity_request,*,as_of):
+def normalized_spec(intent,capacity_request,*,as_of,envelope_record_sha256=None):
     if set(intent)!=INTENT_KEYS or intent['format']!=FORMAT or intent['status']!=STATUS:
         raise ValueError('Unsupported reservation intent shape or authority boundary')
     if intent['production_authority']!='NOT_ASSESSED':
@@ -153,6 +153,7 @@ def normalized_spec(intent,capacity_request,*,as_of):
         'request_id':spec['request_id'],
         'wsd_engineering_ref':spec['wsd_engineering_ref'],
         'envelope_id':spec['envelope_id'],
+        'envelope_record_sha256':envelope_record_sha256,
         'capacity_request_ref':spec['capacity_request_ref'],
         'capacity_request_sha256':records.canonical_digest(capacity_request),
         'expires_at':expires.isoformat(),
@@ -176,13 +177,21 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
     if not isinstance(capacity_request_ref,str):raise ValueError('capacity_request_ref required')
     repository_ref(capacity_request_ref)
     capacity_request=sitecheck.load_request(ROOT/capacity_request_ref)
-    spec=normalized_spec(intent,capacity_request,as_of=as_of)
-    spec_sha=records.canonical_digest(spec)
-
     cap_result=sitecheck.evaluate(
         capacity_request,capacity_index,qindex=qindex,provenance_index=provenance_index,
         campaign_evidence_index=campaign_evidence_index,
         target_selection_index=target_selection_index,as_of=as_of)
+    requested_envelope_id=intent.get('spec',{}).get('envelope_id')
+    envelope_rows=[
+        row for row in cap_result['evaluations']
+        if row['record_id']==requested_envelope_id
+    ]
+    envelope_digest=envelope_rows[0]['envelope_record_sha256'] if len(envelope_rows)==1 else None
+    spec=normalized_spec(
+        intent,capacity_request,as_of=as_of,
+        envelope_record_sha256=envelope_digest)
+    spec_sha=records.canonical_digest(spec)
+
     journal=records.validate(reservation_index,as_of=as_of)
     existing_by_op={x['operation_id']:x for x in journal['records']}
     existing_by_id={x['reservation_id']:x for x in journal['records']}
@@ -196,7 +205,8 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
         same_spec=(record['spec_sha256']==spec_sha
                    and record['generation']==spec['generation']
                    and record['request_id']==spec['request_id']
-                   and record['envelope_id']==spec['envelope_id'])
+                   and record['envelope_id']==spec['envelope_id']
+                   and record['envelope_record_sha256']==spec['envelope_record_sha256'])
         if not (same_identity and same_spec):
             status=HOLD_CONFLICT
         elif record['unresolved']:
@@ -207,7 +217,7 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
             status=EXISTING_CONSUMED
         else:
             status=HOLD_TERMINAL
-    elif spec['envelope_id'] not in cap_result['matching_envelopes']:
+    elif spec['envelope_id'] not in cap_result['matching_envelopes'] or spec['envelope_record_sha256'] is None:
         status=HOLD_ENVELOPE
     else:
         status=READY
@@ -220,6 +230,7 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
         'generation':spec['generation'],
         'spec_sha256':spec_sha,
         'envelope_id':spec['envelope_id'],
+        'envelope_record_sha256':spec['envelope_record_sha256'],
         'capacity_status':cap_result['status'],
         'may_create_reservation':False,'may_extend_reservation':False,
         'may_consume_reservation':False,'may_release_reservation':False,
@@ -237,7 +248,7 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
             'No reservation-system write occurs.',
             'No site is chosen by this check; envelope_id is supplied by the accepted workflow.',
             'No address or external dependency value is guessed.',
-            'Spec identity is stable across retries; a changed spec with the same operation identity is a conflict.'
+            'Spec identity includes the exact commissioned-envelope SHA-256; envelope drift under the same ID is a conflict rather than an idempotent retry.'
         ]
     }
 

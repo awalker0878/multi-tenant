@@ -200,6 +200,7 @@ def evaluate(request,index,*,qindex=None,provenance_index=None,campaign_evidence
             'service_class_id':record['service_class_id'],'platform':record['platform'],
             'product_tuple_id':record['product_tuple_id'],
             'qualification_record_id':record['qualification_record_id'],
+            'envelope_record_sha256':record['record_sha256'],
             'eligible':eligible,'blockers':sorted(set(blockers)),
             'capacity':sorted(capacity_view,key=lambda x:x['id'])
         })

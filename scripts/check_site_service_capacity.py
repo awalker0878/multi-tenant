@@ -8,6 +8,7 @@ contact infrastructure, or issue production authorization.
 from __future__ import annotations
 
 import argparse
+import hashlib
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 import json
@@ -270,6 +271,9 @@ def validate_record(record, *, qindex, provenance_index=None, campaign_evidence_
         'site_ref': binding['site_ref'],
         'cell_ref': binding['cell_ref'],
         'campaign_scope_ref': binding['campaign_scope_ref'],
+        'record_sha256': hashlib.sha256(
+            json.dumps(record, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
+        ).hexdigest(),
         'assurance_profiles': sorted(assurance),
         'profile_refs': dict(profiles),
         'failure_model_id': failure['id'],

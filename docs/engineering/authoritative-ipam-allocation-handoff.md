@@ -18,6 +18,12 @@ There is **no address or prefix value field**. Any unexpected caller-supplied va
 
 The IPAM operation ID must match exactly one `ipam` dependency handoff in the parent reservation intent. A new external IPAM reserve is considered ready only while the parent exported reservation is confirmed `HELD` and unresolved.
 
+## Parent reservation envelope binding
+
+The parent reservation specification now includes the SHA-256 of the exact commissioned site/service envelope from which the reservation was derived. The IPAM preflight reconstructs the parent reservation intent using the envelope digest stored in the authoritative reservation record before computing `parent_reservation_spec_sha256`.
+
+This keeps the address-allocation handoff chained to the same commissioned capacity/qualification state. A reservation created against one envelope revision cannot be silently reused as the parent of IPAM work after that envelope changes under the same ID.
+
 ## Exported lifecycle evidence
 
 The repository implementation model uses `RESERVED`, `CONFIRMED`, `RELEASE_PENDING`, `QUARANTINED`, `RELEASED`, and `UNCERTAIN`. These are repository record states, not a requirement that a selected IPAM product expose those exact names.

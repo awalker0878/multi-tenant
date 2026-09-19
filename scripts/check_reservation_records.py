@@ -18,7 +18,7 @@ import re
 
 ROOT=Path(__file__).resolve().parents[1]
 INDEX=ROOT/'sources/capabilities/reservation_record_index.json'
-FORMAT='portable-hosting-reservation-record-index/1'
+FORMAT='portable-hosting-reservation-record-index/2'
 STATUS='EXPORTED_RESERVATION_EVIDENCE_NOT_RESERVATION_AUTHORITY'
 STATES={'HELD','CONSUMED','RELEASED','EXPIRED','UNCERTAIN'}
 ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.:-]{1,191}$')
@@ -26,7 +26,7 @@ SHA=re.compile(r'^[0-9a-f]{64}$')
 INDEX_KEYS={'format','status','reviewed_source_revision','records'}
 RECORD_KEYS={
     'reservation_id','operation_id','generation','state','request_id',
-    'wsd_engineering_ref','envelope_id','spec_sha256','authoritative_system',
+    'wsd_engineering_ref','envelope_id','envelope_record_sha256','spec_sha256','authoritative_system',
     'created_at','expires_at','last_observed_at','owners','resources',
     'dependency_handoffs','evidence_refs','source_refs'
 }
@@ -117,6 +117,8 @@ def validate_record(record,*,as_of,root=ROOT):
     if record['state'] not in STATES:raise ValueError('Unknown reservation state')
     positive_int(record['generation'],'generation')
     repository_ref(record['wsd_engineering_ref'],root)
+    if not isinstance(record['envelope_record_sha256'],str) or not SHA.fullmatch(record['envelope_record_sha256']):
+        raise ValueError('Reservation envelope SHA-256 required')
     if not isinstance(record['spec_sha256'],str) or not SHA.fullmatch(record['spec_sha256']):
         raise ValueError('Reservation spec SHA-256 required')
 
@@ -193,6 +195,7 @@ def validate_record(record,*,as_of,root=ROOT):
         'state':record['state'],
         'request_id':record['request_id'],
         'envelope_id':record['envelope_id'],
+        'envelope_record_sha256':record['envelope_record_sha256'],
         'spec_sha256':record['spec_sha256'],
         'authoritative_system':dict(system),
         'created_at':created.isoformat(),
