@@ -292,6 +292,19 @@ def validate_record(record, as_of, root=ROOT):
             if assertion_id in latest and latest[assertion_id]['result'] == 'PASSED'
             and as_of < latest[assertion_id]['_fresh_until']
         ),
+        'latest_passing_evidence': [
+            {
+                'assertion_id': assertion_id,
+                'attempt_id': latest[assertion_id]['attempt_id'],
+                'evidence_ref': latest[assertion_id]['evidence_ref'],
+                'artifact_sha256': latest[assertion_id]['artifact_sha256'],
+                'observed_at': latest[assertion_id]['_observed'].isoformat(),
+                'fresh_until': latest[assertion_id]['_fresh_until'].isoformat(),
+            }
+            for assertion_id in sorted(attempted_scope)
+            if assertion_id in latest and latest[assertion_id]['result'] == 'PASSED'
+            and as_of < latest[assertion_id]['_fresh_until']
+        ],
         'missing_assertions': missing,
         'nonpassing_assertions': nonpassing,
         'stale_assertions': stale,
