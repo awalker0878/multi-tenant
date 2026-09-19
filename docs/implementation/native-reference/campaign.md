@@ -81,9 +81,11 @@ assertion prevents the related service acceptance until resolved under the actua
 
 Review the evidence under its current tuple and topology; identify changes that require
 new tests. Keep G2 offered-capability acceptance, applicable initial G4 readiness and
-G3 production authority distinct. The local exporter cannot validate filled results or
-produce an acceptance token. CI in this repository executes only its separately scoped
-local/engine checks and must never receive the actual native campaign credentials.
+G3 production authority distinct. The repository can validate only the exported campaign-evidence record through the
+[qualification campaign evidence gate](../../engineering/qualification-campaign-evidence-assurance.md).
+It cannot execute native observations, authenticate controlled artifacts by itself,
+issue a qualification/acceptance token, or receive the actual native campaign credentials.
+CI continues to execute only its separately scoped local/engine checks.
 
 [Kit index](README.md) · [Recovery and teardown](recovery-retirement.md)
 
