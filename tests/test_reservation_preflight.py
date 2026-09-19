@@ -103,6 +103,20 @@ def qindex():
     x=qualification.load();x['records']=[qrecord()];return x
 
 
+def qualification_binding():
+    record=qrecord()
+    return {
+        'qualification_record_id':record['id'],
+        'qualification_record_sha256':hashlib.sha256(json.dumps(record,sort_keys=True,separators=(',', ':'),ensure_ascii=False).encode('utf-8')).hexdigest(),
+        'approval_decision_ref':record['approval']['decision_ref'],
+        'supporting_campaign_id':'CAMPAIGN-FIXTURE-01',
+        'selection_id':'selection-fixture',
+        'site_ref':'controlled-site:fixture',
+        'cell_ref':'controlled-cell:fixture',
+        'campaign_scope_ref':'controlled-campaign-scope:fixture'
+    }
+
+
 def qualification_chain():
     ref='controlled-evidence:nutanix:fixture'
     return {
@@ -135,7 +149,7 @@ def cap_record():
         'id':'ENV-FIXTURE-01','state':'CURRENT_COMMISSIONED',
         'site_id':'site-fixture','cell_id':'cell-fixture','service_class_id':'sc-fixture',
         'platform':'nutanix','product_tuple_id':'nutanix-res-fixture',
-        'qualification_record_id':'QUAL-NUTANIX-RES-FIXTURE-01',
+        'qualification_binding':qualification_binding(),
         'assurance_profiles':[],'profile_refs':deepcopy(req['required_profile_refs']),
         'failure_model':{'id':'FAIL-FIXTURE','description':'Synthetic failure model',
                          'evidence_ref':'controlled-failure:fixture'},

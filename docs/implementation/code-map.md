@@ -122,7 +122,7 @@ Design: [Hosting cells and failure boundaries](../architecture/reference/4-hosti
 
 Implementation: [active capacity inventory](../../sources/capabilities/site_service_capacity_index.json) · [capacity-envelope validator](../../scripts/check_site_service_capacity.py) · [read-only site/service precheck](../../scripts/check_site_service_eligibility.py) · [engineering boundary](../engineering/site-service-capacity-eligibility.md)
 
-The current inventory is intentionally empty. Matching envelopes never create a reservation, select a site, allocate an address or authorize activation; one failed capacity/profile/quota dimension rejects the envelope.
+The current inventory is intentionally empty. A commissioned envelope now pins the exact qualification dossier SHA-256, approval decision and one supporting target-bound campaign/site/cell scope, preventing silent drift when a dossier changes under the same ID. Matching envelopes still never create a reservation, select a site, allocate an address or authorize activation; one failed capacity/profile/quota dimension rejects the envelope.
 
 ## Reservation preflight and reconciliation evidence
 

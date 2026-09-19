@@ -23,11 +23,20 @@
   },
   "remaining_work": [
     "commission actual site/cell/service-class envelopes",
-    "bind each envelope to a current exact-tuple qualification record",
+    "pin each envelope to the exact approved qualification digest and decision",
+    "pin the supporting target-bound campaign/site/cell scope",
     "record approved placement/service profiles and failure model evidence",
     "measure surviving capacity and operational reserves by bottleneck",
     "integrate tenant quota and authoritative address/service capacity",
     "create reservations only under a separate accountable reservation owner"
   ],
-  "formal_authorization": "NOT_ISSUED"
+  "formal_authorization": "NOT_ISSUED",
+  "capacity_index_format": "portable-hosting-site-service-capacity/2",
+  "qualification_binding": {
+    "exact_dossier_sha256": true,
+    "approval_decision_ref": true,
+    "supporting_campaign_id": true,
+    "target_selection_id": true,
+    "controlled_site_cell_scope": true
+  }
 }

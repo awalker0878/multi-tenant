@@ -9,6 +9,7 @@ its exact installed tuple and explicitly qualified capabilities.
 from __future__ import annotations
 
 import argparse
+import hashlib
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -213,7 +214,12 @@ def validate_record(record, *, as_of, root=ROOT):
             }
             for ref in sorted(evidence_by_ref)
         ],
-        'approval_expires_at': approval_expires.isoformat()
+        'approval_decision_ref': approval['decision_ref'],
+        'approval_approved_at': approved.isoformat(),
+        'approval_expires_at': approval_expires.isoformat(),
+        'record_sha256': hashlib.sha256(
+            json.dumps(record, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
+        ).hexdigest()
     }
 
 
@@ -274,7 +280,19 @@ def validate(index, *, as_of=None, root=ROOT, provenance_index=None,
 
         evidence_support = {}
         supporting_campaign_ids = set()
+        campaign_evidence_refs = {}
+        campaign_scopes = {}
         for item in campaign_support:
+            campaign_scopes[item['campaign_id']] = {
+                'campaign_id': item['campaign_id'],
+                'selection_id': item['selection_id'],
+                'site_ref': item['site_ref'],
+                'cell_ref': item['cell_ref'],
+                'campaign_scope_ref': item['campaign_scope_ref'],
+                'service_scope_ref': item['service_scope_ref'],
+                'topology_generation_ref': item['topology_generation_ref'],
+                'evidence_refs': []
+            }
             for observed in item['latest_passing_evidence']:
                 ref = observed['evidence_ref']
                 normalized = (
@@ -286,6 +304,7 @@ def validate(index, *, as_of=None, root=ROOT, provenance_index=None,
                 if prior is not None and prior[:3] != normalized:
                     raise ValueError('Campaign evidence reference is ambiguous across current packets')
                 evidence_support[ref] = (*normalized, item['campaign_id'])
+                campaign_evidence_refs.setdefault(item['campaign_id'], set()).add(ref)
 
         for evidence in checked['evidence']:
             support = evidence_support.get(evidence['ref'])
@@ -300,8 +319,13 @@ def validate(index, *, as_of=None, root=ROOT, provenance_index=None,
                 raise ValueError('Qualification evidence validity extends beyond current campaign evidence freshness')
             supporting_campaign_ids.add(campaign_id)
 
+        for campaign_id, refs in campaign_evidence_refs.items():
+            campaign_scopes[campaign_id]['evidence_refs'] = sorted(refs)
         checked['provenance_id'] = supporting[0]['provenance_id']
         checked['campaign_evidence_ids'] = sorted(supporting_campaign_ids)
+        checked['campaign_support'] = [
+            campaign_scopes[campaign_id] for campaign_id in sorted(supporting_campaign_ids)
+        ]
         seen.add(checked['id'])
         records.append(checked)
     return {
