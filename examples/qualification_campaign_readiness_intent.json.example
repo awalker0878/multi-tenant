@@ -1,0 +1,22 @@
+{
+  "format": "portable-hosting-qualification-campaign-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-QUALIFICATION-CAMPAIGN-01",
+  "campaign_id": "EXAMPLE-CAMPAIGN-NOT-RUN",
+  "selection_id": "example-target-not-selected",
+  "site_ref": "controlled-site:EXAMPLE-NOT-SELECTED",
+  "cell_ref": "controlled-cell:EXAMPLE-NOT-SELECTED",
+  "campaign_scope_ref": "controlled-campaign-scope:EXAMPLE-NOT-AUTHORIZED",
+  "platform_family": "NUTANIX",
+  "product_tuple_id": "example-tuple-not-selected",
+  "service_scope_ref": "controlled-service:EXAMPLE-NOT-QUALIFIED",
+  "topology_generation_ref": "controlled-topology:EXAMPLE-NOT-QUALIFIED",
+  "qualification_decision": "NOT_ASSESSED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/implementation/native-reference/campaign.md",
+    "docs/assurance/qualification-campaign/6-build-an-evidence-packet-a-reviewer-can-challenge.md",
+    "docs/assurance/qualification-campaign/8-close-defects-and-issue-a-scoped-campaign-disposition.md",
+    "docs/engineering/qualification-campaign-evidence-assurance.md"
+  ]
+}
