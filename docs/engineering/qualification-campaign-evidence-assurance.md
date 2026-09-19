@@ -14,7 +14,7 @@ The repository now records the actual target separately from native qualificatio
 
 ## Active evidence index
 
-The active index is \`sources/capabilities/qualification_campaign_evidence_index.json\` and is intentionally empty.
+The active index is \`sources/capabilities/qualification_campaign_evidence_index.json\` and is intentionally empty. Schema v2 adds the explicit authorization block so evidence cannot be detached from the campaign authority under which it was collected.
 
 Every active record must bind to one reviewed target-selection record for the same:
 
