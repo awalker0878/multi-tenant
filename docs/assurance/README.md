@@ -16,6 +16,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Implementation coverage and audit boundaries](implementation-audit.md)
 
+[Repository-side completion and residual audit](repository-side-completion-and-residual-audit.md)
+
 [Original editable registers](registers.md)
 
 [Historical audits and source lineage](../archive/README.md)
