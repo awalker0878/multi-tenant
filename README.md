@@ -83,7 +83,7 @@ The [IPAM allocation handoff](docs/engineering/authoritative-ipam-allocation-han
 
 ## Authoritative DNS registration handoff
 
-The [DNS registration handoff](docs/engineering/authoritative-dns-registration-handoff.md) binds an immutable DNS operation to a confirmed authoritative IPAM allocation and opaque name/zone scope. Git stores no actual FQDN or A/AAAA/PTR value. Required authoritative/recursive/secondary observations are explicit, uncertain outcomes stop retries, and retirement preserves tombstone/reuse controls. The existing RFC2136 client remains a separately approved service-owner mutation path and is never invoked by CI.
+The [DNS registration handoff](docs/engineering/authoritative-dns-registration-handoff.md) binds an immutable DNS operation to the stable SHA-256 of a confirmed authoritative IPAM allocation/realization and to the SHA-256 of the complete normalized DNS intent. Reused allocation/registration IDs cannot hide parent, TTL, zone, owner or scope drift. Git stores no actual FQDN or A/AAAA/PTR value. Required propagation observations remain explicit, retirement preserves tombstone/reuse controls, and the RFC2136 client remains a separately approved service-owner mutation path never invoked by CI.
 
 
 ## Backup protection and isolated-restore assurance
