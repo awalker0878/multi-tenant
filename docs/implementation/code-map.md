@@ -228,6 +228,14 @@ Implementation: [active production activation assurance index](../../sources/cap
 
 A pre-activation ready state requires current G0/G1/G2, applicable initial G4 readiness, valid operating authority, reversible G3 exposure and tested withdrawal readiness. Current activated state additionally requires a real activation receipt and passing live-path/dependency/telemetry observations; failed or unknown live checks require withdrawal. CI performs no exposure, withdrawal, apply or activation mutation.
 
+## Identity, certificate and cryptographic trust assurance
+
+Design: [SVC §3 identity, certificates, keys and independent recovery](../architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md) · [CRY assertion allocation](allocation/cry.md) · [IAM/CRY requirements](../assurance/requirements.md#IAM-001)
+
+Implementation: [active identity/crypto assurance index](../../sources/capabilities/identity_crypto_assurance_index.json) · [assurance validator](../../scripts/check_identity_crypto_assurance.py) · [readiness preflight](../../scripts/check_identity_crypto_readiness.py) · [engineering boundary](../engineering/identity-crypto-trust-assurance.md)
+
+Current trust qualification requires separate human/workload/automation authorization, hardened privileged/emergency access, revocation evidence, certificate lifecycle and endpoint identity, separated key-use/admin/recovery/destruction authority, retained-data-aware destruction, KMS/trust outage/no-plaintext-fallback evidence, independent recovery and crypto-agility records. CI performs no identity/certificate/key/recovery mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.

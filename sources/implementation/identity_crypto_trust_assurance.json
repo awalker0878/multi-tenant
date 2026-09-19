@@ -1,0 +1,33 @@
+{
+  "id": "IDENTITY-CRYPTO-TRUST-ASSURANCE-01",
+  "source_baseline_commit": "fc9e8d7f7813262edbc67ce8aea6c019f92344b2",
+  "status": "IMPLEMENTED_TRUST_EVIDENCE_GATE_NO_IDENTITY_OR_KEY_MUTATION",
+  "backlog_ids": ["I07"],
+  "requirements": ["IAM-001", "IAM-002", "IAM-003", "CRY-001", "CRY-002", "CRY-003"],
+  "assurance_index": "sources/capabilities/identity_crypto_assurance_index.json",
+  "checker": "scripts/check_identity_crypto_assurance.py",
+  "preflight": "scripts/check_identity_crypto_readiness.py",
+  "engineering": "docs/engineering/identity-crypto-trust-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_issue_credential": false,
+    "may_revoke_credential": false,
+    "may_enroll_certificate": false,
+    "may_rotate_key": false,
+    "may_destroy_key": false,
+    "may_change_privileged_access": false,
+    "may_execute_recovery": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual identity, PKI, PAM, KMS/HSM and trust-service implementations and exact service scope",
+    "qualify separately scoped human, workload and automation authorization with no tenant-to-provider authority inheritance",
+    "qualify privileged/emergency/supplier access, strong authentication, time-bound delegation and revocation propagation",
+    "qualify certificate issuance, endpoint identity, trust distribution, renewal and revocation on the selected implementation",
+    "record separated key-use, administration, recovery and destruction authorities plus retained-data/copy dependencies",
+    "exercise KMS/trust outages and independent recovery with no plaintext or validation-disabled fallback",
+    "maintain cryptographic inventory, certificate rotation, algorithm transition and exception evidence"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

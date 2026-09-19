@@ -49,6 +49,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Production activation and initial-readiness assurance](production-activation-and-initial-readiness-assurance.md)
 
+[Identity, certificate and cryptographic trust assurance](identity-crypto-trust-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
