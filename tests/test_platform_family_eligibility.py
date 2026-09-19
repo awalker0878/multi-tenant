@@ -200,6 +200,12 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         self.assertIs(result['may_select_site'], False)
         self.assertIn('site/cell/service-class eligibility', result['remaining_gates'])
 
+    def test_qualified_family_fails_closed_if_campaign_evidence_disappears(self):
+        self.qualify('nutanix')
+        self.campaign_evidence_index['records']=[]
+        with self.assertRaises(ValueError):
+            self.evaluate()
+
     def test_registry_edit_without_dossier_cannot_create_family_match(self):
         profile = self.registry['profiles']['nutanix']
         profile['product_tuple'] = 'fixture-selected-product-api-provider-tuple'
