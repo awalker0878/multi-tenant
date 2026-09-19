@@ -252,6 +252,14 @@ Implementation: [active service-reply assurance index](../../sources/capabilitie
 
 Current reply-path qualification requires exact binding/origin/endpoint/family scope, entitlement/revocation, forward and origin-specific return ownership, accepted security-edge evidence, connected/summary/NAT/PBR/alternate-interface review, source validation, no-transit proof, failure/recovery observations and service availability/lifecycle evidence. CI performs no route, binding or service mutation.
 
+## Bootstrap service and steady-state transition assurance
+
+Design: [RA §21 Day-0 bootstrap](../architecture/reference/21-day-0-bootstrap-and-physical-commissioning.md) · [PROV §2 bootstrap without circular dependencies](provisioning-strategy/2-day-0-and-steady-state-commissioning-without-circular-dependencies.md) · [SVC §2 name/time/initialization/telemetry](../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md)
+
+Implementation: [active bootstrap assurance index](../../sources/capabilities/bootstrap_service_assurance_index.json) · [assurance validator](../../scripts/check_bootstrap_service_assurance.py) · [readiness preflight](../../scripts/check_bootstrap_service_readiness.py) · [authoritative IPAM handoff](../engineering/authoritative-ipam-allocation-handoff.md) · [authoritative DNS handoff](../engineering/authoritative-dns-registration-handoff.md) · [engineering boundary](../engineering/bootstrap-service-readiness-assurance.md)
+
+Current bootstrap qualification requires authoritative reservation/IPAM/DNS lifecycle, selected address-assignment/DHCP-metadata behavior, resolver/time/trust/artifact/telemetry/service-reply dependencies, restricted OOB/management execution, dependency-loss behavior with no unrestricted fallback, recoverable configuration/state and verified temporary-to-steady-state handover. CI performs no bootstrap mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
