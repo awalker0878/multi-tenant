@@ -2,7 +2,11 @@
   "id": "QUALIFICATION-CAMPAIGN-EVIDENCE-ASSURANCE-01",
   "source_baseline_commit": "12730e1ef3102da12487c5f7d9da30754b679945",
   "status": "IMPLEMENTED_CAMPAIGN_EVIDENCE_VALIDATION_NO_NATIVE_EXECUTION_OR_QUALIFICATION_AUTHORITY",
-  "requirements": ["QUAL-001", "ASSUR-003", "ACPT-001"],
+  "requirements": [
+    "QUAL-001",
+    "ASSUR-003",
+    "ACPT-001"
+  ],
   "assurance_index": "sources/capabilities/qualification_campaign_evidence_index.json",
   "checker": "scripts/check_qualification_campaign_assurance.py",
   "preflight": "scripts/check_qualification_campaign_readiness.py",
@@ -24,7 +28,8 @@
     "collect controlled evidence, provenance, positive controls, freshness and reviewer records",
     "record explicit not-applicable decisions and every residual campaign gap",
     "submit the current complete packet to the independent qualification authority",
-    "populate the separate PlatformProfile qualification index only after an accountable decision"
+    "allow the PlatformProfile dossier to publish only evidence that still matches the current campaign packet"
   ],
-  "formal_authorization": "NOT_ISSUED"
+  "formal_authorization": "NOT_ISSUED",
+  "qualification_integration": "scripts/check_platform_qualification.py"
 }
