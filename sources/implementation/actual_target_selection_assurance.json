@@ -1,0 +1,30 @@
+{
+  "id": "ACTUAL-TARGET-SELECTION-ASSURANCE-01",
+  "source_baseline_commit": "c189ce6c1cca953212ceb5fa76ad5b48bf44a0b8",
+  "status": "IMPLEMENTED_TARGET_SELECTION_RECORD_NO_TARGET_CONTACT_AUTHORITY",
+  "backlog_ids": ["I02"],
+  "requirements": ["QUAL-001", "ASSUR-003", "SUP-001"],
+  "assurance_index": "sources/capabilities/target_selection_assurance_index.json",
+  "checker": "scripts/check_target_selection_assurance.py",
+  "preflight": "scripts/check_target_selection_readiness.py",
+  "engineering": "docs/engineering/actual-target-selection-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_select_target": false,
+    "may_contact_target": false,
+    "may_retrieve_credentials": false,
+    "may_run_native_tests": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "choose the actual site/cell and restricted qualification campaign scope",
+    "record the installed hardware/product/API/provider/backend/feature/licence tuple",
+    "select the actual security-edge realization and management/OOB context",
+    "identify exact native API, observer and writer scopes plus evidence workspace and credential custody",
+    "record production-data restrictions, permitted/prohibited campaign operations, cleanup and stop authority",
+    "obtain current external change/target-contact authority and permitted contact window",
+    "populate later native qualification/evidence gates from the selected target without treating this selection as qualification"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
