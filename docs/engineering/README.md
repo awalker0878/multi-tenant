@@ -53,6 +53,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Storage ownership, copy-lineage and lifecycle assurance](storage-data-lifecycle-assurance.md)
 
+[Origin-specific shared-service reply assurance](origin-specific-service-reply-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
