@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from scripts import check_version_source_provenance as provenance
+from scripts import check_qualification_campaign_assurance as campaign
 
 INDEX = ROOT / 'sources/capabilities/qualification_index.json'
 FORMAT = 'portable-hosting-native-qualification-index/1'
@@ -29,6 +30,7 @@ CAPABILITIES = {
     'dedicated_edge_context', 'audit_logging'
 }
 PLATFORMS = {'nutanix', 'vmware-nsx', 'openstack'}
+CAMPAIGN_PLATFORM = {'nutanix':'NUTANIX', 'vmware-nsx':'VMWARE_NSX', 'openstack':'OPENSTACK'}
 ID = re.compile(r'^[A-Z][A-Z0-9_.-]{2,127}$')
 TUPLE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.:-]{2,191}$')
 SHA = re.compile(r'^[0-9a-f]{64}$')
@@ -201,11 +203,22 @@ def validate_record(record, *, as_of, root=ROOT):
         'qualified_capabilities': sorted(caps),
         'assurance_profiles': sorted(assurance),
         'evidence_refs': sorted(evidence_by_ref),
+        'evidence': [
+            {
+                'ref': ref,
+                'sha256': next(item['sha256'] for item in evidence if item['ref'] == ref),
+                'observed_at': evidence_by_ref[ref][0].isoformat(),
+                'expires_at': evidence_by_ref[ref][1].isoformat(),
+                'test_set': evidence_by_ref[ref][2],
+            }
+            for ref in sorted(evidence_by_ref)
+        ],
         'approval_expires_at': approval_expires.isoformat()
     }
 
 
-def validate(index, *, as_of=None, root=ROOT, provenance_index=None):
+def validate(index, *, as_of=None, root=ROOT, provenance_index=None,
+             campaign_evidence_index=None, target_selection_index=None):
     if as_of is None:
         as_of = datetime.now(timezone.utc)
     if not isinstance(as_of, datetime) or as_of.tzinfo is None:
@@ -224,6 +237,16 @@ def validate(index, *, as_of=None, root=ROOT, provenance_index=None):
         provenance_index = provenance.load()
     provenance_summary = provenance.validate(provenance_index, as_of=as_of, root=root)
     provenance_records = provenance_summary['records']
+    if campaign_evidence_index is None:
+        campaign_evidence_index = campaign.load()
+    campaign_summary = campaign.validate(
+        campaign_evidence_index, as_of=as_of, root=root,
+        target_selection_index=target_selection_index
+    )
+    current_campaigns = [
+        item for item in campaign_summary['records']
+        if item['state'] == 'CURRENT_EVIDENCE_COMPLETE'
+    ]
     seen = set()
     records = []
     for record in index['records']:
@@ -240,7 +263,45 @@ def validate(index, *, as_of=None, root=ROOT, provenance_index=None):
             raise ValueError('Current qualification requires one matching CURRENT_SUPPORTED version/source provenance record')
         if supporting[0]['product_tuple'] != checked['product_tuple']:
             raise ValueError('Qualification product tuple differs from current version/source provenance record')
+
+        campaign_support = [
+            item for item in current_campaigns
+            if item['platform_family'] == CAMPAIGN_PLATFORM[checked['platform']]
+            and item['product_tuple_id'] == checked['product_tuple_id']
+        ]
+        if not campaign_support:
+            raise ValueError('Current qualification requires current target-bound qualification-campaign evidence for the exact tuple')
+
+        evidence_support = {}
+        supporting_campaign_ids = set()
+        for item in campaign_support:
+            for observed in item['latest_passing_evidence']:
+                ref = observed['evidence_ref']
+                normalized = (
+                    observed['artifact_sha256'],
+                    observed['observed_at'],
+                    observed['fresh_until'],
+                )
+                prior = evidence_support.get(ref)
+                if prior is not None and prior[:3] != normalized:
+                    raise ValueError('Campaign evidence reference is ambiguous across current packets')
+                evidence_support[ref] = (*normalized, item['campaign_id'])
+
+        for evidence in checked['evidence']:
+            support = evidence_support.get(evidence['ref'])
+            if support is None:
+                raise ValueError('Qualification evidence is not contained in a current target-bound campaign packet')
+            digest, observed_at, fresh_until, campaign_id = support
+            if evidence['sha256'] != digest:
+                raise ValueError('Qualification evidence digest differs from the current campaign packet')
+            if evidence['observed_at'] != observed_at:
+                raise ValueError('Qualification evidence observation time differs from the current campaign packet')
+            if instant(evidence['expires_at'], 'qualification evidence expires_at') > instant(fresh_until, 'campaign evidence fresh_until'):
+                raise ValueError('Qualification evidence validity extends beyond current campaign evidence freshness')
+            supporting_campaign_ids.add(campaign_id)
+
         checked['provenance_id'] = supporting[0]['provenance_id']
+        checked['campaign_evidence_ids'] = sorted(supporting_campaign_ids)
         seen.add(checked['id'])
         records.append(checked)
     return {
@@ -251,8 +312,13 @@ def validate(index, *, as_of=None, root=ROOT, provenance_index=None):
     }
 
 
-def records_for(index, platform, product_tuple_id, *, as_of=None, root=ROOT, provenance_index=None):
-    summary = validate(index, as_of=as_of, root=root, provenance_index=provenance_index)
+def records_for(index, platform, product_tuple_id, *, as_of=None, root=ROOT, provenance_index=None,
+                campaign_evidence_index=None, target_selection_index=None):
+    summary = validate(
+        index, as_of=as_of, root=root, provenance_index=provenance_index,
+        campaign_evidence_index=campaign_evidence_index,
+        target_selection_index=target_selection_index
+    )
     return [r for r in summary['records']
             if r['platform'] == platform and r['product_tuple_id'] == product_tuple_id]
 
@@ -277,7 +343,7 @@ def main():
             'may_activate': False,
             'limits': [
                 'Qualification-record consistency only; no platform contact occurs.',
-                'A current qualification record requires a matching CURRENT_SUPPORTED version/source provenance record.',
+                'A current qualification record requires matching CURRENT_SUPPORTED version/source provenance and current target-bound campaign evidence.',
                 'A current qualification record is not production placement or service authorization.',
                 'Site/cell capacity, requester authority, recovery and operating acceptance remain separate.'
             ]
