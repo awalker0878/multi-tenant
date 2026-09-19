@@ -51,6 +51,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Identity, certificate and cryptographic trust assurance](identity-crypto-trust-assurance.md)
 
+[Storage ownership, copy-lineage and lifecycle assurance](storage-data-lifecycle-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

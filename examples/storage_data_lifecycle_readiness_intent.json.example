@@ -1,0 +1,15 @@
+{
+  "format": "portable-hosting-storage-data-lifecycle-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-STORAGE-LIFECYCLE-01",
+  "storage_id": "example-storage-profile-not-qualified",
+  "site_ref": "controlled-site:EXAMPLE-NOT-ACCEPTED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-ACCEPTED",
+  "platform_profile_ref": "controlled-platform-profile:EXAMPLE-NOT-QUALIFIED",
+  "storage_profile_ref": "controlled-storage-profile:EXAMPLE-NOT-QUALIFIED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/architecture/shared-services/4-storage-copies-and-retained-data-ownership.md",
+    "docs/engineering/storage-data-lifecycle-assurance.md"
+  ]
+}

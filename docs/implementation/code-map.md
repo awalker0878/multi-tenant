@@ -236,6 +236,14 @@ Implementation: [active identity/crypto assurance index](../../sources/capabilit
 
 Current trust qualification requires separate human/workload/automation authorization, hardened privileged/emergency access, revocation evidence, certificate lifecycle and endpoint identity, separated key-use/admin/recovery/destruction authority, retained-data-aware destruction, KMS/trust outage/no-plaintext-fallback evidence, independent recovery and crypto-agility records. CI performs no identity/certificate/key/recovery mutation.
 
+## Storage ownership, copy-lineage and lifecycle assurance
+
+Design: [SVC §4 storage and retained-data ownership](../architecture/shared-services/4-storage-copies-and-retained-data-ownership.md) · [STO assertion allocation](allocation/sto.md) · [Storage/backup architecture](../architecture/reference/12-storage-backup-and-data-isolation-architecture.md)
+
+Implementation: [active storage lifecycle assurance index](../../sources/capabilities/storage_data_lifecycle_assurance_index.json) · [assurance validator](../../scripts/check_storage_data_lifecycle_assurance.py) · [readiness preflight](../../scripts/check_storage_data_lifecycle_readiness.py) · [separate backup/restore assurance](../../sources/capabilities/backup_restore_assurance_index.json) · [engineering boundary](../engineering/storage-data-lifecycle-assurance.md)
+
+Current storage qualification requires owner/categorization/access/key/placement lineage, cross-scope authorization/denial, measured service semantics under contention/failure, derivative-copy/hold/key-version records and a qualified release/sanitization procedure. Actual resource retirement still requires a resource-specific receipt; CI performs no storage mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.

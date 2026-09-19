@@ -1,0 +1,33 @@
+{
+  "id": "STORAGE-DATA-LIFECYCLE-ASSURANCE-01",
+  "source_baseline_commit": "a3176bbc9964a58205f0a823556a1ba55e1c4e66",
+  "status": "IMPLEMENTED_STORAGE_SERVICE_EVIDENCE_GATE_NO_STORAGE_MUTATION",
+  "backlog_ids": ["I07"],
+  "requirements": ["STO-001", "STO-002", "STO-003"],
+  "assurance_index": "sources/capabilities/storage_data_lifecycle_assurance_index.json",
+  "checker": "scripts/check_storage_data_lifecycle_assurance.py",
+  "preflight": "scripts/check_storage_data_lifecycle_readiness.py",
+  "engineering": "docs/engineering/storage-data-lifecycle-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_provision_storage": false,
+    "may_attach_storage": false,
+    "may_snapshot_or_clone": false,
+    "may_export_data": false,
+    "may_delete_copy": false,
+    "may_sanitize_media": false,
+    "may_release_reuse": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual storage service implementation and exact offered storage profile",
+    "record resource ownership, categorization, access scope, key policy, placement/retention and lineage",
+    "qualify cross-scope attachment/export authorization and denial",
+    "measure capacity/performance, consistency, replication, snapshot/clone and portability under contention and accepted failure",
+    "maintain authoritative derivative-copy catalogue, retained-copy lineage, holds, key-version mapping and copy authority",
+    "qualify withdrawal/copy-hold reconciliation, approved sanitization method, verification and receipt process",
+    "retain an actual resource-specific sanitization receipt for every real release/reuse event"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

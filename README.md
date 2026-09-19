@@ -129,3 +129,7 @@ The [production activation gate](docs/engineering/production-activation-and-init
 ## Identity, certificate and cryptographic trust assurance
 
 The [identity/crypto trust gate](docs/engineering/identity-crypto-trust-assurance.md) addresses the trust-services portion of I07. It requires separately scoped human/workload/automation identities, hardened privileged/emergency access, observed revocation including cached tokens, certificate issuance/renewal/revocation and endpoint identity, separated key-use/admin/recovery/destruction authority, retained-data-aware destruction, KMS/trust outage behavior, no plaintext fallback, independent recovery and crypto-agility records. The active trust index is intentionally empty.
+
+## Storage ownership, copy-lineage and lifecycle assurance
+
+The [storage lifecycle gate](docs/engineering/storage-data-lifecycle-assurance.md) addresses the remaining storage-service portion of I07. It requires current owner/categorization/access/key/placement lineage, cross-scope authorization and denial evidence, measurable capacity/performance/consistency/replication/snapshot/portability semantics under contention and failure, authoritative derivative-copy/hold/key-version records, and a qualified withdrawal/sanitization/receipt procedure. Backup/restore remains a separate assurance dependency. The active storage index is intentionally empty.
