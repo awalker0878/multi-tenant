@@ -30,7 +30,7 @@ The current registry intentionally yields no production-eligible platform becaus
 
 When a native campaign is completed, update the selected product tuple, attach controlled external evidence references, and record only the capabilities actually demonstrated for that tuple. Assurance-profile eligibility must be recorded separately and cannot be inferred from a product family name.
 
-Before any such update is accepted, the exact tuple must have a current [native PlatformProfile qualification dossier](platform-native-qualification.md). The registry checker cross-validates native-qualified claims and assurance profiles against that active dossier index; directly editing a qualification flag is insufficient.
+Before any such update is accepted, the exact tuple must have a current [native PlatformProfile qualification dossier](platform-native-qualification.md). That dossier itself must trace its native evidence to a current target-bound [qualification campaign evidence packet](qualification-campaign-evidence-assurance.md). The registry checker cross-validates native-qualified claims and assurance profiles against the active dossier index; directly editing a qualification flag or attaching an ungoverned evidence reference is insufficient.
 
 ## Relationship to implementation work
 
