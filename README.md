@@ -133,3 +133,7 @@ The [identity/crypto trust gate](docs/engineering/identity-crypto-trust-assuranc
 ## Storage ownership, copy-lineage and lifecycle assurance
 
 The [storage lifecycle gate](docs/engineering/storage-data-lifecycle-assurance.md) addresses the remaining storage-service portion of I07. It requires current owner/categorization/access/key/placement lineage, cross-scope authorization and denial evidence, measurable capacity/performance/consistency/replication/snapshot/portability semantics under contention and failure, authoritative derivative-copy/hold/key-version records, and a qualified withdrawal/sanitization/receipt procedure. Backup/restore remains a separate assurance dependency. The active storage index is intentionally empty.
+
+## Origin-specific shared-service reply assurance
+
+The [service-reply assurance gate](docs/engineering/origin-specific-service-reply-assurance.md) addresses I05 above the routed packet fixture. A current binding requires exact service entitlement, endpoint identity/authentication, forward and origin-specific reply ownership, accepted ZIP evidence, connected/summary/NAT/PBR/alternate-interface review, source validation, no-transit proof, missing-reply-route and edge-failure tests, reverse-initiation denial, recovery, telemetry, survivor capacity, and binding/version revocation evidence. The active service-reply index is intentionally empty.

@@ -1,0 +1,31 @@
+{
+  "id": "ORIGIN-SPECIFIC-SERVICE-REPLY-ASSURANCE-01",
+  "source_baseline_commit": "1ed2f9cdec70ad7e3f78b522a0efd6cfb113899a",
+  "status": "IMPLEMENTED_SERVICE_REPLY_EVIDENCE_GATE_NO_ROUTING_MUTATION",
+  "backlog_ids": ["I05"],
+  "requirements": ["SVC-001", "SVC-002", "SVC-003", "EDGE-002", "RTE-004"],
+  "assurance_index": "sources/capabilities/service_reply_assurance_index.json",
+  "checker": "scripts/check_service_reply_assurance.py",
+  "preflight": "scripts/check_service_reply_readiness.py",
+  "engineering": "docs/engineering/origin-specific-service-reply-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_create_route": false,
+    "may_change_service_binding": false,
+    "may_change_policy": false,
+    "may_revoke_binding": false,
+    "may_change_service": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "select the actual shared-service endpoint, service profile and exact tenant/domain binding",
+    "record native forward and origin-specific reply route ownership for each offered family",
+    "prove connected/summary/NAT/PBR/alternate-interface paths do not bypass the accepted security context",
+    "qualify source validation, service endpoint identity, authentication, entitlement and management separation",
+    "exercise missing reply route, unavailable next hop, edge loss, unsolicited reverse initiation and exact recovery without borrowing another default",
+    "measure service availability, telemetry, surviving capacity and binding/version lifecycle",
+    "retain current revocation evidence when entitlement or service version expires"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}

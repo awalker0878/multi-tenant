@@ -1,0 +1,18 @@
+{
+  "format": "portable-hosting-service-reply-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-SERVICE-REPLY-01",
+  "reply_id": "example-service-reply-not-qualified",
+  "site_ref": "controlled-site:EXAMPLE-NOT-ACCEPTED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-ACCEPTED",
+  "service_binding_ref": "controlled-service-binding:EXAMPLE-NOT-APPROVED",
+  "origin_context_ref": "controlled-origin-context:EXAMPLE-NOT-ACCEPTED",
+  "service_endpoint_ref": "controlled-service-endpoint:EXAMPLE-NOT-QUALIFIED",
+  "address_family": "IPV6",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/adr/0035-make-shared-service-replies-select-the-originating-security-context.md",
+    "docs/engineering/network-boundaries/2-walk-f14-01-through-the-forward-and-reply-routes.md",
+    "docs/engineering/origin-specific-service-reply-assurance.md"
+  ]
+}
