@@ -185,7 +185,7 @@ def validate_record(record, *, qindex, provenance_index=None, campaign_evidence_
     ]
     if len(campaign_matches) != 1:
         raise ValueError('Commissioned envelope is not bound to one exact supporting campaign/site/cell scope')
-    if set(qrecord['evidence_refs']) != set(campaign_matches[0]['evidence_refs']):
+    if not set(qrecord['evidence_refs']) <= set(campaign_matches[0]['evidence_refs']):
         raise ValueError('Commissioned envelope supporting campaign does not cover the full approved qualification evidence set')
 
     assurance = unique_strings(record['assurance_profiles'], 'assurance_profiles', allow_empty=True)
