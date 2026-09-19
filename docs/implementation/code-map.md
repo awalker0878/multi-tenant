@@ -244,6 +244,14 @@ Implementation: [active storage lifecycle assurance index](../../sources/capabil
 
 Current storage qualification requires owner/categorization/access/key/placement lineage, cross-scope authorization/denial, measured service semantics under contention/failure, derivative-copy/hold/key-version records and a qualified release/sanitization procedure. Actual resource retirement still requires a resource-specific receipt; CI performs no storage mutation.
 
+## Origin-specific shared-service reply assurance
+
+Design: [ADR-0035 origin-specific replies](../adr/0035-make-shared-service-replies-select-the-originating-security-context.md) · [NBD §2 forward/reply routes](../engineering/network-boundaries/2-walk-f14-01-through-the-forward-and-reply-routes.md) · [SVC §1 placement and consumption boundaries](../architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md)
+
+Implementation: [active service-reply assurance index](../../sources/capabilities/service_reply_assurance_index.json) · [assurance validator](../../scripts/check_service_reply_assurance.py) · [readiness preflight](../../scripts/check_service_reply_readiness.py) · [engineering boundary](../engineering/origin-specific-service-reply-assurance.md)
+
+Current reply-path qualification requires exact binding/origin/endpoint/family scope, entitlement/revocation, forward and origin-specific return ownership, accepted security-edge evidence, connected/summary/NAT/PBR/alternate-interface review, source validation, no-transit proof, failure/recovery observations and service availability/lifecycle evidence. CI performs no route, binding or service mutation.
+
 ## Open native work
 
 [The inherited implementation backlog](../../sources/implementation_backlog.csv) remains the source record for installed target selection, effective security edges, authoritative service integration, native IPv6, actual fencing and production readiness. This conversion does not close those items.
