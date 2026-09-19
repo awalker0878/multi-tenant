@@ -159,6 +159,25 @@ class IPAMRecordTests(unittest.TestCase):
         r=allocation_record('CONFIRMED');r['realization_ref']=None
         with self.assertRaises(ValueError):ipam.validate(allocation_index(r),as_of=AS_OF)
 
+    def test_confirmation_digest_is_stable_across_release_lifecycle(self):
+        digests=[]
+        for state in ('CONFIRMED','RELEASE_PENDING','QUARANTINED','RELEASED'):
+            result=ipam.validate(allocation_index(allocation_record(state)),as_of=AS_OF)
+            digests.append(result['records'][0]['confirmation_sha256'])
+        self.assertEqual(len(set(digests)),1)
+        self.assertIsNotNone(digests[0])
+
+    def test_confirmation_digest_changes_when_realization_binding_changes(self):
+        base=ipam.validate(
+            allocation_index(allocation_record('CONFIRMED')),as_of=AS_OF
+        )['records'][0]['confirmation_sha256']
+        changed=allocation_record('CONFIRMED')
+        changed['realization_ref']='controlled-realization:different-fixture'
+        other=ipam.validate(
+            allocation_index(changed),as_of=AS_OF
+        )['records'][0]['confirmation_sha256']
+        self.assertNotEqual(base,other)
+
     def test_release_pending_preserves_incomplete_cleanup(self):
         result=ipam.validate(allocation_index(allocation_record('RELEASE_PENDING')),as_of=AS_OF)
         self.assertEqual(result['release_lifecycle_count'],1)
