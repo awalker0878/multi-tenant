@@ -1,0 +1,15 @@
+{
+  "format": "portable-hosting-identity-crypto-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-IDENTITY-CRYPTO-01",
+  "trust_id": "example-trust-not-qualified",
+  "site_ref": "controlled-site:EXAMPLE-NOT-ACCEPTED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-ACCEPTED",
+  "trust_profile_ref": "controlled-trust-profile:EXAMPLE-NOT-QUALIFIED",
+  "key_profile_ref": "controlled-key-profile:EXAMPLE-NOT-QUALIFIED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md",
+    "docs/engineering/identity-crypto-trust-assurance.md"
+  ]
+}
