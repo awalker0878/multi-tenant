@@ -268,6 +268,14 @@ Implementation: [active target-selection assurance index](../../sources/capabili
 
 Current target selection records the externally chosen site/cell, exact platform tuple references, security-edge/management/backend realization, restricted native API/observer/writer campaign scope, credential custody, evidence workspace, permitted/prohibited operations, cleanup and time-bounded target-contact authority. CI does not select or contact a target, retrieve credentials, run native tests, apply or activate.
 
+## Qualification campaign evidence packet assurance
+
+Design: [Native campaign procedure](native-reference/campaign.md) · [QCP §6 evidence packet](../assurance/qualification-campaign/6-build-an-evidence-packet-a-reviewer-can-challenge.md) · [QCP §8 disposition](../assurance/qualification-campaign/8-close-defects-and-issue-a-scoped-campaign-disposition.md) · [QUAL §5 applicability/evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md)
+
+Implementation: [active campaign evidence index](../../sources/capabilities/qualification_campaign_evidence_index.json) · [evidence validator](../../scripts/check_qualification_campaign_assurance.py) · [review-readiness preflight](../../scripts/check_qualification_campaign_readiness.py) · [engineering boundary](../engineering/qualification-campaign-evidence-assurance.md)
+
+Current campaign assurance binds the exact selected target and service/topology scope to explicit applicability, retained attempts, healthy positive controls for negative observations, evidence freshness and residual gaps. A complete packet is review input only; CI cannot execute native tests, issue qualification, publish a native-qualified registry claim, apply or activate.
+
 ## Open native work
 
 [The implementation backlog](../../sources/implementation_backlog.csv) remains the source record for **actual owner decisions and native evidence**. I01–I10 now have repository-side verification, handoff or assurance mechanisms; that does not select a target, populate any active assurance index, contact a native system, issue authorization or turn synthetic evidence into native qualification.
