@@ -1,0 +1,32 @@
+{
+  "id": "BOOTSTRAP-SERVICE-READINESS-ASSURANCE-01",
+  "source_baseline_commit": "3e2cc52ffbedfd0fcf7a44bcbc72671a6291f0d4",
+  "status": "IMPLEMENTED_BOOTSTRAP_COMPOSITION_GATE_NO_SERVICE_MUTATION",
+  "backlog_ids": ["I06"],
+  "requirements": ["AUTO-001", "MGT-005", "REC-001", "QUAL-001", "SVC-003"],
+  "assurance_index": "sources/capabilities/bootstrap_service_assurance_index.json",
+  "checker": "scripts/check_bootstrap_service_assurance.py",
+  "preflight": "scripts/check_bootstrap_service_readiness.py",
+  "engineering": "docs/engineering/bootstrap-service-readiness-assurance.md",
+  "current_records": 0,
+  "authority": {
+    "may_allocate_address": false,
+    "may_write_dns": false,
+    "may_change_dhcp_metadata": false,
+    "may_issue_credential": false,
+    "may_change_service_binding": false,
+    "may_retire_bootstrap_dependency": false,
+    "may_apply": false,
+    "may_activate": false
+  },
+  "remaining_native_work": [
+    "bind actual authoritative reservation/IPAM/DNS lifecycle evidence and selected address-assignment/DHCP/metadata behavior",
+    "qualify resolver, time, identity/trust, certificate/key access, artifact repository, telemetry and origin-specific service reply paths",
+    "prove restricted console/OOB, initial privileged trust, restricted execution, artifact integrity, management isolation and recoverable configuration/state",
+    "exercise resolver/time/repository/telemetry/identity dependency loss without unrestricted fallback",
+    "record all temporary bootstrap dependencies, credentials, routes and exceptions plus their steady-state replacement",
+    "revoke temporary credentials/grants only after steady-state verification while preserving required emergency/recovery material",
+    "obtain attributable bootstrap/foundation handover acceptance"
+  ],
+  "formal_authorization": "NOT_ISSUED"
+}
