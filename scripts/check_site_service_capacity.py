@@ -22,7 +22,7 @@ if str(ROOT) not in sys.path:
 from scripts import check_platform_qualification as qualification
 
 INDEX = ROOT / 'sources/capabilities/site_service_capacity_index.json'
-FORMAT = 'portable-hosting-site-service-capacity/1'
+FORMAT = 'portable-hosting-site-service-capacity/2'
 STATUS = 'ENGINEERING_CAPACITY_RECORDS_NOT_RESERVATION_AUTHORITY'
 PLATFORMS = {'nutanix', 'vmware-nsx', 'openstack'}
 ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.:-]{1,191}$')
@@ -30,9 +30,14 @@ SHA = re.compile(r'^[0-9a-f]{64}$')
 INDEX_KEYS = {'format', 'status', 'reviewed_source_revision', 'records'}
 RECORD_KEYS = {
     'id', 'state', 'site_id', 'cell_id', 'service_class_id', 'platform',
-    'product_tuple_id', 'qualification_record_id', 'assurance_profiles',
+    'product_tuple_id', 'qualification_binding', 'assurance_profiles',
     'profile_refs', 'failure_model', 'capacity_measured_at', 'capacity_expires_at',
     'dimensions', 'owners', 'source_refs'
+}
+QUALIFICATION_BINDING_KEYS = {
+    'qualification_record_id', 'qualification_record_sha256',
+    'approval_decision_ref', 'supporting_campaign_id',
+    'selection_id', 'site_ref', 'cell_ref', 'campaign_scope_ref'
 }
 PROFILE_KEYS = {
     'co_residency', 'compute', 'storage', 'network', 'security_edge',
@@ -135,11 +140,22 @@ def validate_record(record, *, qindex, provenance_index=None, campaign_evidence_
         raise ValueError('Site capacity record has unexpected or missing fields')
     if record['state'] != 'CURRENT_COMMISSIONED':
         raise ValueError('Only CURRENT_COMMISSIONED records belong in the active index')
-    for key in ('id', 'site_id', 'cell_id', 'service_class_id', 'product_tuple_id',
-                'qualification_record_id'):
+    for key in ('id', 'site_id', 'cell_id', 'service_class_id', 'product_tuple_id'):
         identifier(record[key], key)
     if record['platform'] not in PLATFORMS:
         raise ValueError('Unknown platform family')
+
+    binding = record['qualification_binding']
+    if not isinstance(binding, dict) or set(binding) != QUALIFICATION_BINDING_KEYS:
+        raise ValueError('Exact qualification binding is required for a commissioned envelope')
+    identifier(binding['qualification_record_id'], 'qualification_binding.qualification_record_id')
+    if not isinstance(binding['qualification_record_sha256'], str) or not SHA.fullmatch(binding['qualification_record_sha256']):
+        raise ValueError('qualification_binding.qualification_record_sha256 must be lowercase SHA-256')
+    bounded(binding['approval_decision_ref'], 'qualification_binding.approval_decision_ref')
+    identifier(binding['supporting_campaign_id'], 'qualification_binding.supporting_campaign_id')
+    identifier(binding['selection_id'], 'qualification_binding.selection_id')
+    for key in ('site_ref', 'cell_ref', 'campaign_scope_ref'):
+        bounded(binding[key], f'qualification_binding.{key}', 256)
 
     qsummary = qualification.validate(
         qindex, as_of=as_of, root=root, provenance_index=provenance_index,
@@ -148,13 +164,29 @@ def validate_record(record, *, qindex, provenance_index=None, campaign_evidence_
     )
     matches = [
         item for item in qsummary['records']
-        if item['id'] == record['qualification_record_id']
+        if item['id'] == binding['qualification_record_id']
         and item['platform'] == record['platform']
         and item['product_tuple_id'] == record['product_tuple_id']
     ]
     if len(matches) != 1:
         raise ValueError('Site service class is not bound to one current exact-tuple qualification record')
     qrecord = matches[0]
+    if qrecord['record_sha256'] != binding['qualification_record_sha256']:
+        raise ValueError('Commissioned envelope qualification digest differs from the current approved dossier')
+    if qrecord['approval_decision_ref'] != binding['approval_decision_ref']:
+        raise ValueError('Commissioned envelope approval decision differs from the current approved dossier')
+    campaign_matches = [
+        item for item in qrecord['campaign_support']
+        if item['campaign_id'] == binding['supporting_campaign_id']
+        and item['selection_id'] == binding['selection_id']
+        and item['site_ref'] == binding['site_ref']
+        and item['cell_ref'] == binding['cell_ref']
+        and item['campaign_scope_ref'] == binding['campaign_scope_ref']
+    ]
+    if len(campaign_matches) != 1:
+        raise ValueError('Commissioned envelope is not bound to one exact supporting campaign/site/cell scope')
+    if set(qrecord['evidence_refs']) != set(campaign_matches[0]['evidence_refs']):
+        raise ValueError('Commissioned envelope supporting campaign does not cover the full approved qualification evidence set')
 
     assurance = unique_strings(record['assurance_profiles'], 'assurance_profiles', allow_empty=True)
     if not set(assurance) <= set(qrecord['assurance_profiles']):
@@ -230,7 +262,14 @@ def validate_record(record, *, qindex, provenance_index=None, campaign_evidence_
         'service_class_id': record['service_class_id'],
         'platform': record['platform'],
         'product_tuple_id': record['product_tuple_id'],
-        'qualification_record_id': record['qualification_record_id'],
+        'qualification_record_id': binding['qualification_record_id'],
+        'qualification_record_sha256': binding['qualification_record_sha256'],
+        'approval_decision_ref': binding['approval_decision_ref'],
+        'supporting_campaign_id': binding['supporting_campaign_id'],
+        'selection_id': binding['selection_id'],
+        'site_ref': binding['site_ref'],
+        'cell_ref': binding['cell_ref'],
+        'campaign_scope_ref': binding['campaign_scope_ref'],
         'assurance_profiles': sorted(assurance),
         'profile_refs': dict(profiles),
         'failure_model_id': failure['id'],
@@ -302,7 +341,7 @@ def main():
             'may_apply': False,
             'may_activate': False,
             'limits': [
-                'Engineering inventory only; no site selection or reservation is created.',
+                'Engineering inventory only; no site selection or reservation is created. Commissioned envelopes pin the exact approved qualification digest and supporting target-bound campaign scope.',
                 'Surviving capacity is evaluated under the recorded failure model and operational reserve.',
                 'Quota, address, storage, key, recovery and shared-service dependencies remain explicit admission inputs.'
             ]
