@@ -12,7 +12,15 @@ The retained requirements are PLACE-001, SVCM-001, SVCM-002, CAP-001 and CAP-002
 
 The active machine-readable inventory is `sources/capabilities/site_service_capacity_index.json`. It is intentionally empty today.
 
-A future CURRENT_COMMISSIONED record binds the site, cell, service class, exact platform tuple, current qualification record, assurance profiles, co-residency/compute/storage/network/security-edge/availability/recovery/location/key/backup profiles, failure model, current capacity measurements, owners and source evidence.
+A future CURRENT_COMMISSIONED record binds the site, cell, service class, exact platform tuple, assurance profiles, co-residency/compute/storage/network/security-edge/availability/recovery/location/key/backup profiles, failure model, current capacity measurements, owners and source evidence. Schema v2 also pins the exact qualification dossier SHA-256, approval decision reference, supporting campaign ID, selection ID, controlled site/cell references and campaign-scope reference used when the envelope was commissioned.
+
+## Qualification immutability boundary
+
+A commissioned envelope cannot rely only on a reusable qualification record ID. The validator recomputes the current approved dossier digest and requires it to equal the digest captured by the envelope. The approval decision must also be unchanged.
+
+The envelope additionally names one current target-bound campaign scope that supports the dossier. That campaign must match the recorded campaign ID, selection ID, controlled site/cell references and campaign-scope reference, and it must contain the full native evidence set used by the approved qualification dossier. The campaign may contain additional evidence.
+
+If the dossier changes under the same ID, its approval decision changes, or the supporting campaign/site/cell binding no longer matches, the envelope becomes invalid and must be recommissioned or explicitly re-approved. This prevents a capacity record from silently inheriting a later qualification state it was never measured or commissioned against.
 
 ## Capacity arithmetic
 
