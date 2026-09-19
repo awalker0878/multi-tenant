@@ -242,6 +242,13 @@ class IPAMPreflightTests(unittest.TestCase):
                     'may_reuse_address','may_write_dns','may_apply','may_activate'):
             self.assertIs(result[key],False)
 
+    def test_parent_envelope_digest_must_match_parent_reservation_spec(self):
+        ridx=reservation_index()
+        ridx['records'][0]['envelope_record_sha256']=reservation_records.canonical_digest(
+            {'fixture':'different-envelope'})
+        result=self.evaluate(ridx=ridx)
+        self.assertEqual(result['status'],preflight.HOLD_PARENT)
+
     def test_parent_consumed_does_not_start_new_ipam_reserve(self):
         result=self.evaluate(ridx=reservation_index('CONSUMED'))
         self.assertEqual(result['status'],preflight.HOLD_PARENT)
