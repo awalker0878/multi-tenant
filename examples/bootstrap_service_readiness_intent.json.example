@@ -1,0 +1,18 @@
+{
+  "format": "portable-hosting-bootstrap-service-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-BOOTSTRAP-SERVICE-01",
+  "bootstrap_id": "example-bootstrap-profile-not-qualified",
+  "site_ref": "controlled-site:EXAMPLE-NOT-ACCEPTED",
+  "service_class_ref": "controlled-service-class:EXAMPLE-NOT-ACCEPTED",
+  "platform_profile_ref": "controlled-platform-profile:EXAMPLE-NOT-QUALIFIED",
+  "bootstrap_profile_ref": "controlled-bootstrap-profile:EXAMPLE-NOT-QUALIFIED",
+  "address_family_profile_ref": "controlled-address-family-profile:EXAMPLE-NOT-QUALIFIED",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/architecture/reference/21-day-0-bootstrap-and-physical-commissioning.md",
+    "docs/architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md",
+    "docs/implementation/provisioning-strategy/2-day-0-and-steady-state-commissioning-without-circular-dependencies.md",
+    "docs/engineering/bootstrap-service-readiness-assurance.md"
+  ]
+}

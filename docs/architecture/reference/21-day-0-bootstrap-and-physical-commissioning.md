@@ -27,6 +27,8 @@ Use supported switch/hardware configuration interfaces and platform installation
 
 Bootstrap services may be temporarily external to the new hosting cell. Their location, access scope, lifetime and transition are documented. When steady-state identity, names, keys and automation are established, migrate ownership without losing recovery access, revoke temporary grants and reconcile configurations. Do not destroy the only recovery material as part of a bootstrap cleanup step.
 
+The [bootstrap service assurance gate](../../engineering/bootstrap-service-readiness-assurance.md) records the exact authoritative address/name lifecycle, minimum dependency, restricted-management, dependency-loss and steady-state transition evidence required before this bootstrap profile can be treated as current. It does not perform any bootstrap mutation.
+
 ## Foundation changes after Day 0
 
 Adding hosts, new attachment pools, service leaves or another cell follows the same foundation controls without becoming an ordinary tenant operation. Drain or isolate affected resources, verify compatibility and surviving capacity, apply the approved change and requalify impacted paths. A new switch or host is not eligible simply because its management API is reachable. It becomes eligible after its baseline, inventory and operational ownership are accepted.

@@ -55,6 +55,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Origin-specific shared-service reply assurance](origin-specific-service-reply-assurance.md)
 
+[Bootstrap service and steady-state transition assurance](bootstrap-service-readiness-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

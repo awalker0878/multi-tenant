@@ -30,6 +30,8 @@ Use a dependency-cut review: for every primary service, remove the resource or f
 
 The transition record names each temporary endpoint, credential, route, artifact store and exception; its consuming package; its steady-state replacement; the verification performed after transfer; and the authority allowed to retire it. Bootstrap expiry must not automatically remove a still-required recovery dependency. Unresolved transitions remain an explicit operating restriction rather than hidden permanent defaults.
 
+Use the [bootstrap service assurance gate](../../engineering/bootstrap-service-readiness-assurance.md) to bind those dependencies and transition records to the exact site/service/platform/bootstrap profile. A passing record is evidence-only; IPAM, DNS, identity, DHCP/metadata and service-binding mutations remain with their respective authorities.
+
 Subsequent capacity expansion reuses P1–P3 controls. Hosts, edge contexts, storage pools and attachment capacity enter service only after baseline, compatibility, surviving capacity and ownership checks. An expansion may be automated, but it remains a foundation operation with a different impact boundary from adding one workload.
 
 Related engineering: [Trust-service recovery](../../architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md#SVC_s_003)  •  [Recovery dependency order](../../architecture/shared-services/6-failure-recovery-migration-and-failback-topology.md#SVC_s_006)  •  [Fault-domain record](../../assurance/site-qualification/2-site-low-level-design-and-dependency-schedule.md#QUAL_s_002)
