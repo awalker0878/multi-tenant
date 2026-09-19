@@ -116,6 +116,10 @@ class NavigationIntegrationTests(unittest.TestCase):
         text = self.navigation()['docs/engineering/README.md']
         self.assertIn('actual-target-selection-assurance.md', text)
 
+    def test_qualification_campaign_navigation_survives_regeneration(self):
+        text = self.navigation()['docs/engineering/README.md']
+        self.assertIn('qualification-campaign-evidence-assurance.md', text)
+
     def test_all_three_work_packages_survive_regeneration(self):
         text = self.navigation()['docs/implementation/README.md']
         for destination in ('routed-ipv6-lab.md', 'nutanix-task-tree-readback.md', 'native-reference/README.md'):
@@ -167,6 +171,8 @@ class NavigationIntegrationTests(unittest.TestCase):
         self.assertTrue(any('scripts/check_bootstrap_service_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_target_selection_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_target_selection_readiness.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_qualification_campaign_assurance.py' in s for s in commands))
+        self.assertTrue(any('scripts/check_qualification_campaign_readiness.py' in s for s in commands))
         self.assertTrue(any('lab/run_task_tree_lab.py --execute' in s for s in commands))
         self.assertTrue(any('tools/check_local.py' in s for s in commands))
 
