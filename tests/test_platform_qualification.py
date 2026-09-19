@@ -183,6 +183,19 @@ class QualificationIndexTests(unittest.TestCase):
         result=self.validate()
         self.assertEqual(result['records'][0]['campaign_evidence_ids'],['CAMPAIGN-FIXTURE-01'])
 
+    def test_current_qualification_can_rely_on_evidence_collected_before_contact_expiry(self):
+        self.index['records']=[record()]
+        targets=deepcopy(self.target_selection_index)
+        targets['records'][0]['state']='CONTACT_AUTHORITY_DUE'
+        targets['records'][0]['scope']['target_contact_valid_until']='2026-09-18T15:00:00Z'
+        campaigns=deepcopy(self.campaign_evidence_index)
+        campaigns['records'][0]['authorization']['target_contact_valid_until']='2026-09-18T15:00:00Z'
+        result=self.validate(
+            campaign_evidence_index=campaigns,
+            target_selection_index=targets)
+        self.assertEqual(result['current_records'],1)
+        self.assertEqual(result['records'][0]['campaign_evidence_ids'],['CAMPAIGN-FIXTURE-01'])
+
     def test_current_qualification_requires_current_campaign_evidence(self):
         self.index['records']=[record()]
         with self.assertRaises(ValueError):
