@@ -11,6 +11,7 @@ import sys
 import unittest
 
 from scripts import check_platform_qualification as qualification
+from scripts import check_qualification_campaign_assurance as campaign
 from scripts import check_reservation_preflight as preflight
 from scripts import check_reservation_records as records
 from scripts import check_site_service_capacity as capacity
@@ -251,6 +252,15 @@ class ReservationPreflightTests(unittest.TestCase):
         for key in ('may_create_reservation','may_extend_reservation','may_consume_reservation',
                     'may_release_reservation','may_allocate_address','may_apply','may_activate'):
             self.assertIs(result[key],False)
+
+    def test_reservation_preflight_rejects_campaignless_qualification(self):
+        chain=qualification_chain()
+        chain['campaign_evidence_index']=campaign.load()
+        with self.assertRaises(ValueError):
+            preflight.evaluate(
+                intent(),capacity_index=cap_index(),reservation_index=records.load(),
+                qindex=qindex(),provenance_index=provenance_index(),
+                **chain,as_of=AS_OF)
 
     def test_same_operation_same_spec_is_idempotent_existing_hold(self):
         i=intent();result=self.evaluate(i,journal(reservation_record(i)))
