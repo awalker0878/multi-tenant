@@ -30,6 +30,14 @@
     "stored_in_normalized_spec": true,
     "stored_in_exported_reservation_record": true,
     "same_id_drift_is_conflict": true,
-    "propagated_to_ipam_parent_binding": true
-  }
+    "propagated_to_ipam_parent_binding": true,
+    "parent_spec_reverified_by_ipam": true
+  },
+  "remaining_work": [
+    "create authoritative reservations only after current envelope eligibility",
+    "store the exact commissioned-envelope digest with the authoritative reservation",
+    "reconcile any same-ID envelope drift before retry or reuse",
+    "propagate and reverify the parent reservation spec in downstream IPAM",
+    "retain separate reservation/IPAM/DNS owners and expiry/release lifecycles"
+  ]
 }
