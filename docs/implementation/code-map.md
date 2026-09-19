@@ -274,7 +274,7 @@ Design: [Native campaign procedure](native-reference/campaign.md) · [QCP §6 ev
 
 Implementation: [active campaign evidence index](../../sources/capabilities/qualification_campaign_evidence_index.json) · [evidence validator](../../scripts/check_qualification_campaign_assurance.py) · [review-readiness preflight](../../scripts/check_qualification_campaign_readiness.py) · [engineering boundary](../engineering/qualification-campaign-evidence-assurance.md)
 
-Current campaign assurance binds the exact selected target and service/topology scope to explicit applicability, retained attempts, healthy positive controls for negative observations, evidence freshness and residual gaps. A complete packet is review input only; CI cannot execute native tests, issue qualification, publish a native-qualified registry claim, apply or activate.
+Current campaign assurance binds the reviewed target and service/topology scope to the exact restricted change/contact/stop authority, native API/observer/writer scopes, credential custody, evidence workspace, data restrictions, permitted/prohibited operations, cleanup and contact window, plus explicit applicability, retained attempts, healthy positive controls, freshness and residual gaps. Attempts outside the authorized window are rejected; evidence collected inside it may remain current after contact authority later expires, without granting new target contact. A complete packet remains review input only.
 
 ## Open native work
 
