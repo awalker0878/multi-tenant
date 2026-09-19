@@ -36,13 +36,22 @@ SHA256 = re.compile(r'^[0-9a-f]{64}$')
 
 INDEX_KEYS = {'format', 'status', 'reviewed_source_revision', 'records'}
 RECORD_KEYS = {
-    'campaign_id', 'generation', 'state', 'selection_id', 'scope', 'governance',
-    'required_assertions', 'not_applicable', 'attempts', 'residual_gaps', 'source_refs'
+    'campaign_id', 'generation', 'state', 'selection_id', 'scope', 'authorization',
+    'governance', 'required_assertions', 'not_applicable', 'attempts',
+    'residual_gaps', 'source_refs'
 }
 SCOPE_KEYS = {
     'site_ref', 'cell_ref', 'campaign_scope_ref', 'platform_family',
     'product_tuple_id', 'service_scope_ref', 'topology_generation_ref',
     'address_families', 'failure_scope_ref', 'started_at', 'review_by'
+}
+AUTHORIZATION_KEYS = {
+    'change_authority_ref', 'target_contact_authority_ref',
+    'target_contact_valid_until', 'stop_authority_ref',
+    'qualification_campaign_ref', 'native_api_scope_ref', 'observer_scope_ref',
+    'writer_scope_ref', 'credential_custody_ref', 'evidence_workspace_ref',
+    'data_restriction_ref', 'permitted_operations_ref',
+    'prohibited_operations_ref', 'cleanup_ref', 'contact_window_ref'
 }
 GOVERNANCE_KEYS = {
     'applicability_ref', 'run_sheet_ref', 'authorized_fault_scope_ref',
@@ -109,6 +118,18 @@ def validate_record(record, as_of, root=ROOT):
     if started > as_of or review_by <= started:
         raise ValueError('Qualification-campaign scope chronology invalid')
 
+    authorization = record['authorization']
+    if not isinstance(authorization, dict) or set(authorization) != AUTHORIZATION_KEYS:
+        raise ValueError('Qualification-campaign authorization shape invalid')
+    for key in AUTHORIZATION_KEYS - {'target_contact_valid_until'}:
+        target.opaque_ref(authorization[key], f'authorization.{key}')
+    authorized_until = target.instant(
+        authorization['target_contact_valid_until'],
+        'authorization.target_contact_valid_until'
+    )
+    if authorized_until <= started:
+        raise ValueError('Qualification campaign starts after its authorized target-contact window')
+
     governance = record['governance']
     if not isinstance(governance, dict) or set(governance) != GOVERNANCE_KEYS:
         raise ValueError('Qualification-campaign governance shape invalid')
@@ -118,6 +139,8 @@ def validate_record(record, as_of, root=ROOT):
         raise ValueError('Campaign evidence cannot carry a qualification decision')
     if governance['production_authority_status'] != 'NOT_ISSUED':
         raise ValueError('Campaign evidence cannot carry production authority')
+    if governance['evidence_workspace_ref'] != authorization['evidence_workspace_ref']:
+        raise ValueError('Campaign evidence workspace differs from the authorized target-selection workspace')
 
     required = target.unique_strings(record['required_assertions'], 'required_assertions', maximum=512)
     for assertion_id in required:
@@ -173,6 +196,8 @@ def validate_record(record, as_of, root=ROOT):
         fresh_until = target.instant(raw['fresh_until'], 'attempt.fresh_until')
         if observed < started or observed > as_of or fresh_until <= observed:
             raise ValueError('Campaign attempt chronology invalid')
+        if observed > authorized_until:
+            raise ValueError('Campaign attempt occurred after authorized target-contact expiry')
         key = (assertion_id, observed)
         if key in assertion_times:
             raise ValueError('One assertion cannot have ambiguous attempts at the same observation time')
@@ -283,6 +308,8 @@ def validate_record(record, as_of, root=ROOT):
         'platform_family': scope['platform_family'],
         'product_tuple_id': scope['product_tuple_id'],
         'service_scope_ref': scope['service_scope_ref'],
+        'started_at': started.isoformat(),
+        'authorization': dict(authorization),
         'topology_generation_ref': scope['topology_generation_ref'],
         'address_families': sorted(families),
         'required_assertions': sorted(required),
@@ -334,9 +361,9 @@ def validate(index, as_of=None, root=ROOT, target_selection_index=None):
     if target_selection_index is None:
         target_selection_index = target.load()
     target_summary = target.validate(target_selection_index, as_of=as_of, root=root)
-    current_targets = {
+    usable_targets = {
         item['selection_id']: item for item in target_summary['records']
-        if item['state'] == 'CURRENT_SELECTED'
+        if item['state'] in {'CURRENT_SELECTED', 'CONTACT_AUTHORITY_DUE'}
     }
 
     campaign_ids = set()
@@ -348,12 +375,43 @@ def validate(index, as_of=None, root=ROOT, target_selection_index=None):
             raise ValueError('Duplicate qualification-campaign ID')
         if item['selection_id'] in selection_ids:
             raise ValueError('Only one active campaign evidence record is allowed per target selection')
-        selected = current_targets.get(item['selection_id'])
+        selected = usable_targets.get(item['selection_id'])
         if selected is None:
-            raise ValueError('Qualification campaign requires a matching CURRENT_SELECTED target-selection record')
+            raise ValueError('Qualification campaign requires a current reviewed target selection; review-due, gapped or uncertain target state is ineligible')
         for field in ('site_ref', 'cell_ref', 'campaign_scope_ref', 'platform_family', 'product_tuple_id'):
             if item[field] != selected[field]:
                 raise ValueError(f'Qualification campaign does not match selected target field: {field}')
+        expected_authorization = {
+            'change_authority_ref': selected['change_authority_ref'],
+            'target_contact_authority_ref': selected['target_contact_authority_ref'],
+            'stop_authority_ref': selected['stop_authority_ref'],
+            'qualification_campaign_ref': selected['qualification_campaign_ref'],
+            'native_api_scope_ref': selected['native_api_scope_ref'],
+            'observer_scope_ref': selected['observer_scope_ref'],
+            'writer_scope_ref': selected['writer_scope_ref'],
+            'credential_custody_ref': selected['credential_custody_ref'],
+            'evidence_workspace_ref': selected['evidence_workspace_ref'],
+            'data_restriction_ref': selected['data_restriction_ref'],
+            'permitted_operations_ref': selected['permitted_operations_ref'],
+            'prohibited_operations_ref': selected['prohibited_operations_ref'],
+            'cleanup_ref': selected['cleanup_ref'],
+            'contact_window_ref': selected['contact_window_ref'],
+        }
+        for field, value in expected_authorization.items():
+            if item['authorization'][field] != value:
+                raise ValueError(f'Qualification campaign authorization differs from target selection: {field}')
+        campaign_authorized_until = target.instant(
+            item['authorization']['target_contact_valid_until'],
+            'campaign target_contact_valid_until'
+        )
+        selected_at = target.instant(selected['selected_at'], 'selected_at')
+        selected_contact_until = target.instant(
+            selected['target_contact_valid_until'], 'target_contact_valid_until'
+        )
+        if target.instant(item['started_at'], 'campaign started_at') < selected_at:
+            raise ValueError('Qualification campaign starts before the target selection became effective')
+        if campaign_authorized_until > selected_contact_until:
+            raise ValueError('Qualification campaign claims a longer contact window than the target selection')
         campaign_ids.add(item['campaign_id'])
         selection_ids.add(item['selection_id'])
         out.append(item)
@@ -389,7 +447,7 @@ def main():
             'may_apply': False,
             'may_activate': False,
             'limits': [
-                'Campaign evidence is bound to a separately CURRENT_SELECTED target; this checker does not contact it.',
+                'Campaign evidence is bound to the exact reviewed target selection and restricted authorization used when observations were collected; this checker does not contact it.',
                 'A complete evidence packet is review input, not an independent qualification decision.',
                 'The active PlatformProfile qualification index remains separately governed.',
                 'Production activation requires separate operating and activation authority.'
