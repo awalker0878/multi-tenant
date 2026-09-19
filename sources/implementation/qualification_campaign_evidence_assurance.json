@@ -51,5 +51,7 @@
       "contact window"
     ],
     "contact_expiry_semantics": "Completed evidence remains eligible only for observations collected within the authorized window; expiry blocks new target interaction but does not erase prior observations."
-  }
+  },
+  "authorization_binding_baseline_commit": "602c0b4bb9b7fb3f6a8bc0aad6049816792649a2",
+  "assurance_index_format": "portable-hosting-qualification-campaign-evidence-index/2"
 }
