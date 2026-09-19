@@ -57,6 +57,8 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Bootstrap service and steady-state transition assurance](bootstrap-service-readiness-assurance.md)
 
+[Actual target selection and restricted native-campaign assurance](actual-target-selection-assurance.md)
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
