@@ -92,6 +92,10 @@ jobs:
         run: python scripts/check_production_activation_assurance.py --as-of 2026-09-18T22:05:00Z > build/reports/production_activation_assurance.json
       - name: Production activation readiness must remain held without current authority and initial readiness
         run: python scripts/check_production_activation_readiness.py examples/production_activation_readiness_intent.json.example --as-of 2026-09-18T22:05:00Z --expected-status HOLD_NO_CURRENT_PRODUCTION_ACTIVATION_ASSURANCE > build/reports/production_activation_readiness.json
+      - name: Exported identity and cryptographic trust assurance remains non-authoritative
+        run: python scripts/check_identity_crypto_assurance.py --as-of 2026-09-18T23:00:00Z > build/reports/identity_crypto_assurance.json
+      - name: Identity and cryptographic trust readiness must remain held without current native trust evidence
+        run: python scripts/check_identity_crypto_readiness.py examples/identity_crypto_readiness_intent.json.example --as-of 2026-09-18T23:00:00Z --expected-status HOLD_NO_CURRENT_IDENTITY_CRYPTO_ASSURANCE > build/reports/identity_crypto_readiness.json
       - name: Local regressions and route-model checks
         run: python tools/check_local.py
       - name: Known Nutanix task-tree and recovery campaign over loopback HTTPS
