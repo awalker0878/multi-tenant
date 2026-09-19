@@ -16,7 +16,7 @@ The repository now records the actual target separately from native qualificatio
 
 The active index is \`sources/capabilities/qualification_campaign_evidence_index.json\` and is intentionally empty.
 
-Every active record must bind to one \`CURRENT_SELECTED\` record in the target-selection assurance index for the same:
+Every active record must bind to one reviewed target-selection record for the same:
 
 - selection ID;
 - site and cell;
@@ -24,7 +24,20 @@ Every active record must bind to one \`CURRENT_SELECTED\` record in the target-s
 - platform family; and
 - exact product-tuple ID.
 
-A campaign packet cannot float free of the target on which its observations were made.
+The packet also carries the exact authorization references selected for the native campaign: change/contact/stop authority, qualification-campaign identity, native API/observer/writer scopes, credential custody, evidence workspace, data restrictions, permitted/prohibited operations, cleanup and contact-window reference. Those references must match the target-selection record, and the governed evidence workspace must equal the authorized workspace.
+
+A campaign packet cannot float free of the target or the restricted authority under which its observations were made.
+
+## Contact-window semantics
+
+Target-contact authority controls **new target interaction**, not the historical validity of observations already collected under that authority. A completed evidence packet may therefore remain current after the contact window expires when:
+
+- the target selection itself remains reviewed and has no open/uncertain scope gap;
+- the packet records an authorized contact expiry no later than the target-selection expiry;
+- the campaign began after the target selection became effective; and
+- every native attempt occurred on or before the recorded authorized expiry.
+
+A target-selection state of `CONTACT_AUTHORITY_DUE` can support retained campaign evidence under those conditions, but it still grants **no permission to reconnect, retrieve credentials, rerun tests or refresh evidence**. `REVIEW_DUE`, `GAPS_OPEN` and `UNCERTAIN` target selections cannot support a current campaign packet.
 
 ## Campaign scope and applicability
 
