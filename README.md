@@ -145,3 +145,7 @@ The [bootstrap service gate](docs/engineering/bootstrap-service-readiness-assura
 ## Actual target selection for restricted native campaigns
 
 The [target-selection assurance gate](docs/engineering/actual-target-selection-assurance.md) addresses I02 without choosing a site, platform or security edge. A current record captures the externally selected site/cell, exact installed tuple references, EC/SE realization, restricted native API/observer/writer scope, credential custody, evidence workspace, data restrictions, permitted/prohibited operations, cleanup/stop authority and time-bounded target-contact authority. The active target-selection index is intentionally empty, and CI cannot select or contact a target.
+
+## Qualification campaign evidence assurance
+
+The [campaign evidence gate](docs/engineering/qualification-campaign-evidence-assurance.md) binds an externally executed native qualification campaign to the current selected target and exact service/topology scope. It requires explicit applicability, retained attempts, healthy positive controls for negative observations, artifact hashes, freshness, reviewed not-applicable decisions and residual-gap state. The active campaign evidence index is intentionally empty. A complete packet is review input only: CI cannot contact the target, execute native tests, issue qualification, publish a native-qualified platform claim, apply infrastructure or activate production.
