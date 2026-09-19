@@ -116,6 +116,23 @@ def campaign_record(evidence_refs, platform='nutanix', tuple_id='fixture-tuple',
             'started_at': '2026-09-17T09:00:00Z',
             'review_by': '2026-12-31T23:59:59Z'
         },
+        'authorization': {
+            'change_authority_ref': 'controlled-authority:change',
+            'target_contact_authority_ref': 'controlled-authority:target-contact',
+            'target_contact_valid_until': '2026-12-31T23:59:59Z',
+            'stop_authority_ref': 'controlled-authority:stop',
+            'qualification_campaign_ref': 'controlled-campaign:qualification',
+            'native_api_scope_ref': 'controlled-campaign:native-api',
+            'observer_scope_ref': 'controlled-campaign:observer',
+            'writer_scope_ref': 'controlled-campaign:writer',
+            'credential_custody_ref': 'controlled-campaign:credential-custody',
+            'evidence_workspace_ref': 'controlled-campaign:evidence-workspace',
+            'data_restriction_ref': 'controlled-campaign:no-production-data',
+            'permitted_operations_ref': 'controlled-campaign:permitted',
+            'prohibited_operations_ref': 'controlled-campaign:prohibited',
+            'cleanup_ref': 'controlled-campaign:cleanup',
+            'contact_window_ref': 'controlled-campaign:window'
+        },
         'governance': {
             'applicability_ref': 'controlled-campaign:applicability',
             'run_sheet_ref': 'controlled-campaign:run-sheet',
