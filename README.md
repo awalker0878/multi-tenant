@@ -125,3 +125,7 @@ The [native IPv6 assurance gate](docs/engineering/native-ipv6-address-family-ass
 ## Production activation and initial-readiness assurance
 
 The [production activation gate](docs/engineering/production-activation-and-initial-readiness-assurance.md) addresses I10 without granting activation authority. It binds exact site/service/platform/workload/exposure scope to current G0/G1/G2 prerequisites, applicable initial G4 recovery/operations readiness, valid operating authority, a reversible G3 exposure plan, tested withdrawal readiness, and post-activation live-path evidence. Failed or unknown live verification requires withdrawal rather than optimistic continuation. The active activation index is intentionally empty.
+
+## Identity, certificate and cryptographic trust assurance
+
+The [identity/crypto trust gate](docs/engineering/identity-crypto-trust-assurance.md) addresses the trust-services portion of I07. It requires separately scoped human/workload/automation identities, hardened privileged/emergency access, observed revocation including cached tokens, certificate issuance/renewal/revocation and endpoint identity, separated key-use/admin/recovery/destruction authority, retained-data-aware destruction, KMS/trust outage behavior, no plaintext fallback, independent recovery and crypto-agility records. The active trust index is intentionally empty.
