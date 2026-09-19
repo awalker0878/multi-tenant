@@ -141,3 +141,7 @@ The [service-reply assurance gate](docs/engineering/origin-specific-service-repl
 ## Bootstrap service and steady-state transition assurance
 
 The [bootstrap service gate](docs/engineering/bootstrap-service-readiness-assurance.md) addresses I06 by composing the existing authoritative IPAM/DNS handoffs with the minimum initialization dependencies required for safe Day-0 and endpoint bootstrap. Current readiness requires selected address-assignment/DHCP-metadata behavior, resolver/time/trust/certificate/key/artifact/telemetry/service-reply paths, restricted OOB/management execution, dependency-loss behavior with no unrestricted fallback, recoverable configuration/state, and verified transition from temporary dependencies to steady-state services. The active bootstrap index is intentionally empty.
+
+## Actual target selection for restricted native campaigns
+
+The [target-selection assurance gate](docs/engineering/actual-target-selection-assurance.md) addresses I02 without choosing a site, platform or security edge. A current record captures the externally selected site/cell, exact installed tuple references, EC/SE realization, restricted native API/observer/writer scope, credential custody, evidence workspace, data restrictions, permitted/prohibited operations, cleanup/stop authority and time-bounded target-contact authority. The active target-selection index is intentionally empty, and CI cannot select or contact a target.
