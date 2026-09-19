@@ -9,6 +9,7 @@ through its accepted interface.
 from __future__ import annotations
 
 import argparse
+import hashlib
 from datetime import datetime, timezone
 import ipaddress
 import json
@@ -103,6 +104,12 @@ def unique_strings(value,label,*,allow_empty=False,maximum=128):
         raise ValueError(f'{label}: nonempty strings required')
     if len(value)!=len(set(value)):raise ValueError(f'{label}: duplicates not allowed')
     return value
+
+
+def canonical_digest(value):
+    return hashlib.sha256(json.dumps(
+        value,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False
+    ).encode('utf-8')).hexdigest()
 
 
 def load(path:Path=INDEX):
@@ -260,6 +267,31 @@ def validate_record(record,*,as_of,root=ROOT):
     sources=unique_strings(record['source_refs'],'source_refs')
     for ref in sources:repository_ref(ref,root)
 
+    confirmation_sha256=None
+    if confirmed is not None:
+        confirmation_sha256=canonical_digest({
+            'allocation_id':record['allocation_id'],
+            'operation_id':record['operation_id'],
+            'generation':record['generation'],
+            'reservation_id':record['reservation_id'],
+            'request_id':record['request_id'],
+            'wsd_engineering_ref':record['wsd_engineering_ref'],
+            'intent_sha256':record['intent_sha256'],
+            'allocation_policy':record['allocation_policy'],
+            'overlap_exception_ref':record['overlap_exception_ref'],
+            'family':family,
+            'allocation_kind':kind,
+            'requested_prefix_length':record['requested_prefix_length'],
+            'delegated_scope_ref':record['delegated_scope_ref'],
+            'authoritative_system':{
+                'system_ref':system['system_ref'],
+                'record_ref':system['record_ref']
+            },
+            'allocation_ref':record['allocation_ref'],
+            'confirmed_at':confirmed.isoformat(),
+            'realization_ref':record['realization_ref']
+        })
+
     return {
         'allocation_id':record['allocation_id'],'operation_id':record['operation_id'],
         'generation':record['generation'],'state':record['state'],
@@ -269,6 +301,9 @@ def validate_record(record,*,as_of,root=ROOT):
         'delegated_scope_ref':record['delegated_scope_ref'],
         'authoritative_system':dict(system),'allocation_ref':record['allocation_ref'],
         'created_at':created.isoformat(),'last_observed_at':observed.isoformat(),
+        'confirmed_at':confirmed.isoformat() if confirmed else None,
+        'realization_ref':record['realization_ref'],
+        'confirmation_sha256':confirmation_sha256,
         'cleanup':cleanup,'unresolved':record['state']=='UNCERTAIN',
         'evidence_refs':sorted(evidence)
     }
