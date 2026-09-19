@@ -1,0 +1,18 @@
+{
+  "format": "portable-hosting-target-selection-readiness-intent/1",
+  "status": "PLANNING_ONLY_NOT_AUTHORIZED",
+  "request_id": "EXAMPLE-TARGET-SELECTION-01",
+  "selection_id": "example-target-not-selected",
+  "site_ref": "controlled-site:EXAMPLE-NOT-SELECTED",
+  "cell_ref": "controlled-cell:EXAMPLE-NOT-SELECTED",
+  "campaign_scope_ref": "controlled-campaign-scope:EXAMPLE-NOT-AUTHORIZED",
+  "platform_family": "NUTANIX",
+  "product_tuple_id": "example-tuple-not-selected",
+  "production_authority": "NOT_ASSESSED",
+  "source_refs": [
+    "docs/implementation/delivery-guide/1-implementation-workplan-and-required-inputs.md",
+    "docs/engineering/platform-realizations/7-implementation-tuple-and-decision-package.md",
+    "docs/assurance/gap-map/4-open-decision-package-for-implementation.md",
+    "docs/engineering/actual-target-selection-assurance.md"
+  ]
+}

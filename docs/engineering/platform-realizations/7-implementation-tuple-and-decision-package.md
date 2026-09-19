@@ -27,6 +27,8 @@ Each native realization needs a controlled implementation record before it is of
 
 The supplied operation-coverage CSV is intentionally unqualified. Populate a row with actual resource types and supported operations, attach current vendor evidence and execute the lifecycle scenarios. Where another owner or installer manages the resource, name that owner and the accepted handoff rather than forcing the object into Terraform state. A provider change may require requalification even if the running platform release is unchanged.
 
+The [actual target-selection assurance gate](../actual-target-selection-assurance.md) records which real site/cell and implementation tuple have been selected for a restricted native campaign before these lifecycle scenarios contact a target. That selection remains separate from current support/provenance and native qualification.
+
 Related engineering: [Vendor decision gaps](../../assurance/gap-map/3-detailed-gap-register-and-treatment.md#GM_s_003)  •  [Operation-level matrix](../../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md#PROV_s_003)  •  [Evidence applicability](../../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md#QUAL_s_005)
 
 [Previous chapter](6-portable-composite-and-migrated-service-choices.md) · [Chapter index](README.md) · [Next chapter](08-references-parent-basis-and-external-context.md)

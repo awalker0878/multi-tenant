@@ -30,4 +30,6 @@ Baseline and related records: [DEL §3](../../governance/delivery-framework/3-ap
 
 Use Implementation\_Tracker.xlsx for the execution record. A local workbook status is an index to evidence and authority; it is not an approval engine. Record actual operators and approvers rather than accepting the role names in this reference as assignments.
 
+Use the [actual target-selection assurance gate](../../engineering/actual-target-selection-assurance.md) to record the real site/cell, installed tuple and restricted native-campaign scope before target contact. A current gate record is evidence of the external selection only; it neither selects nor contacts the target.
+
 [Chapter index](README.md) · [Next chapter](2-work-packages-dependencies-and-authority.md)
