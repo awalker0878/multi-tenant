@@ -78,7 +78,12 @@ def evaluate_task(record, body, current=None):
                 and type(body.get('eventChainId')) is int and body['eventChainId'] == record['event_chain_id']
                 and c.timestamp(body['queueTime']) == c.timestamp(record['queued_at']), 'Task execution binding differs')
         require(type(body.get('cancelled')) is bool, 'Explicit cancellation state required')
-        require(not body.get('parentTaskKey') and body.get('rootTaskKey') in (None, '', record['moid']), 'Task tree requires separate reconciliation')
+        if 'parent_task_id' in record:
+            require((body.get('parentTaskKey') or None) == record['parent_task_id'], 'Task parent differs')
+            require(body.get('rootTaskKey') == record['root_task_id'] if record['parent_task_id'] else
+                    body.get('rootTaskKey') in (None, '', record['moid']), 'Task root differs')
+        else:
+            require(not body.get('parentTaskKey') and body.get('rootTaskKey') in (None, '', record['moid']), 'Task tree requires separate reconciliation')
         state = body.get('state'); require(state in {'queued', 'running', 'success', 'error'}, 'Unknown task state')
         result.update(identity_match=True, config_status='MATCH', native_state=state)
         # Native error text and arbitrary task results never enter the journal.

@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from tools.compile_wsd import STATE
-from tools import vsphere_observe, vsphere_task_observe
+from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe
 from tools.check_release import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
@@ -175,8 +175,9 @@ def flow_binding(scope, manifest, outputs, workload, network):
 
 
 def vsphere_adapter(manifest):
-    require(manifest.get('profile') in {vsphere_observe.PROFILE, vsphere_task_observe.PROFILE}, 'Supported vSphere observer required')
-    return vsphere_observe if manifest['profile'] == vsphere_observe.PROFILE else vsphere_task_observe
+    adapters = {a.PROFILE: a for a in (vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe)}
+    require(manifest.get('profile') in adapters, 'Supported vSphere observer required')
+    return adapters[manifest['profile']]
 
 
 def vsphere_binding(scope, manifest, outputs, network):

@@ -14,9 +14,13 @@ import sys
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from tools import readback_core as c
-from tools import nsx_observe, nutanix_observe, vsphere_task_observe
+from tools import nsx_observe, nutanix_observe, vsphere_task_observe, vsphere_task_tree_observe
 
 ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe,'vmware':vsphere_task_observe}
+
+
+def adapter_for(m):
+    return vsphere_task_tree_observe if m.get('platform') == 'vmware' and m.get('profile') == vsphere_task_tree_observe.PROFILE else ADAPTERS[m['platform']]
 
 
 def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
@@ -41,7 +45,7 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
     if not isinstance(hist,list) or not 1<=len(hist)<=10:
         raise ValueError('Incomplete observation history')
     previous=None;stable=0;prior_time=start
-    key_selector=getattr(ADAPTERS[m['platform']],'observation_keys',None)
+    key_selector=getattr(adapter_for(m),'observation_keys',None)
     keys=key_selector(m) if key_selector else {r['path'] if m['platform']=='nsx' else r['ext_id'] for r in m['resources']}
     for index,row in enumerate(hist,1):
         c.exact_keys(row,{'round','observed_at','snapshot_sha256','states','outcome'})
@@ -67,7 +71,7 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
                     raise ValueError('Missing selected-configuration digest')
                 if state['config_status']=='MATCH' and state.get('mismatch_fields')!=[]:
                     raise ValueError('Match contains contradictory mismatch information')
-        history_check=getattr(ADAPTERS[m['platform']],'validate_observation_history',None)
+        history_check=getattr(adapter_for(m),'validate_observation_history',None)
         if history_check is not None:
             # A later review clock must not validate facts that postdate the sample.
             try:history_check(m,hist[:index-1],states,current=t)
@@ -94,7 +98,7 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
     reasons=[];result='HOLD_INVALID_EVIDENCE'
     try:
         if m.get('platform') not in ADAPTERS:raise ValueError('Unsupported platform')
-        ADAPTERS[m['platform']].validate(m)
+        adapter_for(m).validate(m)
         c.exact_keys(context,{'kind','operation_id','tenant_id','scope_id','manifest_sha256','report_sha256',
             'accepted_plan_sha256','change_record_ref','attempted_at','last_security_change_at',
             'attempted_generation','current_generation','executor_state','writer_fence','quarantine','containment','data_disposition'})

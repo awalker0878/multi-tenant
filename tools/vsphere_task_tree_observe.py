@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Bounded recorded VM task trees with native child-history closure checks."""
+from copy import deepcopy
+import os
+from pathlib import Path
+import sys
+if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from tools import readback_core as c, vsphere_observe as vm, vsphere_task_observe as task, vsphere_history
+from tools.run_files import require
+
+PROFILE = 'vsphere-vi-json-8.0.3.0-task-tree-history'
+COVERAGE = 'task-coverage'
+
+
+def validate(m):
+    c.common_manifest(m, 'vmware'); require(m['profile'] == PROFILE, 'Unsupported task-tree profile')
+    c.exact_keys(m['task'], {'execution_record_ref', 'coverage_ref', 'task_manager_id', 'records'})
+    c.text(m['task']['coverage_ref']); c.identifier(m['task']['task_manager_id'])
+    flat = deepcopy(m); flat['profile'] = task.PROFILE
+    for key in ('coverage_ref', 'task_manager_id'): flat['task'].pop(key)
+    for r in flat['task']['records']:
+        c.exact_keys(r, {'moid', 'vm_moid', 'description_id', 'queued_at', 'event_chain_id', 'parent_task_id', 'root_task_id'})
+        r.pop('parent_task_id'); r.pop('root_task_id')
+    task.validate(flat)
+    records = {r['moid']: r for r in m['task']['records']}
+    for r in records.values():
+        vm.moid(r['root_task_id'], 'task'); parent = r['parent_task_id']
+        require(parent is None or parent in records, 'Task parent absent from accepted graph')
+        seen = {r['moid']}; node = r
+        while node['parent_task_id'] is not None:
+            parent = records[node['parent_task_id']]
+            require(parent['moid'] not in seen and parent['vm_moid'] == r['vm_moid']
+                    and c.timestamp(parent['queued_at']) <= c.timestamp(node['queued_at']), 'Cyclic, foreign or reversed task ancestry')
+            seen.add(parent['moid']); node = parent
+        require(node['moid'] == r['root_task_id'], 'Accepted task root differs from ancestry')
+
+
+def targets(m):
+    validate(m)
+    return vm.targets(task.vm_manifest(m)) | {task.task_target(r) for r in m['task']['records']}
+
+
+def observation_keys(m): return task.observation_keys(m) | {COVERAGE}
+
+
+def history_witness(bodies):
+    witnesses = [task.task_witness(body) for body in bodies]
+    return sorted(witnesses, key=lambda w: w.get('key', ''))
+
+
+def coverage_state(m, witness, states):
+    status = 'UNKNOWN'; mismatches = []
+    try:
+        c.exact_keys(witness, {'before', 'after'})
+        expected = {r['moid']: r for r in m['task']['records'] if r['parent_task_id'] is not None}
+        observed = {s['resource_key']: s['task_witness'] for s in states if s['resource_key'] in expected}
+        for phase in ('before', 'after'):
+            rows = witness[phase]
+            require(isinstance(rows, list) and len(rows) <= 100 and all(isinstance(r, dict) for r in rows), 'Invalid history witness')
+            ids = [row.get('key') for row in rows]
+            require(all(isinstance(key, str) for key in ids) and len(ids) == len(set(ids)), 'Ambiguous history IDs')
+            if set(ids) != set(expected): mismatches.append('/history/' + phase + ':child_set_differs')
+        if c.digest(witness['before']) != c.digest(witness['after']): mismatches.append('/history:changed_during_snapshot')
+        if any(c.digest(w) != c.digest(observed.get(w.get('key'))) for w in witness['after']):
+            mismatches.append('/history:task_get_differs')
+        status = 'DIFFERENT' if mismatches else 'MATCH'
+    except (ValueError, TypeError, KeyError): mismatches.append('/history:unknown')
+    return dict(resource_key=COVERAGE, identity_match=status != 'UNKNOWN', config_status=status,
+        progress='UNKNOWN' if status == 'UNKNOWN' else 'COMPLETE', reason='VISIBLE_CHILD_HISTORY_ONLY_NOT_A_WRITER_FENCE',
+        config_sha256=c.digest(witness), mismatch_fields=mismatches, history_witness=witness, task_completion_observed=False)
+
+
+def sample(m, client):
+    before_history = history_witness(client.children())
+    before = [task.task_sample(r, client) for r in m['task']['records']]
+    snapshots = vm.sample(task.vm_manifest(m), client)
+    after = [task.task_sample(r, client) for r in m['task']['records']]
+    after_history = history_witness(client.children())
+    for first, last in zip(before, after):
+        if first.get('native_state') in {'success', 'error'} and c.digest(first) != c.digest(last):
+            raise c.ObservationError('VSPHERE_TERMINAL_TASK_CHANGED')
+    witness = {'before': before_history, 'after': after_history}
+    return snapshots + after + [coverage_state(m, witness, after)]
+
+
+def validate_observation_history(m, history, states, current=None):
+    if len(states) == 1 and states[0].get('resource_key') == 'scope': return
+    task.validate_observation_history(m, history, states, current=current)
+    try:
+        coverage = [s for s in states if s.get('resource_key') == COVERAGE]
+        require(len(coverage) == 1 and c.digest(coverage[0]) == c.digest(coverage_state(m, coverage[0]['history_witness'], states)), 'History summary differs')
+    except (ValueError, TypeError, KeyError):
+        raise c.ObservationError('VSPHERE_HISTORY_WITNESS_DIFFERS') from None
+
+
+def make_client(m, args):
+    return vsphere_history.Client(m['origin'], args.expected_origin, os.environ.get('VCENTER_SESSION', ''), targets(m),
+        m['task']['task_manager_id'], [r['moid'] for r in m['task']['records']], args.ca_file)
+
+
+if __name__ == '__main__':
+    from tools.readback_cli import run
+    raise SystemExit(run(sys.modules[__name__], 'VCENTER', session=True, client_factory=make_client))

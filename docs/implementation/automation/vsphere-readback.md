@@ -91,3 +91,46 @@ defines the observed fields; the pinned
 [govmomi VM simulator](https://github.com/vmware/govmomi/blob/v0.49.0/simulator/virtual_machine.go)
 provides the supported task description identifiers. Actual site commissioning
 must verify their native behavior and the installed API tuple.
+
+## Bounded task trees and child-history checks
+
+`tools/vsphere_task_tree_observe.py` uses profile
+`vsphere-vi-json-8.0.3.0-task-tree-history`. It retains the accepted VM resources
+and supported power/reconfiguration operations. The `task` object adds
+`task_manager_id` and `coverage_ref`; every task record adds `parent_task_id`
+(null for a root) and `root_task_id`. Enumerate at most 20 tasks, including every
+accepted child, with an acyclic ancestry confined to its observed VM. The native
+parent/root links and timestamps must match. Clone/result-bearing operations,
+tasks on other native entity types and unreviewed internal operations remain held.
+
+This profile also queries native history with `parentTaskKey` set to **all**
+accepted task IDs, including leaves. It uses only three session-collector POST
+methods: create the filtered collector, read successive pages, and destroy that
+collector. No VM power/configuration, task cancel, unfiltered inventory query or
+arbitrary POST interface is supplied. A new collector begins at the oldest item;
+the reader drains through an explicit empty page. A short page is not treated as
+completion. Six pages, 20 entries per page, 100 total entries, the shared request
+limit and a 120-second transport budget bound collection. Duplicated, oversized,
+incomplete or failed pages and cleanup failures hold the observation. After a
+lost collector-creation reply or process stop, the session owner must reconcile
+remaining session collectors; the tool does not rediscover or retry creation.
+
+Child-history scans bracket task/VM reads. Both scans must match the exact
+expected non-root task set and the direct task witnesses. Missing or additional
+children hold; parent success cannot hide a pending or failed child. Two stable
+rounds are still required. Campaign v5 and offline recovery review support this
+profile, including recomputation of history coverage from its bounded witnesses.
+
+The coverage reference must independently establish installed API applicability,
+task-history retention and the observer's visibility into every relevant native
+task. These queries prove only the visible accepted task graph; they cannot fence
+another writer, detect all unrelated operations on the VM, or prevent a future
+child submission. Keep actual writer exclusion and operation-wide reconciliation
+as separate required evidence. No ledger is cleared and no power action is issued.
+
+Interfaces: [task filter](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/TaskFilterSpec/),
+[collector creation](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/TaskManager/moId/CreateCollectorForTasks/post/),
+[page reads](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/TaskHistoryCollector/moId/ReadNextTasks/post/),
+[initial cursor](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/HistoryCollector/moId/RewindCollector/post/)
+and [collector cleanup](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/HistoryCollector/moId/DestroyCollector/post/).
+The session-local collector changes are separate from infrastructure mutations.

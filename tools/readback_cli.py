@@ -7,7 +7,7 @@ from pathlib import Path
 from tools import readback_core as c
 
 
-def run(adapter,credential_prefix, *, session=False):
+def run(adapter,credential_prefix, *, session=False, client_factory=None):
     p=argparse.ArgumentParser(description=adapter.__doc__)
     p.add_argument('manifest',type=Path)
     p.add_argument('--read-authorized-target',action='store_true')
@@ -29,7 +29,7 @@ def run(adapter,credential_prefix, *, session=False):
             raise ValueError('Documentation endpoint cannot be contacted')
         if type(a.rounds) is not int or not 2<=a.rounds<=10 or not 0<=a.interval<=10:
             raise ValueError('Bounded polling values required')
-        client=c.ReadClient(m['origin'],a.expected_origin,
+        client=client_factory(m,a) if client_factory else c.ReadClient(m['origin'],a.expected_origin,
             None if session else os.environ.get(credential_prefix+'_USERNAME',''),
             None if session else os.environ.get(credential_prefix+'_PASSWORD',''),
             adapter.targets(m),ca_file=a.ca_file,
