@@ -12,7 +12,7 @@ from urllib.error import HTTPError, URLError
 from unittest.mock import patch
 
 from lab.native_readback_fixture import credentials
-from tools.netbox_ipam import operate, validate_authority, validate
+from tools.netbox_ipam import AllocationReader, operate, validate_authority, validate
 from tools.run_files import digest, encoded, load_private, utcnow
 from tools.service_http import JsonService
 
@@ -188,3 +188,51 @@ class NetboxTests(unittest.TestCase):
                        dict(valid_until=(utcnow() - timedelta(seconds=1)).isoformat())]:
             with self.subTest(change=change), self.assertRaises(ValueError):
                 validate_authority(self.job, 'reserve', authority | change, b'fixture', None)
+
+    def test_exact_readback_rejects_list_detail_identity_and_status_races(self):
+        self.run_action('reserve')
+        request = self.client.request
+        for change in [dict(id=5), dict(status={'value': 'active'})]:
+            def changed(method, path, *args, **kwargs):
+                row, headers = request(method, path, *args, **kwargs)
+                if path == '/api/ipam/ip-addresses/4/':
+                    row.update(change)
+                return row, headers
+            before = len(self.calls)
+            with self.subTest(change=change), patch.object(self.client, 'request', side_effect=changed):
+                with self.assertRaises(ValueError):
+                    self.run_action('confirm')
+            self.assertTrue(all(method == 'GET' for method, _ in self.calls[before:]))
+        self.assertEqual(load_private(next(self.ledger.glob('*/head.json')))['allocation_status'], 'reserved')
+
+    def test_malformed_native_identity_and_collection_cannot_confirm(self):
+        self.run_action('reserve')
+        request = self.client.request
+        cases = [('list', {'count': True}), ('list', {'count': -1}), ('list', {'results': None}),
+                 ('detail', {'tenant': {'id': True}}), ('detail', {'id': True}),
+                 ('detail', {'status': {'value': 'dhcp'}}), ('prefix', {'tenant': {'id': True}})]
+        for target, change in cases:
+            def changed(method, path, *args, **kwargs):
+                row, headers = request(method, path, *args, **kwargs)
+                if ((target == 'list' and '?' in path)
+                        or (target == 'detail' and path == '/api/ipam/ip-addresses/4/')
+                        or (target == 'prefix' and '/prefixes/' in path)):
+                    row.update(change)
+                return row, headers
+            before = len(self.calls)
+            with self.subTest(target=target, change=change), patch.object(self.client, 'request', side_effect=changed):
+                with self.assertRaises(ValueError):
+                    self.run_action('confirm')
+            self.assertTrue(all(method == 'GET' for method, _ in self.calls[before:]))
+
+    def test_dependent_readback_preserves_allocation_ledger(self):
+        self.run_action('reserve')
+        self.run_action('confirm')
+        before = {p: p.read_bytes() for p in self.ledger.rglob('*') if p.is_file()}
+        count = len(self.calls)
+        reader = AllocationReader(self.job, self.authority, self.client)
+        reader.namespace()
+        row, etag = reader.observed()
+        self.assertEqual((row['id'], reader.check(row), etag), (4, 'active', 'W/"current"'))
+        self.assertTrue(all(method == 'GET' for method, _ in self.calls[count:]))
+        self.assertEqual(before, {p: p.read_bytes() for p in self.ledger.rglob('*') if p.is_file()})

@@ -94,50 +94,76 @@ def relation(row, key):
     return row.get(key, {}).get('id') if isinstance(row.get(key), dict) else row.get(key)
 
 
-def operate(job, action, authority, client, ledger):
-    validate(job)
-    require(action in ACTIONS, 'Unknown IPAM action')
-    require(client.origin == job['origin'].rstrip('/'), 'IPAM client origin changed')
+class AllocationReader:
+    """Exact native allocation/namespace readback shared by dependent services."""
 
-    def call(method, path, body=None, **kwargs):
-        current_window(authority)
-        seconds = (datetime.fromisoformat(authority['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
-        result, headers = client.request(method, path, body, timeout=seconds, **kwargs)
+    def __init__(self, job, authority, client):
+        validate(job)
+        require(client.origin == job['origin'].rstrip('/'), 'IPAM client origin changed')
+        self.job, self.authority, self.client = job, authority, client
+
+    def call(self, method, path, body=None, **kwargs):
+        current_window(self.authority)
+        seconds = (datetime.fromisoformat(self.authority['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
+        result, headers = self.client.request(method, path, body, timeout=seconds, **kwargs)
         headers = {k.lower(): v for k, v in headers.items()}
         require(headers.get('api-version') == '4.7', 'The selected NetBox 4.7 API is required')
         return result, headers
 
-    def check(row):
-        require(row.get('address') == job['address'] and relation(row, 'tenant') == job['tenant_id']
-                and relation(row, 'vrf') == job['vrf_id']
+    def check(self, row):
+        job = self.job
+        require(isinstance(row, dict) and row.get('address') == job['address']
+                and type(relation(row, 'tenant')) is int and relation(row, 'tenant') == job['tenant_id']
+                and type(relation(row, 'vrf')) is int and relation(row, 'vrf') == job['vrf_id']
+                and isinstance(row.get('custom_fields'), dict)
                 and all(row.get('custom_fields', {}).get(k) == v for k, v in refs(job).items()),
                 'IPAM object ownership or allocation changed')
         require(type(row.get('id')) is int and row['id'] > 0, 'Missing native IPAM identity')
+        require(isinstance(row.get('status'), dict)
+                and row['status'].get('value') in {'reserved', 'active', 'deprecated'},
+                'Unsupported native allocation status')
         return row['status']['value']
 
-    def observed():
+    def observed(self):
+        job = self.job
         query = urlencode({'address': str(ipaddress.ip_interface(job['address']).ip), 'vrf_id': job['vrf_id'], 'limit': 2})
-        result, _ = call('GET', '/api/ipam/ip-addresses/?' + query)
-        require(result.get('next') is None and result.get('count') == len(result.get('results', []))
-                and result['count'] <= 1, 'Ambiguous or paginated IP allocation')
+        result, _ = self.call('GET', '/api/ipam/ip-addresses/?' + query)
+        require(isinstance(result, dict) and isinstance(result.get('results'), list)
+                and type(result.get('count')) is int and result.get('next') is None
+                and result['count'] == len(result['results']) and result['count'] <= 1,
+                'Ambiguous or paginated IP allocation')
         if not result['results']:
             return None, None
-        check(result['results'][0])
-        row, headers = call('GET', f"/api/ipam/ip-addresses/{result['results'][0]['id']}/")
-        check(row)
+        selected = result['results'][0]
+        status = self.check(selected)
+        row, headers = self.call('GET', f"/api/ipam/ip-addresses/{selected['id']}/")
+        require(self.check(row) == status and row['id'] == selected['id'],
+                'Allocation identity or status changed between list and detail reads')
         return row, headers.get('etag')
 
+    def namespace(self):
+        job = self.job
+        prefix, _ = self.call('GET', f"/api/ipam/prefixes/{job['prefix_id']}/")
+        vrf, _ = self.call('GET', f"/api/ipam/vrfs/{job['vrf_id']}/")
+        require(isinstance(prefix, dict) and isinstance(vrf, dict)
+                and all(type(value) is int for value in [prefix.get('id'), relation(prefix, 'tenant'),
+                        relation(prefix, 'vrf'), vrf.get('id'), relation(vrf, 'tenant')])
+                and prefix.get('id') == job['prefix_id'] and prefix.get('prefix') == job['prefix']
+                and relation(prefix, 'tenant') == job['tenant_id'] and relation(prefix, 'vrf') == job['vrf_id']
+                and vrf.get('id') == job['vrf_id'] and relation(vrf, 'tenant') == job['tenant_id']
+                and vrf.get('enforce_unique') is True, 'Prefix/tenant/VRF binding or server uniqueness changed')
+
+
+def operate(job, action, authority, client, ledger):
+    reader = AllocationReader(job, authority, client)
+    require(action in ACTIONS, 'Unknown IPAM action')
+    call, check, observed = reader.call, reader.check, reader.observed
     with allocation_lock(ledger, job) as directory:
         head_path = directory / 'head.json'
         head = load_private(head_path) if head_path.exists() else None
         if head and head['status'] == 'OUTCOME_UNKNOWN':
             require(action == 'reconcile', 'Uncertain IPAM mutation requires read-only reconciliation')
-        prefix, _ = call('GET', f"/api/ipam/prefixes/{job['prefix_id']}/")
-        vrf, _ = call('GET', f"/api/ipam/vrfs/{job['vrf_id']}/")
-        require(prefix.get('id') == job['prefix_id'] and prefix.get('prefix') == job['prefix']
-                and relation(prefix, 'tenant') == job['tenant_id'] and relation(prefix, 'vrf') == job['vrf_id']
-                and vrf.get('id') == job['vrf_id'] and relation(vrf, 'tenant') == job['tenant_id']
-                and vrf.get('enforce_unique') is True, 'Prefix/tenant/VRF binding or server uniqueness changed')
+        reader.namespace()
         row, etag = observed()
         if action == 'reconcile':
             require(row is not None, 'No completed allocation observed; keep uncertainty hold')
