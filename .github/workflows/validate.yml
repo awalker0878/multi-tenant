@@ -150,6 +150,8 @@ jobs:
         run: sudo "$(command -v python)" lab/run_guest_services_lab.py --require-engines --scratch-root /etc/rsyslog.d
       - name: Recover useful synthetic data using the real restic engine
         run: python lab/run_restic_lab.py
+      - name: Exercise leased edge activation and withdrawal with real local packets
+        run: sudo "$(command -v python)" lab/run_nft_edge_lab.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -158,6 +160,7 @@ jobs:
             build/reports/ansible_validation.json
             build/reports/guest_services_lab.json
             build/reports/restic_recovery_lab.json
+            build/reports/nft_edge_lab.json
           retention-days: 14
           if-no-files-found: warn
   terraform:
