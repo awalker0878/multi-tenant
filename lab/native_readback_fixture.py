@@ -110,7 +110,8 @@ class Fixture:
             protocol_version='HTTP/1.1'
             def log_message(self,*_):pass
             def do_GET(self):
-                fixture.requests.append({'method':'GET','path':self.path,'has_basic_auth':self.headers.get('Authorization','').startswith('Basic ')})
+                fixture.requests.append({'method':'GET','path':self.path,'has_basic_auth':self.headers.get('Authorization','').startswith('Basic '),
+                                         'has_session_auth':bool(self.headers.get('vmware-api-session-id'))})
                 fixture.counts[self.path]=fixture.counts.get(self.path,0)+1
                 spec=deepcopy(fixture.routes.get(self.path,{'status':404,'body':{'error':'not in fixture'}}))
                 if fixture.hook:

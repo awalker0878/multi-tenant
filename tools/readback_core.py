@@ -170,19 +170,27 @@ class ObservationError(Exception):
 
 class ReadClient:
     """One HTTPS GET per call; no redirects, cookies, proxies, discovery or writes."""
-    def __init__(self, endpoint: str, expected_origin: str, username: str, password: str,
+    def __init__(self, endpoint: str, expected_origin: str, username: str | None, password: str | None,
                  allowed_targets: set[str], ca_file: str | None = None,
-                 timeout: float = 5.0, budget: float = 60.0):
+                 timeout: float = 5.0, budget: float = 60.0, *, session_token: str | None = None):
         self.origin = origin(endpoint)
         if self.origin != origin(expected_origin):
             raise ValueError('Target origin differs from accepted origin')
         p = urlsplit(self.origin)
         self.host, self.port = p.hostname, p.port or 443
-        text(username, 'injected username', 256)
-        text(password, 'injected password', 4096)
-        if ':' in username:
-            raise ValueError('Invalid Basic authentication username')
-        self._auth = 'Basic ' + base64.b64encode((username + ':' + password).encode()).decode('ascii')
+        if session_token is not None:
+            if username is not None or password is not None:
+                raise ValueError('Exactly one authentication method required')
+            text(session_token, 'injected session', 4096)
+            if any(ord(char) > 126 or char.isspace() for char in session_token):
+                raise ValueError('Invalid session header')
+            self._auth_headers = {'vmware-api-session-id': session_token}
+        else:
+            text(username, 'injected username', 256)
+            text(password, 'injected password', 4096)
+            if ':' in username:
+                raise ValueError('Invalid Basic authentication username')
+            self._auth_headers = {'Authorization': 'Basic ' + base64.b64encode((username + ':' + password).encode()).decode('ascii')}
         if not allowed_targets or any(not t.startswith('/') or t.startswith('//') or '\\' in t or '#' in t or any(ord(c)<33 or ord(c)>126 for c in t) for t in allowed_targets):
             raise ValueError('Invalid exact GET targets')
         self.allowed_targets = frozenset(allowed_targets)
@@ -207,7 +215,7 @@ class ReadClient:
         self.request_count += 1
         connection = http.client.HTTPSConnection(self.host, self.port, timeout=min(self.timeout, remaining), context=self.context)
         try:
-            connection.request('GET', target, headers={'Authorization': self._auth, 'Accept': 'application/json',
+            connection.request('GET', target, headers={**self._auth_headers, 'Accept': 'application/json',
                 'Accept-Encoding': 'identity', 'Connection': 'close', 'Cache-Control': 'no-cache'})
             read_socket = connection.sock
             response = connection.getresponse()
