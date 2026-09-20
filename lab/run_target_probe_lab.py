@@ -41,7 +41,9 @@ def run(user):
             reservation.bind(('127.0.0.1', 0)); port = reservation.getsockname()[1]
         config = directory / 'sshd.conf'
         config.write_text('\n'.join([f'Port {port}', 'ListenAddress 127.0.0.1',
-            f'HostKey {directory}/host', f'PidFile {directory}/sshd.pid', 'UsePAM no',
+            # Match the Ubuntu guest profile: PAM account/session checks with
+            # certificate-only authentication. Do not alter fixture account locks.
+            f'HostKey {directory}/host', f'PidFile {directory}/sshd.pid', 'UsePAM yes',
             'PasswordAuthentication no', 'KbdInteractiveAuthentication no', 'PermitRootLogin no',
             'AuthorizedKeysFile none', f'TrustedUserCAKeys {directory}/ca.pub',
             'PubkeyAcceptedAlgorithms ssh-ed25519-cert-v01@openssh.com', f'AllowUsers {user}',
