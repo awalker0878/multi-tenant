@@ -104,7 +104,8 @@ Their exact coverage and task limitations are documented separately.
 [VMware network association readers](implementation/automation/vmware-network-binding.md)
 add exact NSX-backed distributed-portgroup/switch identities and segment-scoped
 realized-switch identities. Campaign v6 binds these to each VM's assigned domain;
-effective per-port/DFW membership and native qualification remain separate.
+v7 adds exact distributed-port occupants, connection cookies and VM/NIC/host/MAC
+bindings. Effective DFW membership and native qualification remain separate.
 The profile's source dependency is networking/prism Go SDK v4.3.1; the code itself
 uses standard-library HTTP rather than executing the SDK. No legacy API fallback
 or installed compatibility claim is made. [U3–U6]
@@ -113,8 +114,9 @@ or installed compatibility claim is made. [U3–U6]
 
 The base profiles use GET-only access through an exact generated path allowlist
 and a canonical HTTPS origin. The separate vSphere task-tree profile adds bounded
-session-collector POSTs for filtered history creation, page reads and cleanup;
-it supplies no infrastructure mutation interface. All profiles verify the server
+session-collector POSTs for filtered history creation, page reads and cleanup.
+The port-attachment profile adds fixed, exact-key `FetchDVPorts` POSTs for reads;
+neither supplies an infrastructure mutation interface. All profiles verify the server
 certificate/hostname and reject redirects,
 foreign response links, environment proxies and credentials embedded in an origin.
 They do not create a login session or request credential renewal. The original

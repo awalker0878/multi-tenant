@@ -127,6 +127,18 @@ This profile refuses opaque/standard backings; v5 retains its narrower coverage.
 Per-port attachment, effective DFW membership/exclusions, guest addresses and
 native fencing still need independent evidence. Do not downgrade after a v6 hold.
 
+Use `hosting-target-campaign/7` for the additional
+[native port attachment checks](vmware-network-binding.md#campaign-v7-bind-the-observed-port-occupant).
+It keeps v6's assets, using the attachment profile for `portgroup_manifest` and
+including each native connection cookie in VM NIC backing expectations. Every
+owned NIC must match exactly one observed port's occupant, host, MAC and connection
+instance. Its fixed, scoped `FetchDVPorts` POSTs are read-only and must be included
+in accepted collection authority. Missing visibility, changed attachments and
+unused ports hold. The two portgroup reports now include attachment observations;
+all five reports remain bound per phase. v6 remains a narrower association profile.
+Neither supplies effective DFW enforcement, native fencing or production acceptance.
+Do not downgrade after a v7 hold.
+
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.

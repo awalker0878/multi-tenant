@@ -82,8 +82,9 @@ drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-read
 [Flow readback](nutanix-flow-readback.md) and [campaign v4](target-qualification.md)
 alongside actual network/VM task evidence. For VMware use
 [vSphere VM/task readback](vsphere-readback.md) and campaign v5, or
-[campaign v6](vmware-network-binding.md) for observed NSX-backed portgroup/segment
-associations. Snapshot matches cannot resolve an uncertain native operation.
+[campaign v6/v7](vmware-network-binding.md) for observed NSX-backed portgroup/segment
+associations and, in v7, exact port occupants, connection cookies and host/runtime
+bindings. These observations cannot resolve an uncertain native operation.
 Task profiles check accepted tasks and, where selected, bounded child history or
 visible existing-VM activity; they never clear an execution ledger or authorize
 replay. The [held-attempt reviewer](terraform-recovery.md)
@@ -110,7 +111,7 @@ enforcement or failure recovery.
 Remaining vSphere integration includes a separately fenced, data-preserving
 power/guest-bootstrap owner, complete native task coverage beyond the bounded
 template-clone/power/reconfiguration/activity profiles, effective per-port/DFW
-membership and unsupported network realizations beyond v6's selected associations, and
+membership and unsupported network realizations beyond v7's selected attachments, and
 operation-wide reconciliation and authorized ledger recovery. The observers and
 reviewer do not supply these write/fencing interfaces. Keep the NSX containment and reviewed
 operator hold points until those capabilities and their live behavior are accepted.

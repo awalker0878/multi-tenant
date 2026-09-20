@@ -117,3 +117,79 @@ independent tests and evidence. Task-aware VM profiles retain their separate
 coverage limits; snapshots do not imply task completion. Neither v6 nor the new
 standalone profiles release a held Terraform attempt or authorize a power action.
 Do not downgrade to v5 to bypass an association failure.
+
+## Exact native port attachments
+
+`tools/vsphere_port_observe.py` uses profile
+`vsphere-vi-json-8.0.3.0-nsx-port-attachments`. Keep the portgroup envelope and
+expectations above and add `ports` to each resource: 1–64 independently accepted
+selected `DistributedVirtualPort` objects, at most 100 across the manifest.
+Each port has exactly these selected fields:
+
+| Field | Required expectation |
+| --- | --- |
+| `_typeName`, `key`, `dvsUuid`, `portgroupKey` | `DistributedVirtualPort`, exact port key and the enclosing group's accepted switch UUID/portgroup key |
+| `config` | `_typeName: DVPortConfigInfo`, native `configVersion` |
+| `proxyHost` | Exact `HostSystem` managed reference |
+| `connectee` | `_typeName: DistributedVirtualSwitchPortConnectee`, exact `VirtualMachine` reference in `connectedEntity`, string `nicKey`, `type: vmVnic` |
+| `connectionCookie`, `lastStatusChange` | Native signed int32 connection cookie and accepted timestamp; never substitute a default for missing data |
+| `conflict` | `false` |
+| `state` | `_typeName: DVPortState`, with `runtimeInfo` containing `_typeName: DVPortStatus`, `linkUp: true`, `blocked: false` and native lowercase `macAddress` |
+
+Managed references use `type` and `value`, optionally `_typeName:
+ManagedObjectReference`. Duplicate switch/port identities or VM/NIC occupants are
+refused. These are selected attachment fields, not complete effective port policy.
+Descriptions, traffic statistics, address hints and vendor extensions are excluded
+from evidence. Configuration revisions and runtime status changes remain bound.
+
+The client calls the exact accepted switch's VI JSON `FetchDVPorts` method using
+POST with `{"criteria":{"portKey":["<exact accepted keys>"]}}`. This is a
+read-only `System.Read` method; the implementation has no port mutation method.
+It never omits criteria, requests all inventory, or filters out inactive ports.
+Each response must be an array covering the exact requested keys once. Missing,
+duplicate, extra, unreadable or malformed results hold. Missing connectee fields
+because of restricted visibility also hold.
+
+Port reads bracket the existing portgroup/switch reads, with two stable rounds
+required. Changed occupant, host, cookie, revision, link state or selected runtime
+data cannot pass. Normal explicit contact, session, CA, origin and private-output
+controls apply. Without the contact flag this command validates inputs only;
+the preview's `planned_get_targets` counts property GETs, excluding method POSTs:
+
+```sh
+python3 tools/vsphere_port_observe.py /private/operator/port-attachments.json
+```
+
+Interfaces: [FetchDVPorts](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VmwareDistributedVirtualSwitch/moId/FetchDVPorts/post/),
+[port fields and connection cookie](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/DistributedVirtualPort/),
+[connectee visibility](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/DistributedVirtualSwitchPortConnectee/)
+and [runtime status](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/DVPortStatus/).
+The pinned [govmomi method](https://github.com/vmware/govmomi/blob/v0.49.0/object/distributed_virtual_switch.go)
+and [connectee enum](https://github.com/vmware/govmomi/blob/v0.49.0/vim25/types/enum.go)
+also define the selected call/type. Published documentation and synthetic TLS
+fixtures do not establish installed 8.0.3.0 compatibility; qualify actual response
+types, optional-field visibility, revision/cookie semantics and privilege scope.
+
+## Campaign v7: bind the observed port occupant
+
+Use `hosting-target-campaign/7` with the v6 assets and the attachment profile for
+`portgroup_manifest`. Every VM NIC's full native backing must include its accepted
+`connectionCookie`. The campaign retains v6's owned domain/segment binding and
+additionally requires one unique observed port per NIC. Port key, switch UUID,
+portgroup key and cookie must match the VM backing; connected VM MoID and NIC key
+must match the owned VM; proxy host and runtime MAC must match VM runtime/config.
+Extra port evidence is refused. All these bindings are checked before contact.
+
+The same five-report sequence now uses the attachment reader for both portgroup
+reports before and after traffic. Native attachment changes after the VM read
+stop collection; every phase digest binds its five reports. Retain explicit
+authority for the read-only POSTs and the current independently accepted private
+expectations. A hold requires native-owner investigation and recollection under
+current authority, not editing expectations to fit an unexplained result.
+
+These bounded observations still are not atomic or continuous. A later port
+reuse, mobility event or writer can invalidate them. They do not prove effective
+DFW membership/exclusions, guest IP identity, native isolation, HA, recovery or
+writer fencing. The profile does not release a held attempt or authorize power
+control. Do not downgrade to v6/v5 after an attachment hold. Use the
+[commissioning cases](site-commissioning.md) to qualify the installed behavior.

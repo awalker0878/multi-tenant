@@ -81,7 +81,7 @@ guards. Neither creates a site inventory or establishes effective native policy.
 
 | Platform | Implemented control | Required before a live campaign |
 | --- | --- | --- |
-| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in v5 and selected NSX portgroup/segment associations in v6 | Qualify the selected native association profile, image initialization, per-port attachment, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
+| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in v5, selected NSX portgroup/segment associations in v6 and port occupants in v7 | Qualify the installed attachment profile, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
 | Nutanix | Existing VM ON/NIC connected, or OFF/disconnected with disks retained; exact owned Flow service exceptions/withdrawal; AHV/network/Flow readback in campaign v4 | Accepted native Flow semantics/precedence and project/category/placement/storage, image initialization and actual network/VM/Flow task evidence; native withdrawal and recovery qualification |
 
 Keep VMware domain and workload state ownership separate. The pinned vSphere
@@ -108,9 +108,24 @@ provenance. Qualify the mapping for every offered member/domain, including:
 | Missing, duplicate, paginated or failed NSX realization | Hold for native-owner investigation |
 | Opaque/standard backing, multiple enforcement points or unsupported native shape | Profile refused; qualify a separate supported realization |
 
-Actual per-port attachment, dynamic group membership, DFW exclusions/precedence,
-same-host bypass and real allowed/denied traffic remain separate checks. A
-configured association does not establish isolation, HA or writer exclusion.
+For [campaign v7](vmware-network-binding.md#campaign-v7-bind-the-observed-port-occupant),
+also accept exact native port keys, connection cookies, VM/NIC connectees, proxy
+hosts and selected runtime state. Qualify the installed VI JSON version and
+scoped `System.Read` visibility for the fixed `FetchDVPorts` POST. Exercise:
+
+| Native case | Required result |
+| --- | --- |
+| Reused port key with a different VM/NIC or connection cookie | Hold despite a matching switch and portgroup |
+| VM migration changes the serving host or attachment | Hold against old expectations; verify the native outcome before accepting current evidence |
+| Blocked, disconnected or conflicting port | Hold; do not filter inactive ports out of the query |
+| Observer cannot see the connected VM, cookie or selected runtime fields | Hold; no default identity or successful empty result |
+| Missing, extra or duplicate port rows | Hold without broadening the query |
+| Attachment changes between port and VM observations | Stop collection and retain containment |
+
+These fixtures still require actual native commissioning. Dynamic group membership,
+DFW exclusions/precedence, same-host bypass and real allowed/denied traffic remain
+separate checks. Port link/occupant evidence does not establish isolation, HA or
+writer exclusion. Do not downgrade a failed attachment campaign to v6/v5.
 
 For the vSphere task-tree profile, accept native task-history visibility,
 retention, supported ancestry/operation shapes and session-collector permissions
