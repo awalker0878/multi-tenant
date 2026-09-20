@@ -19,6 +19,9 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [OpenStack workload readback](openstack-readback.md) | Nova placement, Cinder attachments/encryption and Glance image identity |
 | [VMware and Nutanix restricted lifecycle](platform-lifecycle.md) | Exact NSX service rules, AHV power/NIC transitions and retained-data withdrawal |
 | [Nutanix VM readback](nutanix-vm-readback.md) | Scoped AHV placement, membership, disk, NIC and power snapshots; campaign v3 binding |
+| [Nutanix Flow readback](nutanix-flow-readback.md) | Owned policy, category/VPC membership and strong-ETag observations; campaign v4 binding |
+| [vSphere VM and task readback](vsphere-readback.md) | Exact VM snapshots, child history, template clone source/result witnesses and campaign v5 binding |
+| [Held Terraform attempt review](terraform-recovery.md) | Saved-plan configuration/identity checks and private review packets that preserve uncertainty holds |
 | [Site commissioning sequence](site-commissioning.md) | Concrete installation-to-recovery campaign and the evidence needed to close native qualification |
 | [Reference service decisions](reference-realization.md) | OpenStack-first internal IPv4 qualification path, GitLab state and concrete service products |
 | [NetBox IPAM](netbox-ipam.md) | Scoped reserve/confirm/retire operations, conditional writes and lost-response holds |

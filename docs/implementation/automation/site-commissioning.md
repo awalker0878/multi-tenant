@@ -101,6 +101,23 @@ collector cleanup failure. Bind interrupted existing-VM attempts through the
 Establish actual native writer exclusion and quarantine before collecting recovery
 readback. A local lock or later verification record cannot supply that exclusion.
 
+For template cloning, capture the installed platform's native `TaskInfo` shape
+and description, accepted source MoID/BIOS UUID/instance UUID/revision, original
+request/task trail, and exact returned destination MoID/UUID. Validate the
+[clone-tree profile](vsphere-readback.md) on a restricted authorized fixture:
+
+| Native scenario | Required observation |
+| --- | --- |
+| Clone finishes while destination child work remains | Pending child prevents completion review |
+| Result VM, source identity or template revision differs | Uncertain/different evidence keeps the operation held |
+| Child is absent from accepted scope or history is incomplete | Coverage holds; investigate native ownership rather than guessing an ID |
+| Saved CPU/memory plan differs from expected VM configuration | Existing-VM recovery packet is refused |
+| Clone completed after a lost provider reply | Preserve data and the ledger; independently reconcile created resource, state ownership and every follow-on task |
+
+Retain real results, including unsupported task types and omission semantics.
+Synthetic successful reports must not populate the site's acceptance record.
+The clone observer does not implement creation adoption or close power fencing.
+
 Retain the exact task trails, native revision/ETag evidence, failed observations,
 healthy denial controls and accepted cross-system bindings. Perform actual HA,
 same-host/bypass/security, withdrawal and application-consistent recovery tests

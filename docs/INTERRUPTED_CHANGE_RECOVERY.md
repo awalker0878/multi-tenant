@@ -30,7 +30,8 @@ from the same unreviewed response being tested. Missing task IDs or incomplete
 entity coverage require native-owner investigation. The bounded
 [vSphere task-tree profile](implementation/automation/vsphere-readback.md) queries
 child history only for accepted task IDs and requires the exact accepted child
-set. It does not adopt unknown tasks or supply general inventory discovery or
+set. Its template-clone variant binds the accepted source and returned destination
+identities while retaining the same coverage holds. It does not adopt unknown tasks or supply general inventory discovery or
 speculative resend capability.
 
 NSX configuration reads bracket realization status. Nutanix task reads bracket
@@ -60,7 +61,9 @@ controls; an older matching snapshot cannot resolve that timing gap.
 For a held VMware Terraform workload attempt, use the
 [saved-plan/ledger binding reviewer](implementation/automation/terraform-recovery.md)
 to join these records to the immutable attempt. This additional profile supports
-known existing VM updates only and always preserves the ledger hold.
+known existing VMs and CPU/memory/topology updates only, compares planned native
+configuration, and always preserves the ledger hold. Clone result evidence still
+needs separate creation/state ownership reconciliation.
 
 | Result | Meaning and next accountable action |
 |---|---|

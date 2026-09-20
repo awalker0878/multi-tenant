@@ -148,6 +148,28 @@ reconciliation, actual commissioning and live HA/security/recovery remain open.
 See [vSphere readback](vsphere-readback.md) and
 [held-attempt recovery](terraform-recovery.md) for the supported limits.
 
+## Template-clone evidence and planned-configuration increment
+
+Further small commits extend native reconciliation without issuing a clone,
+power change, state adoption or ledger release:
+
+| Capability | Implemented behavior | Remaining boundary |
+| --- | --- | --- |
+| Clone result witness | Exact accepted source entity and returned destination VM; missing, foreign or contradictory results hold | Native operation description/TaskInfo shape and original execution trail require installed-tuple acceptance |
+| Template clone tree | Source BIOS/instance UUID, template flag and revision sampled around destination/task/history reads; source/result witnesses recomputed offline and usable in campaign v5 | Source image provenance, submission-time immutability, unsupported internal/cross-entity tasks and complete operation-wide coverage |
+| Planned configuration binding | Existing VM name, CPU, memory, topology and pool compared with native expectations and sealed inputs; unsupported updates, drift, moved/imported addresses and unknown values hold | New clone ownership/state reconciliation and the unchanged disk/NIC/security baseline remain separately required |
+
+Local verification passed 1,556 Python/source tests with no skips and 80
+route/model checks. Implementation revision `39f0ea1` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35521927155)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35521927158).
+Later revisions require their own exact PR checks. These are synthetic API and
+private-ledger fixtures and disposable engine/lab experiments. Native writer
+exclusion, fenced power/guest-bootstrap control, state adoption/authorized ledger
+recovery, actual commissioning and live HA/security/recovery remain open.
+No actual site was contacted or changed. The commissioning runbook now records
+the clone-specific native failure scenarios and evidence to collect.
+
 ### Recorded verification
 
 The OpenStack lifecycle/readback revision `c11b09a` passed
@@ -186,8 +208,8 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/exact-task/task-tree and NSX evidence in v5. Qualify installed APIs and history visibility, complete clone/result-bearing/VM/Flow task coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
-| W17 | Partial reconciliation evidence; native fencing blocked | Task witnesses, bounded vSphere child history and existing-VM attempt binding are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
+| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/task-tree/template-clone and NSX evidence in v5. Qualify installed APIs, task descriptions and history visibility; complete remaining internal/cross-entity/VM/Flow coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
+| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded vSphere child history and existing-VM plan configuration/attempt binding are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector in restricted campaigns for all three exact installed tuples, complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |

@@ -85,9 +85,11 @@ alongside actual network/VM task evidence. For VMware use
 cannot resolve an uncertain native operation; the task reader observes only exact
 recorded tasks, with an optional bounded child-history check, and never clears an
 execution ledger or authorizes replay. The [held-attempt reviewer](terraform-recovery.md)
-binds existing-VM observations to the exact saved plan and current durable hold.
-No live platform
-is contacted by provider mocks, synthetic plans or the local HTTPS fixtures.
+binds existing-VM observations to the exact saved plan and current durable hold,
+comparing supported CPU/memory/topology configuration and holding other updates.
+The separate clone-tree profile observes accepted template identity/revision and
+the clone's exact result VM without adopting it into state. No live platform is
+contacted by provider mocks, synthetic plans or the local HTTPS fixtures.
 
 On failure, withdraw the separately owned edge exposure first. Prepare and review
 a fresh transition to `prepared`, keeping the same VM/storage/member inputs.
@@ -104,8 +106,8 @@ mocks and synthetic saved plans exercise implementation boundaries, not native
 enforcement or failure recovery.
 
 Remaining vSphere integration includes a separately fenced, data-preserving
-power/guest-bootstrap owner, complete native task coverage for composite clone
-and reconfiguration workflows, cross-system NIC/NSX membership evidence, and
+power/guest-bootstrap owner, complete native task coverage beyond the bounded
+template-clone/power/reconfiguration profile, cross-system NIC/NSX membership evidence, and
 operation-wide reconciliation and authorized ledger recovery. The observers and
 reviewer do not supply these write/fencing interfaces. Keep the NSX containment and reviewed
 operator hold points until those capabilities and their live behavior are accepted.
