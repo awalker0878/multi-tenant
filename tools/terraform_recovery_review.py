@@ -50,7 +50,7 @@ def bind_configuration(change, resource, member_name, member):
 def bind_plan(plan, inputs, manifest):
     """Existing VM IDs only. Unknown creates/replacements need native adoption review."""
     require(plan.get('format_version') == '1.2' and plan.get('complete') is True, 'Complete saved plan required')
-    require(manifest['profile'] == tree.PROFILE, 'Clone results require separate creation/adoption review')
+    require(manifest['profile'] == tree.activity.PROFILE, 'Existing-VM activity coverage required; clone adoption remains separate')
     require(not plan.get('errored') and not plan.get('deferred_changes') and not plan.get('resource_drift')
             and all(isinstance(check, dict) and check.get('status') == 'pass' for check in plan.get('checks', [])), 'Unresolved plan evidence')
     changes = plan.get('resource_changes'); require(isinstance(changes, list), 'Saved resource changes required')
@@ -122,6 +122,7 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
         require(context['accepted_plan_sha256'] == bundle['artifacts']['saved.tfplan']
                 and context['attempted_generation'] == bundle['generation']
                 and context['attempted_at'] == head['started_at'] and context['change_record_ref'] == head['change_ref'], 'Context is not the exact attempted plan')
+        require(c.timestamp(manifest['task']['activity_since']) == c.timestamp(head['started_at']), 'Activity window differs from immutable attempt start')
         require(all(c.timestamp(r['queued_at']) >= c.timestamp(head['started_at']) for r in manifest['task']['records']), 'Historical tasks cannot resolve this attempt')
         triage = recovery_review.review(manifest, report, context)
         require(read_private(ledger / 'head.json') == head_bytes, 'Ledger changed during review')

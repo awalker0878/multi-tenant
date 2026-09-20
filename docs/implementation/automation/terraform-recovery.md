@@ -1,7 +1,7 @@
 # Review a held vSphere Terraform attempt
 
 `tools/terraform_recovery_review.py` joins the saved execution evidence, current
-durable ledger head and [vSphere task-tree observations](vsphere-readback.md).
+durable ledger head and [vSphere VM activity observations](vsphere-readback.md).
 It writes an immutable private review packet. It never clears the ledger, runs
 Terraform, changes native infrastructure or authorizes replay.
 
@@ -26,10 +26,15 @@ provider schema or establish NSX/network associations. The separate clone-tree
 observer can collect result/source evidence, but cannot use this existing-VM
 review path to adopt a newly created resource.
 
-Preserve the original bundle and shared durable ledger. Prepare current task-tree
-and child-history observations with the original operation ID, portable tenant/WSD,
-native provider origin and accepted independent target bindings. Task queue times
-must not predate the attempt. The interrupted-change context must name the exact
+Preserve the original bundle and shared durable ledger. Prepare current observations
+with profile `vsphere-vi-json-8.0.3.0-vm-task-activity`, the original operation ID,
+portable tenant/WSD, native provider origin and accepted independent target bindings.
+This checks the accepted tree and child history as well as visible pending work
+and work completed since the attempt on those exact VMs. The review refuses older
+profiles that observe only the accepted tree. `task.activity_since` must equal the
+immutable ledger attempt start; a shorter or shifted window is refused. Additional
+activity holds review even if the accepted tasks succeeded and the VM matches.
+Accepted task queue times must not predate the attempt. The interrupted-change context must name the exact
 binary saved-plan digest, attempted generation/time and original change reference.
 Its current generation, genuine native writer-fence, quarantine and incident
 containment evidence still determine the triage result.
@@ -40,7 +45,7 @@ that postdates the report's start requires fresh native sampling.
 python3 tools/terraform_recovery_review.py \
   --bundle /private/operator/held-attempt \
   --ledger /private/shared-ledger \
-  --manifest /private/operator/vsphere-tree.json \
+  --manifest /private/operator/vsphere-activity.json \
   --readback /private/operator/vsphere-report.json \
   --context /private/operator/recovery-context.json \
   --output /private/operator/new-recovery-review.json

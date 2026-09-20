@@ -7,8 +7,8 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
-from tests.test_native_readback import context
-from tests.test_vsphere_task_tree import manifest, Client
+from tests.test_vsphere_task_activity import manifest, Client, context
+from tests.test_vsphere_observe import ref
 from tools import readback_core as c, terraform_recovery_review as r, vsphere_task_tree_observe as tree
 from tools.run_files import digest, encoded, write_new, load_private, utcnow
 from tools.terraform_run import select_scope
@@ -43,7 +43,7 @@ class AttemptRecoveryTests(unittest.TestCase):
                            artifacts={key: digest(value) for key, value in values.items()})
         for name, raw in values.items(): write_new(self.operation / name, raw)
         write_new(self.operation / 'bundle.json', encoded(self.bundle))
-        start = (c.timestamp(self.m['task']['records'][0]['queued_at']) - timedelta(seconds=1)).isoformat()
+        start = self.m['task']['activity_since']
         self.started = dict(format='hosting-terraform-attempt/1', status='STARTED_OUTCOME_UNKNOWN', scope=scope,
             bundle_sha256=digest(encoded(self.bundle)), operation_id=self.m['operation_id'], generation=4,
             change_ref='FIXTURE-CHANGE', started_at=start)
@@ -96,6 +96,33 @@ class AttemptRecoveryTests(unittest.TestCase):
         report = self.run_review()
         self.assertEqual(report['triage']['result'], 'HOLD_WRITER_NOT_FENCED')
         self.assertEqual(load_private(self.folder / 'head.json'), self.head)
+    def test_known_task_only_profile_cannot_downgrade_receipt_review(self):
+        m = deepcopy(self.m); m['profile'] = tree.PROFILE; del m['task']['activity_since']
+        tree.validate(m)
+        (self.base / 'manifest').write_bytes(encoded(m))
+        with self.assertRaisesRegex(ValueError, 'activity coverage required'): self.run_review()
+        self.assertFalse((self.base / 'review.json').exists())
+    def test_activity_window_must_bind_to_immutable_attempt_start(self):
+        for delta in (-1, 0.5):
+            m = deepcopy(self.m)
+            m['task']['activity_since'] = (c.timestamp(self.started['started_at']) + timedelta(seconds=delta)).isoformat()
+            tree.validate(m); (self.base / 'manifest').write_bytes(encoded(m))
+            with self.assertRaisesRegex(ValueError, 'Activity window differs'): self.run_review()
+        self.assertFalse((self.base / 'review.json').exists())
+    def test_unrecorded_vm_activity_keeps_attempt_held(self):
+        before = {p.name: p.read_bytes() for p in self.folder.iterdir()}
+        client = Client(self.m); other = deepcopy(client.activity_rows['vm-1']['completed'][0])
+        old = (c.timestamp(self.started['started_at']) - timedelta(hours=1)).isoformat()
+        other.update(key='task-99', task=ref('Task', 'task-99'), queueTime=old, startTime=old)
+        client.activity_rows['vm-1']['completed'].append(other)
+        report = c.observe(self.m, client, tree, interval=0)
+        x = context(self.m, report)
+        x.update(accepted_plan_sha256=self.bundle['artifacts']['saved.tfplan'], change_record_ref=self.started['change_ref'])
+        (self.base / 'readback').write_bytes(encoded(report)); (self.base / 'context').write_bytes(encoded(x))
+        result = self.run_review()
+        self.assertEqual(result['triage']['result'], 'RECONCILE_DIVERGENCE')
+        self.assertFalse(result['ledger_released']); self.assertFalse(result['may_apply'])
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.folder.iterdir()})
     def test_matching_uuid_cannot_hide_different_planned_configuration(self):
         inputs = load_private(self.operation / 'inputs.json')
         for field, value in [('name', 'another-vm'), ('num_cpus', 8), ('num_cores_per_socket', 2), ('memory', 8192),
