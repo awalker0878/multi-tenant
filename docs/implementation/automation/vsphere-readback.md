@@ -128,6 +128,50 @@ another writer, detect all unrelated operations on the VM, or prevent a future
 child submission. Keep actual writer exclusion and operation-wide reconciliation
 as separate required evidence. No ledger is cleared and no power action is issued.
 
+### Activity on the exact existing VMs
+
+Profile `vsphere-vi-json-8.0.3.0-vm-task-activity` adds a check for separate root
+tasks omitted from the accepted tree. It supports the same existing-VM power and
+reconfiguration task records, and adds `task.activity_since`: the exact interrupted
+attempt start timestamp. Offline recovery review requires this timestamp to equal
+`context.attempted_at`. It must precede or equal every accepted task's queue time.
+This profile is separate from clone/source reconciliation below.
+
+For each accepted VM, the collector uses that exact `VirtualMachine` reference
+and entity recursion `self`, with no user, parent, root or event-chain restriction:
+
+1. Read all visible queued/running tasks, without a time cutoff. Older pending
+   work must remain visible.
+2. Read success/error tasks with `completedTime` beginning at `activity_since`.
+   Work queued before the attempt but completed afterward must remain visible.
+
+These scans bracket the child-history and direct task/VM reads. Before and after
+activity must contain exactly the accepted task set, including roots, agree with
+the direct task witnesses, and remain stable. Additional or omitted tasks hold.
+A task crossing from pending to completed between queries appears twice and holds
+as uncertain; the reader does not silently deduplicate it. Wrong entities,
+contradictory filter results and future/reversed timestamps also hold. Offline
+review recomputes these checks from the selected witnesses at each sample's time.
+
+Only the three collector methods described above are used. Each activity scan
+allows at most 100 entries across its queries; the per-collector page bounds and
+shared request/time budgets still apply. A busy VM may exceed these limits and
+require a separate native investigation; narrowing visibility to obtain a match
+is not an acceptable fallback. Campaign v5 supports this profile.
+
+This detects **visible task activity**, not all native changes. Installed task
+retention, RBAC visibility and filter behavior require independent qualification.
+Synchronous operations without tasks, other entities, hidden/expired records and
+work submitted after the scan are outside its coverage. It does not implement
+writer exclusion, issue power actions, or establish complete lifecycle recovery.
+Keep the external writer fence and operation-wide reconciliation requirements.
+
+Filter semantics: [entity scope](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/TaskFilterSpecByEntity/),
+[`self` recursion](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/TaskFilterSpecRecursionOption_enum/),
+[time bounds](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/TaskFilterSpecByTime/)
+and [completion-time selection](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/TaskFilterSpecTimeOption_enum/).
+Published interfaces and local fixtures do not qualify the installed API tuple.
+
 Interfaces: [task filter](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/data-structures/TaskFilterSpec/),
 [collector creation](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/TaskManager/moId/CreateCollectorForTasks/post/),
 [page reads](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/TaskHistoryCollector/moId/ReadNextTasks/post/),

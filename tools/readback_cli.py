@@ -1,4 +1,4 @@
-"""CLI plumbing for explicit, authenticated, GET-only platform observation."""
+"""CLI plumbing for explicit, authenticated platform observation."""
 from __future__ import annotations
 import argparse
 import json

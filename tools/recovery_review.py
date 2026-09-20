@@ -115,6 +115,8 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
             raise ValueError('Unbound operation evidence')
         c.text(context['change_record_ref'],'existing change record')
         attempted=c.timestamp(context['attempted_at']);changed=c.timestamp(context['last_security_change_at'])
+        if m.get('profile') == vsphere_task_tree_observe.activity.PROFILE and c.timestamp(m['task']['activity_since']) != attempted:
+            raise ValueError('VM task activity window differs from the attempted operation')
         if attempted>current or changed>current or c.timestamp(report['started_at'])<max(attempted,changed):
             raise ValueError('Observation predates operation or security change')
         result_native=check_report(m,report,current,max_age)

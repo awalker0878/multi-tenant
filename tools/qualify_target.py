@@ -176,7 +176,7 @@ def flow_binding(scope, manifest, outputs, workload, network):
 
 def vsphere_adapter(manifest):
     adapters = {a.PROFILE: a for a in (vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe)}
-    adapters[vsphere_task_tree_observe.CLONE_PROFILE] = vsphere_task_tree_observe
+    adapters.update({profile: vsphere_task_tree_observe for profile in vsphere_task_tree_observe.PROFILES})
     require(manifest.get('profile') in adapters, 'Supported vSphere observer required')
     return adapters[manifest['profile']]
 
