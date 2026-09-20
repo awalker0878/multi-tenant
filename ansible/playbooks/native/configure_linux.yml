@@ -46,3 +46,5 @@
           - ansible_facts.service_mgr == 'systemd'
   roles:
     - role: linux_guest_baseline
+    - role: linux_guest_services
+      when: hosting_target.profile == 'ubuntu-24.04-services-v1'

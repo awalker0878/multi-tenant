@@ -1,0 +1,173 @@
+---
+- name: Require all service packages from the approved image
+  ansible.builtin.assert:
+    that:
+      - item in ansible_facts.packages
+  loop: [openssh-server, systemd-resolved, rsyslog, rsyslog-gnutls]
+
+- name: Read pre-provisioned administrator identities
+  ansible.builtin.getent:
+    database: passwd
+
+- name: Reject privileged aliases
+  ansible.builtin.assert:
+    that:
+      - item in ansible_facts.getent_passwd
+      - ansible_facts.getent_passwd[item][1] | int > 0
+  loop: '{{ hosting_target.services.admin_users + [hosting_target.services.breakglass.user] }}'
+
+- name: Configure explicitly owned guest security and service files
+  become: true
+  block:
+    - name: Create owned configuration directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - /etc/ssh/hosting-principals
+        - /etc/ssh/hosting-recovery
+        - /etc/systemd/resolved.conf.d
+        - /etc/systemd/journald.conf.d
+
+    - name: Create protected collector credential directory
+      ansible.builtin.file:
+        path: /etc/hosting-log
+        state: directory
+        owner: root
+        group: syslog
+        mode: '0750'
+
+    - name: Install exact collector trust and client identity
+      ansible.builtin.copy:
+        src: '{{ hosting_target.services.files[item.source].path }}'
+        dest: '/etc/hosting-log/{{ item.dest }}'
+        owner: root
+        group: syslog
+        mode: '0640'
+      loop:
+        - {source: log_ca, dest: ca.pem}
+        - {source: log_certificate, dest: client.pem}
+        - {source: log_key, dest: client.key}
+      no_log: true
+      diff: false
+      notify: Validate and restart owned logging
+
+    - name: Install current SSH user trust roots and revocations
+      ansible.builtin.copy:
+        dest: '/etc/ssh/{{ item.name }}'
+        content: "{{ item.keys | join('\n') }}\n"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - {name: hosting-user-ca.pub, keys: '{{ hosting_target.services.user_ca_keys }}'}
+        - {name: hosting-revoked-keys, keys: '{{ hosting_target.services.revoked_user_keys }}'}
+      notify: Validate and reload owned SSH
+
+    - name: Bind each administrator to a tenant and WSD principal
+      ansible.builtin.copy:
+        dest: '/etc/ssh/hosting-principals/{{ item }}'
+        content: |
+          {{ hosting_guest_access.scope.tenant_key }}:{{ hosting_guest_access.scope.wsd_key }}:{{ item }}
+        owner: root
+        group: root
+        mode: '0644'
+      loop: '{{ hosting_target.services.admin_users }}'
+      notify: Validate and reload owned SSH
+
+    - name: Install independently held recovery public key
+      ansible.builtin.copy:
+        dest: '/etc/ssh/hosting-recovery/{{ hosting_target.services.breakglass.user }}'
+        content: |
+          {{ hosting_target.services.breakglass.public_key }}
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Validate and reload owned SSH
+
+    - name: Install the whole owned SSH server profile after syntax validation
+      ansible.builtin.template:
+        src: sshd_config.j2
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: '0600'
+        validate: '/usr/sbin/sshd -t -f %s'
+      notify: Validate and reload owned SSH
+
+    - name: Use only the declared recursive resolvers
+      ansible.builtin.template:
+        src: resolved.conf.j2
+        dest: /etc/systemd/resolved.conf.d/60-hosting.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart owned resolver
+
+    - name: Bind libc resolution to the managed systemd resolver
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+      notify: Restart owned resolver
+
+    - name: Persist bounded local audit transport
+      ansible.builtin.template:
+        src: journald.conf.j2
+        dest: /etc/systemd/journald.conf.d/60-hosting.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart owned journal
+
+    - name: Queue scoped logs for authenticated TLS delivery
+      ansible.builtin.template:
+        src: logging.conf.j2
+        dest: /etc/rsyslog.d/40-hosting-forward.conf
+        owner: root
+        group: root
+        mode: '0644'
+        validate: '/usr/sbin/rsyslogd -N1 -f %s'
+      notify: Validate and restart owned logging
+
+    - name: Keep guest service daemons enabled
+      ansible.builtin.service:
+        name: '{{ item }}'
+        enabled: true
+        state: started
+      loop: [ssh, systemd-resolved, rsyslog]
+
+- name: Complete owned service changes before connection verification
+  ansible.builtin.meta: flush_handlers
+
+- name: Reconnect using the certificate profile after SSH changes
+  ansible.builtin.meta: reset_connection
+  when: not ansible_check_mode
+
+- name: Prove certificate access remains available
+  ansible.builtin.wait_for_connection:
+    timeout: 60
+  when: not ansible_check_mode
+
+- name: Read global and per-link resolver settings
+  ansible.builtin.command:
+    argv: [/usr/bin/resolvectl, dns]
+  register: hosting_resolver_readback
+  changed_when: false
+  when: not ansible_check_mode
+
+- name: Reject unexpected DHCP or per-link resolver overrides
+  ansible.builtin.assert:
+    that:
+      - hosting_resolver_readback.stdout | hosting_resolvers_bound(hosting_target.services.resolver_addresses)
+  when: not ansible_check_mode
+
+- name: Emit the source-bound guest service verification marker
+  ansible.builtin.command:
+    argv: [/usr/bin/logger, -t, hosting-verification, '{{ hosting_guest_access.change_ref }}']
+  changed_when: false
+  when: not ansible_check_mode
