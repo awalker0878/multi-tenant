@@ -41,3 +41,38 @@ and [switch summary](https://developer.broadcom.com/xapis/virtual-infrastructure
 also checked against the provider-pinned
 [govmomi 0.49.0 types](https://github.com/vmware/govmomi/blob/v0.49.0/vim25/types/types.go).
 Published interfaces and local HTTPS fixtures do not qualify an installed tuple.
+
+## NSX segment realization identity
+
+`tools/nsx_segment_observe.py` uses profile
+`nsx-local-policy-v1-segment-switches`. Keep the existing NSX envelope, full
+selected policies and exact revision/intent-version/enforcement-point expectations.
+Every segment additionally has `logical_switch`, an independently accepted
+selected `GenericPolicyRealizedResource` with `entity_type: RealizedLogicalSwitch`,
+`id`, `path`, `_revision`, `intent_reference: [<segment path>]`,
+`enforcement_point_path`, `realization_specific_identifier` and `state: REALIZED`.
+This profile supports one Local Manager enforcement point per segment. Its native
+switch UUID must not be reused by a different accepted segment.
+
+The reader calls the exact segment's `realized-entities?intent_path=...` endpoint
+before and after the existing policy/config/intent-status reads. It requires one
+stable logical-switch result matching the accepted identity, native revision and
+segment reference, with an explicit empty alarms list. Other realized entity types
+are outside this association check; their presence does not establish attachment
+or enforcement. Fault/description text is not persisted.
+
+The result list must be complete: at most 100 entries, a matching integer
+`result_count`, no duplicate paths and no continuation cursor. A paginated or
+ambiguous response holds for native-owner investigation; the tool never broadens
+the query or infers an association from a display name. Missing/changed identity,
+failed realization and pending publication retain their corresponding holds.
+
+```sh
+python3 tools/nsx_segment_observe.py /private/operator/nsx-segments.json
+```
+
+Interfaces: [segment-scoped realized entities](https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/method_ListRealizedEntities.html)
+and [realized resource fields](https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/types_GenericPolicyRealizedResource.html).
+The installed API version, entity/path shape, omission behavior and RBAC visibility
+must be qualified independently. This selected identity check does not replace
+effective policy, per-port membership, packet-path or recovery qualification.
