@@ -119,9 +119,11 @@ automatic command to clear an uncertain record. Do not delete a ledger to retry.
 ## Delivery boundary
 
 This increment supplies restricted plan/apply execution and durable attempt
-records. It does not install a backend, qualify a platform, configure bootstrap
-connectivity, activate production, authenticate approval signers, or prove native
-recovery. Existing quarantine, retention and field-ownership constraints remain
+records. OpenStack bootstrap/withdrawal additionally requires the
+[exact transition contract](openstack-bootstrap.md), passed to preparation with
+`--transition`; it is sealed and rechecked at apply. This does not install a
+backend, qualify a platform, commission edge connectivity, activate production,
+authenticate approval signers, or prove native recovery. Retention and field-ownership constraints remain
 effective. Success must be followed by independent native observation and the
 remaining service gates.
 

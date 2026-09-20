@@ -34,12 +34,10 @@ documents the supported operator path and its remaining integration boundaries.
 | Real local Terraform experiment | Built-in data resource proves saved-plan use, stale-plan rejection, output capture and private artifact permissions | No platform provider, remote backend or infrastructure is exercised |
 | Repository release settings | Reviewable required-check/review ruleset and administrator procedure | Settings are not enabled by committing the file; independent reviewer coverage is still needed |
 
-The current Terraform resource modules still describe prepared/restricted state.
-Powered/connected native bootstrap, full adopted guest hardening, native drift
-repair, upgrades and coordinated retirement remain unfinished. The following
-increment implements concrete service operations and edge activation without
-silently changing those Terraform lifecycle contracts. W01–W29 remain open under
-their actual acceptance criteria.
+Terraform defaults remain prepared/restricted. The OpenStack-first increment
+below adds explicitly reviewed power/connectivity transitions. Full adopted
+guest hardening, native drift repair, upgrades and coordinated retirement remain
+unfinished. W01–W29 remain open under their actual acceptance criteria.
 
 ## Reference service and qualification increment
 
@@ -61,7 +59,33 @@ live service or populate accepted site/platform/assurance indexes. Executable
 operations require private actual inputs; documentation examples never supply
 native authority.
 
-## Current verification
+## OpenStack commissioning implementation
+
+The [bootstrap runbook](openstack-bootstrap.md) now connects existing prepared
+resources to the guest/service and qualification tools. Small PR commits add:
+
+| Capability | Implemented behavior | Native boundary |
+| --- | --- | --- |
+| Terraform lifecycle | Explicit prepared/bootstrap network, router, port and VM state; exact /32 service rules; config-drive prerequisite; data-preserving withdrawal | Existing images and actual edge/service paths must be accepted before powering guests |
+| Saved-plan transition | Prior successful scope outputs and native IDs, exact input hash, expiring acceptance references; no unrelated mutation, replacement or deletion; revalidation before apply | External change custody and native writer exclusion remain operator responsibilities |
+| Nova/Cinder/Glance readback | Two stable GETs, exact compute hosts, encrypted retained volumes, matching attachments and protected image hashes | Actual installed API versions and privileged read access are required; API equality does not prove isolation or HA |
+| Campaign v2 | Network plus workload observations before/after guest traffic; all guest-output server/volume IDs and boot-image lineage must be covered | Execute on the commissioned site and independently accept complete security/recovery results |
+
+Follow the [site commissioning sequence](site-commissioning.md) to run these tools
+on actual infrastructure. VMware/Nutanix powered bootstrap, native fencing,
+automatic drift containment, upgrades and coordinated retirement remain separate
+implementation work. Accepted site/platform indexes remain empty.
+
+### Recorded verification
+
+The OpenStack lifecycle/readback revision `c11b09a` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35514866135)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35514865933).
+Local verification passed 1,474 Python/source tests and 80 route/model checks.
+New HTTPS tests use disposable synthetic API fixtures; Terraform lifecycle tests
+use provider mocks and the executor's synthetic plan boundary. No live Nova,
+Cinder, Glance or Neutron environment was contacted. Subsequent documentation
+changes retain their own exact PR checks.
 
 At `15a574d`, [architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35490547048) and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35490547095) passed. This includes all 16 registered Terraform module/composition/root pairs, real Ansible syntax and local rejection/idempotence checks, and the two disposable packet families. Local Python verification at `9a76d90` passed 1,392 tests and 80 route/model checks; `15a574d` adds the tested ambiguous-input rejection case. Later revisions must use their own exact CI results; these links are not evidence for untested source.
 
@@ -86,11 +110,11 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W09 | Partial placement checks only | Implement actual tenant project/RBAC/quota/pool/AZ entitlement mutations and delegated-credential negative tests. Declared eligibility is not enforced native entitlement. |
 | W10 | Partial NetBox IPAM integration | Native API reserve/confirm/retire and uncertain-outcome reconciliation exist. Qualify the actual service, integrate its receipts with accepted records and implement separate compute-capacity hold/renew/release. Address reuse remains held pending cleanup. |
 | W11 | Existing DNS tooling; integration open | Bind the selected authoritative DNS operation to real confirmed IPAM/reservation records; qualify A/AAAA/PTR, conflicts, uncertain outcomes, observations and retirement/reuse. |
-| W12 | Partial | Compositions, source-bound restricted execution and receipt-based domain/workload/guest handoffs exist. Integrate accepted edge routes/attachments, capacity, IPAM and current native observations; qualify whole fixtures and partial effects on all three stacks. |
-| W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver and bounded logging exist. Deliver trusted images, first boot/restricted native bootstrap, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
+| W12 | Partial | Compositions, source-bound execution, receipt handoffs and exact OpenStack bootstrap/withdrawal exist. Integrate accepted edge routes/attachments, capacity and IPAM; qualify whole fixtures and partial effects on all three stacks. |
+| W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial | Neutron local dispatch and output/inventory binding are added. Implement VM/Nova/Cinder/Flow/category/storage/identity observers and complete receipt-to-manifest integration, using actual task/revision/ETag evidence. Do not invent missing native versions or task IDs from Terraform success. |
+| W16 | Partial OpenStack workload readback | Neutron dispatch plus Nova placement, Cinder retained storage/image lineage and Glance identity observations are implemented and bound to guest outputs in campaign v2. Complete other-platform VM/Flow/category/storage/identity coverage and native task/revision/ETag integration. Do not invent missing versions or task IDs from Terraform success. |
 | W17 | Blocked on native coordinator/fencing interfaces | Implement actual cross-writer fencing, native task tracking, late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds and receipt handoffs are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |

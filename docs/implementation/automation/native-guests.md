@@ -8,6 +8,12 @@ Terraform owns the VM, network, storage and lifecycle resources. The baseline An
 
 First complete independent image/provenance and native VM/placement verification, the accepted restricted-bootstrap transition, entitled time-service paths and scoped SSH/sudo access. Restricted Terraform defaults do not start and expose all guests. This playbook cannot establish reachability by weakening platform quarantine.
 
+For the reference OpenStack path, use the [exact bootstrap transition](openstack-bootstrap.md)
+and [Nova/Cinder/Glance observations](openstack-readback.md) before constructing
+guest access. The trusted image must already consume static config-drive network
+data and accept the operator's SSH certificate; configuration cannot repair an
+unreachable or untrusted first connection.
+
 Capture the workload root's `terraform output -json` privately. Create one `hosting-guest-access/1` JSON document with these fields:
 
 When using the [reviewed Terraform executor](terraform-execution.md), the inventory

@@ -15,6 +15,9 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Current package status](progress.md) | Implemented commits, verification and exact remaining work for W01–W29 |
 | [WSD deployment](wsd-deployment.md) | Cluster-aware compilation, scoped state identities, domain/workload compositions and output handoffs |
 | [Reviewed Terraform execution](terraform-execution.md) | Private saved plans, exact review binding, durable attempts and scope-checked output handoffs |
+| [OpenStack bootstrap and withdrawal](openstack-bootstrap.md) | Exact native-ID lifecycle transitions, retained data and narrow service rules |
+| [OpenStack workload readback](openstack-readback.md) | Nova placement, Cinder attachments/encryption and Glance image identity |
+| [Site commissioning sequence](site-commissioning.md) | Concrete installation-to-recovery campaign and the evidence needed to close native qualification |
 | [Reference service decisions](reference-realization.md) | OpenStack-first internal IPv4 qualification path, GitLab state and concrete service products |
 | [NetBox IPAM](netbox-ipam.md) | Scoped reserve/confirm/retire operations, conditional writes and lost-response holds |
 | [Native guest configuration](native-guests.md) | Bound SSH inventory, candidate Linux roles and native acceptance limits |
