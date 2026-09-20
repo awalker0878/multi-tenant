@@ -1,5 +1,5 @@
 """Bind campaign VM NICs through observed portgroups to owned NSX segments."""
-from tools import readback_core as c, nsx_segment_observe as nsx, vsphere_network_observe as pg
+from tools import readback_core as c, nsx_segment_observe as nsx, vsphere_network_observe as pg, vsphere_port_observe as ports
 from tools.compile_wsd import STATE
 from tools.run_files import require
 
@@ -46,3 +46,23 @@ def bind(scope, workloads, outputs, network, portgroups, domain_outputs, inputs)
             port = backing['port']
             require((port['switchUuid'], port['portgroupKey']) == pg.backing_key(r), 'NIC backing differs from assigned domain network')
     require(used == set(groups), 'Unused or incomplete portgroup coverage')
+
+
+def bind_attachments(scope, workloads, outputs, network, portgroups, domain_outputs, inputs):
+    ports.validate(portgroups)
+    bind(scope, workloads, outputs, network, ports.group_manifest(portgroups), domain_outputs, inputs)
+    selected = {(p['dvsUuid'], p['portgroupKey'], p['key']): p for r in portgroups['resources'] for p in r['ports']}
+    used = set()
+    for resource in workloads['resources']:
+        vm = resource['expected']
+        for nic in vm['config']['hardware']['device']:
+            if nic['_typeName'] != 'VirtualVmxnet3': continue
+            backing = nic['backing']['port']; key = (backing['switchUuid'], backing['portgroupKey'], backing['portKey'])
+            require(key in selected and key not in used, 'Every VM NIC requires one unique observed port')
+            used.add(key); port = selected[key]; entity = port['connectee']
+            ports.cookie(backing.get('connectionCookie'))
+            require(port['connectionCookie'] == backing['connectionCookie'], 'Port connection instance differs from VM backing')
+            require(entity['connectedEntity']['value'] == resource['moid'] and entity['nicKey'] == str(nic['key']), 'Port connects to a different VM or NIC')
+            require(port['proxyHost']['value'] == vm['runtime']['host']['value'], 'Port host differs from VM runtime')
+            require(port['state']['runtimeInfo']['macAddress'] == nic['macAddress'], 'Port runtime MAC differs from VM NIC')
+    require(used == set(selected), 'Unassigned port evidence refused')
