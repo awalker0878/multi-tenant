@@ -36,7 +36,7 @@ def run(user):
             command([keygen, '-q', '-t', 'ed25519', '-N', '', '-f', str(directory / name)])
         command([keygen, '-q', '-s', str(directory / 'ca'), '-I', 'disposable-probe-fixture',
                  '-n', user, '-V', '-1m:+5m', str(directory / 'ssh_key.pub')])
-        (directory / 'ssh_key-cert.pub').rename(directory / 'ssh_certificate')
+        (directory / 'ssh_key-cert.pub').chmod(0o600)
         with socket.socket() as reservation:
             reservation.bind(('127.0.0.1', 0)); port = reservation.getsockname()[1]
         config = directory / 'sshd.conf'

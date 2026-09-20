@@ -150,7 +150,9 @@ def ssh_probe(case, target, authority, directory, binary, ca, sequence):
             '-p', str(target['port']), '-l', target['user']]
     settings = ['BatchMode=yes', 'StrictHostKeyChecking=yes', 'UpdateHostKeys=no',
         'GlobalKnownHostsFile=/dev/null', 'UserKnownHostsFile=' + str(directory / 'known_hosts'),
-        'CertificateFile=' + str(directory / 'ssh_certificate'), 'IdentitiesOnly=yes', 'IdentityAgent=none',
+        # Adjacent ssh_key-cert.pub retains the private-key filename when the
+        # raw identity is filtered out by the certificate-only algorithm list.
+        'IdentitiesOnly=yes', 'IdentityAgent=none',
         'PubkeyAcceptedAlgorithms=ssh-ed25519-cert-v01@openssh.com', 'ForwardAgent=no', 'ClearAllForwardings=yes',
         'ProxyCommand=none', 'ProxyJump=none', 'ConnectionAttempts=1', 'ConnectTimeout=5',
         'ServerAliveInterval=3', 'ServerAliveCountMax=1', 'LogLevel=ERROR']
@@ -215,8 +217,9 @@ def main():
         write_new(directory / 'plan.json', raw)
         write_new(directory / 'authority.json', encoded(authority))
         # Copy only assets the child processes need; API credentials stay in memory.
-        for key in ('native_manifest', 'native_ca', 'ssh_key', 'ssh_certificate'):
+        for key in ('native_manifest', 'native_ca', 'ssh_key'):
             write_new(directory / key, assets[key])
+        write_new(directory / 'ssh_key-cert.pub', assets['ssh_certificate'])
         write_new(directory / 'known_hosts', pins.encode())
         result = {'status': 'HOLD_INCOMPLETE', 'scope': plan['scope'], 'source_commit': source['commit'],
                   'plan_sha256': digest(raw), 'started_at': utcnow().isoformat(), 'production_qualified': False}

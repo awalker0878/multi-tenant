@@ -38,7 +38,9 @@ The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.
 The approved private key is copied into the private run directory for the child
-client and removed on normal completion/failure. After a forced controller stop,
+client, with its certificate at the adjacent `ssh_key-cert.pub` path for
+[OpenSSH's identity pairing](https://man.openbsd.org/ssh_config#IdentityFile),
+and removed on normal completion/failure. After a forced controller stop,
 protect and reconcile that directory, including any remaining key copy.
 
 Each case has exactly these fields (the digest is illustrative):
