@@ -1,0 +1,14 @@
+{
+  "allow_restricted_build": false,
+  "tenant_key": "tenant-01",
+  "test_authorization_ref": "",
+  "wsd_key": "wsd-01",
+  "members": {
+    "D01O": {
+      "ipv4_cidr": "192.0.2.0/27",
+      "gateway_host_number": 1
+    }
+  },
+  "platform_endpoint": "REQUIRED-FROM-ACCEPTED-SITE-RECORD",
+  "platform_username": "REQUIRED-FROM-ACCEPTED-SITE-RECORD"
+}

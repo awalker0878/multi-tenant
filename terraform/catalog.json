@@ -80,6 +80,54 @@
       "module": "terraform/modules/vsphere-workload",
       "root": "terraform/stacks/components/vsphere-workload",
       "owner_scope": "wsd"
+    },
+    {
+      "id": "nutanix-wsd-domains",
+      "platform": "nutanix",
+      "kind": "composition",
+      "module": "terraform/compositions/nutanix/domains",
+      "root": "terraform/stacks/wsd/nutanix/domains",
+      "owner_scope": "wsd"
+    },
+    {
+      "id": "nutanix-wsd-workloads",
+      "platform": "nutanix",
+      "kind": "composition",
+      "module": "terraform/compositions/nutanix/workloads",
+      "root": "terraform/stacks/wsd/nutanix/workloads",
+      "owner_scope": "wsd"
+    },
+    {
+      "id": "vmware-wsd-domains",
+      "platform": "vmware",
+      "kind": "composition",
+      "module": "terraform/compositions/vmware/domains",
+      "root": "terraform/stacks/wsd/vmware/domains",
+      "owner_scope": "wsd"
+    },
+    {
+      "id": "vmware-wsd-workloads",
+      "platform": "vmware",
+      "kind": "composition",
+      "module": "terraform/compositions/vmware/workloads",
+      "root": "terraform/stacks/wsd/vmware/workloads",
+      "owner_scope": "wsd"
+    },
+    {
+      "id": "openstack-wsd-domains",
+      "platform": "openstack",
+      "kind": "composition",
+      "module": "terraform/compositions/openstack/domains",
+      "root": "terraform/stacks/wsd/openstack/domains",
+      "owner_scope": "wsd"
+    },
+    {
+      "id": "openstack-wsd-workloads",
+      "platform": "openstack",
+      "kind": "composition",
+      "module": "terraform/compositions/openstack/workloads",
+      "root": "terraform/stacks/wsd/openstack/workloads",
+      "owner_scope": "wsd"
     }
   ]
 }
