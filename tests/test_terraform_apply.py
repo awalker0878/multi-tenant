@@ -140,6 +140,16 @@ class TerraformApplyTests(TerraformRunFixture, unittest.TestCase):
             self.execute()
         self.assertEqual(self.apply_calls, [])
 
+    def test_even_a_reviewed_incomplete_manifest_is_rejected(self):
+        bundle = load_private(self.args.output / 'bundle.json')
+        del bundle['artifacts']['environment.json']
+        (self.args.output / 'bundle.json').write_bytes(encoded(bundle))
+        self.approval['bundle_sha256'] = digest(encoded(bundle))
+        self.approval_file.write_bytes(encoded(self.approval))
+        with self.assertRaisesRegex(ValueError, 'Incomplete'):
+            self.execute()
+        self.assertEqual(self.apply_calls, [])
+
 
 if __name__ == '__main__':
     unittest.main()

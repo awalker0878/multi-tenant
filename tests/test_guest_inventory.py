@@ -6,6 +6,9 @@ from pathlib import Path
 import struct
 import tempfile
 import unittest
+import json
+import subprocess
+import sys
 
 from tools.compile_wsd import STATE
 from tools.guest_inventory import build, gate
@@ -27,6 +30,30 @@ def fixture():
 
 
 class GuestInventoryTests(unittest.TestCase):
+    def test_cli_accepts_one_receipted_workload_run_without_manual_output_copy(self):
+        from tools.run_files import digest, encoded, utcnow, write_new
+        from tools.compile_wsd import ROOT
+        outputs, access = fixture()
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            inputs = {'members': {'guest-01': {}}}
+            bundle = {'format': 'hosting-terraform-bundle/1', 'source_commit': 'a' * 40,
+                      'scope': outputs['scope']['value'], 'operation_id': 'op-01', 'generation': 1,
+                      'artifacts': {'inputs.json': digest(encoded(inputs))}}
+            result = {'format': 'hosting-terraform-attempt/1', 'status': 'APPLIED_REQUIRES_NATIVE_ACCEPTANCE',
+                      'bundle_sha256': digest(encoded(bundle)), 'scope': outputs['scope']['value'],
+                      'operation_id': 'op-01', 'generation': 1, 'completed_at': utcnow().isoformat(),
+                      'outputs_sha256': digest(encoded(outputs))}
+            for name, data in [('inputs.json', inputs), ('bundle.json', bundle), ('outputs.json', outputs),
+                               ('result.json', result), ('access.json', access)]:
+                write_new(directory / name, encoded(data))
+            invocation = subprocess.run([sys.executable, str(ROOT / 'tools/guest_inventory.py'),
+                str(directory / 'access.json'), '--workload-run', str(directory), '--output', str(directory / 'inventory')],
+                capture_output=True, text=True, timeout=30)
+            self.assertEqual(invocation.returncode, 0, invocation.stdout + invocation.stderr)
+            inventory = json.loads((directory / 'inventory/inventory.json').read_text())
+            self.assertFalse(inventory['all']['vars']['hosting_native_enabled'])
+
     def test_immutable_outputs_and_disabled_inventory(self):
         outputs, access = fixture(); before = copy.deepcopy((outputs, access))
         inv, keys = build(outputs, access, '/private/run/known_hosts')

@@ -12,9 +12,13 @@ import tempfile
 from tools.neutron_observe import strict_loads
 
 
+class OperatorError(ValueError):
+    """A fixed, non-sensitive precondition diagnostic suitable for the console."""
+
+
 def require(condition, message):
     if not condition:
-        raise ValueError(message)
+        raise OperatorError(message)
 
 
 def digest(data):

@@ -25,7 +25,7 @@ from tools.neutron_observe import strict_loads
 from tools.plan_review import review
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,
                              new_directory, private_path, read_private, require,
-                             utcnow, write_new)
+                             utcnow, write_new, OperatorError)
 from tools.terraform_catalog import entries
 
 SCOPE_KEYS = ('environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key', 'phase')
@@ -260,6 +260,9 @@ def main():
         result = prepare(args)
         print(json.dumps(result))
         return 0
+    except OperatorError as exc:
+        print(json.dumps({'status': 'STOPPED', 'reason': str(exc), 'native_acceptance': False}))
+        return 2
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
         # Exception values and native diagnostics can contain secrets or endpoints.
         print(json.dumps({'status': 'STOPPED', 'native_acceptance': False,

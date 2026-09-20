@@ -24,7 +24,7 @@ from tools.check_release import verify
 from tools.compile_wsd import STATE
 from tools.plan_review import review
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,
-    private_path, read_private, replace_private, require, utcnow, write_new)
+    private_path, read_private, replace_private, require, utcnow, write_new, OperatorError)
 from tools.terraform_run import backend_settings, command, runtime_environment, select_scope
 
 
@@ -35,6 +35,11 @@ def validate_bundle(operation, approval, binary, root=ROOT):
     bundle = load_private(operation / 'bundle.json')
     require(bundle['format'] == 'hosting-terraform-bundle/1'
             and bundle['status'] == 'AWAITING_EXACT_PLAN_REVIEW', 'Unsupported execution bundle')
+    required = {'inputs.json', 'backend.json', 'backend.hcl', 'environment.json', 'contact.json',
+                'references.json', 'terraform.rc', 'version.json', 'saved.tfplan', 'plan.json', 'review.json'}
+    require(isinstance(bundle['artifacts'], dict) and required <= set(bundle['artifacts'])
+            and not set(bundle['artifacts']) - required - {'ca.pem'}, 'Incomplete or unknown bundle artifacts')
+    require(bool(bundle['source_files']), 'Execution source manifest is empty')
     require(set(approval) == {'format', 'bundle_sha256', 'review_sha256', 'operation_id', 'generation',
             'valid_from', 'valid_until', 'change_ref'}, 'Invalid apply approval fields')
     require(approval['format'] == 'hosting-terraform-approval/1'
@@ -153,6 +158,9 @@ def main():
     try:
         print(json.dumps(apply(args)))
         return 0
+    except OperatorError as exc:
+        print(json.dumps({'status': 'STOPPED', 'reason': str(exc), 'native_acceptance': False}))
+        return 2
     except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError):
         print(json.dumps({'status': 'STOPPED', 'native_acceptance': False,
                           'reason': 'Precondition failed or native result is uncertain; inspect the private ledger'}))
