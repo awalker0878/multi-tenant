@@ -57,7 +57,7 @@ An explicitly unsupported operation/profile must be rejected by the execution pa
 | G3 — Controlled activation | Separate current operating/change authority, verified readiness, exposure and withdrawal procedure, live checks | Any required live result is failed or unknown |
 | Recurring G4 — Lifecycle assurance | Change/drift/incident/recovery exercises, updated evidence and requalification after material change | Evidence expires, tuple drifts or the service exceeds tested limits |
 
-These gate names follow [the existing commissioning sequence](../implementation/native-reference/platform-build.md); this audit does not introduce a second approval model. Git commits and CI success are not substitutes for those authorities.
+These gate names follow [the existing commissioning sequence](../native-reference/platform-build.md); this audit does not introduce a second approval model. Git commits and CI success are not substitutes for those authorities.
 
 ## Evidence to retain
 
@@ -69,6 +69,6 @@ Populate the existing capability, target, provenance, campaign, qualification, c
 
 ## Documentation-change verification
 
-For this audit, validate documentation navigation, local links, source inventory consistency and repository hygiene. No Terraform/Ansible resource implementation is changed. The audited engine/packet status is recorded separately in [the audit](audit.md); fresh post-publication CI reports apply to the documentation commit itself.
+For this audit, validate documentation navigation, local links, source inventory consistency and repository hygiene. No Terraform/Ansible resource implementation is changed. The audited engine/packet status is recorded separately in [the audit](../../assurance/automation-baseline-audit.md); fresh post-publication CI reports apply to the documentation commit itself.
 
 Future implementation increments must run the existing applicable repository, engine and lab gates, extend tests for their actual new behavior and execute the affected native campaign. Broad synthetic success cannot close an unexecuted native requirement.

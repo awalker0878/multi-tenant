@@ -6,7 +6,7 @@ This repository now contains the Word documents' actual content as Markdown chap
 
 | Start with | Content |
 | --- | --- |
-| [1.0 automation completion audit](1.0/README.md) | Terraform/Ansible coverage across Nutanix, VMware/NSX and OpenStack; remaining work, delivery sequence and acceptance gates |
+| [1.0 automation completion audit](implementation/automation/README.md) | Terraform/Ansible coverage across Nutanix, VMware/NSX and OpenStack; remaining work, delivery sequence and acceptance gates |
 | [Architecture](architecture/README.md) / [RAD reading view](architecture/RAD.md) | Scope, physical/logical design, security and service boundaries, portability and adoption |
 | [Engineering](engineering/README.md) / [TAD reading view](engineering/TAD.md) | Fabric, native stacks, forward/reply paths, dependencies and supported build responsibilities |
 | [Solution designs](solutions/README.md) | Service alternatives and a connected two-tenant OZ/RZ worked environment |

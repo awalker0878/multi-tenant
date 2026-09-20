@@ -1,6 +1,6 @@
 # Completion backlog — work required for 1.0
 
-[1.0 index](README.md) · [Audit findings](audit.md) · [Platform detail](environments.md) · [Acceptance](acceptance.md)
+[1.0 index](README.md) · [Audit findings](../../assurance/automation-baseline-audit.md) · [Platform detail](environments.md) · [Acceptance](acceptance.md)
 
 **Baseline:** 2026-09-19, source `0dff519e852c3e0c72118e04d086548e6f6fd88b`. All work packages below are **OPEN** at this audit's completion. Existing partial code is credited in the audit; an open item does not mean its entire implementation must be rewritten. Owner roles are proposed responsibilities, not assigned people or recorded approvals.
 
@@ -17,7 +17,7 @@
 
 **Design outputs:** supported-environment register, accepted LLD/interface handoffs, native resource/field owner table and create/observe/update/import/replace/delete support matrix. Keep the register's sensitive endpoint and credential values in the designated private systems.
 
-The [cluster topology and WSD placement elaboration](cluster-topology-and-wsd-placement.md) adds a proposed cluster/capacity catalogue and per-WSD placement schedule to W01, with explicit follow-through into commissioning, admission, verification and lifecycle packages. It does not close any package or change the original audit snapshot.
+The [cluster topology and WSD placement elaboration](../../engineering/cluster-topology-and-wsd-placement.md) adds a proposed cluster/capacity catalogue and per-WSD placement schedule to W01, with explicit follow-through into commissioning, admission, verification and lifecycle packages. It does not close any package or change the original audit snapshot.
 
 ## B. Commission usable infrastructure and common services
 

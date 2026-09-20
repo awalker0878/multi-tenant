@@ -4,7 +4,7 @@
 
 ## Ownership and execution model
 
-Use the existing [P0–P6 infrastructure work packages](../architecture/reference/20-provisioning-model-and-infrastructure-work-packages.md). A supported installer commissions a platform; Terraform manages its accepted resource scopes; Ansible configures supported host/guest/service scopes and runs operational procedures; service owners retain address/name, edge, identity/key and protection authority. The coordinator may be an existing automation/change platform. Building a custom controller, API or database is not a prerequisite.
+Use the existing [P0–P6 infrastructure work packages](../../architecture/reference/20-provisioning-model-and-infrastructure-work-packages.md). A supported installer commissions a platform; Terraform manages its accepted resource scopes; Ansible configures supported host/guest/service scopes and runs operational procedures; service owners retain address/name, edge, identity/key and protection authority. The coordinator may be an existing automation/change platform. Building a custom controller, API or database is not a prerequisite.
 
 | Scope | Primary writer | Required handoff |
 | --- | --- | --- |
@@ -67,6 +67,6 @@ Keep the current local-only playbooks intact as a distinct test profile. Introdu
 
 Separate PR checks, native qualification and production execution. PR jobs keep no-contact fixtures and no live credentials. Native jobs use scoped runners, protected environment inputs, exact targets, current authority and separate read/write identities where required. The workflow must check current time for live validity; the fixed `--as-of` timestamps in synthetic CI examples are deterministic fixture inputs, not live authorization checks.
 
-Serialize writers by actual owned resource scope across Terraform, Ansible and service integrations. Preserve operation IDs and native task identities on retries. An expired coordinator lease or released Terraform lock does not fence a still-running native task. On uncertainty, reconcile first; use [the existing recovery reasoning](../implementation/native-reference/recovery-retirement.md) to guide a real owner-operated implementation.
+Serialize writers by actual owned resource scope across Terraform, Ansible and service integrations. Preserve operation IDs and native task identities on retries. An expired coordinator lease or released Terraform lock does not fence a still-running native task. On uncertainty, reconcile first; use [the existing recovery reasoning](../native-reference/recovery-retirement.md) to guide a real owner-operated implementation.
 
 Retain raw plans/state/logs/native evidence privately with appropriate access and retention. Publish only reviewed, non-sensitive evidence references and digests to Git. The current public CI artifacts and 14-day retention are suitable for synthetic checks, not automatically for native operational evidence.

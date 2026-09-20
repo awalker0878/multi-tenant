@@ -1,12 +1,12 @@
 # Environment coverage and platform completion requirements
 
-[1.0 index](README.md) · [Repository audit](audit.md) · [Completion backlog](completion-backlog.md)
+[1.0 index](README.md) · [Repository audit](../../assurance/automation-baseline-audit.md) · [Completion backlog](completion-backlog.md)
 
 ## Coverage model
 
 An environment is not just a Terraform directory named after a vendor. Track an actual **site/cell + installed platform tuple + lifecycle target + tenant/WSD + zone/security profile + address family + service/recovery offer**. Every offered combination needs supported inputs, owned automation, tests and operating evidence. Do not declare every possible combination supported by taking a Cartesian product of labels.
 
-The [current architecture](../architecture/reference/7-tenant-environments-and-security-domain-placement.md) separates tenant administration, WSD lifecycle, logical security domain and site/platform domain instance. Preserve those distinctions. A Terraform workspace name or Ansible inventory group alone does not enforce security or placement isolation.
+The [current architecture](../../architecture/reference/7-tenant-environments-and-security-domain-placement.md) separates tenant administration, WSD lifecycle, logical security domain and site/platform domain instance. Preserve those distinctions. A Terraform workspace name or Ansible inventory group alone does not enforce security or placement isolation.
 
 ## Core platform and common-layer matrix
 
@@ -36,7 +36,7 @@ The [current architecture](../architecture/reference/7-tenant-environments-and-s
 | Workload/configuration | Isolated first boot and IP/DNS/initialization, image-based configuration, supported guest roles and enrollment; controlled NIC/power transition | Useful guest reachable only over allowed bootstrap paths; repeated run converges; no exposure before quarantine |
 | Lifecycle/readback | VM, disk, NIC, category, Flow, project and relevant storage observations in addition to VPC/subnet/task support; task receipts and asynchronous recovery | Lost response, partial task tree, failed child, concurrent change, resize, restore and retirement handled without duplicate or unsafe resources |
 
-Source basis: [Nutanix commissioning](../engineering/platform-build/2-nutanix-commission-the-hosting-cell.md), [tenant realization](../engineering/platform-build/3-nutanix-realize-a-tenant-and-its-workload-domains.md), [task-tree implementation](../implementation/nutanix-task-tree-readback.md).
+Source basis: [Nutanix commissioning](../../engineering/platform-build/2-nutanix-commission-the-hosting-cell.md), [tenant realization](../../engineering/platform-build/3-nutanix-realize-a-tenant-and-its-workload-domains.md), [task-tree implementation](../nutanix-task-tree-readback.md).
 
 ### VMware/NSX-specific work
 
@@ -48,7 +48,7 @@ Source basis: [Nutanix commissioning](../engineering/platform-build/2-nutanix-co
 | Workload/configuration | Resolve NSX segment to vCenter network ID, qualify supported template layout and guest customization, configure/enroll guest through restricted paths | Quarantine proven **before cloning**; clone may power on; unsupported template layouts fail preflight |
 | Lifecycle/readback | vSphere VM/NIC/disk/datastore/storage-policy and placement readback alongside NSX realization; supported migration/adoption/update/retirement | API configuration agrees with actual enforcement; retained disks have accountable custody; mobility and recovery preserve isolation |
 
-Source basis: [VMware/NSX commissioning](../engineering/platform-build/4-vmware-nsx-commission-transport-compute-and-edge-roles.md), [policy lifecycle](../engineering/platform-build/5-vmware-nsx-bind-domain-workload-and-policy-lifecycles.md), [vSphere constraints](../../terraform/modules/vsphere-workload/README.md).
+Source basis: [VMware/NSX commissioning](../../engineering/platform-build/4-vmware-nsx-commission-transport-compute-and-edge-roles.md), [policy lifecycle](../../engineering/platform-build/5-vmware-nsx-bind-domain-workload-and-policy-lifecycles.md), [vSphere constraints](../../../terraform/modules/vsphere-workload/README.md).
 
 ### OpenStack-specific work
 
@@ -60,7 +60,7 @@ Source basis: [VMware/NSX commissioning](../engineering/platform-build/4-vmware-
 | Workload/configuration | Coordinate network/router/port activation and VM bootstrap; accepted image initialization, guest roles and service enrollment | Safe first boot, retained boot/data volumes, correct project identity and independent guest/data access checks |
 | Lifecycle/readback | Add Nova/Cinder/Keystone coverage and Ansible Neutron dispatch; reconcile asynchronous build/attach/delete and partial volumes/ports | Import, resize, rebuild, restore, failure recovery and retirement preserve ownership and retained data |
 
-Source basis: [distribution commissioning](../engineering/platform-build/6-openstack-commission-a-distribution-not-a-generic-label.md), [mandatory network ownership](../engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md), [Neutron observer](../../tools/neutron_observe.py).
+Source basis: [distribution commissioning](../../engineering/platform-build/6-openstack-commission-a-distribution-not-a-generic-label.md), [mandatory network ownership](../../engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md), [Neutron observer](../../../tools/neutron_observe.py).
 
 ## Lifecycle targets
 

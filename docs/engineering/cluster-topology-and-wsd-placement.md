@@ -4,7 +4,7 @@
 
 **Date:** 2026-09-20. Reviewed against repository revision `be492784c8f935eaa5895c973f3ff77ffd5eb622`. The original 1.0 audit snapshot remains a historical assessment of its stated revision.
 
-[1.0 index](README.md) · [Environment coverage](environments.md) · [Completion backlog](completion-backlog.md)
+[1.0 index](../implementation/automation/README.md) · [Environment coverage](../implementation/automation/environments.md) · [Completion backlog](../implementation/automation/completion-backlog.md)
 
 ## 1. The WSD consumes qualified cluster capacity
 

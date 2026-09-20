@@ -1,6 +1,6 @@
 # Repository audit — actual coverage and remaining gaps
 
-[1.0 index](README.md) · [Environment coverage](environments.md) · [Completion backlog](completion-backlog.md)
+[1.0 index](../implementation/automation/README.md) · [Environment coverage](../implementation/automation/environments.md) · [Completion backlog](../implementation/automation/completion-backlog.md)
 
 ## Baseline and method
 
@@ -22,7 +22,7 @@ Findings concern the inspected source revision. Relative source links make navig
 | Assurance | Extensive validators for native qualification, capacity, reservations, address/name, trust, edge, recovery and operating evidence | Validation of supplied records does not supply the live service or generate genuine acceptance evidence |
 | Active readiness evidence | All 20 `sources/capabilities/*index.json` files have empty `records`; all 3 platform tuples are `UNSELECTED` and all 30 registered capability entries are `NOT_QUALIFIED` | The repository cannot establish any of the three stacks as ready for ordinary placement |
 
-Sources: [Terraform](../../terraform/README.md), [Ansible](../../ansible/README.md), [capability registry](../../sources/capabilities/platform_registry.json), [capability indexes](../../sources/capabilities/), [native reference procedure](../implementation/native-reference/platform-build.md), [audit snapshot](audit-evidence.json).
+Sources: [Terraform](../../terraform/README.md), [Ansible](../../ansible/README.md), [capability registry](../../sources/capabilities/platform_registry.json), [capability indexes](../../sources/capabilities), [native reference procedure](../implementation/native-reference/platform-build.md), [audit snapshot](automation-baseline-evidence.json).
 
 ## Exact-revision CI
 
@@ -39,7 +39,7 @@ Do not repeat the old ZIP-era “engine blocked/not run” wording in the Terraf
 
 ## Terraform coverage by owned scope
 
-Every source link below points to the actual module. Matching standalone roots live under [terraform/roots](../../terraform/roots/). No root composes the complete fixture or the full P0–P6 process.
+Every source link below points to the actual module. Matching standalone roots live under [terraform/roots](../../terraform/roots). No root composes the complete fixture or the full P0–P6 process.
 
 | Module | Native resources currently implemented | Material work still outside this module |
 | --- | --- | --- |
@@ -89,4 +89,4 @@ F09 is an intentional current boundary, not a reason to disable checks. A future
 
 ## Overall assessment
 
-This is a substantial architecture, bounded automation and assurance foundation. It is not yet an operational multi-environment provisioning system. No defensible completion percentage follows from document volume, validator count or passing CI. Track closure by executable work packages and native outcomes in [the backlog](completion-backlog.md) and [acceptance matrix](acceptance.md).
+This is a substantial architecture, bounded automation and assurance foundation. It is not yet an operational multi-environment provisioning system. No defensible completion percentage follows from document volume, validator count or passing CI. Track closure by executable work packages and native outcomes in [the backlog](../implementation/automation/completion-backlog.md) and [acceptance matrix](../implementation/automation/acceptance.md).

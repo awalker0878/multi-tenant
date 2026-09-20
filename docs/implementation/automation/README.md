@@ -1,4 +1,4 @@
-# 1.0 — Terraform and Ansible completion audit
+# Terraform and Ansible delivery program
 
 **Audit date:** 2026-09-19
 
@@ -8,17 +8,17 @@
 
 The repository has useful, tested building blocks for restricted domain, workload and route creation on Nutanix, VMware/NSX and OpenStack. It does **not yet contain a complete Terraform and Ansible process** to commission, provision, configure, activate, operate and retire those environments. Most remaining work is executable integration and native qualification, rather than additional readiness-record validators.
 
-This folder records the work needed for a 1.0 delivery. The folder name is a planning milestone, not a release declaration or a replacement for the existing architecture v1.4 baseline. The infrastructure architecture, security boundaries and resource ownership remain the basis of the plan.
+This maintained implementation program carries forward the 1.0 completion plan. Moving it into the documentation hierarchy does not declare the work complete or replace the architecture baseline. The infrastructure architecture, security boundaries and resource ownership remain the basis of the plan.
 
 | Document | Purpose |
 | --- | --- |
-| [Repository audit](audit.md) | Verified implementation inventory, concrete gaps and exact-revision CI evidence |
+| [Repository audit](../../assurance/automation-baseline-audit.md) | Verified implementation inventory, concrete gaps and exact-revision CI evidence |
 | [Environment coverage](environments.md) | Completion requirements for all three platform families, common infrastructure, lifecycle environments and optional service profiles |
-| [Cluster topology and WSD placement](cluster-topology-and-wsd-placement.md) | Proposed physical/control/service cluster roles, shared versus dedicated capacity, and WSD placement across primary and recovery infrastructure |
+| [Cluster topology and WSD placement](../../engineering/cluster-topology-and-wsd-placement.md) | Proposed physical/control/service cluster roles, shared versus dedicated capacity, and WSD placement across primary and recovery infrastructure |
 | [Required delivery process](delivery-process.md) | How Terraform, Ansible, supported installers and service-owner tools must work together from bootstrap through retirement |
 | [Completion backlog](completion-backlog.md) | Prioritized work packages, dependencies, proposed owner roles, deliverables and closure criteria |
 | [Acceptance and release gates](acceptance.md) | Tests and evidence required before calling each environment complete |
-| [Audit snapshot](audit-evidence.json) | Machine-readable source inventory and observed CI metadata for this audit |
+| [Audit snapshot](../../assurance/automation-baseline-evidence.json) | Machine-readable source inventory and observed CI metadata for this audit |
 
 ## Main gaps
 
@@ -35,6 +35,6 @@ The core platform scope is **Nutanix AHV/Flow, VMware vSphere/NSX and OpenStack*
 
 The first implementation target should be the existing two-tenant internal OZ/RZ reference fixture, completed vertically on one selected supported stack, then reproduced and qualified on the other two. The overall three-stack milestone remains open until each stack meets the same declared service outcomes.
 
-This audit adds documentation only. It does not select an actual product tuple, create an environment, issue operating authority or change existing automation safeguards.
+The baseline audit remains historical. Follow [implementation progress](progress.md) for current code delivery and remaining native dependencies. Actual tuple selection, qualification and operating authority remain separate from code publication.
 
-[Documentation home](../README.md)
+[Documentation home](../../README.md)
