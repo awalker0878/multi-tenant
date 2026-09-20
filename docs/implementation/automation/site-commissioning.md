@@ -69,5 +69,24 @@ The application owner supplies consistency/export and recovered-service checks.
 Record accepted results using the existing [native reference campaign](../native-reference/campaign.md)
 and [acceptance gates](acceptance.md). Attach failed attempts and resolutions as
 well as successful evidence. Repeat the declared offer on VMware/NSX and Nutanix
-after their remaining lifecycle integrations are implemented. A qualified first
+using the controls below once their remaining integration prerequisites are met. A qualified first
 OpenStack site does not qualify those platforms or any public/dual-stack offer.
+
+## VMware and Nutanix follow-on commissioning
+
+The [restricted lifecycle executor](platform-lifecycle.md) now supports exact
+NSX domain bootstrap/withdrawal and AHV workload power/NIC transitions. Both use
+the reviewed saved-plan process, prior successful native IDs and retained-data
+guards. Neither creates a site inventory or establishes effective native policy.
+
+| Platform | Implemented control | Required before a live campaign |
+| --- | --- | --- |
+| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop | Independently observed NSX/vCenter network binding, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual power/placement/storage readback and native reconciliation |
+| Nutanix | Existing VM ON/NIC connected, or OFF/disconnected with disks retained; scoped AHV snapshots and campaign v3 | Flow service-rule lifecycle integration, accepted native project/category/placement/storage, image initialization and actual network/VM task evidence; native withdrawal and recovery qualification |
+
+Keep VMware domain and workload state ownership separate. The pinned vSphere
+provider's power state is computed, and a clone may already be powered on in the
+quarantined domain. A domain withdrawal is not proof that the VM is off. Nutanix's
+current owned Flow policy remains deny-only; the new VM power control cannot
+make the guest reachable through it. Preserve these holds until the owned native
+integration and its observed behavior are accepted.

@@ -72,9 +72,36 @@ resources to the guest/service and qualification tools. Small PR commits add:
 | Campaign v2 | Network plus workload observations before/after guest traffic; all guest-output server/volume IDs and boot-image lineage must be covered | Execute on the commissioned site and independently accept complete security/recovery results |
 
 Follow the [site commissioning sequence](site-commissioning.md) to run these tools
-on actual infrastructure. VMware/Nutanix powered bootstrap, native fencing,
-automatic drift containment, upgrades and coordinated retirement remain separate
-implementation work. Accepted site/platform indexes remain empty.
+on actual infrastructure. The VMware/Nutanix increment below adds restricted
+controls without completing those stacks. Native fencing, automatic drift
+containment, upgrades and coordinated retirement remain separate implementation
+work. Accepted site/platform indexes remain empty.
+
+## VMware and Nutanix lifecycle implementation
+
+Further small commits in PR #46 implement the [platform lifecycle contract](platform-lifecycle.md):
+
+| Capability | Implemented behavior | Remaining native boundary |
+| --- | --- | --- |
+| AHV power/NIC lifecycle | Prepared OFF/disconnected defaults, explicitly accepted ON/connected bootstrap, data-preserving return to prepared | Owned Flow service-rule lifecycle, image initialization and actual placement/storage/guest acceptance |
+| NSX domain lifecycle | Sorted exact IPv4 TCP/UDP service exceptions, mandatory dual-family drop, connected segment; withdrawal removes exceptions and disconnects | Effective DFW precedence/membership/exclusions, same-host enforcement and accepted upstream service paths; vSphere power remains computed |
+| Exact lifecycle plan review | Prior native identity and immutable non-lifecycle inputs, expiring references, restricted update fields; unknown security values, drift and replacements block | Issuing authority, cross-writer exclusion and actual native reconciliation |
+| AHV VM snapshots | Exact native tenant, host/cluster/project/category, power, CPU/memory, NIC and retained-disk expectations with strong ETags and stable GETs | Selected fields only; no VM task completion, Flow enforcement, HA or application recovery claim |
+| Campaign v3 | AHV snapshots plus network readback before/after guest probes; every workload VM and NIC subnet/address bound to the campaign | Execute on actual installed APIs and independently accept complete results |
+
+The lifecycle revision `c0e4334` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35515987373)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35515987368).
+The VM snapshot revision `8a27774` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35516459827)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35516459833).
+Campaign-v3 revision `12436e8` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35516700256)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35516700258),
+plus 1,490 local Python/source tests and 80 route/model checks. Subsequent
+revisions need their own exact PR checks.
+These are synthetic API/provider tests and disposable local experiments; no
+actual VMware or Nutanix site was contacted or qualified.
 
 ### Recorded verification
 
@@ -110,11 +137,11 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W09 | Partial placement checks only | Implement actual tenant project/RBAC/quota/pool/AZ entitlement mutations and delegated-credential negative tests. Declared eligibility is not enforced native entitlement. |
 | W10 | Partial NetBox IPAM integration | Native API reserve/confirm/retire and uncertain-outcome reconciliation exist. Qualify the actual service, integrate its receipts with accepted records and implement separate compute-capacity hold/renew/release. Address reuse remains held pending cleanup. |
 | W11 | Existing DNS tooling; integration open | Bind the selected authoritative DNS operation to real confirmed IPAM/reservation records; qualify A/AAAA/PTR, conflicts, uncertain outcomes, observations and retirement/reuse. |
-| W12 | Partial | Compositions, source-bound execution, receipt handoffs and exact OpenStack bootstrap/withdrawal exist. Integrate accepted edge routes/attachments, capacity and IPAM; qualify whole fixtures and partial effects on all three stacks. |
+| W12 | Partial | Compositions, source-bound execution, receipt handoffs and exact OpenStack/NSX/AHV lifecycle controls exist. Complete Flow service rules and remaining native lifecycle, integrate accepted edge routes/attachments, capacity and IPAM; qualify whole fixtures and partial effects on all three stacks. |
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial OpenStack workload readback | Neutron dispatch plus Nova placement, Cinder retained storage/image lineage and Glance identity observations are implemented and bound to guest outputs in campaign v2. Complete other-platform VM/Flow/category/storage/identity coverage and native task/revision/ETag integration. Do not invent missing versions or task IDs from Terraform success. |
+| W16 | Partial workload readback | Neutron/Nova/Cinder/Glance observations are bound to guest outputs in campaign v2; AHV VM placement/category/NIC/disk snapshots are bound in campaign v3. Complete vSphere/Flow coverage and native VM task/revision integration. Do not infer task completion from snapshots or Terraform success. |
 | W17 | Blocked on native coordinator/fencing interfaces | Implement actual cross-writer fencing, native task tracking, late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds and receipt handoffs are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |

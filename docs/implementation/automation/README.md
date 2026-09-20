@@ -17,6 +17,8 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Reviewed Terraform execution](terraform-execution.md) | Private saved plans, exact review binding, durable attempts and scope-checked output handoffs |
 | [OpenStack bootstrap and withdrawal](openstack-bootstrap.md) | Exact native-ID lifecycle transitions, retained data and narrow service rules |
 | [OpenStack workload readback](openstack-readback.md) | Nova placement, Cinder attachments/encryption and Glance image identity |
+| [VMware and Nutanix restricted lifecycle](platform-lifecycle.md) | Exact NSX service rules, AHV power/NIC transitions and retained-data withdrawal |
+| [Nutanix VM readback](nutanix-vm-readback.md) | Scoped AHV placement, membership, disk, NIC and power snapshots; campaign v3 binding |
 | [Site commissioning sequence](site-commissioning.md) | Concrete installation-to-recovery campaign and the evidence needed to close native qualification |
 | [Reference service decisions](reference-realization.md) | OpenStack-first internal IPv4 qualification path, GitLab state and concrete service products |
 | [NetBox IPAM](netbox-ipam.md) | Scoped reserve/confirm/retire operations, conditional writes and lost-response holds |

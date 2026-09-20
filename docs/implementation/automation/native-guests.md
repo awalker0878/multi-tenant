@@ -14,6 +14,14 @@ guest access. The trusted image must already consume static config-drive network
 data and accept the operator's SSH certificate; configuration cannot repair an
 unreachable or untrusted first connection.
 
+For VMware and Nutanix, the [restricted lifecycle controls](platform-lifecycle.md)
+now supply NSX domain service exceptions and AHV power/NIC changes. They do not
+initialize the guest or prove a usable service path. Nutanix's owned Flow policy
+still needs service-rule lifecycle integration; vSphere power is computed in the
+pinned provider. Accept actual image/address/certificate initialization and native
+enforcement first. [AHV snapshots](nutanix-vm-readback.md) supplement this handoff;
+they do not establish guest readiness or native task completion.
+
 Capture the workload root's `terraform output -json` privately. Create one `hosting-guest-access/1` JSON document with these fields:
 
 When using the [reviewed Terraform executor](terraform-execution.md), the inventory

@@ -9,8 +9,10 @@ clone and exposes power state as computed, so no writable power switch is added.
 
 Terraform remains the writer for these existing native objects. Native ownership,
 effective policy and guest initialization must be independently accepted. The
-Nutanix VM transition alone cannot override its domain's deny policy; the Flow
-service-policy realization is a separate prerequisite. No external attachment,
+Nutanix VM transition alone cannot override its domain's deny policy. The owned
+Flow policy remains deny-only; service-rule lifecycle integration is still
+required before the end-to-end Nutanix bootstrap can be commissioned. Do not edit
+the Terraform-owned policy through a competing writer. No external attachment,
 route advertisement, HA placement, image credential or site inventory is inferred.
 
 ## Exact saved-plan contract
@@ -58,6 +60,14 @@ same-host paths, actual guest addressing/identity, placement/storage and the
 provider edge's limited services. Prepared Terraform outputs do not prove these
 properties. After apply, read actual power/NIC or NSX realization, then execute
 healthy-control traffic tests and guest convergence before activation.
+
+For NSX use the existing exact-policy observer, including actual rule order,
+scope, intent version and every accepted enforcement point. Segment connectivity
+OFF alone does not establish same-segment isolation: observe the mandatory DFW
+drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-readback.md)
+and [campaign v3](target-qualification.md) alongside actual network task evidence.
+The VM snapshot cannot resolve an uncertain native operation. No live platform
+is contacted by provider mocks, synthetic plans or the local HTTPS fixtures.
 
 On failure, withdraw the separately owned edge exposure first. Prepare and review
 a fresh transition to `prepared`, keeping the same VM/storage/member inputs.
