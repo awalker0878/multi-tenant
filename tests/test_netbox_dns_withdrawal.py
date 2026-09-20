@@ -191,3 +191,105 @@ class NetboxDNSWithdrawalTests(unittest.TestCase):
         changed = handoff.validate(self.job, self.receipt, self.dns_job, self.scope, action='withdraw',
                                     registration=other, fixture=True)
         self.assertNotEqual(binding, changed)
+
+    def test_IPAM_retirement_requires_all_forward_and_reverse_cleanup(self):
+        self.registered()
+        forward_server = self.dns_server
+        self.run_dns('withdraw')
+        server = Authority('2.0.192.in-addr.arpa.', 'owner.fixture.invalid.', self.secret).__enter__()
+        self.addCleanup(server.__exit__, None, None, None)
+        self.dns_server = server
+        self.dns_job, self.scope = example(server.port, zone='2.0.192.in-addr.arpa.',
+                    name='20.2.0.192.in-addr.arpa.', rtype='PTR', value='app.fixture.invalid.')
+        self.prepare_dns()
+        self.registered()
+        count = len(self.calls)
+        with self.assertRaises(OSError): self.run_action('retire')
+        self.assertEqual(len(self.calls), count)
+        self.assertEqual(type(self).row['status']['value'], 'active')
+        self.run_dns('withdraw')
+        self.assertEqual(self.run_action('retire')['allocation_status'], 'deprecated')
+        self.assertFalse(any(method == 'DELETE' for method, _ in self.calls))
+        with self.assertRaises(ValueError): self.run_action('reserve')
+        # Neither service's ownership tombstone was released by retirement.
+        self.assertTrue(any(kind == 'TXT' for _, kind in server.store))
+        self.assertTrue(any(kind == 'TXT' for _, kind in forward_server.store))
+
+    def test_uncertain_withdrawal_blocks_IPAM_retirement_until_reconciled(self):
+        self.registered()
+        self.dns_server.drop_update_reply = True
+        self.dns_server.before_update = lambda server: setattr(server, 'fail_after_commit', True)
+        self.assertEqual(self.run_dns('withdraw')['status'], 'DNS_WITHDRAWAL_HELD')
+        before = len(self.calls)
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(len(self.calls), before)
+        self.dns_server.fail_after_commit = False
+        self.run_dns('reconcile-withdrawal')
+        self.assertEqual(self.run_action('retire')['allocation_status'], 'deprecated')
+
+    def test_new_retirement_window_requires_fresh_DNS_tombstone_read(self):
+        self.registered()
+        self.run_dns('withdraw')
+        self.authority['valid_from'] = utcnow().isoformat()
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(type(self).row['status']['value'], 'active')
+        self.run_dns('reconcile-withdrawal')
+        self.assertEqual(self.run_action('retire')['allocation_status'], 'deprecated')
+
+    def test_failed_new_tombstone_read_overrides_earlier_success(self):
+        self.registered()
+        self.run_dns('withdraw')
+        self.dns_server.set('app.fixture.invalid.', 'A', 60, ['192.0.2.99'])
+        self.assertEqual(self.run_dns('reconcile-withdrawal')['status'], 'DNS_WITHDRAWAL_HELD')
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(type(self).row['status']['value'], 'active')
+
+    def test_cleanup_receipt_cannot_be_substituted_or_claim_reuse(self):
+        self.registered()
+        self.run_dns('withdraw')
+        original = load_private(self.withdrawal_transaction())
+        for key, value in [('binding_sha256', '0' * 64), ('registration_binding_sha256', '0' * 64),
+                ('reusable', True), ('action', 'register'), ('status', 'DNS_WITHDRAWAL_HELD')]:
+            replace_private(self.withdrawal_transaction(), encoded(original | {key: value}))
+            with self.subTest(key=key), self.assertRaises(ValueError): self.run_action('retire')
+        for key in ('job_sha256', 'scope_sha256'):
+            changed = deepcopy(original)
+            changed['dns'][key] = '0' * 64
+            replace_private(self.withdrawal_transaction(), encoded(changed))
+            with self.subTest(key=key), self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(type(self).row['status']['value'], 'active')
+        self.assertFalse(any(method == 'PATCH' for method, _ in self.calls))
+
+    def test_cleanup_for_another_allocation_cannot_authorize_retirement(self):
+        self.registered()
+        self.run_dns('withdraw')
+        path = next(self.ledger.glob('*/dns-*/withdrawal-attempt.json'))
+        attempt = load_private(path)
+        replace_private(path, encoded(attempt | {'request_sha256': '0' * 64}))
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(type(self).row['status']['value'], 'active')
+
+    def test_lost_IPAM_retirement_reply_still_requires_read_only_IPAM_recovery(self):
+        self.registered()
+        self.run_dns('withdraw')
+        request = self.client.request
+        def lose(method, *args, **kwargs):
+            result = request(method, *args, **kwargs)
+            if method == 'PATCH': raise TimeoutError('Synthetic lost reply')
+            return result
+        with patch.object(self.client, 'request', side_effect=lose), self.assertRaises(TimeoutError):
+            self.run_action('retire')
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(self.run_action('reconcile')['allocation_status'], 'deprecated')
+        self.assertEqual(sum(method == 'PATCH' for method, _ in self.calls), 1)
+
+    def test_broken_reconciliation_link_cannot_fall_back_to_old_success(self):
+        self.registered()
+        slot = self.transaction().parent
+        (slot / 'reconciliation.json').symlink_to(slot / 'missing-original-reconciliation.json')
+        with self.assertRaises(ValueError): self.run_dns('withdraw')
+        (slot / 'reconciliation.json').unlink()
+        self.run_dns('withdraw')
+        (slot / 'withdrawal-reconciliation.json').symlink_to(slot / 'missing-withdrawal-reconciliation.json')
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertEqual(type(self).row['status']['value'], 'active')

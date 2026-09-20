@@ -151,7 +151,8 @@ def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
                     'Withdrawal parent differs from the durable registration attempt')
             if not read_only:
                 parent_path = slot / 'reconciliation.json'
-                parent = load_private(parent_path if parent_path.exists() else slot / 'transaction.json')
+                parent = load_private(parent_path if parent_path.exists() or parent_path.is_symlink()
+                                      else slot / 'transaction.json')
                 require(parent.get('format') == 'hosting-netbox-dns-receipt/1'
                         and parent.get('binding_sha256') == parent_binding
                         and parent.get('status') == 'AUTHORITATIVE_REGISTRATION_OBSERVED'

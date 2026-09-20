@@ -94,6 +94,48 @@ def relation(row, key):
     return row.get(key, {}).get('id') if isinstance(row.get(key), dict) else row.get(key)
 
 
+def require_dns_cleanup(directory, job, authority):
+    """Gate retirement on current completed cleanup of every managed DNS slot.
+
+    Caller holds the shared allocation lock. Native DNS permissions/fencing and
+    cleanup outside this ledger remain the service owner's responsibility.
+    """
+    current_window(authority)
+    since = datetime.fromisoformat(authority['valid_from'].replace('Z', '+00:00'))
+    for slot in sorted(directory.glob('dns-*')):
+        private_path(slot, directory=True)
+        parent = load_private(slot / 'attempt.json')
+        attempt = load_private(slot / 'withdrawal-attempt.json')
+        latest = slot / 'withdrawal-reconciliation.json'
+        reconciled = latest.exists() or latest.is_symlink()
+        result = load_private(latest if reconciled else slot / 'withdrawal-transaction.json')
+        require(isinstance(parent, dict) and isinstance(attempt, dict) and isinstance(result, dict),
+                'Managed DNS cleanup records are invalid')
+        for record, fields in [(parent, ('binding_sha256',)), (attempt, ('binding_sha256',
+                'registration_binding_sha256', 'request_sha256', 'job_sha256', 'scope_sha256'))]:
+            require(all(isinstance(record.get(key), str) and re.fullmatch(r'[0-9a-f]{64}', record[key])
+                        for key in fields), 'Managed DNS cleanup binding is missing')
+        native = result.get('dns')
+        require(attempt['registration_binding_sha256'] == parent['binding_sha256']
+                and attempt['request_sha256'] == digest(encoded(job))
+                and result.get('format') == 'hosting-netbox-dns-receipt/1'
+                and result.get('action') == ('reconcile-withdrawal' if reconciled else 'withdraw')
+                and result.get('status') == 'AUTHORITATIVE_TOMBSTONE_OBSERVED'
+                and result.get('binding_sha256') == attempt['binding_sha256']
+                and result.get('registration_binding_sha256') == parent['binding_sha256']
+                and result.get('reusable') is False and result.get('activation_authorized') is False
+                and isinstance(native, dict) and native.get('activation_authorized') is False
+                and native.get('status') in {'APPLIED_OBSERVED', 'ALREADY_APPLIED_OBSERVED', 'RECONCILED_APPLIED_OBSERVED'}
+                and native.get('job_sha256') == attempt['job_sha256']
+                and native.get('scope_sha256') == attempt['scope_sha256'],
+                'Managed DNS cleanup is unresolved or belongs to another attempt')
+        observed = datetime.fromisoformat(native.get('observed_at', native.get('finished_at', '')).replace('Z', '+00:00'))
+        finished = datetime.fromisoformat(result.get('finished_at', '').replace('Z', '+00:00'))
+        require(observed.tzinfo is not None and finished.tzinfo is not None
+                and since <= observed <= finished <= utcnow(),
+                'Reobserve DNS tombstones within the current IPAM retirement authority window')
+
+
 class AllocationReader:
     """Exact native allocation/namespace readback shared by dependent services."""
 
@@ -163,6 +205,8 @@ def operate(job, action, authority, client, ledger):
         head = load_private(head_path) if head_path.exists() else None
         if head and head['status'] == 'OUTCOME_UNKNOWN':
             require(action == 'reconcile', 'Uncertain IPAM mutation requires read-only reconciliation')
+        if action == 'retire':
+            require_dns_cleanup(directory, job, authority)
         reader.namespace()
         row, etag = observed()
         if action == 'reconcile':
