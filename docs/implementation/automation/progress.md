@@ -18,6 +18,29 @@
 
 Use the [WSD deployment runbook](wsd-deployment.md) and [native guest runbook](native-guests.md) for the actual interfaces, private inputs, output binding and migration precautions. No native apply, guest connection, state migration, activation, deletion or infrastructure deployment was executed during this implementation.
 
+## Reviewed execution increment
+
+[PR #46](https://github.com/awalker0878/multi-tenant/pull/46) delivers the next
+repository implementation in separate commits. Its [execution runbook](terraform-execution.md)
+documents the supported operator path and its remaining integration boundaries.
+
+| Delivered capability | Concrete behavior | Remaining boundary |
+| --- | --- | --- |
+| Private saved-plan preparation | Clean source snapshot, pinned Terraform, explicit HTTP lock endpoints, current contact authority, exact input/credential/trust binding and the existing restricted-plan review | Actual backend, native credentials, accepted target and engineering approval remain external |
+| Exact-plan application | Exact bundle/review binding, live expiry checks, backend lock, private logs and source-bound execution | The issuing authority and actual target qualification are not created by JSON records |
+| Durable attempt ledger | Persist uncertainty before mutation; reject duplicate operation/generation, concurrent executor writer and unknown prior outcome | A shared durable ledger is required; native tasks and other tools require actual fencing and reconciliation |
+| Three-platform credential path | Nutanix/VMware injected credentials; self-contained scoped OpenStack cloud profile; bound optional private CA | Actual least-privilege credentials and supported installed tuples must be supplied and qualified |
+| Receipt-based handoffs | Successful exact domain outputs compile disabled workload drafts; successful workload receipts feed pinned guest inventory | Independent native quarantine/placement and VMware network mapping remain required |
+| Real local Terraform experiment | Built-in data resource proves saved-plan use, stale-plan rejection, output capture and private artifact permissions | No platform provider, remote backend or infrastructure is exercised |
+| Repository release settings | Reviewable required-check/review ruleset and administrator procedure | Settings are not enabled by committing the file; independent reviewer coverage is still needed |
+
+The current resource modules still describe prepared/restricted state. This
+increment does not implement powered/connected bootstrap or active lifecycle
+states, full guest hardening/enrollment, native drift repair, upgrades, restore
+or retirement. Adding permissive booleans without the selected edge/service
+interfaces would not complete those operations. W01–W29 remain open under their
+actual acceptance criteria.
+
 ## Current verification
 
 At `15a574d`, [architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35490547048) and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35490547095) passed. This includes all 16 registered Terraform module/composition/root pairs, real Ansible syntax and local rejection/idempotence checks, and the two disposable packet families. Local Python verification at `9a76d90` passed 1,392 tests and 80 route/model checks; `15a574d` adds the tested ambiguous-input rejection case. Later revisions must use their own exact CI results; these links are not evidence for untested source.
@@ -41,13 +64,13 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W09 | Partial placement checks only | Implement actual tenant project/RBAC/quota/pool/AZ entitlement mutations and delegated-credential negative tests. Declared eligibility is not enforced native entitlement. |
 | W10 | Blocked on capacity/IPAM authority | Implement the selected service APIs for idempotent hold/confirm/renew/reconcile/release and exact demand/generation binding. The compiler does not allocate addresses or reserve capacity. |
 | W11 | Existing DNS tooling; integration open | Bind the selected authoritative DNS operation to real confirmed IPAM/reservation records; qualify A/AAAA/PTR, conflicts, uncertain outcomes, observations and retirement/reuse. |
-| W12 | Partial | Compositions and domain-to-workload ID handoffs exist. Integrate accepted edge routes/attachments, capacity, IPAM, credentials and exact-plan execution; qualify whole fixtures and partial effects on all three stacks. |
+| W12 | Partial | Compositions, source-bound restricted execution and receipt-based domain/workload/guest handoffs exist. Integrate accepted edge routes/attachments, capacity, IPAM and current native observations; qualify whole fixtures and partial effects on all three stacks. |
 | W13 | Partial Linux configuration | Candidate hostname/time/kernel configuration exists. Deliver actual images, provenance, first boot, restricted bootstrap, resolver, full adopted hardening, patch/reboot/resume and selected Windows/other guest profiles. |
 | W14 | Blocked on consumer interfaces | Implement selected identity/certificate/KMS, monitoring/logging, backup, storage and package enrollment/renewal/revocation/removal with actual service replies and restore evidence. |
 | W15 | Blocked on edge/service handoffs | Implement approved connectivity, scoped allow rules, forward/reply routing and controlled egress/activation field ownership. Current Terraform resources remain restricted. |
 | W16 | Partial | Neutron local dispatch and output/inventory binding are added. Implement VM/Nova/Cinder/Flow/category/storage/identity observers and complete receipt-to-manifest integration, using actual task/revision/ETag evidence. Do not invent missing native versions or task IDs from Terraform success. |
 | W17 | Blocked on native coordinator/fencing interfaces | Implement actual cross-writer fencing, native task tracking, late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
-| W18 | Runbooks and handoffs delivered; coordinator open | Integrate the chosen change/automation system with live preflight/reservation, exact saved-plan/source/input binding, ordered apply, evidence retention, native reconciliation and activation hold. No unattended native runner is installed. |
+| W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds and receipt handoffs are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Blocked on real targets and prerequisites | Execute and independently accept restricted native campaigns for all three exact tuples, publish measured capacity and demonstrate controlled production exposure/withdrawal. All native indexes remain unqualified. |
 | W21 | Operational integration open | Connect scheduled drift/health/capacity checks to selected observers and alerting, classify emergency/security/unknown drift, and exercise owned incident containment/release. Guest convergence is not a platform drift service. |
@@ -55,7 +78,7 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W23 | Blocked on backup/key/storage products | Implement capture/retention and isolated useful-data restore against the selected services, independent protection/delete authority, catalogues/keys and measured RPO/RTO. |
 | W24 | Blocked on accepted adoption/recovery design | Deliver exact native import/state mappings, same-service re-creation, supported portable data transitions, and any promised synchronization/cutover/failback with writer exclusion. No blind state move or cross-stack live migration is supplied. |
 | W25 | Blocked on retained-data/service authorities | Implement withdrawal and scoped cleanup across policy/routes/DNS/enrollment/native resources; reconcile partial effects, preserve retained copies/keys and release IPAM/reservations only after confirmed cleanup/reuse quarantine. |
-| W26 | Partial | Catalogue-based Terraform checks, composition mocks, cluster/inventory negatives and native Ansible guard checks exist. Add actual native operation campaigns, service integrations, secrets controls and runtime tests as targets/interfaces are selected. |
+| W26 | Partial | Catalogue/provider checks, composition mocks, cluster/inventory negatives, Ansible guards and the real built-in Terraform saved-plan experiment exist. Add actual native operation campaigns, remote backend locking/recovery, service integrations and runtime tests as targets/interfaces are selected. |
 | W27 | Maintained docs delivered; operational acceptance open | Current paths, commands, commits and limits are documented. Add actual as-built records, assigned maintaining owners/cadence, accepted operating MOPs and release evidence after qualification. |
 | W28 | Conditional; no public profile selected | Select and implement ingress/WAF/LB, PAZ capacity, DNS/certificates, backend identity, HA/recovery and withdrawal; run its independent campaign. Internal OZ/RZ examples do not expose public service. |
 | W29 | Conditional; extensions unselected | For each adopted assurance/bare-metal/container/accelerator/stretch/cross-stack/additional-platform offer, supply its design, real automation and separate native evidence/limits. |

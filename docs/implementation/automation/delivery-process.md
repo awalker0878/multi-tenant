@@ -74,3 +74,9 @@ Retain raw plans/state/logs/native evidence privately with appropriate access an
 ## Implemented operator entrypoints
 
 The [WSD deployment runbook](wsd-deployment.md) and [native guest runbook](native-guests.md) now define the implemented Terraform and Ansible paths, private input/output handoffs, scope checks and execution limits. The [package record](progress.md) distinguishes these delivered code paths from commissioning, owner-service mutations and native acceptance still outstanding.
+
+The [reviewed execution path](terraform-execution.md) now supplies real saved-plan
+preparation/application, exact source/input/backend/credential binding, durable
+attempt records and domain-to-workload-to-inventory handoffs. It operates on one
+owned WSD phase at a time. It does not implement the selected service APIs,
+cross-writer native fencing, production connectivity or an unattended scheduler.

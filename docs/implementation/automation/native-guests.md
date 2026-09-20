@@ -10,6 +10,11 @@ First complete independent image/provenance and native VM/placement verification
 
 Capture the workload root's `terraform output -json` privately. Create one `hosting-guest-access/1` JSON document with these fields:
 
+When using the [reviewed Terraform executor](terraform-execution.md), the inventory
+builder can consume `--workload-run` directly. Its successful receipt and output
+digest are checked before the existing guest identity/access checks. This removes
+the manual output-copy step without supplying native quarantine acceptance.
+
 | Field | Required value |
 | --- | --- |
 | `format` | `hosting-guest-access/1` |

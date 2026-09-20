@@ -1,6 +1,6 @@
 # Portable Multi-Tenant Secure Hosting
 
-Private infrastructure architecture, engineering and implementation workspace.
+Infrastructure architecture, engineering and implementation workspace. This repository is public; actual inventories, credentials, plans, state and native evidence belong in private operator systems.
 
 ## Read the architecture and engineering in Git
 
@@ -27,6 +27,8 @@ The ten native Terraform primitives are retained under `terraform/modules`; thei
 ## Current automation delivery
 
 The former `docs/1.0` plan now lives in the maintained [automation delivery program](docs/implementation/automation/README.md). Use the [WSD deployment runbook](docs/implementation/automation/wsd-deployment.md), [native guest runbook](docs/implementation/automation/native-guests.md) and [package delivery record](docs/implementation/automation/progress.md). Site commissioning, service-owner integrations, complete lifecycle automation and native qualification remain incomplete; repository publication is not an end-to-end release.
+
+[Reviewed Terraform execution](docs/implementation/automation/terraform-execution.md) supplies private saved-plan preparation/application, exact source/input/backend/credential binding, durable failure holds, and execution-receipt handoffs into workload compilation and guest inventory. The [release controls](docs/implementation/automation/release-controls.md) include a proposed GitHub ruleset and its administrator activation steps. Neither addition qualifies a native platform or activates production.
 
 ## Local review
 

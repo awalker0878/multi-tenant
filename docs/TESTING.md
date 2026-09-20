@@ -1,5 +1,24 @@
 # Test strategy and actual evidence levels
 
+## Reviewed execution tests
+
+`tests/test_terraform_run.py`, `tests/test_terraform_apply.py` and
+`tests/test_wsd_handoff.py` exercise exact source/input/backend/credential binding,
+live expiry, private permissions, failed/duplicate/concurrent attempts, receipt
+integrity and the three-platform handoff. Process doubles do not contact native
+infrastructure. The guest CLI test covers receipt-to-inventory argument handling.
+
+`python lab/run_terraform_execution_lab.py` additionally uses the pinned real
+Terraform engine and only its built-in `terraform_data` resource in a disposable
+local directory. It verifies saved binary plans, stale-state rejection, output
+capture and owner-only artifacts. No remote backend, vendor provider, provisioner,
+guest or native service is involved. Hosted Terraform CI runs this experiment and
+retains its separate report; it is not native qualification.
+
+The ruleset test checks that every proposed required check names an unconditional
+PR job, avoiding an unmergeable release configuration when workflows are renamed.
+It does not enable GitHub rules or test administrator permissions.
+
 The active reference describes the infrastructure; the tests evaluate specific code
 and observations, not organizational authorization. [Terraform guidance](../terraform/README.md)
 and [Ansible boundaries](../ansible/README.md) describe the two execution surfaces.
