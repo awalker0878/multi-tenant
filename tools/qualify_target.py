@@ -13,7 +13,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe
+from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe
 from tools.check_release import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
@@ -27,7 +27,7 @@ ADAPTERS = {'openstack': neutron_observe, 'vmware': nsx_observe, 'nutanix': nuta
 
 def validate(plan):
     c.exact_keys(plan, {'format', 'scope', 'source_commit', 'origin', 'assets', 'cases'})
-    require(plan['format'] in {'hosting-target-campaign/1', 'hosting-target-campaign/2'}, 'Unknown target campaign')
+    require(plan['format'] in {'hosting-target-campaign/1', 'hosting-target-campaign/2', 'hosting-target-campaign/3'}, 'Unknown target campaign')
     c.exact_keys(plan['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'})
     for value in plan['scope'].values():
         c.identifier(value)
@@ -35,8 +35,10 @@ def validate(plan):
             'Exact platform and committed source required')
     require(c.origin(plan['origin']) == plan['origin'], 'Canonical native HTTPS origin required')
     extended = plan['format'] == 'hosting-target-campaign/2'
+    ahv = plan['format'] == 'hosting-target-campaign/3'
     require(not extended or plan['scope']['platform'] == 'openstack', 'Workload readback campaign requires OpenStack')
-    c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else set()))
+    require(not ahv or plan['scope']['platform'] == 'nutanix', 'AHV readback campaign requires Nutanix')
+    c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else {'workload_manifest'} if ahv else set()))
     for asset in plan['assets'].values():
         c.exact_keys(asset, {'path', 'sha256'})
         require(isinstance(asset['path'], str) and Path(asset['path']).is_absolute()
@@ -98,7 +100,33 @@ def bound_inputs(plan, known_hosts):
     else:
         adapter.validate(manifest)
         require(manifest['origin'] == plan['origin'] and manifest['contact_enabled'] is True, 'Native manifest contact differs')
+        if plan['format'] == 'hosting-target-campaign/3':
+            ahv_binding(plan['scope'], c.strict_loads(assets['workload_manifest']),
+                        variables['hosting_workload_outputs'], access, manifest)
     return assets, access, pins
+
+
+def ahv_binding(scope, manifest, outputs, access, network):
+    nutanix_vm_observe.validate(manifest)
+    require(scope['platform'] == 'nutanix' and manifest['contact_enabled'] is True, 'Enabled AHV observation required')
+    require(all(manifest[key] == network[key] for key in ('origin', 'operation_id', 'tenant_id', 'scope_id',
+            'target_binding_ref', 'engineering_record_ref')), 'Network and AHV observation bindings differ')
+    require(manifest['tenant_id'] == scope['tenant_key'] and manifest['scope_id'] == scope['wsd_key'], 'Foreign AHV scope')
+    members = outputs['members']['value']
+    selected = {r['ext_id']: r['expected'] for r in manifest['resources']}
+    require(set(selected) == {v['vm_id'] for v in members.values()}, 'AHV readback must cover every owned VM exactly')
+    tenants = {r['expected']['tenantId'] for r in network['resources']}
+    subnets = {r['ext_id'] for r in network['resources'] if r['kind'] == 'subnet'}
+    require(len(tenants) == 1 and tenants == {r['tenantId'] for r in selected.values()}, 'Foreign native tenant')
+    for name, member in members.items():
+        vm = selected[member['vm_id']]
+        require(vm['powerState'] == 'ON', 'Traffic campaign requires powered-on VM observations')
+        addresses = set()
+        for nic in vm['nics']:
+            require(nic['nicBackingInfo']['isConnected'] is True
+                    and nic['nicNetworkInfo']['subnet']['extId'] in subnets, 'NIC must be connected to an observed subnet')
+            addresses.add(nic['nicNetworkInfo']['ipv4Config']['ipAddress']['value'])
+        require(access['targets'][name]['address'] in addresses, 'Guest access address differs from accepted AHV NIC')
 
 
 def workload_binding(scope, manifest, outputs, project_id):
@@ -143,8 +171,26 @@ def budget(authority, maximum):
 def native_readback(plan, assets, authority, directory, label):
     platform = plan['scope']['platform']
     script = {'openstack': 'neutron_observe.py', 'vmware': 'nsx_observe.py', 'nutanix': 'nutanix_observe.py'}[platform]
+    network_hash = reader_child(plan, assets, authority, directory, label, script, 'native_manifest')
+    if plan.get('format') == 'hosting-target-campaign/2':
+        budget(authority, 120)
+        manifest = c.strict_loads(assets['workload_manifest'])
+        client = openstack_observe.Client(manifest, assets['workload_token'].decode().strip(), assets['workload_ca'], authority)
+        observation = openstack_observe.observe(manifest, client)
+        write_new(directory / (label + '-workloads.json'), encoded(observation))
+        require(observation['status'] == 'OBSERVED_MATCH_NOT_QUALIFIED', 'Workload identity, placement or storage readback failed')
+        return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': digest(encoded(observation))}))
+    if plan.get('format') == 'hosting-target-campaign/3':
+        workload_hash = reader_child(plan, assets, authority, directory, label + '-workloads',
+                                     'nutanix_vm_observe.py', 'workload_manifest')
+        return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': workload_hash}))
+    return network_hash
+
+
+def reader_child(plan, assets, authority, directory, label, script, manifest_name):
+    platform = plan['scope']['platform']
     output = directory / (label + '.json')
-    argv = [sys.executable, str(ROOT / 'tools' / script), str(directory / 'native_manifest'),
+    argv = [sys.executable, str(ROOT / 'tools' / script), str(directory / manifest_name),
             '--read-authorized-target', '--expected-origin', plan['origin'],
             '--ca-file', str(directory / 'native_ca'), '--output', str(output)]
     credentials = c.strict_loads(assets['native_credentials'])
@@ -166,16 +212,7 @@ def native_readback(plan, assets, authority, directory, label):
     report = load_private(output)
     require(report.get('outcome', report.get('status')) in {'READBACK_MATCH_NOT_QUALIFIED', 'OBSERVED_MATCH_NOT_QUALIFIED'},
             'Native readback is not stable and matching')
-    network_hash = digest(read_private(output))
-    if plan.get('format') == 'hosting-target-campaign/2':
-        budget(authority, 120)
-        manifest = c.strict_loads(assets['workload_manifest'])
-        client = openstack_observe.Client(manifest, assets['workload_token'].decode().strip(), assets['workload_ca'], authority)
-        observation = openstack_observe.observe(manifest, client)
-        write_new(directory / (label + '-workloads.json'), encoded(observation))
-        require(observation['status'] == 'OBSERVED_MATCH_NOT_QUALIFIED', 'Workload identity, placement or storage readback failed')
-        return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': digest(encoded(observation))}))
-    return network_hash
+    return digest(read_private(output))
 
 
 def ssh_probe(case, target, authority, directory, binary, ca, sequence):
@@ -255,6 +292,8 @@ def main():
         # Copy only assets the child processes need; API credentials stay in memory.
         for key in ('native_manifest', 'native_ca', 'ssh_key'):
             write_new(directory / key, assets[key])
+        if plan['format'] == 'hosting-target-campaign/3':
+            write_new(directory / 'workload_manifest', assets['workload_manifest'])
         write_new(directory / 'ssh_key-cert.pub', assets['ssh_certificate'])
         write_new(directory / 'known_hosts', pins.encode())
         result = {'status': 'HOLD_INCOMPLETE', 'scope': plan['scope'], 'source_commit': source['commit'],

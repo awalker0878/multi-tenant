@@ -54,8 +54,8 @@ uncertain Terraform apply, authorize replay, prove Flow enforcement, establish
 HA placement/failover, or qualify a recovery. Use actual task evidence and the
 [commissioning procedure](site-commissioning.md) separately.
 
-This standalone snapshot supplements [restricted lifecycle transitions](platform-lifecycle.md).
-It is not yet an integrated AHV workload step in the target qualification runner.
+This snapshot supplements [restricted lifecycle transitions](platform-lifecycle.md)
+and is integrated before and after guest probes in [campaign v3](target-qualification.md).
 Keep the readback, effective Flow/DFW, guest probes and recovery evidence together
 under the accepted site record; none of these implementation tests closes live
 platform qualification.

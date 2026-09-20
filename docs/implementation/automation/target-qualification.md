@@ -51,6 +51,22 @@ the workload results. The campaign's native hashes bind both collector results.
 Version 1 remains available for the existing network-only campaigns; its scope
 does not include Nova/Cinder/Glance placement or storage qualification.
 
+For Nutanix use `hosting-target-campaign/3`. It adds only `workload_manifest` to
+the seven base assets and reuses the exact Prism origin, credentials and CA.
+The [AHV snapshot manifest](nutanix-vm-readback.md) must cover every VM ID in the
+bound guest outputs. It must share the network manifest's operation, portable
+tenant/WSD, engineering and target binding references, and actual native tenant
+UUID. Every NIC must be connected to an enumerated native subnet; each guest's
+accepted address must occur on its VM. Powered-off expectations are rejected for
+this traffic campaign. Actual host, category, project, disk and ETag expectations
+still require independent acceptance; Terraform outputs do not establish them.
+
+Version 3 performs the network/task readback and AHV snapshot readback before and
+after traffic, with a separate 120-second budget for each child and joint result
+hashes. A network task result does not prove VM task completion. The AHV report
+explicitly lacks that claim. Flow policy/precedence, same-host isolation, image
+initialization, HA and retained-data recovery remain separate native obligations.
+
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.
@@ -112,7 +128,7 @@ python tools/qualify_target.py /private/operator/campaign.json --execute \
 
 Without `--execute`, only the plan schema is checked and no target is contacted.
 Execution validates source, assets and authority before contact. Native reads
-are bounded to 120 seconds per phase; each SSH command to 20 seconds and its
+are bounded to 120 seconds per collector; each SSH command to 20 seconds and its
 remote probe to 10 seconds. The next phase is refused unless enough authority
 remains for its entire timeout. Access expiry is checked before every guest call.
 
