@@ -86,11 +86,13 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
     return value
 
 
-def valid_control(observation:dict,scope:str,start:datetime,current:datetime,max_age:int)->bool:
+def valid_control(observation:dict,scope:str,start:datetime,readback_start:datetime,current:datetime,max_age:int)->bool:
     c.exact_keys(observation,{'state','scope_id','observed_at','evidence_ref'})
     c.text(observation['evidence_ref'],'existing operational evidence reference')
     t=c.timestamp(observation['observed_at'])
-    return observation['state']=='VERIFIED' and observation['scope_id']==scope and start<=t<=current and (current-t).total_seconds()<=max_age
+    # Readback collected before exclusion/restriction can be invalidated by a
+    # competing writer. A later control observation requires a fresh readback.
+    return observation['state']=='VERIFIED' and observation['scope_id']==scope and start<=t<=readback_start<=current and (current-t).total_seconds()<=max_age
 
 
 def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=300)->dict:
@@ -121,8 +123,9 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
         if context['executor_state'] not in ('STOPPED','RUNNING','UNKNOWN') or context['containment'] not in ('NONE','ACTIVE','UNKNOWN'):
             raise ValueError('Unknown writer/containment disposition')
         if context['data_disposition']!='PRESERVE':raise ValueError('This procedure never authorizes data destruction')
-        fenced=valid_control(context['writer_fence'],m['scope_id'],max(attempted,changed),current,max_age)
-        denied=valid_control(context['quarantine'],m['scope_id'],max(attempted,changed),current,max_age)
+        readback_start=c.timestamp(report['started_at'])
+        fenced=valid_control(context['writer_fence'],m['scope_id'],max(attempted,changed),readback_start,current,max_age)
+        denied=valid_control(context['quarantine'],m['scope_id'],max(attempted,changed),readback_start,current,max_age)
         if context['containment']=='ACTIVE':
             result='KEEP_INCIDENT_CONTAINMENT';reasons=['INCIDENT_AUTHORITY_REMAINS_IN_FORCE']
         elif context['containment']=='UNKNOWN':

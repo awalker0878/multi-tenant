@@ -27,8 +27,8 @@ def context(m,r):
       'accepted_plan_sha256':c.digest({'plan':'LOCAL EXAMPLE ONLY'}),'change_record_ref':'LAB-CHANGE',
       'attempted_at':when,'last_security_change_at':when,'attempted_generation':4,'current_generation':4,
       'executor_state':'STOPPED','containment':'NONE','data_disposition':'PRESERVE',
-      'writer_fence':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':datetime.now(timezone.utc).isoformat(),'evidence_ref':'LAB-FENCE'},
-      'quarantine':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':datetime.now(timezone.utc).isoformat(),'evidence_ref':'LAB-QUARANTINE'}}
+      'writer_fence':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':r['started_at'],'evidence_ref':'LAB-FENCE'},
+      'quarantine':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':r['started_at'],'evidence_ref':'LAB-QUARANTINE'}}
 
 
 class NativeWireTests(unittest.TestCase):
@@ -255,6 +255,12 @@ class RecoveryReviewTests(unittest.TestCase):
         self.x['quarantine']['state']='UNKNOWN';self.assertEqual(self.review()['result'],'HOLD_QUARANTINE_NOT_VERIFIED')
     def test_foreign_fence_scope(self):
         self.x['writer_fence']['scope_id']='D02O';self.assertEqual(self.review()['result'],'HOLD_WRITER_NOT_FENCED')
+    def test_readback_before_fence_requires_fresh_observation(self):
+        self.x['writer_fence']['observed_at']=self.r['completed_at']
+        self.assertEqual(self.review()['result'],'HOLD_WRITER_NOT_FENCED')
+    def test_readback_before_quarantine_requires_fresh_observation(self):
+        self.x['quarantine']['observed_at']=self.r['completed_at']
+        self.assertEqual(self.review()['result'],'HOLD_QUARANTINE_NOT_VERIFIED')
     def test_wrong_report_digest(self):
         self.x['report_sha256']='a'*64;self.assertEqual(self.review()['result'],'HOLD_INVALID_EVIDENCE')
     def test_wrong_manifest_generation_digest(self):

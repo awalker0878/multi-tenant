@@ -23,8 +23,8 @@ def operator_context(m,r):
       'accepted_plan_sha256':c.digest({'local_fixture_plan':4}),'change_record_ref':'LOCAL-TEST-CHANGE',
       'attempted_at':before,'last_security_change_at':before,'attempted_generation':4,'current_generation':4,
       'executor_state':'STOPPED','containment':'NONE','data_disposition':'PRESERVE',
-      'writer_fence':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':c.now(),'evidence_ref':'SIMULATED-EXTERNAL-FENCE-RECORD'},
-      'quarantine':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':c.now(),'evidence_ref':'SIMULATED-EXTERNAL-QUARANTINE-RECORD'}}
+      'writer_fence':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':r['started_at'],'evidence_ref':'SIMULATED-EXTERNAL-FENCE-RECORD'},
+      'quarantine':{'state':'VERIFIED','scope_id':m['scope_id'],'observed_at':r['started_at'],'evidence_ref':'SIMULATED-EXTERNAL-QUARANTINE-RECORD'}}
 
 
 def campaign():
