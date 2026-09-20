@@ -24,3 +24,17 @@ Native and allocation IDs must come from accepted engineering records. Credentia
 `vpc_id`, `subnet_id`, `security_category_id`, `quarantine_policy_id`, `delivery_state`.
 
 Output IDs and the static delivery-state label do not establish native readiness, test results or authorization.
+# Restricted Flow service lifecycle
+
+`lifecycle_stage` defaults to `prepared`, preserving the original two deny rules.
+Explicit `bootstrap` adds sorted exact IPv4 /32 TCP/UDP service rules for the
+owned category and VPC. Both allow modes remain `NONE`; only the selected peer
+and port are supplied. Return to `prepared` removes the exceptions and preserves
+the baseline/intra-group denies. No external VPC attachment is added.
+
+This follows the pinned provider's selective-subnet acceptance example in
+[the 2.4.2 tests](https://github.com/nutanix/terraform-provider-nutanix/blob/v2.4.2/nutanix/services/networkingv2/resource_nutanix_network_security_policies_v2_test.go).
+Provider mocks check schema and intended values, not installed Flow semantics.
+Native policy precedence, category ownership, paths, task completion and healthy
+denial controls must be accepted before using the service. Bootstrap requires
+`bootstrap_acceptance_ref`; a reference string is not approval authentication.

@@ -1,5 +1,5 @@
 {
-  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "//": "Restricted domain preparation and exact Flow service bootstrap. Native policy precedence and enforcement require qualification.",
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
@@ -63,6 +63,36 @@
         {
           "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
           "error_message": "Invalid value for Usable host offset for the native gateway."
+        }
+      ]
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
+    },
+    "bootstrap_rules": {
+      "type": "map(object({direction = string, protocol = string, port = number, remote_ipv4 = string}))",
+      "nullable": false,
+      "default": {},
+      "description": "Stable owned rule keys; exact endpoint and TCP/UDP port only. Keep existing rules during withdrawal; disabled interfaces contain exposure.",
+      "validation": [
+        {
+          "condition": "${length(var.bootstrap_rules) <= 32 && alltrue([for key, r in var.bootstrap_rules : can(regex(\"^[a-z][a-z0-9-]{1,40}$\", key)) && contains([\"ingress\", \"egress\"], r.direction) && contains([\"tcp\", \"udp\"], r.protocol) && r.port >= 1 && r.port <= 65535 && floor(r.port) == r.port && can(cidrnetmask(\"${r.remote_ipv4}/32\"))])}",
+          "error_message": "At most 32 named exact IPv4 TCP/UDP service rules are supported."
         }
       ]
     }
@@ -193,8 +223,79 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Flow bootstrap requires independent native policy, service-path and withdrawal acceptance."
             }
           ]
+        },
+        "dynamic": {
+          "rules": {
+            "for_each": "${var.lifecycle_stage == \"bootstrap\" ? var.bootstrap_rules : {}}",
+            "content": {
+              "description": "${rules.key}",
+              "type": "APPLICATION",
+              "spec": [
+                {
+                  "application_rule_spec": [
+                    {
+                      "secured_group_category_associated_entity_type": "VM",
+                      "secured_group_category_references": [
+                        "${nutanix_category_v2.domain.id}"
+                      ],
+                      "src_allow_spec": "NONE",
+                      "dest_allow_spec": "NONE",
+                      "is_all_protocol_allowed": false,
+                      "src_category_associated_entity_type": "VM",
+                      "dest_category_associated_entity_type": "VM",
+                      "secured_group_entity_group_reference": "",
+                      "src_entity_group_reference": "",
+                      "dest_entity_group_reference": "",
+                      "network_function_reference": "",
+                      "network_function_chain_reference": "",
+                      "src_category_references": [],
+                      "dest_category_references": [],
+                      "src_address_group_references": [],
+                      "dest_address_group_references": [],
+                      "service_group_references": [],
+                      "icmp_services": [],
+                      "dynamic": {
+                        "src_subnet": {
+                          "for_each": "${rules.value.direction == \"ingress\" ? [rules.value.remote_ipv4] : []}",
+                          "content": {
+                            "value": "${src_subnet.value}",
+                            "prefix_length": 32
+                          }
+                        },
+                        "dest_subnet": {
+                          "for_each": "${rules.value.direction == \"egress\" ? [rules.value.remote_ipv4] : []}",
+                          "content": {
+                            "value": "${dest_subnet.value}",
+                            "prefix_length": 32
+                          }
+                        },
+                        "tcp_services": {
+                          "for_each": "${rules.value.protocol == \"tcp\" ? [rules.value.port] : []}",
+                          "content": {
+                            "start_port": "${tcp_services.value}",
+                            "end_port": "${tcp_services.value}"
+                          }
+                        },
+                        "udp_services": {
+                          "for_each": "${rules.value.protocol == \"udp\" ? [rules.value.port] : []}",
+                          "content": {
+                            "start_port": "${udp_services.value}",
+                            "end_port": "${udp_services.value}"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
         }
       }
     }
@@ -214,6 +315,9 @@
     },
     "delivery_state": {
       "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    },
+    "lifecycle_stage": {
+      "value": "${var.lifecycle_stage}"
     }
   }
 }
