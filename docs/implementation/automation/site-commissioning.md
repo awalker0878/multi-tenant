@@ -19,7 +19,7 @@ derived from the symbolic examples. Keep these values in private operator inputs
    Exercise conflicting writers, access denial across scopes and independent
    state recovery. Protect the private executor ledger and trust/credential
    assets. A lost ledger is a reconciliation hold, not a new operation number.
-3. Commission the selected NetBox, resolver/time, SSH issuer/revocation, logging,
+3. Commission the selected NetBox, authoritative DNS, resolver/time, SSH issuer/revocation, logging,
    package and backup services. Confirm scoped permissions, TLS identity and
    recovery custody. Capture real IPAM reservation/confirmation receipts before
    assigning addresses. Compute capacity reservations remain a separate native
@@ -34,6 +34,9 @@ derived from the symbolic examples. Keep these values in private operator inputs
    workload outputs. Apply the guest baseline/services, rerun for convergence,
    and perform check mode with known drift. Verify logs at the real collector,
    certificate issuance/revocation and successful encrypted captures.
+   Confirm native address ownership before the [NetBox-to-DNS handoff](netbox-dns.md).
+   Keep independent forward/reverse receipts and verify required resolver/secondary
+   propagation. A shared file lock does not replace actual service writer exclusion.
 6. Run [campaign v2](target-qualification.md) against the actual guest and native
    targets. Use positive controls around every expected denial. Correlate results
    with enforcement counters and tenant-delegated mutation tests. Independently

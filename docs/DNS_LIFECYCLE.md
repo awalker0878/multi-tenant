@@ -13,6 +13,12 @@ The upstream [authoritative IPAM handoff](engineering/authoritative-ipam-allocat
 
 The [authoritative DNS registration handoff](engineering/authoritative-dns-registration-handoff.md) adds an evidence/preflight layer above this writer: an exported registration must bind to the stable SHA-256 of the exact CONFIRMED IPAM allocation/realization, the SHA-256 of the full normalized DNS intent, opaque name/zone assignment, required propagation observations and retirement/tombstone state. The IPAM confirmation digest remains stable while later release/quarantine fields advance, but any change to the confirmation-defining allocation scope invalidates the DNS parent binding. This layer does not invoke the writer or store resolved name/address values.
 
+The [NetBox execution handoff](implementation/automation/netbox-dns.md) now connects
+the selected reference IPAM service to this writer for initial IPv4 A/PTR registration.
+It requires a confirmed receipt, current native ownership/revision and the shared
+allocation ledger. Durable attempts prevent replay; recovery only reads. This
+execution receipt does not populate or replace the separate evidence/preflight layer.
+
 The selected candidate interface is standards-based RFC 2136 UPDATE with HMAC-SHA256
 TSIG over TCP. Actual server support, key/name/type policy, management transport,
 clock synchronization, topology and secondary/cache behavior require site acceptance.

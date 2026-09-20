@@ -19,6 +19,8 @@ Qualify the actual server's uniqueness enforcement, ETag/If-Match rejection and
 token/object permissions before use. The adapter requires API-Version `4.7` and
 an object ETag before any update. The local TLS tests exercise protocol handling
 and failure behavior against synthetic responses; they do not qualify NetBox.
+List and exact-detail reads must agree on native allocation identity and status;
+malformed collection counts, IDs and unsupported allocation statuses stop use.
 
 ## Private request and execution
 
@@ -56,8 +58,9 @@ intended completed outcome can clear that hold. Absence does not authorize retry
 
 A reserved address is unavailable to other requests. Confirm only after the
 owning native resource and address binding have been established. Register DNS
-through the existing [DNS client](../../../tools/dns_change.py) using a confirmed
-address. NetBox does not supply a timed compute lease: holds remain allocated
+through the [confirmed allocation DNS handoff](netbox-dns.md), which uses the
+existing DNS client and current native IPAM reads under the shared allocation lock.
+NetBox does not supply a timed compute lease: holds remain allocated
 until explicit retirement and the service owner's later reuse procedure. No
 automatic renewal/release timer fabricates capacity authority.
 
