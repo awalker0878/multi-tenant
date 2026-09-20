@@ -153,6 +153,8 @@ def observation_keys(m):
 def validate_observation_history(m, history, states, current=None):
     current = current or c.timestamp(c.now())
     if len(states) == 1 and states[0].get('resource_key') == 'scope': return
+    vm_ids = {r['moid'] for r in m['resources']}
+    vm.validate_observation_history(vm_manifest(m), history, [s for s in states if s.get('resource_key') in vm_ids], current)
     records = {r['moid']: r for r in m['task']['records']}
     for state in states:
         key = state.get('resource_key')

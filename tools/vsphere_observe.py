@@ -118,15 +118,48 @@ def sample(m, client):
     results = []
     for r in m['resources']:
         first, mismatch = snapshot(r, client)
-        second, second_mismatch = snapshot(r, client); mismatch += second_mismatch
+        second, second_mismatch = snapshot(r, client)
+        witness = {phase: dict(selected_sha256=c.digest(value), runtime_question='/runtime/question:execution_blocked' in paths)
+                   for phase, value, paths in [('before', first, mismatch), ('after', second, second_mismatch)]}
+        mismatch += second_mismatch
         stable = c.digest(first) == c.digest(second)
         identity = all(not c.differences(s.get('config', {}), {key: r['expected']['config'][key]
             for key in ('_typeName', 'uuid', 'instanceUuid')}) for s in (first, second))
         if not stable: mismatch.append('/snapshot:changed_during_observation')
         status = 'UNKNOWN' if not stable or not identity or any(x.endswith((':missing', ':type')) for x in mismatch) else ('DIFFERENT' if mismatch else 'MATCH')
         results.append(dict(resource_key=r['moid'], identity_match=identity, config_status=status, mismatch_fields=sorted(set(mismatch)),
-            config_sha256=c.digest(second), progress='COMPLETE', reason='VSPHERE_SNAPSHOT_ONLY_TASKS_NOT_OBSERVED', task_completion_observed=False))
+            config_sha256=c.digest(second), vm_witness=witness, progress='COMPLETE',
+            reason='VSPHERE_SNAPSHOT_ONLY_TASKS_NOT_OBSERVED', task_completion_observed=False))
     return results
+
+
+def validate_observation_history(m, history, states, current=None):
+    """A MATCH needs both complete selected snapshots to equal the accepted baseline.
+
+    Retain hashes and the runtime-question flag rather than exporting unselected
+    device fields, guest data or diagnostic text. This is consistency evidence,
+    not authentication of the collector or proof of writer exclusion.
+    """
+    try:
+        if len(states) == 1 and states[0].get('resource_key') == 'scope':
+            c.exact_keys(states[0], {'resource_key', 'config_status', 'progress', 'reason'})
+            require(states[0]['config_status'] == states[0]['progress'] == 'UNKNOWN', 'Invalid transport hold'); return
+        require(len(states) == len(m['resources']), 'Exact VM witness coverage required')
+        for resource, state in zip(m['resources'], states):
+            require(state['resource_key'] == resource['moid'] and state['task_completion_observed'] is False
+                    and state['progress'] == 'COMPLETE', 'VM snapshot cannot assert task completion')
+            witness = state['vm_witness']; c.exact_keys(witness, {'before', 'after'})
+            for sample in witness.values():
+                c.exact_keys(sample, {'selected_sha256', 'runtime_question'})
+                require(isinstance(sample['selected_sha256'], str) and c.HEX.fullmatch(sample['selected_sha256'])
+                        and type(sample['runtime_question']) is bool, 'Complete bounded VM snapshot witness required')
+            require(state['config_sha256'] == witness['after']['selected_sha256'], 'Selected VM digest differs')
+            if state['config_status'] == 'MATCH':
+                require(state['identity_match'] is True and state['mismatch_fields'] == [] and all(
+                    sample['selected_sha256'] == c.digest(resource['expected']) and sample['runtime_question'] is False
+                    for sample in witness.values()), 'Matching VM summary contradicts native snapshot witness')
+    except (ValueError, TypeError, KeyError, IndexError):
+        raise c.ObservationError('VSPHERE_VM_WITNESS_INVALID') from None
 
 
 if __name__ == '__main__':
