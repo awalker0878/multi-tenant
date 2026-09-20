@@ -1,0 +1,149 @@
+{
+  "format": "hosting-wsd-environment/1",
+  "environment_key": "qualification-01",
+  "site_key": "site-01",
+  "platform": "openstack",
+  "lifecycle": "qualification",
+  "clusters": [
+    {
+      "id": "cluster-oz",
+      "role": "workload",
+      "zone": "OZ",
+      "trust": "internal-trust",
+      "service_classes": [
+        "standard"
+      ],
+      "eligible_tenants": [
+        "tenant-01",
+        "tenant-02"
+      ],
+      "dedicated_wsd": null,
+      "host_ids": [
+        "host-oz-01",
+        "host-oz-02"
+      ],
+      "native": {
+        "compute_availability_zone": "mock-compute",
+        "storage_availability_zone": "mock-storage",
+        "volume_type": "mock-type"
+      }
+    },
+    {
+      "id": "cluster-rz",
+      "role": "workload",
+      "zone": "RZ",
+      "trust": "internal-trust",
+      "service_classes": [
+        "standard"
+      ],
+      "eligible_tenants": [
+        "tenant-01",
+        "tenant-02"
+      ],
+      "dedicated_wsd": null,
+      "host_ids": [
+        "host-rz-01",
+        "host-rz-02"
+      ],
+      "native": {
+        "compute_availability_zone": "mock-rz-mock-compute",
+        "storage_availability_zone": "mock-rz-mock-storage",
+        "volume_type": "mock-rz-mock-type"
+      }
+    }
+  ],
+  "wsds": [
+    {
+      "tenant_key": "tenant-01",
+      "wsd_key": "wsd-01",
+      "trust": "internal-trust",
+      "service_class": "standard",
+      "domains": [
+        {
+          "id": "D01O",
+          "zone": "OZ",
+          "cluster": "cluster-oz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.0/27",
+            "gateway_host_number": 1,
+            "project_id": "11111111-1111-4111-8111-111111111111"
+          },
+          "workloads": {
+            "tenant-01-oz-01": {
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "ipv4_address": "192.0.2.10",
+              "image_id": "44444444-4444-4444-8444-444444444444",
+              "flavor_id": "mock-flavor"
+            }
+          }
+        },
+        {
+          "id": "D01R",
+          "zone": "RZ",
+          "cluster": "cluster-rz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.32/27",
+            "gateway_host_number": 1,
+            "project_id": "11111111-1111-4111-8111-111111111111"
+          },
+          "workloads": {
+            "tenant-01-rz-01": {
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "ipv4_address": "192.0.2.42",
+              "image_id": "44444444-4444-4444-8444-444444444444",
+              "flavor_id": "mock-flavor"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "tenant_key": "tenant-02",
+      "wsd_key": "wsd-02",
+      "trust": "internal-trust",
+      "service_class": "standard",
+      "domains": [
+        {
+          "id": "D02O",
+          "zone": "OZ",
+          "cluster": "cluster-oz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.64/27",
+            "gateway_host_number": 1,
+            "project_id": "22222222-1111-4111-8111-111111111111"
+          },
+          "workloads": {
+            "tenant-02-oz-01": {
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "ipv4_address": "192.0.2.74",
+              "image_id": "44444444-4444-4444-8444-444444444444",
+              "flavor_id": "mock-flavor"
+            }
+          }
+        },
+        {
+          "id": "D02R",
+          "zone": "RZ",
+          "cluster": "cluster-rz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.96/27",
+            "gateway_host_number": 1,
+            "project_id": "22222222-1111-4111-8111-111111111111"
+          },
+          "workloads": {
+            "tenant-02-rz-01": {
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "ipv4_address": "192.0.2.106",
+              "image_id": "44444444-4444-4444-8444-444444444444",
+              "flavor_id": "mock-flavor"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

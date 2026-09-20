@@ -15,7 +15,7 @@ The [cluster design](../../engineering/cluster-topology-and-wsd-placement.md) se
 
 Security-edge routes and quarantine roots remain under `terraform/stacks/components`. Their owners must not also assign the same resource or field to a WSD state. Platform installation, fabric, shared services, trust and protection are separate commissioning operations, not hidden side effects of a tenant deployment. No selected installer or state-service deployment is supplied until the actual site choices are recorded.
 
-Each composition accepts `tenant_key`, `wsd_key`, disabled-by-default `allow_restricted_build`, `test_authorization_ref`, and a typed `members` map. Domain map keys are native domain identities; workload map keys are native workload identities. Map ordering does not change resource addresses. Empty maps are rejected; this interface is not a retirement mechanism. Required module inputs remain required and primitive lifecycle guards remain in force. Object attributes and stable iteration follow Terraform's [type constraints](https://developer.hashicorp.com/terraform/language/expressions/type-constraints) and [module for_each](https://developer.hashicorp.com/terraform/language/meta-arguments/for_each) semantics.
+Each composition accepts `environment_key`, `site_key`, `tenant_key`, `wsd_key`, disabled-by-default `allow_restricted_build`, `test_authorization_ref`, and a typed `members` map. Domain map keys are native domain identities; workload map keys are native workload identities. Map ordering does not change resource addresses. Empty maps are rejected; this interface is not a retirement mechanism. Required module inputs remain required and primitive lifecycle guards remain in force. Object attributes and stable iteration follow Terraform's [type constraints](https://developer.hashicorp.com/terraform/language/expressions/type-constraints) and [module for_each](https://developer.hashicorp.com/terraform/language/meta-arguments/for_each) semantics.
 
 ## Ordered restricted build
 
@@ -26,7 +26,7 @@ Each composition accepts `tenant_key`, `wsd_key`, disabled-by-default `allow_res
 5. Populate the workload phase using accepted domain outputs and platform placement/image handoffs. Nutanix consumes subnet/category IDs; OpenStack consumes network/subnet/security-group IDs; vSphere requires an independently observed vCenter network ID mapped to the NSX segment, not a guessed conversion from a segment path.
 6. Review and apply the separate workload plan. Capture native IDs and reconcile partial/late tasks before retrying any uncertain operation. The native modules preserve restricted state. Guest bootstrap, service enrollment, connectivity activation and retirement require the separate accepted operations in the [backlog](completion-backlog.md).
 
-Outputs contain `scope`, `members` keyed by immutable identity, and `delivery_state`. Scope identifies tenant/WSD/platform/phase. Member outputs preserve each primitive's native IDs and restricted state. Never treat output JSON as native observation or authority to activate.
+Outputs contain `scope`, `members` keyed by immutable identity, and `delivery_state`. Scope identifies environment/site/tenant/WSD/platform/phase. Member outputs preserve each primitive's native IDs and restricted state. Never treat output JSON as native observation or authority to activate.
 
 ## Existing resources and state
 
@@ -35,3 +35,23 @@ Moving a component root into `stacks/components` preserves its addresses. Adopti
 ## Verification limits
 
 The catalogue and engine verifier include every component/composition/root. CI validates schemas and restricted plan-only mocks without native credentials or backend access. Generated composition tests check stable output identities and empty-scope rejection; primitive tests check native quarantine fields. Passing these gates proves source/engine behavior only. Native create/read/replan, interruptions, quotas, survivor capacity, guest operation and useful-data recovery remain target-bound acceptance work.
+
+## Compile cluster-aware inputs
+
+`tools/compile_wsd.py` consumes `hosting-wsd-environment/1`. Disabled examples for all three platforms live in `examples/environments/`; these describe symbolic qualification fixtures, not selected targets. The register supports qualification, development, test, production and recovery lifecycle labels. A label never changes qualification or authorization requirements. The implemented allocation profile is internal IPv4 OZ/RZ; PAZ and native IPv6 allocations are rejected until their integrations are delivered.
+
+Each cluster records role, zone, physical host identities, trust, eligible tenants/service classes, optional dedicated tenant/WSD and native placement mapping. WSDs select eligible clusters per domain. The compiler checks physical host disjointness, role/zone/trust/entitlement/dedication, stable native names, native field ownership, canonical prefixes and usable nonduplicate guest addresses. It does not reserve capacity or replace authoritative IPAM. Add provider-role clusters to the same register for architectural inventory; WSD allocation can only select workload-role clusters.
+
+```sh
+python tools/compile_wsd.py examples/environments/nutanix.json.example \
+  --output /private/operator/new-domain-drafts
+python tools/compile_wsd.py /private/operator/environment.json \
+  --phase workloads --domain-outputs /private/operator/domain-outputs.json \
+  --output /private/operator/new-workload-drafts
+```
+
+The parent output directory must exist outside the repository. Each invocation creates a new private directory (0700) and files (0600), refuses overwrite, and emits one input file per tenant/WSD plus `scopes.json` with entrypoints and state-key identities. Credential variables remain externally injected. All outputs retain `allow_restricted_build: false`, empty authorization references and, for workloads, empty quarantine acceptance references.
+
+`domain-outputs.json` maps `tenant_key/wsd_key` to that domain root's unmodified `terraform output -json` document. Exact scope and member identity checks prevent cross-environment and cross-WSD ID substitution. Missing or extra scopes fail. Nutanix and OpenStack IDs are wired directly from the matching domain. VMware additionally requires `--vmware-bindings` with `tenant_key/wsd_key/domain_key` mapped to `{ "segment_path": "observed NSX path", "network_id": "observed vCenter ID" }`; the segment must match the domain output. This mapping still requires independent native observation and quarantine acceptance.
+
+Generated inputs are review drafts. No command in this compiler invokes Terraform, approves capacity, bootstraps a backend, starts a guest or activates connectivity. Use the ordered build above and record actual target-bound acceptance before enabling a restricted build.

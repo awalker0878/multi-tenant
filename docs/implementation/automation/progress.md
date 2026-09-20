@@ -12,6 +12,8 @@ The 1.0 plan is now maintained in the architecture, engineering, implementation 
 
 | WSD domain/workload compositions on all three platforms | Six typed compositions and roots; plan-only mocks; W12/W26 partially implemented | Actual placement, quarantine observations, native task reconciliation and qualification remain required |
 
+| Cluster-aware WSD compilation and output handoff | Internal OZ/RZ examples for three platforms; per-environment/site/WSD/phase state identities; negative placement and output tests | Compiler emits disabled drafts; actual cluster commissioning, entitlement, capacity/IPAM and quarantine acceptance remain external |
+
 ## External inputs still required
 
 The repository does not contain selected native site endpoints, installed product/API/hardware/licence tuples, scoped credentials, an accepted physical network/security-edge realization, state service, authoritative capacity/IPAM service, storage/key/backup service selections, or their operating authorities. Product-specific installation, actual service mutations and native qualification cannot be completed by inventing these inputs. All three platform families remain unqualified until genuine target-bound evidence is accepted.

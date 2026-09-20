@@ -1,0 +1,167 @@
+{
+  "format": "hosting-wsd-environment/1",
+  "environment_key": "qualification-01",
+  "site_key": "site-01",
+  "platform": "vmware",
+  "lifecycle": "qualification",
+  "clusters": [
+    {
+      "id": "cluster-oz",
+      "role": "workload",
+      "zone": "OZ",
+      "trust": "internal-trust",
+      "service_classes": [
+        "standard"
+      ],
+      "eligible_tenants": [
+        "tenant-01",
+        "tenant-02"
+      ],
+      "dedicated_wsd": null,
+      "host_ids": [
+        "host-oz-01",
+        "host-oz-02"
+      ],
+      "native": {
+        "datastore_id": "datastore-mock",
+        "resource_pool_id": "resgroup-mock"
+      }
+    },
+    {
+      "id": "cluster-rz",
+      "role": "workload",
+      "zone": "RZ",
+      "trust": "internal-trust",
+      "service_classes": [
+        "standard"
+      ],
+      "eligible_tenants": [
+        "tenant-01",
+        "tenant-02"
+      ],
+      "dedicated_wsd": null,
+      "host_ids": [
+        "host-rz-01",
+        "host-rz-02"
+      ],
+      "native": {
+        "datastore_id": "mock-rz-datastore-mock",
+        "resource_pool_id": "mock-rz-resgroup-mock"
+      }
+    }
+  ],
+  "wsds": [
+    {
+      "tenant_key": "tenant-01",
+      "wsd_key": "wsd-01",
+      "trust": "internal-trust",
+      "service_class": "standard",
+      "domains": [
+        {
+          "id": "D01O",
+          "zone": "OZ",
+          "cluster": "cluster-oz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.0/27",
+            "gateway_host_number": 1,
+            "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/mock",
+            "quarantine_sequence": 110
+          },
+          "workloads": {
+            "tenant-01-oz-01": {
+              "vcpu": 2,
+              "memory_gib": 4,
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "template_uuid": "99999999-9999-4999-8999-999999999999",
+              "guest_id": "otherLinux64Guest",
+              "scsi_type": "pvscsi",
+              "firmware": "efi",
+              "storage_policy_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+            }
+          }
+        },
+        {
+          "id": "D01R",
+          "zone": "RZ",
+          "cluster": "cluster-rz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.32/27",
+            "gateway_host_number": 1,
+            "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/mock",
+            "quarantine_sequence": 111
+          },
+          "workloads": {
+            "tenant-01-rz-01": {
+              "vcpu": 2,
+              "memory_gib": 4,
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "template_uuid": "99999999-9999-4999-8999-999999999999",
+              "guest_id": "otherLinux64Guest",
+              "scsi_type": "pvscsi",
+              "firmware": "efi",
+              "storage_policy_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "tenant_key": "tenant-02",
+      "wsd_key": "wsd-02",
+      "trust": "internal-trust",
+      "service_class": "standard",
+      "domains": [
+        {
+          "id": "D02O",
+          "zone": "OZ",
+          "cluster": "cluster-oz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.64/27",
+            "gateway_host_number": 1,
+            "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/mock",
+            "quarantine_sequence": 120
+          },
+          "workloads": {
+            "tenant-02-oz-01": {
+              "vcpu": 2,
+              "memory_gib": 4,
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "template_uuid": "99999999-9999-4999-8999-999999999999",
+              "guest_id": "otherLinux64Guest",
+              "scsi_type": "pvscsi",
+              "firmware": "efi",
+              "storage_policy_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+            }
+          }
+        },
+        {
+          "id": "D02R",
+          "zone": "RZ",
+          "cluster": "cluster-rz",
+          "inputs": {
+            "ipv4_cidr": "192.0.2.96/27",
+            "gateway_host_number": 1,
+            "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/mock",
+            "quarantine_sequence": 121
+          },
+          "workloads": {
+            "tenant-02-rz-01": {
+              "vcpu": 2,
+              "memory_gib": 4,
+              "boot_disk_gib": 40,
+              "data_disk_gib": 0,
+              "template_uuid": "99999999-9999-4999-8999-999999999999",
+              "guest_id": "otherLinux64Guest",
+              "scsi_type": "pvscsi",
+              "firmware": "efi",
+              "storage_policy_id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

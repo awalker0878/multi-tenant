@@ -5,6 +5,8 @@ variables {
   tenant_key = "tenant-01"
   test_authorization_ref = "MOCK-ONLY-NO-REAL-AUTHORITY"
   wsd_key = "wsd-01"
+  environment_key = "qualification-01"
+  site_key = "site-01"
   members = {"D01O": {"ipv4_cidr": "192.0.2.0/27", "gateway_host_number": 1}}
 }
 

@@ -42,6 +42,26 @@
         }
       ]
     },
+    "environment_key": {
+      "type": "string",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.environment_key))}",
+          "error_message": "A stable environment/site identity is required."
+        }
+      ]
+    },
+    "site_key": {
+      "type": "string",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.site_key))}",
+          "error_message": "A stable environment/site identity is required."
+        }
+      ]
+    },
     "members": {
       "type": "map(object({domain_key = string, vcpu = optional(number, 2), memory_gib = optional(number, 4), boot_disk_gib = optional(number, 40), data_disk_gib = optional(number, 0), accepted_quarantine_ref = string, resource_pool_id = string, datastore_id = string, quarantine_network_id = string, template_uuid = string, guest_id = string, scsi_type = string, firmware = string, storage_policy_id = string}))",
       "nullable": false,
@@ -84,7 +104,9 @@
         "tenant_key": "${var.tenant_key}",
         "wsd_key": "${var.wsd_key}",
         "platform": "vmware",
-        "phase": "workloads"
+        "phase": "workloads",
+        "environment_key": "${var.environment_key}",
+        "site_key": "${var.site_key}"
       }
     },
     "members": {

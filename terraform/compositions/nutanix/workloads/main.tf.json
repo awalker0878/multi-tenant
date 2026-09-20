@@ -42,6 +42,26 @@
         }
       ]
     },
+    "environment_key": {
+      "type": "string",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.environment_key))}",
+          "error_message": "A stable environment/site identity is required."
+        }
+      ]
+    },
+    "site_key": {
+      "type": "string",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^[a-z][a-z0-9-]{1,40}$\", var.site_key))}",
+          "error_message": "A stable environment/site identity is required."
+        }
+      ]
+    },
     "members": {
       "type": "map(object({domain_key = string, vcpu = optional(number, 2), memory_gib = optional(number, 4), boot_disk_gib = optional(number, 40), data_disk_gib = optional(number, 0), accepted_quarantine_ref = string, cluster_id = string, project_id = string, storage_container_id = string, image_id = string, subnet_id = string, security_category_id = string, ipv4_address = string}))",
       "nullable": false,
@@ -83,7 +103,9 @@
         "tenant_key": "${var.tenant_key}",
         "wsd_key": "${var.wsd_key}",
         "platform": "nutanix",
-        "phase": "workloads"
+        "phase": "workloads",
+        "environment_key": "${var.environment_key}",
+        "site_key": "${var.site_key}"
       }
     },
     "members": {
