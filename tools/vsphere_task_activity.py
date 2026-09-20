@@ -3,10 +3,19 @@ from tools import readback_core as c, vsphere_observe as vm, vsphere_task_observ
 from tools.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-vm-task-activity'
+CLONE_PROFILE = 'vsphere-vi-json-8.0.3.0-clone-task-activity'
+PROFILES = {PROFILE, CLONE_PROFILE}
 KEY = 'task-activity'
 
 
+def entity_ids(m):
+    identities = {r['moid'] for r in m['resources']}
+    if m['profile'] == CLONE_PROFILE: identities |= {r['moid'] for r in m['task']['sources']}
+    return identities
+
+
 def validate_window(m):
+    require(1 <= len(entity_ids(m)) <= 20, 'Bounded combined activity entity set required')
     since = c.timestamp(m['task']['activity_since'])
     require(since <= c.timestamp(c.now()) and all(since <= c.timestamp(r['queued_at']) for r in m['task']['records']),
             'Activity window must include every accepted task')
@@ -18,7 +27,7 @@ def witness(activity):
 
 
 def flatten(m, sample, current):
-    c.exact_keys(sample, {r['moid'] for r in m['resources']})
+    c.exact_keys(sample, entity_ids(m))
     since = c.timestamp(m['task']['activity_since']); found = {}
     for identity, queries in sample.items():
         c.exact_keys(queries, {'pending', 'completed'})

@@ -10,21 +10,22 @@ from tools.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-task-tree-history'
 CLONE_PROFILE = 'vsphere-vi-json-8.0.3.0-clone-tree-history'
-PROFILES = {PROFILE, CLONE_PROFILE, activity.PROFILE}
+CLONE_PROFILES = {CLONE_PROFILE, activity.CLONE_PROFILE}
+PROFILES = {PROFILE} | CLONE_PROFILES | activity.PROFILES
 COVERAGE = 'task-coverage'
 
 
 def validate(m):
     c.common_manifest(m, 'vmware'); require(m['profile'] in PROFILES, 'Unsupported task-tree profile')
-    vm.validate(task.vm_manifest(m)); clones = m['profile'] == CLONE_PROFILE
+    vm.validate(task.vm_manifest(m)); clones = m['profile'] in CLONE_PROFILES
     keys = {'execution_record_ref', 'coverage_ref', 'task_manager_id', 'records'}
     if clones: keys.add('sources')
-    if m['profile'] == activity.PROFILE: keys.add('activity_since')
+    if m['profile'] in activity.PROFILES: keys.add('activity_since')
     c.exact_keys(m['task'], keys); c.text(m['task']['execution_record_ref'])
     c.text(m['task']['coverage_ref']); c.identifier(m['task']['task_manager_id'])
     sources = source.validate(m['task']['sources'], m['resources']) if clones else None
     task.validate_records(m['task']['records'], {r['moid'] for r in m['resources']}, clone_sources=sources, ancestry=True)
-    if m['profile'] == activity.PROFILE: activity.validate_window(m)
+    if m['profile'] in activity.PROFILES: activity.validate_window(m)
     records = {r['moid']: r for r in m['task']['records']}
     if clones:
         roots = [r for r in records.values() if r['description_id'] == task.CLONE]
@@ -51,7 +52,7 @@ def targets(m):
 
 def observation_keys(m):
     return (task.observation_keys(m) | {COVERAGE} | {r['moid'] for r in m['task'].get('sources', [])}
-            | ({activity.KEY} if m['profile'] == activity.PROFILE else set()))
+            | ({activity.KEY} if m['profile'] in activity.PROFILES else set()))
 
 
 def history_witness(bodies):
@@ -82,7 +83,7 @@ def coverage_state(m, witness, states):
 
 
 def sample(m, client):
-    before_activity = activity.witness(client.activity()) if m['profile'] == activity.PROFILE else None
+    before_activity = activity.witness(client.activity()) if m['profile'] in activity.PROFILES else None
     sources = m['task'].get('sources', [])
     before_sources = [source.read(r, client) for r in sources]
     before_history = history_witness(client.children())
@@ -106,7 +107,7 @@ def validate_observation_history(m, history, states, current=None):
     if len(states) == 1 and states[0].get('resource_key') == 'scope': return
     task.validate_observation_history(m, history, states, current=current)
     try:
-        if m['profile'] == activity.PROFILE:
+        if m['profile'] in activity.PROFILES:
             matches = [s for s in states if s.get('resource_key') == activity.KEY]
             require(len(matches) == 1 and c.digest(matches[0]) == c.digest(activity.state(m, matches[0]['activity_witness'], states, current)), 'Activity summary differs')
         for r in m['task'].get('sources', []):
@@ -119,9 +120,9 @@ def validate_observation_history(m, history, states, current=None):
 
 
 def make_client(m, args):
-    active = m['profile'] == activity.PROFILE
+    active = m['profile'] in activity.PROFILES
     client = vsphere_history.ActivityClient if active else vsphere_history.Client
-    options = {'vm_ids': [r['moid'] for r in m['resources']], 'since': m['task']['activity_since']} if active else {}
+    options = {'vm_ids': sorted(activity.entity_ids(m)), 'since': m['task']['activity_since']} if active else {}
     return client(m['origin'], args.expected_origin, os.environ.get('VCENTER_SESSION', ''), targets(m),
         m['task']['task_manager_id'], [r['moid'] for r in m['task']['records']], args.ca_file, **options)
 
