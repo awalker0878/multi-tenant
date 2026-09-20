@@ -83,11 +83,11 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
         findings.append({'severity':level,'code':code,'resource':safe,'field':field})
     lifecycle = {}
     if transition is not None:
-        from tools.openstack_transition import plan_bindings
+        from tools.lifecycle_transition import plan_bindings
         try:
             lifecycle = plan_bindings(plan, transition)
             finding('REVIEW', 'NATIVE_BOOTSTRAP_AND_WITHDRAWAL_ACCEPTANCE_REQUIRED')
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError, TypeError, IndexError):
             finding('BLOCK', 'LIFECYCLE_CONTRACT_VIOLATION')
     if plan.get('errored') is True:finding('BLOCK','PLAN_ERRORED')
     if plan.get('complete') is False or plan.get('deferred_changes'):finding('REVIEW','PLAN_INCOMPLETE')
@@ -190,10 +190,11 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
             finding('REVIEW','ACTUAL_GATEWAY_FIREWALL_PATH_PRECEDENCE_REQUIRED',address)
         if kind=='nsxt_policy_segment':
             blocks=after.get('advanced_config')
+            connectivity = 'ON' if address in lifecycle and transition['target_stage'] == 'bootstrap' else 'OFF'
             if not isinstance(blocks,list) or len(blocks)!=1:finding('REVIEW','SEGMENT_CONNECTIVITY_UNRESOLVED',address)
             elif not isinstance(blocks[0],dict):raise PlanError('Malformed NSX advanced configuration.')
-            elif blocks[0].get('connectivity')!='OFF' or blocks[0].get('urpf_mode')!='STRICT':finding('BLOCK','SEGMENT_QUARANTINE_CHANGED',address)
-        if kind=='nsxt_policy_security_policy':
+            elif blocks[0].get('connectivity')!=connectivity or blocks[0].get('urpf_mode')!='STRICT':finding('BLOCK','SEGMENT_QUARANTINE_CHANGED',address)
+        if kind=='nsxt_policy_security_policy' and address not in lifecycle:
             scope=after.get('scope');rules=after.get('rule')
             if not isinstance(scope,list) or len(scope)!=1 or not scope[0] or scope[0]=='ANY':finding('BLOCK','POLICY_SCOPE_NOT_BOUNDED',address)
             if not isinstance(rules,list) or not rules:finding('REVIEW','DROP_RULE_UNRESOLVED',address)
@@ -224,7 +225,8 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
             if not isinstance(nics,list) or len(nics)!=1:finding('REVIEW','NIC_SET_UNRESOLVED',address)
             else:
                 connected=[value for path,value in walk(nics) if path[-1]=='is_connected']
-                if connected!=[False]:finding('BLOCK','NIC_NOT_EXPLICITLY_DISCONNECTED',address)
+                target = address in lifecycle and transition['target_stage'] == 'bootstrap'
+                if connected!=[target]:finding('BLOCK','NIC_NOT_EXPLICITLY_DISCONNECTED',address)
             finding('REVIEW','ACTUAL_CLUSTER_IMAGE_STORAGE_AND_POLICY_HANDOFF_REQUIRED',address)
         if kind=='openstack_networking_port_v2':
             groups=after.get('security_group_ids')

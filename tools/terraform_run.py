@@ -181,7 +181,7 @@ def prepare(args, root=ROOT):
     entry, scope, state_key = select_scope(root, args.catalog_id, inputs)
     transition = load_private(args.transition) if getattr(args, 'transition', None) else None
     if transition is not None:
-        from tools.openstack_transition import validate as validate_transition
+        from tools.lifecycle_transition import validate as validate_transition
         validate_transition(transition, scope, input_bytes)
     settings = backend_settings(backend, state_key)
     environment_bytes = read_private(args.environment)

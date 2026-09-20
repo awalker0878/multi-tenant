@@ -1,0 +1,77 @@
+# VMware and Nutanix restricted lifecycle
+
+The pinned providers expose different controls. Nutanix VM bootstrap requests
+ON and connects the existing NIC. Withdrawal requests OFF and disconnects it.
+VMware domain bootstrap connects the owned NSX segment and inserts exact IPv4
+TCP/UDP exceptions before the mandatory dual-family drop; withdrawal restores
+the sole drop and disconnects the segment. The vSphere provider may power on a
+clone and exposes power state as computed, so no writable power switch is added.
+
+Terraform remains the writer for these existing native objects. Native ownership,
+effective policy and guest initialization must be independently accepted. The
+Nutanix VM transition alone cannot override its domain's deny policy; the Flow
+service-policy realization is a separate prerequisite. No external attachment,
+route advertisement, HA placement, image credential or site inventory is inferred.
+
+## Exact saved-plan contract
+
+`tools/lifecycle_transition.py` creates a `hosting-platform-transition/1` record
+from a successful private execution completed within 24 hours. Supported scopes
+are Nutanix workloads and VMware domains. Existing OpenStack transition records
+remain accepted by the saved-plan executor through the same validation dispatch.
+
+Copy the previous run's inputs. Keep the allocation, placement, image, hardware,
+endpoint and member inputs identical. Change only each member's `lifecycle_stage`,
+`bootstrap_acceptance_ref`, applicable `bootstrap_rules`, and the root change
+reference. Every member must use the same target stage. Bootstrap rules have
+`direction` (ingress/egress), `protocol` (tcp/udp), one integer `port` and one
+unicast `remote_ipv4`; their scope is the whole owned domain group.
+
+The owner-only acceptance file has `valid_from`, `valid_until` (at most one hour)
+and `acceptance_refs` with `native_boundary`, `service_paths`, `image_bootstrap`
+and `withdrawal`. These reference independently accepted site records; they are
+not cryptographic signatures or an approval service.
+
+```sh
+python tools/lifecycle_transition.py --prior-run /private/prior-run \
+  --inputs /private/bootstrap-inputs.json --acceptance /private/acceptance.json \
+  --stage bootstrap --output /private/transition.json
+```
+
+Use the [saved-plan process](terraform-execution.md), passing
+`--transition /private/transition.json` to preparation. The record is sealed in
+the bundle, revalidated against exact inputs before apply, and expires alongside
+the separately issued apply authority. Resource addresses and native IDs/paths
+must match the prior outputs. Unknown security values, drift, creation, deletion,
+replacement, adoption, membership changes and unrelated native updates block.
+
+For NSX, the full ordered rule list must match the requested services and terminal
+drop. No exclusion, alternate scope, protocol expansion or hidden nonempty rule
+selector is accepted. Segment changes are restricted to connectivity. For AHV,
+only power and the existing NIC's connection flag may change; disks, addressing,
+cluster/project/category and other VM fields are held constant.
+
+## Native hold points
+
+Before bootstrap, accept native Flow/DFW precedence, membership and exclusions,
+same-host paths, actual guest addressing/identity, placement/storage and the
+provider edge's limited services. Prepared Terraform outputs do not prove these
+properties. After apply, read actual power/NIC or NSX realization, then execute
+healthy-control traffic tests and guest convergence before activation.
+
+On failure, withdraw the separately owned edge exposure first. Prepare and review
+a fresh transition to `prepared`, keeping the same VM/storage/member inputs.
+NSX withdrawal removes inline exceptions, with its mandatory drop retained.
+Read back the final state, including existing-session behavior. These operations
+are not atomic across scopes; timeout or partial native outcomes remain held for
+reconciliation. Do not delete disks or revert Terraform state to recover data.
+
+Live HA/security/recovery qualification and supported installed tuples remain
+required. Follow the [commissioning sequence](site-commissioning.md). Provider
+mocks and synthetic saved plans exercise implementation boundaries, not native
+enforcement or failure recovery.
+
+Interfaces checked against the pinned provider sources:
+[Nutanix 2.4.2 VM](https://github.com/nutanix/terraform-provider-nutanix/blob/v2.4.2/website/docs/r/virtual_machine_v2.html.markdown),
+[NSX 3.10.0 policy](https://github.com/vmware/terraform-provider-nsxt/blob/v3.10.0/docs/resources/policy_security_policy.md),
+[vSphere 2.12.0 VM](https://github.com/vmware/terraform-provider-vsphere/blob/v2.12.0/docs/resources/virtual_machine.md).

@@ -65,7 +65,7 @@ def validate_bundle(operation, approval, binary, root=ROOT):
     backend_settings(load_private(operation / 'backend.json'), state_key)
     transition = load_private(operation / 'transition.json') if 'transition.json' in bundle['artifacts'] else None
     if transition is not None:
-        from tools.openstack_transition import validate as validate_transition
+        from tools.lifecycle_transition import validate as validate_transition
         validate_transition(transition, scope, read_private(operation / 'inputs.json'))
     result = review(load_private(operation / 'plan.json'), load_private(operation / 'references.json'), transition)
     require(result['status'] != 'BLOCKED' and result == load_private(operation / 'review.json'),
@@ -103,7 +103,7 @@ def verify_outputs(outputs, bundle, inputs):
     require(isinstance(members, dict) and set(members) == set(inputs['members']), 'Output member identities differ')
     require(all(isinstance(v, dict) and v.get('delivery_state') == STATE for v in members.values()),
             'Unexpected member delivery state')
-    if bundle['scope']['platform'] == 'openstack':
+    if bundle['scope']['platform'] in {'openstack', 'nutanix', 'vmware'}:
         for name, member in members.items():
             # Legacy prepared receipts remain readable; bootstrap must be explicit.
             require(member.get('lifecycle_stage', 'prepared') == inputs['members'][name].get('lifecycle_stage', 'prepared'),
