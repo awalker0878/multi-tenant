@@ -70,3 +70,7 @@ Separate PR checks, native qualification and production execution. PR jobs keep 
 Serialize writers by actual owned resource scope across Terraform, Ansible and service integrations. Preserve operation IDs and native task identities on retries. An expired coordinator lease or released Terraform lock does not fence a still-running native task. On uncertainty, reconcile first; use [the existing recovery reasoning](../native-reference/recovery-retirement.md) to guide a real owner-operated implementation.
 
 Retain raw plans/state/logs/native evidence privately with appropriate access and retention. Publish only reviewed, non-sensitive evidence references and digests to Git. The current public CI artifacts and 14-day retention are suitable for synthetic checks, not automatically for native operational evidence.
+
+## Implemented operator entrypoints
+
+The [WSD deployment runbook](wsd-deployment.md) and [native guest runbook](native-guests.md) now define the implemented Terraform and Ansible paths, private input/output handoffs, scope checks and execution limits. The [package record](progress.md) distinguishes these delivered code paths from commissioning, owner-service mutations and native acceptance still outstanding.

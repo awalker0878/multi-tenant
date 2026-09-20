@@ -72,7 +72,7 @@ Implementation: [lab/run_namespace_lab.py](../../lab/run_namespace_lab.py) · [l
 
 Local IPv4 mutual-TLS and resource-grant observations do not qualify enterprise PKI, KMS, backup, native IPv6 or vendor HA.
 
-## Local Ansible staging and expectation validation
+## Ansible local staging and bound guest configuration
 
 Design: [PROV §1](provisioning-strategy/1-provisioning-scopes-ownership-and-accepted-handoffs.md) · [PROV §3](provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md)
 
@@ -80,7 +80,7 @@ Decisions: [ADR-0013](../adr/0013-compose-provisioning-across-separate-platform-
 
 Implementation: [ansible/roles](../../ansible/roles) · [ansible/playbooks](../../ansible/playbooks) · [scripts/verify_ansible.py](../../scripts/verify_ansible.py)
 
-New candidate localhost-only roles; not native switch, hypervisor or firewall configuration.
+Local staging/readback validation and a separate guarded Linux guest profile; native guest qualification remains open. No native switch, hypervisor or firewall installer.
 
 ## Source checks and engine gates
 

@@ -22,7 +22,11 @@ The Word library is now available as full linked Markdown chapters, tables, diag
 
 The infrastructure architecture remains authoritative. Terraform and Ansible implement separately owned resource and verification responsibilities; they do not define a new hosting application. Native code remains candidate implementation until its actual supported target and evidence are accepted. The supplied source records distinguish local fixtures, native readback and formal operating authorization.
 
-The ten native Terraform module/root pairs, Ansible source, observation tools, tests and packet fixtures are retained. The integrated audit correction preserves production connectivity and resource semantics. Current source publication is recorded by Git and exact CI results; ZIP-era statements describe their original delivery only. Historical test reports remain historical, and no infrastructure is deployed by this repository review.
+The ten native Terraform primitives are retained under `terraform/modules`; their execution roots now live under `terraform/stacks/components`. Six WSD compositions add separate domain and workload roots under `terraform/stacks/wsd`. Cluster-aware input compilation and a bound Linux guest Ansible profile connect those scopes without changing the native quarantine defaults. The integrated audit correction preserves production connectivity and resource semantics. Current source publication is recorded by Git and exact CI results; ZIP-era statements describe their original delivery only. Historical test reports remain historical, and no infrastructure is deployed by this repository review.
+
+## Current automation delivery
+
+The former `docs/1.0` plan now lives in the maintained [automation delivery program](docs/implementation/automation/README.md). Use the [WSD deployment runbook](docs/implementation/automation/wsd-deployment.md), [native guest runbook](docs/implementation/automation/native-guests.md) and [package delivery record](docs/implementation/automation/progress.md). Site commissioning, service-owner integrations, complete lifecycle automation and native qualification remain incomplete; repository publication is not an end-to-end release.
 
 ## Local review
 

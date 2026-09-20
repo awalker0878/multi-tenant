@@ -12,6 +12,9 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 
 | Document | Purpose |
 | --- | --- |
+| [Current package status](progress.md) | Implemented commits, verification and exact remaining work for W01–W29 |
+| [WSD deployment](wsd-deployment.md) | Cluster-aware compilation, scoped state identities, domain/workload compositions and output handoffs |
+| [Native guest configuration](native-guests.md) | Bound SSH inventory, candidate Linux roles and native acceptance limits |
 | [Repository audit](../../assurance/automation-baseline-audit.md) | Verified implementation inventory, concrete gaps and exact-revision CI evidence |
 | [Environment coverage](environments.md) | Completion requirements for all three platform families, common infrastructure, lifecycle environments and optional service profiles |
 | [Cluster topology and WSD placement](../../engineering/cluster-topology-and-wsd-placement.md) | Proposed physical/control/service cluster roles, shared versus dedicated capacity, and WSD placement across primary and recovery infrastructure |
@@ -23,8 +26,8 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 ## Main gaps
 
 1. Build the P0–P3 foundation: recoverable automation/state, physical fabric/OOB, platform installation and security/shared-service integrations.
-2. Compose the existing independent Terraform roots into repeatable tenant/WSD deployments with actual entitlement, quota, placement, IPAM and DNS handoffs.
-3. Add remote Ansible inventories and roles for supported guest/platform configuration, hardening, service enrollment and operations. The current two playbooks operate only on localhost.
+2. Qualify the new Terraform WSD compositions and connect actual entitlement, quota, capacity/IPAM/DNS and security-edge handoffs. Cluster-aware draft compilation is implemented.
+3. Qualify the new bound Linux guest profile and complete selected image/first-boot, OS hardening, service enrollment, Windows/other offered profiles and operations. Local validation remains separate.
 4. Implement restricted bootstrap, security-edge attachments, permitted service paths and a separately controlled activation/withdrawal process. Existing quarantine defaults must remain effective until prerequisites are verified.
 5. Complete readback, drift, interrupted-operation reconciliation, upgrades, import/adoption, restore, migration and data-safe retirement across all three stacks.
 6. Execute real native qualification campaigns and record actual accepted capacity, recovery and operational evidence. Current successful CI does not close these items.

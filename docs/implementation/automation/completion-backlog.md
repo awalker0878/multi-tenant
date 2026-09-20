@@ -1,10 +1,12 @@
 # Completion backlog — work required for 1.0
 
-[1.0 index](README.md) · [Audit findings](../../assurance/automation-baseline-audit.md) · [Platform detail](environments.md) · [Acceptance](acceptance.md)
+[Delivery program](README.md) · [Audit findings](../../assurance/automation-baseline-audit.md) · [Platform detail](environments.md) · [Acceptance](acceptance.md)
 
 **Baseline:** 2026-09-19, source `0dff519e852c3e0c72118e04d086548e6f6fd88b`. All work packages below are **OPEN** at this audit's completion. Existing partial code is credited in the audit; an open item does not mean its entire implementation must be rewritten. Owner roles are proposed responsibilities, not assigned people or recorded approvals.
 
 **Priority:** Critical blocks a usable integrated process; High blocks a complete operational release; Conditional is mandatory when its service/profile is offered. These are delivery priorities, distinct from architecture work-package labels P0–P6. Each package closes only with linked source, tests and the relevant native evidence. A new validator or a completed template alone does not close an integration task.
+
+Current source delivery and remaining work are maintained in [the package disposition record](progress.md). The baseline OPEN status and original closure criteria below are preserved; new compositions or passing CI do not by themselves close a package.
 
 ## A. Establish the actual target and automation foundation
 

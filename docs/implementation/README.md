@@ -10,6 +10,14 @@ Infrastructure work packages and ownership lead. Tool descriptions remain subord
 
 These links open the full converted narrative, tables, placeholders, diagrams and cross-references—not a summary of the Word files. Source metadata and originals remain linked in every chapter.
 
+[Current Terraform/Ansible delivery program](automation/README.md)
+
+[WSD deployment](automation/wsd-deployment.md)
+
+[Native guest configuration](automation/native-guests.md)
+
+[Package status](automation/progress.md)
+
 [Architecture / decision / implementation map](code-map.md)
 
 [Method-of-procedure and handover templates](../templates/implementation-mop/README.md)

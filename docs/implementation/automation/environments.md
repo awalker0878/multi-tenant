@@ -1,6 +1,8 @@
 # Environment coverage and platform completion requirements
 
-[1.0 index](README.md) · [Repository audit](../../assurance/automation-baseline-audit.md) · [Completion backlog](completion-backlog.md)
+[Delivery program](README.md) · [Repository audit](../../assurance/automation-baseline-audit.md) · [Completion backlog](completion-backlog.md)
+
+For current code, use [WSD deployment](wsd-deployment.md), [native guest configuration](native-guests.md) and [package status](progress.md). The matrices below retain the completion requirements derived from the baseline audit; they do not supersede the delivery record.
 
 ## Coverage model
 

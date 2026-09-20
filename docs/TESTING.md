@@ -26,8 +26,8 @@ python tools/verify_terraform.py --mock-tests
 |---|---|---|
 | Repository | Source shapes, common-secret patterns, links, frozen bytes, mock-test guard, YAML structure | Engine parsing, exhaustive security review, native compatibility |
 | Local regressions | Python functions and disposable loopback HTTPS/DNS/TLS fixtures; route-model cases | Native product behaviour, routed IPv6 or full ZIP qualification |
-| Ansible engine | Actual syntax checks, local template/file tasks, second-run zero-change, check-mode non-mutation and negative fixtures | Remote host configuration, switch support, native contacts |
-| Terraform engine | Backend-disabled init/validate, real plugin schemas and plan-only provider mocks on ten module/root pairs | Live provider API support, infrastructure conformance, safe production apply |
+| Ansible engine | Actual local/native syntax, local template/file tasks, second-run zero-change, check-mode non-mutation, and native pre-contact rejection fixtures | Remote host configuration, switch support, native contacts |
+| Terraform engine | Backend-disabled init/validate, real plugin schemas and plan-only provider mocks on every registered component and composition/root pair | Live provider API support, infrastructure conformance, safe production apply |
 | Routed-family laboratory | Separate fixed IPv4 and IPv6 namespace packet/TLS campaigns, plus exact-source report completeness | Native IPv6, vendor HA, production DNS/PKI or authorization |
 | Other manual labs | Additional fixed disposable protocol campaigns | Native product qualification or authorization |
 | Native qualification | Separate approved target and engineering procedure | Not executed or automated by repository CI |
@@ -57,8 +57,7 @@ corresponding module/root locations through a separate change. Do not invent the
 
 No Ansible source existed in the imported increment. These new roles use only core
 modules. The staging role writes two reference files in a caller-marked local directory;
-it cannot create a native VM, route or firewall policy. The other role invokes only the
-fixed native reader's input-validation mode, without contact flags. Defaults opt out.
+it cannot create a native VM, route or firewall policy. The local readback role invokes only the fixed NSX/Nutanix/Neutron readers' input-validation modes. Separate native Linux tasks bind Terraform IDs and pinned SSH/machine identities before configuration. Defaults opt out; native roles are syntax-checked and their disabled/malformed guards are executed locally in CI. The [native guest runbook](implementation/automation/native-guests.md) records owned fields and required target validation.
 
 The engine verifier executes first-run staging, repeat staging, check-mode drift
 simulation, disabled and foreign-owner rejection and no-contact reader validation.
