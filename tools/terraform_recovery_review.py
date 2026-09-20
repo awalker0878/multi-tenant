@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bind vSphere recovery observations to a held Terraform attempt; never release it."""
+"""Bind supported native recovery observations to a held Terraform attempt; never release it."""
 import argparse
 import fcntl
 import json
@@ -11,6 +11,7 @@ from tools import readback_core as c, recovery_review, vsphere_task_tree_observe
 from tools.run_files import digest, encoded, load_private, private_path, read_private, require, write_new, utcnow
 from tools.terraform_run import ROOT, select_scope, backend_settings
 from tools.plan_review import has_true
+from tools import nutanix_terraform_recovery as ahv, lifecycle_transition
 
 HELD = {'STARTED_OUTCOME_UNKNOWN', 'HOLD_RECONCILIATION_REQUIRED'}
 OBSERVED_PLAN_FIELDS = {'name', 'num_cpus', 'num_cores_per_socket', 'memory', 'resource_pool_id'}
@@ -93,8 +94,8 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
     for name in needed:
         require(digest(read_private(operation / name)) == bundle['artifacts'][name], 'Sealed execution artifact changed')
     inputs = load_private(operation / 'inputs.json'); _, scope, state_key = select_scope(ROOT, bundle['catalog_id'], inputs)
-    require(scope == bundle['scope'] and scope['platform'] == 'vmware' and scope['phase'] == 'workloads'
-            and state_key == bundle['state_key'], 'Only exact VMware workload scope supported')
+    require(scope == bundle['scope'] and scope['platform'] in {'vmware', 'nutanix'} and scope['phase'] == 'workloads'
+            and state_key == bundle['state_key'], 'Only exact supported workload scopes allowed')
     backend = load_private(operation / 'backend.json'); backend_settings(backend, state_key)
     ledger = private_path(ledger_root / digest(backend['address'].encode()), directory=True)
     lock = private_path(ledger / 'writer.lock')
@@ -112,26 +113,39 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
         if head['status'] == 'HOLD_RECONCILIATION_REQUIRED':
             require(load_private(ledger / (attempt_id + '.result.json')) == head, 'Held result differs from ledger head')
         manifest = load_private(manifest_path); report = load_private(report_path); context = load_private(context_path)
-        tree.validate(manifest)
+        recovery_review.adapter_for(manifest).validate(manifest)
+        require(manifest['platform'] == scope['platform'], 'Observation platform differs from attempt')
         require(manifest['operation_id'] == bundle['operation_id'] and manifest['tenant_id'] == scope['tenant_key']
                 and manifest['scope_id'] == scope['wsd_key'], 'Observation scope differs from attempt')
         endpoint = inputs['platform_endpoint']
         expected_origin = c.origin(endpoint if endpoint.startswith('https://') else 'https://' + endpoint)
         require(manifest['origin'] == expected_origin, 'Native origin differs from sealed provider endpoint')
-        bound = bind_plan(load_private(operation / 'plan.json'), inputs, manifest)
+        fields = OBSERVED_PLAN_FIELDS; lifecycle_hash = None
+        if scope['platform'] == 'nutanix':
+            lifecycle_hash = bundle['artifacts'].get('transition.json')
+            require(lifecycle_hash is not None and digest(read_private(operation / 'transition.json')) == lifecycle_hash,
+                    'Sealed AHV lifecycle record required')
+            transition = load_private(operation / 'transition.json')
+            lifecycle_transition.validate(transition, scope, read_private(operation / 'inputs.json'), as_of=c.timestamp(head['started_at']))
+            bound = ahv.bind_plan(load_private(operation / 'plan.json'), inputs, manifest, transition, attempted_at=head['started_at'])
+            fields = ahv.OBSERVED_PLAN_FIELDS
+            require(c.timestamp(manifest['task']['created_after']) == c.timestamp(head['started_at']), 'AHV activity window differs from immutable attempt')
+        else:
+            bound = bind_plan(load_private(operation / 'plan.json'), inputs, manifest)
+            require(c.timestamp(manifest['task']['activity_since']) == c.timestamp(head['started_at']), 'Activity window differs from immutable attempt start')
+            require(all(c.timestamp(r['queued_at']) >= c.timestamp(head['started_at']) for r in manifest['task']['records']), 'Historical tasks cannot resolve this attempt')
         require(context['accepted_plan_sha256'] == bundle['artifacts']['saved.tfplan']
                 and context['attempted_generation'] == bundle['generation']
                 and context['attempted_at'] == head['started_at'] and context['change_record_ref'] == head['change_ref'], 'Context is not the exact attempted plan')
-        require(c.timestamp(manifest['task']['activity_since']) == c.timestamp(head['started_at']), 'Activity window differs from immutable attempt start')
-        require(all(c.timestamp(r['queued_at']) >= c.timestamp(head['started_at']) for r in manifest['task']['records']), 'Historical tasks cannot resolve this attempt')
         triage = recovery_review.review(manifest, report, context)
         require(read_private(ledger / 'head.json') == head_bytes, 'Ledger changed during review')
         result = dict(format='hosting-terraform-recovery-review/1', reviewed_at=utcnow().isoformat(),
             scope=scope, operation_id=bundle['operation_id'], generation=bundle['generation'], bundle_sha256=digest(bundle_bytes),
             ledger_head_sha256=digest(head_bytes), manifest_sha256=c.digest(manifest), report_sha256=c.digest(report),
             context_sha256=c.digest(context), plan_native_bindings=bound, triage=triage,
-            plan_configuration_fields=sorted(OBSERVED_PLAN_FIELDS),
+            plan_configuration_fields=sorted(fields),
             ledger_status=head['status'], ledger_released=False, may_apply=False, may_delete=False, may_activate=False)
+        if lifecycle_hash is not None: result['lifecycle_sha256'] = lifecycle_hash
         write_new(output, encoded(result))
         return result
     finally: os.close(fd)

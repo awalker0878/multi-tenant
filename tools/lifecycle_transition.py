@@ -77,9 +77,10 @@ def bindings(record):
     return resources
 
 
-def validate(record, scope=None, input_bytes=None):
+def validate(record, scope=None, input_bytes=None, *, as_of=None):
     require(isinstance(record, dict), 'Lifecycle record object required')
     if record.get('format') == 'hosting-openstack-transition/1':
+        require(as_of is None, 'Historical validation is limited to the platform transition profile')
         return os_transition.validate(record, scope, input_bytes)
     c.exact_keys(record, {'format', 'scope', 'input_sha256', 'prior_bundle_sha256', 'prior_outputs',
                          'prior_inputs', 'requested_inputs', 'target_stage', 'valid_from', 'valid_until', 'acceptance_refs', 'resources'})
@@ -87,7 +88,9 @@ def validate(record, scope=None, input_bytes=None):
     c.exact_keys(record['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key', 'phase'})
     for value in record['scope'].values(): c.identifier(value)
     for key in ('input_sha256', 'prior_bundle_sha256'): require(isinstance(record[key], str) and c.HEX.fullmatch(record[key]), 'Exact artifact hash required')
-    current_window(record); c.exact_keys(record['acceptance_refs'], os_transition.REFS)
+    # Recovery may inspect the original window at an immutable attempt timestamp.
+    # Prepare/apply callers omit as_of and still require current authority.
+    current_window(record, now=as_of); c.exact_keys(record['acceptance_refs'], os_transition.REFS)
     for value in record['acceptance_refs'].values(): c.text(value)
     previous, intended = copy.deepcopy(record['prior_inputs']), copy.deepcopy(record['requested_inputs'])
     require(isinstance(previous, dict) and isinstance(intended, dict) and previous.get('allow_restricted_build') is True
@@ -155,10 +158,12 @@ def nsx_policy(after, member, group, stage):
         else: require(entries == [], 'Terminal drop must not be narrowed to a service')
 
 
-def plan_bindings(plan, record):
+def plan_bindings(plan, record, *, as_of=None):
     require(isinstance(record, dict), 'Lifecycle record object required')
-    if record.get('format') == 'hosting-openstack-transition/1': return os_transition.plan_bindings(plan, record)
-    validate(record)
+    if record.get('format') == 'hosting-openstack-transition/1':
+        require(as_of is None, 'Historical validation is limited to the platform transition profile')
+        return os_transition.plan_bindings(plan, record)
+    validate(record, as_of=as_of)
     require(not plan.get('resource_drift') and plan.get('complete') is not False and not plan.get('deferred_changes'), 'Resolve native drift before lifecycle')
     seen = set()
     for item in plan['resource_changes']:
