@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from tools.compile_wsd import STATE
 from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe
+from tools import nsx_segment_observe, vmware_network_binding
 from tools.check_release import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
@@ -26,12 +27,13 @@ ASSETS = {'inventory', 'native_manifest', 'native_credentials', 'native_ca',
 WORKLOAD_ASSETS = {'workload_manifest', 'workload_token', 'workload_ca'}
 FLOW_ASSETS = {'flow_manifest', 'domain_outputs'}
 VSPHERE_ASSETS = {'workload_manifest', 'workload_session', 'workload_ca'}
+NETWORK_BINDING_ASSETS = {'portgroup_manifest', 'domain_outputs', 'workload_inputs'}
 ADAPTERS = {'openstack': neutron_observe, 'vmware': nsx_observe, 'nutanix': nutanix_observe}
 
 
 def validate(plan):
     c.exact_keys(plan, {'format', 'scope', 'source_commit', 'origin', 'assets', 'cases'})
-    require(plan['format'] in {'hosting-target-campaign/' + str(i) for i in range(1, 6)}, 'Unknown target campaign')
+    require(plan['format'] in {'hosting-target-campaign/' + str(i) for i in range(1, 7)}, 'Unknown target campaign')
     c.exact_keys(plan['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'})
     for value in plan['scope'].values():
         c.identifier(value)
@@ -41,12 +43,13 @@ def validate(plan):
     extended = plan['format'] == 'hosting-target-campaign/2'
     flow = plan['format'] == 'hosting-target-campaign/4'
     ahv = plan['format'] == 'hosting-target-campaign/3' or flow
-    vsphere = plan['format'] == 'hosting-target-campaign/5'
+    mapping = plan['format'] == 'hosting-target-campaign/6'
+    vsphere = plan['format'] == 'hosting-target-campaign/5' or mapping
     require(not extended or plan['scope']['platform'] == 'openstack', 'Workload readback campaign requires OpenStack')
     require(not ahv or plan['scope']['platform'] == 'nutanix', 'AHV readback campaign requires Nutanix')
     require(not vsphere or plan['scope']['platform'] == 'vmware', 'vSphere readback campaign requires VMware')
     c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else VSPHERE_ASSETS if vsphere else {'workload_manifest'} if ahv else set())
-                 | (FLOW_ASSETS if flow else set()))
+                 | (FLOW_ASSETS if flow else set()) | (NETWORK_BINDING_ASSETS if mapping else set()))
     for asset in plan['assets'].values():
         c.exact_keys(asset, {'path', 'sha256'})
         require(isinstance(asset['path'], str) and Path(asset['path']).is_absolute()
@@ -99,7 +102,7 @@ def bound_inputs(plan, known_hosts):
     require(all(case['guest'] in access['targets'] for case in plan['cases']), 'Unknown guest selector')
     require(all(ipaddress.ip_address(t['address']).version == 4 for t in access['targets'].values()), 'IPv4 campaign required')
     manifest = c.strict_loads(assets['native_manifest'])
-    adapter = ADAPTERS[plan['scope']['platform']]
+    adapter = nsx_segment_observe if plan['format'] == 'hosting-target-campaign/6' else ADAPTERS[plan['scope']['platform']]
     if adapter is neutron_observe:
         adapter.validate_manifest(manifest)
         if plan['format'] == 'hosting-target-campaign/2':
@@ -115,8 +118,11 @@ def bound_inputs(plan, known_hosts):
             if plan['format'] == 'hosting-target-campaign/4':
                 flow_binding(plan['scope'], c.strict_loads(assets['flow_manifest']),
                              c.strict_loads(assets['domain_outputs']), workload, manifest)
-        if plan['format'] == 'hosting-target-campaign/5':
+        if plan['format'] in {'hosting-target-campaign/5', 'hosting-target-campaign/6'}:
             vsphere_binding(plan['scope'], c.strict_loads(assets['workload_manifest']), variables['hosting_workload_outputs'], manifest)
+        if plan['format'] == 'hosting-target-campaign/6':
+            vmware_network_binding.bind(plan['scope'], c.strict_loads(assets['workload_manifest']), variables['hosting_workload_outputs'], manifest,
+                c.strict_loads(assets['portgroup_manifest']), c.strict_loads(assets['domain_outputs']), c.strict_loads(assets['workload_inputs']))
     return assets, access, pins
 
 
@@ -239,6 +245,17 @@ def budget(authority, maximum):
 def native_readback(plan, assets, authority, directory, label):
     platform = plan['scope']['platform']
     script = {'openstack': 'neutron_observe.py', 'vmware': 'nsx_observe.py', 'nutanix': 'nutanix_observe.py'}[platform]
+    if plan.get('format') == 'hosting-target-campaign/6':
+        adapter = vsphere_adapter(c.strict_loads(assets['workload_manifest']))
+        collected = {}
+        for key, script, manifest_name in (
+            ('network_before', 'nsx_segment_observe.py', 'native_manifest'),
+            ('portgroups_before', 'vsphere_network_observe.py', 'portgroup_manifest'),
+            ('workloads', Path(adapter.__file__).name, 'workload_manifest'),
+            ('portgroups_after', 'vsphere_network_observe.py', 'portgroup_manifest'),
+            ('network_after', 'nsx_segment_observe.py', 'native_manifest')):
+            collected[key + '_sha256'] = reader_child(plan, assets, authority, directory, label + '-' + key, script, manifest_name)
+        return digest(encoded(collected))
     network_hash = reader_child(plan, assets, authority, directory, label, script, 'native_manifest')
     if plan.get('format') == 'hosting-target-campaign/5':
         adapter = vsphere_adapter(c.strict_loads(assets['workload_manifest']))
@@ -267,7 +284,7 @@ def native_readback(plan, assets, authority, directory, label):
 def reader_child(plan, assets, authority, directory, label, script, manifest_name):
     platform = plan['scope']['platform']
     output = directory / (label + '.json')
-    vcenter = platform == 'vmware' and manifest_name == 'workload_manifest'
+    vcenter = platform == 'vmware' and manifest_name in {'workload_manifest', 'portgroup_manifest'}
     origin = c.strict_loads(assets[manifest_name])['origin'] if vcenter else plan['origin']
     argv = [sys.executable, str(ROOT / 'tools' / script), str(directory / manifest_name),
             '--read-authorized-target', '--expected-origin', origin,
@@ -375,12 +392,14 @@ def main():
         # Copy only assets the child processes need; API credentials stay in memory.
         for key in ('native_manifest', 'native_ca', 'ssh_key'):
             write_new(directory / key, assets[key])
-        if plan['format'] in {'hosting-target-campaign/3', 'hosting-target-campaign/4', 'hosting-target-campaign/5'}:
+        if plan['format'] in {'hosting-target-campaign/3', 'hosting-target-campaign/4', 'hosting-target-campaign/5', 'hosting-target-campaign/6'}:
             write_new(directory / 'workload_manifest', assets['workload_manifest'])
         if plan['format'] == 'hosting-target-campaign/4':
             write_new(directory / 'flow_manifest', assets['flow_manifest'])
-        if plan['format'] == 'hosting-target-campaign/5':
+        if plan['format'] in {'hosting-target-campaign/5', 'hosting-target-campaign/6'}:
             write_new(directory / 'workload_ca', assets['workload_ca'])
+        if plan['format'] == 'hosting-target-campaign/6':
+            write_new(directory / 'portgroup_manifest', assets['portgroup_manifest'])
         write_new(directory / 'ssh_key-cert.pub', assets['ssh_certificate'])
         write_new(directory / 'known_hosts', pins.encode())
         result = {'status': 'HOLD_INCOMPLETE', 'scope': plan['scope'], 'source_commit': source['commit'],

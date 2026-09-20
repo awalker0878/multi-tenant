@@ -76,3 +76,44 @@ and [realized resource fields](https://developer.broadcom.com/xapis/nsx-t-data-c
 The installed API version, entity/path shape, omission behavior and RBAC visibility
 must be qualified independently. This selected identity check does not replace
 effective policy, per-port membership, packet-path or recovery qualification.
+
+## Campaign v6: bind the member's assigned network
+
+Use `hosting-target-campaign/6` with the existing
+[campaign command and authority](target-qualification.md). It extends v5 with
+three additional private, hash-bound assets:
+
+| Asset | Content and binding |
+| --- | --- |
+| `portgroup_manifest` | The enabled vCenter profile above; same vCenter origin, operation, tenant/WSD and engineering/target references as the VM manifest |
+| `domain_outputs` | Original VMware domain outputs for the exact campaign scope; every owned segment path must appear once in NSX observation |
+| `workload_inputs` | Original workload inputs with exact member names, `domain_key`, `quarantine_network_id`, scope and vCenter endpoint |
+
+Use `nsx-local-policy-v1-segment-switches` for `native_manifest`; retain the accepted
+full policy expectations as well as segment resources. Keep a supported vSphere
+VM snapshot/task profile for `workload_manifest`. The VM UUIDs must cover the owned
+workload outputs exactly. Every NIC must use a distributed-port backing whose
+switch UUID and portgroup key match the member's assigned portgroup MoID. That
+portgroup's `logicalSwitchUuid` must match the NSX realized switch for the member's
+specific domain. An attachment to a different owned domain still fails. Extra
+unused portgroups, omitted segments, ambiguous native IDs and unsupported opaque
+or standard backings are refused before contact.
+
+The campaign authority binds all supplied asset bytes. Obtain inputs/outputs from
+their private execution records and independently accept their provenance; this
+campaign does not authenticate receipts or infer ownership from names.
+
+Before and after traffic, v6 collects NSX policy/segment evidence, portgroup
+evidence, VM/task evidence, portgroup evidence again, then NSX evidence again.
+Every reader must match its independently accepted expectations. The phase digest
+binds all five reports; failures stop collection and keep exposure held. vCenter
+uses only its VI session/CA, and NSX uses only its own credentials/CA. Each child
+retains its bounded transport and expiring campaign authority checks.
+
+These reads are not an atomic cross-system snapshot. They check selected configured
+associations, not actual per-port attachment, effective DFW membership/exclusions,
+hidden policy, guest IP identity, forwarding or writer exclusion. Preserve those
+independent tests and evidence. Task-aware VM profiles retain their separate
+coverage limits; snapshots do not imply task completion. Neither v6 nor the new
+standalone profiles release a held Terraform attempt or authorize a power action.
+Do not downgrade to v5 to bypass an association failure.
