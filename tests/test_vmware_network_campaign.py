@@ -72,6 +72,7 @@ class NetworkCampaignTests(unittest.TestCase):
             lambda d: d[1]['resources'][0]['expected']['config']['hardware']['device'][2]['backing']['port'].update(portgroupKey='other'),
             lambda d: d[1]['resources'][0]['expected']['config']['hardware']['device'][2].update(backing=dict(_typeName='VirtualEthernetCardOpaqueNetworkBackingInfo', opaqueNetworkId=uid(30), opaqueNetworkType='nsx.LogicalSwitch')),
             lambda d: d[5].update(platform_endpoint='https://other.example.test'),
+            lambda d: d[5].update(platform_endpoint=42),
             lambda d: d[5]['members']['guest-01'].update(quarantine_network_id='dvportgroup-99'),
             lambda d: d[4]['scope']['value'].update(tenant_key='foreign'),
             lambda d: d[4]['members']['value']['D01O'].update(segment_path='/infra/segments/other')):

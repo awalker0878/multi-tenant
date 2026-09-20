@@ -17,6 +17,7 @@ def bind(scope, workloads, outputs, network, portgroups, domain_outputs, inputs)
             and outputs.get('delivery_state', {}).get('value') == STATE, 'Owned workload outputs required')
     require(all(inputs.get(k) == scope[k] for k in ('environment_key', 'site_key', 'tenant_key', 'wsd_key')), 'Workload inputs scope differs')
     endpoint = inputs['platform_endpoint']
+    c.text(endpoint, 'workload platform endpoint', 512)
     require(c.origin(endpoint if endpoint.startswith('https://') else 'https://' + endpoint) == workloads['origin'], 'Workload endpoint differs')
     domains = domain_outputs.get('members', {}).get('value'); members = outputs['members']['value']
     require(isinstance(domains, dict) and domains and isinstance(members, dict) and members
