@@ -19,7 +19,7 @@ from lab.native_readback_fixture import credentials
 
 
 def run(require_engines=False, scratch_root=None):
-    engines = {name: shutil.which(name) for name in ('sshd', 'rsyslogd', 'ssh-keygen')}
+    engines = {name: shutil.which(name) for name in ('sshd', 'rsyslogd', 'ssh-keygen', 'systemd-analyze')}
     if not all(engines.values()):
         return {'status': 'MISSING_LOCAL_ENGINES', 'missing': [k for k, v in engines.items() if not v],
                 'native_contact': False}, 2 if require_engines else 0
@@ -64,6 +64,20 @@ def run(require_engines=False, scratch_root=None):
         if result.returncode:
             raise RuntimeError('Local rsyslog configuration validation failed: ' + result.stderr)
         checks.append({'engine': 'rsyslogd', 'status': 'PASS'})
+        backup_env = Environment(loader=FileSystemLoader(ROOT / 'ansible/roles/linux_guest_backup/templates'),
+                                 undefined=StrictUndefined, keep_trailing_newline=True)
+        target['services']['backup'] = dict(interval_minutes=60, config=dict(max_seconds=600,
+                                                source='/srv/hosting-exports/tenant-a/science/guest-a'))
+        units = []
+        for name in ('hosting-backup.service', 'hosting-backup.timer'):
+            path = base / name
+            path.write_text(backup_env.get_template(name + '.j2').render(hosting_target=target))
+            units.append(str(path))
+        result = subprocess.run([engines['systemd-analyze'], 'verify', '--man=no', *units],
+                                capture_output=True, text=True, timeout=15)
+        if result.returncode:
+            raise RuntimeError('Local backup unit validation failed: ' + result.stderr)
+        checks.append({'engine': 'systemd-analyze', 'status': 'PASS'})
         return {'status': 'PASSED_LOCAL_GUEST_SERVICE_ENGINES_ONLY', 'checks': checks, 'native_contact': False}, 0
 
 

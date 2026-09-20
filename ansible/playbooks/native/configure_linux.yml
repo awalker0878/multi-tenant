@@ -48,3 +48,7 @@
     - role: linux_guest_baseline
     - role: linux_guest_services
       when: hosting_target.profile == 'ubuntu-24.04-services-v1'
+    - role: linux_guest_backup
+      when:
+        - hosting_target.profile == 'ubuntu-24.04-services-v1'
+        - hosting_target.services.backup is defined

@@ -4,10 +4,11 @@ from pathlib import Path
 import struct
 import tempfile
 import unittest
+from datetime import timedelta
 
 from lab.native_readback_fixture import credentials
 from tools.guest_services import validate_services, verify_assets, resolver_bound
-from tools.run_files import digest
+from tools.run_files import digest, utcnow
 
 
 def fixture(directory='/private/operator'):
@@ -23,6 +24,29 @@ def fixture(directory='/private/operator'):
 
 
 class GuestServicesTests(unittest.TestCase):
+    def test_backup_scope_and_expired_withdrawal(self):
+        target, scope = fixture()
+        scope.update(environment_key='test', site_key='site-a', platform='nutanix', phase='workloads')
+        target.update(hostname='guest-a', machine_id='a' * 32)
+        config = dict(format='hosting-restic-export/1', scope={k: v for k, v in scope.items() if k != 'phase'},
+            member='guest-a', machine_id='a' * 32, source='/srv/hosting-exports/tenant-a/science/guest-a',
+            repository='rest:https://backup.example.com/tenant-a/science/', repository_id='b' * 64,
+            restic_sha256='c' * 64, valid_until=(utcnow() + timedelta(hours=1)).isoformat(),
+            consistency_ref='EXPORT-1', max_seconds=600)
+        binding = dict(config=config, credentials={'path': '/private/credentials', 'sha256': 'a' * 64},
+                       ca={'path': '/private/ca.pem', 'sha256': 'b' * 64}, enabled=True, interval_minutes=60)
+        target['services']['backup'] = binding
+        validate_services(target, scope)
+        binding['config']['source'] = '/srv/hosting-exports/tenant-b/science/guest-a'
+        with self.assertRaises(ValueError):
+            validate_services(target, scope)
+        binding['config']['source'] = '/srv/hosting-exports/tenant-a/science/guest-a'
+        binding['config']['valid_until'] = (utcnow() - timedelta(hours=1)).isoformat()
+        with self.assertRaises(ValueError):
+            validate_services(target, scope)
+        binding['enabled'] = False
+        validate_services(target, scope)
+
     def test_foreign_link_dns_cannot_bypass_global_selection(self):
         self.assertTrue(resolver_bound('Global: 192.0.2.53\nLink 2 (eth0):\n', ['192.0.2.53']))
         for output in ['Global: 192.0.2.53\nLink 2 (eth0): 198.51.100.53', 'Global:']:

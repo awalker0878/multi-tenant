@@ -29,9 +29,10 @@ def address(value):
 
 def validate_services(target, scope):
     services = target['services']
-    require(isinstance(services, dict) and set(services) == {'ownership_ref', 'resolver_addresses',
-        'admin_users', 'user_ca_keys', 'revoked_user_keys', 'breakglass', 'log', 'journal_mib', 'files'},
-        'Complete guest service profile required')
+    required = {'ownership_ref', 'resolver_addresses',
+        'admin_users', 'user_ca_keys', 'revoked_user_keys', 'breakglass', 'log', 'journal_mib', 'files'}
+    require(isinstance(services, dict) and required <= set(services)
+            and not set(services) - required - {'backup'}, 'Complete guest service profile required')
     require(re.fullmatch(r'[A-Za-z0-9:._/-]{3,200}', services['ownership_ref']), 'Owned guest-file handoff required')
     for key in ('resolver_addresses', 'admin_users', 'user_ca_keys'):
         require(isinstance(services[key], list) and 1 <= len(services[key]) <= 8
@@ -64,6 +65,24 @@ def validate_services(target, scope):
                 and re.fullmatch(r'/[A-Za-z0-9_./-]+', asset['path'])
                 and '..' not in Path(asset['path']).parts
                 and re.fullmatch('[0-9a-f]{64}', asset['sha256']), 'Private content-bound TLS asset required')
+    if 'backup' in services:
+        backup = services['backup']
+        require(set(backup) == {'config', 'credentials', 'ca', 'interval_minutes', 'enabled'}, 'Exact backup enrollment required')
+        require(type(backup['enabled']) is bool and type(backup['interval_minutes']) is int
+                and 15 <= backup['interval_minutes'] <= 1440, 'Explicit backup schedule required')
+        from tools.restic_run import validate
+        validate(backup['config'], allow_expired=not backup['enabled'])
+        require(backup['config']['scope'] == {k: v for k, v in scope.items() if k != 'phase'}
+                and backup['config']['member'] == target['hostname']
+                and backup['config']['machine_id'] == target['machine_id'], 'Backup enrollment belongs to another guest')
+        export_root = Path('/srv/hosting-exports') / scope['tenant_key'] / scope['wsd_key'] / target['hostname']
+        source = backup['config']['source']
+        require(re.fullmatch(r'/[A-Za-z0-9_./-]+', source) and Path(source).is_relative_to(export_root),
+                'Guest backup must stay inside its owned export directory')
+        for asset in (backup['credentials'], backup['ca']):
+            require(set(asset) == {'path', 'sha256'} and re.fullmatch(r'/[A-Za-z0-9_./-]+', asset['path'])
+                    and '..' not in Path(asset['path']).parts and re.fullmatch('[0-9a-f]{64}', asset['sha256']),
+                    'Private bound backup credentials/trust required')
     return services
 
 
@@ -74,6 +93,9 @@ def verify_assets(target, scope):
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     context.load_verify_locations(cafile=services['files']['log_ca']['path'])
     context.load_cert_chain(services['files']['log_certificate']['path'], services['files']['log_key']['path'])
+    if 'backup' in services:
+        for asset in (services['backup']['credentials'], services['backup']['ca']):
+            require(digest(read_private(asset['path'])) == asset['sha256'], 'Backup credential/trust asset changed')
 
 
 def resolver_bound(output, allowed):

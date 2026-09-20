@@ -54,7 +54,7 @@ def manifest(source):
     return files
 
 
-def validate(config, *, fixture=False):
+def validate(config, *, fixture=False, allow_expired=False):
     require(set(config) == {'format', 'scope', 'member', 'machine_id', 'source', 'repository',
             'repository_id', 'restic_sha256', 'valid_until', 'consistency_ref', 'max_seconds'}, 'Invalid backup configuration')
     require(config['format'] == 'hosting-restic-export/1', 'Unknown backup configuration')
@@ -71,7 +71,8 @@ def validate(config, *, fixture=False):
             and str(source) == config['source'], 'Absolute canonical bounded export path required')
     require(re.fullmatch(r'[A-Za-z0-9:._/-]{3,200}', config['consistency_ref']), 'Export consistency ownership required')
     require(type(config['max_seconds']) is int and 1 <= config['max_seconds'] <= 3600, 'Bounded backup/restore duration required')
-    require(0 < (timestamp(config['valid_until']) - utcnow()).total_seconds() <= 31 * 86400,
+    seconds = (timestamp(config['valid_until']) - utcnow()).total_seconds()
+    require((allow_expired and seconds <= 0) or 0 < seconds <= 31 * 86400,
             'Delegated backup entitlement expired or exceeds 31 days')
     if not fixture:
         require(config['repository'].startswith('rest:https://'), 'Pre-created authenticated TLS REST repository required')

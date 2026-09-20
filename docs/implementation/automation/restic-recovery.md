@@ -83,3 +83,27 @@ pins its own reviewed binary digest and records its version.
 Sources: [restic backup](https://restic.readthedocs.io/en/stable/040_backup.html),
 [repository backends](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html),
 [restore](https://restic.readthedocs.io/en/stable/050_restore.html).
+
+## Guest enrollment and withdrawal
+
+The [guest service profile](guest-services.md) accepts an optional `backup` block
+with inline `config`, private content-bound `credentials` and `ca` assets (each
+`path`/`sha256`), an explicit Boolean `enabled`, and `interval_minutes` from 15 to
+1,440. The configuration must match the guest's scope, hostname and machine ID.
+Its export is confined to `/srv/hosting-exports/<tenant>/<wsd>/<hostname>`.
+The image/data producer owns creation and consistency of that export.
+
+Ansible installs the reviewed executable package, root-only credentials, confined
+systemd oneshot service and timer. It checks the installed restic binary digest.
+The service writes only its private run records; it never initializes a remote
+repository or receives retention/delete authority. The timer serializes its own
+invocations. Entitlement expiry causes capture to stop until an explicit renewal.
+Monitor timer/service failures, the latest successful capture age and local evidence
+disk capacity; copy receipts to the independent evidence store before retiring a
+guest. Local report retention is an explicit operator duty, not backup retention.
+
+Set `enabled: false` in the retained enrollment block to disable the timer and stop
+the owned service. Removing the block alone does not uninstall an existing service.
+Preserve repository passwords and retained copies under the recovery custodian;
+ordinary de-enrollment does not delete either. A changed backup binary requires a
+reviewed image/profile update and a new restore test.

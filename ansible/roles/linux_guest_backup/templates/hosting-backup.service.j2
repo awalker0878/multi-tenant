@@ -1,0 +1,23 @@
+[Unit]
+Description=Capture the approved workload file export
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+ExecStart=/usr/bin/python3 /usr/local/lib/hosting/tools/restic_run.py backup --config /etc/hosting-backup/config.json --credentials /etc/hosting-backup/credentials.json --restic /usr/bin/restic --ca-bundle /etc/hosting-backup/ca.pem --output-root /var/lib/hosting-backup/runs --execute
+TimeoutStartSec={{ hosting_target.services.backup.config.max_seconds + 30 }}
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadOnlyPaths={{ hosting_target.services.backup.config.source }}
+ReadWritePaths=/var/lib/hosting-backup
