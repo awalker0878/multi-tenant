@@ -42,8 +42,9 @@ class NativeSources(unittest.TestCase):
  def test_nutanix_category_uses_documented_id(self):self.assertIn('nutanix_category_v2.domain.id',json.dumps(load('nutanix-domain')));self.assertNotIn('nutanix_category_v2.domain.ext_id',json.dumps(load('nutanix-domain')))
  def test_nsx_tier0_not_bound(self):self.assertNotIn('tier0_path',load('nsx-domain')['resource']['nsxt_policy_tier1_gateway']['domain'])
  def test_nsx_drop_is_explicit_and_bounded(self):
-  p=load('nsx-domain')['resource']['nsxt_policy_security_policy']['quarantine'];self.assertEqual(len(p['scope']),1);self.assertEqual(p['rule'][0]['action'],'DROP');self.assertIs(p['rule'][0]['logged'],True)
- def test_nsx_off_gateway_configuration(self):self.assertEqual(load('nsx-domain')['resource']['nsxt_policy_segment']['domain']['advanced_config'][0]['connectivity'],'OFF')
+  d=load('nsx-domain');p=d['resource']['nsxt_policy_security_policy']['quarantine'];self.assertEqual(len(p['scope']),1);self.assertIn('action = "DROP"',d['locals']['lifecycle_rules']);self.assertIs(p['dynamic']['rule']['content']['logged'],True)
+ def test_nsx_off_gateway_configuration(self):
+  d=load('nsx-domain');self.assertEqual(d['variable']['lifecycle_stage']['default'],'prepared');self.assertEqual(d['resource']['nsxt_policy_segment']['domain']['advanced_config'][0]['connectivity'],'${var.lifecycle_stage == "bootstrap" ? "ON" : "OFF"}')
  def test_openstack_no_external_router(self):
   doc=load('openstack-domain');r=doc['resource']['openstack_networking_router_v2']['domain'];self.assertNotIn('external_network_id',r);self.assertNotIn('enable_snat',r)
   self.assertEqual(doc['variable']['lifecycle_stage']['default'],'prepared');self.assertEqual(r['admin_state_up'],'${var.lifecycle_stage == "bootstrap"}')

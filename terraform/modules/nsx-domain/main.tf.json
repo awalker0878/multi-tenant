@@ -81,6 +81,36 @@
           "error_message": "Invalid value for Provider-reserved Emergency policy sequence."
         }
       ]
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
+    },
+    "bootstrap_rules": {
+      "type": "map(object({direction = string, protocol = string, port = number, remote_ipv4 = string}))",
+      "nullable": false,
+      "default": {},
+      "description": "Stable owned rule keys; exact endpoint and TCP/UDP port only. Keep existing rules during withdrawal; disabled interfaces contain exposure.",
+      "validation": [
+        {
+          "condition": "${length(var.bootstrap_rules) <= 32 && alltrue([for key, r in var.bootstrap_rules : can(regex(\"^[a-z][a-z0-9-]{1,40}$\", key)) && contains([\"ingress\", \"egress\"], r.direction) && contains([\"tcp\", \"udp\"], r.protocol) && r.port >= 1 && r.port <= 65535 && floor(r.port) == r.port && can(cidrnetmask(\"${r.remote_ipv4}/32\"))])}",
+          "error_message": "At most 32 named exact IPv4 TCP/UDP service rules are supported."
+        }
+      ]
     }
   },
   "resource": {
@@ -96,6 +126,10 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted NSX bootstrap requires accepted mandatory policy, native realization and service paths."
             }
           ]
         }
@@ -113,7 +147,7 @@
         ],
         "advanced_config": [
           {
-            "connectivity": "OFF",
+            "connectivity": "${var.lifecycle_stage == \"bootstrap\" ? \"ON\" : \"OFF\"}",
             "urpf_mode": "STRICT"
           }
         ],
@@ -123,6 +157,10 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted NSX bootstrap requires accepted mandatory policy, native realization and service paths."
             }
           ]
         }
@@ -148,6 +186,10 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted NSX bootstrap requires accepted mandatory policy, native realization and service paths."
             }
           ]
         }
@@ -163,26 +205,50 @@
         "scope": [
           "${nsxt_policy_group.domain.path}"
         ],
-        "rule": [
-          {
-            "display_name": "deny-scoped-ip-traffic",
-            "source_groups": [],
-            "destination_groups": [],
-            "action": "DROP",
-            "direction": "IN_OUT",
-            "ip_version": "IPV4_IPV6",
-            "logged": true,
-            "disabled": false
-          }
-        ],
         "lifecycle": {
           "prevent_destroy": true,
           "precondition": [
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted NSX bootstrap requires accepted mandatory policy, native realization and service paths."
             }
           ]
+        },
+        "dynamic": {
+          "rule": {
+            "for_each": "${local.lifecycle_rules}",
+            "content": {
+              "display_name": "${rule.value.name}",
+              "source_groups": "${rule.value.source}",
+              "destination_groups": "${rule.value.destination}",
+              "action": "${rule.value.action}",
+              "direction": "IN_OUT",
+              "ip_version": "${rule.value.action == \"ALLOW\" ? \"IPV4\" : \"IPV4_IPV6\"}",
+              "logged": true,
+              "disabled": false,
+              "services": [],
+              "dynamic": {
+                "service_entries": {
+                  "for_each": "${rule.value.action == \"ALLOW\" ? [rule.value] : []}",
+                  "content": {
+                    "l4_port_set_entry": [
+                      {
+                        "protocol": "${service_entries.value.protocol}",
+                        "destination_ports": [
+                          "${tostring(service_entries.value.port)}"
+                        ],
+                        "source_ports": []
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -202,6 +268,12 @@
     },
     "delivery_state": {
       "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    },
+    "lifecycle_stage": {
+      "value": "${var.lifecycle_stage}"
     }
+  },
+  "locals": {
+    "lifecycle_rules": "${concat(var.lifecycle_stage == \"bootstrap\" ? [for key in sort(keys(var.bootstrap_rules)) : { name = key, action = \"ALLOW\", source = var.bootstrap_rules[key].direction == \"ingress\" ? [\"${var.bootstrap_rules[key].remote_ipv4}/32\"] : [nsxt_policy_group.domain.path], destination = var.bootstrap_rules[key].direction == \"ingress\" ? [nsxt_policy_group.domain.path] : [\"${var.bootstrap_rules[key].remote_ipv4}/32\"], protocol = upper(var.bootstrap_rules[key].protocol), port = var.bootstrap_rules[key].port }] : [], [{ name = \"deny-scoped-ip-traffic\", action = \"DROP\", source = [], destination = [], protocol = \"TCP\", port = 0 }])}"
   }
 }

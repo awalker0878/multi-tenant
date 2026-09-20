@@ -1,5 +1,21 @@
 # nsx-domain
 
+## Restricted bootstrap lifecycle
+
+The default `lifecycle_stage = "prepared"` keeps segment connectivity OFF and the
+sole logged, dual-family DROP rule. Explicit `bootstrap` with a nonempty
+`bootstrap_acceptance_ref` connects the segment and inserts reviewed IPv4 /32
+TCP/UDP service exceptions before that drop. `bootstrap_rules` maps stable names
+to `{direction, protocol, port, remote_ipv4}`; the owned group is the other peer.
+No upstream gateway or route advertisement is added. Returning to `prepared`
+removes all exceptions and disconnects the segment, retaining native objects/data.
+
+Native realization and DFW precedence/exclusion checks remain mandatory before
+guest contact. Connectivity OFF alone is not a same-segment isolation guarantee;
+the independently verified mandatory DFW boundary is essential. Terraform retains
+ownership of segment/policy changes. The vSphere provider's computed power state
+does not become a writable lifecycle switch.
+
 Provider interface pin: `vmware/nsxt` `= 3.10.0`. This is not an installed compatibility decision.
 
 Targets NSX Local Manager only, not Global Manager or VMC. Creates a disconnected segment, unconnected Tier-1, segment-membership group and group-scoped Emergency DROP policy. An empty source/destination list means Any within the explicitly scoped group. Segment disconnection is not a same-subnet or non-IP isolation proof. Existing higher-priority policy and DFW exclusions must be inspected before attaching a VM; the sequence is an allocated policy slot, not a universal safe default. No Tier-0/VRF is created.
