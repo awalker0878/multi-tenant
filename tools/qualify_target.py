@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from tools.compile_wsd import STATE
-from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe
+from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe
 from tools import nsx_segment_observe, vmware_network_binding
 from tools.check_release import verify
 from tools.guest_inventory import build
@@ -127,8 +127,14 @@ def bound_inputs(plan, known_hosts):
     return assets, access, pins
 
 
+def ahv_adapter(manifest):
+    adapters = {a.PROFILE: a for a in (nutanix_vm_observe, nutanix_vm_task_observe)}
+    require(manifest.get('profile') in adapters, 'Supported explicit AHV observer required')
+    return adapters[manifest['profile']]
+
+
 def ahv_binding(scope, manifest, outputs, access, network):
-    nutanix_vm_observe.validate(manifest)
+    ahv_adapter(manifest).validate(manifest)
     require(scope['platform'] == 'nutanix' and manifest['contact_enabled'] is True, 'Enabled AHV observation required')
     require(all(manifest[key] == network[key] for key in ('origin', 'operation_id', 'tenant_id', 'scope_id',
             'target_binding_ref', 'engineering_record_ref')), 'Network and AHV observation bindings differ')
@@ -273,8 +279,9 @@ def native_readback(plan, assets, authority, directory, label):
         require(observation['status'] == 'OBSERVED_MATCH_NOT_QUALIFIED', 'Workload identity, placement or storage readback failed')
         return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': digest(encoded(observation))}))
     if plan.get('format') in {'hosting-target-campaign/3', 'hosting-target-campaign/4'}:
+        adapter = ahv_adapter(c.strict_loads(assets['workload_manifest']))
         workload_hash = reader_child(plan, assets, authority, directory, label + '-workloads',
-                                     'nutanix_vm_observe.py', 'workload_manifest')
+                                     Path(adapter.__file__).name, 'workload_manifest')
         combined = {'network_sha256': network_hash, 'workloads_sha256': workload_hash}
         if plan['format'] == 'hosting-target-campaign/4':
             combined['flow_sha256'] = reader_child(plan, assets, authority, directory, label + '-flow',

@@ -66,7 +66,8 @@ class FlowCampaignTests(unittest.TestCase):
             for key, value in (('native_manifest', encoded(network)), ('workload_manifest', encoded(workload)),
                 ('flow_manifest', encoded(policy)), ('native_ca', (service.directory / 'ca.pem').read_bytes())):
                 write_new(directory / key, value)
-            assets = {'native_credentials': encoded(dict(username='fixture', password='fixture'))}
+            assets = {'native_credentials': encoded(dict(username='fixture', password='fixture')),
+                      'workload_manifest': encoded(workload)}
             result = q.native_readback(plan, assets, window(), directory, 'before')
             expected = {key + '_sha256': digest((directory / (name + '.json')).read_bytes())
                         for key, name in [('network', 'before'), ('workloads', 'before-workloads'), ('flow', 'before-flow')]}

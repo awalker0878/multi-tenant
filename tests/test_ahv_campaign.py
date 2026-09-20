@@ -72,7 +72,8 @@ class AhvCampaignTests(unittest.TestCase):
             service.routes[target] = {'body': {'data': resource['expected']}, 'etag': resource['expected_etag']}
             for key, value in (('native_manifest', encoded(network)), ('workload_manifest', encoded(workload)),
                                ('native_ca', (service.directory / 'ca.pem').read_bytes())): write_new(directory / key, value)
-            assets = {'native_credentials': encoded({'username': 'fixture', 'password': 'fixture'})}
+            assets = {'native_credentials': encoded({'username': 'fixture', 'password': 'fixture'}),
+                      'workload_manifest': encoded(workload)}
             result = q.native_readback(plan, assets, window(), directory, 'before')
             expected = {'network_sha256': digest((directory / 'before.json').read_bytes()),
                         'workloads_sha256': digest((directory / 'before-workloads.json').read_bytes())}
