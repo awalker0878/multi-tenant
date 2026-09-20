@@ -13,6 +13,10 @@ Use profile `nutanix-ahv-v4.2-vm-snapshot` in the native-reader manifest format:
 independently accepted strong `expected_etag`, and `expected`. Do not include
 `task`: this observer cannot determine task completion.
 
+For independently recorded VM task IDs, use the separate
+[AHV VM/task profile](nutanix-vm-task-readback.md). It adds bounded Prism task
+witnesses and recovery review; this snapshot profile retains its original semantics.
+
 The expected wire fields include actual native tenant UUID, VM UUID/type/name,
 host, cluster, project, complete category membership, ON/OFF power, CPU/memory,
 cross-cluster migration flag, exact NIC identities/connections/MACs/subnets/IPv4,

@@ -42,6 +42,12 @@ resource reads. Stable samples strengthen attribution, but they are not a native
 transaction or proof of total inventory completeness. Inspect the selected-field
 coverage and add independent route/enforcement/data checks before any later change.
 
+The separate [AHV VM/task profile](implementation/automation/nutanix-vm-task-readback.md)
+checks an explicitly recorded Prism graph around VMM VM snapshots. Offline review
+recomputes its task witnesses and completion flags, requires the creation window
+to start at the context's attempted change, and retains fencing/quarantine holds.
+It does not discover competing tasks or join AHV evidence to the Terraform ledger.
+
 ## Review the three records together
 
 The [offline reviewer](../tools/recovery_review.py) consumes the accepted manifest,

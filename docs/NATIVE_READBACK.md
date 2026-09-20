@@ -100,7 +100,11 @@ VMs, Flow policies and route resources are not covered by this networking reader
 Separate [AHV VM](implementation/automation/nutanix-vm-readback.md) and
 [Flow policy](implementation/automation/nutanix-flow-readback.md) snapshot profiles
 are available, as are [vSphere VM/task observations](implementation/automation/vsphere-readback.md).
-Their exact coverage and task limitations are documented separately.
+The optional [AHV VM/task profile](implementation/automation/nutanix-vm-task-readback.md)
+combines VMM v4.2 snapshots with a bounded, explicitly recorded Prism v4.3 task
+graph. It supports offline recovery review and campaigns v3/v4; it does not
+discover other work or provide native fencing. Their exact coverage and task
+limitations are documented separately.
 The vSphere clone activity profile additionally observes visible work on both
 accepted template sources and result VMs, without clone submission, state adoption
 or native writer fencing.

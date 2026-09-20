@@ -80,7 +80,10 @@ scope, intent version and every accepted enforcement point. Segment connectivity
 OFF alone does not establish same-segment isolation: observe the mandatory DFW
 drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-readback.md),
 [Flow readback](nutanix-flow-readback.md) and [campaign v4](target-qualification.md)
-alongside actual network/VM task evidence. For VMware use
+alongside actual network/VM task evidence. The optional
+[AHV VM/task reader](nutanix-vm-task-readback.md) binds the selected VM snapshots
+to recorded Prism tasks in campaigns v3/v4 and offline review. It does not observe
+unlisted competing work or clear a held execution. For VMware use
 [vSphere VM/task readback](vsphere-readback.md) and campaign v5, or
 [campaign v6/v7](vmware-network-binding.md) for observed NSX-backed portgroup/segment
 associations and, in v7, exact port occupants, connection cookies and host/runtime

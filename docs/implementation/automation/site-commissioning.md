@@ -96,6 +96,22 @@ are separate applies: enable only independently accepted restricted service path
 then collect native observations and controlled guest evidence. No cross-scope
 atomicity or Flow enforcement is inferred from a successful Terraform apply.
 
+For the optional [AHV VM/task profile](nutanix-vm-task-readback.md), establish
+installed VMM v4.2 and Prism v4.3 support and read-role visibility. Capture original
+VM power/reconfiguration task IDs, native operation labels, parent/child and entity
+sets, expected VM revisions and the actual attempt interval. Qualify these cases:
+
+| Native case | Required result |
+| --- | --- |
+| Successful root and all recorded children, independently accepted VM state | Stable matching evidence permits review only; preserve the external fence and quarantine |
+| Matching VM with pending/failed child or missing task | Hold; never replay to obtain a cleaner result |
+| Unlisted entity, truncated child list or unsupported batch shape | Hold for complete native-owner investigation |
+| VM placement, NIC/disk identity or revision changes during collection | Hold and preserve the original data/ownership trail |
+| Another writer or later operation exists outside the recorded graph | Independent fencing and operation-wide reconciliation remain mandatory; this profile cannot detect all such work |
+
+Exercise offline witness review and v3/v4 campaign collection with those native
+records. A simulated fence record cannot close the cross-writer fencing gate.
+
 For [campaign v6](vmware-network-binding.md), accept the actual Local Manager
 segment/realized-switch and vCenter distributed-portgroup/switch response shapes,
 native IDs/revisions and both observers' RBAC visibility. Use original private
