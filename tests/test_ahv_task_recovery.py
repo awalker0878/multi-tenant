@@ -122,7 +122,7 @@ class CampaignTests(unittest.TestCase):
                     r = policy['resources'][0]
                     service.routes[flow.resource_target(r)] = dict(body={'data': r['expected']}, etag=r['expected_etag'])
                     assets = {'native_credentials': encoded(dict(username='fixture', password='fixture')),
-                              'workload_manifest': encoded(workload)}
+                              'workload_manifest': encoded(workload), 'flow_manifest': encoded(policy)}
                     for key, value in (('native_manifest', encoded(network)), ('workload_manifest', encoded(workload)),
                         ('flow_manifest', encoded(policy)), ('native_ca', (service.directory / 'ca.pem').read_bytes())):
                         write_new(directory / key, value)
