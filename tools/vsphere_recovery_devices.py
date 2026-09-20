@@ -1,6 +1,7 @@
 """Bind selected existing vSphere devices to pinned-provider plans; never mutate state."""
+import json
 import re
-from tools import readback_core as c, vsphere_observe as vm
+from tools import readback_core as c, vsphere_observe as vm, vsphere_port_observe as ports, vsphere_network_observe as pg
 from tools.run_files import require
 
 SCSI = {'pvscsi': 'ParaVirtualSCSIController', 'lsilogic': 'VirtualLsiLogicController',
@@ -40,7 +41,7 @@ def bind_disks(after, expected, member):
         require(len(candidates) == 1, 'Native disk slot differs from owned layout')
         disk = candidates[0]; backing = disk['backing']; plan = by_label[label]
         require(backing.get('thinProvisioned') is True and backing.get('eagerlyScrub') is False
-                and backing.get('sharing', '') in {'', 'sharingNone'}, 'Explicit thin unshared base disk required')
+                and backing.get('sharing') == 'sharingNone', 'Explicit thin unshared base disk required')
         match = re.fullmatch(r'\[[^\]\r\n]+\] ([^\r\n]+)', backing['fileName'])
         require(match is not None and not match[1].startswith('/') and all(p not in {'', '.', '..'} for p in match[1].split('/')),
                 'Exact relative datastore file required')
@@ -54,7 +55,67 @@ def bind_disks(after, expected, member):
         if 'device_address' in plan:
             require(plan['device_address'] == f'scsi:0:{unit}', 'Planned device address differs from native slot')
         if 'disk_sharing' in plan:
-            require(plan['disk_sharing'] == backing.get('sharing', 'sharingNone'), 'Disk sharing differs')
+            require(plan['disk_sharing'] == backing['sharing'], 'Disk sharing differs')
         if 'write_through' in plan:
             require(type(backing.get('writeThrough')) is bool and plan['write_through'] is backing['writeThrough'],
                     'Disk write-through differs')
+
+
+def bind_nic(after, expected, member):
+    nics = [d for d in expected['config']['hardware']['device'] if d['_typeName'] == 'VirtualVmxnet3']
+    planned = after.get('network_interface')
+    require(len(nics) == 1 and isinstance(planned, list) and len(planned) == 1 and isinstance(planned[0], dict),
+            'One exact existing vmxnet3 NIC required')
+    nic = nics[0]; vm.moid(member['quarantine_network_id'], 'dvportgroup')
+    require(nic.get('addressType') in {'generated', 'assigned'} and expected['runtime']['powerState'] == 'poweredOn'
+            and nic['connectable']['connected'] is True, 'Powered-on connected NIC with native-assigned MAC required')
+    require(not c.differences(planned[0], dict(key=nic['key'], mac_address=nic['macAddress'], adapter_type='vmxnet3',
+            network_id=member['quarantine_network_id'], use_static_mac=False)), 'Planned NIC differs from native identity or sealed inputs')
+    if 'host_system_id' in after:
+        require(after['host_system_id'] == expected['runtime']['host']['value'], 'Known host differs from native placement')
+
+
+def bind_network(inputs, manifest, network):
+    """Join vCenter network MoIDs to native switch/portgroup keys and exact occupants."""
+    ports.validate(network)
+    for key in ('origin', 'operation_id', 'tenant_id', 'scope_id', 'engineering_record_ref', 'target_binding_ref'):
+        require(network[key] == manifest[key], 'Attachment evidence scope differs from workload evidence')
+    groups = {r['moid']: r for r in network['resources']}; used_groups = set(); used_ports = set(); result = {}
+    by_name = {r['expected']['config']['name']: r for r in manifest['resources']}
+    require(len(by_name) == len(manifest['resources']) and set(by_name) == set(inputs['members']), 'Exact workload names required')
+    for name, member in inputs['members'].items():
+        resource = by_name[name]; expected = resource['expected']; network_id = member['quarantine_network_id']
+        require(network_id in groups, 'Assigned native network must be observed')
+        group = groups[network_id]; used_groups.add(network_id)
+        nics = [d for d in expected['config']['hardware']['device'] if d['_typeName'] == 'VirtualVmxnet3']
+        require(len(nics) == 1, 'One exact existing NIC required'); nic = nics[0]; backing = nic['backing']
+        require(backing['_typeName'] == 'VirtualEthernetCardDistributedVirtualPortBackingInfo', 'Observed NSX distributed backing required')
+        port = backing['port']; ports.cookie(port.get('connectionCookie'))
+        require((port['switchUuid'], port['portgroupKey']) == pg.backing_key(group), 'Native NIC differs from planned network MoID')
+        matches = [p for p in group['ports'] if p['key'] == port['portKey']]
+        require(len(matches) == 1, 'Exact native port must be observed'); observed = matches[0]
+        identity = (port['switchUuid'], port['portKey']); require(identity not in used_ports, 'Port reused across owned VMs'); used_ports.add(identity)
+        require(observed['connectionCookie'] == port['connectionCookie']
+                and observed['connectee']['connectedEntity']['value'] == resource['moid']
+                and observed['connectee']['nicKey'] == str(nic['key'])
+                and observed['proxyHost']['value'] == expected['runtime']['host']['value']
+                and observed['state']['runtimeInfo']['macAddress'] == nic['macAddress'], 'Native port occupant differs from VM NIC')
+        address = 'module.owned.module.member[' + json.dumps(name) + '].vsphere_virtual_machine.workload'
+        result[address] = dict(vm_moid=resource['moid'], network_moid=network_id, nic_key=nic['key'], mac_address=nic['macAddress'],
+            switch_uuid=port['switchUuid'], portgroup_key=port['portgroupKey'], port_key=port['portKey'], connection_cookie=port['connectionCookie'])
+    require(used_groups == set(groups) and used_ports == {(p['dvsUuid'], p['key']) for r in network['resources'] for p in r['ports']},
+            'Unused or incomplete native attachment coverage')
+    return result
+
+
+def check_network_report(network, report, context, current):
+    # Explicit adapter selection validates an additional read-only report; it
+    # does not let a snapshot satisfy the independent VM/task completion gate.
+    from tools import recovery_review
+    require(recovery_review.check_report(network, report, current, 300, adapter=ports) == 'READBACK_MATCH_NOT_QUALIFIED',
+            'Fresh complete matching native attachments required')
+    start = c.timestamp(report['started_at'])
+    attempt = max(c.timestamp(context['attempted_at']), c.timestamp(context['last_security_change_at']))
+    require(start >= attempt, 'Attachment observation predates attempt or security change')
+    return all(recovery_review.valid_control(context[key], network['scope_id'], attempt, start, current, 300)
+               for key in ('writer_fence', 'quarantine'))

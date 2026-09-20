@@ -15,7 +15,7 @@ from tools import nutanix_terraform_recovery as ahv, lifecycle_transition
 from tools import vsphere_recovery_devices as devices
 
 HELD = {'STARTED_OUTCOME_UNKNOWN', 'HOLD_RECONCILIATION_REQUIRED'}
-OBSERVED_PLAN_FIELDS = {'name', 'num_cpus', 'num_cores_per_socket', 'memory', 'resource_pool_id'} | devices.DISK_FIELDS
+OBSERVED_PLAN_FIELDS = {'name', 'num_cpus', 'num_cores_per_socket', 'memory', 'resource_pool_id', 'network_interface'} | devices.DISK_FIELDS
 UPDATE_FIELDS = {'num_cpus', 'num_cores_per_socket', 'memory'}
 COMPUTED_FIELDS = {'change_version', 'default_ip_address', 'guest_ip_addresses', 'power_state', 'vapp_transport'}
 
@@ -50,6 +50,7 @@ def bind_configuration(change, resource, member_name, member):
         if key in after and not has_true(unknown.get(key)):
             require(type(after[key]) is str and after[key] == value, 'Known native plan metadata differs')
     devices.bind_disks(after, expected, member)
+    devices.bind_nic(after, expected, member)
 
 
 def bind_plan(plan, inputs, manifest):
@@ -85,7 +86,7 @@ def bind_plan(plan, inputs, manifest):
     return actual
 
 
-def review_attempt(operation, ledger_root, manifest_path, report_path, context_path, output):
+def review_attempt(operation, ledger_root, manifest_path, report_path, context_path, output, *, network_manifest=None, network_readback=None):
     operation = private_path(operation, directory=True); ledger_root = private_path(ledger_root, directory=True)
     output = Path(output).absolute()
     require(not output.resolve().is_relative_to(ROOT.resolve()) and not output.resolve().is_relative_to(ledger_root)
@@ -124,8 +125,9 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
         endpoint = inputs['platform_endpoint']
         expected_origin = c.origin(endpoint if endpoint.startswith('https://') else 'https://' + endpoint)
         require(manifest['origin'] == expected_origin, 'Native origin differs from sealed provider endpoint')
-        fields = OBSERVED_PLAN_FIELDS; lifecycle_hash = None
+        fields = OBSERVED_PLAN_FIELDS; lifecycle_hash = None; attachments = None; current = utcnow()
         if scope['platform'] == 'nutanix':
+            require(network_manifest is None and network_readback is None, 'vSphere attachment inputs cannot qualify AHV')
             lifecycle_hash = bundle['artifacts'].get('transition.json')
             require(lifecycle_hash is not None and digest(read_private(operation / 'transition.json')) == lifecycle_hash,
                     'Sealed AHV lifecycle record required')
@@ -138,10 +140,18 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
             bound = bind_plan(load_private(operation / 'plan.json'), inputs, manifest)
             require(c.timestamp(manifest['task']['activity_since']) == c.timestamp(head['started_at']), 'Activity window differs from immutable attempt start')
             require(all(c.timestamp(r['queued_at']) >= c.timestamp(head['started_at']) for r in manifest['task']['records']), 'Historical tasks cannot resolve this attempt')
+            require(network_manifest is not None and network_readback is not None, 'Private native attachment manifest and report required')
+            network = load_private(network_manifest); network_report = load_private(network_readback)
+            device_bindings = devices.bind_network(inputs, manifest, network)
+            under_controls = devices.check_network_report(network, network_report, context, current)
+            attachments = dict(manifest_sha256=c.digest(network), report_sha256=c.digest(network_report),
+                               native_bindings=device_bindings, observed_under_controls=under_controls)
         require(context['accepted_plan_sha256'] == bundle['artifacts']['saved.tfplan']
                 and context['attempted_generation'] == bundle['generation']
                 and context['attempted_at'] == head['started_at'] and context['change_record_ref'] == head['change_ref'], 'Context is not the exact attempted plan')
-        triage = recovery_review.review(manifest, report, context)
+        triage = recovery_review.review(manifest, report, context, current=current)
+        if attachments is not None and not attachments['observed_under_controls'] and triage['result'] == 'READY_FOR_OPERATOR_RECOVERY_REVIEW':
+            triage.update(result='HOLD_NETWORK_NOT_UNDER_CONTROLS', reasons=['RESAMPLE_ATTACHMENTS_AFTER_FENCING_AND_QUARANTINE_VERIFICATION'])
         require(read_private(ledger / 'head.json') == head_bytes, 'Ledger changed during review')
         result = dict(format='hosting-terraform-recovery-review/1', reviewed_at=utcnow().isoformat(),
             scope=scope, operation_id=bundle['operation_id'], generation=bundle['generation'], bundle_sha256=digest(bundle_bytes),
@@ -150,6 +160,7 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
             plan_configuration_fields=sorted(fields),
             ledger_status=head['status'], ledger_released=False, may_apply=False, may_delete=False, may_activate=False)
         if lifecycle_hash is not None: result['lifecycle_sha256'] = lifecycle_hash
+        if attachments is not None: result['network_evidence'] = attachments
         write_new(output, encoded(result))
         return result
     finally: os.close(fd)
@@ -158,9 +169,11 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('bundle', 'ledger', 'manifest', 'readback', 'context', 'output'): parser.add_argument('--' + name, type=Path, required=True)
+    for name in ('network-manifest', 'network-readback'): parser.add_argument('--' + name, type=Path)
     args = parser.parse_args()
     try:
-        result = review_attempt(args.bundle, args.ledger, args.manifest, args.readback, args.context, args.output)
+        result = review_attempt(args.bundle, args.ledger, args.manifest, args.readback, args.context, args.output,
+                               network_manifest=args.network_manifest, network_readback=args.network_readback)
         print(json.dumps({'result': result['triage']['result'], 'ledger_released': False, 'may_apply': False}))
         return 0 if result['triage']['result'] == 'READY_FOR_OPERATOR_RECOVERY_REVIEW' else 2
     except (OSError, ValueError, KeyError, TypeError):

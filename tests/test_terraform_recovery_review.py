@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from tests.test_vsphere_task_activity import manifest, Client, context
 from tests.test_vsphere_observe import ref
+from tests import test_vsphere_port_observe as ports
 from tools import readback_core as c, terraform_recovery_review as r, vsphere_task_tree_observe as tree
 from tools.run_files import digest, encoded, write_new, load_private, utcnow
 from tools.terraform_run import select_scope
@@ -24,9 +25,13 @@ class AttemptRecoveryTests(unittest.TestCase):
         inputs.update(allow_restricted_build=True, test_authorization_ref='FIXTURE', platform_endpoint='vc.example.test')
         inputs['members']['processor-01']['resource_pool_id'] = 'resgroup-1'
         inputs['members']['processor-01']['datastore_id'] = 'datastore-1'
+        inputs['members']['processor-01']['quarantine_network_id'] = 'dvportgroup-1'
         disk = self.m['resources'][0]['expected']['config']['hardware']['device'][1]
         disk.update(capacityInKB=41943040, capacityInBytes=42949672960)
-        disk['backing'].update(thinProvisioned=True, eagerlyScrub=False)
+        disk['backing'].update(thinProvisioned=True, eagerlyScrub=False, sharing='sharingNone', writeThrough=False)
+        nic = self.m['resources'][0]['expected']['config']['hardware']['device'][2]
+        nic.update(addressType='generated', backing=dict(_typeName='VirtualEthernetCardDistributedVirtualPortBackingInfo',
+            port=dict(switchUuid='fixture-dvs-uuid', portgroupKey='fixture-pg-key', portKey='17', connectionCookie=12345)))
         self.m['resources'][0]['expected']['config']['name'] = 'processor-01'
         _, scope, state_key = select_scope(r.ROOT, 'vmware-wsd-workloads', inputs)
         self.m.update(tenant_id=scope['tenant_key'], scope_id=scope['wsd_key'])
@@ -36,12 +41,13 @@ class AttemptRecoveryTests(unittest.TestCase):
         write_new(self.folder / 'writer.lock', b'')
         identity = self.m['resources'][0]['expected']['config']['uuid']
         after = dict(id=identity, name='processor-01', num_cpus=2, num_cores_per_socket=1, memory=4096, resource_pool_id='resgroup-1',
-                     firmware='efi', network_interface=[{'network_id': 'accepted-external-binding'}])
+                     firmware='efi', network_interface=[dict(network_id='dvportgroup-1', key=4000,
+                         mac_address='00:50:56:00:00:01', adapter_type='vmxnet3', use_static_mac=False)])
         after.update(datastore_id='datastore-1', scsi_type='pvscsi', scsi_controller_count=1,
             storage_policy_id=inputs['members']['processor-01']['storage_policy_id'], disk=[dict(label='disk0',
                 key=2000, uuid='6000C290-fixture-disk', unit_number=0, controller_type='scsi', size=40,
                 path='vm/vm.vmdk', datastore_id='datastore-1', disk_mode='persistent', thin_provisioned=True,
-                eagerly_scrub=False, keep_on_remove=True, attach=False,
+                eagerly_scrub=False, keep_on_remove=True, attach=False, disk_sharing='sharingNone', write_through=False,
                 storage_policy_id=inputs['members']['processor-01']['storage_policy_id'])])
         self.plan = dict(format_version='1.2', complete=True, resource_changes=[dict(
             address='module.owned.module.member["processor-01"].vsphere_virtual_machine.workload', type='vsphere_virtual_machine',
@@ -64,9 +70,17 @@ class AttemptRecoveryTests(unittest.TestCase):
         report = c.observe(self.m, Client(self.m), tree, interval=0); x = context(self.m, report)
         x.update(accepted_plan_sha256=digest(values['saved.tfplan']), attempted_at=start, change_record_ref='FIXTURE-CHANGE')
         for name, value in [('manifest', self.m), ('readback', report), ('context', x)]: write_new(self.base / name, encoded(value))
+        self.network = ports.manifest(self.m['origin'])
+        self.network.update({key: self.m[key] for key in ('operation_id', 'tenant_id', 'scope_id', 'engineering_record_ref', 'target_binding_ref')})
+        self.network['resources'][0]['expected']['config']['key'] = 'fixture-pg-key'
+        port = self.network['resources'][0]['ports'][0]; port['portgroupKey'] = 'fixture-pg-key'
+        port['state']['runtimeInfo']['macAddress'] = nic['macAddress']
+        self.network_report = c.observe(self.network, ports.Client(self.network), ports.p, interval=0)
+        write_new(self.base / 'network', encoded(self.network)); write_new(self.base / 'network-report', encoded(self.network_report))
 
     def run_review(self, name='review.json'):
-        return r.review_attempt(self.operation, self.ledger, self.base / 'manifest', self.base / 'readback', self.base / 'context', self.base / name)
+        return r.review_attempt(self.operation, self.ledger, self.base / 'manifest', self.base / 'readback', self.base / 'context', self.base / name,
+                               network_manifest=self.base / 'network', network_readback=self.base / 'network-report')
 
     def test_review_binds_held_attempt_and_preserves_all_ledger_bytes(self):
         before = {p.name: p.read_bytes() for p in self.folder.iterdir()}

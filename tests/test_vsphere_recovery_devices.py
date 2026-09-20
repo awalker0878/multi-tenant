@@ -46,6 +46,7 @@ class DiskBindingTests(unittest.TestCase):
             lambda ds: ds.append(deepcopy(ds[0]) | dict(key=1001, busNumber=1)),
             lambda ds: ds[1].update(controllerKey=999), lambda ds: ds[1].update(unitNumber=1),
             lambda ds: ds[1]['backing'].pop('thinProvisioned'), lambda ds: ds[1]['backing'].pop('eagerlyScrub'),
+            lambda ds: ds[1]['backing'].pop('sharing'),
             lambda ds: ds[1]['backing'].update(sharing='sharingMultiWriter'),
             lambda ds: ds[1]['backing'].update(parent={'uuid': 'snapshot'}),
             lambda ds: ds[1]['backing'].update(fileName='[fixture-ds] ../escape.vmdk')]
