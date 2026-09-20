@@ -27,8 +27,11 @@ Use [native readback](NATIVE_READBACK.md) with the exact accepted object/task ID
 expected configuration/version tokens. It must observe the intended target and
 operation, not a resource with a similar display name. Do not fill expected values
 from the same unreviewed response being tested. Missing task IDs or incomplete
-entity coverage require native-owner investigation; this release has no discovery
-or speculative resend capability.
+entity coverage require native-owner investigation. The bounded
+[vSphere task-tree profile](implementation/automation/vsphere-readback.md) queries
+child history only for accepted task IDs and requires the exact accepted child
+set. It does not adopt unknown tasks or supply general inventory discovery or
+speculative resend capability.
 
 NSX configuration reads bracket realization status. Nutanix task reads bracket
 resource reads. Stable samples strengthen attribution, but they are not a native
@@ -48,6 +51,16 @@ fencing and quarantine, plus current containment. They need genuine native-owner
 and operating evidence. This tool verifies **record consistency**, not signatures,
 actual fencing or approval authenticity. Host clock integrity and artifact-access
 protection remain prerequisites.
+
+Fencing and quarantine must be verified after the attempted operation/latest
+security change and no later than the readback start. If either control was
+verified after sampling began, collect a fresh report under the established
+controls; an older matching snapshot cannot resolve that timing gap.
+
+For a held VMware Terraform workload attempt, use the
+[saved-plan/ledger binding reviewer](implementation/automation/terraform-recovery.md)
+to join these records to the immutable attempt. This additional profile supports
+known existing VM updates only and always preserves the ledger hold.
 
 | Result | Meaning and next accountable action |
 |---|---|

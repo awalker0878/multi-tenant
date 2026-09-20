@@ -43,8 +43,10 @@ The [restricted platform lifecycle](docs/implementation/automation/platform-life
 now includes owned Nutanix Flow service bootstrap/withdrawal and exact-plan checks.
 [Flow snapshots](docs/implementation/automation/nutanix-flow-readback.md) bind policy,
 category and VPC evidence to AHV guest campaigns. [vSphere readback](docs/implementation/automation/vsphere-readback.md)
-adds VM/device/placement snapshots and exact recorded task observations alongside
-NSX campaigns. Live commissioning, effective enforcement, complete fenced native
+adds VM/device/placement snapshots and bounded task-tree/child-history observations
+alongside NSX campaigns. [Held-attempt review](docs/implementation/automation/terraform-recovery.md)
+binds those observations to the saved plan and durable ledger without releasing it.
+Live commissioning, effective enforcement, complete fenced native
 reconciliation and HA/application recovery qualification remain open.
 
 ## Local review

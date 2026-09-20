@@ -19,6 +19,8 @@ must not predate the attempt. The interrupted-change context must name the exact
 binary saved-plan digest, attempted generation/time and original change reference.
 Its current generation, genuine native writer-fence, quarantine and incident
 containment evidence still determine the triage result.
+Verify fencing and quarantine before starting readback; a control observation
+that postdates the report's start requires fresh native sampling.
 
 ```sh
 python3 tools/terraform_recovery_review.py \

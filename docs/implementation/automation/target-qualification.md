@@ -94,9 +94,12 @@ authority. Credentials are injected only into their own collector process.
 
 The vSphere manifest must cover exactly the BIOS UUIDs in the owned workload
 outputs, share NSX's operation, portable tenant/WSD and engineering/target
-references, and expect powered-on VMs with connected NICs. Both the VM snapshot
-and exact-task profile are supported; choosing a snapshot does not claim task
-completion. The runner collects NSX and vSphere evidence before and after probes
+references, and expect powered-on VMs with connected NICs. VM snapshot, exact-task
+and bounded task-tree/history profiles are supported; choosing a snapshot does
+not claim task completion. The history profile additionally creates, reads and
+destroys session-local filtered collectors through fixed POST methods. Accept
+that capability and the observer's task visibility in the campaign authority.
+The runner collects NSX and vSphere evidence before and after probes
 and binds both report hashes. Task failure or VM drift holds the campaign.
 
 The scope reference must independently establish the managed-object/UUID and

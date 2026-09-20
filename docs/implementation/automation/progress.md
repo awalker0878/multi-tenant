@@ -125,6 +125,29 @@ guest-bootstrap writer, composite lifecycle reconciliation, actual site services
 and native acceptance work remain open. See the
 [updated commissioning runbook](site-commissioning.md).
 
+## vSphere task-tree and held-attempt recovery increment
+
+Small commits in PR #46 extend the existing observers and executor evidence:
+
+| Capability | Implemented behavior | Remaining boundary |
+| --- | --- | --- |
+| Task witnesses | Offline review recomputes exact task outcomes and chronology from selected native fields; fault/result text is excluded | Accepted operation/task mapping and authentic native evidence remain external |
+| Bounded task trees | Exact ancestry and child-history sets checked before/after VM reads; filtered session collectors are paginated and destroyed; missing/extra/pending/failed children hold | Installed history visibility/retention, clone/result-bearing and cross-entity workflows, future or unrelated work and actual native fencing |
+| Held Terraform attempt review | Known existing VM updates bound to exact saved-plan bytes, sealed scope/origin, immutable attempt and current ledger head; separate private packet preserves the hold | Unknown creates/replacements/deletes need ownership reconciliation; no adoption, replay or ledger release is supplied |
+| Recovery control chronology | Fencing and quarantine observations must precede readback; later controls require a fresh report | Genuine native exclusion and containment must be established through their owners |
+
+Local verification passed 1,544 Python/source tests with no skips and 80
+route/model checks. HTTPS/history and attempt-ledger fixtures remain synthetic.
+The implementation revision `799ab90` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35520842368)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35520842351).
+Subsequent revisions require their own exact PR checks.
+No live infrastructure was contacted or changed, and no native acceptance index
+was populated. The fenced power/guest-bootstrap owner, full operation-wide native
+reconciliation, actual commissioning and live HA/security/recovery remain open.
+See [vSphere readback](vsphere-readback.md) and
+[held-attempt recovery](terraform-recovery.md) for the supported limits.
+
 ### Recorded verification
 
 The OpenStack lifecycle/readback revision `c11b09a` passed
@@ -163,9 +186,9 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/exact-task and NSX evidence in v5. Qualify installed APIs, complete composite/VM/Flow task coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
-| W17 | Blocked on native coordinator/fencing interfaces | Implement actual cross-writer fencing, native task tracking, late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
-| W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds and receipt handoffs are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
+| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/exact-task/task-tree and NSX evidence in v5. Qualify installed APIs and history visibility, complete clone/result-bearing/VM/Flow task coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
+| W17 | Partial reconciliation evidence; native fencing blocked | Task witnesses, bounded vSphere child history and existing-VM attempt binding are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
+| W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector in restricted campaigns for all three exact installed tuples, complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
 | W21 | Operational integration open | Connect scheduled drift/health/capacity checks to selected observers and alerting, classify emergency/security/unknown drift, and exercise owned incident containment/release. Guest convergence is not a platform drift service. |

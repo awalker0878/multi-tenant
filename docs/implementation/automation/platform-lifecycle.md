@@ -83,7 +83,10 @@ drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-read
 alongside actual network/VM task evidence. For VMware use
 [vSphere VM/task readback](vsphere-readback.md) and campaign v5. Snapshot matches
 cannot resolve an uncertain native operation; the task reader observes only exact
-recorded tasks and never clears an execution ledger or authorizes replay. No live platform
+recorded tasks, with an optional bounded child-history check, and never clears an
+execution ledger or authorizes replay. The [held-attempt reviewer](terraform-recovery.md)
+binds existing-VM observations to the exact saved plan and current durable hold.
+No live platform
 is contacted by provider mocks, synthetic plans or the local HTTPS fixtures.
 
 On failure, withdraw the separately owned edge exposure first. Prepare and review
@@ -103,8 +106,8 @@ enforcement or failure recovery.
 Remaining vSphere integration includes a separately fenced, data-preserving
 power/guest-bootstrap owner, complete native task coverage for composite clone
 and reconfiguration workflows, cross-system NIC/NSX membership evidence, and
-operation-wide reconciliation with the durable ledger. The new GET readers do
-not supply these write/fencing interfaces. Keep the NSX containment and reviewed
+operation-wide reconciliation and authorized ledger recovery. The observers and
+reviewer do not supply these write/fencing interfaces. Keep the NSX containment and reviewed
 operator hold points until those capabilities and their live behavior are accepted.
 
 Interfaces checked against the pinned provider sources:

@@ -107,14 +107,20 @@ or installed compatibility claim is made. [U3–U6]
 
 ## Transport and evidence protections
 
-The transport is GET-only through an exact generated path allowlist and a canonical
-HTTPS origin. It verifies the server certificate/hostname and rejects redirects,
+The base profiles use GET-only access through an exact generated path allowlist
+and a canonical HTTPS origin. The separate vSphere task-tree profile adds bounded
+session-collector POSTs for filtered history creation, page reads and cleanup;
+it supplies no infrastructure mutation interface. All profiles verify the server
+certificate/hostname and reject redirects,
 foreign response links, environment proxies and credentials embedded in an origin.
-It does not create a session cookie or request credential renewal. The new clients
-use task-scoped Basic credentials over TLS because that is the selected candidate
-profile; stronger or different authentication requires an explicit integration.
+They do not create a login session or request credential renewal. The original
+NSX/Nutanix profiles use task-scoped Basic credentials over TLS; vSphere uses an
+independently issued VI session. Profile-specific authentication must be accepted
+for the installed target.
 
-Replies must be HTTP 200 JSON objects. Duplicate JSON keys, nonfinite numbers,
+GET replies must be HTTP 200 JSON objects. The vSphere history profile additionally
+accepts bounded JSON arrays for pages and strict HTTP 204 collector cleanup.
+Duplicate JSON keys, nonfinite numbers,
 ambiguous framing, unsupported content encoding, weak/ambiguous ETags, oversized
 bodies, truncated content, credential-shaped input and malformed nested data are
 rejected. HTTP 404 is unknown, not deletion evidence. Error text and actual values
@@ -122,13 +128,14 @@ are not echoed into diagnostic reasons. Revision/hash comparisons do not grant
 permission to rewrite the resource.
 
 Default limits: 20 resources, 3 rounds (2–10 supported), 0.2-second inter-round pause,
-5-second socket timeout, 60-second overall cooperative budget, 400 GET ceiling and
+5-second socket timeout, 60-second overall cooperative budget, 400 request ceiling and
 2 MiB body ceiling. These are implementation bounds, **not government-mandated
 thresholds**. Remaining read time is applied to the live TLS socket, including
 Connection:close responses. The operating system's hostname-resolution call is
 not forcibly interrupted by that budget; use approved DNS and an execution-level
 deadline for native runs. A slow-body regression proves the response-read budget,
-not all resolver failure behavior.
+not all resolver failure behavior. The vSphere history profile uses a 120-second
+transport budget with its additional documented page/entry bounds.
 
 The output path is created exclusively, without following a symlink, mode0600. An
 initial incomplete record is written before contact; output is flushed and synced.

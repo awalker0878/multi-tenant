@@ -93,6 +93,14 @@ are separate applies: enable only independently accepted restricted service path
 then collect native observations and controlled guest evidence. No cross-scope
 atomicity or Flow enforcement is inferred from a successful Terraform apply.
 
+For the vSphere task-tree profile, accept native task-history visibility,
+retention, supported ancestry/operation shapes and session-collector permissions
+on the installed tuple. Exercise missing/extra children, incomplete pages and
+collector cleanup failure. Bind interrupted existing-VM attempts through the
+[recovery reviewer](terraform-recovery.md); it preserves the original ledger hold.
+Establish actual native writer exclusion and quarantine before collecting recovery
+readback. A local lock or later verification record cannot supply that exclusion.
+
 Retain the exact task trails, native revision/ETag evidence, failed observations,
 healthy denial controls and accepted cross-system bindings. Perform actual HA,
 same-host/bypass/security, withdrawal and application-consistent recovery tests

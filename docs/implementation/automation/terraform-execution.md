@@ -116,6 +116,12 @@ approved reconciliation and controlled ledger recovery must be integrated with
 the selected platform/change service before unattended execution. There is no
 automatic command to clear an uncertain record. Do not delete a ledger to retry.
 
+The [vSphere held-attempt reviewer](terraform-recovery.md) can bind current native
+task-tree observations to the exact saved plan, known existing VM identities and
+current immutable attempt records. It writes a separate private packet under the
+existing executor lock and leaves every ledger byte unchanged. Creates, replacements,
+deletes and unknown identities require separate ownership/adoption reconciliation.
+
 ## Delivery boundary
 
 This increment supplies restricted plan/apply execution and durable attempt
