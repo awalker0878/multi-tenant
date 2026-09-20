@@ -85,7 +85,9 @@ alongside actual network/VM task evidence. The optional
 to recorded Prism tasks in campaigns v3/v4 and offline review. It does not observe
 unlisted competing work or clear a held execution. The separate
 [AHV activity reader](nutanix-vm-activity-readback.md) adds bounded exact-VM queries
-for visible pending/late-completed tasks and holds unlisted work. For VMware use
+for visible pending/late-completed tasks and holds unlisted work. The
+[Flow activity reader](nutanix-flow-activity-readback.md) adds the corresponding
+recorded-task and visible-policy coverage to campaign v4. For VMware use
 [vSphere VM/task readback](vsphere-readback.md) and campaign v5, or
 [campaign v6/v7](vmware-network-binding.md) for observed NSX-backed portgroup/segment
 associations and, in v7, exact port occupants, connection cookies and host/runtime
@@ -98,7 +100,10 @@ replay. The [held-attempt reviewer](terraform-recovery.md)
 binds existing-VM observations to the exact saved plan and current durable hold,
 comparing supported vSphere CPU/memory/topology configuration, unchanged retained
 disks and planned NIC/native port attachments, or the sealed AHV
-power/NIC lifecycle and retained disk/placement identities. Other updates hold;
+power/NIC lifecycle and retained disk/placement identities. It also binds sealed
+Flow domain bootstrap/withdrawal plans, exact policy/category/VPC and retained
+deny IDs, with generated service-rule IDs only where explicitly computed in the
+original plan. Other updates hold;
 historical AHV transition review never renews apply authority or releases the ledger.
 vSphere receipt review requires fresh attachment witnesses alongside task activity,
 both collected after fence/quarantine verification. It supports the current

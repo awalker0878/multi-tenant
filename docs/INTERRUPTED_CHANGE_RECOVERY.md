@@ -53,6 +53,12 @@ since the attempt. Offline review recomputes complete pages, counts, selected
 task fields and agreement with direct GETs. Extra or incomplete activity holds;
 it does not establish native writer exclusion or complete inventory visibility.
 
+The [Flow task/activity profile](implementation/automation/nutanix-flow-activity-readback.md)
+applies the same bounded Prism activity checks to exact owned policies, with
+strong-ETag policy snapshots and a full-shape verdict. Mixed policy/category/VPC
+operations remain outside its scope. A matching snapshot cannot hide pending,
+failed or extra work, or substitute for live enforcement/fencing evidence.
+
 ## Review the three records together
 
 The [offline reviewer](../tools/recovery_review.py) consumes the accepted manifest,
@@ -93,6 +99,14 @@ member inputs and the original attempt window. Historical validity is evaluated
 at attempt time; expired authority cannot be used for a new apply. Unsupported
 changes, creation/adoption or incomplete bindings hold. Every review leaves all
 ledger records intact and grants no recovery action or activation authority.
+
+For a held Nutanix domain attempt, the reviewer also supports existing Flow
+service bootstrap/withdrawal with the explicit policy activity profile. It binds
+the sealed transition and exact prior policy/category/VPC identities, service
+intent and retained deny IDs to the original saved plan and immutable attempt.
+Only explicitly computed new service-rule IDs may be unknown in that plan.
+Unrelated domain resources must be resolved no-ops. No new policy/state adoption,
+ledger release or replay authority is created.
 
 | Result | Meaning and next accountable action |
 |---|---|

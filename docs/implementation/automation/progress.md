@@ -381,6 +381,45 @@ Fenced vSphere power, full native reconciliation/adoption, actual commissioning
 and live HA/security/application recovery remain open. No live infrastructure
 or native acceptance index was changed.
 
+## Flow policy activity and held lifecycle review increment
+
+The explicit [Flow activity profile](nutanix-flow-activity-readback.md) adds recorded
+Prism tasks and bounded per-policy queries around strong-ETag snapshots. It reuses
+the tested entity-activity checks: all pending work, terminal work completed since
+the original attempt, complete bounded pages/counts, exact affected policies and
+agreement with direct task GETs. Extra, omitted, changed, pending or failed work
+holds. Campaign v4 selects the bound Flow profile without downgrading and retains
+all network/AHV/domain/category/VPC ownership and combined report-hash bindings.
+
+Both Flow readers now retain policy/ETag hashes and a full native-shape verdict.
+Offline review checks these alongside task/activity witnesses; contradictory
+summaries cannot hide a native selector omitted from the expected projection.
+Reports without the new witnesses must be recollected. Consistency checks do not
+authenticate a collector or prove effective enforcement.
+
+The [held-attempt reviewer](terraform-recovery.md) now binds existing Nutanix domain
+service bootstrap/withdrawal to the sealed transition, inputs, saved plan and
+immutable attempt. It requires exact policy/category/VPC/name/service intent and
+retained deny IDs. Only explicitly computed new service-rule IDs may be unknown;
+unrelated domain resources must be resolved no-ops. Unknown policy identities,
+security fields, adoption, replacements, deletes and partial coverage hold.
+Historical transition validity does not renew current apply authority. Every
+review preserves all ledger bytes and grants no mutation or activation authority.
+
+Local verification passed 1,763 Python/source tests without skips and 80 route/model
+checks. Repository/documentation checks passed with 11,062 active links and no
+issues. New scripted TLS/CLI tests cover task failures/pending/extra activity,
+policy shape and ETag contradictions, offline witness tampering, actual campaign
+child dispatch, sealed artifacts, retained/generated rule IDs, sorted service
+insertions, historical validity and ledger preservation. Hosted engine results
+belong to the final published revision's PR checks; fixtures are not native acceptance.
+
+Installed API/query/RBAC/retention, actual provider default/rule-ID behavior,
+policy enforcement/precedence and cross-writer fencing remain unqualified.
+Fenced vSphere control, operation-wide native reconciliation/adoption, actual site
+commissioning and live HA/security/application recovery remain open. No live
+infrastructure or native acceptance index was changed.
+
 ## Package disposition and next concrete work
 
 “Partial” credits delivered code or retained functionality, not operational acceptance. “Blocked” identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
@@ -402,8 +441,8 @@ or native acceptance index was changed.
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV snapshot, recorded VM/task graph or visible VM activity plus network/Flow evidence in v3/v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5; selected member-to-portgroup-to-segment associations in v6 and exact port occupants/cookies/host/runtime in v7. Qualify installed APIs, query/count semantics, history/activity, realized entities and port visibility; complete remaining task/entity/Flow coverage, effective DFW membership and unsupported network realizations. Do not infer task completion from snapshots or Terraform success. |
-| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded AHV recorded-task/activity review, bounded vSphere child history, visible existing-VM and clone source/destination activity, and held-attempt plan bindings for supported vSphere configuration/devices/native port attachments and AHV power/NIC lifecycle are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Review preserves all ledger holds. Serial Ansible and Terraform state locks do not fence native tasks. |
+| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV snapshot, recorded VM/task graph or visible VM activity plus network evidence in v3/v4; explicit Flow snapshot or policy/task/activity evidence in v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5; selected member-to-portgroup-to-segment associations in v6 and exact port occupants/cookies/host/runtime in v7. Qualify installed APIs, query/count semantics, history/activity, realized entities and port visibility; complete remaining task/entity/Flow coverage, effective DFW membership and unsupported network realizations. Do not infer task completion from snapshots or Terraform success. |
+| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded AHV and Flow recorded-task/activity review, bounded vSphere child history, visible existing-VM and clone source/destination activity, and held-attempt plan bindings for supported vSphere configuration/devices/native port attachments, AHV power/NIC lifecycle and Flow domain service transitions are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Review preserves all ledger holds. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector in restricted campaigns for all three exact installed tuples, complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |

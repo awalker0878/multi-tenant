@@ -79,7 +79,8 @@ initialization, HA and retained-data recovery remain separate native obligations
 
 For the owned Nutanix service policy use `hosting-target-campaign/4`. It extends
 version 3 with two more bound assets: `flow_manifest` for the
-[Flow snapshot reader](nutanix-flow-readback.md), and `domain_outputs` from the
+[Flow snapshot reader](nutanix-flow-readback.md) or explicit
+[Flow task/activity reader](nutanix-flow-activity-readback.md), and `domain_outputs` from the
 successful domains execution receipt. All three observers use the same Prism
 origin, credentials, CA, operation and accepted scope. The Flow manifest must
 enumerate every owned domain policy exactly once, with the output category and
@@ -89,9 +90,11 @@ prevent substituting a matching policy that does not cover the tested workload.
 
 Version 4 collects network/task, AHV and Flow reports both before and after
 traffic. The combined digest binds all three reports; each child keeps its own
-120-second budget. It still does not establish precedence against policies
-outside the owned set, effective enforcement, complete category membership across
-the site, Flow task completion or HA/recovery. Preserve independent native policy
+120-second budget. The bound profile selects the Flow child with no fallback.
+The activity profile checks its recorded tasks and bounded visible policy work;
+the snapshot profile makes no task-completion claim. Neither establishes
+precedence against policies outside the owned set, effective enforcement, complete
+category membership across the site, operation-wide task coverage or HA/recovery. Preserve independent native policy
 and counter evidence alongside the controlled guest probes. Do not downgrade to
 an earlier campaign version to bypass a failed policy observation.
 

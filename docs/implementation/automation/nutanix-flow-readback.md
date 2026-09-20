@@ -43,3 +43,10 @@ Repository TLS fixtures test serialization and refusal behavior; they do not
 qualify an installed Prism/Flow version. Commissioning must still bind policy
 ownership and category membership, prove allowed service traffic and cross-domain
 denials with healthy controls, test withdrawal, and retain live recovery evidence.
+
+The separate [Flow task/activity profile](nutanix-flow-activity-readback.md) brackets
+these policy reads with recorded Prism tasks and visible policy activity. It
+supports campaign v4 and held existing-domain lifecycle review. The original
+snapshot profile remains task-free. Both profiles now retain selected policy/ETag
+hashes and the full-shape verdict for offline consistency checks; older reports
+without these witnesses require recollection.

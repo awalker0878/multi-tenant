@@ -1,7 +1,7 @@
-# Review a held Terraform workload attempt
+# Review a held Terraform native attempt
 
 `tools/terraform_recovery_review.py` joins the saved execution evidence, current
-durable ledger head and supported vSphere or AHV VM activity observations.
+durable ledger head and supported vSphere/AHV VM or Flow policy activity observations.
 It writes an immutable private review packet. It never clears the ledger, runs
 Terraform, changes native infrastructure or authorizes replay.
 
@@ -121,6 +121,33 @@ The context must bind the binary saved-plan digest, attempted generation/time
 and original change reference. Current containment, real native fencing and
 quarantine still govern the recomputed triage result.
 
+## Existing Flow service lifecycle
+
+For a Nutanix domain attempt, use the explicit
+[Flow task/activity profile](nutanix-flow-activity-readback.md). It requires policy
+snapshots, recorded Prism tasks and complete bounded visible activity, with the
+same original-attempt window and current independent controls as AHV recovery.
+The sealed `transition.json` must describe bootstrap or return to `prepared` for
+existing owned policies. The reviewer binds its historical validity, scope,
+member inputs, prior policy/category/VPC IDs and the saved rule-only plan.
+
+Every policy must retain its known native ID and module-derived name. Type,
+ENFORCE state, VPC scope, category, hit logging, disabled IPv6 bypass, both deny
+rules and exact sorted service intent must match the native expectations. The
+original deny IDs and any retained service IDs must be known and unchanged.
+A new service-rule ID can be observed where the original plan explicitly marks
+only that computed ID unknown. This does not adopt a new policy into state.
+Known service IDs must match; unresolved security fields and contradictory masks
+hold. Existing category/VPC/subnet resources may occur only as exact resolved
+no-ops. Other mutations, imports, moved addresses, replacements, deletes and
+partial policy coverage require separate engineering/ownership reconciliation.
+
+Selected mappings follow the pinned
+[Flow provider resource](https://github.com/nutanix/terraform-provider-nutanix/blob/v2.4.2/nutanix/services/networkingv2/resource_nutanix_network_security_policies_v2.go).
+Other unchanged provider settings keep their independent baseline requirements.
+Actual installed defaults and task/entity/query semantics still need qualification.
+Historical review does not renew apply authority or release the ledger.
+
 ## Private review packet
 
 For vSphere, supply the VM/task and native attachment evidence:
@@ -137,12 +164,12 @@ python3 tools/terraform_recovery_review.py \
   --output /private/operator/new-recovery-review.json
 ```
 
-For AHV, use the same command with its activity manifest/report and **omit both
-network options**. vSphere attachment inputs cannot qualify an AHV attempt.
+For AHV or Flow, use the same command with its activity manifest/report and
+**omit both network options**. vSphere attachment inputs cannot qualify Nutanix.
 
 All inputs must be owner-only private artifacts. The new output must be outside
 the repository, bundle and ledger. The tool checks sealed input/backend/plan
-bytes (and the AHV lifecycle artifact), scope, native VM coverage, current held
+bytes (and the Nutanix lifecycle artifact), scope, native object coverage, current held
 head, immutable start/result records and context/report bindings. It takes the
 existing local executor lock while reading and writing the separate review packet, refuses a concurrent
 executor and rechecks the head. This lock makes the local review consistent; it

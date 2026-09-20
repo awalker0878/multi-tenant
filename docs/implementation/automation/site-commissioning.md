@@ -260,3 +260,30 @@ Retain the exact task trails, native revision/ETag evidence, failed observations
 healthy denial controls and accepted cross-system bindings. Perform actual HA,
 same-host/bypass/security, withdrawal and application-consistent recovery tests
 on the intended site. Current fixtures and provider mocks do not close those gates.
+
+## Flow task/activity and held-domain review qualification
+
+Qualify the [Flow activity profile](nutanix-flow-activity-readback.md) independently
+of the AHV profile, using actual policy task IDs and labels from the writer trail.
+Confirm microseg v4.2/Prism v4.3 compatibility, exact entity/status/completion filter
+support, `extId` ordering, filtered totals/page completeness, cross-writer RBAC
+visibility and retention. Prove that the installed task graph covers only the
+selected policy set; category/VPC/VM side effects need separate reconciliation.
+
+| Native case | Required observation or hold |
+| --- | --- |
+| Successful recorded update with stable exact policy and ETag | Two stable matching rounds; no enforcement or activation claim |
+| Recorded child pending, failed, missing, truncated or foreign | Preserve pending/failure/uncertain hold |
+| Old pending task or unrecorded recently completed work | Additional activity holds even when the reviewed policy matches |
+| Hidden/expired activity, unsupported query or inconsistent totals/order | Keep the target unqualified; never substitute snapshot-only recovery |
+| Alternate native selector outside the expected projection | Policy shape holds; rehashed MATCH summary cannot remove the failed verdict |
+| Held bootstrap or service withdrawal | Bind actual sealed transition/plan/attempt and known retained deny IDs; preserve every ledger byte |
+| New computed service-rule ID | Original plan explicitly marks only that new ID unknown; accepted policy/service semantics and all retained IDs still match |
+| Missing accepted native fence or live quarantine proof | Keep recovery held and establish controls through their owners |
+
+Use controlled guest traffic with healthy controls to qualify allowed services,
+cross-domain and same-host denials, policy precedence and withdrawal. Exercise
+lost replies and late tasks under the accepted native fencing mechanism. Compare
+actual generated rule IDs/provider defaults to the saved plan and retain the
+private review packet. Synthetic TLS/plan tests do not supply these results or
+prove HA, retained-data/application recovery or production readiness.

@@ -111,6 +111,11 @@ existing AHV power/NIC lifecycle attempts while preserving the ledger hold.
 Installed query semantics, retention and cross-writer visibility require native
 qualification; these observations still provide no native fencing. Each
 profile's exact coverage and task limitations are documented separately.
+The [Flow task/activity profile](implementation/automation/nutanix-flow-activity-readback.md)
+adds recorded policy tasks and bounded visible policy activity to campaign v4
+and held existing-domain lifecycle review. Offline review checks policy/ETag
+hashes and the full native shape verdict as well as task/activity witnesses.
+Actual enforcement and cross-writer fencing remain independently required.
 The vSphere clone activity profile additionally observes visible work on both
 accepted template sources and result VMs, without clone submission, state adoption
 or native writer fencing.
