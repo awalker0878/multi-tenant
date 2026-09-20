@@ -22,6 +22,8 @@ class AttemptRecoveryTests(unittest.TestCase):
         self.m = manifest('https://vc.example.test')
         inputs = json.loads((r.ROOT / 'terraform/stacks/wsd/vmware/workloads/inputs.tfvars.json.example').read_text())
         inputs.update(allow_restricted_build=True, test_authorization_ref='FIXTURE', platform_endpoint='vc.example.test')
+        inputs['members']['processor-01']['resource_pool_id'] = 'resgroup-1'
+        self.m['resources'][0]['expected']['config']['name'] = 'processor-01'
         _, scope, state_key = select_scope(r.ROOT, 'vmware-wsd-workloads', inputs)
         self.m.update(tenant_id=scope['tenant_key'], scope_id=scope['wsd_key'])
         backend = dict(state_key=state_key, address='https://state.example.test/fixture', lock_address='https://state.example.test/fixture/lock',
@@ -29,10 +31,12 @@ class AttemptRecoveryTests(unittest.TestCase):
         self.folder = self.ledger / digest(backend['address'].encode()); self.folder.mkdir(mode=0o700)
         write_new(self.folder / 'writer.lock', b'')
         identity = self.m['resources'][0]['expected']['config']['uuid']
+        after = dict(id=identity, name='processor-01', num_cpus=2, num_cores_per_socket=1, memory=4096, resource_pool_id='resgroup-1',
+                     firmware='efi', network_interface=[{'network_id': 'accepted-external-binding'}])
         self.plan = dict(format_version='1.2', complete=True, resource_changes=[dict(
             address='module.owned.module.member["processor-01"].vsphere_virtual_machine.workload', type='vsphere_virtual_machine',
             mode='managed', provider_name='registry.terraform.io/hashicorp/vsphere',
-            change=dict(actions=['update'], before={'id': identity}, after={'id': identity}, after_unknown={}))])
+            change=dict(actions=['update'], before=deepcopy(after) | dict(num_cpus=1), after=after, after_unknown={}))])
         values = {'inputs.json': encoded(inputs), 'backend.json': encoded(backend), 'plan.json': encoded(self.plan), 'saved.tfplan': b'FIXTURE-NOT-TERRAFORM'}
         self.bundle = dict(format='hosting-terraform-bundle/1', status='AWAITING_EXACT_PLAN_REVIEW', catalog_id='vmware-wsd-workloads',
                            scope=scope, state_key=state_key, operation_id=self.m['operation_id'], generation=4,
@@ -92,6 +96,37 @@ class AttemptRecoveryTests(unittest.TestCase):
         report = self.run_review()
         self.assertEqual(report['triage']['result'], 'HOLD_WRITER_NOT_FENCED')
         self.assertEqual(load_private(self.folder / 'head.json'), self.head)
+    def test_matching_uuid_cannot_hide_different_planned_configuration(self):
+        inputs = load_private(self.operation / 'inputs.json')
+        for field, value in [('name', 'another-vm'), ('num_cpus', 8), ('num_cores_per_socket', 2), ('memory', 8192),
+                             ('resource_pool_id', 'resgroup-2'), ('num_cpus', True)]:
+            m = deepcopy(self.m); plan = deepcopy(self.plan)
+            plan['resource_changes'][0]['change']['after'][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError): r.bind_plan(plan, inputs, m)
+        m = deepcopy(self.m); m['resources'][0]['expected']['config']['hardware']['numCPU'] = 8
+        with self.assertRaises(ValueError): r.bind_plan(self.plan, inputs, m)
+    def test_unobserved_changes_unknowns_and_adoption_do_not_get_review_packet(self):
+        inputs = load_private(self.operation / 'inputs.json')
+        for mutate in (lambda p: p['resource_changes'][0]['change']['after'].update(firmware='bios'),
+            lambda p: p['resource_changes'][0]['change']['after']['network_interface'][0].update(network_id='foreign'),
+            lambda p: p['resource_changes'][0]['change']['after_unknown'].update(memory=True),
+            lambda p: p['resource_changes'][0]['change']['after_unknown'].update(memory=1),
+            lambda p: p['resource_changes'][0]['change']['after_unknown'].update(network_interface=[{'network_id': True}]),
+            lambda p: p['resource_changes'][0]['change'].update(actions=['no-op']),
+            lambda p: p['resource_changes'][0].update(previous_address='another-address'),
+            lambda p: p['resource_changes'][0]['change'].update(importing={'id': 'foreign'}),
+            lambda p: p.update(resource_drift=[{'type': 'vsphere_virtual_machine'}])):
+            plan = deepcopy(self.plan); mutate(plan)
+            with self.assertRaises(ValueError): r.bind_plan(plan, inputs, self.m)
+    def test_known_native_metadata_must_match_and_computed_revision_may_be_unknown(self):
+        inputs = load_private(self.operation / 'inputs.json')
+        for key, value in [('moid', 'vm-2'), ('uuid', 'foreign'), ('change_version', 'foreign'), ('power_state', 'off')]:
+            plan = deepcopy(self.plan); change = plan['resource_changes'][0]['change']
+            change['before'][key] = value; change['after'][key] = value
+            with self.assertRaises(ValueError): r.bind_plan(plan, inputs, self.m)
+        plan = deepcopy(self.plan); change = plan['resource_changes'][0]['change']
+        change['before']['change_version'] = 'old'; change['after_unknown']['change_version'] = True
+        self.assertEqual(len(r.bind_plan(plan, inputs, self.m)), 1)
 
 
 if __name__ == '__main__': unittest.main()

@@ -12,6 +12,20 @@ must cover those same UUIDs. Unknown creates, replacements, deletes, extra manag
 resource types and partial identity coverage require separate ownership/adoption
 reconciliation; do not substitute guessed IDs to obtain a review result.
 
+The reviewer compares planned name, vCPU count, cores per socket, memory in MB
+and resource-pool MoID with the accepted native expectations and sealed member
+inputs. This profile permits only CPU/memory/topology updates; other requested
+changes, unresolved values, drift, moved addresses and adoption hold. Known
+native MoID/UUID/revision/power metadata must agree when present. A computed
+revision may be unknown in the plan; independent current readback still requires
+an accepted exact revision. Matching VM UUIDs alone is insufficient.
+
+Disk/NIC/firmware and other unchanged settings remain subject to their independent
+native baseline and ownership evidence. This profile does not translate the full
+provider schema or establish NSX/network associations. The separate clone-tree
+observer can collect result/source evidence, but cannot use this existing-VM
+review path to adopt a newly created resource.
+
 Preserve the original bundle and shared durable ledger. Prepare current task-tree
 and child-history observations with the original operation ID, portable tenant/WSD,
 native provider origin and accepted independent target bindings. Task queue times

@@ -10,15 +10,52 @@ if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().pa
 from tools import readback_core as c, recovery_review, vsphere_task_tree_observe as tree
 from tools.run_files import digest, encoded, load_private, private_path, read_private, require, write_new, utcnow
 from tools.terraform_run import ROOT, select_scope, backend_settings
+from tools.plan_review import has_true
 
 HELD = {'STARTED_OUTCOME_UNKNOWN', 'HOLD_RECONCILIATION_REQUIRED'}
+OBSERVED_PLAN_FIELDS = {'name', 'num_cpus', 'num_cores_per_socket', 'memory', 'resource_pool_id'}
+UPDATE_FIELDS = {'num_cpus', 'num_cores_per_socket', 'memory'}
+COMPUTED_FIELDS = {'change_version', 'default_ip_address', 'guest_ip_addresses', 'power_state', 'vapp_transport'}
+
+
+def valid_unknown_mask(value):
+    if type(value) is bool: return True
+    if isinstance(value, dict): return all(valid_unknown_mask(x) for x in value.values())
+    if isinstance(value, list): return all(valid_unknown_mask(x) for x in value)
+    return False
+
+
+def bind_configuration(change, resource, member_name, member):
+    """Compare supported planned configuration; hold changes outside this coverage."""
+    before, after, unknown = change['before'], change['after'], change.get('after_unknown', {})
+    require(valid_unknown_mask(unknown), 'Malformed planned unknown mask')
+    require(not any(has_true(value) for key, value in unknown.items() if key not in COMPUTED_FIELDS), 'Unresolved planned configuration')
+    changed = {key for key in set(before) | set(after) if c.digest(before.get(key)) != c.digest(after.get(key))}
+    require(changed <= UPDATE_FIELDS | COMPUTED_FIELDS, 'Update exceeds observed configuration coverage')
+    require(change['actions'] != ['no-op'] or changed <= COMPUTED_FIELDS, 'No-op contradicts planned configuration')
+    expected = resource['expected']; hardware = expected['config']['hardware']
+    values = dict(name=expected['config']['name'], num_cpus=hardware['numCPU'], num_cores_per_socket=hardware['numCoresPerSocket'],
+                  memory=hardware['memoryMB'], resource_pool_id=expected['resourcePool']['value'])
+    require(all(key in after and type(after[key]) is type(value) and after[key] == value for key, value in values.items()), 'Planned configuration differs from native expectations')
+    require(values['name'] == member_name and values['num_cpus'] == member.get('vcpu', 2)
+            and values['memory'] == member.get('memory_gib', 4) * 1024
+            and values['resource_pool_id'] == member['resource_pool_id'], 'Configuration differs from sealed member inputs')
+    known_native = dict(moid=resource['moid'], uuid=expected['config']['uuid'], change_version=expected['config']['changeVersion'],
+                        power_state={'poweredOn': 'on', 'poweredOff': 'off'}[expected['runtime']['powerState']])
+    for key, value in known_native.items():
+        if key in after and not has_true(unknown.get(key)):
+            require(type(after[key]) is str and after[key] == value, 'Known native plan metadata differs')
 
 
 def bind_plan(plan, inputs, manifest):
     """Existing VM IDs only. Unknown creates/replacements need native adoption review."""
     require(plan.get('format_version') == '1.2' and plan.get('complete') is True, 'Complete saved plan required')
+    require(manifest['profile'] == tree.PROFILE, 'Clone results require separate creation/adoption review')
+    require(not plan.get('errored') and not plan.get('deferred_changes') and not plan.get('resource_drift')
+            and all(isinstance(check, dict) and check.get('status') == 'pass' for check in plan.get('checks', [])), 'Unresolved plan evidence')
     changes = plan.get('resource_changes'); require(isinstance(changes, list), 'Saved resource changes required')
-    wanted = {'module.owned.module.member[' + json.dumps(name) + '].vsphere_virtual_machine.workload' for name in inputs['members']}
+    wanted = {'module.owned.module.member[' + json.dumps(name) + '].vsphere_virtual_machine.workload': name for name in inputs['members']}
+    resources = {r['expected']['config']['uuid']: r for r in manifest['resources']}
     actual = {}; ids = set()
     for r in changes:
         require(isinstance(r, dict), 'Resource change object required')
@@ -27,6 +64,7 @@ def bind_plan(plan, inputs, manifest):
                 and r.get('provider_name') == 'registry.terraform.io/hashicorp/vsphere'
                 and r.get('address') in wanted and r['address'] not in actual, 'Unreviewed resource scope')
         change = r['change']; require(isinstance(change, dict), 'Native change object required')
+        require(not r.get('previous_address') and not r.get('deposed') and not change.get('importing'), 'Adoption or moved address requires separate ownership review')
         before, after = change.get('before'), change.get('after')
         require(change.get('actions') in (['no-op'], ['update']) and isinstance(before, dict) and isinstance(after, dict), 'Create/delete/replace requires separate ownership reconciliation')
         identity = before.get('id')
@@ -34,8 +72,11 @@ def bind_plan(plan, inputs, manifest):
         require(isinstance(unknown, dict) and (unknown.get('id') is None or unknown.get('id') is False), 'Unknown VM identity')
         require(isinstance(identity, str) and c.UUID.fullmatch(identity) and after.get('id') == identity
                 and identity not in ids, 'Known unchanged VM identity required')
+        require(identity in resources, 'Native VM absent from accepted observation')
+        name = wanted[r['address']]
+        bind_configuration(change, resources[identity], name, inputs['members'][name])
         ids.add(identity); actual[r['address']] = identity
-    require(set(actual) == wanted and ids == {r['expected']['config']['uuid'] for r in manifest['resources']}, 'Plan and native VM coverage differ')
+    require(set(actual) == set(wanted) and ids == set(resources), 'Plan and native VM coverage differ')
     return actual
 
 
@@ -88,6 +129,7 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
             scope=scope, operation_id=bundle['operation_id'], generation=bundle['generation'], bundle_sha256=digest(bundle_bytes),
             ledger_head_sha256=digest(head_bytes), manifest_sha256=c.digest(manifest), report_sha256=c.digest(report),
             context_sha256=c.digest(context), plan_native_bindings=bound, triage=triage,
+            plan_configuration_fields=sorted(OBSERVED_PLAN_FIELDS),
             ledger_status=head['status'], ledger_released=False, may_apply=False, may_delete=False, may_activate=False)
         write_new(output, encoded(result))
         return result
