@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from tools.compile_wsd import STATE
-from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe
+from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe
 from tools import nsx_segment_observe, vmware_network_binding
 from tools.check_release import verify
 from tools.guest_inventory import build
@@ -128,7 +128,7 @@ def bound_inputs(plan, known_hosts):
 
 
 def ahv_adapter(manifest):
-    adapters = {a.PROFILE: a for a in (nutanix_vm_observe, nutanix_vm_task_observe)}
+    adapters = {a.PROFILE: a for a in (nutanix_vm_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe)}
     require(manifest.get('profile') in adapters, 'Supported explicit AHV observer required')
     return adapters[manifest['profile']]
 

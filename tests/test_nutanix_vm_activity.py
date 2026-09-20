@@ -13,6 +13,9 @@ from lab.native_readback_fixture import Fixture
 from tests import test_nutanix_vm_task_observe as fixtures
 from tests.test_nutanix_vm_observe import manifest as vm_manifest, uid
 from tools import nutanix_vm_activity_observe as a, nutanix_task_tree as tree, readback_core as c
+from tools import recovery_review as rr
+from lab.run_readback_lab import operator_context
+from tests.test_nutanix_task_tree import reseal
 
 
 def manifest(origin='https://pc.example.invalid'):
@@ -158,6 +161,25 @@ class ActivityTests(unittest.TestCase):
     def test_unselected_native_task_text_is_not_exported(self):
         for row in self.page()['data']: row['operationDescription'] = 'PRIVATE-DIAGNOSTICS'
         self.assertNotIn('PRIVATE-DIAGNOSTICS', json.dumps(self.outcome('READBACK_MATCH_NOT_QUALIFIED')))
+
+    def test_offline_recovery_recomputes_activity_and_retains_control_holds(self):
+        report = self.observe(); context = operator_context(self.m, report)
+        context['attempted_at'] = self.m['task']['created_after']
+        self.assertEqual(rr.review(self.m, report, context)['result'], 'READY_FOR_OPERATOR_RECOVERY_REVIEW')
+        context['writer_fence']['state'] = 'UNKNOWN'
+        self.assertEqual(rr.review(self.m, report, context)['result'], 'HOLD_WRITER_NOT_FENCED')
+        context['writer_fence']['state'] = 'VERIFIED'
+        for row in report['history']:
+            row['states'][-1]['activity_witness']['before'][uid(1)][0]['tasks'].clear()
+        reseal(report); context['report_sha256'] = report['content_sha256']
+        self.assertEqual(rr.review(self.m, report, context)['result'], 'HOLD_INVALID_EVIDENCE')
+
+    def test_unrecorded_activity_requires_divergence_review(self):
+        self.f.routes.update(activity_routes(self.m, self.f.routes, [self.extra()]))
+        report = self.observe(); context = operator_context(self.m, report)
+        context['attempted_at'] = self.m['task']['created_after']
+        result = rr.review(self.m, report, context)
+        self.assertEqual(result['result'], 'RECONCILE_DIVERGENCE'); self.assertFalse(result['may_apply'])
 
     def test_cli_is_offline_by_default_then_uses_exact_gets(self):
         with tempfile.TemporaryDirectory() as directory:

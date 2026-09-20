@@ -11,6 +11,7 @@ from tests.test_nutanix_vm_observe import manifest as vm_manifest
 from tests.test_nutanix_task_tree import reseal
 from tests.test_flow_campaign import inputs
 from tests.test_target_campaign import window
+from tests import test_nutanix_vm_activity as activity_fixture
 from tools import nutanix_vm_task_observe as ahv, nutanix_flow_observe as flow
 from tools import nutanix_task_tree as tree, readback_core as c, recovery_review as rr, qualify_target as q
 from tools.guest_inventory import build
@@ -104,7 +105,9 @@ class CampaignTests(unittest.TestCase):
 
     def test_v3_and_v4_real_child_readers_bind_tasks_and_stop_on_pending_or_failed_task(self):
         with Fixture() as service:
-            for version, status, expected in ((3, 'RUNNING', 'HOLD_NATIVE_PENDING'), (4, 'FAILED', 'HOLD_NATIVE_FAILURE')):
+            for version, status, expected, activity in ((3, 'RUNNING', 'HOLD_NATIVE_PENDING', False),
+                    (4, 'FAILED', 'HOLD_NATIVE_FAILURE', False), (3, 'RUNNING', 'HOLD_NATIVE_PENDING', True),
+                    (4, 'FAILED', 'HOLD_NATIVE_FAILURE', True)):
                 with self.subTest(version=version), tempfile.TemporaryDirectory() as tmp:
                     directory = Path(tmp)
                     plan, workload, network, _, _, policy, _ = inputs(service.origin)
@@ -112,7 +115,9 @@ class CampaignTests(unittest.TestCase):
                     if version == 3:
                         for key in q.FLOW_ASSETS: del plan['assets'][key]
                     q.validate(plan); workload = task_manifest(workload)
+                    if activity: workload['profile'] = activity_fixture.a.PROFILE
                     service.routes = network_responses(network) | responses(workload)
+                    if activity: service.routes.update(activity_fixture.activity_routes(workload, service.routes))
                     service.requests = []; service.counts = {}
                     r = policy['resources'][0]
                     service.routes[flow.resource_target(r)] = dict(body={'data': r['expected']}, etag=r['expected_etag'])
@@ -129,6 +134,12 @@ class CampaignTests(unittest.TestCase):
                     self.assertTrue(c.load(directory / 'before-workloads.json')['history'][-1]['states'][0]['task_completion_observed'])
                     flow_reads = service.counts.get(flow.resource_target(r), 0)
                     service.routes[tree.target(CHILD)]['body']['data'].update(status=status, completedTime=None)
+                    if activity:
+                        if status == 'FAILED':
+                            service.routes[tree.target(CHILD)]['body']['data']['completedTime'] = workload['task']['created_before']
+                            # Child completion must precede the successful parent's completion.
+                            service.routes[tree.target(workload['task']['ext_id'])]['body']['data']['completedTime'] = workload['task']['created_before']
+                        service.routes.update(activity_fixture.activity_routes(workload, service.routes))
                     with self.assertRaises(ValueError): q.native_readback(plan, assets, window(), directory, 'after')
                     self.assertEqual(c.load(directory / 'after-workloads.json')['outcome'], expected)
                     self.assertFalse((directory / 'after-flow.json').exists())
