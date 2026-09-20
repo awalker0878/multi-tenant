@@ -67,6 +67,24 @@ hashes. A network task result does not prove VM task completion. The AHV report
 explicitly lacks that claim. Flow policy/precedence, same-host isolation, image
 initialization, HA and retained-data recovery remain separate native obligations.
 
+For the owned Nutanix service policy use `hosting-target-campaign/4`. It extends
+version 3 with two more bound assets: `flow_manifest` for the
+[Flow snapshot reader](nutanix-flow-readback.md), and `domain_outputs` from the
+successful domains execution receipt. All three observers use the same Prism
+origin, credentials, CA, operation and accepted scope. The Flow manifest must
+enumerate every owned domain policy exactly once, with the output category and
+VPC IDs. Each observed VM must belong to exactly one of those domain categories,
+and all its NIC subnets must belong to that policy's observed VPC. These checks
+prevent substituting a matching policy that does not cover the tested workload.
+
+Version 4 collects network/task, AHV and Flow reports both before and after
+traffic. The combined digest binds all three reports; each child keeps its own
+120-second budget. It still does not establish precedence against policies
+outside the owned set, effective enforcement, complete category membership across
+the site, Flow task completion or HA/recovery. Preserve independent native policy
+and counter evidence alongside the controlled guest probes. Do not downgrade to
+an earlier campaign version to bypass a failed policy observation.
+
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.

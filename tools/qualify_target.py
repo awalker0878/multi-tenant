@@ -13,7 +13,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe
+from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
+from tools.compile_wsd import STATE
 from tools.check_release import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
@@ -22,12 +23,13 @@ from tools.run_files import (current_window, digest, encoded, load_private, new_
 ASSETS = {'inventory', 'native_manifest', 'native_credentials', 'native_ca',
           'ssh_key', 'ssh_certificate', 'probe_ca'}
 WORKLOAD_ASSETS = {'workload_manifest', 'workload_token', 'workload_ca'}
+FLOW_ASSETS = {'flow_manifest', 'domain_outputs'}
 ADAPTERS = {'openstack': neutron_observe, 'vmware': nsx_observe, 'nutanix': nutanix_observe}
 
 
 def validate(plan):
     c.exact_keys(plan, {'format', 'scope', 'source_commit', 'origin', 'assets', 'cases'})
-    require(plan['format'] in {'hosting-target-campaign/1', 'hosting-target-campaign/2', 'hosting-target-campaign/3'}, 'Unknown target campaign')
+    require(plan['format'] in {'hosting-target-campaign/1', 'hosting-target-campaign/2', 'hosting-target-campaign/3', 'hosting-target-campaign/4'}, 'Unknown target campaign')
     c.exact_keys(plan['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'})
     for value in plan['scope'].values():
         c.identifier(value)
@@ -35,10 +37,12 @@ def validate(plan):
             'Exact platform and committed source required')
     require(c.origin(plan['origin']) == plan['origin'], 'Canonical native HTTPS origin required')
     extended = plan['format'] == 'hosting-target-campaign/2'
-    ahv = plan['format'] == 'hosting-target-campaign/3'
+    flow = plan['format'] == 'hosting-target-campaign/4'
+    ahv = plan['format'] == 'hosting-target-campaign/3' or flow
     require(not extended or plan['scope']['platform'] == 'openstack', 'Workload readback campaign requires OpenStack')
     require(not ahv or plan['scope']['platform'] == 'nutanix', 'AHV readback campaign requires Nutanix')
-    c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else {'workload_manifest'} if ahv else set()))
+    c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else {'workload_manifest'} if ahv else set())
+                 | (FLOW_ASSETS if flow else set()))
     for asset in plan['assets'].values():
         c.exact_keys(asset, {'path', 'sha256'})
         require(isinstance(asset['path'], str) and Path(asset['path']).is_absolute()
@@ -100,9 +104,13 @@ def bound_inputs(plan, known_hosts):
     else:
         adapter.validate(manifest)
         require(manifest['origin'] == plan['origin'] and manifest['contact_enabled'] is True, 'Native manifest contact differs')
-        if plan['format'] == 'hosting-target-campaign/3':
-            ahv_binding(plan['scope'], c.strict_loads(assets['workload_manifest']),
+        if plan['format'] in {'hosting-target-campaign/3', 'hosting-target-campaign/4'}:
+            workload = c.strict_loads(assets['workload_manifest'])
+            ahv_binding(plan['scope'], workload,
                         variables['hosting_workload_outputs'], access, manifest)
+            if plan['format'] == 'hosting-target-campaign/4':
+                flow_binding(plan['scope'], c.strict_loads(assets['flow_manifest']),
+                             c.strict_loads(assets['domain_outputs']), workload, manifest)
     return assets, access, pins
 
 
@@ -127,6 +135,37 @@ def ahv_binding(scope, manifest, outputs, access, network):
                     and nic['nicNetworkInfo']['subnet']['extId'] in subnets, 'NIC must be connected to an observed subnet')
             addresses.add(nic['nicNetworkInfo']['ipv4Config']['ipAddress']['value'])
         require(access['targets'][name]['address'] in addresses, 'Guest access address differs from accepted AHV NIC')
+
+
+def flow_binding(scope, manifest, outputs, workload, network):
+    nutanix_flow_observe.validate(manifest)
+    require(scope['platform'] == 'nutanix' and manifest['contact_enabled'] is True, 'Enabled Flow observation required')
+    require(all(manifest[key] == network[key] for key in ('origin', 'operation_id', 'tenant_id', 'scope_id',
+            'target_binding_ref', 'engineering_record_ref')), 'Flow and network observation bindings differ')
+    require(manifest['tenant_id'] == scope['tenant_key'] and manifest['scope_id'] == scope['wsd_key'], 'Foreign Flow scope')
+    require(outputs.get('scope', {}).get('value') == scope | {'phase': 'domains'}
+            and outputs.get('delivery_state', {}).get('value') == STATE, 'Domain output scope differs')
+    members = outputs.get('members', {}).get('value')
+    require(isinstance(members, dict) and members, 'Owned domain outputs required')
+    selected = {r['ext_id']: r for r in manifest['resources']}
+    require(set(selected) == {m['quarantine_policy_id'] for m in members.values()}
+            and len(selected) == len(members), 'Every owned domain policy must be observed exactly once')
+    tenants = {r['expected']['tenantId'] for r in network['resources']}
+    require(len(tenants) == 1 and tenants == {r['expected']['tenantId'] for r in selected.values()}, 'Foreign Flow tenant')
+    vpcs = {r['ext_id'] for r in network['resources'] if r['kind'] == 'vpc'}
+    subnets = {r['ext_id']: r['expected']['vpcReference'] for r in network['resources'] if r['kind'] == 'subnet'}
+    categories = {}
+    for member in members.values():
+        r = selected[member['quarantine_policy_id']]
+        require(member.get('delivery_state') == STATE and r['category_id'] == member['security_category_id']
+                and r['vpc_id'] == member['vpc_id'] and r['vpc_id'] in vpcs
+                and r['category_id'] not in categories, 'Foreign or ambiguous Flow ownership')
+        categories[r['category_id']] = r['vpc_id']
+    for resource in workload['resources']:
+        vm = resource['expected']; membership = {x['extId'] for x in vm['categories']} & categories.keys()
+        require(len(membership) == 1, 'Each VM requires exactly one owned domain category')
+        vpc = categories[next(iter(membership))]
+        require(all(subnets.get(n['nicNetworkInfo']['subnet']['extId']) == vpc for n in vm['nics']), 'VM NIC VPC differs from Flow scope')
 
 
 def workload_binding(scope, manifest, outputs, project_id):
@@ -180,10 +219,14 @@ def native_readback(plan, assets, authority, directory, label):
         write_new(directory / (label + '-workloads.json'), encoded(observation))
         require(observation['status'] == 'OBSERVED_MATCH_NOT_QUALIFIED', 'Workload identity, placement or storage readback failed')
         return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': digest(encoded(observation))}))
-    if plan.get('format') == 'hosting-target-campaign/3':
+    if plan.get('format') in {'hosting-target-campaign/3', 'hosting-target-campaign/4'}:
         workload_hash = reader_child(plan, assets, authority, directory, label + '-workloads',
                                      'nutanix_vm_observe.py', 'workload_manifest')
-        return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': workload_hash}))
+        combined = {'network_sha256': network_hash, 'workloads_sha256': workload_hash}
+        if plan['format'] == 'hosting-target-campaign/4':
+            combined['flow_sha256'] = reader_child(plan, assets, authority, directory, label + '-flow',
+                                                   'nutanix_flow_observe.py', 'flow_manifest')
+        return digest(encoded(combined))
     return network_hash
 
 
@@ -292,8 +335,10 @@ def main():
         # Copy only assets the child processes need; API credentials stay in memory.
         for key in ('native_manifest', 'native_ca', 'ssh_key'):
             write_new(directory / key, assets[key])
-        if plan['format'] == 'hosting-target-campaign/3':
+        if plan['format'] in {'hosting-target-campaign/3', 'hosting-target-campaign/4'}:
             write_new(directory / 'workload_manifest', assets['workload_manifest'])
+        if plan['format'] == 'hosting-target-campaign/4':
+            write_new(directory / 'flow_manifest', assets['flow_manifest'])
         write_new(directory / 'ssh_key-cert.pub', assets['ssh_certificate'])
         write_new(directory / 'known_hosts', pins.encode())
         result = {'status': 'HOLD_INCOMPLETE', 'scope': plan['scope'], 'source_commit': source['commit'],
