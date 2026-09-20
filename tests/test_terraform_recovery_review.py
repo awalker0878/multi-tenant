@@ -109,6 +109,15 @@ class AttemptRecoveryTests(unittest.TestCase):
             tree.validate(m); (self.base / 'manifest').write_bytes(encoded(m))
             with self.assertRaisesRegex(ValueError, 'Activity window differs'): self.run_review()
         self.assertFalse((self.base / 'review.json').exists())
+    def test_clone_activity_cannot_enter_existing_vm_review_or_release_ledger(self):
+        from tests.test_vsphere_clone_activity import manifest as clone_manifest
+        m = clone_manifest(self.m['origin'])
+        m.update({k: self.m[k] for k in ('operation_id', 'tenant_id', 'scope_id')})
+        tree.validate(m); (self.base / 'manifest').write_bytes(encoded(m))
+        before = {p.name: p.read_bytes() for p in self.folder.iterdir()}
+        with self.assertRaisesRegex(ValueError, 'clone adoption remains separate'): self.run_review()
+        self.assertFalse((self.base / 'review.json').exists())
+        self.assertEqual(before, {p.name: p.read_bytes() for p in self.folder.iterdir()})
     def test_unrecorded_vm_activity_keeps_attempt_held(self):
         before = {p.name: p.read_bytes() for p in self.folder.iterdir()}
         client = Client(self.m); other = deepcopy(client.activity_rows['vm-1']['completed'][0])

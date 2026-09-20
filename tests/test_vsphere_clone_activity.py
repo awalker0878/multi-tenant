@@ -75,6 +75,22 @@ class CloneActivityTests(unittest.TestCase):
         report = self.observe(); x = context(self.m, report)
         x['attempted_at'] = (c.timestamp(x['attempted_at']) - timedelta(seconds=1)).isoformat()
         self.assertEqual(rr.review(self.m, report, x)['result'], 'HOLD_INVALID_EVIDENCE')
+    def test_successful_clone_does_not_hide_pending_or_failed_destination_work(self):
+        for native, outcome in (('running', 'HOLD_NATIVE_PENDING'), ('error', 'HOLD_NATIVE_FAILURE')):
+            self.client = Client(self.m)
+            row = self.client.activity_rows['vm-1']['completed'].pop()
+            row.update(state=native)
+            if native == 'running': row['completeTime'] = None
+            self.client.routes[task.task_target(self.m['task']['records'][1])] = deepcopy(row)
+            self.client.history = [deepcopy(row)]
+            self.client.activity_rows['vm-1']['pending' if native == 'running' else 'completed'].append(row)
+            self.assertEqual(self.observe()['outcome'], outcome)
+    def test_matching_clone_activity_does_not_substitute_for_fencing_or_quarantine(self):
+        report = self.observe()
+        for control, result in (('writer_fence', 'HOLD_WRITER_NOT_FENCED'), ('quarantine', 'HOLD_QUARANTINE_NOT_VERIFIED')):
+            x = context(self.m, report); x[control]['state'] = 'UNVERIFIED'
+            review = rr.review(self.m, report, x)
+            self.assertEqual(review['result'], result); self.assertFalse(review['may_apply'])
     def test_rehashed_activity_omission_or_foreign_result_cannot_override_summary(self):
         for mutate in (lambda w: w['after'].pop('vm-9'), lambda w: w['after']['vm-9']['completed'].clear(),
             lambda w: w['after']['vm-9']['completed'][0]['result_reference'].update(value='vm-2')):
