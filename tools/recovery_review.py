@@ -14,13 +14,15 @@ import sys
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from tools import readback_core as c
-from tools import nutanix_flow_activity_observe
+from tools import nutanix_flow_activity_observe, nsx_domain_observe
 from tools import nsx_observe, nutanix_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe, vsphere_task_observe, vsphere_task_tree_observe
 
 ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe,'vmware':vsphere_task_observe}
 
 
 def adapter_for(m):
+    if m.get('platform') == 'nsx' and m.get('profile') == nsx_domain_observe.PROFILE:
+        return nsx_domain_observe
     if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_flow_activity_observe.PROFILE:
         return nutanix_flow_activity_observe
     if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_vm_activity_observe.PROFILE:

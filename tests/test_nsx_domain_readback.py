@@ -1,0 +1,73 @@
+from copy import deepcopy
+import json
+import unittest
+from lab.native_readback_fixture import Fixture
+from lab.run_readback_lab import operator_context
+from tests.nsx_domain_fixture import scenario, responses
+from tests.test_nutanix_task_tree import reseal
+from tools import nsx_domain_observe as domain, readback_core as c, recovery_review as rr
+
+
+class DomainReadbackTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls): cls.f = Fixture()
+    @classmethod
+    def tearDownClass(cls): cls.f.close()
+    def setUp(self):
+        _, _, self.m, _ = scenario(self.f.origin)
+        self.f.routes = responses(self.m); self.f.requests = []; self.f.counts = {}; self.f.hook = None
+    def observe(self):
+        client = c.ReadClient(self.f.origin, self.f.origin, 'fixture', 'fixture', domain.targets(self.m), str(self.f.directory/'ca.pem'))
+        return c.observe(self.m, client, domain, interval=0)
+
+    def test_exact_four_object_coverage_is_get_only_and_replayable(self):
+        report = self.observe()
+        self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
+        self.assertEqual(rr.review(self.m, report, operator_context(self.m, report))['result'], 'READY_FOR_OPERATOR_RECOVERY_REVIEW')
+        self.assertEqual(len(report['history'][-1]['states']), 4)
+        self.assertTrue(all(request['method'] == 'GET' for request in self.f.requests))
+
+    def test_additional_selectors_or_behavior_in_either_read_hold(self):
+        for kind, mutate in [('tier1', lambda b: b.update(locale_services=[{'edge_cluster_path': '/infra/foreign'}])),
+                ('segment', lambda b: b['subnets'][0].update(dhcp_config={'server_address': '192.0.2.8'})),
+                ('segment', lambda b: b.update(bridge_profiles=[{'bridge_profile_path': '/infra/foreign'}])),
+                ('group', lambda b: b['expression'][0].update(value='foreign')),
+                ('security_policy', lambda b: b['rules'][0].update(destination_exclusions=['foreign'])),
+                ('security_policy', lambda b: b.update(marked_for_delete=True))]:
+            for first in (True, False):
+                self.setUp(); path = '/policy/api/v1'+next(r['path'] for r in self.m['resources'] if r['kind'] == kind)
+                def hook(target, count, spec):
+                    if target == path and (count % 2 == 1) == first:
+                        value = deepcopy(self.f.routes[target]); mutate(value['body']); return value
+                    return spec
+                self.f.hook = hook
+                with self.subTest(kind=kind, first=first):
+                    report = self.observe(); self.assertEqual(report['outcome'], 'HOLD_UNCERTAIN')
+                    self.assertEqual(report['history'][-1]['states'][0]['reason'], 'NSX_DOMAIN_SHAPE_UNSUPPORTED')
+
+    def test_metadata_is_omitted_and_inactive_provider_defaults_are_bounded(self):
+        for r in self.m['resources']:
+            body = self.f.routes['/policy/api/v1'+r['path']]['body']
+            body.update(_last_modified_user='PRIVATE-SENTINEL', _system_owned=False, _protection='NOT_PROTECTED')
+            if r['kind'] == 'segment': body.update(type='ROUTED', admin_state='UP')
+        report = self.observe(); self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
+        self.assertNotIn('PRIVATE-SENTINEL', json.dumps(report))
+
+    def test_unbound_or_shared_domain_objects_are_refused_before_contact(self):
+        for mutate in (lambda m: m['resources'].pop(),
+                       lambda m: m['resources'][2]['expected']['expression'][0].update(paths=['/infra/segments/foreign']),
+                       lambda m: m['resources'][0]['expected'].update(tier0_path='/infra/tier-0s/foreign'),
+                       lambda m: m['resources'][3]['expected']['rules'][0].update(path='/infra/foreign'),
+                       lambda m: m['resources'][3]['expected'].update(tags=[{'tag': 'foreign', 'scope': 'role'}])):
+            m = deepcopy(self.m); mutate(m)
+            with self.assertRaises(ValueError): domain.targets(m)
+        self.assertEqual(self.f.requests, [])
+
+    def test_missing_or_rehashed_shape_witness_cannot_pass_offline(self):
+        report = self.observe()
+        for value in (None, {'before': False, 'after': True}, {'before': 1, 'after': True}):
+            bad = deepcopy(report); bad['history'][0]['states'][0]['shape_witness'] = value; reseal(bad)
+            self.assertEqual(rr.review(self.m, bad, operator_context(self.m, bad))['result'], 'HOLD_INVALID_EVIDENCE')
+
+
+if __name__ == '__main__': unittest.main()
