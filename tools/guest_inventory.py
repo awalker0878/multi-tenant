@@ -16,6 +16,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.compile_wsd import STATE, fields, identity, require
+from tools.neutron_observe import strict_loads
 
 
 def timestamp(value):
@@ -115,7 +116,7 @@ def main():
     try:
         folder = args.output.resolve()
         require(not folder.is_relative_to(ROOT), 'Private inventory must be outside the repository')
-        inventory, keys = build(json.loads(args.workload_outputs.read_text()), json.loads(args.access.read_text()), str(folder / 'known_hosts'))
+        inventory, keys = build(strict_loads(args.workload_outputs.read_bytes()), strict_loads(args.access.read_bytes()), str(folder / 'known_hosts'))
         folder.mkdir(mode=0o700, exist_ok=False)
         for name, value in {'inventory.json': json.dumps(inventory, indent=2) + '\n', 'known_hosts': keys}.items():
             with open(os.open(folder / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'w') as stream:

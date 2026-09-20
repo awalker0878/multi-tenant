@@ -13,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.build_wsd_compositions import COMPONENTS
+from tools.neutron_observe import strict_loads
 
 ROLES = {'management', 'security-edge', 'shared-services', 'trust', 'workload',
          'data', 'protection', 'recovery', 'qualification'}
@@ -184,9 +185,9 @@ def main():
     args = parser.parse_args()
     try:
         require(not args.output.resolve().is_relative_to(ROOT), 'Use private output storage outside the repository')
-        files, plan = compile_environment(json.loads(args.environment.read_text()), args.phase,
-            json.loads(args.domain_outputs.read_text()) if args.domain_outputs else None,
-            json.loads(args.vmware_bindings.read_text()) if args.vmware_bindings else None)
+        files, plan = compile_environment(strict_loads(args.environment.read_bytes()), args.phase,
+            strict_loads(args.domain_outputs.read_bytes()) if args.domain_outputs else None,
+            strict_loads(args.vmware_bindings.read_bytes()) if args.vmware_bindings else None)
         # No overwrite: an existing reviewed input set is immutable to this compiler.
         args.output.mkdir(mode=0o700, parents=False, exist_ok=False)
         for name, data in {**files, 'scopes.json': plan}.items():

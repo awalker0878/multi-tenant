@@ -56,7 +56,18 @@
       ansible.builtin.command:
         argv: [/usr/sbin/sysctl, -w, '{{ item.item }}=0']
       loop: '{{ hosting_observed_sysctls.results }}'
-      when: item.stdout | trim != '0'
+      when:
+        - not ansible_check_mode
+        - item.stdout | trim != '0'
+      changed_when: true
+
+    - name: Report predicted live kernel control changes in check mode
+      ansible.builtin.debug:
+        msg: 'Would set {{ item.item }} to 0'
+      loop: '{{ hosting_observed_sysctls.results }}'
+      when:
+        - ansible_check_mode
+        - item.stdout | trim != '0'
       changed_when: true
 
     - name: Ensure the image time service is enabled
