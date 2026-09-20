@@ -147,7 +147,9 @@ jobs:
           sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-server rsyslog rsyslog-gnutls restic nftables
           sudo mkdir -p /run/sshd
       - name: Validate rendered guest configuration with real local engines
-        run: python lab/run_guest_services_lab.py --require-engines
+        run: sudo "$(command -v python)" lab/run_guest_services_lab.py --require-engines --scratch-root /etc/rsyslog.d
+      - name: Recover useful synthetic data using the real restic engine
+        run: python lab/run_restic_lab.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -155,6 +157,7 @@ jobs:
           path: |
             build/reports/ansible_validation.json
             build/reports/guest_services_lab.json
+            build/reports/restic_recovery_lab.json
           retention-days: 14
           if-no-files-found: warn
   terraform:
