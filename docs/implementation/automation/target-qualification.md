@@ -34,6 +34,23 @@ in `sha256`. Do not commit actual values, credentials or evidence.
 | `ssh_certificate` | Matching user certificate accepted by the guest CA/principal policy |
 | `probe_ca` | PEM CA bundle for the approved health endpoints |
 
+For the OpenStack bootstrap/activation/recovery campaign use
+`hosting-target-campaign/2`. It retains these fields and adds three bound assets:
+`workload_manifest`, `workload_token` (plain token bytes), and `workload_ca`.
+The [OpenStack workload manifest](openstack-readback.md) must cover every server,
+boot volume and data volume in the bound guest outputs. Nova and Cinder attachment
+expectations must agree with those outputs, and each boot volume's image ID must
+be included in Glance observations. The manifest's project must match Neutron;
+its site/tenant/WSD scope must match the campaign. Volumes created without an
+image may omit `volume_image_metadata`; bootable volumes require image lineage.
+
+Version 2 performs both network and workload readback before and after traffic.
+Each collector has its own 120-second maximum and checks remaining authority.
+Private `native-before-workloads.json` and `native-after-workloads.json` record
+the workload results. The campaign's native hashes bind both collector results.
+Version 1 remains available for the existing network-only campaigns; its scope
+does not include Nova/Cinder/Glance placement or storage qualification.
+
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.

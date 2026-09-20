@@ -26,7 +26,7 @@ def manifest(origin):
     volume = {'id': VOLUME, 'os-vol-tenant-attr:tenant_id': PROJECT, 'status': 'in-use',
               'size': 40, 'encrypted': True, 'bootable': 'true', 'availability_zone': 'storage-oz',
               'volume_type': 'encrypted', 'attachments': [{'server_id': SERVER, 'volume_id': VOLUME}],
-              'metadata': {'tenant_key': 'tenant-01'}}
+              'metadata': {'tenant_key': 'tenant-01'}, 'volume_image_metadata': {'image_id': IMAGE}}
     image = {'id': IMAGE, 'owner': PROJECT, 'status': 'active', 'visibility': 'private',
              'protected': True, 'disk_format': 'qcow2', 'container_format': 'bare',
              'os_hash_algo': 'sha256', 'os_hash_value': 'a' * 64, 'min_disk': 40, 'min_ram': 1024}

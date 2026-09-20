@@ -6,13 +6,15 @@ import ssl
 import subprocess
 import sys
 import tempfile
+import json
+from urllib.parse import urlencode
 import threading
 import unittest
 
 from lab.native_readback_fixture import Fixture, manifest, responses, credentials
 from tools.guest_probe import probe
 from tools.qualify_target import (ASSETS, authority_matches, budget, native_readback,
-                                  traffic_campaign, validate, bound_inputs)
+                                  traffic_campaign, validate, bound_inputs, workload_binding, WORKLOAD_ASSETS)
 from tools.run_files import digest, encoded, utcnow, write_new
 from tools.guest_inventory import build
 from tests.test_guest_inventory import fixture
@@ -34,6 +36,55 @@ def plan_fixture():
 
 
 class CampaignTests(unittest.TestCase):
+    def test_v2_real_tls_combines_network_and_workload_observations(self):
+        from tests.test_openstack_observe import OpenStackReadbackTests, PROJECT
+        from tools import neutron_observe as n
+        fixture = OpenStackReadbackTests(); fixture.setUp()
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                directory = Path(tmp)
+                native = json.loads(Path('ansible/fixtures/neutron_manifest.json').read_text())
+                native['project_id'] = PROJECT
+                for r in native['resources']:
+                    query = urlencode([('fields', x) for x in sorted(n.FIELDS[r['kind']])])
+                    path = '/v2.0/' + n.COLLECTION[r['kind']] + '/' + r['id'] + '?' + query
+                    fixture.f.routes[path] = {'body': {r['kind']: {'id': r['id'], 'project_id': PROJECT,
+                        'revision_number': 1, **r['expected']}}}
+                ca = (fixture.f.directory / 'ca.pem').read_bytes()
+                write_new(directory / 'native_manifest', encoded(native)); write_new(directory / 'native_ca', ca)
+                assets = {'native_credentials': encoded({'token': 'fixture'}), 'workload_manifest': encoded(fixture.m),
+                          'workload_token': b'fixture', 'workload_ca': ca}
+                plan = {'format': 'hosting-target-campaign/2', 'scope': fixture.m['scope'], 'origin': fixture.f.origin}
+                combined = native_readback(plan, assets, window(), directory, 'before')
+                self.assertEqual(len(combined), 64)
+                self.assertTrue((directory / 'before-workloads.json').is_file())
+                fixture.f.routes[fixture.paths[0]]['body']['server']['OS-EXT-SRV-ATTR:host'] = 'unexpected-host'
+                with self.assertRaises(ValueError): native_readback(plan, assets, window(), directory, 'after')
+        finally: fixture.doCleanups()
+
+    def test_v2_requires_exact_workload_assets_and_owned_storage(self):
+        from tests.test_openstack_observe import manifest as workload_manifest, PROJECT, SERVER, VOLUME
+        import copy
+        plan = plan_fixture(); plan['format'] = 'hosting-target-campaign/2'; plan['scope']['platform'] = 'openstack'
+        with self.assertRaises(ValueError): validate(plan)
+        plan['assets'].update({k: dict(path='/private/' + k, sha256='a' * 64) for k in WORKLOAD_ASSETS})
+        validate(plan)
+        m = workload_manifest(plan['origin']); m['scope'] = plan['scope']
+        outputs = {'members': {'value': {'guest': {'server_id': SERVER, 'boot_volume_id': VOLUME, 'data_volume_ids': []}}}}
+        workload_binding(plan['scope'], m, outputs, PROJECT)
+        for mutation in ('server', 'volume', 'project', 'scope', 'image'):
+            bad = copy.deepcopy(m)
+            if mutation in ('server', 'volume', 'image'): bad['resources'] = [r for r in bad['resources'] if r['kind'] != mutation]
+            if mutation == 'project': bad['project_id'] = 'f' * 32
+            if mutation == 'scope': bad['scope']['tenant_key'] = 'foreign'
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError): workload_binding(plan['scope'], bad, outputs, PROJECT)
+        bad = copy.deepcopy(m)
+        bad['resources'][1]['expected']['attachments'][0]['server_id'] = VOLUME
+        with self.assertRaises(ValueError): workload_binding(plan['scope'], bad, outputs, PROJECT)
+        bad = copy.deepcopy(m)
+        bad['resources'][1]['expected']['volume_image_metadata']['image_id'] = VOLUME
+        with self.assertRaises(ValueError): workload_binding(plan['scope'], bad, outputs, PROJECT)
+
     def test_denial_requires_matching_healthy_peer_and_never_accepts_failed_control(self):
         cases = validate(plan_fixture())
         calls = []

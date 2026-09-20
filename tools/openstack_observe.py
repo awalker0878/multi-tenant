@@ -23,7 +23,7 @@ KINDS = {
         'flavor', 'metadata', 'config_drive', 'os-extended-volumes:volumes_attached'}),
     'volume': ('volume', 'volumes', 'volume', 'volume 3.60', {
         'id', 'os-vol-tenant-attr:tenant_id', 'status', 'size', 'encrypted', 'bootable',
-        'availability_zone', 'volume_type', 'attachments', 'metadata'}),
+        'availability_zone', 'volume_type', 'attachments', 'metadata', 'volume_image_metadata'}),
     'image': ('image', 'images', None, None, {
         'id', 'owner', 'status', 'visibility', 'protected', 'disk_format', 'container_format',
         'os_hash_algo', 'os_hash_value', 'min_disk', 'min_ram'}),
@@ -46,7 +46,8 @@ def validate(manifest):
         kind = resource['kind']; service, _, _, _, fields = KINDS[kind]
         require((kind, resource['id']) not in seen, 'Duplicate native object')
         seen.add((kind, resource['id'])); needed.add(service)
-        c.exact_keys(resource['expected'], fields)
+        optional = {'volume_image_metadata'} if kind == 'volume' and isinstance(resource['expected'], dict) and resource['expected'].get('bootable') == 'false' else set()
+        c.exact_keys(resource['expected'], fields - optional, optional)
         expected = resource['expected']
         require(expected['id'] == resource['id'], 'Native ID expectation differs')
         c.reject_sensitive(expected)
@@ -73,6 +74,10 @@ def validate(manifest):
             require(expected['encrypted'] is True and type(expected['size']) is int and expected['size'] > 0
                     and expected['status'] in {'available', 'in-use'} and isinstance(expected['attachments'], list),
                     'Encrypted stable volume with explicit attachment set required')
+            require(expected['bootable'] in {'true', 'false'} and isinstance(expected.get('volume_image_metadata', {}), dict), 'Explicit volume image lineage required')
+            if expected['bootable'] == 'true':
+                image_id = expected['volume_image_metadata'].get('image_id')
+                require(isinstance(image_id, str) and c.UUID.fullmatch(image_id), 'Exact boot image lineage required')
         else:
             require(expected['status'] == 'active' and expected['protected'] is True
                     and expected['os_hash_algo'] in {'sha256', 'sha512'}, 'Protected image with strong content hash required')

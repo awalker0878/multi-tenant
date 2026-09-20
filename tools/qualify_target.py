@@ -13,7 +13,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe
+from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe
 from tools.check_release import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
@@ -21,19 +21,22 @@ from tools.run_files import (current_window, digest, encoded, load_private, new_
 
 ASSETS = {'inventory', 'native_manifest', 'native_credentials', 'native_ca',
           'ssh_key', 'ssh_certificate', 'probe_ca'}
+WORKLOAD_ASSETS = {'workload_manifest', 'workload_token', 'workload_ca'}
 ADAPTERS = {'openstack': neutron_observe, 'vmware': nsx_observe, 'nutanix': nutanix_observe}
 
 
 def validate(plan):
     c.exact_keys(plan, {'format', 'scope', 'source_commit', 'origin', 'assets', 'cases'})
-    require(plan['format'] == 'hosting-target-campaign/1', 'Unknown target campaign')
+    require(plan['format'] in {'hosting-target-campaign/1', 'hosting-target-campaign/2'}, 'Unknown target campaign')
     c.exact_keys(plan['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'})
     for value in plan['scope'].values():
         c.identifier(value)
     require(plan['scope']['platform'] in ADAPTERS and re.fullmatch('[0-9a-f]{40}', plan['source_commit']),
             'Exact platform and committed source required')
     require(c.origin(plan['origin']) == plan['origin'], 'Canonical native HTTPS origin required')
-    c.exact_keys(plan['assets'], ASSETS)
+    extended = plan['format'] == 'hosting-target-campaign/2'
+    require(not extended or plan['scope']['platform'] == 'openstack', 'Workload readback campaign requires OpenStack')
+    c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else set()))
     for asset in plan['assets'].values():
         c.exact_keys(asset, {'path', 'sha256'})
         require(isinstance(asset['path'], str) and Path(asset['path']).is_absolute()
@@ -89,10 +92,34 @@ def bound_inputs(plan, known_hosts):
     adapter = ADAPTERS[plan['scope']['platform']]
     if adapter is neutron_observe:
         adapter.validate_manifest(manifest)
+        if plan['format'] == 'hosting-target-campaign/2':
+            workload = c.strict_loads(assets['workload_manifest'])
+            workload_binding(plan['scope'], workload, variables['hosting_workload_outputs'], manifest['project_id'])
     else:
         adapter.validate(manifest)
         require(manifest['origin'] == plan['origin'] and manifest['contact_enabled'] is True, 'Native manifest contact differs')
     return assets, access, pins
+
+
+def workload_binding(scope, manifest, outputs, project_id):
+    openstack_observe.validate(manifest)
+    require(manifest['scope'] == scope and manifest['project_id'] == project_id, 'Foreign workload observation scope')
+    members = outputs['members']['value']
+    servers = {v['server_id'] for v in members.values()}
+    volumes = {volume for v in members.values() for volume in [v['boot_volume_id'], *v['data_volume_ids']]}
+    selected = {kind: {r['id'] for r in manifest['resources'] if r['kind'] == kind} for kind in openstack_observe.KINDS}
+    require(selected['server'] == servers and selected['volume'] == volumes and selected['image'], 'Readback must cover every owned server and retained volume plus an accepted image')
+    for member in members.values():
+        server = next(r['expected'] for r in manifest['resources'] if r['kind'] == 'server' and r['id'] == member['server_id'])
+        require(server['status'] == 'ACTIVE' and {x['id'] for x in server['os-extended-volumes:volumes_attached']} ==
+                {member['boot_volume_id'], *member['data_volume_ids']}, 'Server attachments differ from owned outputs')
+        for volume_id in [member['boot_volume_id'], *member['data_volume_ids']]:
+            volume = next(r['expected'] for r in manifest['resources'] if r['kind'] == 'volume' and r['id'] == volume_id)
+            require(volume['status'] == 'in-use' and len(volume['attachments']) == 1
+                    and volume['attachments'][0].get('server_id') == member['server_id']
+                    and volume['attachments'][0].get('volume_id') == volume_id, 'Cinder attachment differs from the owned server')
+            if volume_id == member['boot_volume_id']:
+                require(volume['bootable'] == 'true' and volume['volume_image_metadata']['image_id'] in selected['image'], 'Boot volume image is absent from readback')
 
 
 def authority_matches(authority, plan_bytes, source, ssh_bytes):
@@ -139,7 +166,16 @@ def native_readback(plan, assets, authority, directory, label):
     report = load_private(output)
     require(report.get('outcome', report.get('status')) in {'READBACK_MATCH_NOT_QUALIFIED', 'OBSERVED_MATCH_NOT_QUALIFIED'},
             'Native readback is not stable and matching')
-    return digest(read_private(output))
+    network_hash = digest(read_private(output))
+    if plan.get('format') == 'hosting-target-campaign/2':
+        budget(authority, 120)
+        manifest = c.strict_loads(assets['workload_manifest'])
+        client = openstack_observe.Client(manifest, assets['workload_token'].decode().strip(), assets['workload_ca'], authority)
+        observation = openstack_observe.observe(manifest, client)
+        write_new(directory / (label + '-workloads.json'), encoded(observation))
+        require(observation['status'] == 'OBSERVED_MATCH_NOT_QUALIFIED', 'Workload identity, placement or storage readback failed')
+        return digest(encoded({'network_sha256': network_hash, 'workloads_sha256': digest(encoded(observation))}))
+    return network_hash
 
 
 def ssh_probe(case, target, authority, directory, binary, ca, sequence):
