@@ -101,6 +101,10 @@ Separate [AHV VM](implementation/automation/nutanix-vm-readback.md) and
 [Flow policy](implementation/automation/nutanix-flow-readback.md) snapshot profiles
 are available, as are [vSphere VM/task observations](implementation/automation/vsphere-readback.md).
 Their exact coverage and task limitations are documented separately.
+[VMware network association readers](implementation/automation/vmware-network-binding.md)
+add exact NSX-backed distributed-portgroup/switch identities and segment-scoped
+realized-switch identities. Campaign v6 binds these to each VM's assigned domain;
+effective per-port/DFW membership and native qualification remain separate.
 The profile's source dependency is networking/prism Go SDK v4.3.1; the code itself
 uses standard-library HTTP rather than executing the SDK. No legacy API fallback
 or installed compatibility claim is made. [U3–U6]

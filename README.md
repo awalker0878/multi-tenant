@@ -51,6 +51,9 @@ the exact existing VMs, alongside NSX campaigns.
 compares supported existing-VM configuration with the saved plan and binds the
 durable ledger without releasing it. It requires VM activity coverage from the
 immutable attempt start. Clone state adoption remains separate.
+[VMware campaign v6](docs/implementation/automation/vmware-network-binding.md)
+checks each distributed NIC backing through its assigned portgroup to the owned
+NSX segment's realized logical switch; per-port/DFW enforcement remains separate.
 Live commissioning, effective enforcement, complete fenced native
 reconciliation and HA/application recovery qualification remain open.
 

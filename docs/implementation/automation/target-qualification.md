@@ -116,6 +116,17 @@ NIC backing but does not discover or prove that cross-system association, effect
 DFW group membership, guest address configuration or policy precedence. Keep the
 accepted native network mapping and enforcement evidence with the campaign.
 
+For NSX-backed distributed portgroups, use `hosting-target-campaign/6` to add
+[observed network associations](vmware-network-binding.md). Add `portgroup_manifest`,
+`domain_outputs` and `workload_inputs` to the v5 assets, and use the segment-switch
+NSX profile. Every NIC is bound through its member's assigned portgroup to that
+member's owned domain segment and realized logical-switch UUID. Both NSX and
+portgroup readers bracket VM/task collection before and after traffic, with all
+five report hashes bound per phase. Missing, foreign or changed mappings hold.
+This profile refuses opaque/standard backings; v5 retains its narrower coverage.
+Per-port attachment, effective DFW membership/exclusions, guest addresses and
+native fencing still need independent evidence. Do not downgrade after a v6 hold.
+
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.

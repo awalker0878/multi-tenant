@@ -81,10 +81,12 @@ OFF alone does not establish same-segment isolation: observe the mandatory DFW
 drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-readback.md),
 [Flow readback](nutanix-flow-readback.md) and [campaign v4](target-qualification.md)
 alongside actual network/VM task evidence. For VMware use
-[vSphere VM/task readback](vsphere-readback.md) and campaign v5. Snapshot matches
-cannot resolve an uncertain native operation; the task reader observes only exact
-recorded tasks, with an optional bounded child-history check, and never clears an
-execution ledger or authorizes replay. The [held-attempt reviewer](terraform-recovery.md)
+[vSphere VM/task readback](vsphere-readback.md) and campaign v5, or
+[campaign v6](vmware-network-binding.md) for observed NSX-backed portgroup/segment
+associations. Snapshot matches cannot resolve an uncertain native operation.
+Task profiles check accepted tasks and, where selected, bounded child history or
+visible existing-VM activity; they never clear an execution ledger or authorize
+replay. The [held-attempt reviewer](terraform-recovery.md)
 binds existing-VM observations to the exact saved plan and current durable hold,
 comparing supported CPU/memory/topology configuration and holding other updates.
 The separate clone-tree profile observes accepted template identity/revision and
@@ -107,7 +109,8 @@ enforcement or failure recovery.
 
 Remaining vSphere integration includes a separately fenced, data-preserving
 power/guest-bootstrap owner, complete native task coverage beyond the bounded
-template-clone/power/reconfiguration profile, cross-system NIC/NSX membership evidence, and
+template-clone/power/reconfiguration/activity profiles, effective per-port/DFW
+membership and unsupported network realizations beyond v6's selected associations, and
 operation-wide reconciliation and authorized ledger recovery. The observers and
 reviewer do not supply these write/fencing interfaces. Keep the NSX containment and reviewed
 operator hold points until those capabilities and their live behavior are accepted.

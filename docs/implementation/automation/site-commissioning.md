@@ -81,7 +81,7 @@ guards. Neither creates a site inventory or establishes effective native policy.
 
 | Platform | Implemented control | Required before a live campaign |
 | --- | --- | --- |
-| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in campaign v5 | Independently observed NSX/vCenter network binding, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
+| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in v5 and selected NSX portgroup/segment associations in v6 | Qualify the selected native association profile, image initialization, per-port attachment, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
 | Nutanix | Existing VM ON/NIC connected, or OFF/disconnected with disks retained; exact owned Flow service exceptions/withdrawal; AHV/network/Flow readback in campaign v4 | Accepted native Flow semantics/precedence and project/category/placement/storage, image initialization and actual network/VM/Flow task evidence; native withdrawal and recovery qualification |
 
 Keep VMware domain and workload state ownership separate. The pinned vSphere
@@ -92,6 +92,25 @@ cannot replay, cancel or clear a held operation. Nutanix domain and VM transitio
 are separate applies: enable only independently accepted restricted service paths,
 then collect native observations and controlled guest evidence. No cross-scope
 atomicity or Flow enforcement is inferred from a successful Terraform apply.
+
+For [campaign v6](vmware-network-binding.md), accept the actual Local Manager
+segment/realized-switch and vCenter distributed-portgroup/switch response shapes,
+native IDs/revisions and both observers' RBAC visibility. Use original private
+domain outputs and workload inputs, and retain their independently accepted
+provenance. Qualify the mapping for every offered member/domain, including:
+
+| Native case | Required result |
+| --- | --- |
+| NIC moved to another owned domain's portgroup | Hold despite both domains being owned and their policies matching |
+| Same display name on a different switch/portgroup | Hold on native backing identity mismatch |
+| NSX segment points to a different realized logical switch | Hold on the cross-system UUID mismatch |
+| Stale portgroup revision, missing DVS reference or changed mapping during sampling | Hold; obtain current accepted expectations and recollect |
+| Missing, duplicate, paginated or failed NSX realization | Hold for native-owner investigation |
+| Opaque/standard backing, multiple enforcement points or unsupported native shape | Profile refused; qualify a separate supported realization |
+
+Actual per-port attachment, dynamic group membership, DFW exclusions/precedence,
+same-host bypass and real allowed/denied traffic remain separate checks. A
+configured association does not establish isolation, HA or writer exclusion.
 
 For the vSphere task-tree profile, accept native task-history visibility,
 retention, supported ancestry/operation shapes and session-collector permissions

@@ -13,6 +13,11 @@ the mapping from managed object ID to BIOS `uuid` (the Terraform VM ID) and
 vCenter `instanceUuid` independently. A VM name or portable tenant label is
 insufficient proof of ownership.
 
+For NSX-backed distributed ports, the separate
+[network association readers and campaign v6](vmware-network-binding.md) bind
+selected portgroup/switch identities to the assigned domain's realized NSX switch.
+This does not establish effective per-port attachment or DFW enforcement.
+
 The snapshot includes the accepted config `changeVersion`, CPU/memory, full
 hardware device inventory, host, resource pool, power and explicit stable runtime
 flags. This profile supports vmxnet3 NICs on opaque NSX or distributed-port
