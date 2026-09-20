@@ -164,6 +164,8 @@ jobs:
           terraform_wrapper: false
       - name: Review actual committed provider lock selections
         run: python scripts/check_dependency_locks.py
+      - name: Saved-plan execution, stale-state rejection and private artifact permissions
+        run: python lab/run_terraform_execution_lab.py
       - name: Backend-disabled validation, module schemas and plan-only provider mocks
         run: python tools/verify_terraform.py --mock-tests
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -173,6 +175,7 @@ jobs:
           path: |
             build/reports/provider_lock_review.json
             build/reports/terraform_validation.json
+            build/reports/terraform_execution_lab.json
             build/reports/toolchain-schemas/
             build/reports/toolchain-locks/
           include-hidden-files: true
