@@ -141,16 +141,16 @@ class TerraformCommandBoundary(unittest.TestCase):
                 self.assertIn('-backend=false',cmd);self.assertIn('-lockfile=readonly',cmd)
                 out='' # Do not overwrite the actual lock in the fixture copy.
             elif cmd[:1]==['validate']:out='{"valid":true}'
-            elif cmd[:1]==['test']:self.assertEqual(directory.parent.name,'modules');out='synthetic unit response, no real provider'
+            elif cmd[:1]==['test']:self.assertNotIn('backend',json.loads((directory/'main.tf.json').read_text())['terraform']);out='synthetic unit response, no real provider'
             elif cmd==['providers','schema','-json']:
-                self.assertEqual(directory.parent.name,'modules');out='{"provider_schemas":{"TEST-FIXTURE":{}}}'
+                self.assertNotIn('backend',json.loads((directory/'main.tf.json').read_text())['terraform']);out='{"provider_schemas":{"TEST-FIXTURE":{}}}'
             else:raise AssertionError(cmd)
             return subprocess.CompletedProcess(argv,0,out,'')
         with tempfile.TemporaryDirectory() as td,patch.object(tf.shutil,'which',return_value='/synthetic-terraform'),patch.object(tf.subprocess,'run',side_effect=fake),patch.object(sys,'argv',['verify','--mock-tests','--output',str(Path(td)/'report.json')]),redirect_stdout(io.StringIO()):
             self.assertEqual(tf.main(),0);report=json.loads((Path(td)/'report.json').read_text())
-            self.assertEqual(len(report['roots']),10);self.assertEqual(len(report['modules']),10)
+            self.assertEqual(len(report['roots']),len(tf.entries()));self.assertEqual(len(report['modules']),len(tf.entries()))
             self.assertTrue(all(r['validation']=='PASSED' and r['schema_export']=='NOT_RUN_ROOT_BACKEND_BOUNDARY' for r in report['roots']))
-            self.assertEqual(sum(a[2:]==['providers','schema','-json'] for a in calls),10)
+            self.assertEqual(sum(a[2:]==['providers','schema','-json'] for a in calls),len(tf.entries()))
             self.assertFalse(any('apply' in a or 'destroy' in a for a in calls))
 
 if __name__=='__main__':unittest.main()
