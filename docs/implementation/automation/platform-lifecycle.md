@@ -96,9 +96,14 @@ accepted template and destination for visible pending/late work; it retains sour
 identity and result/tree checks. These profiles never clear an execution ledger or authorize
 replay. The [held-attempt reviewer](terraform-recovery.md)
 binds existing-VM observations to the exact saved plan and current durable hold,
-comparing supported vSphere CPU/memory/topology configuration or the sealed AHV
+comparing supported vSphere CPU/memory/topology configuration, unchanged retained
+disks and planned NIC/native port attachments, or the sealed AHV
 power/NIC lifecycle and retained disk/placement identities. Other updates hold;
 historical AHV transition review never renews apply authority or releases the ledger.
+vSphere receipt review requires fresh attachment witnesses alongside task activity,
+both collected after fence/quarantine verification. It supports the current
+one-controller boot/optional-data disk and powered-on single-vmxnet3 layout;
+unsupported layouts remain held for separate engineering review.
 The separate clone-tree profile observes accepted template identity/revision and
 the clone's exact result VM without adopting it into state. No live platform is
 contacted by provider mocks, synthetic plans or the local HTTPS fixtures.

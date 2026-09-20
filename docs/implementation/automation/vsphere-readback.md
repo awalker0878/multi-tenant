@@ -48,6 +48,13 @@ changes but is not an atomic snapshot or a native writer fence. A configuration
 match cannot determine task completion, resolve an uncertain Terraform apply,
 authorize retry, prove NSX membership/enforcement, or establish HA/recovery.
 
+Each VM state now retains a `vm_witness` containing both selected snapshot digests
+and Boolean runtime-question indicators. Offline task review requires both digests
+to equal the accepted complete selected configuration before accepting `MATCH`;
+a matching second sample cannot erase a differing first sample or an unresolved
+runtime question. The witness exports no question text, guest customization or
+unselected device values. Hashes attest consistency only, not collector authenticity.
+
 Interfaces: Broadcom's [VM config](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/config/get/),
 [runtime](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/runtime/get/)
 and [session authentication](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/api-security-schema/)
@@ -85,7 +92,9 @@ the entire operation before separately authorizing any forward action.
 
 The offline `tools/recovery_review.py` now accepts the exact-task profile. It
 requires VM and task coverage, recomputes task outcomes from bounded selected
-witnesses at each sample's time, and rejects rehashed contradictory summaries.
+witnesses at each sample's time, checks both VM snapshot digests and rejects
+rehashed contradictory summaries. Held existing-VM Terraform review additionally
+requires the [retained disk and native attachment bindings](terraform-recovery.md).
 Snapshots alone remain insufficient for completion review. The normal fencing,
 quarantine, containment, freshness and generation checks still apply; every result
 retains `may_apply: false`. Witnesses exclude native fault text and arbitrary

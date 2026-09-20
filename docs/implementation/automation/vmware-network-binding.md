@@ -193,3 +193,22 @@ DFW membership/exclusions, guest IP identity, native isolation, HA, recovery or
 writer fencing. The profile does not release a held attempt or authorize power
 control. Do not downgrade to v6/v5 after an attachment hold. Use the
 [commissioning cases](site-commissioning.md) to qualify the installed behavior.
+
+## Held Terraform attempt review
+
+Portgroup reports retain selected before/after `group_witness` values. Attachment
+reports retain `attachment_witness` with both port reads and the bracketed
+portgroup/switch reads. Offline review recomputes identities, differences,
+stability and selected hashes; changing a summary and its outer digest cannot
+hide a contradictory witness. Native descriptions, counters and diagnostic text
+remain excluded. Recollect older reports that omit these witnesses.
+
+The [held-attempt reviewer](terraform-recovery.md) now requires the attachment
+profile alongside existing-VM activity evidence. It binds the planned NIC key,
+MAC and sealed network MoID through the observed switch/portgroup to the exact
+VM/NIC occupant, cookie, host and runtime MAC. Both observations must be fresh and
+collected under verified fencing/quarantine. Uncertain/missing attachment evidence
+holds; there is no fallback to a matching portgroup alone. The review supports
+the current module's powered-on, connected single-vmxnet3 layout only and leaves
+all ledger bytes held. Native NSX ownership/enforcement and complete operation
+reconciliation remain independent requirements.

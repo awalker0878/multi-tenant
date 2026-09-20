@@ -348,6 +348,39 @@ installed query semantics/RBAC visibility, real cross-writer fencing, complete
 native reconciliation, site commissioning and live HA/security/recovery remain
 unqualified. No live infrastructure or native acceptance index was changed.
 
+## vSphere device and attachment recovery increment
+
+The [held-attempt reviewer](terraform-recovery.md) now binds retained disk
+keys/UUIDs, VMDK paths, capacity, datastore and SCSI layout to the saved plan and
+sealed member inputs. It requires the current module's explicit persistent,
+thin, unshared boot/optional-data layout and retained-file settings. Planned
+NIC key/MAC/adapter/network identity must match; CPU/memory/topology remain the
+only permitted updates. Unsupported layouts and device changes remain held.
+
+Fresh [native port-attachment evidence](vmware-network-binding.md) is now required
+for vSphere receipt review. It resolves the planned network MoID through observed
+switch/portgroup keys and checks exact VM/NIC occupant, port cookie, host and MAC.
+Shared portgroups require complete distinct owned attachments. Both VM and network
+reports must be collected after current fence/quarantine verification; every
+outcome retains the durable ledger hold.
+
+Portgroup/port reports now retain selected before/after witnesses for offline
+recomputation. VM/task review checks both selected VM snapshot hashes against the
+accepted baseline and preserves a runtime-question indicator without exporting
+question text or unselected device/guest values. Rehashed summaries cannot hide
+contradictory witnesses; older reports without these fields must be recollected.
+
+Local verification passed 1,734 Python/source tests without skips and 80 route/model
+checks. Added tests cover foreign/missing/unknown disks, exact optional-data slots,
+native network MoID/key distinction, NIC/port/cookie/host substitution, shared
+groups, stale or pre-fence network evidence, offline witness tampering, private
+CLI output and ledger preservation. Hosted engine results belong to the final
+published revision's PR checks. Synthetic fixtures do not qualify real native
+response/default semantics, storage compliance, fencing or site behavior.
+Fenced vSphere power, full native reconciliation/adoption, actual commissioning
+and live HA/security/application recovery remain open. No live infrastructure
+or native acceptance index was changed.
+
 ## Package disposition and next concrete work
 
 “Partial” credits delivered code or retained functionality, not operational acceptance. “Blocked” identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
@@ -370,7 +403,7 @@ unqualified. No live infrastructure or native acceptance index was changed.
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
 | W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV snapshot, recorded VM/task graph or visible VM activity plus network/Flow evidence in v3/v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5; selected member-to-portgroup-to-segment associations in v6 and exact port occupants/cookies/host/runtime in v7. Qualify installed APIs, query/count semantics, history/activity, realized entities and port visibility; complete remaining task/entity/Flow coverage, effective DFW membership and unsupported network realizations. Do not infer task completion from snapshots or Terraform success. |
-| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded AHV recorded-task/activity review, bounded vSphere child history, visible existing-VM and clone source/destination activity, and held-attempt plan bindings for supported vSphere configuration and AHV power/NIC lifecycle are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Review preserves all ledger holds. Serial Ansible and Terraform state locks do not fence native tasks. |
+| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded AHV recorded-task/activity review, bounded vSphere child history, visible existing-VM and clone source/destination activity, and held-attempt plan bindings for supported vSphere configuration/devices/native port attachments and AHV power/NIC lifecycle are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Review preserves all ledger holds. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector in restricted campaigns for all three exact installed tuples, complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |

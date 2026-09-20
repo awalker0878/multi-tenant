@@ -119,6 +119,12 @@ add exact NSX-backed distributed-portgroup/switch identities and segment-scoped
 realized-switch identities. Campaign v6 binds these to each VM's assigned domain;
 v7 adds exact distributed-port occupants, connection cookies and VM/NIC/host/MAC
 bindings. Effective DFW membership and native qualification remain separate.
+The [held vSphere reviewer](implementation/automation/terraform-recovery.md) now
+requires those attachment witnesses alongside VM activity, binds retained disks
+and NICs to the saved plan, and checks both reports under the same fence/quarantine
+timing. Offline review rechecks selected network witnesses and both VM snapshot
+digests; older witness-free reports require recollection. These consistency checks
+preserve the ledger and do not authenticate a collector or create native fencing.
 The profile's source dependency is networking/prism Go SDK v4.3.1; the code itself
 uses standard-library HTTP rather than executing the SDK. No legacy API fallback
 or installed compatibility claim is made. [U3–U6]

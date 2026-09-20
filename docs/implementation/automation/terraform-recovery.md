@@ -22,10 +22,51 @@ native MoID/UUID/revision/power metadata must agree when present. A computed
 revision may be unknown in the plan; independent current readback still requires
 an accepted exact revision. Matching VM UUIDs alone is insufficient.
 
-Disk/NIC/firmware and other unchanged settings remain subject to their independent
-native baseline and ownership evidence. This profile does not translate the full
-provider schema or establish NSX/network associations. The separate clone-tree
-observer can collect result/source evidence, and the separate
+Retained disks now require exact native device keys/UUIDs, relative VMDK paths,
+capacity, datastore and controller/slot bindings. The supported current-module
+layout is one SCSI controller on bus 0, `disk0` at unit 0 and optional `data0` at
+unit 1. Capacities must equal the sealed member inputs; native backing must be
+persistent, thin, explicitly not eagerly scrubbed and `sharingNone`, with no
+parent snapshot. Planned `keep_on_remove` must remain true and `attach` false.
+Storage policy IDs must agree across plan and sealed inputs; this does not prove
+native SPBM compliance, encryption or useful-data recovery. Unknown/missing disk
+identities and unsupported layouts hold, even when before/after plan values agree.
+
+The existing VM must be powered on with one connected vmxnet3 NIC and a native
+generated/assigned MAC. Its planned key, MAC, adapter and network MoID must match
+the accepted VM and sealed `quarantine_network_id`; static-MAC configuration is
+outside this profile. Also collect the separate
+[native attachment report](vmware-network-binding.md) with profile
+`vsphere-vi-json-8.0.3.0-nsx-port-attachments`. Pass the private manifest/report
+through `--network-manifest` and `--network-readback`. They must share the VM
+report's vCenter origin, operation, tenant/WSD, engineering and target bindings.
+
+The reviewer resolves each planned network MoID through the observed portgroup
+and switch to its exact native backing keys. It checks port key/cookie, connected
+VM/NIC, host and runtime MAC against the accepted VM. Native keys are not assumed
+equal to Terraform network MoIDs. Shared portgroups are allowed only with complete
+distinct owned occupants; extra ports or unused groups hold. Opaque/standard
+networks, powered-off/disconnected VMs and unsupported layouts require separate
+review. No guessed key-to-MoID conversion or snapshot-only fallback is supplied.
+
+Both reports must be fresh, postdate the attempt/security change and have been
+collected after the same current fence/quarantine verification. Attachment
+witnesses are recomputed offline; missing witnesses, drift, stale or unbound
+reports refuse the packet. `HOLD_NETWORK_NOT_UNDER_CONTROLS` requires new network
+sampling if its collection began before those controls were verified, even if
+the later VM sample matches. Recollect older reports without the witness fields.
+The packet binds both report/manifest hashes and the native attachment mapping.
+
+Firmware, image trust and other unchanged settings retain their independent
+baseline and ownership requirements. This profile does not translate the entire
+provider schema or establish effective NSX domain membership/DFW enforcement;
+the separate campaign v7 still checks owned NSX segment associations and traffic.
+The selected plan mappings follow the pinned provider's
+[disk readback](https://github.com/vmware/terraform-provider-vsphere/blob/v2.12.0/vsphere/internal/virtualdevice/virtual_machine_disk_subresource.go),
+[device keys/addresses](https://github.com/vmware/terraform-provider-vsphere/blob/v2.12.0/vsphere/internal/virtualdevice/virtual_machine_device_subresource.go)
+and [NIC network resolution](https://github.com/vmware/terraform-provider-vsphere/blob/v2.12.0/vsphere/internal/virtualdevice/virtual_machine_network_interface_subresource.go).
+Actual installed schema/visibility and response semantics still require qualification.
+The separate clone-tree observer can collect result/source evidence, and the separate
 `vsphere-vi-json-8.0.3.0-clone-task-activity` profile additionally observes visible
 work on both source and destination. Neither can use this existing-VM review path
 to adopt a newly created resource. A matching clone activity report leaves all
@@ -82,7 +123,7 @@ quarantine still govern the recomputed triage result.
 
 ## Private review packet
 
-Use the same command for either profile, choosing its accepted manifest/report:
+For vSphere, supply the VM/task and native attachment evidence:
 
 ```sh
 python3 tools/terraform_recovery_review.py \
@@ -90,15 +131,20 @@ python3 tools/terraform_recovery_review.py \
   --ledger /private/shared-ledger \
   --manifest /private/operator/vsphere-activity.json \
   --readback /private/operator/vsphere-report.json \
+  --network-manifest /private/operator/port-attachments.json \
+  --network-readback /private/operator/port-attachment-report.json \
   --context /private/operator/recovery-context.json \
   --output /private/operator/new-recovery-review.json
 ```
 
+For AHV, use the same command with its activity manifest/report and **omit both
+network options**. vSphere attachment inputs cannot qualify an AHV attempt.
+
 All inputs must be owner-only private artifacts. The new output must be outside
 the repository, bundle and ledger. The tool checks sealed input/backend/plan
-bytes (and the AHV lifecycle artifact), scope, native VM coverage, current held head, immutable start/result
-records and context/report bindings. It takes the existing local executor lock
-while reading and writing the separate review packet, refuses a concurrent
+bytes (and the AHV lifecycle artifact), scope, native VM coverage, current held
+head, immutable start/result records and context/report bindings. It takes the
+existing local executor lock while reading and writing the separate review packet, refuses a concurrent
 executor and rechecks the head. This lock makes the local review consistent; it
 is not native fencing and does not cover another tool or a delayed platform task.
 

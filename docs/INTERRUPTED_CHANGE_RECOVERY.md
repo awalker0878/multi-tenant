@@ -77,9 +77,14 @@ For a held VMware Terraform workload attempt, use the
 to join these records to the immutable attempt. This additional profile supports
 known existing VMs and CPU/memory/topology updates only, compares planned native
 configuration, requires VM activity coverage beginning at the immutable attempt
-start, and always preserves the ledger hold. Older known-task-only profiles cannot
-substitute for this coverage. Clone result evidence still
-needs separate creation/state ownership reconciliation.
+start, and always preserves the ledger hold. It now also binds retained disk
+UUIDs/paths/layout and planned NIC identities to sealed inputs, and requires a
+fresh native port-attachment report connecting network MoID, switch/portgroup,
+port occupant/cookie, VM/NIC, host and MAC. Both reports must be collected after
+fencing/quarantine verification. The supported layout and two extra private
+network inputs are specified in the runbook. Older known-task-only profiles or
+reports without the new witnesses cannot substitute for this coverage. Clone
+result evidence still needs separate creation/state ownership reconciliation.
 
 For a held Nutanix workload attempt, the same reviewer supports existing AHV
 power/NIC transitions with the activity profile and original sealed lifecycle
@@ -93,6 +98,7 @@ ledger records intact and grants no recovery action or activation authority.
 |---|---|
 | `KEEP_INCIDENT_CONTAINMENT` | An active incident restriction takes precedence; ordinary convergence must not undo it. |
 | `HOLD_CONTAINMENT_UNKNOWN` | Establish current containment authority before continuing. |
+| `HOLD_NETWORK_NOT_UNDER_CONTROLS` | Held vSphere review found attachment sampling before verified fence/quarantine; collect fresh attachment evidence. |
 | `HOLD_WRITER_NOT_FENCED` | The executor may still run, or the scoped/current fencing record is insufficient. |
 | `HOLD_SUPERSEDED_CHANGE` | Current generation differs from the attempted change; obtain a new comparison/decision. |
 | `HOLD_QUARANTINE_NOT_VERIFIED` | Matching object state does not establish safe connectivity. |

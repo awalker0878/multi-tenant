@@ -176,6 +176,27 @@ collector cleanup failure. Bind interrupted existing-VM attempts through the
 Establish actual native writer exclusion and quarantine before collecting recovery
 readback. A local lock or later verification record cannot supply that exclusion.
 
+For held vSphere configuration attempts, collect both VM activity and native
+port-attachment reports under the same verified controls. Qualify actual pinned
+provider disk/NIC fields against native responses for the current one-controller
+boot/optional-data disk and powered-on single-vmxnet3 layout. Exercise:
+
+| Native case | Required result |
+| --- | --- |
+| Disk UUID, device key, datastore, VMDK path, size or SCSI slot differs from the saved plan | Hold even if VM UUID and completed tasks match |
+| Snapshot parent, shared disk, missing backing flags, unknown identity or unsupported controller layout | Hold; no assumed default or data adoption |
+| Planned network MoID differs from native portgroup key | Resolve through accepted native portgroup/switch evidence; never assume equal strings |
+| NIC key/MAC, port occupant, cookie or serving host differs | Hold; do not reassign expected identities to obtain a match |
+| Shared portgroup contains an extra/unassigned selected port | Refuse incomplete or extra attachment coverage |
+| Matching VM report collected after fencing but attachment report collected before it | `HOLD_NETWORK_NOT_UNDER_CONTROLS`; resample attachments under current controls |
+| Old report without VM snapshot or network attachment witnesses | Refuse review; collect new evidence |
+| Matching second VM read follows a differing first read, or a runtime question blocks execution | Hold and preserve native-owner investigation evidence |
+
+Verify immutable ledger preservation for every outcome. Disk retention flags and
+matching policy IDs do not prove application recovery, SPBM compliance or native
+encryption; qualify those separately. These checks do not add power control,
+state adoption or a native writer fence.
+
 Existing-VM receipt review now requires the separate
 `vsphere-vi-json-8.0.3.0-vm-task-activity` profile. Qualify its exact VM/`self`
 scope, pending-state query without a time cutoff and completion-time window
