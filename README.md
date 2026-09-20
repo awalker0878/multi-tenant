@@ -45,9 +45,12 @@ now includes owned Nutanix Flow service bootstrap/withdrawal and exact-plan chec
 category and VPC evidence to AHV guest campaigns. [vSphere readback](docs/implementation/automation/vsphere-readback.md)
 adds VM/device/placement snapshots and bounded task-tree/child-history observations,
 including accepted template identities and exact clone result VMs,
-alongside NSX campaigns. [Held-attempt review](docs/implementation/automation/terraform-recovery.md)
+plus a separate profile checking visible pending/recently completed activity on
+the exact existing VMs, alongside NSX campaigns.
+[Held-attempt review](docs/implementation/automation/terraform-recovery.md)
 compares supported existing-VM configuration with the saved plan and binds the
-durable ledger without releasing it. Clone state adoption remains separate.
+durable ledger without releasing it. It requires VM activity coverage from the
+immutable attempt start. Clone state adoption remains separate.
 Live commissioning, effective enforcement, complete fenced native
 reconciliation and HA/application recovery qualification remain open.
 

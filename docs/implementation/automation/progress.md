@@ -170,6 +170,31 @@ recovery, actual commissioning and live HA/security/recovery remain open.
 No actual site was contacted or changed. The commissioning runbook now records
 the clone-specific native failure scenarios and evidence to collect.
 
+## Existing-VM activity reconciliation increment
+
+Small commits in PR #46 address the gap between a matching accepted task tree and
+separate visible operations on those same VMs:
+
+| Capability | Implemented behavior | Remaining boundary |
+| --- | --- | --- |
+| Scoped VM activity collection | Exact VM/`self` collectors read all pending work and work completed since the attempt; older queued work is not excluded; bounded paging and collector cleanup | Installed filter behavior, RBAC visibility and history retention require native qualification |
+| Activity reconciliation | Before/after activity must equal the accepted full task set and direct witnesses; additional/omitted tasks, transitions, contradictory chronology and changed evidence hold; offline review recomputes witnesses | Synchronous/no-task operations, other entities, hidden/expired tasks and future work remain outside this coverage |
+| Held-attempt requirement | Receipt review requires this profile and binds its window to the immutable attempt start; an older known-task-only profile or shifted window is refused | Original ledger remains held; native fencing, state adoption and authorized forward recovery remain external |
+
+Local verification passed 1,571 Python/source tests with no skips and 80 route/model
+checks. HTTPS task-history and private-ledger fixtures remain synthetic.
+Implementation revision `1644abc` passed
+[architecture/automation CI](https://github.com/awalker0878/multi-tenant/actions/runs/35523032734)
+and the [routed-family campaign](https://github.com/awalker0878/multi-tenant/actions/runs/35523032789).
+Later revisions require their own exact PR checks; these do not qualify an actual
+site. The [readback](vsphere-readback.md),
+[recovery](terraform-recovery.md) and [commissioning](site-commissioning.md) runbooks
+document the profile and additional native cases to exercise.
+
+No live infrastructure was contacted or changed. Fenced vSphere power/lifecycle
+control, complete operation-wide native reconciliation, actual commissioning and
+live HA/security/recovery qualification remain open.
+
 ### Recorded verification
 
 The OpenStack lifecycle/readback revision `c11b09a` passed
@@ -208,8 +233,8 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/task-tree/template-clone and NSX evidence in v5. Qualify installed APIs, task descriptions and history visibility; complete remaining internal/cross-entity/VM/Flow coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
-| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded vSphere child history and existing-VM plan configuration/attempt binding are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
+| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5. Qualify installed APIs, task descriptions, history visibility/retention and activity filters; complete remaining internal/cross-entity/VM/Flow coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
+| W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded vSphere child history, visible existing-VM activity and plan configuration/attempt binding are implemented. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector in restricted campaigns for all three exact installed tuples, complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |

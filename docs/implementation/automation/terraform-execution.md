@@ -117,8 +117,10 @@ the selected platform/change service before unattended execution. There is no
 automatic command to clear an uncertain record. Do not delete a ledger to retry.
 
 The [vSphere held-attempt reviewer](terraform-recovery.md) can bind current native
-task-tree observations to the exact saved plan, known existing VM identities and
-current immutable attempt records. It writes a separate private packet under the
+task-tree and VM activity observations to the exact saved plan, known existing VM
+identities and current immutable attempt records. The activity window must equal
+the immutable attempt start; known-task-only profiles cannot substitute for it.
+It writes a separate private packet under the
 existing executor lock and leaves every ledger byte unchanged. Creates, replacements,
 deletes and unknown identities require separate ownership/adoption reconciliation.
 

@@ -101,6 +101,27 @@ collector cleanup failure. Bind interrupted existing-VM attempts through the
 Establish actual native writer exclusion and quarantine before collecting recovery
 readback. A local lock or later verification record cannot supply that exclusion.
 
+Existing-VM receipt review now requires the separate
+`vsphere-vi-json-8.0.3.0-vm-task-activity` profile. Qualify its exact VM/`self`
+scope, pending-state query without a time cutoff and completion-time window
+beginning at the immutable attempt start. Keep user/chain filters absent. Exercise:
+
+| Native case | Required result |
+| --- | --- |
+| Separate unrecorded root task on the same VM | Hold, even when known tasks and VM configuration match |
+| Task queued before the attempt and still running | Visible pending task; hold |
+| Task queued before the attempt and completed afterward | Visible completion; hold |
+| Task moves from pending to completed between the two queries | Duplicate/changed evidence holds; recollect only under established exclusion |
+| Missing records, exhausted pages or failed collector cleanup | Hold; do not downgrade to a narrower profile |
+| Shortened/shifted activity window or older known-task-only profile | Held-attempt packet refused |
+
+Independently establish native RBAC/history visibility and retention; the observer
+cannot distinguish a silently hidden task from a genuinely absent task. Tasks on
+other entities, synchronous operations without tasks and future submissions remain
+outside this scan. Complete operation coverage and actual writer exclusion stay
+separate acceptance requirements. The template-clone profile below does not gain
+this existing-VM activity coverage.
+
 For template cloning, capture the installed platform's native `TaskInfo` shape
 and description, accepted source MoID/BIOS UUID/instance UUID/revision, original
 request/task trail, and exact returned destination MoID/UUID. Validate the
