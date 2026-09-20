@@ -14,9 +14,9 @@ import sys
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from tools import readback_core as c
-from tools import nsx_observe, nutanix_observe
+from tools import nsx_observe, nutanix_observe, vsphere_task_observe
 
-ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe}
+ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe,'vmware':vsphere_task_observe}
 
 
 def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
@@ -41,7 +41,8 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
     if not isinstance(hist,list) or not 1<=len(hist)<=10:
         raise ValueError('Incomplete observation history')
     previous=None;stable=0;prior_time=start
-    keys={r['path'] if m['platform']=='nsx' else r['ext_id'] for r in m['resources']}
+    key_selector=getattr(ADAPTERS[m['platform']],'observation_keys',None)
+    keys=key_selector(m) if key_selector else {r['path'] if m['platform']=='nsx' else r['ext_id'] for r in m['resources']}
     for index,row in enumerate(hist,1):
         c.exact_keys(row,{'round','observed_at','snapshot_sha256','states','outcome'})
         if type(row['round']) is not int or row['round']!=index:

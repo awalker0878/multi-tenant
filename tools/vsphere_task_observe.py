@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Observe accepted vSphere task IDs with VM snapshots; never authorize replay."""
 from pathlib import Path
+import re
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import readback_core as c, vsphere_observe as vm
@@ -37,11 +38,39 @@ def targets(m):
     return vm.targets(vm_manifest(m)) | {task_target(r) for r in m['task']['records']}
 
 
-def task_sample(record, client):
-    body, _ = client.get(task_target(record))
-    result = dict(resource_key=record['moid'], identity_match=False, config_status='UNKNOWN', progress='UNKNOWN',
-                  reason='VSPHERE_TASK_UNCERTAIN', task_completion_observed=False)
+WITNESS_FIELDS = {'_typeName', 'key', 'task', 'entity', 'descriptionId', 'eventChainId', 'queueTime',
+                  'startTime', 'completeTime', 'state', 'cancelled', 'parentTaskKey', 'rootTaskKey'}
+
+
+def task_witness(body):
+    witness = {key: body[key] for key in WITNESS_FIELDS if key in body}
+    witness.update(has_error=body.get('error') is not None, has_result=body.get('result') is not None)
     try:
+        for key, value in witness.items():
+            if value is None: continue
+            if key in {'task', 'entity'}:
+                vm.reference(value, 'Task' if key == 'task' else 'VirtualMachine', 'task' if key == 'task' else 'vm')
+            elif key in {'key', 'parentTaskKey', 'rootTaskKey'}:
+                if value != '': vm.moid(value, 'task')
+            elif key in {'queueTime', 'startTime', 'completeTime'}: c.timestamp(value)
+            elif key == 'descriptionId': require(isinstance(value, str) and re.fullmatch(r'VirtualMachine\.[A-Za-z]{1,64}', value), 'Invalid task operation')
+            elif key == '_typeName': require(value == 'TaskInfo', 'Invalid task type')
+            elif key == 'state': require(value in {'queued', 'running', 'success', 'error'}, 'Unknown task state')
+            elif key == 'eventChainId': require(type(value) is int and value >= 0, 'Invalid event chain')
+            else: require(type(value) is bool, 'Invalid task flag')
+    except (ValueError, TypeError):
+        return {'has_error': False, 'has_result': False}
+    return witness
+
+
+def evaluate_task(record, body, current=None):
+    current = current or c.timestamp(c.now())
+    result = dict(resource_key=record['moid'], identity_match=False, config_status='UNKNOWN', progress='UNKNOWN',
+                  reason='VSPHERE_TASK_UNCERTAIN', task_completion_observed=False,
+                  task_witness=body, config_sha256=c.digest(body), mismatch_fields=[])
+    try:
+        c.exact_keys(body, {'has_error', 'has_result'}, WITNESS_FIELDS)
+        require(type(body['has_error']) is bool and type(body['has_result']) is bool, 'Typed native result flags required')
         require(body.get('_typeName') == 'TaskInfo' and body.get('key') == record['moid'], 'Wrong task identity')
         vm.reference(body.get('task'), 'Task', 'task'); vm.reference(body.get('entity'), 'VirtualMachine', 'vm')
         require(body['task']['value'] == record['moid'] and body['entity']['value'] == record['vm_moid']
@@ -55,17 +84,22 @@ def task_sample(record, client):
         # Native error text and arbitrary task results never enter the journal.
         if body['cancelled'] or state == 'error':
             result.update(progress='FAILED', reason='VSPHERE_TASK_FAILED_OR_CANCELLED'); return result
-        require(body.get('error') is None and body.get('result') is None, 'Contradictory or unsupported task result')
+        require(not body['has_error'] and not body['has_result'], 'Contradictory or unsupported task result')
         if state in {'queued', 'running'}:
             require(body.get('completeTime') is None, 'Pending task claims completion')
             result.update(progress='PENDING', reason='VSPHERE_TASK_PENDING'); return result
         queued = c.timestamp(body['queueTime']); started = c.timestamp(body['startTime']); completed = c.timestamp(body['completeTime'])
-        require(queued <= started <= completed <= c.timestamp(c.now()), 'Task completion chronology differs')
+        require(queued <= started <= completed <= current, 'Task completion chronology differs')
         result.update(progress='COMPLETE', reason='EXACT_TASK_COMPLETED_REPLAY_NOT_AUTHORIZED', task_completion_observed=True,
                       execution_sha256=c.digest({key: body[key] for key in ('key', 'descriptionId', 'entity', 'eventChainId', 'queueTime', 'startTime', 'completeTime')}))
     except (ValueError, TypeError, KeyError):
         result.update(config_status='UNKNOWN', progress='UNKNOWN')
     return result
+
+
+def task_sample(record, client):
+    body, _ = client.get(task_target(record))
+    return evaluate_task(record, task_witness(body))
 
 
 def sample(m, client):
@@ -78,7 +112,20 @@ def sample(m, client):
     return snapshots + after
 
 
-def validate_observation_history(m, history, states):
+def observation_keys(m):
+    return {r['moid'] for r in m['resources']} | {r['moid'] for r in m['task']['records']}
+
+
+def validate_observation_history(m, history, states, current=None):
+    current = current or c.timestamp(c.now())
+    if len(states) == 1 and states[0].get('resource_key') == 'scope': return
+    records = {r['moid']: r for r in m['task']['records']}
+    for state in states:
+        key = state.get('resource_key')
+        if key in records:
+            witness = state.get('task_witness')
+            if not isinstance(witness, dict) or c.digest(state) != c.digest(evaluate_task(records[key], witness, current)):
+                raise c.ObservationError('VSPHERE_TASK_WITNESS_DIFFERS')
     previous = {s['resource_key']: s for h in history for s in h['states'] if s.get('task_completion_observed') is True}
     for state in states:
         if state['resource_key'] in previous and c.digest(state) != c.digest(previous[state['resource_key']]):

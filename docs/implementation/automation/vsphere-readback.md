@@ -78,6 +78,14 @@ readiness. Retain the report with the original execution receipt, approved
 inputs, native task trail and state/backend evidence. An operator must reconcile
 the entire operation before separately authorizing any forward action.
 
+The offline `tools/recovery_review.py` now accepts the exact-task profile. It
+requires VM and task coverage, recomputes task outcomes from bounded selected
+witnesses at each sample's time, and rejects rehashed contradictory summaries.
+Snapshots alone remain insufficient for completion review. The normal fencing,
+quarantine, containment, freshness and generation checks still apply; every result
+retains `may_apply: false`. Witnesses exclude native fault text and arbitrary
+results. Recollect older reports that lack the new witness fields.
+
 The [TaskInfo API](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/Task/moId/info/get/)
 defines the observed fields; the pinned
 [govmomi VM simulator](https://github.com/vmware/govmomi/blob/v0.49.0/simulator/virtual_machine.go)
