@@ -14,6 +14,7 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | --- | --- |
 | [Current package status](progress.md) | Implemented commits, verification and exact remaining work for W01–W29 |
 | [WSD deployment](wsd-deployment.md) | Cluster-aware compilation, scoped state identities, domain/workload compositions and output handoffs |
+| [Reviewed Terraform execution](terraform-execution.md) | Private saved plans, exact review binding, durable attempts and scope-checked output handoffs |
 | [Native guest configuration](native-guests.md) | Bound SSH inventory, candidate Linux roles and native acceptance limits |
 | [Repository audit](../../assurance/automation-baseline-audit.md) | Verified implementation inventory, concrete gaps and exact-revision CI evidence |
 | [Environment coverage](environments.md) | Completion requirements for all three platform families, common infrastructure, lifecycle environments and optional service profiles |

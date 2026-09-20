@@ -125,6 +125,39 @@ recovery. Existing quarantine, retention and field-ownership constraints remain
 effective. Success must be followed by independent native observation and the
 remaining service gates.
 
+## Handoff into workloads and guests
+
+Successful domain runs can feed workload compilation without editing native ID
+maps by hand. Each run's bundle, result, exact output bytes, scope, operation and
+generation are checked. Domain inputs must match the current environment intent;
+missing, duplicate, foreign, uncertain or older-than-24-hour runs are rejected.
+
+```sh
+python tools/wsd_handoff.py \
+  --environment /private/operator/environment.json \
+  --domain-run /private/operator/tenant-01-domains \
+  --domain-run /private/operator/tenant-02-domains \
+  --output /private/operator/workload-drafts
+```
+
+For VMware, also supply the independently observed NSX-segment/vCenter-network
+map through `--vmware-bindings`. The compiler never guesses that association.
+Generated inputs remain disabled and quarantine acceptance references remain
+empty. Terraform outputs do not replace native observation or capacity/IPAM
+authority. The handoff retains the source and execution provenance for each WSD.
+
+After a separately reviewed workload apply and accepted bootstrap/access handoff:
+
+```sh
+python tools/guest_inventory.py /private/operator/guest-access.json \
+  --workload-run /private/operator/tenant-01-workloads \
+  --output /private/operator/guest-inventory
+```
+
+This verifies the successful workload receipt before using the existing pinned
+SSH and observed machine-identity checks. Building an inventory still does not
+open SSH or activate a service.
+
 See [WSD deployment](wsd-deployment.md), [delivery process](delivery-process.md)
 and [acceptance gates](acceptance.md). Terraform documents the sensitive contents
 and exact-plan workflow in its [plan reference](https://developer.hashicorp.com/terraform/cli/commands/plan).

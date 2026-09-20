@@ -109,14 +109,21 @@ def gate(enabled, outputs, access, known_hosts, targets, hostvars):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('workload_outputs', type=Path)
+    parser.add_argument('workload_outputs', type=Path, nargs='?')
     parser.add_argument('access', type=Path)
+    parser.add_argument('--workload-run', type=Path)
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     try:
         folder = args.output.resolve()
         require(not folder.is_relative_to(ROOT), 'Private inventory must be outside the repository')
-        inventory, keys = build(strict_loads(args.workload_outputs.read_bytes()), strict_loads(args.access.read_bytes()), str(folder / 'known_hosts'))
+        require((args.workload_outputs is None) != (args.workload_run is None), 'Choose raw outputs or one successful workload run')
+        if args.workload_run:
+            from tools.wsd_handoff import execution_outputs
+            outputs, _, _ = execution_outputs(args.workload_run, 'workloads')
+        else:
+            outputs = strict_loads(args.workload_outputs.read_bytes())
+        inventory, keys = build(outputs, strict_loads(args.access.read_bytes()), str(folder / 'known_hosts'))
         folder.mkdir(mode=0o700, exist_ok=False)
         for name, value in {'inventory.json': json.dumps(inventory, indent=2) + '\n', 'known_hosts': keys}.items():
             with open(os.open(folder / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'w') as stream:
