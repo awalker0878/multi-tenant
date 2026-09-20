@@ -44,7 +44,8 @@ run "bootstrap_without_acceptance_rejected" {
     lifecycle_stage = "bootstrap"
     config_drive = true
   }
-  expect_failures = [openstack_networking_port_v2.workload, openstack_compute_instance_v2.workload, openstack_blockstorage_volume_v3.boot]
+  # Terraform stops traversal at these failed dependencies; the server is not evaluated.
+  expect_failures = [openstack_networking_port_v2.workload, openstack_blockstorage_volume_v3.boot]
 }
 
 run "quarantine_configuration" {
