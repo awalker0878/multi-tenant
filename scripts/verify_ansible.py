@@ -27,7 +27,7 @@ def main():
         vars=json.loads((ROOT/'ansible/fixtures/reference_bundle.json').read_text());vars.update(hosting_stage_enabled=True,hosting_staging_root=str(staging),ansible_python_interpreter=sys.executable)
         varfile=tmp/'vars.json';varfile.write_text(json.dumps(vars))
         def run(name,play,extra=None,expect_failure=False,zero_changes=False):
-            argv=base+[str(ROOT/'ansible/playbooks'/play),'-e','@'+str(varfile),*(extra or [])]
+            argv=base+[str(ROOT/'ansible/playbooks/local'/play),'-e','@'+str(varfile),*(extra or [])]
             try:r=subprocess.run(argv,cwd=ROOT/'ansible',env=env,capture_output=True,text=True,timeout=120);stdout=r.stdout;code=r.returncode;stderr=r.stderr
             except subprocess.TimeoutExpired:stdout='';code=124;stderr='Timeout'
             recap=re.findall(r'localhost\s*:\s*ok=\d+\s+changed=(\d+)\s+unreachable=(\d+)\s+failed=(\d+)',stdout)
@@ -49,8 +49,8 @@ def main():
         report['checks'].append({'name':'check-mode-does-not-mutate','passed':before==after})
         vars['hosting_stage_enabled']=False;varfile.write_text(json.dumps(vars));run('disabled-opt-in-rejected','stage_reference.yml',expect_failure=True)
         vars['hosting_stage_enabled']=True;vars['hosting_bundle']['routes'][0]['owner']='D02O';varfile.write_text(json.dumps(vars));run('foreign-route-rejected','stage_reference.yml',expect_failure=True)
-        for platform in ('nsx','nutanix'):
-            vars.update(hosting_platform=platform,hosting_manifest_path=str(ROOT/f'examples/{platform}_observation.json.example'));varfile.write_text(json.dumps(vars))
+        for platform in ('nsx','nutanix','neutron'):
+            vars.update(hosting_platform=platform,hosting_manifest_path=str(ROOT/'ansible/fixtures/neutron_manifest.json') if platform=='neutron' else str(ROOT/f'examples/{platform}_observation.json.example'));varfile.write_text(json.dumps(vars))
             run(platform+'-validation-no-contact','validate_readback.yml',zero_changes=True)
         try:
             handoff=json.loads((directory/'engineering-handoff.json').read_text())

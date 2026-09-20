@@ -1,33 +1,11 @@
-# Ansible — separate local engineering and verification responsibilities
+# Ansible execution profiles
 
-Increment 04 contained no Ansible source. These are **new candidate playbooks**,
-not imported or already-qualified vendor installers.
+Local engineering and validation playbooks live under `playbooks/local`. `configuration_bundle` validates a documentation fixture and renders private JSON/CSV into a marked staging directory. `readback_validate` checks NSX, Nutanix or Neutron manifests without target contact. Both profiles fix localhost, local connection, no facts and no escalation. Native platform observers remain separately invoked and require explicit target consent.
 
-`configuration_bundle` validates an explicit documentation-only engineering fixture,
-requires a caller-created marked staging directory, and renders a private JSON
-handoff and CSV route schedule. It does not configure Linux routing, a switch,
-firewall, hypervisor or service. Staging requires a Boolean opt-in; templates never
-grant apply or activation authority. This is the local P4 engineering handoff, not
-a new tenant provisioning API.
+The default inventory is `inventories/localhost.yml`. Provider credentials and remote inventories never enter ordinary PR CI. Terraform owns native resources; guest configuration has separate ownership and must not change platform policy, attachment or lifecycle fields.
 
-`readback_validate` runs the existing NSX/Nutanix validation-only CLI against an exact
-manifest and verifies `INPUT_VALID_NO_CONTACT`. The playbook has no native-contact
-option. Use separately accepted native readback procedures outside automatic CI.
+## Checks
 
-Both playbooks fix localhost, local connection, no facts and no escalation. No
-remote inventory, SSH credential, package installation, service restart or native
-mutation is included. Terraform and Ansible therefore have no competing native
-resource owner in this release.
+Run `python scripts/verify_ansible.py` with the pinned toolchain from `requirements-dev.txt`. It runs real engine syntax, local staging, repeat-idempotence, nonmutating check mode, rejected-input and three-platform manifest tests. Missing engines fail the gate. Engine status comes from each current report and GitHub run; source YAML parsing alone is not engine or native qualification.
 
-## Tests
-
-From the repository root, run `python scripts/verify_ansible.py`. With the actual
-Ansible engine installed it performs syntax checking, renders in a temporary marked
-workspace, repeats to require zero changes, checks drift in check mode without
-mutating files, exercises invalid/unapproved inputs and runs both manifest-validation
-variants. Workspaces are removed afterwards. Missing engines produce BLOCKED status
-and nonzero exit; Python/Jinja source tests are separately identified.
-
-The authoring runtime could not install Ansible. **Engine syntax, check-mode and
-idempotence tests are authored but not run here.** CI performs the real gate after
-push; static YAML parsing is not claimed as engine validation.
+See the maintained [automation process](../docs/implementation/automation/README.md) and [WSD deployment runbook](../docs/implementation/automation/wsd-deployment.md).

@@ -62,8 +62,8 @@ Committed provider pins are Nutanix `2.4.2`, NSX `3.10.0`, vSphere `2.12.0` and 
 
 | Source | Implemented behavior | Missing for complete delivery |
 | --- | --- | --- |
-| [stage_reference.yml](../../ansible/playbooks/stage_reference.yml) / [configuration_bundle](../../ansible/roles/configuration_bundle/tasks/main.yml) | Validate a local engineering fixture and render private JSON/CSV files into a marked staging directory | Actual platform/host/network/guest configuration and accepted output-to-inventory handoff |
-| [validate_readback.yml](../../ansible/playbooks/validate_readback.yml) / [readback_validate](../../ansible/roles/readback_validate/tasks/main.yml) | Validate NSX or Nutanix manifests without target contact | Neutron dispatch parity, approved native readback workflow, complete workload/storage coverage and live acceptance |
+| [stage_reference.yml](../../ansible/playbooks/local/stage_reference.yml) / [configuration_bundle](../../ansible/roles/configuration_bundle/tasks/main.yml) | Validate a local engineering fixture and render private JSON/CSV files into a marked staging directory | Actual platform/host/network/guest configuration and accepted output-to-inventory handoff |
+| [validate_readback.yml](../../ansible/playbooks/local/validate_readback.yml) / [readback_validate](../../ansible/roles/readback_validate/tasks/main.yml) | Validate NSX or Nutanix manifests without target contact | Neutron dispatch parity, approved native readback workflow, complete workload/storage coverage and live acceptance |
 | [localhost inventory](../../ansible/inventories/localhost.yml) | Fixed local execution, no facts/escalation | Isolated inventory sources, target identity checks, Linux SSH / Windows WinRM or PSRP where offered, credential injection and remote role tests |
 | [requirements-dev.txt](../../requirements-dev.txt) | Pinned Ansible core and selected Python dependencies | Selected vendor collections, collection dependency locks, reproducible execution environment and native version qualification |
 

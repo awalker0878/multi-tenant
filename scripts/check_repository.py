@@ -97,7 +97,7 @@ def check(root=ROOT):
             if m['terraform']['required_providers']!=r['terraform']['required_providers']:problem('PROVIDER_PIN_DIVERGENCE',mod.parent.name)
             if not plan_only_mock_tests(mod.parent):problem('UNSAFE_MOCK_TEST',mod.parent.name)
         except (OSError,KeyError,ValueError) as e:problem('NATIVE_SOURCE_STRUCTURE',mod.parent.name,e)
-    for p in (root/'ansible/playbooks').glob('*.yml'):
+    for p in (root/'ansible/playbooks/local').glob('*.yml'):
         counts['ansible_playbooks']+=1
         try:
             for play in yaml.load(p.read_text(),Loader=UniqueLoader):

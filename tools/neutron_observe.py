@@ -181,11 +181,19 @@ def write_private(path:Path,value:dict)->None:
 
 def main()->int:
  p=argparse.ArgumentParser(description=__doc__)
- p.add_argument('manifest',type=Path);p.add_argument('--endpoint',required=True);p.add_argument('--expected-origin',required=True)
- p.add_argument('--ca-file');p.add_argument('--output',type=Path,required=True)
- p.add_argument('--read-authorized-target',action='store_true',help='Explicit consent to bounded read-only target contact')
+ p.add_argument('manifest',type=Path);p.add_argument('--endpoint');p.add_argument('--expected-origin')
+ p.add_argument('--ca-file');p.add_argument('--output',type=Path)
+ mode=p.add_mutually_exclusive_group()
+ mode.add_argument('--read-authorized-target',action='store_true',help='Explicit consent to bounded read-only target contact')
+ mode.add_argument('--validate-only',action='store_true',help='Validate the manifest without credentials or target contact')
  a=p.parse_args()
+ if a.validate_only:
+  try:validate_manifest(strict_loads(a.manifest.read_bytes()))
+  except (ValueError,OSError):
+   print('{"status":"INVALID_INPUT","target_contacted":false,"may_activate":false}');return 4
+  print('{"status":"INPUT_VALID_NO_CONTACT","target_contacted":false,"may_activate":false}');return 0
  if not a.read_authorized_target:p.error('No target contacted. --read-authorized-target is required.')
+ if not all((a.endpoint,a.expected_origin,a.output)):p.error('Endpoint, expected origin and private output are required for native observation.')
  try:
   manifest=strict_loads(a.manifest.read_bytes());validate_manifest(manifest)
   client=Client(a.endpoint,a.expected_origin,os.environ.get('OS_TOKEN',''),a.ca_file)

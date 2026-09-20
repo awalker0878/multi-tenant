@@ -14,6 +14,8 @@ The 1.0 plan is now maintained in the architecture, engineering, implementation 
 
 | Cluster-aware WSD compilation and output handoff | Internal OZ/RZ examples for three platforms; per-environment/site/WSD/phase state identities; negative placement and output tests | Compiler emits disabled drafts; actual cluster commissioning, entitlement, capacity/IPAM and quarantine acceptance remain external |
 
+| Separate local Ansible profiles and Neutron dispatch | Local playbooks moved under `playbooks/local`; all three manifest adapters support no-contact validation | Native guest/observer coverage and qualification remain distinct |
+
 ## External inputs still required
 
 The repository does not contain selected native site endpoints, installed product/API/hardware/licence tuples, scoped credentials, an accepted physical network/security-edge realization, state service, authoritative capacity/IPAM service, storage/key/backup service selections, or their operating authorities. Product-specific installation, actual service mutations and native qualification cannot be completed by inventing these inputs. All three platform families remain unqualified until genuine target-bound evidence is accepted.

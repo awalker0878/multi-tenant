@@ -163,7 +163,7 @@ class TestAnsiblePureValidation(unittest.TestCase):
         self.assertIs(defaults['hosting_stage_enabled'],False)
 
     def test_all_playbooks_localhost_no_privilege_escalation(self):
-        for path in (ROOT/'ansible/playbooks').glob('*.yml'):
+        for path in (ROOT/'ansible/playbooks/local').glob('*.yml'):
             for play in yaml.safe_load(path.read_text()):
                 self.assertEqual(play['hosts'],'localhost')
                 self.assertEqual(play['connection'],'local')

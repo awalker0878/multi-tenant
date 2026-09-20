@@ -3,16 +3,15 @@
     that:
       - inventory_hostname == 'localhost'
       - ansible_connection == 'local'
-      - hosting_platform in ['nsx', 'nutanix']
+      - hosting_platform in ['nsx', 'nutanix', 'neutron']
       - hosting_manifest_path | length > 0
     fail_msg: 'Use an exact local manifest and a supported read-only adapter.'
 
 - name: Validate input without contacting any platform
   ansible.builtin.command:
-    argv:
-      - '{{ ansible_playbook_python }}'
-      - '{{ playbook_dir }}/../../tools/{{ hosting_platform }}_observe.py'
-      - '{{ hosting_manifest_path }}'
+    argv: >-
+      {{ [ansible_playbook_python, playbook_dir + '/../../../tools/' + hosting_platform + '_observe.py', hosting_manifest_path]
+         + (['--validate-only'] if hosting_platform == 'neutron' else []) }}
   register: hosting_readback_validation
   changed_when: false
   when: not ansible_check_mode
