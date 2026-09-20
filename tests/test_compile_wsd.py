@@ -26,6 +26,15 @@ def receipts(env):
 
 
 class WsdCompilerTests(unittest.TestCase):
+    def test_initial_compiler_cannot_bootstrap(self):
+        for key, value in [('lifecycle_stage', 'bootstrap'),
+                           ('bootstrap_acceptance_ref', 'CHG-123'),
+                           ('bootstrap_rules', {'ssh': {}})]:
+            env = example('openstack')
+            env['wsds'][0]['domains'][0]['inputs'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                compile_environment(env)
+
     def test_two_tenants_four_domains_three_platforms(self):
         for platform in COMPONENTS:
             with self.subTest(platform=platform):
