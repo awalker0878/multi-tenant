@@ -54,20 +54,45 @@ def read(r, client):
     return {key: selected(client.get(path)[0], r['expected'][key]) for key, path in properties(r).items()}
 
 
+def observation_keys(m): return {r['moid'] for r in m['resources']}
+
+
+def witness_state(r, evidence):
+    c.exact_keys(evidence, {'before', 'after'})
+    for snapshot in evidence.values():
+        require(isinstance(snapshot, dict) and c.digest(selected(snapshot, r['expected'])) == c.digest(snapshot),
+                'Selected portgroup witness required')
+    before, after = evidence['before'], evidence['after']
+    mismatches = c.differences(after, r['expected'])
+    stable = c.digest(before) == c.digest(after)
+    identity = all(not c.differences(x, {'config': {k: r['expected']['config'][k]
+        for k in ('_typeName', 'key', 'distributedVirtualSwitch')}, 'switch': r['expected']['switch']}) for x in (before, after))
+    if not stable: mismatches.append('/snapshot:changed_during_observation')
+    unknown = not stable or not identity or any(p.endswith((':missing', ':type')) for p in mismatches)
+    return dict(resource_key=r['moid'], identity_match=identity, config_status='UNKNOWN' if unknown else 'DIFFERENT' if mismatches else 'MATCH',
+        progress='COMPLETE', mismatch_fields=mismatches, config_sha256=c.digest(after), task_completion_observed=False,
+        group_witness=evidence, reason='PORTGROUP_IDENTITY_ONLY_NOT_PORT_ATTACHMENT_OR_DFW_ENFORCEMENT')
+
+
 def sample(m, client):
-    states = []
-    for r in m['resources']:
-        before = read(r, client); after = read(r, client)
-        mismatches = c.differences(after, r['expected'])
-        stable = c.digest(before) == c.digest(after)
-        identity = all(not c.differences(x, {'config': {k: r['expected']['config'][k]
-            for k in ('_typeName', 'key', 'distributedVirtualSwitch')}, 'switch': r['expected']['switch']}) for x in (before, after))
-        if not stable: mismatches.append('/snapshot:changed_during_observation')
-        unknown = not stable or not identity or any(p.endswith((':missing', ':type')) for p in mismatches)
-        states.append(dict(resource_key=r['moid'], identity_match=identity, config_status='UNKNOWN' if unknown else 'DIFFERENT' if mismatches else 'MATCH',
-            progress='COMPLETE', mismatch_fields=mismatches, config_sha256=c.digest(after), task_completion_observed=False,
-            reason='PORTGROUP_IDENTITY_ONLY_NOT_PORT_ATTACHMENT_OR_DFW_ENFORCEMENT'))
-    return states
+    return [witness_state(r, dict(before=read(r, client), after=read(r, client))) for r in m['resources']]
+
+
+def validate_witnesses(m, states, recompute, field):
+    try:
+        if len(states) == 1 and states[0].get('resource_key') == 'scope':
+            c.exact_keys(states[0], {'resource_key', 'config_status', 'progress', 'reason'})
+            require(states[0]['config_status'] == states[0]['progress'] == 'UNKNOWN', 'Invalid transport hold')
+            c.text(states[0]['reason']); return
+        require(len(states) == len(m['resources']), 'Complete device observation coverage required')
+        for resource, state in zip(m['resources'], states):
+            require(c.digest(state) == c.digest(recompute(resource, state[field])), 'Device witness or summary differs')
+    except (ValueError, TypeError, KeyError, IndexError):
+        raise c.ObservationError('VSPHERE_NETWORK_WITNESS_INVALID') from None
+
+
+def validate_observation_history(m, history, states, current=None):
+    validate_witnesses(m, states, witness_state, 'group_witness')
 
 
 if __name__ == '__main__':

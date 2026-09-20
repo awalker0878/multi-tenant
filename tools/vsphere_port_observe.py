@@ -86,25 +86,43 @@ def read(r, client):
     return result
 
 
+def observation_keys(m): return pg.observation_keys(m)
+
+
+def witness_state(r, evidence):
+    c.exact_keys(evidence, {'before', 'after', 'portgroup'})
+    expected = {p['key']: p for p in r['ports']}
+    for phase in ('before', 'after'):
+        c.exact_keys(evidence[phase], set(expected))
+        require(c.digest(selected(evidence[phase], expected)) == c.digest(evidence[phase]), 'Selected port witness required')
+    before, after = evidence['before'], evidence['after']
+    state = pg.witness_state(r, evidence['portgroup']); del state['group_witness']
+    mismatch = c.differences(after, expected)
+    stable = c.digest(before) == c.digest(after)
+    identity = all(not c.differences(snapshot, {key: {k: p[k] for k in IDENTITY} for key, p in expected.items()}) for snapshot in (before, after))
+    if not stable: mismatch.append('/snapshot:changed_during_observation')
+    unknown = not stable or not identity or any(p.endswith((':missing', ':type')) for p in mismatch)
+    state['identity_match'] = state['identity_match'] and identity
+    if unknown: state['config_status'] = 'UNKNOWN'
+    elif mismatch and state['config_status'] == 'MATCH': state['config_status'] = 'DIFFERENT'
+    state['mismatch_fields'] += ['/ports' + p for p in mismatch]
+    state['config_sha256'] = c.digest({'portgroup_sha256': state['config_sha256'], 'ports': after})
+    state['attachment_witness'] = evidence
+    state['reason'] = 'SELECTED_PORT_ATTACHMENT_ONLY_NOT_DFW_ENFORCEMENT_OR_WRITER_FENCE'
+    return state
+
+
 def sample(m, client):
     states = []
     for r in m['resources']:
         before = read(r, client)
-        state = pg.sample(group_manifest(m) | {'resources': [{k: v for k, v in r.items() if k != 'ports'}]}, client)[0]
-        after = read(r, client); expected = {p['key']: p for p in r['ports']}
-        mismatch = c.differences(after, expected)
-        stable = c.digest(before) == c.digest(after)
-        identity = all(not c.differences(snapshot, {key: {k: p[k] for k in IDENTITY} for key, p in expected.items()}) for snapshot in (before, after))
-        if not stable: mismatch.append('/snapshot:changed_during_observation')
-        unknown = not stable or not identity or any(p.endswith((':missing', ':type')) for p in mismatch)
-        state['identity_match'] = state['identity_match'] and identity
-        if unknown: state['config_status'] = 'UNKNOWN'
-        elif mismatch and state['config_status'] == 'MATCH': state['config_status'] = 'DIFFERENT'
-        state['mismatch_fields'] += ['/ports' + p for p in mismatch]
-        state['config_sha256'] = c.digest({'portgroup_sha256': state['config_sha256'], 'ports': after})
-        state['reason'] = 'SELECTED_PORT_ATTACHMENT_ONLY_NOT_DFW_ENFORCEMENT_OR_WRITER_FENCE'
-        states.append(state)
+        group = dict(before=pg.read(r, client), after=pg.read(r, client))
+        states.append(witness_state(r, dict(before=before, portgroup=group, after=read(r, client))))
     return states
+
+
+def validate_observation_history(m, history, states, current=None):
+    pg.validate_witnesses(m, states, witness_state, 'attachment_witness')
 
 
 if __name__ == '__main__':
