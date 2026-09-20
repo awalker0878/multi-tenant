@@ -36,20 +36,22 @@ class TerraformRunFixture:
                         'lock_method': 'POST', 'unlock_method': 'DELETE'}
         self.source = 'a' * 40
         now = utcnow()
-        self.authority = {'format': 'hosting-terraform-contact/1', 'source_commit': self.source,
+        self.credentials = {'TF_VAR_platform_password': 'SYNTHETIC-SECRET'}
+        self.authority = {'format': 'hosting-terraform-contact/2', 'source_commit': self.source,
                           'scope': self.scope, 'operation_id': 'op-01', 'generation': 1,
                           'input_sha256': digest(encoded(self.inputs)), 'backend_sha256': digest(encoded(self.backend)),
+                          'environment_sha256': digest(encoded(self.credentials)), 'cloud_sha256': None, 'ca_sha256': None,
                           'valid_from': (now - timedelta(minutes=1)).isoformat(),
                           'valid_until': (now + timedelta(minutes=20)).isoformat(), 'change_ref': 'CHG-001'}
         for name, value in {'inputs': self.inputs, 'backend': self.backend, 'authority': self.authority,
-                            'environment': {'TF_VAR_platform_password': 'SYNTHETIC-SECRET'}}.items():
+                            'environment': self.credentials}.items():
             write_new(self.base / name, encoded(value))
         self.binary = self.base / 'terraform'
         write_new(self.binary, b'not a native engine; test double only\n')
         self.binary.chmod(0o700)
         self.args = argparse.Namespace(**{k: self.base / k for k in ('inputs', 'backend', 'authority', 'environment')},
              terraform=self.binary, output=self.base / 'operation', references=None,
-             catalog_id='nutanix-wsd-domains', read_authorized_target=True)
+             catalog_id='nutanix-wsd-domains', read_authorized_target=True, cloud=None, ca_bundle=None)
         self.calls = []
 
     def snapshot(self, root, destination):
@@ -160,6 +162,47 @@ class TerraformRunTests(TerraformRunFixture, unittest.TestCase):
         for changes in ({'allow_restricted_build': False}, {'platform_password': 'secret'}):
             with self.assertRaises(ValueError):
                 run.select_scope(run.ROOT, 'nutanix-wsd-domains', {**self.inputs, **changes})
+
+    def test_changed_credential_material_requires_new_contact_binding(self):
+        self.args.environment.write_bytes(encoded({'TF_VAR_platform_password': 'CHANGED'}))
+        with self.assertRaises(ValueError):
+            self.prepare()
+        self.assertEqual(self.calls, [])
+
+    def test_openstack_cloud_is_self_contained_and_tls_bound(self):
+        cloud = {'clouds': {'test': {'auth_type': 'v3applicationcredential', 'verify': True,
+            'region_name': 'region-1', 'interface': 'internal', 'auth': {
+            'auth_url': 'https://identity.example.test/v3', 'application_credential_id': 'synthetic-id',
+            'application_credential_secret': 'synthetic-secret'}}}}
+        self.assertEqual(run.cloud_config(encoded(cloud), 'test'), cloud)
+        for field, value in [('verify', False), ('profile', 'ambient'), ('cacert', '/unbound.pem')]:
+            changed = copy.deepcopy(cloud)
+            changed['clouds']['test'][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                run.cloud_config(encoded(changed), 'test')
+
+    def test_openstack_profile_is_copied_and_ambient_files_are_shadowed(self):
+        self.inputs = json.loads((run.ROOT / 'terraform/stacks/wsd/openstack/domains/inputs.tfvars.json.example').read_text())
+        self.inputs.update(allow_restricted_build=True, test_authorization_ref='TEST-PRIVATE-CHANGE')
+        self.args.catalog_id = 'openstack-wsd-domains'
+        self.entry, self.scope, self.state_key = run.select_scope(run.ROOT, self.args.catalog_id, self.inputs)
+        self.backend['state_key'] = self.state_key
+        cloud = {'clouds': {self.inputs['openstack_cloud']: {'auth_type': 'v3applicationcredential',
+            'verify': True, 'region_name': 'region-1', 'interface': 'internal', 'auth': {
+            'auth_url': 'https://identity.example.test/v3', 'application_credential_id': 'test-id',
+            'application_credential_secret': 'test-secret'}}}}
+        self.args.cloud = self.base / 'cloud.json'
+        write_new(self.args.cloud, encoded(cloud))
+        self.authority.update(scope=self.scope, input_sha256=digest(encoded(self.inputs)),
+                              backend_sha256=digest(encoded(self.backend)), cloud_sha256=digest(encoded(cloud)))
+        for name, value in [('inputs', self.inputs), ('backend', self.backend), ('authority', self.authority)]:
+            (self.base / name).write_bytes(encoded(value))
+        self.prepare()
+        directory = self.args.output / 'source' / self.entry['root']
+        self.assertEqual(load_private(directory / 'clouds.yaml'), cloud)
+        self.assertEqual(load_private(directory / 'secure.yaml'), {'clouds': {}})
+        env = run.runtime_environment(self.args.output, {}, 'openstack', directory)
+        self.assertEqual(env['OS_CLIENT_CONFIG_FILE'], str(directory / 'clouds.yaml'))
 
 
 if __name__ == '__main__':

@@ -25,7 +25,7 @@ from tools.compile_wsd import STATE
 from tools.plan_review import review
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,
     private_path, read_private, replace_private, require, utcnow, write_new)
-from tools.terraform_run import backend_settings, command, process_environment, select_scope
+from tools.terraform_run import backend_settings, command, runtime_environment, select_scope
 
 
 def validate_bundle(operation, approval, binary, root=ROOT):
@@ -103,8 +103,8 @@ def apply(args, root=ROOT):
     binary = Path(args.terraform).resolve(strict=True)
     bundle = validate_bundle(operation, approval, binary, root)
     credentials = load_private(operation / 'environment.json')
-    env = process_environment(credentials)
-    env.update(TMPDIR=str(operation / 'tmp'), TF_CLI_CONFIG_FILE=str(operation / 'terraform.rc'))
+    directory = operation / 'source' / bundle['root']
+    env = runtime_environment(operation, credentials, bundle['scope']['platform'], directory)
     backend = load_private(operation / 'backend.json')
     identity = digest(encoded({'operation': bundle['operation_id'], 'generation': bundle['generation']}))
     with scope_ledger(args.ledger, backend['address']) as ledger:
@@ -120,7 +120,6 @@ def apply(args, root=ROOT):
         replace_private(ledger / 'head.json', encoded(receipt))
         write_new(operation / 'approval.json', encoded(approval))
         try:
-            directory = operation / 'source' / bundle['root']
             remaining = (datetime.fromisoformat(approval['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
             require(remaining > 0, 'Approval expired before mutation')
             command(binary, directory, ['apply', '-input=false', '-no-color', '-lock=true', '-lock-timeout=60s',

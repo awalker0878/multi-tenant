@@ -19,19 +19,38 @@ The backend JSON contains `state_key`, `address`, `lock_address`,
 locking and one reviewed server authority. Backend service access controls,
 encryption at rest, recoverability and ownership must already be commissioned.
 
-The contact handoff uses format `hosting-terraform-contact/1` and contains
+The contact handoff uses format `hosting-terraform-contact/2` and contains
 `source_commit`, the six-field output `scope`, `operation_id`, positive integer
-`generation`, `input_sha256`, `backend_sha256`, `valid_from`, `valid_until` and
+`generation`, `input_sha256`, `backend_sha256`, `environment_sha256`,
+`cloud_sha256`, `ca_sha256`, `valid_from`, `valid_until` and
 `change_ref`. Its contact window must be current and no longer than one hour.
 The runner consumes this record from the trusted operator/change system. The
 file is not a signature and the runner does not authenticate its issuing human;
 protect its custody and restrict who can invoke the runner with native credentials.
 
-The credential JSON currently permits `TF_VAR_platform_password`,
+The cloud/CA digest is `null` when that optional file is absent. Version 1
+contact records are rejected because they did not bind external credential/trust
+inputs. Native command timeouts are capped by the remaining contact window.
+
+The credential JSON permits `TF_VAR_platform_password`,
 `TF_HTTP_USERNAME` and `TF_HTTP_PASSWORD`. No implicit Terraform CLI flags,
 workspace, endpoint overrides, provider development overrides or debug logging
-are inherited. Nutanix and VMware WSD roots are supported; OpenStack cloud-file
-custody is an explicit remaining executor dependency.
+are inherited. All three WSD platform families are supported by the executor.
+
+For OpenStack, supply `--cloud` with a private JSON document containing exactly
+one `clouds` entry named by `openstack_cloud`. The profile fields are
+`auth_type: v3applicationcredential`, `verify: true`, an explicit `region_name`,
+`interface: internal` or `public`, and `auth` containing the HTTPS `auth_url`,
+`application_credential_id` and `application_credential_secret`. Use scoped
+application credentials from the actual project authority. Arbitrary YAML,
+imported vendor profiles and external file references are rejected. The executor
+copies the profile into the operation and supplies empty secure/public overlays
+so ambient profiles cannot replace its account or project. This follows the
+pinned provider dependency's [cloud discovery implementation](https://github.com/gophercloud/utils/blob/8f6f0255f600/openstack/clientconfig/utils.go).
+
+For an enterprise trust anchor, supply a private `--ca-bundle` PEM file; its
+bytes are bound by contact authority and the bundle. Ambient TLS overrides are
+not inherited. Credential or trust changes require a new reviewed plan.
 
 ```sh
 python tools/terraform_run.py \
