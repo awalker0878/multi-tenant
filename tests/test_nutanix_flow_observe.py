@@ -43,6 +43,9 @@ class FlowSnapshots(unittest.TestCase):
             lambda e: e['rules'][2]['spec'].update(destIpv6Subnet={'value': '2001:db8::1', 'prefixLength': 128}),
             lambda e: e['rules'][2]['spec'].update(serviceGroupReferences=[uid(50)]),
             lambda e: e['rules'][2]['spec']['udpServices'][0].update(endPort=65535),
+            lambda e: e['rules'][2].update({'$specItemDiscriminator': flow.TYPE + 'IntraEntityGroupRuleSpec'}),
+            lambda e: e['rules'][2]['spec']['udpServices'][0].update({'$objectType': flow.TYPE + 'TcpPortRangeSpec'}),
+            lambda e: e['rules'][2]['spec']['destSubnet'].update({'$objectType': 'common.v1.config.IPv6Address'}),
             lambda e: e['rules'][2].update(tenantId=uid(50))]
         for mutate in mutations:
             self.client = Client(self.m); mutate(self.client.body['data'])
@@ -59,6 +62,10 @@ class FlowSnapshots(unittest.TestCase):
     def test_readonly_metadata_is_not_journaled(self):
         self.client.body['data']['description'] = 'PRIVATE-SENTINEL'
         self.client.body['data']['networkFunctionReferences'] = []
+        rule = self.client.body['data']['rules'][2]
+        rule['$specItemDiscriminator'] = rule['spec']['$objectType']
+        rule['spec']['destSubnet']['$reserved'] = {'$fv': 'v1.r0'}
+        rule['spec']['udpServices'][0]['$reserved'] = {'$fv': 'v4.r2'}
         report = self.observe()
         self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
         self.assertNotIn('PRIVATE-SENTINEL', json.dumps(report))

@@ -29,14 +29,17 @@ def convert_fields(wire, names):
     result = {mapping[key]: value for key, value in wire.items() if key in mapping}
     for key in ('src_subnet', 'dest_subnet'):
         if key in result and result[key] is not None:
-            subnet = result[key]; c.exact_keys(subnet, {'value', 'prefixLength'}, {'$objectType'})
+            subnet = result[key]; c.exact_keys(subnet, {'value', 'prefixLength'}, {'$objectType', '$reserved'})
+            require(subnet.get('$objectType', 'common.v1.config.IPv4Address') == 'common.v1.config.IPv4Address', 'Wrong peer address type')
             result[key] = [{'value': subnet['value'], 'prefix_length': subnet['prefixLength']}]
     for key in ('tcp_services', 'udp_services'):
         if key in result and result[key] is not None:
             require(isinstance(result[key], list), 'Service list required')
             ports = []
             for port in result[key]:
-                c.exact_keys(port, {'startPort', 'endPort'}, {'$objectType'})
+                c.exact_keys(port, {'startPort', 'endPort'}, {'$objectType', '$reserved'})
+                port_type = TYPE + ('TcpPortRangeSpec' if key == 'tcp_services' else 'UdpPortRangeSpec')
+                require(port.get('$objectType', port_type) == port_type, 'Wrong protocol service type')
                 ports.append({'start_port': port['startPort'], 'end_port': port['endPort']})
             result[key] = ports
     return result
@@ -71,6 +74,7 @@ def policy_shape(data, resource):
             names |= flow_policy.EMPTY_INTRA | {'secured_group_action'}
             wire_type, key = 'IntraEntityGroupRuleSpec', 'intra_entity_group_rule_spec'
         require(spec.get('$objectType') == TYPE + wire_type, 'Native rule discriminator differs')
+        require(rule.get('$specItemDiscriminator', TYPE + wire_type) == TYPE + wire_type, 'Contradictory native union discriminator')
         item = {'type': kind, 'spec': [{key: [convert_fields(spec, names)]}]}
         if 'description' in rule: item['description'] = rule['description']
         converted['rules'].append(item)
