@@ -110,6 +110,16 @@ holds the campaign. Accept the window and installed filter/visibility behavior
 independently; this does not supply native writer exclusion or general lifecycle
 coverage. Do not switch to a narrower profile to bypass an activity hold.
 
+For accepted template clones, the separate
+`vsphere-vi-json-8.0.3.0-clone-task-activity` workload profile observes the unique
+union of source and destination VMs. It retains template/result/tree evidence
+and adds the same pending/completed scans on both sides. Accept the complete
+source/destination scope and exact attempt window; busy shared templates, missing
+source visibility and separate work keep the campaign held. It is supported in
+v5/v6/v7 without new assets. Templates remain separately owned source objects;
+only destination VMs enter workload-output and port/domain binding. This does not
+authorize clone adoption or release a held Terraform attempt.
+
 The scope reference must independently establish the managed-object/UUID and
 NSX-segment/vCenter-network associations. This version observes each configured
 NIC backing but does not discover or prove that cross-system association, effective

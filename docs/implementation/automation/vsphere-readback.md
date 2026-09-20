@@ -140,7 +140,7 @@ tasks omitted from the accepted tree. It supports the same existing-VM power and
 reconfiguration task records, and adds `task.activity_since`: the exact interrupted
 attempt start timestamp. Offline recovery review requires this timestamp to equal
 `context.attempted_at`. It must precede or equal every accepted task's queue time.
-This profile is separate from clone/source reconciliation below.
+This profile is separate from the clone activity profile below.
 
 For each accepted VM, the collector uses that exact `VirtualMachine` reference
 and entity recursion `self`, with no user, parent, root or event-chain restriction:
@@ -218,3 +218,49 @@ defines the successful result as the new VM; Broadcom's
 [native clone diagnostic](https://knowledge.broadcom.com/external/article/427645/scheduled-vm-clone-task-fails-with-error.html)
 identifies the native clone operation. The profile remains an unqualified
 candidate until native TaskInfo captures establish its exact applicability.
+
+### Activity on clone sources and destinations
+
+Use `vsphere-vi-json-8.0.3.0-clone-task-activity` with the same task-tree command to
+observe separate visible work on both sides of the clone. Keep the clone roots,
+child records, accepted `task.sources` and destination expectations above. Add
+`task.activity_since`, the exact interrupted attempt start, no later than any
+accepted task queue time. Offline triage requires it to equal `context.attempted_at`.
+Do not infer this timestamp from task completion or the latest observation.
+
+The observer queries the unique union of accepted source and destination MoIDs,
+at most 20 combined, with the same exact-entity/`self` filters described above.
+Shared templates are queried once. It collects pending tasks without a time cutoff
+and success/error tasks completed since the attempt, before and after source,
+child-history, direct task and destination VM observations. No user, root, parent,
+event-chain or operation filter narrows these activity scans.
+
+The combined visible task set must match all accepted records and direct task
+witnesses, including the clone root's source entity and exact returned VM. Every
+source and destination query must be present. A destination query may be empty
+when all accepted work is recorded against the source; omitting that query is
+uncertain evidence. Missing roots, separate clones, old pending tasks, late
+completions and destination work outside the accepted tree hold. Cross-query
+duplicates, wrong entities and contradictory result/time fields also hold.
+
+Offline review recomputes the activity, template and task witnesses. Matching
+observations still require genuine native writer exclusion and quarantine before
+readback. The native resource-set/fence evidence must cover the template and
+destination, including the shared template's owner; a WSD label alone does not
+fence either native object. Active incident containment continues to block review.
+This profile cannot enter the existing-VM Terraform receipt review, adopt a clone,
+release an execution ledger, submit another clone or issue power commands.
+
+The existing request/time/page limits remain shared: at most 100 activity rows per
+scan, complete collector pagination and cleanup, and the 400-request/120-second
+transport budget. Busy shared templates or larger exact scopes can exhaust that
+budget and require separate native-owner investigation. Never omit a source,
+shorten the window, or downgrade to the clone-tree-only profile to obtain a match.
+
+Campaigns v5/v6/v7 accept this workload profile with their existing assets. v7
+retains its destination NIC/port/domain bindings; template activity does not make
+the source a tenant workload or supply image attestation. Qualify the native
+source/destination task attribution, retention, RBAC and filter semantics through
+the [commissioning cases](site-commissioning.md). Other entities, synchronous
+operations, hidden/expired work and later submissions remain outside coverage.
+These bounded reads do not establish complete native reconciliation or fencing.

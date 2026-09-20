@@ -86,7 +86,9 @@ alongside actual network/VM task evidence. For VMware use
 associations and, in v7, exact port occupants, connection cookies and host/runtime
 bindings. These observations cannot resolve an uncertain native operation.
 Task profiles check accepted tasks and, where selected, bounded child history or
-visible existing-VM activity; they never clear an execution ledger or authorize
+visible existing-VM activity. The separate clone activity profile scans both the
+accepted template and destination for visible pending/late work; it retains source
+identity and result/tree checks. These profiles never clear an execution ledger or authorize
 replay. The [held-attempt reviewer](terraform-recovery.md)
 binds existing-VM observations to the exact saved plan and current durable hold,
 comparing supported CPU/memory/topology configuration and holding other updates.

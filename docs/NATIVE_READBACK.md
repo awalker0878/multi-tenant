@@ -101,6 +101,9 @@ Separate [AHV VM](implementation/automation/nutanix-vm-readback.md) and
 [Flow policy](implementation/automation/nutanix-flow-readback.md) snapshot profiles
 are available, as are [vSphere VM/task observations](implementation/automation/vsphere-readback.md).
 Their exact coverage and task limitations are documented separately.
+The vSphere clone activity profile additionally observes visible work on both
+accepted template sources and result VMs, without clone submission, state adoption
+or native writer fencing.
 [VMware network association readers](implementation/automation/vmware-network-binding.md)
 add exact NSX-backed distributed-portgroup/switch identities and segment-scoped
 realized-switch identities. Campaign v6 binds these to each VM's assigned domain;

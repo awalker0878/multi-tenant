@@ -153,8 +153,8 @@ Independently establish native RBAC/history visibility and retention; the observ
 cannot distinguish a silently hidden task from a genuinely absent task. Tasks on
 other entities, synchronous operations without tasks and future submissions remain
 outside this scan. Complete operation coverage and actual writer exclusion stay
-separate acceptance requirements. The template-clone profile below does not gain
-this existing-VM activity coverage.
+separate acceptance requirements. The clone-tree-only profile remains narrower;
+use the separate clone activity profile below for source/destination scans.
 
 For template cloning, capture the installed platform's native `TaskInfo` shape
 and description, accepted source MoID/BIOS UUID/instance UUID/revision, original
@@ -172,6 +172,27 @@ request/task trail, and exact returned destination MoID/UUID. Validate the
 Retain real results, including unsupported task types and omission semantics.
 Synthetic successful reports must not populate the site's acceptance record.
 The clone observer does not implement creation adoption or close power fencing.
+
+Qualify `vsphere-vi-json-8.0.3.0-clone-task-activity` before relying on its combined
+source/destination observations. Capture real native attribution, including the
+source clone root, returned destination and any child operations. Establish the
+actual observation role's visibility and retention on **both** objects, and accept
+the exact attempt window. Shared-template ownership and fencing must be covered
+by their responsible native owner; tenant-scoped authority alone is insufficient.
+
+| Native scenario | Required result |
+| --- | --- |
+| Separate clone from the same template | Extra source task holds even if the selected result VM matches |
+| Old source task remains pending, or finishes after the attempt start | Visible in the corresponding query; retain the hold |
+| Result VM has separate power/reconfiguration work | Hold on the combined task-set difference |
+| Source root hidden/expired, or a source/result query is omitted | Missing coverage holds; never treat it as a successful empty scope |
+| Accepted clone work belongs to the source and the destination query is empty | Empty query must still be collected and checked against the exact accepted task set |
+| Shared template used for several accepted destinations | Query it once while retaining every destination and clone result binding |
+| Source page/cleanup fails or aggregate budget is exhausted | Stop collection; preserve containment and the ledger |
+
+Recompute offline witnesses and test the profile with the chosen campaign version.
+Matching activity cannot substitute for fencing/quarantine evidence or authorize
+state adoption. Do not narrow filters or downgrade profiles after a hold.
 
 Retain the exact task trails, native revision/ETag evidence, failed observations,
 healthy denial controls and accepted cross-system bindings. Perform actual HA,

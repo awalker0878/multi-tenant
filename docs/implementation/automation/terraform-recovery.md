@@ -23,8 +23,12 @@ an accepted exact revision. Matching VM UUIDs alone is insufficient.
 Disk/NIC/firmware and other unchanged settings remain subject to their independent
 native baseline and ownership evidence. This profile does not translate the full
 provider schema or establish NSX/network associations. The separate clone-tree
-observer can collect result/source evidence, but cannot use this existing-VM
-review path to adopt a newly created resource.
+observer can collect result/source evidence, and the separate
+`vsphere-vi-json-8.0.3.0-clone-task-activity` profile additionally observes visible
+work on both source and destination. Neither can use this existing-VM review path
+to adopt a newly created resource. A matching clone activity report leaves all
+ledger bytes held; creation/state ownership and approved forward action remain
+separate native-owner decisions.
 
 Preserve the original bundle and shared durable ledger. Prepare current observations
 with profile `vsphere-vi-json-8.0.3.0-vm-task-activity`, the original operation ID,
