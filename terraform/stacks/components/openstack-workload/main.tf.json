@@ -141,6 +141,30 @@
       "type": "string",
       "description": "Named protected clouds.yaml profile for the correct project",
       "nullable": false
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
+    },
+    "config_drive": {
+      "type": "bool",
+      "default": false,
+      "nullable": false,
+      "description": "Opt in at initial VM creation to the metadata config drive required by the reference bootstrap image. Changing an existing VM can require replacement."
     }
   },
   "module": {
@@ -165,12 +189,18 @@
       "flavor_id": "${var.flavor_id}",
       "compute_availability_zone": "${var.compute_availability_zone}",
       "storage_availability_zone": "${var.storage_availability_zone}",
-      "volume_type": "${var.volume_type}"
+      "volume_type": "${var.volume_type}",
+      "lifecycle_stage": "${var.lifecycle_stage}",
+      "bootstrap_acceptance_ref": "${var.bootstrap_acceptance_ref}",
+      "config_drive": "${var.config_drive}"
     }
   },
   "output": {
     "handoff": {
       "value": "${module.owned}"
+    },
+    "lifecycle_stage": {
+      "value": "${module.owned.lifecycle_stage}"
     }
   }
 }

@@ -25,3 +25,14 @@ Native and allocation IDs must come from accepted engineering records. Credentia
 `network_id`, `subnet_id`, `router_id`, `security_group_id`, `delivery_state`.
 
 Output IDs and the static delivery-state label do not establish native readiness, test results or authorization.
+# Restricted bootstrap lifecycle
+
+Defaults keep the network and router down. `lifecycle_stage = "bootstrap"`
+requires `bootstrap_acceptance_ref` and is a separately reviewed non-production
+transition. `bootstrap_rules` adds only named IPv4 /32 TCP/UDP service tuples to
+the provider-owned group; default egress stays removed. Keep the rule map when
+returning to `prepared`: interfaces go down and rule identities remain owned.
+Rule deletion is prevented until a separate retirement design is accepted.
+The normal restricted-plan reviewer still blocks exposure without the dedicated
+transition contract. Native mandatory-policy ownership and actual routing must
+be independently accepted before a transition.

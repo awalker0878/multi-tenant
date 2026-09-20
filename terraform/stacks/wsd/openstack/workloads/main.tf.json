@@ -72,7 +72,7 @@
       ]
     },
     "members": {
-      "type": "map(object({domain_key = string, boot_disk_gib = optional(number, 40), data_disk_gib = optional(number, 0), accepted_quarantine_ref = string, network_id = string, subnet_id = string, security_group_id = string, ipv4_address = string, image_id = string, flavor_id = string, compute_availability_zone = string, storage_availability_zone = string, volume_type = string}))",
+      "type": "map(object({domain_key = string, boot_disk_gib = optional(number, 40), data_disk_gib = optional(number, 0), accepted_quarantine_ref = string, network_id = string, subnet_id = string, security_group_id = string, ipv4_address = string, image_id = string, flavor_id = string, compute_availability_zone = string, storage_availability_zone = string, volume_type = string, lifecycle_stage = optional(string, \"prepared\"), bootstrap_acceptance_ref = optional(string, \"\"), config_drive = optional(bool, false)}))",
       "nullable": false,
       "description": "workloads owned by this tenant/WSD; map keys are immutable native identities.",
       "validation": [
