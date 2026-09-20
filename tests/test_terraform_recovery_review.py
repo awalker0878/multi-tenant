@@ -23,6 +23,10 @@ class AttemptRecoveryTests(unittest.TestCase):
         inputs = json.loads((r.ROOT / 'terraform/stacks/wsd/vmware/workloads/inputs.tfvars.json.example').read_text())
         inputs.update(allow_restricted_build=True, test_authorization_ref='FIXTURE', platform_endpoint='vc.example.test')
         inputs['members']['processor-01']['resource_pool_id'] = 'resgroup-1'
+        inputs['members']['processor-01']['datastore_id'] = 'datastore-1'
+        disk = self.m['resources'][0]['expected']['config']['hardware']['device'][1]
+        disk.update(capacityInKB=41943040, capacityInBytes=42949672960)
+        disk['backing'].update(thinProvisioned=True, eagerlyScrub=False)
         self.m['resources'][0]['expected']['config']['name'] = 'processor-01'
         _, scope, state_key = select_scope(r.ROOT, 'vmware-wsd-workloads', inputs)
         self.m.update(tenant_id=scope['tenant_key'], scope_id=scope['wsd_key'])
@@ -33,6 +37,12 @@ class AttemptRecoveryTests(unittest.TestCase):
         identity = self.m['resources'][0]['expected']['config']['uuid']
         after = dict(id=identity, name='processor-01', num_cpus=2, num_cores_per_socket=1, memory=4096, resource_pool_id='resgroup-1',
                      firmware='efi', network_interface=[{'network_id': 'accepted-external-binding'}])
+        after.update(datastore_id='datastore-1', scsi_type='pvscsi', scsi_controller_count=1,
+            storage_policy_id=inputs['members']['processor-01']['storage_policy_id'], disk=[dict(label='disk0',
+                key=2000, uuid='6000C290-fixture-disk', unit_number=0, controller_type='scsi', size=40,
+                path='vm/vm.vmdk', datastore_id='datastore-1', disk_mode='persistent', thin_provisioned=True,
+                eagerly_scrub=False, keep_on_remove=True, attach=False,
+                storage_policy_id=inputs['members']['processor-01']['storage_policy_id'])])
         self.plan = dict(format_version='1.2', complete=True, resource_changes=[dict(
             address='module.owned.module.member["processor-01"].vsphere_virtual_machine.workload', type='vsphere_virtual_machine',
             mode='managed', provider_name='registry.terraform.io/hashicorp/vsphere',

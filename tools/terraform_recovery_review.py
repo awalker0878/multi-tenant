@@ -12,9 +12,10 @@ from tools.run_files import digest, encoded, load_private, private_path, read_pr
 from tools.terraform_run import ROOT, select_scope, backend_settings
 from tools.plan_review import has_true
 from tools import nutanix_terraform_recovery as ahv, lifecycle_transition
+from tools import vsphere_recovery_devices as devices
 
 HELD = {'STARTED_OUTCOME_UNKNOWN', 'HOLD_RECONCILIATION_REQUIRED'}
-OBSERVED_PLAN_FIELDS = {'name', 'num_cpus', 'num_cores_per_socket', 'memory', 'resource_pool_id'}
+OBSERVED_PLAN_FIELDS = {'name', 'num_cpus', 'num_cores_per_socket', 'memory', 'resource_pool_id'} | devices.DISK_FIELDS
 UPDATE_FIELDS = {'num_cpus', 'num_cores_per_socket', 'memory'}
 COMPUTED_FIELDS = {'change_version', 'default_ip_address', 'guest_ip_addresses', 'power_state', 'vapp_transport'}
 
@@ -35,6 +36,8 @@ def bind_configuration(change, resource, member_name, member):
     require(changed <= UPDATE_FIELDS | COMPUTED_FIELDS, 'Update exceeds observed configuration coverage')
     require(change['actions'] != ['no-op'] or changed <= COMPUTED_FIELDS, 'No-op contradicts planned configuration')
     expected = resource['expected']; hardware = expected['config']['hardware']
+    for field, default in [('vcpu', 2), ('memory_gib', 4)]:
+        require(type(member.get(field, default)) is int and member.get(field, default) > 0, 'Typed member capacity required')
     values = dict(name=expected['config']['name'], num_cpus=hardware['numCPU'], num_cores_per_socket=hardware['numCoresPerSocket'],
                   memory=hardware['memoryMB'], resource_pool_id=expected['resourcePool']['value'])
     require(all(key in after and type(after[key]) is type(value) and after[key] == value for key, value in values.items()), 'Planned configuration differs from native expectations')
@@ -46,6 +49,7 @@ def bind_configuration(change, resource, member_name, member):
     for key, value in known_native.items():
         if key in after and not has_true(unknown.get(key)):
             require(type(after[key]) is str and after[key] == value, 'Known native plan metadata differs')
+    devices.bind_disks(after, expected, member)
 
 
 def bind_plan(plan, inputs, manifest):
