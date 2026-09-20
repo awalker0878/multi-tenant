@@ -23,13 +23,17 @@ def bind_rules(change, expected):
     require(mask is False or isinstance(mask, list) and (not mask or len(mask) == len(after['rules'])),
             'Incomplete rule unknown mask')
     planned = deepcopy(after)
+    prior_services = {}
+    for rule in before['rules'][2:]:
+        name = rule.get('description')
+        require(isinstance(name, str) and name and name not in prior_services, 'Ambiguous prior service-rule identity')
+        prior_services[name] = rule
     for index, rule in enumerate(after['rules']):
         ident = expected['rules'][index]['ext_id']
         rule_mask = mask[index] if mask and isinstance(mask, list) else {}
         require(isinstance(rule_mask, dict), 'Rule unknown object required')
-        old = before['rules'][index] if index < len(before['rules']) else None
-        retained = old is not None and (index < 2 or old.get('description') == rule.get('description'))
-        if retained:
+        old = before['rules'][index] if index < 2 else prior_services.get(rule.get('description'))
+        if old is not None:
             require(old.get('ext_id') == rule.get('ext_id') == ident and not has_true(rule_mask.get('ext_id')),
                     'Retained Flow rule identity differs or is unresolved')
         elif rule_mask.get('ext_id') is True:

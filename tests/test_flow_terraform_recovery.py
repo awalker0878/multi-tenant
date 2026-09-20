@@ -113,6 +113,20 @@ class HeldFlowTests(unittest.TestCase):
         plan = deepcopy(self.plan); plan['resource_changes'][0]['change']['after_unknown'] = {}
         with self.assertRaises(ValueError): self.bind(plan=plan)
 
+    def test_retained_service_identity_follows_name_when_sorted_position_changes(self):
+        from tests.test_flow_lifecycle import policy
+        service = self.transition['requested_inputs']['members']['D01O']['bootstrap_rules']['dns']
+        before = policy({'zulu': service}); after = policy({'alpha': service, 'zulu': service})
+        for doc in (before, after):
+            for index in range(2): doc['rules'][index]['ext_id'] = fixtures.uid(21+index)
+        before['rules'][2]['ext_id'] = fixtures.uid(23)
+        after['rules'][3]['ext_id'] = fixtures.uid(23)
+        expected = deepcopy(after); expected['rules'][2]['ext_id'] = fixtures.uid(24)
+        change = dict(before=before, after=after, after_unknown={'rules': [{}, {}, {'ext_id': True}, {}]})
+        flow.bind_rules(change, expected)
+        after['rules'][3].pop('ext_id'); change['after_unknown']['rules'][3]['ext_id'] = True
+        with self.assertRaises(ValueError): flow.bind_rules(change, expected)
+
     def test_retained_denies_cannot_change_identity_even_with_matching_semantics(self):
         for mutate in (lambda ch: ch['after_unknown'].update(rules=[{'ext_id': True}, {}, {'ext_id': True}]),
                        lambda ch: ch['after_unknown'].update(rules=[{}, {}, {'ext_id': 1}]),
