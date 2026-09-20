@@ -114,8 +114,15 @@ def run():
                     change_ref='LOCAL-FIXTURE', boundary_acceptance_ref='LOCAL-FIXTURE', readiness_ref='LOCAL-FIXTURE')
                 authority_path = base / f'authority-{counter}.json'
                 authority_path.write_bytes(encoded(authority)); authority_path.chmod(0o600)
-                command(ns('edge', sys.executable, str(ROOT / 'tools/nft_edge.py'), 'apply', *common, '--mode', mode,
-                           '--authority', str(authority_path), '--ledger', str(ledger), '--output', str(base / f'apply-{counter}')))
+                try:
+                    command(ns('edge', sys.executable, str(ROOT / 'tools/nft_edge.py'), 'apply', *common, '--mode', mode,
+                               '--authority', str(authority_path), '--ledger', str(ledger), '--output', str(base / f'apply-{counter}')))
+                except subprocess.CalledProcessError as exc:
+                    # This campaign owns every synthetic input and has no native
+                    # credentials. Retain its engine diagnostic before cleanup.
+                    logs = sorted((base / f'apply-{counter}').glob('kernel-*.log'))
+                    detail = '\n'.join(p.read_text()[-4000:] for p in logs if p.stat().st_size)
+                    raise RuntimeError('Local fixture nft engine: ' + detail) from exc
             apply('withdraw'); probe(19651, False); probe(19652, False)
             apply('bootstrap'); probe(19651, True); probe(19652, False)
             apply('active'); probe(19651, True); probe(19652, True)

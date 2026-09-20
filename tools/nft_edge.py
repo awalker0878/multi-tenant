@@ -75,7 +75,9 @@ def render(spec, mode, lease_seconds, *, exists=False):
     require(mode in {'bootstrap', 'active', 'withdraw'} and type(lease_seconds) is int
             and 1 <= lease_seconds <= spec['max_lease_seconds'], 'Invalid edge mode/lease')
     flows = [] if mode == 'withdraw' else [x for x in spec['flows'] if mode == 'active' or x['phase'] == 'bootstrap']
-    marker = 'hosting:' + scope_hash + ':' + digest(encoded(spec)) + ':' + mode
+    # Native nft comments are bounded to 128 bytes. Full input digests remain
+    # in the private receipt; ownership retains the complete scope digest.
+    marker = 'hosting:' + scope_hash + ':' + digest(encoded(spec))[:16] + ':' + mode
     lines = ([f'delete table inet {table}'] if exists else []) + [f'table inet {table} {{', f' comment "{marker}"']
     for i, flow in enumerate(flows):
         lines += [f' set f{i} {{', '  type ipv4_addr . ipv4_addr . inet_service', '  flags timeout',
