@@ -22,7 +22,7 @@ def closed_plan():
                              'port_security_enabled': True}}}]}
 
 
-class TerraformRunTests(unittest.TestCase):
+class TerraformRunFixture:
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
@@ -75,6 +75,8 @@ class TerraformRunTests(unittest.TestCase):
              patch.object(run, 'command', side_effect=self.engine):
             return run.prepare(self.args)
 
+
+class TerraformRunTests(TerraformRunFixture, unittest.TestCase):
     def test_prepare_saves_the_binary_plan_and_derives_its_json(self):
         result = self.prepare()
         self.assertEqual([c[0] for c in self.calls], ['version', 'init', 'plan', 'show'])

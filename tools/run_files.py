@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import stat
+import tempfile
 
 from tools.neutron_observe import strict_loads
 
@@ -76,6 +77,24 @@ def write_new(path, data):
         stream.flush()
         os.fsync(stream.fileno())
     sync_directory(path.parent)
+
+
+def replace_private(path, data):
+    """Atomically replace a ledger pointer; immutable attempt records live beside it."""
+    path = Path(path)
+    private_path(path.parent, directory=True)
+    if path.exists():
+        private_path(path)
+    fd, name = tempfile.mkstemp(prefix='.pending-', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(name, path)
+        sync_directory(path.parent)
+    finally:
+        Path(name).unlink(missing_ok=True)
 
 
 def new_directory(path, repository):

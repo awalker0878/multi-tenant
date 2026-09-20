@@ -58,12 +58,53 @@ private. Console output includes only status and the bundle digest. Preserve
 failed operation directories for review; never promote them by editing their
 contents.
 
+## Saved-plan application
+
+Review the complete private plan and every finding. An externally controlled
+`hosting-terraform-approval/1` record must identify `bundle_sha256`,
+`review_sha256`, `operation_id`, `generation`, `valid_from`, `valid_until` and
+`change_ref`. The review digest covers the entire review JSON, including findings
+requiring independent engineering/native evidence. The record consumes actual
+change approval; it does not manufacture that approval. The maximum apply window
+and plan age are one hour. Apply from the same clean source revision and binary.
+
+```sh
+python tools/terraform_apply.py \
+  --bundle /private/operator/run-001 \
+  --approval /private/operator/approved.json \
+  --terraform /opt/terraform/bin/terraform \
+  --ledger /private/operator/execution-ledger \
+  --execute-approved-change
+```
+
+The ledger directory must already exist with mode 0700. All writers using this
+executor must use the same durable ledger and canonical backend address. A
+POSIX advisory lock serializes this executor's writers for that backend, while
+Terraform's backend lock protects state. The executor records and fsyncs a
+started/unknown outcome **before** invoking the exact saved binary plan. No new
+plan, automatic retry, destroy, force-unlock or rollback is invoked during apply.
+
+A timeout, interrupt, failed apply, missing output or mismatched output leaves
+the scope held for independent native reconciliation. A process killed before
+it can record failure leaves its durable started/unknown record. Reusing the
+same operation/generation is rejected even from a copied bundle. A successful
+apply captures scope-checked outputs for the next phase and remains explicitly
+`APPLIED_REQUIRES_NATIVE_ACCEPTANCE`.
+
+These filesystem locks do not fence another tool or a native task still running
+after a controller dies. Actual cross-writer exclusion, native task discovery,
+approved reconciliation and controlled ledger recovery must be integrated with
+the selected platform/change service before unattended execution. There is no
+automatic command to clear an uncertain record. Do not delete a ledger to retry.
+
 ## Delivery boundary
 
-The initial increment implements preparation only. Saved-plan application,
-durable execution history and uncertain-outcome handling follow as separate
-increments. No native campaign or production activation is claimed. Existing
-quarantine, retention and field-ownership constraints remain effective.
+This increment supplies restricted plan/apply execution and durable attempt
+records. It does not install a backend, qualify a platform, configure bootstrap
+connectivity, activate production, authenticate approval signers, or prove native
+recovery. Existing quarantine, retention and field-ownership constraints remain
+effective. Success must be followed by independent native observation and the
+remaining service gates.
 
 See [WSD deployment](wsd-deployment.md), [delivery process](delivery-process.md)
 and [acceptance gates](acceptance.md). Terraform documents the sensitive contents
