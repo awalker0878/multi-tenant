@@ -204,11 +204,12 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
                     if rule.get('action')!='DROP' or rule.get('logged') is not True or rule.get('disabled') is not False or rule.get('direction')!='IN_OUT' or rule.get('ip_version')!='IPV4_IPV6':finding('BLOCK','NSX_QUARANTINE_RULE_CHANGED',address)
                     if not empty(rule.get('source_groups')) or not empty(rule.get('destination_groups')) or not empty(rule.get('services')) or not empty(rule.get('service_entries')):finding('BLOCK','DROP_RULE_NARROWED',address)
             finding('REVIEW','NATIVE_DFW_PRECEDENCE_AND_EXCLUSIONS_NOT_OBSERVED',address)
-        if kind=='nutanix_network_security_policy_v2':
+        if kind=='nutanix_network_security_policy_v2' and address not in lifecycle:
             refs=after.get('vpc_reference')
             if not isinstance(refs,list) or len(refs)!=1 or not refs[0]:finding('REVIEW','VPC_POLICY_SCOPE_UNRESOLVED',address)
             rules=after.get('rules')
-            if not isinstance(rules,list) or len(rules)!=2:finding('REVIEW','NUTANIX_RULE_SET_UNRESOLVED',address)
+            if not isinstance(rules,list):finding('REVIEW','NUTANIX_RULE_SET_UNRESOLVED',address)
+            elif len(rules)!=2:finding('BLOCK','NUTANIX_UNBOUND_SERVICE_RULES',address)
             else:
                 ruletypes={}
                 for rule in rules:

@@ -19,7 +19,7 @@ from tools.run_files import current_window, digest, encoded, load_private, read_
 
 FORMAT = 'hosting-platform-transition/1'
 KNOBS = {'lifecycle_stage', 'bootstrap_acceptance_ref', 'bootstrap_rules'}
-SUPPORTED = {('nutanix', 'workloads'), ('vmware', 'domains')}
+SUPPORTED = {('nutanix', 'workloads'), ('nutanix', 'domains'), ('vmware', 'domains')}
 RULE_METADATA = {'nsx_id', 'path', 'revision', 'rule_id', 'sequence_number'}
 EMPTY_RULE_DEFAULTS = {'description', 'notes', 'log_label', 'tag', 'scope', 'profiles',
                        'sources_excluded', 'destinations_excluded'}
@@ -55,7 +55,14 @@ def bindings(record):
         c.text(member.get('bootstrap_acceptance_ref'), 'native bootstrap acceptance')
         native = outputs['members']['value'][name]
         prefix = 'module.owned.module.member[' + json.dumps(name) + '].'
-        if scope['platform'] == 'nutanix':
+        if scope['platform'] == 'nutanix' and scope['phase'] == 'domains':
+            service_rules(member)
+            for key in ('quarantine_policy_id', 'security_category_id', 'vpc_id'):
+                require(isinstance(native[key], str) and c.UUID.fullmatch(native[key]), 'Exact prior Flow ownership required')
+            kind = 'nutanix_network_security_policy_v2'
+            resources[prefix + kind + '.quarantine'] = {'type': kind, 'identity_field': 'ext_id',
+                'id': native['quarantine_policy_id'], 'member': name, 'values': {}}
+        elif scope['platform'] == 'nutanix':
             require(isinstance(native['vm_id'], str) and c.UUID.fullmatch(native['vm_id']), 'Owned AHV VM UUID required')
             kind = 'nutanix_virtual_machine_v2'
             resources[prefix + kind + '.workload'] = {'type': kind, 'identity_field': 'id', 'id': native['vm_id'],
@@ -168,13 +175,24 @@ def plan_bindings(plan, record):
             continue
         require(item['type'] == spec['type'] and before.get(spec['identity_field']) == after.get(spec['identity_field']) == spec['id'], 'Native identity changed')
         ignored = {'revision'} if spec['type'].startswith('nsxt_') else {'update_time', 'status'}
+        if spec['type'] == 'nutanix_network_security_policy_v2': ignored = {'last_update_time'}
         security_unknown = {k: v for k, v in unknown.items() if k not in ignored}
         if spec['type'] == 'nsxt_policy_security_policy' and isinstance(security_unknown.get('rule'), list):
             require(all(isinstance(r, dict) for r in security_unknown['rule']), 'Malformed policy unknown fields')
             security_unknown['rule'] = [{k: v for k, v in r.items() if k not in RULE_METADATA} for r in security_unknown['rule']]
+        if spec['type'] == 'nutanix_network_security_policy_v2' and isinstance(security_unknown.get('rules'), list):
+            require(all(isinstance(r, dict) for r in security_unknown['rules']), 'Malformed Flow unknown fields')
+            security_unknown['rules'] = [{k: v for k, v in r.items() if k != 'ext_id'} for r in security_unknown['rules']]
         require(not os_transition.any_true(security_unknown), 'Unknown lifecycle security or mutation fields')
         member = record['requested_inputs']['members'][spec['member']]
-        if spec['type'] == 'nutanix_virtual_machine_v2':
+        if spec['type'] == 'nutanix_network_security_policy_v2':
+            from tools import flow_policy
+            native = record['prior_outputs']['members']['value'][spec['member']]
+            services = service_rules(member) if record['target_stage'] == 'bootstrap' else {}
+            flow_policy.validate(after, native['security_category_id'], native['vpc_id'], services)
+            unchanged(before, after, ignored | {'rules'})
+            require(c.digest(before.get('rules', [])[:2]) == c.digest(after['rules'][:2]), 'Existing Flow deny rules must remain unchanged')
+        elif spec['type'] == 'nutanix_virtual_machine_v2':
             require(after.get('power_state') == spec['values']['power_state'], 'Wrong AHV power target')
             for key, input_key in [('cluster', 'cluster_id'), ('project', 'project_id'), ('categories', 'security_category_id')]:
                 require(isinstance(after.get(key), list) and len(after[key]) == 1 and after[key][0].get('ext_id') == member[input_key], 'AHV placement or security membership changed')
