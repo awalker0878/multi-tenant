@@ -115,6 +115,18 @@ def plan_bindings(plan, record):
             continue
         require(item['type'] == spec['type'], 'Lifecycle type mismatch')
         require(not c.differences(after, spec['values']) and not any(any_true(unknown.get(k)) for k in spec['values']), 'Lifecycle values unresolved or outside contract')
+        if spec['type'] == 'openstack_networking_network_v2':
+            require(not c.differences(after, {'shared': False, 'external': False, 'port_security_enabled': True}), 'Known isolated network security required')
+        if spec['type'] == 'openstack_networking_router_v2':
+            require(not after.get('external_network_id') and not after.get('external_fixed_ip'), 'External router attachment prohibited')
+        if spec['type'] == 'openstack_networking_port_v2':
+            groups = after.get('security_group_ids')
+            require(after.get('port_security_enabled') is True and isinstance(groups, list) and len(groups) == 1 and groups[0]
+                    and not after.get('no_security_groups') and not after.get('allowed_address_pairs'), 'Known single-group port security required')
+        if spec['type'] == 'openstack_compute_instance_v2':
+            blocks = after.get('block_device')
+            require(isinstance(blocks, list) and len(blocks) == 1 and isinstance(blocks[0], dict)
+                    and blocks[0].get('delete_on_termination') is False, 'Known retained boot attachment required')
         if spec['type'] == RULE:
             require(not after.get('remote_group_id') and not after.get('remote_address_group_id'), 'Extra rule selectors prohibited')
         if spec['id'] is None:

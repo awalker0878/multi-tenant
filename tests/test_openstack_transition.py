@@ -87,6 +87,15 @@ class TransitionTests(unittest.TestCase):
         rule = next(i for i in plan['resource_changes'] if i['type'] == t.RULE)
         rule['change']['after']['remote_ip_prefix'] = '0.0.0.0/0'
         self.assertEqual(review(plan, transition=record)['status'], 'BLOCKED')
+
+    def test_missing_native_security_fields_cannot_be_approved_as_review_only(self):
+        for phase, kind, field in [('domains', 'openstack_networking_network_v2', 'port_security_enabled'),
+                                    ('workloads', 'openstack_networking_port_v2', 'security_group_ids'),
+                                    ('workloads', 'openstack_compute_instance_v2', 'block_device')]:
+            _, record, plan = fixture(phase)
+            change = next(r['change'] for r in plan['resource_changes'] if r['type'] == kind)
+            del change['before'][field]; del change['after'][field]
+            with self.subTest(field=field): self.assertEqual(review(plan, transition=record)['status'], 'BLOCKED')
         _, record, plan = fixture()
         next(iter(record['resources'].values()))['values']['port_security_enabled'] = False
         self.assertEqual(review(plan, transition=record)['status'], 'BLOCKED')
