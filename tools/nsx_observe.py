@@ -156,6 +156,54 @@ def progress(body, r):
     return 'PENDING','REALIZATION_PENDING',c.digest(observation)
 
 
+def realization_witness(body):
+    """Keep only bounded attribution/status fields; omit alarms and diagnostic text."""
+    def scalar(value): return value if isinstance(value, str) and len(value) <= 1024 else None
+    def status(value): return {'consolidated_status': scalar(value.get('consolidated_status'))} if isinstance(value, dict) else None
+    points = body.get('consolidated_status_per_enforcement_point')
+    return dict(intent_path=scalar(body.get('intent_path')), intent_version=scalar(body.get('intent_version')),
+        publish_status=scalar(body.get('publish_status')), consolidated_status=status(body.get('consolidated_status')),
+        consolidated_status_per_enforcement_point=[dict(enforcement_point_path=scalar(p.get('enforcement_point_path')),
+            consolidated_status=status(p.get('consolidated_status'))) if isinstance(p, dict) else None for p in points]
+            if isinstance(points, list) and len(points) <= 20 else None)
+
+
+def validate_observation_history(m, history, states, current=None):
+    """Recompute realization and refuse matching summaries contradicted by either read."""
+    from tools.run_files import require
+    try:
+        if len(states) == 1 and states[0].get('resource_key') == 'scope':
+            require(states[0].get('config_status') == states[0].get('progress') == 'UNKNOWN', 'Invalid scope hold')
+            return
+        require([s.get('resource_key') for s in states] == [r['path'] for r in m['resources']], 'NSX coverage differs')
+        for r, state in zip(m['resources'], states):
+            witness = state['config_witness']
+            c.exact_keys(witness, {'before_sha256', 'after_sha256', 'identity_match', 'revision'})
+            require(all(isinstance(witness[k], str) and c.HEX.fullmatch(witness[k])
+                        for k in ('before_sha256', 'after_sha256')), 'Invalid NSX snapshot digest')
+            require(type(witness['identity_match']) is bool and witness['identity_match'] is state.get('identity_match')
+                    and c.digest(witness['revision']) == c.digest(state.get('revision'))
+                    and witness['after_sha256'] == state.get('config_sha256'), 'NSX snapshot summary differs')
+            native = state['realization_witness']
+            require(c.digest(realization_witness(native)) == c.digest(native), 'Invalid realization witness shape')
+            p, reason, realized = progress(native, r)
+            if witness['before_sha256'] != witness['after_sha256']:
+                require(state.get('config_status') == 'UNKNOWN', 'Changed configuration cannot match')
+                p, reason = 'UNKNOWN', 'CONFIG_CHANGED_DURING_REALIZATION_READ'
+            if not witness['identity_match']:
+                require(state.get('config_status') == 'UNKNOWN', 'Foreign identity cannot match')
+                p, reason = 'UNKNOWN', 'RESOURCE_IDENTITY_MISMATCH'
+            require(state.get('progress') == p and state.get('reason') == reason
+                    and state.get('realization_sha256') == realized, 'Realization summary contradicts witness')
+            if state.get('config_status') == 'MATCH':
+                require(witness['identity_match'] and state.get('mismatch_fields') == []
+                        and witness['before_sha256'] == witness['after_sha256'] == c.digest(r['expected'])
+                        and type(witness['revision']) is int and witness['revision'] == r['expected']['_revision'],
+                        'NSX match contradicts accepted snapshots')
+    except (ValueError, TypeError, KeyError, IndexError, AttributeError):
+        raise c.ObservationError('NSX_OBSERVATION_WITNESS_INVALID') from None
+
+
 def sample(m, client):
     result=[]
     for r in m['resources']:
@@ -167,6 +215,7 @@ def sample(m, client):
         b={k:after[k] for k in fields if k in after}
         mismatch=c.differences(b,r['expected'])
         config='UNKNOWN' if any(s.endswith(':missing') for s in mismatch) else ('DIFFERENT' if mismatch else 'MATCH')
+        realization = realization_witness(realization)
         p,reason,realized=progress(realization,r)
         if c.digest(a)!=c.digest(b):
             config='UNKNOWN';p='UNKNOWN';reason='CONFIG_CHANGED_DURING_REALIZATION_READ'
@@ -176,7 +225,9 @@ def sample(m, client):
         result.append({'resource_key':r['path'],'identity_match':identity,
             'config_status':config,'progress':p,'reason':reason,'mismatch_fields':mismatch,
             'config_sha256':c.digest(b),'revision':b.get('_revision') if type(b.get('_revision')) is int else None,
-            'realization_sha256':realized})
+            'realization_sha256':realized, 'realization_witness':realization,
+            'config_witness':dict(before_sha256=c.digest(a), after_sha256=c.digest(b), identity_match=identity,
+                                  revision=b.get('_revision') if type(b.get('_revision')) is int else None)})
     return result
 
 
