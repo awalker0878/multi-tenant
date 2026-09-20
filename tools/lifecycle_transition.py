@@ -20,9 +20,9 @@ from tools.run_files import current_window, digest, encoded, load_private, read_
 FORMAT = 'hosting-platform-transition/1'
 KNOBS = {'lifecycle_stage', 'bootstrap_acceptance_ref', 'bootstrap_rules'}
 SUPPORTED = {('nutanix', 'workloads'), ('vmware', 'domains')}
-RULE_METADATA = {'id', 'path', 'revision', 'rule_id', 'sequence_number'}
+RULE_METADATA = {'nsx_id', 'path', 'revision', 'rule_id', 'sequence_number'}
 EMPTY_RULE_DEFAULTS = {'description', 'notes', 'log_label', 'tag', 'scope', 'profiles',
-                       'context_profiles', 'sources_excluded', 'destinations_excluded'}
+                       'sources_excluded', 'destinations_excluded'}
 
 
 def service_rules(member):
@@ -116,6 +116,7 @@ def nsx_policy(after, member, group, stage):
     rules = service_rules(member) if stage == 'bootstrap' else {}
     actual = after.get('rule')
     require(isinstance(actual, list) and len(actual) == len(rules) + 1, 'Exact allow list and terminal drop required')
+    last_sequence = 0
     for index, key in enumerate([*sorted(rules), None]):
         rule = rules.get(key)
         expected = {'display_name': key or 'deny-scoped-ip-traffic', 'action': 'ALLOW' if rule else 'DROP',
@@ -127,15 +128,23 @@ def nsx_policy(after, member, group, stage):
             expected['source_groups'] = peer if rule['direction'] == 'ingress' else [group]
             expected['destination_groups'] = [group] if rule['direction'] == 'ingress' else peer
         require(isinstance(actual[index], dict), 'Native rule object required')
+        sequence = actual[index].get('sequence_number')
+        # The provider assigns an omitted/zero sequence in list order. Refuse
+        # contradictory explicit values rather than relying on silent repair.
+        if sequence is None or type(sequence) is int and sequence == 0:
+            last_sequence += 1
+        else:
+            require(type(sequence) is int and sequence > last_sequence, 'NSX sequence contradicts reviewed rule order')
+            last_sequence = sequence
         current = copy.deepcopy(actual[index]); entries = current.pop('service_entries', [])
         exact_shape(current, expected, RULE_METADATA, EMPTY_RULE_DEFAULTS)
         if rule:
             require(isinstance(entries, list) and len(entries) == 1 and isinstance(entries[0], dict), 'Single service entry required')
             sets = entries[0].get('l4_port_set_entry')
             require(isinstance(sets, list) and len(sets) == 1, 'Single TCP/UDP service required')
-            exact_shape(entries[0], {'l4_port_set_entry': sets}, empty_defaults={'icmp_entry', 'igmp_entry', 'ether_type_entry', 'ip_protocol_entry', 'alg_entry'})
+            exact_shape(entries[0], {'l4_port_set_entry': sets}, empty_defaults={'icmp_entry', 'igmp_entry', 'ether_type_entry', 'ip_protocol_entry', 'algorithm_entry'})
             exact_shape(sets[0], {'protocol': rule['protocol'].upper(), 'destination_ports': [str(rule['port'])], 'source_ports': []},
-                        empty_defaults={'display_name'})
+                        empty_defaults={'display_name', 'description'})
         else: require(entries == [], 'Terminal drop must not be narrowed to a service')
 
 

@@ -128,10 +128,33 @@ class LifecycleTests(unittest.TestCase):
 
     def test_rule_computed_ids_allowed_security_unknowns_held(self):
         record, plan = fixture('vmware'); change = plan['resource_changes'][1]['change']
-        change['after_unknown']['rule'] = [{'id': True, 'revision': True, 'rule_id': True}, {'id': True}]
+        change['after_unknown']['rule'] = [{'nsx_id': True, 'revision': True, 'rule_id': True}, {'nsx_id': True}]
         self.assertNotEqual(review(plan, transition=record)['status'], 'BLOCKED')
         change['after_unknown']['rule'][0]['destination_groups'] = True
         self.assertEqual(review(plan, transition=record)['status'], 'BLOCKED')
+
+    def test_nsx_pinned_provider_empty_service_fields_are_accepted_but_other_protocols_block(self):
+        record, plan = fixture('vmware'); change = plan['resource_changes'][1]['change']
+        for index, rule in enumerate(change['after']['rule']):
+            rule.update(nsx_id=None, path=None, revision=None, rule_id=None, sequence_number=None,
+                        description='', notes='', log_label='', tag=[], scope=[], profiles=[],
+                        sources_excluded=False, destinations_excluded=False)
+            if rule['service_entries']:
+                entry = rule['service_entries'][0]
+                entry.update({key: [] for key in ('icmp_entry', 'igmp_entry', 'ether_type_entry', 'ip_protocol_entry', 'algorithm_entry')})
+                entry['l4_port_set_entry'][0].update(display_name='', description='')
+        change['after_unknown']['rule'] = [{key: True for key in t.RULE_METADATA} for _ in change['after']['rule']]
+        self.assertNotEqual(review(plan, transition=record)['status'], 'BLOCKED')
+        change['after']['rule'][0]['service_entries'][0]['algorithm_entry'] = [{'algorithm': 'FTP'}]
+        self.assertEqual(review(plan, transition=record)['status'], 'BLOCKED')
+
+    def test_nsx_explicit_sequence_must_preserve_reviewed_order(self):
+        for sequence, blocked in (([0, 0], False), ([10, 20], False), ([20, 10], True),
+                                  ([10, 10], True), ([True, 20], True), ([-1, 20], True)):
+            record, plan = fixture('vmware'); rules = plan['resource_changes'][1]['change']['after']['rule']
+            for rule, number in zip(rules, sequence): rule['sequence_number'] = number
+            with self.subTest(sequence=sequence):
+                self.assertEqual(review(plan, transition=record)['status'] == 'BLOCKED', blocked)
 
 
 if __name__ == '__main__': unittest.main()

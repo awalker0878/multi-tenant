@@ -53,6 +53,11 @@ selector is accepted. Segment changes are restricted to connectivity. For AHV,
 only power and the existing NIC's connection flag may change; disks, addressing,
 cluster/project/category and other VM fields are held constant.
 
+The reviewer recognizes the pinned NSX provider's computed `nsx_id` and empty
+service defaults. Nonempty alternate protocol entries still block. Known rule
+sequence numbers must agree with the reviewed order; omitted/zero numbers are
+assigned by the provider and must be checked in the native policy observation.
+
 ## Native hold points
 
 Before bootstrap, accept native Flow/DFW precedence, membership and exclusions,
