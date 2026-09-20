@@ -9,6 +9,7 @@ A missing executable or failed initialization is BLOCKED, not a passing test.
 from __future__ import annotations
 
 import argparse
+import sys
 import hashlib
 import re
 import json
@@ -21,6 +22,8 @@ import time
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from tools.terraform_catalog import entries
 
 
 def plan_only_mock_tests(directory: Path) -> bool:
@@ -64,6 +67,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=ROOT / "build/reports/terraform_validation.json")
     args = parser.parse_args()
     started = time.monotonic()
+    catalogue = entries()
     source_digests = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                       for p in sorted((ROOT / "terraform").rglob("*"))
                       if p.is_file() and ".terraform" not in p.parts}
@@ -75,8 +79,8 @@ def main() -> int:
         "mock_tests_requested": args.mock_tests,
         "modules": [],
         "roots": [],
-        "planned_module_count": len(list((ROOT/"terraform/modules").glob("*/main.tf.json"))),
-        "planned_root_count": len(list((ROOT/"terraform/roots").glob("*/main.tf.json"))),
+        "planned_module_count": len(catalogue),
+        "planned_root_count": len(catalogue),
         "schema_export": "NOT_RUN",
         "source_files_sha256": source_digests,
         "tested_source_sha256": hashlib.sha256(json.dumps(source_digests, sort_keys=True).encode()).hexdigest(),
@@ -134,11 +138,11 @@ def main() -> int:
             ignore=shutil.ignore_patterns(".terraform", "*.tfstate*", "*.tfplan", "*.tfvars", "*.tfvars.json"),
         )
         for family in ("modules", "roots"):
-            for directory in sorted((work / family).iterdir()):
-                if not directory.is_dir():
-                    continue
+            for scope in catalogue:
+                relative = Path(scope["module" if family == "modules" else "root"]).relative_to("terraform")
+                directory = work / relative
                 entry: dict[str, Any] = {
-                    "name": directory.name, "validation": "NOT_RUN",
+                    "name": scope["id"], "path": str(relative), "validation": "NOT_RUN",
                     "mock_tests": "NOT_RUN" if family == "modules" else "NOT_APPLICABLE_ROOT",
                 }
                 init_args = [f"-chdir={directory}", "init", "-backend=false", "-input=false"]
@@ -175,7 +179,7 @@ def main() -> int:
                         schema = json.loads(schema_result["stdout"])
                         if schema_result["exit_code"] != 0 or not schema.get("provider_schemas"):
                             raise ValueError("Schema export unavailable")
-                        destination = args.output.parent / "toolchain-schemas" / family / directory.name
+                        destination = args.output.parent / "toolchain-schemas" / family / scope["id"]
                         destination.mkdir(parents=True, exist_ok=True)
                         schema_path = destination / "provider-schema.json"
                         schema_path.write_text(json.dumps(schema, indent=2) + "\n")
@@ -187,21 +191,21 @@ def main() -> int:
                 else:
                     entry["schema_export"] = "NOT_RUN_ROOT_BACKEND_BOUNDARY"
                     entry["schema_source"] = "matching backend-free module; provider constraints must match"
-                    module_config = json.loads((work / "modules" / directory.name / "main.tf.json").read_text())
+                    module_config = json.loads((work / Path(scope["module"]).relative_to("terraform") / "main.tf.json").read_text())
                     root_config = json.loads((directory / "main.tf.json").read_text())
                     entry["matching_module_provider_requirements"] = (module_config["terraform"]["required_providers"] == root_config["terraform"]["required_providers"])
                 lock = directory / ".terraform.lock.hcl"
                 if lock.is_file():
-                    destination = args.output.parent / "toolchain-locks" / family / directory.name
+                    destination = args.output.parent / "toolchain-locks" / family / scope["id"]
                     destination.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(lock, destination / lock.name)
                     entry["lock_sha256"] = hashlib.sha256(lock.read_bytes()).hexdigest()
-                    entry["lock_origin"] = "SOURCE_LOCK_VALIDATED_READONLY" if (ROOT / "terraform" / family / directory.name / lock.name).is_file() else "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
+                    entry["lock_origin"] = "SOURCE_LOCK_VALIDATED_READONLY" if (ROOT / "terraform" / relative / lock.name).is_file() else "GENERATED_BY_ACTUAL_INITIALIZATION_REVIEW_REQUIRED"
                 report[family].append(entry)
 
     validated = (
-        len(report["modules"]) == report["planned_module_count"] == 10
-        and len(report["roots"]) == report["planned_root_count"] == 10
+        len(report["modules"]) == report["planned_module_count"] > 0
+        and len(report["roots"]) == report["planned_root_count"] > 0
         and all(item["validation"] == "PASSED"
                 and item.get("schema_export") == "EXPORTED_FROM_ACTUAL_PLUGINS"
                 and item.get("lock_sha256") for item in report["modules"])

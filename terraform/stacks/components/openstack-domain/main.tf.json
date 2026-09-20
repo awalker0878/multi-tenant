@@ -88,7 +88,7 @@
   },
   "module": {
     "owned": {
-      "source": "../../modules/openstack-domain",
+      "source": "../../../modules/openstack-domain",
       "providers": {
         "openstack": "openstack"
       },

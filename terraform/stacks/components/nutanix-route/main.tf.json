@@ -1,5 +1,5 @@
 {
-  "//": "Operator root: remote HTTP backend is deliberately incomplete; configure accepted HTTPS backend and lock endpoints. Credentials are injected, not checked in.",
+  "//": "Separate restricted-build route root; HTTPS remote backend and target credentials are external inputs.",
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
@@ -54,28 +54,56 @@
       "description": "Reference to separately issued test-scope authorization",
       "nullable": false
     },
-    "ipv4_cidr": {
+    "engineering_record_ref": {
       "type": "string",
-      "description": "Allocated canonical IPv4 domain prefix",
+      "description": "External accepted engineering change record; a string is not proof of approval",
+      "nullable": false
+    },
+    "attachment_acceptance_ref": {
+      "type": "string",
+      "description": "Evidence reference for the existing isolated target attachment and enforcement; not an automatic approval",
+      "nullable": false
+    },
+    "route_key": {
+      "type": "string",
+      "description": "Stable native route identity",
       "nullable": false,
       "validation": [
         {
-          "condition": "${can(cidrnetmask(var.ipv4_cidr))}",
-          "error_message": "Invalid value for Allocated canonical IPv4 domain prefix."
+          "condition": "${can(regex(\"^[A-Za-z][A-Za-z0-9-]{1,31}$\", var.route_key))}",
+          "error_message": "Invalid input: Stable native route identity"
         }
       ]
     },
-    "gateway_host_number": {
-      "type": "number",
-      "description": "Usable host offset for the native gateway",
+    "destination_cidr": {
+      "type": "string",
+      "description": "Allocated canonical IPv4 destination; no default route in this increment",
       "nullable": false,
-      "default": 1,
       "validation": [
         {
-          "condition": "${var.gateway_host_number >= 1 && floor(var.gateway_host_number) == var.gateway_host_number}",
-          "error_message": "Invalid value for Usable host offset for the native gateway."
+          "condition": "${can(cidrnetmask(var.destination_cidr)) && try(tonumber(split(\"/\", var.destination_cidr)[1]) > 0, false)}",
+          "error_message": "Invalid input: Allocated canonical IPv4 destination; no default route in this increment"
+        },
+        {
+          "condition": "${try(format(\"%s/%s\", cidrhost(var.destination_cidr, 0), split(\"/\", var.destination_cidr)[1]) == var.destination_cidr, false)}",
+          "error_message": "Destination must be a canonical IPv4 network."
         }
       ]
+    },
+    "route_table_id": {
+      "type": "string",
+      "description": "Accepted existing route-table UUID",
+      "nullable": false
+    },
+    "vpc_id": {
+      "type": "string",
+      "description": "Existing domain VPC UUID",
+      "nullable": false
+    },
+    "external_subnet_id": {
+      "type": "string",
+      "description": "Existing isolated external-subnet UUID; attached and accepted by its owner",
+      "nullable": false
     },
     "platform_endpoint": {
       "type": "string",
@@ -96,7 +124,7 @@
   },
   "module": {
     "owned": {
-      "source": "../../modules/nutanix-domain",
+      "source": "../../../modules/nutanix-route",
       "providers": {
         "nutanix": "nutanix"
       },
@@ -104,8 +132,13 @@
       "domain_key": "${var.domain_key}",
       "allow_restricted_build": "${var.allow_restricted_build}",
       "test_authorization_ref": "${var.test_authorization_ref}",
-      "ipv4_cidr": "${var.ipv4_cidr}",
-      "gateway_host_number": "${var.gateway_host_number}"
+      "engineering_record_ref": "${var.engineering_record_ref}",
+      "attachment_acceptance_ref": "${var.attachment_acceptance_ref}",
+      "route_key": "${var.route_key}",
+      "destination_cidr": "${var.destination_cidr}",
+      "route_table_id": "${var.route_table_id}",
+      "vpc_id": "${var.vpc_id}",
+      "external_subnet_id": "${var.external_subnet_id}"
     }
   },
   "output": {

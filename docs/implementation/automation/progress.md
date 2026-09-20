@@ -8,6 +8,8 @@ The 1.0 plan is now maintained in the architecture, engineering, implementation 
 | --- | --- | --- |
 | Promote the 1.0 plan and cluster topology | Implemented; maintained links replace the temporary folder | Native site adoption is not implied |
 
+| Scoped Terraform entrypoints and catalogue | Implemented; component resource addresses preserved; checks discover registered scopes | Actual backend provisioning, access controls and state recovery still require site services |
+
 ## External inputs still required
 
 The repository does not contain selected native site endpoints, installed product/API/hardware/licence tuples, scoped credentials, an accepted physical network/security-edge realization, state service, authoritative capacity/IPAM service, storage/key/backup service selections, or their operating authorities. Product-specific installation, actual service mutations and native qualification cannot be completed by inventing these inputs. All three platform families remain unqualified until genuine target-bound evidence is accepted.

@@ -164,7 +164,7 @@ class EngineBoundaryTests(unittest.TestCase):
         self.assertIn('NOT_RUN_ROOT_BACKEND_BOUNDARY',body)
         self.assertIn('-lockfile=readonly',(ROOT/'tools/verify_terraform.py').read_text())
     def test_actual_ci_generated_locks_exist_for_every_root(self):
-        roots=ROOT/'terraform/roots'
+        roots=ROOT/'terraform/stacks/components'
         for root in roots.iterdir():
             if root.is_dir():
                 text=(root/'.terraform.lock.hcl').read_text();self.assertIn('hashes = [',text);self.assertIn('registry.terraform.io/',text)

@@ -19,22 +19,22 @@ class NativeSources(unittest.TestCase):
    for types in json.loads(p.read_text())['resource'].values():
     for config in types.values():self.assertIn('var.allow_restricted_build',config['lifecycle']['precondition'][0]['condition'])
  def test_roots_child_variable_parity(self):
-  for p in (ROOT/'terraform/roots').glob('*/main.tf.json'):
+  for p in (ROOT/'terraform/stacks/components').glob('*/main.tf.json'):
    root=json.loads(p.read_text());child=load(p.parent.name);call=root['module']['owned'];args=set(call)-{'source','providers'};self.assertEqual(args,set(child['variable']))
  def test_no_provider_config_in_children(self):
   for p in (ROOT/'terraform/modules').glob('*/main.tf.json'):self.assertNotIn('provider',json.loads(p.read_text()))
  def test_explicit_provider_in_roots(self):
-  for p in (ROOT/'terraform/roots').glob('*/main.tf.json'):
+  for p in (ROOT/'terraform/stacks/components').glob('*/main.tf.json'):
    root=json.loads(p.read_text());self.assertEqual(len(root['provider']),1)
    for conf in root['provider'].values():
     self.assertFalse(conf.get('insecure',False));self.assertFalse(conf.get('allow_unverified_ssl',False))
  def test_no_silent_local_state_backend(self):
-  for p in (ROOT/'terraform/roots').glob('*/main.tf.json'):self.assertEqual(json.loads(p.read_text())['terraform']['backend'],{'http':{}})
+  for p in (ROOT/'terraform/stacks/components').glob('*/main.tf.json'):self.assertEqual(json.loads(p.read_text())['terraform']['backend'],{'http':{}})
  def test_pins_consistent(self):
-  for p in (ROOT/'terraform/roots').glob('*/main.tf.json'):
+  for p in (ROOT/'terraform/stacks/components').glob('*/main.tf.json'):
    self.assertEqual(json.loads(p.read_text())['terraform']['required_providers'],load(p.parent.name)['terraform']['required_providers'])
  def test_no_active_examples_or_credentials(self):
-  for p in (ROOT/'terraform/roots').glob('*/inputs.tfvars.json.example'):
+  for p in (ROOT/'terraform/stacks/components').glob('*/inputs.tfvars.json.example'):
    j=json.loads(p.read_text());self.assertIs(j['allow_restricted_build'],False);self.assertNotIn('platform_password',j)
  def test_nutanix_vpc_no_external_attachment(self):self.assertNotIn('external_subnets',load('nutanix-domain')['resource']['nutanix_vpc_v2']['domain'])
  def test_nutanix_policy_enforced_scoped(self):

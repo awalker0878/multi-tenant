@@ -3,9 +3,9 @@
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
-      "nutanix": {
-        "source": "nutanix/nutanix",
-        "version": "= 2.4.2"
+      "openstack": {
+        "source": "terraform-provider-openstack/openstack",
+        "version": "= 3.4.0"
       }
     },
     "backend": {
@@ -13,10 +13,8 @@
     }
   },
   "provider": {
-    "nutanix": {
-      "endpoint": "${var.platform_endpoint}",
-      "username": "${var.platform_username}",
-      "password": "${var.platform_password}",
+    "openstack": {
+      "cloud": "${var.openstack_cloud}",
       "insecure": false
     }
   },
@@ -90,43 +88,33 @@
         }
       ]
     },
-    "route_table_id": {
+    "router_id": {
       "type": "string",
-      "description": "Accepted existing route-table UUID",
+      "description": "Accepted existing isolated Neutron router UUID",
       "nullable": false
     },
-    "vpc_id": {
+    "next_hop_address": {
       "type": "string",
-      "description": "Existing domain VPC UUID",
-      "nullable": false
-    },
-    "external_subnet_id": {
-      "type": "string",
-      "description": "Existing isolated external-subnet UUID; attached and accepted by its owner",
-      "nullable": false
-    },
-    "platform_endpoint": {
-      "type": "string",
-      "description": "Prism Central endpoint",
-      "nullable": false
-    },
-    "platform_username": {
-      "type": "string",
-      "description": "Restricted provider account",
-      "nullable": false
-    },
-    "platform_password": {
-      "type": "string",
-      "description": "Credential injected at execution",
+      "description": "Accepted directly reachable IPv4 next hop",
       "nullable": false,
-      "sensitive": true
+      "validation": [
+        {
+          "condition": "${can(cidrnetmask(format(\"%s/32\", var.next_hop_address)))}",
+          "error_message": "Invalid input: Accepted directly reachable IPv4 next hop"
+        }
+      ]
+    },
+    "openstack_cloud": {
+      "type": "string",
+      "description": "Named protected clouds.yaml profile for the correct project",
+      "nullable": false
     }
   },
   "module": {
     "owned": {
-      "source": "../../modules/nutanix-route",
+      "source": "../../../modules/openstack-route",
       "providers": {
-        "nutanix": "nutanix"
+        "openstack": "openstack"
       },
       "tenant_key": "${var.tenant_key}",
       "domain_key": "${var.domain_key}",
@@ -136,9 +124,8 @@
       "attachment_acceptance_ref": "${var.attachment_acceptance_ref}",
       "route_key": "${var.route_key}",
       "destination_cidr": "${var.destination_cidr}",
-      "route_table_id": "${var.route_table_id}",
-      "vpc_id": "${var.vpc_id}",
-      "external_subnet_id": "${var.external_subnet_id}"
+      "router_id": "${var.router_id}",
+      "next_hop_address": "${var.next_hop_address}"
     }
   },
   "output": {

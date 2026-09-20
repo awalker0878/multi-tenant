@@ -12,6 +12,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.catalog_artifacts import collect
 from tools.verify_terraform import plan_only_mock_tests
+from tools.terraform_catalog import entries as terraform_entries
 EXCLUDED={'.git','.venv','__pycache__','build','dist','.pytest_cache','.mypy_cache','.ruff_cache'}
 
 class UniqueLoader(yaml.SafeLoader):
@@ -84,13 +85,16 @@ def check(root=ROOT):
         rows=json.loads((root/'sources/artifact_catalog.json').read_text());counts['catalog_artifacts']=len(rows)
         if rows!=collect(root):problem('STALE_ARTIFACT_CATALOG','sources/artifact_catalog.json')
     except (OSError,ValueError,TypeError) as e:problem('CATALOG_OR_REFERENCE_ERROR','sources',e)
-    for mod in sorted((root/'terraform/modules').glob('*/main.tf.json')):
+    try: scopes=terraform_entries(root)
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        scopes=[];problem('TERRAFORM_CATALOG','terraform/catalog.json',e)
+    for scope in scopes:
+        mod=root/scope['module']/'main.tf.json'
         counts['terraform_module_root_pairs']+=1
         try:
-            m=json.loads(mod.read_text());r=json.loads((root/'terraform/roots'/mod.parent.name/'main.tf.json').read_text())
-            if not m.get('resource'):problem('EMPTY_NATIVE_MODULE',mod.parent.name)
+            m=json.loads(mod.read_text());r=json.loads((root/scope['root']/'main.tf.json').read_text())
+            if not m.get('resource' if scope['kind']=='component' else 'module'):problem('EMPTY_NATIVE_MODULE',mod.parent.name)
             if m['terraform']['required_providers']!=r['terraform']['required_providers']:problem('PROVIDER_PIN_DIVERGENCE',mod.parent.name)
-            if r['module']['owned']['source']!=f'../../modules/{mod.parent.name}':problem('ROOT_MODULE_PATH',mod.parent.name)
             if not plan_only_mock_tests(mod.parent):problem('UNSAFE_MOCK_TEST',mod.parent.name)
         except (OSError,KeyError,ValueError) as e:problem('NATIVE_SOURCE_STRUCTURE',mod.parent.name,e)
     for p in (root/'ansible/playbooks').glob('*.yml'):

@@ -3,12 +3,12 @@ from pathlib import Path
 from tools.input_review import review_inputs
 ROOT=Path(__file__).resolve().parents[1]
 
-def config():return json.loads((ROOT/'terraform/roots/openstack-domain/main.tf.json').read_text())
+def config():return json.loads((ROOT/'terraform/stacks/components/openstack-domain/main.tf.json').read_text())
 def values():return {'tenant_key':'tenant-01','domain_key':'D01O','allow_restricted_build':True,'test_authorization_ref':'CHG-4714','ipv4_cidr':'10.240.0.0/27','project_id':'9d3a2f01-c428-4d0b-aedf-658a431f2203','openstack_cloud':'qualified-lab-project01'}
 class Inputs(unittest.TestCase):
  def test_valid_shape_not_authorized(self):self.assertEqual(review_inputs(config(),values())['status'],'INPUT_SHAPE_CHECKED_NOT_AUTHORIZED')
  def test_all_shipped_examples_blocked(self):
-  for root in (ROOT/'terraform/roots').iterdir():
+  for root in (ROOT/'terraform/stacks/components').iterdir():
    with self.subTest(root=root.name):self.assertEqual(review_inputs(json.loads((root/'main.tf.json').read_text()),json.loads((root/'inputs.tfvars.json.example').read_text()))['status'],'BLOCKED_INPUTS')
  def test_missing_project(self):
   v=values();del v['project_id'];self.assertEqual(review_inputs(config(),v)['status'],'BLOCKED_INPUTS')

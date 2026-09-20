@@ -8,7 +8,7 @@ Design: [RA §16](../architecture/reference/16-nutanix-hosting-stack-reference-r
 
 Decisions: [ADR-0024](../adr/0024-use-independent-nutanix-vpc-domain-realizations-with-qualified-handoffs.md) · [ADR-0008](../adr/0008-preserve-zone-aware-host-placement-and-disclose-every-shared-layer.md)
 
-Implementation: [terraform/modules/nutanix-domain](../../terraform/modules/nutanix-domain) · [terraform/roots/nutanix-domain](../../terraform/roots/nutanix-domain) · [terraform/modules/nutanix-workload](../../terraform/modules/nutanix-workload) · [terraform/roots/nutanix-workload](../../terraform/roots/nutanix-workload)
+Implementation: [terraform/modules/nutanix-domain](../../terraform/modules/nutanix-domain) · [terraform/stacks/components/nutanix-domain](../../terraform/stacks/components/nutanix-domain) · [terraform/modules/nutanix-workload](../../terraform/modules/nutanix-workload) · [terraform/stacks/components/nutanix-workload](../../terraform/stacks/components/nutanix-workload)
 
 Candidate native resources; actual Flow, placement, storage and external handoff behaviour requires target qualification.
 

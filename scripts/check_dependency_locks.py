@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def check(root=ROOT):
  rows=[];errors=[]
- for config in sorted((root/'terraform').glob('*/*/main.tf.json')):
+ for config in sorted((root/'terraform').rglob('main.tf.json')):
   required=json.loads(config.read_text())['terraform']['required_providers'];lock=config.parent/'.terraform.lock.hcl'
   if not lock.is_file():errors.append(str(lock.relative_to(root))+': missing actual lock');continue
   text=lock.read_text();blocks=dict(re.findall(r'provider\s+"([^"]+)"\s*\{([^}]+)\}',text,re.S))

@@ -7968,7 +7968,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: The portable API SHALL be versioned and backward-compatibility rules SHALL be published.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -7994,7 +7994,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Vendor identifiers, VLAN/VNI/VRF details, route targets, raw firewall rules and raw next-hop routes SHALL NOT be part of the normal consumer contract.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8020,7 +8020,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Where a consumer-facing provisioning API is provided, it SHALL enforce immutable IDs, idempotent create, optimistic concurrency, typed/closed schemas, authorized references and authoritative service-owned status; stale or unauthorized updates SHALL fail before side effects. These controls MAY be implemented by an existing qualified service interface.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8047,7 +8047,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Where a consumer-facing provisioning API is provided, it SHALL enforce immutable IDs, idempotent create, optimistic concurrency, typed/closed schemas, authorized references and authoritative service-owned status",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8074,7 +8074,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: stale or unauthorized updates SHALL fail before side effects. These controls MAY be implemented by an existing qualified service interface.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8234,7 +8234,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: If security admission, IPAM, route authority, or mandatory policy validation is unavailable, new provisioning SHALL stop rather than inventing or bypassing required state.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8261,7 +8261,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Provisioning SHALL be journaled and idempotent, reserve only eligible capacity/addresses, enforce deny before attachment/exposure, and gate activation on realized current-generation evidence and authorization.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8289,7 +8289,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Retries SHALL distinguish transient, permanent and conflict failures, use bounded backoff/deadlines and preserve resource identity; uncertain outcomes SHALL be discovered and reconciled rather than duplicated.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8316,7 +8316,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Retries SHALL distinguish transient, permanent and conflict failures, use bounded backoff/deadlines and preserve resource identity",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8343,7 +8343,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: uncertain outcomes SHALL be discovered and reconciled rather than duplicated.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8370,7 +8370,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Provider configuration SHALL be defined in root modules and passed to child modules; reusable child modules SHOULD NOT embed provider credentials/configuration.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8396,7 +8396,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Provider configuration SHALL be defined in root modules and passed to child modules",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8422,7 +8422,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: reusable child modules SHOULD NOT embed provider credentials/configuration.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8448,7 +8448,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Provider versions SHALL be constrained and dependency lock files SHALL be committed and reviewed.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8475,7 +8475,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Declared provider constraints",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8502,7 +8502,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Real root lockfile selections and checksums",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8529,7 +8529,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Lock reviewed and version controlled",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8556,7 +8556,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: The provisioning workflow SHALL select the required hosting-platform and shared-service adapters before execution; adapters SHALL preserve their authority and lifecycle boundaries. A single giant conditional module SHOULD NOT attempt to implement all platforms.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8582,7 +8582,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: The provisioning workflow SHALL select the required hosting-platform and shared-service adapters before execution",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8608,7 +8608,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: adapters SHALL preserve their authority and lifecycle boundaries. A single giant conditional module SHOULD NOT attempt to implement all platforms.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8634,7 +8634,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Module interfaces SHOULD be relatively flat and composable; deeply nested modules that obscure lifecycle or ownership boundaries SHOULD be avoided.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8660,7 +8660,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Module interfaces SHOULD be relatively flat and composable",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8686,7 +8686,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: deeply nested modules that obscure lifecycle or ownership boundaries SHOULD be avoided.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8712,7 +8712,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Remote module sources and runner images SHALL be pinned to immutable versions/digests separately from provider lockfiles; approved package checksums and provenance SHALL be verified before privileged execution.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8738,7 +8738,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Immutable module version/source pin",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8764,7 +8764,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Immutable runner image pin",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8790,7 +8790,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Accepted package checksums",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -8816,7 +8816,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Provenance verified before privileged execution",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9287,7 +9287,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: A change that modifies inter-zone policy, external exposure, route authority, management access, or assurance profile SHALL receive a higher change classification than an ordinary workload scale operation.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9313,7 +9313,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: An approval SHALL bind the immutable plan and all security-relevant input/policy/state/dependency digests; stale, changed or expired artifacts SHALL be rejected at apply.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9339,7 +9339,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Approval binds immutable plan",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9365,7 +9365,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Input/profile/policy hashes bound",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9391,7 +9391,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Current state/dependency generation bound",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9417,7 +9417,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Stale or changed approval refused",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9443,7 +9443,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Expired approval refused",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9715,7 +9715,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Security-significant drift SHALL generate an actionable event and update technical conformance/readiness conditions until resolved or accepted; formal authorization records SHALL remain separately attributable and immutable.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9742,7 +9742,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Security-significant drift SHALL generate an actionable event and update technical conformance/readiness conditions until resolved or accepted",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9769,7 +9769,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: formal authorization records SHALL remain separately attributable and immutable.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9796,7 +9796,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Emergency changes SHALL be reconciled back into the source of truth after the incident or maintenance action.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9822,7 +9822,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Incident containment overrides SHALL take precedence over ordinary reconciliation until explicitly released or handled by their approved expiry policy; automated repair SHALL NOT silently undo containment.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9849,7 +9849,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Incident containment overrides SHALL take precedence over ordinary reconciliation until explicitly released or handled by their approved expiry policy",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
@@ -9876,7 +9876,7 @@
     "implementation_disposition": "CANDIDATE_PARTIAL_TOOLING_AND_EXTERNAL_EXECUTION_GOVERNANCE",
     "required_artifact_or_record": "Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: automated repair SHALL NOT silently undo containment.",
     "candidate_artifacts": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "tools/verify_terraform.py",
       "tools/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"

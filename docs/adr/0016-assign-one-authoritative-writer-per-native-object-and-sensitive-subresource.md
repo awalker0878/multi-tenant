@@ -36,7 +36,7 @@ Related implementation areas are traceability targets, not proof of complete imp
 
 - [tools/recovery_review.py](../../tools/recovery_review.py)
 - [tools/route_record_review.py](../../tools/route_record_review.py)
-- [terraform/roots](../../terraform/roots)
+- [terraform/stacks/components](../../terraform/stacks/components)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

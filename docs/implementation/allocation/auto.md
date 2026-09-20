@@ -19,7 +19,7 @@ If security admission, IPAM, route authority, or mandatory policy validation is 
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: If security admission, IPAM, route authority, or mandatory policy validation is unavailable, new provisioning SHALL stop rather than inventing or bypassing required state.
 
-**Available related source:** [terraform/roots](../../../terraform/roots) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-011, CT-029, CT-045
 
@@ -42,7 +42,7 @@ Provisioning SHALL be journaled and idempotent, reserve only eligible capacity/a
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Provisioning SHALL be journaled and idempotent, reserve only eligible capacity/addresses, enforce deny before attachment/exposure, and gate activation on realized current-generation evidence and authorization.
 
-**Available related source:** [terraform/roots](../../../terraform/roots) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-045, CT-046, CT-048, CT-069
 
@@ -65,7 +65,7 @@ Retries SHALL distinguish transient, permanent and conflict failures, use bounde
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Retries SHALL distinguish transient, permanent and conflict failures, use bounded backoff/deadlines and preserve resource identity; uncertain outcomes SHALL be discovered and reconciled rather than duplicated.
 
-**Available related source:** [terraform/roots](../../../terraform/roots) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-045, CT-046, CT-047
 
@@ -83,7 +83,7 @@ Retries SHALL distinguish transient, permanent and conflict failures, use bounde
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Retries SHALL distinguish transient, permanent and conflict failures, use bounded backoff/deadlines and preserve resource identity
 
-**Available related source:** [terraform/roots](../../../terraform/roots) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-045, CT-046, CT-047
 
@@ -101,7 +101,7 @@ Retries SHALL distinguish transient, permanent and conflict failures, use bounde
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: uncertain outcomes SHALL be discovered and reconciled rather than duplicated.
 
-**Available related source:** [terraform/roots](../../../terraform/roots) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-045, CT-046, CT-047
 

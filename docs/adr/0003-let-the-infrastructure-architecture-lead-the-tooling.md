@@ -35,7 +35,7 @@ Trace every automated operation to a component, authority boundary and lifecycle
 Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [terraform/modules](../../terraform/modules)
-- [terraform/roots](../../terraform/roots)
+- [terraform/stacks/components](../../terraform/stacks/components)
 - [ansible](../../ansible)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

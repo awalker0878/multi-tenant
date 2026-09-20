@@ -112,7 +112,7 @@
   },
   "module": {
     "owned": {
-      "source": "../../modules/nsx-domain",
+      "source": "../../../modules/nsx-domain",
       "providers": {
         "nsxt": "nsxt"
       },

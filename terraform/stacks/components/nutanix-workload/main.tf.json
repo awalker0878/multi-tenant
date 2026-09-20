@@ -3,9 +3,9 @@
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
-      "openstack": {
-        "source": "terraform-provider-openstack/openstack",
-        "version": "= 3.4.0"
+      "nutanix": {
+        "source": "nutanix/nutanix",
+        "version": "= 2.4.2"
       }
     },
     "backend": {
@@ -13,8 +13,10 @@
     }
   },
   "provider": {
-    "openstack": {
-      "cloud": "${var.openstack_cloud}",
+    "nutanix": {
+      "endpoint": "${var.platform_endpoint}",
+      "username": "${var.platform_username}",
+      "password": "${var.platform_password}",
       "insecure": false
     }
   },
@@ -63,6 +65,30 @@
         }
       ]
     },
+    "vcpu": {
+      "type": "number",
+      "description": "Requested guest vCPU",
+      "nullable": false,
+      "default": 2,
+      "validation": [
+        {
+          "condition": "${var.vcpu >= 1 && floor(var.vcpu) == var.vcpu}",
+          "error_message": "Invalid value for Requested guest vCPU."
+        }
+      ]
+    },
+    "memory_gib": {
+      "type": "number",
+      "description": "Requested guest memory in GiB",
+      "nullable": false,
+      "default": 4,
+      "validation": [
+        {
+          "condition": "${var.memory_gib >= 1 && floor(var.memory_gib) == var.memory_gib}",
+          "error_message": "Invalid value for Requested guest memory in GiB."
+        }
+      ]
+    },
     "boot_disk_gib": {
       "type": "number",
       "description": "Requested boot disk GiB; must be at least image/template size",
@@ -92,80 +118,81 @@
       "description": "Scoped independently reviewed network/policy/placement handoff reference",
       "nullable": false
     },
-    "network_id": {
+    "cluster_id": {
       "type": "string",
-      "description": "Accepted quarantine network UUID",
+      "description": "Accepted zone-eligible AHV cluster UUID",
       "nullable": false
     },
-    "subnet_id": {
+    "project_id": {
       "type": "string",
-      "description": "Accepted quarantine subnet UUID",
+      "description": "Accepted project UUID",
       "nullable": false
     },
-    "security_group_id": {
+    "storage_container_id": {
       "type": "string",
-      "description": "Accepted no-user-flow group UUID",
-      "nullable": false
-    },
-    "ipv4_address": {
-      "type": "string",
-      "description": "Authoritatively reserved IPv4 address",
+      "description": "Accepted storage-container UUID",
       "nullable": false
     },
     "image_id": {
       "type": "string",
-      "description": "Approved Glance image UUID",
+      "description": "Approved boot-image UUID",
       "nullable": false
     },
-    "flavor_id": {
+    "subnet_id": {
       "type": "string",
-      "description": "Approved flavor ID matching requested capacity and placement",
+      "description": "Accepted isolated domain subnet UUID",
       "nullable": false
     },
-    "compute_availability_zone": {
+    "security_category_id": {
       "type": "string",
-      "description": "Accepted Nova availability zone",
+      "description": "Provider-owned category UUID from domain handoff",
       "nullable": false
     },
-    "storage_availability_zone": {
+    "ipv4_address": {
       "type": "string",
-      "description": "Accepted Cinder availability zone",
+      "description": "Reserved endpoint IPv4 address",
       "nullable": false
     },
-    "volume_type": {
+    "platform_endpoint": {
       "type": "string",
-      "description": "Accepted storage/encryption type",
+      "description": "Prism Central endpoint",
       "nullable": false
     },
-    "openstack_cloud": {
+    "platform_username": {
       "type": "string",
-      "description": "Named protected clouds.yaml profile for the correct project",
+      "description": "Restricted provider account",
       "nullable": false
+    },
+    "platform_password": {
+      "type": "string",
+      "description": "Credential injected at execution",
+      "nullable": false,
+      "sensitive": true
     }
   },
   "module": {
     "owned": {
-      "source": "../../modules/openstack-workload",
+      "source": "../../../modules/nutanix-workload",
       "providers": {
-        "openstack": "openstack"
+        "nutanix": "nutanix"
       },
       "tenant_key": "${var.tenant_key}",
       "domain_key": "${var.domain_key}",
       "allow_restricted_build": "${var.allow_restricted_build}",
       "test_authorization_ref": "${var.test_authorization_ref}",
       "workload_key": "${var.workload_key}",
+      "vcpu": "${var.vcpu}",
+      "memory_gib": "${var.memory_gib}",
       "boot_disk_gib": "${var.boot_disk_gib}",
       "data_disk_gib": "${var.data_disk_gib}",
       "accepted_quarantine_ref": "${var.accepted_quarantine_ref}",
-      "network_id": "${var.network_id}",
-      "subnet_id": "${var.subnet_id}",
-      "security_group_id": "${var.security_group_id}",
-      "ipv4_address": "${var.ipv4_address}",
+      "cluster_id": "${var.cluster_id}",
+      "project_id": "${var.project_id}",
+      "storage_container_id": "${var.storage_container_id}",
       "image_id": "${var.image_id}",
-      "flavor_id": "${var.flavor_id}",
-      "compute_availability_zone": "${var.compute_availability_zone}",
-      "storage_availability_zone": "${var.storage_availability_zone}",
-      "volume_type": "${var.volume_type}"
+      "subnet_id": "${var.subnet_id}",
+      "security_category_id": "${var.security_category_id}",
+      "ipv4_address": "${var.ipv4_address}"
     }
   },
   "output": {

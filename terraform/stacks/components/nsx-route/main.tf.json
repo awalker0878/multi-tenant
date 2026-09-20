@@ -3,9 +3,9 @@
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
-      "openstack": {
-        "source": "terraform-provider-openstack/openstack",
-        "version": "= 3.4.0"
+      "nsxt": {
+        "source": "vmware/nsxt",
+        "version": "= 3.10.0"
       }
     },
     "backend": {
@@ -13,9 +13,11 @@
     }
   },
   "provider": {
-    "openstack": {
-      "cloud": "${var.openstack_cloud}",
-      "insecure": false
+    "nsxt": {
+      "host": "${var.platform_endpoint}",
+      "username": "${var.platform_username}",
+      "password": "${var.platform_password}",
+      "allow_unverified_ssl": false
     }
   },
   "variable": {
@@ -88,10 +90,16 @@
         }
       ]
     },
-    "router_id": {
+    "gateway_path": {
       "type": "string",
-      "description": "Accepted existing isolated Neutron router UUID",
-      "nullable": false
+      "description": "Existing isolated Tier-0/VRF or Tier-1 gateway policy path",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${can(regex(\"^/infra/tier-[01]s/[^/]+$\", var.gateway_path))}",
+          "error_message": "Invalid input: Existing isolated Tier-0/VRF or Tier-1 gateway policy path"
+        }
+      ]
     },
     "next_hop_address": {
       "type": "string",
@@ -104,17 +112,28 @@
         }
       ]
     },
-    "openstack_cloud": {
+    "platform_endpoint": {
       "type": "string",
-      "description": "Named protected clouds.yaml profile for the correct project",
+      "description": "NSX Local Manager endpoint",
       "nullable": false
+    },
+    "platform_username": {
+      "type": "string",
+      "description": "Restricted provider account",
+      "nullable": false
+    },
+    "platform_password": {
+      "type": "string",
+      "description": "Credential injected at execution",
+      "nullable": false,
+      "sensitive": true
     }
   },
   "module": {
     "owned": {
-      "source": "../../modules/openstack-route",
+      "source": "../../../modules/nsx-route",
       "providers": {
-        "openstack": "openstack"
+        "nsxt": "nsxt"
       },
       "tenant_key": "${var.tenant_key}",
       "domain_key": "${var.domain_key}",
@@ -124,7 +143,7 @@
       "attachment_acceptance_ref": "${var.attachment_acceptance_ref}",
       "route_key": "${var.route_key}",
       "destination_cidr": "${var.destination_cidr}",
-      "router_id": "${var.router_id}",
+      "gateway_path": "${var.gateway_path}",
       "next_hop_address": "${var.next_hop_address}"
     }
   },

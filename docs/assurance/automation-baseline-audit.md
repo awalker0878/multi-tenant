@@ -39,7 +39,7 @@ Do not repeat the old ZIP-era “engine blocked/not run” wording in the Terraf
 
 ## Terraform coverage by owned scope
 
-Every source link below points to the actual module. Matching standalone roots live under [terraform/roots](../../terraform/roots). No root composes the complete fixture or the full P0–P6 process.
+Every source link below points to the actual module. Matching standalone roots live under [terraform/stacks/components](../../terraform/stacks/components). No root composes the complete fixture or the full P0–P6 process.
 
 | Module | Native resources currently implemented | Material work still outside this module |
 | --- | --- | --- |

@@ -104,7 +104,7 @@
   },
   "module": {
     "owned": {
-      "source": "../../modules/nsx-gateway-quarantine",
+      "source": "../../../modules/nsx-gateway-quarantine",
       "providers": {
         "nsxt": "nsxt"
       },

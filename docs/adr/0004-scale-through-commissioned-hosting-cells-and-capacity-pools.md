@@ -34,7 +34,7 @@ Record the cell boundary, bottlenecks, attachment slots, measured surviving capa
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [terraform/roots](../../terraform/roots)
+- [terraform/stacks/components](../../terraform/stacks/components)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

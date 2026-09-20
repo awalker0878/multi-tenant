@@ -34,7 +34,7 @@ Define every package's prerequisites, owned objects, accepted outputs, completio
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [terraform/roots](../../terraform/roots)
+- [terraform/stacks/components](../../terraform/stacks/components)
 - [terraform/modules](../../terraform/modules)
 - [tools/dns_change.py](../../tools/dns_change.py)
 - [ansible](../../ansible)

@@ -36,7 +36,7 @@
     ],
     "implementation_paths": [
       "terraform/modules",
-      "terraform/roots",
+      "terraform/stacks/components",
       "ansible"
     ],
     "open_work": "Actual site architecture adoption and the selected delivery-tool responsibility model remain implementation decisions.",
@@ -89,7 +89,7 @@
       "SVCM-002"
     ],
     "implementation_paths": [
-      "terraform/roots"
+      "terraform/stacks/components"
     ],
     "open_work": "Site inventory, failure groups, usable capacities and expansion lead times are not supplied by the reference example.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -566,7 +566,7 @@
       "STATE-003"
     ],
     "implementation_paths": [
-      "terraform/roots",
+      "terraform/stacks/components",
       "terraform/modules",
       "tools/dns_change.py",
       "ansible"
@@ -746,7 +746,7 @@
     "implementation_paths": [
       "tools/recovery_review.py",
       "tools/route_record_review.py",
-      "terraform/roots"
+      "terraform/stacks/components"
     ],
     "open_work": "Actual native writer exclusion and transfer acceptance remain external controls; an offline record checker does not implement fencing.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",

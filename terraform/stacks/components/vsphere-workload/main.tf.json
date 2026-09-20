@@ -3,9 +3,9 @@
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
-      "nutanix": {
-        "source": "nutanix/nutanix",
-        "version": "= 2.4.2"
+      "vsphere": {
+        "source": "hashicorp/vsphere",
+        "version": "= 2.12.0"
       }
     },
     "backend": {
@@ -13,11 +13,11 @@
     }
   },
   "provider": {
-    "nutanix": {
-      "endpoint": "${var.platform_endpoint}",
-      "username": "${var.platform_username}",
+    "vsphere": {
+      "vsphere_server": "${var.platform_endpoint}",
+      "user": "${var.platform_username}",
       "password": "${var.platform_password}",
-      "insecure": false
+      "allow_unverified_ssl": false
     }
   },
   "variable": {
@@ -118,44 +118,55 @@
       "description": "Scoped independently reviewed network/policy/placement handoff reference",
       "nullable": false
     },
-    "cluster_id": {
+    "resource_pool_id": {
       "type": "string",
-      "description": "Accepted zone-eligible AHV cluster UUID",
+      "description": "Accepted zone-eligible resource-pool managed object ID",
       "nullable": false
     },
-    "project_id": {
+    "datastore_id": {
       "type": "string",
-      "description": "Accepted project UUID",
+      "description": "Accepted datastore managed object ID",
       "nullable": false
     },
-    "storage_container_id": {
+    "quarantine_network_id": {
       "type": "string",
-      "description": "Accepted storage-container UUID",
+      "description": "vCenter network ID mapped to the accepted NSX quarantine segment",
       "nullable": false
     },
-    "image_id": {
+    "template_uuid": {
       "type": "string",
-      "description": "Approved boot-image UUID",
+      "description": "Approved single-boot-disk single-NIC template UUID",
       "nullable": false
     },
-    "subnet_id": {
+    "guest_id": {
       "type": "string",
-      "description": "Accepted isolated domain subnet UUID",
+      "description": "Guest OS ID matching the approved template",
       "nullable": false
     },
-    "security_category_id": {
+    "scsi_type": {
       "type": "string",
-      "description": "Provider-owned category UUID from domain handoff",
+      "description": "SCSI controller type matching the template",
       "nullable": false
     },
-    "ipv4_address": {
+    "firmware": {
       "type": "string",
-      "description": "Reserved endpoint IPv4 address",
+      "description": "Template firmware",
+      "nullable": false,
+      "validation": [
+        {
+          "condition": "${contains([\"bios\", \"efi\"], var.firmware)}",
+          "error_message": "Invalid value for Template firmware."
+        }
+      ]
+    },
+    "storage_policy_id": {
+      "type": "string",
+      "description": "Accepted storage policy ID",
       "nullable": false
     },
     "platform_endpoint": {
       "type": "string",
-      "description": "Prism Central endpoint",
+      "description": "vCenter endpoint",
       "nullable": false
     },
     "platform_username": {
@@ -172,9 +183,9 @@
   },
   "module": {
     "owned": {
-      "source": "../../modules/nutanix-workload",
+      "source": "../../../modules/vsphere-workload",
       "providers": {
-        "nutanix": "nutanix"
+        "vsphere": "vsphere"
       },
       "tenant_key": "${var.tenant_key}",
       "domain_key": "${var.domain_key}",
@@ -186,13 +197,14 @@
       "boot_disk_gib": "${var.boot_disk_gib}",
       "data_disk_gib": "${var.data_disk_gib}",
       "accepted_quarantine_ref": "${var.accepted_quarantine_ref}",
-      "cluster_id": "${var.cluster_id}",
-      "project_id": "${var.project_id}",
-      "storage_container_id": "${var.storage_container_id}",
-      "image_id": "${var.image_id}",
-      "subnet_id": "${var.subnet_id}",
-      "security_category_id": "${var.security_category_id}",
-      "ipv4_address": "${var.ipv4_address}"
+      "resource_pool_id": "${var.resource_pool_id}",
+      "datastore_id": "${var.datastore_id}",
+      "quarantine_network_id": "${var.quarantine_network_id}",
+      "template_uuid": "${var.template_uuid}",
+      "guest_id": "${var.guest_id}",
+      "scsi_type": "${var.scsi_type}",
+      "firmware": "${var.firmware}",
+      "storage_policy_id": "${var.storage_policy_id}"
     }
   },
   "output": {

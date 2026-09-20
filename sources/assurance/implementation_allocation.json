@@ -7544,7 +7544,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider configuration SHALL be defined in root modules and passed to child modules",
     "verification_procedures": [
@@ -7571,7 +7571,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: reusable child modules SHOULD NOT embed provider credentials/configuration.",
     "verification_procedures": [
@@ -7598,7 +7598,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider versions SHALL be constrained and dependency lock files SHALL be committed and reviewed.",
     "verification_procedures": [
@@ -7626,7 +7626,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The provisioning workflow SHALL select the required hosting-platform and shared-service adapters before execution",
     "verification_procedures": [
@@ -7653,7 +7653,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: adapters SHALL preserve their authority and lifecycle boundaries. A single giant conditional module SHOULD NOT attempt to implement all platforms.",
     "verification_procedures": [
@@ -7680,7 +7680,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Module interfaces SHOULD be relatively flat and composable",
     "verification_procedures": [
@@ -7707,7 +7707,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: deeply nested modules that obscure lifecycle or ownership boundaries SHOULD be avoided.",
     "verification_procedures": [
@@ -7734,7 +7734,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Remote module sources and runner images SHALL be pinned to immutable versions/digests separately from provider lockfiles",
     "verification_procedures": [
@@ -7761,7 +7761,7 @@
     "artifacts": [
       "tools/verify_terraform.py",
       "terraform/modules/nsx-domain/main.tf.json",
-      "terraform/roots/nsx-domain/main.tf.json"
+      "terraform/stacks/components/nsx-domain/main.tf.json"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: approved package checksums and provenance SHALL be verified before privileged execution.",
     "verification_procedures": [
@@ -7786,7 +7786,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: No single routine tenant automation identity SHALL have authority to modify physical fabric, management foundation, security edge, and tenant workloads simultaneously.",
@@ -7812,7 +7812,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: encryption",
@@ -7839,7 +7839,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: strong authentication",
@@ -7866,7 +7866,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: locking",
@@ -7893,7 +7893,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: recovery/versioning",
@@ -7920,7 +7920,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: access logging",
@@ -7947,7 +7947,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: separation",
@@ -7974,7 +7974,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Cross-state/external-service changes SHALL use a journaled dependency workflow with scoped outputs, idempotent stage completion and data-safe compensation",
@@ -8001,7 +8001,7 @@
     "enforcement_location": "External remote-state backend, scoped execution identities and ownership handoffs",
     "implementation_disposition": "EXTERNAL_BACKEND_CONTROLS_REQUIRED",
     "artifacts": [
-      "terraform/roots/nsx-domain/main.tf.json",
+      "terraform/stacks/components/nsx-domain/main.tf.json",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: state-file restoration SHALL NOT be represented as infrastructure rollback.",
