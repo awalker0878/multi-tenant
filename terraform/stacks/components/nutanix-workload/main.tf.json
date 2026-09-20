@@ -168,6 +168,24 @@
       "description": "Credential injected at execution",
       "nullable": false,
       "sensitive": true
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
     }
   },
   "module": {
@@ -192,12 +210,17 @@
       "image_id": "${var.image_id}",
       "subnet_id": "${var.subnet_id}",
       "security_category_id": "${var.security_category_id}",
-      "ipv4_address": "${var.ipv4_address}"
+      "ipv4_address": "${var.ipv4_address}",
+      "lifecycle_stage": "${var.lifecycle_stage}",
+      "bootstrap_acceptance_ref": "${var.bootstrap_acceptance_ref}"
     }
   },
   "output": {
     "handoff": {
       "value": "${module.owned}"
+    },
+    "lifecycle_stage": {
+      "value": "${module.owned.lifecycle_stage}"
     }
   }
 }

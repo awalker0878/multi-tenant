@@ -141,6 +141,24 @@
       "type": "string",
       "description": "Reserved endpoint IPv4 address",
       "nullable": false
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
     }
   },
   "resource": {
@@ -166,7 +184,7 @@
         "num_sockets": 1,
         "num_cores_per_socket": "${var.vcpu}",
         "memory_size_bytes": "${var.memory_gib * 1073741824}",
-        "power_state": "OFF",
+        "power_state": "${var.lifecycle_stage == \"bootstrap\" ? \"ON\" : \"OFF\"}",
         "disks": [
           {
             "disk_address": [
@@ -238,7 +256,7 @@
                 "virtual_ethernet_nic": [
                   {
                     "model": "VIRTIO",
-                    "is_connected": false
+                    "is_connected": "${var.lifecycle_stage == \"bootstrap\"}"
                   }
                 ]
               }
@@ -280,6 +298,10 @@
             {
               "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
               "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires accepted native Flow policy, service paths and guest initialization."
             }
           ]
         }
@@ -292,6 +314,9 @@
     },
     "delivery_state": {
       "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    },
+    "lifecycle_stage": {
+      "value": "${var.lifecycle_stage}"
     }
   }
 }

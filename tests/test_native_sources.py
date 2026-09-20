@@ -54,7 +54,7 @@ class NativeSources(unittest.TestCase):
  def test_openstack_flavor_not_unused_cpu_knob(self):
   j=load('openstack-workload');self.assertNotIn('vcpu',j['variable']);self.assertNotIn('memory_gib',j['variable']);self.assertIn('flavor_id',j['variable'])
  def test_nutanix_actual_nic_disconnected(self):
-  vm=load('nutanix-workload')['resource']['nutanix_virtual_machine_v2']['workload'];self.assertEqual(vm['power_state'],'OFF');self.assertIs(vm['nics'][0]['nic_backing_info'][0]['virtual_ethernet_nic'][0]['is_connected'],False)
+  doc=load('nutanix-workload');vm=doc['resource']['nutanix_virtual_machine_v2']['workload'];self.assertEqual(doc['variable']['lifecycle_stage']['default'],'prepared');self.assertEqual(vm['power_state'],'${var.lifecycle_stage == "bootstrap" ? "ON" : "OFF"}');self.assertEqual(vm['nics'][0]['nic_backing_info'][0]['virtual_ethernet_nic'][0]['is_connected'],'${var.lifecycle_stage == "bootstrap"}')
  def test_vsphere_no_invented_power_switch(self):
   vm=load('vsphere-workload')['resource']['vsphere_virtual_machine']['workload'];self.assertNotIn('power_state',vm);self.assertNotIn('start_connected',vm['network_interface'][0])
  def test_vsphere_disk_policy_applied_to_disks(self):
