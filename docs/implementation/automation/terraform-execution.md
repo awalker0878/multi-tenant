@@ -123,7 +123,7 @@ records. OpenStack bootstrap/withdrawal additionally requires the
 [exact transition contract](openstack-bootstrap.md), passed to preparation with
 `--transition`; it is sealed and rechecked at apply. The same argument accepts
 the [VMware/Nutanix transition contract](platform-lifecycle.md) for NSX domain
-connectivity/service rules and AHV workload power/NIC changes. Those records
+connectivity/service rules, Flow domain service rules and AHV workload power/NIC changes. Those records
 also preserve all non-lifecycle input values and bind prior native identities.
 This does not install a
 backend, qualify a platform, commission edge connectivity, activate production,

@@ -96,7 +96,11 @@ requiring review. Suspended, redacted and unrecognized status values remain unkn
 Composite tasks and limited/unresolved affected-entity lists are rejected rather
 than treated as complete. This release neither lists nor cancels tasks. [U2]
 
-VMs, Flow policies and route resources are not covered by the new Nutanix reader.
+VMs, Flow policies and route resources are not covered by this networking reader.
+Separate [AHV VM](implementation/automation/nutanix-vm-readback.md) and
+[Flow policy](implementation/automation/nutanix-flow-readback.md) snapshot profiles
+are available, as are [vSphere VM/task observations](implementation/automation/vsphere-readback.md).
+Their exact coverage and task limitations are documented separately.
 The profile's source dependency is networking/prism Go SDK v4.3.1; the code itself
 uses standard-library HTTP rather than executing the SDK. No legacy API fallback
 or installed compatibility claim is made. [U3–U6]

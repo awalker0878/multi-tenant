@@ -75,18 +75,25 @@ OpenStack site does not qualify those platforms or any public/dual-stack offer.
 ## VMware and Nutanix follow-on commissioning
 
 The [restricted lifecycle executor](platform-lifecycle.md) now supports exact
-NSX domain bootstrap/withdrawal and AHV workload power/NIC transitions. Both use
+NSX/Flow domain bootstrap/withdrawal and AHV workload power/NIC transitions. They use
 the reviewed saved-plan process, prior successful native IDs and retained-data
 guards. Neither creates a site inventory or establishes effective native policy.
 
 | Platform | Implemented control | Required before a live campaign |
 | --- | --- | --- |
-| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop | Independently observed NSX/vCenter network binding, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual power/placement/storage readback and native reconciliation |
-| Nutanix | Existing VM ON/NIC connected, or OFF/disconnected with disks retained; scoped AHV snapshots and campaign v3 | Flow service-rule lifecycle integration, accepted native project/category/placement/storage, image initialization and actual network/VM task evidence; native withdrawal and recovery qualification |
+| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in campaign v5 | Independently observed NSX/vCenter network binding, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
+| Nutanix | Existing VM ON/NIC connected, or OFF/disconnected with disks retained; exact owned Flow service exceptions/withdrawal; AHV/network/Flow readback in campaign v4 | Accepted native Flow semantics/precedence and project/category/placement/storage, image initialization and actual network/VM/Flow task evidence; native withdrawal and recovery qualification |
 
 Keep VMware domain and workload state ownership separate. The pinned vSphere
 provider's power state is computed, and a clone may already be powered on in the
-quarantined domain. A domain withdrawal is not proof that the VM is off. Nutanix's
-current owned Flow policy remains deny-only; the new VM power control cannot
-make the guest reachable through it. Preserve these holds until the owned native
-integration and its observed behavior are accepted.
+quarantined domain. A domain withdrawal is not proof that the VM is off. A future
+vSphere power writer needs explicit ownership and native fencing; current readers
+cannot replay, cancel or clear a held operation. Nutanix domain and VM transitions
+are separate applies: enable only independently accepted restricted service paths,
+then collect native observations and controlled guest evidence. No cross-scope
+atomicity or Flow enforcement is inferred from a successful Terraform apply.
+
+Retain the exact task trails, native revision/ETag evidence, failed observations,
+healthy denial controls and accepted cross-system bindings. Perform actual HA,
+same-host/bypass/security, withdrawal and application-consistent recovery tests
+on the intended site. Current fixtures and provider mocks do not close those gates.

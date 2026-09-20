@@ -83,7 +83,7 @@ Further small commits in PR #46 implement the [platform lifecycle contract](plat
 
 | Capability | Implemented behavior | Remaining native boundary |
 | --- | --- | --- |
-| AHV power/NIC lifecycle | Prepared OFF/disconnected defaults, explicitly accepted ON/connected bootstrap, data-preserving return to prepared | Owned Flow service-rule lifecycle, image initialization and actual placement/storage/guest acceptance |
+| AHV power/NIC lifecycle | Prepared OFF/disconnected defaults, explicitly accepted ON/connected bootstrap, data-preserving return to prepared | Effective Flow enforcement, image initialization and actual placement/storage/guest acceptance |
 | NSX domain lifecycle | Sorted exact IPv4 TCP/UDP service exceptions, mandatory dual-family drop, connected segment; withdrawal removes exceptions and disconnects | Effective DFW precedence/membership/exclusions, same-host enforcement and accepted upstream service paths; vSphere power remains computed |
 | Exact lifecycle plan review | Prior native identity and immutable non-lifecycle inputs, expiring references, restricted update fields; unknown security values, drift and replacements block | Issuing authority, cross-writer exclusion and actual native reconciliation |
 | AHV VM snapshots | Exact native tenant, host/cluster/project/category, power, CPU/memory, NIC and retained-disk expectations with strong ETags and stable GETs | Selected fields only; no VM task completion, Flow enforcement, HA or application recovery claim |
@@ -102,6 +102,28 @@ plus 1,490 local Python/source tests and 80 route/model checks. Subsequent
 revisions need their own exact PR checks.
 These are synthetic API/provider tests and disposable local experiments; no
 actual VMware or Nutanix site was contacted or qualified.
+
+## Flow service and vSphere reconciliation increment
+
+Further small commits in PR #46 add concrete integration without issuing native
+acceptance:
+
+| Capability | Implemented behavior | Remaining boundary |
+| --- | --- | --- |
+| Flow service lifecycle | Exact IPv4 peer/TCP-or-UDP port exceptions in the existing owned policy; withdrawal removes exceptions; both deny rules, category, VPC, ENFORCE and logging retained | Installed policy semantics/precedence, native task outcomes and live allowed/denied/withdrawal behavior |
+| Flow saved-plan contract | Prior policy/category/VPC IDs, exact service intent, immutable deny pair; unbound bootstrap, extra selectors, unknown security values and unrelated updates block | Separately accepted authority and native writer fencing |
+| Flow readback and campaign v4 | Strong-ETag policy snapshots plus AHV/network observations; every domain policy bound to output IDs and VM category/NIC VPC membership before/after traffic | Effective enforcement outside the selected policy set, actual task coverage and site qualification |
+| vSphere VM readback | Exact MoID/BIOS UUID/instance UUID, config revision, full device backings, host/resource-pool placement and power; repeat GETs hold observed concurrent change | Installed VI JSON 8.0.3.0 schema, native ownership/mapping and complete security/storage/HA acceptance |
+| vSphere task evidence | Accepted exact task/VM/operation/queue-time/event-chain binding, success chronology, pending/failure/unknown holds and terminal-regression checks | Complete composite task coverage, native writer fencing and operation-wide ledger reconciliation; no replay/repair authorization |
+| VMware campaign v5 | NSX plus vSphere snapshot or task evidence around certificate-SSH traffic, separate origins/trust/credentials and combined report hashes | Independent NSX/vCenter mapping, effective DFW membership, site commissioning and live HA/security/recovery |
+
+Local verification passed 1,523 Python/source tests with no skips and 80 route/model
+checks. Flow/provider and vSphere HTTPS fixtures remain synthetic; current hosted
+CI supplies the pinned provider/Ansible/disposable-lab gates for the exact PR head.
+No live infrastructure was contacted or changed. The remaining vSphere power and
+guest-bootstrap writer, composite lifecycle reconciliation, actual site services
+and native acceptance work remain open. See the
+[updated commissioning runbook](site-commissioning.md).
 
 ### Recorded verification
 
@@ -137,11 +159,11 @@ The authoring runtime could not start Terraform provider Unix sockets; GitHub's 
 | W09 | Partial placement checks only | Implement actual tenant project/RBAC/quota/pool/AZ entitlement mutations and delegated-credential negative tests. Declared eligibility is not enforced native entitlement. |
 | W10 | Partial NetBox IPAM integration | Native API reserve/confirm/retire and uncertain-outcome reconciliation exist. Qualify the actual service, integrate its receipts with accepted records and implement separate compute-capacity hold/renew/release. Address reuse remains held pending cleanup. |
 | W11 | Existing DNS tooling; integration open | Bind the selected authoritative DNS operation to real confirmed IPAM/reservation records; qualify A/AAAA/PTR, conflicts, uncertain outcomes, observations and retirement/reuse. |
-| W12 | Partial | Compositions, source-bound execution, receipt handoffs and exact OpenStack/NSX/AHV lifecycle controls exist. Complete Flow service rules and remaining native lifecycle, integrate accepted edge routes/attachments, capacity and IPAM; qualify whole fixtures and partial effects on all three stacks. |
+| W12 | Partial | Compositions, source-bound execution, receipt handoffs and exact OpenStack/NSX/AHV/Flow lifecycle controls exist. Complete remaining vSphere/native lifecycle, integrate accepted edge routes/attachments, capacity and IPAM; qualify whole fixtures and partial effects on all three stacks. |
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial workload readback | Neutron/Nova/Cinder/Glance observations are bound to guest outputs in campaign v2; AHV VM placement/category/NIC/disk snapshots are bound in campaign v3. Complete vSphere/Flow coverage and native VM task/revision integration. Do not infer task completion from snapshots or Terraform success. |
+| W16 | Partial workload readback | OpenStack observations are bound in campaign v2; AHV/network/Flow evidence in v4; vSphere VM/exact-task and NSX evidence in v5. Qualify installed APIs, complete composite/VM/Flow task coverage, cross-system membership and native revision integration. Do not infer task completion from snapshots or Terraform success. |
 | W17 | Blocked on native coordinator/fencing interfaces | Implement actual cross-writer fencing, native task tracking, late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds and receipt handoffs are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |

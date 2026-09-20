@@ -39,6 +39,14 @@ established-session withdrawal. The [target runner](docs/implementation/automati
 collects real API and guest traffic evidence. Actual site commissioning, full
 platform lifecycle and independent native acceptance remain required.
 
+The [restricted platform lifecycle](docs/implementation/automation/platform-lifecycle.md)
+now includes owned Nutanix Flow service bootstrap/withdrawal and exact-plan checks.
+[Flow snapshots](docs/implementation/automation/nutanix-flow-readback.md) bind policy,
+category and VPC evidence to AHV guest campaigns. [vSphere readback](docs/implementation/automation/vsphere-readback.md)
+adds VM/device/placement snapshots and exact recorded task observations alongside
+NSX campaigns. Live commissioning, effective enforcement, complete fenced native
+reconciliation and HA/application recovery qualification remain open.
+
 ## Local review
 
 ```sh

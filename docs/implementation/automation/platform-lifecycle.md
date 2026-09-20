@@ -10,8 +10,10 @@ clone and exposes power state as computed, so no writable power switch is added.
 Terraform remains the writer for these existing native objects. Native ownership,
 effective policy and guest initialization must be independently accepted. The
 Nutanix VM transition alone cannot override its domain's deny policy. The owned
-Flow policy remains deny-only; service-rule lifecycle integration is still
-required before the end-to-end Nutanix bootstrap can be commissioned. Do not edit
+Flow policy now supports exact IPv4 TCP/UDP service exceptions in bootstrap and
+removes them on withdrawal. Both original deny rules, ENFORCE, hit logging, the
+owned category and VPC scope are retained. Commissioning must prove the actual
+installed policy semantics, precedence and service paths. Do not edit
 the Terraform-owned policy through a competing writer. No external attachment,
 route advertisement, HA placement, image credential or site inventory is inferred.
 
@@ -19,7 +21,7 @@ route advertisement, HA placement, image credential or site inventory is inferre
 
 `tools/lifecycle_transition.py` creates a `hosting-platform-transition/1` record
 from a successful private execution completed within 24 hours. Supported scopes
-are Nutanix workloads and VMware domains. Existing OpenStack transition records
+are Nutanix domains/workloads and VMware domains. Existing OpenStack transition records
 remain accepted by the saved-plan executor through the same validation dispatch.
 
 Copy the previous run's inputs. Keep the allocation, placement, image, hardware,
@@ -53,6 +55,13 @@ selector is accepted. Segment changes are restricted to connectivity. For AHV,
 only power and the existing NIC's connection flag may change; disks, addressing,
 cluster/project/category and other VM fields are held constant.
 
+For Flow, only the exact owned policy's rule list and computed update metadata
+may change. The prior two deny rules must remain unchanged. Added application
+rules use the owned category, one /32 peer and one TCP/UDP port, with no all-protocol
+allow, alternate category/address/entity group, service insertion or unrelated
+native change. Bootstrap without a valid lifecycle record is blocked by plan
+review. Withdrawal keeps the same policy ID and restores its original deny pair.
+
 The reviewer recognizes the pinned NSX provider's computed `nsx_id` and empty
 service defaults. Nonempty alternate protocol entries still block. Known rule
 sequence numbers must agree with the reviewed order; omitted/zero numbers are
@@ -69,14 +78,19 @@ healthy-control traffic tests and guest convergence before activation.
 For NSX use the existing exact-policy observer, including actual rule order,
 scope, intent version and every accepted enforcement point. Segment connectivity
 OFF alone does not establish same-segment isolation: observe the mandatory DFW
-drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-readback.md)
-and [campaign v3](target-qualification.md) alongside actual network task evidence.
-The VM snapshot cannot resolve an uncertain native operation. No live platform
+drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-readback.md),
+[Flow readback](nutanix-flow-readback.md) and [campaign v4](target-qualification.md)
+alongside actual network/VM task evidence. For VMware use
+[vSphere VM/task readback](vsphere-readback.md) and campaign v5. Snapshot matches
+cannot resolve an uncertain native operation; the task reader observes only exact
+recorded tasks and never clears an execution ledger or authorizes replay. No live platform
 is contacted by provider mocks, synthetic plans or the local HTTPS fixtures.
 
 On failure, withdraw the separately owned edge exposure first. Prepare and review
 a fresh transition to `prepared`, keeping the same VM/storage/member inputs.
 NSX withdrawal removes inline exceptions, with its mandatory drop retained.
+Flow withdrawal removes service exceptions while retaining both deny rules;
+the separate AHV workload withdrawal powers off and disconnects the existing NIC.
 Read back the final state, including existing-session behavior. These operations
 are not atomic across scopes; timeout or partial native outcomes remain held for
 reconciliation. Do not delete disks or revert Terraform state to recover data.
@@ -85,6 +99,13 @@ Live HA/security/recovery qualification and supported installed tuples remain
 required. Follow the [commissioning sequence](site-commissioning.md). Provider
 mocks and synthetic saved plans exercise implementation boundaries, not native
 enforcement or failure recovery.
+
+Remaining vSphere integration includes a separately fenced, data-preserving
+power/guest-bootstrap owner, complete native task coverage for composite clone
+and reconfiguration workflows, cross-system NIC/NSX membership evidence, and
+operation-wide reconciliation with the durable ledger. The new GET readers do
+not supply these write/fencing interfaces. Keep the NSX containment and reviewed
+operator hold points until those capabilities and their live behavior are accepted.
 
 Interfaces checked against the pinned provider sources:
 [Nutanix 2.4.2 VM](https://github.com/nutanix/terraform-provider-nutanix/blob/v2.4.2/website/docs/r/virtual_machine_v2.html.markdown),
