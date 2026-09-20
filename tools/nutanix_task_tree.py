@@ -53,13 +53,25 @@ def validate(m: dict) -> None:
     c.common_manifest(m, 'nutanix')
     if m['profile'] != PROFILE: raise ValueError('Wrong explicit task-tree profile')
     task = m.get('task'); c.exact_keys(task, ROOT_FIELDS)
-    if not isinstance(task['descendants'], list) or not 1 <= len(task['descendants']) < MAX_TASKS:
-        raise ValueError('The task-tree profile requires 2-16 explicitly recorded tasks')
     # Reuse the existing selected-resource validation. This is internal schema
     # composition, not native API version negotiation or a fallback request.
     legacy = deepcopy(m); legacy['profile'] = native.PROFILE
     legacy['task'] = {k: task[k] for k in ('ext_id', 'operation', 'created_after', 'entity_ids')}
     native.validate(legacy)
+    validate_graph(m)
+
+
+def validate_graph(m: dict, *, minimum_tasks: int = 2) -> None:
+    """Bind recorded tasks to already validated resources, independent of resource API."""
+    task = m.get('task'); c.exact_keys(task, ROOT_FIELDS)
+    if not isinstance(task['descendants'], list) or not minimum_tasks - 1 <= len(task['descendants']) < MAX_TASKS:
+        raise ValueError('Explicit recorded task count is outside the profile bounds')
+    c.text(task['operation'], 'expected native operation', 128)
+    entities = task['entity_ids']
+    if (not isinstance(entities, list) or any(not isinstance(e, str) for e in entities)
+            or len(entities) != len(set(entities))
+            or set(entities) != {r['ext_id'] for r in m['resources']}):
+        raise ValueError('Root task must cover exactly the accepted resources')
     if c.timestamp(task['created_after']) > c.timestamp(task['created_before']):
         raise ValueError('Reversed accepted task-creation window')
     root_id = task_id(task['ext_id']); allowed_entities = set(task['entity_ids'])
@@ -193,6 +205,11 @@ def summary(m: dict, witness: dict) -> tuple[str, str]:
 
 def sample(m: dict, client) -> list[dict]:
     from tools.nutanix_observe import sample_resources
+    return sample_graph(m, client, sample_resources)
+
+
+def sample_graph(m: dict, client, resource_sampler) -> list[dict]:
+    """Bracket the selected resource snapshot with the complete recorded task graph."""
     ordered = specs(m)
     def phase(reverse=False):
         observed = {}
@@ -202,7 +219,7 @@ def sample(m: dict, client) -> list[dict]:
             body, _ = client.get(target(node['ext_id']))
             observed[node['ext_id']] = node_observation(body, node, m, datetime.now(timezone.utc))
         return [observed[n['ext_id']] for n in ordered]
-    before = phase(); resources = sample_resources(m, client); after = phase(True)
+    before = phase(); resources = resource_sampler(m, client); after = phase(True)
     witness = {'before': before, 'after': after}
     progress, reason = summary(m, witness)
     for resource in resources:
