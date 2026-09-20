@@ -126,14 +126,49 @@ class Worker:
                 stream.close()
 
 
+VOLATILE_NETWORK_KEYS = frozenset({
+    'valid_life_time','preferred_life_time','expires','stats','stats64',
+    'cacheinfo','used','lastuse'
+})
+
+
+def stable_configuration(value):
+    """Canonicalize configuration while retaining real addresses/routes/link settings.
+
+    `ip -j` arrays are sets for this preservation check; their serialization order is
+    not configuration. Volatile lifetime/counter fields are also excluded. Values,
+    list membership, MTUs, addresses, gateways, metrics, admin flags and sysctls remain.
+    """
+    if isinstance(value, dict):
+        return {k:stable_configuration(v) for k,v in value.items()
+                if k not in VOLATILE_NETWORK_KEYS}
+    if isinstance(value, list):
+        items=[stable_configuration(v) for v in value]
+        return sorted(items,key=lambda item:json.dumps(
+            item,sort_keys=True,separators=(',',':')))
+    return value
+
+
+def configuration_digest(value) -> str:
+    canonical=stable_configuration(value)
+    return hashlib.sha256(json.dumps(
+        canonical,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+
+
+def configuration_snapshot() -> dict:
+    data={'namespace':os.readlink('/proc/self/ns/net')}
+    for label,args in [('links',['-j','link']),('addresses',['-j','addr']),
+                       ('ipv4_routes',['-4','-j','route','show','table','all']),
+                       ('ipv6_routes',['-6','-j','route','show','table','all'])]:
+        data[label]=json.loads(execute(['ip',*args]))
+    for family in ('ipv4','ipv6'):
+        path=Path(f'/proc/sys/net/{family}/conf/all/forwarding')
+        data[family+'_forwarding']=path.read_text().strip()
+    return data
+
+
 def host_fingerprint() -> dict:
-    values = {}
-    for name, args in (('links',['-j','link']), ('routes',['-j','route','show','table','all'])):
-        data = json.loads(execute(['ip', *args]))
-        # Packet counters and timestamps may change without a configuration change.
-        values[name] = data
-    values['namespace'] = os.readlink('/proc/self/ns/net')
-    return values
+    return stable_configuration(configuration_snapshot())
 
 
 def run_inner() -> dict:
@@ -348,6 +383,8 @@ def main() -> int:
                 os.killpg(proc.pid,signal.SIGKILL)
                 proc.wait(4)
         after = host_fingerprint()
+        result['original_configuration_section_sha256_before'] = {k:configuration_digest(v) for k,v in before.items()}
+        result['original_configuration_section_sha256_after'] = {k:configuration_digest(v) for k,v in after.items()}
         result['original_namespace_configuration_unchanged'] = before==after
         if before!=after:
             result['status']='FAILED_HOST_CONFIGURATION_CHANGED'

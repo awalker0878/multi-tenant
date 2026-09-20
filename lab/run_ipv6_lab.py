@@ -23,7 +23,8 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lab import ipv6_fixture as f
-from lab.run_namespace_lab import Worker as PipeWorker
+from lab.run_namespace_lab import (Worker as PipeWorker, stable_configuration,
+                                   configuration_digest, configuration_snapshot)
 
 
 class Worker(PipeWorker):
@@ -45,46 +46,6 @@ def execute(args: list[str]) -> str:
     if result.returncode: raise RuntimeError(f'{args[0]}: {result.stderr.strip()[:1000]}')
     return result.stdout
 
-
-VOLATILE_NETWORK_KEYS = frozenset({
-    'valid_life_time','preferred_life_time','expires','stats','stats64',
-    'cacheinfo','used','lastuse'
-})
-
-
-def stable_configuration(value):
-    """Canonicalize configuration while retaining real addresses/routes/link settings.
-
-    `ip -j` arrays are sets for this preservation check; their serialization order is
-    not configuration. Volatile lifetime/counter fields are also excluded. Values,
-    list membership, MTUs, addresses, gateways, metrics, admin flags and sysctls remain.
-    """
-    if isinstance(value, dict):
-        return {k:stable_configuration(v) for k,v in value.items()
-                if k not in VOLATILE_NETWORK_KEYS}
-    if isinstance(value, list):
-        items=[stable_configuration(v) for v in value]
-        return sorted(items,key=lambda item:json.dumps(
-            item,sort_keys=True,separators=(',',':')))
-    return value
-
-
-def configuration_digest(value) -> str:
-    canonical=stable_configuration(value)
-    return hashlib.sha256(json.dumps(
-        canonical,sort_keys=True,separators=(',',':')).encode()).hexdigest()
-
-
-def configuration_snapshot() -> dict:
-    data={'namespace':os.readlink('/proc/self/ns/net')}
-    for label,args in [('links',['-j','link']),('addresses',['-j','addr']),
-                       ('ipv4_routes',['-4','-j','route','show','table','all']),
-                       ('ipv6_routes',['-6','-j','route','show','table','all'])]:
-        data[label]=json.loads(execute(['ip',*args]))
-    for family in ('ipv4','ipv6'):
-        path=Path(f'/proc/sys/net/{family}/conf/all/forwarding')
-        data[family+'_forwarding']=path.read_text().strip()
-    return data
 
 
 def fingerprint(snapshot: dict | None = None) -> str:
