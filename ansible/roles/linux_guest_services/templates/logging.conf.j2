@@ -1,8 +1,8 @@
 # Client private key and certificate belong only to this log producer.
 global(
-  DefaultNetstreamDriverCAFile="/etc/hosting-log/ca.pem"
-  DefaultNetstreamDriverCertFile="/etc/hosting-log/client.pem"
-  DefaultNetstreamDriverKeyFile="/etc/hosting-log/client.key"
+  DefaultNetstreamDriverCAFile="/etc/rsyslog.d/hosting/ca.pem"
+  DefaultNetstreamDriverCertFile="/etc/rsyslog.d/hosting/client.pem"
+  DefaultNetstreamDriverKeyFile="/etc/rsyslog.d/hosting/client.key"
 )
 action(
   type="omfwd"
@@ -16,6 +16,7 @@ action(
   template="RSYSLOG_SyslogProtocol23Format"
   action.resumeRetryCount="-1"
   queue.type="LinkedList"
+  queue.spoolDirectory="/var/spool/rsyslog"
   queue.filename="hosting-forward"
   queue.maxDiskSpace="{{ hosting_target.services.log.queue_mib }}m"
   queue.saveOnShutdown="on"

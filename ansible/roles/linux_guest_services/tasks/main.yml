@@ -34,7 +34,7 @@
 
     - name: Create protected collector credential directory
       ansible.builtin.file:
-        path: /etc/hosting-log
+        path: /etc/rsyslog.d/hosting
         state: directory
         owner: root
         group: syslog
@@ -43,7 +43,7 @@
     - name: Install exact collector trust and client identity
       ansible.builtin.copy:
         src: '{{ hosting_target.services.files[item.source].path }}'
-        dest: '/etc/hosting-log/{{ item.dest }}'
+        dest: '/etc/rsyslog.d/hosting/{{ item.dest }}'
         owner: root
         group: syslog
         mode: '0640'
@@ -124,14 +124,29 @@
         mode: '0644'
       notify: Restart owned journal
 
-    - name: Queue scoped logs for authenticated TLS delivery
+    - name: Stage the candidate in the daemon's permitted configuration tree
       ansible.builtin.template:
         src: logging.conf.j2
+        dest: /etc/rsyslog.d/hosting/candidate.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Validate candidate logging without loading it into the live service
+      ansible.builtin.command:
+        argv: [/usr/sbin/rsyslogd, -N1, -f, /etc/rsyslog.d/hosting/candidate.conf]
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Publish validated TLS logging configuration
+      ansible.builtin.copy:
+        remote_src: true
+        src: /etc/rsyslog.d/hosting/candidate.conf
         dest: /etc/rsyslog.d/40-hosting-forward.conf
         owner: root
         group: root
         mode: '0644'
-        validate: '/usr/sbin/rsyslogd -N1 -f %s'
+      when: not ansible_check_mode
       notify: Validate and restart owned logging
 
     - name: Keep guest service daemons enabled

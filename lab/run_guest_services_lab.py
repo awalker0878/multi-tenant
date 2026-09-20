@@ -18,12 +18,12 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 from lab.native_readback_fixture import credentials
 
 
-def run(require_engines=False):
+def run(require_engines=False, scratch_root=None):
     engines = {name: shutil.which(name) for name in ('sshd', 'rsyslogd', 'ssh-keygen')}
     if not all(engines.values()):
         return {'status': 'MISSING_LOCAL_ENGINES', 'missing': [k for k, v in engines.items() if not v],
                 'native_contact': False}, 2 if require_engines else 0
-    with tempfile.TemporaryDirectory(prefix='hosting-guest-services-') as tmp:
+    with tempfile.TemporaryDirectory(prefix='hosting-guest-services-', dir=scratch_root) as tmp:
         base = Path(tmp)
         credentials(base)
         key = base / 'host-key'
@@ -55,10 +55,9 @@ def run(require_engines=False):
                 raise RuntimeError('Effective SSH configuration differs from the declared identity boundary')
             checks.append({'engine': 'sshd', 'account': account, 'effective_controls': len(expected), 'status': 'PASS'})
         logging = env.get_template('logging.conf.j2').render(hosting_target=target)
-        logging = logging.replace('/etc/hosting-log/ca.pem', str(base / 'ca.pem'))
-        logging = logging.replace('/etc/hosting-log/client.pem', str(base / 'server.pem'))
-        logging = logging.replace('/etc/hosting-log/client.key', str(base / 'server.key'))
-        logging = 'global(workDirectory="' + str(base) + '")\n' + logging
+        logging = logging.replace('/etc/rsyslog.d/hosting/ca.pem', str(base / 'ca.pem'))
+        logging = logging.replace('/etc/rsyslog.d/hosting/client.pem', str(base / 'server.pem'))
+        logging = logging.replace('/etc/rsyslog.d/hosting/client.key', str(base / 'server.key'))
         path = base / 'logging.conf'
         path.write_text(logging)
         result = subprocess.run([engines['rsyslogd'], '-N1', '-f', str(path)], capture_output=True, text=True, timeout=15)
@@ -71,9 +70,10 @@ def run(require_engines=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--require-engines', action='store_true')
+    parser.add_argument('--scratch-root', type=Path)
     args = parser.parse_args()
     try:
-        report, code = run(args.require_engines)
+        report, code = run(args.require_engines, args.scratch_root)
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:
         report, code = {'status': 'FAILED_LOCAL_GUEST_SERVICE_ENGINES', 'reason': str(exc), 'native_contact': False}, 2
     output = ROOT / 'build/reports/guest_services_lab.json'
