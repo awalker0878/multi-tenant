@@ -85,6 +85,26 @@ the site, Flow task completion or HA/recovery. Preserve independent native polic
 and counter evidence alongside the controlled guest probes. Do not downgrade to
 an earlier campaign version to bypass a failed policy observation.
 
+For VMware use `hosting-target-campaign/5`. Add `workload_manifest`,
+`workload_session` (plain short-lived VI session bytes) and `workload_ca` to the
+seven base assets. The plan's `origin` and base credentials/CA remain bound to
+NSX. The [vSphere manifest](vsphere-readback.md) carries its separately accepted
+vCenter origin; its bytes and CA/session asset bytes are bound by the campaign
+authority. Credentials are injected only into their own collector process.
+
+The vSphere manifest must cover exactly the BIOS UUIDs in the owned workload
+outputs, share NSX's operation, portable tenant/WSD and engineering/target
+references, and expect powered-on VMs with connected NICs. Both the VM snapshot
+and exact-task profile are supported; choosing a snapshot does not claim task
+completion. The runner collects NSX and vSphere evidence before and after probes
+and binds both report hashes. Task failure or VM drift holds the campaign.
+
+The scope reference must independently establish the managed-object/UUID and
+NSX-segment/vCenter-network associations. This version observes each configured
+NIC backing but does not discover or prove that cross-system association, effective
+DFW group membership, guest address configuration or policy precedence. Keep the
+accepted native network mapping and enforcement evidence with the campaign.
+
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command
 overrides and ambient SSH configuration, proxies, agents and user key discovery.
