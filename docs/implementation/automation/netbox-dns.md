@@ -2,7 +2,8 @@
 
 The [reference profile](reference-realization.md) connects a confirmed IPv4
 [NetBox allocation](netbox-ipam.md) to the existing [RFC 2136/TSIG writer](../../DNS_LIFECYCLE.md).
-`tools/netbox_dns.py` registers one initial A or PTR record in one accepted zone.
+`tools/netbox_dns.py` registers one initial A or PTR record in one accepted zone
+and supports its [exact owned withdrawal](netbox-dns-retirement.md).
 It checks native IPAM state and preserves a durable, write-once attempt. It does
 not allocate addresses, confirm VM bindings, authorize activation or complete the
 external IPAM/DNS evidence indexes.
@@ -31,8 +32,9 @@ The job must contain exactly one initial record, `previous_marker: null` and
 `before: null`. For A, its only value is the confirmed IPv4 address without the
 prefix length. For PTR, its owner name is that exact address's reverse name and
 its one target is the independently assigned FQDN. The scope allows only the
-selected value and accepted TTL ceiling. Update, deletion, AAAA, multiple aliases,
-adoption and reuse are outside this adapter's initial-registration interface.
+selected value and accepted TTL ceiling. Updates, AAAA, multiple aliases,
+adoption and reuse remain outside this interface. Deletion uses the separate
+withdrawal action with the exact original registration and retained markers.
 
 ```sh
 python tools/netbox_dns.py --action register \
@@ -48,7 +50,7 @@ inputs. This is distinct from the DNS writer's compact JSON hashes.
 
 The trusted change system supplies `hosting-netbox-dns-authority/1` with exactly:
 
-- `format`, `binding_sha256` and `action` (`register` or `reconcile`);
+- `format`, `binding_sha256` and `action` (`register`, `reconcile`, `withdraw` or `reconcile-withdrawal`);
 - `valid_from` and `valid_until`, a current timezone-aware window of at most one hour;
 - `change_ref`, the external accepted change reference;
 - `token_sha256`, `ca_sha256` and `tsig_sha256`, hashes of the exact private files.
@@ -112,8 +114,9 @@ The shared lock serializes participating allocation tools. It is not a distribut
 fence against administrators, direct service writers, another ledger or server-side
 changes between reads. Actual NetBox uniqueness/ETags, service RBAC, DNS ACLs,
 transport protection and durable storage must be commissioned. Neither service
-provides a cross-service atomic transaction here. Coordinated retirement, tombstone
-release, IPv6 IPAM integration and name/address reuse remain separate work.
+provides a cross-service atomic transaction here. The [retirement handoff](netbox-dns-retirement.md)
+now gates IPAM deprecation on current managed DNS tombstones; complete cross-service
+retirement, tombstone release, IPv6 IPAM integration and name/address reuse remain open.
 
 Loopback tests use real TLS and TSIG bytes with synthetic NetBox/DNS authorities.
 They cover A/PTR handoff, current-state races, expiry, lock exclusion, durable

@@ -68,6 +68,15 @@ Retain the receipt with native IDs, scope, address, request digest and observed
 revision. Current downstream checks still require independent platform/address
 readback and the applicable reservation/IPAM handoff records.
 
+Before `retire`, every DNS registration in this allocation's shared ledger must
+have completed [owned withdrawal](netbox-dns-retirement.md), with matching native
+tombstone observation and receipt inside the current retirement authority window.
+A newer failed reconciliation overrides older success. Missing, uncertain, stale
+or foreign cleanup stops before NetBox contact. Reobserve tombstones with newly
+authorized read-only reconciliation when the retirement window changes. The
+external `cleanup_ref` still covers the other accepted cleanup/retention duties;
+the ledger does not discover unmanaged DNS or fence external writers.
+
 Sources: [REST authentication and conditional writes](https://netbox.readthedocs.io/en/stable/integrations/rest-api/),
 [VRF uniqueness](https://netbox.readthedocs.io/en/stable/models/ipam/vrf/),
 [4.7 release line](https://netbox.readthedocs.io/en/stable/release-notes/version-4.7/).

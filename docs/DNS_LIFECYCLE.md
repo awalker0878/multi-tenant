@@ -18,6 +18,10 @@ the selected reference IPAM service to this writer for initial IPv4 A/PTR regist
 It requires a confirmed receipt, current native ownership/revision and the shared
 allocation ledger. Durable attempts prevent replay; recovery only reads. This
 execution receipt does not populate or replace the separate evidence/preflight layer.
+Its [owned withdrawal path](implementation/automation/netbox-dns-retirement.md)
+removes the exact registered A/PTR generation while retaining markers and keeping
+IPAM allocated. NetBox retirement checks all managed DNS cleanup receipts in the
+current authority window; complete dependency retirement and reuse remain external.
 
 The selected candidate interface is standards-based RFC 2136 UPDATE with HMAC-SHA256
 TSIG over TCP. Actual server support, key/name/type policy, management transport,
