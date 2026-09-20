@@ -38,7 +38,7 @@ def validate_bundle(operation, approval, binary, root=ROOT):
     required = {'inputs.json', 'backend.json', 'backend.hcl', 'environment.json', 'contact.json',
                 'references.json', 'terraform.rc', 'version.json', 'saved.tfplan', 'plan.json', 'review.json'}
     require(isinstance(bundle['artifacts'], dict) and required <= set(bundle['artifacts'])
-            and not set(bundle['artifacts']) - required - {'ca.pem'}, 'Incomplete or unknown bundle artifacts')
+            and not set(bundle['artifacts']) - required - {'ca.pem', 'transition.json'}, 'Incomplete or unknown bundle artifacts')
     require(bool(bundle['source_files']), 'Execution source manifest is empty')
     require(set(approval) == {'format', 'bundle_sha256', 'review_sha256', 'operation_id', 'generation',
             'valid_from', 'valid_until', 'change_ref'}, 'Invalid apply approval fields')
@@ -63,7 +63,11 @@ def validate_bundle(operation, approval, binary, root=ROOT):
     require((entry['root'], scope, state_key) == (bundle['root'], bundle['scope'], bundle['state_key']),
             'Bundle scope differs from its inputs')
     backend_settings(load_private(operation / 'backend.json'), state_key)
-    result = review(load_private(operation / 'plan.json'), load_private(operation / 'references.json'))
+    transition = load_private(operation / 'transition.json') if 'transition.json' in bundle['artifacts'] else None
+    if transition is not None:
+        from tools.openstack_transition import validate as validate_transition
+        validate_transition(transition, scope, read_private(operation / 'inputs.json'))
+    result = review(load_private(operation / 'plan.json'), load_private(operation / 'references.json'), transition)
     require(result['status'] != 'BLOCKED' and result == load_private(operation / 'review.json'),
             'Plan review is blocked or changed')
     require(approval['review_sha256'] == digest(encoded(result)), 'All exact review findings must be reviewed')
@@ -99,6 +103,11 @@ def verify_outputs(outputs, bundle, inputs):
     require(isinstance(members, dict) and set(members) == set(inputs['members']), 'Output member identities differ')
     require(all(isinstance(v, dict) and v.get('delivery_state') == STATE for v in members.values()),
             'Unexpected member delivery state')
+    if bundle['scope']['platform'] == 'openstack':
+        for name, member in members.items():
+            # Legacy prepared receipts remain readable; bootstrap must be explicit.
+            require(member.get('lifecycle_stage', 'prepared') == inputs['members'][name].get('lifecycle_stage', 'prepared'),
+                    'Native output lifecycle differs from the exact plan inputs')
 
 
 def apply(args, root=ROOT):
@@ -116,6 +125,8 @@ def apply(args, root=ROOT):
         # Attempt identity survives a copied bundle or a new coordinator process.
         require(not (ledger / (identity + '.started.json')).exists(), 'This operation/generation was already attempted')
         current_window(approval)
+        if 'transition.json' in bundle['artifacts']:
+            current_window(load_private(operation / 'transition.json'))
         receipt = {'format': 'hosting-terraform-attempt/1', 'status': 'STARTED_OUTCOME_UNKNOWN',
                    'bundle_sha256': approval['bundle_sha256'], 'scope': bundle['scope'],
                    'operation_id': bundle['operation_id'], 'generation': bundle['generation'],
@@ -126,6 +137,9 @@ def apply(args, root=ROOT):
         write_new(operation / 'approval.json', encoded(approval))
         try:
             remaining = (datetime.fromisoformat(approval['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
+            if 'transition.json' in bundle['artifacts']:
+                deadline = load_private(operation / 'transition.json')['valid_until']
+                remaining = min(remaining, (datetime.fromisoformat(deadline.replace('Z', '+00:00')) - utcnow()).total_seconds())
             require(remaining > 0, 'Approval expired before mutation')
             command(binary, directory, ['apply', '-input=false', '-no-color', '-lock=true', '-lock-timeout=60s',
                     str(operation / 'saved.tfplan')], env, operation / 'apply.log', timeout=min(remaining, 3600))

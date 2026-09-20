@@ -179,6 +179,10 @@ def prepare(args, root=ROOT):
     input_bytes, backend_bytes = read_private(args.inputs), read_private(args.backend)
     inputs, backend = strict_loads(input_bytes), strict_loads(backend_bytes)
     entry, scope, state_key = select_scope(root, args.catalog_id, inputs)
+    transition = load_private(args.transition) if getattr(args, 'transition', None) else None
+    if transition is not None:
+        from tools.openstack_transition import validate as validate_transition
+        validate_transition(transition, scope, input_bytes)
     settings = backend_settings(backend, state_key)
     environment_bytes = read_private(args.environment)
     cloud_bytes = read_private(args.cloud) if args.cloud else None
@@ -215,6 +219,8 @@ def prepare(args, root=ROOT):
         write_new(operation / name, data)
     references = load_private(args.references) if args.references else {}
     write_new(operation / 'references.json', encoded(references))
+    if transition is not None:
+        write_new(operation / 'transition.json', encoded(transition))
     write_new(operation / 'backend.hcl', ''.join(f'{k} = {json.dumps(v)}\n' for k, v in sorted(settings.items())).encode())
     authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json')
     version = strict_loads(read_private(operation / 'version.json'))['terraform_version']
@@ -227,7 +233,7 @@ def prepare(args, root=ROOT):
             '-detailed-exitcode', f'-var-file={operation / "inputs.json"}', f'-out={operation / "saved.tfplan"}'],
             env, operation / 'plan.log', ok=(0, 2))
     authorized_command(authority, binary, directory, ['show', '-json', str(operation / 'saved.tfplan')], env, operation / 'plan.json')
-    result = review(strict_loads(read_private(operation / 'plan.json')), references)
+    result = review(strict_loads(read_private(operation / 'plan.json')), references, transition)
     write_new(operation / 'review.json', encoded(result))
     require(result['status'] != 'BLOCKED', 'Restricted plan has blocked changes; no execution bundle issued')
     current_window(authority)
@@ -235,6 +241,8 @@ def prepare(args, root=ROOT):
                  'references.json', 'terraform.rc', 'version.json', 'saved.tfplan', 'plan.json', 'review.json']
     if ca_bytes is not None:
         protected.append('ca.pem')
+    if transition is not None:
+        protected.append('transition.json')
     manifest = {'format': 'hosting-terraform-bundle/1', 'source_commit': source['commit'],
                 'catalog_id': entry['id'], 'root': entry['root'], 'scope': scope, 'state_key': state_key,
                 'operation_id': authority['operation_id'], 'generation': authority['generation'],
@@ -252,6 +260,7 @@ def main():
     for name in ('inputs', 'backend', 'authority', 'environment', 'output', 'terraform'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--references', type=Path)
+    parser.add_argument('--transition', type=Path)
     parser.add_argument('--cloud', type=Path)
     parser.add_argument('--ca-bundle', type=Path)
     parser.add_argument('--read-authorized-target', action='store_true')

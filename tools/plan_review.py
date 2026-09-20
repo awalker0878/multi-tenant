@@ -69,7 +69,7 @@ def walk(value:Any,path:tuple=()):
 def empty(value:Any)->bool:return value is None or value=='' or value==[] or value=={}
 
 
-def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None)->dict[str,Any]:
+def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None, transition=None)->dict[str,Any]:
     if not isinstance(plan,dict):raise PlanError('Expected a JSON object.')
     if not re.fullmatch(r'1\.[0-9]+',str(plan.get('format_version',''))):raise PlanError('Unsupported or missing plan format_version.')
     changes=plan.get('resource_changes')
@@ -81,6 +81,14 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
         # Never echo attribute values, expressions, provider credentials or plan metadata.
         safe=address if SAFE_ADDRESS.fullmatch(address) else 'REDACTED_RESOURCE_ADDRESS'
         findings.append({'severity':level,'code':code,'resource':safe,'field':field})
+    lifecycle = {}
+    if transition is not None:
+        from tools.openstack_transition import plan_bindings
+        try:
+            lifecycle = plan_bindings(plan, transition)
+            finding('REVIEW', 'NATIVE_BOOTSTRAP_AND_WITHDRAWAL_ACCEPTANCE_REQUIRED')
+        except (ValueError, KeyError, TypeError):
+            finding('BLOCK', 'LIFECYCLE_CONTRACT_VIOLATION')
     if plan.get('errored') is True:finding('BLOCK','PLAN_ERRORED')
     if plan.get('complete') is False or plan.get('deferred_changes'):finding('REVIEW','PLAN_INCOMPLETE')
     if plan.get('resource_drift'):finding('REVIEW','DRIFT_PRESENT')
@@ -106,7 +114,7 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
         if 'delete' in actions:
             finding('BLOCK','DELETE_OR_REPLACEMENT',address);continue
         if actions not in (['create'],['update'],['no-op']):finding('BLOCK','UNSUPPORTED_ACTION',address);continue
-        if kind not in ALLOWED:finding('BLOCK','RESOURCE_TYPE_OUTSIDE_INCREMENT',address);continue
+        if kind not in ALLOWED and address not in lifecycle:finding('BLOCK','RESOURCE_TYPE_OUTSIDE_INCREMENT',address);continue
         expected_provider=next((v for k,v in PREFIX_PROVIDER.items() if kind.startswith(k)),None)
         if item.get('provider_name')!=expected_provider:finding('BLOCK','UNEXPECTED_PROVIDER_SOURCE',address)
         if actions==['update']:finding('REVIEW','UPDATE_REQUIRES_CHANGE_AND_DATA_REVIEW',address)
@@ -120,7 +128,8 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
             if has_true(unknown.get(field)):finding('REVIEW','SECURITY_FIELD_UNKNOWN',address,field)
             elif field not in after:finding('REVIEW','SECURITY_FIELD_MISSING',address,field)
             elif type(after[field]) is not type(expected) or after[field]!=expected:finding('BLOCK','QUARANTINE_VALUE_CHANGED',address,field)
-        for field,value in SCALAR_RULES.get(kind,{}).items():scalar(field,value)
+        rules = {**SCALAR_RULES.get(kind,{}), **lifecycle.get(address, {}).get('values', {})}
+        for field,value in rules.items():scalar(field,value)
         for field in EMPTY_RULES.get(kind,()):
             if has_true(unknown.get(field)):finding('REVIEW','FORBIDDEN_PATH_FIELD_UNKNOWN',address,field)
             elif not empty(after.get(field)):finding('BLOCK','UNEXPECTED_CONNECTIVITY_OR_DEVICE',address,field)
