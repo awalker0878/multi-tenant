@@ -14,6 +14,7 @@ This folder records the work needed for a 1.0 delivery. The folder name is a pla
 | --- | --- |
 | [Repository audit](audit.md) | Verified implementation inventory, concrete gaps and exact-revision CI evidence |
 | [Environment coverage](environments.md) | Completion requirements for all three platform families, common infrastructure, lifecycle environments and optional service profiles |
+| [Cluster topology and WSD placement](cluster-topology-and-wsd-placement.md) | Proposed physical/control/service cluster roles, shared versus dedicated capacity, and WSD placement across primary and recovery infrastructure |
 | [Required delivery process](delivery-process.md) | How Terraform, Ansible, supported installers and service-owner tools must work together from bootstrap through retirement |
 | [Completion backlog](completion-backlog.md) | Prioritized work packages, dependencies, proposed owner roles, deliverables and closure criteria |
 | [Acceptance and release gates](acceptance.md) | Tests and evidence required before calling each environment complete |

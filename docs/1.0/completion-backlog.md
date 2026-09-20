@@ -17,6 +17,8 @@
 
 **Design outputs:** supported-environment register, accepted LLD/interface handoffs, native resource/field owner table and create/observe/update/import/replace/delete support matrix. Keep the register's sensitive endpoint and credential values in the designated private systems.
 
+The [cluster topology and WSD placement elaboration](cluster-topology-and-wsd-placement.md) adds a proposed cluster/capacity catalogue and per-WSD placement schedule to W01, with explicit follow-through into commissioning, admission, verification and lifecycle packages. It does not close any package or change the original audit snapshot.
+
 ## B. Commission usable infrastructure and common services
 
 | ID / priority | Required work and deliverable | Dependencies | Proposed owner | Closure criterion |
