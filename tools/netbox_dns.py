@@ -90,6 +90,17 @@ def validate_authority(binding, action, authority, token, ca, secret):
     current_window(authority)
 
 
+class AuthorizedDNSClient(dns_writer.Client):
+    """Use the existing signed transport with a current window for every query."""
+    def __init__(self, client, authority):
+        self.client, self.authority = client, authority
+        self.server, self.port, self.key_name = client.server, client.port, client.key_name
+
+    def exchange(self, message):
+        current_window(self.authority)
+        return self.client.exchange(message)
+
+
 def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client, ledger,
             *, action, fixture=False):
     binding = validate(allocation, receipt, job, scope, action=action, fixture=fixture)
@@ -98,6 +109,7 @@ def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
     require((dns_client.server, dns_client.port, dns_client.key_name)
             == (job['server'], job['port'], job['key_name']), 'DNS transport changed')
     current_window(authority)
+    dns_client = AuthorizedDNSClient(dns_client, authority)
     reader = AllocationReader(allocation, authority, ipam_client)
     identity = confirmed(allocation, receipt)
     with allocation_lock(ledger, allocation) as directory:

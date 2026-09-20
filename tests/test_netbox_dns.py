@@ -242,6 +242,18 @@ class NetboxDNSTests(unittest.TestCase):
         self.assertEqual(self.calls, [])
         self.assertEqual(self.dns_server.queries, 0)
 
+    def test_expiry_between_dns_queries_stops_further_contact(self):
+        exchange = self.dns_client.exchange
+        def expire_after_query(message):
+            result = exchange(message)
+            self.authority['valid_until'] = (utcnow() - timedelta(seconds=1)).isoformat()
+            return result
+        with patch.object(self.dns_client, 'exchange', side_effect=expire_after_query), self.assertRaises(ValueError):
+            self.run_dns()
+        self.assertEqual(self.dns_server.queries, 1)
+        self.assertEqual(self.dns_server.update_requests, 0)
+        self.assertEqual(load_private(self.transaction())['status'], 'DNS_REGISTRATION_HELD')
+
     def test_authority_binds_both_credentials_CA_action_and_entire_intent(self):
         binding = handoff.validate(self.job, self.receipt, self.dns_job, self.scope, fixture=True)
         authority = self.authority | dict(format='hosting-netbox-dns-authority/1', binding_sha256=binding,
