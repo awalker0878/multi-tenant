@@ -113,16 +113,53 @@ def sample(m, client):
         if not isinstance(data, dict): raise c.ObservationError('FLOW_BODY_MISSING')
         actual = vm.selected(data, r['expected']); mismatch = c.differences(actual, r['expected'])
         identity = not c.differences(actual, {key: r['expected'][key] for key in ('extId', '$objectType', 'tenantId')})
+        shape_valid = True
         try: policy_shape(data, r)
-        except (ValueError, TypeError, KeyError, IndexError): mismatch.append('/policy:unreviewed_shape_or_selector')
+        except (ValueError, TypeError, KeyError, IndexError):
+            shape_valid = False; mismatch.append('/policy:unreviewed_shape_or_selector')
         if etag is None: mismatch.append('/ETag:missing')
         elif etag != r['expected_etag']: mismatch.append('/ETag:value')
         config = 'UNKNOWN' if not identity or any(x.endswith((':missing', ':type')) for x in mismatch) else ('DIFFERENT' if mismatch else 'MATCH')
         results.append({'resource_key': r['ext_id'], 'identity_match': identity, 'config_status': config,
             'mismatch_fields': mismatch, 'config_sha256': c.digest(actual), 'etag_sha256': c.digest(etag),
+            'policy_witness': dict(selected_sha256=c.digest(actual), etag_sha256=c.digest(etag), policy_shape_valid=shape_valid),
             'progress': 'COMPLETE', 'reason': 'FLOW_SNAPSHOT_ONLY_ENFORCEMENT_AND_TASKS_NOT_OBSERVED',
             'task_completion_observed': False})
     return results
+
+
+def validate_snapshot_witnesses(m, states):
+    """Recheck selected hashes and full-shape verdict, including unselected selectors.
+
+    These are consistency witnesses, not authenticated evidence or native fences.
+    Task adapters may replace progress while preserving policy evidence.
+    """
+    require([s.get('resource_key') for s in states] == [r['ext_id'] for r in m['resources']], 'Policy coverage differs')
+    for r, state in zip(m['resources'], states):
+        witness = state.get('policy_witness'); c.exact_keys(witness, {'selected_sha256', 'etag_sha256', 'policy_shape_valid'})
+        require(type(witness['policy_shape_valid']) is bool, 'Policy shape verdict missing')
+        for field, summary in (('selected_sha256', 'config_sha256'), ('etag_sha256', 'etag_sha256')):
+            require(isinstance(witness[field], str) and re.fullmatch(r'[0-9a-f]{64}', witness[field])
+                    and witness[field] == state.get(summary), 'Policy snapshot digest differs')
+        if state.get('config_status') == 'MATCH':
+            require(state.get('identity_match') is True and state.get('mismatch_fields') == []
+                    and witness['policy_shape_valid'] is True
+                    and witness['selected_sha256'] == c.digest(r['expected'])
+                    and witness['etag_sha256'] == c.digest(r['expected_etag']), 'Policy match contradicts snapshot witness')
+
+
+def validate_observation_history(m, history, states, current=None):
+    try:
+        if len(states) == 1 and states[0].get('resource_key') == 'scope':
+            require(states[0].get('config_status') == states[0].get('progress') == 'UNKNOWN', 'Invalid scope hold')
+            return
+        validate_snapshot_witnesses(m, states)
+        for state in states:
+            require(state.get('task_completion_observed') is False and state.get('progress') == 'COMPLETE'
+                    and state.get('reason') == 'FLOW_SNAPSHOT_ONLY_ENFORCEMENT_AND_TASKS_NOT_OBSERVED',
+                    'Snapshot cannot claim native task completion')
+    except (ValueError, TypeError, KeyError, IndexError):
+        raise c.ObservationError('FLOW_SNAPSHOT_WITNESS_INVALID') from None
 
 
 if __name__ == '__main__':

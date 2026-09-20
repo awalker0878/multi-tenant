@@ -35,6 +35,17 @@ class FlowSnapshots(unittest.TestCase):
         self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
         self.assertFalse(report['may_activate'])
         self.assertFalse(report['history'][-1]['states'][0]['task_completion_observed'])
+    def test_offline_snapshot_cannot_claim_task_completion_or_ignore_shape(self):
+        states = self.observe()['history'][-1]['states']
+        for mutate in (lambda s: s[0].update(task_completion_observed=True),
+                       lambda s: s[0].update(progress='PENDING'),
+                       lambda s: s[0].update(config_sha256='0'*64),
+                       lambda s: s[0]['policy_witness'].update(policy_shape_valid=False)):
+            bad = deepcopy(states); mutate(bad)
+            with self.assertRaises(c.ObservationError): flow.validate_observation_history(self.m, [], bad)
+        self.client.body['data']['networkFunctionReferences'] = [uid(50)]
+        states = self.observe()['history'][0]['states']; states[0].update(config_status='MATCH', mismatch_fields=[])
+        with self.assertRaises(c.ObservationError): flow.validate_observation_history(self.m, [], states)
     def test_extra_native_selectors_cannot_hide_outside_selected_projection(self):
         mutations = [lambda e: e.update(networkFunctionReferences=[uid(50)]),
             lambda e: e.update(scopeReferences=[uid(50)]), lambda e: e.update(securedGroups=[uid(50)]),
