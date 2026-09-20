@@ -134,3 +134,38 @@ Interfaces: [task filter](https://developer.broadcom.com/xapis/virtual-infrastru
 [initial cursor](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/HistoryCollector/moId/RewindCollector/post/)
 and [collector cleanup](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/HistoryCollector/moId/DestroyCollector/post/).
 The session-local collector changes are separate from infrastructure mutations.
+
+## Template clone result and source coverage
+
+The same task-tree command additionally supports
+`vsphere-vi-json-8.0.3.0-clone-tree-history`. This profile observes an already
+identified clone; it never submits `CloneVM_Task` or discovers a destination by
+name. Each destination requires exactly one accepted `VirtualMachine.clone` root
+record. It adds `source_moid`; `vm_moid` remains the destination. A successful
+task must name the source as its entity and return the exact destination VM
+managed reference. Missing, foreign or unsupported results remain held. Pending
+clones cannot claim a result, and clone success cannot hide pending child work.
+
+Add `task.sources`, a bounded list of `moid` and `expected` objects. Each expected
+object contains `_typeName: VirtualMachineConfigInfo`, `uuid`, `instanceUuid`,
+`template: true` and the accepted `changeVersion`. Source identities must be
+distinct from destinations and observed twice around the task/history/VM reads.
+Unstable identity/revision, changed template status and missing child history hold.
+Offline review recomputes both source and result witnesses; campaign v5 supports
+this profile. Destination device/placement/power coverage remains unchanged.
+
+Accept source UUID/revision, destination binding and task trail independently.
+The source snapshot does not attest image contents or prove the template was
+unchanged at clone submission. vCenter task descriptions and history visibility
+must be qualified on the actual installed tuple; do not silently map simulator
+aliases to native operations. The pinned govmomi simulator calls its clone task
+`VirtualMachine.cloneVm`, which is not accepted as an alias by this profile.
+Unrecorded internal task types, chained clones, non-template sources and other
+cross-entity operations still require separate coverage. No state adoption,
+ledger release, native fencing, replay or power control is supplied.
+
+The [CloneVM task contract](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VirtualMachine/moId/CloneVM_Task/post/)
+defines the successful result as the new VM; Broadcom's
+[native clone diagnostic](https://knowledge.broadcom.com/external/article/427645/scheduled-vm-clone-task-fails-with-error.html)
+identifies the native clone operation. The profile remains an unqualified
+candidate until native TaskInfo captures establish its exact applicability.

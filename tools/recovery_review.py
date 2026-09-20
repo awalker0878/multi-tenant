@@ -20,7 +20,7 @@ ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe,'vmware':vsphere_task_obse
 
 
 def adapter_for(m):
-    return vsphere_task_tree_observe if m.get('platform') == 'vmware' and m.get('profile') == vsphere_task_tree_observe.PROFILE else ADAPTERS[m['platform']]
+    return vsphere_task_tree_observe if m.get('platform') == 'vmware' and m.get('profile') in vsphere_task_tree_observe.PROFILES else ADAPTERS[m['platform']]
 
 
 def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
