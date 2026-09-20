@@ -15,9 +15,12 @@ class Client(c.ReadClient):
         self.manager = task_manager_id; self.parents = tuple(sorted(parent_ids))
 
     def children(self):
+        return self._collect({'parentTaskKey': list(self.parents)})
+
+    def _collect(self, selected_filter):
         """Drain all pages, then destroy the collector; cleanup failure holds."""
         path = vm.PREFIX + 'TaskManager/' + self.manager + '/CreateCollectorForTasks'
-        collector, _ = self._request('POST', path, {'filter': {'parentTaskKey': list(self.parents)}})
+        collector, _ = self._request('POST', path, {'filter': selected_filter})
         try:
             c.exact_keys(collector, {'type', 'value'}, {'_typeName'})
             require(collector['type'] == 'TaskHistoryCollector'
@@ -48,3 +51,29 @@ class Client(c.ReadClient):
             # This destroys only the collector just returned in this session.
             # Interrupted/failed cleanup still requires session-owner attention.
             self._request('POST', vm.PREFIX + 'HistoryCollector/' + identifier + '/DestroyCollector', no_content=True)
+
+
+class ActivityClient(Client):
+    """Fixed exact-VM queries; no folder recursion or user/task-ID filters."""
+    def __init__(self, *args, vm_ids, since, **kwargs):
+        require(isinstance(vm_ids, list) and 1 <= len(vm_ids) <= 20, 'Exact bounded VM set required')
+        for identity in vm_ids: vm.moid(identity, 'vm')
+        require(len(set(vm_ids)) == len(vm_ids) and c.timestamp(since) <= c.timestamp(c.now()), 'Invalid activity scope/window')
+        super().__init__(*args, **kwargs)
+        self.vm_ids = tuple(sorted(vm_ids)); self.since = since
+
+    def activity(self):
+        result = {}; count = 0
+        for identity in self.vm_ids:
+            entity = {'entity': {'type': 'VirtualMachine', 'value': identity}, 'recursion': 'self'}
+            result[identity] = {}
+            # Read active work first, then completions. A task crossing the two
+            # queries remains visible as a duplicate/changed witness and holds.
+            for phase, selected in (
+                ('pending', {'entity': entity, 'state': ['queued', 'running']}),
+                ('completed', {'entity': entity, 'state': ['success', 'error'],
+                               'time': {'timeType': 'completedTime', 'beginTime': self.since}})):
+                rows = self._collect(selected); count += len(rows)
+                if count > 100: raise c.ObservationError('VSPHERE_ACTIVITY_HISTORY_LIMIT')
+                result[identity][phase] = rows
+        return result
