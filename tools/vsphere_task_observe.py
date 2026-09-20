@@ -9,6 +9,7 @@ from tools.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-vm-tasks'
 OPERATIONS = {'VirtualMachine.powerOn', 'VirtualMachine.powerOff', 'VirtualMachine.reconfigVm'}
+CLONE = 'VirtualMachine.clone'
 
 
 def vm_manifest(m): return {key: (vm.PROFILE if key == 'profile' else value) for key, value in m.items() if key != 'task'}
@@ -18,16 +19,28 @@ def validate(m):
     c.common_manifest(m, 'vmware'); require(m['profile'] == PROFILE and 'task' in m, 'Explicit task profile required')
     vm.validate(vm_manifest(m)); task = m['task']; c.exact_keys(task, {'execution_record_ref', 'records'})
     c.text(task['execution_record_ref'])
-    require(isinstance(task['records'], list) and 1 <= len(task['records']) <= 20, 'Enumerate 1-20 exact tasks')
+    validate_records(task['records'], {r['moid'] for r in m['resources']})
+
+
+def validate_records(records, vm_ids, *, clone_sources=None, ancestry=False):
+    require(isinstance(records, list) and 1 <= len(records) <= 20, 'Enumerate 1-20 exact tasks')
     ids = set(); entities = set()
-    for record in task['records']:
-        c.exact_keys(record, {'moid', 'vm_moid', 'description_id', 'queued_at', 'event_chain_id'})
+    for record in records:
+        require(isinstance(record, dict), 'Task record object required')
+        clone = record.get('description_id') == CLONE and clone_sources is not None
+        keys = {'moid', 'vm_moid', 'description_id', 'queued_at', 'event_chain_id'}
+        if ancestry: keys |= {'parent_task_id', 'root_task_id'}
+        if clone: keys.add('source_moid')
+        c.exact_keys(record, keys)
         vm.moid(record['moid'], 'task'); vm.moid(record['vm_moid'], 'vm')
-        require(record['moid'] not in ids and record['description_id'] in OPERATIONS, 'Duplicate or unsupported task')
+        require(record['moid'] not in ids and (record['description_id'] in OPERATIONS or clone), 'Duplicate or unsupported task')
+        if clone:
+            vm.moid(record['source_moid'], 'vm')
+            require(record['source_moid'] in clone_sources and record['source_moid'] != record['vm_moid'], 'Unbound clone source')
         require(type(record['event_chain_id']) is int and record['event_chain_id'] >= 0, 'Native event chain required')
         require(c.timestamp(record['queued_at']) <= c.timestamp(c.now()), 'Future task record refused')
         ids.add(record['moid']); entities.add(record['vm_moid'])
-    require(entities == {r['moid'] for r in m['resources']}, 'Tasks must cover exactly the observed VMs')
+    require(entities == vm_ids, 'Tasks must cover exactly the observed VMs')
 
 
 def task_target(record): return vm.PREFIX + 'Task/' + record['moid'] + '/info'
@@ -60,6 +73,12 @@ def task_witness(body):
             else: require(type(value) is bool, 'Invalid task flag')
     except (ValueError, TypeError):
         return {'has_error': False, 'has_result': False}
+    if body.get('descriptionId') == CLONE and witness['has_result']:
+        try:
+            vm.reference(body['result'], 'VirtualMachine', 'vm')
+            witness['result_reference'] = dict(body['result'])
+        except (ValueError, TypeError):
+            pass  # Preserve the unsupported-result flag without logging its contents.
     return witness
 
 
@@ -69,11 +88,13 @@ def evaluate_task(record, body, current=None):
                   reason='VSPHERE_TASK_UNCERTAIN', task_completion_observed=False,
                   task_witness=body, config_sha256=c.digest(body), mismatch_fields=[])
     try:
-        c.exact_keys(body, {'has_error', 'has_result'}, WITNESS_FIELDS)
+        c.exact_keys(body, {'has_error', 'has_result'}, WITNESS_FIELDS | {'result_reference'})
         require(type(body['has_error']) is bool and type(body['has_result']) is bool, 'Typed native result flags required')
         require(body.get('_typeName') == 'TaskInfo' and body.get('key') == record['moid'], 'Wrong task identity')
         vm.reference(body.get('task'), 'Task', 'task'); vm.reference(body.get('entity'), 'VirtualMachine', 'vm')
-        require(body['task']['value'] == record['moid'] and body['entity']['value'] == record['vm_moid']
+        clone = record['description_id'] == CLONE
+        entity = record['source_moid'] if clone else record['vm_moid']
+        require(body['task']['value'] == record['moid'] and body['entity']['value'] == entity
                 and body.get('descriptionId') == record['description_id']
                 and type(body.get('eventChainId')) is int and body['eventChainId'] == record['event_chain_id']
                 and c.timestamp(body['queueTime']) == c.timestamp(record['queued_at']), 'Task execution binding differs')
@@ -89,7 +110,13 @@ def evaluate_task(record, body, current=None):
         # Native error text and arbitrary task results never enter the journal.
         if body['cancelled'] or state == 'error':
             result.update(progress='FAILED', reason='VSPHERE_TASK_FAILED_OR_CANCELLED'); return result
-        require(not body['has_error'] and not body['has_result'], 'Contradictory or unsupported task result')
+        require(not body['has_error'], 'Contradictory native task error')
+        if clone and state == 'success':
+            require(body['has_result'], 'Completed clone result required')
+            vm.reference(body.get('result_reference'), 'VirtualMachine', 'vm')
+            require(body['result_reference']['value'] == record['vm_moid'], 'Clone destination differs')
+        else:
+            require(not body['has_result'] and 'result_reference' not in body, 'Contradictory or unsupported task result')
         if state in {'queued', 'running'}:
             require(body.get('completeTime') is None, 'Pending task claims completion')
             result.update(progress='PENDING', reason='VSPHERE_TASK_PENDING'); return result
@@ -97,6 +124,8 @@ def evaluate_task(record, body, current=None):
         require(queued <= started <= completed <= current, 'Task completion chronology differs')
         result.update(progress='COMPLETE', reason='EXACT_TASK_COMPLETED_REPLAY_NOT_AUTHORIZED', task_completion_observed=True,
                       execution_sha256=c.digest({key: body[key] for key in ('key', 'descriptionId', 'entity', 'eventChainId', 'queueTime', 'startTime', 'completeTime')}))
+        if clone:
+            result['execution_sha256'] = c.digest({'task_sha256': result['execution_sha256'], 'result_reference': body['result_reference']})
     except (ValueError, TypeError, KeyError):
         result.update(config_status='UNKNOWN', progress='UNKNOWN')
     return result
