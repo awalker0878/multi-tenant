@@ -53,8 +53,9 @@ does not include Nova/Cinder/Glance placement or storage qualification.
 
 For Nutanix use `hosting-target-campaign/3`. It adds only `workload_manifest` to
 the seven base assets and reuses the exact Prism origin, credentials and CA.
-The [AHV snapshot manifest](nutanix-vm-readback.md), or the explicit
-[AHV VM/task manifest](nutanix-vm-task-readback.md), must cover every VM ID in the
+The [AHV snapshot manifest](nutanix-vm-readback.md), explicit
+[AHV VM/task manifest](nutanix-vm-task-readback.md), or
+[AHV activity manifest](nutanix-vm-activity-readback.md) must cover every VM ID in the
 bound guest outputs. It must share the network manifest's operation, portable
 tenant/WSD, engineering and target binding references, and actual native tenant
 UUID. Every NIC must be connected to an enumerated native subnet; each guest's
@@ -67,7 +68,11 @@ after traffic, with a separate 120-second budget for each child and joint result
 hashes. A network task result does not prove VM task completion. The AHV snapshot
 profile explicitly lacks that claim; the VM/task profile brackets snapshots with
 the complete enumerated Prism task graph and holds pending/failed/unknown work.
-It requires both VMM v4.2 and Prism v4.3 support on the accepted installed tuple.
+The activity profile additionally brackets that sample with exact-VM queries for
+visible pending work of any age and work completed since the attempt. Extra,
+changed or incomplete activity holds. Both task profiles require VMM v4.2 and
+Prism v4.3 support; the activity profile also requires installed qualification of
+its exact collection filter, ordering, pagination/counts and cross-writer visibility.
 The bound profile selects the reader; there is no automatic downgrade on failure.
 Flow policy/precedence, same-host isolation, image
 initialization, HA and retained-data recovery remain separate native obligations.

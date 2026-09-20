@@ -72,9 +72,11 @@ accepts this profile and recomputes every task witness, history and completion
 flag. Its context's `attempted_at` must equal `task.created_after`; the upper
 creation bound must be no later than readback start. Current writer-fence,
 quarantine, generation, containment and data-preservation requirements still
-apply. `READY_FOR_OPERATOR_RECOVERY_REVIEW` permits review only. It does not join
-AHV observations to the saved Terraform plan or durable attempt ledger; the
-[held-attempt integration](terraform-recovery.md) remains vSphere-specific.
+apply. `READY_FOR_OPERATOR_RECOVERY_REVIEW` permits review only. This known-task
+profile cannot join observations to the saved Terraform plan or durable ledger.
+The separate [AHV activity profile](nutanix-vm-activity-readback.md) supplies the
+bounded visible-work coverage required by the supported AHV power/NIC
+[held-attempt integration](terraform-recovery.md).
 
 [Campaigns v3 and v4](target-qualification.md) select this reader from the bound
 workload manifest's exact profile. Existing VM ownership, subnet/address and Flow

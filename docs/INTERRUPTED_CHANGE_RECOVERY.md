@@ -47,6 +47,11 @@ checks an explicitly recorded Prism graph around VMM VM snapshots. Offline revie
 recomputes its task witnesses and completion flags, requires the creation window
 to start at the context's attempted change, and retains fencing/quarantine holds.
 It does not discover competing tasks or join AHV evidence to the Terraform ledger.
+The separate [AHV activity profile](implementation/automation/nutanix-vm-activity-readback.md)
+adds bounded per-VM queries for visible pending work of any age and work completed
+since the attempt. Offline review recomputes complete pages, counts, selected
+task fields and agreement with direct GETs. Extra or incomplete activity holds;
+it does not establish native writer exclusion or complete inventory visibility.
 
 ## Review the three records together
 
@@ -75,6 +80,14 @@ configuration, requires VM activity coverage beginning at the immutable attempt
 start, and always preserves the ledger hold. Older known-task-only profiles cannot
 substitute for this coverage. Clone result evidence still
 needs separate creation/state ownership reconciliation.
+
+For a held Nutanix workload attempt, the same reviewer supports existing AHV
+power/NIC transitions with the activity profile and original sealed lifecycle
+record. It binds selected planned configuration, retained disk/NIC identities,
+member inputs and the original attempt window. Historical validity is evaluated
+at attempt time; expired authority cannot be used for a new apply. Unsupported
+changes, creation/adoption or incomplete bindings hold. Every review leaves all
+ledger records intact and grants no recovery action or activation authority.
 
 | Result | Meaning and next accountable action |
 |---|---|

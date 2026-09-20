@@ -112,6 +112,28 @@ sets, expected VM revisions and the actual attempt interval. Qualify these cases
 Exercise offline witness review and v3/v4 campaign collection with those native
 records. A simulated fence record cannot close the cross-writer fencing gate.
 
+For the separate [AHV activity profile](nutanix-vm-activity-readback.md), qualify
+the exact installed OData affected-entity/status/completion predicate, ascending
+task-ID ordering, filtered totals, retention and observation-role visibility.
+Include tasks owned by other scoped writers. Unsupported or partially visible
+collections must hold; changing the query or removing coverage needs a separately
+reviewed profile. Extend commissioning with these cases:
+
+| Native case | Required result |
+| --- | --- |
+| Pending task started before the interrupted attempt, or separate task completed after it | Visible activity holds despite matching recorded tasks and VM state |
+| Shared task affecting multiple accepted VMs | Every VM query contains the same complete native witness; aggregate limits still apply |
+| Multiple pages, truncated page, changing count, duplicate/out-of-order row or rejected filter | Only complete stable bounded traversal can match; all uncertain coverage holds |
+| Task-list witness differs from direct task GET, or work appears during VM sampling | Hold and retain both witnesses for native-owner investigation |
+| Actual saved power/NIC plan with changed disk, MAC, placement or unknown configuration | Held-attempt review refuses contradictory or incomplete bindings |
+| Transition expired after the immutable attempt | Historical review may proceed only if it was valid at attempt time; prepare/apply still reject expired authority |
+
+Exercise the [AHV held-attempt reviewer](terraform-recovery.md) with actual sealed
+bundles, durable attempt records and independent native expectations. Confirm
+that every result preserves the original ledger bytes and grants no replay or
+activation authority. Supply genuine current fencing/quarantine evidence before
+sampling; this procedure does not create a native writer-exclusion mechanism.
+
 For [campaign v6](vmware-network-binding.md), accept the actual Local Manager
 segment/realized-switch and vCenter distributed-portgroup/switch response shapes,
 native IDs/revisions and both observers' RBAC visibility. Use original private

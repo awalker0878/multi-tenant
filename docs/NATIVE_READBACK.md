@@ -103,8 +103,14 @@ are available, as are [vSphere VM/task observations](implementation/automation/v
 The optional [AHV VM/task profile](implementation/automation/nutanix-vm-task-readback.md)
 combines VMM v4.2 snapshots with a bounded, explicitly recorded Prism v4.3 task
 graph. It supports offline recovery review and campaigns v3/v4; it does not
-discover other work or provide native fencing. Their exact coverage and task
-limitations are documented separately.
+discover other work or provide native fencing. The separate
+[AHV activity profile](implementation/automation/nutanix-vm-activity-readback.md)
+adds bounded queries for visible pending/late-completed tasks on those exact VMs.
+Extra or uncertain activity holds. It supports saved-plan/ledger review of
+existing AHV power/NIC lifecycle attempts while preserving the ledger hold.
+Installed query semantics, retention and cross-writer visibility require native
+qualification; these observations still provide no native fencing. Each
+profile's exact coverage and task limitations are documented separately.
 The vSphere clone activity profile additionally observes visible work on both
 accepted template sources and result VMs, without clone submission, state adoption
 or native writer fencing.
