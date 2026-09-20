@@ -209,16 +209,29 @@ class ReadClient:
     def get(self, target: str) -> tuple[dict, str | None]:
         if target not in self.allowed_targets:
             raise ObservationError('TARGET_NOT_IN_ACCEPTED_SCOPE')
+        return self._request('GET', target)
+
+    def _request(self, method, target, body=None, response_type=dict, no_content=False):
+        """Shared transport only; callers must constrain method, target and body."""
         remaining = self.deadline - time.monotonic()
         if remaining <= 0 or self.request_count >= 400:
             raise ObservationError('OBSERVATION_BUDGET_EXHAUSTED')
         self.request_count += 1
         connection = http.client.HTTPSConnection(self.host, self.port, timeout=min(self.timeout, remaining), context=self.context)
         try:
-            connection.request('GET', target, headers={**self._auth_headers, 'Accept': 'application/json',
-                'Accept-Encoding': 'identity', 'Connection': 'close', 'Cache-Control': 'no-cache'})
+            headers = {**self._auth_headers, 'Accept': 'application/json', 'Accept-Encoding': 'identity',
+                       'Connection': 'close', 'Cache-Control': 'no-cache'}
+            payload = None if body is None else json.dumps(body, allow_nan=False, separators=(',', ':')).encode()
+            if payload is not None:
+                if len(payload) > LIMIT: raise ObservationError('REQUEST_TOO_LARGE')
+                headers['Content-Type'] = 'application/json'
+            connection.request(method, target, body=payload, headers=headers)
             read_socket = connection.sock
             response = connection.getresponse()
+            if no_content:
+                if response.status != 204 or response.getheader('Transfer-Encoding') or response.getheader('Content-Length') not in (None, '0'):
+                    raise ObservationError('VOID_RESPONSE_REQUIRED')
+                return None, None
             if response.status != 200:
                 raise ObservationError('HTTP_'+str(response.status))
             if response.getheader('Content-Encoding', 'identity').lower() not in ('', 'identity'):
@@ -247,8 +260,8 @@ class ReadClient:
             if sizes and len(data)!=int(sizes[0]):
                 raise ObservationError('TRUNCATED_RESPONSE')
             value = strict_loads(bytes(data))
-            if not isinstance(value, dict):
-                raise ObservationError('OBJECT_RESPONSE_REQUIRED')
+            if not isinstance(value, response_type):
+                raise ObservationError('OBJECT_RESPONSE_REQUIRED' if response_type is dict else 'RESPONSE_TYPE_DIFFERS')
             etags = response.headers.get_all('ETag', [])
             if len(etags)>1:
                 raise ObservationError('AMBIGUOUS_ETAG')
