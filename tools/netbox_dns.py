@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Register one scoped A or PTR record from a confirmed NetBox IPv4 allocation.
+"""Register or withdraw an owned A/PTR record from a confirmed IPv4 allocation.
 
 The existing RFC 2136/TSIG writer owns DNS. This adapter supplies current IPAM
 preconditions and a shared write-once attempt; recovery only reads native state.
@@ -22,6 +22,11 @@ from tools.netbox_ipam import AllocationReader, allocation_lock, refs, validate 
 from tools.run_files import (current_window, digest, encoded, load_private, private_path,
                              read_private, replace_private, require, sync_directory, utcnow, write_new)
 from tools.service_http import JsonService
+
+ACTIONS = {'register', 'reconcile', 'withdraw', 'reconcile-withdrawal'}
+READ_ACTIONS = {'reconcile', 'reconcile-withdrawal'}
+WITHDRAW_ACTIONS = {'withdraw', 'reconcile-withdrawal'}
+OBSERVED = {'AUTHORITATIVE_REGISTRATION_OBSERVED', 'AUTHORITATIVE_TOMBSTONE_OBSERVED'}
 
 
 def resource_id(allocation):
@@ -47,11 +52,11 @@ def confirmed(allocation, receipt):
     return {k: v for k, v in receipt.items() if k != 'observed_at'}
 
 
-def validate(allocation, receipt, job, scope, *, action='register', fixture=False):
+def validate(allocation, receipt, job, scope, *, action='register', registration=None, fixture=False):
     confirmed(allocation, receipt)
-    require(action in {'register', 'reconcile'}, 'Unknown DNS/IPAM action')
+    require(action in ACTIONS, 'Unknown DNS/IPAM action')
     validation_time = utcnow()
-    if action == 'reconcile':
+    if action in READ_ACTIONS:
         # Historical deadlines constrain writes. A new, exact read authority may
         # inspect the original attempt after expiry without editing its inputs.
         deadlines = [datetime.fromisoformat(value['valid_until'].replace('Z', '+00:00'))
@@ -61,11 +66,30 @@ def validate(allocation, receipt, job, scope, *, action='register', fixture=Fals
     dns_writer.validate(job, scope, now=validation_time, fixture=fixture)
     require(job['tenant_id'] == allocation['scope']['tenant_key']
             and job['resource_id'] == resource_id(allocation), 'DNS owner must bind the complete IPAM scope/member')
+    if action in WITHDRAW_ACTIONS:
+        require(isinstance(registration, dict) and set(registration) == {'job', 'scope'},
+                'Withdrawal requires the exact original registration job and scope')
+        original, original_scope = registration['job'], registration['scope']
+        validate(allocation, receipt, original, original_scope, action='reconcile', fixture=fixture)
+        require(original['enabled'] and original_scope['enabled'], 'Disabled registration cannot establish ownership')
+        require(all(job[key] == original[key] for key in
+                    ('tenant_id', 'resource_id', 'zone', 'server', 'port', 'key_name'))
+                and job['operation_id'] != original['operation_id'],
+                'Withdrawal must retain the original owner/transport and use a new operation')
+        require(job['previous_marker'] == dns_writer.marker_value(original)
+                and job['records'] == [dict(name=original['records'][0]['name'],
+                      type=original['records'][0]['type'], before=original['records'][0]['after'], after=None)],
+                'Withdrawal must remove only the exact registered generation and record')
+        require(scope['allowed_records'][0]['values'] == original['records'][0]['after']['values'],
+                'Withdrawal scope must retain only the original value')
+        return digest(encoded({'allocation': allocation, 'confirmation': receipt, 'job': job,
+                               'scope': scope, 'registration': registration}))
+    require(registration is None, 'Registration parent is only valid for withdrawal')
     require(job['previous_marker'] is None and len(job['records']) == 1,
             'This adapter supports one initial A or PTR registration only')
     record = job['records'][0]
     require(record['before'] is None and record['after'] is not None,
-            'Updates, deletion and reuse need a separate DNS owner workflow')
+            'Use the withdrawal action for deletion; updates and reuse remain separate')
     ip = ipaddress.ip_interface(allocation['address']).ip
     values = record['after']['values']
     require((record['type'] == 'A' and values == [str(ip)])
@@ -81,7 +105,7 @@ def validate_authority(binding, action, authority, token, ca, secret):
         'token_sha256', 'ca_sha256', 'tsig_sha256'}, 'Exact DNS/IPAM contact authority required')
     require(authority['format'] == 'hosting-netbox-dns-authority/1'
             and authority['binding_sha256'] == binding and authority['action'] == action
-            and action in {'register', 'reconcile'}, 'DNS/IPAM authority changed')
+            and action in ACTIONS, 'DNS/IPAM authority changed')
     require(authority['token_sha256'] == digest(token)
             and authority['ca_sha256'] == (digest(ca) if ca is not None else None)
             and authority['tsig_sha256'] == digest(secret), 'DNS/IPAM credential or trust binding changed')
@@ -102,9 +126,9 @@ class AuthorizedDNSClient(dns_writer.Client):
 
 
 def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client, ledger,
-            *, action, fixture=False):
-    binding = validate(allocation, receipt, job, scope, action=action, fixture=fixture)
-    require(action in {'register', 'reconcile'}, 'Unknown DNS/IPAM action')
+            *, action, registration=None, fixture=False):
+    binding = validate(allocation, receipt, job, scope, action=action, registration=registration, fixture=fixture)
+    withdrawing, read_only = action in WITHDRAW_ACTIONS, action in READ_ACTIONS
     require(job['enabled'] and scope['enabled'], 'Disabled DNS inputs cannot contact services')
     require((dns_client.server, dns_client.port, dns_client.key_name)
             == (job['server'], job['port'], job['key_name']), 'DNS transport changed')
@@ -118,21 +142,45 @@ def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
         # Endpoint, key, UUID, output path or intent changes cannot bypass a zone's
         # existing attempt for this allocation owner. Forward/reverse are separate.
         slot = directory / ('dns-' + digest(encoded([job['zone'], job['resource_id']])))
-        if action == 'register':
+        parent_binding = None
+        if withdrawing:
+            private_path(slot, directory=True)
+            parent_binding = validate(allocation, receipt, registration['job'], registration['scope'],
+                                      action='reconcile', fixture=fixture)
+            require(load_private(slot / 'attempt.json')['binding_sha256'] == parent_binding,
+                    'Withdrawal parent differs from the durable registration attempt')
+            if not read_only:
+                parent_path = slot / 'reconciliation.json'
+                parent = load_private(parent_path if parent_path.exists() else slot / 'transaction.json')
+                require(parent.get('format') == 'hosting-netbox-dns-receipt/1'
+                        and parent.get('binding_sha256') == parent_binding
+                        and parent.get('status') == 'AUTHORITATIVE_REGISTRATION_OBSERVED'
+                        and parent.get('dns', {}).get('status') in dns_writer.STATES,
+                        'Reconcile the registered generation before starting withdrawal')
+        attempt_path = slot / ('withdrawal-attempt.json' if withdrawing else 'attempt.json')
+        if not read_only:
             slot.mkdir(mode=0o700, exist_ok=True)
             private_path(slot, directory=True)
             sync_directory(directory)
-            write_new(slot / 'attempt.json', encoded({'binding_sha256': binding, 'started_at': utcnow().isoformat()}))
+            attempt = {'binding_sha256': binding, 'started_at': utcnow().isoformat()}
+            if withdrawing:
+                attempt.update(registration_binding_sha256=parent_binding,
+                               request_sha256=validate_allocation(allocation),
+                               job_sha256=dns_writer.digest(job), scope_sha256=dns_writer.digest(scope))
+            write_new(attempt_path, encoded(attempt))
         else:
             private_path(slot, directory=True)
-            require(load_private(slot / 'attempt.json')['binding_sha256'] == binding,
+            require(load_private(attempt_path)['binding_sha256'] == binding,
                     'Reconciliation must retain the exact original DNS/IPAM inputs')
         head = {'format': 'hosting-netbox-dns-receipt/1', 'binding_sha256': binding,
-                'action': action, 'status': 'DNS_REGISTRATION_HELD', 'dns': None,
+                'action': action, 'status': 'DNS_WITHDRAWAL_HELD' if withdrawing else 'DNS_REGISTRATION_HELD', 'dns': None,
                 'activation_authorized': False, 'reusable': False}
+        if withdrawing:
+            head['registration_binding_sha256'] = parent_binding
         # Keep the last transaction journal on recovery; read-only observations
         # must not erase the original UPDATE_PENDING or lost-response evidence.
-        output_path = slot / ('transaction.json' if action == 'register' else 'reconciliation.json')
+        output_path = slot / (('withdrawal-' if withdrawing else '')
+                              + ('reconciliation.json' if read_only else 'transaction.json'))
         replace_private(output_path, encoded(head))
 
         def refresh():
@@ -142,7 +190,7 @@ def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
                     and row['id'] == receipt['native_id'] and etag == receipt['etag'],
                     'Current native IPAM confirmation or revision changed')
             current_window(authority)
-            validate(allocation, receipt, job, scope, action=action, fixture=fixture)
+            validate(allocation, receipt, job, scope, action=action, registration=registration, fixture=fixture)
 
         def record(report):
             head['dns'] = report
@@ -153,7 +201,7 @@ def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
 
         try:
             refresh()
-            if action == 'register':
+            if not read_only:
                 result = dns_writer.change(job, scope, dns_client, execute=True, fixture=fixture, record=record)
             else:
                 observed = dns_writer.snapshot(job, dns_client)
@@ -166,12 +214,12 @@ def operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
                 record(result)
             refresh()
             if result['status'] in dns_writer.STATES:
-                head['status'] = 'AUTHORITATIVE_REGISTRATION_OBSERVED'
+                head['status'] = 'AUTHORITATIVE_TOMBSTONE_OBSERVED' if withdrawing else 'AUTHORITATIVE_REGISTRATION_OBSERVED'
             head['finished_at'] = utcnow().isoformat()
             replace_private(output_path, encoded(head))
             return head
         except (OSError, ValueError, TypeError, KeyError, AttributeError, dns.exception.DNSException) as exc:
-            head['status'] = 'DNS_REGISTRATION_HELD'
+            head['status'] = 'DNS_WITHDRAWAL_HELD' if withdrawing else 'DNS_REGISTRATION_HELD'
             head['error_class'] = type(exc).__name__
             replace_private(output_path, encoded(head))
             raise
@@ -181,7 +229,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('allocation', 'confirmation', 'job', 'scope'):
         parser.add_argument('--' + name, type=Path, required=True)
-    parser.add_argument('--action', choices=['register', 'reconcile'], required=True)
+    parser.add_argument('--action', choices=sorted(ACTIONS), required=True)
+    parser.add_argument('--registration-job', type=Path)
+    parser.add_argument('--registration-scope', type=Path)
     for name in ('authority', 'token-file', 'ca-bundle', 'tsig-file', 'ledger', 'output'):
         parser.add_argument('--' + name, type=Path)
     parser.add_argument('--execute', action='store_true')
@@ -189,7 +239,10 @@ def main():
     try:
         allocation, receipt, job, scope = [load_private(getattr(args, key))
                                           for key in ('allocation', 'confirmation', 'job', 'scope')]
-        binding = validate(allocation, receipt, job, scope, action=args.action)
+        require(bool(args.registration_job) == bool(args.registration_scope), 'Both registration parent files required')
+        registration = {'job': load_private(args.registration_job), 'scope': load_private(args.registration_scope)} \
+            if args.registration_job else None
+        binding = validate(allocation, receipt, job, scope, action=args.action, registration=registration)
         if not args.execute:
             print(json.dumps({'status': 'VALIDATED_NO_CONTACT', 'binding_sha256': binding}))
             return 0
@@ -206,12 +259,12 @@ def main():
         ipam_client = JsonService(allocation['origin'], 'Bearer ' + token.decode().strip(), args.ca_bundle)
         dns_client = dns_writer.Client(job['server'], job['port'], job['key_name'], secret.decode().strip())
         result = operate(allocation, receipt, job, scope, authority, ipam_client, dns_client,
-                         args.ledger, action=args.action)
+                         args.ledger, action=args.action, registration=registration)
         write_new(args.output, encoded(result))
         print(json.dumps({'status': result['status'], 'activation_authorized': False}))
-        return 0 if result['status'] == 'AUTHORITATIVE_REGISTRATION_OBSERVED' else 2
+        return 0 if result['status'] in OBSERVED else 2
     except (OSError, ValueError, TypeError, KeyError, AttributeError, dns.exception.DNSException):
-        print('{"status":"STOPPED","reason":"Inspect private IPAM/DNS ledgers; do not retry registration"}')
+        print('{"status":"STOPPED","reason":"Inspect private IPAM/DNS ledgers; do not retry uncertain writes"}')
         return 2
 
 
