@@ -11,7 +11,7 @@ from tools import readback_core as c, recovery_review, vsphere_task_tree_observe
 from tools.run_files import digest, encoded, load_private, private_path, read_private, require, write_new, utcnow
 from tools.terraform_run import ROOT, select_scope, backend_settings
 from tools.plan_review import has_true
-from tools import nutanix_terraform_recovery as ahv, lifecycle_transition
+from tools import nutanix_terraform_recovery as ahv, nutanix_flow_terraform_recovery as flow, lifecycle_transition
 from tools import vsphere_recovery_devices as devices
 
 HELD = {'STARTED_OUTCOME_UNKNOWN', 'HOLD_RECONCILIATION_REQUIRED'}
@@ -99,8 +99,8 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
     for name in needed:
         require(digest(read_private(operation / name)) == bundle['artifacts'][name], 'Sealed execution artifact changed')
     inputs = load_private(operation / 'inputs.json'); _, scope, state_key = select_scope(ROOT, bundle['catalog_id'], inputs)
-    require(scope == bundle['scope'] and scope['platform'] in {'vmware', 'nutanix'} and scope['phase'] == 'workloads'
-            and state_key == bundle['state_key'], 'Only exact supported workload scopes allowed')
+    require(scope == bundle['scope'] and (scope['platform'], scope['phase']) in {('vmware', 'workloads'), ('nutanix', 'workloads'), ('nutanix', 'domains')}
+            and state_key == bundle['state_key'], 'Only exact supported native recovery scopes allowed')
     backend = load_private(operation / 'backend.json'); backend_settings(backend, state_key)
     ledger = private_path(ledger_root / digest(backend['address'].encode()), directory=True)
     lock = private_path(ledger / 'writer.lock')
@@ -127,15 +127,16 @@ def review_attempt(operation, ledger_root, manifest_path, report_path, context_p
         require(manifest['origin'] == expected_origin, 'Native origin differs from sealed provider endpoint')
         fields = OBSERVED_PLAN_FIELDS; lifecycle_hash = None; attachments = None; current = utcnow()
         if scope['platform'] == 'nutanix':
-            require(network_manifest is None and network_readback is None, 'vSphere attachment inputs cannot qualify AHV')
+            require(network_manifest is None and network_readback is None, 'vSphere attachment inputs cannot qualify Nutanix')
             lifecycle_hash = bundle['artifacts'].get('transition.json')
             require(lifecycle_hash is not None and digest(read_private(operation / 'transition.json')) == lifecycle_hash,
-                    'Sealed AHV lifecycle record required')
+                    'Sealed Nutanix lifecycle record required')
             transition = load_private(operation / 'transition.json')
             lifecycle_transition.validate(transition, scope, read_private(operation / 'inputs.json'), as_of=c.timestamp(head['started_at']))
-            bound = ahv.bind_plan(load_private(operation / 'plan.json'), inputs, manifest, transition, attempted_at=head['started_at'])
-            fields = ahv.OBSERVED_PLAN_FIELDS
-            require(c.timestamp(manifest['task']['created_after']) == c.timestamp(head['started_at']), 'AHV activity window differs from immutable attempt')
+            binder = flow if scope['phase'] == 'domains' else ahv
+            bound = binder.bind_plan(load_private(operation / 'plan.json'), inputs, manifest, transition, attempted_at=head['started_at'])
+            fields = binder.OBSERVED_PLAN_FIELDS
+            require(c.timestamp(manifest['task']['created_after']) == c.timestamp(head['started_at']), 'Nutanix activity window differs from immutable attempt')
         else:
             bound = bind_plan(load_private(operation / 'plan.json'), inputs, manifest)
             require(c.timestamp(manifest['task']['activity_since']) == c.timestamp(head['started_at']), 'Activity window differs from immutable attempt start')

@@ -75,10 +75,11 @@ def policy_shape(data, resource):
             wire_type, key = 'IntraEntityGroupRuleSpec', 'intra_entity_group_rule_spec'
         require(spec.get('$objectType') == TYPE + wire_type, 'Native rule discriminator differs')
         require(rule.get('$specItemDiscriminator', TYPE + wire_type) == TYPE + wire_type, 'Contradictory native union discriminator')
-        item = {'type': kind, 'spec': [{key: [convert_fields(spec, names)]}]}
+        item = {'ext_id': rule['extId'], 'type': kind, 'spec': [{key: [convert_fields(spec, names)]}]}
         if 'description' in rule: item['description'] = rule['description']
         converted['rules'].append(item)
     flow_policy.validate(converted, resource['category_id'], resource['vpc_id'], resource['services'])
+    return converted
 
 
 def validate(m):
