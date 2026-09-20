@@ -8,6 +8,7 @@ deployment inputs. The architecture remains portable across all three VM stacks.
 
 | Concern | Selected reference implementation | Architecture basis and boundary |
 | --- | --- | --- |
+| First qualification path | OpenStack, internal IPv4 two-tenant OZ/RZ fixture, Ubuntu 24.04 guests | [Delivery order](README.md#scope-of-all-environments); existing Neutron exact-ID observations and domain/workload roots provide the first vertical path. VMware/NSX and Nutanix remain required follow-on targets; no installed site or release tuple is invented |
 | Terraform state | GitLab-managed HTTP state, separate projects at the required credential boundary, one state per environment/site/platform/tenant/WSD/phase | [Writer ownership](../provisioning-strategy/5-concurrency-ownership-and-failed-execution.md); backend locks serialize Terraform, while native task fencing remains separate |
 | Address ownership | NetBox REST IPAM, exact tenant/VRF/prefix and reserved address; bounded token, operation identity and lost-response reconciliation | [Service interfaces](../native-reference/service-interfaces.md); IPAM is not a compute-capacity reservation service |
 | Authoritative DNS | Existing RFC 2136 client with TSIG, connected only after confirmed IPAM | Same service interface schedule; recursive resolution remains a separate guest dependency |
@@ -16,7 +17,7 @@ deployment inputs. The architecture remains portable across all three VM stacks.
 | Guest audit transport | rsyslog over authenticated TLS to explicit collectors, persistent local journal and disk queue | [Service interfaces](../native-reference/service-interfaces.md); ingestion credentials do not grant collector administration or deletion |
 | Workload data backup | restic client and a TLS REST repository with append-only server authority; separate retention administrator and restore custodian | [Backup and isolated restore](../../architecture/shared-services/5-backup-capture-independent-protection-and-isolated-restore.md); file backup is not application-consistent VM snapshot protection |
 | Activation | Adopted provider-owned Linux/nftables IPv4 edge: exact service tuples, expiring kernel allows, explicit bootstrap/active/withdraw operations | [Edge adapter](edge-activation.md); requires commissioned routes, native attachments, mandatory platform policy and independently verified boot/HA containment |
-| Qualification | Execute scoped tests against the actual selected targets and retain measured results separately from local experiments | [Native campaign](../native-reference/campaign.md); no local fixture populates accepted qualification indexes |
+| Qualification | Bound native API readback before/after certificate-SSH guest health and denial probes | [Target runner](target-qualification.md) feeds the [native campaign](../native-reference/campaign.md); no local fixture populates accepted qualification indexes |
 
 ## State service setup
 

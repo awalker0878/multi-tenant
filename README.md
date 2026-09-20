@@ -30,6 +30,15 @@ The former `docs/1.0` plan now lives in the maintained [automation delivery prog
 
 [Reviewed Terraform execution](docs/implementation/automation/terraform-execution.md) supplies private saved-plan preparation/application, exact source/input/backend/credential binding, durable failure holds, and execution-receipt handoffs into workload compilation and guest inventory. The [release controls](docs/implementation/automation/release-controls.md) include a proposed GitHub ruleset and its administrator activation steps. Neither addition qualifies a native platform or activates production.
 
+The [reference implementation](docs/implementation/automation/reference-realization.md)
+now selects an OpenStack-first internal IPv4 qualification path, GitLab state,
+NetBox IPAM, Ubuntu certificate SSH/resolver/TLS logging, restic protection and a
+provider-owned nftables edge. Executable adapters perform scoped allocation,
+guest enrollment, encrypted file capture/restore, expiring activation and
+established-session withdrawal. The [target runner](docs/implementation/automation/target-qualification.md)
+collects real API and guest traffic evidence. Actual site commissioning, full
+platform lifecycle and independent native acceptance remain required.
+
 ## Local review
 
 ```sh
@@ -94,7 +103,7 @@ The [DNS registration handoff](docs/engineering/authoritative-dns-registration-h
 
 ## Backup protection and isolated-restore assurance
 
-The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-assurance.md) requires evidence of management separation, protected-copy retention, catalogue/key availability and a current isolated useful-data restore before the backup/recovery dependency can be considered ready. The active assurance index is intentionally empty. CI never captures, deletes or restores backup data, destroys keys, reconnects a restored service or authorizes production.
+The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-assurance.md) requires evidence of management separation, protected-copy retention, catalogue/key availability and a current isolated useful-data restore before the backup/recovery dependency can be considered ready. The active assurance index is intentionally empty. CI captures and restores only disposable local fixture files; it never accesses native backup data, destroys retained keys, reconnects a restored service or authorizes production.
 
 ## Control inheritance and external-dependency assurance
 
