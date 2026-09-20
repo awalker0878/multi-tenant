@@ -9,6 +9,9 @@ import sys
 import tempfile
 import unittest
 from lab.native_readback_fixture import Fixture
+from lab.run_readback_lab import operator_context
+from tests.test_nutanix_task_tree import reseal
+from tools import recovery_review as rr
 from tests import test_nutanix_vm_task_observe as tasks
 from tests.test_nutanix_vm_activity import activity_routes
 from tests.test_nutanix_flow_observe import manifest as snapshot_manifest
@@ -135,6 +138,30 @@ class FlowActivityTests(unittest.TestCase):
         self.policy()['description'] = 'PRIVATE-SENTINEL'
         self.page()['data'][0]['operationDescription'] = 'PRIVATE-SENTINEL'
         self.assertNotIn('PRIVATE-SENTINEL', json.dumps(self.outcome('READBACK_MATCH_NOT_QUALIFIED')))
+
+    def test_recovery_replays_evidence_and_requires_independent_controls(self):
+        report = self.observe(); context = operator_context(self.m, report)
+        context['attempted_at'] = self.m['task']['created_after']
+        self.assertEqual(rr.review(self.m, report, context)['result'], 'READY_FOR_OPERATOR_RECOVERY_REVIEW')
+        for control, expected in (('writer_fence', 'HOLD_WRITER_NOT_FENCED'), ('quarantine', 'HOLD_QUARANTINE_NOT_VERIFIED')):
+            bad = deepcopy(context); bad[control]['state'] = 'UNKNOWN'
+            self.assertEqual(rr.review(self.m, report, bad)['result'], expected)
+        for mutate in (lambda r: r['history'][0]['states'][0]['policy_witness'].update(policy_shape_valid=False),
+                       lambda r: r['history'][0]['states'][-1]['activity_witness']['before'][uid(20)][0]['tasks'].clear()):
+            bad = deepcopy(report); mutate(bad); reseal(bad)
+            ctx = deepcopy(context); ctx['report_sha256'] = bad['content_sha256']
+            self.assertEqual(rr.review(self.m, bad, ctx)['result'], 'HOLD_INVALID_EVIDENCE')
+
+    def test_recovery_attempt_window_must_match_and_predate_readback(self):
+        report = self.observe(); context = operator_context(self.m, report)
+        context['attempted_at'] = self.m['task']['created_after']
+        context['attempted_at'] = (c.timestamp(context['attempted_at']) - timedelta(seconds=1)).isoformat()
+        self.assertEqual(rr.review(self.m, report, context)['result'], 'HOLD_INVALID_EVIDENCE')
+        self.m['task']['created_before'] = c.now()
+        report['manifest_sha256'] = c.digest(self.m); reseal(report)
+        context.update(manifest_sha256=c.digest(self.m), report_sha256=report['content_sha256'],
+                       attempted_at=self.m['task']['created_after'])
+        self.assertEqual(rr.review(self.m, report, context)['result'], 'HOLD_INVALID_EVIDENCE')
 
     def test_cli_validates_offline_then_contacts_only_exact_gets(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -14,12 +14,15 @@ import sys
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from tools import readback_core as c
+from tools import nutanix_flow_activity_observe
 from tools import nsx_observe, nutanix_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe, vsphere_task_observe, vsphere_task_tree_observe
 
 ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe,'vmware':vsphere_task_observe}
 
 
 def adapter_for(m):
+    if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_flow_activity_observe.PROFILE:
+        return nutanix_flow_activity_observe
     if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_vm_activity_observe.PROFILE:
         return nutanix_vm_activity_observe
     if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_vm_task_observe.PROFILE:
@@ -121,10 +124,10 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
             raise ValueError('Unbound operation evidence')
         c.text(context['change_record_ref'],'existing change record')
         attempted=c.timestamp(context['attempted_at']);changed=c.timestamp(context['last_security_change_at'])
-        if m.get('profile') in {nutanix_vm_task_observe.PROFILE, nutanix_vm_activity_observe.PROFILE}:
+        if m.get('profile') in {nutanix_vm_task_observe.PROFILE, nutanix_vm_activity_observe.PROFILE, nutanix_flow_activity_observe.PROFILE}:
             if (c.timestamp(m['task']['created_after']) != attempted
                     or c.timestamp(m['task']['created_before']) > c.timestamp(report['started_at'])):
-                raise ValueError('AHV task window must start at the attempted change and end before readback')
+                raise ValueError('Nutanix task window must start at the attempted change and end before readback')
         if m.get('profile') in vsphere_task_tree_observe.activity.PROFILES and c.timestamp(m['task']['activity_since']) != attempted:
             raise ValueError('VM task activity window differs from the attempted operation')
         if attempted>current or changed>current or c.timestamp(report['started_at'])<max(attempted,changed):

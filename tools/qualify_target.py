@@ -13,6 +13,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools import nutanix_flow_activity_observe
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from tools.compile_wsd import STATE
 from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe
@@ -156,8 +157,14 @@ def ahv_binding(scope, manifest, outputs, access, network):
         require(access['targets'][name]['address'] in addresses, 'Guest access address differs from accepted AHV NIC')
 
 
+def flow_adapter(manifest):
+    adapters = {a.PROFILE: a for a in (nutanix_flow_observe, nutanix_flow_activity_observe)}
+    require(manifest.get('profile') in adapters, 'Supported explicit Flow observer required')
+    return adapters[manifest['profile']]
+
+
 def flow_binding(scope, manifest, outputs, workload, network):
-    nutanix_flow_observe.validate(manifest)
+    flow_adapter(manifest).validate(manifest)
     require(scope['platform'] == 'nutanix' and manifest['contact_enabled'] is True, 'Enabled Flow observation required')
     require(all(manifest[key] == network[key] for key in ('origin', 'operation_id', 'tenant_id', 'scope_id',
             'target_binding_ref', 'engineering_record_ref')), 'Flow and network observation bindings differ')
@@ -284,8 +291,9 @@ def native_readback(plan, assets, authority, directory, label):
                                      Path(adapter.__file__).name, 'workload_manifest')
         combined = {'network_sha256': network_hash, 'workloads_sha256': workload_hash}
         if plan['format'] == 'hosting-target-campaign/4':
+            policy_adapter = flow_adapter(c.strict_loads(assets['flow_manifest']))
             combined['flow_sha256'] = reader_child(plan, assets, authority, directory, label + '-flow',
-                                                   'nutanix_flow_observe.py', 'flow_manifest')
+                                                   Path(policy_adapter.__file__).name, 'flow_manifest')
         return digest(encoded(combined))
     return network_hash
 
