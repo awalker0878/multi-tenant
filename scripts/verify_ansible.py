@@ -39,6 +39,9 @@ def main():
         if version.returncode:return finish('BLOCKED_TOOLCHAIN','Cannot query Ansible version')
         for play in ('stage_reference.yml','validate_readback.yml'):run('syntax-'+play,play,['--syntax-check'])
         if any(not row['passed'] for row in report['checks']):return finish('FAILED_ANSIBLE_CHECK','Syntax failure')
+        run('syntax-native-linux','../native/configure_linux.yml',['--syntax-check'])
+        run('native-profile-disabled-before-contact','../native/configure_linux.yml',expect_failure=True)
+        run('native-profile-missing-bindings-before-contact','../native/configure_linux.yml',['-e','{"hosting_native_enabled":true}'],expect_failure=True)
         run('stage-first','stage_reference.yml');run('stage-second-idempotent','stage_reference.yml',zero_changes=True)
         directory=staging/'tenant-01--D01O'
         before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.glob('*') if p.is_file()}

@@ -16,6 +16,8 @@ The 1.0 plan is now maintained in the architecture, engineering, implementation 
 
 | Separate local Ansible profiles and Neutron dispatch | Local playbooks moved under `playbooks/local`; all three manifest adapters support no-contact validation | Native guest/observer coverage and qualification remain distinct |
 
+| Bound Linux guest inventory and native Ansible profile | Terraform identity and pinned SSH handoff; pre-contact rejection tests; candidate Ubuntu 24.04 hostname/chrony/kernel configuration | Actual image/bootstrap paths, SSH/sudo access, native idempotence and broader OS/service profiles remain unqualified |
+
 ## External inputs still required
 
 The repository does not contain selected native site endpoints, installed product/API/hardware/licence tuples, scoped credentials, an accepted physical network/security-edge realization, state service, authoritative capacity/IPAM service, storage/key/backup service selections, or their operating authorities. Product-specific installation, actual service mutations and native qualification cannot be completed by inventing these inputs. All three platform families remain unqualified until genuine target-bound evidence is accepted.

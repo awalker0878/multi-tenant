@@ -1,0 +1,76 @@
+---
+- name: Inspect image-provided packages
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Require the declared chrony image dependency
+  ansible.builtin.assert:
+    that:
+      - "'chrony' in ansible_facts.packages"
+    fail_msg: 'Use the approved Ubuntu 24.04 image with chrony preinstalled.'
+
+- name: Apply only the guest baseline fields owned by this profile
+  become: true
+  block:
+    - name: Configure the approved guest hostname
+      ansible.builtin.hostname:
+        name: '{{ hosting_target.hostname }}'
+        use: systemd
+
+    - name: Configure only entitled time sources
+      ansible.builtin.template:
+        src: chrony.conf.j2
+        dest: /etc/chrony/chrony.conf
+        owner: root
+        group: root
+        mode: '0644'
+        validate: '/usr/sbin/chronyd -p -f %s'
+      notify: Restart owned chrony configuration
+
+    - name: Persist workload forwarding and redirect restrictions
+      ansible.builtin.copy:
+        dest: /etc/sysctl.d/60-hosting-guest.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          # Owned by the hosting Linux workload profile; not for routers or appliances.
+          net.ipv4.ip_forward = 0
+          net.ipv6.conf.all.forwarding = 0
+          net.ipv4.conf.all.accept_redirects = 0
+          net.ipv4.conf.default.accept_redirects = 0
+          net.ipv4.conf.all.send_redirects = 0
+          net.ipv4.conf.default.send_redirects = 0
+          net.ipv6.conf.all.accept_redirects = 0
+          net.ipv6.conf.default.accept_redirects = 0
+
+    - name: Read current guest kernel controls
+      ansible.builtin.command:
+        argv: [/usr/sbin/sysctl, -n, '{{ item }}']
+      loop: '{{ hosting_guest_sysctls }}'
+      register: hosting_observed_sysctls
+      changed_when: false
+      check_mode: false
+
+    - name: Converge only owned live kernel controls
+      ansible.builtin.command:
+        argv: [/usr/sbin/sysctl, -w, '{{ item.item }}=0']
+      loop: '{{ hosting_observed_sysctls.results }}'
+      when: item.stdout | trim != '0'
+      changed_when: true
+
+    - name: Ensure the image time service is enabled
+      ansible.builtin.service:
+        name: chrony
+        enabled: true
+        state: started
+
+- name: Complete service changes before checking time synchronization
+  ansible.builtin.meta: flush_handlers
+
+- name: Check time synchronization after configuration
+  become: true
+  ansible.builtin.command:
+    argv: [/usr/bin/chronyc, waitsync, '6', '0.1', '0.0', '2']
+  changed_when: false
+  when: not ansible_check_mode

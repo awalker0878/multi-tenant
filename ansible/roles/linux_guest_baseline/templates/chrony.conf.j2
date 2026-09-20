@@ -1,0 +1,9 @@
+# Owned hosting workload time configuration. No public pools or serving clients.
+{% for server in hosting_target.time_servers %}
+server {{ server }} iburst
+{% endfor %}
+driftfile /var/lib/chrony/chrony.drift
+rtcsync
+makestep 1.0 3
+port 0
+cmdport 0

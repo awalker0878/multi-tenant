@@ -1,0 +1,48 @@
+---
+- name: Bind the entire native invocation before opening SSH
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  any_errors_fatal: true
+  tasks:
+    - name: Validate explicit scope and pinned inventory locally
+      ansible.builtin.set_fact:
+        hosting_verified_guests: >-
+          {{ (hosting_native_enabled | default(false)) | hosting_guest_gate(
+             hosting_workload_outputs | default({}), hosting_guest_access | default({}),
+             hosting_known_hosts | default(''), groups['hosting_guests'] | default([]), hostvars) }}
+
+- name: Configure only the bound Linux guest allocation
+  hosts: hosting_guests
+  connection: ssh
+  gather_facts: false
+  become: false
+  serial: 1
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Require the controller gate even when a limit skipped localhost
+      ansible.builtin.assert:
+        that:
+          - inventory_hostname in (hostvars['localhost']['hosting_verified_guests'] | default([]))
+          - hosting_guest_access.valid_until | hosting_handoff_current
+      delegate_to: localhost
+    - name: Read guest machine identity before any configuration
+      ansible.builtin.slurp:
+        src: /etc/machine-id
+      register: hosting_observed_machine
+    - name: Verify independently observed guest identity
+      ansible.builtin.assert:
+        that:
+          - (hosting_observed_machine.content | b64decode | trim) == hosting_target.machine_id
+    - name: Gather required operating-system facts
+      ansible.builtin.setup:
+        gather_subset: [min]
+    - name: Enforce the declared image profile
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == 'Ubuntu'
+          - ansible_facts.distribution_version == '24.04'
+          - ansible_facts.service_mgr == 'systemd'
+  roles:
+    - role: linux_guest_baseline

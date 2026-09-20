@@ -97,13 +97,29 @@ def check(root=ROOT):
             if m['terraform']['required_providers']!=r['terraform']['required_providers']:problem('PROVIDER_PIN_DIVERGENCE',mod.parent.name)
             if not plan_only_mock_tests(mod.parent):problem('UNSAFE_MOCK_TEST',mod.parent.name)
         except (OSError,KeyError,ValueError) as e:problem('NATIVE_SOURCE_STRUCTURE',mod.parent.name,e)
-    for p in (root/'ansible/playbooks/local').glob('*.yml'):
-        counts['ansible_playbooks']+=1
-        try:
-            for play in yaml.load(p.read_text(),Loader=UniqueLoader):
-                if play.get('hosts')!='localhost' or play.get('connection')!='local' or play.get('become') is not False:
-                    problem('UNBOUNDED_DEFAULT_ANSIBLE',p.relative_to(root))
-        except Exception as e:problem('ANSIBLE_SOURCE',p.relative_to(root),e)
+    try:
+        catalog=json.loads((root/'ansible/catalog.json').read_text())
+        if catalog['format']!='hosting-ansible-catalog/1':raise ValueError('Unknown Ansible catalogue')
+        rows=catalog['playbooks'];registered={row['path'] for row in rows}
+        actual={str(p.relative_to(root/'ansible')) for p in (root/'ansible/playbooks').rglob('*.yml')}
+        if registered!=actual or len(rows)!=len(registered):raise ValueError('Unregistered or duplicate Ansible playbook')
+        for row in rows:
+            if row.get('profile') not in {'local','native-linux'}:raise ValueError('Unknown Ansible profile')
+            p=root/'ansible'/row['path'];counts['ansible_playbooks']+=1
+            plays=yaml.load(p.read_text(),Loader=UniqueLoader)
+            for n,play in enumerate(plays):
+                if play.get('gather_facts') is not False or play.get('become') is not False:
+                    problem('UNBOUNDED_ANSIBLE_DEFAULT',p.relative_to(root))
+                if row['profile']=='local' or n==0:
+                    if play.get('hosts')!='localhost' or play.get('connection')!='local':
+                        problem('UNBOUNDED_DEFAULT_ANSIBLE',p.relative_to(root))
+                elif row['profile']=='native-linux':
+                    if play.get('hosts')!='hosting_guests' or play.get('connection')!='ssh' or play.get('serial')!=1 or play.get('any_errors_fatal') is not True:
+                        problem('UNBOUNDED_NATIVE_ANSIBLE',p.relative_to(root))
+                else:problem('UNKNOWN_ANSIBLE_PROFILE',p.relative_to(root))
+            if row['profile']=='native-linux' and (len(plays)!=2 or 'hosting_guest_gate' not in p.read_text()):
+                problem('MISSING_NATIVE_ANSIBLE_GATE',p.relative_to(root))
+    except (OSError,ValueError,KeyError,TypeError) as e:problem('ANSIBLE_CATALOG','ansible/catalog.json',e)
     for p in (root/'.github/workflows').glob('*.yml'):
         try:
             doc=yaml.load(p.read_text(),Loader=yaml.BaseLoader)
