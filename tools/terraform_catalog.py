@@ -33,7 +33,7 @@ def entries(root: Path = ROOT) -> list[dict]:
             raise ValueError('Root/module ownership mismatch')
         if module['terraform']['required_providers'] != config['terraform']['required_providers']:
             raise ValueError('Root/module provider mismatch')
-    actual = {str(p.parent.relative_to(root)) for p in (root / 'terraform').rglob('main.tf.json')
+    actual = {p.parent.relative_to(root).as_posix() for p in (root / 'terraform').rglob('main.tf.json')
               if '.terraform' not in p.parts}
     if actual != paths:
         raise ValueError('Unregistered or missing Terraform configuration')

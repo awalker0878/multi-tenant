@@ -101,7 +101,7 @@ def check(root=ROOT):
         catalog=json.loads((root/'ansible/catalog.json').read_text(encoding='utf-8'))
         if catalog['format']!='hosting-ansible-catalog/1':raise ValueError('Unknown Ansible catalogue')
         rows=catalog['playbooks'];registered={row['path'] for row in rows}
-        actual={str(p.relative_to(root/'ansible')) for p in (root/'ansible/playbooks').rglob('*.yml')}
+        actual={p.relative_to(root/'ansible').as_posix() for p in (root/'ansible/playbooks').rglob('*.yml')}
         if registered!=actual or len(rows)!=len(registered):raise ValueError('Unregistered or duplicate Ansible playbook')
         for row in rows:
             if row.get('profile') not in {'local','native-linux'}:raise ValueError('Unknown Ansible profile')

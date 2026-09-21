@@ -21,7 +21,7 @@ def build(root=ROOT):
     ra=json.loads(ra_path.read_text(encoding='utf-8'));ct=read_csv(base/'04_Shared/tests.csv')
     qpath=base/'04_Shared/development/qualification_observation_cards.csv';cards=read_csv(qpath)
     wpath=base/'05_Reference_v1_4/registers/v1_4_verification_assertions.csv';worked=read_csv(wpath)
-    path='docs/assurance/realization-addenda.md';lines=['# Native realization addenda — RA-01 to RA-12','','These are the retained supplemental procedures, not a new set of executed tests. Each elaborates the CT references shown and retains its original not-run state. Select by actual stack, offered service and accepted test safety envelope.','',b.link(path,str(ra_path.relative_to(root)),'Unchanged source JSON'),'']
+    path='docs/assurance/realization-addenda.md';lines=['# Native realization addenda — RA-01 to RA-12','','These are the retained supplemental procedures, not a new set of executed tests. Each elaborates the CT references shown and retains its original not-run state. Select by actual stack, offered service and accepted test safety envelope.','',b.link(path,ra_path.relative_to(root).as_posix(),'Unchanged source JSON'),'']
     for row in ra:
         lines += [f'<a id="{row["id"]}"></a>',f'## {row["id"]} — {row["title"]}','',f'**State:** {row["executionStatus"]}. **Base procedures:** '+', '.join(row['baseTests'])+'.','',row['procedure'],'','**Expected:** '+row['expected'],'','**Safety:** '+row['safety'],'','**Parent architecture:** '+' · '.join(b.slink(path,'RA',n) for n in row['chapters']), '']
     b.write(path,'\n'.join(lines))
@@ -30,15 +30,15 @@ def build(root=ROOT):
     mappings=[]
     for row in ra:
         refs=row['baseTests'];lines.append('| '+b.link(path,'docs/assurance/realization-addenda.md',row['id'],row['id'])+' | '+', '.join(refs)+' | Selected native realization; '+row['executionStatus']+' |')
-        mappings.append({'id':row['id'],'family':'RA','source_path':str(ra_path.relative_to(root)),'base_tests':refs,'execution_status':row['executionStatus'],'applicability':'Selected native realization and covered failure; owner-approved scope required'})
+        mappings.append({'id':row['id'],'family':'RA','source_path':ra_path.relative_to(root).as_posix(),'base_tests':refs,'execution_status':row['executionStatus'],'applicability':'Selected native realization and covered failure; owner-approved scope required'})
     for row in cards:
         refs=[x.strip() for x in row['existing_test_ids'].split(';')];lines.append('| '+row['id']+' | '+', '.join(refs)+' | '+row['title']+'; '+row['execution_status']+' |')
-        mappings.append({'id':row['id'],'family':'Q11','source_path':str(qpath.relative_to(root)),'base_tests':refs,'execution_status':row['execution_status'],'applicability':row['scope_note']})
+        mappings.append({'id':row['id'],'family':'Q11','source_path':qpath.relative_to(root).as_posix(),'base_tests':refs,'execution_status':row['execution_status'],'applicability':row['scope_note']})
     for row in worked:
         ident=row['assertion'].split(' / ',1)[0]
         # Preserve original columns and wording verbatim in the source; the navigation does not invent equivalence.
-        mappings.append({'id':ident,'family':'W14','source_path':str(wpath.relative_to(root)),'original_record':row,'execution_status':'not-run','applicability':'Connected W14 design; applicability and current native observation must be assessed'})
-    lines += ['',b.link(path,str(wpath.relative_to(root)),'Original W14 assertion register')+' · '+b.link(path,str(qpath.relative_to(root)),'Original Q11 observation register'),'','## Acceptance boundary','','A mandatory assertion that is blocked, not run or unjustifiably not applicable cannot pass a gate. First-stack acceptance does not wait for already-qualified multiple stacks; cross-stack outcome comparison and actual data/service exit are later separate claims. Reuse evidence only when target generation, topology, versions and dependency conditions remain valid.','', '[Assertion-to-owner allocation](../implementation/assertion-allocation.md) · [Historical finding dispositions](historical-dispositions.md)']
+        mappings.append({'id':ident,'family':'W14','source_path':wpath.relative_to(root).as_posix(),'original_record':row,'execution_status':'not-run','applicability':'Connected W14 design; applicability and current native observation must be assessed'})
+    lines += ['',b.link(path,wpath.relative_to(root).as_posix(),'Original W14 assertion register')+' · '+b.link(path,qpath.relative_to(root).as_posix(),'Original Q11 observation register'),'','## Acceptance boundary','','A mandatory assertion that is blocked, not run or unjustifiably not applicable cannot pass a gate. First-stack acceptance does not wait for already-qualified multiple stacks; cross-stack outcome comparison and actual data/service exit are later separate claims. Reuse evidence only when target generation, topology, versions and dependency conditions remain valid.','', '[Assertion-to-owner allocation](../implementation/assertion-allocation.md) · [Historical finding dispositions](historical-dispositions.md)']
     b.write(path,'\n'.join(lines))
     out=root/'sources/assurance';out.mkdir(exist_ok=True)
     (out/'verification_families.json').write_text(json.dumps({'families':{'CT':len(ct),'RA':len(ra),'W14':len(worked),'Q11':len(cards)},'supplemental_mappings':mappings,'execution':'SPECIFICATIONS_NOT_EXECUTED','counts_are_not_additive_unique_tests':True},indent=2)+'\n')

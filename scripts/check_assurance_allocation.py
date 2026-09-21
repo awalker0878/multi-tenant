@@ -14,16 +14,16 @@ def verification_errors(root, index):
     ct=csv_rows(base/'04_Shared/tests.csv')
     expected=[]
     for row in ra:
-        expected.append({'id':row['id'],'family':'RA','source_path':str(ra_path.relative_to(root)),
+        expected.append({'id':row['id'],'family':'RA','source_path':ra_path.relative_to(root).as_posix(),
             'base_tests':row['baseTests'],'execution_status':row['executionStatus'],
             'applicability':'Selected native realization and covered failure; owner-approved scope required'})
     for row in q:
-        expected.append({'id':row['id'],'family':'Q11','source_path':str(q_path.relative_to(root)),
+        expected.append({'id':row['id'],'family':'Q11','source_path':q_path.relative_to(root).as_posix(),
             'base_tests':[x.strip() for x in row['existing_test_ids'].split(';')],
             'execution_status':row['execution_status'],'applicability':row['scope_note']})
     for row in w:
         expected.append({'id':row['assertion'].split(' / ',1)[0],'family':'W14',
-            'source_path':str(w_path.relative_to(root)),'original_record':row,'execution_status':'not-run',
+            'source_path':w_path.relative_to(root).as_posix(),'original_record':row,'execution_status':'not-run',
             'applicability':'Connected W14 design; applicability and current native observation must be assessed'})
     wanted={'families':{'CT':len(ct),'RA':len(ra),'W14':len(w),'Q11':len(q)},
         'supplemental_mappings':expected,'execution':'SPECIFICATIONS_NOT_EXECUTED',

@@ -7,7 +7,10 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def collect(root=ROOT):
     rows=[]
-    for p in sorted(root.rglob('*')):
+    # Order by the repository-relative POSIX path so the catalogue is identical on
+    # every host; native path sorting is case-insensitive on Windows and would
+    # otherwise rewrite the committed order.
+    for p in sorted(root.rglob('*'), key=lambda q: q.relative_to(root).as_posix()):
         rel=p.relative_to(root)
         if not p.is_file() or p.is_symlink() or p.suffix.lower() not in ('.docx','.xlsx','.pdf'):
             continue

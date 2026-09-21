@@ -45,7 +45,7 @@ def run(root=ROOT):
     ledger=json.loads((root/'sources/documentation/block_coverage.json').read_text(encoding='utf-8'))
     bysource={d['id']:d for d in manifest};specs={d['id']:d for d in inv['documents']}
     check('one manifest per source',set(bysource)==set(specs) and len(bysource)==len(manifest))
-    actualdocx={str(p.relative_to(root)) for p in root.rglob('*.docx') if not any(x in p.parts for x in ('build','.git','.venv','evidence'))}
+    actualdocx={p.relative_to(root).as_posix() for p in root.rglob('*.docx') if not any(x in p.parts for x in ('build','.git','.venv','evidence'))}
     check('all repository Word files converted',actualdocx=={d['source'] for d in manifest})
     cache={};ids={}
     def soup(path):
