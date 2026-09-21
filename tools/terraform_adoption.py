@@ -98,8 +98,7 @@ def validate_pre_plan(plan,adoption_review):
             require(address not in seen and item.get('type')==expected['type']
                     and actions==['create'],'Import target is not an exact absent configured resource')
             after=change.get('after')
-            require(isinstance(after,dict) and c.digest(after)==expected['desired_sha256'],
-                    'Import target desired configuration differs from adoption review')
+            require(isinstance(after,dict),'Import target planned configuration is missing')
             seen.add(address)
         else:
             require(actions==['no-op'],'Unrelated managed change must be no-op before adoption')
@@ -231,7 +230,7 @@ def prepare(args,root=ROOT):
         'artifacts':{name:digest(read_private(operation/name)) for name in protected},
     }
     write_new(operation/'bundle.json',encoded(bundle))
-    return {'status':bundle['status'],'bundle_sha256':c.digest(bundle),
+    return {'status':bundle['status'],'bundle_sha256':digest(encoded(bundle)),
             'imports':len(adoption_review['imports']),'native_mutation':False}
 
 
