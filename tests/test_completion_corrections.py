@@ -133,15 +133,19 @@ class CurrentIntegrityTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.root=Path(self.temp.name)
         subprocess.run(['git','init','-q',str(self.root)],check=True)
-        (self.root/'one.txt').write_text('original\n')
+        # Pin LF in the fixture so the byte comparison does not depend on the host's
+        # newline translation or Git autocrlf setting; the repository pins LF too.
+        for key,value in (('core.autocrlf','false'),('core.eol','lf')):
+            subprocess.run(['git','-C',str(self.root),'config',key,value],check=True)
+        (self.root/'one.txt').write_bytes(b'original\n')
         for args in [['add','.'],['-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','Synthetic local fixture']]:subprocess.run(['git','-C',str(self.root),*args],check=True)
     def test_fresh_checkout_passes_current_command(self):self.assertEqual(verify(self.root)['status'],'HASHES_MATCH')
     def test_modified_tracked_file_fails(self):
-        (self.root/'one.txt').write_text('changed');self.assertTrue(verify(self.root)['issues'])
+        (self.root/'one.txt').write_bytes(b'changed');self.assertTrue(verify(self.root)['issues'])
     def test_untracked_source_is_not_current_release(self):
-        (self.root/'extra').write_text('uncommitted');self.assertTrue(verify(self.root)['issues'])
+        (self.root/'extra').write_bytes(b'uncommitted');self.assertTrue(verify(self.root)['issues'])
     def test_staged_difference_is_not_current_head(self):
-        (self.root/'one.txt').write_text('changed');subprocess.run(['git','-C',str(self.root),'add','.'],check=True);self.assertTrue(verify(self.root)['issues'])
+        (self.root/'one.txt').write_bytes(b'changed');subprocess.run(['git','-C',str(self.root),'add','.'],check=True);self.assertTrue(verify(self.root)['issues'])
     def test_export_needs_explicit_manifest(self):
         with tempfile.TemporaryDirectory() as temp:
             p=Path(temp);(p/'x').write_text('x');self.assertEqual(verify(p)['status'],'BLOCKED_NO_CURRENT_CHECKOUT')
