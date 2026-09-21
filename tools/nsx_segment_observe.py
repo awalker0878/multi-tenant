@@ -20,6 +20,11 @@ def policy_manifest(m):
 
 def validate(m):
     require(m.get('profile') == PROFILE, 'Segment switch profile required'); nsx.validate(policy_manifest(m))
+    validate_bindings(m)
+
+
+def validate_bindings(m):
+    """Shared segment association contract; caller validates its policy profile."""
     switches = set(); found = False
     for r in m['resources']:
         if r['kind'] != 'segment':
@@ -75,7 +80,37 @@ def switch_state(r, before, after):
     else: mismatches = ['/realization:ambiguous_missing_or_changed_switch']
     return dict(resource_key=r['path'] + ':logical-switch', identity_match=status != 'UNKNOWN', config_status=status,
         progress=progress, mismatch_fields=mismatches, config_sha256=c.digest({'before': before, 'after': after}),
+        switch_witness={'before': before, 'after': after},
         reason='SEGMENT_SWITCH_IDENTITY_ONLY_NOT_EFFECTIVE_DFW_OR_ATTACHMENT')
+
+
+def observation_keys(m):
+    return {r['path'] for r in m['resources']} | {r['path'] + ':logical-switch' for r in m['resources'] if r['kind'] == 'segment'}
+
+
+def validate_switch_history(m, states):
+    segments = [r for r in m['resources'] if r['kind'] == 'segment']
+    try:
+        require(len(states) == len(segments), 'Realized-switch coverage differs')
+        for resource, state in zip(segments, states):
+            witness = state['switch_witness']; c.exact_keys(witness, {'before', 'after'})
+            for rows in witness.values():
+                require(isinstance(rows, list) and len(rows) <= 100, 'Unbounded switch witness')
+                for row in rows:
+                    c.exact_keys(row, {'alarms_empty'}, FIELDS)
+                    require(type(row['alarms_empty']) is bool, 'Invalid switch alarm indicator')
+            require(c.digest(state) == c.digest(switch_state(resource, witness['before'], witness['after'])),
+                    'Realized-switch summary contradicts native evidence')
+    except (ValueError, TypeError, KeyError, IndexError, AttributeError):
+        raise c.ObservationError('NSX_SWITCH_WITNESS_INVALID') from None
+
+
+def validate_observation_history(m, history, states, current=None):
+    if len(states) == 1 and states[0].get('resource_key') == 'scope':
+        nsx.validate_observation_history(policy_manifest(m), history, states, current); return
+    size = len(m['resources'])
+    nsx.validate_observation_history(policy_manifest(m), history, states[:size], current)
+    validate_switch_history(m, states[size:])
 
 
 def sample(m, client):
