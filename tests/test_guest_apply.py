@@ -1,0 +1,128 @@
+from copy import deepcopy
+from datetime import timedelta
+import os
+from pathlib import Path
+import signal
+import subprocess
+import tempfile
+from types import SimpleNamespace
+import unittest
+from unittest.mock import patch
+from tests.test_guest_run import inputs, prepare, SOURCE
+from tools import guest_apply as a, guest_run as g
+from tools.run_files import digest, encoded, file_map, load_private, utcnow, write_new
+
+
+def configured(folder, mode='check'):
+    args = inputs(folder, mode); prepare(args)
+    approval = dict(format='hosting-guest-approval/1', bundle_sha256=digest((args.output/'bundle.json').read_bytes()),
+        operation_id=args.operation_id, generation=args.generation, valid_from=(utcnow()-timedelta(seconds=5)).isoformat(),
+        valid_until=(utcnow()+timedelta(minutes=10)).isoformat(), change_ref=load_private(args.access)['change_ref'])
+    write_new(folder/'approval.json', encoded(approval)); (folder/'ledger').mkdir(mode=0o700)
+    return SimpleNamespace(bundle=args.output, approval=folder/'approval.json', ledger=folder/'ledger', execute=True)
+
+
+def successful_child(argv, directory, env, timeout):
+    assert (directory/'runtime/ssh_key').exists()
+    summary = dict(ok=4, failures=0, unreachable=0, changed=1, skipped=0, rescued=0, ignored=0)
+    write_new(directory/'runtime/stats.json', encoded(dict(format='hosting-guest-stats/1',
+        completed_at=utcnow().isoformat(), hosts={'localhost': summary, 'guest-01': summary})))
+
+
+class GuestExecutionTests(unittest.TestCase):
+    def test_success_requires_counters_and_check_mode_cannot_become_configure(self):
+        for mode, status in [('check', 'CHECK_COMPLETED_REQUIRES_REVIEW'), ('configure', 'CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE')]:
+            with tempfile.TemporaryDirectory() as tmp:
+                args = configured(Path(tmp), mode)
+                with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=successful_child) as child:
+                    result = a.apply(args)
+                self.assertEqual(result['status'], status); self.assertFalse(result['native_acceptance'])
+                self.assertEqual('--check' in child.call_args.args[0], mode == 'check')
+                self.assertIn('-I', child.call_args.args[0]); self.assertNotIn('--diff', child.call_args.args[0])
+                self.assertFalse((args.bundle/'runtime/ssh_key').exists())
+                receipt = load_private(args.bundle/'result.json')
+                self.assertEqual(receipt['stats_sha256'], digest((args.bundle/'runtime/stats.json').read_bytes()))
+                self.assertEqual(len(list(args.ledger.rglob('*.started.json'))), 1)
+
+    def test_altered_inputs_source_runtime_inventory_or_approval_prevent_any_attempt(self):
+        for fault in ('source', 'inventory', 'pins', 'runtime', 'mode', 'approval', 'expiry', 'key', 'budget', 'opt_in'):
+            with tempfile.TemporaryDirectory() as tmp:
+                args = configured(Path(tmp)); bad_source = False
+                if fault == 'source': bad_source = True
+                elif fault == 'inventory':
+                    p = args.bundle/'inventory.json'; data = load_private(p)
+                    data['all']['children']['hosting_guests']['hosts']['guest-01']['ansible_connection'] = 'local'; p.write_bytes(encoded(data))
+                elif fault == 'pins': (args.bundle/'known_hosts').write_bytes(b'wrong-host')
+                elif fault == 'runtime':
+                    p = args.bundle/'runtime.json'; data = load_private(p); data['ssh_sha256'] = '0'*64; p.write_bytes(encoded(data))
+                elif fault == 'mode':
+                    p = args.bundle/'bundle.json'; data = load_private(p); data['mode'] = 'configure'; p.write_bytes(encoded(data))
+                elif fault in {'approval', 'expiry', 'budget'}:
+                    data = load_private(args.approval)
+                    if fault == 'approval': data['bundle_sha256'] = '0'*64
+                    elif fault == 'expiry': data['valid_until'] = (utcnow()-timedelta(seconds=1)).isoformat()
+                    else: data['valid_until'] = (utcnow()+timedelta(seconds=20)).isoformat()
+                    args.approval.write_bytes(encoded(data))
+                elif fault == 'key': (Path(tmp)/'key').write_bytes(b'changed-key')
+                elif fault == 'opt_in': args.execute = False
+                with patch.object(g, 'verify', return_value=SOURCE | {'commit': 'b'*40} if bad_source else SOURCE), \
+                     patch.object(a, 'run_process') as child, self.subTest(fault=fault), self.assertRaises(ValueError): a.apply(args)
+                child.assert_not_called(); self.assertEqual(list(args.ledger.rglob('*.started.json')), [])
+
+    def test_rehashed_unsafe_inventory_still_cannot_override_generated_connections(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            args = configured(Path(tmp)); p = args.bundle/'inventory.json'; data = load_private(p)
+            data['all']['vars']['ansible_connection'] = 'local'; p.write_bytes(encoded(data))
+            bundle = load_private(args.bundle/'bundle.json'); bundle['artifacts']['inventory.json'] = digest(p.read_bytes())
+            (args.bundle/'bundle.json').write_bytes(encoded(bundle))
+            approval = load_private(args.approval); approval['bundle_sha256'] = digest(encoded(bundle)); args.approval.write_bytes(encoded(approval))
+            with patch.object(g, 'verify', return_value=SOURCE), self.assertRaises(ValueError): a.apply(args)
+
+    def test_failure_interrupt_and_missing_or_false_stats_leave_durable_hold(self):
+        for fault in ('timeout', 'interrupt', 'missing', 'foreign', 'ignored', 'stale'):
+            with tempfile.TemporaryDirectory() as tmp:
+                args = configured(Path(tmp), 'configure')
+                def fail(argv, directory, env, timeout):
+                    started = list(args.ledger.rglob('*.started.json'))
+                    self.assertEqual(len(started), 1); self.assertEqual(load_private(started[0])['status'], 'STARTED_OUTCOME_UNKNOWN')
+                    if fault == 'timeout': raise subprocess.TimeoutExpired(argv, timeout)
+                    if fault == 'interrupt': raise KeyboardInterrupt
+                    if fault == 'missing': return
+                    successful_child(argv, directory, env, timeout)
+                    p = directory/'runtime/stats.json'; data = load_private(p)
+                    if fault == 'foreign': data['hosts']['foreign'] = data['hosts'].pop('guest-01')
+                    elif fault == 'ignored': data['hosts']['guest-01']['ignored'] = 1
+                    else: data['completed_at'] = '2000-01-01T00:00:00Z'
+                    p.write_bytes(encoded(data))
+                with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=fail), \
+                     self.subTest(fault=fault), self.assertRaises((ValueError, OSError, subprocess.TimeoutExpired, KeyboardInterrupt)): a.apply(args)
+                receipt = load_private(args.bundle/'result.json')
+                self.assertEqual(receipt['status'], 'HOLD_RECONCILIATION_REQUIRED')
+                self.assertFalse((args.bundle/'runtime/ssh_key').exists())
+                self.assertEqual(load_private(next(args.ledger.rglob('head.json'))), receipt)
+
+    def test_uncertain_scope_blocks_new_operation_and_renamed_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp); args = configured(folder)
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=KeyboardInterrupt), self.assertRaises(KeyboardInterrupt): a.apply(args)
+            before = file_map(args.ledger); next_folder = folder/'next'; next_folder.mkdir(mode=0o700)
+            candidate = configured(next_folder); candidate.ledger = args.ledger
+            bundle = load_private(candidate.bundle/'bundle.json'); bundle['operation_id'] = 'different-operation'
+            (candidate.bundle/'bundle.json').write_bytes(encoded(bundle))
+            approval = load_private(candidate.approval); approval.update(operation_id=bundle['operation_id'], bundle_sha256=digest(encoded(bundle)))
+            candidate.approval.write_bytes(encoded(approval))
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process') as child, self.assertRaises(ValueError): a.apply(candidate)
+            child.assert_not_called(); self.assertEqual(file_map(args.ledger), before)
+            moved = folder/'moved'; candidate.bundle.rename(moved); candidate.bundle = moved
+            with patch.object(g, 'verify', return_value=SOURCE), self.assertRaises(ValueError): a.apply(candidate)
+
+    def test_controller_timeout_terminates_its_process_group(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            process = unittest.mock.Mock(pid=123456)
+            process.wait.side_effect = [subprocess.TimeoutExpired(['fixture'], 1), -9]
+            with patch.object(a.subprocess, 'Popen', return_value=process) as launch, patch.object(a.os, 'killpg') as kill:
+                with self.assertRaises(subprocess.TimeoutExpired): a.run_process(['fixture'], Path(tmp), {}, 1)
+            self.assertTrue(launch.call_args.kwargs['start_new_session']); kill.assert_called_once_with(123456, signal.SIGKILL)
+
+
+if __name__ == '__main__': unittest.main()
