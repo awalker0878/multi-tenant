@@ -303,14 +303,22 @@ def retain(path,raw):
     else: write_new(path,raw)
 
 
-def remote_dispatch(step,packet,directory,plan,*,observe=False):
+def remote_dispatch(step,packet,directory,plan,*,observe=False,recovery_authority=None):
     from tools import owner_worker,remote_owner
-    files=file_paths(packet); values=packet['parameters']; job=load_private(files['job'])
-    require(digest(Path(values['ssh']).read_bytes())==values['ssh_sha256'],'Remote transport executable changed')
+    files=file_paths({'files':{'job':packet['files']['job']}}); values=packet['parameters']; job=load_private(files['job'])
     result_path=directory/'remote-result.json'
     if result_path.exists(): result=load_private(result_path)
     else:
-        result=remote_owner.contact(job,load_private(files['target']),values['ssh'],files['ssh_key'],
+        require(digest(Path(values['ssh']).read_bytes())==values['ssh_sha256'],'Remote transport executable changed')
+        original=file_paths({'files':{'target':packet['files']['target']}})
+        target=load_private(original['target'])
+        if recovery_authority is not None:
+            require(observe,'Renewed remote access is observation-only')
+            record=load_private(recovery_authority)
+            target,files=remote_owner.recovery_access(record,job,target)
+            retain(directory/('recovery-access-'+c.digest(record)+'.json'),encoded(record))
+        else: files=file_paths({'files':{name:packet['files'][name] for name in ('ssh_key','ssh_certificate')}})
+        result=remote_owner.contact(job,target,values['ssh'],files['ssh_key'],
                                    files['ssh_certificate'],directory,observe=observe)
         write_new(result_path,encoded(result))
     artifacts=owner_worker.check_result(result,job)
@@ -324,7 +332,7 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
         if kind=='remote_owner':
-            return remote_dispatch(step,packet,directory,plan,observe=True)
+            return remote_dispatch(step,packet,directory,plan,observe=True,recovery_authority=recovery_authority)
         if kind=='edge_containment':
             from tools.edge_contain import execute
             import uuid

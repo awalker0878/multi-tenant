@@ -107,6 +107,15 @@ Backup manifests retain their original owner-host paths for snapshot checking;
 do not rewrite them. Restore can consume privately transferred exact receipt
 and manifest copies on an independently identified worker, with separate authority.
 
+If SSH access expires during recovery, publish
+`<step_id>.recovery-authority.json` in the coordinator inbox. This is
+`hosting-owner-recovery-access/1` with the original `job_sha256`, `access_ref`
+and `files` bindings for `target`, `ssh_key` and `ssh_certificate`. The renewed
+target may change only `valid_from` and `valid_until`; address, account, host key,
+machine ID, port and duration bound must remain identical. Original expired key
+files can be removed. The coordinator retains the renewal record and sends only
+`observe`. New credentials cannot change the staged job or redispatch its write.
+
 ## Evidence and limits
 
 Integration tests exercise worker journals, capture handoffs, unknown outcomes

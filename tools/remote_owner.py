@@ -8,7 +8,7 @@ import struct
 import subprocess
 import uuid
 from tools import owner_worker as worker, readback_core as c
-from tools.run_files import current_window,digest,encoded,private_path,read_private,require,write_new
+from tools.run_files import current_window,digest,encoded,load_private,private_path,read_private,require,write_new
 
 
 def validate(target,job):
@@ -28,6 +28,23 @@ def validate(target,job):
     require(len(raw)==51 and raw[:19]==struct.pack('>I',11)+b'ssh-ed25519'+struct.pack('>I',32),
             'Malformed owner host key')
     current_window(target)
+
+
+def recovery_access(record,job,original):
+    c.exact_keys(record,{'format','job_sha256','files','access_ref'})
+    require(record['format']=='hosting-owner-recovery-access/1' and record['job_sha256']==c.digest(job),
+            'Recovery access must bind the original remote job')
+    c.text(record['access_ref']); c.exact_keys(record['files'],{'target','ssh_key','ssh_certificate'})
+    paths={}
+    for name,binding in record['files'].items():
+        c.exact_keys(binding,{'path','sha256'})
+        require(digest(read_private(binding['path']))==binding['sha256'],'Recovery access input bytes changed')
+        paths[name]=Path(binding['path'])
+    target=load_private(paths['target']); validate(target,job)
+    require({k:v for k,v in target.items() if k not in {'valid_from','valid_until'}}==
+            {k:v for k,v in original.items() if k not in {'valid_from','valid_until'}},
+            'Recovery access cannot change the original owner endpoint or transport bounds')
+    return target,paths
 
 
 def contact(job,target,binary,key,certificate,directory,*,observe=False):

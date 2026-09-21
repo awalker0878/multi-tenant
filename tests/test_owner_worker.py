@@ -75,12 +75,30 @@ class OwnerWorkerTests(unittest.TestCase):
         def contact(job,target,binary,key,certificate,directory,*,observe=False):
             modes.append(observe); result=self.serve('observe' if observe else 'execute')
             if not observe: raise InterruptedError('SSH response lost after owner completion')
+            self.assertEqual(key,self.base/'renewed-key.json')
+            self.assertEqual(certificate,self.base/'renewed-cert.json')
             return result
         with patch.object(remote_owner,'contact',side_effect=contact):
             with self.assertRaises(InterruptedError): delivery.run(self.plan,self.inbox,self.ledger,execute=True)
+            # Expired/revoked original credentials may be removed; replacement
+            # access can only observe the same pinned endpoint and immutable job.
+            (self.base/'ssh_key.json').unlink(); (self.base/'ssh_certificate.json').unlink()
+            renewal={'format':'hosting-owner-recovery-access/1','job_sha256':c.digest(self.job),
+                     'files':{},'access_ref':'TEST-RENEWED-OBSERVATION'}
+            for name,value,suffix in [('target',target|{'valid_until':(utcnow()+timedelta(minutes=30)).isoformat()},'target'),
+                                      ('ssh_key','NEW-TEST-KEY','key'),('ssh_certificate','NEW-TEST-CERT','cert')]:
+                path=self.base/('renewed-'+suffix+'.json'); write_new(path,encoded(value))
+                renewal['files'][name]={'path':str(path),'sha256':digest(read_private(path))}
+            write_new(self.inbox/'remote.recovery-authority.json',encoded(renewal))
             self.assertEqual(delivery.run(self.plan,self.inbox,self.ledger,execute=True)['status'],
                              'DELIVERY_EXECUTED_REQUIRES_ACCEPTANCE')
         self.assertEqual(modes,[False,True]); self.assertEqual(self.calls.count('backup'),1)
+        # A renewed window cannot select a new endpoint or change its host key.
+        for update in ({'address':'192.0.2.20'},{'max_seconds':60},{'user':'different'}):
+            path=self.base/'renewed-target.json'; replace_private(path,encoded(target|update))
+            renewal['files']['target']['sha256']=digest(read_private(path))
+            with self.assertRaisesRegex(ValueError,'original owner endpoint'):
+                remote_owner.recovery_access(renewal,self.job,target)
 
 
 if __name__=='__main__': unittest.main()
