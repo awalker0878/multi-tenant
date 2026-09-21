@@ -68,7 +68,8 @@ def runtime_record(python, ssh):
 
 
 def source_paths(root):
-    paths = [root / PLAYBOOK, root / 'ansible/filter_plugins/guest_filters.py',
+    paths = [root / PLAYBOOK, root / 'scripts/__init__.py', root / 'scripts/build_wsd_compositions.py',
+             root / 'ansible/filter_plugins/guest_filters.py',
              root / 'ansible/callback_plugins/hosting_guest_result.py']
     paths += list((root / 'tools').glob('*.py'))
     for role in ('linux_guest_baseline', 'linux_guest_services', 'linux_guest_backup'):

@@ -13,8 +13,10 @@ from tools import guest_apply as a, guest_run as g
 from tools.run_files import digest, encoded, file_map, load_private, utcnow, write_new
 
 
-def configured(folder, mode='check'):
-    args = inputs(folder, mode); prepare(args)
+def configured(folder, mode='check', ssh=None):
+    args = inputs(folder, mode)
+    if ssh is not None: args.ssh = ssh
+    prepare(args)
     approval = dict(format='hosting-guest-approval/1', bundle_sha256=digest((args.output/'bundle.json').read_bytes()),
         operation_id=args.operation_id, generation=args.generation, valid_from=(utcnow()-timedelta(seconds=5)).isoformat(),
         valid_until=(utcnow()+timedelta(minutes=10)).isoformat(), change_ref=load_private(args.access)['change_ref'])
@@ -30,6 +32,29 @@ def successful_child(argv, directory, env, timeout):
 
 
 class GuestExecutionTests(unittest.TestCase):
+    def test_real_ansible_uses_pinned_ssh_after_gate_and_records_unreachable_guest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp); ssh = folder/'ssh-fixture'; calls = folder/'ssh-calls.json'
+            ssh.write_text('#!/usr/bin/python3\nimport json,sys\nfrom pathlib import Path\n'
+                + 'Path('+repr(str(calls))+').write_text(json.dumps(sys.argv[1:]))\nraise SystemExit(255)\n')
+            ssh.chmod(0o700); args = configured(folder, ssh=ssh)
+            source = file_map(args.bundle/'source')
+            with patch.dict(os.environ, {'ANSIBLE_CONFIG': '/untrusted', 'ANSIBLE_SSH_ARGS': '-o StrictHostKeyChecking=no',
+                    'SSH_AUTH_SOCK': '/untrusted', 'PYTHONPATH': '/untrusted'}), \
+                 patch.object(g, 'verify', return_value=SOURCE), self.assertRaises(ValueError): a.apply(args)
+            self.assertTrue(calls.exists(), (args.bundle/'ansible.log').read_text())
+            argv = __import__('json').loads(calls.read_text())
+            for option in ('/dev/null', 'IdentitiesOnly=yes', 'IdentityAgent=none', 'ProxyCommand=none',
+                           'ControlMaster=no', 'StrictHostKeyChecking=yes',
+                           'PubkeyAcceptedAlgorithms=ssh-ed25519-cert-v01@openssh.com'):
+                self.assertIn(option, argv)
+            report = load_private(args.bundle/'runtime/stats.json')
+            self.assertGreater(report['hosts']['localhost']['ok'], 0)
+            self.assertEqual(report['hosts']['guest-01']['unreachable'], 1)
+            self.assertEqual(load_private(args.bundle/'result.json')['status'], 'HOLD_RECONCILIATION_REQUIRED')
+            self.assertEqual(file_map(args.bundle/'source'), source)
+            self.assertFalse((args.bundle/'runtime/ssh_key').exists())
+
     def test_success_requires_counters_and_check_mode_cannot_become_configure(self):
         for mode, status in [('check', 'CHECK_COMPLETED_REQUIRES_REVIEW'), ('configure', 'CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE')]:
             with tempfile.TemporaryDirectory() as tmp:
@@ -123,6 +148,34 @@ class GuestExecutionTests(unittest.TestCase):
             with patch.object(a.subprocess, 'Popen', return_value=process) as launch, patch.object(a.os, 'killpg') as kill:
                 with self.assertRaises(subprocess.TimeoutExpired): a.run_process(['fixture'], Path(tmp), {}, 1)
             self.assertTrue(launch.call_args.kwargs['start_new_session']); kill.assert_called_once_with(123456, signal.SIGKILL)
+
+    def test_start_record_without_head_blocks_new_work_and_preserves_every_byte(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            args = configured(Path(tmp)); scope = load_private(args.bundle/'bundle.json')['scope']
+            ledger = args.ledger/digest(encoded(scope)); ledger.mkdir(mode=0o700)
+            write_new(ledger/'lost.started.json', encoded(dict(format='hosting-guest-attempt/1', scope=scope,
+                      status='STARTED_OUTCOME_UNKNOWN', operation_id='previous-operation')))
+            before = file_map(args.ledger)
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process') as child, self.assertRaises(ValueError): a.apply(args)
+            child.assert_not_called()
+            after = file_map(args.ledger); after.pop(str(ledger.relative_to(args.ledger)/'writer.lock'))
+            self.assertEqual(before, after)
+
+    def test_successful_attempt_cannot_be_replayed_from_a_new_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp); first = configured(folder)
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=successful_child): a.apply(first)
+            before = file_map(first.ledger); other = folder/'next'; other.mkdir(mode=0o700)
+            second = configured(other); second.ledger = first.ledger
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process') as child, self.assertRaises(ValueError): a.apply(second)
+            child.assert_not_called(); self.assertEqual(file_map(first.ledger), before)
+            bundle = load_private(second.bundle/'bundle.json'); bundle['generation'] = 2
+            (second.bundle/'bundle.json').write_bytes(encoded(bundle))
+            approval = load_private(second.approval); approval.update(generation=2, bundle_sha256=digest(encoded(bundle)))
+            second.approval.write_bytes(encoded(approval))
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=successful_child):
+                self.assertEqual(a.apply(second)['status'], 'CHECK_COMPLETED_REQUIRES_REVIEW')
+            self.assertEqual(len(list(first.ledger.rglob('*.started.json'))), 2)
 
 
 if __name__ == '__main__': unittest.main()

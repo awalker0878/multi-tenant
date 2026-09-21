@@ -47,6 +47,7 @@ def build(outputs, access, known_hosts, now=None):
     hosts, key_lines, endpoints, native_ids, machine_ids = {}, [], set(), set(), set()
     for name, target in access['targets'].items():
         identity(name)
+        require(name not in {'localhost', 'all', 'ungrouped', 'hosting_guests'}, 'Reserved Ansible inventory identity')
         keys = {'native_id', 'address', 'port', 'user', 'host_key', 'machine_id', 'hostname', 'profile', 'time_servers'}
         fields(target, keys | ({'services'} if target.get('profile') == PROFILE else set()), 'guest target')
         member = members[name]

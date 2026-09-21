@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
 from tools import guest_run as g
 from tools.guest_inventory import timestamp
+from tools.neutron_observe import strict_loads
 from tools.run_files import (current_window, digest, encoded, file_map, load_private, private_path,
     read_private, replace_private, require, sync_directory, utcnow, write_new)
 
@@ -101,6 +102,15 @@ def scope_ledger(path, scope):
     descriptor = os.open(lock, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     try:
         private_path(lock); fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        # An abrupt stop can occur after the immutable start but before head.json.
+        # A renamed operation cannot bypass that incomplete write window.
+        for started in directory.glob('*.started.json'):
+            prior = load_private(started); result = started.with_name(started.name.replace('.started.json', '.result.json'))
+            require(result.exists(), 'Guest attempt has no completed outcome')
+            completed = load_private(result)
+            require(completed.get('status') in SUCCESS and all(completed.get(k) == prior.get(k)
+                    for k in ('format', 'scope', 'operation_id', 'generation', 'bundle_sha256', 'mode', 'started_at')),
+                    'Guest attempt is uncertain or has inconsistent records')
         if (directory/'head.json').exists():
             previous = load_private(directory/'head.json')
             require(previous.get('format') == 'hosting-guest-attempt/1' and previous.get('scope') == scope
@@ -132,7 +142,7 @@ def run_process(argv, directory, env, timeout):
 
 
 def verify_stats(directory, access, started):
-    raw = read_private(directory/'runtime/stats.json'); report = load_private(directory/'runtime/stats.json')
+    raw = read_private(directory/'runtime/stats.json'); report = strict_loads(raw)
     exact(report, {'format', 'completed_at', 'hosts'})
     require(report['format'] == 'hosting-guest-stats/1' and started <= timestamp(report['completed_at']) <= utcnow(),
             'Guest completion counters are stale or missing')
