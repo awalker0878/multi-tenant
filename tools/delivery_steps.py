@@ -11,6 +11,7 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
 # arbitrary module, executable arguments or environment overlay is accepted.
 KINDS = {
+    'edge_containment': ({'nft','nft_sha256'}, {'spec','authority'}, set()),
     'remote_owner': ({'ssh','ssh_sha256'}, {'job','target','ssh_key','ssh_certificate'}, set()),
     'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
@@ -107,11 +108,15 @@ def validate_packet(step, packet, plan, base):
                 and accepted['step_id']==step['id'] and accepted['dependencies']==packet['dependencies']
                 and accepted['purpose']==values['purpose'], 'Acceptance does not bind this delivery gate')
         match_scope(accepted['scope'],plan); c.text(accepted['acceptance_ref']); current_window(accepted)
-    if kind in {'edge_policy','target_campaign','ipam','dns','capacity'}:
-        field={'edge_policy':'spec','target_campaign':'plan','ipam':'request','dns':'allocation','capacity':'request'}[kind]
+    if kind in {'edge_policy','edge_containment','target_campaign','ipam','dns','capacity'}:
+        field={'edge_policy':'spec','edge_containment':'spec','target_campaign':'plan','ipam':'request','dns':'allocation','capacity':'request'}[kind]
         value=load_private(files[field]); match_scope(value['scope'],plan)
         if kind=='target_campaign': require(value['source_commit']==plan['source_commit'], 'Foreign campaign source')
         if kind=='edge_policy': require(values['mode'] in {'withdraw','bootstrap','active'}, 'Unknown edge transition')
+        if kind=='edge_containment':
+            from tools.edge_contain import authorize
+            authorize(value,load_private(files['authority']))
+            require(value['nft_sha256']==values['nft_sha256'],'Incident executable binding changed')
         if kind=='ipam':
             from tools.netbox_ipam import ACTIONS
             require(values['action'] in ACTIONS,'Unknown IPAM operation')
@@ -132,7 +137,11 @@ def validate_packet(step, packet, plan, base):
 def owner_ledger(base, owner):
     # Native owner ledgers are shared across all delivery scopes/generations.
     # A new operation directory must never reset an owner's uncertainty hold.
-    parent=base.parents[2]/'owners'
+    return native_owner_ledger(base.parents[2],owner)
+
+
+def native_owner_ledger(ledger,owner):
+    parent=ledger/'owners'
     if not parent.exists(): parent.mkdir(mode=0o700); sync_directory(parent.parent)
     private_path(parent,directory=True)
     path=parent/owner
@@ -167,6 +176,12 @@ def dispatch(step, packet, directory, base, plan, root):
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
     if kind=='remote_owner':
         return remote_dispatch(step,packet,directory,plan)
+    elif kind=='edge_containment':
+        from tools.edge_contain import execute
+        result=execute(load_private(files['spec']),load_private(files['authority']),values['nft'],
+                       owner_ledger(base,'edge_policy'),directory/'execution')
+        write_new(directory/'containment.json',read_private(directory/'execution/containment.json'))
+        names=['containment.json']
     elif kind=='restic':
         from tools.restic_run import execute
         result=execute(values['action'],load_private(files['config']),load_private(files['credentials']),
@@ -310,6 +325,23 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
         kind=step['kind']
         if kind=='remote_owner':
             return remote_dispatch(step,packet,directory,plan,observe=True)
+        if kind=='edge_containment':
+            from tools.edge_contain import execute
+            import uuid
+            files=file_paths(packet); values=packet['parameters']
+            original=directory/'execution/containment.json'
+            if not original.exists():
+                folder=directory/('observation-'+uuid.uuid4().hex)
+                execute(load_private(files['spec']),load_private(files['authority']),values['nft'],
+                        owner_ledger(base,'edge_policy'),folder,observe_only=True)
+                original=folder/'containment.json'
+            result=load_private(original)
+            require(result['status']=='CONTAINED_OBSERVED_NOT_QUALIFIED' and result['scope']==plan['scope']
+                    and result['spec_sha256']==digest(encoded(load_private(files['spec'])))
+                    and result['authority_sha256']==digest(encoded(load_private(files['authority']))),
+                    'Recovered incident receipt changed')
+            retain(directory/'containment.json',read_private(original))
+            return complete(step,packet,directory,plan,result,['containment.json'])
         if kind=='restic':
             files=file_paths(packet); values=packet['parameters']; config=load_private(files['config'])
             match_scope(config['scope'],plan)

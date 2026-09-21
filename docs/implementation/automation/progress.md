@@ -42,6 +42,12 @@ returns bounded receipt artifacts. After a lost reply, coordinator recovery can
 only observe the original job. Native source/host privileges and independent
 service acceptance remain owner responsibilities.
 
+Remote incident jobs now let a central failure hook withdraw on the edge host
+despite a held forward workflow. Every request observes current drop rules;
+cached successful containment cannot hide reopened policy. Immutable native
+edge history also prevents completed withdrawal from masking an older unknown
+write before a subsequent activation.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

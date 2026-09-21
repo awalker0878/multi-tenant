@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import re
 import sys
+import uuid
 
 ROOT=Path(__file__).resolve().parents[1]
 if __package__ in (None,''): sys.path.insert(0,str(ROOT))
@@ -14,7 +15,7 @@ from tools import delivery_run as delivery, readback_core as c
 from tools.run_files import (current_window,digest,encoded,load_private,private_path,read_private,
                              require,sync_directory,write_new)
 
-KINDS={'edge_policy','restic'}
+KINDS={'edge_policy','restic','edge_containment'}
 MAX_RESULT=8*1024*1024
 COMMAND='hosting-owner/1'
 
@@ -51,6 +52,7 @@ def validate(job):
 
 
 def exports(job):
+    if job['kind']=='edge_containment': return {'containment.json'}
     if job['kind']=='edge_policy': return {'result.json'}
     require(job['parameters']['action'] in {'backup','restore'},'Unknown remote backup action')
     return {'receipt.json','context.json'} | ({'manifest.json'} if job['parameters']['action']=='backup' else set())
@@ -71,13 +73,25 @@ def check_result(value,job):
         raw=base64.b64decode(artifact['base64'],validate=True)
         require(digest(raw)==artifact['sha256'],'Remote owner artifact digest differs')
         decoded[name]=raw
-    receipt=c.strict_loads(decoded['result.json' if job['kind']=='edge_policy' else 'receipt.json'])
+    receipt=c.strict_loads(decoded[{'edge_policy':'result.json','edge_containment':'containment.json','restic':'receipt.json'}[job['kind']]])
     require(receipt['status']==value['owner_status'],'Remote owner status differs from its receipt')
-    allowed={'edge_policy':{'APPLIED_EXPIRING_POLICY_NOT_QUALIFIED'},
+    allowed={'edge_policy':{'APPLIED_EXPIRING_POLICY_NOT_QUALIFIED'},'edge_containment':{'CONTAINED_OBSERVED_NOT_QUALIFIED'},
              'restic':{'CAPTURED_REQUIRES_RESTORE_TEST'} if job['parameters'].get('action')=='backup'
                       else {'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'}}
     require(value['owner_status'] in allowed[job['kind']],'Remote native outcome remains held')
     return decoded
+
+
+def response(job,status,directory):
+    artifacts={}
+    for name in sorted(exports(job)):
+        raw=read_private(directory/name)
+        artifacts[name]={'sha256':digest(raw),'base64':base64.b64encode(raw).decode('ascii')}
+    value={'format':'hosting-owner-result/1','job_id':job['job_id'],'job_sha256':c.digest(job),
+        'machine_id':job['machine_id'],'source_commit':job['source_commit'],'status':'OWNER_COMPLETED_REQUIRES_ACCEPTANCE',
+        'owner_status':status,'artifacts':artifacts,'native_acceptance':False,'production_activation':False}
+    check_result(value,job); require(len(encoded(value))<=MAX_RESULT,'Owner result exceeds transport budget')
+    return value
 
 
 def serve(request,spool,ledger,*,root=ROOT):
@@ -94,6 +108,20 @@ def serve(request,spool,ledger,*,root=ROOT):
     inbox=spool/c.digest(job)
     if not inbox.exists(): inbox.mkdir(mode=0o700); sync_directory(spool)
     private_path(inbox,directory=True)
+    if job['kind']=='edge_containment':
+        # Incident authority outranks a held forward delivery. The native edge
+        # ledger remains shared, and only this withdrawal-only owner takes this path.
+        from tools.delivery_steps import file_paths,native_owner_ledger
+        from tools.edge_contain import execute
+        if request['action']=='execute': current_window(job)
+        files=file_paths(job); values=job['parameters']
+        spec=load_private(files['spec']); require(spec['scope']==job['scope'],'Foreign incident boundary')
+        require(spec['nft_sha256']==values['nft_sha256'],'Incident executable binding differs')
+        directory=inbox/('incident-'+uuid.uuid4().hex)
+        result=execute(spec,load_private(files['authority']),values['nft'],native_owner_ledger(ledger,'edge_policy'),
+                       directory,observe_only=request['action']=='observe')
+        value=response(job,result['status'],directory)
+        write_new(directory/'response.json',encoded(value)); return value
     result_path=inbox/'result.json'
     if result_path.exists():
         value=load_private(result_path); check_result(value,job); return value
@@ -107,15 +135,10 @@ def serve(request,spool,ledger,*,root=ROOT):
     scope={'owner':'delivery',**plan['scope']}
     directory=ledger/digest(encoded(scope))/'runs'/c.digest(plan)/'steps/owner'
     completion=load_private(directory/'owner-completion.json')
-    artifacts={}
     for name in sorted(exports(job)):
         raw=read_private(directory/name)
         require(digest(raw)==completion['artifacts'][name],'Owner receipt changed before transmission')
-        artifacts[name]={'sha256':digest(raw),'base64':base64.b64encode(raw).decode('ascii')}
-    value={'format':'hosting-owner-result/1','job_id':job['job_id'],'job_sha256':c.digest(job),
-        'machine_id':job['machine_id'],'source_commit':job['source_commit'],'status':'OWNER_COMPLETED_REQUIRES_ACCEPTANCE',
-        'owner_status':completion['status'],'artifacts':artifacts,'native_acceptance':False,'production_activation':False}
-    check_result(value,job); require(len(encoded(value))<=MAX_RESULT,'Owner result exceeds transport budget')
+    value=response(job,completion['status'],directory)
     write_new(result_path,encoded(value))
     return value
 

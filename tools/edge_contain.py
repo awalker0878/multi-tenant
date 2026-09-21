@@ -60,7 +60,7 @@ def authorize(spec,authority):
     current_window(authority)
 
 
-def contain(spec,authority,kernel,ledger,operation):
+def contain(spec,authority,kernel,ledger,operation,*,observe_only=False):
     table,scope_hash=edge.validate(spec); authorize(spec,authority)
     selected=dict(spec,operation_id='contain-'+c.digest(authority['incident_id'])[:32])
     # One incident has one immutable withdrawal attempt even after a lost reply.
@@ -75,6 +75,7 @@ def contain(spec,authority,kernel,ledger,operation):
         # This observation cannot clear an uncertain owner head or replay a write.
         observed_withdrawal(selected,current)
     else:
+        require(not observe_only,'Observation cannot start incident withdrawal')
         delegated=dict(spec_sha256=digest(encoded(selected)),mode='withdraw',expected_state_sha256=state_hash,
             valid_from=authority['valid_from'],valid_until=authority['valid_until'],change_ref=authority['change_ref'],
             boundary_acceptance_ref=authority['boundary_acceptance_ref'],readiness_ref='INCIDENT-CONTAINMENT-ONLY')
@@ -89,18 +90,24 @@ def contain(spec,authority,kernel,ledger,operation):
     return result
 
 
+def execute(spec,authority,nft,ledger,output,*,observe_only=False):
+    edge.validate(spec)
+    require(Path('/etc/machine-id').read_text().strip()==spec['machine_id']
+            and os.stat('/proc/self/ns/net').st_ino==spec['network_namespace_inode'],
+            'Wrong native edge machine or namespace')
+    binary=Path(nft).resolve(strict=True)
+    require(digest(binary.read_bytes())==spec['nft_sha256'],'Native firewall executable changed')
+    operation=new_directory(output,ROOT)
+    return contain(spec,authority,edge.Kernel(binary,operation),ledger,operation,observe_only=observe_only)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('spec','authority','nft','ledger','output'): parser.add_argument('--'+name,required=True,type=Path)
     parser.add_argument('--execute',action='store_true'); args=parser.parse_args()
     try:
         require(args.execute,'Explicit delegated incident containment required')
-        spec=load_private(args.spec); edge.validate(spec)
-        require(Path('/etc/machine-id').read_text().strip()==spec['machine_id'] and os.stat('/proc/self/ns/net').st_ino==spec['network_namespace_inode'],
-                'Wrong native edge machine or namespace')
-        require(digest(args.nft.read_bytes())==spec['nft_sha256'],'Native firewall executable changed')
-        operation=new_directory(args.output,ROOT)
-        result=contain(spec,load_private(args.authority),edge.Kernel(args.nft.resolve(strict=True),operation),args.ledger,operation)
+        result=execute(load_private(args.spec),load_private(args.authority),args.nft,args.ledger,args.output)
         print(json.dumps({'status':result['status'],'write_attempted':result['write_attempted']})); return 0
     except (ValueError,OSError,KeyError,TypeError):
         print('{"status":"CONTAINMENT_UNCONFIRMED","reason":"Preserve native holds; inspect the private incident evidence"}'); return 2

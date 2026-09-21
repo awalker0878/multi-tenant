@@ -50,6 +50,15 @@ class ContainmentTests(unittest.TestCase):
         text=(self.base/'first/candidate.nft').read_text()
         self.assertNotIn('counter accept',text); self.assertNotIn('flush ruleset',text)
         self.assertIn('counter drop',text)
+
+    def test_read_only_observation_cannot_initiate_incident(self):
+        folder=self.base/'observation'; folder.mkdir(mode=0o700)
+        with self.assertRaisesRegex(ValueError,'Observation cannot start'):
+            c.contain(self.spec,self.authority,self.kernel,self.ledger,folder,observe_only=True)
+        self.assertEqual(self.kernel.writes,0)
+        self.operate('withdraw')
+        result=c.contain(self.spec,self.authority,self.kernel,self.ledger,folder,observe_only=True)
+        self.assertFalse(result['write_attempted']); self.assertEqual(self.kernel.writes,1)
     def test_lost_reply_keeps_owner_hold_and_recovers_by_observation(self):
         self.kernel.lost=True
         with self.assertRaises(OSError): self.operate('first')

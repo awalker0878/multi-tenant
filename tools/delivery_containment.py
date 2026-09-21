@@ -7,15 +7,32 @@ from tools.run_files import current_window,digest,encoded,load_private,private_p
 
 
 def validate(config,plan):
-    c.exact_keys(config,{'format','plan_sha256','trigger_steps','spec','authority','nft','nft_sha256'})
-    require(config['format']=='hosting-delivery-containment/1' and config['plan_sha256']==c.digest(plan),
+    remote=config.get('format')=='hosting-delivery-containment/2'
+    common={'format','plan_sha256','trigger_steps'}
+    c.exact_keys(config,common|({'job','target','ssh_key','ssh_certificate','ssh','ssh_sha256'} if remote
+                              else {'spec','authority','nft','nft_sha256'}))
+    require(config['format'] in {'hosting-delivery-containment/1','hosting-delivery-containment/2'}
+            and config['plan_sha256']==c.digest(plan),
             'Incident containment belongs to another delivery')
     require(isinstance(config['trigger_steps'],list) and config['trigger_steps']
             and len(config['trigger_steps'])==len(set(config['trigger_steps']))
             and set(config['trigger_steps'])<={s['id'] for s in plan['steps']}, 'Exact bounded failure trigger set required')
-    for name in ('spec','authority'):
+    for name in ('job','target','ssh_key','ssh_certificate') if remote else ('spec','authority'):
         c.exact_keys(config[name],{'path','sha256'})
         require(digest(read_private(config[name]['path']))==config[name]['sha256'],'Incident containment input changed')
+    if remote:
+        from tools import owner_worker,remote_owner
+        job=load_private(config['job']['path']); owner_worker.validate(job)
+        require(job['kind']=='edge_containment' and job['scope']==plan['scope']
+                and job['source_commit']==plan['source_commit'] and job['delivery']=={
+                    'plan_sha256':c.digest(plan),'step_id':'incident-containment','dependencies':{}},
+                'Remote incident job must bind only this delivery boundary')
+        current_window(job)
+        target=load_private(config['target']['path']); remote_owner.validate(target,job)
+        binary=Path(config['ssh'])
+        require(binary.is_absolute() and binary.is_file() and digest(binary.read_bytes())==config['ssh_sha256'],
+                'Incident transport executable changed')
+        return target
     binary=Path(config['nft'])
     require(binary.is_absolute() and binary.is_file() and digest(binary.read_bytes())==config['nft_sha256'],'Incident containment executable changed')
     spec=load_private(config['spec']['path']); authority=load_private(config['authority']['path'])
@@ -39,11 +56,22 @@ def execute(config,plan,step_id,base,root):
         'containment_sha256':c.digest(config),'at':c.now()}))
     try:
         authority=validate(config,plan); current_window(authority)
-        remaining=(c.timestamp(authority['valid_until'])-c.timestamp(c.now())).total_seconds()
-        child(root,'edge_contain.py',['--spec',config['spec']['path'],'--authority',config['authority']['path'],
-            '--nft',config['nft'],'--ledger',owner_ledger(base,'edge_policy'),'--output',directory/'execution','--execute'],
-            directory,timeout=min(60,remaining))
-        result=load_private(directory/'execution/containment.json')
+        if config['format']=='hosting-delivery-containment/2':
+            from tools import remote_owner,owner_worker
+            job=load_private(config['job']['path'])
+            response=remote_owner.contact(job,authority,config['ssh'],config['ssh_key']['path'],
+                                          config['ssh_certificate']['path'],directory)
+            write_new(directory/'remote-result.json',encoded(response))
+            raw=owner_worker.check_result(response,job)['containment.json']
+            write_new(directory/'containment.json',raw); result=c.strict_loads(raw)
+            require(abs((c.timestamp(c.now())-c.timestamp(result['observed_at'])).total_seconds())<=5,
+                    'Remote containment observation is stale or clocks disagree')
+        else:
+            remaining=(c.timestamp(authority['valid_until'])-c.timestamp(c.now())).total_seconds()
+            child(root,'edge_contain.py',['--spec',config['spec']['path'],'--authority',config['authority']['path'],
+                '--nft',config['nft'],'--ledger',owner_ledger(base,'edge_policy'),'--output',directory/'execution','--execute'],
+                directory,timeout=min(60,remaining))
+            result=load_private(directory/'execution/containment.json')
         require(result['status']=='CONTAINED_OBSERVED_NOT_QUALIFIED' and result['scope']==plan['scope'],
                 'Incident containment was not observed')
         write_new(directory/'result.json',encoded(result))

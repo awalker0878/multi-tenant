@@ -65,12 +65,29 @@ selected verification stage also trigger containment and return
 or advances the forward workflow. An unconfirmed result retains the hold and
 diagnostic class; native error text is not copied to the console.
 
-The runtime must execute on the accepted edge owner host and namespace. This
-local failure hook does not create cross-host dispatch or survive controller
-host loss. Existing kernel lease expiry remains the independent controller-loss
-mechanism. External incident ownership remains necessary for unreachable hosts
-and unqualified boot/HA behavior. Renew delegated authority before expiry; actual
-emergency access must not depend on a failed workload platform.
+For a central coordinator, use `hosting-delivery-containment/2` with
+`plan_sha256`, `trigger_steps`, executable `ssh` and `ssh_sha256`, plus private
+file bindings `job`, `target`, `ssh_key`, `ssh_certificate`. These use the
+[remote worker contracts](remote-owner-worker.md). The job must be
+`edge_containment` for this exact source and scope; its `delivery` binding is
+the coordinator plan digest, `step_id: incident-containment`, and empty
+`dependencies`. This predelegation permits only the incident withdrawal path;
+it does not wait for a successful forward stage or an unknown future receipt.
+
+The worker performs fresh native observation on each incident invocation, even
+when its previous withdrawal completed. A retry never reissues an attempted
+native withdrawal. The central hook checks the returned receipt's scope and
+requires its observation within five seconds of current time, including clock
+skew. Unsynchronized clocks or delayed/stale responses leave containment
+unconfirmed. Retained trigger, transport and receipt evidence does not advance
+the failed graph.
+
+The native executor still runs on the accepted edge machine and namespace. The
+hook cannot survive coordinator host loss or reach an unavailable edge host.
+Kernel lease expiry remains the independent controller-loss mechanism. External
+incident ownership remains necessary for unreachable hosts and unqualified
+boot/HA behavior. Renew delegated authority before expiry; emergency access
+must not depend on a failed workload platform.
 
 The real packet fixture `lab/run_nft_edge_lab.py` now exercises delegated
 withdrawal after activation, native JSON readback, both denied service paths and

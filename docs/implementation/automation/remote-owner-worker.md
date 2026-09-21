@@ -73,7 +73,7 @@ and digests but no credential bytes, is a coordinator `job` file.
 | `source_commit` | Exact clean source commit shared with the coordinator |
 | `scope` | The five delivery scope fields |
 | `generation` | Increasing worker generation for the WSD; each subsequent job gets a new generation |
-| `kind` | `edge_policy` or `restic` |
+| `kind` | `edge_policy`, `edge_containment` or `restic` |
 | `parameters`, `files` | Adapter parameters and private file bindings, resolved on the worker |
 | `delivery` | Exact coordinator `plan_sha256`, `step_id` and predecessor `dependencies` digests |
 | `valid_from`, `valid_until` | Actual dispatch window, at most one hour |
@@ -83,6 +83,14 @@ The worker performs the adapter's usual scope, binary, machine, namespace,
 credential and native authority checks. A staged job does not override them.
 Jobs for one WSD serialize through a shared worker ledger. Renaming a job or
 raising its generation cannot bypass an uncertain predecessor.
+
+The sole exception to forward workflow ordering is `edge_containment`, which
+uses separately delegated incident authority and the same native edge ledger.
+It can withdraw while the forward graph is held. Its parameters are `nft` and
+`nft_sha256`, and its files are `spec` and `authority`. Every invocation performs
+fresh native containment observation; historical cached receipts cannot mask a
+reopened policy. `observe` cannot initiate a withdrawal. Unknown earlier writes
+remain in the native history and prevent later reactivation.
 
 The coordinator packet has parameters `ssh` and `ssh_sha256`, and files `job`,
 `target`, `ssh_key`, `ssh_certificate`. The target is `hosting-owner-target/1`
@@ -109,8 +117,9 @@ changed host-key denial and arbitrary-command rejection. Its backup executable
 is synthetic; the separate restic laboratory exercises the real backup engine.
 
 This does not install a live endpoint, provision native credentials, remotely
-attest a machine or qualify the underlying edge/backup service. The incident
-containment hook currently executes on the edge owner host. Remote job transport
-alone is not an incident scheduler or failover mechanism. Kernel lease expiry
-still limits exposure after controller loss. Cross-host incident dispatch,
-edge boot/HA and independent recovery remain separate implementation work.
+attest a machine or qualify the underlying edge/backup service. The
+[incident hook](incident-containment.md) can dispatch a predelegated remote
+withdrawal when selected verification fails. It is not a continuous incident
+scheduler or host failover mechanism. Kernel lease expiry still limits exposure
+after controller loss. Edge boot/HA and independent recovery remain separate
+implementation work.

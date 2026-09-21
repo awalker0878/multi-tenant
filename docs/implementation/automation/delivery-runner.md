@@ -83,6 +83,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `vsphere_power` | None | `request`, `authority`, `session` | `ca_file` |
 | `target_campaign` | `ssh`, `ssh_sha256` | `plan`, `authority` | None |
 | `edge_policy` | `nft`, `nft_sha256`, `mode` | `spec`, `authority` | None |
+| `edge_containment` | `nft`, `nft_sha256` | `spec`, `authority` | None |
 | `ipam` | `action` | `request`, `authority`, `token_file` | `ca_bundle` |
 | `dns` | `action` | `allocation`, `confirmation`, `job`, `scope`, `authority`, `token_file`, `tsig_file` | `ca_bundle`, `registration_job`, `registration_scope` |
 
