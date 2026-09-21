@@ -7,7 +7,6 @@ import json
 import os
 from pathlib import Path
 import pwd
-import shlex
 import shutil
 import socket
 import subprocess
@@ -17,7 +16,7 @@ import time
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from tools import remote_owner,owner_worker,readback_core as c
+from tools import remote_owner,owner_worker,owner_install,readback_core as c
 from tools.run_files import digest,encoded,read_private,utcnow,write_new
 
 
@@ -72,16 +71,26 @@ else:
                  '-V','-1m:+5m',str(base/'ssh_key.pub')]); (base/'ssh_key-cert.pub').chmod(0o600)
         with socket.socket() as reservation:
             reservation.bind(('127.0.0.1',0)); port=reservation.getsockname()[1]
-        forced=' '.join(shlex.quote(str(x)) for x in [sys.executable,'-I',ROOT/'tools/owner_worker.py','--spool',spool,'--ledger',ledger])
-        daemon_config=base/'sshd.conf'
-        daemon_config.write_text('\n'.join([f'Port {port}','ListenAddress 127.0.0.1',f'HostKey {base}/host',
-            f'PidFile {base}/sshd.pid','UsePAM yes','PasswordAuthentication no','KbdInteractiveAuthentication no',
-            'PermitRootLogin no','AuthorizedKeysFile none',f'TrustedUserCAKeys {base}/ca.pub',
-            'PubkeyAcceptedAlgorithms ssh-ed25519-cert-v01@openssh.com',f'AllowUsers {user}',
-            'AllowAgentForwarding no','AllowTcpForwarding no','AllowStreamLocalForwarding no',
-            'PermitTunnel no','X11Forwarding no','PermitTTY no','PermitUserRC no','PermitUserEnvironment no',
-            'ForceCommand '+forced,'']))
+        install_config={'format':'hosting-owner-install/1','source_commit':commit,'machine_id':job['machine_id'],
+            'account':user,'uid':account.pw_uid,'gid':account.pw_gid,'listen_address':'127.0.0.1','port':port,
+            'principal':user,'source':str(ROOT),'python':sys.executable,'sshd':sshd,'ssh_keygen':keygen,
+            'systemctl':'/usr/bin/systemctl','host_private':{'path':str(base/'host'),'sha256':digest((base/'host').read_bytes())},
+            'host_public':' '.join((base/'host.pub').read_text().split()[:2]),
+            'user_ca':' '.join((base/'ca.pub').read_text().split()[:2]),'data_directory':'/var/lib/hosting-owner-fixture',
+            'ledger_mode':'new','custody_ref':'DISPOSABLE-LOCAL-FIXTURE'}
+        for name in ('python','sshd','ssh_keygen','systemctl'):
+            install_config[name+'_sha256']=digest(Path(install_config[name]).read_bytes())
+        for name,raw in owner_install.service_files(install_config,config_directory=base,
+                data_directory=owner,runtime_directory=base).items():
+            (base/name).write_bytes(raw); (base/name).chmod(0o644)
+        (base/'host-key').write_bytes((base/'host').read_bytes()); (base/'host-key').chmod(0o600)
+        daemon_config=base/'sshd_config'
         command([sshd,'-t','-f',str(daemon_config)])
+        parsed=command([sshd,'-T','-f',str(daemon_config)])
+        if 'authenticationmethods publickey' not in parsed or 'disableforwarding yes' not in parsed:
+            raise RuntimeError('Native daemon did not retain the generated worker restrictions')
+        analyze=shutil.which('systemd-analyze')
+        if analyze: command([analyze,'verify','--man=no',str(base/owner_install.SERVICE)])
         target={'format':'hosting-owner-target/1','address':'127.0.0.1','port':port,'user':user,
             'host_key':' '.join((base/'host.pub').read_text().split()[:2]),'machine_id':job['machine_id'],
             'valid_from':job['valid_from'],'valid_until':job['valid_until'],'max_seconds':30}
@@ -112,6 +121,7 @@ else:
                 if (owner/'captures').read_text()!='1': raise RuntimeError('Negative case executed backup')
                 if list(transport.glob('*/ssh_key*')): raise RuntimeError('Temporary credentials retained')
                 return {'status':'PASSED_LOCAL_OWNER_SSH_ONLY','certificate_ssh':True,'forced_command':True,
+                    'installation_profile_native_parse':True,'installation_unit_native_parse':bool(analyze),
                     'retained_receipt_observed_without_replay':True,'wrong_machine_and_host_key_rejected':True,
                     'arbitrary_command_rejected':True,'temporary_credentials_removed':True,
                     'backup_engine':'SYNTHETIC_FIXTURE','native_platform_contacted':False}

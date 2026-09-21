@@ -68,6 +68,13 @@ or retain a completed observation without replaying UPDATE. Tests exercise stale
 cache values, decaying TTLs, invalid negative answers, view failures and interrupted
 handoffs; actual DNS replication/view acceptance and address reuse remain separate.
 
+The [owner endpoint installer](owner-installation.md) now installs the fixed
+certificate SSH profile as a dedicated systemd service on an accepted Ubuntu
+host. It binds source, account, host/CA keys and binaries; preserves selected
+ledger custody; validates native daemon configuration; and resumes only the
+same installation without replacing changed files or restarting native jobs.
+The real SSH lab consumes the generated profile instead of a separate fixture.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

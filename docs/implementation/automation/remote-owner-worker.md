@@ -17,6 +17,11 @@ reconciliation for unknown outcomes. A local lock is not distributed fencing.
 
 ## Fixed endpoint installation
 
+The [worker installer](owner-installation.md) now installs this dedicated profile,
+validates the actual daemon configuration, preserves selected ledger custody and
+enables its separate systemd service. It supports exact interrupted-install
+resume without overwriting changed files or restarting native jobs.
+
 Use a dedicated managed SSH endpoint with a pinned host key and an independently
 recoverable approved source checkout at the same commit as the coordinator.
 Source, interpreter, CA/principal policy and forced-command configuration remain
@@ -125,10 +130,11 @@ forced worker: receipt return, read-only observation, wrong-machine denial,
 changed host-key denial and arbitrary-command rejection. Its backup executable
 is synthetic; the separate restic laboratory exercises the real backup engine.
 
-This does not install a live endpoint, provision native credentials, remotely
+The worker protocol itself does not install a live endpoint, provision native credentials, remotely
 attest a machine or qualify the underlying edge/backup service. The
 [incident hook](incident-containment.md) can dispatch a predelegated remote
 withdrawal when selected verification fails. It is not a continuous incident
 scheduler or host failover mechanism. Kernel lease expiry still limits exposure
-after controller loss. Edge boot/HA and independent recovery remain separate
-implementation work.
+after controller loss. The [edge startup guard](edge-startup.md) establishes
+denial before managed network attachment; installed boot/HA acceptance and
+independent recovery remain separate.
