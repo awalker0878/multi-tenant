@@ -91,12 +91,16 @@ def attempt_state(events):
             require(all(c.digest(p['request']) != c.digest(data['request']) for p in attempts), 'Power request was repeated')
             if attempts:
                 require(data['request']['generation'] > attempts[-1]['request']['generation'], 'Power generation must increase')
-            attempts.append(dict(request=data['request'], started_at=event['at'], task_id=None, binding=None, complete=None))
+            attempts.append(dict(request=data['request'], started_at=event['at'], started_event_sha256=c.digest(event),
+                                 task_id=None, binding=None, complete=None))
         else:
             require(attempts and attempts[-1]['complete'] is None, 'Orphan or post-completion power event')
             state = attempts[-1]
-            if kind == 'TASK_RETURNED':
-                c.exact_keys(data, {'task_id'}); vm.moid(data['task_id'], 'task')
+            if kind in {'TASK_RETURNED','TASK_RECONCILED'}:
+                c.exact_keys(data, {'task_id'} if kind=='TASK_RETURNED' else {'task_id','claim_sha256'})
+                vm.moid(data['task_id'], 'task')
+                if kind=='TASK_RECONCILED':
+                    require(isinstance(data['claim_sha256'],str) and c.HEX.fullmatch(data['claim_sha256']), 'Invalid native reconciliation digest')
                 require(state['task_id'] is None, 'Native task binding cannot change')
                 state['task_id'] = data['task_id']
             elif kind == 'TASK_BOUND':
@@ -108,9 +112,47 @@ def attempt_state(events):
                 require(state['binding'] is not None, 'Missing native task binding')
                 validate_completion(state, data)
                 state['complete'] = data
+            elif kind=='OBSERVATION_AUTHORIZED':
+                c.exact_keys(data,{'authority_sha256'})
+                require(isinstance(data['authority_sha256'],str) and c.HEX.fullmatch(data['authority_sha256']), 'Invalid observation authority digest')
             else:
                 raise ValueError('Unknown power execution event')
     return attempts
+
+
+def reconcile_task(request,authority,claim,ledger,client,root=ROOT):
+    """Attach an independently accepted lost-response task; issue no native write."""
+    resource=validate(request); authorize(request,authority,resume=True)
+    source=verify(root)
+    require(source['status']=='HASHES_MATCH' and source['commit']==request['source_commit'],'Exact clean recovery source required')
+    require(client.request_sha256==c.digest(request),'Foreign power observation transport')
+    c.exact_keys(claim,{'format','request_sha256','started_event_sha256','task_id','valid_from','valid_until',
+                        'task_mapping_ref','writer_fence_ref','containment_ref'})
+    require(claim['format']=='hosting-vsphere-power-reconciliation/1' and claim['request_sha256']==c.digest(request),
+            'Native reconciliation differs from the held request')
+    for key in ('task_mapping_ref','writer_fence_ref','containment_ref'): c.text(claim[key])
+    vm.moid(claim['task_id'],'task'); current_window(claim)
+    scope=dict(owner='vsphere-power',origin=request['snapshot']['origin'],vm_moid=resource['moid'])
+    with journal.locked(ledger,scope) as log:
+        attempts=attempt_state(log.events)
+        require(attempts and c.digest(attempts[-1]['request'])==c.digest(request),'No matching held native power request')
+        state=attempts[-1]
+        require(state['task_id'] is None and state['complete'] is None
+                and claim['started_event_sha256']==state['started_event_sha256'],'Reconciliation does not bind the exact unassigned attempt')
+        client.deadline=min(client.deadline,time.monotonic()+min((c.timestamp(x['valid_until'])-c.timestamp(c.now())).total_seconds()
+                            for x in (claim,authority)))
+        witness=client.task_info(claim['task_id'])
+        record=dict(moid=claim['task_id'],vm_moid=resource['moid'],description_id=witness.get('descriptionId'),
+                    queued_at=witness.get('queueTime'),event_chain_id=witness.get('eventChainId'))
+        validate_binding(state|{'task_id':claim['task_id']},record)
+        observed=task.evaluate_task(record,witness)
+        require(observed['identity_match'] and observed['progress'] in {'PENDING','COMPLETE'},'Native task mapping is failed or uncertain')
+        current_window(claim); current_window(authority)
+        # The claim comes from the independent native recovery owner, not a
+        # "latest matching task" search or inference from matching power state.
+        log.append('TASK_RECONCILED',{'task_id':claim['task_id'],'claim_sha256':c.digest(claim)})
+        log.append('TASK_BOUND',{'record':record})
+    return {'status':'TASK_BOUND_FOR_READ_ONLY_RESUME','native_acceptance':False,'production_activation':False}
 
 
 def validate_binding(state, record):
@@ -187,6 +229,7 @@ def execute(request, authority, ledger, client, *, execute_approved_change=False
             require(state is attempts[-1], 'A later power generation superseded this request')
             if state['complete'] is not None: return state['complete']
             require(resume, 'Power was attempted; resume observation only')
+            log.append('OBSERVATION_AUTHORIZED',{'authority_sha256':c.digest(authority)})
         else:
             require(not resume and (not attempts or attempts[-1]['complete'] is not None), 'Unknown or held power attempt')
             require(not attempts or request['generation'] > attempts[-1]['request']['generation'], 'Power generation must increase')
@@ -223,6 +266,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('request', 'authority', 'ledger'): parser.add_argument('--' + name, required=True)
     parser.add_argument('--ca-file')
+    parser.add_argument('--reconcile-task',type=Path)
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument('--execute-approved-change', action='store_true')
     mode.add_argument('--resume', action='store_true')
@@ -231,6 +275,9 @@ def main():
         request, authority = load_private(args.request), load_private(args.authority)
         validate(request); authorize(request, authority, resume=args.resume)
         client = Client(request, os.environ.get('VCENTER_SESSION_TOKEN'), args.ca_file)
+        if args.reconcile_task:
+            require(args.resume,'Task reconciliation is available only in read-only resume mode')
+            reconcile_task(request,authority,load_private(args.reconcile_task),args.ledger,client)
         result = execute(request, authority, args.ledger, client,
                          execute_approved_change=args.execute_approved_change, resume=args.resume)
         print(json.dumps({'status': result['status'], 'request_sha256': result['request_sha256']}))

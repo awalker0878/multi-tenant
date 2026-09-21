@@ -213,6 +213,10 @@ def dispatch(step, packet, directory, base, plan, root):
             require(result.get('allocation_status') in {'reserved','active','deprecated'},'IPAM allocation remains held')
     if not names:
         write_new(directory/'result.json',encoded(result)); names=['result.json']
+    return complete(step,packet,directory,plan,result,names)
+
+
+def complete(step,packet,directory,plan,result,names):
     from tools.delivery_run import artifact_receipt
     completion={'format':'hosting-delivery-owner-completion/1','plan_sha256':c.digest(plan),'step_id':step['id'],
                 'packet_sha256':c.digest(packet),'status':result['status'],'artifacts':artifact_receipt(directory,names)}
@@ -220,9 +224,51 @@ def dispatch(step, packet, directory, base, plan, root):
     return result,names+['owner-completion.json']
 
 
-def recover(step, packet, directory, base, plan, root):
+def retain(path,raw):
+    if path.exists(): require(read_private(path)==raw,'Interrupted owner handoff copy changed')
+    else: write_new(path,raw)
+
+
+def recover(step, packet, directory, base, plan, root, *, recovery_authority=None):
     """Only recover durable completion; never rerun an uncertain owner operation."""
     from tools.delivery_run import artifact_receipt
+    if not (directory/'owner-completion.json').exists():
+        kind=step['kind']
+        if kind in {'terraform_apply','guest_apply'}:
+            prepared=prepared_directory(step,packet,plan,base)
+            require(read_private(prepared/'bundle.json')==read_private(prepared.parent/'bundle.json'),'Interrupted bundle changed')
+            bundle=load_private(prepared/'bundle.json'); result=load_private(prepared/'result.json')
+            match_scope(bundle['scope'],plan)
+            require(bundle['source_commit']==plan['source_commit'] and result['bundle_sha256']==digest(read_private(prepared/'bundle.json'))
+                    and result['operation_id']==bundle['operation_id'] and result['generation']==bundle['generation'],
+                    'Interrupted owner completion binding changed')
+            if kind=='terraform_apply':
+                from tools.terraform_apply import scope_ledger
+                from tools.wsd_handoff import execution_outputs
+                execution_outputs(prepared,bundle['scope']['phase'])
+                address=load_private(prepared/'backend.json')['address']
+                with scope_ledger(owner_ledger(base,'terraform'),address,bundle['scope']) as owned:
+                    require(c.digest(load_private(owned/'head.json'))==c.digest(result),'Later Terraform work superseded this handoff')
+                originals={'result.json':'result.json','outputs.json':'outputs.json'}
+            else:
+                from tools.guest_apply import scope_ledger
+                require(result['mode']==bundle['mode'] and result['source_commit']==bundle['source_commit'],'Guest execution identity changed')
+                with scope_ledger(owner_ledger(base,'guest'),bundle['scope']) as owned:
+                    require(c.digest(load_private(owned/'head.json'))==c.digest(result),'Later guest work superseded this handoff')
+                require(digest(read_private(prepared/'runtime/stats.json'))==result['stats_sha256'],'Interrupted guest statistics changed')
+                originals={'result.json':'result.json','stats.json':'runtime/stats.json'}
+            for name,original in originals.items(): retain(directory/name,read_private(prepared/original))
+            return complete(step,packet,directory,plan,result,list(originals))
+        if kind=='vsphere_power':
+            from tools.vsphere_power import Client,execute
+            # This path can only resume observation. Renewing authority never
+            # grants permission to redispatch the original power POST.
+            files=file_paths(packet); request=load_private(files['request'])
+            authority=load_private(recovery_authority or files['authority'])
+            client=Client(request,read_private(files['session']).decode().strip(),files.get('ca_file'))
+            result=execute(request,authority,owner_ledger(base,'power'),client,resume=True,root=root)
+            retain(directory/'result.json',encoded(result))
+            return complete(step,packet,directory,plan,result,['result.json'])
     completed=load_private(directory/'owner-completion.json')
     c.exact_keys(completed,{'format','plan_sha256','step_id','packet_sha256','status','artifacts'})
     require(completed['format']=='hosting-delivery-owner-completion/1' and completed['plan_sha256']==c.digest(plan)

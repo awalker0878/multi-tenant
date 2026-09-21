@@ -167,7 +167,9 @@ def run(plan, inbox, ledger, *, execute=False, root=ROOT):
                     current_window(renewals.get(gate,original))
             if identity in starts:
                 saved = starts[identity]['packet']
-                result, names = recover(step, saved, directory, base, plan, root)
+                recovery_authority=inbox/(identity+'.recovery-authority.json')
+                result, names = recover(step, saved, directory, base, plan, root,
+                                        recovery_authority=recovery_authority if recovery_authority.exists() else None)
             else:
                 incoming = inbox / (identity + '.json')
                 if not incoming.exists():

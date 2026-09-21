@@ -84,11 +84,27 @@ python tools/vsphere_power.py --request /private/power.json \
 
 Issue current observation authority for the same request if the earlier window
 expired. A returned task ID can be bound after interruption. If the response
-was lost before its ID was persisted, this command holds for independent native
-task reconciliation; a renamed operation or higher generation cannot bypass it.
+was lost before its ID was persisted, this command holds until an independent
+native recovery owner maps the exact attempted request to its actual task.
+A renamed operation or higher generation cannot bypass it.
 No automatic retry, inferred no-op, task cancellation or rollback is supplied.
 Successful duplicate invocation returns the retained receipt without contacting
 the VM again. It does not imply that historical state is still current.
+
+For a lost response, supply `--resume --reconcile-task /private/task-mapping.json`.
+The mapping has `format: hosting-vsphere-power-reconciliation/1`,
+`request_sha256`, `started_event_sha256`, `task_id`, `valid_from`, `valid_until`,
+`task_mapping_ref`, `writer_fence_ref` and `containment_ref`. The start-event
+digest uses `tools.readback_core.digest` over the exact immutable `STARTED`
+event, including sequence and prior-event binding. Preserve the actual accepted
+mapping file with the external recovery record. The command checks its current
+window and the native task's VM, operation, queue chronology, event chain and
+nonfailed state before attaching the task to the held attempt. A matching VM
+power state alone cannot assign a task, and the tool never searches for the
+latest task or chooses a candidate on the operator's behalf. A reconciled task
+still must pass the ordinary completion, retained-device and activity checks.
+The journal distinguishes independently reconciled IDs from IDs returned by the
+original write and records renewed observation authority digests.
 
 The receipt is `POWER_CHANGED_REQUIRES_NATIVE_ACCEPTANCE`, with native acceptance
 and production activation both false. Feed its task binding and VM snapshot into

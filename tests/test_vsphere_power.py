@@ -84,6 +84,20 @@ class PowerTests(unittest.TestCase):
         self.auth = authority(self.req); self.client.request_sha256 = c.digest(self.req)
         with self.assertRaises(ValueError): self.run_power()
         self.assertEqual(self.client.writes, 1)
+    def test_independent_lost_response_mapping_restores_observation_without_writes(self):
+        self.client.lost=True
+        with self.assertRaises(c.ObservationError): self.run_power()
+        event=c.load(next(self.ledger.glob('*/00000001.json')))
+        claim=dict(format='hosting-vsphere-power-reconciliation/1',request_sha256=c.digest(self.req),
+            started_event_sha256=c.digest(event),task_id='task-1',valid_from=self.auth['valid_from'],valid_until=self.auth['valid_until'],
+            task_mapping_ref='TEST-INDEPENDENT-MAPPING',writer_fence_ref='TEST',containment_ref='TEST')
+        for change in ({'started_event_sha256':'0'*64},{'request_sha256':'0'*64}):
+            with self.assertRaises(ValueError): p.reconcile_task(self.req,self.auth,claim|change,self.ledger,self.client)
+        self.assertEqual(p.reconcile_task(self.req,self.auth,claim,self.ledger,self.client)['status'],'TASK_BOUND_FOR_READ_ONLY_RESUME')
+        self.assertEqual(self.run_power(resume=True)['status'],p.COMPLETE)
+        self.assertEqual(self.client.writes,1)
+        kinds=[c.load(path)['kind'] for path in sorted(self.ledger.glob('*/*.json'))]
+        self.assertIn('TASK_RECONCILED',kinds)
     def test_native_drift_or_competing_work_blocks_completion(self):
         for field in ('disk', 'placement', 'question', 'extra-task', 'task-entity', 'task-before-attempt'):
             with self.subTest(field=field), tempfile.TemporaryDirectory() as temp:

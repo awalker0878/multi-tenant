@@ -71,8 +71,14 @@ class DeliveryTerraformTests(TerraformRunFixture, unittest.TestCase):
             raise InterruptedError('controller lost')
         self.apply_engine=broken
         with self.assertRaises(InterruptedError): self.run_delivery()
-        with self.assertRaises(OSError): self.run_delivery()
+        with self.assertRaisesRegex(ValueError,'incomplete or uncertain'): self.run_delivery()
         self.assertEqual(len(self.apply_calls),1)
+    def test_completed_owner_recovers_when_coordinator_marker_was_never_written(self):
+        waiting=self.run_delivery(); self.authorize_apply(waiting)
+        with patch.object(s,'complete',side_effect=InterruptedError('crash before marker')),self.assertRaises(InterruptedError): self.run_delivery()
+        self.assertEqual(len(self.apply_calls),2)
+        self.assertEqual(self.run_delivery()['status'],'DELIVERY_EXECUTED_REQUIRES_ACCEPTANCE')
+        self.assertEqual(len(self.apply_calls),2)
 
 
 if __name__=='__main__': unittest.main()

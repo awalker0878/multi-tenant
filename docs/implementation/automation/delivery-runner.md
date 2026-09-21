@@ -127,6 +127,17 @@ but before coordinator publication resumes by publishing that same completion.
 If an owner was interrupted before that durable completion, keep the hold and
 use its independent recovery procedure; the coordinator does not rerun it.
 
+For Terraform and guest applies, the runner can also recover an owner that
+finished before the coordinator's completion marker was written. It verifies the
+original bundle, exact source/scope, retained outputs or guest statistics, and
+the shared owner's complete attempt history and latest head before publishing
+the handoff. A failed/unknown owner result or a later superseding operation holds.
+For vSphere power, restart resumes native task observation only; it cannot send
+a second power request. If needed, publish `<step-id>.recovery-authority.json`
+with current power observation authority for the identical original request.
+Lost response task IDs use the separately accepted
+[native task mapping](vsphere-power.md) before the runner resumes observation.
+
 Native owner ledgers live under the shared `owners` directory, outside individual
 workflow generations. A new graph, scope directory or output folder therefore
 does not silently create a fresh owner ledger. All controllers must share this
@@ -140,5 +151,5 @@ lease and qualification facts come from the relevant owner evidence. In
 particular, completion does not keep an expiring edge lease alive. A failed
 post-activation campaign requires the separate edge owner's authorized withdrawal;
 do not make that incident action wait for successful completion of the delivery
-graph. A crash before the owner completion marker, autonomous containment and
-cross-host dispatch remain separate integration work.
+graph. Autonomous containment and cross-host dispatch remain separate integration
+work; neither is implied by local process restart recovery.
