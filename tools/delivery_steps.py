@@ -11,6 +11,7 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
 # arbitrary module, executable arguments or environment overlay is accepted.
 KINDS = {
+    'capacity': ({'action','database'}, {'request','authority'}, {'native_ids'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
@@ -76,8 +77,8 @@ def validate_packet(step, packet, plan, base):
                 and accepted['step_id']==step['id'] and accepted['dependencies']==packet['dependencies']
                 and accepted['purpose']==values['purpose'], 'Acceptance does not bind this delivery gate')
         match_scope(accepted['scope'],plan); c.text(accepted['acceptance_ref']); current_window(accepted)
-    if kind in {'edge_policy','target_campaign','ipam','dns'}:
-        field={'edge_policy':'spec','target_campaign':'plan','ipam':'request','dns':'allocation'}[kind]
+    if kind in {'edge_policy','target_campaign','ipam','dns','capacity'}:
+        field={'edge_policy':'spec','target_campaign':'plan','ipam':'request','dns':'allocation','capacity':'request'}[kind]
         value=load_private(files[field]); match_scope(value['scope'],plan)
         if kind=='target_campaign': require(value['source_commit']==plan['source_commit'], 'Foreign campaign source')
         if kind=='edge_policy': require(values['mode'] in {'withdraw','bootstrap','active'}, 'Unknown edge transition')
@@ -87,6 +88,9 @@ def validate_packet(step, packet, plan, base):
         if kind=='dns':
             from tools.netbox_dns import ACTIONS
             require(values['action'] in ACTIONS,'Unknown DNS operation')
+        if kind=='capacity':
+            require(values['action'] in {'reserve','confirm','release'},'Unknown capacity transition')
+            private_path(values['database'])
     if kind=='vsphere_power':
         from tools.vsphere_power import validate
         request=load_private(files['request']); validate(request)
@@ -131,7 +135,11 @@ def child(root, module, arguments, directory, *, timeout):
 def dispatch(step, packet, directory, base, plan, root):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
-    if kind=='acceptance':
+    if kind=='capacity':
+        from tools.capacity import operate
+        result=operate(values['database'],load_private(files['request']),values['action'],load_private(files['authority']),
+                       load_private(files['native_ids']) if 'native_ids' in files else None)
+    elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
         result={'status':'EXTERNAL_ACCEPTANCE_RECORDED','acceptance_ref':accepted['acceptance_ref']}

@@ -18,6 +18,12 @@ exact predecessor receipt digests; saved owner completion survives a coordinator
 restart without reissuing the owner operation. Current gate renewal preserves
 the original evidence. Native owner ledgers remain shared across graph generations.
 
+The [capacity owner](capacity-reservations.md) adds real transactional reservation,
+confirmation and release, tenant/pool budget enforcement, explicit failure reserve,
+native identity retention, exact previous-receipt approval and versioned envelope
+renewal. Concurrent-controller and interrupted-transaction tests run against SQLite;
+the qualified native capacity budget and cleanup observations remain site inputs.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

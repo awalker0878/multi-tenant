@@ -70,6 +70,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 
 | Kind | Parameters | Mandatory files | Optional files |
 | --- | --- | --- | --- |
+| `capacity` | `action`, `database` | `request`, `authority` | `native_ids` |
 | `acceptance` | `purpose` | `acceptance` | None |
 | `terraform_plan` | `catalog_id`, `terraform`, `terraform_sha256` | `inputs`, `backend`, `environment`, `authority` | `references`, `cloud`, `ca_bundle`, `transition` |
 | `terraform_apply` | `prepared_step` | `approval` | None |
