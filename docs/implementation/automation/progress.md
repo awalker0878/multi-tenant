@@ -61,6 +61,13 @@ systemd unit and hard manager dependency do not restore active leases, change
 routes/sysctls or clear native holds. Packet tests cover volatile-policy loss;
 actual reboot/HA and independent recovery still require installed-site evidence.
 
+The [DNS propagation observer](dns-propagation.md) consumes completed primary
+transactions and reads exact ownership generations across accepted secondary and
+recursive views using signed TCP. Delivery recovery can repeat incomplete reads
+or retain a completed observation without replaying UPDATE. Tests exercise stale
+cache values, decaying TTLs, invalid negative answers, view failures and interrupted
+handoffs; actual DNS replication/view acceptance and address reuse remain separate.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

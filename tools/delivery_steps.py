@@ -27,6 +27,7 @@ KINDS = {
     'edge_policy': ({'nft','nft_sha256','mode'}, {'spec','authority'}, set()),
     'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle'}),
     'dns': ({'action'}, {'allocation','confirmation','job','scope','authority','token_file','tsig_file'}, {'ca_bundle','registration_job','registration_scope'}),
+    'dns_propagation': ({'dns_step'}, {'config','secrets'}, set()),
 }
 
 
@@ -54,6 +55,10 @@ def validate_packet(step, packet, plan, base):
     c.exact_keys(packet['parameters'], params)
     c.exact_keys(packet['files'], required, optional)
     files = file_paths(packet); values=packet['parameters']; kind=step['kind']
+    if kind=='dns_propagation':
+        from tools.dns_propagation import validate
+        job,scope,receipt=dns_handoff(step,packet,plan,base)
+        validate(load_private(files['config']),job,scope,receipt,load_private(files['secrets']))
     for binary in ('terraform','python','ssh','nft','restic'):
         if binary in values:
             path=Path(values[binary])
@@ -191,6 +196,8 @@ def dispatch(step, packet, directory, base, plan, root):
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
     if kind=='remote_owner':
         return remote_dispatch(step,packet,directory,plan)
+    elif kind=='dns_propagation':
+        return dns_observation(step,packet,directory,base,plan)
     elif kind=='edge_containment':
         from tools.edge_contain import execute
         result=execute(load_private(files['spec']),load_private(files['authority']),values['nft'],
@@ -324,6 +331,40 @@ def retain(path,raw):
     else: write_new(path,raw)
 
 
+def dns_handoff(step,packet,plan,base):
+    upstream=dependency(step,packet['parameters']['dns_step'],'dns',plan,base)
+    parent=load_private(upstream/'packet.json')
+    files=file_paths({'files':{key:parent['files'][key] for key in ('allocation','job','scope')}})
+    match_scope(load_private(files['allocation'])['scope'],plan)
+    return load_private(files['job']),load_private(files['scope']),load_private(upstream/'result.json')
+
+
+def dns_observation(step,packet,directory,base,plan,*,recovery_authority=None):
+    from tools import dns_propagation as dns
+    files=file_paths(packet); job,scope,receipt=dns_handoff(step,packet,plan,base)
+    secrets=load_private(files['secrets']); config=load_private(files['config'])
+    if (directory/'result.json').exists():
+        result=load_private(directory/'result.json')
+        selected=result.get('config_sha256')
+        require(isinstance(selected,str) and len(selected)==64 and all(x in '0123456789abcdef' for x in selected),
+                'Invalid retained DNS observation configuration digest')
+        name='observation-'+selected+'.json'; observed_config=load_private(directory/name)
+        dns.validate(observed_config,job,scope,receipt,secrets,current=False)
+        dns.validate_result(result,observed_config,job,scope,receipt)
+    else:
+        observed_config=load_private(recovery_authority) if recovery_authority else config
+        name='observation-'+c.digest(observed_config)+'.json'
+    require({k:v for k,v in observed_config.items() if k not in {'valid_from','valid_until','observation_ref'}}==
+            {k:v for k,v in config.items() if k not in {'valid_from','valid_until','observation_ref'}},
+            'DNS observation renewal cannot change the original job, keys or views')
+    if not (directory/'result.json').exists():
+        retain(directory/name,encoded(observed_config))
+        result=dns.observe(observed_config,job,scope,receipt,secrets)
+        dns.validate_result(result,observed_config,job,scope,receipt)
+        retain(directory/'result.json',encoded(result))
+    return complete(step,packet,directory,plan,result,['result.json',name])
+
+
 def remote_dispatch(step,packet,directory,plan,*,observe=False,recovery_authority=None):
     from tools import owner_worker,remote_owner
     files=file_paths({'files':{'job':packet['files']['job']}}); values=packet['parameters']; job=load_private(files['job'])
@@ -352,6 +393,8 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='dns_propagation':
+            return dns_observation(step,packet,directory,base,plan,recovery_authority=recovery_authority)
         if kind=='capacity':
             from tools.capacity import operate
             files=file_paths(packet); values=packet['parameters']; request=load_private(files['request'])

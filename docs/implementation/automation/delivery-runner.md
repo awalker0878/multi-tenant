@@ -86,6 +86,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `edge_containment` | `nft`, `nft_sha256` | `spec`, `authority` | None |
 | `ipam` | `action` | `request`, `authority`, `token_file` | `ca_bundle` |
 | `dns` | `action` | `allocation`, `confirmation`, `job`, `scope`, `authority`, `token_file`, `tsig_file` | `ca_bundle`, `registration_job`, `registration_scope` |
+| `dns_propagation` | `dns_step` | `config`, `secrets` | None |
 
 `prepared_step` must be a direct dependency of the correct plan kind.
 `workload_step` must be a direct Terraform apply dependency. The runner checks
@@ -106,6 +107,13 @@ allocation ledger. Edge and backup work must execute on their accepted native
 machine; a coordinator does not bypass local machine/namespace checks. Use the
 [remote owner worker](remote-owner-worker.md) for separately hosted edge and
 restic jobs; its forced command accepts only exact privately staged jobs.
+
+`dns_propagation` consumes its direct `dns_step` dependency's original job,
+scope and completed primary result. It authenticates the selected primary,
+secondary and recursive views before the service/retirement acceptance gate.
+Its interrupted operation is read-only and can resume without another UPDATE.
+See [DNS propagation](dns-propagation.md) for view selection and renewed read
+authority; success never releases DNS tombstones or authorizes address reuse.
 
 `restic` uses `action: backup` with a null `target`, or `action: restore`
 with a new absolute isolated destination. The backup configuration binds the
