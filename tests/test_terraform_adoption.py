@@ -74,14 +74,14 @@ class TerraformAdoptionTests(unittest.TestCase):
             change('module.owned.vm.a',{'name':'app-a','num_cpus':2,'memory':4096},['create']),
             change('module.owned.vm.b',{'name':'app-b','num_cpus':4,'memory':8192},['create']),
         ])
-        for case in ('unrelated','missing','desired'):
+        for case in ('unrelated','missing','malformed'):
             plan=deepcopy(base)
             if case=='unrelated':
                 plan['resource_changes'].append(change('module.other.change',{'x':2},['update'],{'x':1}))
             elif case=='missing':
                 plan['resource_changes'].pop()
             else:
-                plan['resource_changes'][0]['change']['after']['memory']=2048
+                plan['resource_changes'][0]['change']['after']=None
             with self.subTest(case=case), self.assertRaises(ValueError):
                 t.validate_pre_plan(plan,review())
 
