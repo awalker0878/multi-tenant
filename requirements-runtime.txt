@@ -2,4 +2,4 @@
 # Obtain verified packages from the approved dependency source/mirror.
 dnspython==2.8.0
 # Verify scoped SSH issuer certificates and trusted signing identities.
-cryptography==46.0.4
+cryptography==50.0.1
