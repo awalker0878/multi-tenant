@@ -55,6 +55,12 @@ are explicit and converted conservatively from native byte/GiB/MiB dimensions.
 Interrupted committed capacity actions recover through the authoritative SQLite
 receipt without repeating a mutation.
 
+The [edge startup guard](edge-startup.md) installs all accepted deny-only
+boundaries in one native transaction before managed network attachment. Its
+systemd unit and hard manager dependency do not restore active leases, change
+routes/sysctls or clear native holds. Packet tests cover volatile-policy loss;
+actual reboot/HA and independent recovery still require installed-site evidence.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

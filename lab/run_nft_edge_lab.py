@@ -152,10 +152,31 @@ def run():
                 if result['status']!='CONTAINED_OBSERVED_NOT_QUALIFIED' or result['write_attempted']!=(attempt=='first'):
                     raise RuntimeError('Delegated containment did not retain its one native attempt')
                 probe(19651,False); probe(19652,False); probe(19652,True,'server')
+            # Simulate loss of volatile policy at startup, then invoke the real
+            # boot executor before making any new forwarding/activation claim.
+            from tools.nft_edge import validate as edge_identity
+            table,_=edge_identity(spec)
+            command(ns('edge',nft,'delete','table','inet',table))
+            denied=dict(spec,flows=[])
+            denied_path=base/'boot-boundary.json'; denied_path.write_bytes(encoded(denied)); denied_path.chmod(0o600)
+            commit=command(['git','-c','safe.directory='+str(ROOT),'-C',str(ROOT),'rev-parse','HEAD']).strip()
+            boot_config=dict(format='hosting-edge-boot/1',source_commit=commit,machine_id=spec['machine_id'],
+                network_namespace_inode=spec['network_namespace_inode'],nft=nft,nft_sha256=spec['nft_sha256'],
+                ledger=str(ledger),specs=[{'path':str(denied_path),'sha256':digest(encoded(denied))}],
+                boundary_acceptance_ref='LOCAL-BOOT-FIXTURE',boot_ordering_ref='LOCAL-ENGINE-ONLY-NO-REBOOT')
+            boot_path=base/'boot.json'; boot_path.write_bytes(encoded(boot_config)); boot_path.chmod(0o600)
+            history={p.relative_to(ledger):p.read_bytes() for p in ledger.rglob('*.json')}
+            command(ns('edge','env','GIT_CONFIG_COUNT=1','GIT_CONFIG_KEY_0=safe.directory','GIT_CONFIG_VALUE_0='+str(ROOT),
+                sys.executable,str(ROOT/'tools/edge_boot.py'),'apply','--config',str(boot_path),'--output-root',str(base),'--execute'))
+            if history!={p.relative_to(ledger):p.read_bytes() for p in ledger.rglob('*.json')}:
+                raise RuntimeError('Boot denial altered native owner history')
+            probe(19651,False); probe(19652,False); probe(19652,True,'server')
             return dict(status='PASSED_LOCAL_NATIVE_KERNEL_EDGE_ONLY', healthy_controls=True,
                         bootstrap_scope=True, active_scope=True, established_session_withdrawn=True,
                         controller_loss_expiry=True, delegated_incident_containment=True,
-                        containment_retry_read_only=True, native_platform_contacted=False, edge_ha_qualified=False)
+                        containment_retry_read_only=True, boot_denial_after_volatile_policy_loss=True,
+                        boot_preserves_native_holds=True, actual_host_reboot_tested=False,
+                        native_platform_contacted=False, edge_ha_qualified=False)
     finally:
         for process in processes:
             if process.poll() is None:

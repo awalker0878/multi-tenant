@@ -1,5 +1,9 @@
 # Scoped Linux edge activation and withdrawal
 
+Use the [startup denial guard](edge-startup.md) to establish owned drops before
+the accepted network manager starts. It restores no active leases and preserves
+unresolved owner history; actual reboot and HA qualification remain site tests.
+
 The reference adapter `tools/nft_edge.py` targets a provider-owned Linux/nftables
 IPv4 security edge with already commissioned interfaces and routing. This is an
 adoption path for an explicitly selected edge, not a replacement for Nutanix Flow,

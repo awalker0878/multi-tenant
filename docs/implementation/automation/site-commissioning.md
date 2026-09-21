@@ -22,8 +22,8 @@ derived from the symbolic examples. Keep these values in private operator inputs
 3. Commission the selected NetBox, authoritative DNS, resolver/time, SSH issuer/revocation, logging,
    package and backup services. Confirm scoped permissions, TLS identity and
    recovery custody. Capture real IPAM reservation/confirmation receipts before
-   assigning addresses. Compute capacity reservations remain a separate native
-   integration and must be controlled by the site operator.
+   assigning addresses. Commission the [capacity owner](capacity-reservations.md)
+   and its accepted native sizing/placement catalogue before ordinary allocation.
 4. Create the two-tenant prepared fixture with reviewed saved plans. Preserve
    scope-specific outputs and successful receipts. Bind Neutron observations to
    the accepted project and resources; collect Nova/Cinder/Glance identity,
@@ -89,9 +89,10 @@ guards. Neither creates a site inventory or establishes effective native policy.
 
 Keep VMware domain and workload state ownership separate. The pinned vSphere
 provider's power state is computed, and a clone may already be powered on in the
-quarantined domain. A domain withdrawal is not proof that the VM is off. A future
-vSphere power writer needs explicit ownership and native fencing; current readers
-cannot replay, cancel or clear a held operation. Nutanix domain and VM transitions
+quarantined domain. A domain withdrawal is not proof that the VM is off. The
+vSphere power writer is now available through the [retained-VM power executor](vsphere-power.md),
+with explicit ownership and native fencing requirements. Readers cannot replay,
+cancel or clear a held operation. Nutanix domain and VM transitions
 are separate applies: enable only independently accepted restricted service paths,
 then collect native observations and controlled guest evidence. No cross-scope
 atomicity or Flow enforcement is inferred from a successful Terraform apply.
