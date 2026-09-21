@@ -4,9 +4,9 @@ import tempfile
 import unittest
 
 from tools import adoption, delivery_steps as steps, readback_core as c
-from tools.run_files import digest, encoded, load_private, read_private, replace_private
+from tools.run_files import digest, encoded, load_private, read_private, replace_private, write_new
 
-SOURCE='a'*40
+ROOT=Path(__file__).resolve().parents[1]\nSOURCE='a'*40
 SCOPE={
     'environment_key':'reference','site_key':'site-01','platform':'openstack',
     'tenant_key':'tenant-01','wsd_key':'science-prod',
@@ -135,6 +135,81 @@ class DeliveryAdoptionTests(unittest.TestCase):
             adoption.evaluate=original
         self.assertFalse(result['may_import_automatically'])
         self.assertFalse((self.directory/'execution').exists())
+
+    def test_terraform_adoption_delivery_stages_share_exact_prepared_bundle(self):
+        inputs=json.loads((ROOT/'terraform/stacks/wsd/openstack/workloads/inputs.tfvars.json.example').read_text())
+        inputs.update(environment_key=SCOPE['environment_key'],site_key=SCOPE['site_key'],
+                      tenant_key=SCOPE['tenant_key'],wsd_key=SCOPE['wsd_key'],
+                      allow_restricted_build=True,test_authorization_ref='TEST-ONLY')
+        state_key='/'.join([SCOPE['environment_key'],SCOPE['site_key'],'openstack',
+                            SCOPE['tenant_key'],SCOPE['wsd_key'],'workloads'])
+        backend={'state_key':state_key,'address':'https://state.example.test/x',
+                 'lock_address':'https://state.example.test/x/lock',
+                 'unlock_address':'https://state.example.test/x/lock',
+                 'lock_method':'POST','unlock_method':'DELETE'}
+        adoption_plan={
+            'format':'hosting-adoption/1','source_commit':SOURCE,'operation_id':'adopt-delivery-02','generation':2,
+            'scope':dict(SCOPE),'state':{'backend_sha256':digest(encoded(backend)),'state_key':state_key,
+                                        'backup_ref':'state-backup/2','lock_ref':'state-lock/2'},
+            'resources':[{
+                'address':'module.owned.openstack_compute_instance_v2.workload',
+                'type':'openstack_compute_instance_v2','native_id':'server-22',
+                'current_owner':'legacy-runbook','target_owner':'terraform',
+                'ownership_mode':'handover_to_terraform','shared':False,
+                'import_method':'terraform_import','import_id':'server-22',
+                'current_sha256':'4'*64,'desired_sha256':'4'*64,'delta':'no-op',
+                'change_class':'routine','allowed_update_fields':[],
+                'discovery_ref':'inventory/server-22','recovery_ref':'restore/server-22',
+                'old_writer_fence_ref':'writer-handover/22',
+            }],
+        }
+        adoption_evidence={
+            'format':'hosting-adoption-evidence/1','plan_sha256':c.digest(adoption_plan),
+            'state':{'backend_sha256':adoption_plan['state']['backend_sha256'],'state_key':state_key,
+                     'backup_verified':True,'lock_verified':True,'observed_at':'2026-09-21T13:00:00+00:00',
+                     'evidence_ref':'state-evidence/22'},
+            'resources':[{
+                'address':adoption_plan['resources'][0]['address'],'native_id':'server-22',
+                'observed_sha256':'4'*64,'current_owner':'legacy-runbook','old_writer_active':False,
+                'recovery_verified':True,'import_supported':True,'plan_actions':['no-op'],
+                'replacement':False,'delete':False,'exposure_change':False,
+                'observed_at':'2026-09-21T13:00:00+00:00','evidence_ref':'native-evidence/22',
+            }],
+        }
+        delivery={
+            'format':'hosting-delivery/1','source_commit':SOURCE,'operation_id':'delivery-adopt-native',
+            'generation':2,'scope':dict(SCOPE),
+            'steps':[{'id':'adopt-plan','kind':'terraform_adoption_plan','needs':[]},
+                     {'id':'adopt-apply','kind':'terraform_adoption_apply','needs':['adopt-plan']}],
+        }
+        binary=Path(sys.executable).resolve()
+        def offer(identity,parameters,values):
+            files={}
+            for name,value in values.items():
+                path=self.base/(identity+'-'+name+'.json')
+                replace_private(path,encoded(value))
+                files[name]={'path':str(path),'sha256':digest(read_private(path))}
+            return {'format':'hosting-delivery-step/1','plan_sha256':c.digest(delivery),
+                    'step_id':identity,'dependencies':{},'parameters':parameters,'files':files}
+        prepared_packet=offer('adopt-plan',
+            {'catalog_id':'openstack-wsd-workloads','terraform':str(binary),
+             'terraform_sha256':digest(binary.read_bytes())},
+            {'inputs':inputs,'backend':backend,'environment':{},'authority':{},
+             'adoption_plan':adoption_plan,'adoption_evidence':adoption_evidence})
+        steps.validate_packet(delivery['steps'][0],prepared_packet,delivery,self.base)
+        upstream=self.base/'steps/adopt-plan'; execution=upstream/'execution'
+        execution.mkdir(parents=True,mode=0o700)
+        bundle={'format':'hosting-terraform-adoption-bundle/1','source_commit':SOURCE,
+                'scope':dict(SCOPE)|{'phase':'workloads'}}
+        write_new(upstream/'bundle.json',encoded(bundle)); write_new(execution/'bundle.json',encoded(bundle))
+        write_new(upstream/'packet.json',encoded(prepared_packet))
+        approval=self.base/'approval.json'; replace_private(approval,b'{}')
+        apply_packet={'format':'hosting-delivery-step/1','plan_sha256':c.digest(delivery),
+                      'step_id':'adopt-apply','dependencies':{},
+                      'parameters':{'prepared_step':'adopt-plan'},
+                      'files':{'approval':{'path':str(approval),'sha256':digest(read_private(approval))}}}
+        steps.validate_packet(delivery['steps'][1],apply_packet,delivery,self.base)
+        self.assertEqual(steps.prepared_directory(delivery['steps'][1],apply_packet,delivery,self.base),execution)
 
 
 if __name__=='__main__':
