@@ -19,6 +19,7 @@ KINDS = {
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
+    'retirement_review': (set(), {'plan','evidence'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
@@ -119,6 +120,12 @@ def validate_packet(step, packet, plan, base):
             from tools.capacity_demand import check_ancestors
             check_ancestors(step,plan,base,load_private(files['inputs']),
                             cloud_sha256=digest(read_private(files['cloud'])) if 'cloud' in files else None)
+    if kind=='retirement_review':
+        from tools.retirement import validate_evidence
+        retirement_plan=load_private(files['plan'])
+        require(retirement_plan['source_commit']==plan['source_commit']
+                and retirement_plan['scope']==plan['scope'], 'Foreign retirement review')
+        validate_evidence(retirement_plan,load_private(files['evidence']))
     if kind=='acceptance':
         require(values['purpose'] in {'admission','domain','bootstrap','services','activation','post_activation','recovery','retirement'}, 'Unknown acceptance gate')
         accepted=load_private(files['acceptance'])
@@ -249,6 +256,11 @@ def dispatch(step, packet, directory, base, plan, root):
             for name,value in {'result.json':result,'capacity-request.json':request,'sizing.json':sizing,
                                'demand.json':bind_request(request,load_private(files['inputs']),sizing)}.items():
                 write_new(directory/name,encoded(value)); names.append(name)
+    elif kind=='retirement_review':
+        from tools.retirement import evaluate
+        result=evaluate(load_private(files['plan']),load_private(files['evidence']))
+        write_new(directory/'retirement-review.json',encoded(result))
+        names=['retirement-review.json']
     elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
