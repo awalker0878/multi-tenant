@@ -17,7 +17,8 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from tools import remote_owner,owner_worker,owner_install,owner_revocations,readback_core as c
+from tools import remote_owner,owner_worker,owner_install,owner_revocations,ssh_issuer,readback_core as c
+from tools.check_release import verify
 from tools.run_files import digest,encoded,read_private,utcnow,write_new
 
 
@@ -71,8 +72,32 @@ else:
         def command(argv): return subprocess.check_output(argv,stderr=subprocess.STDOUT,timeout=15,text=True)
         for name in ('host','ca','ssh_key'):
             command([keygen,'-q','-t','ed25519','-N','','-f',str(base/name)])
-        command([keygen,'-q','-s',str(base/'ca'),'-I','disposable-owner-fixture','-n',user,
-                 '-V','-1m:+5m',str(base/'ssh_key.pub')]); (base/'ssh_key-cert.pub').chmod(0o600)
+        issuer_home=base/'issuer'; issuer_home.mkdir(mode=0o700); (base/'ca').rename(issuer_home/'ca')
+        issuer_config={'format':'hosting-ssh-issuer/1','source_commit':commit,'machine_id':job['machine_id'],
+            'uid':os.getuid(),'source':str(ROOT),'ssh_keygen':keygen,'ssh_keygen_sha256':digest(Path(keygen).read_bytes()),
+            'ca_private':{'path':str(issuer_home/'ca'),'sha256':digest((issuer_home/'ca').read_bytes())},
+            'ca_public':' '.join((base/'ca.pub').read_text().split()[:2]),'principal':user,
+            'source_ranges':['127.0.0.0/8'],'maximum_validity_seconds':600,'serial_floor':1,
+            'data_directory':str(issuer_home/'ledger'),'policy_ref':'DISPOSABLE-LOCAL-FIXTURE','recovery_ref':'FIXTURE-CUSTODY'}
+        class FixtureIssuer(ssh_issuer.Host):
+            def identity(self,value,root):
+                # CI checkout custody is not a commissioned issuer installation.
+                source=verify(root)
+                if source['status']!='HASHES_MATCH' or source['commit']!=commit or \
+                   digest(read_private(value['ca_private']['path']))!=value['ca_private']['sha256']:
+                    raise RuntimeError('Fixture source or signing key changed')
+        issuer=FixtureIssuer(); now=utcnow()
+        certificate_request={'format':'hosting-ssh-issuer-request/1','config_sha256':c.digest(issuer_config),
+            'operation_id':'issue-worker','action':'issue','subject':' '.join((base/'ssh_key.pub').read_text().split()[:2]),
+            'identity_ref':'DISPOSABLE-FIXTURE-WORKER','source_range':'127.0.0.1/32',
+            'valid_after':int(now.timestamp())-10,'valid_before':int(now.timestamp())+300}
+        def issuer_authority(request,action):
+            return {'format':'hosting-ssh-issuer-authority/1','request_sha256':c.digest(request),'action':action,
+                'ledger_mode':'new' if not Path(issuer_config['data_directory']).exists() else 'retained',
+                'valid_from':(now-timedelta(minutes=1)).isoformat(),'valid_until':(now+timedelta(minutes=10)).isoformat(),
+                'change_ref':'DISPOSABLE-LOCAL-IDENTITY'}
+        issuance=ssh_issuer.execute(issuer_config,certificate_request,issuer_authority(certificate_request,'issue'),host=issuer)
+        certificate=Path(issuance['certificate_path'])
         with socket.socket() as reservation:
             reservation.bind(('127.0.0.1',0)); port=reservation.getsockname()[1]
         install_config={'format':'hosting-owner-install/1','source_commit':commit,'machine_id':job['machine_id'],
@@ -101,8 +126,8 @@ else:
             'host_key':' '.join((base/'host.pub').read_text().split()[:2]),'machine_id':job['machine_id'],
             'valid_from':job['valid_from'],'valid_until':job['valid_until'],'max_seconds':30}
         transport=base/'transport'; transport.mkdir(mode=0o700)
-        def contact(value=job,endpoint=target,observe=False):
-            return remote_owner.contact(value,endpoint,ssh,base/'ssh_key',base/'ssh_key-cert.pub',transport,observe=observe)
+        def contact(value=job,endpoint=target,observe=False,cert=certificate):
+            return remote_owner.contact(value,endpoint,ssh,base/'ssh_key',cert,transport,observe=observe)
         with open(base/'daemon.log','wb') as log:
             daemon=subprocess.Popen([sshd,'-D','-e','-f',str(daemon_config)],stdout=log,stderr=log)
             try:
@@ -131,6 +156,21 @@ else:
                     else: raise RuntimeError('Worker accepted an arbitrary command')
                 finally: owner_worker.COMMAND=original
                 if (owner/'captures').read_text()!='1': raise RuntimeError('Negative case executed backup')
+                other_source=certificate_request|{'operation_id':'wrong-source','source_range':'127.0.0.2/32'}
+                other=ssh_issuer.execute(issuer_config,other_source,issuer_authority(other_source,'issue'),host=issuer)
+                try: contact(observe=True,cert=Path(other['certificate_path']))
+                except ValueError: pass
+                else: raise RuntimeError('Certificate source restriction was ignored')
+                issuer_revoke={key:value for key,value in certificate_request.items()
+                    if key not in {'source_range','valid_after','valid_before'}}
+                issuer_revoke.update(action='revoke',operation_id='deny-worker')
+                denial=ssh_issuer.execute(issuer_config,issuer_revoke,issuer_authority(issuer_revoke,'revoke'),host=issuer)
+                renewal=certificate_request|{'operation_id':'denied-renewal'}
+                try: ssh_issuer.execute(issuer_config,renewal,issuer_authority(renewal,'issue'),host=issuer)
+                except ValueError: pass
+                else: raise RuntimeError('Issuer renewed a revoked subject')
+                # Issuer denial alone cannot revoke an already issued credential.
+                if contact(observe=True)!=first: raise RuntimeError('Existing credential observation differs')
                 # Seed an explicit disposable installed-profile handoff; run the
                 # actual durable revocation owner and atomic publisher thereafter.
                 class FixtureHost(owner_install.Host):
@@ -146,7 +186,7 @@ else:
                     write_new(state/'intent.json',encoded({'format':'hosting-owner-install-intent/1',
                         'config':install_config,'files':hashes}))
                     revoke={'format':'hosting-owner-revocation/1','config_sha256':c.digest(install_config),
-                        'operation_id':'fixture-revocation','keys':[' '.join((base/'ssh_key.pub').read_text().split()[:2])],
+                        'operation_id':'fixture-revocation','keys':denial['revoked_subjects'],
                         'identity_ref':'DISPOSABLE-FIXTURE-SUBJECT'}
                     authority={'format':'hosting-owner-revocation-authority/1','request_sha256':c.digest(revoke),
                         'valid_from':job['valid_from'],'valid_until':job['valid_until'],
@@ -157,6 +197,8 @@ else:
                 else: raise RuntimeError('Revoked certificate subject retained worker access')
                 if list(transport.glob('*/ssh_key*')): raise RuntimeError('Temporary credentials retained')
                 return {'status':'PASSED_LOCAL_OWNER_SSH_ONLY','certificate_ssh':True,'forced_command':True,
+                    'durable_issuer_certificate_authenticated':True,'certificate_source_restriction_enforced':True,
+                    'issuer_denial_prevented_renewal':True,'issuer_denial_required_endpoint_propagation':True,
                     'installation_profile_native_parse':True,'installation_unit_native_parse':bool(analyze),
                     'revoked_certificate_subject_rejected_without_restart':True,
                     'retained_receipt_observed_without_replay':True,'wrong_machine_and_host_key_rejected':True,

@@ -101,6 +101,13 @@ checks all used/unused state slots and repeats native reads without state writes
 retains interrupted attempts, and verifies completed artifact reuse. Independent
 protection/restore, native fencing and GitLab service recovery remain distinct.
 
+The [scoped SSH issuer](ssh-issuer.md) now signs exact short-lived user
+certificates with a local accepted CA, durable serial reservation, cryptographic
+grant verification and read-only lost-response recovery. Monotonic issuer denial
+prevents renewal and supplies the existing worker revocation handoff. Actual
+OpenSSH tests cover signature/scope changes, unknown attempts and denial; issuer
+custody, endpoint propagation and independent recovery remain explicit boundaries.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
