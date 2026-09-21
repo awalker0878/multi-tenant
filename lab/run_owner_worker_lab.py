@@ -78,7 +78,8 @@ else:
             'principal':user,'source':str(ROOT),'python':sys.executable,'sshd':sshd,'ssh_keygen':keygen,
             'systemctl':'/usr/bin/systemctl','host_private':{'path':str(base/'host'),'sha256':digest((base/'host').read_bytes())},
             'host_public':' '.join((base/'host.pub').read_text().split()[:2]),
-            'user_ca':' '.join((base/'ca.pub').read_text().split()[:2]),'data_directory':'/var/lib/hosting-owner-fixture',
+            'user_ca':' '.join((base/'ca.pub').read_text().split()[:2]),'revoked_user_keys':[],
+            'data_directory':'/var/lib/hosting-owner-fixture',
             'ledger_mode':'new','custody_ref':'DISPOSABLE-LOCAL-FIXTURE'}
         for name in ('python','sshd','ssh_keygen','systemctl'):
             install_config[name+'_sha256']=digest(Path(install_config[name]).read_bytes())
@@ -127,9 +128,14 @@ else:
                     else: raise RuntimeError('Worker accepted an arbitrary command')
                 finally: owner_worker.COMMAND=original
                 if (owner/'captures').read_text()!='1': raise RuntimeError('Negative case executed backup')
+                (base/'revoked-keys').write_text(' '.join((base/'ssh_key.pub').read_text().split()[:2])+'\n')
+                try: contact(observe=True)
+                except ValueError: pass
+                else: raise RuntimeError('Revoked certificate subject retained worker access')
                 if list(transport.glob('*/ssh_key*')): raise RuntimeError('Temporary credentials retained')
                 return {'status':'PASSED_LOCAL_OWNER_SSH_ONLY','certificate_ssh':True,'forced_command':True,
                     'installation_profile_native_parse':True,'installation_unit_native_parse':bool(analyze),
+                    'revoked_certificate_subject_rejected_without_restart':True,
                     'retained_receipt_observed_without_replay':True,'wrong_machine_and_host_key_rejected':True,
                     'arbitrary_command_rejected':True,'temporary_credentials_removed':True,
                     'backup_engine':'SYNTHETIC_FIXTURE','native_platform_contacted':False}

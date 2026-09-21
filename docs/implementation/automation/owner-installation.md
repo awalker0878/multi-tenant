@@ -59,6 +59,7 @@ The exact `hosting-owner-install/1` object has these fields:
 | `python_sha256`, `sshd_sha256`, `systemctl_sha256`, `ssh_keygen_sha256` | Exact executable byte digests |
 | `host_private` | `{ "path": "/private/host-key", "sha256": "<exact-byte-digest>" }` |
 | `host_public`, `user_ca` | Separate exact `ssh-ed25519 <base64>` public keys, without comments |
+| `revoked_user_keys` | Explicit list of zero to 1024 distinct Ed25519 subject public keys revoked from certificate access |
 | `data_directory` | A dedicated `/var/lib/hosting-owner-<name>` directory, excluding the installer state directory |
 | `ledger_mode` | `new` or `retained` |
 | `custody_ref` | Independently accepted worker/ledger custody record |
@@ -102,6 +103,7 @@ retains a candidate, validates it with the actual `sshd -t`, then publishes:
 | `/etc/hosting-owner/sshd_config` | Exact certificate/forced-command profile, `0600` |
 | `/etc/hosting-owner/host-key` | Accepted private host key, `0600` |
 | `/etc/hosting-owner/user-ca.pub`, `/etc/hosting-owner/principals` | Root-controlled authentication selection, `0644` |
+| `/etc/hosting-owner/revoked-keys` | Explicit certificate-subject revocation list, `0644` |
 | `/etc/systemd/system/hosting-owner.service` | Dedicated worker service |
 | `/etc/tmpfiles.d/hosting-owner.conf` | Create `/run/sshd` with the standard root-owned `0755` privilege-separation directory at boot |
 | `<data_directory>/spool`, `<data_directory>/ledger` | Exact private worker-owned directories, preserving retained contents |
@@ -148,3 +150,10 @@ The disposable SSH lab uses this exact generated daemon profile, validates it
 with native `sshd -t/-T`, parses the systemd unit, and exercises real certificate
 SSH and forced-worker restrictions. It does not install a live endpoint or
 reboot an accepted owner host.
+
+The native SSH lab also replaces only its disposable revocation list and proves
+that the revoked subject cannot authenticate a new connection, without restarting
+the daemon. Revocation does not end an existing SSH session or fence a native job.
+Live revocation-list changes belong to the accepted identity maintenance owner;
+the initial installer never overwrites a changed list or silently removes a
+revocation during repeat installation.

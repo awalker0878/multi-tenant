@@ -20,7 +20,7 @@ def config(private):
         account='owner', uid=os.getuid(), gid=os.getgid(), listen_address='10.0.0.10', port=2222, principal='hosting-owner',
         source='/opt/hosting-source', python='/usr/bin/python3', sshd='/usr/sbin/sshd', systemctl='/usr/bin/systemctl',
         ssh_keygen='/usr/bin/ssh-keygen', host_private={'path':str(private),'sha256':digest(private.read_bytes())},
-        host_public=key(1), user_ca=key(2), data_directory='/var/lib/hosting-owner-edge', ledger_mode='new', custody_ref='TEST-CUSTODY')
+        host_public=key(1), user_ca=key(2), revoked_user_keys=[], data_directory='/var/lib/hosting-owner-edge', ledger_mode='new', custody_ref='TEST-CUSTODY')
     for name in ('python','sshd','systemctl','ssh_keygen'): result[name+'_sha256']='c'*64
     return result
 
@@ -66,6 +66,7 @@ class InstallTests(unittest.TestCase):
         self.assertIn('AuthorizedKeysFile none\n',daemon); self.assertIn('DisableForwarding yes\n',daemon)
         self.assertIn('ForceCommand /usr/bin/python3 -I /opt/hosting-source/tools/owner_worker.py',daemon)
         self.assertIn('SetEnv GIT_CONFIG_COUNT=1',daemon)
+        self.assertIn('RevokedKeys /etc/hosting-owner/revoked-keys',daemon)
         self.assertEqual(self.host.path(d.CONFIG/'host-key').stat().st_mode & 0o777,0o600)
         self.assertEqual(self.host.path(d.CONFIG/'principals').read_text(),'hosting-owner\n')
 

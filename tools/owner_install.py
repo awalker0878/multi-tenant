@@ -50,7 +50,7 @@ def validate(config):
     c.exact_keys(config, {'format', 'source_commit', 'machine_id', 'account', 'uid', 'gid',
         'listen_address', 'port', 'principal', 'source', 'python', 'python_sha256', 'sshd', 'sshd_sha256',
         'systemctl', 'systemctl_sha256', 'ssh_keygen', 'ssh_keygen_sha256', 'host_private', 'host_public',
-        'user_ca', 'data_directory', 'ledger_mode', 'custody_ref'})
+        'user_ca', 'revoked_user_keys', 'data_directory', 'ledger_mode', 'custody_ref'})
     require(config['format'] == 'hosting-owner-install/1'
             and isinstance(config['source_commit'], str) and re.fullmatch('[0-9a-f]{40}', config['source_commit'])
             and isinstance(config['machine_id'], str) and re.fullmatch('[0-9a-f]{32}', config['machine_id']),
@@ -77,6 +77,10 @@ def validate(config):
             'Exact private host-key binding required')
     public_key(config['host_public']); public_key(config['user_ca'])
     require(config['host_public'] != config['user_ca'], 'Host and user-signing keys must be separate')
+    require(isinstance(config['revoked_user_keys'],list) and len(config['revoked_user_keys']) <= 1024,
+            'Explicit bounded worker revocation list required')
+    for key in config['revoked_user_keys']: public_key(key)
+    require(len(config['revoked_user_keys']) == len(set(config['revoked_user_keys'])), 'Duplicate revoked user key')
     require(config['ledger_mode'] in {'new', 'retained'}, 'Explicit new or retained ledger selection required')
     c.text(config['custody_ref'])
 
@@ -101,6 +105,7 @@ def service_files(config, *, config_directory=CONFIG, data_directory=None, runti
         'KbdInteractiveAuthentication no', 'PermitEmptyPasswords no', 'HostbasedAuthentication no', 'GSSAPIAuthentication no',
         'PermitRootLogin '+('prohibit-password' if config['uid'] == 0 else 'no'), 'AuthorizedKeysFile none',
         'AuthorizedKeysCommand none', 'AuthorizedPrincipalsCommand none', f'TrustedUserCAKeys {directory}/user-ca.pub',
+        f'RevokedKeys {directory}/revoked-keys',
         f'AuthorizedPrincipalsFile {directory}/principals', 'CASignatureAlgorithms ssh-ed25519',
         'PubkeyAcceptedAlgorithms ssh-ed25519-cert-v01@openssh.com', f"AllowUsers {config['account']}",
         'AllowAgentForwarding no', 'AllowTcpForwarding no', 'AllowStreamLocalForwarding no', 'DisableForwarding yes',
@@ -118,6 +123,7 @@ def service_files(config, *, config_directory=CONFIG, data_directory=None, runti
         'KillMode=process', 'TimeoutStopSec=15', 'ProtectSystem=full', 'ProtectHome=read-only',
         '', '[Install]', 'WantedBy=multi-user.target', ''])
     return {'sshd_config': daemon.encode(), 'user-ca.pub': (config['user_ca']+'\n').encode(),
+            'revoked-keys': ('\n'.join(sorted(config['revoked_user_keys']))+'\n').encode(),
             'principals': (config['principal']+'\n').encode(), SERVICE: service.encode(),
             'hosting-owner.tmpfiles': b'd /run/sshd 0755 root root -\n'}
 
