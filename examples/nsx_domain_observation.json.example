@@ -1,0 +1,191 @@
+{
+  "platform": "nsx",
+  "origin": "https://nsx.example.invalid",
+  "operation_id": "op-lab-004",
+  "tenant_id": "tenant-01",
+  "scope_id": "wsd-01",
+  "engineering_record_ref": "LAB-ENGINEERING-ONLY",
+  "target_binding_ref": "LAB-TARGET-ONLY",
+  "contact_enabled": false,
+  "profile": "nsx-local-policy-v1-domain-lifecycle",
+  "resources": [
+    {
+      "kind": "tier1",
+      "path": "/infra/tier-1s/8dae1a59-433e-5597-a1ff-0814bf7646ea",
+      "expected": {
+        "id": "8dae1a59-433e-5597-a1ff-0814bf7646ea",
+        "path": "/infra/tier-1s/8dae1a59-433e-5597-a1ff-0814bf7646ea",
+        "resource_type": "Tier1",
+        "_revision": 7,
+        "tags": [],
+        "display_name": "tenant-01-D01O",
+        "tier0_path": "",
+        "route_advertisement_types": [],
+        "route_advertisement_rules": []
+      },
+      "realization": {
+        "intent_version": "accepted-intent-tier1",
+        "enforcement_points": [
+          "/infra/sites/default/enforcement-points/default"
+        ]
+      }
+    },
+    {
+      "kind": "segment",
+      "path": "/infra/segments/9e14ca80-c64d-545a-b060-1a85c4e89e99",
+      "expected": {
+        "id": "9e14ca80-c64d-545a-b060-1a85c4e89e99",
+        "path": "/infra/segments/9e14ca80-c64d-545a-b060-1a85c4e89e99",
+        "resource_type": "Segment",
+        "_revision": 7,
+        "tags": [],
+        "display_name": "tenant-01-D01O-network",
+        "connectivity_path": "/infra/tier-1s/8dae1a59-433e-5597-a1ff-0814bf7646ea",
+        "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/mock",
+        "subnets": [
+          {
+            "gateway_address": "192.0.2.1/27"
+          }
+        ],
+        "advanced_config": {
+          "connectivity": "ON",
+          "urpf_mode": "STRICT"
+        }
+      },
+      "realization": {
+        "intent_version": "accepted-intent-segment",
+        "enforcement_points": [
+          "/infra/sites/default/enforcement-points/default"
+        ]
+      }
+    },
+    {
+      "kind": "group",
+      "path": "/infra/domains/default/groups/9e14ca80-c64d-545a-b060-1a85c4e89e99",
+      "expected": {
+        "id": "9e14ca80-c64d-545a-b060-1a85c4e89e99",
+        "path": "/infra/domains/default/groups/9e14ca80-c64d-545a-b060-1a85c4e89e99",
+        "resource_type": "Group",
+        "_revision": 7,
+        "tags": [],
+        "display_name": "tenant-01-D01O-members",
+        "expression": [
+          {
+            "resource_type": "PathExpression",
+            "paths": [
+              "/infra/segments/9e14ca80-c64d-545a-b060-1a85c4e89e99"
+            ]
+          }
+        ],
+        "extended_expression": []
+      },
+      "realization": {
+        "intent_version": "accepted-intent-group",
+        "enforcement_points": [
+          "/infra/sites/default/enforcement-points/default"
+        ]
+      }
+    },
+    {
+      "kind": "security_policy",
+      "path": "/infra/domains/default/security-policies/9e14ca80-c64d-545a-b060-1a85c4e89e99",
+      "expected": {
+        "id": "9e14ca80-c64d-545a-b060-1a85c4e89e99",
+        "path": "/infra/domains/default/security-policies/9e14ca80-c64d-545a-b060-1a85c4e89e99",
+        "resource_type": "SecurityPolicy",
+        "_revision": 7,
+        "tags": [],
+        "display_name": "tenant-01-D01O-quarantine",
+        "category": "Emergency",
+        "sequence_number": 100,
+        "stateful": true,
+        "tcp_strict": true,
+        "locked": false,
+        "scope": [
+          "/infra/domains/default/groups/9e14ca80-c64d-545a-b060-1a85c4e89e99"
+        ],
+        "rules": [
+          {
+            "display_name": "dns",
+            "path": "/infra/domains/default/security-policies/9e14ca80-c64d-545a-b060-1a85c4e89e99/rules/839843f3-c9ca-5364-80b3-570832a67203",
+            "rule_id": 101,
+            "action": "ALLOW",
+            "direction": "IN_OUT",
+            "logged": true,
+            "disabled": false,
+            "sequence_number": 1,
+            "id": "839843f3-c9ca-5364-80b3-570832a67203",
+            "resource_type": "Rule",
+            "_revision": 7,
+            "ip_protocol": "IPV4",
+            "source_groups": [
+              "/infra/domains/default/groups/9e14ca80-c64d-545a-b060-1a85c4e89e99"
+            ],
+            "destination_groups": [
+              "10.42.0.53/32"
+            ],
+            "services": [
+              "ANY"
+            ],
+            "profiles": [
+              "ANY"
+            ],
+            "scope": [
+              "ANY"
+            ],
+            "sources_excluded": false,
+            "destinations_excluded": false,
+            "service_entries": [
+              {
+                "resource_type": "L4PortSetServiceEntry",
+                "l4_protocol": "UDP",
+                "source_ports": [],
+                "destination_ports": [
+                  "53"
+                ]
+              }
+            ]
+          },
+          {
+            "display_name": "deny-scoped-ip-traffic",
+            "path": "/infra/domains/default/security-policies/9e14ca80-c64d-545a-b060-1a85c4e89e99/rules/b0121790-c685-5463-9e42-a08cc4224bb3",
+            "rule_id": 100,
+            "action": "DROP",
+            "direction": "IN_OUT",
+            "logged": true,
+            "disabled": false,
+            "sequence_number": 2,
+            "id": "b0121790-c685-5463-9e42-a08cc4224bb3",
+            "resource_type": "Rule",
+            "_revision": 7,
+            "ip_protocol": "IPV4_IPV6",
+            "source_groups": [
+              "ANY"
+            ],
+            "destination_groups": [
+              "ANY"
+            ],
+            "services": [
+              "ANY"
+            ],
+            "profiles": [
+              "ANY"
+            ],
+            "scope": [
+              "ANY"
+            ],
+            "sources_excluded": false,
+            "destinations_excluded": false,
+            "service_entries": []
+          }
+        ]
+      },
+      "realization": {
+        "intent_version": "accepted-intent-security_policy",
+        "enforcement_points": [
+          "/infra/sites/default/enforcement-points/default"
+        ]
+      }
+    }
+  ]
+}

@@ -75,8 +75,10 @@ provider edge's limited services. Prepared Terraform outputs do not prove these
 properties. After apply, read actual power/NIC or NSX realization, then execute
 healthy-control traffic tests and guest convergence before activation.
 
-For NSX use the existing exact-policy observer, including actual rule order,
-scope, intent version and every accepted enforcement point. Segment connectivity
+For NSX the [domain lifecycle observer](nsx-domain-readback.md) covers the owned
+Tier-1, segment, group and policy, including actual rule order, scope, intent
+version and every accepted enforcement point. Its separate held-plan reviewer
+preserves all ledger holds; it supplies no writer fence. Segment connectivity
 OFF alone does not establish same-segment isolation: observe the mandatory DFW
 drop and test same-host paths. For Nutanix use [AHV VM readback](nutanix-vm-readback.md),
 [Flow readback](nutanix-flow-readback.md) and [campaign v4](target-qualification.md)

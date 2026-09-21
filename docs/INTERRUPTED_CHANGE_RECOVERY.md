@@ -108,6 +108,15 @@ Only explicitly computed new service-rule IDs may be unknown in that plan.
 Unrelated domain resources must be resolved no-ops. No new policy/state adoption,
 ledger release or replay authority is created.
 
+For a held VMware domain attempt, the same reviewer binds the explicit
+[NSX domain observer](implementation/automation/nsx-domain-readback.md) to the
+sealed lifecycle transition and saved plan. It checks prior Tier-1, segment,
+group and policy identities, restricted service intent, retained/generated rule
+IDs and current realization evidence. Unsupported selectors in either native
+snapshot hold. NSX task inventory and cross-writer exclusion are not supplied;
+independent fencing, quarantine, operation-wide reconciliation and ledger holds
+remain mandatory.
+
 | Result | Meaning and next accountable action |
 |---|---|
 | `KEEP_INCIDENT_CONTAINMENT` | An active incident restriction takes precedence; ordinary convergence must not undo it. |

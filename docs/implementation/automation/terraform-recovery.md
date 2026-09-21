@@ -1,7 +1,7 @@
 # Review a held Terraform native attempt
 
 `tools/terraform_recovery_review.py` joins the saved execution evidence, current
-durable ledger head and supported vSphere/AHV VM or Flow policy activity observations.
+durable ledger head and supported vSphere/AHV VM, Flow activity or NSX domain observations.
 It writes an immutable private review packet. It never clears the ledger, runs
 Terraform, changes native infrastructure or authorizes replay.
 
@@ -148,6 +148,32 @@ Other unchanged provider settings keep their independent baseline requirements.
 Actual installed defaults and task/entity/query semantics still need qualification.
 Historical review does not renew apply authority or release the ledger.
 
+## Existing NSX domain lifecycle
+
+For a held VMware domain attempt, use the explicit
+[NSX domain profile](nsx-domain-readback.md). The manifest platform is `nsx`, while
+the bundle scope remains `vmware`/`domains`; the observer origin must equal the
+sealed domain provider endpoint. Generic NSX snapshots and vSphere attachment
+reports cannot substitute for this profile.
+
+The original sealed transition is evaluated at the immutable attempt start and
+bound to the exact saved-plan bytes, generation, tenant/WSD and change reference.
+Review covers all four prior owned objects per member: Tier-1 and group as
+resolved no-ops, segment connectivity and the exact restricted policy service
+bootstrap/withdrawal. Names, allocation, transport zone, group relationships,
+policy boundary and retained rule IDs must match. Only explicitly computed new
+rule IDs and supported computed metadata may remain unknown in the saved plan.
+Known metadata and effective rule order must match current accepted expectations.
+Unrelated resources, unobserved behavior, unresolved security, moves, adoption,
+replacement and partial coverage hold.
+
+Current independent fencing/quarantine must predate the fresh observation.
+Realization versions and enforcing-system spans are checked; no native task
+enumeration or attempt activity window is claimed for NSX. Complete operation
+reconciliation, real exclusion, enforcement and permitted forward action remain
+native-owner responsibilities. Expired historical authority never authorizes a
+new apply, and a favorable review leaves the ledger held.
+
 ## Private review packet
 
 For vSphere, supply the VM/task and native attachment evidence:
@@ -164,12 +190,13 @@ python3 tools/terraform_recovery_review.py \
   --output /private/operator/new-recovery-review.json
 ```
 
-For AHV or Flow, use the same command with its activity manifest/report and
-**omit both network options**. vSphere attachment inputs cannot qualify Nutanix.
+For AHV or Flow, use the same command with its activity manifest/report. For NSX
+domains, use its domain manifest/report. **Omit both network options** for these
+scopes; vSphere attachment inputs cannot qualify them.
 
 All inputs must be owner-only private artifacts. The new output must be outside
 the repository, bundle and ledger. The tool checks sealed input/backend/plan
-bytes (and the Nutanix lifecycle artifact), scope, native object coverage, current held
+bytes (and the applicable sealed lifecycle artifact), scope, native object coverage, current held
 head, immutable start/result records and context/report bindings. It takes the
 existing local executor lock while reading and writing the separate review packet, refuses a concurrent
 executor and rechecks the head. This lock makes the local review consistent; it

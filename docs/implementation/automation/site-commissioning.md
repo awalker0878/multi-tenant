@@ -287,3 +287,28 @@ lost replies and late tasks under the accepted native fencing mechanism. Compare
 actual generated rule IDs/provider defaults to the saved plan and retain the
 private review packet. Synthetic TLS/plan tests do not supply these results or
 prove HA, retained-data/application recovery or production readiness.
+
+## NSX domain lifecycle and recovery qualification
+
+Qualify the explicit [NSX domain profile](nsx-domain-readback.md) against the
+installed Local Manager and pinned provider. Record all four owned paths per
+domain, current configuration/rule revisions, independent intent versions and
+the complete expected enforcing-system span. Capture actual absent/empty default
+representations and rule IDs before accepting the profile. Missing required
+fields remain a hold until reviewed normalization is implemented.
+
+| Native case | Required observation or hold |
+| --- | --- |
+| Bootstrap or return to prepared completes | Stable exact Tier-1/segment/group/policy snapshots and realization; independently test allowed and denied traffic |
+| Configuration changes between either status bracket | Unknown; recollect only under established writer exclusion |
+| Pending/error/stale intent or missing/extra enforcement point | Retain distinct pending/failure/unknown hold |
+| Additional group selector, bridge/DHCP/pool behavior or narrowed drop | Shape/configuration hold; never ignore it through selected-field projection |
+| New service rule and moved terminal drop | Verify generated rule metadata and retained drop ID against the original saved plan |
+| Lost provider reply or late effect | Bind exact held bundle/transition/ledger; preserve all records and reconcile every affected entity independently |
+| Fence/quarantine absent or verified after collection begins | Keep recovery held; obtain new observations under accepted controls |
+
+Use actual effective membership, DFW exclusions/precedence, same-host traffic,
+external attachments and per-node enforcement checks. This observer does not
+enumerate locale-service or task side effects, prove native writer exclusion,
+release a ledger or establish HA/application recovery. Record real restricted
+site results through the accepting owners; synthetic reports cannot close them.

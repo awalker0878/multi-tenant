@@ -1,5 +1,10 @@
 from copy import deepcopy
 import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
@@ -70,6 +75,28 @@ class DomainReadbackTests(unittest.TestCase):
         for value in (None, {'before': False, 'after': True}, {'before': 1, 'after': True}):
             bad = deepcopy(report); bad['history'][0]['states'][0]['shape_witness'] = value; reseal(bad)
             self.assertEqual(rr.review(self.m, bad, operator_context(self.m, bad))['result'], 'HOLD_INVALID_EVIDENCE')
+
+    def test_cli_requires_explicit_contact_and_writes_private_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            manifest = Path(directory)/'manifest.json'; output = Path(directory)/'report.json'
+            manifest.write_text(json.dumps(self.m))
+            command = [sys.executable, str(Path(domain.__file__).resolve()), str(manifest)]
+            result = subprocess.run(command, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+            self.assertEqual(json.loads(result.stdout)['status'], 'INPUT_VALID_NO_CONTACT')
+            self.assertEqual(self.f.requests, [])
+            command.extend(['--read-authorized-target', '--expected-origin', self.f.origin, '--ca-file', str(self.f.directory/'ca.pem'),
+                            '--output', str(output), '--interval', '0'])
+            result = subprocess.run(command, capture_output=True, text=True, env=os.environ | {'NSXT_USERNAME': 'fixture', 'NSXT_PASSWORD': 'fixture'})
+            self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+            self.assertEqual(json.loads(result.stdout)['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
+            self.assertEqual(output.stat().st_mode & 0o777, 0o600)
+            self.assertNotIn(self.m['resources'][0]['path'], result.stdout)
+
+    def test_disabled_example_validates_without_contact(self):
+        path = Path(domain.__file__).resolve().parents[1]/'examples/nsx_domain_observation.json.example'
+        manifest = c.load(path); domain.validate(manifest)
+        self.assertFalse(manifest['contact_enabled']); self.assertTrue(manifest['origin'].endswith('.invalid'))
 
 
 if __name__ == '__main__': unittest.main()

@@ -69,6 +69,17 @@ a separately supported profile. The documentation snapshot consulted identifies
 NSX 9.1.1.0; it is not evidence that an installed NSX release or the retained
 Terraform provider combination supports every field. [N1–N4]
 
+Reports now retain bounded realization fields and both selected configuration
+hashes. Offline review recomputes the realization result and rejects matching
+summaries contradicted by either configuration read. Recollect older reports
+without these witnesses. They do not authenticate the collector or fence writers.
+
+The explicit [owned-domain profile](implementation/automation/nsx-domain-readback.md)
+adds complete Tier-1/segment/group/policy relationships and rejects unsupported
+selectors in both full responses before projection. It supports existing-domain
+held Terraform lifecycle review; it does not replace effective DFW membership,
+native task inventory or the separate segment/switch/port campaign profiles.
+
 ## Nutanix networking and prism v4.3 profile
 
 The SDK reference exposes exact VPC/subnet GET interfaces and an exact task GET.
