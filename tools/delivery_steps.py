@@ -11,6 +11,7 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
 # arbitrary module, executable arguments or environment overlay is accepted.
 KINDS = {
+    'openstack_quota': (set(), {'request','authority','token','ca'}, set()),
     'edge_containment': ({'nft','nft_sha256'}, {'spec','authority'}, set()),
     'remote_owner': ({'ssh','ssh_sha256'}, {'job','target','ssh_key','ssh_certificate'}, set()),
     'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
@@ -55,6 +56,11 @@ def validate_packet(step, packet, plan, base):
     c.exact_keys(packet['parameters'], params)
     c.exact_keys(packet['files'], required, optional)
     files = file_paths(packet); values=packet['parameters']; kind=step['kind']
+    if kind=='openstack_quota':
+        from tools.openstack_quota import validate
+        request=load_private(files['request']); validate(request)
+        require(request['scope']=={key:plan['scope'][key] for key in request['scope']}
+                and request['source_commit']==plan['source_commit'], 'Foreign tenant quota handoff')
     if kind=='dns_propagation':
         from tools.dns_propagation import validate
         job,scope,receipt=dns_handoff(step,packet,plan,base)
@@ -194,6 +200,8 @@ def child(root, module, arguments, directory, *, timeout):
 def dispatch(step, packet, directory, base, plan, root):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
+    if kind=='openstack_quota':
+        return quota_dispatch(step,packet,directory,base,plan,root)
     if kind=='remote_owner':
         return remote_dispatch(step,packet,directory,plan)
     elif kind=='dns_propagation':
@@ -331,6 +339,54 @@ def retain(path,raw):
     else: write_new(path,raw)
 
 
+
+def quota_dispatch(step,packet,directory,base,plan,root,*,observe=False,recovery_authority=None):
+    from tools import openstack_quota as quota
+    original=file_paths({'files':{'request':packet['files']['request']}})
+    request=load_private(original['request']); quota.validate(request)
+    require(request['scope']=={key:plan['scope'][key] for key in request['scope']}
+            and request['source_commit']==plan['source_commit'],'Foreign tenant quota handoff')
+    if (directory/'result.json').exists():
+        result=load_private(directory/'result.json')
+        sha=result.get('authority_sha256')
+        require(isinstance(sha,str) and c.HEX.fullmatch(sha),'Invalid retained quota authority digest')
+        authority_name='quota-authority-'+sha+'.json'; authority=load_private(directory/authority_name)
+    else:
+        if recovery_authority is not None:
+            require(observe,'Renewed quota access is observation-only')
+            access=load_private(recovery_authority)
+            c.exact_keys(access,{'format','request_sha256','files'})
+            require(access['format']=='hosting-openstack-quota-recovery/1'
+                    and access['request_sha256']==c.digest(request),'Quota recovery belongs to another request')
+            c.exact_keys(access['files'],{'authority','token','ca'})
+            for binding in access['files'].values():
+                c.exact_keys(binding,{'path','sha256'})
+                require(isinstance(binding['path'],str) and Path(binding['path']).is_absolute()
+                        and isinstance(binding['sha256'],str) and c.HEX.fullmatch(binding['sha256']), 'Exact private quota recovery artifact required')
+            files=file_paths({'files':access['files']})
+        else: files=file_paths({'files':{name:packet['files'][name] for name in ('authority','token','ca')}})
+        authority=load_private(files['authority'])
+        require(not observe or authority['action']=='observe','Interrupted quota handoff requires explicit read-only authority')
+        authority_name='quota-authority-'+c.digest(authority)+'.json'; retain(directory/authority_name,encoded(authority))
+        result=quota.operate(request,authority,read_private(files['token']),read_private(files['ca']),
+                             owner_ledger(base,'openstack_quota'),root=root)
+        retain(directory/'result.json',encoded(result))
+    require(result['format']=='hosting-openstack-quota-receipt/1'
+            and result['status']=='PROJECT_QUOTAS_OBSERVED_REQUIRES_ENFORCEMENT_ACCEPTANCE'
+            and result['request_sha256']==c.digest(request) and result['authority_sha256']==c.digest(authority)
+            and authority['request_sha256']==c.digest(request) and authority['action'] in {'apply','observe'}
+            and result['scope']==request['scope'] and result['project_id']==request['project']['id']
+            and result['service']==request['service'] and result['generation']==request['generation']
+            and {key:value['limit'] for key,value in result['quotas'].items()}==request['after'],
+            'Retained quota owner handoff differs')
+    current_window(authority,now=c.timestamp(result['observed_at']))
+    with quota.journal.locked(owner_ledger(base,'openstack_quota'),quota.owner_scope(request)) as log:
+        operations=quota.history(log,request['scope'])
+        require(operations and operations[-1]['completed'] and operations[-1]['request']==request,
+                'Quota native history is missing, pending or superseded')
+        return complete(step,packet,directory,plan,result,['result.json',authority_name])
+
+
 def dns_handoff(step,packet,plan,base):
     upstream=dependency(step,packet['parameters']['dns_step'],'dns',plan,base)
     parent=load_private(upstream/'packet.json')
@@ -393,6 +449,8 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='openstack_quota':
+            return quota_dispatch(step,packet,directory,base,plan,root,observe=True,recovery_authority=recovery_authority)
         if kind=='dns_propagation':
             return dns_observation(step,packet,directory,base,plan,recovery_authority=recovery_authority)
         if kind=='capacity':

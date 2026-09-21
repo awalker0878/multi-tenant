@@ -70,6 +70,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 
 | Kind | Parameters | Mandatory files | Optional files |
 | --- | --- | --- | --- |
+| `openstack_quota` | None | `request`, `authority`, `token`, `ca` | None |
 | `remote_owner` | `ssh`, `ssh_sha256` | `job`, `target`, `ssh_key`, `ssh_certificate` | None |
 | `restic` | `action`, `restic`, `restic_sha256`, `target` | `config`, `credentials` | `ca_bundle`; restore also requires `receipt`, `manifest`, `restore_authority` |
 | `capacity` | `action`, `database` | `request`, `authority` | `native_ids`; reserve pairs `inputs`, `sizing` to bind actual workload demand |
@@ -124,6 +125,28 @@ execution context and capture manifest. A crash after a durable owner receipt
 can recover those copies without another backup or restore. Missing receipts
 hold the stage; the runner never guesses a snapshot or overwrites a destination.
 See [restic recovery](restic-recovery.md) for repository/key responsibilities.
+
+The `openstack_quota` stage applies the accepted project-level quota change
+for the delivery's exact environment/site/tenant and OpenStack source. Quotas
+belong to the tenant project, so their owner ledger is shared across WSD graphs.
+It does not reserve physical capacity or grant a role. Place the completed quota
+handoff behind admission and before allocation that consumes the entitlement.
+See [OpenStack quotas](openstack-quotas.md) for native driver acceptance.
+
+If a quota stage loses its result, publish `<step-id>.recovery-authority.json`
+as `hosting-openstack-quota-recovery/1` with `request_sha256` and
+`files`. The files object binds exactly `authority`, `token`, `ca`
+using the ordinary absolute private path and byte-digest shape. The renewed
+authority must be observe-only for the original request. This supports expired
+credential replacement without changing the approved project, actor, endpoint,
+roles or limits. A pending native change is observed, never reissued.
+
+The stage retains its actual authority and result before publishing completion.
+A lost coordinator marker can recover those bytes without retaining old
+credentials or issuing more native writes. It checks that the shared native
+quota history is still completed at this same request; later/pending generations
+hold the old handoff. Finished delivery receipts are historical records, so
+subsequent allocation still needs current admission and enforcement evidence.
 
 ## Accepted gates and renewal
 
