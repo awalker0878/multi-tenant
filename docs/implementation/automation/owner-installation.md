@@ -16,7 +16,7 @@ not cause this tool to overwrite or restart a running worker.
 ## Host and custody prerequisites
 
 Use the independent accepted management/console path. Preinstall the supported
-OpenSSH server, systemd, Git, Python runtime and required owner executables from
+OpenSSH server, systemd, Git, [Python execution runtime](runtime-bootstrap.md) and required owner executables from
 the approved artifact source. The source checkout must be at the exact accepted
 commit and must be root-owned, without symlinks or group/other write permission.
 Its ancestors and executable locations must also remain root-controlled. The

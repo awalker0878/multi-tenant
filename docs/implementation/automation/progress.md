@@ -81,6 +81,13 @@ Repeated installation preserves journaled revocations; unknown identity controls
 remain held. Revocation affects new authentication and never claims to cancel
 existing sessions or fence their native tasks.
 
+The [offline runtime builder](runtime-bootstrap.md) creates a pinned execution
+environment from an exact accepted wheel set and Terraform archive. It performs
+actual isolated installation and dependency checks, seals the complete installed
+tree, verifies completed reuse and preserves incomplete builds without rerunning
+them. Base OS trust, artifact approval and native platform qualification remain
+separate acceptance inputs.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

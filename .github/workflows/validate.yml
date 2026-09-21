@@ -187,6 +187,8 @@ jobs:
         run: python scripts/check_dependency_locks.py
       - name: Saved-plan execution, stale-state rejection and private artifact permissions
         run: python lab/run_terraform_execution_lab.py
+      - name: Build and verify the actual offline execution runtime without network access
+        run: sudo env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory "GIT_CONFIG_VALUE_0=$PWD" "$(command -v python)" lab/run_runtime_build_lab.py --execute --terraform "$(command -v terraform)"
       - name: Backend-disabled validation, module schemas and plan-only provider mocks
         run: python tools/verify_terraform.py --mock-tests
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -197,6 +199,7 @@ jobs:
             build/reports/provider_lock_review.json
             build/reports/terraform_validation.json
             build/reports/terraform_execution_lab.json
+            build/reports/runtime_build_lab.json
             build/reports/toolchain-schemas/
             build/reports/toolchain-locks/
           include-hidden-files: true
