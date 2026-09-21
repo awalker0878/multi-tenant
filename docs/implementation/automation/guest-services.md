@@ -7,6 +7,14 @@ recursive resolver selection, persistent journal bounds, collector TLS assets an
 the log-forwarding action. Select it only where these files are assigned to this
 role by the image and service owners.
 
+`tools/guest_services.py` owns the controller-side contract for this profile. It
+validates the closed `services` object — ownership assignment, resolver bounds,
+account separation, certificate/key algorithms and asset hashes — before any
+guest contact. The [guest inventory](native-guests.md) requires the complete
+object and validates it; the [reviewed guest executor](guest-execution.md)
+re-verifies the sealed asset hashes before running the profile. Validation is an
+input check only: it issues no credential and asserts no host state.
+
 The image must include OpenSSH server, systemd-resolved, chrony, rsyslog and its
 GnuTLS module. Pre-provision non-root administrator and recovery accounts with
 their separately approved privileges. The initial SSH session must already use

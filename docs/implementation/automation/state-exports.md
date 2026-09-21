@@ -74,8 +74,10 @@ repository-pinned Terraform version, validates lineage/minimum serial, and reads
 that same serial through GitLab's retained-version endpoint. Both JSON objects
 must match. State files may contain credentials and private data; every stored
 file is owner-only and console output contains only status and request digest.
-The existing HTTPS transport refuses redirects, proxies, automatic retries and
-responses larger than 4 MiB. Larger states require a separately accepted profile.
+The existing HTTPS transport (`tools/service_http.py`, shared with the
+[allocation](netbox-ipam.md) and [DNS](netbox-dns.md) writers) refuses redirects,
+proxies, automatic retries and responses larger than 4 MiB. Larger states require
+a separately accepted profile.
 
 A second complete latest-state sweep must match the exported bytes, including
 continued absence for explicitly unused slots. Project/custody checks repeat
