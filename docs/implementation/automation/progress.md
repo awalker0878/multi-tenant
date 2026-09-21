@@ -24,6 +24,11 @@ native identity retention, exact previous-receipt approval and versioned envelop
 renewal. Concurrent-controller and interrupted-transaction tests run against SQLite;
 the qualified native capacity budget and cleanup observations remain site inputs.
 
+Receipt-based workload compilation and bootstrap/withdrawal transition preparation
+are now registered delivery stages. Their adapters invoke the actual three-platform
+compiler and lifecycle contracts; fixtures verify retained native identities and
+keep generated workload drafts disabled for exact review.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

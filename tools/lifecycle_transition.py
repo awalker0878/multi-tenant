@@ -224,20 +224,28 @@ def plan_bindings(plan, record, *, as_of=None):
     return record['resources']
 
 
+def prepare(prior_run, inputs_path, acceptance_path, stage):
+    from tools.wsd_handoff import execution_outputs
+    prior_run=Path(prior_run)
+    bundle=load_private(prior_run/'bundle.json')
+    if bundle['scope']['platform']=='openstack':
+        return os_transition.prepare(prior_run,inputs_path,acceptance_path,stage)
+    outputs,previous,provenance=execution_outputs(prior_run,bundle['scope']['phase'])
+    raw=read_private(inputs_path); accepted=load_private(acceptance_path)
+    c.exact_keys(accepted,{'valid_from','valid_until','acceptance_refs'})
+    record={'format':FORMAT,'scope':bundle['scope'],'input_sha256':digest(raw),
+            'prior_bundle_sha256':provenance['bundle_sha256'],'prior_outputs':outputs,
+            'prior_inputs':previous,'requested_inputs':c.strict_loads(raw),'target_stage':stage,**accepted}
+    record['resources']=bindings(record); validate(record,bundle['scope'],raw)
+    return record
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('prior-run', 'inputs', 'acceptance', 'output'): p.add_argument('--' + name, type=Path, required=True)
     p.add_argument('--stage', choices=sorted(os_transition.STAGES), required=True); args = p.parse_args()
     try:
-        from tools.wsd_handoff import execution_outputs
-        bundle = load_private(args.prior_run / 'bundle.json')
-        outputs, previous, provenance = execution_outputs(args.prior_run, bundle['scope']['phase'])
-        raw = read_private(args.inputs); accepted = load_private(args.acceptance)
-        c.exact_keys(accepted, {'valid_from', 'valid_until', 'acceptance_refs'})
-        record = {'format': FORMAT, 'scope': bundle['scope'], 'input_sha256': digest(raw),
-                  'prior_bundle_sha256': provenance['bundle_sha256'], 'prior_outputs': outputs,
-                  'prior_inputs': previous, 'requested_inputs': c.strict_loads(raw), 'target_stage': args.stage, **accepted}
-        record['resources'] = bindings(record); validate(record, bundle['scope'], raw)
+        record=prepare(args.prior_run,args.inputs,args.acceptance,args.stage)
         write_new(args.output, encoded(record)); print('{"status":"TRANSITION_REQUIRES_EXACT_PLAN_REVIEW"}'); return 0
     except (OSError, ValueError, KeyError, TypeError, IndexError):
         print('{"status":"HOLD_INVALID_TRANSITION"}'); return 2

@@ -74,6 +74,8 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `acceptance` | `purpose` | `acceptance` | None |
 | `terraform_plan` | `catalog_id`, `terraform`, `terraform_sha256` | `inputs`, `backend`, `environment`, `authority` | `references`, `cloud`, `ca_bundle`, `transition` |
 | `terraform_apply` | `prepared_step` | `approval` | None |
+| `workload_inputs` | `domain_steps`, `selected_input` | `environment` | `vmware_bindings` |
+| `platform_transition` | `prior_step`, `stage` | `inputs`, `acceptance` | None |
 | `guest_plan` | `workload_step`, `python`, `python_sha256`, `ssh`, `ssh_sha256`, `mode`, `max_seconds` | `access`, `references`, `ssh_key`, `ssh_certificate` | None |
 | `guest_apply` | `prepared_step` | `approval` | None |
 | `vsphere_power` | None | `request`, `authority`, `session` | `ca_file` |
@@ -85,6 +87,14 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 `prepared_step` must be a direct dependency of the correct plan kind.
 `workload_step` must be a direct Terraform apply dependency. The runner checks
 that the original execution outputs still equal the retained handoff copies.
+`domain_steps` names the exact direct apply dependencies required by the supplied
+environment intent; `selected_input` selects one compiled workload input key.
+The stage emits `inputs.json`, `scopes.json` and `handoff.json`. Workload drafts
+remain disabled until actual scope/input review enables the requested build.
+`platform_transition` takes a direct prior apply dependency and `stage` equal to
+`bootstrap` or `prepared`; it emits `transition.json` for the next saved-plan
+preparation. The common adapter dispatches the existing OpenStack, Nutanix or NSX
+transition contract and preserves each owner's field/resource restrictions.
 Guest operation IDs are deterministically derived from delivery operation plus
 step ID; their generation matches the delivery. Terraform and other owners keep
 their exact independently approved native operation identities. Files retain

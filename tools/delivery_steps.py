@@ -11,6 +11,8 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
 # arbitrary module, executable arguments or environment overlay is accepted.
 KINDS = {
+    'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
+    'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
@@ -64,6 +66,14 @@ def validate_packet(step, packet, plan, base):
         match_scope(load_private(files['access'])['scope'],plan)
         require(values['mode'] in {'check','configure'} and type(values['max_seconds']) is int
                 and 30<=values['max_seconds']<=3600, 'Invalid guest execution bounds')
+    if kind=='platform_transition':
+        dependency(step,values['prior_step'],'terraform_apply',plan,base)
+        require(values['stage'] in {'prepared','bootstrap'},'Unknown native lifecycle stage')
+    if kind=='workload_inputs':
+        require(isinstance(values['domain_steps'],list) and values['domain_steps']
+                and len(values['domain_steps'])==len(set(values['domain_steps'])),'Exact domain execution dependency set required')
+        for selected in values['domain_steps']: dependency(step,selected,'terraform_apply',plan,base)
+        c.text(values['selected_input'],length=1024)
     if kind=='terraform_plan':
         from tools.terraform_run import select_scope
         from tools.delivery_run import ROOT
@@ -135,7 +145,25 @@ def child(root, module, arguments, directory, *, timeout):
 def dispatch(step, packet, directory, base, plan, root):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
-    if kind=='capacity':
+    if kind=='platform_transition':
+        from tools.lifecycle_transition import prepare
+        prior=terraform_execution(values['prior_step'],plan,base)
+        record=prepare(prior,files['inputs'],files['acceptance'],values['stage'])
+        match_scope(record['scope'],plan)
+        write_new(directory/'transition.json',encoded(record)); names=['transition.json']
+        result={'status':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW'}
+    elif kind=='workload_inputs':
+        from tools.wsd_handoff import compile_runs
+        records=[terraform_execution(selected,plan,base) for selected in values['domain_steps']]
+        outputs,scopes,provenance=compile_runs(load_private(files['environment']),records,
+            load_private(files['vmware_bindings']) if 'vmware_bindings' in files else None)
+        require(values['selected_input'] in outputs,'Requested workload input is absent from the compiled handoff')
+        selected=[row for row in scopes['scopes'] if row['input']==values['selected_input']]
+        require(len(selected)==1,'Exact workload draft scope required'); match_scope(selected[0]['scope'],plan)
+        for name,value in {'inputs.json':outputs[values['selected_input']],'scopes.json':scopes,'handoff.json':provenance}.items():
+            write_new(directory/name,encoded(value)); names.append(name)
+        result={'status':'BOUND_WORKLOAD_DRAFT_REQUIRES_REVIEW'}
+    elif kind=='capacity':
         from tools.capacity import operate
         result=operate(values['database'],load_private(files['request']),values['action'],load_private(files['authority']),
                        load_private(files['native_ids']) if 'native_ids' in files else None)
