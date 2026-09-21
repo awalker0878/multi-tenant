@@ -50,6 +50,8 @@ class DomainReadbackTests(unittest.TestCase):
             body = self.f.routes['/policy/api/v1'+r['path']]['body']
             body.update(_last_modified_user='PRIVATE-SENTINEL', _system_owned=False, _protection='NOT_PROTECTED')
             if r['kind'] == 'segment': body.update(type='ROUTED', admin_state='UP')
+            if r['kind'] == 'security_policy':
+                for rule in body['rules']: rule.update(tag='', notes='', tags=[])
         report = self.observe(); self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
         self.assertNotIn('PRIVATE-SENTINEL', json.dumps(report))
 

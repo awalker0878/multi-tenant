@@ -57,7 +57,7 @@ def project(body, resource):
     elif kind == 'security_policy':
         rules = []
         for rule in result['rules']:
-            r = selected(rule, RULE, defaults={'notes': '', 'log_label': '', 'tag': [], 'tags': [],
+            r = selected(rule, RULE, defaults={'notes': '', 'log_label': '', 'tag': '', 'tags': [],
                          'disabled_reason': '', 'directional': False})
             require(r['path'] == resource['path'] + '/rules/' + r['id'] and r['resource_type'] == 'Rule', 'Rule identity differs')
             r['service_entries'] = [selected(e, {'resource_type', 'l4_protocol', 'source_ports', 'destination_ports'},
