@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from tools import readback_core as c, terraform_adoption as t, terraform_apply
-from tools.run_files import encoded, replace_private, write_new
+from tools.run_files import digest, encoded, replace_private, write_new
 
 
 SCOPE={
@@ -120,8 +120,8 @@ class TerraformAdoptionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             ledger=Path(tmp); ledger.chmod(0o700)
             address='https://state.example.test/project/state/scope'
-            scope=ledger/c.digest(address.encode()); scope.mkdir(mode=0o700)
-            identity=c.digest({'operation':'adopt-1','generation':1})
+            scope=ledger/digest(address.encode()); scope.mkdir(mode=0o700)
+            identity=digest(encoded({'operation':'adopt-1','generation':1}))
             started={
                 'format':'hosting-terraform-adoption-attempt/1','status':'STARTED_OUTCOME_UNKNOWN',
                 'bundle_sha256':'1'*64,'scope':dict(SCOPE),'operation_id':'adopt-1','generation':1,
@@ -137,8 +137,8 @@ class TerraformAdoptionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             ledger=Path(tmp); ledger.chmod(0o700)
             address='https://state.example.test/project/state/scope'
-            scope=ledger/c.digest(address.encode()); scope.mkdir(mode=0o700)
-            identity=c.digest({'operation':'adopt-1','generation':1})
+            scope=ledger/digest(address.encode()); scope.mkdir(mode=0o700)
+            identity=digest(encoded({'operation':'adopt-1','generation':1}))
             started={
                 'format':'hosting-terraform-adoption-attempt/1','status':'STARTED_OUTCOME_UNKNOWN',
                 'bundle_sha256':'1'*64,'scope':dict(SCOPE),'operation_id':'adopt-1','generation':1,
