@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from tests.test_nft_edge import fixture
 from tools import edge_contain as c,nft_edge as edge
-from tools.run_files import digest,encoded,load_private,utcnow
+from tools.run_files import digest,encoded,load_private,replace_private,utcnow
 
 
 def state(spec):
@@ -74,6 +74,45 @@ class ContainmentTests(unittest.TestCase):
         self.authority['valid_until']=(utcnow()-timedelta(seconds=1)).isoformat()
         with self.assertRaises(ValueError): self.operate('expired')
         self.assertEqual(self.kernel.writes,0)
+
+    def test_completed_containment_does_not_clear_older_unknown_forward_write(self):
+        forward=self.base/'forward'; forward.mkdir(mode=0o700)
+        authority=dict(spec_sha256=digest(encoded(self.spec)),mode='active',
+            expected_state_sha256=self.kernel.inspect(self.spec)[1],valid_from=self.authority['valid_from'],
+            valid_until=self.authority['valid_until'],change_ref='TEST-FORWARD',boundary_acceptance_ref='TEST-BOUNDARY',
+            readiness_ref='TEST-READINESS')
+        self.kernel.lost=True
+        with self.assertRaises(OSError): edge.apply(self.spec,'active',authority,self.kernel,self.ledger,forward)
+        self.kernel.lost=False
+        self.assertEqual(self.operate('contain')['status'],'CONTAINED_OBSERVED_NOT_QUALIFIED')
+        self.assertEqual(load_private(next(self.ledger.glob('*/head.json')))['status'],'APPLIED_EXPIRING_POLICY_NOT_QUALIFIED')
+        next_spec=dict(self.spec,operation_id='new-forward',generation=2)
+        authority.update(spec_sha256=digest(encoded(next_spec)),expected_state_sha256=self.kernel.inspect(self.spec)[1])
+        next_run=self.base/'next'; next_run.mkdir(mode=0o700); writes=self.kernel.writes
+        with self.assertRaisesRegex(ValueError,'Unresolved native edge history'):
+            edge.apply(next_spec,'active',authority,self.kernel,self.ledger,next_run)
+        self.assertEqual(self.kernel.writes,writes)
+
+    def test_completed_history_allows_next_generation_and_detects_changed_receipts(self):
+        self.operate('contain')
+        spec=dict(self.spec,operation_id='reviewed-reopen',generation=2)
+        authority=dict(spec_sha256=digest(encoded(spec)),mode='active',
+            expected_state_sha256=self.kernel.inspect(spec)[1],valid_from=self.authority['valid_from'],
+            valid_until=self.authority['valid_until'],change_ref='TEST-REOPEN',boundary_acceptance_ref='TEST-BOUNDARY',
+            readiness_ref='TEST-READINESS')
+        directory=self.base/'reopen'; directory.mkdir(mode=0o700)
+        self.assertEqual(edge.apply(spec,'active',authority,self.kernel,self.ledger,directory)['status'],
+                         'APPLIED_EXPIRING_POLICY_NOT_QUALIFIED')
+        head=next(self.ledger.glob('*/head.json')); record=load_private(head)
+        boundary=record['boundary_sha256']
+        self.assertEqual(edge.completed_history(head.parent,boundary),2)
+        identity=digest(encoded([record['operation_id'],record['generation'],record['mode']]))
+        result_path=head.parent/(identity+'.result.json'); original=result_path.read_bytes()
+        for update in ({'generation':True},{'spec_sha256':'0'*64},{'completed_at':'2000-01-01T00:00:00+00:00'}):
+            replace_private(result_path,encoded(record|update))
+            with self.assertRaises(ValueError): edge.completed_history(head.parent,boundary)
+        replace_private(result_path,original); head.unlink()
+        with self.assertRaisesRegex(ValueError,'head differs'): edge.completed_history(result_path.parent,boundary)
 
 
 if __name__=='__main__': unittest.main()

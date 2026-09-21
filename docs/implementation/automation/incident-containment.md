@@ -29,6 +29,12 @@ only observes and cannot issue another write. After a lost reply, matching nativ
 withdrawal supplies a separate containment receipt while preserving the uncertain
 edge ledger head.
 
+Before any later bootstrap or active policy, the edge owner checks every
+immutable start/result pair and the latest head. A successful withdrawal cannot
+hide an older unresolved forward write. Missing results, changed bindings or
+overlapping history require reconciliation before opening flows; withdrawal
+remains available under its separate incident authority.
+
 Readback requires an active owned `inet` table, the exact forwarding hook and
 priority, no extra chains/sets/objects, and a rate-limited log plus unconditional
 drop for both directions of every owned interface. Missing drops, accepts,

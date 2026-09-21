@@ -135,6 +135,45 @@ class Kernel:
         return state, digest(encoded(normalized(state)))
 
 
+def completed_history(ledger, boundary):
+    """Containment cannot make an older uncertain native write disappear."""
+    starts=list(ledger.glob('*.started.json')); results=list(ledger.glob('*.result.json'))
+    identities={path.name.removesuffix('.started.json') for path in starts}
+    require(identities=={path.name.removesuffix('.result.json') for path in results},
+            'Unresolved native edge history requires reconciliation before opening flows')
+    completed=[]
+    for path in starts:
+        attempt=load_private(path)
+        require(set(attempt)=={'status','generation','operation_id','mode','boundary_sha256','spec_sha256','started_at'}
+                and attempt['status']=='OUTCOME_UNKNOWN' and type(attempt['generation']) is int
+                and attempt['generation']>0 and attempt['mode'] in {'withdraw','bootstrap','active'}
+                and attempt['boundary_sha256']==boundary,'Invalid native edge attempt history')
+        identity=digest(encoded([attempt['operation_id'],attempt['generation'],attempt['mode']]))
+        require(path.name==identity+'.started.json','Edge attempt identity changed')
+        result=load_private(ledger/(identity+'.result.json'))
+        require(set(result)==set(attempt)|{'observed_state_sha256','completed_at','lease_seconds','production_qualified'}
+                and result['status']=='APPLIED_EXPIRING_POLICY_NOT_QUALIFIED'
+                and all(result[key]==value and type(result[key]) is type(value) for key,value in attempt.items() if key!='status')
+                and result['production_qualified'] is False
+                and re.fullmatch('[0-9a-f]{64}',result['observed_state_sha256'])
+                and type(result['lease_seconds']) is int and result['lease_seconds']>0,
+                'Native edge completion binding changed')
+        start=datetime.fromisoformat(attempt['started_at']); end=datetime.fromisoformat(result['completed_at'])
+        require(start.tzinfo is not None and end.tzinfo is not None and start<=end<=utcnow(),
+                'Native edge completion chronology changed')
+        completed.append(result)
+    head=ledger/'head.json'
+    if not completed:
+        require(not head.exists(),'Native edge head has no immutable history')
+        return 0
+    completed.sort(key=lambda item:datetime.fromisoformat(item['completed_at']))
+    require(head.exists() and load_private(head)==completed[-1],'Native edge head differs from immutable completion')
+    for previous,current in zip(completed,completed[1:]):
+        require(datetime.fromisoformat(previous['completed_at'])<=datetime.fromisoformat(current['started_at']),
+                'Native edge execution history overlaps')
+    return max(item['generation'] for item in completed)
+
+
 def apply(spec, mode, authority, kernel, ledger, operation):
     table, scope_hash = validate(spec)
     require(set(authority) == {'spec_sha256', 'mode', 'expected_state_sha256', 'valid_from', 'valid_until',
@@ -152,6 +191,8 @@ def apply(spec, mode, authority, kernel, ledger, operation):
         private_path(ledger / 'writer.lock')
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         boundary = digest(encoded([spec['interfaces'], spec['owned_interfaces'], spec['machine_id'], spec['network_namespace_inode']]))
+        if mode != 'withdraw':
+            require(spec['generation']>completed_history(ledger,boundary),'Native edge generation must exceed its full history')
         head_path = ledger / 'head.json'
         if head_path.exists():
             head = load_private(head_path)
