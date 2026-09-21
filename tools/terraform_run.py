@@ -37,7 +37,7 @@ def select_scope(root, catalog_id, inputs):
     selected = [e for e in entries(root) if e['id'] == catalog_id and e['kind'] == 'composition']
     require(len(selected) == 1, 'Select one registered WSD composition')
     entry = selected[0]
-    config = json.loads((root / entry['root'] / 'main.tf.json').read_text())
+    config = json.loads((root / entry['root'] / 'main.tf.json').read_text(encoding='utf-8'))
     require(config['terraform'].get('backend') == {'http': {}}, 'Only the owned HTTP backend is supported')
     require(isinstance(inputs, dict) and not set(inputs) - set(config['variable']), 'Unknown Terraform inputs')
     require(not any(k in inputs for k, v in config['variable'].items() if v.get('sensitive')),
@@ -224,7 +224,7 @@ def prepare(args, root=ROOT):
     write_new(operation / 'backend.hcl', ''.join(f'{k} = {json.dumps(v)}\n' for k, v in sorted(settings.items())).encode())
     authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json')
     version = strict_loads(read_private(operation / 'version.json'))['terraform_version']
-    require(version == json.loads((root / 'config/toolchain.json').read_text())['terraform'], 'Terraform version differs from the pinned toolchain')
+    require(version == json.loads((root / 'config/toolchain.json').read_text(encoding='utf-8'))['terraform'], 'Terraform version differs from the pinned toolchain')
     current_window(authority)
     authorized_command(authority, binary, directory, ['init', '-input=false', '-no-color', '-lockfile=readonly',
             '-reconfigure', f'-backend-config={operation / "backend.hcl"}'], env, operation / 'init.log')

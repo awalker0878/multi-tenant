@@ -57,7 +57,7 @@ def pins(root):
         require(re.fullmatch(r'requirements-[a-z]+\.txt', name), 'Unsupported repository requirements include')
         if name in seen: return
         seen.add(name)
-        for line in (root/name).read_text().splitlines():
+        for line in (root/name).read_text(encoding='utf-8').splitlines():
             line = line.strip()
             if not line or line.startswith('#'): continue
             if line.startswith('-r '): visit(line[3:]); continue
@@ -77,7 +77,7 @@ def validate(config, root=ROOT):
             'Exact runtime build profile required')
     require(isinstance(config['source_commit'],str) and re.fullmatch('[0-9a-f]{40}',config['source_commit']),
             'Exact source commit required')
-    toolchain=json.loads((root/'config/toolchain.json').read_text())
+    toolchain=json.loads((root/'config/toolchain.json').read_text(encoding='utf-8'))
     require(isinstance(config['python_version'],str) and re.fullmatch(re.escape(toolchain['python'])+r'\.[0-9]+',config['python_version']),
             'Accepted full Python version must match the repository minor version')
     for key in ('python','output'): installed_path(config[key])

@@ -40,9 +40,9 @@ def run(root=ROOT):
     def check(name,passed,detail=None):
         checks.append({'name':name,'passed':bool(passed),**({'detail':detail} if detail else {})})
         if not passed:errors.append({'check':name,**({'detail':detail} if detail else {})})
-    inv=json.loads((root/'sources/documentation/source_inventory.json').read_text())
-    manifest=json.loads((root/'sources/documentation/conversion_manifest.json').read_text())['documents']
-    ledger=json.loads((root/'sources/documentation/block_coverage.json').read_text())
+    inv=json.loads((root/'sources/documentation/source_inventory.json').read_text(encoding='utf-8'))
+    manifest=json.loads((root/'sources/documentation/conversion_manifest.json').read_text(encoding='utf-8'))['documents']
+    ledger=json.loads((root/'sources/documentation/block_coverage.json').read_text(encoding='utf-8'))
     bysource={d['id']:d for d in manifest};specs={d['id']:d for d in inv['documents']}
     check('one manifest per source',set(bysource)==set(specs) and len(bysource)==len(manifest))
     actualdocx={str(p.relative_to(root)) for p in root.rglob('*.docx') if not any(x in p.parts for x in ('build','.git','.venv','evidence'))}
@@ -113,7 +113,7 @@ def run(root=ROOT):
             metrics['source_bookmarks']+=1
             check('bookmark retained: '+d['id']+' '+name,mark['anchor'] in anchors(root/mark['path']))
         for p in destinations:
-            if d['historical']:check('historical banner: '+str(p.relative_to(root)),'Historical only.' in p.read_text())
+            if d['historical']:check('historical banner: '+str(p.relative_to(root)),'Historical only.' in p.read_text(encoding='utf-8'))
     # Parse Markdown rather than scanning raw syntax: code samples are not links.
     paths=list((root/'docs').rglob('*.md'))+[root/'README.md']
     for p in paths:
@@ -131,7 +131,7 @@ def run(root=ROOT):
             if parts.fragment and target.suffix.lower()=='.md':
                 metrics['fragment_links']+=1
                 check('fragment link: '+str(p.relative_to(root))+' -> '+value,unquote(parts.fragment) in anchors(target))
-    records=json.loads((root/'sources/documentation/adr_records.json').read_text())
+    records=json.loads((root/'sources/documentation/adr_records.json').read_text(encoding='utf-8'))
     reqs=list(csv.DictReader((root/'reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared/requirements.csv').open(encoding='utf-8-sig',newline='')))
     reqids={r['requirementId'] for r in reqs}
     allsourceids={x for a in records for x in a['source_decision_ids']}
@@ -141,14 +141,14 @@ def run(root=ROOT):
     check('ADR lifecycle validity',not lifecycle_errors,lifecycle_errors or None)
     builder=Builder(root)
     crosswalk=list(csv.DictReader((root/'sources/documentation/adr_crosswalk.csv').open(newline='')))
-    index_text=(root/'docs/adr/README.md').read_text()
+    index_text=(root/'docs/adr/README.md').read_text(encoding='utf-8')
     for a in records:
         row=next((line for line in index_text.splitlines() if a['id']+' — ' in line), '')
         check('ADR index state agrees: '+a['id'], '; '+a['status']+' |' in row)
         mapped=[row for row in crosswalk if row['adr']==a['id']]
         check('ADR crosswalk state agrees: '+a['id'],bool(mapped) and all(row['status']==a['status'] for row in mapped))
         target=root/builder.adrpath(a)
-        check('ADR rendering agrees with record: '+a['id'], target.is_file() and target.read_text()==render_adr(a,builder))
+        check('ADR rendering agrees with record: '+a['id'], target.is_file() and target.read_text(encoding='utf-8')==render_adr(a,builder))
     structural=check_structure(root)
     check('Independent code and ordered table structure',not structural['errors'],structural['errors'] or None)
     metrics['independent_table_cells']=structural['cells']

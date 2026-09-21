@@ -11,9 +11,9 @@ ROOT=Path(__file__).resolve().parents[1]
 def check(root=ROOT):
  rows=[];errors=[]
  for config in sorted((root/'terraform').rglob('main.tf.json')):
-  required=json.loads(config.read_text())['terraform']['required_providers'];lock=config.parent/'.terraform.lock.hcl'
+  required=json.loads(config.read_text(encoding='utf-8'))['terraform']['required_providers'];lock=config.parent/'.terraform.lock.hcl'
   if not lock.is_file():errors.append(str(lock.relative_to(root))+': missing actual lock');continue
-  text=lock.read_text();blocks=dict(re.findall(r'provider\s+"([^"]+)"\s*\{([^}]+)\}',text,re.S))
+  text=lock.read_text(encoding='utf-8');blocks=dict(re.findall(r'provider\s+"([^"]+)"\s*\{([^}]+)\}',text,re.S))
   wanted={'registry.terraform.io/'+v['source']:v['version'].removeprefix('= ').strip() for v in required.values()}
   if set(blocks)!=set(wanted):errors.append(str(lock.relative_to(root))+': provider scope mismatch')
   for address,version in wanted.items():

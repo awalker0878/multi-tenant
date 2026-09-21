@@ -46,7 +46,7 @@ def fields(value, expected, label):
 
 
 def native_inputs(platform, phase, supplied, excluded):
-    config = json.loads((ROOT / 'terraform/modules' / COMPONENTS[platform][phase] / 'main.tf.json').read_text())
+    config = json.loads((ROOT / 'terraform/modules' / COMPONENTS[platform][phase] / 'main.tf.json').read_text(encoding='utf-8'))
     variables = {k: v for k, v in config['variable'].items() if k not in excluded}
     require(isinstance(supplied, dict) and not set(supplied) - set(variables), 'Unknown or owned native input')
     values = {}

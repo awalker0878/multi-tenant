@@ -38,9 +38,9 @@ def plan_only_mock_tests(directory: Path) -> bool:
     if not configs or list(tests.rglob("*.tftest.json")):
         return False
     try:
-        required = json.loads((directory / "main.tf.json").read_text())["terraform"]["required_providers"]
+        required = json.loads((directory / "main.tf.json").read_text(encoding='utf-8'))["terraform"]["required_providers"]
         for path in configs:
-            text = path.read_text()
+            text = path.read_text(encoding='utf-8')
             # Preserve quoted strings while removing actual HCL comments.
             clean = re.sub(r'("(?:\\.|[^"\\])*")|(/\*[\s\S]*?\*/|//[^\n]*|\#[^\n]*)',
                            lambda m: m[1] if m[1] else " ", text)
@@ -201,8 +201,8 @@ def main() -> int:
                 else:
                     entry["schema_export"] = "NOT_RUN_ROOT_BACKEND_BOUNDARY"
                     entry["schema_source"] = "matching backend-free module; provider constraints must match"
-                    module_config = json.loads((work / Path(scope["module"]).relative_to("terraform") / "main.tf.json").read_text())
-                    root_config = json.loads((directory / "main.tf.json").read_text())
+                    module_config = json.loads((work / Path(scope["module"]).relative_to("terraform") / "main.tf.json").read_text(encoding='utf-8'))
+                    root_config = json.loads((directory / "main.tf.json").read_text(encoding='utf-8'))
                     entry["matching_module_provider_requirements"] = (module_config["terraform"]["required_providers"] == root_config["terraform"]["required_providers"])
                 lock = directory / ".terraform.lock.hcl"
                 if lock.is_file():

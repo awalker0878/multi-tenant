@@ -47,11 +47,11 @@ def compare_code(expected, page):
 
 
 def check(root:Path):
-    sources=json.loads((root/'sources/documentation/conversion_manifest.json').read_text())['documents']
-    ledger={(x['source_id'],x['block']):x for x in json.loads((root/'sources/documentation/block_coverage.json').read_text())}
+    sources=json.loads((root/'sources/documentation/conversion_manifest.json').read_text(encoding='utf-8'))['documents']
+    ledger={(x['source_id'],x['block']):x for x in json.loads((root/'sources/documentation/block_coverage.json').read_text(encoding='utf-8'))}
     cache={};errors=[];tables=cells=codes=0
     def soup(path):
-        if path not in cache:cache[path]=BeautifulSoup(MD(path.read_text()),'html.parser')
+        if path not in cache:cache[path]=BeautifulSoup(MD(path.read_text(encoding='utf-8')),'html.parser')
         return cache[path]
     for source in sources:
         with ZipFile(root/source['source']) as archive:tree=ET.fromstring(archive.read('word/document.xml'))

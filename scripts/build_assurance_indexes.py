@@ -18,7 +18,7 @@ def read_csv(path):
 def build(root=ROOT):
     b=Builder(root);base=root/'reference/Portable_Hosting_Delivery_Kits_v1_1'
     ra_path=base/'05_Reference_v1_4/registers/realization_verification_addenda.json'
-    ra=json.loads(ra_path.read_text());ct=read_csv(base/'04_Shared/tests.csv')
+    ra=json.loads(ra_path.read_text(encoding='utf-8'));ct=read_csv(base/'04_Shared/tests.csv')
     qpath=base/'04_Shared/development/qualification_observation_cards.csv';cards=read_csv(qpath)
     wpath=base/'05_Reference_v1_4/registers/v1_4_verification_assertions.csv';worked=read_csv(wpath)
     path='docs/assurance/realization-addenda.md';lines=['# Native realization addenda — RA-01 to RA-12','','These are the retained supplemental procedures, not a new set of executed tests. Each elaborates the CT references shown and retains its original not-run state. Select by actual stack, offered service and accepted test safety envelope.','',b.link(path,str(ra_path.relative_to(root)),'Unchanged source JSON'),'']
@@ -42,7 +42,7 @@ def build(root=ROOT):
     b.write(path,'\n'.join(lines))
     out=root/'sources/assurance';out.mkdir(exist_ok=True)
     (out/'verification_families.json').write_text(json.dumps({'families':{'CT':len(ct),'RA':len(ra),'W14':len(worked),'Q11':len(cards)},'supplemental_mappings':mappings,'execution':'SPECIFICATIONS_NOT_EXECUTED','counts_are_not_additive_unique_tests':True},indent=2)+'\n')
-    allocation=json.loads((out/'implementation_assertions.json').read_text());counts=Counter(row['requirement_id'].split('-')[0] for row in allocation)
+    allocation=json.loads((out/'implementation_assertions.json').read_text(encoding='utf-8'));counts=Counter(row['requirement_id'].split('-')[0] for row in allocation)
     path='docs/implementation/assertion-allocation.md'
     lines=['# Assertion-level implementation and enforcement allocation','','**State: proposed engineering allocation; native verification and owner adoption are not claimed.** Each row retains its exact source requirement and identifies a narrower checkable facet, enforcement owner/location, related candidate artifact or external operating record, verification method and remaining dependency. A module link does not satisfy a requirement by itself.','','All 194 requirements are represented. Compound requirements have explicit facets as well as an umbrella obligation that preserves anything not covered by a facet. The umbrella is not marked passed; the owner must finish scope analysis for each actual offered service. Not applicable requires an explicit rationale and authority, not a convenience flag.','','| Family | Allocation rows | Read |','|---|---:|---|']
     for family,count in sorted(counts.items()):lines.append(f'| {family} | {count} | [{family} allocation](allocation/{family.lower()}.md) |')

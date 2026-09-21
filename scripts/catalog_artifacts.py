@@ -28,7 +28,7 @@ def main():
     conversion=ROOT/'sources/documentation/conversion_manifest.json'
     converted={}
     if conversion.exists():
-        converted={d['source']:d for d in json.loads(conversion.read_text())['documents']}
+        converted={d['source']:d for d in json.loads(conversion.read_text(encoding='utf-8'))['documents']}
     lines=['# Artifact and Markdown catalogue','','Read the full chapter content in Git; keep the original files as provenance. Source conversion does not change an approval or test result.',
            '', '| Artifact | Role | Read the content | Original source |','|---|---|---|---|']
     for r in rows:

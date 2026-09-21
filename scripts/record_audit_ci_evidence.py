@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def main():
  q=ROOT/'build/reports';out=ROOT/'evidence/completion-audit';out.mkdir(parents=True,exist_ok=True)
- tf=json.loads((q/'terraform_validation.json').read_text());an=json.loads((q/'ansible_validation.json').read_text());local=json.loads((q/'local_validation.json').read_text());docs=json.loads((q/'documentation_validation.json').read_text());repo=json.loads((q/'repository_check.json').read_text());locks=json.loads((q/'provider_lock_review.json').read_text())
+ tf=json.loads((q/'terraform_validation.json').read_text(encoding='utf-8'));an=json.loads((q/'ansible_validation.json').read_text(encoding='utf-8'));local=json.loads((q/'local_validation.json').read_text(encoding='utf-8'));docs=json.loads((q/'documentation_validation.json').read_text(encoding='utf-8'));repo=json.loads((q/'repository_check.json').read_text(encoding='utf-8'));locks=json.loads((q/'provider_lock_review.json').read_text(encoding='utf-8'))
  assert tf['status']=='PASSED_TOOLCHAIN_ONLY',tf['status']
  assert not locks['errors']
  assert local['unit_and_source_tests']['failures']==0 and local['unit_and_source_tests']['errors']==0

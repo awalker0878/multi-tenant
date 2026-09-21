@@ -132,7 +132,7 @@ def capture(request,project,receipt,authority,token,*,ca_file=None,client=None,r
             return projects.project_observation(project,get(project_path),call,identifier)
         before=observe_project()
         require(before==receipt['project'],'Project identity, restrictions or custody changed since acceptance')
-        version=json.loads((root/'config/toolchain.json').read_text())['terraform']
+        version=json.loads((root/'config/toolchain.json').read_text(encoding='utf-8'))['terraform']
         states=[]
         for expected in request['states']:
             key=expected['state_key']; path=urlsplit(backends[key]['address']).path

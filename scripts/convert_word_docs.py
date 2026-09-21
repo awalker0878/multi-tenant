@@ -383,7 +383,7 @@ class Source:
                 'bookmarks':{k:{'path':str(p.relative_to(self.root)),'anchor':a} for k,(p,a) in self.bookmarks.items()}}
 
 def build(root=ROOT):
-    cfg=json.loads((root/'sources/documentation/source_inventory.json').read_text())
+    cfg=json.loads((root/'sources/documentation/source_inventory.json').read_text(encoding='utf-8'))
     for spec in cfg['documents']:
         if Path(spec['destination']).as_posix().startswith('docs/current'):
             raise ValueError('Frozen-source refresh cannot target maintained design records')

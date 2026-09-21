@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def verify_snapshot(root,manifest_path):
     issues=[];count=0;root=root.resolve()
     try:
-        data=json.loads(manifest_path.read_text());items=data['file_sha256']
+        data=json.loads(manifest_path.read_text(encoding='utf-8'));items=data['file_sha256']
         if not isinstance(items,dict) or not items:raise ValueError('Empty digest map')
         for name,digest in items.items():
             rel=PurePosixPath(name)

@@ -29,7 +29,7 @@ def plan(destination,source=ROOT):
     if git(destination,'status','--porcelain','--untracked-files=all'):raise ValueError('Checkout has local changes; commit or preserve them before import')
     integrity=verify(source)
     if integrity['issues']:raise ValueError('Source ZIP release hashes do not match')
-    manifest=json.loads((source/'sources/release_manifest.json').read_text())['file_sha256']
+    manifest=json.loads((source/'sources/release_manifest.json').read_text(encoding='utf-8'))['file_sha256']
     names=sorted([*manifest,'sources/release_manifest.json'])
     initial=(source/'evidence/imported/github-initial-README.md').read_bytes()
     rows=[]

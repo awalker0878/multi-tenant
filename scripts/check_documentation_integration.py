@@ -26,7 +26,7 @@ rejected or superseded by consolidating these filenames.
 def check(root):
     errors=[];aliases=[]
     try:
-        data=json.loads((root/'sources/documentation/integration_authority.json').read_text())
+        data=json.loads((root/'sources/documentation/integration_authority.json').read_text(encoding='utf-8'))
         builder=Builder(root)
         active={row['id']:builder.adrpath(row) for row in builder.adrs}
         aliases=data['path_aliases']
@@ -41,12 +41,12 @@ def check(root):
             p=root/rel
             if not rel.startswith('docs/adr/') or not p.resolve().is_relative_to((root/'docs/adr').resolve()):
                 errors.append('Alias outside decision directory');continue
-            if p.is_symlink() or not p.is_file() or p.read_text()!=alias_text(row):errors.append('Alias is not a pure navigation record: '+rel)
+            if p.is_symlink() or not p.is_file() or p.read_text(encoding='utf-8')!=alias_text(row):errors.append('Alias is not a pure navigation record: '+rel)
         numbered={p.relative_to(root).as_posix() for p in (root/'docs/adr').glob('*.md') if re.match(r'^\d{4}-',p.name)}
         if numbered!=expected|seen:errors.append('Numbered ADR files differ from canonical records and explicit aliases')
         for row in data['historical_views']:
             p=root/row['path'];target=root/row['target']
-            if not p.is_file() or not p.read_text().startswith('<!-- RETAINED-HISTORICAL-PROPOSAL -->') or not target.is_file():
+            if not p.is_file() or not p.read_text(encoding='utf-8').startswith('<!-- RETAINED-HISTORICAL-PROPOSAL -->') or not target.is_file():
                 errors.append('Historical proposal lacks a visible current-authority boundary: '+row['path'])
             archive=root/row['archived_path']
             if not archive.is_file() or hashlib.sha256(archive.read_bytes()).hexdigest()!=row['previous_blob_sha256']:
@@ -59,7 +59,7 @@ def check(root):
             'assurance_builder':'scripts/build_assurance_indexes.py','history':'sources/assurance/historical_audit_dispositions.csv'}
         if data['canonical']!=canonical or any(not (root/path).exists() for path in canonical.values()):
             errors.append('Canonical documentation authority is incomplete or changed without checker review')
-        if json.loads((root/data['inactive_amendments']).read_text())!=[]:
+        if json.loads((root/data['inactive_amendments']).read_text(encoding='utf-8'))!=[]:
             errors.append('Retired source-block amendment ledger must not become a second active authoring surface')
         for rel in data['retained_inactive_records']:
             if not (root/rel).is_file():errors.append('Historical proposal source removed: '+rel)

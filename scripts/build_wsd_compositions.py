@@ -21,8 +21,8 @@ def rendered(root=ROOT):
         for phase, component in phases.items():
             primitive = root / 'terraform/modules' / component
             old_root = root / 'terraform/stacks/components' / component
-            native = json.loads((primitive / 'main.tf.json').read_text())
-            config = json.loads((old_root / 'main.tf.json').read_text())
+            native = json.loads((primitive / 'main.tf.json').read_text(encoding='utf-8'))
+            config = json.loads((old_root / 'main.tf.json').read_text(encoding='utf-8'))
             common = {'tenant_key', 'allow_restricted_build', 'test_authorization_ref'}
             identity = 'domain_key' if phase == 'domains' else 'workload_key'
             attrs = {k: v for k, v in native['variable'].items() if k not in common | {identity}}
@@ -71,10 +71,10 @@ def rendered(root=ROOT):
             }
             files[module_path + '/main.tf.json'] = json.dumps(module, indent=2) + '\n'
             files[root_path + '/main.tf.json'] = json.dumps(stack, indent=2) + '\n'
-            lock = (primitive / '.terraform.lock.hcl').read_text()
+            lock = (primitive / '.terraform.lock.hcl').read_text(encoding='utf-8')
             files[module_path + '/.terraform.lock.hcl'] = lock
             files[root_path + '/.terraform.lock.hcl'] = lock
-            example = json.loads((old_root / 'inputs.tfvars.json.example').read_text())
+            example = json.loads((old_root / 'inputs.tfvars.json.example').read_text(encoding='utf-8'))
             member = {k: example[k] for k in attrs if k in example}
             inputs = {k: example[k] for k in sorted(common)}
             inputs.update(wsd_key='wsd-01', environment_key='qualification-01', site_key='site-01', members={example[identity]: member})
@@ -109,7 +109,7 @@ run "empty_scope_rejected" {
             files[module_path + '/tests/composition.tftest.hcl'] = test
             entries.append({'id': f'{platform}-wsd-{phase}', 'platform': platform, 'kind': 'composition',
                             'module': module_path, 'root': root_path, 'owner_scope': 'wsd'})
-    catalog = json.loads((root / 'terraform/catalog.json').read_text())
+    catalog = json.loads((root / 'terraform/catalog.json').read_text(encoding='utf-8'))
     catalog['entries'] = [e for e in catalog['entries'] if e['kind'] == 'component'] + entries
     files['terraform/catalog.json'] = json.dumps(catalog, indent=2) + '\n'
     return files
@@ -122,7 +122,7 @@ def main():
     changed = []
     for name, content in rendered().items():
         path = ROOT / name
-        if not path.exists() or path.read_text() != content:
+        if not path.exists() or path.read_text(encoding='utf-8') != content:
             changed.append(name)
             if not args.check:
                 path.parent.mkdir(parents=True, exist_ok=True)

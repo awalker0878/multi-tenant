@@ -24,7 +24,7 @@ def main():
         env={k:v for k,v in os.environ.items() if not k.startswith(('ANSIBLE_','TF_VAR_','OS_','NSXT_','NUTANIX_','VSPHERE_'))}
         env.update(HOME=str(home),ANSIBLE_CONFIG=str(ROOT/'ansible/ansible.cfg'),ANSIBLE_FORCE_COLOR='false',ANSIBLE_NOCOLOR='1',ANSIBLE_LOCAL_TEMP=str(tmp/'ansible-tmp'))
         base=[binary,'-i',str(ROOT/'ansible/inventories/localhost.yml')]
-        vars=json.loads((ROOT/'ansible/fixtures/reference_bundle.json').read_text());vars.update(hosting_stage_enabled=True,hosting_staging_root=str(staging),ansible_python_interpreter=sys.executable)
+        vars=json.loads((ROOT/'ansible/fixtures/reference_bundle.json').read_text(encoding='utf-8'));vars.update(hosting_stage_enabled=True,hosting_staging_root=str(staging),ansible_python_interpreter=sys.executable)
         varfile=tmp/'vars.json';varfile.write_text(json.dumps(vars))
         def run(name,play,extra=None,expect_failure=False,zero_changes=False):
             argv=base+[str(ROOT/'ansible/playbooks/local'/play),'-e','@'+str(varfile),*(extra or [])]
@@ -56,7 +56,7 @@ def main():
             vars.update(hosting_platform=platform,hosting_manifest_path=str(ROOT/'ansible/fixtures/neutron_manifest.json') if platform=='neutron' else str(ROOT/f'examples/{platform}_observation.json.example'));varfile.write_text(json.dumps(vars))
             run(platform+'-validation-no-contact','validate_readback.yml',zero_changes=True)
         try:
-            handoff=json.loads((directory/'engineering-handoff.json').read_text())
+            handoff=json.loads((directory/'engineering-handoff.json').read_text(encoding='utf-8'))
             safe=handoff['may_apply'] is False and handoff['may_activate'] is False
         except (ValueError,KeyError,OSError):safe=False
         report['checks'].append({'name':'staged-handoff-never-authorizes','passed':safe})
