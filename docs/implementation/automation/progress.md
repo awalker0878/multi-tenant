@@ -37,6 +37,17 @@ native identity retention, exact previous-receipt approval and versioned envelop
 renewal. Concurrent-controller and interrupted-transaction tests run against SQLite;
 the qualified native capacity budget and cleanup observations remain site inputs.
 
+The [dependency-safe retirement coordinator](retirement-orchestration.md) now
+binds live-service cleanup to an exact source/scope, accountable resource owners,
+retained-data custody and a topologically ordered action graph. It prevents shared
+resources from blind removal, requires retained-copy/key/disposition records before
+destructive cleanup, enforces DNS withdrawal before IPAM retirement and holds
+capacity release until every applicable cleanup owner is an ancestor. Exact owner
+receipts can be reviewed through the durable delivery runner without issuing a
+native mutation. This is a W25 repository integration increment; actual platform
+cleanup, reuse quarantine, sanitization and service-owner acceptance remain native
+commissioning evidence.
+
 Receipt-based workload compilation and bootstrap/withdrawal transition preparation
 are now registered delivery stages. Their adapters invoke the actual three-platform
 compiler and lifecycle contracts; fixtures verify retained native identities and
