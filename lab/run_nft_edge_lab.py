@@ -140,9 +140,22 @@ def run():
             apply('active'); probe(19652, True)
             time.sleep(5.2)
             probe(19651, False); probe(19652, False); probe(19652, True, 'server')
+            apply('active'); probe(19652, True)
+            incident=dict(format='hosting-edge-containment-authority/1',spec_sha256=digest(encoded(spec)),incident_id='local-incident',
+                valid_from=(utcnow()-timedelta(seconds=1)).isoformat(),valid_until=(utcnow()+timedelta(minutes=5)).isoformat(),
+                change_ref='LOCAL-INCIDENT',boundary_acceptance_ref='LOCAL-BOUNDARY')
+            incident_path=base/'incident.json'; incident_path.write_bytes(encoded(incident)); incident_path.chmod(0o600)
+            for attempt in ('first','repeat'):
+                result=json.loads(command(ns('edge',sys.executable,str(ROOT/'tools/edge_contain.py'),
+                    '--spec',str(base/f'spec-{counter}.json'),'--authority',str(incident_path),'--nft',nft,
+                    '--ledger',str(ledger),'--output',str(base/('contain-'+attempt)),'--execute')))
+                if result['status']!='CONTAINED_OBSERVED_NOT_QUALIFIED' or result['write_attempted']!=(attempt=='first'):
+                    raise RuntimeError('Delegated containment did not retain its one native attempt')
+                probe(19651,False); probe(19652,False); probe(19652,True,'server')
             return dict(status='PASSED_LOCAL_NATIVE_KERNEL_EDGE_ONLY', healthy_controls=True,
                         bootstrap_scope=True, active_scope=True, established_session_withdrawn=True,
-                        controller_loss_expiry=True, native_platform_contacted=False, edge_ha_qualified=False)
+                        controller_loss_expiry=True, delegated_incident_containment=True,
+                        containment_retry_read_only=True, native_platform_contacted=False, edge_ha_qualified=False)
     finally:
         for process in processes:
             if process.poll() is None:

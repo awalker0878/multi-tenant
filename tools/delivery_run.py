@@ -126,8 +126,9 @@ def replay(log, plan):
     return starts,receipts,active is None,closed,renewals
 
 
-def run(plan, inbox, ledger, *, execute=False, root=ROOT):
+def run(plan, inbox, ledger, *, execute=False, root=ROOT, containment=None):
     from tools.delivery_steps import dispatch, recover, validate_packet
+    from tools import delivery_containment
     validate(plan)
     source = verify(root)
     require(source['status'] == 'HASHES_MATCH' and source['commit'] == plan['source_commit'], 'Exact clean delivery source required')
@@ -136,18 +137,22 @@ def run(plan, inbox, ledger, *, execute=False, root=ROOT):
     require(not ledger.resolve().is_relative_to(root.resolve()) and not inbox.resolve().is_relative_to(root.resolve()),
             'Private delivery storage must be outside the source checkout')
     require(execute is True, 'Explicit delivery execution opt-in required')
+    if containment is not None: delivery_containment.validate(containment,plan)
+    context={}
     # Stable resource scope prevents a renamed workflow from evading uncertainty.
-    with journal.locked(ledger, {'owner':'delivery', **plan['scope']}) as log:
+    with journal.locked(ledger, {'owner':'delivery', **plan['scope']}) as log, delivery_containment.guard(containment,plan,context,root):
         starts, receipts, new, closed, renewals = replay(log, plan)
         if new:
             log.append('DELIVERY_STARTED', {'plan':plan})
         base=log.directory/'runs'/c.digest(plan)
+        context['base']=base
         for path in (log.directory/'runs',base,base/'steps'):
             if not path.exists(): path.mkdir(mode=0o700); sync_directory(path.parent)
             private_path(path, directory=True)
         for step in plan['steps']:
             identity = step['id']
             if identity in receipts: continue
+            context['step_id']=identity
             require(set(step['needs']) <= receipts.keys(), 'Incomplete delivery dependency')
             directory = base / 'steps' / identity
             # Gate records remain current through every dependent operation,
@@ -173,7 +178,12 @@ def run(plan, inbox, ledger, *, execute=False, root=ROOT):
             else:
                 incoming = inbox / (identity + '.json')
                 if not incoming.exists():
-                    return dict(status='WAITING_STAGE_INPUTS', step_id=identity, plan_sha256=c.digest(plan),
+                    waiting='WAITING_STAGE_INPUTS'
+                    if containment is not None and identity in containment['trigger_steps']:
+                        context['containment_attempted']=True
+                        delivery_containment.execute(containment,plan,identity,base,root)
+                        waiting='WAITING_STAGE_INPUTS_CONTAINED'
+                    return dict(status=waiting, step_id=identity, plan_sha256=c.digest(plan),
                                 dependencies={key:c.digest(receipts[key]) for key in step['needs']},
                                 completed_steps=list(receipts), native_acceptance=False, production_activation=False)
                 saved = packet(incoming, plan, step, receipts)
@@ -202,9 +212,11 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('plan','inbox','ledger'): parser.add_argument('--'+name, required=True, type=Path)
     parser.add_argument('--execute',action='store_true')
+    parser.add_argument('--containment',type=Path)
     args=parser.parse_args()
     try:
-        result=run(load_private(args.plan),args.inbox,args.ledger,execute=args.execute)
+        result=run(load_private(args.plan),args.inbox,args.ledger,execute=args.execute,
+                   containment=load_private(args.containment) if args.containment else None)
         print(json.dumps(result)); return 0
     except Exception:
         # Native subprocess/transport exceptions can contain private material.

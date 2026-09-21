@@ -8,6 +8,11 @@ tenant must have no administrative access to the edge, its namespace or its nati
 attachments. The [architecture activation sequence](../provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
 still governs production exposure.
 
+The [delegated incident handler](incident-containment.md) supplies a separate
+withdrawal-only authority and native drop-rule readback, including automatic
+failure handling for selected delivery stages. It retains the same edge owner
+ledger and does not authorize reactivation.
+
 ## Foundation requirements
 
 Assign dedicated WSD domain interfaces, explicit service/transit interfaces,

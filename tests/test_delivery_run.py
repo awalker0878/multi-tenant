@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from tools import delivery_run as d, delivery_steps as s, execution_journal as j, readback_core as c
+from tools import delivery_run as d, delivery_steps as s, execution_journal as j, readback_core as c,delivery_containment as incident
 from tools.run_files import digest, encoded, load_private, read_private, replace_private, utcnow, write_new
 
 
@@ -97,6 +97,26 @@ class DeliveryTests(unittest.TestCase):
         value['parameters']['command']='arbitrary'; replace_private(path,encoded(value))
         with self.assertRaises(ValueError): self.run_delivery()
         self.assertFalse(any(self.ledger.glob('*/runs/*/steps/*/packet.json')))
+    def test_selected_owner_failure_invokes_delegated_containment_and_keeps_hold(self):
+        self.offer('admit',{})
+        with patch.object(incident,'validate'),patch.object(incident,'execute') as contained,\
+             patch.object(s,'dispatch',side_effect=ValueError('native verification failed')):
+            with self.assertRaisesRegex(ValueError,'native verification failed'):
+                d.run(self.plan,self.inbox,self.ledger,execute=True,containment={'trigger_steps':['admit']})
+            self.assertEqual(contained.call_count,1)
+            self.assertEqual(contained.call_args.args[2],'admit')
+        self.assertFalse(any(self.ledger.glob('*/runs/*/steps/admit/owner-completion.json')))
+    def test_missing_post_verification_inputs_contain_instead_of_leaving_exposure(self):
+        with patch.object(incident,'validate'),patch.object(incident,'execute') as contained:
+            result=d.run(self.plan,self.inbox,self.ledger,execute=True,containment={'trigger_steps':['admit']})
+            self.assertEqual(result['status'],'WAITING_STAGE_INPUTS_CONTAINED'); self.assertEqual(contained.call_count,1)
+    def test_unselected_failure_and_failed_containment_cannot_advance_workflow(self):
+        self.offer('admit',{})
+        with patch.object(incident,'validate'),patch.object(incident,'execute',side_effect=OSError('containment unavailable')) as contained,\
+             patch.object(s,'dispatch',side_effect=ValueError('original failure')):
+            with self.assertRaisesRegex(ValueError,'original failure'):
+                d.run(self.plan,self.inbox,self.ledger,execute=True,containment={'trigger_steps':['ready']})
+            self.assertEqual(contained.call_count,0)
 
 
 if __name__=='__main__': unittest.main()

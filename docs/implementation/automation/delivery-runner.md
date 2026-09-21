@@ -159,7 +159,9 @@ The final state is `DELIVERY_EXECUTED_REQUIRES_ACCEPTANCE`. Native acceptance an
 production activation remain false in coordinator summaries; actual exposure,
 lease and qualification facts come from the relevant owner evidence. In
 particular, completion does not keep an expiring edge lease alive. A failed
-post-activation campaign requires the separate edge owner's authorized withdrawal;
-do not make that incident action wait for successful completion of the delivery
-graph. Autonomous containment and cross-host dispatch remain separate integration
-work; neither is implied by local process restart recovery.
+post-activation campaign requires the separate edge owner's authorized withdrawal.
+The optional [delegated incident handler](incident-containment.md) performs that
+withdrawal on selected failures or missing verification inputs while keeping
+the forward workflow held. It does not depend on successful graph completion.
+Cross-host dispatch and controller-host-loss handling remain separate from this
+local failure hook.
