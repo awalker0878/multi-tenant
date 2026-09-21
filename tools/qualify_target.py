@@ -17,7 +17,8 @@ from tools import nutanix_flow_activity_observe
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from tools.compile_wsd import STATE
 from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe
-from tools import nsx_segment_observe, vmware_network_binding
+from tools import nsx_segment_observe, nsx_domain_switch_observe, nsx_domain_binding, vmware_network_binding
+from tools import recovery_review, vsphere_port_observe
 from tools.check_release import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
@@ -29,12 +30,16 @@ WORKLOAD_ASSETS = {'workload_manifest', 'workload_token', 'workload_ca'}
 FLOW_ASSETS = {'flow_manifest', 'domain_outputs'}
 VSPHERE_ASSETS = {'workload_manifest', 'workload_session', 'workload_ca'}
 NETWORK_BINDING_ASSETS = {'portgroup_manifest', 'domain_outputs', 'workload_inputs'}
+DOMAIN_CAMPAIGN = 'hosting-target-campaign/8'
+MAPPING_CAMPAIGNS = {'hosting-target-campaign/6', 'hosting-target-campaign/7', DOMAIN_CAMPAIGN}
+PORT_CAMPAIGNS = {'hosting-target-campaign/7', DOMAIN_CAMPAIGN}
+VSPHERE_CAMPAIGNS = {'hosting-target-campaign/5'} | MAPPING_CAMPAIGNS
 ADAPTERS = {'openstack': neutron_observe, 'vmware': nsx_observe, 'nutanix': nutanix_observe}
 
 
 def validate(plan):
     c.exact_keys(plan, {'format', 'scope', 'source_commit', 'origin', 'assets', 'cases'})
-    require(plan['format'] in {'hosting-target-campaign/' + str(i) for i in range(1, 8)}, 'Unknown target campaign')
+    require(plan['format'] in {'hosting-target-campaign/' + str(i) for i in range(1, 9)}, 'Unknown target campaign')
     c.exact_keys(plan['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'})
     for value in plan['scope'].values():
         c.identifier(value)
@@ -44,13 +49,14 @@ def validate(plan):
     extended = plan['format'] == 'hosting-target-campaign/2'
     flow = plan['format'] == 'hosting-target-campaign/4'
     ahv = plan['format'] == 'hosting-target-campaign/3' or flow
-    mapping = plan['format'] in {'hosting-target-campaign/6', 'hosting-target-campaign/7'}
-    vsphere = plan['format'] == 'hosting-target-campaign/5' or mapping
+    mapping = plan['format'] in MAPPING_CAMPAIGNS
+    vsphere = plan['format'] in VSPHERE_CAMPAIGNS
     require(not extended or plan['scope']['platform'] == 'openstack', 'Workload readback campaign requires OpenStack')
     require(not ahv or plan['scope']['platform'] == 'nutanix', 'AHV readback campaign requires Nutanix')
     require(not vsphere or plan['scope']['platform'] == 'vmware', 'vSphere readback campaign requires VMware')
     c.exact_keys(plan['assets'], ASSETS | (WORKLOAD_ASSETS if extended else VSPHERE_ASSETS if vsphere else {'workload_manifest'} if ahv else set())
-                 | (FLOW_ASSETS if flow else set()) | (NETWORK_BINDING_ASSETS if mapping else set()))
+                 | (FLOW_ASSETS if flow else set()) | (NETWORK_BINDING_ASSETS if mapping else set())
+                 | ({'domain_inputs'} if plan['format'] == DOMAIN_CAMPAIGN else set()))
     for asset in plan['assets'].values():
         c.exact_keys(asset, {'path', 'sha256'})
         require(isinstance(asset['path'], str) and Path(asset['path']).is_absolute()
@@ -103,7 +109,8 @@ def bound_inputs(plan, known_hosts):
     require(all(case['guest'] in access['targets'] for case in plan['cases']), 'Unknown guest selector')
     require(all(ipaddress.ip_address(t['address']).version == 4 for t in access['targets'].values()), 'IPv4 campaign required')
     manifest = c.strict_loads(assets['native_manifest'])
-    adapter = nsx_segment_observe if plan['format'] in {'hosting-target-campaign/6', 'hosting-target-campaign/7'} else ADAPTERS[plan['scope']['platform']]
+    adapter = (nsx_domain_switch_observe if plan['format'] == DOMAIN_CAMPAIGN else nsx_segment_observe
+               if plan['format'] in MAPPING_CAMPAIGNS else ADAPTERS[plan['scope']['platform']])
     if adapter is neutron_observe:
         adapter.validate_manifest(manifest)
         if plan['format'] == 'hosting-target-campaign/2':
@@ -119,11 +126,16 @@ def bound_inputs(plan, known_hosts):
             if plan['format'] == 'hosting-target-campaign/4':
                 flow_binding(plan['scope'], c.strict_loads(assets['flow_manifest']),
                              c.strict_loads(assets['domain_outputs']), workload, manifest)
-        if plan['format'] in {'hosting-target-campaign/5', 'hosting-target-campaign/6', 'hosting-target-campaign/7'}:
+        if plan['format'] in VSPHERE_CAMPAIGNS:
             vsphere_binding(plan['scope'], c.strict_loads(assets['workload_manifest']), variables['hosting_workload_outputs'], manifest)
-        if plan['format'] in {'hosting-target-campaign/6', 'hosting-target-campaign/7'}:
-            binder = vmware_network_binding.bind_attachments if plan['format'] == 'hosting-target-campaign/7' else vmware_network_binding.bind
-            binder(plan['scope'], c.strict_loads(assets['workload_manifest']), variables['hosting_workload_outputs'], manifest,
+        if plan['format'] in MAPPING_CAMPAIGNS:
+            network = manifest
+            if plan['format'] == DOMAIN_CAMPAIGN:
+                nsx_domain_binding.bind(plan['scope'], c.strict_loads(assets['domain_outputs']), c.strict_loads(assets['domain_inputs']),
+                                        nsx_domain_switch_observe.domain_manifest(manifest))
+                network = nsx_domain_switch_observe.segment_manifest(manifest)
+            binder = vmware_network_binding.bind_attachments if plan['format'] in PORT_CAMPAIGNS else vmware_network_binding.bind
+            binder(plan['scope'], c.strict_loads(assets['workload_manifest']), variables['hosting_workload_outputs'], network,
                 c.strict_loads(assets['portgroup_manifest']), c.strict_loads(assets['domain_outputs']), c.strict_loads(assets['workload_inputs']))
     return assets, access, pins
 
@@ -259,16 +271,17 @@ def budget(authority, maximum):
 def native_readback(plan, assets, authority, directory, label):
     platform = plan['scope']['platform']
     script = {'openstack': 'neutron_observe.py', 'vmware': 'nsx_observe.py', 'nutanix': 'nutanix_observe.py'}[platform]
-    if plan.get('format') in {'hosting-target-campaign/6', 'hosting-target-campaign/7'}:
+    if plan.get('format') in MAPPING_CAMPAIGNS:
         adapter = vsphere_adapter(c.strict_loads(assets['workload_manifest']))
-        port_reader = 'vsphere_port_observe.py' if plan['format'] == 'hosting-target-campaign/7' else 'vsphere_network_observe.py'
+        port_reader = 'vsphere_port_observe.py' if plan['format'] in PORT_CAMPAIGNS else 'vsphere_network_observe.py'
+        network_reader = 'nsx_domain_switch_observe.py' if plan['format'] == DOMAIN_CAMPAIGN else 'nsx_segment_observe.py'
         collected = {}
         for key, script, manifest_name in (
-            ('network_before', 'nsx_segment_observe.py', 'native_manifest'),
+            ('network_before', network_reader, 'native_manifest'),
             ('portgroups_before', port_reader, 'portgroup_manifest'),
             ('workloads', Path(adapter.__file__).name, 'workload_manifest'),
             ('portgroups_after', port_reader, 'portgroup_manifest'),
-            ('network_after', 'nsx_segment_observe.py', 'native_manifest')):
+            ('network_after', network_reader, 'native_manifest')):
             collected[key + '_sha256'] = reader_child(plan, assets, authority, directory, label + '-' + key, script, manifest_name)
         return digest(encoded(collected))
     network_hash = reader_child(plan, assets, authority, directory, label, script, 'native_manifest')
@@ -322,14 +335,28 @@ def reader_child(plan, assets, authority, directory, label, script, manifest_nam
         for key in credentials:
             c.text(credentials[key], length=4096)
             env[('NSXT' if platform == 'vmware' else 'NUTANIX') + '_' + key.upper()] = credentials[key]
+    child_started = utcnow()
     with os.fdopen(os.open(directory / (label + '.log'), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600), 'wb') as log:
         result = subprocess.run(argv, stdin=subprocess.DEVNULL, stdout=log, stderr=log,
                                 env=env, timeout=budget(authority, 120), umask=0o077)
     require(result.returncode == 0, 'Native readback failed; exposure must remain held')
-    report = load_private(output)
+    raw = read_private(output); report = c.strict_loads(raw)
     require(report.get('outcome', report.get('status')) in {'READBACK_MATCH_NOT_QUALIFIED', 'OBSERVED_MATCH_NOT_QUALIFIED'},
             'Native readback is not stable and matching')
-    return digest(read_private(output))
+    if plan.get('format') == DOMAIN_CAMPAIGN:
+        check_campaign_report(assets, manifest_name, report, child_started, utcnow())
+    return digest(raw)
+
+
+def check_campaign_report(assets, manifest_name, report, started, current):
+    """Replay each v8 child report; a summary string or reused report cannot pass."""
+    require(manifest_name in {'native_manifest', 'portgroup_manifest', 'workload_manifest'}, 'Unreviewed child observation')
+    manifest = c.strict_loads(assets[manifest_name])
+    adapter = (nsx_domain_switch_observe if manifest_name == 'native_manifest' else vsphere_port_observe
+               if manifest_name == 'portgroup_manifest' else vsphere_adapter(manifest))
+    require(c.timestamp(report['started_at']) >= started, 'Child reused evidence from before collection')
+    require(recovery_review.check_report(manifest, report, current, 300, adapter=adapter) == 'READBACK_MATCH_NOT_QUALIFIED',
+            'Child evidence is incomplete, contradictory or unbound')
 
 
 def ssh_probe(case, target, authority, directory, binary, ca, sequence):
@@ -409,13 +436,13 @@ def main():
         # Copy only assets the child processes need; API credentials stay in memory.
         for key in ('native_manifest', 'native_ca', 'ssh_key'):
             write_new(directory / key, assets[key])
-        if plan['format'] in {'hosting-target-campaign/3', 'hosting-target-campaign/4', 'hosting-target-campaign/5', 'hosting-target-campaign/6', 'hosting-target-campaign/7'}:
+        if plan['format'] in {'hosting-target-campaign/3', 'hosting-target-campaign/4'} | VSPHERE_CAMPAIGNS:
             write_new(directory / 'workload_manifest', assets['workload_manifest'])
         if plan['format'] == 'hosting-target-campaign/4':
             write_new(directory / 'flow_manifest', assets['flow_manifest'])
-        if plan['format'] in {'hosting-target-campaign/5', 'hosting-target-campaign/6', 'hosting-target-campaign/7'}:
+        if plan['format'] in VSPHERE_CAMPAIGNS:
             write_new(directory / 'workload_ca', assets['workload_ca'])
-        if plan['format'] in {'hosting-target-campaign/6', 'hosting-target-campaign/7'}:
+        if plan['format'] in MAPPING_CAMPAIGNS:
             write_new(directory / 'portgroup_manifest', assets['portgroup_manifest'])
         write_new(directory / 'ssh_key-cert.pub', assets['ssh_certificate'])
         write_new(directory / 'known_hosts', pins.encode())

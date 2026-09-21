@@ -133,6 +133,9 @@ def sample(m, client):
     return results
 
 
+def observation_keys(m): return {r['moid'] for r in m['resources']}
+
+
 def validate_observation_history(m, history, states, current=None):
     """A MATCH needs both complete selected snapshots to equal the accepted baseline.
 
