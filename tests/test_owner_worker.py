@@ -57,6 +57,23 @@ class OwnerWorkerTests(unittest.TestCase):
                          lambda x:x['artifacts'].update(secret={'sha256':'0'*64,'base64':'eA=='})):
             bad=deepcopy(result); mutation(bad)
             with self.assertRaises(ValueError): worker.check_result(bad,self.job)
+    def test_transport_setup_failures_remove_all_temporary_credentials_before_network_contact(self):
+        raw=struct.pack('>I',11)+b'ssh-ed25519'+struct.pack('>I',32)+b'x'*32
+        target={'format':'hosting-owner-target/1','address':'192.0.2.10','port':22,'user':'hosting',
+            'machine_id':self.job['machine_id'],'host_key':'ssh-ed25519 '+base64.b64encode(raw).decode(),
+            'valid_from':self.job['valid_from'],'valid_until':self.job['valid_until'],'max_seconds':30}
+        key=self.base/'key'; certificate=self.base/'certificate'
+        write_new(key,b'TEST-KEY'); write_new(certificate,b'TEST-CERTIFICATE')
+        for failed in ('ssh_key-cert.pub','known_hosts'):
+            def failing(path,raw):
+                if path.name==failed: raise OSError('Synthetic artifact publication failure')
+                return write_new(path,raw)
+            with self.subTest(failed=failed),patch.object(remote_owner,'write_new',side_effect=failing), \
+                 patch.object(remote_owner.subprocess,'run',side_effect=AssertionError('unexpected network contact')), \
+                 self.assertRaises(OSError):
+                remote_owner.contact(self.job,target,'/usr/bin/ssh',key,certificate,self.base)
+            self.assertFalse(list(self.base.glob('transport-*/ssh_key*')))
+            self.assertEqual(read_private(key),b'TEST-KEY'); self.assertEqual(read_private(certificate),b'TEST-CERTIFICATE')
     def test_remote_delivery_recovers_lost_response_by_observation_only(self):
         self.plan['steps']=[{'id':'remote','kind':'remote_owner','needs':[]}]
         self.job['delivery']={'plan_sha256':c.digest(self.plan),'step_id':'remote','dependencies':{}}

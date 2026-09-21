@@ -8,7 +8,7 @@ import struct
 import subprocess
 import uuid
 from tools import owner_worker as worker, readback_core as c
-from tools.run_files import current_window,digest,encoded,load_private,private_path,read_private,require,write_new
+from tools.run_files import current_window,digest,encoded,load_private,private_path,read_private,require,sync_directory,write_new
 
 
 def validate(target,job):
@@ -52,6 +52,15 @@ def contact(job,target,binary,key,certificate,directory,*,observe=False):
     if not observe: current_window(job)
     directory=private_path(directory,directory=True)
     attempt=directory/('transport-'+uuid.uuid4().hex); attempt.mkdir(mode=0o700)
+    try:
+        return exchange(job,target,binary,key,certificate,attempt,observe=observe)
+    finally:
+        (attempt/'ssh_key').unlink(missing_ok=True); (attempt/'ssh_key-cert.pub').unlink(missing_ok=True)
+        sync_directory(attempt)
+
+
+def exchange(job,target,binary,key,certificate,attempt,*,observe):
+    """Setup and transport are both inside the credential cleanup boundary."""
     private_path(key); private_path(certificate)
     for name,raw in {'ssh_key':read_private(key),'ssh_key-cert.pub':read_private(certificate)}.items(): write_new(attempt/name,raw)
     host=target['address']; port=target['port']
@@ -70,14 +79,11 @@ def contact(job,target,binary,key,certificate,directory,*,observe=False):
              'job_id':job['job_id'],'job_sha256':c.digest(job)}
     budget=min(target['max_seconds'],(c.timestamp(target['valid_until'])-c.timestamp(c.now())).total_seconds())
     output=attempt/'response.json'
-    try:
-        with os.fdopen(os.open(attempt/'ssh.log',os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'wb') as err, \
-             os.fdopen(os.open(output,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'wb') as out:
-            result=subprocess.run(argv,input=encoded(request),stdout=out,stderr=err,
-                env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8'},timeout=budget,umask=0o077)
-            out.flush(); os.fsync(out.fileno()); err.flush(); os.fsync(err.fileno())
-        require(result.returncode==0 and output.stat().st_size<=worker.MAX_RESULT,'Remote owner remains held; observe its retained job')
-        value=c.strict_loads(read_private(output)); worker.check_result(value,job)
-        return value
-    finally:
-        (attempt/'ssh_key').unlink(missing_ok=True); (attempt/'ssh_key-cert.pub').unlink(missing_ok=True)
+    with os.fdopen(os.open(attempt/'ssh.log',os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'wb') as err, \
+         os.fdopen(os.open(output,os.O_CREAT|os.O_EXCL|os.O_WRONLY,0o600),'wb') as out:
+        result=subprocess.run(argv,input=encoded(request),stdout=out,stderr=err,
+            env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8'},timeout=budget,umask=0o077)
+        out.flush(); os.fsync(out.fileno()); err.flush(); os.fsync(err.fileno())
+    require(result.returncode==0 and output.stat().st_size<=worker.MAX_RESULT,'Remote owner remains held; observe its retained job')
+    value=c.strict_loads(read_private(output)); worker.check_result(value,job)
+    return value
