@@ -43,6 +43,20 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Edge startup installation](edge-startup.md#resumable-installer) | Exact host installation, durable deny boundaries and verified network-manager dependency |
 | [OpenStack project quotas](openstack-quotas.md) | Exact native quota changes, usage checks and read-only interrupted recovery |
 | [Scoped SSH issuer](ssh-issuer.md) | Native certificate signing, durable serials, issuer denial and endpoint revocation handoff |
+| [Operations drift and health review](operations-review.md) | Scheduled configuration/health/capacity/telemetry classification, alert routing, emergency-override preservation and containment-aware delivery gating |
+| [Persistent delivery execution](delivery-runner.md) | Ordered dependency-graph execution, exact handoffs, durable completion and restart recovery |
+| [Capacity reservations](capacity-reservations.md) | Transactional compute/storage reservation, confirmation and release against pool and tenant budgets |
+| [Delegated incident containment](incident-containment.md) | Owned-boundary withdrawal under separate incident authority and automatic delivery-failure containment |
+| [DNS propagation observation](dns-propagation.md) | Read-only primary, secondary and recursive view observations for the owned DNS handoff |
+| [NetBox allocation to authoritative DNS](netbox-dns.md) | One exact A/PTR registration per accepted zone with durable write-once attempts |
+| [Owned DNS withdrawal](netbox-dns-retirement.md) | Live-binding removal before IPAM retirement, retaining tombstones and retained data |
+| [AHV VM and recorded task readback](nutanix-vm-task-readback.md) | Bounded recorded VM/task witnesses for W16/W17 |
+| [AHV visible VM activity](nutanix-vm-activity-readback.md) | Bounded visible-work queries for accepted VMs and the held AHV lifecycle review |
+| [Owner endpoint installation](owner-installation.md) | Dedicated systemd-managed SSH endpoint for the remote owner worker |
+| [Worker certificate revocation](owner-revocations.md) | Deny-only monotonic subject revocation for installed owner endpoints |
+| [Remote owner worker](remote-owner-worker.md) | Forced-command dispatch of privately staged edge and restic jobs over certificate SSH |
+| [VMware network associations](vmware-network-binding.md) | Observed vSphere NIC backing to intended NSX domain association |
+| [Retained-VM power execution](vsphere-power.md) | Single exact native power task for an existing VMware VM |
 | [GitLab state project bootstrap](state-projects.md) | Private native project creation, exact backend handoffs and interrupted recovery |
 | [Offline runtime bootstrap](runtime-bootstrap.md) | Exact artifact builds, installed dependency verification and retained runtime custody |
 | [Dependency-safe retirement](retirement-orchestration.md) | Ordered cleanup evidence, retained-data custody, DNS/IPAM sequencing and capacity-release holds |

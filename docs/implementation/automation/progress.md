@@ -132,6 +132,22 @@ prevents renewal and supplies the existing worker revocation handoff. Actual
 OpenSSH tests cover signature/scope changes, unknown attempts and denial; issuer
 custody, endpoint propagation and independent recovery remain explicit boundaries.
 
+The [operations drift, health and capacity review](operations-review.md) classifies
+scheduled configuration, health, capacity and telemetry evidence and routes every
+non-healthy observation to its accountable owner. Configuration drift is compared
+by exact digest, so it is reported as matched, benign, security-critical or
+covered by an active emergency override instead of being accepted as desired
+state; a stale or unknown observation cannot be treated as healthy. The review is
+a registered delivery stage: `enforce()` raises a hold that stops ordinary
+reconciliation, and the containment guard reads that hold's `containment_required`
+flag instead of assuming withdrawal, so benign drift and capacity pressure hold
+the graph without withdrawing the owned edge boundary. Recovery after an
+interruption reloads the recorded review and alert set and re-raises the original
+hold, so an uncertain review is never reclassified as healthy. A healthy review
+still returns no reconciliation authority, no native acceptance and no activation.
+Selected native observers, alert delivery and the owned containment/release
+exercise remain W21 native work.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
@@ -678,7 +694,7 @@ populate accepted qualification indexes or establish cross-writer fencing.
 | W18 | Partial operator executor delivered | Terraform and guest preparation/execution, bounded commands, durable uncertainty holds, replayed guest completion counters, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector, including v8's complete owned VMware domain intent and attachment binding, in restricted campaigns for all three exact installed tuples. Complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
-| W21 | Operational integration open | Connect scheduled drift/health/capacity checks to selected observers and alerting, classify emergency/security/unknown drift, and exercise owned incident containment/release. Guest convergence is not a platform drift service. |
+| W21 | Partial classification and delivery gating delivered | Exact configuration drift, declared health, capacity and telemetry states are classified, routed to accountable owners, preserved under an active emergency override and gated in the delivery graph by a containment-aware hold. Connect selected native observers and alerting, and exercise owned incident containment and release against installed systems. Guest convergence is not a platform drift service. |
 | W22 | Lifecycle implementation open | Add accepted resize/scale/growth, image refresh, patch/reboot, provider/platform/collection upgrades, rotation and replacement workflows with actual maintenance budgets and requalification rules. |
 | W23 | Partial restic capture/restore | Encrypted scoped file capture, confined scheduling and isolated byte verification are implemented and locally exercised. Provision append-only protection, independent retention/keys, catalogues and application-consistent exports; measure native application RPO/RTO. |
 | W24 | Blocked on accepted adoption/recovery design | Deliver exact native import/state mappings, same-service re-creation, supported portable data transitions, and any promised synchronization/cutover/failback with writer exclusion. No blind state move or cross-stack live migration is supplied. |
