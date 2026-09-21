@@ -4,6 +4,9 @@
 WSD domain or workload root. This is an operator tool for an already selected,
 authorized native target. Hosted PR checks never invoke it against a platform.
 
+`tools/terraform_catalog.py` discovers the explicitly registered writer scopes
+from `terraform/catalog.json` without assuming a fixed count.
+
 ## Plan preparation
 
 Use a clean committed checkout, the pinned Terraform executable and private

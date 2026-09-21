@@ -31,6 +31,13 @@ unknown, including fields the native product may omit when empty. A profile whos
 required fields/version tokens cannot be obtained needs an engineered, reviewed
 normalization or a different observer; the code does not fabricate success.
 
+`tools/readback_cli.py` supplies the shared command-line plumbing for these
+adapters. It validates the manifest without contacting anything unless
+`--read-authorized-target` is given, requires an enabled manifest, an expected
+origin and a new private output before any request, refuses `.invalid`
+documentation endpoints, bounds polling rounds and never echoes
+credential-bearing exceptions or manifest values.
+
 ## NSX Local Manager profile
 
 Read each exact selected object through `/policy/api/v1`, then its corresponding

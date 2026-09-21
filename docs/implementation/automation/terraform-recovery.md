@@ -5,6 +5,14 @@ durable ledger head and supported vSphere/AHV VM, Flow activity or NSX domain ob
 It writes an immutable private review packet. It never clears the ledger, runs
 Terraform, changes native infrastructure or authorizes replay.
 
+The per-platform reconciliation modules are
+`tools/vsphere_recovery_devices.py` (existing vSphere devices against
+pinned-provider plans; it never mutates state),
+`tools/nutanix_terraform_recovery.py` (AHV power/NIC lifecycle plans),
+`tools/nutanix_flow_terraform_recovery.py` (Flow service changes) and
+`tools/nsx_terraform_recovery.py` (NSX domain lifecycle). Each binds to the
+original held saved plan and none can release a ledger.
+
 ## Existing vSphere VM configuration
 
 The [vSphere profile](vsphere-readback.md) supports existing VMs in one VMware workload

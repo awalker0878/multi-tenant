@@ -9,6 +9,11 @@ contains synthetic identities and expectations; replace them only from accepted
 engineering and native-owner records. Never populate an expected baseline from
 the unreviewed response being tested.
 
+`tools/nsx_domain_binding.py` then binds the observed domain intent to exact
+owned outputs and provider inputs. Binding establishes record consistency only:
+it does not authenticate ownership, prove packet enforcement, renew apply
+authority or release a held operation.
+
 ## Required observation scope
 
 Use the common [native manifest envelope](../../NATIVE_READBACK.md) with platform

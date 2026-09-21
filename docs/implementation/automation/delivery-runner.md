@@ -6,6 +6,10 @@ and process restart recovery. It does not issue approvals or establish native
 fencing. Each Terraform, guest, power, IPAM, DNS, campaign and edge adapter retains
 its own validation, credentials, scope, private evidence and uncertainty ledger.
 
+`tools/delivery_steps.py` holds the typed per-kind adapters and the registered
+kind table. `tools/execution_journal.py` records durable ordered events for one
+owned resource; it is not a native writer fence.
+
 ## Workflow contract
 
 A private `hosting-delivery/1` plan contains `source_commit`, `operation_id`, a

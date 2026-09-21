@@ -163,6 +163,22 @@ accountability failure rather than evidence of an exposed boundary. Notification
 delivery, on-call paging and the owned containment/release exercise remain W21
 native work.
 
+The maintained pages now name every implementing module under `tools/`. The
+[delivery runner](delivery-runner.md) names the typed stage table and the
+per-resource execution journal, [incident containment](incident-containment.md)
+names the predelegated delivery containment,
+[remote owner](remote-owner-worker.md) names the coordinator transport,
+[NSX domain readback](nsx-domain-readback.md) and
+[VMware network binding](vmware-network-binding.md) name their binding modules,
+[Terraform recovery](terraform-recovery.md) names the four per-platform
+reconciliation modules, [vSphere readback](vsphere-readback.md) names the
+task-history, task-activity and clone-source readers, the AHV and Flow activity
+pages name the shared Prism activity module, [Flow readback](nutanix-flow-readback.md)
+names the policy-shape validator, [Terraform execution](terraform-execution.md)
+names the writer-scope catalogue, and the common
+[native readback envelope](../../NATIVE_READBACK.md) names the shared CLI
+plumbing. No page gained a claim the code does not support.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
@@ -715,7 +731,7 @@ populate accepted qualification indexes or establish cross-writer fencing.
 | W24 | Blocked on accepted adoption/recovery design | Deliver exact native import/state mappings, same-service re-creation, supported portable data transitions, and any promised synchronization/cutover/failback with writer exclusion. No blind state move or cross-stack live migration is supplied. |
 | W25 | Partial DNS/IPAM retirement; other authorities remain open | Exact owned A/PTR withdrawal retains tombstones; NetBox deprecation requires current matched cleanup of every managed DNS slot. Complete withdrawal and cleanup across policy/routes/enrollment/native resources, external DNS, retained-copy/key transfer and independent cleanup acceptance. Address/name release and reuse quarantine remain unimplemented. |
 | W26 | Partial | Catalogue/provider checks, composition mocks, cluster/inventory negatives, Ansible guards and the real built-in Terraform saved-plan experiment exist. Add actual native operation campaigns, remote backend locking/recovery, service integrations and runtime tests as targets/interfaces are selected. |
-| W27 | Maintained docs delivered; operational acceptance open | Current paths, commands, commits and limits are documented. Add actual as-built records, assigned maintaining owners/cadence, accepted operating MOPs and release evidence after qualification. |
+| W27 | Maintained docs delivered; operational acceptance open | Current paths, commands, commits and limits are documented, and every module under `tools/` is now named by a maintained page so an operator can reach its implementing code from the documentation. Add actual as-built records, assigned maintaining owners/cadence, accepted operating MOPs and release evidence after qualification. |
 | W28 | Conditional; no public profile selected | Select and implement ingress/WAF/LB, PAZ capacity, DNS/certificates, backend identity, HA/recovery and withdrawal; run its independent campaign. Internal OZ/RZ examples do not expose public service. |
 | W29 | Conditional; extensions unselected | For each adopted assurance/bare-metal/container/accelerator/stretch/cross-stack/additional-platform offer, supply its design, real automation and separate native evidence/limits. |
 

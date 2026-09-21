@@ -6,6 +6,9 @@ remove scoped exposure, install the owned deny boundary if absent, and observe
 containment after a lost reply. It cannot introduce an allow, change routes or
 interfaces, clear another owner's hold, or authorize reactivation.
 
+`tools/delivery_containment.py` carries the optional predelegated containment
+that runs independently of forward-stage success when a delivery stage fails.
+
 ## Authority and execution
 
 Use the exact [edge specification](edge-activation.md). Authority has

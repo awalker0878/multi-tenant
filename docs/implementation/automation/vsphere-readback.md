@@ -13,6 +13,12 @@ the mapping from managed object ID to BIOS `uuid` (the Terraform VM ID) and
 vCenter `instanceUuid` independently. A VM name or portable tenant label is
 insufficient proof of ownership.
 
+The task-oriented readers share that schema. `tools/vsphere_history.py` runs
+scoped task-history queries with session-local collectors only;
+`tools/vsphere_task_activity.py` checks visible task activity on exact VMs, and
+`tools/vsphere_clone_source.py` reads selected template identity and revision
+evidence. None mutates source state or adopts a template.
+
 For NSX-backed distributed ports, the separate
 [network association readers and campaign v6](vmware-network-binding.md) bind
 selected portgroup/switch identities to the assigned domain's realized NSX switch.

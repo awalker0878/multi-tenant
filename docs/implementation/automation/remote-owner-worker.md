@@ -7,6 +7,10 @@ and returns its fixed receipt/manifest artifacts. Native credentials and source
 exports stay on the owner host. The worker accepts no arbitrary command,
 upload, executable argument list, recursive remote job or shell session.
 
+`tools/remote_owner.py` is the coordinator side of that transport: it validates
+the target and job and dispatches over certificate SSH using only a fixed forced
+command and the staged job digest.
+
 This is the selected reference transport for edge-host and backup-host work.
 The coordinator and each worker have separate durable delivery journals. An
 unknown SSH outcome holds the coordinator stage. Resume sends `observe`, which
