@@ -11,6 +11,7 @@ if __package__ in (None, ''):
     sys.path.insert(0, str(ROOT))
 
 from tools import readback_core as c
+from tools.check_release import verify
 from tools.run_files import encoded, load_private, require, write_new
 
 ACTION_ORDER = {
@@ -227,7 +228,11 @@ def main():
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     try:
-        result = evaluate(load_private(args.plan), load_private(args.evidence))
+        plan = load_private(args.plan)
+        source = verify(ROOT)
+        require(source['status'] == 'HASHES_MATCH' and source['commit'] == plan['source_commit'],
+                'Exact clean retirement source required')
+        result = evaluate(plan, load_private(args.evidence))
         data = encoded(result)
         if args.output:
             write_new(args.output, data)
