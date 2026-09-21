@@ -20,6 +20,7 @@ KINDS = {
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'retirement_review': (set(), {'plan','evidence'}, set()),
+    'adoption_review': (set(), {'plan','evidence'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
@@ -126,6 +127,12 @@ def validate_packet(step, packet, plan, base):
         require(retirement_plan['source_commit']==plan['source_commit']
                 and retirement_plan['scope']==plan['scope'], 'Foreign retirement review')
         validate_evidence(retirement_plan,load_private(files['evidence']))
+    if kind=='adoption_review':
+        from tools.adoption import validate_evidence
+        adoption_plan=load_private(files['plan'])
+        require(adoption_plan['source_commit']==plan['source_commit']
+                and adoption_plan['scope']==plan['scope'], 'Foreign adoption review')
+        validate_evidence(adoption_plan,load_private(files['evidence']))
     if kind=='acceptance':
         require(values['purpose'] in {'admission','domain','bootstrap','services','activation','post_activation','recovery','retirement'}, 'Unknown acceptance gate')
         accepted=load_private(files['acceptance'])
@@ -261,6 +268,11 @@ def dispatch(step, packet, directory, base, plan, root):
         result=evaluate(load_private(files['plan']),load_private(files['evidence']))
         write_new(directory/'retirement-review.json',encoded(result))
         names=['retirement-review.json']
+    elif kind=='adoption_review':
+        from tools.adoption import evaluate
+        result=evaluate(load_private(files['plan']),load_private(files['evidence']))
+        write_new(directory/'adoption-review.json',encoded(result))
+        names=['adoption-review.json']
     elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
