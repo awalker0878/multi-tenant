@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from tools import adoption, delivery_steps as steps, readback_core as c
-from tools.run_files import digest, encoded, load_private, read_private, write_new
+from tools.run_files import digest, encoded, load_private, read_private, replace_private
 
 SOURCE='a'*40
 SCOPE={
@@ -95,7 +95,7 @@ class DeliveryAdoptionTests(unittest.TestCase):
         files={}
         values={'plan':self.adoption,'evidence':evidence(self.adoption)}
         for name,value in values.items():
-            path=self.base/(name+'.json'); write_new(path,encoded(value))
+            path=self.base/(name+'.json'); replace_private(path,encoded(value))
             files[name]={'path':str(path),'sha256':digest(read_private(path))}
         return {
             'format':'hosting-delivery-step/1',
