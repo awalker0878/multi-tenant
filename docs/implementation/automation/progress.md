@@ -4,6 +4,12 @@
 
 ## Delivered changes
 
+The [edge startup installer](edge-startup.md#resumable-installer) now installs
+accepted permanent denial and the hard network-manager dependency during
+console maintenance. It preserves native ledgers, checks loaded units and
+current denial, and resumes exact interrupted installations without starting
+network management. Real reboot/HA qualification remains an installed-site task.
+
 The continuation after merged PR #46 adds a [retained-VM vSphere power
 executor](vsphere-power.md): one exact native power task, durable intent and task
 identity, retained-device/placement readback, competing-task checks and read-only

@@ -42,7 +42,7 @@ retains a private candidate, immutable attempt and native logs, plus a receipt
 when denial is observed. It never clears an old native hold. A changed namespace
 requires owner reconciliation and configuration review; IDs are not rebound.
 
-## Startup dependency installation
+## Startup dependency rendering
 
 Render the unit and manager drop-in using actual installed paths:
 
@@ -91,3 +91,69 @@ checks that native journal bytes did not change. This simulates volatile policy
 loss. It does not reboot a host or prove initramfs ordering, OOB recovery, HA,
 same-subnet isolation or the installed manager's complete behavior. Those remain
 actual commissioning and acceptance exercises.
+
+## Resumable installer
+
+`tools/edge_install.py` installs this profile on an accepted Ubuntu 24.04
+systemd host during console/OOB maintenance. The selected network manager must
+already be inactive and dead. The installer never starts, stops or restarts that
+manager. It checks the actual host/system namespace, exact clean root-controlled
+source, binaries, native manager unit and every preexisting manager drop-in.
+
+The private `hosting-edge-install/1` configuration has these exact fields:
+
+| Fields | Binding |
+| --- | --- |
+| `format` | `hosting-edge-install/1` |
+| `source` | Absolute accepted installed checkout |
+| `python`, `systemctl`, `systemd_analyze` | Absolute accepted host executables |
+| Each executable's `_sha256` field | Exact executable bytes |
+| `manager` | `systemd-networkd.service` or `NetworkManager.service` |
+| `manager_unit` | Exact native unit `{path, sha256}` |
+| `manager_dropins` | Sorted explicit existing `{path, sha256}` bindings, at most 32 |
+| `boot` | Complete accepted `hosting-edge-boot/1` configuration above |
+| `custody_ref` | Accepted local startup files and independent recovery custody |
+
+Machine, namespace, source commit, nft executable and ledger bindings come from
+`boot`. The native ledger must already exist and remains separately owned.
+Source, interpreter, nft and ledger cannot depend on home, temporary or runtime
+paths. The accepted installation design must also exclude network-mounted boot
+dependencies; path spelling alone cannot prove storage availability.
+
+The private `hosting-edge-install-authority/1` record contains `format`,
+`config_sha256`, `valid_from`, `valid_until`, `change_ref`,
+`maintenance_ref` and `recovery_access_ref`. Its exact configuration digest
+and current window, at most one hour, bind the offline installation procedure.
+
+```sh
+python tools/edge_install.py --config /private/edge-install.json
+python tools/edge_install.py --config /private/edge-install.json \
+  --authority /private/edge-install-authority.json --execute
+```
+
+The immutable intent lives in `/var/lib/hosting-edge-boot-install`. The
+installer copies accepted deny boundaries and its rewritten private boot
+configuration into `/etc/hosting-edge-boot`; only file locations change.
+The unit writes boot observations to `/var/lib/hosting-edge-boot`. Source
+boundary files remain necessary for exact interrupted-install recovery; the
+installed startup service uses the durable copies.
+
+The installer publishes the guard unit and exact manager dependency, runs native
+`systemd-analyze verify`, reloads unit metadata and checks the actual loaded
+fragment, overrides and hard dependency. It enables and starts only the guard,
+then independently observes permanent native denial under the shared edge
+locks. An active oneshot service alone cannot satisfy installation. A successful
+receipt still requires actual startup/attachment qualification.
+
+Repeated installation verifies existing bytes and custody. Changed files,
+unknown units/overrides, a running manager, missing native ledger or unconfirmed
+denial hold the operation. Resume does not remove files, clear native holds,
+restore allows or restart an active guard to hide later policy changes.
+Installation file locks do not fence other root/network operators; the accepted
+maintenance procedure must exclude those writers and preserve console access.
+Starting networking afterward remains the separately accepted commissioning step.
+
+Installer regressions cover stopped-manager enforcement, unknown native units,
+changed files, concurrent installers, interrupted reload/start and actual systemd
+unit parsing. They do not operate a live manager or establish host reboot/HA
+qualification.
