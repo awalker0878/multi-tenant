@@ -142,9 +142,9 @@ The authoritative reservation system remains external. Stable reservation/operat
 
 Design: [Addressing and authoritative IPAM](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [Reserve/confirm/release lifecycle](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
 
-Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../scripts/check_ipam_allocation_records.py) · [no-guess allocation preflight](../../scripts/check_ipam_allocation_preflight.py) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
+Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../scripts/check_ipam_allocation_records.py) · [no-guess allocation preflight](../../scripts/check_ipam_allocation_preflight.py) · [live NetBox lifecycle operator](../../tools/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
 
-Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated without reserving/releasing an address or writing DNS.
+Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated from exported evidence without reserving/releasing an address or writing DNS. The live operator tool performs the same reserve/confirm/retire/quarantine/release lifecycle against NetBox under one authoritative writer lock, and refuses reuse except through a new explicit allocation decision.
 
 ## Authoritative DNS registration handoff
 

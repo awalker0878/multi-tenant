@@ -92,7 +92,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `target_campaign` | `ssh`, `ssh_sha256` | `plan`, `authority` | None |
 | `edge_policy` | `nft`, `nft_sha256`, `mode` | `spec`, `authority` | None |
 | `edge_containment` | `nft`, `nft_sha256` | `spec`, `authority` | None |
-| `ipam` | `action` | `request`, `authority`, `token_file` | `ca_bundle` |
+| `ipam` | `action` | `request`, `authority`, `token_file` | `ca_bundle`, `release_evidence` |
 | `dns` | `action` | `allocation`, `confirmation`, `job`, `scope`, `authority`, `token_file`, `tsig_file` | `ca_bundle`, `registration_job`, `registration_scope` |
 | `dns_propagation` | `dns_step` | `config`, `secrets` | None |
 
@@ -115,7 +115,13 @@ transition contract and preserves each owner's field/resource restrictions.
 Guest operation IDs are deterministically derived from delivery operation plus
 step ID; their generation matches the delivery. Terraform and other owners keep
 their exact independently approved native operation identities. Files retain
-the schemas documented in each owner's runbook. IPAM and DNS share one native
+the schemas documented in each owner's runbook. `ipam` accepts every registered
+action: `reserve`, `confirm`, `reconcile`, `retire`, `quarantine` and `release`.
+The `release_evidence` binding is required exactly for `quarantine` and `release`,
+and is forwarded as `--release-evidence`. Completion accepts the observed
+`allocation_status` `reserved`, `active`, `deprecated`, `QUARANTINED` or `RELEASED`;
+a `quarantine` step therefore completes with the address still held, and reuse
+remains a separate explicit allocation decision. IPAM and DNS share one native
 allocation ledger. Edge and backup work must execute on their accepted native
 machine; a coordinator does not bypass local machine/namespace checks. Use the
 [remote owner worker](remote-owner-worker.md) for separately hosted edge and

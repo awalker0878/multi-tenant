@@ -29,7 +29,7 @@ KINDS = {
     'vsphere_power': (set(), {'request','authority','session'}, {'ca_file'}),
     'target_campaign': ({'ssh','ssh_sha256'}, {'plan','authority'}, set()),
     'edge_policy': ({'nft','nft_sha256','mode'}, {'spec','authority'}, set()),
-    'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle'}),
+    'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle','release_evidence'}),
     'dns': ({'action'}, {'allocation','confirmation','job','scope','authority','token_file','tsig_file'}, {'ca_bundle','registration_job','registration_scope'}),
     'dns_propagation': ({'dns_step'}, {'config','secrets'}, set()),
 }
@@ -161,8 +161,10 @@ def validate_packet(step, packet, plan, base):
             authorize(value,load_private(files['authority']))
             require(value['nft_sha256']==values['nft_sha256'],'Incident executable binding changed')
         if kind=='ipam':
-            from tools.netbox_ipam import ACTIONS
+            from tools.netbox_ipam import ACTIONS, RELEASE_ACTIONS
             require(values['action'] in ACTIONS,'Unknown IPAM operation')
+            require(('release_evidence' in files)==(values['action'] in RELEASE_ACTIONS),
+                    'Reuse quarantine evidence is required exactly for quarantine and release')
         if kind=='dns':
             from tools.netbox_dns import ACTIONS
             require(values['action'] in ACTIONS,'Unknown DNS operation')
@@ -369,7 +371,7 @@ def dispatch(step, packet, directory, base, plan, root):
                   'dns':{'AUTHORITATIVE_REGISTRATION_OBSERVED','AUTHORITATIVE_TOMBSTONE_OBSERVED'}}
         if kind in accepted: require(result['status'] in accepted[kind],'Delivery owner outcome remains held')
         if kind=='ipam':
-            require(result.get('allocation_status') in {'reserved','active','deprecated'},'IPAM allocation remains held')
+            require(result.get('allocation_status') in {'reserved','active','deprecated','QUARANTINED','RELEASED'},'IPAM allocation remains held')
     if not names:
         write_new(directory/'result.json',encoded(result)); names=['result.json']
     return complete(step,packet,directory,plan,result,names)

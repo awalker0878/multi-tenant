@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Reserve, confirm, reconcile and tombstone an exact NetBox 4.7 IP allocation.
+"""Reserve, confirm, reconcile, retire, quarantine and release one NetBox 4.7 allocation.
 
-No automatic free-address selection, deletion, retry or reuse after retirement.
+No automatic free-address selection, deletion, retry or reuse. Retirement is
+followed by a declared reuse quarantine over completed dependent cleanup, and a
+released address is only re-reserved by a fresh explicit allocation decision.
 The shared durable ledger and service-side VRF uniqueness are both required.
 """
 import argparse
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 import fcntl
 import ipaddress
 import json
@@ -19,11 +21,101 @@ from urllib.parse import urlencode
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.compile_wsd import identity
+from tools.neutron_observe import strict_loads
 from tools.run_files import (current_window, digest, encoded, load_private, private_path,
                              read_private, replace_private, require, utcnow, write_new, OperatorError)
 from tools.service_http import JsonService
 
-ACTIONS = {'reserve', 'confirm', 'reconcile', 'retire'}
+ACTIONS = {'reserve', 'confirm', 'reconcile', 'retire', 'quarantine', 'release'}
+RELEASE_ACTIONS = {'quarantine', 'release'}
+RETIREMENT_ACTIONS = RELEASE_ACTIONS | {'retire'}
+# Release cleanup mirrors the exported allocation record so live and exported
+# reuse evidence stay comparable; only the owner can accept external cleanup.
+CLEANUP_CATEGORIES = {'routes', 'dhcp_leases', 'dns', 'policy', 'logging_attribution', 'incident_response'}
+CLEANUP_STATES = {'NOT_STARTED', 'PENDING', 'COMPLETE', 'NOT_APPLICABLE'}
+COMPLETE_STATES = {'COMPLETE', 'NOT_APPLICABLE'}
+RELEASE_EVIDENCE = 'hosting-netbox-release-evidence/1'
+QUARANTINE_RECEIPT = 'hosting-netbox-quarantine/1'
+RELEASE_RECEIPT = 'hosting-netbox-release/1'
+MAX_QUARANTINE_SECONDS = 31536000
+REFERENCE = re.compile(r'[A-Za-z0-9:._/-]{3,200}')
+
+
+def instant(value, message):
+    require(isinstance(value, str) and value.strip(), message)
+    try:
+        result = datetime.fromisoformat(value.replace('Z', '+00:00'))
+    except ValueError:
+        raise OperatorError(message) from None
+    require(result.tzinfo is not None, message)
+    return result
+
+
+def validate_cleanup(cleanup):
+    """Normalize the six dependent cleanup categories of the exported record.
+
+    Routes, DHCP, DNS, policy, logging attribution and incident response stay
+    under their own service owners. Only bounded references and observation
+    times cross this boundary; this adapter never performs that cleanup.
+    """
+    require(isinstance(cleanup, dict) and set(cleanup) == CLEANUP_CATEGORIES,
+            'Every dependent cleanup category must be declared')
+    normalized = {}
+    for key, item in cleanup.items():
+        require(isinstance(item, dict) and set(item) == {'status', 'evidence_ref', 'observed_at'},
+                'Dependent cleanup evidence shape invalid')
+        require(item['status'] in CLEANUP_STATES, 'Unknown dependent cleanup status')
+        if item['status'] == 'NOT_STARTED':
+            require(item['evidence_ref'] is None and item['observed_at'] is None,
+                    'NOT_STARTED cleanup cannot claim evidence')
+            normalized[key] = {'status': 'NOT_STARTED', 'evidence_ref': None, 'observed_at': None}
+            continue
+        require(isinstance(item['evidence_ref'], str) and REFERENCE.fullmatch(item['evidence_ref']),
+                'Started cleanup requires an accepted external evidence reference')
+        normalized[key] = {'status': item['status'], 'evidence_ref': item['evidence_ref'],
+                           'observed_at': instant(item['observed_at'],
+                                                  'Dependent cleanup observation time required').isoformat()}
+    return normalized
+
+
+def cleanup_complete(cleanup):
+    return all(item['status'] in COMPLETE_STATES for item in cleanup.values())
+
+
+def validate_release_evidence(job, raw):
+    """Bind one immutable reuse-quarantine declaration to this exact allocation."""
+    require(isinstance(raw, (bytes, bytearray)) and len(raw) < 65536,
+            'Bounded private reuse quarantine evidence required')
+    value = strict_loads(bytes(raw))
+    require(isinstance(value, dict) and set(value) == {'format', 'request_sha256', 'change_ref',
+            'duration_seconds', 'cleanup', 'declared_at'}, 'Exact reuse quarantine declaration required')
+    require(value['format'] == RELEASE_EVIDENCE and value['request_sha256'] == digest(encoded(job)),
+            'Reuse quarantine declaration does not bind this exact allocation')
+    require(isinstance(value['change_ref'], str) and REFERENCE.fullmatch(value['change_ref']),
+            'Accepted reuse and cleanup procedure reference required')
+    duration = value['duration_seconds']
+    require(type(duration) is int and 0 < duration <= MAX_QUARANTINE_SECONDS,
+            'Bounded reuse quarantine duration required')
+    cleanup = validate_cleanup(value['cleanup'])
+    require(cleanup_complete(cleanup),
+            'Reuse quarantine requires every dependent cleanup completed or not applicable')
+    declared = instant(value['declared_at'], 'Reuse quarantine declaration time required')
+    return {'change_ref': value['change_ref'], 'declared_at': declared.isoformat(),
+            'duration_seconds': duration,
+            'reuse_not_before': (declared + timedelta(seconds=duration)).isoformat(),
+            'cleanup': cleanup, 'evidence_sha256': digest(raw)}
+
+
+def require_current_declaration(declaration, authority):
+    """The declaration and every cleanup observation must be current, not replayed."""
+    since = instant(authority['valid_from'], 'Authority start required')
+    declared = instant(declaration['declared_at'], 'Reuse quarantine declaration time required')
+    require(since <= declared <= utcnow(),
+            'Declare the reuse quarantine and its cleanup inside the current authority window')
+    for item in declaration['cleanup'].values():
+        if item['observed_at'] is not None:
+            require(since <= instant(item['observed_at'], 'Dependent cleanup observation time required') <= declared,
+                    'Dependent cleanup evidence must be observed inside the current authority window')
 
 
 def validate(job):
@@ -51,16 +143,22 @@ def validate(job):
     return digest(encoded(job))
 
 
-def validate_authority(job, action, authority, token_bytes, ca_bytes):
+def validate_authority(job, action, authority, token_bytes, ca_bytes, evidence_bytes=None):
     require(action in ACTIONS and set(authority) == {'request_sha256', 'action', 'valid_from',
-            'valid_until', 'change_ref', 'cleanup_ref', 'token_sha256', 'ca_sha256'}, 'Invalid IPAM authority')
+            'valid_until', 'change_ref', 'cleanup_ref', 'evidence_sha256', 'token_sha256',
+            'ca_sha256'}, 'Invalid IPAM authority')
     require(authority['request_sha256'] == validate(job) and authority['action'] == action,
             'IPAM authority does not match the exact operation')
     require(authority['token_sha256'] == digest(token_bytes)
-            and authority['ca_sha256'] == (digest(ca_bytes) if ca_bytes is not None else None),
-            'IPAM credential/trust binding changed')
-    for value in [authority['change_ref']] + ([authority['cleanup_ref']] if action == 'retire' else []):
-        require(isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9:._/-]{3,200}', value),
+            and authority['ca_sha256'] == (digest(ca_bytes) if ca_bytes is not None else None)
+            and authority['evidence_sha256'] == (digest(evidence_bytes) if evidence_bytes is not None else None),
+            'IPAM credential, trust or reuse-quarantine evidence binding changed')
+    require((evidence_bytes is not None) == (action in RELEASE_ACTIONS),
+            'Reuse quarantine evidence is required exactly for quarantine and release')
+    require(action in RETIREMENT_ACTIONS or authority['cleanup_ref'] is None,
+            'Completed dependent cleanup reference is only valid for retirement or release')
+    for value in [authority['change_ref']] + ([authority['cleanup_ref']] if action in RETIREMENT_ACTIONS else []):
+        require(isinstance(value, str) and REFERENCE.fullmatch(value),
                 'Current change and completed cleanup references required')
     current_window(authority)
 
@@ -196,17 +294,95 @@ class AllocationReader:
                 and vrf.get('enforce_unique') is True, 'Prefix/tenant/VRF binding or server uniqueness changed')
 
 
-def operate(job, action, authority, client, ledger):
+def release(directory, job, action, authority, evidence, head, row, etag, native_status):
+    """Declare, then elapse, the reuse quarantine over completed dependent cleanup.
+
+    Caller holds the shared allocation lock and has already read the native
+    allocation and its dependent cleanup. Retirement is never undone: the native
+    row stays `deprecated`, this adapter never deletes or frees it, and later
+    reuse remains a new explicit allocation decision by the address authority.
+    """
+    request_sha256 = digest(encoded(job))
+    lifecycle = head.get('allocation_status') if isinstance(head, dict) else None
+    require(native_status == 'deprecated' and lifecycle in {'deprecated', 'QUARANTINED', 'RELEASED'},
+            'A completed retirement of this allocation is required before quarantine or release')
+    quarantine_path, release_path = directory / 'quarantine.json', directory / 'release.json'
+    # The declaration is re-presented and re-validated for both halves of the
+    # procedure, so the elapsed reuse boundary is proved by the accepted evidence
+    # and never by a mutable timestamp recorded beside it.
+    declaration = validate_release_evidence(job, evidence)
+    if action == 'quarantine':
+        # Declaring the quarantine is a decision taken now, inside this authority window.
+        require_current_declaration(declaration, authority)
+        require(not release_path.exists(), 'A released address cannot be re-quarantined')
+        if quarantine_path.exists():
+            record = load_private(quarantine_path)
+            require(isinstance(record, dict) and record.get('format') == QUARANTINE_RECEIPT
+                    and record.get('request_sha256') == request_sha256
+                    and record.get('evidence_sha256') == declaration['evidence_sha256']
+                    and record.get('reuse_not_before') == declaration['reuse_not_before'],
+                    'A different reuse quarantine is already declared for this address')
+        else:
+            record = {'format': QUARANTINE_RECEIPT, 'request_sha256': request_sha256, **declaration}
+            write_new(quarantine_path, encoded(record))
+        reusable, released_at = False, None
+    else:
+        require(quarantine_path.exists(), 'A declared reuse quarantine is required before release')
+        record = load_private(quarantine_path)
+        require(isinstance(record, dict) and record.get('format') == QUARANTINE_RECEIPT
+                and record.get('request_sha256') == request_sha256
+                and record.get('evidence_sha256') == declaration['evidence_sha256']
+                and record.get('declared_at') == declaration['declared_at']
+                and record.get('duration_seconds') == declaration['duration_seconds']
+                and record.get('change_ref') == declaration['change_ref']
+                and record.get('reuse_not_before') == declaration['reuse_not_before']
+                and isinstance(record.get('cleanup'), dict)
+                and cleanup_complete(validate_cleanup(record['cleanup'])),
+                'The declared reuse quarantine does not bind this allocation')
+        reusable, released_at = True, None
+        if release_path.exists():
+            released_at = instant(load_private(release_path).get('released_at'),
+                                  'Recorded release time required')
+            require(released_at >= instant(declaration['reuse_not_before'], 'Reuse boundary required'),
+                    'The recorded release precedes the declared reuse boundary')
+        else:
+            released_at = utcnow()
+            require(released_at >= instant(declaration['reuse_not_before'], 'Reuse boundary required'),
+                    'The declared reuse quarantine has not elapsed')
+            write_new(release_path, encoded({'format': RELEASE_RECEIPT, 'request_sha256': request_sha256,
+                       'quarantine_sha256': digest(encoded(record)), 'change_ref': record['change_ref'],
+                       'reuse_not_before': record['reuse_not_before'],
+                       'released_at': released_at.isoformat(), 'cleanup': record['cleanup']}))
+    receipt = {'format': RELEASE_RECEIPT if action == 'release' else QUARANTINE_RECEIPT, 'status': 'OBSERVED',
+               'allocation_status': 'RELEASED' if action == 'release' else 'QUARANTINED',
+               'action': action, 'request_sha256': request_sha256, 'scope': job['scope'],
+               'member': job['member'], 'address': job['address'], 'native_id': row['id'], 'etag': etag,
+               'observed_at': utcnow().isoformat(), 'reusable': reusable,
+               'reuse_not_before': declaration['reuse_not_before'],
+               'released_at': released_at.isoformat() if released_at else None,
+               'cleanup': declaration['cleanup']}
+    # head.json becomes the terminal lifecycle receipt; dependent services that
+    # require the exact confirmed-allocation receipt fail closed from here on.
+    replace_private(directory / 'head.json', encoded(receipt))
+    return receipt
+
+
+def operate(job, action, authority, client, ledger, evidence=None):
     reader = AllocationReader(job, authority, client)
     require(action in ACTIONS, 'Unknown IPAM action')
+    require((evidence is not None) == (action in RELEASE_ACTIONS),
+            'Reuse quarantine evidence is required exactly for quarantine and release')
     call, check, observed = reader.call, reader.check, reader.observed
     with allocation_lock(ledger, job) as directory:
         head_path = directory / 'head.json'
         head = load_private(head_path) if head_path.exists() else None
         if head and head['status'] == 'OUTCOME_UNKNOWN':
             require(action == 'reconcile', 'Uncertain IPAM mutation requires read-only reconciliation')
-        if action == 'retire':
+        if action in {'retire', 'quarantine'}:
             require_dns_cleanup(directory, job, authority)
+        if action == 'retire':
+            require(not (directory / 'quarantine.json').exists(),
+                    'A declared reuse quarantine cannot be re-retired')
         reader.namespace()
         row, etag = observed()
         if action == 'reconcile':
@@ -214,6 +390,9 @@ def operate(job, action, authority, client, ledger):
             # Only the intended completed outcome clears an uncertainty hold.
             if head and head['status'] == 'OUTCOME_UNKNOWN':
                 require(check(row) == head['desired_status'], 'Mutation completion remains uncertain')
+        elif action in RELEASE_ACTIONS:
+            return release(directory, job, action, authority, evidence, head, row, etag,
+                           check(row) if row is not None else None)
         elif action == 'reserve' and row is not None:
             require(check(row) in {'reserved', 'active'}, 'Retired addresses cannot be reused')
         else:
@@ -247,6 +426,7 @@ def main():
     parser.add_argument('request', type=Path)
     parser.add_argument('--action', choices=sorted(ACTIONS), required=True)
     parser.add_argument('--authority', type=Path)
+    parser.add_argument('--release-evidence', type=Path)
     parser.add_argument('--token-file', type=Path)
     parser.add_argument('--ca-bundle', type=Path)
     parser.add_argument('--ledger', type=Path)
@@ -256,6 +436,11 @@ def main():
     try:
         job = load_private(args.request)
         validate(job)
+        evidence = read_private(args.release_evidence) if args.release_evidence else None
+        require((evidence is not None) == (args.action in RELEASE_ACTIONS),
+                'Reuse quarantine evidence is required exactly for quarantine and release')
+        if evidence is not None:
+            validate_release_evidence(job, evidence)
         if not args.execute:
             print('{"status":"VALIDATED_NO_CONTACT"}')
             return 0
@@ -265,11 +450,11 @@ def main():
         token_bytes = read_private(args.token_file)
         ca_bytes = read_private(args.ca_bundle) if args.ca_bundle else None
         authority = load_private(args.authority)
-        validate_authority(job, args.action, authority, token_bytes, ca_bytes)
+        validate_authority(job, args.action, authority, token_bytes, ca_bytes, evidence)
         token = token_bytes.decode().strip()
         require(re.fullmatch(r'nbt_[A-Za-z0-9]+\.[A-Za-z0-9]+', token), 'Scoped NetBox v2 token required')
         client = JsonService(job['origin'], 'Bearer ' + token, args.ca_bundle)
-        result = operate(job, args.action, authority, client, args.ledger)
+        result = operate(job, args.action, authority, client, args.ledger, evidence)
         write_new(args.output, encoded(result))
         print(json.dumps({'status': result['status'], 'allocation_status': result['allocation_status']}))
         return 0

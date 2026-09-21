@@ -115,8 +115,10 @@ fence against administrators, direct service writers, another ledger or server-s
 changes between reads. Actual NetBox uniqueness/ETags, service RBAC, DNS ACLs,
 transport protection and durable storage must be commissioned. Neither service
 provides a cross-service atomic transaction here. The [retirement handoff](netbox-dns-retirement.md)
-now gates IPAM deprecation on current managed DNS tombstones; complete cross-service
-retirement, tombstone release, IPv6 IPAM integration and name/address reuse remain open.
+now gates IPAM deprecation on current managed DNS tombstones, and address reuse now
+requires a [declared quarantine and observed release](netbox-ipam.md) over complete
+dependent cleanup; complete cross-service retirement, tombstone release, IPv6 IPAM
+integration and the DNS *name* reuse quarantine remain open.
 
 Loopback tests use real TLS and TSIG bytes with synthetic NetBox/DNS authorities.
 They cover A/PTR handoff, current-state races, expiry, lock exclusion, durable

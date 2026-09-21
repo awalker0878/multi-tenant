@@ -120,8 +120,8 @@ requires actual, accepted evidence for:
 - identity and certificate revocation;
 - useful-data retention and independently recoverable keys/catalogues;
 - platform-specific VM/volume/network/policy cleanup or retained ownership;
-- DNS tombstone propagation and address/name reuse quarantine;
-- IPAM retirement;
+- DNS tombstone propagation and the [declared address reuse quarantine](netbox-ipam.md);
+- IPAM retirement and the observed reuse boundary;
 - capacity release against authoritative current ownership;
 - absence of orphan active dependencies across shared services;
 - sanitization/destruction when a retained object later becomes eligible;

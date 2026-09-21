@@ -1,6 +1,6 @@
 # Automation implementation progress
 
-**Updated:** 2026-09-21. **Release status:** incomplete; no native platform is qualified by this change. The former `docs/1.0` material is now maintained under engineering, implementation and assurance. The [baseline audit](../../assurance/automation-baseline-audit.md) and its evidence remain historical. Every W01–W29 acceptance package is still open under its [original closure criteria](completion-backlog.md).
+**Updated:** 2026-09-21. **Release status:** incomplete; no native platform is qualified by this change. The former `docs/1.0` material is now maintained under engineering, implementation and assurance. The [baseline audit](../../assurance/automation-baseline-audit.md) and its evidence remain historical. Every W01â€“W29 acceptance package is still open under its [original closure criteria](completion-backlog.md).
 
 ## Delivered changes
 
@@ -45,8 +45,8 @@ destructive cleanup, enforces DNS withdrawal before IPAM retirement and holds
 capacity release until every applicable cleanup owner is an ancestor. Exact owner
 receipts can be reviewed through the durable delivery runner without issuing a
 native mutation. This is a W25 repository integration increment; actual platform
-cleanup, reuse quarantine, sanitization and service-owner acceptance remain native
-commissioning evidence.
+cleanup, sanitization, reuse-quarantine observation and service-owner acceptance
+remain native commissioning evidence.
 
 Receipt-based workload compilation and bootstrap/withdrawal transition preparation
 are now registered delivery stages. Their adapters invoke the actual three-platform
@@ -208,8 +208,8 @@ authority with real TSIG parsing), `lab/native_readback_fixture.py` and
 `lab/mtls_scenarios.py` and `lab/worker.py` (private fixture workers on the permitted
 namespace path), and `lab/ipv6_fixture.py`, `lab/ipv6_worker.py` and
 `lab/link_config.py` (fixed WD14 IPv6 policy, private pipe worker and per-interface
-rtnetlink helper). Each entry repeats the module's own limit — test instrument, private
-worker, synthetic task tree — so the map cannot be read as claiming a production
+rtnetlink helper). Each entry repeats the module's own limit â€” test instrument, private
+worker, synthetic task tree â€” so the map cannot be read as claiming a production
 service.
 
 | Change | Main commit | What is implemented |
@@ -245,7 +245,7 @@ documents the supported operator path and its remaining integration boundaries.
 Terraform defaults remain prepared/restricted. The OpenStack-first increment
 below adds explicitly reviewed power/connectivity transitions. Full adopted
 guest hardening, native drift repair, upgrades and coordinated retirement remain
-unfinished. W01–W29 remain open under their actual acceptance criteria.
+unfinished. W01â€“W29 remain open under their actual acceptance criteria.
 
 ## Reference service and qualification increment
 
@@ -734,7 +734,7 @@ populate accepted qualification indexes or establish cross-writer fencing.
 
 ## Package disposition and next concrete work
 
-“Partial” credits delivered code or retained functionality, not operational acceptance. “Blocked” identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
+â€œPartialâ€ credits delivered code or retained functionality, not operational acceptance. â€œBlockedâ€ identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
 
 | Package | Current disposition | Work still required to meet acceptance |
 | --- | --- | --- |
@@ -762,7 +762,7 @@ populate accepted qualification indexes or establish cross-writer fencing.
 | W22 | Lifecycle implementation open | Add accepted resize/scale/growth, image refresh, patch/reboot, provider/platform/collection upgrades, rotation and replacement workflows with actual maintenance budgets and requalification rules. |
 | W23 | Partial restic capture/restore | Encrypted scoped file capture, confined scheduling and isolated byte verification are implemented and locally exercised. Provision append-only protection, independent retention/keys, catalogues and application-consistent exports; measure native application RPO/RTO. |
 | W24 | Blocked on accepted adoption/recovery design | Deliver exact native import/state mappings, same-service re-creation, supported portable data transitions, and any promised synchronization/cutover/failback with writer exclusion. No blind state move or cross-stack live migration is supplied. |
-| W25 | Partial DNS/IPAM retirement; other authorities remain open | Exact owned A/PTR withdrawal retains tombstones; NetBox deprecation requires current matched cleanup of every managed DNS slot. Complete withdrawal and cleanup across policy/routes/enrollment/native resources, external DNS, retained-copy/key transfer and independent cleanup acceptance. Address/name release and reuse quarantine remain unimplemented. |
+| W25 | Partial DNS/IPAM retirement; other authorities remain open | Exact owned A/PTR withdrawal retains tombstones; NetBox deprecation requires current matched cleanup of every managed DNS slot. Address reuse now has a declared quarantine over the six dependent cleanup categories and an observed release boundary; reuse stays a new explicit allocation decision. Complete withdrawal and cleanup across policy/routes/enrollment/native resources, external DNS, retained-copy/key transfer and independent cleanup acceptance. |
 | W26 | Partial | Catalogue/provider checks, composition mocks, cluster/inventory negatives, Ansible guards and the real built-in Terraform saved-plan experiment exist. Add actual native operation campaigns, remote backend locking/recovery, service integrations and runtime tests as targets/interfaces are selected. |
 | W27 | Maintained docs delivered; operational acceptance open | Current paths, commands, commits and limits are documented, and every module under `tools/` is now named by a maintained page so an operator can reach its implementing code from the documentation. Add actual as-built records, assigned maintaining owners/cadence, accepted operating MOPs and release evidence after qualification. |
 | W28 | Conditional; no public profile selected | Select and implement ingress/WAF/LB, PAZ capacity, DNS/certificates, backend identity, HA/recovery and withdrawal; run its independent campaign. Internal OZ/RZ examples do not expose public service. |

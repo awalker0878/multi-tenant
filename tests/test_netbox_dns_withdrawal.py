@@ -10,6 +10,7 @@ from lab.dns_authority import Authority
 from tests import test_netbox_dns as registration_fixture
 from tests.test_dns_transactions import example
 from tools import dns_change as dns_writer, netbox_dns as handoff
+from tools.netbox_ipam import CLEANUP_CATEGORIES, RELEASE_EVIDENCE, operate as ipam_operate, validate as validate_allocation
 from tools.run_files import digest, encoded, load_private, replace_private, utcnow
 
 
@@ -293,3 +294,47 @@ class NetboxDNSWithdrawalTests(unittest.TestCase):
         (slot / 'withdrawal-reconciliation.json').symlink_to(slot / 'missing-withdrawal-reconciliation.json')
         with self.assertRaises(ValueError): self.run_action('retire')
         self.assertEqual(type(self).row['status']['value'], 'active')
+
+    def release_evidence(self, *, duration=1, request_sha256=None):
+        observed = (utcnow() - timedelta(seconds=30)).isoformat()
+        return encoded({'format': RELEASE_EVIDENCE,
+                        'request_sha256': request_sha256 or validate_allocation(self.job),
+                        'change_ref': 'CHANGE-REUSE-1', 'duration_seconds': duration,
+                        'cleanup': {key: {'status': 'COMPLETE', 'evidence_ref': 'EVIDENCE-' + key,
+                                          'observed_at': observed} for key in sorted(CLEANUP_CATEGORIES)},
+                        'declared_at': observed})
+
+    def run_release(self, action, evidence):
+        return ipam_operate(self.job, action, self.authority, self.client, self.ledger, evidence)
+
+    def head_receipt(self):
+        return load_private(next(self.ledger.glob('*/head.json')))
+
+    def test_reuse_quarantine_requires_every_DNS_tombstone_then_releases_address(self):
+        self.registered()
+        self.run_dns('withdraw')
+        # Widen the retirement window so the declared cleanup stays inside it.
+        self.authority['valid_from'] = (utcnow() - timedelta(minutes=5)).isoformat()
+        evidence = self.release_evidence()
+        with self.assertRaises(ValueError): self.run_release('quarantine', evidence)
+        self.assertEqual(type(self).row['status']['value'], 'active')
+        self.assertEqual(self.run_action('retire')['allocation_status'], 'deprecated')
+        with self.assertRaises(ValueError): self.run_release('quarantine',
+            self.release_evidence(request_sha256='0' * 64))
+        held = self.run_release('quarantine', evidence)
+        self.assertEqual((held['format'], held['allocation_status'], held['reusable'], held['released_at']),
+                         ('hosting-netbox-quarantine/1', 'QUARANTINED', False, None))
+        # Dependent DNS work fails closed on the terminal quarantine receipt.
+        with self.assertRaises(ValueError): handoff.confirmed(self.job, self.head_receipt())
+        released = self.run_release('release', evidence)
+        self.assertEqual((released['format'], released['allocation_status'], released['reusable']),
+                         ('hosting-netbox-release/1', 'RELEASED', True))
+        self.assertGreaterEqual(released['released_at'], held['reuse_not_before'])
+        self.assertEqual(released['released_at'], load_private(
+            next(self.ledger.glob('*/release.json')))['released_at'])
+        # Reuse is a new explicit allocation decision, never an automatic reuse.
+        with self.assertRaises(ValueError): self.run_action('reserve')
+        with self.assertRaises(ValueError): self.run_action('retire')
+        self.assertFalse(any(method == 'DELETE' for method, _ in self.calls))
+        # Every ownership tombstone survived quarantine and release.
+        self.assertTrue(any(kind == 'TXT' for _, kind in self.dns_server.store))
