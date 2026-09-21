@@ -13,10 +13,11 @@ import subprocess
 import sys
 import tempfile
 import time
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from tools import remote_owner,owner_worker,owner_install,readback_core as c
+from tools import remote_owner,owner_worker,owner_install,owner_revocations,readback_core as c
 from tools.run_files import digest,encoded,read_private,utcnow,write_new
 
 
@@ -27,9 +28,10 @@ def run(user):
         raise RuntimeError('Disposable SSH fixture requires root and an existing non-root fixture account')
     # StrictModes checks every ancestor of AuthorizedPrincipalsFile. A fixture
     # under world-writable /tmp cannot represent the root-controlled installer.
-    with tempfile.TemporaryDirectory(prefix='hosting-worker-lab-',dir='/var/lib') as tmp:
+    with tempfile.TemporaryDirectory(prefix='hosting-worker-lab-',dir='/var/lib') as tmp, \
+         tempfile.TemporaryDirectory(prefix='hosting-owner-lab-',dir='/var/lib') as data_tmp:
         base=Path(tmp); base.chmod(0o755)
-        owner=base/'owner'; owner.mkdir(mode=0o700)
+        owner=Path(data_tmp); owner.chmod(0o700)
         spool=owner/'spool'; spool.mkdir(mode=0o700)
         ledger=owner/'ledger'; ledger.mkdir(mode=0o700)
         source=owner/'export'; source.mkdir(mode=0o700); (source/'data').write_bytes(b'Useful fixture data')
@@ -79,7 +81,7 @@ else:
             'systemctl':'/usr/bin/systemctl','host_private':{'path':str(base/'host'),'sha256':digest((base/'host').read_bytes())},
             'host_public':' '.join((base/'host.pub').read_text().split()[:2]),
             'user_ca':' '.join((base/'ca.pub').read_text().split()[:2]),'revoked_user_keys':[],
-            'data_directory':'/var/lib/hosting-owner-fixture',
+            'data_directory':str(owner),
             'ledger_mode':'new','custody_ref':'DISPOSABLE-LOCAL-FIXTURE'}
         for name in ('python','sshd','ssh_keygen','systemctl'):
             install_config[name+'_sha256']=digest(Path(install_config[name]).read_bytes())
@@ -88,6 +90,7 @@ else:
             (base/name).write_bytes(raw); (base/name).chmod(0o644)
         (base/'host-key').write_bytes((base/'host').read_bytes()); (base/'host-key').chmod(0o600)
         daemon_config=base/'sshd_config'
+        daemon_config.chmod(0o600)
         command([sshd,'-t','-f',str(daemon_config)])
         parsed=command([sshd,'-T','-f',str(daemon_config)])
         if 'authenticationmethods publickey' not in parsed or 'disableforwarding yes' not in parsed:
@@ -128,7 +131,27 @@ else:
                     else: raise RuntimeError('Worker accepted an arbitrary command')
                 finally: owner_worker.COMMAND=original
                 if (owner/'captures').read_text()!='1': raise RuntimeError('Negative case executed backup')
-                (base/'revoked-keys').write_text(' '.join((base/'ssh_key.pub').read_text().split()[:2])+'\n')
+                # Seed an explicit disposable installed-profile handoff; run the
+                # actual durable revocation owner and atomic publisher thereafter.
+                class FixtureHost(owner_install.Host):
+                    def identity(self,value,root):
+                        if value['machine_id']!=Path('/etc/machine-id').read_text().strip():
+                            raise RuntimeError('Fixture owner machine changed')
+                with patch.multiple(owner_install,CONFIG=base,STATE=base/'revocation-state',
+                        UNIT=base/owner_install.SERVICE,TMPFILES=base/'hosting-owner.tmpfiles',RUNTIME=base):
+                    fixture_host=FixtureHost(); state=fixture_host.directory(owner_install.STATE)
+                    installed_files=owner_install.service_files(install_config)
+                    hashes={name:digest(raw) for name,raw in installed_files.items()}
+                    hashes['host-key']=install_config['host_private']['sha256']
+                    write_new(state/'intent.json',encoded({'format':'hosting-owner-install-intent/1',
+                        'config':install_config,'files':hashes}))
+                    revoke={'format':'hosting-owner-revocation/1','config_sha256':c.digest(install_config),
+                        'operation_id':'fixture-revocation','keys':[' '.join((base/'ssh_key.pub').read_text().split()[:2])],
+                        'identity_ref':'DISPOSABLE-FIXTURE-SUBJECT'}
+                    authority={'format':'hosting-owner-revocation-authority/1','request_sha256':c.digest(revoke),
+                        'valid_from':job['valid_from'],'valid_until':job['valid_until'],
+                        'change_ref':'DISPOSABLE-FIXTURE-REVOCATION','recovery_access_ref':'FIXTURE-CONTROLLER'}
+                    owner_revocations.revoke(install_config,revoke,authority,host=fixture_host)
                 try: contact(observe=True)
                 except ValueError: pass
                 else: raise RuntimeError('Revoked certificate subject retained worker access')

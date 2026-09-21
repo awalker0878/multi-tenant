@@ -31,6 +31,7 @@ CONFIG = Path('/etc/hosting-owner')
 UNIT = Path('/etc/systemd/system') / SERVICE
 STATE = Path('/var/lib/hosting-owner-install')
 TMPFILES = Path('/etc/tmpfiles.d/hosting-owner.conf')
+RUNTIME = Path('/run/hosting-owner')
 
 
 def installed_path(value):
@@ -93,11 +94,11 @@ def authorize(config, authority):
     for name in ('change_ref', 'recovery_access_ref'): c.text(authority[name])
 
 
-def service_files(config, *, config_directory=CONFIG, data_directory=None, runtime_directory=Path('/run/hosting-owner')):
+def service_files(config, *, config_directory=None, data_directory=None, runtime_directory=None):
     """Render the same fixed daemon profile for installation and real SSH labs."""
-    validate(config); directory = installed_path(str(config_directory))
+    validate(config); directory = installed_path(str(config_directory or CONFIG))
     data = installed_path(str(data_directory or config['data_directory']))
-    runtime = installed_path(str(runtime_directory))
+    runtime = installed_path(str(runtime_directory or RUNTIME))
     forced = f"{config['python']} -I {config['source']}/tools/owner_worker.py --spool {data}/spool --ledger {data}/ledger"
     daemon = '\n'.join([f"Port {config['port']}", f"ListenAddress {config['listen_address']}", 'AddressFamily inet',
         f'HostKey {directory}/host-key', 'HostKeyAlgorithms ssh-ed25519', f'PidFile {runtime}/sshd.pid',
@@ -185,10 +186,7 @@ class Host:
         path = self.path(path)
         require(not any(p.is_symlink() for p in (path,*path.parents)), 'Symlink in worker installation file')
         if path.exists():
-            info = path.stat()
-            require(path.is_file() and info.st_uid == self.custodian_uid and info.st_gid == self.custodian_gid
-                    and stat.S_IMODE(info.st_mode) == mode
-                    and path.read_bytes() == data, 'Existing worker file changed; maintenance reconciliation required')
+            self.verify_file('/'+str(path.relative_to(self.prefix)),data,mode)
             return
         # Atomic publication leaves either the exact complete file or no destination.
         fd, name = tempfile.mkstemp(prefix='.install-', dir=path.parent)
@@ -196,6 +194,27 @@ class Host:
             with os.fdopen(fd,'wb') as stream:
                 stream.write(data); stream.flush(); os.fchmod(stream.fileno(),mode); os.fsync(stream.fileno())
             os.link(name,path,follow_symlinks=False); sync_directory(path.parent)
+        finally: Path(name).unlink(missing_ok=True)
+
+    def verify_file(self, path, data, mode):
+        path = self.path(path)
+        require(not any(p.is_symlink() for p in (path,*path.parents)), 'Symlink in worker installation file')
+        info = path.stat()
+        require(path.is_file() and info.st_uid == self.custodian_uid and info.st_gid == self.custodian_gid
+                and stat.S_IMODE(info.st_mode) == mode and path.read_bytes() == data,
+                'Existing worker file changed; maintenance reconciliation required')
+
+    def replace_revocations(self, before, after):
+        """Caller holds the installation lock and has proved a monotonic policy."""
+        target = CONFIG/'revoked-keys'; path = self.path(target)
+        self.verify_file(target,before,0o644)
+        fd,name = tempfile.mkstemp(prefix='.revoking-',dir=path.parent)
+        try:
+            with os.fdopen(fd,'wb') as stream:
+                stream.write(after); stream.flush(); os.fchmod(stream.fileno(),0o644); os.fsync(stream.fileno())
+            self.verify_file(target,before,0o644)
+            os.replace(name,path); sync_directory(path.parent)
+            self.verify_file(target,after,0o644)
         finally: Path(name).unlink(missing_ok=True)
 
 
@@ -232,6 +251,10 @@ def install(config, authority, *, host=None, root=ROOT):
         data = Path(config['data_directory'])
         for path in (data,data/'spool',data/'ledger'):
             host.directory(path,config['uid'],config['gid'],create=config['ledger_mode'] == 'new')
+        from tools.owner_revocations import effective, reconcile
+        _,prefixes = effective(config,host)
+        if host.path(CONFIG/'revoked-keys').exists(): reconcile(host,prefixes)
+        files['revoked-keys'] = prefixes[-1]
         for name,raw in files.items():
             host.file(UNIT if name == SERVICE else TMPFILES if name == 'hosting-owner.tmpfiles' else CONFIG/name,raw,
                       0o600 if name in {'host-key','sshd_config'} else 0o644)

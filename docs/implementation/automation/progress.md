@@ -75,6 +75,12 @@ ledger custody; validates native daemon configuration; and resumes only the
 same installation without replacing changed files or restarting native jobs.
 The real SSH lab consumes the generated profile instead of a separate fixture.
 
+The [worker revocation owner](owner-revocations.md) adds durable, monotonic
+certificate-subject denial with atomic publication and interrupted recovery.
+Repeated installation preserves journaled revocations; unknown identity controls
+remain held. Revocation affects new authentication and never claims to cancel
+existing sessions or fence their native tasks.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

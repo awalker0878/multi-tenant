@@ -6,7 +6,9 @@ only its dedicated configuration/unit, a standard OpenSSH runtime-directory
 declaration and selected private worker directories. It never edits management
 SSH configuration, runs a staged native job or resets a native owner ledger.
 
-This is an initial-installation and exact-resume procedure. Source upgrades,
+This is an initial-installation and exact-resume procedure. The separate
+[subject revocation owner](owner-revocations.md) performs monotonic deny-only
+maintenance and its journal is preserved by repeat installation. Source upgrades,
 account changes, listener moves, CA/host-key rotation and endpoint removal use a
 separately accepted maintenance operation; modifying an installation input does
 not cause this tool to overwrite or restart a running worker.
@@ -109,7 +111,8 @@ retains a candidate, validates it with the actual `sshd -t`, then publishes:
 | `<data_directory>/spool`, `<data_directory>/ledger` | Exact private worker-owned directories, preserving retained contents |
 
 Files are published atomically and never replaced by a repeat invocation.
-Existing bytes/modes/owners must equal the original plan. Symlinks, foreign
+Existing bytes/modes/owners must equal the original plan, with the revocation
+list extended only by the retained identity-owner journal. Symlinks, foreign
 endpoint files, altered native unit selection and systemd drop-ins are refused.
 The installer validates the final daemon configuration, reloads systemd metadata,
 checks the actual loaded unit path, then enables/starts only `hosting-owner.service`.
@@ -154,6 +157,6 @@ reboot an accepted owner host.
 The native SSH lab also replaces only its disposable revocation list and proves
 that the revoked subject cannot authenticate a new connection, without restarting
 the daemon. Revocation does not end an existing SSH session or fence a native job.
-Live revocation-list changes belong to the accepted identity maintenance owner;
-the initial installer never overwrites a changed list or silently removes a
-revocation during repeat installation.
+Use the [revocation owner](owner-revocations.md) for accepted live subject-key
+denial and interrupted publication recovery. The initial installer never erases
+unknown policy or silently removes a journaled revocation during repeat installation.

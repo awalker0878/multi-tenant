@@ -21,6 +21,9 @@ The [worker installer](owner-installation.md) now installs this dedicated profil
 validates the actual daemon configuration, preserves selected ledger custody and
 enables its separate systemd service. It supports exact interrupted-install
 resume without overwriting changed files or restarting native jobs.
+The [subject revocation owner](owner-revocations.md) can subsequently deny selected
+certificate subjects through the independent identity-management path while
+preserving all previous revocations and existing native-job records.
 
 Use a dedicated managed SSH endpoint with a pinned host key and an independently
 recoverable approved source checkout at the same commit as the coordinator.
