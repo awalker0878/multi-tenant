@@ -92,8 +92,13 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 `prepared_step` must be a direct dependency of the correct plan kind.
 `workload_step` must be a direct Terraform apply dependency. The runner checks
 that the original execution outputs still equal the retained handoff copies.
-`domain_steps` names the exact direct apply dependencies required by the supplied
-environment intent; `selected_input` selects one compiled workload input key.
+`domain_steps` names the exact direct apply dependencies for this WSD in the
+supplied full environment intent; `selected_input` selects one compiled workload
+input key. The compiler validates the complete environment before selecting the
+exact tenant/WSD of this delivery. Operators can pass the same accepted two-tenant
+reference environment to each WSD graph without editing it into partial inputs.
+The handoff retains the complete environment digest and selected scope; native
+receipts from another WSD still cannot satisfy this graph.
 The stage emits `inputs.json`, `scopes.json` and `handoff.json`. Workload drafts
 remain disabled until actual scope/input review enables the requested build.
 `platform_transition` takes a direct prior apply dependency and `stage` equal to

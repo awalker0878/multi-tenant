@@ -229,9 +229,9 @@ def dispatch(step, packet, directory, base, plan, root):
         write_new(directory/'transition.json',encoded(record)); names=['transition.json']
         result={'status':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW'}
     elif kind=='workload_inputs':
-        from tools.wsd_handoff import compile_runs
+        from tools.wsd_handoff import compile_scope_runs
         records=[terraform_execution(selected,plan,base) for selected in values['domain_steps']]
-        outputs,scopes,provenance=compile_runs(load_private(files['environment']),records,
+        outputs,scopes,provenance=compile_scope_runs(load_private(files['environment']),records,plan['scope'],
             load_private(files['vmware_bindings']) if 'vmware_bindings' in files else None)
         require(values['selected_input'] in outputs,'Requested workload input is absent from the compiled handoff')
         selected=[row for row in scopes['scopes'] if row['input']==values['selected_input']]

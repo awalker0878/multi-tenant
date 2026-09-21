@@ -60,7 +60,7 @@ class DeliveryHandoffTests(unittest.TestCase):
         for platform in ('nutanix','vmware','openstack'):
             with self.subTest(platform=platform):
                 base=self.root/platform; base.mkdir(mode=0o700)
-                environment=example(platform); environment['wsds']=environment['wsds'][:1]
+                environment=example(platform)
                 outputs,bindings=receipts(environment); domains,domain_scopes=compile_environment(environment)
                 row=domain_scopes['scopes'][0]; native=next(iter(outputs.values()))
                 scope=self.native(base,domains[row['input']],native)
@@ -72,6 +72,22 @@ class DeliveryHandoffTests(unittest.TestCase):
                 self.assertEqual(result['status'],'BOUND_WORKLOAD_DRAFT_REQUIRES_REVIEW')
                 actual=load_private(output/'inputs.json')
                 self.assertEqual(actual,workloads[selected]); self.assertFalse(actual['allow_restricted_build'])
+                provenance=load_private(output/'handoff.json')
+                self.assertEqual(provenance['environment_sha256'],c.digest(environment))
+                self.assertEqual(provenance['selected_scope'],{k:v for k,v in scope.items() if k!='phase'})
+
+
+    def test_scoped_handoff_still_validates_other_tenant_intent_and_rejects_foreign_scope(self):
+        from tools.wsd_handoff import compile_scope_runs
+        environment=example('openstack'); _,scopes=compile_environment(environment)
+        scope={k:v for k,v in scopes['scopes'][0]['scope'].items() if k!='phase'}
+        foreign=scope|{'tenant_key':'foreign'}
+        with self.assertRaisesRegex(ValueError,'absent or ambiguous'):
+            compile_scope_runs(environment,[],foreign)
+        bad=deepcopy(environment); bad['wsds'][1]['domains'][0]['zone']='UNKNOWN'
+        with self.assertRaises(ValueError): compile_scope_runs(bad,[],scope)
+        with self.assertRaisesRegex(ValueError,'Every intended WSD'):
+            compile_scope_runs(environment,[],scope)
 
 
 if __name__=='__main__': unittest.main()
