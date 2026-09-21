@@ -72,7 +72,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | --- | --- | --- | --- |
 | `remote_owner` | `ssh`, `ssh_sha256` | `job`, `target`, `ssh_key`, `ssh_certificate` | None |
 | `restic` | `action`, `restic`, `restic_sha256`, `target` | `config`, `credentials` | `ca_bundle`; restore also requires `receipt`, `manifest`, `restore_authority` |
-| `capacity` | `action`, `database` | `request`, `authority` | `native_ids` |
+| `capacity` | `action`, `database` | `request`, `authority` | `native_ids`; reserve pairs `inputs`, `sizing` to bind actual workload demand |
 | `acceptance` | `purpose` | `acceptance` | None |
 | `terraform_plan` | `catalog_id`, `terraform`, `terraform_sha256` | `inputs`, `backend`, `environment`, `authority` | `references`, `cloud`, `ca_bundle`, `transition` |
 | `terraform_apply` | `prepared_step` | `approval` | None |

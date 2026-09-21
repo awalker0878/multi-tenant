@@ -48,6 +48,13 @@ cached successful containment cannot hide reopened policy. Immutable native
 edge history also prevents completed withdrawal from masking an older unknown
 write before a subsequent activation.
 
+Capacity reservation stages can now derive actual workload demand for all three
+platforms, bind accepted placement and OpenStack flavor/cloud sizing, and check
+the same live allocation before Terraform plan and apply. Decimal MB/GB units
+are explicit and converted conservatively from native byte/GiB/MiB dimensions.
+Interrupted committed capacity actions recover through the authoritative SQLite
+receipt without repeating a mutation.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

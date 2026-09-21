@@ -16,7 +16,7 @@ KINDS = {
     'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
-    'capacity': ({'action','database'}, {'request','authority'}, {'native_ids'}),
+    'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
@@ -82,6 +82,10 @@ def validate_packet(step, packet, plan, base):
         require(read_private(upstream/'bundle.json')==read_private(upstream/'execution/bundle.json'), 'Prepared owner bundle changed')
         bundle=load_private(upstream/'bundle.json'); match_scope(bundle['scope'],plan)
         require(bundle['source_commit']==plan['source_commit'],'Prepared owner source changed')
+        if kind=='terraform_apply' and bundle['scope']['phase']=='workloads':
+            from tools.capacity_demand import check_ancestors
+            cloud_sha=load_private(upstream/'execution/contact.json')['cloud_sha256'] if plan['scope']['platform']=='openstack' else None
+            check_ancestors(step,plan,base,load_private(upstream/'execution/inputs.json'),cloud_sha256=cloud_sha)
     if kind=='guest_plan':
         dependency(step,values['workload_step'],'terraform_apply',plan,base)
         match_scope(load_private(files['access'])['scope'],plan)
@@ -100,6 +104,10 @@ def validate_packet(step, packet, plan, base):
         from tools.delivery_run import ROOT
         _,scope,_=select_scope(ROOT,values['catalog_id'],load_private(files['inputs']))
         match_scope(scope,plan)
+        if scope['phase']=='workloads':
+            from tools.capacity_demand import check_ancestors
+            check_ancestors(step,plan,base,load_private(files['inputs']),
+                            cloud_sha256=digest(read_private(files['cloud'])) if 'cloud' in files else None)
     if kind=='acceptance':
         require(values['purpose'] in {'admission','domain','bootstrap','services','activation','post_activation','recovery','retirement'}, 'Unknown acceptance gate')
         accepted=load_private(files['acceptance'])
@@ -126,6 +134,13 @@ def validate_packet(step, packet, plan, base):
         if kind=='capacity':
             require(values['action'] in {'reserve','confirm','release'},'Unknown capacity transition')
             private_path(values['database'])
+            require(('inputs' in files)==('sizing' in files),'Workload inputs and sizing catalogue must be paired')
+            if 'inputs' in files:
+                from tools.capacity_demand import bind_request,owner_binding
+                require(values['action']=='reserve','Workload sizing is bound at reservation')
+                sizing=load_private(files['sizing'])
+                bind_request(value,load_private(files['inputs']),sizing)
+                owner_binding(values['database'],value,sizing,require_live=False)
     if kind=='vsphere_power':
         from tools.vsphere_power import validate
         request=load_private(files['request']); validate(request)
@@ -213,6 +228,12 @@ def dispatch(step, packet, directory, base, plan, root):
         from tools.capacity import operate
         result=operate(values['database'],load_private(files['request']),values['action'],load_private(files['authority']),
                        load_private(files['native_ids']) if 'native_ids' in files else None)
+        if 'inputs' in files:
+            from tools.capacity_demand import bind_request
+            request=load_private(files['request']); sizing=load_private(files['sizing'])
+            for name,value in {'result.json':result,'capacity-request.json':request,'sizing.json':sizing,
+                               'demand.json':bind_request(request,load_private(files['inputs']),sizing)}.items():
+                write_new(directory/name,encoded(value)); names.append(name)
     elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
@@ -331,6 +352,26 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='capacity':
+            from tools.capacity import operate
+            files=file_paths(packet); values=packet['parameters']; request=load_private(files['request'])
+            authority=load_private(files['authority']); result=operate(values['database'],request,'inspect',None)
+            require(result['status']=={'reserve':'RESERVED','confirm':'CONFIRMED','release':'RELEASED'}[values['action']]
+                    and authority['format']=='hosting-capacity-authority/1'
+                    and authority['request_sha256']==c.digest(request) and authority['action']==values['action']
+                    and all(result[key]==authority[key] for key in ('envelope_sha256','change_ref','evidence_ref'))
+                    and c.timestamp(authority['valid_from'])<=c.timestamp(result['observed_at'])<c.timestamp(authority['valid_until']),
+                    'Capacity owner receipt no longer matches the interrupted action')
+            if values['action']=='confirm':
+                require(result['native_ids']==sorted(load_private(files['native_ids'])),'Recovered capacity native identities differ')
+            artifacts={'result.json':result}
+            if 'inputs' in files:
+                from tools.capacity_demand import bind_request
+                sizing=load_private(files['sizing'])
+                artifacts.update({'capacity-request.json':request,'sizing.json':sizing,
+                    'demand.json':bind_request(request,load_private(files['inputs']),sizing,current=False)})
+            for name,value in artifacts.items(): retain(directory/name,encoded(value))
+            return complete(step,packet,directory,plan,result,list(artifacts))
         if kind=='remote_owner':
             return remote_dispatch(step,packet,directory,plan,observe=True,recovery_authority=recovery_authority)
         if kind=='edge_containment':

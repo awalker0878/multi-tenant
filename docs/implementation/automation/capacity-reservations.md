@@ -1,7 +1,8 @@
 # Capacity reservation owner
 
 `tools/capacity.py` supplies the missing compute/storage reservation transaction
-before native provisioning. It accounts for vCPU, memory MB and storage GB against
+before native provisioning. It accounts for vCPU, decimal memory MB (10^6 bytes)
+and decimal storage GB (10^9 bytes) against
 both a qualified pool budget and tenant entitlement. Reserved and confirmed
 allocations both consume capacity; a controller timeout or expired approval never
 recycles them automatically.
@@ -94,6 +95,62 @@ requires a current envelope. The [delivery runner](delivery-runner.md) exposes
 these three transitions as the `capacity` stage kind.
 
 ## Refresh, retention and recovery
+
+### Bind actual workload demand
+
+An ordinary workload delivery's `capacity` reserve packet includes paired
+`inputs` and `sizing` files in addition to its request and authority. Inputs are
+the workload composition inputs; native build enablement is not needed merely
+to calculate demand. `tools/capacity_demand.py` derives each member's vCPU and
+memory/disk bytes and rounds its MB/GB charge upward. Nutanix and VMware use the
+declared integer GiB sizes and the existing composition defaults (2 vCPU, 4 GiB
+RAM, 40 GiB boot, zero data disk). Explicit JSON null follows those same Terraform
+optional defaults. A reservation may exceed demand but cannot undercharge it.
+
+The accepted `hosting-capacity-sizing/1` catalogue contains `pool_id`, `origin`,
+`native_id`, `platform`, `site_key`, `placements`, `flavors`, `provider_selector`,
+`cloud_sha256`, `valid_from`, `valid_until` and `acceptance_ref`. The current
+window is at most one hour. Native pool identity must equal the authoritative
+capacity envelope. `provider_selector` has exactly `platform_endpoint` for
+Nutanix/VMware or `openstack_cloud` for OpenStack. OpenStack additionally requires
+the exact private source cloud-file byte digest in `cloud_sha256`; other
+platforms use JSON null. Acceptance binds those provider settings to the native
+pool; no name-only discovery or automatic qualification is performed.
+
+Each accepted placement in `placements` contains exactly:
+
+| Platform | Placement fields |
+| --- | --- |
+| Nutanix | `cluster_id`, `project_id`, `storage_container_id` |
+| VMware | `resource_pool_id`, `datastore_id`, `storage_policy_id` |
+| OpenStack | `compute_availability_zone`, `storage_availability_zone`, `volume_type` |
+
+For OpenStack, `flavors` maps exact flavor IDs to `vcpu`, `ram_mib`, `root_gib`,
+`ephemeral_gib` and `swap_mib`. The selected retained-volume profile requires
+zero local root, ephemeral and swap disks. Obtain the actual dimensions and
+placement constraints from accepted native observations; do not infer them from
+flavor names. [Nova documents RAM and swap in MiB and disk sizes in GiB](https://docs.openstack.org/api-ref/compute/#show-flavor-details).
+Other platforms use an empty flavor map. Pool budgets remain responsible for
+physical overhead, failure reserves, fragmentation and actual placement limits.
+
+The reserve stage retains `demand.json`, `sizing.json` and
+`capacity-request.json` with its native receipt. Every subsequent workload
+Terraform plan and apply with that reserve stage as an ancestor checks the same
+member/shape/placement projection, the same provider/cloud binding, current
+catalogue and envelope, and a live exact reservation. Changed demand or released
+capacity holds before invoking Terraform. Native network IDs and reviewed
+lifecycle states can change without altering the capacity projection. A reserve
+ancestor without sizing cannot authorize a workload stage. Initial qualification
+graphs without a reserve stage retain their separate restricted-capacity
+commissioning authority; the generic runner does not invent admission gates.
+
+A committed reservation can also recover from the SQLite receipt after the
+coordinator loses its completion marker, without a second mutation. A later
+confirmation/release or a changed receipt cannot masquerade as the interrupted
+action. This binding does not fence concurrent native writers or substitute for
+the independent cleanup evidence required before releasing capacity.
+
+### Envelope and ledger maintenance
 
 Use `update-envelope` with `--envelope` and `--authority`. The authority is
 `hosting-capacity-envelope-authority/1` with `envelope_sha256`,
