@@ -1,12 +1,15 @@
 """Delivery binding for brownfield adoption review; no Terraform import is executed."""
+import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
 from tools import adoption, delivery_steps as steps, readback_core as c
 from tools.run_files import digest, encoded, load_private, read_private, replace_private, write_new
 
-ROOT=Path(__file__).resolve().parents[1]\nSOURCE='a'*40
+ROOT=Path(__file__).resolve().parents[1]
+SOURCE='a'*40
 SCOPE={
     'environment_key':'reference','site_key':'site-01','platform':'openstack',
     'tenant_key':'tenant-01','wsd_key':'science-prod',
