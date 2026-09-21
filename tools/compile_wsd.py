@@ -53,9 +53,12 @@ def native_inputs(platform, phase, supplied, excluded):
     for key, spec in variables.items():
         value = supplied.get(key, spec.get('default'))
         kind = spec['type']
-        require((kind == 'string' and isinstance(value, str) and bool(value.strip()))
+        if key in {'lifecycle_stage', 'bootstrap_acceptance_ref', 'bootstrap_rules'}:
+            require(value == spec['default'], 'Initial compilation cannot issue a bootstrap transition')
+        require((kind == 'string' and isinstance(value, str) and (bool(value.strip()) or spec.get('default') == ''))
                 or (kind == 'number' and type(value) in (int, float) and value >= 0)
-                or (kind == 'bool' and type(value) is bool), f'Missing or invalid native input: {key}')
+                or (kind == 'bool' and type(value) is bool)
+                or (key == 'bootstrap_rules' and isinstance(value, dict) and not value), f'Missing or invalid native input: {key}')
         require(not isinstance(value, str) or ('${' not in value and '%{' not in value), 'Template syntax in native input')
         values[key] = value
     return values

@@ -69,6 +69,17 @@ a separately supported profile. The documentation snapshot consulted identifies
 NSX 9.1.1.0; it is not evidence that an installed NSX release or the retained
 Terraform provider combination supports every field. [N1–N4]
 
+Reports now retain bounded realization fields and both selected configuration
+hashes. Offline review recomputes the realization result and rejects matching
+summaries contradicted by either configuration read. Recollect older reports
+without these witnesses. They do not authenticate the collector or fence writers.
+
+The explicit [owned-domain profile](implementation/automation/nsx-domain-readback.md)
+adds complete Tier-1/segment/group/policy relationships and rejects unsupported
+selectors in both full responses before projection. It supports existing-domain
+held Terraform lifecycle review; it does not replace effective DFW membership,
+native task inventory or the separate segment/switch/port campaign profiles.
+
 ## Nutanix networking and prism v4.3 profile
 
 The SDK reference exposes exact VPC/subnet GET interfaces and an exact task GET.
@@ -96,21 +107,65 @@ requiring review. Suspended, redacted and unrecognized status values remain unkn
 Composite tasks and limited/unresolved affected-entity lists are rejected rather
 than treated as complete. This release neither lists nor cancels tasks. [U2]
 
-VMs, Flow policies and route resources are not covered by the new Nutanix reader.
+VMs, Flow policies and route resources are not covered by this networking reader.
+Separate [AHV VM](implementation/automation/nutanix-vm-readback.md) and
+[Flow policy](implementation/automation/nutanix-flow-readback.md) snapshot profiles
+are available, as are [vSphere VM/task observations](implementation/automation/vsphere-readback.md).
+The optional [AHV VM/task profile](implementation/automation/nutanix-vm-task-readback.md)
+combines VMM v4.2 snapshots with a bounded, explicitly recorded Prism v4.3 task
+graph. It supports offline recovery review and campaigns v3/v4; it does not
+discover other work or provide native fencing. The separate
+[AHV activity profile](implementation/automation/nutanix-vm-activity-readback.md)
+adds bounded queries for visible pending/late-completed tasks on those exact VMs.
+Extra or uncertain activity holds. It supports saved-plan/ledger review of
+existing AHV power/NIC lifecycle attempts while preserving the ledger hold.
+Installed query semantics, retention and cross-writer visibility require native
+qualification; these observations still provide no native fencing. Each
+profile's exact coverage and task limitations are documented separately.
+The [Flow task/activity profile](implementation/automation/nutanix-flow-activity-readback.md)
+adds recorded policy tasks and bounded visible policy activity to campaign v4
+and held existing-domain lifecycle review. Offline review checks policy/ETag
+hashes and the full native shape verdict as well as task/activity witnesses.
+Actual enforcement and cross-writer fencing remain independently required.
+The vSphere clone activity profile additionally observes visible work on both
+accepted template sources and result VMs, without clone submission, state adoption
+or native writer fencing.
+[VMware network association readers](implementation/automation/vmware-network-binding.md)
+add exact NSX-backed distributed-portgroup/switch identities and segment-scoped
+realized-switch identities. Campaign v6 binds these to each VM's assigned domain;
+v7 adds exact distributed-port occupants, connection cookies and VM/NIC/host/MAC
+bindings. [Campaign v8](implementation/automation/target-qualification.md#campaign-v8-bind-full-domain-intent)
+adds strict complete owned-domain observations and binds allocation, lifecycle
+and service intent to original inputs/outputs. It replays all five reports per
+phase, including both logical-switch witnesses, around the guest traffic checks.
+Effective DFW membership and native qualification remain separate.
+The [held vSphere reviewer](implementation/automation/terraform-recovery.md) now
+requires those attachment witnesses alongside VM activity, binds retained disks
+and NICs to the saved plan, and checks both reports under the same fence/quarantine
+timing. Offline review rechecks selected network witnesses and both VM snapshot
+digests; older witness-free reports require recollection. These consistency checks
+preserve the ledger and do not authenticate a collector or create native fencing.
 The profile's source dependency is networking/prism Go SDK v4.3.1; the code itself
 uses standard-library HTTP rather than executing the SDK. No legacy API fallback
 or installed compatibility claim is made. [U3–U6]
 
 ## Transport and evidence protections
 
-The transport is GET-only through an exact generated path allowlist and a canonical
-HTTPS origin. It verifies the server certificate/hostname and rejects redirects,
+The base profiles use GET-only access through an exact generated path allowlist
+and a canonical HTTPS origin. The separate vSphere task-tree profile adds bounded
+session-collector POSTs for filtered history creation, page reads and cleanup.
+The port-attachment profile adds fixed, exact-key `FetchDVPorts` POSTs for reads;
+neither supplies an infrastructure mutation interface. All profiles verify the server
+certificate/hostname and reject redirects,
 foreign response links, environment proxies and credentials embedded in an origin.
-It does not create a session cookie or request credential renewal. The new clients
-use task-scoped Basic credentials over TLS because that is the selected candidate
-profile; stronger or different authentication requires an explicit integration.
+They do not create a login session or request credential renewal. The original
+NSX/Nutanix profiles use task-scoped Basic credentials over TLS; vSphere uses an
+independently issued VI session. Profile-specific authentication must be accepted
+for the installed target.
 
-Replies must be HTTP 200 JSON objects. Duplicate JSON keys, nonfinite numbers,
+GET replies must be HTTP 200 JSON objects. The vSphere history profile additionally
+accepts bounded JSON arrays for pages and strict HTTP 204 collector cleanup.
+Duplicate JSON keys, nonfinite numbers,
 ambiguous framing, unsupported content encoding, weak/ambiguous ETags, oversized
 bodies, truncated content, credential-shaped input and malformed nested data are
 rejected. HTTP 404 is unknown, not deletion evidence. Error text and actual values
@@ -118,13 +173,14 @@ are not echoed into diagnostic reasons. Revision/hash comparisons do not grant
 permission to rewrite the resource.
 
 Default limits: 20 resources, 3 rounds (2–10 supported), 0.2-second inter-round pause,
-5-second socket timeout, 60-second overall cooperative budget, 400 GET ceiling and
+5-second socket timeout, 60-second overall cooperative budget, 400 request ceiling and
 2 MiB body ceiling. These are implementation bounds, **not government-mandated
 thresholds**. Remaining read time is applied to the live TLS socket, including
 Connection:close responses. The operating system's hostname-resolution call is
 not forcibly interrupted by that budget; use approved DNS and an execution-level
 deadline for native runs. A slow-body regression proves the response-read budget,
-not all resolver failure behavior.
+not all resolver failure behavior. The vSphere history profile uses a 120-second
+transport budget with its additional documented page/entry bounds.
 
 The output path is created exclusively, without following a symlink, mode0600. An
 initial incomplete record is written before contact; output is flushed and synced.

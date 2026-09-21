@@ -4,6 +4,11 @@
 
 The existing `tools/dns_change.py` remains the separately scoped RFC 2136/TSIG mutation mechanism. This package does not invoke it. It only validates exported DNS lifecycle evidence and decides whether an immutable registration intent is ready to be handed to the DNS owner.
 
+The separate [NetBox execution adapter](../implementation/automation/netbox-dns.md)
+connects confirmed native IPv4 allocations to initial A/PTR registration. Its
+private receipts and read-only recovery do not satisfy this package's accepted
+allocation/realization, name assignment or required propagation evidence by themselves.
+
 ## Source boundary
 
 The architecture requires authoritative IPAM to reserve and confirm addresses before dependent name registration. DNS forward/reverse records, TTLs and reuse conditions are part of the same lifecycle, while recursive resolution, authoritative hosting, dynamic update and transfer/replication duties remain separate. Service failure must pause changes rather than create guessed addresses, alternate names or broader update authority.

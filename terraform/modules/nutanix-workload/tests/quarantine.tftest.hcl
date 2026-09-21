@@ -21,6 +21,28 @@ variables {
   ipv4_address = "192.0.2.10"
 }
 
+run "restricted_bootstrap" {
+  command = plan
+  variables {
+    lifecycle_stage = "bootstrap"
+    bootstrap_acceptance_ref = "MOCK-ONLY-NOT-ACCEPTED"
+  }
+  assert {
+    condition = nutanix_virtual_machine_v2.workload.power_state == "ON" && nutanix_virtual_machine_v2.workload.nics[0].nic_backing_info[0].virtual_ethernet_nic[0].is_connected
+    error_message = "Reviewed bootstrap must request power and NIC connection together."
+  }
+  assert {
+    condition = output.delivery_state == "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY" && output.lifecycle_stage == "bootstrap"
+    error_message = "Bootstrap is not production qualification."
+  }
+}
+
+run "unaccepted_bootstrap_rejected" {
+  command = plan
+  variables { lifecycle_stage = "bootstrap" }
+  expect_failures = [nutanix_virtual_machine_v2.workload]
+}
+
 run "quarantine_configuration" {
   command = plan
   assert {

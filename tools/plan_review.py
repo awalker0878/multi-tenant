@@ -69,7 +69,7 @@ def walk(value:Any,path:tuple=()):
 def empty(value:Any)->bool:return value is None or value=='' or value==[] or value=={}
 
 
-def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None)->dict[str,Any]:
+def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None, transition=None)->dict[str,Any]:
     if not isinstance(plan,dict):raise PlanError('Expected a JSON object.')
     if not re.fullmatch(r'1\.[0-9]+',str(plan.get('format_version',''))):raise PlanError('Unsupported or missing plan format_version.')
     changes=plan.get('resource_changes')
@@ -81,6 +81,14 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
         # Never echo attribute values, expressions, provider credentials or plan metadata.
         safe=address if SAFE_ADDRESS.fullmatch(address) else 'REDACTED_RESOURCE_ADDRESS'
         findings.append({'severity':level,'code':code,'resource':safe,'field':field})
+    lifecycle = {}
+    if transition is not None:
+        from tools.lifecycle_transition import plan_bindings
+        try:
+            lifecycle = plan_bindings(plan, transition)
+            finding('REVIEW', 'NATIVE_BOOTSTRAP_AND_WITHDRAWAL_ACCEPTANCE_REQUIRED')
+        except (ValueError, KeyError, TypeError, IndexError):
+            finding('BLOCK', 'LIFECYCLE_CONTRACT_VIOLATION')
     if plan.get('errored') is True:finding('BLOCK','PLAN_ERRORED')
     if plan.get('complete') is False or plan.get('deferred_changes'):finding('REVIEW','PLAN_INCOMPLETE')
     if plan.get('resource_drift'):finding('REVIEW','DRIFT_PRESENT')
@@ -106,7 +114,7 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
         if 'delete' in actions:
             finding('BLOCK','DELETE_OR_REPLACEMENT',address);continue
         if actions not in (['create'],['update'],['no-op']):finding('BLOCK','UNSUPPORTED_ACTION',address);continue
-        if kind not in ALLOWED:finding('BLOCK','RESOURCE_TYPE_OUTSIDE_INCREMENT',address);continue
+        if kind not in ALLOWED and address not in lifecycle:finding('BLOCK','RESOURCE_TYPE_OUTSIDE_INCREMENT',address);continue
         expected_provider=next((v for k,v in PREFIX_PROVIDER.items() if kind.startswith(k)),None)
         if item.get('provider_name')!=expected_provider:finding('BLOCK','UNEXPECTED_PROVIDER_SOURCE',address)
         if actions==['update']:finding('REVIEW','UPDATE_REQUIRES_CHANGE_AND_DATA_REVIEW',address)
@@ -120,7 +128,8 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
             if has_true(unknown.get(field)):finding('REVIEW','SECURITY_FIELD_UNKNOWN',address,field)
             elif field not in after:finding('REVIEW','SECURITY_FIELD_MISSING',address,field)
             elif type(after[field]) is not type(expected) or after[field]!=expected:finding('BLOCK','QUARANTINE_VALUE_CHANGED',address,field)
-        for field,value in SCALAR_RULES.get(kind,{}).items():scalar(field,value)
+        rules = {**SCALAR_RULES.get(kind,{}), **lifecycle.get(address, {}).get('values', {})}
+        for field,value in rules.items():scalar(field,value)
         for field in EMPTY_RULES.get(kind,()):
             if has_true(unknown.get(field)):finding('REVIEW','FORBIDDEN_PATH_FIELD_UNKNOWN',address,field)
             elif not empty(after.get(field)):finding('BLOCK','UNEXPECTED_CONNECTIVITY_OR_DEVICE',address,field)
@@ -181,10 +190,11 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
             finding('REVIEW','ACTUAL_GATEWAY_FIREWALL_PATH_PRECEDENCE_REQUIRED',address)
         if kind=='nsxt_policy_segment':
             blocks=after.get('advanced_config')
+            connectivity = 'ON' if address in lifecycle and transition['target_stage'] == 'bootstrap' else 'OFF'
             if not isinstance(blocks,list) or len(blocks)!=1:finding('REVIEW','SEGMENT_CONNECTIVITY_UNRESOLVED',address)
             elif not isinstance(blocks[0],dict):raise PlanError('Malformed NSX advanced configuration.')
-            elif blocks[0].get('connectivity')!='OFF' or blocks[0].get('urpf_mode')!='STRICT':finding('BLOCK','SEGMENT_QUARANTINE_CHANGED',address)
-        if kind=='nsxt_policy_security_policy':
+            elif blocks[0].get('connectivity')!=connectivity or blocks[0].get('urpf_mode')!='STRICT':finding('BLOCK','SEGMENT_QUARANTINE_CHANGED',address)
+        if kind=='nsxt_policy_security_policy' and address not in lifecycle:
             scope=after.get('scope');rules=after.get('rule')
             if not isinstance(scope,list) or len(scope)!=1 or not scope[0] or scope[0]=='ANY':finding('BLOCK','POLICY_SCOPE_NOT_BOUNDED',address)
             if not isinstance(rules,list) or not rules:finding('REVIEW','DROP_RULE_UNRESOLVED',address)
@@ -194,11 +204,12 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
                     if rule.get('action')!='DROP' or rule.get('logged') is not True or rule.get('disabled') is not False or rule.get('direction')!='IN_OUT' or rule.get('ip_version')!='IPV4_IPV6':finding('BLOCK','NSX_QUARANTINE_RULE_CHANGED',address)
                     if not empty(rule.get('source_groups')) or not empty(rule.get('destination_groups')) or not empty(rule.get('services')) or not empty(rule.get('service_entries')):finding('BLOCK','DROP_RULE_NARROWED',address)
             finding('REVIEW','NATIVE_DFW_PRECEDENCE_AND_EXCLUSIONS_NOT_OBSERVED',address)
-        if kind=='nutanix_network_security_policy_v2':
+        if kind=='nutanix_network_security_policy_v2' and address not in lifecycle:
             refs=after.get('vpc_reference')
             if not isinstance(refs,list) or len(refs)!=1 or not refs[0]:finding('REVIEW','VPC_POLICY_SCOPE_UNRESOLVED',address)
             rules=after.get('rules')
-            if not isinstance(rules,list) or len(rules)!=2:finding('REVIEW','NUTANIX_RULE_SET_UNRESOLVED',address)
+            if not isinstance(rules,list):finding('REVIEW','NUTANIX_RULE_SET_UNRESOLVED',address)
+            elif len(rules)!=2:finding('BLOCK','NUTANIX_UNBOUND_SERVICE_RULES',address)
             else:
                 ruletypes={}
                 for rule in rules:
@@ -215,7 +226,8 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
             if not isinstance(nics,list) or len(nics)!=1:finding('REVIEW','NIC_SET_UNRESOLVED',address)
             else:
                 connected=[value for path,value in walk(nics) if path[-1]=='is_connected']
-                if connected!=[False]:finding('BLOCK','NIC_NOT_EXPLICITLY_DISCONNECTED',address)
+                target = address in lifecycle and transition['target_stage'] == 'bootstrap'
+                if connected!=[target]:finding('BLOCK','NIC_NOT_EXPLICITLY_DISCONNECTED',address)
             finding('REVIEW','ACTUAL_CLUSTER_IMAGE_STORAGE_AND_POLICY_HANDOFF_REQUIRED',address)
         if kind=='openstack_networking_port_v2':
             groups=after.get('security_group_ids')

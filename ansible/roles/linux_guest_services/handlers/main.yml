@@ -1,0 +1,40 @@
+---
+- name: Check complete SSH configuration before reload
+  become: true
+  ansible.builtin.command:
+    argv: [/usr/sbin/sshd, -t]
+  changed_when: false
+  listen: Validate and reload owned SSH
+
+- name: Reload SSH after successful validation
+  become: true
+  ansible.builtin.service:
+    name: ssh
+    state: reloaded
+  listen: Validate and reload owned SSH
+
+- name: Check complete logging configuration before restart
+  become: true
+  ansible.builtin.command:
+    argv: [/usr/sbin/rsyslogd, -N1]
+  changed_when: false
+  listen: Validate and restart owned logging
+
+- name: Restart logging after successful validation
+  become: true
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+  listen: Validate and restart owned logging
+
+- name: Restart owned resolver
+  become: true
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+
+- name: Restart owned journal
+  become: true
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted

@@ -14,12 +14,31 @@ import sys
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from tools import readback_core as c
-from tools import nsx_observe, nutanix_observe
+from tools import nutanix_flow_activity_observe, nsx_domain_observe, nsx_segment_observe, nsx_domain_switch_observe
+from tools import nsx_observe, nutanix_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe, vsphere_task_observe, vsphere_task_tree_observe
 
-ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe}
+ADAPTERS={'nsx':nsx_observe,'nutanix':nutanix_observe,'vmware':vsphere_task_observe}
 
 
-def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
+def adapter_for(m):
+    if m.get('platform') == 'nsx' and m.get('profile') == nsx_domain_switch_observe.PROFILE:
+        return nsx_domain_switch_observe
+    if m.get('platform') == 'nsx' and m.get('profile') == nsx_segment_observe.PROFILE:
+        return nsx_segment_observe
+    if m.get('platform') == 'nsx' and m.get('profile') == nsx_domain_observe.PROFILE:
+        return nsx_domain_observe
+    if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_flow_activity_observe.PROFILE:
+        return nutanix_flow_activity_observe
+    if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_vm_activity_observe.PROFILE:
+        return nutanix_vm_activity_observe
+    if m.get('platform') == 'nutanix' and m.get('profile') == nutanix_vm_task_observe.PROFILE:
+        return nutanix_vm_task_observe
+    return vsphere_task_tree_observe if m.get('platform') == 'vmware' and m.get('profile') in vsphere_task_tree_observe.PROFILES else ADAPTERS[m['platform']]
+
+
+def check_report(m:dict,report:dict,current:datetime,max_age:int,*,adapter=None)->str:
+    adapter = adapter or adapter_for(m)
+    adapter.validate(m)
     if type(max_age) is not int or not 1<=max_age<=900:
         raise ValueError('Evidence age bound must be 1-900 seconds')
     c.exact_keys(report,{'kind','platform','profile','origin','operation_id','tenant_id','scope_id',
@@ -41,7 +60,8 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
     if not isinstance(hist,list) or not 1<=len(hist)<=10:
         raise ValueError('Incomplete observation history')
     previous=None;stable=0;prior_time=start
-    keys={r['path'] if m['platform']=='nsx' else r['ext_id'] for r in m['resources']}
+    key_selector=getattr(adapter,'observation_keys',None)
+    keys=key_selector(m) if key_selector else {r['path'] if m['platform']=='nsx' else r['ext_id'] for r in m['resources']}
     for index,row in enumerate(hist,1):
         c.exact_keys(row,{'round','observed_at','snapshot_sha256','states','outcome'})
         if type(row['round']) is not int or row['round']!=index:
@@ -66,7 +86,7 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
                     raise ValueError('Missing selected-configuration digest')
                 if state['config_status']=='MATCH' and state.get('mismatch_fields')!=[]:
                     raise ValueError('Match contains contradictory mismatch information')
-        history_check=getattr(ADAPTERS[m['platform']],'validate_observation_history',None)
+        history_check=getattr(adapter,'validate_observation_history',None)
         if history_check is not None:
             # A later review clock must not validate facts that postdate the sample.
             try:history_check(m,hist[:index-1],states,current=t)
@@ -81,11 +101,13 @@ def check_report(m:dict,report:dict,current:datetime,max_age:int)->str:
     return value
 
 
-def valid_control(observation:dict,scope:str,start:datetime,current:datetime,max_age:int)->bool:
+def valid_control(observation:dict,scope:str,start:datetime,readback_start:datetime,current:datetime,max_age:int)->bool:
     c.exact_keys(observation,{'state','scope_id','observed_at','evidence_ref'})
     c.text(observation['evidence_ref'],'existing operational evidence reference')
     t=c.timestamp(observation['observed_at'])
-    return observation['state']=='VERIFIED' and observation['scope_id']==scope and start<=t<=current and (current-t).total_seconds()<=max_age
+    # Readback collected before exclusion/restriction can be invalidated by a
+    # competing writer. A later control observation requires a fresh readback.
+    return observation['state']=='VERIFIED' and observation['scope_id']==scope and start<=t<=readback_start<=current and (current-t).total_seconds()<=max_age
 
 
 def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=300)->dict:
@@ -93,7 +115,7 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
     reasons=[];result='HOLD_INVALID_EVIDENCE'
     try:
         if m.get('platform') not in ADAPTERS:raise ValueError('Unsupported platform')
-        ADAPTERS[m['platform']].validate(m)
+        adapter_for(m).validate(m)
         c.exact_keys(context,{'kind','operation_id','tenant_id','scope_id','manifest_sha256','report_sha256',
             'accepted_plan_sha256','change_record_ref','attempted_at','last_security_change_at',
             'attempted_generation','current_generation','executor_state','writer_fence','quarantine','containment','data_disposition'})
@@ -108,6 +130,12 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
             raise ValueError('Unbound operation evidence')
         c.text(context['change_record_ref'],'existing change record')
         attempted=c.timestamp(context['attempted_at']);changed=c.timestamp(context['last_security_change_at'])
+        if m.get('profile') in {nutanix_vm_task_observe.PROFILE, nutanix_vm_activity_observe.PROFILE, nutanix_flow_activity_observe.PROFILE}:
+            if (c.timestamp(m['task']['created_after']) != attempted
+                    or c.timestamp(m['task']['created_before']) > c.timestamp(report['started_at'])):
+                raise ValueError('Nutanix task window must start at the attempted change and end before readback')
+        if m.get('profile') in vsphere_task_tree_observe.activity.PROFILES and c.timestamp(m['task']['activity_since']) != attempted:
+            raise ValueError('VM task activity window differs from the attempted operation')
         if attempted>current or changed>current or c.timestamp(report['started_at'])<max(attempted,changed):
             raise ValueError('Observation predates operation or security change')
         result_native=check_report(m,report,current,max_age)
@@ -116,8 +144,9 @@ def review(m:dict,report:dict,context:dict,*,current:datetime|None=None,max_age=
         if context['executor_state'] not in ('STOPPED','RUNNING','UNKNOWN') or context['containment'] not in ('NONE','ACTIVE','UNKNOWN'):
             raise ValueError('Unknown writer/containment disposition')
         if context['data_disposition']!='PRESERVE':raise ValueError('This procedure never authorizes data destruction')
-        fenced=valid_control(context['writer_fence'],m['scope_id'],max(attempted,changed),current,max_age)
-        denied=valid_control(context['quarantine'],m['scope_id'],max(attempted,changed),current,max_age)
+        readback_start=c.timestamp(report['started_at'])
+        fenced=valid_control(context['writer_fence'],m['scope_id'],max(attempted,changed),readback_start,current,max_age)
+        denied=valid_control(context['quarantine'],m['scope_id'],max(attempted,changed),readback_start,current,max_age)
         if context['containment']=='ACTIVE':
             result='KEEP_INCIDENT_CONTAINMENT';reasons=['INCIDENT_AUTHORITY_REMAINS_IN_FORCE']
         elif context['containment']=='UNKNOWN':

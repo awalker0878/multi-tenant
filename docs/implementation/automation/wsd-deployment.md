@@ -19,6 +19,12 @@ Each composition accepts `environment_key`, `site_key`, `tenant_key`, `wsd_key`,
 
 ## Ordered restricted build
 
+The [reviewed execution commands](terraform-execution.md) now implement private
+saved-plan preparation/application for these roots and bind successful outputs
+into the next phase. They require selected targets, current external authority,
+commissioned services and a durable operator ledger; they do not supply those
+prerequisites or production activation.
+
 1. Select actual supported platform/site/tuple, commissioned cluster capacity and accepted WSD placement. Resolve authoritative reservation/IPAM/DNS and independently owned edge/service dependencies. The repository's empty qualification indexes do not authorize allocation.
 2. Assign unique backend addresses and lock endpoints to environment/site/platform/tenant/WSD/phase. Bootstrap the chosen encrypted, versioned state service and demonstrate access separation, locking and restore. Inject provider/backend credentials from private systems. Do not put credentials in backend files, command arguments or committed inputs.
 3. Copy the disabled example from the selected domain root into private storage and populate accepted allocations. Initialize the root with its owned backend, create a saved plan and review its exact source, inputs, changes and scope before applying that plan. Save the narrow `terraform output -json` output privately.

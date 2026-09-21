@@ -141,11 +141,29 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
       - name: Syntax, safe local staging, idempotence, check mode and negative cases
         run: python scripts/verify_ansible.py
+      - name: Install local guest service validation engines
+        run: |
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-server rsyslog rsyslog-gnutls restic nftables
+          sudo mkdir -p /run/sshd
+      - name: Validate rendered guest configuration with real local engines
+        run: sudo "$(command -v python)" lab/run_guest_services_lab.py --require-engines --scratch-root /etc/rsyslog.d
+      - name: Recover useful synthetic data using the real restic engine
+        run: python lab/run_restic_lab.py
+      - name: Exercise leased edge activation and withdrawal with real local packets
+        run: sudo "$(command -v python)" lab/run_nft_edge_lab.py
+      - name: Exercise fixed guest probes with real certificate SSH and TLS
+        run: sudo "$(command -v python)" lab/run_target_probe_lab.py --user "$(id -un)"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: ansible-local-test-reports
-          path: build/reports/ansible_validation.json
+          path: |
+            build/reports/ansible_validation.json
+            build/reports/guest_services_lab.json
+            build/reports/restic_recovery_lab.json
+            build/reports/nft_edge_lab.json
+            build/reports/target_probe_lab.json
           retention-days: 14
           if-no-files-found: warn
   terraform:
@@ -164,6 +182,8 @@ jobs:
           terraform_wrapper: false
       - name: Review actual committed provider lock selections
         run: python scripts/check_dependency_locks.py
+      - name: Saved-plan execution, stale-state rejection and private artifact permissions
+        run: python lab/run_terraform_execution_lab.py
       - name: Backend-disabled validation, module schemas and plan-only provider mocks
         run: python tools/verify_terraform.py --mock-tests
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -173,6 +193,7 @@ jobs:
           path: |
             build/reports/provider_lock_review.json
             build/reports/terraform_validation.json
+            build/reports/terraform_execution_lab.json
             build/reports/toolchain-schemas/
             build/reports/toolchain-locks/
           include-hidden-files: true

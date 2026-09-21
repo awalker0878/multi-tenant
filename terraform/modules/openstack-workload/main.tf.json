@@ -1,5 +1,5 @@
 {
-  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "//": "Candidate OpenStack lifecycle: prepared by default; separately reviewed restricted bootstrap. No production readiness is implied.",
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
@@ -127,6 +127,30 @@
       "type": "string",
       "description": "Accepted storage/encryption type",
       "nullable": false
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
+    },
+    "config_drive": {
+      "type": "bool",
+      "default": false,
+      "nullable": false,
+      "description": "Opt in at initial VM creation to the metadata config drive required by the reference bootstrap image. Changing an existing VM can require replacement."
     }
   },
   "resource": {
@@ -134,7 +158,7 @@
       "workload": {
         "name": "${var.workload_key}-port",
         "network_id": "${var.network_id}",
-        "admin_state_up": false,
+        "admin_state_up": "${var.lifecycle_stage == \"bootstrap\"}",
         "port_security_enabled": true,
         "security_group_ids": [
           "${var.security_group_id}"
@@ -155,6 +179,10 @@
             {
               "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
               "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -182,6 +210,10 @@
             {
               "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
               "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -207,6 +239,10 @@
             {
               "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
               "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -217,7 +253,7 @@
         "name": "${var.workload_key}",
         "flavor_id": "${var.flavor_id}",
         "availability_zone": "${var.compute_availability_zone}",
-        "power_state": "shutoff",
+        "power_state": "${var.lifecycle_stage == \"bootstrap\" ? \"active\" : \"shutoff\"}",
         "stop_before_destroy": true,
         "metadata": {
           "tenant_key": "${var.tenant_key}",
@@ -248,9 +284,18 @@
             {
               "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
               "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || var.config_drive}",
+              "error_message": "Reference bootstrap requires a config drive selected at initial VM creation and an image that consumes its static network data."
             }
           ]
-        }
+        },
+        "config_drive": "${var.config_drive}"
       }
     },
     "openstack_compute_volume_attach_v2": {
@@ -268,6 +313,10 @@
             {
               "condition": "${length(trimspace(var.accepted_quarantine_ref)) > 0}",
               "error_message": "A separately reviewed quarantine/placement handoff is required. A reference string is not proof of approval."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -289,6 +338,9 @@
     },
     "delivery_state": {
       "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    },
+    "lifecycle_stage": {
+      "value": "${var.lifecycle_stage}"
     }
   }
 }

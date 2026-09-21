@@ -97,6 +97,15 @@ def main() -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(status)
+        if status != "PASSED_TOOLCHAIN_ONLY":
+            if reason:
+                print(reason)
+            for family in ("modules", "roots"):
+                for item in report[family]:
+                    if item["validation"] != "PASSED" or item["mock_tests"] == "FAILED":
+                        # This runner removes credentials and only validates fixed
+                        # sources / mocked plans. Keep useful failures in CI logs.
+                        print(json.dumps(item, indent=2))
         return 0 if status == "PASSED_TOOLCHAIN_ONLY" else 2
 
     binary = shutil.which("terraform")
@@ -172,6 +181,7 @@ def main() -> int:
                     tested = run([f"-chdir={directory}", "test", "-no-color"], 300)
                     entry["mock_tests"] = "PASSED" if tested["exit_code"] == 0 else "FAILED"
                     entry["mock_output"] = tested["stdout"][-8000:]
+                    entry["mock_diagnostic"] = tested["stderr"][-8000:]
                     entry["mock_exit"] = tested["exit_code"]
                 if family == "modules":
                     schema_result = run([f"-chdir={directory}", "providers", "schema", "-json"])

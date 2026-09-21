@@ -27,13 +27,37 @@ Use [native readback](NATIVE_READBACK.md) with the exact accepted object/task ID
 expected configuration/version tokens. It must observe the intended target and
 operation, not a resource with a similar display name. Do not fill expected values
 from the same unreviewed response being tested. Missing task IDs or incomplete
-entity coverage require native-owner investigation; this release has no discovery
-or speculative resend capability.
+entity coverage require native-owner investigation. The bounded
+[vSphere task-tree profile](implementation/automation/vsphere-readback.md) queries
+child history only for accepted task IDs and requires the exact accepted child
+set. Its separate existing-VM activity variant also queries pending tasks without
+a time cutoff and tasks completed since the interrupted attempt, including
+unrecorded roots. Extra or omitted activity holds. Its template-clone variant binds
+the accepted source and returned destination identities while retaining child
+coverage holds. These profiles do not adopt unknown tasks or supply general inventory discovery or
+speculative resend capability.
 
 NSX configuration reads bracket realization status. Nutanix task reads bracket
 resource reads. Stable samples strengthen attribution, but they are not a native
 transaction or proof of total inventory completeness. Inspect the selected-field
 coverage and add independent route/enforcement/data checks before any later change.
+
+The separate [AHV VM/task profile](implementation/automation/nutanix-vm-task-readback.md)
+checks an explicitly recorded Prism graph around VMM VM snapshots. Offline review
+recomputes its task witnesses and completion flags, requires the creation window
+to start at the context's attempted change, and retains fencing/quarantine holds.
+It does not discover competing tasks or join AHV evidence to the Terraform ledger.
+The separate [AHV activity profile](implementation/automation/nutanix-vm-activity-readback.md)
+adds bounded per-VM queries for visible pending work of any age and work completed
+since the attempt. Offline review recomputes complete pages, counts, selected
+task fields and agreement with direct GETs. Extra or incomplete activity holds;
+it does not establish native writer exclusion or complete inventory visibility.
+
+The [Flow task/activity profile](implementation/automation/nutanix-flow-activity-readback.md)
+applies the same bounded Prism activity checks to exact owned policies, with
+strong-ETag policy snapshots and a full-shape verdict. Mixed policy/category/VPC
+operations remain outside its scope. A matching snapshot cannot hide pending,
+failed or extra work, or substitute for live enforcement/fencing evidence.
 
 ## Review the three records together
 
@@ -49,10 +73,55 @@ and operating evidence. This tool verifies **record consistency**, not signature
 actual fencing or approval authenticity. Host clock integrity and artifact-access
 protection remain prerequisites.
 
+Fencing and quarantine must be verified after the attempted operation/latest
+security change and no later than the readback start. If either control was
+verified after sampling began, collect a fresh report under the established
+controls; an older matching snapshot cannot resolve that timing gap.
+
+For a held VMware Terraform workload attempt, use the
+[saved-plan/ledger binding reviewer](implementation/automation/terraform-recovery.md)
+to join these records to the immutable attempt. This additional profile supports
+known existing VMs and CPU/memory/topology updates only, compares planned native
+configuration, requires VM activity coverage beginning at the immutable attempt
+start, and always preserves the ledger hold. It now also binds retained disk
+UUIDs/paths/layout and planned NIC identities to sealed inputs, and requires a
+fresh native port-attachment report connecting network MoID, switch/portgroup,
+port occupant/cookie, VM/NIC, host and MAC. Both reports must be collected after
+fencing/quarantine verification. The supported layout and two extra private
+network inputs are specified in the runbook. Older known-task-only profiles or
+reports without the new witnesses cannot substitute for this coverage. Clone
+result evidence still needs separate creation/state ownership reconciliation.
+
+For a held Nutanix workload attempt, the same reviewer supports existing AHV
+power/NIC transitions with the activity profile and original sealed lifecycle
+record. It binds selected planned configuration, retained disk/NIC identities,
+member inputs and the original attempt window. Historical validity is evaluated
+at attempt time; expired authority cannot be used for a new apply. Unsupported
+changes, creation/adoption or incomplete bindings hold. Every review leaves all
+ledger records intact and grants no recovery action or activation authority.
+
+For a held Nutanix domain attempt, the reviewer also supports existing Flow
+service bootstrap/withdrawal with the explicit policy activity profile. It binds
+the sealed transition and exact prior policy/category/VPC identities, service
+intent and retained deny IDs to the original saved plan and immutable attempt.
+Only explicitly computed new service-rule IDs may be unknown in that plan.
+Unrelated domain resources must be resolved no-ops. No new policy/state adoption,
+ledger release or replay authority is created.
+
+For a held VMware domain attempt, the same reviewer binds the explicit
+[NSX domain observer](implementation/automation/nsx-domain-readback.md) to the
+sealed lifecycle transition and saved plan. It checks prior Tier-1, segment,
+group and policy identities, restricted service intent, retained/generated rule
+IDs and current realization evidence. Unsupported selectors in either native
+snapshot hold. NSX task inventory and cross-writer exclusion are not supplied;
+independent fencing, quarantine, operation-wide reconciliation and ledger holds
+remain mandatory.
+
 | Result | Meaning and next accountable action |
 |---|---|
 | `KEEP_INCIDENT_CONTAINMENT` | An active incident restriction takes precedence; ordinary convergence must not undo it. |
 | `HOLD_CONTAINMENT_UNKNOWN` | Establish current containment authority before continuing. |
+| `HOLD_NETWORK_NOT_UNDER_CONTROLS` | Held vSphere review found attachment sampling before verified fence/quarantine; collect fresh attachment evidence. |
 | `HOLD_WRITER_NOT_FENCED` | The executor may still run, or the scoped/current fencing record is insufficient. |
 | `HOLD_SUPERSEDED_CHANGE` | Current generation differs from the attempted change; obtain a new comparison/decision. |
 | `HOLD_QUARANTINE_NOT_VERIFIED` | Matching object state does not establish safe connectivity. |

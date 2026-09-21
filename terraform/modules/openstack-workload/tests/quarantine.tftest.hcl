@@ -1,4 +1,4 @@
-# NOT EXECUTED IN THIS RELEASE. Requires Terraform >= 1.7 and the pinned provider.
+# Plan-only provider mocks; actual native execution needs separate qualification.
 mock_provider "openstack" {}
 
 variables {
@@ -19,6 +19,33 @@ variables {
   compute_availability_zone = "mock-compute"
   storage_availability_zone = "mock-storage"
   volume_type = "mock-type"
+}
+
+run "restricted_bootstrap_power_and_port" {
+  command = plan
+  variables {
+    lifecycle_stage = "bootstrap"
+    bootstrap_acceptance_ref = "MOCK-ONLY-NOT-ACCEPTED"
+    config_drive = true
+  }
+  assert {
+    condition = openstack_compute_instance_v2.workload.power_state == "active" && openstack_networking_port_v2.workload.admin_state_up && openstack_networking_port_v2.workload.port_security_enabled
+    error_message = "Explicit bootstrap powers and connects only the guarded owned workload."
+  }
+  assert {
+    condition = openstack_compute_instance_v2.workload.block_device[0].delete_on_termination == false && length(openstack_networking_port_v2.workload.security_group_ids) == 1
+    error_message = "Bootstrap must retain data and the single mandatory group."
+  }
+}
+
+run "bootstrap_without_acceptance_rejected" {
+  command = plan
+  variables {
+    lifecycle_stage = "bootstrap"
+    config_drive = true
+  }
+  # Terraform stops traversal at these failed dependencies; the server is not evaluated.
+  expect_failures = [openstack_networking_port_v2.workload, openstack_blockstorage_volume_v3.boot]
 }
 
 run "quarantine_configuration" {

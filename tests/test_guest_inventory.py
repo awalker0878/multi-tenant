@@ -6,6 +6,9 @@ from pathlib import Path
 import struct
 import tempfile
 import unittest
+import json
+import subprocess
+import sys
 
 from tools.compile_wsd import STATE
 from tools.guest_inventory import build, gate
@@ -27,6 +30,53 @@ def fixture():
 
 
 class GuestInventoryTests(unittest.TestCase):
+    def test_ansible_filter_normalizes_tagged_integers_without_coercing_bad_types(self):
+        import importlib.util
+        path = Path(__file__).resolve().parents[1]/'ansible/filter_plugins/guest_filters.py'
+        spec = importlib.util.spec_from_file_location('guest_filters_fixture', path)
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        class TaggedInt(int): pass
+        with tempfile.TemporaryDirectory() as tmp:
+            outputs, access = fixture(); known = Path(tmp)/'known_hosts'
+            inventory, pins = build(outputs, access, str(known)); known.write_text(pins); known.chmod(0o600)
+            hosts = inventory['all']['children']['hosting_guests']['hosts']
+            access['targets']['guest-01']['port'] = TaggedInt(22)
+            self.assertEqual(module.guest_gate(True, outputs, access, str(known), list(hosts), hosts), ['guest-01'])
+            for value in (True, 22.0, '22'):
+                access['targets']['guest-01']['port'] = value
+                with self.subTest(value=value), self.assertRaises(ValueError): module.guest_gate(True, outputs, access, str(known), list(hosts), hosts)
+
+    def test_control_host_and_group_names_cannot_be_guest_identities(self):
+        for name in ('localhost', 'all', 'ungrouped', 'hosting_guests'):
+            outputs, access = fixture()
+            outputs['members']['value'][name] = outputs['members']['value'].pop('guest-01')
+            access['targets'][name] = access['targets'].pop('guest-01')
+            with self.subTest(name=name), self.assertRaises(ValueError): build(outputs, access, '/private/known_hosts')
+
+    def test_cli_accepts_one_receipted_workload_run_without_manual_output_copy(self):
+        from tools.run_files import digest, encoded, utcnow, write_new
+        from tools.compile_wsd import ROOT
+        outputs, access = fixture()
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            inputs = {'members': {'guest-01': {}}}
+            bundle = {'format': 'hosting-terraform-bundle/1', 'source_commit': 'a' * 40,
+                      'scope': outputs['scope']['value'], 'operation_id': 'op-01', 'generation': 1,
+                      'artifacts': {'inputs.json': digest(encoded(inputs))}}
+            result = {'format': 'hosting-terraform-attempt/1', 'status': 'APPLIED_REQUIRES_NATIVE_ACCEPTANCE',
+                      'bundle_sha256': digest(encoded(bundle)), 'scope': outputs['scope']['value'],
+                      'operation_id': 'op-01', 'generation': 1, 'completed_at': utcnow().isoformat(),
+                      'outputs_sha256': digest(encoded(outputs))}
+            for name, data in [('inputs.json', inputs), ('bundle.json', bundle), ('outputs.json', outputs),
+                               ('result.json', result), ('access.json', access)]:
+                write_new(directory / name, encoded(data))
+            invocation = subprocess.run([sys.executable, str(ROOT / 'tools/guest_inventory.py'),
+                str(directory / 'access.json'), '--workload-run', str(directory), '--output', str(directory / 'inventory')],
+                capture_output=True, text=True, timeout=30)
+            self.assertEqual(invocation.returncode, 0, invocation.stdout + invocation.stderr)
+            inventory = json.loads((directory / 'inventory/inventory.json').read_text())
+            self.assertFalse(inventory['all']['vars']['hosting_native_enabled'])
+
     def test_immutable_outputs_and_disabled_inventory(self):
         outputs, access = fixture(); before = copy.deepcopy((outputs, access))
         inv, keys = build(outputs, access, '/private/run/known_hosts')

@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.compile_wsd import STATE, fields, identity, require
 from tools.neutron_observe import strict_loads
+from tools.guest_services import PROFILE, validate_services, verify_assets
 
 
 def timestamp(value):
@@ -46,7 +47,9 @@ def build(outputs, access, known_hosts, now=None):
     hosts, key_lines, endpoints, native_ids, machine_ids = {}, [], set(), set(), set()
     for name, target in access['targets'].items():
         identity(name)
-        fields(target, {'native_id', 'address', 'port', 'user', 'host_key', 'machine_id', 'hostname', 'profile', 'time_servers'}, 'guest target')
+        require(name not in {'localhost', 'all', 'ungrouped', 'hosting_guests'}, 'Reserved Ansible inventory identity')
+        keys = {'native_id', 'address', 'port', 'user', 'host_key', 'machine_id', 'hostname', 'profile', 'time_servers'}
+        fields(target, keys | ({'services'} if target.get('profile') == PROFILE else set()), 'guest target')
         member = members[name]
         native_id = member.get('server_id' if platform == 'openstack' else 'vm_id')
         require(isinstance(native_id, str) and native_id and target['native_id'] == native_id
@@ -62,7 +65,9 @@ def build(outputs, access, known_hosts, now=None):
         require(re.fullmatch(r'[0-9a-f]{32}', target['machine_id']) and target['machine_id'] not in machine_ids, 'Unique observed machine ID required')
         machine_ids.add(target['machine_id'])
         require(re.fullmatch(r'[a-z][a-z0-9-]{1,62}', target['hostname']), 'Invalid guest hostname')
-        require(target['profile'] == 'ubuntu-24.04-chrony', 'Unsupported guest image profile')
+        require(target['profile'] in {'ubuntu-24.04-chrony', PROFILE}, 'Unsupported guest image profile')
+        if target['profile'] == PROFILE:
+            validate_services(target, access['scope'])
         require(isinstance(target['time_servers'], list) and 1 <= len(target['time_servers']) <= 4, 'Explicit time servers required')
         for server in target['time_servers']:
             ip = ipaddress.ip_address(server)
@@ -83,6 +88,11 @@ def build(outputs, access, known_hosts, now=None):
             'ansible_host_key_checking': True, 'ansible_ssh_host_key_checking': True,
             'hosting_target': target,
         }
+        if target['profile'] == PROFILE:
+            # The image must already trust the selected user CA. Requiring a
+            # certificate on the initial connection proves access before keys
+            # are withdrawn by the full owned server configuration.
+            hosts[name]['ansible_ssh_common_args'] += ' -o PubkeyAcceptedAlgorithms=ssh-ed25519-cert-v01@openssh.com'
     variables = {'hosting_native_enabled': False, 'hosting_guest_access': access,
                  'hosting_workload_outputs': outputs, 'hosting_known_hosts': known_hosts}
     return {'all': {'vars': variables, 'children': {'hosting_guests': {'hosts': hosts}}}}, '\n'.join(key_lines) + '\n'
@@ -98,6 +108,8 @@ def gate(enabled, outputs, access, known_hosts, targets, hostvars):
             'Private non-symlink known-hosts file required')
     require(path.read_text() == expected_keys, 'Pinned SSH keys changed')
     for name, values in expected.items():
+        if values['hosting_target']['profile'] == PROFILE:
+            verify_assets(values['hosting_target'], access['scope'])
         forbidden = {'ansible_ssh_host', 'ansible_ssh_port', 'ansible_ssh_user', 'ansible_password',
                      'ansible_ssh_pass', 'ansible_ssh_args', 'ansible_ssh_extra_args',
                      'ansible_scp_extra_args', 'ansible_sftp_extra_args', 'ansible_ssh_executable',
@@ -109,14 +121,21 @@ def gate(enabled, outputs, access, known_hosts, targets, hostvars):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('workload_outputs', type=Path)
+    parser.add_argument('workload_outputs', type=Path, nargs='?')
     parser.add_argument('access', type=Path)
+    parser.add_argument('--workload-run', type=Path)
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     try:
         folder = args.output.resolve()
         require(not folder.is_relative_to(ROOT), 'Private inventory must be outside the repository')
-        inventory, keys = build(strict_loads(args.workload_outputs.read_bytes()), strict_loads(args.access.read_bytes()), str(folder / 'known_hosts'))
+        require((args.workload_outputs is None) != (args.workload_run is None), 'Choose raw outputs or one successful workload run')
+        if args.workload_run:
+            from tools.wsd_handoff import execution_outputs
+            outputs, _, _ = execution_outputs(args.workload_run, 'workloads')
+        else:
+            outputs = strict_loads(args.workload_outputs.read_bytes())
+        inventory, keys = build(outputs, strict_loads(args.access.read_bytes()), str(folder / 'known_hosts'))
         folder.mkdir(mode=0o700, exist_ok=False)
         for name, value in {'inventory.json': json.dumps(inventory, indent=2) + '\n', 'known_hosts': keys}.items():
             with open(os.open(folder / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600), 'w') as stream:

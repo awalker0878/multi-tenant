@@ -170,19 +170,27 @@ class ObservationError(Exception):
 
 class ReadClient:
     """One HTTPS GET per call; no redirects, cookies, proxies, discovery or writes."""
-    def __init__(self, endpoint: str, expected_origin: str, username: str, password: str,
+    def __init__(self, endpoint: str, expected_origin: str, username: str | None, password: str | None,
                  allowed_targets: set[str], ca_file: str | None = None,
-                 timeout: float = 5.0, budget: float = 60.0):
+                 timeout: float = 5.0, budget: float = 60.0, *, session_token: str | None = None):
         self.origin = origin(endpoint)
         if self.origin != origin(expected_origin):
             raise ValueError('Target origin differs from accepted origin')
         p = urlsplit(self.origin)
         self.host, self.port = p.hostname, p.port or 443
-        text(username, 'injected username', 256)
-        text(password, 'injected password', 4096)
-        if ':' in username:
-            raise ValueError('Invalid Basic authentication username')
-        self._auth = 'Basic ' + base64.b64encode((username + ':' + password).encode()).decode('ascii')
+        if session_token is not None:
+            if username is not None or password is not None:
+                raise ValueError('Exactly one authentication method required')
+            text(session_token, 'injected session', 4096)
+            if any(ord(char) > 126 or char.isspace() for char in session_token):
+                raise ValueError('Invalid session header')
+            self._auth_headers = {'vmware-api-session-id': session_token}
+        else:
+            text(username, 'injected username', 256)
+            text(password, 'injected password', 4096)
+            if ':' in username:
+                raise ValueError('Invalid Basic authentication username')
+            self._auth_headers = {'Authorization': 'Basic ' + base64.b64encode((username + ':' + password).encode()).decode('ascii')}
         if not allowed_targets or any(not t.startswith('/') or t.startswith('//') or '\\' in t or '#' in t or any(ord(c)<33 or ord(c)>126 for c in t) for t in allowed_targets):
             raise ValueError('Invalid exact GET targets')
         self.allowed_targets = frozenset(allowed_targets)
@@ -201,16 +209,29 @@ class ReadClient:
     def get(self, target: str) -> tuple[dict, str | None]:
         if target not in self.allowed_targets:
             raise ObservationError('TARGET_NOT_IN_ACCEPTED_SCOPE')
+        return self._request('GET', target)
+
+    def _request(self, method, target, body=None, response_type=dict, no_content=False):
+        """Shared transport only; callers must constrain method, target and body."""
         remaining = self.deadline - time.monotonic()
         if remaining <= 0 or self.request_count >= 400:
             raise ObservationError('OBSERVATION_BUDGET_EXHAUSTED')
         self.request_count += 1
         connection = http.client.HTTPSConnection(self.host, self.port, timeout=min(self.timeout, remaining), context=self.context)
         try:
-            connection.request('GET', target, headers={'Authorization': self._auth, 'Accept': 'application/json',
-                'Accept-Encoding': 'identity', 'Connection': 'close', 'Cache-Control': 'no-cache'})
+            headers = {**self._auth_headers, 'Accept': 'application/json', 'Accept-Encoding': 'identity',
+                       'Connection': 'close', 'Cache-Control': 'no-cache'}
+            payload = None if body is None else json.dumps(body, allow_nan=False, separators=(',', ':')).encode()
+            if payload is not None:
+                if len(payload) > LIMIT: raise ObservationError('REQUEST_TOO_LARGE')
+                headers['Content-Type'] = 'application/json'
+            connection.request(method, target, body=payload, headers=headers)
             read_socket = connection.sock
             response = connection.getresponse()
+            if no_content:
+                if response.status != 204 or response.getheader('Transfer-Encoding') or response.getheader('Content-Length') not in (None, '0'):
+                    raise ObservationError('VOID_RESPONSE_REQUIRED')
+                return None, None
             if response.status != 200:
                 raise ObservationError('HTTP_'+str(response.status))
             if response.getheader('Content-Encoding', 'identity').lower() not in ('', 'identity'):
@@ -239,8 +260,8 @@ class ReadClient:
             if sizes and len(data)!=int(sizes[0]):
                 raise ObservationError('TRUNCATED_RESPONSE')
             value = strict_loads(bytes(data))
-            if not isinstance(value, dict):
-                raise ObservationError('OBJECT_RESPONSE_REQUIRED')
+            if not isinstance(value, response_type):
+                raise ObservationError('OBJECT_RESPONSE_REQUIRED' if response_type is dict else 'RESPONSE_TYPE_DIFFERS')
             etags = response.headers.get_all('ETag', [])
             if len(etags)>1:
                 raise ObservationError('AMBIGUOUS_ETAG')

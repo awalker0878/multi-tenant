@@ -63,7 +63,7 @@
       ]
     },
     "members": {
-      "type": "map(object({ipv4_cidr = string, gateway_host_number = optional(number, 1)}))",
+      "type": "map(object({ipv4_cidr = string, gateway_host_number = optional(number, 1), lifecycle_stage = optional(string, \"prepared\"), bootstrap_acceptance_ref = optional(string, \"\"), bootstrap_rules = optional(map(object({direction = string, protocol = string, port = number, remote_ipv4 = string})), {})}))",
       "nullable": false,
       "description": "domains owned by this tenant/WSD; map keys are immutable native identities.",
       "validation": [
@@ -83,7 +83,10 @@
       "test_authorization_ref": "${var.test_authorization_ref}",
       "domain_key": "${each.key}",
       "ipv4_cidr": "${each.value.ipv4_cidr}",
-      "gateway_host_number": "${each.value.gateway_host_number}"
+      "gateway_host_number": "${each.value.gateway_host_number}",
+      "lifecycle_stage": "${each.value.lifecycle_stage}",
+      "bootstrap_acceptance_ref": "${each.value.bootstrap_acceptance_ref}",
+      "bootstrap_rules": "${each.value.bootstrap_rules}"
     }
   },
   "output": {

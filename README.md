@@ -1,6 +1,6 @@
 # Portable Multi-Tenant Secure Hosting
 
-Private infrastructure architecture, engineering and implementation workspace.
+Infrastructure architecture, engineering and implementation workspace. This repository is public; actual inventories, credentials, plans, state and native evidence belong in private operator systems.
 
 ## Read the architecture and engineering in Git
 
@@ -27,6 +27,35 @@ The ten native Terraform primitives are retained under `terraform/modules`; thei
 ## Current automation delivery
 
 The former `docs/1.0` plan now lives in the maintained [automation delivery program](docs/implementation/automation/README.md). Use the [WSD deployment runbook](docs/implementation/automation/wsd-deployment.md), [native guest runbook](docs/implementation/automation/native-guests.md) and [package delivery record](docs/implementation/automation/progress.md). Site commissioning, service-owner integrations, complete lifecycle automation and native qualification remain incomplete; repository publication is not an end-to-end release.
+
+[Reviewed Terraform execution](docs/implementation/automation/terraform-execution.md) supplies private saved-plan preparation/application, exact source/input/backend/credential binding, durable failure holds, and execution-receipt handoffs into workload compilation and guest inventory. The [release controls](docs/implementation/automation/release-controls.md) include a proposed GitHub ruleset and its administrator activation steps. Neither addition qualifies a native platform or activates production.
+
+The [reference implementation](docs/implementation/automation/reference-realization.md)
+now selects an OpenStack-first internal IPv4 qualification path, GitLab state,
+NetBox IPAM, Ubuntu certificate SSH/resolver/TLS logging, restic protection and a
+provider-owned nftables edge. Executable adapters perform scoped allocation,
+guest enrollment, encrypted file capture/restore, expiring activation and
+established-session withdrawal. The [target runner](docs/implementation/automation/target-qualification.md)
+collects real API and guest traffic evidence. Actual site commissioning, full
+platform lifecycle and independent native acceptance remain required.
+
+The [restricted platform lifecycle](docs/implementation/automation/platform-lifecycle.md)
+now includes owned Nutanix Flow service bootstrap/withdrawal and exact-plan checks.
+[Flow snapshots](docs/implementation/automation/nutanix-flow-readback.md) bind policy,
+category and VPC evidence to AHV guest campaigns. [vSphere readback](docs/implementation/automation/vsphere-readback.md)
+adds VM/device/placement snapshots and bounded task-tree/child-history observations,
+including accepted template identities and exact clone result VMs,
+plus a separate profile checking visible pending/recently completed activity on
+the exact existing VMs, alongside NSX campaigns.
+[Held-attempt review](docs/implementation/automation/terraform-recovery.md)
+compares supported existing-VM configuration with the saved plan and binds the
+durable ledger without releasing it. It requires VM activity coverage from the
+immutable attempt start. Clone state adoption remains separate.
+[VMware campaign v6](docs/implementation/automation/vmware-network-binding.md)
+checks each distributed NIC backing through its assigned portgroup to the owned
+NSX segment's realized logical switch; per-port/DFW enforcement remains separate.
+Live commissioning, effective enforcement, complete fenced native
+reconciliation and HA/application recovery qualification remain open.
 
 ## Local review
 
@@ -92,7 +121,7 @@ The [DNS registration handoff](docs/engineering/authoritative-dns-registration-h
 
 ## Backup protection and isolated-restore assurance
 
-The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-assurance.md) requires evidence of management separation, protected-copy retention, catalogue/key availability and a current isolated useful-data restore before the backup/recovery dependency can be considered ready. The active assurance index is intentionally empty. CI never captures, deletes or restores backup data, destroys keys, reconnects a restored service or authorizes production.
+The [backup/restore assurance gate](docs/engineering/backup-isolated-restore-assurance.md) requires evidence of management separation, protected-copy retention, catalogue/key availability and a current isolated useful-data restore before the backup/recovery dependency can be considered ready. The active assurance index is intentionally empty. CI captures and restores only disposable local fixture files; it never accesses native backup data, destroys retained keys, reconnects a restored service or authorizes production.
 
 ## Control inheritance and external-dependency assurance
 

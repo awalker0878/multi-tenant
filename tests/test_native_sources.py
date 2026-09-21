@@ -42,10 +42,12 @@ class NativeSources(unittest.TestCase):
  def test_nutanix_category_uses_documented_id(self):self.assertIn('nutanix_category_v2.domain.id',json.dumps(load('nutanix-domain')));self.assertNotIn('nutanix_category_v2.domain.ext_id',json.dumps(load('nutanix-domain')))
  def test_nsx_tier0_not_bound(self):self.assertNotIn('tier0_path',load('nsx-domain')['resource']['nsxt_policy_tier1_gateway']['domain'])
  def test_nsx_drop_is_explicit_and_bounded(self):
-  p=load('nsx-domain')['resource']['nsxt_policy_security_policy']['quarantine'];self.assertEqual(len(p['scope']),1);self.assertEqual(p['rule'][0]['action'],'DROP');self.assertIs(p['rule'][0]['logged'],True)
- def test_nsx_off_gateway_configuration(self):self.assertEqual(load('nsx-domain')['resource']['nsxt_policy_segment']['domain']['advanced_config'][0]['connectivity'],'OFF')
+  d=load('nsx-domain');p=d['resource']['nsxt_policy_security_policy']['quarantine'];self.assertEqual(len(p['scope']),1);self.assertIn('action = "DROP"',d['locals']['lifecycle_rules']);self.assertIs(p['dynamic']['rule']['content']['logged'],True)
+ def test_nsx_off_gateway_configuration(self):
+  d=load('nsx-domain');self.assertEqual(d['variable']['lifecycle_stage']['default'],'prepared');self.assertEqual(d['resource']['nsxt_policy_segment']['domain']['advanced_config'][0]['connectivity'],'${var.lifecycle_stage == "bootstrap" ? "ON" : "OFF"}')
  def test_openstack_no_external_router(self):
-  r=load('openstack-domain')['resource']['openstack_networking_router_v2']['domain'];self.assertNotIn('external_network_id',r);self.assertNotIn('enable_snat',r);self.assertIs(r['admin_state_up'],False)
+  doc=load('openstack-domain');r=doc['resource']['openstack_networking_router_v2']['domain'];self.assertNotIn('external_network_id',r);self.assertNotIn('enable_snat',r)
+  self.assertEqual(doc['variable']['lifecycle_stage']['default'],'prepared');self.assertEqual(r['admin_state_up'],'${var.lifecycle_stage == "bootstrap"}')
  def test_openstack_own_empty_group(self):self.assertIs(load('openstack-domain')['resource']['openstack_networking_secgroup_v2']['quarantine']['delete_default_rules'],True)
  def test_openstack_group_on_port_not_server(self):
   r=load('openstack-workload')['resource'];self.assertNotIn('security_groups',r['openstack_compute_instance_v2']['workload']);self.assertEqual(len(r['openstack_networking_port_v2']['workload']['security_group_ids']),1)
@@ -53,7 +55,7 @@ class NativeSources(unittest.TestCase):
  def test_openstack_flavor_not_unused_cpu_knob(self):
   j=load('openstack-workload');self.assertNotIn('vcpu',j['variable']);self.assertNotIn('memory_gib',j['variable']);self.assertIn('flavor_id',j['variable'])
  def test_nutanix_actual_nic_disconnected(self):
-  vm=load('nutanix-workload')['resource']['nutanix_virtual_machine_v2']['workload'];self.assertEqual(vm['power_state'],'OFF');self.assertIs(vm['nics'][0]['nic_backing_info'][0]['virtual_ethernet_nic'][0]['is_connected'],False)
+  doc=load('nutanix-workload');vm=doc['resource']['nutanix_virtual_machine_v2']['workload'];self.assertEqual(doc['variable']['lifecycle_stage']['default'],'prepared');self.assertEqual(vm['power_state'],'${var.lifecycle_stage == "bootstrap" ? "ON" : "OFF"}');self.assertEqual(vm['nics'][0]['nic_backing_info'][0]['virtual_ethernet_nic'][0]['is_connected'],'${var.lifecycle_stage == "bootstrap"}')
  def test_vsphere_no_invented_power_switch(self):
   vm=load('vsphere-workload')['resource']['vsphere_virtual_machine']['workload'];self.assertNotIn('power_state',vm);self.assertNotIn('start_connected',vm['network_interface'][0])
  def test_vsphere_disk_policy_applied_to_disks(self):

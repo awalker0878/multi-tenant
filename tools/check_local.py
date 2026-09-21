@@ -59,11 +59,11 @@ def main() -> int:
         'terraform_engine_validation': 'NOT_RUN_BY_THIS_COMMAND',
         'separate_recorded_toolchain_status': recorded_toolchain,
         'provider_mock_tests': 'NOT_RUN_BY_THIS_COMMAND',
-        'ansible_engine_validation': 'NOT_RUN_BY_THIS_COMMAND',
+        'ansible_engine_validation': 'GUEST_CONTROLLER_FIXTURE_ONLY',
         'live_infrastructure_qualification': 'NOT_RUN',
         'formal_authorization': 'NOT_ISSUED',
         'elapsed_seconds': round(time.monotonic() - started, 3),
-        'note': 'Python, YAML and Jinja source tests do not run the Terraform or Ansible engines, execute provider plugins or prove native security behavior.',
+        'note': 'The suite includes a pinned Ansible controller dispatch to a non-networking SSH fixture. It does not run Terraform/provider engines, configure a native guest or prove native security behavior; full Ansible profile verification is separate.',
     }
     (quality / 'local_validation.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2))

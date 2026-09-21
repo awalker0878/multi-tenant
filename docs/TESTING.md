@@ -1,5 +1,45 @@
 # Test strategy and actual evidence levels
 
+## Service and activation implementation tests
+
+The reference adapter tests verify state-key separation, NetBox conditional-write
+and uncertain-outcome behavior, guest asset/identity binding, encrypted export
+scope, expiring edge policy and target-campaign healthy controls. NetBox HTTP
+fixtures run real loopback TLS with synthetic API responses; they are not a
+NetBox installation or proof of its actual token permissions.
+
+The Ansible CI job also runs these real local engines:
+
+| Experiment | What executes | Remaining native evidence |
+| --- | --- | --- |
+| `lab/run_guest_services_lab.py` | Rendered OpenSSH/rsyslog configurations parsed by the installed daemons; backup service/timer checked by systemd | Whole guest convergence/idempotence, received collector events and reboot/patch behavior |
+| `lab/run_restic_lab.py` | Encrypted repository, real capture, changed source, isolated restore and recovered byte checks; wrong-key/foreign-scope rejection | Remote append-only enforcement, independently held keys, retention and application consistency/RPO/RTO |
+| `lab/run_nft_edge_lab.py` | Three disposable namespaces; healthy forward/reply paths, bootstrap/active policy, established-session withdrawal and kernel expiry after controller loss | Actual platform attachments, same-subnet boundaries, routing/HA/boot containment and capacity |
+| `lab/run_target_probe_lab.py` | Disposable loopback sshd, actual user certificate and pinned host key, fixed guest probe, verified HTTPS, wrong-machine/host-key rejection | Actual guest/native resource binding, native images, operator privilege and full qualification campaign |
+
+These jobs use no native credentials. Native tools remain opt-in and never update
+accepted indexes automatically. See the [service decisions](implementation/automation/reference-realization.md)
+and [target collection procedure](implementation/automation/target-qualification.md).
+
+## Reviewed execution tests
+
+`tests/test_terraform_run.py`, `tests/test_terraform_apply.py` and
+`tests/test_wsd_handoff.py` exercise exact source/input/backend/credential binding,
+live expiry, private permissions, failed/duplicate/concurrent attempts, receipt
+integrity and the three-platform handoff. Process doubles do not contact native
+infrastructure. The guest CLI test covers receipt-to-inventory argument handling.
+
+`python lab/run_terraform_execution_lab.py` additionally uses the pinned real
+Terraform engine and only its built-in `terraform_data` resource in a disposable
+local directory. It verifies saved binary plans, stale-state rejection, output
+capture and owner-only artifacts. No remote backend, vendor provider, provisioner,
+guest or native service is involved. Hosted Terraform CI runs this experiment and
+retains its separate report; it is not native qualification.
+
+The ruleset test checks that every proposed required check names an unconditional
+PR job, avoiding an unmergeable release configuration when workflows are renamed.
+It does not enable GitHub rules or test administrator permissions.
+
 The active reference describes the infrastructure; the tests evaluate specific code
 and observations, not organizational authorization. [Terraform guidance](../terraform/README.md)
 and [Ansible boundaries](../ansible/README.md) describe the two execution surfaces.

@@ -35,3 +35,14 @@ Native and allocation IDs must come from accepted engineering records. Credentia
 `server_id`, `port_id`, `boot_volume_id`, `data_volume_ids`, `delivery_state`.
 
 Output IDs and the static delivery-state label do not establish native readiness, test results or authorization.
+# Restricted bootstrap lifecycle
+
+Defaults keep the port down and request a stopped VM. Select `config_drive = true`
+when initially creating the reference bootstrap VM, using an accepted image that
+consumes config-drive static networking and already trusts the operator SSH CA.
+Enabling a config drive on an existing VM may require replacement; prevent-destroy
+and the execution reviewer reject that operation.
+`lifecycle_stage = "bootstrap"` with `bootstrap_acceptance_ref` powers the VM and
+enables its single protected port. Returning to `prepared` stops it and disables
+the port while preserving disks. Neither state qualifies or activates production.
+Native guest shutdown, network containment and service paths need real-target tests.

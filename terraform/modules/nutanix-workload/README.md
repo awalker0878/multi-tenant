@@ -2,7 +2,7 @@
 
 Provider interface pin: `nutanix/nutanix` `= 2.4.2`. This is not an installed compatibility decision.
 
-Creates a VM with owned boot/optional data disks, selected cluster/project/category, an explicitly disconnected NIC and OFF requested state. Verify the resulting native power and NIC state rather than trusting API completion. No guest customization, power-on, backup policy or key-service grant is fabricated. Cluster choice must already enforce the accepted zone/co-residency policy; this module does not install HA placement policy.
+Defaults create a VM with owned boot/optional data disks, selected cluster/project/category, an explicitly disconnected NIC and OFF requested state. An explicit `lifecycle_stage = "bootstrap"` with `bootstrap_acceptance_ref` requests ON and connects the single NIC. Returning to `prepared` disconnects it and requests OFF without replacing the VM or disks. Native power/NIC behavior and accepted Flow service policy must be observed independently. The image must already support the accepted address/bootstrap mechanism and operator identity. No backup policy or key-service grant is fabricated. Cluster choice must already enforce the accepted zone/co-residency policy; this module does not install HA placement policy.
 
 No provider configuration or credentials live in this child module. `prevent_destroy` is a configuration safeguard, not an authorization or backup mechanism; removing configuration can remove that protection. Retirement requires a separately reviewed change. Module outputs are resource identifiers, not acceptance evidence. See [commissioning](../../../docs/COMMISSIONING.md) and the [release guide](../../../Implementation_Execution_Guide.docx).
 
@@ -32,6 +32,11 @@ Native and allocation IDs must come from accepted engineering records. Credentia
 
 ## Outputs
 
-`vm_id`, `delivery_state`.
+`vm_id`, `delivery_state`, `lifecycle_stage`.
+
+`lifecycle_stage` defaults to `prepared`; `bootstrap_acceptance_ref` defaults to
+empty and is required for bootstrap. These fields do not authorize a transition;
+use a separately reviewed saved plan. Restricted initial compilation cannot set
+them to bootstrap. Disk retention remains guarded by `prevent_destroy`.
 
 Output IDs and the static delivery-state label do not establish native readiness, test results or authorization.

@@ -43,7 +43,7 @@ def review_inputs(root:dict,inputs:dict)->dict:
   if (typ=='string' and not isinstance(value,str)) or (typ=='bool' and type(value) is not bool) or (typ=='number' and (type(value) not in {int,float})):
    error('WRONG_INPUT_TYPE',key);continue
   if isinstance(value,str):
-   if not value.strip():error('EMPTY_REQUIRED_VALUE',key)
+   if not value.strip() and spec.get('default') != '':error('EMPTY_REQUIRED_VALUE',key)
    elif PLACEHOLDER.search(value) or value.lower().endswith('.example') or REPEATED_UUID.match(value):error('PLACEHOLDER_NOT_SITE_VALUE',key)
   if key in {'tenant_key','workload_key'} and isinstance(value,str) and not re.fullmatch(r'[a-z][a-z0-9-]{1,40}',value):error('INVALID_LOGICAL_ID',key)
   if key=='domain_key' and isinstance(value,str) and not re.fullmatch(r'[A-Za-z][A-Za-z0-9-]{1,23}',value):error('INVALID_LOGICAL_ID',key)
@@ -61,6 +61,8 @@ def review_inputs(root:dict,inputs:dict)->dict:
   value=resolved[key];minimum=0 if key=='data_disk_gib' else 1
   if type(value) not in {int,float} or value!=int(value) or value<minimum:error('INVALID_CAPACITY_OR_INDEX',key)
  if resolved.get('allow_restricted_build') is not True:error('RESTRICTED_BUILD_NOT_OPTED_IN','allow_restricted_build')
+ if resolved.get('lifecycle_stage', 'prepared') != 'prepared' or resolved.get('bootstrap_rules', {}):
+  error('BOOTSTRAP_REQUIRES_EXACT_TRANSITION_REVIEW','lifecycle_stage')
  if 'ipv4_cidr' in resolved:
   try:
    net=ipaddress.ip_network(resolved['ipv4_cidr']);host=resolved.get('gateway_host_number',1)

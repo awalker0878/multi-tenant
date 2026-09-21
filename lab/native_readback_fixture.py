@@ -104,13 +104,14 @@ class Fixture:
     def __init__(self):
         self.temp=tempfile.TemporaryDirectory(prefix='hosting-inc04-')
         self.directory=Path(self.temp.name);credentials(self.directory)
-        self.routes={};self.requests=[];self.counts={};self.hook=None
+        self.routes={};self.requests=[];self.counts={};self.hook=None;self.post_routes={};self.post_bodies=[]
         fixture=self
         class Handler(BaseHTTPRequestHandler):
             protocol_version='HTTP/1.1'
             def log_message(self,*_):pass
             def do_GET(self):
-                fixture.requests.append({'method':'GET','path':self.path,'has_basic_auth':self.headers.get('Authorization','').startswith('Basic ')})
+                fixture.requests.append({'method':'GET','path':self.path,'has_basic_auth':self.headers.get('Authorization','').startswith('Basic '),
+                                         'has_session_auth':bool(self.headers.get('vmware-api-session-id'))})
                 fixture.counts[self.path]=fixture.counts.get(self.path,0)+1
                 spec=deepcopy(fixture.routes.get(self.path,{'status':404,'body':{'error':'not in fixture'}}))
                 if fixture.hook:
@@ -131,7 +132,22 @@ class Fixture:
                     else:self.wfile.write(data)
                 except (BrokenPipeError,ConnectionResetError,ssl.SSLError):pass
             def do_POST(self):
-                fixture.requests.append({'method':'POST','path':self.path});self.send_error(405)
+                fixture.requests.append({'method':self.command,'path':self.path,
+                    'has_basic_auth':self.headers.get('Authorization','').startswith('Basic '),
+                    'has_session_auth':bool(self.headers.get('vmware-api-session-id'))})
+                if self.command != 'POST' or self.path not in fixture.post_routes:
+                    self.send_error(405);return
+                raw=self.rfile.read(int(self.headers.get('Content-Length','0')))
+                body=json.loads(raw) if raw else None
+                fixture.post_bodies.append((self.path,body))
+                spec=fixture.post_routes[self.path]
+                if callable(spec):spec=spec(body)
+                data=b'' if spec.get('status')==204 else json.dumps(spec.get('body')).encode()
+                self.send_response(spec.get('status',200))
+                if data:self.send_header('Content-Type','application/json')
+                self.send_header('Content-Length',str(len(data)));self.send_header('Connection','close')
+                for k,v in spec.get('headers',[]):self.send_header(k,v)
+                self.end_headers();self.wfile.write(data)
             do_PUT=do_POST;do_PATCH=do_POST;do_DELETE=do_POST
         self.server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
         self.server.daemon_threads=True

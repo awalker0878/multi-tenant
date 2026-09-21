@@ -92,6 +92,36 @@
       "description": "Credential injected at execution",
       "nullable": false,
       "sensitive": true
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
+    },
+    "bootstrap_rules": {
+      "type": "map(object({direction = string, protocol = string, port = number, remote_ipv4 = string}))",
+      "nullable": false,
+      "default": {},
+      "description": "Stable owned rule keys; exact endpoint and TCP/UDP port only. Keep existing rules during withdrawal; disabled interfaces contain exposure.",
+      "validation": [
+        {
+          "condition": "${length(var.bootstrap_rules) <= 32 && alltrue([for key, r in var.bootstrap_rules : can(regex(\"^[a-z][a-z0-9-]{1,40}$\", key)) && contains([\"ingress\", \"egress\"], r.direction) && contains([\"tcp\", \"udp\"], r.protocol) && r.port >= 1 && r.port <= 65535 && floor(r.port) == r.port && can(cidrnetmask(\"${r.remote_ipv4}/32\"))])}",
+          "error_message": "At most 32 named exact IPv4 TCP/UDP service rules are supported."
+        }
+      ]
     }
   },
   "module": {
@@ -105,7 +135,10 @@
       "allow_restricted_build": "${var.allow_restricted_build}",
       "test_authorization_ref": "${var.test_authorization_ref}",
       "ipv4_cidr": "${var.ipv4_cidr}",
-      "gateway_host_number": "${var.gateway_host_number}"
+      "gateway_host_number": "${var.gateway_host_number}",
+      "lifecycle_stage": "${var.lifecycle_stage}",
+      "bootstrap_acceptance_ref": "${var.bootstrap_acceptance_ref}",
+      "bootstrap_rules": "${var.bootstrap_rules}"
     }
   },
   "output": {

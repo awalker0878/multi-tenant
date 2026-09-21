@@ -1,5 +1,5 @@
 {
-  "//": "Original implementation, increment 01. RESTRICTED QUARANTINE ONLY. Native provider validation and target tests are outstanding.",
+  "//": "Candidate OpenStack lifecycle: prepared by default; separately reviewed restricted bootstrap. No production readiness is implied.",
   "terraform": {
     "required_version": ">= 1.7.0, < 2.0.0",
     "required_providers": {
@@ -70,6 +70,36 @@
       "type": "string",
       "description": "Keystone project ID matching the execution credential scope",
       "nullable": false
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "nullable": false,
+      "default": "prepared",
+      "description": "Owned lifecycle target: prepared (held down) or bootstrap (explicit restricted service paths).",
+      "validation": [
+        {
+          "condition": "${contains([\"prepared\", \"bootstrap\"], var.lifecycle_stage)}",
+          "error_message": "Only prepared or restricted bootstrap is implemented."
+        }
+      ]
+    },
+    "bootstrap_acceptance_ref": {
+      "type": "string",
+      "nullable": false,
+      "default": "",
+      "description": "Independent current mandatory-policy, edge, image and placement acceptance for restricted bootstrap."
+    },
+    "bootstrap_rules": {
+      "type": "map(object({direction = string, protocol = string, port = number, remote_ipv4 = string}))",
+      "nullable": false,
+      "default": {},
+      "description": "Stable owned rule keys; exact endpoint and TCP/UDP port only. Keep existing rules during withdrawal; disabled interfaces contain exposure.",
+      "validation": [
+        {
+          "condition": "${length(var.bootstrap_rules) <= 32 && alltrue([for key, r in var.bootstrap_rules : can(regex(\"^[a-z][a-z0-9-]{1,40}$\", key)) && contains([\"ingress\", \"egress\"], r.direction) && contains([\"tcp\", \"udp\"], r.protocol) && r.port >= 1 && r.port <= 65535 && floor(r.port) == r.port && can(cidrnetmask(\"${r.remote_ipv4}/32\"))])}",
+          "error_message": "At most 32 named exact IPv4 TCP/UDP service rules are supported."
+        }
+      ]
     }
   },
   "resource": {
@@ -77,7 +107,7 @@
       "domain": {
         "name": "${var.tenant_key}-${var.domain_key}",
         "tenant_id": "${var.project_id}",
-        "admin_state_up": false,
+        "admin_state_up": "${var.lifecycle_stage == \"bootstrap\"}",
         "shared": false,
         "external": false,
         "port_security_enabled": true,
@@ -87,6 +117,10 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -108,6 +142,10 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -117,13 +155,17 @@
       "domain": {
         "name": "${var.tenant_key}-${var.domain_key}-router",
         "tenant_id": "${var.project_id}",
-        "admin_state_up": false,
+        "admin_state_up": "${var.lifecycle_stage == \"bootstrap\"}",
         "lifecycle": {
           "prevent_destroy": true,
           "precondition": [
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -139,6 +181,10 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
             }
           ]
         }
@@ -148,7 +194,7 @@
       "quarantine": {
         "name": "${var.tenant_key}-${var.domain_key}-quarantine",
         "tenant_id": "${var.project_id}",
-        "description": "No user traffic rules; explicit ports must use this group.",
+        "description": "Provider-owned group: no default egress; optional exact reviewed bootstrap services only.",
         "delete_default_rules": true,
         "lifecycle": {
           "prevent_destroy": true,
@@ -156,6 +202,32 @@
             {
               "condition": "${var.allow_restricted_build && length(trimspace(var.test_authorization_ref)) > 0}",
               "error_message": "Restricted build is not opted in or the external test-authorization reference is missing. No production activation is implemented."
+            },
+            {
+              "condition": "${var.lifecycle_stage == \"prepared\" || length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Restricted bootstrap requires independent native boundary and service-path acceptance."
+            }
+          ]
+        }
+      }
+    },
+    "openstack_networking_secgroup_rule_v2": {
+      "bootstrap": {
+        "for_each": "${var.bootstrap_rules}",
+        "tenant_id": "${var.project_id}",
+        "security_group_id": "${openstack_networking_secgroup_v2.quarantine.id}",
+        "direction": "${each.value.direction}",
+        "ethertype": "IPv4",
+        "protocol": "${each.value.protocol}",
+        "port_range_min": "${each.value.port}",
+        "port_range_max": "${each.value.port}",
+        "remote_ip_prefix": "${each.value.remote_ipv4}/32",
+        "lifecycle": {
+          "prevent_destroy": true,
+          "precondition": [
+            {
+              "condition": "${var.allow_restricted_build && length(trimspace(var.bootstrap_acceptance_ref)) > 0}",
+              "error_message": "Explicit service-rule ownership and bootstrap acceptance required."
             }
           ]
         }
@@ -177,6 +249,12 @@
     },
     "delivery_state": {
       "value": "PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY"
+    },
+    "bootstrap_rule_ids": {
+      "value": "${{ for key, rule in openstack_networking_secgroup_rule_v2.bootstrap : key => rule.id }}"
+    },
+    "lifecycle_stage": {
+      "value": "${var.lifecycle_stage}"
     }
   }
 }

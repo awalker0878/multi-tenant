@@ -63,7 +63,7 @@
       ]
     },
     "members": {
-      "type": "map(object({domain_key = string, vcpu = optional(number, 2), memory_gib = optional(number, 4), boot_disk_gib = optional(number, 40), data_disk_gib = optional(number, 0), accepted_quarantine_ref = string, cluster_id = string, project_id = string, storage_container_id = string, image_id = string, subnet_id = string, security_category_id = string, ipv4_address = string}))",
+      "type": "map(object({domain_key = string, vcpu = optional(number, 2), memory_gib = optional(number, 4), boot_disk_gib = optional(number, 40), data_disk_gib = optional(number, 0), accepted_quarantine_ref = string, cluster_id = string, project_id = string, storage_container_id = string, image_id = string, subnet_id = string, security_category_id = string, ipv4_address = string, lifecycle_stage = optional(string, \"prepared\"), bootstrap_acceptance_ref = optional(string, \"\")}))",
       "nullable": false,
       "description": "workloads owned by this tenant/WSD; map keys are immutable native identities.",
       "validation": [
@@ -94,7 +94,9 @@
       "image_id": "${each.value.image_id}",
       "subnet_id": "${each.value.subnet_id}",
       "security_category_id": "${each.value.security_category_id}",
-      "ipv4_address": "${each.value.ipv4_address}"
+      "ipv4_address": "${each.value.ipv4_address}",
+      "lifecycle_stage": "${each.value.lifecycle_stage}",
+      "bootstrap_acceptance_ref": "${each.value.bootstrap_acceptance_ref}"
     }
   },
   "output": {
