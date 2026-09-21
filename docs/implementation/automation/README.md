@@ -43,7 +43,7 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Edge startup installation](edge-startup.md#resumable-installer) | Exact host installation, durable deny boundaries and verified network-manager dependency |
 | [OpenStack project quotas](openstack-quotas.md) | Exact native quota changes, usage checks and read-only interrupted recovery |
 | [Scoped SSH issuer](ssh-issuer.md) | Native certificate signing, durable serials, issuer denial and endpoint revocation handoff |
-| [Operations drift and health review](operations-review.md) | Scheduled configuration/health/capacity/telemetry classification, alert routing, emergency-override preservation and containment-aware delivery gating |
+| [Operations drift and health review](operations-review.md) | Scheduled configuration/health/capacity/telemetry classification, alert routing, emergency-override preservation, review-bound alert acknowledgement/escalation and containment-aware delivery gating |
 | [Persistent delivery execution](delivery-runner.md) | Ordered dependency-graph execution, exact handoffs, durable completion and restart recovery |
 | [Capacity reservations](capacity-reservations.md) | Transactional compute/storage reservation, confirmation and release against pool and tenant budgets |
 | [Delegated incident containment](incident-containment.md) | Owned-boundary withdrawal under separate incident authority and automatic delivery-failure containment |

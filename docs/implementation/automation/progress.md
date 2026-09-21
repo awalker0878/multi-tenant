@@ -148,6 +148,21 @@ still returns no reconciliation authority, no native acceptance and no activatio
 Selected native observers, alert delivery and the owned containment/release
 exercise remain W21 native work.
 
+The [operations review](operations-review.md) now also binds its alerts to
+accountable acknowledgement. Each acknowledgement must name the same review
+digest, the exact alert classification and the accountable route owner, so an
+alert cannot be closed by another route or against another review. An alert that
+is still unanswered one review cadence after it was observed is escalated rather
+than silently carried, and a late response is recorded as late. Containment
+release is authorized only when the release binds exactly the contained alerts,
+every contained alert was acknowledged in time and the release does not precede
+the accountable response; otherwise the stage records the blocking reason and
+holds. `operations_alerts` is a registered delivery stage whose hold never
+requests containment withdrawal, because a missing acknowledgement is an
+accountability failure rather than evidence of an exposed boundary. Notification
+delivery, on-call paging and the owned containment/release exercise remain W21
+native work.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
@@ -694,7 +709,7 @@ populate accepted qualification indexes or establish cross-writer fencing.
 | W18 | Partial operator executor delivered | Terraform and guest preparation/execution, bounded commands, durable uncertainty holds, replayed guest completion counters, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector, including v8's complete owned VMware domain intent and attachment binding, in restricted campaigns for all three exact installed tuples. Complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
-| W21 | Partial classification and delivery gating delivered | Exact configuration drift, declared health, capacity and telemetry states are classified, routed to accountable owners, preserved under an active emergency override and gated in the delivery graph by a containment-aware hold. Connect selected native observers and alerting, and exercise owned incident containment and release against installed systems. Guest convergence is not a platform drift service. |
+| W21 | Partial classification, alert accountability and delivery gating delivered | Exact configuration drift, declared health, capacity and telemetry states are classified, routed to accountable owners, preserved under an active emergency override and gated in the delivery graph by a containment-aware hold. Alerts now require a review-bound, owner-bound acknowledgement, escalate after one cadence and authorize containment release only against exactly the acknowledged contained alerts. Connect selected native observers and notification delivery, and exercise owned incident containment and release against installed systems. Guest convergence is not a platform drift service. |
 | W22 | Lifecycle implementation open | Add accepted resize/scale/growth, image refresh, patch/reboot, provider/platform/collection upgrades, rotation and replacement workflows with actual maintenance budgets and requalification rules. |
 | W23 | Partial restic capture/restore | Encrypted scoped file capture, confined scheduling and isolated byte verification are implemented and locally exercised. Provision append-only protection, independent retention/keys, catalogues and application-consistent exports; measure native application RPO/RTO. |
 | W24 | Blocked on accepted adoption/recovery design | Deliver exact native import/state mappings, same-service re-creation, supported portable data transitions, and any promised synchronization/cutover/failback with writer exclusion. No blind state move or cross-stack live migration is supplied. |

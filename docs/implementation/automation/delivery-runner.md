@@ -75,6 +75,9 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `restic` | `action`, `restic`, `restic_sha256`, `target` | `config`, `credentials` | `ca_bundle`; restore also requires `receipt`, `manifest`, `restore_authority` |
 | `capacity` | `action`, `database` | `request`, `authority` | `native_ids`; reserve pairs `inputs`, `sizing` to bind actual workload demand |
 | `acceptance` | `purpose` | `acceptance` | None |
+| `retirement_review` | None | `plan`, `evidence` | None |
+| `operations_review` | None | `review` | None |
+| `operations_alerts` | None | `review`, `result`, `acknowledgements` | `release` |
 | `terraform_plan` | `catalog_id`, `terraform`, `terraform_sha256` | `inputs`, `backend`, `environment`, `authority` | `references`, `cloud`, `ca_bundle`, `transition` |
 | `terraform_apply` | `prepared_step` | `approval` | None |
 | `workload_inputs` | `domain_steps`, `selected_input` | `environment` | `vmware_bindings` |

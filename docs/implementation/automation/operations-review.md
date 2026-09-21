@@ -8,6 +8,10 @@ boundary, contain an edge or authorize production activation: a healthy review
 still returns `ordinary_reconciliation_authorized: false`, `native_acceptance:
 false` and `production_activation: false`.
 
+`tools/operations_alerts.py` then binds the resulting alerts to accountable
+acknowledgement, escalation and containment release, so a routed alert cannot be
+closed by silence, by another owner or by a release that precedes the response.
+
 ## Private review input
 
 The review is a private file with `format: hosting-operations-review/1` and
@@ -120,6 +124,79 @@ and the alert set to equal the recorded one exactly, and then re-raises the
 original hold. An uncertain operations review is therefore never reclassified as
 healthy by a retry.
 
+`operations_alerts` is the companion [delivery stage](delivery-runner.md) that
+binds the review's alerts to accountable acknowledgement. It takes the private
+`review` and `result` documents plus an `acknowledgements` list, and an optional
+`release` record, and writes `alert-accounting.json`.
+
+## Alert acknowledgement and escalation
+
+`tools/operations_alerts.py` turns each alert in a review result into an
+accountability record. It never mutates a native resource and never asserts
+acceptance; it decides only whether the alerts have been answered by the owner
+that the review names.
+
+An acknowledgement is `hosting-operations-acknowledgement/1` with keys
+`format`, `review_sha256`, `observation_id`, `classification`, `owner`,
+`acknowledged_by`, `acknowledged_at` and `response_ref`. Validation requires the
+digest to equal the acknowledged result's `review_sha256`, the classification to
+equal the alert's classification, the owner to equal the alert's accountable
+route owner, and the observation to actually carry an alert. An alert therefore
+cannot be closed against a different review, by a different route, or by naming
+an observation that the review classified as healthy.
+
+Escalation is measured against the review cadence. The deadline for an alert is
+its observation's `observed_at` plus the review's `cadence_seconds`, and each
+alert is classified as:
+
+| State | Meaning |
+|-------|---------|
+| `PENDING` | No acknowledgement yet, before the cadence deadline |
+| `ESCALATED` | No acknowledgement yet, at or after the cadence deadline |
+| `ACKNOWLEDGED` | Acknowledged before the cadence deadline |
+| `LATE` | Acknowledged, but only at or after the cadence deadline |
+
+The accounting status is `ALERTS_NONE` when the review produced no alerts,
+`ALERTS_ESCALATED` when any alert is `ESCALATED` or `LATE`, `ALERTS_PENDING`
+when alerts remain unacknowledged inside their cadence, and `ALERTS_ACKNOWLEDGED`
+when every alert was answered in time. Duplicate acknowledgements for one alert
+and acknowledgements dated after the current review are rejected.
+
+## Containment release
+
+A release is `hosting-operations-containment-release/1` with keys `format`,
+`review_sha256`, `observation_ids`, `authority_ref`, `released_at` and
+`restoration_ref`. A release is authorized only when all of the following hold:
+
+* the review requires containment for at least one alert;
+* `observation_ids` names exactly the set of contained alerts, so a release
+  cannot drop or smuggle an observation;
+* every contained alert is `ACKNOWLEDGED` in time; and
+* `released_at` is not earlier than the latest acknowledgement of a contained
+  alert, so the release follows the accountable response rather than preceding it.
+
+Otherwise the accounting records a blocking reason of `NO_CONTAINMENT_TO_RELEASE`,
+`RELEASE_DOES_NOT_BIND_EXACT_CONTAINED_ALERTS`,
+`CONTAINED_ALERT_NOT_ACKNOWLEDGED` or `RELEASE_PRECEDES_ACCOUNTABLE_RESPONSE`,
+and `containment_release_authorized` stays false. A requested but unauthorized
+release is a hold even when every alert was acknowledged.
+
+`enforce()` raises `AlertHold`, in this order, for an escalated alert, for an
+unacknowledged alert still inside its cadence, and for an unauthorized release.
+`AlertHold` sets `containment_required` to `false` deliberately: a missing
+acknowledgement is an accountability failure, not evidence that the owned edge
+boundary is exposed, so it never withdraws containment through the
+[delivery containment guard](incident-containment.md).
+
+Delivery integration follows the review stage. Validation checks the review
+digest, the plan's `source_commit` and `scope`, every acknowledgement and any
+release before dispatch. Dispatch writes `alert-accounting.json` and then calls
+`enforce()`, so a held alert stage records its accounting but never writes
+`owner-completion.json`. Recovery reloads the durable accounting and requires it
+to match the recorded review digest, the ordered alert set and every
+acknowledgement's owner and time before re-raising the original hold. An
+interrupted alert stage is therefore never completed by a retry.
+
 ## Command line
 
 ```sh
@@ -132,10 +209,26 @@ python tools/operations_review.py --review /private/operations-review.json \
 including a rejected input, exits 2 with `HOLD_OPERATIONS_RECONCILIATION` and
 `native_acceptance: false`.
 
+```sh
+python tools/operations_alerts.py --review /private/operations-review.json \
+  --result /private/operations-result.json \
+  --acknowledgements /private/acknowledgements.json \
+  --release /private/containment-release.json \
+  --output /private/alert-accounting.json
+```
+
+`--release` is optional. `main` exits 0 only when no alert is escalated, no
+alert is pending and any requested release is authorized; otherwise, and for any
+rejected input, it exits 2 with `HOLD_OPERATIONS_ALERTS` and
+`native_acceptance: false`.
+
 ## Limits
 
 The review is a classification of supplied evidence. It performs no native read,
 repair, boundary change or activation, and it does not qualify an observer, a
-notification path or an operating authority. Observer coverage, alert delivery,
-on-call acknowledgement, containment execution and production acceptance remain
-native commissioning evidence under the [completion backlog](completion-backlog.md).
+notification path or an operating authority. The alert accounting is likewise a
+record of supplied acknowledgements and release authority: it delivers no
+notification, pages no on-call owner, and performs no containment or restoration.
+Observer coverage, alert delivery, on-call acknowledgement, containment execution
+and production acceptance remain native commissioning evidence under the
+[completion backlog](completion-backlog.md).
