@@ -150,6 +150,8 @@ jobs:
         run: sudo "$(command -v python)" lab/run_guest_services_lab.py --require-engines --scratch-root /etc/rsyslog.d
       - name: Recover useful synthetic data using the real restic engine
         run: python lab/run_restic_lab.py
+      - name: Export synthetic versioned state over TLS and recover it with real restic
+        run: python lab/run_state_protection_lab.py --execute
       - name: Exercise leased edge activation and withdrawal with real local packets
         run: sudo "$(command -v python)" lab/run_nft_edge_lab.py
       - name: Exercise fixed guest probes with real certificate SSH and TLS

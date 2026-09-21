@@ -124,3 +124,10 @@ changes between sweeps, permission/identity drift, partial-read recovery and
 changed completed bytes. All export requests are asserted to be GETs. These
 fixtures do not qualify installed GitLab retention or independently protected
 recovery; perform the actual service and data recovery exercises at commissioning.
+
+The separate hosted `lab/run_state_protection_lab.py` connects the actual exporter
+to a disposable TLS state fixture, captures its completed directory with the real
+restic engine, changes the original exported files, and restores the retained
+state and index into an isolated destination. The service data and acceptance
+inputs are synthetic; the export, encryption/capture and restore code paths are
+real. The local repository fixture does not establish remote append-only custody.
