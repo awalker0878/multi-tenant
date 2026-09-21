@@ -96,6 +96,13 @@ python tools/terraform_apply.py \
   --execute-approved-change
 ```
 
+Before admitting a new attempt, the executor now replays every immutable
+start/completion pair in the backend scope. Missing starts, missing results,
+orphan results, changed identity/scope, overlapping chronology and a missing or
+inconsistent head all hold. This includes interruption after the durable start
+but before head publication: a renamed operation cannot bypass that window.
+Historical completion is checked without renewing its apply authority.
+
 The ledger directory must already exist with mode 0700. All writers using this
 executor must use the same durable ledger and canonical backend address. A
 POSIX advisory lock serializes this executor's writers for that backend, while

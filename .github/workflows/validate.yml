@@ -150,10 +150,14 @@ jobs:
         run: sudo "$(command -v python)" lab/run_guest_services_lab.py --require-engines --scratch-root /etc/rsyslog.d
       - name: Recover useful synthetic data using the real restic engine
         run: python lab/run_restic_lab.py
+      - name: Export synthetic versioned state over TLS and recover it with real restic
+        run: python lab/run_state_protection_lab.py --execute
       - name: Exercise leased edge activation and withdrawal with real local packets
         run: sudo "$(command -v python)" lab/run_nft_edge_lab.py
       - name: Exercise fixed guest probes with real certificate SSH and TLS
         run: sudo "$(command -v python)" lab/run_target_probe_lab.py --user "$(id -un)"
+      - name: Execute a staged owner job through a real forced-command SSH worker
+        run: sudo env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory "GIT_CONFIG_VALUE_0=$PWD" "$(command -v python)" lab/run_owner_worker_lab.py --user "$(id -un)"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -164,6 +168,7 @@ jobs:
             build/reports/restic_recovery_lab.json
             build/reports/nft_edge_lab.json
             build/reports/target_probe_lab.json
+            build/reports/owner_worker_lab.json
           retention-days: 14
           if-no-files-found: warn
   terraform:
@@ -184,6 +189,8 @@ jobs:
         run: python scripts/check_dependency_locks.py
       - name: Saved-plan execution, stale-state rejection and private artifact permissions
         run: python lab/run_terraform_execution_lab.py
+      - name: Build and verify the actual offline execution runtime without network access
+        run: sudo env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory "GIT_CONFIG_VALUE_0=$PWD" "$(command -v python)" lab/run_runtime_build_lab.py --execute --terraform "$(command -v terraform)"
       - name: Backend-disabled validation, module schemas and plan-only provider mocks
         run: python tools/verify_terraform.py --mock-tests
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -194,6 +201,7 @@ jobs:
             build/reports/provider_lock_review.json
             build/reports/terraform_validation.json
             build/reports/terraform_execution_lab.json
+            build/reports/runtime_build_lab.json
             build/reports/toolchain-schemas/
             build/reports/toolchain-locks/
           include-hidden-files: true

@@ -190,6 +190,44 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
     return result
 
 
+def execute(action, config, credentials, binary, operation, *, ca_file=None,
+            receipt=None, expected=None, target=None, authority=None):
+    """Execute one fixed owner operation, preserving a deterministic private path."""
+    validate(config)
+    require(action in {'backup', 'restore'}, 'Unknown backup operation')
+    machine = Path('/etc/machine-id').read_text().strip()
+    if action == 'backup':
+        require(machine == config['machine_id'], 'Backup source machine identity changed')
+        require(all(value is None for value in (receipt, expected, target, authority)),
+                'Backup cannot carry restore inputs')
+    else:
+        from tools.run_files import current_window
+        require(all(value is not None for value in (receipt, expected, target, authority)), 'Exact restore inputs required')
+        current_window(authority)
+        require(set(authority) == {'valid_from', 'valid_until', 'config_sha256', 'receipt_sha256',
+                'machine_id', 'target', 'isolation_ref', 'change_ref'}
+                and authority['config_sha256'] == digest(encoded(config))
+                and authority['receipt_sha256'] == digest(encoded(receipt))
+                and authority['machine_id'] == machine and machine != config['machine_id']
+                and authority['target'] == str(Path(target).absolute())
+                and all(re.fullmatch(r'[A-Za-z0-9:._/-]{3,200}', authority[k]) for k in ('isolation_ref', 'change_ref')),
+                'Restore requires current authority for an independent isolated target')
+    operation = new_directory(operation, ROOT)
+    write_new(operation / 'context.json', encoded({'action': action, 'config_sha256': digest(encoded(config)),
+        'receipt_sha256': digest(encoded(receipt)) if receipt is not None else None,
+        'manifest_sha256': digest(encoded(expected)) if expected is not None else None,
+        'authority_sha256': digest(encoded(authority)) if authority is not None else None,
+        'machine_id': machine, 'target': str(Path(target).absolute()) if target is not None else None}))
+    client = Restic(binary, config, credentials, operation, ca_file)
+    if action == 'backup':
+        result, _ = backup(config, client, operation)
+    else:
+        client.deadline = min(client.deadline, time.monotonic() +
+            (timestamp(authority['valid_until']) - utcnow()).total_seconds())
+        result = restore(config, receipt, expected, client, operation, target)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['backup', 'restore'])
@@ -205,31 +243,11 @@ def main():
         if not args.execute:
             print('{"status":"VALIDATED_NO_CONTACT"}')
             return 0
-        machine = Path('/etc/machine-id').read_text().strip()
-        receipt = expected = None
-        if args.action == 'backup':
-            require(machine == config['machine_id'], 'Backup source machine identity changed')
-        else:
-            from tools.run_files import current_window
-            require(all([args.receipt, args.manifest, args.target, args.restore_authority]), 'Exact restore inputs required')
-            receipt, expected, authority = [load_private(p) for p in (args.receipt, args.manifest, args.restore_authority)]
-            current_window(authority)
-            require(set(authority) == {'valid_from', 'valid_until', 'config_sha256', 'receipt_sha256',
-                    'machine_id', 'target', 'isolation_ref', 'change_ref'}
-                    and authority['config_sha256'] == digest(encoded(config))
-                    and authority['receipt_sha256'] == digest(encoded(receipt))
-                    and authority['machine_id'] == machine and machine != config['machine_id']
-                    and authority['target'] == str(args.target.absolute())
-                    and all(re.fullmatch(r'[A-Za-z0-9:._/-]{3,200}', authority[k]) for k in ('isolation_ref', 'change_ref')),
-                    'Restore requires current authority for an independent isolated target')
-        operation = new_directory(args.output_root / ('run-' + uuid.uuid4().hex), ROOT)
-        client = Restic(args.restic, config, load_private(args.credentials), operation, args.ca_bundle)
-        if args.action == 'backup':
-            result, _ = backup(config, client, operation)
-        else:
-            client.deadline = min(client.deadline, time.monotonic() +
-                (timestamp(authority['valid_until']) - utcnow()).total_seconds())
-            result = restore(config, receipt, expected, client, operation, args.target)
+        operation = args.output_root / ('run-' + uuid.uuid4().hex)
+        result = execute(args.action, config, load_private(args.credentials), args.restic, operation,
+            ca_file=args.ca_bundle, receipt=load_private(args.receipt) if args.receipt else None,
+            expected=load_private(args.manifest) if args.manifest else None, target=args.target,
+            authority=load_private(args.restore_authority) if args.restore_authority else None)
         print(json.dumps({'status': result['status'], 'operation': str(operation), 'production_activation': False}))
         return 0
     except OperatorError as exc:

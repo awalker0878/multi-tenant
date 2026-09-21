@@ -11,9 +11,13 @@ deployment inputs. The architecture remains portable across all three VM stacks.
 | First qualification path | OpenStack, internal IPv4 two-tenant OZ/RZ fixture, Ubuntu 24.04 guests | [Delivery order](README.md#scope-of-all-environments); existing Neutron exact-ID observations and domain/workload roots provide the first vertical path. VMware/NSX and Nutanix remain required follow-on targets; no installed site or release tuple is invented |
 | Terraform state | GitLab-managed HTTP state, separate projects at the required credential boundary, one state per environment/site/platform/tenant/WSD/phase | [Writer ownership](../provisioning-strategy/5-concurrency-ownership-and-failed-execution.md); backend locks serialize Terraform, while native task fencing remains separate |
 | Address ownership | NetBox REST IPAM, exact tenant/VRF/prefix and reserved address; bounded token, operation identity and lost-response reconciliation | [Service interfaces](../native-reference/service-interfaces.md); IPAM is not a compute-capacity reservation service |
+| Compute/storage reservation | Single authoritative capacity-owner host with transactional SQLite accounting, explicit failure reserves and tenant entitlements | [Capacity owner](capacity-reservations.md); confirmed and uncertain native allocations retain their charge until accepted cleanup, and all callers share the same recoverable owner |
 | Authoritative DNS | Existing RFC 2136 client with TSIG; [NetBox handoff](netbox-dns.md) binds initial A/PTR registration to current confirmed IPv4 ownership | Same service interface schedule; forward/reverse and recursive/secondary observations remain separate gates |
 | Guest | Existing Ubuntu 24.04 systemd/Python image profile, extended with explicitly owned hardening and service files | [Guest runbook](native-guests.md); image packages and actual installed versions are qualified before use |
 | Guest execution | Source-bound private Ansible bundle, certificate-only SSH, fixed serial playbook, exact mode approval and durable per-scope attempt ledger | [Reviewed guest execution](guest-execution.md); implements the existing guest ownership boundary and keeps native fencing/acceptance separate |
+| Delivery coordination | Durable ordered graph with typed owner adapters, exact predecessor receipts, current gate renewals and persistent native owner ledgers | [Persistent runner](delivery-runner.md); an external change platform supplies actual reviewed stage inputs and approvals |
+| Remote owner execution | Pinned certificate SSH to a forced worker for exact owner-staged edge, containment and restic jobs | [Remote worker](remote-owner-worker.md); native credentials remain on the owner host and uncertain replies resume through observation |
+| VMware power | Separate retained-VM power owner with exact native task binding and read-only interrupted-task observation | [Power executor](vsphere-power.md); compatibility API selection, data quiescence and effective native writer exclusion require installed-target acceptance |
 | Administrator identity | OpenSSH user certificates from an external issuing authority, explicit per-account principals and revocation data | [Identity and independent recovery](../../architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md); signing keys stay outside workloads and Terraform state |
 | Guest audit transport | rsyslog over authenticated TLS to explicit collectors, persistent local journal and disk queue | [Service interfaces](../native-reference/service-interfaces.md); ingestion credentials do not grant collector administration or deletion |
 | Workload data backup | restic client and a TLS REST repository with append-only server authority; separate retention administrator and restore custodian | [Backup and isolated restore](../../architecture/shared-services/5-backup-capture-independent-protection-and-isolated-restore.md); file backup is not application-consistent VM snapshot protection |
@@ -28,6 +32,11 @@ must not read one another's state. Restrict the runner token to its intended sta
 project and retain GitLab encryption secrets, database and object storage through
 the independently tested service backup. Restoring an old state is not a native
 resource rollback.
+
+The [state project owner](state-projects.md) creates a dedicated private project
+in an existing accepted namespace and supplies its observed native ID directly
+to the backend compiler. It checks actual project restrictions and inherited
+membership, preserves uncertain creation and never writes a state file.
 
 `tools/state_backend.py` compiles `backend.json` consumed by the
 [reviewed executor](terraform-execution.md). It takes `--origin`, `--project-id`,

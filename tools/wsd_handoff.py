@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+from copy import deepcopy
 import json
 from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from tools import readback_core as c
 from tools.compile_wsd import compile_environment
 from tools.run_files import (digest, encoded, load_private, new_directory,
                             read_private, require, utcnow, write_new)
@@ -56,6 +58,22 @@ def compile_runs(environment, directories, vmware_bindings=None):
     require(set(outputs) == set(expected_scopes), 'Every intended WSD requires exactly one successful domain run')
     files, scopes = compile_environment(environment, 'workloads', outputs, vmware_bindings)
     return files, scopes, {'status': 'BOUND_EXECUTION_OUTPUTS_NOT_NATIVE_ACCEPTANCE', 'runs': provenance}
+
+
+
+def compile_scope_runs(environment, directories, scope, vmware_bindings=None):
+    """Validate the full accepted environment, then compile one exact WSD."""
+    _, all_scopes = compile_environment(environment)
+    c.exact_keys(scope, {'environment_key','site_key','platform','tenant_key','wsd_key'})
+    selected = [row for row in all_scopes['scopes']
+                if {key:row['scope'][key] for key in scope} == scope]
+    require(len(selected) == 1, 'Delivery scope is absent or ambiguous in the accepted environment')
+    narrowed = deepcopy(environment)
+    narrowed['wsds'] = [row for row in environment['wsds']
+                       if (row['tenant_key'],row['wsd_key']) == (scope['tenant_key'],scope['wsd_key'])]
+    files, scopes, provenance = compile_runs(narrowed, directories, vmware_bindings)
+    provenance.update(environment_sha256=c.digest(environment), selected_scope=scope)
+    return files, scopes, provenance
 
 
 def main():

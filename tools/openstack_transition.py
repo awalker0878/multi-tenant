@@ -152,23 +152,29 @@ def any_true(value):
     return value is True or isinstance(value, dict) and any(any_true(v) for v in value.values()) or isinstance(value, list) and any(any_true(v) for v in value)
 
 
+def prepare(prior_run, inputs_path, acceptance_path, stage):
+    from tools.wsd_handoff import execution_outputs
+    prior_run=Path(prior_run)
+    prior=load_private(prior_run/'bundle.json')
+    outputs,previous,provenance=execution_outputs(prior_run,prior['scope']['phase'])
+    raw=read_private(inputs_path); inputs=c.strict_loads(raw); accepted=load_private(acceptance_path)
+    c.exact_keys(accepted,{'valid_from','valid_until','acceptance_refs'})
+    require({k:inputs[k] for k in ('environment_key','site_key','tenant_key','wsd_key')}==
+            {k:prior['scope'][k] for k in ('environment_key','site_key','tenant_key','wsd_key')},'Input scope changed')
+    record={'format':'hosting-openstack-transition/1','scope':prior['scope'],'input_sha256':digest(raw),
+            'prior_bundle_sha256':provenance['bundle_sha256'],'prior_outputs':outputs,'target_stage':stage,**accepted,
+            'resources':bindings(prior['scope'],inputs,outputs,stage)}
+    validate(record,prior['scope'],raw)
+    return record
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('prior-run', 'inputs', 'acceptance', 'output'): p.add_argument('--' + name, type=Path, required=True)
     p.add_argument('--stage', choices=sorted(STAGES), required=True); args = p.parse_args()
     try:
-        from tools.wsd_handoff import execution_outputs
-        prior = load_private(args.prior_run / 'bundle.json')
-        outputs, previous, provenance = execution_outputs(args.prior_run, prior['scope']['phase'])
-        raw = read_private(args.inputs); inputs = c.strict_loads(raw); accepted = load_private(args.acceptance)
-        c.exact_keys(accepted, {'valid_from', 'valid_until', 'acceptance_refs'})
-        require({k: inputs[k] for k in ('environment_key', 'site_key', 'tenant_key', 'wsd_key')} ==
-                {k: prior['scope'][k] for k in ('environment_key', 'site_key', 'tenant_key', 'wsd_key')}, 'Input scope changed')
-        record = {'format': 'hosting-openstack-transition/1', 'scope': prior['scope'], 'input_sha256': digest(raw),
-                  'prior_bundle_sha256': provenance['bundle_sha256'], 'prior_outputs': outputs,
-                  'target_stage': args.stage, **accepted,
-                  'resources': bindings(prior['scope'], inputs, outputs, args.stage)}
-        validate(record, prior['scope'], raw); write_new(args.output, encoded(record))
+        record=prepare(args.prior_run,args.inputs,args.acceptance,args.stage)
+        write_new(args.output, encoded(record))
         print('{"status":"TRANSITION_REQUIRES_EXACT_PLAN_REVIEW","native_contact":false}'); return 0
     except (OSError, ValueError, KeyError, TypeError):
         print('{"status":"HOLD_INVALID_TRANSITION"}'); return 2

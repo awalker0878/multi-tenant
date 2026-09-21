@@ -104,6 +104,11 @@ and retained-copy/key obligations that this ledger cannot establish. No DNS slot
 does not prove there are no external DNS dependencies. A missing/corrupt ledger
 is a recovery hold, not permission to start with an empty replacement ledger.
 
+Use the [DNS propagation observer](dns-propagation.md) on each completed withdrawal
+to collect authenticated secondary/recursive evidence for that cleanup reference.
+It preserves the original tombstone generation and never flushes caches or
+releases ownership. Selected-view readback is not universal cache-expiry proof.
+
 NetBox retirement conditionally changes the row to `deprecated`; it does not
 delete or release it. If that PATCH has an uncertain response, use the existing
 IPAM `reconcile` action. Do not repeat the write, remove DNS attempts or reactivate

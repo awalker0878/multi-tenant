@@ -133,12 +133,13 @@ required. Follow the [commissioning sequence](site-commissioning.md). Provider
 mocks and synthetic saved plans exercise implementation boundaries, not native
 enforcement or failure recovery.
 
-Remaining vSphere integration includes a separately fenced, data-preserving
-power/guest-bootstrap owner, complete native task coverage beyond the bounded
+The [retained-VM power executor](vsphere-power.md) now supplies a separate power
+writer, durable task binding and read-only resume for a returned task ID.
+Independent native fencing, unidentified-task reconciliation, complete native task coverage beyond the bounded
 template-clone/power/reconfiguration/activity profiles, effective per-port/DFW
 membership and unsupported network realizations beyond v7's selected attachments, and
-operation-wide reconciliation and authorized ledger recovery. The observers and
-reviewer do not supply these write/fencing interfaces. Keep the NSX containment and reviewed
+operation-wide reconciliation and authorized ledger recovery remain required. The observers and
+reviewer do not supply native fencing. Keep the NSX containment and reviewed
 operator hold points until those capabilities and their live behavior are accepted.
 
 Interfaces checked against the pinned provider sources:

@@ -23,9 +23,55 @@ sys.path.insert(0, str(ROOT))
 from tools.check_release import verify
 from tools.compile_wsd import STATE
 from tools.plan_review import review
+from tools import readback_core as c
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,
-    private_path, read_private, replace_private, require, utcnow, write_new, OperatorError)
+    private_path, read_private, replace_private, require, sync_directory, utcnow, write_new, OperatorError)
 from tools.terraform_run import backend_settings, command, runtime_environment, select_scope
+
+ATTEMPT_FIELDS = {'format','status','bundle_sha256','scope','operation_id','generation','change_ref','started_at'}
+
+
+def completed_history(scope, expected_scope=None):
+    """Every immutable attempt must complete before any new operation can start."""
+    records={}
+    for path in scope.glob('*.started.json'):
+        started=load_private(path); c.exact_keys(started,ATTEMPT_FIELDS)
+        require(started['format']=='hosting-terraform-attempt/1' and started['status']=='STARTED_OUTCOME_UNKNOWN',
+                'Unknown Terraform attempt record')
+        c.identifier(started['operation_id']); c.text(started['change_ref'])
+        require(type(started['generation']) is int and started['generation']>0
+                and isinstance(started['bundle_sha256'],str) and c.HEX.fullmatch(started['bundle_sha256']),
+                'Invalid Terraform attempt identity')
+        c.exact_keys(started['scope'],{'environment_key','site_key','platform','tenant_key','wsd_key','phase'})
+        for value in started['scope'].values(): c.identifier(value)
+        require(expected_scope is None or started['scope']==expected_scope,'Terraform ledger belongs to another scope')
+        identity=digest(encoded({'operation':started['operation_id'],'generation':started['generation']}))
+        require(path.name==identity+'.started.json','Terraform attempt filename differs')
+        completed_path=scope/(identity+'.result.json')
+        require(completed_path.exists(),'Terraform attempt has no completed outcome; reconcile the durable start')
+        completed=load_private(completed_path)
+        c.exact_keys(completed,ATTEMPT_FIELDS|{'completed_at','outputs_sha256'})
+        require(completed['status']=='APPLIED_REQUIRES_NATIVE_ACCEPTANCE'
+                and not c.differences({key:completed[key] for key in ATTEMPT_FIELDS-{'status'}},
+                                      {key:started[key] for key in ATTEMPT_FIELDS-{'status'}}),
+                'Terraform outcome is uncertain or its completion identity changed')
+        require(isinstance(completed['outputs_sha256'],str) and c.HEX.fullmatch(completed['outputs_sha256']),
+                'Terraform output digest required')
+        require(c.timestamp(started['started_at'])<=c.timestamp(completed['completed_at'])<=utcnow(),
+                'Invalid Terraform completion chronology')
+        records[identity]=completed
+    require({p.name for p in scope.glob('*.result.json')}=={key+'.result.json' for key in records},
+            'Orphan Terraform completion evidence requires reconciliation')
+    ordered=sorted(records.values(),key=lambda row:c.timestamp(row['started_at']))
+    for previous,current in zip(ordered,ordered[1:]):
+        require(c.timestamp(previous['completed_at'])<=c.timestamp(current['started_at']),
+                'Overlapping Terraform execution history')
+    if (scope/'head.json').exists():
+        require(ordered and c.digest(load_private(scope/'head.json'))==c.digest(ordered[-1]),
+                'Terraform head differs from the latest complete attempt')
+    else:
+        require(not records,'Terraform completion head is missing; reconcile publication')
+    return records
 
 
 def validate_bundle(operation, approval, binary, root=ROOT):
@@ -45,7 +91,8 @@ def validate_bundle(operation, approval, binary, root=ROOT):
     require(approval['format'] == 'hosting-terraform-approval/1'
             and approval['bundle_sha256'] == digest(bundle_bytes)
             and approval['operation_id'] == bundle['operation_id']
-            and approval['generation'] == bundle['generation'], 'Approval does not match the exact bundle')
+            and type(approval['generation']) is int and type(bundle['generation']) is int
+            and bundle['generation']>0 and approval['generation'] == bundle['generation'], 'Approval does not match the exact bundle')
     require(isinstance(approval['change_ref'], str) and approval['change_ref'].strip(), 'External apply authority required')
     current_window(approval)
     created = datetime.fromisoformat(bundle['created_at'])
@@ -75,11 +122,12 @@ def validate_bundle(operation, approval, binary, root=ROOT):
 
 
 @contextmanager
-def scope_ledger(ledger, backend_address):
+def scope_ledger(ledger, backend_address, expected_scope=None):
     ledger = private_path(ledger, directory=True)
     scope = ledger / digest(backend_address.encode())
     try:
         scope.mkdir(mode=0o700)
+        sync_directory(ledger)
     except FileExistsError:
         private_path(scope, directory=True)
     lock = scope / 'writer.lock'
@@ -87,10 +135,7 @@ def scope_ledger(ledger, backend_address):
     try:
         private_path(lock)
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        if (scope / 'head.json').exists():
-            previous = load_private(scope / 'head.json')
-            require(previous['status'] == 'APPLIED_REQUIRES_NATIVE_ACCEPTANCE',
-                    'Previous native outcome is uncertain; independent reconciliation is required')
+        completed_history(scope,expected_scope)
         yield scope
     finally:
         os.close(fd)
@@ -121,7 +166,7 @@ def apply(args, root=ROOT):
     env = runtime_environment(operation, credentials, bundle['scope']['platform'], directory)
     backend = load_private(operation / 'backend.json')
     identity = digest(encoded({'operation': bundle['operation_id'], 'generation': bundle['generation']}))
-    with scope_ledger(args.ledger, backend['address']) as ledger:
+    with scope_ledger(args.ledger, backend['address'],bundle['scope']) as ledger:
         # Attempt identity survives a copied bundle or a new coordinator process.
         require(not (ledger / (identity + '.started.json')).exists(), 'This operation/generation was already attempted')
         current_window(approval)

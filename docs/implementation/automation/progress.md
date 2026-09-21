@@ -4,6 +4,123 @@
 
 ## Delivered changes
 
+The [OpenStack quota owner](openstack-quotas.md) now applies accepted finite
+project limits through Nova, Cinder and Neutron. It binds current native identity
+and catalog endpoints, retains usage/reservation charges, journals before each
+write and recovers uncertain outcomes through read-only observation. Installed
+quota enforcement, delegated role isolation and physical capacity acceptance
+remain distinct native requirements.
+
+The [edge startup installer](edge-startup.md#resumable-installer) now installs
+accepted permanent denial and the hard network-manager dependency during
+console maintenance. It preserves native ledgers, checks loaded units and
+current denial, and resumes exact interrupted installations without starting
+network management. Real reboot/HA qualification remains an installed-site task.
+
+The continuation after merged PR #46 adds a [retained-VM vSphere power
+executor](vsphere-power.md): one exact native power task, durable intent and task
+identity, retained-device/placement readback, competing-task checks and read-only
+resume. The append-only journal survives controller interruption without a
+second native POST. Local TLS fixtures exercise real request serialization;
+installed-target acceptance and effective native writer exclusion remain external.
+
+The [persistent delivery runner](delivery-runner.md) now connects registered
+Terraform preparation/application, guest preparation/application, native power,
+IPAM/DNS, target campaigns, edge policy and accepted gates. Stage packets bind
+exact predecessor receipt digests; saved owner completion survives a coordinator
+restart without reissuing the owner operation. Current gate renewal preserves
+the original evidence. Native owner ledgers remain shared across graph generations.
+
+The [capacity owner](capacity-reservations.md) adds real transactional reservation,
+confirmation and release, tenant/pool budget enforcement, explicit failure reserve,
+native identity retention, exact previous-receipt approval and versioned envelope
+renewal. Concurrent-controller and interrupted-transaction tests run against SQLite;
+the qualified native capacity budget and cleanup observations remain site inputs.
+
+Receipt-based workload compilation and bootstrap/withdrawal transition preparation
+are now registered delivery stages. Their adapters invoke the actual three-platform
+compiler and lifecycle contracts; fixtures verify retained native identities and
+keep generated workload drafts disabled for exact review.
+
+[Delegated incident containment](incident-containment.md) now withdraws the owned
+edge policy when selected delivery verification fails or its inputs are missing.
+The real-kernel packet experiment proves withdrawal and a read-only retry. The
+restic capture/restore owner is also a delivery stage, retaining exact manifests
+and recovering a completed owner handoff without repeating data operations.
+
+The [remote owner worker](remote-owner-worker.md) connects those host-local edge
+and restic executors to a central delivery graph over pinned certificate SSH.
+It executes only exact privately staged jobs, preserves the owner's ledger and
+returns bounded receipt artifacts. After a lost reply, coordinator recovery can
+only observe the original job. Native source/host privileges and independent
+service acceptance remain owner responsibilities.
+
+Remote incident jobs now let a central failure hook withdraw on the edge host
+despite a held forward workflow. Every request observes current drop rules;
+cached successful containment cannot hide reopened policy. Immutable native
+edge history also prevents completed withdrawal from masking an older unknown
+write before a subsequent activation.
+
+Capacity reservation stages can now derive actual workload demand for all three
+platforms, bind accepted placement and OpenStack flavor/cloud sizing, and check
+the same live allocation before Terraform plan and apply. Decimal MB/GB units
+are explicit and converted conservatively from native byte/GiB/MiB dimensions.
+Interrupted committed capacity actions recover through the authoritative SQLite
+receipt without repeating a mutation.
+
+The [edge startup guard](edge-startup.md) installs all accepted deny-only
+boundaries in one native transaction before managed network attachment. Its
+systemd unit and hard manager dependency do not restore active leases, change
+routes/sysctls or clear native holds. Packet tests cover volatile-policy loss;
+actual reboot/HA and independent recovery still require installed-site evidence.
+
+The [DNS propagation observer](dns-propagation.md) consumes completed primary
+transactions and reads exact ownership generations across accepted secondary and
+recursive views using signed TCP. Delivery recovery can repeat incomplete reads
+or retain a completed observation without replaying UPDATE. Tests exercise stale
+cache values, decaying TTLs, invalid negative answers, view failures and interrupted
+handoffs; actual DNS replication/view acceptance and address reuse remain separate.
+
+The [owner endpoint installer](owner-installation.md) now installs the fixed
+certificate SSH profile as a dedicated systemd service on an accepted Ubuntu
+host. It binds source, account, host/CA keys and binaries; preserves selected
+ledger custody; validates native daemon configuration; and resumes only the
+same installation without replacing changed files or restarting native jobs.
+The real SSH lab consumes the generated profile instead of a separate fixture.
+
+The [worker revocation owner](owner-revocations.md) adds durable, monotonic
+certificate-subject denial with atomic publication and interrupted recovery.
+Repeated installation preserves journaled revocations; unknown identity controls
+remain held. Revocation affects new authentication and never claims to cancel
+existing sessions or fence their native tasks.
+
+The [offline runtime builder](runtime-bootstrap.md) creates a pinned execution
+environment from an exact accepted wheel set and Terraform archive. It performs
+actual isolated installation and dependency checks, seals the complete installed
+tree, verifies completed reuse and preserves incomplete builds without rerunning
+them. Base OS trust, artifact approval and native platform qualification remain
+separate acceptance inputs.
+
+The [GitLab state project owner](state-projects.md) creates one private accepted
+state credential boundary with exact namespace/member/version checks, durable
+creation intent and read-only lost-response recovery. Its native project ID
+feeds the existing scoped backend compiler directly. It never writes state,
+grants membership or retries an uncertain creation; installed state locking,
+backup/recovery and delegated access qualification remain commissioning work.
+
+The [state exporter](state-exports.md) now reads exact accepted GitLab state
+lineages/serials and retained versions into private restic-ready exports. It
+checks all used/unused state slots and repeats native reads without state writes,
+retains interrupted attempts, and verifies completed artifact reuse. Independent
+protection/restore, native fencing and GitLab service recovery remain distinct.
+
+The [scoped SSH issuer](ssh-issuer.md) now signs exact short-lived user
+certificates with a local accepted CA, durable serial reservation, cryptographic
+grant verification and read-only lost-response recovery. Monotonic issuer denial
+prevents renewal and supplies the existing worker revocation handoff. Actual
+OpenSSH tests cover signature/scope changes, unknown attempts and denial; issuer
+custody, endpoint propagation and independent recovery remain explicit boundaries.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

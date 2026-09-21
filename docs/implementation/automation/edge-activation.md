@@ -1,5 +1,9 @@
 # Scoped Linux edge activation and withdrawal
 
+Use the [startup denial guard](edge-startup.md) to establish owned drops before
+the accepted network manager starts. It restores no active leases and preserves
+unresolved owner history; actual reboot and HA qualification remain site tests.
+
 The reference adapter `tools/nft_edge.py` targets a provider-owned Linux/nftables
 IPv4 security edge with already commissioned interfaces and routing. This is an
 adoption path for an explicitly selected edge, not a replacement for Nutanix Flow,
@@ -7,6 +11,11 @@ NSX distributed enforcement or OpenStack provider-owned mandatory policy. The
 tenant must have no administrative access to the edge, its namespace or its native
 attachments. The [architecture activation sequence](../provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
 still governs production exposure.
+
+The [delegated incident handler](incident-containment.md) supplies a separate
+withdrawal-only authority and native drop-rule readback, including automatic
+failure handling for selected delivery stages. It retains the same edge owner
+ledger and does not authorize reactivation.
 
 ## Foundation requirements
 
