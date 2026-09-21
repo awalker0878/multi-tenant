@@ -19,7 +19,11 @@ Do not use Ansible shell commands to compete with Terraform for the same native 
 
 ## Required sequence
 
-The following is the **target implementation**, not a command sequence currently provided by the repository.
+The following is the target delivery sequence. The [persistent delivery
+runner](delivery-runner.md) now executes registered Terraform, guest, power,
+IPAM/DNS, campaign and edge stages with exact dependency receipts and restart
+recovery. Physical commissioning and every selected architectural gate still
+need their own actual inputs and accepted owner procedures.
 
 | Stage | Required execution | Outputs and gate | Failure behavior |
 | --- | --- | --- | --- |

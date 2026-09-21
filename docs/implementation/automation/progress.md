@@ -11,6 +11,13 @@ resume. The append-only journal survives controller interruption without a
 second native POST. Local TLS fixtures exercise real request serialization;
 installed-target acceptance and effective native writer exclusion remain external.
 
+The [persistent delivery runner](delivery-runner.md) now connects registered
+Terraform preparation/application, guest preparation/application, native power,
+IPAM/DNS, target campaigns, edge policy and accepted gates. Stage packets bind
+exact predecessor receipt digests; saved owner completion survives a coordinator
+restart without reissuing the owner operation. Current gate renewal preserves
+the original evidence. Native owner ledgers remain shared across graph generations.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
