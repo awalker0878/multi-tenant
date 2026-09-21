@@ -48,7 +48,9 @@ Design: [SVC §2](../architecture/shared-services/2-name-time-initialization-and
 
 Decisions: [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [ADR-0010](../adr/0010-expose-shared-services-through-scoped-consumption-endpoints.md)
 
-Implementation: [tools/dns_change.py](../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../DNS_LIFECYCLE.md) · [lab/run_dns_lab.py](../../lab/run_dns_lab.py)
+Implementation: [tools/dns_change.py](../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../DNS_LIFECYCLE.md) · [lab/run_dns_lab.py](../../lab/run_dns_lab.py) · [lab/dns_authority.py](../../lab/dns_authority.py)
+
+[lab/dns_authority.py](../../lab/dns_authority.py) is the bounded test-only TCP authority implementing this integration's RFC2136 subset. It parses and authenticates real TSIG wire messages, serializes transactions and evaluates prerequisites before any store swap; its fault switches exist for tests. It is driven by `lab/run_dns_lab.py` and the DNS transaction, propagation, NetBox and withdrawal test modules.
 
 The candidate RFC2136 client and local fixture do not allocate IPAM addresses, qualify a DNS product or prove cache propagation.
 
@@ -58,7 +60,9 @@ Design: [PROV §5](provisioning-strategy/5-concurrency-ownership-and-failed-exec
 
 Decisions: [ADR-0031](../adr/0031-discover-uncertain-native-outcomes-instead-of-blind-replay-or-rollback.md) · [ADR-0032](../adr/0032-keep-incident-containment-above-routine-reconciliation.md)
 
-Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [tools/neutron_observe.py](../../tools/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py)
+Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [tools/neutron_observe.py](../../tools/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
+
+[lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) is the disposable localhost HTTPS fixture behind the native readback observers, not a vendor emulator or a production service. [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py) scripts a small synthetic task tree over that same real loopback HTTPS fixture; its operation names, IDs and API bodies are synthetic.
 
 Selected reads and offline recovery checks do not perform true writer fencing, platform repair or authorization.
 
@@ -68,7 +72,9 @@ Design: [RA §13](../architecture/reference/13-identity-cryptography-and-service
 
 Decisions: [ADR-0029](../adr/0029-keep-recovery-trust-material-independent-of-the-platform-it-unlocks.md) · [ADR-0017](../adr/0017-separate-reference-adoption-technical-qualification-and-authorization.md)
 
-Implementation: [lab/run_namespace_lab.py](../../lab/run_namespace_lab.py) · [lab/mtls_fixture.py](../../lab/mtls_fixture.py)
+Implementation: [lab/run_namespace_lab.py](../../lab/run_namespace_lab.py) · [lab/mtls_fixture.py](../../lab/mtls_fixture.py) · [lab/mtls_scenarios.py](../../lab/mtls_scenarios.py) · [lab/worker.py](../../lab/worker.py)
+
+[lab/worker.py](../../lab/worker.py) is the private worker for the fixed disposable packet fixture, not a management service and not a remotely exposed API; it is started only by `lab/run_namespace_lab.py` inside a fresh network namespace. [lab/mtls_scenarios.py](../../lab/mtls_scenarios.py) is executed after the original 33 packet assertions on that same permitted path.
 
 Local IPv4 mutual-TLS and resource-grant observations do not qualify enterprise PKI, KMS, backup, native IPv6 or vendor HA.
 
@@ -216,7 +222,9 @@ A matching GET-only readback remains observation evidence only. Current reconcil
 
 Design: [Routed IPv6 qualification](../engineering/routed-ipv6-qualification.md) · [Routed IPv6 execution](routed-ipv6-lab.md) · [IPv6 assertion allocation](allocation/ipv6.md)
 
-Implementation: [active native IPv6 assurance index](../../sources/capabilities/native_ipv6_assurance_index.json) · [assurance validator](../../scripts/check_native_ipv6_assurance.py) · [readiness preflight](../../scripts/check_native_ipv6_readiness.py) · [local routed-family evidence](../../sources/implementation/routed_ipv6.json) · [engineering boundary](../engineering/native-ipv6-address-family-assurance.md)
+Implementation: [active native IPv6 assurance index](../../sources/capabilities/native_ipv6_assurance_index.json) · [assurance validator](../../scripts/check_native_ipv6_assurance.py) · [readiness preflight](../../scripts/check_native_ipv6_readiness.py) · [local routed-family evidence](../../sources/implementation/routed_ipv6.json) · [engineering boundary](../engineering/native-ipv6-address-family-assurance.md) · [lab/ipv6_fixture.py](../../lab/ipv6_fixture.py) · [lab/ipv6_worker.py](../../lab/ipv6_worker.py) · [lab/link_config.py](../../lab/link_config.py)
+
+[lab/ipv6_fixture.py](../../lab/ipv6_fixture.py) fixes the WD14 lab policy and accepts no arbitrary inventory or native target input; it is a Linux test instrument, not a supported production security edge. [lab/ipv6_worker.py](../../lab/ipv6_worker.py) is the private pipe worker for that fixed namespace lab, not a remote service. [lab/link_config.py](../../lab/link_config.py) is a small original rtnetlink helper for per-interface IPv4 fixture forwarding that changes no host-global setting and mounts no `/proc`.
 
 Current native qualification requires exact site/service/platform/security-edge family scope, supported addressing/local-protocol behavior, route/security parity, MTU/PMTU, shared-service dependencies, failure/recovery and operational acceptance. IPv6-only requires no hidden IPv4 fallback; dual-stack requires an independent IPv4 campaign. CI performs no native family mutation or service activation.
 

@@ -199,6 +199,19 @@ accepts `--output` like its sibling labs and refuses a path that already holds a
 with `REFUSED_EXISTING_REPORT`, so a second local run no longer ends in a
 `FileExistsError` traceback and a completed report is never overwritten.
 
+The [implementation code map](../../implementation/code-map.md) and the
+[routed IPv6 lab](../../implementation/routed-ipv6-lab.md) now name every supporting
+instrument that the maintained lab procedures execute, so no implementing `lab/` module
+is left unowned by a maintained page: `lab/dns_authority.py` (bounded test-only RFC2136
+authority with real TSIG parsing), `lab/native_readback_fixture.py` and
+`lab/nutanix_task_tree_fixture.py` (disposable localhost HTTPS fixtures),
+`lab/mtls_scenarios.py` and `lab/worker.py` (private fixture workers on the permitted
+namespace path), and `lab/ipv6_fixture.py`, `lab/ipv6_worker.py` and
+`lab/link_config.py` (fixed WD14 IPv6 policy, private pipe worker and per-interface
+rtnetlink helper). Each entry repeats the module's own limit — test instrument, private
+worker, synthetic task tree — so the map cannot be read as claiming a production
+service.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
