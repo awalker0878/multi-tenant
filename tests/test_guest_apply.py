@@ -32,6 +32,82 @@ def successful_child(argv, directory, env, timeout):
 
 
 class GuestExecutionTests(unittest.TestCase):
+    def test_ledger_replays_complete_receipts_and_rejects_damaged_history_without_writes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            args = configured(Path(tmp))
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=successful_child):
+                a.apply(args)
+            scope = load_private(args.bundle/'bundle.json')['scope']
+            ledger = args.ledger/digest(encoded(scope))
+            saved = {p.name: p.read_bytes() for p in ledger.iterdir()}
+            start = next(ledger.glob('*.started.json')); result = next(ledger.glob('*.result.json'))
+            stats = next(ledger.glob('*.stats.json'))
+            self.assertEqual(stats.read_bytes(), (args.bundle/'runtime/stats.json').read_bytes())
+            with a.scope_ledger(args.ledger, scope): pass
+            for fault in ('source', 'change', 'mode', 'scope', 'boolean_generation', 'authority',
+                          'missing_stats', 'altered_stats', 'missing_start', 'renamed_start',
+                          'missing_head', 'head_drift', 'missing_result', 'inverted_time',
+                          'counter_drift', 'target_drift', 'unknown_field', 'status'):
+                for p in ledger.iterdir(): p.unlink()
+                for name, raw in saved.items(): write_new(ledger/name, raw)
+                data = load_private(result)
+                if fault == 'source': data['source_commit'] = 'b'*40
+                elif fault == 'change': data['change_ref'] = 'OTHER-CHANGE'
+                elif fault == 'mode': data['mode'] = 'configure'
+                elif fault == 'scope': data['scope']['tenant_key'] = 'foreign'
+                elif fault == 'authority': data['native_acceptance'] = True
+                elif fault == 'inverted_time': data['completed_at'] = '2000-01-01T00:00:00Z'
+                elif fault == 'counter_drift': data['hosts']['guest-01']['changed'] += 1
+                elif fault == 'target_drift': data['targets'] = ['foreign-guest']
+                elif fault == 'unknown_field': data['replay_authorized'] = True
+                elif fault == 'status': data['status'] = 'CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE'
+                elif fault == 'boolean_generation':
+                    prior = load_private(start); prior['generation'] = True; start.write_bytes(encoded(prior))
+                elif fault == 'missing_stats': stats.unlink()
+                elif fault == 'altered_stats': stats.write_bytes(stats.read_bytes()+b' ')
+                elif fault == 'missing_start': start.unlink()
+                elif fault == 'renamed_start': start.rename(ledger/('0'*64+'.started.json'))
+                elif fault == 'missing_head': (ledger/'head.json').unlink()
+                elif fault == 'head_drift': (ledger/'head.json').write_bytes(encoded({'status': 'CHECK_COMPLETED_REQUIRES_REVIEW'}))
+                elif fault == 'missing_result': result.unlink()
+                if result.exists(): result.write_bytes(encoded(data))
+                before = file_map(args.ledger)
+                with self.subTest(fault=fault), self.assertRaises((ValueError, OSError)):
+                    with a.scope_ledger(args.ledger, scope): self.fail('Damaged ledger was admitted')
+                self.assertEqual(file_map(args.ledger), before)
+
+    def test_completion_rejects_ambiguous_or_unsuccessful_counters(self):
+        now = utcnow(); summary = dict(ok=4, failures=0, unreachable=0, changed=1, skipped=0, rescued=0, ignored=0)
+        original = dict(format='hosting-guest-stats/1', completed_at=now.isoformat(),
+                        hosts={'localhost': summary, 'guest-01': summary.copy()})
+        for fault in ('duplicate', 'float', 'bool', 'negative', 'excess_changed', 'rescued', 'failed', 'missing', 'future', 'empty'):
+            data = deepcopy(original)
+            if fault == 'float': data['hosts']['guest-01']['ok'] = 4.0
+            elif fault == 'bool': data['hosts']['guest-01']['ok'] = True
+            elif fault == 'negative': data['hosts']['guest-01']['changed'] = -1
+            elif fault == 'excess_changed': data['hosts']['guest-01']['changed'] = 5
+            elif fault == 'rescued': data['hosts']['guest-01']['rescued'] = 1
+            elif fault == 'failed': data['hosts']['guest-01']['failures'] = 1
+            elif fault == 'missing': data['hosts'].pop('guest-01')
+            elif fault == 'future': data['completed_at'] = (now+timedelta(seconds=1)).isoformat()
+            raw = encoded(data)
+            if fault == 'duplicate': raw = raw.replace(b'"ok": 4', b'"ok": 0, "ok": 4')
+            with self.subTest(fault=fault), self.assertRaises(ValueError):
+                a.validate_stats(raw, set() if fault == 'empty' else {'guest-01'}, now, now)
+
+    def test_expired_enrollment_after_dispatch_leaves_hold(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            args = configured(Path(tmp), 'configure'); deadline = a.execution_deadline
+            calls = []
+            def end_after_dispatch(access, approval):
+                return utcnow()-timedelta(seconds=1) if calls else deadline(access, approval)
+            def child(*values): successful_child(*values); calls.append(True)
+            with patch.object(g, 'verify', return_value=SOURCE), patch.object(a, 'run_process', side_effect=child), \
+                 patch.object(a, 'execution_deadline', side_effect=end_after_dispatch), self.assertRaises(ValueError):
+                a.apply(args)
+            self.assertEqual(load_private(args.bundle/'result.json')['status'], 'HOLD_RECONCILIATION_REQUIRED')
+            self.assertFalse((args.bundle/'runtime/ssh_key').exists())
+
     def test_real_ansible_uses_pinned_ssh_after_gate_and_records_unreachable_guest(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp); ssh = folder/'ssh-fixture'; calls = folder/'ssh-calls.json'
@@ -70,7 +146,7 @@ class GuestExecutionTests(unittest.TestCase):
                 self.assertEqual(len(list(args.ledger.rglob('*.started.json'))), 1)
 
     def test_altered_inputs_source_runtime_inventory_or_approval_prevent_any_attempt(self):
-        for fault in ('source', 'inventory', 'pins', 'runtime', 'mode', 'approval', 'expiry', 'key', 'budget', 'opt_in'):
+        for fault in ('source', 'inventory', 'pins', 'runtime', 'mode', 'approval', 'approval_generation', 'expiry', 'key', 'budget', 'opt_in'):
             with tempfile.TemporaryDirectory() as tmp:
                 args = configured(Path(tmp)); bad_source = False
                 if fault == 'source': bad_source = True
@@ -82,9 +158,10 @@ class GuestExecutionTests(unittest.TestCase):
                     p = args.bundle/'runtime.json'; data = load_private(p); data['ssh_sha256'] = '0'*64; p.write_bytes(encoded(data))
                 elif fault == 'mode':
                     p = args.bundle/'bundle.json'; data = load_private(p); data['mode'] = 'configure'; p.write_bytes(encoded(data))
-                elif fault in {'approval', 'expiry', 'budget'}:
+                elif fault in {'approval', 'approval_generation', 'expiry', 'budget'}:
                     data = load_private(args.approval)
                     if fault == 'approval': data['bundle_sha256'] = '0'*64
+                    elif fault == 'approval_generation': data['generation'] = True
                     elif fault == 'expiry': data['valid_until'] = (utcnow()-timedelta(seconds=1)).isoformat()
                     else: data['valid_until'] = (utcnow()+timedelta(seconds=20)).isoformat()
                     args.approval.write_bytes(encoded(data))

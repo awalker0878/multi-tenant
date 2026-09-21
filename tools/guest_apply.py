@@ -19,22 +19,27 @@ from tools.neutron_observe import strict_loads
 from tools.run_files import (current_window, digest, encoded, file_map, load_private, private_path,
     read_private, replace_private, require, sync_directory, utcnow, write_new)
 
-SUCCESS = {'CHECK_COMPLETED_REQUIRES_REVIEW', 'CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE'}
 ARTIFACTS = {'outputs.json', 'access.json', 'original-access.json', 'references.json', 'inventory.json',
              'credentials.json', 'runtime.json', 'handoff.json', 'known_hosts', 'ssh_key-cert.pub', 'ansible.cfg'}
+ATTEMPT_FIELDS = {'format', 'status', 'operation_id', 'generation', 'scope', 'mode', 'source_commit',
+                  'bundle_sha256', 'change_ref', 'started_at', 'targets', 'native_acceptance', 'production_activation'}
 
 
 def exact(value, keys):
     require(isinstance(value, dict) and set(value) == set(keys), 'Unexpected guest execution fields')
 
 
-def execution_budget(bundle, access, approval):
-    current_window(approval)
+def execution_deadline(access, approval):
     deadlines = [timestamp(approval['valid_until']), timestamp(access['valid_until'])]
     for target in access['targets'].values():
         backup = target.get('services', {}).get('backup')
         if backup and backup['enabled']: deadlines.append(timestamp(backup['config']['valid_until']))
-    require((min(deadlines) - utcnow()).total_seconds() >= bundle['max_seconds'],
+    return min(deadlines)
+
+
+def execution_budget(bundle, access, approval):
+    current_window(approval)
+    require((execution_deadline(access, approval) - utcnow()).total_seconds() >= bundle['max_seconds'],
             'Insufficient authority, guest access or enrollment lifetime for the entire execution')
     return bundle['max_seconds']
 
@@ -52,7 +57,8 @@ def validate_bundle(directory, approval, root=ROOT):
             and type(bundle['max_seconds']) is int and 30 <= bundle['max_seconds'] <= 3600, 'Invalid execution identity or bound')
     exact(approval, {'format', 'bundle_sha256', 'operation_id', 'generation', 'valid_from', 'valid_until', 'change_ref'})
     require(approval['format'] == 'hosting-guest-approval/1' and approval['bundle_sha256'] == digest(raw)
-            and approval['operation_id'] == bundle['operation_id'] and approval['generation'] == bundle['generation'],
+            and approval['operation_id'] == bundle['operation_id'] and type(approval['generation']) is int
+            and approval['generation'] == bundle['generation'],
             'Authority does not match the exact guest bundle')
     current_window(approval)
     require(0 <= (utcnow() - timestamp(bundle['created_at'])).total_seconds() <= 3600, 'Guest bundle is stale or future-dated')
@@ -104,17 +110,52 @@ def scope_ledger(path, scope):
         private_path(lock); fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
         # An abrupt stop can occur after the immutable start but before head.json.
         # A renamed operation cannot bypass that incomplete write window.
+        records = {}
         for started in directory.glob('*.started.json'):
-            prior = load_private(started); result = started.with_name(started.name.replace('.started.json', '.result.json'))
+            prior = load_private(started)
+            exact(prior, ATTEMPT_FIELDS)
+            require(prior['format'] == 'hosting-guest-attempt/1' and prior['scope'] == scope
+                    and prior['status'] == 'STARTED_OUTCOME_UNKNOWN'
+                    and prior['native_acceptance'] is False and prior['production_activation'] is False,
+                    'Guest attempt scope or authority changed')
+            g.identity(prior['operation_id'])
+            require(isinstance(prior['targets'], list) and prior['targets']
+                    and all(isinstance(name, str) for name in prior['targets'])
+                    and prior['targets'] == sorted(set(prior['targets'])), 'Invalid recorded guest target set')
+            for name in prior['targets']: g.identity(name)
+            require(type(prior['generation']) is int and prior['generation'] > 0
+                    and prior['mode'] in {'check', 'configure'}
+                    and isinstance(prior['source_commit'], str) and g.re.fullmatch(r'[0-9a-f]{40}', prior['source_commit'])
+                    and isinstance(prior['bundle_sha256'], str) and g.re.fullmatch(r'[0-9a-f]{64}', prior['bundle_sha256'])
+                    and isinstance(prior['change_ref'], str) and prior['change_ref'], 'Invalid guest attempt identity')
+            attempt = digest(encoded({k: prior[k] for k in ('operation_id', 'generation')}))
+            require(started.name == attempt+'.started.json', 'Guest attempt filename differs from its identity')
+            result = directory/(attempt+'.result.json')
             require(result.exists(), 'Guest attempt has no completed outcome')
             completed = load_private(result)
-            require(completed.get('status') in SUCCESS and all(completed.get(k) == prior.get(k)
-                    for k in ('format', 'scope', 'operation_id', 'generation', 'bundle_sha256', 'mode', 'started_at')),
+            exact(completed, ATTEMPT_FIELDS | {'completed_at', 'stats_sha256', 'hosts'})
+            expected_status = ('CHECK_COMPLETED_REQUIRES_REVIEW' if prior['mode'] == 'check'
+                               else 'CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE')
+            require(completed['status'] == expected_status
+                    and all(completed[k] == prior[k] for k in ATTEMPT_FIELDS - {'status'})
+                    and completed['native_acceptance'] is False and completed['production_activation'] is False,
                     'Guest attempt is uncertain or has inconsistent records')
+            begin, end = timestamp(prior['started_at']), timestamp(completed['completed_at'])
+            require(begin <= end <= utcnow(), 'Guest attempt completion time is invalid')
+            raw = read_private(directory/(attempt+'.stats.json'))
+            stats_sha, hosts = validate_stats(raw, set(prior['targets']), begin, end)
+            require(stats_sha == completed['stats_sha256'] and hosts == completed['hosts'],
+                    'Guest completion counters differ from retained evidence')
+            records[attempt] = completed
+        require({p.name for p in directory.glob('*.result.json')} == {k+'.result.json' for k in records}
+                and {p.name for p in directory.glob('*.stats.json')} == {k+'.stats.json' for k in records},
+                'Orphan guest completion evidence requires reconciliation')
         if (directory/'head.json').exists():
             previous = load_private(directory/'head.json')
-            require(previous.get('format') == 'hosting-guest-attempt/1' and previous.get('scope') == scope
-                    and previous.get('status') in SUCCESS, 'Previous guest outcome requires independent reconciliation')
+            require(records and previous == max(records.values(), key=lambda row: timestamp(row['completed_at'])),
+                    'Guest ledger head differs from the latest complete attempt')
+        else:
+            require(not records, 'Guest ledger head is missing; reconcile the interrupted publication')
         yield directory
     finally: os.close(descriptor)
 
@@ -141,15 +182,17 @@ def run_process(argv, directory, env, timeout):
             raise
 
 
-def verify_stats(directory, access, started):
-    raw = read_private(directory/'runtime/stats.json'); report = strict_loads(raw)
+def validate_stats(raw, targets, started, completed):
+    report = strict_loads(raw)
     exact(report, {'format', 'completed_at', 'hosts'})
-    require(report['format'] == 'hosting-guest-stats/1' and started <= timestamp(report['completed_at']) <= utcnow(),
+    require(report['format'] == 'hosting-guest-stats/1' and started <= timestamp(report['completed_at']) <= completed,
             'Guest completion counters are stale or missing')
-    exact(report['hosts'], set(access['targets']) | {'localhost'})
+    require(targets and 'localhost' not in targets, 'Guest completion target set is empty or reserved')
+    exact(report['hosts'], set(targets) | {'localhost'})
     for summary in report['hosts'].values():
         exact(summary, {'ok', 'failures', 'unreachable', 'changed', 'skipped', 'rescued', 'ignored'})
         require(all(type(v) is int and v >= 0 for v in summary.values()) and summary['ok'] > 0
+                and summary['changed'] <= summary['ok']
                 and not any(summary[k] for k in ('failures', 'unreachable', 'rescued', 'ignored')),
                 'A guest failed, was skipped entirely or has unresolved results')
     return digest(raw), report['hosts']
@@ -168,6 +211,7 @@ def apply(args, root=ROOT):
             'operation_id': bundle['operation_id'], 'generation': bundle['generation'], 'scope': bundle['scope'],
             'mode': bundle['mode'], 'source_commit': bundle['source_commit'], 'bundle_sha256': approval['bundle_sha256'],
             'change_ref': approval['change_ref'], 'started_at': utcnow().isoformat(),
+            'targets': sorted(access['targets']),
             'native_acceptance': False, 'production_activation': False}
         write_new(ledger/(attempt+'.started.json'), encoded(receipt))
         replace_private(ledger/'head.json', encoded(receipt))
@@ -181,8 +225,10 @@ def apply(args, root=ROOT):
             run_process(command(directory, bundle, runtime), directory, g.runtime_environment(directory),
                         execution_budget(bundle, access, approval))
             current_window(approval)
-            require(timestamp(access['valid_until']) > utcnow(), 'Guest access expired during execution')
-            stats_sha, hosts = verify_stats(directory, access, timestamp(receipt['started_at']))
+            require(execution_deadline(access, approval) > utcnow(), 'Guest access or enrollment expired during execution')
+            stats_raw = read_private(directory/'runtime/stats.json')
+            stats_sha, hosts = validate_stats(stats_raw, set(access['targets']), timestamp(receipt['started_at']), utcnow())
+            write_new(ledger/(attempt+'.stats.json'), stats_raw)
             receipt.update(status='CHECK_COMPLETED_REQUIRES_REVIEW' if bundle['mode'] == 'check'
                            else 'CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE', completed_at=utcnow().isoformat(),
                            stats_sha256=stats_sha, hosts=hosts)
