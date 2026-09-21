@@ -25,7 +25,9 @@ def run(user):
     account=pwd.getpwnam(user)
     if os.geteuid()!=0 or not all((ssh,sshd,keygen)) or account.pw_uid==0:
         raise RuntimeError('Disposable SSH fixture requires root and an existing non-root fixture account')
-    with tempfile.TemporaryDirectory(prefix='hosting-worker-lab-') as tmp:
+    # StrictModes checks every ancestor of AuthorizedPrincipalsFile. A fixture
+    # under world-writable /tmp cannot represent the root-controlled installer.
+    with tempfile.TemporaryDirectory(prefix='hosting-worker-lab-',dir='/var/lib') as tmp:
         base=Path(tmp); base.chmod(0o755)
         owner=base/'owner'; owner.mkdir(mode=0o700)
         spool=owner/'spool'; spool.mkdir(mode=0o700)
@@ -104,7 +106,13 @@ else:
                     try:
                         with socket.create_connection(('127.0.0.1',port),timeout=.2): break
                     except OSError: time.sleep(.1)
-                first=contact(); repeated=contact(observe=True)
+                try:
+                    first=contact(); repeated=contact(observe=True)
+                except ValueError as exc:
+                    # These logs contain only disposable fixture identities.
+                    # Keep native failure diagnostics before temporary cleanup.
+                    errors='\n'.join(path.read_text(errors='replace')[-2000:] for path in sorted(transport.glob('*/ssh.log')))
+                    raise RuntimeError(str(exc)+'\n'+(base/'daemon.log').read_text(errors='replace')[-6000:]+'\n'+errors) from None
                 if first!=repeated or (owner/'captures').read_text()!='1': raise RuntimeError('Owner operation replayed')
                 for value,endpoint in [(wrong,target|{'machine_id':'0'*32}),
                     (job,target|{'host_key':' '.join((base/'ca.pub').read_text().split()[:2])})]:
