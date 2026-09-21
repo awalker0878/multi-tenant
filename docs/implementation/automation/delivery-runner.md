@@ -70,6 +70,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 
 | Kind | Parameters | Mandatory files | Optional files |
 | --- | --- | --- | --- |
+| `remote_owner` | `ssh`, `ssh_sha256` | `job`, `target`, `ssh_key`, `ssh_certificate` | None |
 | `restic` | `action`, `restic`, `restic_sha256`, `target` | `config`, `credentials` | `ca_bundle`; restore also requires `receipt`, `manifest`, `restore_authority` |
 | `capacity` | `action`, `database` | `request`, `authority` | `native_ids` |
 | `acceptance` | `purpose` | `acceptance` | None |
@@ -101,7 +102,9 @@ step ID; their generation matches the delivery. Terraform and other owners keep
 their exact independently approved native operation identities. Files retain
 the schemas documented in each owner's runbook. IPAM and DNS share one native
 allocation ledger. Edge and backup work must execute on their accepted native
-machine; a coordinator does not bypass local machine/namespace checks.
+machine; a coordinator does not bypass local machine/namespace checks. Use the
+[remote owner worker](remote-owner-worker.md) for separately hosted edge and
+restic jobs; its forced command accepts only exact privately staged jobs.
 
 `restic` uses `action: backup` with a null `target`, or `action: restore`
 with a new absolute isolated destination. The backup configuration binds the

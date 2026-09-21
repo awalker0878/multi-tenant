@@ -35,6 +35,13 @@ The real-kernel packet experiment proves withdrawal and a read-only retry. The
 restic capture/restore owner is also a delivery stage, retaining exact manifests
 and recovering a completed owner handoff without repeating data operations.
 
+The [remote owner worker](remote-owner-worker.md) connects those host-local edge
+and restic executors to a central delivery graph over pinned certificate SSH.
+It executes only exact privately staged jobs, preserves the owner's ledger and
+returns bounded receipt artifacts. After a lost reply, coordinator recovery can
+only observe the original job. Native source/host privileges and independent
+service acceptance remain owner responsibilities.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

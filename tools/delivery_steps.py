@@ -11,6 +11,7 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
 # arbitrary module, executable arguments or environment overlay is accepted.
 KINDS = {
+    'remote_owner': ({'ssh','ssh_sha256'}, {'job','target','ssh_key','ssh_certificate'}, set()),
     'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
@@ -57,6 +58,13 @@ def validate_packet(step, packet, plan, base):
             path=Path(values[binary])
             require(path.is_absolute() and path.is_file() and os.access(path,os.X_OK)
                     and digest(path.read_bytes())==values[binary+'_sha256'], 'Delivery executable changed')
+    if kind=='remote_owner':
+        from tools import owner_worker,remote_owner
+        job=load_private(files['job']); owner_worker.validate(job); match_scope(job['scope'],plan)
+        require(job['source_commit']==plan['source_commit'] and job['delivery']=={
+            'plan_sha256':c.digest(plan),'step_id':step['id'],'dependencies':packet['dependencies']},
+            'Remote owner job belongs to another coordinator handoff')
+        remote_owner.validate(load_private(files['target']),job)
     if kind=='restic':
         from tools.restic_run import validate
         config=load_private(files['config']); validate(config); match_scope(config['scope'],plan)
@@ -157,7 +165,9 @@ def child(root, module, arguments, directory, *, timeout):
 def dispatch(step, packet, directory, base, plan, root):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
-    if kind=='restic':
+    if kind=='remote_owner':
+        return remote_dispatch(step,packet,directory,plan)
+    elif kind=='restic':
         from tools.restic_run import execute
         result=execute(values['action'],load_private(files['config']),load_private(files['credentials']),
             values['restic'],directory/'execution',ca_file=files.get('ca_bundle'),
@@ -278,11 +288,28 @@ def retain(path,raw):
     else: write_new(path,raw)
 
 
+def remote_dispatch(step,packet,directory,plan,*,observe=False):
+    from tools import owner_worker,remote_owner
+    files=file_paths(packet); values=packet['parameters']; job=load_private(files['job'])
+    require(digest(Path(values['ssh']).read_bytes())==values['ssh_sha256'],'Remote transport executable changed')
+    result_path=directory/'remote-result.json'
+    if result_path.exists(): result=load_private(result_path)
+    else:
+        result=remote_owner.contact(job,load_private(files['target']),values['ssh'],files['ssh_key'],
+                                   files['ssh_certificate'],directory,observe=observe)
+        write_new(result_path,encoded(result))
+    artifacts=owner_worker.check_result(result,job)
+    for name,raw in artifacts.items(): retain(directory/name,raw)
+    return complete(step,packet,directory,plan,result,['remote-result.json',*artifacts])
+
+
 def recover(step, packet, directory, base, plan, root, *, recovery_authority=None):
     """Only recover durable completion; never rerun an uncertain owner operation."""
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='remote_owner':
+            return remote_dispatch(step,packet,directory,plan,observe=True)
         if kind=='restic':
             files=file_paths(packet); values=packet['parameters']; config=load_private(files['config'])
             match_scope(config['scope'],plan)

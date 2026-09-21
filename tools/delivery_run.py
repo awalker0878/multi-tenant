@@ -126,7 +126,7 @@ def replay(log, plan):
     return starts,receipts,active is None,closed,renewals
 
 
-def run(plan, inbox, ledger, *, execute=False, root=ROOT, containment=None):
+def run(plan, inbox, ledger, *, execute=False, root=ROOT, containment=None, resume_only=False):
     from tools.delivery_steps import dispatch, recover, validate_packet
     from tools import delivery_containment
     validate(plan)
@@ -142,6 +142,7 @@ def run(plan, inbox, ledger, *, execute=False, root=ROOT, containment=None):
     # Stable resource scope prevents a renamed workflow from evading uncertainty.
     with journal.locked(ledger, {'owner':'delivery', **plan['scope']}) as log, delivery_containment.guard(containment,plan,context,root):
         starts, receipts, new, closed, renewals = replay(log, plan)
+        require(not resume_only or not new,'Observation cannot start a delivery')
         if new:
             log.append('DELIVERY_STARTED', {'plan':plan})
         base=log.directory/'runs'/c.digest(plan)
@@ -176,6 +177,7 @@ def run(plan, inbox, ledger, *, execute=False, root=ROOT, containment=None):
                 result, names = recover(step, saved, directory, base, plan, root,
                                         recovery_authority=recovery_authority if recovery_authority.exists() else None)
             else:
+                require(not resume_only,'Observation cannot start a new owner operation')
                 incoming = inbox / (identity + '.json')
                 if not incoming.exists():
                     waiting='WAITING_STAGE_INPUTS'

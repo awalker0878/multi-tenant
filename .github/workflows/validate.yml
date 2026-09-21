@@ -154,6 +154,8 @@ jobs:
         run: sudo "$(command -v python)" lab/run_nft_edge_lab.py
       - name: Exercise fixed guest probes with real certificate SSH and TLS
         run: sudo "$(command -v python)" lab/run_target_probe_lab.py --user "$(id -un)"
+      - name: Execute a staged owner job through a real forced-command SSH worker
+        run: sudo "$(command -v python)" lab/run_owner_worker_lab.py --user "$(id -un)"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -164,6 +166,7 @@ jobs:
             build/reports/restic_recovery_lab.json
             build/reports/nft_edge_lab.json
             build/reports/target_probe_lab.json
+            build/reports/owner_worker_lab.json
           retention-days: 14
           if-no-files-found: warn
   terraform:
