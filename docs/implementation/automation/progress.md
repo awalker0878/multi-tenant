@@ -95,6 +95,12 @@ feeds the existing scoped backend compiler directly. It never writes state,
 grants membership or retries an uncertain creation; installed state locking,
 backup/recovery and delegated access qualification remain commissioning work.
 
+The [state exporter](state-exports.md) now reads exact accepted GitLab state
+lineages/serials and retained versions into private restic-ready exports. It
+checks all used/unused state slots and repeats native reads without state writes,
+retains interrupted attempts, and verifies completed artifact reuse. Independent
+protection/restore, native fencing and GitLab service recovery remain distinct.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

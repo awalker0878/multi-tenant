@@ -120,6 +120,9 @@ of its complete history. Retain independent custody. Administrative correction
 of a held project's settings requires its own accepted operation; observation
 can then verify the same retained project without another creation.
 
+Use the [private state exporter](state-exports.md) to hand accepted versioned
+state copies to the independent restic protection owner without uploading state.
+
 Before state use, commission actual runner access, cross-project denial,
 concurrent Terraform locks, encryption, version retention and independently
 recoverable GitLab database/object-store/encryption secrets. These are separate

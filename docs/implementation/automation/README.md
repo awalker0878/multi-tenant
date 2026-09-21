@@ -39,6 +39,7 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Required delivery process](delivery-process.md) | How Terraform, Ansible, supported installers and service-owner tools must work together from bootstrap through retirement |
 | [Completion backlog](completion-backlog.md) | Prioritized work packages, dependencies, proposed owner roles, deliverables and closure criteria |
 | [Acceptance and release gates](acceptance.md) | Tests and evidence required before calling each environment complete |
+| [Private state export](state-exports.md) | Exact lineage/serial capture and independent protection handoff |
 | [GitLab state project bootstrap](state-projects.md) | Private native project creation, exact backend handoffs and interrupted recovery |
 | [Offline runtime bootstrap](runtime-bootstrap.md) | Exact artifact builds, installed dependency verification and retained runtime custody |
 | [Repository release controls](release-controls.md) | Proposed required reviews/checks, administrator prerequisites and release sequence |
