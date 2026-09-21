@@ -39,7 +39,8 @@ class Host(d.Host):
                 prefix='/opt/python',base_prefix='/opt/python',stdlib='/opt/python/lib/python3.13'))
         if 'venv' in args:
             env=Path(args[-1]); (env/'bin').mkdir(parents=True); (env/'bin/python').write_bytes(b'PYTHON')
-            (env/'bin/python').chmod(0o700); (env/'lib').mkdir(); (env/'lib64').symlink_to('lib')
+            # Accepted base copies can retain a group-writable source mode.
+            (env/'bin/python').chmod(0o775); (env/'lib').mkdir(); (env/'lib64').symlink_to('lib')
             (env/'pyvenv.cfg').write_text('include-system-site-packages = false\n'); return ''
         if d.PACKAGES_CODE in args:
             return json.dumps(dict(packages={x['name']:x['version'] for x in self.config['wheels']}|self.extra,
@@ -74,6 +75,8 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(d.ENV['PIP_CONFIG_FILE'],'/dev/null')
         self.assertNotIn('PYTHONPATH',d.ENV); self.assertIn('env/lib64',receipt['files'])
         self.assertEqual(receipt['files']['bin/terraform']['mode'],0o700)
+        self.assertEqual(receipt['files']['env/bin/python']['mode'],0o700)
+        self.assertEqual(receipt['files']['env/pyvenv.cfg']['mode'],0o600)
 
     def test_interrupted_install_never_repeats_or_deletes_partial_runtime(self):
         self.host.fail='install'
@@ -178,4 +181,5 @@ class RuntimeTests(unittest.TestCase):
              patch.object(d.subprocess,'run',return_value=result) as command:
             d.Host().command(['/accepted/python','-I'],self.base)
         env=command.call_args.kwargs['env']
+        self.assertEqual(command.call_args.kwargs['umask'],0o077)
         self.assertEqual(env,d.ENV); self.assertNotIn('PIP_TARGET',env); self.assertNotIn('https_proxy',env)

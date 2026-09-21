@@ -160,7 +160,7 @@ def artifacts(config):
 class Host:
     def command(self, argv, cwd):
         result=subprocess.run(list(map(str,argv)),cwd=cwd,env=ENV.copy(),stdin=subprocess.DEVNULL,
-            stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=300)
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=300,umask=0o077)
         require(result.returncode==0 and len(result.stdout)<=2*1024*1024,
                 'Runtime command failed; retain the incomplete output and use a new accepted destination')
         return result.stdout.decode()
@@ -178,6 +178,19 @@ class Host:
             info=item.stat()
             require(info.st_uid in {0,os.getuid()} and not stat.S_IMODE(info.st_mode)&0o022,
                     'Base Python location must remain custodian-controlled')
+
+
+def seal_permissions(directory):
+    """Only a newly built private tree; never repair completed runtime modes."""
+    for path in sorted(directory.rglob('*')):
+        name=path.relative_to(directory).as_posix(); info=path.lstat()
+        require(info.st_uid==os.getuid(), 'New runtime custody differs')
+        if path.is_symlink():
+            require(name=='env/lib64' and os.readlink(path)=='lib', 'Unexpected runtime symlink')
+            continue
+        require(stat.S_ISDIR(info.st_mode) or (stat.S_ISREG(info.st_mode) and info.st_nlink==1),
+                'Unexpected runtime file type or hard link')
+        os.chmod(path,stat.S_IMODE(info.st_mode)&0o700,follow_symlinks=False)
 
 
 def tree(directory):
@@ -257,7 +270,7 @@ def build(config, authority, *, host=None, root=ROOT, observe=False):
         require(terraform_version['terraform_version']==config['terraform']['version']
                 and terraform_version['platform']=='linux_amd64', 'Terraform version or platform differs')
         host.identity(config,root); authorize(config,authority)
-        files=tree(output)
+        seal_permissions(output); files=tree(output)
         # Flush every published file/directory before publishing the completion.
         for name,record in files.items():
             path=output/name

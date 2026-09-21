@@ -35,7 +35,7 @@ class EngineHost(d.Host):
     def command(self,argv,cwd):
         self.commands+=1
         result=subprocess.run(list(map(str,['/usr/bin/unshare','--net','--',*argv])),cwd=cwd,
-            env=d.ENV.copy(),stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=300)
+            env=d.ENV.copy(),stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=300,umask=0o077)
         if result.returncode:
             # These are solely disposable public package fixtures, with no native
             # credentials. Preserve engine diagnostics for CI without retrying.

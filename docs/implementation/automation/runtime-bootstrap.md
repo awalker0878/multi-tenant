@@ -72,6 +72,11 @@ The actual `pip check` and complete installed-distribution comparison reject
 missing/conflicting dependencies and unexpected packages. Terraform's extracted
 bytes, reported version and platform must all match.
 
+Runtime subprocesses use a private umask. Before initial completion, the builder
+removes group/other permissions from its newly created regular files and
+directories, including executable modes copied from the accepted base. It never
+repairs permissions on an already completed runtime.
+
 The builder compiles and seals ordinary hash-checked Python bytecode alongside
 all installed files, modes and directories. Only the venv's internal `lib64`
 alias is permitted. Normal imports preserve this seal; custom optimized Python
