@@ -194,6 +194,11 @@ without POSIX modes cannot report, and the executed case records `output_mode` a
 `posix_mode_bits_enforced` alongside its result. The Linux campaign and its CI check
 are unchanged.
 
+The [task-tree campaign](../../implementation/nutanix-task-tree-readback.md) now
+accepts `--output` like its sibling labs and refuses a path that already holds a report
+with `REFUSED_EXISTING_REPORT`, so a second local run no longer ends in a
+`FileExistsError` traceback and a completed report is never overwritten.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

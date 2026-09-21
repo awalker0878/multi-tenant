@@ -93,8 +93,13 @@ scripted; external fencing/quarantine records are deliberately simulated.
 
 The CLI campaign writes a NEW private `build/reports/local_task_tree_readback.json`
 with exact implementation hashes and per-case requests, task/resource witnesses and
-recovery results. It includes successful and expected-hold cases; a case passes only
-when both observed readback and recovery disposition equal its declared expectations.
+recovery results. `--output` selects another path; a path that already holds a report
+is refused with `REFUSED_EXISTING_REPORT` instead of being overwritten, because a
+completed campaign report is retained evidence. The executed-CLI case records its
+`output_mode` and whether the host enforces POSIX mode bits, so the `0o600` private
+journal control is asserted only where the platform can report it. It includes
+successful and expected-hold cases; a case passes only when both observed readback and
+recovery disposition equal its declared expectations.
 No raw native diagnostic text or fixture credentials are exported. The full repository
 unit suite reruns its overlapping cases separately; counts are not additive native
 acceptance coverage.

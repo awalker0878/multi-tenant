@@ -122,9 +122,20 @@ def campaign() -> list[dict]:
     return rows
 
 
+def refuse(output: Path) -> int:
+    """A previous campaign report is retained evidence and is never overwritten."""
+    print(json.dumps({'kind':'LOCAL_NUTANIX_TASK_TREE_CAMPAIGN','status':'REFUSED_EXISTING_REPORT',
+        'report':str(output),'may_activate':False,
+        'reason':'An existing campaign report is retained evidence; pass --output to keep it'},indent=2))
+    return 2
+
+
 def main() -> int:
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--execute',action='store_true');a=p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--execute',action='store_true')
+    p.add_argument('--output',type=Path,default=ROOT/'build/reports/local_task_tree_readback.json')
+    a=p.parse_args()
     if not a.execute:p.error('Explicit --execute runs only the fixed disposable loopback fixture')
+    if a.output.exists():return refuse(a.output)
     begun=c.now();rows=campaign();failed=sum(x['status']!='PASS' for x in rows)
     report={'kind':'LOCAL_NUTANIX_TASK_TREE_CAMPAIGN','status':'PASSED_LOCAL_HTTPS_ONLY' if not failed else 'FAILED_LOCAL_CAMPAIGN',
         'started_at':begun,'completed_at':c.now(),'passed':len(rows)-failed,'failed':failed,'cases':rows,
@@ -134,7 +145,10 @@ def main() -> int:
                  'Parent/child fixture tests are not actual native composite operation proof',
                  'Writer fencing, quarantine records and change authority are simulated outside-control inputs',
                  'Only complete explicitly enumerated small trees; batch/partial/unlisted tasks remain unsupported']}
-    out=ROOT/'build/reports/local_task_tree_readback.json';out.parent.mkdir(parents=True,exist_ok=True)
-    with c.PrivateJournal(out) as journal:journal.write(report)
+    a.output.parent.mkdir(parents=True,exist_ok=True)
+    try:
+        with c.PrivateJournal(a.output) as journal:journal.write(report)
+    except FileExistsError:
+        return refuse(a.output)
     print(json.dumps({k:v for k,v in report.items() if k!='cases'},indent=2));return 2 if failed else 0
 if __name__=='__main__':raise SystemExit(main())
