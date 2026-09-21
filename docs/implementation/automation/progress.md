@@ -88,6 +88,13 @@ tree, verifies completed reuse and preserves incomplete builds without rerunning
 them. Base OS trust, artifact approval and native platform qualification remain
 separate acceptance inputs.
 
+The [GitLab state project owner](state-projects.md) creates one private accepted
+state credential boundary with exact namespace/member/version checks, durable
+creation intent and read-only lost-response recovery. Its native project ID
+feeds the existing scoped backend compiler directly. It never writes state,
+grants membership or retries an uncertain creation; installed state locking,
+backup/recovery and delegated access qualification remain commissioning work.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

@@ -33,6 +33,11 @@ project and retain GitLab encryption secrets, database and object storage throug
 the independently tested service backup. Restoring an old state is not a native
 resource rollback.
 
+The [state project owner](state-projects.md) creates a dedicated private project
+in an existing accepted namespace and supplies its observed native ID directly
+to the backend compiler. It checks actual project restrictions and inherited
+membership, preserves uncertain creation and never writes a state file.
+
 `tools/state_backend.py` compiles `backend.json` consumed by the
 [reviewed executor](terraform-execution.md). It takes `--origin`, `--project-id`,
 `--environment-key`, `--site-key`, `--platform`, `--tenant-key`, `--wsd-key`,
