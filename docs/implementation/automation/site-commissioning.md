@@ -84,7 +84,7 @@ guards. Neither creates a site inventory or establishes effective native policy.
 
 | Platform | Implemented control | Required before a live campaign |
 | --- | --- | --- |
-| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in v5, selected NSX portgroup/segment associations in v6 and port occupants in v7 | Qualify the installed attachment profile, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
+| VMware/NSX | Segment ON plus exact IPv4 TCP/UDP exceptions before mandatory dual-family drop; withdrawal returns OFF plus sole drop; vSphere VM/task readback in v5, selected NSX portgroup/segment associations in v6, port occupants in v7 and input/output-bound complete owned-domain intent in v8 | Qualify the installed domain/attachment profiles, image initialization, DFW priority/membership/exclusions, all enforcement points and same-host paths; actual task/placement/storage evidence and operation-wide fenced reconciliation |
 | Nutanix | Existing VM ON/NIC connected, or OFF/disconnected with disks retained; exact owned Flow service exceptions/withdrawal; AHV/network/Flow readback in campaign v4 | Accepted native Flow semantics/precedence and project/category/placement/storage, image initialization and actual network/VM/Flow task evidence; native withdrawal and recovery qualification |
 
 Keep VMware domain and workload state ownership separate. The pinned vSphere

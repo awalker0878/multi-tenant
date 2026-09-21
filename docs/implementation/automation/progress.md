@@ -458,6 +458,44 @@ live HA/security/application recovery require actual assets, scoped access and
 accepted owner mechanisms. No live infrastructure or native acceptance index was
 changed; the overall production-readiness milestone remains open.
 
+## Complete owned-domain campaign integration increment
+
+[Campaign v8](target-qualification.md#campaign-v8-bind-full-domain-intent) now
+combines the strict NSX domain observer with realized-switch evidence, native
+vCenter port attachments, the selected VM/task profile and existing guest probes.
+Private domain inputs and original outputs bind every owned Tier-1, segment,
+group and policy to the requested scope, allocation, gateway, transport zone,
+lifecycle stage and exact service intent before contact. Foreign or partial
+coverage, widened selectors and changed services cannot pass through matching
+network identities.
+
+Every phase retains five reports: combined NSX evidence, ports, VM/task evidence,
+ports again and NSX again. Both phases surround the guest traffic checks. The
+runner replays each child's manifest, scope, content hash, witnesses and stability
+summary and refuses stale or reused evidence. Logical-switch reports now retain
+both selected reads and alarm verdicts for offline replay; older reports without
+those witnesses need recollection. The selected VM profile keeps its own task
+coverage limits, including clone source/destination activity where requested.
+
+Scripted real-TLS tests exercise the complete child sequence, separate native
+credential origins, five-report phase digests, private output/key cleanup,
+unsupported native policy before traffic, policy changes after traffic, report
+tampering/reuse and extra clone-source activity. Unit tests cover both domain
+lifecycle stages, wrong inputs/outputs and shared ownership. The disabled example
+and commissioning runbooks preserve independent acceptance requirements. Fixture
+responses and controlled guest probe results do not qualify a native platform.
+
+Local verification passed 1,811 Python/source tests without skips and all 80
+route/model checks. Repository/documentation checks have no issues. Terraform,
+provider, Ansible and packet-laboratory results belong to the final published
+revision's hosted checks; the local regression command does not run those engines.
+
+Actual site inventory, installed API behavior and scoped access remain absent.
+Native fencing, broader operation reconciliation, effective DFW enforcement and
+live HA/security/application recovery remain open. No live infrastructure or
+qualification index was changed; this integration does not enable vSphere power
+control or make the deployment production-ready.
+
 ## Package disposition and next concrete work
 
 “Partial” credits delivered code or retained functionality, not operational acceptance. “Blocked” identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
@@ -479,11 +517,11 @@ changed; the overall production-readiness milestone remains open.
 | W13 | Partial Linux configuration | Hostname/time/kernel, SSH certificates, resolver, bounded logging and the OpenStack config-drive bootstrap prerequisite exist. Deliver actual trusted images, full adopted hardening, patch/reboot/resume and other offered OS profiles; run native convergence. |
 | W14 | Partial selected service enrollment | SSH CA/principals/revocation, TLS log transport and restic schedule/withdrawal exist. Integrate actual issuing/KMS, monitoring, collector acceptance, package and storage services; exercise renewal/revocation and independent restore. |
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
-| W16 | Partial workload/domain readback | OpenStack observations are bound in campaign v2; AHV snapshot, recorded VM/task graph or visible VM activity plus network evidence in v3/v4; explicit Flow snapshot or policy/task/activity evidence in v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5; selected member-to-portgroup-to-segment associations in v6 and exact port occupants/cookies/host/runtime in v7. The separate NSX domain profile observes four owned objects and replayable configuration/realization evidence for held review. Qualify installed APIs, query/count semantics, history/activity, realized entities and port visibility; complete remaining task/entity/Flow coverage, effective DFW membership and unsupported network realizations. Do not infer task completion from snapshots or Terraform success. |
+| W16 | Partial workload/domain readback | OpenStack observations are bound in campaign v2; AHV snapshot, recorded VM/task graph or visible VM activity plus network evidence in v3/v4; explicit Flow snapshot or policy/task/activity evidence in v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5; selected member-to-portgroup-to-segment associations in v6 and exact port occupants/cookies/host/runtime in v7. Campaign v8 binds all four owned NSX domain objects to original inputs/outputs and replays combined domain/switch, port and VM evidence around guest probes. The separate NSX domain profile retains held-plan review. Qualify installed APIs, query/count semantics, history/activity, realized entities and port visibility; complete remaining task/entity/Flow coverage, effective DFW membership and unsupported network realizations. Do not infer task completion from snapshots or Terraform success. |
 | W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded AHV and Flow recorded-task/activity review, bounded vSphere child history, visible existing-VM and clone source/destination activity, and held-attempt plan bindings for supported vSphere configuration/devices/native port attachments, AHV power/NIC lifecycle, Flow service transitions and NSX domain connectivity/service transitions are implemented. NSX review binds all four prior domain objects and retains strict shape/realization limits. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Review preserves all ledger holds. Serial Ansible and Terraform state locks do not fence native tasks. |
 | W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
-| W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector in restricted campaigns for all three exact installed tuples, complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
+| W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector, including v8's complete owned VMware domain intent and attachment binding, in restricted campaigns for all three exact installed tuples. Complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
 | W21 | Operational integration open | Connect scheduled drift/health/capacity checks to selected observers and alerting, classify emergency/security/unknown drift, and exercise owned incident containment/release. Guest convergence is not a platform drift service. |
 | W22 | Lifecycle implementation open | Add accepted resize/scale/growth, image refresh, patch/reboot, provider/platform/collection upgrades, rotation and replacement workflows with actual maintenance budgets and requalification rules. |
 | W23 | Partial restic capture/restore | Encrypted scoped file capture, confined scheduling and isolated byte verification are implemented and locally exercised. Provision append-only protection, independent retention/keys, catalogues and application-consistent exports; measure native application RPO/RTO. |
