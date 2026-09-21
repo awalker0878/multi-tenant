@@ -28,6 +28,7 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Reference service decisions](reference-realization.md) | OpenStack-first internal IPv4 qualification path, GitLab state and concrete service products |
 | [NetBox IPAM](netbox-ipam.md) | Scoped reserve/confirm/retire operations, conditional writes and lost-response holds |
 | [Native guest configuration](native-guests.md) | Bound SSH inventory, candidate Linux roles and native acceptance limits |
+| [Reviewed guest execution](guest-execution.md) | Sealed source/runtime/identity/service inputs, exact Ansible execution and durable interruption holds |
 | [Guest service profile](guest-services.md) | SSH certificates, resolver ownership, TLS logging and backup enrollment |
 | [Encrypted capture and restore](restic-recovery.md) | Real restic exports, independent restore authority and recovered-byte checks |
 | [Edge activation and withdrawal](edge-activation.md) | Scoped nftables policy, expiring allows and established-session withdrawal |

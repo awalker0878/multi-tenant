@@ -316,6 +316,33 @@ semantics, native fences, HA or application recovery. Collect actual allowed and
 denied traffic, correlate enforcement evidence and obtain independent acceptance.
 The campaign cannot release a held attempt or update a qualification index.
 
+## Reviewed guest execution commissioning
+
+Use the [guest execution runbook](guest-execution.md) after the workload identity
+and restricted bootstrap paths are accepted. Qualify the actual protected runner,
+shared ledger storage, native Ubuntu image and scoped certificate/sudo rights.
+The repository's non-networking SSH fixture establishes controller dispatch and
+hold behavior; it does not establish native success or convergence.
+
+| Native case | Required observation or hold |
+| --- | --- |
+| Exact check bundle followed by a separately approved configure bundle | Both bind the original workload IDs, accepted machine IDs/host keys, selected services and their own mode authority |
+| Real second configuration with a new operation/generation | Guest files and services converge; inspect changes and independently accept native state |
+| Wrong machine ID, host key, user principal or certificate trust | Stop before guest changes; retain private denial evidence |
+| Missing sudo, package, Python, time, resolver or service path | Preserve containment and a held attempt; never broaden access automatically |
+| Credential/trust/runtime/source changes after preparation | Refuse changed bytes before SSH contact |
+| Controller timeout, forced stop or dropped SSH response | Preserve the durable hold; inspect remote late effects and recover through independent access |
+| Partial/missing counters or receipt/head corruption | Block all new operations in the scope without repairing history automatically |
+| Concurrent controllers and storage outage/crash | Demonstrate actual lock exclusion and durable start/result/head ordering on the selected ledger storage |
+| Reuse of operation/generation from a renamed bundle | Refuse before guest contact, including after a successful prior result |
+| Guest access or enabled enrollment expires before completion | Hold despite a successful controller exit; preserve counters and native state |
+| Revocation, collector outage or restore failure after configuration | No native acceptance or activation until the relevant owner accepts new evidence |
+
+Preserve native results privately with the source/bundle/operation, actual runtime
+and target identities. Accept useful-data restore, collector receipt, certificate
+revocation and restricted-path tests separately. A controller completion receipt
+cannot close W04/W13/W14/W18 or release an interrupted operation by itself.
+
 ## NSX domain lifecycle and recovery qualification
 
 Qualify the explicit [NSX domain profile](nsx-domain-readback.md) against the

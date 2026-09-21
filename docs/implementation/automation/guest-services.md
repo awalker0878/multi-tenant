@@ -55,6 +55,13 @@ relax the platform edge. Ansible check mode predicts changes without reconnectin
 or emitting the marker. Native first-run/idempotence, certificate expiry/revocation,
 collector loss/queue recovery and resolver failover remain target tests.
 
+The [reviewed guest executor](guest-execution.md) snapshots and rebinds the exact
+TLS/restic controller files into a private bundle and verifies them again before
+running this profile. It binds check/configure mode and runtime, records attempts
+before contact and holds uncertain outcomes. Original service files can no longer
+change the sealed payload after preparation; this does not issue service
+credentials or establish collector/protection acceptance.
+
 `lab/run_guest_services_lab.py --require-engines` renders the actual templates and
 checks effective ordinary/recovery SSH settings plus rsyslog syntax using real
 installed daemons. It starts no daemon and changes no host configuration. This

@@ -80,3 +80,10 @@ preparation/application, exact source/input/backend/credential binding, durable
 attempt records and domain-to-workload-to-inventory handoffs. It operates on one
 owned WSD phase at a time. It does not implement the selected service APIs,
 cross-writer native fencing, production connectivity or an unattended scheduler.
+
+The [reviewed guest execution path](guest-execution.md) now consumes successful
+workload receipts or accepted raw outputs, creates private source/runtime/service
+snapshots, and runs the fixed native Ansible profile under exact mode authority.
+Durable guest attempts hold interruptions and prevent blind replay. This completes
+the operator command for that guest stage; it does not orchestrate every service
+owner or replace native commissioning and cross-writer controls.

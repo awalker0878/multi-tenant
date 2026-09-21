@@ -17,7 +17,7 @@ unreachable or untrusted first connection.
 For VMware and Nutanix, the [restricted lifecycle controls](platform-lifecycle.md)
 now supply NSX domain service exceptions and AHV power/NIC changes. They do not
 initialize the guest or prove a usable service path. Nutanix's owned Flow policy
-still needs service-rule lifecycle integration; vSphere power is computed in the
+supports exact service-rule bootstrap/withdrawal; vSphere power is computed in the
 pinned provider. Accept actual image/address/certificate initialization and native
 enforcement first. [AHV snapshots](nutanix-vm-readback.md) supplement this handoff;
 they do not establish guest readiness or native task completion.
@@ -51,6 +51,13 @@ ansible-playbook -i /private/operator/new-guest-run/inventory.json \
 Run the same approved command without `--check` to configure the accepted target. The parent output directory must exist; the builder creates a new 0700 directory and 0600 inventory/known-hosts files and refuses overwrite. Use the pinned `requirements-dev.txt` toolchain and scoped SSH-agent credentials. Ansible's [SSH connection](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/ssh_connection.html) uses explicit host-key checking, batch mode and the generated key file. Do not override connection parameters, skip guard tasks, or treat this playbook as a sandbox for untrusted operators.
 
 ## Execution and recovery behavior
+
+Use the [reviewed guest executor](guest-execution.md) for source-bound preparation,
+separate check/configure approval, isolated controller settings and durable
+per-scope attempts. It reconstructs the inventory, snapshots service assets and
+executes this same playbook. Successful workload receipts can be supplied directly;
+no manual copying of native output IDs or assembly of Ansible overrides is needed.
+Native file ownership, bootstrap paths and independent recovery remain required.
 
 The first play validates the entire inventory locally before SSH, including output identity, target set, expiry, host keys and disallowed connection overrides. The native play requires that gate even if `--limit` skipped localhost. It checks expiry again per host, reads `/etc/machine-id` without escalation, then checks the OS. Guests run serially; any failed check stops the invocation. Privilege escalation is scoped to owned configuration and time verification.
 

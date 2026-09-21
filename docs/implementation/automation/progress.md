@@ -1,6 +1,6 @@
 # Automation implementation progress
 
-**Updated:** 2026-09-20. **Release status:** incomplete; no native platform is qualified by this change. The former `docs/1.0` material is now maintained under engineering, implementation and assurance. The [baseline audit](../../assurance/automation-baseline-audit.md) and its evidence remain historical. Every W01–W29 acceptance package is still open under its [original closure criteria](completion-backlog.md).
+**Updated:** 2026-09-21. **Release status:** incomplete; no native platform is qualified by this change. The former `docs/1.0` material is now maintained under engineering, implementation and assurance. The [baseline audit](../../assurance/automation-baseline-audit.md) and its evidence remain historical. Every W01–W29 acceptance package is still open under its [original closure criteria](completion-backlog.md).
 
 ## Delivered changes
 
@@ -496,6 +496,34 @@ live HA/security/application recovery remain open. No live infrastructure or
 qualification index was changed; this integration does not enable vSphere power
 control or make the deployment production-ready.
 
+## Reviewed guest execution completion
+
+The [guest execution runbook](guest-execution.md) now supplies the missing
+operator command between accepted workload outputs and the selected native
+Ansible profile. Reference decisions select the pinned Ubuntu/Ansible runtime,
+certificate-only SSH, private service snapshots, serial fixed playbook and
+separate exact approvals for check and configuration.
+
+Preparation binds source, runtime, workload/access identities, service assets
+and external handoff references without guest contact. Execution records its
+immutable attempt before dispatch; interruption, failed or incomplete counters,
+expired enrollment and contradictory history retain a scope-wide hold. Completion
+records retain the original target set and exact callback counters, and later
+operations replay the full receipt against those witnesses. No ledger repair or
+replay command is supplied. Older incomplete histories require independent
+reconciliation rather than automatic migration.
+
+The real pinned Ansible controller reaches the reviewed SSH executable only after
+the inventory gate. Its non-networking SSH fixture fails deliberately to verify
+durable uncertainty and credential cleanup. Other completion/tamper cases use
+controlled process results. Native first/second-run convergence, sudo and image
+behavior, service receipt, remote late effects, ledger durability and recovery
+remain explicit [commissioning cases](site-commissioning.md#reviewed-guest-execution-commissioning).
+
+This increment advances W04/W13/W14/W18/W26 without closing their native
+acceptance criteria. It does not install a runner, contact an actual site,
+populate accepted qualification indexes or establish cross-writer fencing.
+
 ## Package disposition and next concrete work
 
 “Partial” credits delivered code or retained functionality, not operational acceptance. “Blocked” identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
@@ -505,7 +533,7 @@ control or make the deployment production-ready.
 | W01 | Partial | Replace symbolic environment/cluster examples with actual supported site/cell/platform/API/hardware/licence tuples, image/service offers, owners and first qualification target. Confirm physical mappings and co-residency policy. |
 | W02 | Blocked on runner/trust services | Build the selected recoverable native runner, private stores, artifact trust, credential injection/rotation and independent name/time/identity recovery. CI pins alone do not supply P0. |
 | W03 | Partial GitLab integration | Scope-specific backend/lock configuration is implemented. Provision the actual GitLab projects, enforce access separation/encryption/versioning, and demonstrate concurrency and independent state restore. |
-| W04 | Partial | Core-pinned Linux SSH inventory/profile and guard tests exist. Build the selected execution image, scoped credentials and privileges; prove native convergence/check mode and implement Windows/other offered connection profiles. |
+| W04 | Partial execution path delivered | Source/runtime-bound private Ansible bundles, fixed certificate-only SSH, exact-mode authority and durable completion replay are implemented. Build the accepted execution image, scoped credentials and privileges; prove native convergence/check mode and implement other offered connection profiles. |
 | W05 | Blocked on hardware/fabric selection | Implement actual OOB, firmware, port/underlay/VLAN/VNI/VRF/MTU/HA attachment operations using the selected supported device interfaces; qualify failure and configuration recovery. |
 | W06 | Blocked on installed tuples/installers | Select supported Nutanix, VMware/NSX and OpenStack installer/adoption tracks; implement their real inputs, observed readiness and interrupted-install reconciliation. No generic installer stub substitutes for this. |
 | W07 | Blocked on service/storage selections | Commission images/templates, entitled pools, storage classes, resolver/time, artifacts, telemetry, identity/PKI and protection consumers; verify bootstrap-to-steady-state transfer. |
@@ -519,7 +547,7 @@ control or make the deployment production-ready.
 | W15 | Partial expiring activation | Scoped edge bootstrap/active/withdraw policy and established-session withdrawal are implemented. Connect accepted native attachments, route/reply paths and full readiness authority; qualify boot/HA behavior. Terraform defaults remain restricted. |
 | W16 | Partial workload/domain readback | OpenStack observations are bound in campaign v2; AHV snapshot, recorded VM/task graph or visible VM activity plus network evidence in v3/v4; explicit Flow snapshot or policy/task/activity evidence in v4; vSphere VM/task-tree/template-clone/activity and NSX evidence in v5; selected member-to-portgroup-to-segment associations in v6 and exact port occupants/cookies/host/runtime in v7. Campaign v8 binds all four owned NSX domain objects to original inputs/outputs and replays combined domain/switch, port and VM evidence around guest probes. The separate NSX domain profile retains held-plan review. Qualify installed APIs, query/count semantics, history/activity, realized entities and port visibility; complete remaining task/entity/Flow coverage, effective DFW membership and unsupported network realizations. Do not infer task completion from snapshots or Terraform success. |
 | W17 | Partial reconciliation evidence; native fencing blocked | Task/source/result witnesses, bounded AHV and Flow recorded-task/activity review, bounded vSphere child history, visible existing-VM and clone source/destination activity, and held-attempt plan bindings for supported vSphere configuration/devices/native port attachments, AHV power/NIC lifecycle, Flow service transitions and NSX domain connectivity/service transitions are implemented. NSX review binds all four prior domain objects and retains strict shape/realization limits. Deliver actual cross-writer fencing, full late/uncertain outcome reconciliation and authorized repair/adoption/cleanup. Review preserves all ledger holds. Serial Ansible and Terraform state locks do not fence native tasks. |
-| W18 | Partial operator executor delivered | Plan/apply bundles, bounded native commands, durable uncertainty holds, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
+| W18 | Partial operator executor delivered | Terraform and guest preparation/execution, bounded commands, durable uncertainty holds, replayed guest completion counters, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector, including v8's complete owned VMware domain intent and attachment binding, in restricted campaigns for all three exact installed tuples. Complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
 | W21 | Operational integration open | Connect scheduled drift/health/capacity checks to selected observers and alerting, classify emergency/security/unknown drift, and exercise owned incident containment/release. Guest convergence is not a platform drift service. |
