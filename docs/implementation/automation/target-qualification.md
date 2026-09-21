@@ -129,7 +129,7 @@ union of source and destination VMs. It retains template/result/tree evidence
 and adds the same pending/completed scans on both sides. Accept the complete
 source/destination scope and exact attempt window; busy shared templates, missing
 source visibility and separate work keep the campaign held. It is supported in
-v5/v6/v7 without new assets. Templates remain separately owned source objects;
+v5/v6/v7/v8 without additional clone assets. Templates remain separately owned source objects;
 only destination VMs enter workload-output and port/domain binding. This does not
 authorize clone adoption or release a held Terraform attempt.
 
@@ -161,6 +161,56 @@ unused ports hold. The two portgroup reports now include attachment observations
 all five reports remain bound per phase. v6 remains a narrower association profile.
 Neither supplies effective DFW enforcement, native fencing or production acceptance.
 Do not downgrade after a v7 hold.
+
+## Campaign v8: bind full domain intent
+
+Use `hosting-target-campaign/8` with all v7 assets plus `domain_inputs`, an
+absolute private path and SHA-256 for the original `vmware-wsd-domains` input
+JSON. Use the explicit `nsx-local-policy-v1-domain-switches` profile for
+`native_manifest`. Keep the port-attachment profile and the independently
+accepted vSphere snapshot/task/tree/activity profile. The domain-only and
+segment-only profiles cannot substitute for the combined profile.
+
+Before contact, the runner binds the exact campaign/site/tenant/WSD and NSX
+endpoint, every member's original output lifecycle stage, and all four owned
+Tier-1/segment/group/policy paths. It compares expected domain configuration to
+the input allocation/gateway, transport zone, names, empty tags, connectivity,
+group expression, policy sequence/scope and exact service intent. Bootstrap
+requires the original acceptance reference and sorted named TCP/UDP /32 rules
+before the terminal dual-family drop; prepared domains permit only the drop and
+disconnected connectivity. Unsupported inputs, omitted/extra/shared owned
+objects, substituted allocations and broadened services fail before contact.
+Native IDs, revisions and actual rule sequences remain independently accepted
+manifest expectations; the runner does not invent provider-assigned values.
+
+The combined NSX profile supports at most five complete domains, with one
+accepted Local Manager enforcement point per segment's logical switch. Original
+input/output provenance, independently accepted expectations and native visibility
+remain prerequisites. These consistency checks do not authenticate the records.
+
+Before and after guest traffic, collect this fixed sequence:
+
+1. Combined NSX domain and realized-switch evidence.
+2. vCenter portgroup and native port-attachment evidence.
+3. The selected VM snapshot/task/tree/activity evidence.
+4. Portgroup and port-attachment evidence again.
+5. Combined NSX domain and realized-switch evidence again.
+
+All five raw report hashes enter each phase digest. Before accepting each v8
+child, the runner recomputes manifest/report hashes, scope/profile, every selected
+observation and available witness, and the two-round stability summary. Reports
+must start after that child was launched and pass the bounded freshness check
+(at most 300 seconds old). Reused, contradictory or witness-free evidence cannot
+pass through a matching summary string. A native failure before traffic prevents
+probes; a change during traffic prevents successful collection afterward.
+
+The healthy-control denial procedure below remains mandatory. v8 does not widen
+the selected VM profile's task/entity scope, create native fencing, prove DFW
+precedence/per-node enforcement, or authorize state adoption and power control.
+Qualify the [installed campaign scenarios](site-commissioning.md#campaign-v8-domain-intent-and-attachment-qualification).
+Do not downgrade a v8 hold to an earlier campaign.
+
+## Guest traffic observations
 
 The runner reconstructs SSH settings from the bound guest records, uses pinned
 host keys, and requires certificate authentication. It ignores inventory command

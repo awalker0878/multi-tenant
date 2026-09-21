@@ -99,6 +99,32 @@ and [policy reads](https://github.com/vmware/terraform-provider-nsxt/blob/v3.10.
 Installed API omission/default semantics, generated/retained rule behavior and
 realization attribution still need native qualification.
 
+## Combined domain and logical-switch observation
+
+`tools/nsx_domain_switch_observe.py` uses the explicit
+`nsx-local-policy-v1-domain-switches` profile. Keep all four owned resources,
+strict full-response checks and realization expectations above. Add the accepted
+`logical_switch` object from the [segment profile](vmware-network-binding.md#nsx-segment-realization-identity)
+to every segment and no other object. The [disabled combined example](../../../examples/nsx_domain_switch_observation.json.example)
+can be validated without contact:
+
+```sh
+python3 tools/nsx_domain_switch_observe.py /private/operator/nsx-domain-switches.json
+```
+
+Collection uses the same explicit contact, origin, credentials, CA and private
+output controls as the domain command. Each round reads realized switches, all
+domain objects/configuration/realization, then switches again. Both switch reads
+retain bounded selected witnesses and empty-alarm verdicts for offline replay;
+unsupported full domain shapes still hold. This does not add NSX task coverage.
+
+[Campaign v8](target-qualification.md#campaign-v8-bind-full-domain-intent)
+composes these observations with vSphere port and VM evidence and guest probes.
+It additionally binds all owned domain paths and requested service semantics to
+original private inputs/outputs. The domain-only profile remains the contract
+for held Terraform domain review; neither profile silently substitutes for the
+other.
+
 ## Independent work that remains
 
 This profile covers four selected object snapshots, not asynchronous work across
@@ -107,7 +133,8 @@ services, route tables, external attachments, effective group members, DFW
 exclusions/precedence, or rules on every ESXi/Edge node. It does not prove packet
 enforcement, HA, storage or useful-data recovery. The separate campaign v6/v7
 segment/switch/port profiles keep their existing contracts; this domain profile
-cannot replace their attachment or healthy-control traffic evidence.
+cannot replace their attachment or healthy-control traffic evidence. Campaign v8
+explicitly includes those checks alongside the combined domain/switch profile.
 
 Qualify the [site scenarios](site-commissioning.md), actual cross-writer exclusion
 and current quarantine before recovery review. Native late effects, task coverage,

@@ -61,6 +61,11 @@ segment reference, with an explicit empty alarms list. Other realized entity typ
 are outside this association check; their presence does not establish attachment
 or enforcement. Fault/description text is not persisted.
 
+Reports retain selected before/after logical-switch witnesses, including an
+explicit `alarms_empty` verdict. Offline review recomputes identity, revision,
+stability and outcomes; a changed summary and digest cannot conceal a
+contradictory switch witness. Recollect older reports without these witnesses.
+
 The result list must be complete: at most 100 entries, a matching integer
 `result_count`, no duplicate paths and no continuation cursor. A paginated or
 ambiguous response holds for native-owner investigation; the tool never broadens
@@ -193,6 +198,16 @@ DFW membership/exclusions, guest IP identity, native isolation, HA, recovery or
 writer fencing. The profile does not release a held attempt or authorize power
 control. Do not downgrade to v6/v5 after an attachment hold. Use the
 [commissioning cases](site-commissioning.md) to qualify the installed behavior.
+
+## Campaign v8: include complete owned-domain intent
+
+[Campaign v8](target-qualification.md#campaign-v8-bind-full-domain-intent) retains
+v7's port bindings and combines them with strict observations of all four owned
+NSX domain objects. Original domain inputs additionally bind allocation, gateway,
+transport zone, lifecycle stage, policy scope/order and requested service intent.
+Its five reports per phase are replayed before guest evidence can be accepted.
+Both domain-shape and logical-switch witnesses remain required; it does not
+replace independent effective-policy, task coverage or fencing evidence.
 
 ## Held Terraform attempt review
 

@@ -134,7 +134,11 @@ or native writer fencing.
 add exact NSX-backed distributed-portgroup/switch identities and segment-scoped
 realized-switch identities. Campaign v6 binds these to each VM's assigned domain;
 v7 adds exact distributed-port occupants, connection cookies and VM/NIC/host/MAC
-bindings. Effective DFW membership and native qualification remain separate.
+bindings. [Campaign v8](implementation/automation/target-qualification.md#campaign-v8-bind-full-domain-intent)
+adds strict complete owned-domain observations and binds allocation, lifecycle
+and service intent to original inputs/outputs. It replays all five reports per
+phase, including both logical-switch witnesses, around the guest traffic checks.
+Effective DFW membership and native qualification remain separate.
 The [held vSphere reviewer](implementation/automation/terraform-recovery.md) now
 requires those attachment witnesses alongside VM activity, binds retained disks
 and NICs to the saved plan, and checks both reports under the same fence/quarantine

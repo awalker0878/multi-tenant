@@ -1,6 +1,7 @@
 """Compose both checked native profiles without losing either set of evidence."""
 from copy import deepcopy
 import json
+from pathlib import Path
 import unittest
 from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
@@ -21,6 +22,12 @@ def manifest(origin='https://nsx.example.test'):
 class CombinedTests(unittest.TestCase):
     def setUp(self): self.m = manifest(); self.client = Client(self.m)
     def observe(self): return c.observe(self.m, self.client, n, interval=0)
+    def test_disabled_documented_example_has_the_complete_profile(self):
+        example = Path(__file__).resolve().parents[1]/'examples/nsx_domain_switch_observation.json.example'
+        m = c.strict_loads(example.read_bytes()); n.validate(m)
+        self.assertFalse(m['contact_enabled']); self.assertEqual(m['origin'], 'https://nsx.example.invalid')
+        self.assertEqual(len(n.observation_keys(m)), 5)
+
     def test_matching_domain_and_switch_are_replayable_offline(self):
         report = self.observe()
         self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')

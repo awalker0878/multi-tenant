@@ -93,7 +93,11 @@ recorded-task and visible-policy coverage to campaign v4. For VMware use
 [vSphere VM/task readback](vsphere-readback.md) and campaign v5, or
 [campaign v6/v7](vmware-network-binding.md) for observed NSX-backed portgroup/segment
 associations and, in v7, exact port occupants, connection cookies and host/runtime
-bindings. These observations cannot resolve an uncertain native operation.
+bindings. [Campaign v8](target-qualification.md#campaign-v8-bind-full-domain-intent)
+adds strict observation of all four owned NSX domain objects, binds their intended
+configuration to original domain inputs/outputs, and replays every native report
+around the same guest probes. These observations cannot resolve an uncertain
+native operation.
 Task profiles check accepted tasks and, where selected, bounded child history or
 visible existing-VM activity. The separate clone activity profile scans both the
 accepted template and destination for visible pending/late work; it retains source

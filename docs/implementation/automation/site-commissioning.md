@@ -288,6 +288,34 @@ actual generated rule IDs/provider defaults to the saved plan and retain the
 private review packet. Synthetic TLS/plan tests do not supply these results or
 prove HA, retained-data/application recovery or production readiness.
 
+## Campaign v8 domain intent and attachment qualification
+
+Use [campaign v8](target-qualification.md#campaign-v8-bind-full-domain-intent)
+when commissioning complete owned-domain intent with the v7 attachment checks.
+Retain original private domain inputs/outputs, independently accepted native
+expectations and their provenance. Accept the combined NSX GET coverage, vCenter
+read-only port/task methods, separate trust/credential scopes and selected task
+visibility on the actual installed tuple. Exercise these cases in addition to
+the v6/v7 and domain-lifecycle scenarios:
+
+| Native case | Required result |
+| --- | --- |
+| Substituted allocation, gateway, transport zone, lifecycle stage or service input | Refuse inconsistent bindings before any endpoint contact |
+| Omitted, extra or shared Tier-1/segment/group/policy object | Refuse incomplete ownership coverage |
+| Different group selector, broader service, missing terminal drop or unsupported native field | Hold even if the realized switch and vCenter ports match |
+| Missing required empty field on the installed API | Hold for a separately reviewed normalization; never manufacture defaults |
+| Port cookie/host changes or extra visible source/destination task work | Preserve the selected attachment/activity hold; do not narrow the profile |
+| Rehashed report with wrong scope, reused time, false stability or contradictory witness | Reject during child-report replay |
+| Policy or attachment changes after a successful guest probe | Stop with an incomplete held packet; keep prior evidence for investigation |
+| Unhealthy positive control before or after an expected denial | No successful isolation result, even with matching native reports |
+| API credential is available only for its accepted origin | NSX and vCenter readers use only their separately scoped credentials and trust |
+
+Repository tests use scripted TLS endpoints and controlled probe results. They
+do not establish real forwarding, enforcement placement, native field omission
+semantics, native fences, HA or application recovery. Collect actual allowed and
+denied traffic, correlate enforcement evidence and obtain independent acceptance.
+The campaign cannot release a held attempt or update a qualification index.
+
 ## NSX domain lifecycle and recovery qualification
 
 Qualify the explicit [NSX domain profile](nsx-domain-readback.md) against the
