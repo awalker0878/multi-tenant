@@ -200,8 +200,10 @@ class DeliveryAdoptionTests(unittest.TestCase):
             {'inputs':inputs,'backend':backend,'environment':{},'authority':{},
              'adoption_plan':adoption_plan,'adoption_evidence':adoption_evidence})
         steps.validate_packet(delivery['steps'][0],prepared_packet,delivery,self.base)
-        upstream=self.base/'steps/adopt-plan'; execution=upstream/'execution'
-        execution.mkdir(parents=True,mode=0o700)
+        steps_root=self.base/'steps'
+        steps_root.mkdir(mode=0o700)
+        upstream=steps_root/'adopt-plan'; upstream.mkdir(mode=0o700)
+        execution=upstream/'execution'; execution.mkdir(mode=0o700)
         bundle={'format':'hosting-terraform-adoption-bundle/1','source_commit':SOURCE,
                 'scope':dict(SCOPE)|{'phase':'workloads'}}
         write_new(upstream/'bundle.json',encoded(bundle)); write_new(execution/'bundle.json',encoded(bundle))
