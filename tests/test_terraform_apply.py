@@ -134,6 +134,38 @@ class TerraformApplyTests(TerraformRunFixture, unittest.TestCase):
                 self.execute()
         self.assertEqual(self.apply_calls, [])
 
+    def test_start_without_head_blocks_renamed_operation_before_native_contact(self):
+        def crash(*args,**kwargs): raise InterruptedError('head publication interrupted')
+        with patch.object(apply,'replace_private',side_effect=crash),self.assertRaises(InterruptedError): self.execute()
+        self.assertEqual(len(list(self.ledger.glob('*/*.started.json'))),1)
+        self.assertFalse(list(self.ledger.glob('*/head.json')))
+        with self.assertRaises(ValueError):
+            with apply.scope_ledger(self.ledger,self.backend['address']): self.fail('Orphan start was admitted')
+        self.assertEqual(self.apply_calls,[])
+
+    def test_completed_ledger_rejects_damaged_history(self):
+        self.execute(); directory=next(self.ledger.iterdir())
+        saved={path.name:path.read_bytes() for path in directory.glob('*.json')}
+        result_name=next(name for name in saved if name.endswith('.result.json'))
+        start_name=next(name for name in saved if name.endswith('.started.json'))
+        for fault in ('missing_start','missing_result','missing_head','orphan_result','scope','generation','bundle','time','head'):
+            for path in directory.glob('*.json'): path.unlink()
+            for name,raw in saved.items(): write_new(directory/name,raw)
+            if fault.startswith('missing_'):
+                (directory/{'missing_start':start_name,'missing_result':result_name,'missing_head':'head.json'}[fault]).unlink()
+            elif fault=='orphan_result': write_new(directory/('0'*64+'.result.json'),saved[result_name])
+            else:
+                result=load_private(directory/result_name)
+                if fault=='scope': result['scope']['tenant_key']='foreign'
+                if fault=='generation': result['generation']=True
+                if fault=='bundle': result['bundle_sha256']='f'*64
+                if fault=='time': result['completed_at']='2000-01-01T00:00:00Z'
+                if fault=='head': result['change_ref']='OTHER'
+                (directory/('head.json' if fault=='head' else result_name)).write_bytes(encoded(result))
+            with self.subTest(fault=fault),self.assertRaises(ValueError):
+                with apply.scope_ledger(self.ledger,self.backend['address'],self.scope): self.fail('Damaged history was admitted')
+        self.assertEqual(len(self.apply_calls), 2)
+
     def test_native_opt_in_required(self):
         self.apply_args.execute_approved_change = False
         with self.assertRaises(ValueError):
