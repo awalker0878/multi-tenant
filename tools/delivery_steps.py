@@ -20,6 +20,7 @@ KINDS = {
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'retirement_review': (set(), {'plan','evidence'}, set()),
+    'operations_review': (set(), {'review'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
@@ -126,6 +127,11 @@ def validate_packet(step, packet, plan, base):
         require(retirement_plan['source_commit']==plan['source_commit']
                 and retirement_plan['scope']==plan['scope'], 'Foreign retirement review')
         validate_evidence(retirement_plan,load_private(files['evidence']))
+    if kind=='operations_review':
+        from tools.operations_review import validate
+        operations=load_private(files['review']); validate(operations)
+        require(operations['source_commit']==plan['source_commit']
+                and operations['scope']==plan['scope'], 'Foreign operations review')
     if kind=='acceptance':
         require(values['purpose'] in {'admission','domain','bootstrap','services','activation','post_activation','recovery','retirement'}, 'Unknown acceptance gate')
         accepted=load_private(files['acceptance'])
@@ -261,6 +267,15 @@ def dispatch(step, packet, directory, base, plan, root):
         result=evaluate(load_private(files['plan']),load_private(files['evidence']))
         write_new(directory/'retirement-review.json',encoded(result))
         names=['retirement-review.json']
+    elif kind=='operations_review':
+        from tools.operations_review import enforce,evaluate
+        result=evaluate(load_private(files['review']))
+        alerts={'format':'hosting-operations-alerts/1','review_sha256':result['review_sha256'],
+                'alerts':result['alerts']}
+        write_new(directory/'operations-review.json',encoded(result))
+        write_new(directory/'alerts.json',encoded(alerts))
+        names=['operations-review.json','alerts.json']
+        enforce(result)
     elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
@@ -465,6 +480,21 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
             return quota_dispatch(step,packet,directory,base,plan,root,observe=True,recovery_authority=recovery_authority)
         if kind=='dns_propagation':
             return dns_observation(step,packet,directory,base,plan,recovery_authority=recovery_authority)
+        if kind=='operations_review':
+            from tools.operations_review import OperationsHold
+            files=file_paths(packet); review=load_private(files['review'])
+            result=load_private(directory/'operations-review.json')
+            alerts=load_private(directory/'alerts.json')
+            require(result['format']=='hosting-operations-review-result/1'
+                    and result['review_sha256']==c.digest(review)
+                    and result['scope']==plan['scope']
+                    and alerts=={'format':'hosting-operations-alerts/1',
+                                 'review_sha256':result['review_sha256'],'alerts':result['alerts']},
+                    'Interrupted operations review artifacts changed')
+            if result['status']!='OPERATIONS_HEALTHY':
+                raise OperationsHold('Operations evidence remains held',
+                                     containment_required=result['containment_required'])
+            return complete(step,packet,directory,plan,result,['operations-review.json','alerts.json'])
         if kind=='capacity':
             from tools.capacity import operate
             files=file_paths(packet); values=packet['parameters']; request=load_private(files['request'])
