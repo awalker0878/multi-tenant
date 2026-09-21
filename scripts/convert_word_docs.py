@@ -73,7 +73,27 @@ def field_instruction(s):
 class Source:
     def __init__(self, root, spec):
         self.spec=spec; self.root=root; self.path=root/spec['source']; self.out=root/spec['destination']
-        self.zip=ZipFile(self.path); self.sha=digest(self.path.read_bytes())
+        self.zip=ZipFile(self.path)
+        try:
+            self.load()
+        except BaseException:
+            # A refused source must not leave the archive open; hosts that lock open
+            # files cannot then remove or replace it.
+            self.zip.close()
+            raise
+
+    def close(self):
+        """Release the source archive so the caller can delete or replace it."""
+        self.zip.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+    def load(self):
+        self.sha=digest(self.path.read_bytes())
         self.xml=ET.fromstring(self.zip.read('word/document.xml'))
         self.rels={}
         if 'word/_rels/document.xml.rels' in self.zip.namelist():
@@ -388,8 +408,12 @@ def build(root=ROOT):
         if Path(spec['destination']).as_posix().startswith('docs/current'):
             raise ValueError('Frozen-source refresh cannot target maintained design records')
     sources=[Source(root,s) for s in cfg['documents']]
-    lookup={s.path.resolve():s for s in sources}
-    rows=[s.render(lookup) for s in sources]
+    try:
+        lookup={s.path.resolve():s for s in sources}
+        rows=[s.render(lookup) for s in sources]
+    finally:
+        for s in sources:
+            s.close()
     out=root/'sources/documentation';out.mkdir(parents=True,exist_ok=True)
     (out/'conversion_manifest.json').write_text(json.dumps({'kind':'DOCX_TO_MARKDOWN_LINEAGE','documents':rows},ensure_ascii=False,indent=2)+'\n')
     ledger=[]
