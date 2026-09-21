@@ -179,6 +179,21 @@ names the writer-scope catalogue, and the common
 [native readback envelope](../../NATIVE_READBACK.md) names the shared CLI
 plumbing. No page gained a claim the code does not support.
 
+The [task-tree campaign](../../implementation/nutanix-task-tree-readback.md) and its
+CLI regression now build the child environment portably. `lab/run_task_tree_lab.py`
+matches the retained environment names case-insensitively and keeps the platform
+root, because Windows environment names are case-insensitive while `os.environ`
+preserves the on-disk casing: the previous case-sensitive allowlist dropped
+`SYSTEMROOT`, so the child OpenSSL could not load its own configuration and the
+executed-CLI case failed closed with `ssl.SSLError` instead of reaching the fixture.
+The injected fixture credentials also replace any case variant already present, so a
+host cannot silently supply a different reader identity. `tests/test_nutanix_task_tree.py`
+reuses that one helper rather than duplicating the allowlist. The `0o600`
+private-journal assertion is now stated as a POSIX mode-bit control that a host
+without POSIX modes cannot report, and the executed case records `output_mode` and
+`posix_mode_bits_enforced` alongside its result. The Linux campaign and its CI check
+are unchanged.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |

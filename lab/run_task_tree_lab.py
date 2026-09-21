@@ -24,6 +24,24 @@ ROOT=Path(__file__).resolve().parents[1]
 SOURCE_FILES=('tools/nutanix_task_tree.py','tools/nutanix_observe.py','tools/readback_core.py',
  'tools/readback_cli.py','tools/recovery_review.py','lab/native_readback_fixture.py',
  'lab/nutanix_task_tree_fixture.py','lab/run_readback_lab.py','lab/run_task_tree_lab.py')
+CLI_ENVIRONMENT=('PATH','LANG','LC_ALL','LD_LIBRARY_PATH','SYSTEMROOT','WINDIR')
+
+
+def cli_environment() -> dict[str, str]:
+    """Minimal child environment that still starts the host TLS stack.
+
+    Names are matched case-insensitively: Windows environment names are
+    case-insensitive while os.environ preserves the on-disk casing, so a
+    case-sensitive allowlist silently drops the platform root the child OpenSSL
+    needs to load its configuration and CA data. The injected fixture credentials
+    replace any case variant already present for the same reason.
+    """
+    keep={name.upper() for name in CLI_ENVIRONMENT}
+    env={k:v for k,v in os.environ.items() if k.upper() in keep}
+    for name in ('NUTANIX_USERNAME','NUTANIX_PASSWORD'):
+        for existing in [k for k in env if k.upper()==name]:del env[existing]
+    env.update(NUTANIX_USERNAME='fixture-reader',NUTANIX_PASSWORD='temporary-fixture-secret')
+    return env
 
 
 def campaign() -> list[dict]:
@@ -81,19 +99,23 @@ def campaign() -> list[dict]:
             directory=Path(temp);m=reset(f);delayed(f,m)
             input_path=directory/'manifest.json';input_path.write_text(json.dumps(m))
             output=directory/'readback.json'
-            env={k:v for k,v in os.environ.items() if k in ('PATH','LANG','LD_LIBRARY_PATH')}
-            env.update(NUTANIX_USERNAME='fixture-reader',NUTANIX_PASSWORD='temporary-fixture-secret')
+            env=cli_environment()
             proc=subprocess.run([sys.executable,str(ROOT/'tools/nutanix_observe.py'),str(input_path),
                 '--read-authorized-target','--expected-origin',f.origin,'--ca-file',str(f.directory/'ca.pem'),
                 '--output',str(output),'--interval','0.1'],env=env,capture_output=True,text=True,timeout=25)
             r=c.load(output) if output.exists() else {};decision=rr.review(m,r,operator_context(m,r)) if r else {}
+            # The 0o600 private-journal control is a POSIX mode bit; a host without
+            # POSIX modes cannot report it through stat() and is not asserted here.
+            mode=output.stat().st_mode & 0o777 if output.exists() else None
+            private=mode is not None and (os.name!='posix' or mode==0o600)
             good=(proc.returncode==0 and r.get('outcome')=='READBACK_MATCH_NOT_QUALIFIED'
                   and r.get('request_count')==30 and len(r.get('history',[]))==3
-                  and decision.get('result')=='READY_FOR_OPERATOR_RECOVERY_REVIEW'
-                  and output.stat().st_mode & 0o777==0o600)
+                  and decision.get('result')=='READY_FOR_OPERATOR_RECOVERY_REVIEW' and private)
             rows.append({'id':f'TREE-{len(rows)+1:03}','case':'actual-cli-polls-known-tree-and-records-private-result',
                 'status':'PASS' if good else 'FAIL','exit_code':proc.returncode,'readback':r,
                 'recovery_review':decision,'requests':deepcopy(f.requests),
+                'output_mode':None if mode is None else oct(mode),
+                'posix_mode_bits_enforced':os.name=='posix',
                 'external_control_evidence':'SIMULATED_ONLY_NOT_PROOF_OF_WRITER_FENCING_OR_QUARANTINE'})
         if any('scripted sensitive failure detail' in json.dumps(row) or 'scripted private diagnostic' in json.dumps(row) for row in rows):
             raise RuntimeError('Fixture diagnostics escaped redaction')
