@@ -70,6 +70,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 
 | Kind | Parameters | Mandatory files | Optional files |
 | --- | --- | --- | --- |
+| `restic` | `action`, `restic`, `restic_sha256`, `target` | `config`, `credentials` | `ca_bundle`; restore also requires `receipt`, `manifest`, `restore_authority` |
 | `capacity` | `action`, `database` | `request`, `authority` | `native_ids` |
 | `acceptance` | `purpose` | `acceptance` | None |
 | `terraform_plan` | `catalog_id`, `terraform`, `terraform_sha256` | `inputs`, `backend`, `environment`, `authority` | `references`, `cloud`, `ca_bundle`, `transition` |
@@ -101,6 +102,16 @@ their exact independently approved native operation identities. Files retain
 the schemas documented in each owner's runbook. IPAM and DNS share one native
 allocation ledger. Edge and backup work must execute on their accepted native
 machine; a coordinator does not bypass local machine/namespace checks.
+
+`restic` uses `action: backup` with a null `target`, or `action: restore`
+with a new absolute isolated destination. The backup configuration binds the
+source machine, repository ID, executable and export consistency owner. Restore
+requires the exact capture receipt and manifest plus current authority binding
+the destination and an independent machine. The stage retains the receipt,
+execution context and capture manifest. A crash after a durable owner receipt
+can recover those copies without another backup or restore. Missing receipts
+hold the stage; the runner never guesses a snapshot or overwrites a destination.
+See [restic recovery](restic-recovery.md) for repository/key responsibilities.
 
 ## Accepted gates and renewal
 

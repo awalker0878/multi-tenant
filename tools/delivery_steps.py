@@ -11,6 +11,7 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
 # arbitrary module, executable arguments or environment overlay is accepted.
 KINDS = {
+    'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids'}),
@@ -51,11 +52,22 @@ def validate_packet(step, packet, plan, base):
     c.exact_keys(packet['parameters'], params)
     c.exact_keys(packet['files'], required, optional)
     files = file_paths(packet); values=packet['parameters']; kind=step['kind']
-    for binary in ('terraform','python','ssh','nft'):
+    for binary in ('terraform','python','ssh','nft','restic'):
         if binary in values:
             path=Path(values[binary])
             require(path.is_absolute() and path.is_file() and os.access(path,os.X_OK)
                     and digest(path.read_bytes())==values[binary+'_sha256'], 'Delivery executable changed')
+    if kind=='restic':
+        from tools.restic_run import validate
+        config=load_private(files['config']); validate(config); match_scope(config['scope'],plan)
+        require(config['restic_sha256']==values['restic_sha256'],'Backup executable binding changed')
+        require(values['action'] in {'backup','restore'},'Unknown backup transition')
+        restore_files={'receipt','manifest','restore_authority'}
+        if values['action']=='backup':
+            require(values['target'] is None and not restore_files.intersection(files),'Backup cannot carry restore inputs')
+        else:
+            require(restore_files.issubset(files) and isinstance(values['target'],str)
+                    and Path(values['target']).is_absolute(),'Exact restore input set required')
     if kind in {'terraform_apply','guest_apply'}:
         upstream=dependency(step,values['prepared_step'], 'terraform_plan' if kind=='terraform_apply' else 'guest_plan',plan,base)
         require(read_private(upstream/'bundle.json')==read_private(upstream/'execution/bundle.json'), 'Prepared owner bundle changed')
@@ -145,7 +157,16 @@ def child(root, module, arguments, directory, *, timeout):
 def dispatch(step, packet, directory, base, plan, root):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
-    if kind=='platform_transition':
+    if kind=='restic':
+        from tools.restic_run import execute
+        result=execute(values['action'],load_private(files['config']),load_private(files['credentials']),
+            values['restic'],directory/'execution',ca_file=files.get('ca_bundle'),
+            receipt=load_private(files['receipt']) if 'receipt' in files else None,
+            expected=load_private(files['manifest']) if 'manifest' in files else None,target=values['target'],
+            authority=load_private(files['restore_authority']) if 'restore_authority' in files else None)
+        for name in ('receipt.json','context.json') + (('manifest.json',) if values['action']=='backup' else ()):
+            write_new(directory/name,read_private(directory/'execution'/name)); names.append(name)
+    elif kind=='platform_transition':
         from tools.lifecycle_transition import prepare
         prior=terraform_execution(values['prior_step'],plan,base)
         record=prepare(prior,files['inputs'],files['acceptance'],values['stage'])
@@ -262,6 +283,37 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='restic':
+            files=file_paths(packet); values=packet['parameters']; config=load_private(files['config'])
+            match_scope(config['scope'],plan)
+            context=load_private(directory/'execution/context.json')
+            original=load_private(files['receipt']) if 'receipt' in files else None
+            expected=load_private(files['manifest']) if 'manifest' in files else None
+            authority=load_private(files['restore_authority']) if 'restore_authority' in files else None
+            require(context=={'action':values['action'],'config_sha256':digest(encoded(config)),
+                'receipt_sha256':digest(encoded(original)) if original is not None else None,
+                'manifest_sha256':digest(encoded(expected)) if expected is not None else None,
+                'authority_sha256':digest(encoded(authority)) if authority is not None else None,
+                'machine_id':config['machine_id'] if values['action']=='backup' else authority['machine_id'],
+                'target':values['target']},'Interrupted backup execution context differs')
+            result=load_private(directory/'execution/receipt.json')
+            require(result['scope']==config['scope'] and result['member']==config['member'],
+                    'Interrupted backup receipt scope differs')
+            names=['receipt.json','context.json']
+            if values['action']=='backup':
+                manifest=load_private(directory/'execution/manifest.json')
+                require(result['status']=='CAPTURED_REQUIRES_RESTORE_TEST'
+                        and result['repository_id']==config['repository_id'] and result['source']==config['source']
+                        and result['manifest_path']==str(directory/'execution/manifest.json')
+                        and result['manifest_sha256']==digest(encoded(manifest))
+                        and result['file_count']==len(manifest['files']),'Interrupted backup completion differs')
+                names.append('manifest.json')
+            else:
+                require(result['status']=='RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
+                        and result['snapshot_id']==original['snapshot_id'] and result['file_count']==len(expected['files'])
+                        and result['production_activation'] is False,'Interrupted restore completion differs')
+            for name in names: retain(directory/name,read_private(directory/'execution'/name))
+            return complete(step,packet,directory,plan,result,names)
         if kind in {'terraform_apply','guest_apply'}:
             prepared=prepared_directory(step,packet,plan,base)
             require(read_private(prepared/'bundle.json')==read_private(prepared.parent/'bundle.json'),'Interrupted bundle changed')

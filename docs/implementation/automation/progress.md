@@ -29,6 +29,12 @@ are now registered delivery stages. Their adapters invoke the actual three-platf
 compiler and lifecycle contracts; fixtures verify retained native identities and
 keep generated workload drafts disabled for exact review.
 
+[Delegated incident containment](incident-containment.md) now withdraws the owned
+edge policy when selected delivery verification fails or its inputs are missing.
+The real-kernel packet experiment proves withdrawal and a read-only retry. The
+restic capture/restore owner is also a delivery stage, retaining exact manifests
+and recovering a completed owner handoff without repeating data operations.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
