@@ -5,17 +5,12 @@ from tools import readback_core as c, vsphere_observe as vm
 from tools.run_files import require
 
 
-class Client(c.ReadClient):
-    """No general POST interface, task cancellation, power or configuration API."""
-    def __init__(self, endpoint, expected_origin, session, targets, task_manager_id, parent_ids, ca_file=None):
+class CollectorClient(c.ReadClient):
+    """Scoped collectors without requiring a previously recorded parent task."""
+    def __init__(self, endpoint, expected_origin, session, targets, task_manager_id, ca_file=None):
         c.identifier(task_manager_id)
-        require(isinstance(parent_ids, list) and 1 <= len(parent_ids) <= 20 and len(set(parent_ids)) == len(parent_ids), 'Exact bounded parent set required')
-        for task in parent_ids: vm.moid(task, 'task')
         super().__init__(endpoint, expected_origin, None, None, targets, ca_file, budget=120, session_token=session)
-        self.manager = task_manager_id; self.parents = tuple(sorted(parent_ids))
-
-    def children(self):
-        return self._collect({'parentTaskKey': list(self.parents)})
+        self.manager = task_manager_id
 
     def _collect(self, selected_filter):
         """Drain all pages, then destroy the collector; cleanup failure holds."""
@@ -51,6 +46,18 @@ class Client(c.ReadClient):
             # This destroys only the collector just returned in this session.
             # Interrupted/failed cleanup still requires session-owner attention.
             self._request('POST', vm.PREFIX + 'HistoryCollector/' + identifier + '/DestroyCollector', no_content=True)
+
+
+class Client(CollectorClient):
+    """No general POST interface, task cancellation, power or configuration API."""
+    def __init__(self, endpoint, expected_origin, session, targets, task_manager_id, parent_ids, ca_file=None):
+        require(isinstance(parent_ids, list) and 1 <= len(parent_ids) <= 20 and len(set(parent_ids)) == len(parent_ids), 'Exact bounded parent set required')
+        for task in parent_ids: vm.moid(task, 'task')
+        super().__init__(endpoint, expected_origin, session, targets, task_manager_id, ca_file)
+        self.parents = tuple(sorted(parent_ids))
+
+    def children(self):
+        return self._collect({'parentTaskKey': list(self.parents)})
 
 
 class ActivityClient(Client):

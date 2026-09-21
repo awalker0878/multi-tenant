@@ -4,6 +4,13 @@
 
 ## Delivered changes
 
+The continuation after merged PR #46 adds a [retained-VM vSphere power
+executor](vsphere-power.md): one exact native power task, durable intent and task
+identity, retained-device/placement readback, competing-task checks and read-only
+resume. The append-only journal survives controller interruption without a
+second native POST. Local TLS fixtures exercise real request serialization;
+installed-target acceptance and effective native writer exclusion remain external.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
