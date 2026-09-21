@@ -86,10 +86,15 @@ def execute(config,plan,step_id,base,root):
 def guard(config,plan,context,root):
     try:
         yield
-    except BaseException:
+    except BaseException as exc:
         # Run inside the delivery scope lock. Failure never advances the graph,
         # authorizes rollback, clears an owner hold or enables a new flow.
-        if config is not None and not context.get('containment_attempted') and context.get('base') is not None and context.get('step_id') in config['trigger_steps']:
+        # Read-only reviewers can explicitly hold ordinary reconciliation
+        # without requesting withdrawal; all other failures remain
+        # containment-eligible by default.
+        containment_required=getattr(exc,'containment_required',True)
+        if (containment_required and config is not None and not context.get('containment_attempted')
+                and context.get('base') is not None and context.get('step_id') in config['trigger_steps']):
             try: execute(config,plan,context['step_id'],context['base'],root)
             except BaseException: pass  # Preserve the original failure and private containment evidence.
         raise
