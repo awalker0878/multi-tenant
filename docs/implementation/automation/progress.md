@@ -4,6 +4,13 @@
 
 ## Delivered changes
 
+The [OpenStack quota owner](openstack-quotas.md) now applies accepted finite
+project limits through Nova, Cinder and Neutron. It binds current native identity
+and catalog endpoints, retains usage/reservation charges, journals before each
+write and recovers uncertain outcomes through read-only observation. Installed
+quota enforcement, delegated role isolation and physical capacity acceptance
+remain distinct native requirements.
+
 The [edge startup installer](edge-startup.md#resumable-installer) now installs
 accepted permanent denial and the hard network-manager dependency during
 console maintenance. It preserves native ledgers, checks loaded units and

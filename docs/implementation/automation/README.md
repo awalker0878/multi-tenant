@@ -41,6 +41,7 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [Acceptance and release gates](acceptance.md) | Tests and evidence required before calling each environment complete |
 | [Private state export](state-exports.md) | Exact lineage/serial capture and independent protection handoff |
 | [Edge startup installation](edge-startup.md#resumable-installer) | Exact host installation, durable deny boundaries and verified network-manager dependency |
+| [OpenStack project quotas](openstack-quotas.md) | Exact native quota changes, usage checks and read-only interrupted recovery |
 | [Scoped SSH issuer](ssh-issuer.md) | Native certificate signing, durable serials, issuer denial and endpoint revocation handoff |
 | [GitLab state project bootstrap](state-projects.md) | Private native project creation, exact backend handoffs and interrupted recovery |
 | [Offline runtime bootstrap](runtime-bootstrap.md) | Exact artifact builds, installed dependency verification and retained runtime custody |
