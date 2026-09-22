@@ -20,6 +20,7 @@ KINDS = {
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'retirement_review': (set(), {'plan','evidence'}, set()),
+    'operations_review': (set(), {'review'}, set()),
     'adoption_review': (set(), {'plan','evidence'}, set()),
     'terraform_adoption_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority','adoption_plan','adoption_evidence'}, {'references','cloud','ca_bundle'}),
     'terraform_adoption_apply': ({'prepared_step'}, {'approval'}, set()),
@@ -150,6 +151,11 @@ def validate_packet(step, packet, plan, base):
         require(retirement_plan['source_commit']==plan['source_commit']
                 and retirement_plan['scope']==plan['scope'], 'Foreign retirement review')
         validate_evidence(retirement_plan,load_private(files['evidence']))
+    if kind=='operations_review':
+        from tools.operations_review import validate
+        operations=load_private(files['review']); validate(operations)
+        require(operations['source_commit']==plan['source_commit']
+                and operations['scope']==plan['scope'], 'Foreign operations review')
     if kind=='adoption_review':
         from tools.adoption import validate_evidence
         adoption_plan=load_private(files['plan'])
@@ -301,6 +307,15 @@ def dispatch(step, packet, directory, base, plan, root):
         result=evaluate(load_private(files['plan']),load_private(files['evidence']))
         write_new(directory/'adoption-review.json',encoded(result))
         names=['adoption-review.json']
+    elif kind=='operations_review':
+        from tools.operations_review import enforce,evaluate
+        result=evaluate(load_private(files['review']))
+        alerts={'format':'hosting-operations-alerts/1','review_sha256':result['review_sha256'],
+                'alerts':result['alerts']}
+        write_new(directory/'operations-review.json',encoded(result))
+        write_new(directory/'alerts.json',encoded(alerts))
+        names=['operations-review.json','alerts.json']
+        enforce(result)
     elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
@@ -526,6 +541,21 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
             return quota_dispatch(step,packet,directory,base,plan,root,observe=True,recovery_authority=recovery_authority)
         if kind=='dns_propagation':
             return dns_observation(step,packet,directory,base,plan,recovery_authority=recovery_authority)
+        if kind=='operations_review':
+            from tools.operations_review import OperationsHold
+            files=file_paths(packet); review=load_private(files['review'])
+            result=load_private(directory/'operations-review.json')
+            alerts=load_private(directory/'alerts.json')
+            require(result['format']=='hosting-operations-review-result/1'
+                    and result['review_sha256']==c.digest(review)
+                    and result['scope']==plan['scope']
+                    and alerts=={'format':'hosting-operations-alerts/1',
+                                 'review_sha256':result['review_sha256'],'alerts':result['alerts']},
+                    'Interrupted operations review artifacts changed')
+            if result['status']!='OPERATIONS_HEALTHY':
+                raise OperationsHold('Operations evidence remains held',
+                                     containment_required=result['containment_required'])
+            return complete(step,packet,directory,plan,result,['operations-review.json','alerts.json'])
         if kind=='capacity':
             from tools.capacity import operate
             files=file_paths(packet); values=packet['parameters']; request=load_private(files['request'])
