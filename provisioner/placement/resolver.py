@@ -7,13 +7,22 @@ rejected, and selects the best eligible candidate under one stated rule:
 
 The rule is deliberately boring. It is reproducible from inventory alone and it
 never consults a scheduler, a reservation service or a native platform.
+
+A hold is never a bare failure: the decision records every rejected candidate with
+its exact blockers, and reports the most specific hold status that applies. When no
+candidate was evaluated at all the status is `HOLD_NO_ELIGIBLE_SITE`; otherwise the
+status is the first matching class in `_HOLD_FOR_BLOCKER`, falling back to
+`HOLD_NO_ELIGIBLE_PLATFORM`.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from provisioner.domain.errors import ProvisioningError
-from provisioner.domain.placement import (AUTHORITATIVE, FIXTURE, CandidateEvaluation,
+from provisioner.domain.placement import (AUTHORITATIVE, FIXTURE, HOLD_CAPACITY_INSUFFICIENT,
+                                          HOLD_CAPABILITY_NOT_QUALIFIED, HOLD_NO_ELIGIBLE_PLATFORM,
+                                          HOLD_NO_ELIGIBLE_SITE, HOLD_PREFIX_POOL_EXHAUSTED,
+                                          HOLD_SERVICE_UNAVAILABLE, PLACED, CandidateEvaluation,
                                           PlacementDecision, finalize)
 from provisioner.inventory.capacity import Assessment, Demand, assess
 from provisioner.inventory.model import Cell, Cluster, Inventory, Site
@@ -21,6 +30,29 @@ from provisioner.placement import eligibility
 
 SELECTION_RULE = 'highest-capability-count-then-largest-available-vcpu-then-lowest-cell-key'
 SERVICE_NAMES = ('dns', 'ntp', 'identity', 'logging', 'backup')
+
+# Internal blocker classes. Each rejected candidate records why it failed, and the
+# decision reports the most specific class that applies so a hold is actionable.
+BLOCKER_RESIDENCY = 'residency'
+BLOCKER_CAPABILITY = 'capability'
+BLOCKER_CAPACITY = 'capacity'
+BLOCKER_PREFIX_POOL = 'prefix-pool'
+BLOCKER_SERVICE = 'service'
+
+_HOLD_FOR_BLOCKER = ((BLOCKER_CAPACITY, HOLD_CAPACITY_INSUFFICIENT),
+                     (BLOCKER_SERVICE, HOLD_SERVICE_UNAVAILABLE),
+                     (BLOCKER_PREFIX_POOL, HOLD_PREFIX_POOL_EXHAUSTED),
+                     (BLOCKER_CAPABILITY, HOLD_CAPABILITY_NOT_QUALIFIED))
+
+
+def _hold_status(codes: frozenset[str]) -> str:
+    """Map the blocker classes of every rejected candidate to one hold status."""
+    if not codes:
+        return HOLD_NO_ELIGIBLE_SITE
+    for code, status in _HOLD_FOR_BLOCKER:
+        if code in codes:
+            return status
+    return HOLD_NO_ELIGIBLE_PLATFORM
 
 
 @dataclass(frozen=True)
@@ -75,7 +107,7 @@ def _services_present(inventory: Inventory, site: str, services: dict) -> tuple[
 
 
 def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Cluster,
-               inventory: Inventory) -> CandidateEvaluation:
+               inventory: Inventory) -> tuple[CandidateEvaluation, frozenset[str]]:
     _, platform_blockers = eligibility.gate(
         site.platform, set(request.required_capabilities))
     cell_blockers = eligibility.missing_cell_capabilities(
@@ -85,17 +117,23 @@ def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Clust
                                               request.prefix_length)
     missing_services = _services_present(inventory, site.site, request.services)
 
+    codes: set[str] = set()
     blockers: list[str] = []
     if not cluster.supports(request.trust, request.service_class, request.tenant, request.wsd):
         blockers.append('cluster residency does not match trust, service class or tenant eligibility')
+        codes.add(BLOCKER_RESIDENCY)
     if cell_blockers:
         blockers.append('cell lacks capabilities: ' + ', '.join(cell_blockers))
+        codes.add(BLOCKER_CAPABILITY)
     if not assessment.sufficient:
         blockers.extend(assessment.blockers)
+        codes.add(BLOCKER_CAPACITY)
     if not pool_ok:
         blockers.append(pool_reason)
+        codes.add(BLOCKER_PREFIX_POOL)
     if missing_services:
         blockers.append('site lacks service bindings: ' + ', '.join(missing_services))
+        codes.add(BLOCKER_SERVICE)
 
     capability_blockers = tuple(platform_blockers) + tuple('cell:' + c for c in cell_blockers)
     score = len(cell.capabilities) * 1000 + min(cluster.capacity.vcpu_available, 999)
@@ -104,7 +142,7 @@ def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Clust
         platform_family=eligibility.PLATFORM_FAMILY[site.platform], zone=cluster.zone,
         eligible=not blockers, score=score, blockers=tuple(blockers),
         capability_blockers=capability_blockers,
-        product_tuple=eligibility.product_tuple(site.platform))
+        product_tuple=eligibility.product_tuple(site.platform)), frozenset(codes)
 
 
 def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
@@ -118,7 +156,7 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
         registry_blockers.extend(f'{platform}: {b}' for b in blockers)
 
     options: dict[str, list[_ZoneOption]] = {zone: [] for zone in request.zones}
-    evaluations: list[CandidateEvaluation] = []
+    evaluated: list[tuple[CandidateEvaluation, frozenset[str]]] = []
     for site in inventory.sites:
         if site.region != request.region or site.platform not in platforms:
             continue
@@ -131,14 +169,15 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
                 for cluster in cell.zone_clusters(zone):
                     if cluster.role != 'workload':
                         continue
-                    evaluation = _candidate(request, site, cell, cluster, inventory)
-                    evaluations.append(evaluation)
+                    evaluation, codes = _candidate(request, site, cell, cluster, inventory)
+                    evaluated.append((evaluation, codes))
                     if evaluation.eligible:
                         options[zone].append(_ZoneOption(
                             site=site, cell=cell, cluster=cluster, score=evaluation.score,
                             assessment=assess(cluster, request.demand),
                             capability_count=len(cell.capabilities)))
 
+    evaluations = [evaluation for evaluation, _ in evaluated]
     evaluations.sort(key=lambda e: (e.site_key, e.cell_key, e.zone, e.platform))
     authority = AUTHORITATIVE if inventory.authoritative else FIXTURE
     reasons: list[str] = []
@@ -147,20 +186,22 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
 
     missing_zones = [zone for zone in request.zones if not options[zone]]
     if missing_zones:
-        status = 'HOLD_NO_ELIGIBLE_PLATFORM'
-        if registry_blockers and not inventory.authoritative:
-            reasons.append('no platform is natively qualified; fixture inventory was used to demonstrate the path')
+        codes: set[str] = set()
         for zone in missing_zones:
-            rejected = [e for e in evaluations if e.zone == zone]
+            rejected = [(e, c) for e, c in evaluated if e.zone == zone]
             if not rejected:
                 pins = {'site': request.site_pin, 'cell': request.cell_pin}
                 reasons.append(f'{zone}: no reviewed candidate in region {request.region} '
                                f'for platforms {sorted(platforms)}'
                                + (f' matching pins {pins}' if any(pins.values()) else ''))
-            else:
-                for evaluation in rejected:
-                    reasons.append(f'{zone}: {evaluation.site_key}/{evaluation.cell_key} '
-                                   f'{evaluation.platform} rejected: ' + '; '.join(evaluation.blockers))
+                continue
+            for evaluation, evaluation_codes in rejected:
+                codes.update(evaluation_codes)
+                reasons.append(f'{zone}: {evaluation.site_key}/{evaluation.cell_key} '
+                               f'{evaluation.platform} rejected: ' + '; '.join(evaluation.blockers))
+        status = _hold_status(frozenset(codes))
+        if registry_blockers and not inventory.authoritative:
+            reasons.append('no platform is natively qualified; fixture inventory was used to demonstrate the path')
         return finalize(PlacementDecision(
             status=status, authority=authority, request_digest=request.request_digest,
             selection_rule=SELECTION_RULE, candidates=tuple(evaluations),
@@ -181,7 +222,7 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
         reasons.append('capability registry records no native qualification for the required set: '
                        + '; '.join(sorted(registry_blockers)))
     return finalize(PlacementDecision(
-        status='PLACED', authority=authority, request_digest=request.request_digest,
+        status=PLACED, authority=authority, request_digest=request.request_digest,
         selection_rule=SELECTION_RULE, selected=selected, candidates=tuple(evaluations),
         reasons=tuple(reasons), registry_blockers=tuple(sorted(registry_blockers)),
         required_capabilities=request.required_capabilities))

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import unittest
 
-from provisioner.domain.placement import AUTHORITATIVE, FIXTURE, PlacementDecision
+from provisioner.domain.placement import AUTHORITATIVE, AUTHORITIES, FIXTURE, STATUSES, PlacementDecision
 from provisioner.inventory import model as inventory_model
 from provisioner.inventory.capacity import Demand
 from provisioner.placement import eligibility, resolver
@@ -119,7 +119,7 @@ class FailClosedTest(unittest.TestCase):
         document = inventory_document(status=inventory_model.AUTHORITATIVE, zones=('OZ',))
         inventory = inventory_model.build(document)
         decision = resolver.place(request(zones=('OZ', 'RZ')), inventory)
-        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_PLATFORM')
+        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_SITE')
         self.assertTrue(decision.held)
         self.assertTrue(any(r.startswith('RZ: no reviewed candidate') for r in decision.reasons))
 
@@ -127,14 +127,14 @@ class FailClosedTest(unittest.TestCase):
         inventory = inventory_model.build(inventory_document(status=inventory_model.AUTHORITATIVE))
         decision = resolver.place(
             request(demand=Demand(vcpu=1000, memory_gib=1000, storage_gib=1000)), inventory)
-        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_PLATFORM')
+        self.assertEqual(decision.status, 'HOLD_CAPACITY_INSUFFICIENT')
         self.assertTrue(any('vcpu: required 1000' in r for r in decision.reasons))
 
     def test_missing_service_binding_is_a_recorded_blocker(self):
         inventory = inventory_model.build(
             inventory_document(status=inventory_model.AUTHORITATIVE, services=('dns',)))
         decision = resolver.place(request(), inventory)
-        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_PLATFORM')
+        self.assertEqual(decision.status, 'HOLD_SERVICE_UNAVAILABLE')
         self.assertTrue(any('site lacks service bindings' in r for r in decision.reasons))
 
     def test_exhausted_prefix_pool_is_a_recorded_blocker(self):
@@ -142,13 +142,13 @@ class FailClosedTest(unittest.TestCase):
             inventory_document(status=inventory_model.AUTHORITATIVE, zones=('OZ',),
                                allocations=8))
         decision = resolver.place(request(), inventory)
-        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_PLATFORM')
+        self.assertEqual(decision.status, 'HOLD_PREFIX_POOL_EXHAUSTED')
         self.assertTrue(any('can issue a /27' in r for r in decision.reasons))
 
     def test_missing_cell_capability_is_a_recorded_blocker(self):
         inventory = inventory_model.build(inventory_document(status=inventory_model.AUTHORITATIVE))
         decision = resolver.place(request(required=CAPABILITIES + ('audit_logging',)), inventory)
-        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_PLATFORM')
+        self.assertEqual(decision.status, 'HOLD_CAPABILITY_NOT_QUALIFIED')
         self.assertTrue(any('cell lacks capabilities' in r for r in decision.reasons))
 
     def test_unknown_capability_requirement_is_refused(self):
@@ -165,7 +165,7 @@ class FailClosedTest(unittest.TestCase):
     def test_pins_that_match_nothing_hold(self):
         inventory = inventory_model.build(inventory_document(status=inventory_model.AUTHORITATIVE))
         decision = resolver.place(request(site_pin='site-99'), inventory)
-        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_PLATFORM')
+        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_SITE')
         self.assertTrue(any('matching pins' in r for r in decision.reasons))
 
     def test_require_placed_raises_on_a_hold(self):
@@ -177,6 +177,39 @@ class FailClosedTest(unittest.TestCase):
         with self.assertRaises(ProvisioningError) as raised:
             resolver.require_placed(decision)
         self.assertEqual(raised.exception.code, 'NO_ELIGIBLE_PLACEMENT')
+
+
+class VocabularyTest(unittest.TestCase):
+    """No status may be declared unless the resolver can actually emit it."""
+
+    def _emitted_statuses(self) -> set:
+        authoritative = inventory_model.build(
+            inventory_document(status=inventory_model.AUTHORITATIVE))
+        return {
+            resolver.place(request(), authoritative).status,
+            resolver.place(request(zones=('OZ', 'RZ')), authoritative).status,
+            resolver.place(request(site_pin='site-99'), authoritative).status,
+            resolver.place(request(demand=Demand(vcpu=1000, memory_gib=1000,
+                                                 storage_gib=1000)), authoritative).status,
+            resolver.place(request(required=CAPABILITIES + ('audit_logging',)),
+                           authoritative).status,
+            resolver.place(request(), inventory_model.build(
+                inventory_document(status=inventory_model.AUTHORITATIVE,
+                                   services=('dns',)))).status,
+            resolver.place(request(), inventory_model.build(
+                inventory_document(status=inventory_model.AUTHORITATIVE, zones=('OZ',),
+                                   allocations=8))).status,
+            resolver.place(request(service_class='data'), authoritative).status,
+        }
+
+    def test_every_declared_status_is_emitted(self):
+        self.assertEqual(self._emitted_statuses(), set(STATUSES))
+
+    def test_the_decision_schema_matches_the_model_vocabulary(self):
+        from provisioner.schemas import registry
+        schema = registry.load_schema('placement-decision')['properties']
+        self.assertEqual(set(schema['status']['enum']), set(STATUSES))
+        self.assertEqual(set(schema['authority']['enum']), set(AUTHORITIES))
 
 
 class ReferencePlacementTest(unittest.TestCase):

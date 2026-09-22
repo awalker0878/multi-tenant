@@ -22,12 +22,16 @@ candidate it evaluated — eligible or not — with its score and the exact bloc
 | Status | Meaning |
 | --- | --- |
 | `PLACED` | one candidate selected |
-| `HOLD_NO_ELIGIBLE_PLATFORM` | no candidate platform matched |
-| `HOLD_CAPABILITY_NOT_QUALIFIED` | the platform's product tuple is not qualified |
-| `HOLD_CAPACITY_INSUFFICIENT` | the site/cell cannot host the declared demand |
-| `HOLD_SERVICE_UNAVAILABLE` | a required service endpoint or binding class is absent |
-| `HOLD_PREFIX_POOL_EXHAUSTED` | no prefix of the resolved length remains |
-| `HOLD_INVENTORY_NOT_AUTHORITATIVE` | the inventory is a fixture, not site state |
+| `HOLD_CAPACITY_INSUFFICIENT` | a candidate was rejected because the cluster cannot host the declared demand |
+| `HOLD_SERVICE_UNAVAILABLE` | a candidate was rejected because a required service endpoint or binding class is absent |
+| `HOLD_PREFIX_POOL_EXHAUSTED` | a candidate was rejected because no prefix of the resolved length remains |
+| `HOLD_CAPABILITY_NOT_QUALIFIED` | a candidate was rejected because the cell lacks a required capability |
+| `HOLD_NO_ELIGIBLE_PLATFORM` | a candidate was rejected for residency or another reason with no more specific class |
+| `HOLD_NO_ELIGIBLE_SITE` | no candidate was evaluated at all (region, platform or pin matched nothing) |
+
+A decision carries exactly one status. When several candidates were rejected, the
+status is the first matching class in the order above; every individual reason is
+still recorded per candidate in `candidates[].blockers` and in `reasons`.
 
 ## Authority
 
@@ -36,8 +40,9 @@ candidate it evaluated — eligible or not — with its score and the exact bloc
 | `AUTHORITATIVE_SITE_STATE` | reviewed site state; a `PLACED` decision may be planned |
 | `FIXTURE_NOT_PLACEMENT_AUTHORITY` | non-authoritative input; cannot be promoted |
 
-The repository currently ships one fixture
-(`provisioner/inventory/fixtures/openstack-reference.json`). Its decisions are
+The repository currently ships three fixtures
+(`provisioner/inventory/fixtures/openstack-reference.json`,
+`nutanix-reference.json`, `vmware-reference.json`). Their decisions are
 therefore `FIXTURE_NOT_PLACEMENT_AUTHORITY`, and `PlacementDecision.authorized` is
 `False` even when the status is `PLACED`. `create_plan` accepts a fixture-derived
 selection so the pipeline can be exercised, but no artifact claims authorization.
@@ -51,10 +56,12 @@ the same digest. Two different requests never share a placement digest.
 ## Product tuples
 
 `eligibility.product_tuple(platform)` resolves the reviewed product tuple for a
-platform. The registry currently has **no** qualified tuple, so every candidate is
-blocked with `CAPABILITY_NOT_QUALIFIED` and the decision records
-`registry_blockers`. This is intentional: native qualification is external
-evidence, and placement must not invent it.
+platform. The registry currently has **no** qualified tuple, so every platform gate
+reports blockers. Those blockers are recorded per candidate in
+`candidates[].capability_blockers` and at decision level in `registry_blockers`;
+they are *not* a cell-capability failure, so they do not by themselves produce a
+`HOLD_CAPABILITY_NOT_QUALIFIED`. This is intentional: native qualification is
+external evidence, and placement must not invent it.
 
 ## Pins
 
