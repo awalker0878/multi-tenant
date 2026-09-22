@@ -18,6 +18,7 @@ Examples: [`examples/resolved/*.desired-state.json`](../../examples/resolved).
 | --- | --- |
 | `format`, `status` | artifact identity and the disabled/unauthorized marker |
 | `request_digest` | identity of the request this state came from |
+| `generation` | the WSD generation this state claims (a positive integer, `1` for the first) |
 | `apiVersion`, `kind` | carried through from the request |
 | `tenant`, `wsd`, `owner`, `environment` | identity and lifecycle |
 | `site`, `platform`, `platform_family`, `trust`, `service_class` | the placement result |
@@ -57,7 +58,17 @@ native subjects.
 Any change to any field changes the digest, which is what makes the golden corpus
 a real regression rather than a snapshot of formatting. Because the document
 carries the reviewed revision set, a profile or catalog revision changes the
-desired-state digest and the plan identity even when no request field changed.
+desired-state digest and the plan identity even when no request field changed, and
+so does claiming a later `generation`.
+
+## Identity and generation
+
+The desired state does not store its WSD identity; the identity is derived from it
+(`tenant`, `wsd`, `{site_key}-{lifecycle}`, `site_key`, `platform`), because a
+second stored copy could only drift. The `generation` field *is* stored, because it
+is the one thing the desired state cannot derive: it is the reviewed change counter
+the caller claims. Both are bound into the plan and everything downstream of it —
+see [WSD identity and generation model](generation-model.md).
 
 ## What this artifact is not
 

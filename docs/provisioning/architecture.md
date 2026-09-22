@@ -17,11 +17,11 @@ tooling keep their current owners.
 | 4 | Policy and semantics | `provisioner/policy` | policy summary | standards rule, cross-field inconsistency |
 | 5 | Placement | `provisioner/placement` | `PlacementDecision` | no eligible platform, capacity, capability, service, prefix |
 | 6 | Allocation | `provisioner/allocations` | reservations | pool exhaustion, address conflict |
-| 7 | Desired state | `provisioner/compiler/desired_state.py` | `DesiredState` | uncompilable intent |
+| 7 | Desired state | `provisioner/compiler/desired_state.py` | `DesiredState` | uncompilable intent, non-positive generation |
 | 8 | Environment document | `provisioner/compiler/environment.py` | environment document | contract violation, private output path |
 | 9 | Compilation | `tools/compile_wsd.py` (existing) | compiled inputs + plan scopes | compiler refusal |
 | 10 | Execution boundary | `provisioner/execution` | Terraform/Ansible/delivery scopes | undeclared catalog scope |
-| 11 | Conformance | `provisioner/conformance` | conformance report | missing mandatory check |
+| 11 | Conformance | `provisioner/conformance` | conformance report | missing mandatory check, observation bound to another generation |
 | 12 | Observation and reconciliation | `provisioner/observation`, `provisioner/reconciliation` | drift classification | unclassifiable drift |
 | 13 | CLI transport | `provisioner/cli` | JSON result document | every refusal above |
 
@@ -79,9 +79,18 @@ what keeps one portable request compilable on all three platforms — see
 
 Every refusal is a `ProvisioningError` with a stable code, the layer that refused
 it and a remediation. The layers are `syntax`, `structural`, `standards`,
-`capability`, `inventory`, `capacity`, `allocation`, `compilation`, `execution`
-and `authority` (`provisioner/domain/errors.py`). `Diagnostics` accumulates every
-actionable refusal so one run reports all of them, not just the first.
+`capability`, `inventory`, `capacity`, `allocation`, `compilation`, `execution`,
+`authority` and `generation` (`provisioner/domain/errors.py`). `Diagnostics`
+accumulates every actionable refusal so one run reports all of them, not just the
+first.
+
+The `generation` layer refuses a claim that would make the current generation
+ambiguous: a first generation other than `1`, changed desired state at the same
+generation, a lower generation than the one held, an unfinished generation that a
+newer one would silently abandon, and a record read as belonging to another WSD
+identity. The semantics live in `provisioner/domain/generation.py`; the
+authoritative record lives with the owner that holds it, never in this repository.
+See [WSD identity and generation model](generation-model.md).
 
 ## Lifecycle
 

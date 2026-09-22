@@ -33,6 +33,7 @@ Exit `3` is an internal failure (an unreadable file, an unknown platform name).
 | `--inventory PATH` | all | reviewed inventory; defaults to the non-authoritative fixture |
 | `--profiles-root PATH` | all | alternate catalog root; the repository catalogs are the default |
 | `--no-compile` | `plan` | resolve the environment document without invoking the compiler |
+| `--generation N` | all | the WSD generation the caller claims; defaults to `1`, and only a positive integer is accepted |
 | `--approved-plan DIGEST` | `apply` | the digest the caller claims was approved |
 | `--approvals PATH` | `apply` | recorded external approvals bound to a plan digest |
 | `--observations PATH` | `verify` | native observations document |
@@ -45,9 +46,15 @@ rejected candidate), the resolved desired state, the environment document, the
 compiled file list, the compile plan scopes, the Terraform and Ansible scopes, the
 compiler phases, the delivery plan and the conformance report.
 
-`Plan.digest` is the SHA-256 of the request digest plus the rendered environment
-document, so two requests that differ only in an unused field still share a digest
-while any real change produces a new one. Two different requests never collide.
+`Plan.digest` is the canonical SHA-256 of the claimed generation, the request digest,
+the rendered environment document, and the exact reviewed profile, catalog and
+catalog-set revisions the plan resolved against. Two requests that differ only in an
+unused field still share a digest, while any real change — a request field, a
+reviewed revision, or a later generation — produces a new one. Two different requests
+never collide. The plan also carries its WSD `identity` and its derived `operation_id`
+(`{wsd_key}-g{generation}-{plan_digest[:12]}`), so a plan is never confused with a
+later generation of the same WSD. See
+[WSD identity and generation model](generation-model.md).
 
 Compiler phases:
 
@@ -66,8 +73,11 @@ did not produce its artifact for the same request digest.
 ## `verify`
 
 Compares native observations against the plan. Without observations the report is
-`NOT_OBSERVED`; nothing is inferred. Verification cannot promote fixture placement
-and cannot satisfy an external check.
+`NOT_OBSERVED`; nothing is inferred. Every observation is classified against the
+plan's generation: an observation that names no generation is `UNBOUND` and one that
+belongs to another generation is `STALE`, and neither can satisfy current
+conformance. Verification cannot promote fixture placement and cannot satisfy an
+external check.
 
 ## `apply`
 
@@ -75,7 +85,9 @@ and cannot satisfy an external check.
 `plan_digest` matches the plan the repository would produce. It then **still
 refuses** with `EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY`, because this repository
 holds no target contact, credential or change authority. The refusal payload names
-the external authority, the approval format and the outstanding owner operations.
+the external authority, the approval format, the outstanding owner operations and the
+generation, identity and operation identity it would have handed off — one generation
+per handoff, and the authoritative record decides which generation is current.
 
 Approval records are read, never written:
 

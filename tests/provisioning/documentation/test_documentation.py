@@ -23,15 +23,16 @@ ENTRY_POINT = 'python -m provisioner.cli '
 
 #: Documents that carry the current entry point and current module paths.
 ACTIVE_DOCUMENTS = (INDEX, DOCS / 'plan-workflow.md', DOCS / 'architecture.md',
+                    DOCS / 'generation-model.md',
                     support.ROOT / 'README.md', support.ROOT / 'docs' / 'NEXT_WORK.md')
 
 MODULE_PATH = re.compile(r'provisioner/[A-Za-z0-9_./-]+')
 
 #: The active documents the refactor must maintain.
 REQUIRED = ('README.md', 'architecture.md', 'request-contract.md', 'profile-model.md',
-            'placement-model.md', 'desired-state-model.md', 'adapter-contract.md',
-            'terraform-boundary.md', 'service-owner-boundary.md', 'plan-workflow.md',
-            'service-profile-matrix.md')
+            'placement-model.md', 'desired-state-model.md', 'generation-model.md',
+            'adapter-contract.md', 'terraform-boundary.md', 'service-owner-boundary.md',
+            'plan-workflow.md', 'service-profile-matrix.md')
 
 #: Documents outside the provisioning tree that must link to it.
 ENTRY_POINTS = ('README.md', 'docs/README.md', 'docs/implementation/README.md',
@@ -103,6 +104,16 @@ class CommandDocumentationTest(unittest.TestCase):
         documented = set(re.findall(r'^\| `([a-z]+)` \|', self._commands_table(),
                                     flags=re.MULTILINE))
         self.assertEqual(documented, set(COMMANDS))
+
+    def test_documented_options_match_the_command_line(self):
+        """The options table is a view of the transport, never a second source of truth."""
+        from provisioner.cli.main import build_parser
+        text = (DOCS / 'plan-workflow.md').read_text(encoding='utf-8')
+        section = text.split('## Options', 1)[1].split('\n## ', 1)[0]
+        documented = set(re.findall(r'^\| `(--[a-z-]+)', section, flags=re.MULTILINE))
+        declared = {option for action in build_parser()._actions
+                    for option in action.option_strings if option.startswith('--')}
+        self.assertEqual(documented, declared - {'--help'})
 
     def test_documented_exit_codes_match_the_transport(self):
         from provisioner.cli.support import EXIT_INTERNAL, EXIT_OK, EXIT_REFUSED
