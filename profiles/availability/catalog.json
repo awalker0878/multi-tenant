@@ -1,9 +1,21 @@
 {
   "family": "availability",
+  "version": "2",
   "description": "Availability profiles state the internal zones the workload security domain must span.",
+  "requestDefaults": {
+    "zones": {
+      "operations": {
+        "enabled": true
+      },
+      "restricted": {
+        "enabled": true
+      }
+    }
+  },
   "profiles": [
     {
       "profile": "single-zone",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Operations zone only.",
@@ -12,6 +24,7 @@
     },
     {
       "profile": "high",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Operations and restricted zones in separate failure domains.",
@@ -20,6 +33,7 @@
     },
     {
       "profile": "maximum",
+      "version": "1",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Three-zone availability including a protected availability zone.",

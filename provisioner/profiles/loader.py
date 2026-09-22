@@ -2,14 +2,25 @@
 
 Catalogs are reviewed JSON under `profiles/<family>/catalog.json`. The directory
 is the only index: there is no second profile list to drift out of date.
+
+A catalog is also the machine-readable owner of the portable policy defaults: the
+default profile of a family, the portable service list and its default profiles,
+and the request-shape defaults a caller may omit. Nothing a reviewer must be able
+to change lives only in code.
+
+Every catalog and every profile entry carries an explicit reviewed version, and the
+whole reviewed catalog set has a canonical digest. Both are recorded on every
+resolution, so a plan states the exact reviewed revision it was built against.
 """
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+import re
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from provisioner.domain.errors import ProvisioningError
+from provisioner.domain.request import digest
 
 ROOT = Path(__file__).resolve().parents[2]
 PROFILE_ROOT = ROOT / 'profiles'
@@ -20,11 +31,42 @@ FAMILIES = ('environment', 'security', 'assurance', 'availability', 'recovery',
 DEFERRED = 'DEFERRED_NOT_IMPLEMENTED'
 STATUSES = ('IMPLEMENTED_INTERNAL_IPV4_OZ_RZ', DEFERRED)
 
+#: A reviewed version is a positive integer revision written as a JSON string.
+VERSION = re.compile(r'^[1-9][0-9]*$')
+
+#: Families whose catalog must declare which of their profiles is the default.
+DEFAULT_OWNERS = ('assurance', 'compute', 'network', 'recovery', 'storage')
+
+CATALOG_KEYS = {'family', 'version', 'description', 'default', 'services', 'defaults',
+                'requestDefaults', 'profiles'}
+ENTRY_KEYS = {'profile', 'version', 'rank', 'status', 'description', 'requires',
+              'platform_inputs', 'limits'}
+
+
+def _relative(path: Path) -> str:
+    """A path a reader can locate, whether or not it is inside this repository."""
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def _version(value, owner: str, path: str) -> str:
+    if value is None:
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                f'{owner} declares no reviewed version', path=path)
+    if not isinstance(value, str) or not VERSION.match(value):
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                f'{owner} version {value!r} is not a positive integer revision',
+                                path=path)
+    return value
+
 
 @dataclass(frozen=True)
 class Profile:
     family: str
     profile: str
+    version: str
     rank: int
     status: str
     description: str
@@ -45,8 +87,8 @@ class Profile:
         return self.requires.get('service_class')
 
     def to_dict(self) -> dict:
-        return {'family': self.family, 'profile': self.profile, 'rank': self.rank,
-                'status': self.status, 'description': self.description,
+        return {'family': self.family, 'profile': self.profile, 'version': self.version,
+                'rank': self.rank, 'status': self.status, 'description': self.description,
                 'requires': dict(self.requires),
                 'platform_inputs': dict(self.platform_inputs),
                 'limits': list(self.limits)}
@@ -55,6 +97,12 @@ class Profile:
 @dataclass(frozen=True)
 class Catalog:
     families: dict[str, dict[str, Profile]]
+    versions: dict[str, str] = field(default_factory=dict)
+    defaults: dict[str, str] = field(default_factory=dict)
+    request_defaults: dict[str, dict] = field(default_factory=dict)
+    services: tuple[str, ...] = ()
+    service_defaults: dict[str, str] = field(default_factory=dict)
+    digest: str = ''
 
     def get(self, family: str, profile: str) -> Profile:
         if family not in self.families:
@@ -77,58 +125,215 @@ class Catalog:
     def names(self) -> dict[str, list[str]]:
         return {f: sorted(p) for f, p in sorted(self.families.items())}
 
+    def version(self, family: str) -> str:
+        """The reviewed revision of one catalog."""
+        if family not in self.versions:
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    f'No reviewed catalog version for family {family}',
+                                    path=f'$.spec.{family}',
+                                    details={'families': sorted(self.versions)})
+        return self.versions[family]
 
-def _load_one(path: Path) -> tuple[str, dict[str, Profile]]:
+    def default(self, family: str) -> str:
+        """The profile this family's catalog declares when a request omits one."""
+        if family not in self.defaults:
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    f'Profile family {family} declares no default profile',
+                                    path=f'$.spec.{family}',
+                                    details={'families': sorted(self.defaults)})
+        return self.defaults[family]
+
+    def request_default(self, family: str) -> dict:
+        """Request-shape defaults the family's catalog declares for absent fields."""
+        return {key: value for key, value in self.request_defaults.get(family, {}).items()}
+
+    def service_names(self) -> tuple[str, ...]:
+        """The portable service list, owned by the service catalog."""
+        return self.services
+
+    def service_default(self, service: str) -> str:
+        if service not in self.service_defaults:
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    f'Portable service {service} declares no default profile',
+                                    path='$.spec.services',
+                                    details={'services': list(self.services)})
+        return self.service_defaults[service]
+
+    def manifest(self) -> dict:
+        """The full reviewed catalog content, in canonical order."""
+        return {
+            'families': {
+                family: {'version': self.versions[family],
+                         'default': self.defaults.get(family),
+                         'requestDefaults': dict(self.request_defaults.get(family, {})),
+                         'profiles': {name: profile.to_dict()
+                                      for name, profile in sorted(profiles.items())}}
+                for family, profiles in sorted(self.families.items())},
+            'services': list(self.services),
+            'serviceDefaults': dict(self.service_defaults),
+        }
+
+    def version_set(self) -> dict:
+        """Every catalog revision and every profile revision, as one reviewable set."""
+        return {
+            'catalogs': {family: self.versions[family] for family in sorted(self.versions)},
+            'profiles': {family: {name: profile.version
+                                  for name, profile in sorted(profiles.items())}
+                         for family, profiles in sorted(self.families.items())},
+        }
+
+
+def _load_one(path: Path) -> tuple[str, dict]:
     family = path.parent.name
+    relative = _relative(path)
     try:
         document = json.loads(path.read_text(encoding='utf-8'))
     except (OSError, ValueError) as exc:
         raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unreadable profile catalog: {exc}',
-                                path=str(path.relative_to(ROOT))) from exc
+                                path=relative) from exc
+    if not isinstance(document, dict):
+        raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile catalog must be a mapping',
+                                path=relative)
     if document.get('family') != family:
         raise ProvisioningError('UNSUPPORTED_PROFILE',
                                 f'Catalog family {document.get("family")!r} does not match directory {family!r}',
-                                path=str(path.relative_to(ROOT)))
+                                path=relative)
+    unknown = sorted(set(document) - CATALOG_KEYS)
+    if unknown:
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                f'Unknown profile catalog field: {unknown}', path=relative)
+    version = _version(document.get('version'), 'Profile catalog', relative)
+
     rows = document.get('profiles')
     if not isinstance(rows, list) or not rows:
-        raise ProvisioningError('UNSUPPORTED_PROFILE', 'Empty profile catalog',
-                                path=str(path.relative_to(ROOT)))
+        raise ProvisioningError('UNSUPPORTED_PROFILE', 'Empty profile catalog', path=relative)
     profiles: dict[str, Profile] = {}
     ranks: set[tuple[str, int]] = set()
-    allowed = {'profile', 'rank', 'status', 'description', 'requires', 'platform_inputs', 'limits'}
     for row in rows:
         if not isinstance(row, dict) or not {'profile', 'rank', 'status', 'description'} <= set(row):
             raise ProvisioningError('UNSUPPORTED_PROFILE', 'Incomplete profile entry',
-                                    path=str(path.relative_to(ROOT)))
-        if set(row) - allowed:
+                                    path=relative)
+        unknown = sorted(set(row) - ENTRY_KEYS)
+        if unknown:
             raise ProvisioningError('UNSUPPORTED_PROFILE',
-                                    f'Unknown profile entry field in {row.get("profile")}: {sorted(set(row) - allowed)}',
-                                    path=str(path.relative_to(ROOT)))
+                                    f'Unknown profile entry field in {row.get("profile")}: {unknown}',
+                                    path=relative)
         if row['status'] not in STATUSES:
             raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unknown profile status: {row["status"]}',
-                                    path=str(path.relative_to(ROOT)))
+                                    path=relative)
+        entry_version = _version(row.get('version'), f'Profile {row.get("profile")}', relative)
         rank_key = (row['profile'].split('/', 1)[0] if '/' in row['profile'] else family, row['rank'])
         if row['profile'] in profiles or rank_key in ranks:
             raise ProvisioningError('UNSUPPORTED_PROFILE', f'Duplicate profile or rank: {row["profile"]}',
-                                    path=str(path.relative_to(ROOT)))
+                                    path=relative)
         profiles[row['profile']] = Profile(
-            family=family, profile=row['profile'], rank=row['rank'], status=row['status'],
-            description=row['description'], requires=dict(row.get('requires', {})),
+            family=family, profile=row['profile'], version=entry_version, rank=row['rank'],
+            status=row['status'], description=row['description'],
+            requires=dict(row.get('requires', {})),
             platform_inputs=dict(row.get('platform_inputs', {})),
             limits=tuple(row.get('limits', [])))
         ranks.add(rank_key)
-    return family, profiles
+
+    default = document.get('default')
+    if default is not None:
+        if not isinstance(default, str) or default not in profiles:
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    f'Catalog default {default!r} is not a profile of {family}',
+                                    path=relative)
+        if not profiles[default].implemented:
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    f'Catalog default {default} is deferred and cannot be a default',
+                                    path=relative)
+
+    services = document.get('services')
+    service_defaults = document.get('defaults')
+    if family != 'service' and (services is not None or service_defaults is not None):
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                'Only the service catalog declares the portable service list',
+                                path=relative)
+    if services is not None:
+        if (not isinstance(services, list) or not services
+                or not all(isinstance(name, str) and name for name in services)
+                or len(set(services)) != len(services)):
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Invalid portable service list',
+                                    path=relative)
+        for name in services:
+            if not any(profile.startswith(f'{name}/') for profile in profiles):
+                raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                        f'Portable service {name} has no profile in the service catalog',
+                                        path=relative)
+    if service_defaults is not None:
+        if not isinstance(service_defaults, dict):
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Invalid portable service defaults',
+                                    path=relative)
+        if sorted(service_defaults) != sorted(services or []):
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    'Portable service defaults must name every service exactly once',
+                                    path=relative)
+        for name, profile in service_defaults.items():
+            if not isinstance(profile, str) or f'{name}/{profile}' not in profiles:
+                raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                        f'Default profile {name}/{profile} is not in the service catalog',
+                                        path=relative)
+            if not profiles[f'{name}/{profile}'].implemented:
+                raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                        f'Default profile {name}/{profile} is deferred',
+                                        path=relative)
+
+    request_defaults = document.get('requestDefaults', {})
+    if not isinstance(request_defaults, dict) or not all(
+            isinstance(group, dict) for group in request_defaults.values()):
+        raise ProvisioningError('UNSUPPORTED_PROFILE', 'Invalid request defaults', path=relative)
+
+    return family, {'version': version, 'profiles': profiles, 'default': default,
+                    'services': tuple(services or ()),
+                    'defaults': dict(service_defaults or {}),
+                    'requestDefaults': {key: dict(value)
+                                        for key, value in request_defaults.items()}}
 
 
 def load_catalogs(root: Path = PROFILE_ROOT) -> Catalog:
     families: dict[str, dict[str, Profile]] = {}
+    versions: dict[str, str] = {}
+    defaults: dict[str, str] = {}
+    request_defaults: dict[str, dict] = {}
+    services: tuple[str, ...] = ()
+    service_defaults: dict[str, str] = {}
     for path in sorted(root.glob('*/catalog.json')):
-        family, profiles = _load_one(path)
+        family, loaded = _load_one(path)
         if family not in FAMILIES:
-            raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unknown profile family directory: {family}',
-                                    path=str(path.relative_to(ROOT)))
-        families[family] = profiles
-    missing = [f for f in FAMILIES if f not in families]
+            raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                    f'Unknown profile family directory: {family}',
+                                    path=_relative(path))
+        families[family] = loaded['profiles']
+        versions[family] = loaded['version']
+        if loaded['default'] is not None:
+            defaults[family] = loaded['default']
+        if loaded['requestDefaults']:
+            request_defaults[family] = loaded['requestDefaults']
+        if family == 'service':
+            services = loaded['services']
+            service_defaults = loaded['defaults']
+
+    missing = [family for family in FAMILIES if family not in families]
     if missing:
         raise ProvisioningError('UNSUPPORTED_PROFILE', f'Missing profile catalogs: {missing}')
-    return Catalog(families=families)
+    undeclared = [family for family in DEFAULT_OWNERS if family not in defaults]
+    if undeclared:
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                f'Profile catalogs declare no default profile: {undeclared}')
+    if not services or not service_defaults:
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                'The service catalog must declare the portable service list '
+                                'and its default profiles')
+    repeated = sorted({version for version in versions.values()
+                       if list(versions.values()).count(version) > 1})
+    if repeated:
+        raise ProvisioningError('UNSUPPORTED_PROFILE',
+                                f'Catalog versions must form one reviewed revision ladder: {repeated}',
+                                details={'versions': dict(versions)})
+
+    catalog = Catalog(families=families, versions=versions, defaults=defaults,
+                      request_defaults=request_defaults, services=services,
+                      service_defaults=service_defaults)
+    return replace(catalog, digest=digest(catalog.manifest()))

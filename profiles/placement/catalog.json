@@ -1,9 +1,11 @@
 {
   "family": "placement",
+  "version": "6",
   "description": "Placement profiles state the reviewed regions and the deterministic selection rule. They grant no site authority.",
   "profiles": [
     {
       "profile": "east",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Primary internal region.",
@@ -12,6 +14,7 @@
     },
     {
       "profile": "west",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Secondary internal region.",
@@ -20,6 +23,7 @@
     },
     {
       "profile": "public",
+      "version": "1",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Public or partner-facing region.",

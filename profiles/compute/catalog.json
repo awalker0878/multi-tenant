@@ -1,9 +1,12 @@
 {
   "family": "compute",
+  "version": "3",
   "description": "Compute profiles state portable guest sizing. Native flavour, template and image identity are resolved from reviewed inventory, never from the request.",
+  "default": "medium",
   "profiles": [
     {
       "profile": "small",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Two-vCPU guest.",
@@ -13,6 +16,7 @@
     },
     {
       "profile": "medium",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Four-vCPU guest.",
@@ -22,6 +26,7 @@
     },
     {
       "profile": "large",
+      "version": "1",
       "rank": 3,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Eight-vCPU guest.",
@@ -31,6 +36,7 @@
     },
     {
       "profile": "gpu",
+      "version": "1",
       "rank": 4,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Accelerator-attached guest.",

@@ -1,9 +1,25 @@
 {
   "family": "service",
+  "version": "9",
   "description": "Service profiles bind a portable service name to a reviewed binding class. Native endpoints and addresses come from inventory, never from the request.",
+  "services": [
+    "dns",
+    "ntp",
+    "identity",
+    "logging",
+    "backup"
+  ],
+  "defaults": {
+    "dns": "default",
+    "ntp": "default",
+    "identity": "enterprise",
+    "logging": "standard",
+    "backup": "standard"
+  },
   "profiles": [
     {
       "profile": "dns/default",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Internal resolver plus authoritative registration of the resolved member addresses.",
@@ -20,6 +36,7 @@
     },
     {
       "profile": "dns/external-view",
+      "version": "1",
       "rank": 2,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Split-horizon external name view.",
@@ -37,6 +54,7 @@
     },
     {
       "profile": "ntp/default",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Internal time source.",
@@ -51,6 +69,7 @@
     },
     {
       "profile": "identity/enterprise",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Enterprise directory identity with no local account authority.",
@@ -67,6 +86,7 @@
     },
     {
       "profile": "identity/standalone",
+      "version": "1",
       "rank": 2,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Standalone local identity store.",
@@ -81,6 +101,7 @@
     },
     {
       "profile": "logging/standard",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Internal log collection for baseline service classes.",
@@ -97,6 +118,7 @@
     },
     {
       "profile": "logging/protected-b",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Protected log collection for protected service classes.",
@@ -114,6 +136,7 @@
     },
     {
       "profile": "backup/standard",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Isolated encrypted backup binding.",
@@ -130,6 +153,7 @@
     },
     {
       "profile": "backup/enhanced",
+      "version": "1",
       "rank": 2,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Cross-site backup with independent restore target.",

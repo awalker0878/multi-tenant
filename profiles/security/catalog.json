@@ -1,9 +1,17 @@
 {
   "family": "security",
+  "version": "8",
   "description": "Security profiles bind portable intent to a trust level, a service class and the portable capabilities the placement must prove.",
+  "requestDefaults": {
+    "exposure": {
+      "publicIngress": false,
+      "internetEgress": false
+    }
+  },
   "profiles": [
     {
       "profile": "internal-baseline",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
             "description": "Internal baseline separation without a dedicated protected service class.",
@@ -19,6 +27,7 @@
     },
     {
       "profile": "protected-b-medium",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
             "description": "Protected internal service class with distributed policy enforcement in both internal zones.",
@@ -34,6 +43,7 @@
     },
     {
       "profile": "protected-b-high",
+      "version": "1",
       "rank": 3,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
             "description": "Protected internal service class with dedicated edge context, load balancing and logging evidence.",

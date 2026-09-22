@@ -1,9 +1,12 @@
 {
   "family": "assurance",
+  "version": "1",
   "description": "Assurance profiles state the evidence class expected for the environment.",
+  "default": "standard",
   "profiles": [
     {
       "profile": "standard",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Standard repository-side assurance with audit logging required.",
@@ -12,6 +15,7 @@
     },
     {
       "profile": "elevated",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Elevated assurance requiring dedicated edge context, logging and an exercised recovery path.",
@@ -20,6 +24,7 @@
     },
     {
       "profile": "regulatory",
+      "version": "1",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Regulated assurance class.",

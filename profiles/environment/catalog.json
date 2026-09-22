@@ -1,9 +1,11 @@
 {
   "family": "environment",
+  "version": "4",
   "description": "Environment profiles bind a portable environment name to a lifecycle and its minimum standards.",
   "profiles": [
     {
       "profile": "development",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Non-production development environment.",
@@ -20,6 +22,7 @@
     },
     {
       "profile": "test",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Non-production test environment for functional change.",
@@ -36,6 +39,7 @@
     },
     {
       "profile": "qualification",
+      "version": "1",
       "rank": 3,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Target-specific qualification environment used to collect native evidence.",
@@ -52,6 +56,7 @@
     },
     {
       "profile": "production",
+      "version": "1",
       "rank": 4,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Production environment requiring protected security, high availability and recovery.",
@@ -68,6 +73,7 @@
     },
     {
       "profile": "recovery",
+      "version": "1",
       "rank": 5,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Declared recovery environment for an already approved production environment.",

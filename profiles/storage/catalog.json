@@ -1,9 +1,12 @@
 {
   "family": "storage",
+  "version": "10",
   "description": "Storage profiles state portable data sizing and the reviewed storage class. Native datastore, storage container and volume-type identity come from inventory.",
+  "default": "standard",
   "profiles": [
     {
       "profile": "standard",
+      "version": "1",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Boot disk only.",
@@ -12,6 +15,7 @@
     },
     {
       "profile": "high-capacity",
+      "version": "1",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Boot disk plus a protected data volume.",
@@ -20,6 +24,7 @@
     },
     {
       "profile": "encrypted-high-capacity",
+      "version": "1",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Encrypted protected data volume.",
