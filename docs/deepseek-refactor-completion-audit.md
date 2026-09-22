@@ -268,7 +268,8 @@ hosting apply --approved-plan can prove that the external approval cites exactly
 ### GATE-C04 — Introduce a real monotonic WSD generation model
 
 Severity: P1  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include sections 26, 29-32, 33, 35, 37, 60, 79-82, 85, 88, and 91.
 
@@ -302,6 +303,55 @@ The existing delivery runner already requires generation and operation_id. The t
 - stale observation from an earlier generation does not satisfy current conformance;
 - external operation receipts are generation-bound;
 - concurrent generation claims cannot both become current.
+
+#### Completion record
+
+Generation is now a first-class property of one WSD identity rather than a field only
+the delivery runner required. `provisioner/domain/generation.py` owns the semantics;
+the authoritative record stays with the owner that holds it.
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. stable WSD identity | `WsdIdentity` names tenant, WSD, environment (`{site_key}-{lifecycle}`), site and platform; `.key` is `{tenant}/{wsd}@{environment}/{site}/{platform}` and `.digest` covers all five components; `identity_of(state)` derives it from the resolved desired state instead of storing a second copy |
+| 2. monotonic generation semantics | `require_generation` accepts only a positive integer; `GenerationRecord` and `claim()` implement first-generation-`1`, replay, refusal of changed state at the same generation, staleness and supersession |
+| 3. replay safety | `claim()` returns `REPLAYED` with `duplicate_operations: false` when the generation, desired-state digest and plan digest all match the held record |
+| 4. changed state needs a new generation | `claim()` refuses `GENERATION_CONFLICT` when the desired-state or plan digest changed at the same generation |
+| 5. newer generation supersedes | a higher generation claims over a `CLOSED` record and reports it as `superseded`; over an `OPEN` record it is refused unless reconciliation states the decision (`allow_open_supersession`), so an uncertain operation is never silently abandoned |
+| 6. binding | the generation is in `DesiredState`, in `Plan` (as the first term of the plan digest), in the delivery plan and on every owner operation, on every observation (`native.binding()`/`bound()`), in the conformance report (with `identity` and `operation_id`) and on every `EvidenceRecord`, plus a dedicated `generation` evidence kind |
+| 7. no local counter | `generation.py` imports none of `os`, `pathlib`, `json`, `sqlite3`, `tempfile` or `shutil`, and a test asserts it; `GenerationLedger` is the interface, `InMemoryLedger` is a test double that reports `IN_MEMORY_NOT_AUTHORITATIVE`, and the model publishes `authority: EXTERNAL_LEDGER_ONLY` |
+
+Regressions: `tests/provisioning/unit/test_generation.py` (48 tests / 49 subtests)
+covers every required case — same generation plus the same digest is replay-safe;
+same generation with changed desired state is refused; a newer generation supersedes
+an older plan and is refused while the operation is unfinished unless reconciliation
+says otherwise; a stale observation from an earlier generation is `STALE` and does
+not satisfy current conformance (and neither does an `UNBOUND` one); an external
+operation receipt is generation-bound through the derived operation identity
+`{wsd_key}-g{generation}-{plan_digest[:12]}`; and two concurrent claims cannot both
+become current, because the commit is a compare-and-set against the record the
+claimant read.
+
+The delivery contract stays the owner of the scope grammar: `SCOPE_IDENTIFIER`
+mirrors `tools.readback_core.ID`, one test compares the two patterns, another reads
+the scope set out of `tools/delivery_run.py` rather than restating it, and another
+proves the runner accepts this plan's scope and operation identity and refuses `0`,
+`-1`, `True`, `'1'` and `None` exactly as `require_generation` does.
+
+Golden corpus: `generation` is regenerated into
+`examples/resolved/*.desired-state.json`, `examples/golden/*.conformance.json`,
+`examples/golden/digests.json` and `examples/golden/cross-platform.digests.json`; the
+diff is exactly `generation` and the digests derived from it.
+
+Docs: new `docs/provisioning/generation-model.md`, indexed and registered in the
+drift guard, plus updates to `desired-state-model.md`, `architecture.md` (the
+`generation` layer and the stage refusals) and `plan-workflow.md` (plan digest,
+`--generation`, `verify` binding, `apply` handoff). A new documentation regression
+compares the documented options table against the CLI parser.
+
+`python -m pytest tests/provisioning -q` reports 360 passed / 723 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` pass. No production record is claimed: this
+repository defines the generation semantics and holds no authoritative ledger.
 
 ---
 
