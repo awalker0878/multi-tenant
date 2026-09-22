@@ -45,8 +45,25 @@ def fields(value, expected, label):
     require(isinstance(value, dict) and set(value) == set(expected), f'Invalid {label} fields')
 
 
+def native_module(platform, phase):
+    """Load the reviewed native module configuration for one platform and phase."""
+    require(platform in COMPONENTS and phase in {'domains', 'workloads'},
+            'Unsupported platform or phase')
+    return json.loads((ROOT / 'terraform/modules' / COMPONENTS[platform][phase] / 'main.tf.json').read_text(encoding='utf-8'))
+
+
+def native_variables(platform, phase):
+    """The native input names one reviewed module declares.
+
+    This function is the single owner of native field shapes. Callers that must
+    decide which inputs a platform can accept ask here instead of restating a
+    provider-specific field list.
+    """
+    return frozenset(native_module(platform, phase)['variable'])
+
+
 def native_inputs(platform, phase, supplied, excluded):
-    config = json.loads((ROOT / 'terraform/modules' / COMPONENTS[platform][phase] / 'main.tf.json').read_text(encoding='utf-8'))
+    config = native_module(platform, phase)
     variables = {k: v for k, v in config['variable'].items() if k not in excluded}
     require(isinstance(supplied, dict) and not set(supplied) - set(variables), 'Unknown or owned native input')
     values = {}
