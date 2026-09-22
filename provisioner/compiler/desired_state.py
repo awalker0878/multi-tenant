@@ -7,7 +7,7 @@ refuse the request: after this point the pipeline only renders what was decided.
 from __future__ import annotations
 
 from provisioner.allocations import capacity as allocation
-from provisioner.compiler.environment import domain_id, workload_name
+from provisioner.compiler.environment import domain_id, realization_gaps, workload_name
 from provisioner.domain.desired_state import (DomainIntent, DesiredState, WorkloadIntent,
                                                finalize)
 from provisioner.domain.errors import Diagnostics, ProvisioningError
@@ -108,4 +108,7 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
                                sorted({c.id: c for _, c in selections.values()}.values(),
                                       key=lambda c: c.id)),
         domains=tuple(domains))
+    for gap in realization_gaps(state):
+        diagnostics.add_warning(ProvisioningError('REALIZATION_INPUT_UNAVAILABLE', gap,
+                                                  path='$.spec.platform'))
     return finalize(state)

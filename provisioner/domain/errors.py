@@ -29,6 +29,7 @@ CODES: dict[str, tuple[str, str]] = {
     'SERVICE_UNAVAILABLE': ('allocation', 'Commission the shared service or choose a supported profile.'),
     'COMPILATION_FAILED': ('compilation', 'Correct the resolved desired state; the existing compiler refused it.'),
     'ENVIRONMENT_CONTRACT_INVALID': ('compilation', 'Correct the environment document fields the compiler refused.'),
+    'REALIZATION_INPUT_UNAVAILABLE': ('compilation', 'Complete the reviewed platform module or record the gap as an explicit boundary; do not invent the input.'),
     'OUTPUT_PATH_NOT_PRIVATE': ('compilation', 'Write generated inputs outside the repository.'),
     'DETERMINISM_VIOLATION': ('compilation', 'Remove the nondeterministic input; output must be reproducible.'),
     'EXECUTION_REFUSED': ('execution', 'Planning only: this repository holds no execution authority.'),
