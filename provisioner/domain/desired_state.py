@@ -66,6 +66,9 @@ class DesiredState:
     trust: str
     service_class: str
     profiles: dict = field(default_factory=dict)
+    profile_versions: dict = field(default_factory=dict)
+    catalog_versions: dict = field(default_factory=dict)
+    catalog_digest: str = ''
     policy: dict = field(default_factory=dict)
     placement: dict = field(default_factory=dict)
     capabilities: tuple[str, ...] = ()
@@ -101,6 +104,9 @@ class DesiredState:
             'trust': self.trust,
             'service_class': self.service_class,
             'profiles': dict(self.profiles),
+            'profile_versions': dict(self.profile_versions),
+            'catalog_versions': dict(self.catalog_versions),
+            'catalog_digest': self.catalog_digest,
             'policy': dict(self.policy),
             'placement': dict(self.placement),
             'capabilities': list(self.capabilities),

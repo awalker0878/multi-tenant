@@ -56,8 +56,22 @@ class Plan:
 
     @property
     def digest(self) -> str:
-        """Stable identity of this exact plan: the request plus its rendered environment."""
-        return request_digest({'request': self.request.digest, 'environment': self.environment})
+        """Stable identity of this exact plan.
+
+        A plan is not identified by its request alone: it is identified by the
+        request, the rendered environment the existing compiler accepted, and the
+        exact reviewed profile revisions and catalog revisions it resolved against.
+        Bumping a profile or catalog version therefore changes the plan identity even
+        when no request field changed, which is what makes a reviewed policy change
+        visible in every artifact derived from this plan.
+        """
+        return request_digest({
+            'request': self.request.digest,
+            'environment': self.environment,
+            'profiles': self.resolution.profile_versions,
+            'catalogs': self.resolution.catalog_versions,
+            'catalog_digest': self.resolution.catalog_digest,
+        })
 
     def to_dict(self) -> dict:
         return {'format': self.format, 'status': self.status, 'digest': self.digest,
@@ -84,7 +98,7 @@ class Plan:
 
 def validate_request(document: dict, source: str, catalog: Catalog) -> tuple[Request, object, dict]:
     """Run the request-local stages: normalize, resolve, profile and policy validation."""
-    request = compiler_normalize.normalize(document, source=source)
+    request = compiler_normalize.normalize(document, source=source, catalog=catalog)
     resolution = compiler_profiles.resolve(request, catalog)
     diagnostics = compiler_profiles.validate(resolution, catalog)
     diagnostics.extend(semantic.validate(request.document, resolution, catalog).errors)

@@ -19,7 +19,8 @@ RESULT_FORMAT = 'hosting-resolve-result/1'
 def run(context: Context) -> tuple[int, dict]:
     rules = standards.load_rules()
     try:
-        request = compiler_normalize.normalize(context.document, source=context.source)
+        request = compiler_normalize.normalize(context.document, source=context.source,
+                                               catalog=context.catalog)
         resolution = compiler_profiles.resolve(request, context.catalog)
         diagnostics = compiler_profiles.validate(resolution, context.catalog)
         diagnostics.extend(semantic.validate(request.document, resolution,
