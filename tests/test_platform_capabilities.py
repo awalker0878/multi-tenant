@@ -38,6 +38,24 @@ class CapabilityRegistryTests(unittest.TestCase):
         with self.assertRaises(ValueError): c.eligible(self.registry, 'nutanix', {'magic_feature'})
     def test_assurance_requirement_fails_closed(self):
         allowed, blockers = c.eligible(self.registry, 'openstack', set(), 'standard'); self.assertFalse(allowed); self.assertIn('assurance_profile:standard', blockers)
+    def test_qualification_blockers_keep_the_platform_states_distinguishable(self):
+        # implemented capability, but the native tuple is unselected
+        allowed, blockers = c.eligible(self.registry, 'openstack', {'ipv4'})
+        self.assertFalse(allowed)
+        self.assertEqual(blockers, ['product_tuple:UNSELECTED', 'capability:ipv4:NOT_NATIVE_QUALIFIED'])
+        # an unassessed capability is not implemented at all
+        r = deepcopy(self.registry)
+        r['profiles']['openstack']['capabilities']['ipv4']['source_state'] = 'UNASSESSED'
+        allowed, blockers = c.eligible(r, 'openstack', {'ipv4'})
+        self.assertFalse(allowed)
+        self.assertEqual(blockers, ['product_tuple:UNSELECTED', 'capability:ipv4:NOT_IMPLEMENTED'])
+        # a selected tuple whose native qualification is absent or stale
+        r = deepcopy(self.registry)
+        r['profiles']['openstack']['product_tuple'] = 'site-accepted-tuple'
+        allowed, blockers = c.eligible(r, 'openstack', {'ipv4'})
+        self.assertFalse(allowed)
+        self.assertEqual(blockers, ['product_tuple:site-accepted-tuple:NOT_NATIVE_QUALIFIED',
+                                    'capability:ipv4:NOT_NATIVE_QUALIFIED'])
     def test_repository_evidence_must_exist(self):
         r = deepcopy(self.registry); r['profiles']['nutanix']['capabilities']['ipv4']['evidence_refs'] = ['missing/file.md']
         with self.assertRaises(ValueError): c.validate(r)

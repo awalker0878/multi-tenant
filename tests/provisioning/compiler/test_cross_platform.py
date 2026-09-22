@@ -181,9 +181,13 @@ class ReviewedFixtureCorpusTest(unittest.TestCase):
 
     def test_the_fixture_is_never_placement_authority(self):
         for platform in PLATFORMS:
-            decision = plan_for(platform).decision.to_dict()
+            plan = plan_for(platform)
+            decision = plan.decision.to_dict()
             self.assertEqual(decision['authority'], 'FIXTURE_NOT_PLACEMENT_AUTHORITY', platform)
-            self.assertTrue(decision['registry_blockers'], platform)
+            self.assertFalse(decision['qualification']['authoritative'], platform)
+            self.assertFalse(plan.decision.authorized, platform)
+            self.assertTrue(any('cannot authorize anything' in reason
+                                for reason in decision['reasons']), platform)
 
 
 class ProviderSpecificRealizationTest(unittest.TestCase):

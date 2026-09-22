@@ -95,10 +95,35 @@ class FailClosedTest(unittest.TestCase):
     def test_an_authoritative_placement_decision_validates(self):
         from provisioner.domain.placement import (AUTHORITATIVE, PLACED, PlacementDecision,
                                                  finalize)
+        from provisioner.placement import eligibility
+        placed = finalize(PlacementDecision(
+            status=PLACED, authority=AUTHORITATIVE, request_digest='a' * 64,
+            selection_rule='highest-capability-count',
+            qualification=eligibility.RepositoryQualification().to_dict(eligibility.PLATFORMS)))
+        self.assertTrue(placed.authorized)
+        self.assertEqual(
+            registry.validate_named(placed.to_dict(), 'placement-decision'), [])
+
+    def test_a_decision_without_a_recorded_qualification_is_never_authorized(self):
+        from provisioner.domain.placement import (AUTHORITATIVE, PLACED, PlacementDecision,
+                                                 finalize)
         placed = finalize(PlacementDecision(status=PLACED, authority=AUTHORITATIVE,
                                             request_digest='a' * 64,
                                             selection_rule='highest-capability-count'))
-        self.assertTrue(placed.authorized)
+        self.assertFalse(placed.authorized)
+        self.assertEqual(placed.to_dict()['qualification']['source'], 'UNRECORDED')
+        self.assertEqual(
+            registry.validate_named(placed.to_dict(), 'placement-decision'), [])
+
+    def test_a_declared_qualification_never_authorizes(self):
+        from provisioner.domain.placement import (AUTHORITATIVE, PLACED, PlacementDecision,
+                                                 finalize)
+        from provisioner.placement import eligibility
+        placed = finalize(PlacementDecision(
+            status=PLACED, authority=AUTHORITATIVE, request_digest='a' * 64,
+            selection_rule='highest-capability-count',
+            qualification=eligibility.demonstration().to_dict(eligibility.PLATFORMS)))
+        self.assertFalse(placed.authorized)
         self.assertEqual(
             registry.validate_named(placed.to_dict(), 'placement-decision'), [])
 
