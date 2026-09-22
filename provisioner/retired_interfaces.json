@@ -83,6 +83,13 @@
       "enforcement": "the text must not appear in an active document or provisioner source"
     },
     {
+      "interface": "scripts/migrations/seed_completion_allocations.py",
+      "kind": "path",
+      "reason": "One-time seed of the audit allocation records. It refused to run once the maintained records existed, so it was a completed migration artifact rather than a regeneration job.",
+      "replacement": "sources/assurance/implementation_allocation.json",
+      "enforcement": "the path must not exist"
+    },
+    {
       "interface": "provisioner/compiler/native.py",
       "kind": "path",
       "reason": "The provisioner must not restate native field shapes; it re-exports the compiler's.",
