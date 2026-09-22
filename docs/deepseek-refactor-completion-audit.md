@@ -133,7 +133,8 @@ Regressions: `tests/provisioning/placement/test_placement.py` (qualified and unq
 ### GATE-C02 — Multi-zone placement must produce one coherent realization envelope
 
 Severity: P0/P1  
-State at baseline: INVALID
+State at baseline: INVALID  
+State: COMPLETE
 
 Affected requirements include R7, R11, R13, sections 21-24, 41, 63, 71, 76, 88, 91, and 100.
 
@@ -174,6 +175,24 @@ Add tests for:
 - desired-state assembly never has to repair or reinterpret an incoherent placement;
 - one placement artifact completely describes the selected site/platform envelope and per-zone cell/cluster choices;
 - no late INVENTORY_INCOMPLETE can be caused by a placement decision that was reported as PLACED.
+
+#### Completion record
+
+The unit of placement is now a coherent envelope: one site, one platform and an explicit cell/cluster choice for every required zone.
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. atomic envelope defined | `resolver._Envelope` is `(site, platform)` plus a per-zone `_ZoneOption`; `hosting-wsd-environment/1` is single-site/single-platform, so the site is the atomic boundary |
+| 2. complete candidate sets | `resolver._envelopes()` groups eligible options by `(site, platform)` and discards any boundary that does not realize *every* required zone, so zones are never ranked independently |
+| 3. every zone and constraint inside the boundary | only options that already passed `_candidate()` (residency, cell capability, qualification, capacity, prefix pool, service) enter an envelope |
+| 4. explicit zone-to-cell choice | `selected.cells` and `envelope.zones.<zone>.cell_key`; a site may realize zones in different cells |
+| 5. recovery is separate | recovery is representable only as its own placement request; a second primary-zone candidate inside the primary site is now unreachable by construction |
+| 6. fail before desired-state | `place()` returns `HOLD_NO_COHERENT_ENVELOPE` with `selected = null`; `require_placed()` raises `NO_ELIGIBLE_PLACEMENT` and `desired_state.build()` refuses a held decision |
+| 7. unambiguous cluster identity | `envelope.zones.<zone>.cluster_key` is `site/cell/cluster`; `desired_state._cluster()` resolves strictly inside the selected cell and records `INVENTORY_INCOMPLETE` with `site`/`cell`/`cluster` details on a mismatch |
+
+Ranking is one stated rule — envelope capability count, then envelope available vCPU, then `site_key`, then the per-zone cell keys, then the per-zone cluster ids — and within a zone the highest score, then the lowest cell key, then the lowest cluster id. This is a superset of the previous rule (an envelope's capability count is its best zone's), so the reviewed reference request still resolves to `site-01`/`cell-01`/`cluster-oz-01`/`cluster-rz-01`, but now as an explicit coherent choice.
+
+Regressions: `tests/provisioning/placement/test_placement.py` adds `CoherentEnvelopeTest` (asymmetric sites, `platform:auto`, OZ-only/RZ-only split, duplicate cluster ids, same-site multi-cell, site pin, cell pin, separate recovery placement, deterministic tie-breaking on sites and on cells, cell-scoped `desired_state._cluster()` and its refusal) and extends `VocabularyTest` so `HOLD_NO_COHERENT_ENVELOPE` is a status the resolver actually emits. `tests/provisioning/schema/test_schema.py` proves the committed schema requires `selected.envelope` and refuses an unknown zone key. `python -m pytest tests/provisioning -q` reports 270 passed / 515 subtests, and `scripts/check_repository.py`, `scripts/check_documentation.py`, and `scripts/check_retired_interfaces.py` pass. `examples/resolved/*.placement.json`, `examples/resolved/*.desired-state.json`, `examples/golden/digests.json` and `examples/golden/cross-platform.digests.json` were regenerated to match; `plan_digest` is unchanged because the envelope is not part of the rendered environment.
 
 ---
 
