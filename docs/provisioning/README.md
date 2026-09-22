@@ -33,6 +33,8 @@ portable WSD request (YAML)
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |
 | [Plan workflow](plan-workflow.md) | `validate resolve plan status verify evidence apply` |
 | [Supported service-profile matrix](service-profile-matrix.md) | What is implemented, what is deferred, why |
+| [Refactor completion audit](../deepseek-refactor-completion-audit.md) | Ordered completion gates, required regressions, repository-side vs external exit criteria |
+| [DeepSeek completion execution prompt](../deepseek-refactor-completion-execution-prompt.md) | Authoritative execution sequence for closing every repository-side audit gate with small commits |
 
 ## Command line
 
