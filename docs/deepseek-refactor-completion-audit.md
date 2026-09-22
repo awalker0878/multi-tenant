@@ -577,7 +577,8 @@ For each matrix cell:
 ### GATE-C11 — Fix dependency-direction enforcement and remove CLI command coupling
 
 Severity: P1/P2  
-State at baseline: INVALID
+State at baseline: INVALID  
+State: COMPLETE
 
 Affected requirements include sections 46-47, 66-68, 75, 88, 91, 93, and 104.
 
@@ -602,6 +603,24 @@ Several CLI command modules import provisioner.cli.plan as a reusable service. T
 - no source outside CLI imports the transport;
 - no CLI command imports another CLI command;
 - tools/compile_wsd.py remains independent of provisioner.
+
+#### Completion record
+
+The command rule now runs, and the shared operations it needs live below the transport.
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. unreachable regression fixed | `test_architecture._command_couplings()` is called from `test_a_cli_command_imports_no_other_command`; the old `continue` and the code after it are gone |
+| 2. shared operations moved below the CLI | `provisioner/execution/service.py` holds `Context`, `build_context()` and `plan_for()` |
+| 3. commands are thin transports | `plan.py` no longer defines `plan_for`; `apply`, `evidence`, `status` and `verify` call `service.plan_for(context)`; `main.py` calls `service.build_context()`; `support.py` keeps only `EXIT_*`, `emit()` and `refused()` |
+| 4. no command imports a command | no `provisioner/cli/*.py` names another command, by either import form |
+| 5. entry point preserved | `python -m provisioner.cli` is unchanged; `tests/provisioning/end_to_end/test_cli.py` and the documented-entry-point regression both exercise it |
+
+The rule reads the import graph instead of a module prefix, so `from provisioner.cli import plan` is reported as well as `from provisioner.cli.plan import plan_for`. `test_the_command_rule_refuses_a_controlled_command_to_command_import` writes a fixture command to a temporary directory, parses it exactly like a real module and asserts the rule reports `provisioner.cli.plan` for a command and reports nothing for the transport. `test_every_command_delegates_to_the_shared_service` fails any command module that does not import `provisioner.execution.service`.
+
+`provisioner.cli.plan.run_from_path` had no callers and duplicated `build_context()` plus `run()`, so it was removed instead of being left as a migration alias.
+
+Regressions: `tests/provisioning/unit/test_architecture.py` (reachable rule, controlled fixture, shared-service delegation, no outside import of the transport, `tools/compile_wsd.py` independence), `tests/provisioning/end_to_end/test_cli.py` (all seven commands as subprocesses), `tests/provisioning/documentation/test_documentation.py` (the documented entry point runs). `python -m pytest tests/provisioning -q` reports 272 passed / 531 subtests, and `scripts/check_repository.py`, `scripts/check_documentation.py` and `scripts/check_retired_interfaces.py` pass. No artifact, schema or digest changed.
 
 ---
 
