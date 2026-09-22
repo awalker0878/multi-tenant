@@ -1,1 +1,1 @@
-﻿"""Read-only observation, drift and health summaries."""
+"""Read-only observation, drift and health summaries."""

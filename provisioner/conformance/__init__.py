@@ -1,1 +1,1 @@
-﻿"""Independent conformance checks and activation refusal."""
+"""Independent conformance checks and activation refusal."""

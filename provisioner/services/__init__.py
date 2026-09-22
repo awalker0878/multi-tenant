@@ -1,1 +1,1 @@
-﻿"""Shared-service bindings resolved from inventory."""
+"""Shared-service bindings resolved from inventory."""

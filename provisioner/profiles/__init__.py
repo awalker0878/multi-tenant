@@ -1,1 +1,1 @@
-﻿"""Reviewed profile catalogs and deterministic resolution."""
+"""Reviewed profile catalogs and deterministic resolution."""

@@ -1,1 +1,1 @@
-﻿"""The hosting command line entry points."""
+"""The hosting command line entry points."""

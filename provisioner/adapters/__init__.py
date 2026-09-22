@@ -1,1 +1,1 @@
-﻿"""Platform adapters that declare native field shapes and handoffs."""
+"""Platform adapters that declare native field shapes and handoffs."""

@@ -1,1 +1,1 @@
-﻿"""Fail-closed placement: eligibility, scoring and recorded decisions."""
+"""Fail-closed placement: eligibility, scoring and recorded decisions."""
