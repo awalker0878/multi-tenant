@@ -92,6 +92,27 @@ class FailClosedTest(unittest.TestCase):
         self.assertEqual(
             registry.validate_named(held.to_dict(), 'placement-decision'), [])
 
+    def test_an_authoritative_placement_decision_validates(self):
+        from provisioner.domain.placement import (AUTHORITATIVE, PLACED, PlacementDecision,
+                                                 finalize)
+        placed = finalize(PlacementDecision(status=PLACED, authority=AUTHORITATIVE,
+                                            request_digest='a' * 64,
+                                            selection_rule='highest-capability-count'))
+        self.assertTrue(placed.authorized)
+        self.assertEqual(
+            registry.validate_named(placed.to_dict(), 'placement-decision'), [])
+
+    def test_an_unknown_placement_status_is_refused(self):
+        from provisioner.domain.placement import FIXTURE, PlacementDecision
+        with self.assertRaises(ValueError):
+            PlacementDecision(status='PROBABLY_FINE', authority=FIXTURE,
+                              request_digest='a' * 64)
+
+    def test_an_unknown_placement_authority_is_refused(self):
+        from provisioner.domain.placement import PLACED, PlacementDecision
+        with self.assertRaises(ValueError):
+            PlacementDecision(status=PLACED, authority='VIBES', request_digest='a' * 64)
+
     def test_an_unknown_conformance_status_is_refused(self):
         plan = support.reference_plan()
         report = dict(plan.conformance)

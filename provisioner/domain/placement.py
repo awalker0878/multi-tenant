@@ -14,10 +14,24 @@ PLACEMENT_FORMAT = 'hosting-placement-decision/1'
 
 AUTHORITATIVE = 'AUTHORITATIVE_SITE_STATE'
 FIXTURE = 'FIXTURE_NOT_PLACEMENT_AUTHORITY'
+AUTHORITIES = (AUTHORITATIVE, FIXTURE)
 
-STATUSES = ('PLACED', 'HOLD_NO_ELIGIBLE_PLATFORM', 'HOLD_CAPABILITY_NOT_QUALIFIED',
-            'HOLD_CAPACITY_INSUFFICIENT', 'HOLD_SERVICE_UNAVAILABLE',
-            'HOLD_PREFIX_POOL_EXHAUSTED', 'HOLD_INVENTORY_NOT_AUTHORITATIVE')
+PLACED = 'PLACED'
+HOLD_NO_ELIGIBLE_SITE = 'HOLD_NO_ELIGIBLE_SITE'
+HOLD_NO_ELIGIBLE_PLATFORM = 'HOLD_NO_ELIGIBLE_PLATFORM'
+HOLD_CAPABILITY_NOT_QUALIFIED = 'HOLD_CAPABILITY_NOT_QUALIFIED'
+HOLD_CAPACITY_INSUFFICIENT = 'HOLD_CAPACITY_INSUFFICIENT'
+HOLD_SERVICE_UNAVAILABLE = 'HOLD_SERVICE_UNAVAILABLE'
+HOLD_PREFIX_POOL_EXHAUSTED = 'HOLD_PREFIX_POOL_EXHAUSTED'
+
+# Every status this model can emit. `HOLD_NO_ELIGIBLE_SITE` is the only status
+# produced when no candidate was evaluated at all; the remaining holds are
+# ordered most-specific first so one inventory always yields one status.
+HOLD_PRIORITY = (HOLD_CAPACITY_INSUFFICIENT, HOLD_SERVICE_UNAVAILABLE,
+                 HOLD_PREFIX_POOL_EXHAUSTED, HOLD_CAPABILITY_NOT_QUALIFIED,
+                 HOLD_NO_ELIGIBLE_PLATFORM)
+
+STATUSES = (PLACED, HOLD_NO_ELIGIBLE_SITE) + HOLD_PRIORITY
 
 
 @dataclass(frozen=True)
@@ -60,13 +74,19 @@ class PlacementDecision:
     digest: str = ''
     format: str = PLACEMENT_FORMAT
 
+    def __post_init__(self):
+        if self.status not in STATUSES:
+            raise ValueError(f'Unknown placement status: {self.status}')
+        if self.authority not in AUTHORITIES:
+            raise ValueError(f'Unknown placement authority: {self.authority}')
+
     @property
     def held(self) -> bool:
-        return self.status != 'PLACED'
+        return self.status != PLACED
 
     @property
     def authorized(self) -> bool:
-        return self.status == 'PLACED' and self.authority == AUTHORITATIVE
+        return self.status == PLACED and self.authority == AUTHORITATIVE
 
     @property
     def site_key(self) -> str | None:

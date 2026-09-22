@@ -10,9 +10,10 @@
   "additionalProperties": false,
   "properties": {
     "format": {"const": "hosting-placement-decision/1"},
-    "status": {"enum": ["PLACED", "HOLD_NO_ELIGIBLE_PLATFORM", "HOLD_NO_ELIGIBLE_SITE",
-                        "HOLD_CAPABILITY_NOT_QUALIFIED", "HOLD_INVENTORY_NOT_AUTHORITATIVE"]},
-    "authority": {"enum": ["AUTHORITATIVE", "FIXTURE_NOT_PLACEMENT_AUTHORITY"]},
+    "status": {"enum": ["PLACED", "HOLD_CAPACITY_INSUFFICIENT", "HOLD_SERVICE_UNAVAILABLE",
+                        "HOLD_PREFIX_POOL_EXHAUSTED", "HOLD_CAPABILITY_NOT_QUALIFIED",
+                        "HOLD_NO_ELIGIBLE_PLATFORM", "HOLD_NO_ELIGIBLE_SITE"]},
+    "authority": {"enum": ["AUTHORITATIVE_SITE_STATE", "FIXTURE_NOT_PLACEMENT_AUTHORITY"]},
     "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "selection_rule": {"type": "string", "minLength": 1},
     "required_capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},

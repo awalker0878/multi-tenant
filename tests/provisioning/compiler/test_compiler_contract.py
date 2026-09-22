@@ -56,8 +56,8 @@ class DesiredStateTest(unittest.TestCase):
             self.assertEqual(binding['site'], 'site-01')
 
     def test_state_cannot_be_assembled_from_a_held_decision(self):
-        from provisioner.domain.placement import PlacementDecision
-        held = PlacementDecision(status='HOLD_NO_ELIGIBLE_PLATFORM', authority='FIXTURE',
+        from provisioner.domain.placement import FIXTURE, PlacementDecision
+        held = PlacementDecision(status='HOLD_NO_ELIGIBLE_PLATFORM', authority=FIXTURE,
                                  request_digest='a' * 64, selection_rule='test')
         self.assertTrue(held.held)
         with self.assertRaises(ProvisioningError) as raised:
