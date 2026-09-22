@@ -78,7 +78,7 @@ class ReadOnlyCommandTest(unittest.TestCase):
         self.assertEqual(payload['status'], 'RECORDED')
         kinds = {row['kind'] for row in payload['evidence']}
         self.assertEqual(kinds, {'request', 'validation', 'resolution', 'placement',
-                                 'compilation', 'plan', 'conformance'})
+                                 'compilation', 'plan', 'generation', 'conformance'})
         self.assertTrue(all(row['authority'] == 'REPOSITORY_SIDE_ONLY'
                             for row in payload['evidence']))
 

@@ -22,11 +22,11 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "f24e7484b4be8fd48e1795a279674723e881010cf42e29e741b4c58875d28fcf",
+      "desired_state_digest": "fba602fcfc6f4486a23ea00ce9e9a395fead3562063699d40f5176e0d7c401ed",
       "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
       "fixture": "provisioner/inventory/fixtures/nutanix-reference.json",
       "native_contact": false,
-      "plan_digest": "e7c7827f4da87361489e1503406876f6fff0f1baedb242860621b5b061c98da8",
+      "plan_digest": "45acb22451a8d2d3d5476c24b51bbfe2837a569b03b5d441abf8838d55c37933",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -41,11 +41,11 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "23f0497f26ca8732a8214c1a28669da27cdcb1bac6d11629927db6ab5a97f45a",
+      "desired_state_digest": "d9d987f87c2b8630787e86eb9e366eb9f5f903cd46babdcec33dd95e0bea4b8c",
       "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
       "fixture": "provisioner/inventory/fixtures/openstack-reference.json",
       "native_contact": false,
-      "plan_digest": "9fe0f9aefa9aa75f6e34688fcc841a88276f66d78b39bca8a524ba92e75aa5bd",
+      "plan_digest": "3f92173bfd97091deb67bbeee447705344f3c85ebc193ea4bebb5b6923b99d3c",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -60,11 +60,11 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "970eb7362d2349bac678cd6300d571b13adb3d628d40d44ead85f425ed927092",
+      "desired_state_digest": "a00cdd8366aa4228d3dcf6715a6bf4cafaf524c72ae84ce99a0c8c41bb2c7d8c",
       "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
       "fixture": "provisioner/inventory/fixtures/vmware-reference.json",
       "native_contact": false,
-      "plan_digest": "a9ed4e7f6d7742ed544f84033c12e43b69e0e47712b9a8ce140f8d302ea6dd29",
+      "plan_digest": "ffb8c653e3e4cc1960897b84c94b55e5d6954e7ca41160edffaf59f9156ca2ce",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE",
