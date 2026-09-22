@@ -5,10 +5,11 @@ and service bindings are decided here. Placement and allocation are not.
 """
 from __future__ import annotations
 
-from provisioner.cli.support import EXIT_OK, EXIT_REFUSED, Context
+from provisioner.cli.support import EXIT_OK, EXIT_REFUSED
 from provisioner.compiler import normalize as compiler_normalize
 from provisioner.compiler import profiles as compiler_profiles
 from provisioner.domain.errors import ProvisioningError
+from provisioner.execution.service import Context
 from provisioner.policy import diagnostics as policy_diagnostics
 from provisioner.policy import semantic, standards
 

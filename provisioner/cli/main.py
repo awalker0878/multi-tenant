@@ -23,9 +23,9 @@ from provisioner.cli import resolve as resolve_command
 from provisioner.cli import status as status_command
 from provisioner.cli import validate as validate_command
 from provisioner.cli import verify as verify_command
-from provisioner.cli.support import (EXIT_INTERNAL, EXIT_OK, EXIT_REFUSED, build_context,
-                                     emit)
+from provisioner.cli.support import EXIT_INTERNAL, EXIT_OK, EXIT_REFUSED, emit
 from provisioner.domain.errors import ProvisioningError
+from provisioner.execution.service import build_context
 
 PROGRAM = 'hosting'
 COMMANDS = ('validate', 'resolve', 'plan', 'apply', 'status', 'verify', 'evidence')

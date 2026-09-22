@@ -6,10 +6,10 @@ claims service readiness.
 """
 from __future__ import annotations
 
-from provisioner.cli import plan as plan_command
-from provisioner.cli.support import EXIT_OK, EXIT_REFUSED, Context
+from provisioner.cli.support import EXIT_OK, EXIT_REFUSED
 from provisioner.conformance import report as conformance_report
 from provisioner.domain.errors import ProvisioningError
+from provisioner.execution.service import Context, plan_for
 from provisioner.observation import drift as drift_module
 from provisioner.observation import health as health_module
 from provisioner.observation import native as native_module
@@ -30,7 +30,7 @@ def verification_plan(plan) -> list[dict]:
 
 def run(context: Context, observations=()) -> tuple[int, dict]:
     try:
-        plan = plan_command.plan_for(context)
+        plan = plan_for(context)
     except ProvisioningError as error:
         return EXIT_REFUSED, {'format': RESULT_FORMAT, 'status': 'REFUSED',
                               'source': context.source, 'errors': [error.to_dict()],

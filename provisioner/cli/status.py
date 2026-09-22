@@ -6,11 +6,11 @@ requires external evidence is reported as held.
 """
 from __future__ import annotations
 
-from provisioner.cli import plan as plan_command
-from provisioner.cli.support import EXIT_OK, EXIT_REFUSED, Context
+from provisioner.cli.support import EXIT_OK, EXIT_REFUSED
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.lifecycle import (EXTERNAL_EVIDENCE_STAGES, REPOSITORY_STAGES,
                                           STAGES)
+from provisioner.execution.service import Context, plan_for
 
 RESULT_FORMAT = 'hosting-status-result/1'
 
@@ -23,7 +23,7 @@ ARTIFACT_STAGES = (('request', 'request'), ('normalized', 'normalized'),
 
 def run(context: Context) -> tuple[int, dict]:
     try:
-        plan = plan_command.plan_for(context)
+        plan = plan_for(context)
     except ProvisioningError as error:
         return EXIT_REFUSED, {'format': RESULT_FORMAT, 'status': 'REFUSED',
                               'source': context.source, 'errors': [error.to_dict()],

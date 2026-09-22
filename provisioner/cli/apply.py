@@ -9,11 +9,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from provisioner.cli import plan as plan_command
-from provisioner.cli.support import EXIT_REFUSED, Context
+from provisioner.cli.support import EXIT_REFUSED
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import authority as authority_module
 from provisioner.execution import delivery as delivery_module
+from provisioner.execution.service import Context, plan_for
 
 RESULT_FORMAT = 'hosting-apply-result/1'
 
@@ -37,7 +37,7 @@ def refuse(code: str, message: str, context: Context, **details) -> tuple[int, d
 def run(context: Context, approved_plan: str | None = None,
         approvals=()) -> tuple[int, dict]:
     try:
-        plan = plan_command.plan_for(context)
+        plan = plan_for(context)
     except ProvisioningError as error:
         return EXIT_REFUSED, {'format': RESULT_FORMAT, 'status': 'REFUSED',
                               'source': context.source, 'errors': [error.to_dict()],
