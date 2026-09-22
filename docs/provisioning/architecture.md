@@ -13,7 +13,7 @@ tooling keep their current owners.
 | --- | --- | --- | --- | --- |
 | 1 | Parse and normalize | `provisioner/domain/request.py`, `provisioner/compiler/normalize.py` | `Request` | unreadable source, duplicate keys, unknown `apiVersion`/`kind` |
 | 2 | Schema validation | `provisioner/schemas` | violation list | unknown field, wrong type, bad pattern |
-| 3 | Profile resolution | `provisioner/profiles` | `Resolution` | unknown profile, deferred profile |
+| 3 | Profile resolution | `provisioner/profiles` | `Resolution` | unknown profile, deferred profile, unknown service, unversioned catalog |
 | 4 | Policy and semantics | `provisioner/policy` | policy summary | standards rule, cross-field inconsistency |
 | 5 | Placement | `provisioner/placement` | `PlacementDecision` | no eligible platform, capacity, capability, service, prefix |
 | 6 | Allocation | `provisioner/allocations` | reservations | pool exhaustion, address conflict |
@@ -42,6 +42,24 @@ inventory and the catalogs, and `plan_for()` runs the pipeline over that context
 `provisioner/repository.py` is the only module that reaches back into `tools/` and
 `scripts/`; it resolves those modules by name so the existing compiler stays the
 single source of native field shapes.
+
+## Reviewed policy inputs
+
+Stages 1 and 3 read two reviewed inputs and nothing else:
+
+- the reviewed inventory under `sources/capabilities/`, which says what the
+  platforms are allowed to hold;
+- the catalogs under `profiles/<family>/catalog.json`, which say what a portable
+  request may ask for, which defaults a request may omit, and which revision of
+  each answer was reviewed.
+
+Each catalog declares its own `version`, each profile entry declares its own
+`version`, and the loader refuses a catalog or profile without one. The loader
+publishes a canonical `digest` over the whole reviewed set, so the revision of
+every answer is part of the plan identity rather than a property of the checkout.
+No default lives in code: `provisioner/compiler/normalize.py` applies the defaults
+the catalogs declare, so changing a default is a catalog review rather than a
+source edit. See [Profile model](profile-model.md#revisions).
 
 `tests/provisioning/unit/test_architecture.py` enforces every statement in this
 section, plus the rule that no `provisioner/` source carries a UTF-8 byte-order mark.

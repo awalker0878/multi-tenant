@@ -22,6 +22,7 @@ Examples: [`examples/resolved/*.desired-state.json`](../../examples/resolved).
 | `tenant`, `wsd`, `owner`, `environment` | identity and lifecycle |
 | `site`, `platform`, `platform_family`, `trust`, `service_class` | the placement result |
 | `profiles` | the flat resolved profile map (with a nested `services` map) |
+| `profile_versions`, `catalog_versions`, `catalog_digest` | the reviewed revision of every resolved profile, of every catalog, and the canonical digest of the whole reviewed catalog set |
 | `policy` | the policy summary: rules evaluated, violations, exceptions |
 | `placement` | the full `PlacementDecision`, including rejected candidates |
 | `capabilities` | the resolved capability requirements |
@@ -54,7 +55,9 @@ native subjects.
 
 `finalize()` renders the document, drops `digest`, and hashes the canonical JSON.
 Any change to any field changes the digest, which is what makes the golden corpus
-a real regression rather than a snapshot of formatting.
+a real regression rather than a snapshot of formatting. Because the document
+carries the reviewed revision set, a profile or catalog revision changes the
+desired-state digest and the plan identity even when no request field changed.
 
 ## What this artifact is not
 

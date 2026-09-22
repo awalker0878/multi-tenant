@@ -39,17 +39,25 @@ Required: `environment`, `security`, `platform`, `placement`, `availability`.
 | --- | --- | --- |
 | `environment` | string | resolved by the environment catalog; the lifecycle name |
 | `security` | `{profile}` | required; selects the service class |
-| `assurance` | `{profile}` | optional; defaults from the environment minimum |
+| `assurance` | `{profile}` | optional; defaults to the `assurance` catalog's `default` |
 | `platform.preference` | `auto \| nutanix \| vmware \| openstack` | `auto` evaluates every eligible candidate |
 | `placement.region` | string | required |
 | `placement.site` / `placement.cell` | string or `null` | a pin, not a bypass: a pinned value still has to be eligible |
 | `availability` | `{profile}` | required |
-| `network` | `{profile}` | optional |
-| `recovery` | `{enabled, profile}` | `enabled: false` removes the recovery profile |
-| `capacity` | `{computeProfile, storageProfile}` | optional; defaults come from the environment |
-| `zones.operations` / `zones.restricted` | `{enabled}` | toggles; consistency with `availability` is enforced semantically |
-| `services` | `{dns, ntp, identity, logging, backup}` | profile names inside the service family |
-| `exposure` | `{publicIngress, internetEgress}` | both must be `false` in this repository |
+| `network` | `{profile}` | optional; defaults to the `network` catalog's `default` |
+| `recovery` | `{enabled, profile}` | `enabled: false` removes the recovery profile; `enabled` defaults from the `recovery` catalog |
+| `capacity` | `{computeProfile, storageProfile}` | optional; defaults to the `compute` and `storage` catalogs' `default` |
+| `zones.operations` / `zones.restricted` | `{enabled}` | toggles; the defaults are the `availability` catalog's `requestDefaults`, and consistency with `availability` is enforced semantically |
+| `services` | `{dns, ntp, identity, logging, backup}` | profile names inside the service family; the list itself is owned by the `service` catalog |
+| `exposure` | `{publicIngress, internetEgress}` | both must be `false` in this repository; the defaults are the `security` catalog's `requestDefaults` |
+
+Every default above is declared by a catalog and applied by
+`provisioner/compiler/normalize.py`, which is the only place a default is applied.
+Normalization runs before schema validation, so a request may omit any optional
+group and still be validated against the complete document. After normalization no
+optional field is absent: the normalized request is what the request digest covers.
+See [Profile model](profile-model.md#catalog-owned-defaults) for which catalog owns
+which default.
 
 ### Rules that are enforced beyond the schema
 
