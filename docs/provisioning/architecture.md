@@ -39,6 +39,10 @@ Nothing in `provisioner/` imports the CLI, and the CLI imports no other command.
 `scripts/`; it resolves those modules by name so the existing compiler stays the
 single source of native field shapes.
 
+`tests/provisioning/unit/test_architecture.py` enforces every statement in this
+section, plus the rule that no `provisioner/` source carries a UTF-8 byte-order mark.
+A reversed import edge fails that test rather than only contradicting this page.
+
 There is no circular ownership: the compiler never imports `provisioner/`, the
 Terraform roots never import either, and the adapters re-export the compiler's
 field sets rather than restating them. The renderer asks the reviewed module which
