@@ -31,6 +31,9 @@ def build(plan, observations=(), authorization=None, subject: str | None = None)
 
     return {'format': REPORT_FORMAT, 'status': status,
             'subject': subject or f'{plan.request.tenant}/{plan.request.wsd}',
+            'generation': plan.generation,
+            'identity': plan.identity.key,
+            'operation_id': plan.operation_id,
             'plan_digest': plan.digest,
             'request_digest': plan.request.digest,
             'checks': [c.to_dict() for c in results],
@@ -39,7 +42,8 @@ def build(plan, observations=(), authorization=None, subject: str | None = None)
             'native_contact': False,
             'limits': ['This report is repository-side conformance evidence',
                        'A blocking check prevents activation, never planning',
-                       'Unknown required evidence is never reported as PASS']}
+                       'Unknown required evidence is never reported as PASS',
+                       'Evidence produced for another generation never satisfies this report']}
 
 
 def to_dict(plan, observations=(), authorization=None) -> dict:

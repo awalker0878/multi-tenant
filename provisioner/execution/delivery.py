@@ -51,53 +51,92 @@ class Operation:
     status: str
     blocking: bool
     details: dict = field(default_factory=dict)
+    generation: int = 1
+    operation_id: str = ''
 
     def to_dict(self) -> dict:
         return {'name': self.name, 'owner': self.owner, 'description': self.description,
                 'status': self.status, 'blocking': self.blocking,
+                'generation': self.generation, 'operation_id': self.operation_id,
                 'details': dict(self.details)}
 
 
-def _operation(name: str, details: dict | None = None) -> Operation:
+def _operation(name: str, details: dict | None = None, generation: int = 1,
+               operation_id: str = '') -> Operation:
     owner, description, status = OPERATIONS[name]
     return Operation(name=name, owner=owner, description=description, status=status,
-                     blocking=status == BLOCKING, details=dict(details or {}))
+                     blocking=status == BLOCKING, details=dict(details or {}),
+                     generation=generation, operation_id=operation_id)
 
 
-def build(state, scopes: list[dict]) -> dict:
-    """Enumerate the operations this decision requires, with their owners."""
+def build(state, scopes: list[dict], plan_digest: str = '',
+          operation_id: str = '') -> dict:
+    """Enumerate the operations this decision requires, with their owners.
+
+    Every operation is bound to the generation it belongs to and to the operation
+    identity of that generation, so a receipt produced for one generation can never
+    be read as a receipt for another. The binding is derived, never chosen: the same
+    reviewed plan always names the same operations.
+    """
     if not state.domains:
         raise ProvisioningError('COMPILATION_FAILED',
                                 'A delivery plan requires at least one resolved domain',
                                 path='desired_state.domains')
+    identity = state.identity
     addresses = sorted(w.address for d in state.domains for w in d.workloads)
     operations = [
-        _operation('state-backend', {'state_keys': sorted(s['state_key'] for s in scopes)}),
+        _operation('state-backend', {'state_keys': sorted(s['state_key'] for s in scopes)},
+                   state.generation, _operation_id(operation_id, 'state-backend')),
         _operation('capacity-reservation',
-                   {'reservations': {z: r for z, r in sorted(state.reservations.items())}}),
+                   {'reservations': {z: r for z, r in sorted(state.reservations.items())}},
+                   state.generation, _operation_id(operation_id, 'capacity-reservation')),
         _operation('address-allocation',
                    {'prefixes': sorted(d.prefix for d in state.domains),
-                    'addresses': addresses}),
+                    'addresses': addresses},
+                   state.generation, _operation_id(operation_id, 'address-allocation')),
         _operation('dns-registration',
                    {'names': sorted(w.name for d in state.domains for w in d.workloads),
-                    'zone': _zone(state)}),
+                    'zone': _zone(state)},
+                   state.generation, _operation_id(operation_id, 'dns-registration')),
         _operation('security-edge-route',
-                   {'cells': sorted({d.cell_key for d in state.domains})}),
+                   {'cells': sorted({d.cell_key for d in state.domains})},
+                   state.generation, _operation_id(operation_id, 'security-edge-route')),
         _operation('shared-service-handoff',
-                   {'services': sorted(state.services)}),
-        _operation('backup-retention', {'recovery': state.profiles.get('recovery')}),
-        _operation('native-qualification', {'product_tuple': state.placement.get('platform')}),
-        _operation('production-authorization', {'lifecycle': state.lifecycle}),
-        _operation('guest-configuration', {'workloads': len(addresses)}),
+                   {'services': sorted(state.services)},
+                   state.generation, _operation_id(operation_id, 'shared-service-handoff')),
+        _operation('backup-retention', {'recovery': state.profiles.get('recovery')},
+                   state.generation, _operation_id(operation_id, 'backup-retention')),
+        _operation('native-qualification', {'product_tuple': state.placement.get('platform')},
+                   state.generation, _operation_id(operation_id, 'native-qualification')),
+        _operation('production-authorization', {'lifecycle': state.lifecycle},
+                   state.generation, _operation_id(operation_id, 'production-authorization')),
+        _operation('guest-configuration', {'workloads': len(addresses)},
+                   state.generation, _operation_id(operation_id, 'guest-configuration')),
     ]
     return {'format': DELIVERY_FORMAT,
             'status': 'PLANNED_DISABLED_NOT_AUTHORIZED',
+            'generation': state.generation,
+            'identity': identity.to_dict(),
+            'operation_id': operation_id,
+            'plan_digest': plan_digest,
             'operations': [o.to_dict() for o in operations],
             'blocking': sorted(o.name for o in operations if o.blocking),
             'terraform': terraform.to_dict(state.platform),
             'native_contact': False,
             'limits': ['Every operation is performed by the named owner, not by this repository',
-                       'A blocking operation prevents activation, not planning']}
+                       'A blocking operation prevents activation, not planning',
+                       'A receipt is bound to one generation and never carries to another']}
+
+
+def _operation_id(operation_id: str, name: str) -> str:
+    """The generation-scoped identity of one owner operation.
+
+    Shaped like the operation identity it extends — and therefore like the
+    `hosting-delivery/1` identifier the existing runner enforces — so a receipt
+    issued for one generation of one operation can never be read as a receipt for
+    another.
+    """
+    return f'{operation_id}-{name}' if operation_id else ''
 
 
 def _zone(state) -> str:

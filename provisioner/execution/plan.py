@@ -15,6 +15,9 @@ from provisioner.compiler import environment as compiler_environment
 from provisioner.compiler import normalize as compiler_normalize
 from provisioner.compiler import profiles as compiler_profiles
 from provisioner.domain.errors import Diagnostics, ProvisioningError
+from provisioner.domain.generation import (WsdIdentity, identity_of, operation_id,
+                                           record_for as generation_record_for,
+                                           require_generation)
 from provisioner.domain.placement import PlacementDecision
 from provisioner.domain.request import Request, digest as request_digest
 from provisioner.inventory.capacity import demand_for
@@ -49,23 +52,39 @@ class Plan:
     status: str = PLAN_STATUS
     native_contact: bool = False
     format: str = PLAN_FORMAT
+    generation: int = 1
+
+    def __post_init__(self):
+        require_generation(self.generation)
 
     @property
     def warnings(self) -> list[dict]:
         return [w.to_dict() for w in self.diagnostics.warnings]
 
     @property
+    def identity(self) -> WsdIdentity:
+        """The stable WSD identity this plan belongs to."""
+        return identity_of(self.desired_state)
+
+    @property
+    def operation_id(self) -> str:
+        """The deterministic operation identity of this generation of this WSD."""
+        return operation_id(self.identity, self.generation, self.digest)
+
+    @property
     def digest(self) -> str:
         """Stable identity of this exact plan.
 
         A plan is not identified by its request alone: it is identified by the
-        request, the rendered environment the existing compiler accepted, and the
-        exact reviewed profile revisions and catalog revisions it resolved against.
-        Bumping a profile or catalog version therefore changes the plan identity even
-        when no request field changed, which is what makes a reviewed policy change
-        visible in every artifact derived from this plan.
+        generation it claims, the request, the rendered environment the existing
+        compiler accepted, and the exact reviewed profile revisions and catalog
+        revisions it resolved against. Bumping a profile or catalog version
+        therefore changes the plan identity even when no request field changed, and
+        so does claiming a later generation — which is what makes a reviewed policy
+        change or a reviewed re-plan visible in every artifact derived from this plan.
         """
         return request_digest({
+            'generation': self.generation,
             'request': self.request.digest,
             'environment': self.environment,
             'profiles': self.resolution.profile_versions,
@@ -75,6 +94,10 @@ class Plan:
 
     def to_dict(self) -> dict:
         return {'format': self.format, 'status': self.status, 'digest': self.digest,
+                'generation': self.generation,
+                'identity': self.identity.to_dict(),
+                'operation_id': self.operation_id,
+                'generation_record': generation_record_for(self).to_dict(),
                 'request': {'source': self.request.source, 'digest': self.request.digest,
                             'tenant': self.request.tenant, 'wsd': self.request.wsd},
                 'resolution': self.resolution.to_dict(),
@@ -92,8 +115,9 @@ class Plan:
                 'warnings': self.warnings,
                 'native_contact': self.native_contact,
                 'limits': ['A plan is disabled, unqualified and unauthorized',
-                       'No native platform was contacted while creating this plan',
-                               'Execution requires separate recorded authorization']}
+                           'No native platform was contacted while creating this plan',
+                           'Execution requires separate recorded authorization',
+                           'A claimed generation is a change counter, not an approval']}
 
 
 def validate_request(document: dict, source: str, catalog: Catalog) -> tuple[Request, object, dict]:
@@ -147,8 +171,15 @@ def phases(compile_environment: bool = True) -> tuple[dict, ...]:
 
 
 def create_plan(document: dict, source: str, inventory: Inventory, catalog: Catalog,
-                compile_environment: bool = True, qualification=None) -> Plan:
-    """Run the whole pipeline and return the complete plan."""
+                compile_environment: bool = True, qualification=None,
+                generation: int = 1) -> Plan:
+    """Run the whole pipeline and return the complete plan.
+
+    `generation` is the claimed change counter for this WSD identity. It is carried
+    into the desired state, the plan identity and every owner operation. Claiming it
+    is the caller's act; deciding whether it is current belongs to the authoritative
+    record, which lives outside this repository.
+    """
     request, resolution, policy = validate_request(document, source, catalog)
     decision = place(request, resolution, inventory, qualification)
     if decision.held:
@@ -161,7 +192,8 @@ def create_plan(document: dict, source: str, inventory: Inventory, catalog: Cata
                                          'qualification_blockers': list(decision.qualification_blockers)})
     diagnostics = Diagnostics()
     state = compiler_desired_state.build(request, resolution, decision, inventory,
-                                         catalog=catalog, diagnostics=diagnostics)
+                                         catalog=catalog, diagnostics=diagnostics,
+                                         generation=generation)
     environment_document = compiler_environment.render(state)
     compiled, compile_plan = (compiler_environment.compile_document(environment_document)
                               if compile_environment else ({}, {}))
@@ -172,6 +204,8 @@ def create_plan(document: dict, source: str, inventory: Inventory, catalog: Cata
                 desired_state=state, environment=environment_document, compiled=compiled,
                 compile_plan=compile_plan, terraform_scopes=terraform_scopes,
                 ansible_scopes=ansible_scopes, phases=phases(compile_environment),
-                diagnostics=diagnostics)
-    plan = replace(plan, delivery=delivery_plan.build(state, list(terraform_scopes)))
+                diagnostics=diagnostics, generation=generation)
+    plan = replace(plan, delivery=delivery_plan.build(
+        state, list(terraform_scopes), plan_digest=plan.digest,
+        operation_id=plan.operation_id))
     return replace(plan, conformance=conformance_report.build(plan))

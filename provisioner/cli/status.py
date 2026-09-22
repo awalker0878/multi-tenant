@@ -45,6 +45,9 @@ def run(context: Context) -> tuple[int, dict]:
         'format': RESULT_FORMAT, 'status': plan.status, 'source': context.source,
         'subject': f'{plan.request.tenant}/{plan.request.wsd}',
         'request_digest': plan.request.digest, 'plan_digest': plan.digest,
+        'generation': plan.generation,
+        'identity': plan.identity.to_dict(),
+        'operation_id': plan.operation_id,
         'stages': [{'stage': s, 'status': 'REACHED'} for s in reached] +
                   [{'stage': s['stage'], 'status': 'HELD'} for s in held],
         'repository_stages': list(REPOSITORY_STAGES),
@@ -59,7 +62,8 @@ def run(context: Context) -> tuple[int, dict]:
         'activation': 'HELD',
         'native_contact': False,
         'limits': ['A reached stage is a repository artifact, not native state',
-                   'No stage beyond planning can be reached without external evidence']}
+                   'No stage beyond planning can be reached without external evidence',
+                   'The generation is the claim the caller made, not a record this repository holds']}
 
 
 def to_dict(context: Context) -> dict:

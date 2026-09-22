@@ -29,11 +29,20 @@ class ReplayTest(unittest.TestCase):
         plan = support.reference_plan()
         from provisioner.domain.request import digest as request_digest
         self.assertEqual(plan.digest,
-                         request_digest({'request': plan.request.digest,
+                         request_digest({'generation': plan.generation,
+                                         'request': plan.request.digest,
                                          'environment': plan.environment,
                                          'profiles': plan.resolution.profile_versions,
                                          'catalogs': plan.resolution.catalog_versions,
                                          'catalog_digest': plan.resolution.catalog_digest}))
+
+    def test_the_plan_digest_changes_when_only_the_generation_changes(self):
+        plan = support.reference_plan()
+        later = support.reference_plan(generation=2)
+        self.assertEqual(plan.request.digest, later.request.digest)
+        self.assertEqual(plan.environment, later.environment)
+        self.assertNotEqual(plan.digest, later.digest)
+        self.assertNotEqual(plan.operation_id, later.operation_id)
 
     def test_the_plan_digest_is_not_the_request_digest(self):
         plan = support.reference_plan()

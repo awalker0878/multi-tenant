@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from provisioner.domain.generation import identity_of, require_generation
 from provisioner.domain.request import digest
 
 DESIRED_STATE_FORMAT = 'hosting-resolved-desired-state/1'
@@ -65,6 +66,7 @@ class DesiredState:
     platform_family: str
     trust: str
     service_class: str
+    generation: int = 1
     profiles: dict = field(default_factory=dict)
     profile_versions: dict = field(default_factory=dict)
     catalog_versions: dict = field(default_factory=dict)
@@ -87,6 +89,14 @@ class DesiredState:
         'Native qualification and separate production approval remain required',
     )
 
+    def __post_init__(self):
+        require_generation(self.generation)
+
+    @property
+    def identity(self):
+        """The stable WSD identity this state belongs to."""
+        return identity_of(self)
+
     def to_dict(self) -> dict:
         return {
             'format': self.format,
@@ -103,6 +113,7 @@ class DesiredState:
             'platform_family': self.platform_family,
             'trust': self.trust,
             'service_class': self.service_class,
+            'generation': self.generation,
             'profiles': dict(self.profiles),
             'profile_versions': dict(self.profile_versions),
             'catalog_versions': dict(self.catalog_versions),

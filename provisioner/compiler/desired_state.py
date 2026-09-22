@@ -47,8 +47,14 @@ def domain_ids(tenant: str, wsd: str, zones: tuple[str, ...]) -> dict[str, str]:
 
 
 def build(request: Request, resolution, decision: PlacementDecision, inventory: Inventory,
-          catalog=None, diagnostics: Diagnostics | None = None) -> DesiredState:
-    """Assemble the resolved desired state from placement and allocation."""
+          catalog=None, diagnostics: Diagnostics | None = None,
+          generation: int = 1) -> DesiredState:
+    """Assemble the resolved desired state from placement and allocation.
+
+    `generation` is the claimed change counter for this WSD identity. It is carried
+    into the state, and therefore into the state digest and the plan identity, so a
+    later generation is a different desired state even when no request field changed.
+    """
     diagnostics = diagnostics or Diagnostics()
     if decision.held:
         raise ProvisioningError('NO_ELIGIBLE_PLACEMENT',
@@ -111,6 +117,7 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
         lifecycle=resolution.lifecycle, site_key=site_key, platform=platform,
         platform_family=eligibility.PLATFORM_FAMILY[platform],
         trust=resolution.trust, service_class=resolution.service_class,
+        generation=generation,
         profiles=dict(resolution.profiles),
         profile_versions=dict(resolution.profile_versions),
         catalog_versions=dict(resolution.catalog_versions),

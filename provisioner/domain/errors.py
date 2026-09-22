@@ -36,10 +36,13 @@ CODES: dict[str, tuple[str, str]] = {
     'AUTHORITY_REQUIRED': ('authority', 'Obtain separate, recorded production authorization.'),
     'ACTIVATION_REFUSED': ('authority', 'Activation requires independent conformance and authorization.'),
     'ARTIFACT_INTEGRITY_FAILED': ('execution', 'Regenerate the artifact from its reviewed request digest.'),
+    'GENERATION_CONFLICT': ('generation', 'Claim the next generation of the WSD identity instead.'),
+    'GENERATION_IDENTITY_MISMATCH': ('generation', 'Claim the generation against the identity that holds it.'),
+    'STALE_GENERATION': ('generation', 'Use the generation the authoritative record currently holds.'),
 }
 
 LAYERS = ('syntax', 'structural', 'standards', 'capability', 'inventory', 'capacity',
-          'allocation', 'compilation', 'execution', 'authority')
+          'allocation', 'compilation', 'execution', 'authority', 'generation')
 
 
 class ProvisioningError(Exception):

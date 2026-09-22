@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from provisioner.cli.support import EXIT_REFUSED
+from provisioner.domain import generation as generation_module
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import authority as authority_module
 from provisioner.execution import delivery as delivery_module
@@ -66,6 +67,10 @@ def run(context: Context, approved_plan: str | None = None,
         'format': RESULT_FORMAT, 'status': 'EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY',
         'source': context.source, 'plan_digest': plan.digest,
         'request_digest': plan.request.digest, 'approval': approval.to_dict(),
+        'generation': plan.generation,
+        'identity': plan.identity.to_dict(),
+        'operation_id': plan.operation_id,
+        'generation_record': generation_module.record_for(plan).to_dict(),
         'authority': authority_module.to_dict(),
         'phases': [dict(p) for p in plan.phases],
         'terraform_scopes': [dict(s) for s in plan.terraform_scopes],
@@ -76,7 +81,9 @@ def run(context: Context, approved_plan: str | None = None,
         'native_contact': False,
         'limits': ['Every operation is performed by its named owner',
                    'Terraform execution and state remain with the stack owner',
-                   'This repository holds no execution authority'],
+                   'This repository holds no execution authority',
+                   'A handoff carries one generation; the authoritative record decides '
+                   'whether it is still current'],
     }
     error = ProvisioningError(
         'EXECUTION_REFUSED',

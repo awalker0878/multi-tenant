@@ -55,18 +55,19 @@ def platform_request(platform: str, name: str = 'internal-production') -> dict:
 
 
 def platform_plan(platform: str, name: str = 'internal-production',
-                  compile_environment: bool = True):
+                  compile_environment: bool = True, generation: int = 1):
     """Plan the reviewed reference request against that platform's reviewed fixture."""
     path = request_path(name)
     return create_plan(platform_request(platform, name), str(path),
                        reference_fixture(platform), catalogs(),
-                       compile_environment=compile_environment)
+                       compile_environment=compile_environment, generation=generation)
 
 
-def reference_plan(name: str = 'internal-production', compile_environment: bool = True):
+def reference_plan(name: str = 'internal-production', compile_environment: bool = True,
+                   generation: int = 1):
     path = request_path(name)
     return create_plan(load_document(path), str(path), fixture(), catalogs(),
-                       compile_environment=compile_environment)
+                       compile_environment=compile_environment, generation=generation)
 
 
 def golden(name: str) -> dict:

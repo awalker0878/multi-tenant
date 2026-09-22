@@ -50,6 +50,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help='Resolve the environment document without invoking the existing compiler')
     parser.add_argument('--observations', default=None,
                         help='Native observations document (verify only)')
+    parser.add_argument('--generation', type=int, default=1,
+                        help='The WSD generation the caller claims (defaults to the first)')
     return parser
 
 
@@ -72,7 +74,8 @@ def _load_observations(path):
 def dispatch(argv=None) -> tuple[int, dict]:
     """Route one invocation to its command module and return exit code and payload."""
     args = build_parser().parse_args(argv)
-    context = build_context(args.request, args.inventory, args.profiles_root)
+    context = build_context(args.request, args.inventory, args.profiles_root,
+                            generation=args.generation)
 
     if args.command == 'validate':
         return validate_command.run(context)
