@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hosting.platform/v1/workload-security-domain",
+  "title": "Portable workload security domain request",
+  "description": "Consumer-facing intent only. Provider-native identifiers, Terraform state keys, VLAN/VNI values and credentials are never accepted here.",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {"const": "hosting.platform/v1"},
+    "kind": {"const": "WorkloadSecurityDomain"},
+    "metadata": {
+      "type": "object",
+      "required": ["tenant", "name", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "tenant": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,23}$",
+                   "description": "Portable tenant identity, bounded by the native module limit."},
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$",
+                 "description": "Portable workload security domain identity within the tenant."},
+        "owner": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,40}$"},
+        "description": {"type": "string", "maxLength": 240}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["environment", "security", "platform", "placement", "availability"],
+      "additionalProperties": false,
+      "properties": {
+        "environment": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$",
+                        "description": "Environment profile name; resolved by the environment catalog."},
+        "security": {"$ref": "#/definitions/profileRef"},
+        "assurance": {"$ref": "#/definitions/profileRef"},
+        "platform": {
+          "type": "object",
+          "required": ["preference"],
+          "additionalProperties": false,
+          "properties": {
+            "preference": {"enum": ["auto", "nutanix", "vmware", "openstack"],
+                           "description": "auto evaluates eligible candidates; a platform name is a reviewed override."}
+          }
+        },
+        "placement": {
+          "type": "object",
+          "required": ["region"],
+          "additionalProperties": false,
+          "properties": {
+            "region": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "site": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "cell": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9-]{1,40}$"}
+          }
+        },
+        "availability": {"$ref": "#/definitions/profileRef"},
+                "network": {"$ref": "#/definitions/profileRef"},
+                "recovery": {
+          "type": "object",
+          "required": ["enabled"],
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "profile": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"}
+          }
+        },
+        "capacity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "computeProfile": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "storageProfile": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"}
+          }
+        },
+        "zones": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operations": {"$ref": "#/definitions/zoneToggle"},
+            "restricted": {"$ref": "#/definitions/zoneToggle"}
+          }
+        },
+        "services": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dns": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "ntp": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "identity": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "logging": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+            "backup": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"}
+          }
+        },
+        "exposure": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "publicIngress": {"type": "boolean"},
+            "internetEgress": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "profileRef": {
+      "type": "object",
+      "required": ["profile"],
+      "additionalProperties": false,
+      "properties": {"profile": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"}}
+    },
+    "zoneToggle": {
+      "type": "object",
+      "required": ["enabled"],
+      "additionalProperties": false,
+      "properties": {"enabled": {"type": "boolean"}}
+    }
+  }
+}
