@@ -30,7 +30,7 @@ def run(context: Context) -> tuple[int, dict]:
                               'native_contact': False}
 
     reached = ['request', 'normalized', 'validated', 'resolved']
-    reached.append('placed' if not plan.decision.held else 'placed')
+    reached.append('placed')
     reached.append('allocated')
     if plan.compiled:
         reached.append('compiled')
