@@ -456,7 +456,8 @@ The repository already contains NetBox/IPAM, IPAM record, DNS registration, and 
 ### GATE-C08 — Profile catalogs must become versioned policy inputs
 
 Severity: P1  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include R4, sections 25-26, 40, 58, 71, 74, 75, 88, and 91.
 
@@ -484,6 +485,48 @@ Several defaults remain hardcoded in provisioner/compiler/normalize.py, which cr
 - environment-specific defaults resolve deterministically;
 - docs/service-profile matrix cannot drift from catalogs;
 - deferred profile remains explicitly refused.
+
+#### Completion evidence
+
+- every catalog and every profile entry declares a reviewed `version`, and the
+  loader refuses a catalog or profile that omits or malforms one;
+- the loader publishes a canonical `digest` over the whole reviewed set, so a
+  catalog revision is part of plan and desired-state identity;
+- no portable default remains in `provisioner/compiler/normalize.py`: the defaults
+  are the ones the catalogs declare;
+- `docs/provisioning/service-profile-matrix.md` carries a `Version` column that a
+  documentation test compares against the catalogs;
+- a deferred profile is still refused, at resolution and in the matrix.
+
+#### Completion record
+
+Profile policy is now two reviewed sources and nothing else: the catalogs own what
+a portable request may ask for, which defaults a request may omit, and which
+revision of each answer was reviewed. No default survives in code.
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. explicit versioned model | every `profiles/<family>/catalog.json` declares a top-level `version`; every profile entry declares a `version` (`loader.VERSION`, `loader._version`) |
+| 2. portable defaults as reviewed data | `loader.DEFAULT_OWNERS`/`Catalog.default()`/`request_defaults()`/`service_defaults()` read `default`, `services`+`defaults`, and `requestDefaults` from the catalogs |
+| 3. constants only for mechanics | the only constant left is `normalize.PLACEMENT_DEFAULTS`, which encodes absence (`site`/`cell` unset) rather than policy |
+| 4. resolved versions in identity | `Resolution`/`DesiredState` carry `profile_versions`, `catalog_versions`, `catalog_digest`; `Plan.digest` binds request + environment + profile versions + catalog versions + catalog digest |
+| 5. loader/schema validation | the loader refuses missing/invalid/duplicate catalog versions, missing/invalid profile versions, deferred defaults, unknown defaults, a non-service catalog declaring `services`, and incomplete service defaults; `provisioner/schemas/v1/resolved-desired-state.schema.json` requires the three new fields |
+| 6. matrix validated from catalogs | `tests/provisioning/documentation/test_documentation.py::ServiceProfileMatrixTest::test_documented_catalog_revisions_match_the_catalogs` compares every matrix row and every `Reviewed as catalog revision` line against the catalogs |
+| 7. no duplicated family/default list | `normalize.DEFAULTS` is deleted; `defaults_for(catalog)` derives the whole default document from the catalogs |
+| 8. normalization derives defaults | `normalize(document, source, catalog=None)` merges each `REQUEST_DEFAULT_OWNERS` group verbatim; `Plan.validate_request()` and `provisioner/cli/validate.py`/`resolve.py` pass the loaded catalog |
+
+`hosting-profile-resolution/1` becomes `/2` (it now carries the revision set), and
+the reviewed `examples/resolved/*.resolution.json` artifacts move to
+`hosting-resolved-profile-set/2`; the shared environment document is deliberately
+unchanged so every golden `environment.json` stays byte-identical and the existing
+compiler keeps refusing unknown top-level keys.
+
+Regressions: `tests/provisioning/policy/test_profile_versions.py` (34 tests / 94
+subtests), plus the plan-digest test in `tests/provisioning/unit/test_determinism.py`
+and the two new corpus tests in `tests/provisioning/end_to_end/test_golden.py`.
+`python -m pytest tests/provisioning -q` reports 310 passed / 648 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` pass.
 
 ---
 
