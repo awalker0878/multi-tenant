@@ -287,3 +287,10 @@ Current campaign assurance binds the reviewed target and service/topology scope 
 ## Open native work
 
 [The implementation backlog](../../sources/implementation_backlog.csv) remains the source record for **actual owner decisions and native evidence**. I01–I10 now have repository-side verification, handoff or assurance mechanisms; that does not select a target, populate any active assurance index, contact a native system, issue authorization or turn synthetic evidence into native qualification.
+## Portable provisioning pipeline
+
+Design: [Portable provisioning index](../provisioning/README.md) · [Provisioning architecture](../provisioning/architecture.md) · [Request contract](../provisioning/request-contract.md) · [Profile model](../provisioning/profile-model.md) · [Placement model](../provisioning/placement-model.md) · [Desired-state model](../provisioning/desired-state-model.md)
+
+Implementation: [provisioner package](../../provisioner) · [reviewed profile catalogs](../../profiles) · [standards rules](../../policy/rules/standards.json) · [request schemas](../../provisioner/schemas/v1) · [reference requests](../../examples/requests) · [golden artifacts](../../examples/golden) · [command line](../provisioning/plan-workflow.md) · [service-profile matrix](../provisioning/service-profile-matrix.md)
+
+Current portable provisioning validates one `hosting.platform/v1` request against a schema, resolves it against ranked profile catalogs, evaluates standards and cross-field semantics, places it fail-closed over read-only inventory, allocates zone prefixes and service bindings, expands a fully resolved internal desired state and hands it to the existing `tools/compile_wsd.py`. Terraform, Ansible, state backends, delivery and every service owner keep their existing authority. CI does not contact a platform, retrieve credentials, run Terraform or Ansible, apply a plan, activate a service or promote fixture placement to an authorization.
