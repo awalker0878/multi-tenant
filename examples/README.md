@@ -12,7 +12,7 @@ from Terraform. Native provider plans cannot be claimed while the engine is abse
 `requests/` holds the five reviewed portable requests; `resolved/` holds their
 deterministic resolution, placement and desired-state artifacts; `golden/` holds
 their environment and conformance documents plus the `digests.json` index. The
-`tests/provisioning/test_golden.py` regressions replay all of them. They plan as
+`tests/provisioning/end_to_end/test_golden.py` regressions replay all of them. They plan as
 `PLANNED_DISABLED_NOT_AUTHORIZED` with `native_contact: false`; see the
 [portable provisioning documents](../docs/provisioning/README.md).
 
