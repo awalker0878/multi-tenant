@@ -10,20 +10,20 @@ def verification_errors(root, index):
     ra_path=base/'05_Reference_v1_4/registers/realization_verification_addenda.json'
     q_path=base/'04_Shared/development/qualification_observation_cards.csv'
     w_path=base/'05_Reference_v1_4/registers/v1_4_verification_assertions.csv'
-    ra=json.loads(ra_path.read_text());q=csv_rows(q_path);w=csv_rows(w_path)
+    ra=json.loads(ra_path.read_text(encoding='utf-8'));q=csv_rows(q_path);w=csv_rows(w_path)
     ct=csv_rows(base/'04_Shared/tests.csv')
     expected=[]
     for row in ra:
-        expected.append({'id':row['id'],'family':'RA','source_path':str(ra_path.relative_to(root)),
+        expected.append({'id':row['id'],'family':'RA','source_path':ra_path.relative_to(root).as_posix(),
             'base_tests':row['baseTests'],'execution_status':row['executionStatus'],
             'applicability':'Selected native realization and covered failure; owner-approved scope required'})
     for row in q:
-        expected.append({'id':row['id'],'family':'Q11','source_path':str(q_path.relative_to(root)),
+        expected.append({'id':row['id'],'family':'Q11','source_path':q_path.relative_to(root).as_posix(),
             'base_tests':[x.strip() for x in row['existing_test_ids'].split(';')],
             'execution_status':row['execution_status'],'applicability':row['scope_note']})
     for row in w:
         expected.append({'id':row['assertion'].split(' / ',1)[0],'family':'W14',
-            'source_path':str(w_path.relative_to(root)),'original_record':row,'execution_status':'not-run',
+            'source_path':w_path.relative_to(root).as_posix(),'original_record':row,'execution_status':'not-run',
             'applicability':'Connected W14 design; applicability and current native observation must be assessed'})
     wanted={'families':{'CT':len(ct),'RA':len(ra),'W14':len(w),'Q11':len(q)},
         'supplemental_mappings':expected,'execution':'SPECIFICATIONS_NOT_EXECUTED',
@@ -38,7 +38,7 @@ def check(root):
     shared=root/'reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared'
     with (shared/'requirements.csv').open(encoding='utf-8-sig',newline='') as f:requirements={r['requirementId']:r for r in csv.DictReader(f)}
     with (shared/'tests.csv').open(encoding='utf-8-sig',newline='') as f:ct={r['id'] for r in csv.DictReader(f)}
-    rows=json.loads((root/'sources/assurance/implementation_assertions.json').read_text());seen=set();covered=set()
+    rows=json.loads((root/'sources/assurance/implementation_assertions.json').read_text(encoding='utf-8'));seen=set();covered=set()
     for row in rows:
         ident=row.get('assertion_id');parent=row.get('requirement_id')
         if not ident or ident in seen:errors.append('Duplicate/missing assertion ID')
@@ -50,7 +50,7 @@ def check(root):
         if not set(row.get('reference_tests',[]))<=ct:errors.append(str(ident)+': unresolved test IDs')
         if 'NATIVE_NOT_RUN' not in row.get('evidence_class',''):errors.append(str(ident)+': an unverified allocation must not claim native success')
     if covered!=set(requirements):errors.append('Not all requirements have an allocation')
-    families=json.loads((root/'sources/assurance/verification_families.json').read_text())
+    families=json.loads((root/'sources/assurance/verification_families.json').read_text(encoding='utf-8'))
     if families['families']!={'CT':80,'RA':12,'W14':12,'Q11':12}:errors.append('Verification family count mismatch')
     errors.extend(verification_errors(root,families))
     mappings=families['supplemental_mappings'];ids=[r['id'] for r in mappings]

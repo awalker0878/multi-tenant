@@ -5,6 +5,8 @@
 and bounded visible task queries. Its explicit profile is
 `nutanix-microseg-v4.2-prism-v4.3-policy-task-activity`. The installed target must
 support both microseg v4.2 and Prism v4.3. Failure never selects a weaker profile.
+The bounded Prism v4.3 entity-activity queries come from the shared
+`tools/nutanix_entity_activity.py`.
 
 ## Accepted scope and read sequence
 

@@ -11,6 +11,7 @@ This repository now contains the Word documents' actual content as Markdown chap
 | [Engineering](engineering/README.md) / [TAD reading view](engineering/TAD.md) | Fabric, native stacks, forward/reply paths, dependencies and supported build responsibilities |
 | [Solution designs](solutions/README.md) | Service alternatives and a connected two-tenant OZ/RZ worked environment |
 | [Implementation](implementation/README.md) | Commissioning work packages, code coverage, readback, safe stopping and handover |
+| [Portable provisioning](provisioning/README.md) | Parameter-driven request → profile → policy → placement → desired state → compiler pipeline and its command line |
 | [Operations](operations/README.md) | Change, recovery, migration, failback, retention and operating ownership |
 | [Assurance](assurance/README.md) | Gap map, requirements, test specifications, qualification and audit boundaries |
 | [ADRs](adr/README.md) | Proposed source-backed design decisions and original decision-ID mapping |

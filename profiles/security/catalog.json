@@ -1,0 +1,52 @@
+{
+  "family": "security",
+  "description": "Security profiles bind portable intent to a trust level, a service class and the portable capabilities the placement must prove.",
+  "profiles": [
+    {
+      "profile": "internal-baseline",
+      "rank": 1,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+            "description": "Internal baseline separation without a dedicated protected service class.",
+            "requires": {
+              "trust": "internal-trust",
+              "service_class": "standard",
+        "capabilities": ["network_domain", "ipv4", "gateway_policy", "audit_logging"],
+        "zones": ["OZ", "RZ"],
+        "public_ingress": false,
+        "internet_egress": false
+      },
+      "limits": ["Baseline separation is not a protected service class claim"]
+    },
+    {
+      "profile": "protected-b-medium",
+      "rank": 2,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+            "description": "Protected internal service class with distributed policy enforcement in both internal zones.",
+            "requires": {
+              "trust": "internal-trust",
+              "service_class": "protected-b",
+        "capabilities": ["network_domain", "ipv4", "distributed_firewall", "gateway_policy", "audit_logging"],
+        "zones": ["OZ", "RZ"],
+        "public_ingress": false,
+        "internet_egress": false
+      },
+      "limits": ["Internal protected service class only; no public or partner exposure"]
+    },
+    {
+      "profile": "protected-b-high",
+      "rank": 3,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+            "description": "Protected internal service class with dedicated edge context, load balancing and logging evidence.",
+            "requires": {
+              "trust": "internal-trust",
+              "service_class": "protected-b",
+        "capabilities": ["network_domain", "ipv4", "distributed_firewall", "gateway_policy",
+                         "dedicated_edge_context", "native_load_balancer", "audit_logging"],
+        "zones": ["OZ", "RZ"],
+        "public_ingress": false,
+        "internet_egress": false
+      },
+      "limits": ["Dedicated edge context is still an internal boundary, not public exposure"]
+    }
+  ]
+}

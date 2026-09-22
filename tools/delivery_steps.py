@@ -21,6 +21,7 @@ KINDS = {
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'retirement_review': (set(), {'plan','evidence'}, set()),
     'operations_review': (set(), {'review'}, set()),
+    'operations_alerts': (set(), {'review', 'result', 'acknowledgements'}, {'release'}),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
@@ -28,7 +29,7 @@ KINDS = {
     'vsphere_power': (set(), {'request','authority','session'}, {'ca_file'}),
     'target_campaign': ({'ssh','ssh_sha256'}, {'plan','authority'}, set()),
     'edge_policy': ({'nft','nft_sha256','mode'}, {'spec','authority'}, set()),
-    'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle'}),
+    'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle','release_evidence'}),
     'dns': ({'action'}, {'allocation','confirmation','job','scope','authority','token_file','tsig_file'}, {'ca_bundle','registration_job','registration_scope'}),
     'dns_propagation': ({'dns_step'}, {'config','secrets'}, set()),
 }
@@ -132,6 +133,16 @@ def validate_packet(step, packet, plan, base):
         operations=load_private(files['review']); validate(operations)
         require(operations['source_commit']==plan['source_commit']
                 and operations['scope']==plan['scope'], 'Foreign operations review')
+    if kind=='operations_alerts':
+        from tools.operations_alerts import validate_acknowledgement,validate_release,validate_result
+        from tools.operations_review import validate as validate_review
+        review=load_private(files['review']); result=load_private(files['result'])
+        validate_review(review); validate_result(result)
+        require(review['source_commit']==plan['source_commit']
+                and result['review_sha256']==c.digest(review) and result['scope']==plan['scope'],
+                'Foreign operations alert review')
+        for record in load_private(files['acknowledgements']): validate_acknowledgement(result,record)
+        if 'release' in files: validate_release(result,load_private(files['release']))
     if kind=='acceptance':
         require(values['purpose'] in {'admission','domain','bootstrap','services','activation','post_activation','recovery','retirement'}, 'Unknown acceptance gate')
         accepted=load_private(files['acceptance'])
@@ -150,8 +161,10 @@ def validate_packet(step, packet, plan, base):
             authorize(value,load_private(files['authority']))
             require(value['nft_sha256']==values['nft_sha256'],'Incident executable binding changed')
         if kind=='ipam':
-            from tools.netbox_ipam import ACTIONS
+            from tools.netbox_ipam import ACTIONS, RELEASE_ACTIONS
             require(values['action'] in ACTIONS,'Unknown IPAM operation')
+            require(('release_evidence' in files)==(values['action'] in RELEASE_ACTIONS),
+                    'Reuse quarantine evidence is required exactly for quarantine and release')
         if kind=='dns':
             from tools.netbox_dns import ACTIONS
             require(values['action'] in ACTIONS,'Unknown DNS operation')
@@ -276,6 +289,17 @@ def dispatch(step, packet, directory, base, plan, root):
         write_new(directory/'alerts.json',encoded(alerts))
         names=['operations-review.json','alerts.json']
         enforce(result)
+    elif kind=='operations_alerts':
+        from tools.operations_alerts import enforce,evaluate
+        review=load_private(files['review']); report=load_private(files['result'])
+        require(report['format']=='hosting-operations-review-result/1'
+                and report['review_sha256']==c.digest(review) and report['scope']==plan['scope'],
+                'Foreign operations alert review')
+        result=evaluate(review,report,load_private(files['acknowledgements']),
+                        release=load_private(files['release']) if 'release' in files else None)
+        write_new(directory/'alert-accounting.json',encoded(result))
+        names=['alert-accounting.json']
+        enforce(result)
     elif kind=='acceptance':
         accepted=load_private(files['acceptance'])
         write_new(directory/'acceptance.json',encoded(accepted))
@@ -347,7 +371,7 @@ def dispatch(step, packet, directory, base, plan, root):
                   'dns':{'AUTHORITATIVE_REGISTRATION_OBSERVED','AUTHORITATIVE_TOMBSTONE_OBSERVED'}}
         if kind in accepted: require(result['status'] in accepted[kind],'Delivery owner outcome remains held')
         if kind=='ipam':
-            require(result.get('allocation_status') in {'reserved','active','deprecated'},'IPAM allocation remains held')
+            require(result.get('allocation_status') in {'reserved','active','deprecated','QUARANTINED','RELEASED'},'IPAM allocation remains held')
     if not names:
         write_new(directory/'result.json',encoded(result)); names=['result.json']
     return complete(step,packet,directory,plan,result,names)
@@ -495,6 +519,32 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                 raise OperationsHold('Operations evidence remains held',
                                      containment_required=result['containment_required'])
             return complete(step,packet,directory,plan,result,['operations-review.json','alerts.json'])
+        if kind=='operations_alerts':
+            from tools.operations_alerts import AlertHold,validate_acknowledgement
+            files=file_paths(packet); review=load_private(files['review'])
+            result=load_private(files['result'])
+            records=load_private(files['acknowledgements'])
+            outcome=load_private(directory/'alert-accounting.json')
+            require(outcome['format']=='hosting-operations-alert-accounting/1'
+                    and outcome['review_sha256']==c.digest(review)
+                    and result['review_sha256']==c.digest(review)
+                    and outcome['scope']==plan['scope']
+                    and [row['observation_id'] for row in outcome['alerts']]
+                    ==[alert['observation_id'] for alert in result['alerts']],
+                    'Interrupted operations alert artifacts changed')
+            for record in records:
+                validate_acknowledgement(result,record)
+                row=next((item for item in outcome['alerts']
+                          if item['observation_id']==record['observation_id']),None)
+                require(row is not None and row['acknowledged_by']==record['acknowledged_by']
+                        and row['acknowledged_at']==record['acknowledged_at'],
+                        'Interrupted operations alert acknowledgement changed')
+            if outcome['status'] not in {'ALERTS_ACKNOWLEDGED','ALERTS_NONE'}:
+                raise AlertHold('Operations alert escalation requires accountable resolution',
+                                escalate=outcome['status']=='ALERTS_ESCALATED')
+            if outcome['release_requested'] and not outcome['containment_release_authorized']:
+                raise AlertHold(f"Containment release is not authorized: {outcome['release_blocked_reason']}")
+            return complete(step,packet,directory,plan,outcome,['alert-accounting.json'])
         if kind=='capacity':
             from tools.capacity import operate
             files=file_paths(packet); values=packet['parameters']; request=load_private(files['request'])

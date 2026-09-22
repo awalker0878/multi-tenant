@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hosting.platform/v1/conformance-report",
+  "title": "Conformance report",
+  "description": "Repository-side conformance result. Activation is refused here; it needs independent native evidence and separate production authorization. Unknown required evidence is never reported as PASS.",
+  "type": "object",
+  "required": ["format", "status", "subject", "plan_digest", "request_digest", "checks",
+               "failed", "pending", "blocking", "ready", "native_contact"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"const": "hosting-conformance-report/1"},
+    "status": {"enum": ["CONFORMANT", "BLOCKED_ON_EXTERNAL_EVIDENCE", "FAILED"]},
+    "subject": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,23}/[a-z][a-z0-9-]{1,40}$"},
+    "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["format", "name", "status", "authority", "mandatory", "detail",
+                     "evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "format": {"const": "hosting-conformance-check/1"},
+          "name": {"type": "string"},
+          "status": {"enum": ["PASS", "FAIL", "PENDING_EXTERNAL_EVIDENCE", "NOT_APPLICABLE"]},
+          "authority": {"enum": ["REPOSITORY", "EXTERNAL"]},
+          "mandatory": {"type": "boolean"},
+          "detail": {"type": "string"},
+          "evidence": {"type": "object"}
+        }
+      }
+    },
+    "failed": {"type": "array", "items": {"type": "string"}},
+    "pending": {"type": "array", "items": {"type": "string"}},
+    "blocking": {"type": "array", "items": {"type": "string"}},
+    "ready": {"type": "boolean"},
+    "native_contact": {"const": false},
+    "limits": {"type": "array", "items": {"type": "string"}}
+  }
+}

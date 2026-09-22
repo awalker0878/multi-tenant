@@ -20,6 +20,10 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Architecture / decision / implementation map](code-map.md)
 
+[Portable provisioning interface](../provisioning/README.md) ? the one current entry
+point: consumer request to provisioner core to resolved environment to the existing
+WSD compiler to Terraform stacks to delivery, observation and verification.
+
 [Method-of-procedure and handover templates](../templates/implementation-mop/README.md)
 
 [Existing executable commissioning procedure](../COMMISSIONING.md)

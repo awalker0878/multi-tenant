@@ -6,6 +6,12 @@ outside the recorded graph and supplies the activity evidence required by the
 [held AHV lifecycle reviewer](terraform-recovery.md). It never submits native
 commands, adopts tasks/state, releases a ledger or establishes writer exclusion.
 
+`tools/nutanix_entity_activity.py` performs the bounded Prism v4.3
+entity-activity queries shared with the
+[Flow activity observer](nutanix-flow-activity-readback.md). It carries no
+writer-exclusion or recovery authority, and the installed-target filter,
+ordering, count and RBAC completeness must be qualified for each entity kind.
+
 ## Accepted profile and query
 
 Use `nutanix-ahv-v4.2-prism-v4.3-vm-task-activity` with

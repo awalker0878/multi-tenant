@@ -362,7 +362,7 @@ def check_campaign_report(assets, manifest_name, report, started, current):
 def ssh_probe(case, target, authority, directory, binary, ca, sequence):
     require(utcnow() < datetime.fromisoformat(target['access_valid_until'].replace('Z', '+00:00')), 'Guest access expired')
     payload = case | {'machine_id': target['machine_id'], 'source': target['address'], 'ca_pem': ca.decode('ascii')}
-    fixed = (ROOT / 'tools/guest_probe.py').read_text()
+    fixed = (ROOT / 'tools/guest_probe.py').read_text(encoding='utf-8')
     argv = [str(binary), '-F', '/dev/null', '-T', '-i', str(directory / 'ssh_key'),
             '-p', str(target['port']), '-l', target['user']]
     settings = ['BatchMode=yes', 'StrictHostKeyChecking=yes', 'UpdateHostKeys=no',

@@ -20,7 +20,8 @@ Those operations must not be treated as interchangeable cleanup steps:
 4. native owned resources must be reconciled and cleaned up under their actual
    platform owners;
 5. DNS ownership must be withdrawn before IPAM reuse;
-6. IPAM retirement must precede capacity/address reuse;
+6. IPAM retirement must precede the declared reuse quarantine and observed
+   address release, which must precede capacity/address reuse;
 7. capacity can be released only after all applicable cleanup owners have completed;
 8. live-service closure remains separate from later retained-data destruction.
 
@@ -55,13 +56,15 @@ Supported action types are intentionally narrow:
 | `cleanup_native_resources` | Bind native platform cleanup evidence |
 | `withdraw_dns` | Bind authoritative DNS tombstone evidence |
 | `retire_ipam` | Bind IPAM retirement/deprecation evidence |
+| `release_ipam` | Bind the declared reuse quarantine and observed address release |
 | `release_capacity` | Release capacity only after applicable cleanup owners |
 | `close_service` | Record live-service closure after every prior action |
 
 The graph must end at `close_service`. When retained data exists, destructive
 actions must descend from `protect_retained_data`. DNS withdrawal precedes IPAM
-retirement, and capacity release must descend from every applicable native/DNS/IPAM
-cleanup action.
+retirement, address release follows the observed retirement, and capacity release
+must descend from every applicable native/DNS/IPAM cleanup action, including the
+[declared reuse quarantine and observed release](netbox-ipam.md).
 
 ## Evidence format
 
@@ -120,8 +123,8 @@ requires actual, accepted evidence for:
 - identity and certificate revocation;
 - useful-data retention and independently recoverable keys/catalogues;
 - platform-specific VM/volume/network/policy cleanup or retained ownership;
-- DNS tombstone propagation and address/name reuse quarantine;
-- IPAM retirement;
+- DNS tombstone propagation and the [declared address reuse quarantine](netbox-ipam.md);
+- IPAM retirement and the observed reuse boundary;
 - capacity release against authoritative current ownership;
 - absence of orphan active dependencies across shared services;
 - sanitization/destruction when a retained object later becomes eligible;

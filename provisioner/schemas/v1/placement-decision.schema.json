@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hosting.platform/v1/placement-decision",
+  "title": "Placement decision",
+  "description": "Deterministic placement result or an explicit fail-closed hold. A fixture decision is a demonstration and is never placement authority.",
+  "type": "object",
+  "required": ["format", "status", "authority", "request_digest", "required_capabilities",
+               "selection_rule", "registry_blockers", "selected", "candidates", "reasons",
+               "digest"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"const": "hosting-placement-decision/1"},
+    "status": {"enum": ["PLACED", "HOLD_NO_ELIGIBLE_PLATFORM", "HOLD_NO_ELIGIBLE_SITE",
+                        "HOLD_CAPABILITY_NOT_QUALIFIED", "HOLD_INVENTORY_NOT_AUTHORITATIVE"]},
+    "authority": {"enum": ["AUTHORITATIVE", "FIXTURE_NOT_PLACEMENT_AUTHORITY"]},
+    "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "selection_rule": {"type": "string", "minLength": 1},
+    "required_capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "registry_blockers": {"type": "array", "items": {"type": "string"}},
+    "selected": {
+      "type": ["object", "null"],
+      "required": ["site_key", "cell_key", "platform", "clusters", "cells"],
+      "additionalProperties": false,
+      "properties": {
+        "site_key": {"type": ["string", "null"]},
+        "cell_key": {"type": ["string", "null"]},
+        "platform": {"enum": ["nutanix", "vmware", "openstack", null]},
+        "clusters": {"type": "object"},
+        "cells": {"type": "object"}
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["site_key", "cell_key", "platform", "platform_family", "zone",
+                     "eligible", "score", "blockers", "capability_blockers", "product_tuple"],
+        "additionalProperties": false,
+        "properties": {
+          "site_key": {"type": "string"},
+          "cell_key": {"type": "string"},
+          "platform": {"enum": ["nutanix", "vmware", "openstack"]},
+          "platform_family": {"type": "string"},
+          "zone": {"enum": ["OZ", "RZ"]},
+          "eligible": {"type": "boolean"},
+          "score": {"type": "integer"},
+          "blockers": {"type": "array", "items": {"type": "string"}},
+          "capability_blockers": {"type": "array", "items": {"type": "string"}},
+          "product_tuple": {"type": "string"}
+        }
+      }
+    },
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "limits": {"type": "array", "items": {"type": "string"}}
+  }
+}

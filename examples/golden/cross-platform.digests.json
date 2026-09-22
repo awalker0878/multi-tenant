@@ -1,0 +1,66 @@
+{
+  "description": "Deterministic digests for one reviewed reference request realized on each reviewed platform fixture. Every platform is asked for the same portable request (portable_digest); only spec.platform.preference differs, so the per-platform request_digest differs.",
+  "format": "hosting-golden-cross-platform/1",
+  "native_contact": false,
+  "platforms": {
+    "nutanix": {
+      "compiled_files": [
+        "tenant-01/wsd-01/domains.tfvars.json"
+      ],
+      "desired_state_digest": "e75177252ccc045fe44ed4e9173d43d002bb7ee2cba756d860d861fac824f7bc",
+      "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
+      "fixture": "provisioner/inventory/fixtures/nutanix-reference.json",
+      "native_contact": false,
+      "plan_digest": "0328f39a83a87a5f79c7f37f0815f139c3e52bbf4e5d01cde6b60ff3f3382303",
+      "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
+      "realization_gaps": [
+        "INVENTORY_NOT_AUTHORITATIVE"
+      ],
+      "request_digest": "12bd1c3429b9498d8594d558eec059bc76fbea594780b649d07d15b469391e39",
+      "stack_roots": [
+        "terraform/stacks/wsd/nutanix/domains"
+      ],
+      "status": "PLANNED_DISABLED_NOT_AUTHORIZED"
+    },
+    "openstack": {
+      "compiled_files": [
+        "tenant-01/wsd-01/domains.tfvars.json"
+      ],
+      "desired_state_digest": "c11c39f32888c5d73ad1b384159a4f09bcbf586b769a5b9694e290010ff776d5",
+      "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
+      "fixture": "provisioner/inventory/fixtures/openstack-reference.json",
+      "native_contact": false,
+      "plan_digest": "d6f5c30da912e9d8ac917bc78d1fe4ceb2265b4858ab5330e3cce36443811532",
+      "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
+      "realization_gaps": [
+        "INVENTORY_NOT_AUTHORITATIVE"
+      ],
+      "request_digest": "f7040d6c414b71c46afb9bc2f53249f2e222be32468649bd7471bb758cfd7a0f",
+      "stack_roots": [
+        "terraform/stacks/wsd/openstack/domains"
+      ],
+      "status": "PLANNED_DISABLED_NOT_AUTHORIZED"
+    },
+    "vmware": {
+      "compiled_files": [
+        "tenant-01/wsd-01/domains.tfvars.json"
+      ],
+      "desired_state_digest": "b37955da99dec58b32ed148dc80540e2955235611a4f2bc18c5a22555c420224",
+      "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
+      "fixture": "provisioner/inventory/fixtures/vmware-reference.json",
+      "native_contact": false,
+      "plan_digest": "c0ea094419a528d04610d0b866e72ed0da8329b2b8868902a48aa6def01f5489",
+      "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
+      "realization_gaps": [
+        "INVENTORY_NOT_AUTHORITATIVE",
+        "REALIZATION_INPUT_UNAVAILABLE"
+      ],
+      "request_digest": "492853ab3914573578d3bb7b241233f73dcaad56d4b8c8474a52339b21480ab4",
+      "stack_roots": [
+        "terraform/stacks/wsd/vmware/domains"
+      ],
+      "status": "PLANNED_DISABLED_NOT_AUTHORIZED"
+    }
+  },
+  "request": "examples/requests/internal-production.yaml"
+}

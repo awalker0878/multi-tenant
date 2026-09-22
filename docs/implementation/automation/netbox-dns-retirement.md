@@ -112,8 +112,9 @@ releases ownership. Selected-view readback is not universal cache-expiry proof.
 NetBox retirement conditionally changes the row to `deprecated`; it does not
 delete or release it. If that PATCH has an uncertain response, use the existing
 IPAM `reconcile` action. Do not repeat the write, remove DNS attempts or reactivate
-the allocation. Address/name reuse and tombstone release require a separate
-accepted procedure, quarantine and complete dependency evidence.
+the allocation. Address/name reuse then requires the
+[declared reuse quarantine and release](netbox-ipam.md) over complete dependency
+evidence; a tombstone is never released or deleted by this withdrawal.
 
 ## Qualification limits
 

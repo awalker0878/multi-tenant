@@ -22,9 +22,9 @@ END='<!-- END GENERATED DECISION LINKS -->'
 class Builder:
     def __init__(self,root=ROOT):
         self.root=root
-        self.sources=json.loads((root/'sources/documentation/conversion_manifest.json').read_text())['documents']
+        self.sources=json.loads((root/'sources/documentation/conversion_manifest.json').read_text(encoding='utf-8'))['documents']
         self.byid={s['id']:s for s in self.sources}
-        self.adrs=json.loads((root/'sources/documentation/adr_records.json').read_text())
+        self.adrs=json.loads((root/'sources/documentation/adr_records.json').read_text(encoding='utf-8'))
         self.shared=root/'reference/Portable_Hosting_Delivery_Kits_v1_1/04_Shared'
         self.outputs=[]
 
@@ -103,7 +103,7 @@ Use {self.link(p,'docs/DOCUMENTATION_MIGRATION.md','the migration procedure')} a
                 target=self.section(s,n);backlinks.setdefault(target,[]).append(a)
                 cross.append({'adr':a['id'],'title':a['title'],'status':a['status'],'originalDecisionIds':'; '.join(a['source_decision_ids']), 'sourceId':s,'sourceSection':str(n),'markdownSource':target,'adrPath':p})
         for target,items in backlinks.items():
-            p=self.root/target;txt=p.read_text()
+            p=self.root/target;txt=p.read_text(encoding='utf-8')
             txt=re.sub(re.escape(BEGIN)+r'.*?'+re.escape(END),'',txt,flags=re.S).rstrip()
             block='\n\n'+BEGIN+'\n\n## Related decision records\n\n'+'\n'.join('- '+self.link(target,self.adrpath(a),a['id']+' — '+a['title']) for a in items)+'\n\n'+END+'\n'
             p.write_text(txt+block)
@@ -160,7 +160,7 @@ Link the exact requirement IDs, test assertions, code and actual evidence. Keep 
 Record an actual accepting authority, scope, date and evidence only when supplied. Reference any superseded ADR; do not reuse an ID for a different decision.
 ''')
         existing=self.root/'docs/adr/0001-architecture-first-repository.md'
-        s=existing.read_text()
+        s=existing.read_text(encoding='utf-8')
         if 'Markdown-first follow-up' not in s:
             existing.write_text(s.rstrip()+'\n\n## Markdown-first follow-up\n\n[ADR-0002](0002-markdown-first-source-backed-documentation.md) adds full chapter content and source-derived decision records while preserving these original paths.\n')
 
@@ -460,9 +460,9 @@ The numbers G0–G4 identify types of acceptance. As {self.slink(p,'WD',9)} stat
         self.section_map();self.make_adrs();self.catalogues();self.navigation();self.code_map()
         for path in ['docs/README.md','docs/architecture/RAD.md','docs/engineering/TAD.md']:
             p=self.root/path
-            p.write_text(p.read_text().rstrip()+'\n\n'+self.link(path,'docs/current/README.md','Maintained design workspace')+' — current editable records, separately versioned from frozen transcriptions. See '+self.link(path,'docs/assurance/completion-corrections.md','completion-audit dispositions')+'.\n')
+            p.write_text(p.read_text(encoding='utf-8').rstrip()+'\n\n'+self.link(path,'docs/current/README.md','Maintained design workspace')+' — current editable records, separately versioned from frozen transcriptions. See '+self.link(path,'docs/assurance/completion-corrections.md','completion-audit dispositions')+'.\n')
         p=self.root/'docs/assurance/README.md'
-        p.write_text(p.read_text().rstrip()+'\n\n[All verification families](verification-families.md) · [Historical finding dispositions](historical-dispositions.md) · [Assertion allocation](../implementation/assertion-allocation.md)\n')
+        p.write_text(p.read_text(encoding='utf-8').rstrip()+'\n\n[All verification families](verification-families.md) · [Historical finding dispositions](historical-dispositions.md) · [Assertion allocation](../implementation/assertion-allocation.md)\n')
         (self.root/'sources/documentation/integration_outputs.json').write_text(json.dumps(self.outputs,indent=2)+'\n')
         print(f'Built {len(self.outputs)} decision/catalogue/navigation pages; linked {len(self.adrs)} source-derived ADRs.')
 

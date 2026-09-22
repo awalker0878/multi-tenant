@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import os
 from pathlib import Path
 import tempfile
 import subprocess
@@ -18,6 +19,16 @@ from scripts import import_into_checkout as importer
 from tools.verify_terraform import plan_only_mock_tests
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def git_environment():
+    """Environment for fixture Git runs: ambient config injection is not inherited.
+
+    A caller that exports GIT_CONFIG_COUNT/GIT_CONFIG_KEY_n/GIT_CONFIG_VALUE_n
+    (the repository's own CI does this for safe.directory) changes what Git reads.
+    The fixture asserts Git's own staging behavior, so it must not depend on that.
+    """
+    return {k: v for k, v in os.environ.items() if not k.startswith('GIT_CONFIG_')}
 spec = importlib.util.spec_from_file_location(
     "hosting_filters_under_test", ROOT / "ansible/filter_plugins/hosting_filters.py")
 filters = importlib.util.module_from_spec(spec)
@@ -271,10 +282,10 @@ class TestRepositoryPolicy(unittest.TestCase):
             (root/'reference/fixture.csv').write_bytes(original)
             for command in (['git', 'init', '-q', str(root)],
                             ['git', '-C', str(root), 'add', '.']):
-                result = subprocess.run(command, capture_output=True, timeout=30)
+                result = subprocess.run(command, capture_output=True, timeout=30, env=git_environment())
                 self.assertEqual(result.returncode, 0, result.stderr)
             result = subprocess.run(['git', '-C', str(root), 'show', ':reference/fixture.csv'],
-                                    capture_output=True, timeout=30)
+                                    capture_output=True, timeout=30, env=git_environment())
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(result.stdout, original)
 

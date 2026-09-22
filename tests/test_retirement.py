@@ -53,7 +53,8 @@ def plan():
              'resources': ['edge-01', 'identity-01', 'vm-01']},
             {'id': 'withdraw-dns', 'type': 'withdraw_dns', 'needs': ['cleanup-native'], 'resources': ['dns-01']},
             {'id': 'retire-ipam', 'type': 'retire_ipam', 'needs': ['withdraw-dns'], 'resources': ['ipam-01']},
-            {'id': 'release-capacity', 'type': 'release_capacity', 'needs': ['retire-ipam'],
+            {'id': 'release-ipam', 'type': 'release_ipam', 'needs': ['retire-ipam'], 'resources': ['ipam-01']},
+            {'id': 'release-capacity', 'type': 'release_capacity', 'needs': ['release-ipam'],
              'resources': ['capacity-01']},
             {'id': 'close-service', 'type': 'close_service', 'needs': ['release-capacity'],
              'resources': ['capacity-01']},
@@ -110,14 +111,33 @@ class RetirementTests(unittest.TestCase):
 
     def test_capacity_release_must_follow_all_cleanup_owners(self):
         value = plan()
-        value['actions'][6]['needs'] = ['protect-data']
-        value['actions'][7]['needs'] = ['release-capacity', 'retire-ipam']
+        value['actions'][7]['needs'] = ['protect-data']
+        with self.assertRaisesRegex(ValueError, 'all applicable cleanup owners'):
+            r.validate_plan(value)
+
+    def test_address_release_requires_an_accountable_owner_action(self):
+        value = plan()
+        value['actions'].pop(6)
+        value['actions'][6]['needs'] = ['retire-ipam']
+        with self.assertRaisesRegex(ValueError, 'accountable owner action'):
+            r.validate_plan(value)
+
+    def test_address_release_must_follow_observed_retirement(self):
+        value = plan()
+        value['actions'][6]['needs'] = ['withdraw-dns']
+        with self.assertRaisesRegex(ValueError, 'observed IPAM retirement'):
+            r.validate_plan(value)
+
+    def test_capacity_release_must_follow_address_release(self):
+        value = plan()
+        value['actions'][7]['needs'] = ['retire-ipam']
+        value['actions'][8]['needs'] = ['release-capacity', 'release-ipam']
         with self.assertRaisesRegex(ValueError, 'all applicable cleanup owners'):
             r.validate_plan(value)
 
     def test_service_closure_must_cover_every_prior_action(self):
         value = plan()
-        value['actions'][7]['needs'] = ['protect-data']
+        value['actions'][8]['needs'] = ['protect-data']
         with self.assertRaisesRegex(ValueError, 'every prior retirement action'):
             r.validate_plan(value)
 

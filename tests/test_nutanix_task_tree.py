@@ -13,6 +13,7 @@ from unittest.mock import patch
 from lab.native_readback_fixture import Fixture, TASK, VPC, TENANT
 from lab.nutanix_task_tree_fixture import reset, manifest, responses, CHILD_A, CHILD_B, GRANDCHILD, SUBNET
 from lab.run_readback_lab import operator_context
+from lab.run_task_tree_lab import cli_environment
 from tools import nutanix_observe as native, nutanix_task_tree as tree, readback_core as c, recovery_review as rr
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -244,8 +245,7 @@ class CLITests(unittest.TestCase):
     def setUp(self):self.m=reset(self.f);self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.path=Path(self.temp.name)
     def invoke(self,args):
         (self.path/'manifest.json').write_text(json.dumps(self.m))
-        env={k:v for k,v in os.environ.items() if k in ('PATH','LANG','LD_LIBRARY_PATH')}
-        env.update(NUTANIX_USERNAME='fixture-reader',NUTANIX_PASSWORD='temporary-fixture-secret')
+        env=cli_environment()
         return subprocess.run([sys.executable,str(ROOT/'tools/nutanix_observe.py'),str(self.path/'manifest.json'),*args],env=env,capture_output=True,text=True,timeout=20)
     def args(self):return ['--read-authorized-target','--expected-origin',self.f.origin,'--ca-file',str(self.f.directory/'ca.pem'),'--output',str(self.path/'report.json'),'--interval','0']
     def test_default_validation_no_contact(self):
@@ -254,7 +254,7 @@ class CLITests(unittest.TestCase):
     def test_complete_native_reader_cli_over_loopback(self):
         r=self.invoke(self.args());self.assertEqual(r.returncode,0,r.stdout+r.stderr)
         report=json.loads((self.path/'report.json').read_text());self.assertEqual(report['request_count'],20)
-        self.assertEqual((self.path/'report.json').stat().st_mode & 0o777,0o600)
+        if os.name=='posix':self.assertEqual((self.path/'report.json').stat().st_mode & 0o777,0o600)
         self.assertNotIn('temporary-fixture-secret',(self.path/'report.json').read_text())
     def test_disabled_contact_refused(self):
         self.m['contact_enabled']=False;r=self.invoke(self.args());self.assertNotEqual(r.returncode,0);self.assertEqual(self.f.requests,[])

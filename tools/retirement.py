@@ -21,6 +21,7 @@ ACTION_ORDER = {
     'cleanup_native_resources': 40,
     'withdraw_dns': 50,
     'retire_ipam': 60,
+    'release_ipam': 65,
     'release_capacity': 70,
     'close_service': 80,
 }
@@ -125,7 +126,8 @@ def validate_plan(plan):
 
     if retained:
         require('protect_retained_data' in by_type, 'Retained data must be protected before destructive cleanup')
-        destructive = [a for a in plan['actions'] if a['type'] in {'cleanup_native_resources', 'retire_ipam', 'release_capacity'}]
+        destructive = [a for a in plan['actions'] if a['type'] in {'cleanup_native_resources', 'retire_ipam',
+                                                                   'release_ipam', 'release_capacity'}]
         for action in destructive:
             require(by_type['protect_retained_data']['id'] in ancestors(action, actions),
                     'Destructive retirement must depend on retained-data protection')
@@ -137,10 +139,13 @@ def validate_plan(plan):
         if 'withdraw_dns' in by_type:
             require(by_type['withdraw_dns']['id'] in ancestors(by_type['retire_ipam'], actions),
                     'IPAM retirement must depend on DNS withdrawal')
+        require('release_ipam' in by_type, 'Reuse quarantine and address release require an accountable owner action')
+        require(by_type['retire_ipam']['id'] in ancestors(by_type['release_ipam'], actions),
+                'Address release must depend on the observed IPAM retirement')
     if any(r['kind'] == 'capacity' and r['disposition'] in {'remove', 'deprecate'} for r in resources.values()):
         require('release_capacity' in by_type, 'Capacity ownership requires explicit release')
         release_ancestors = ancestors(by_type['release_capacity'], actions)
-        for required in ('cleanup_native_resources', 'withdraw_dns', 'retire_ipam'):
+        for required in ('cleanup_native_resources', 'withdraw_dns', 'retire_ipam', 'release_ipam'):
             if required in by_type:
                 require(by_type[required]['id'] in release_ancestors,
                         'Capacity release must follow all applicable cleanup owners')
@@ -157,7 +162,7 @@ def validate_plan(plan):
                 'storage': {'protect_retained_data', 'cleanup_native_resources'},
                 'network': {'withdraw_exposure', 'cleanup_native_resources'},
                 'dns': {'withdraw_dns'},
-                'ipam': {'retire_ipam'},
+                'ipam': {'retire_ipam', 'release_ipam'},
                 'capacity': {'release_capacity'},
             }[resource['kind']]
             require(coverage[resource_id] & allowed, 'Destructive/deprecating resource has no accountable retirement owner action')

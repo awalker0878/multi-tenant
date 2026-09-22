@@ -1,0 +1,42 @@
+{
+  "family": "compute",
+  "description": "Compute profiles state portable guest sizing. Native flavour, template and image identity are resolved from reviewed inventory, never from the request.",
+  "profiles": [
+    {
+      "profile": "small",
+      "rank": 1,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Two-vCPU guest.",
+      "requires": {"vcpu": 2, "memory_gib": 4, "boot_disk_gib": 40, "workloads_per_zone": 1, "flavor_class": "small"},
+      "platform_inputs": {"vmware": {"guest_id": "otherLinux64Guest", "scsi_type": "pvscsi", "firmware": "efi"}},
+      "limits": ["Sizing is a request, not a native capacity confirmation"]
+    },
+    {
+      "profile": "medium",
+      "rank": 2,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Four-vCPU guest.",
+      "requires": {"vcpu": 4, "memory_gib": 8, "boot_disk_gib": 60, "workloads_per_zone": 1, "flavor_class": "medium"},
+      "platform_inputs": {"vmware": {"guest_id": "otherLinux64Guest", "scsi_type": "pvscsi", "firmware": "efi"}},
+      "limits": ["Sizing is a request, not a native capacity confirmation"]
+    },
+    {
+      "profile": "large",
+      "rank": 3,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Eight-vCPU guest.",
+      "requires": {"vcpu": 8, "memory_gib": 16, "boot_disk_gib": 80, "workloads_per_zone": 1, "flavor_class": "large"},
+      "platform_inputs": {"vmware": {"guest_id": "otherLinux64Guest", "scsi_type": "pvscsi", "firmware": "efi"}},
+      "limits": ["Sizing is a request, not a native capacity confirmation"]
+    },
+    {
+      "profile": "gpu",
+      "rank": 4,
+      "status": "DEFERRED_NOT_IMPLEMENTED",
+      "description": "Accelerator-attached guest.",
+      "requires": {"vcpu": 16, "memory_gib": 64, "boot_disk_gib": 120, "workloads_per_zone": 1, "flavor_class": "gpu"},
+      "platform_inputs": {},
+      "limits": ["Deferred: no reviewed accelerator capacity or scheduling model exists"]
+    }
+  ]
+}

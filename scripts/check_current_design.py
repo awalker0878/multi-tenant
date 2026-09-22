@@ -6,7 +6,7 @@ import json,re
 
 def check(root):
     errors=[];path=root/'sources/documentation/current_design_records.json'
-    records=json.loads(path.read_text());seen=set()
+    records=json.loads(path.read_text(encoding='utf-8'));seen=set()
     for record in records:
         ident=record.get('id');rel=record.get('path','');p=root/rel
         if not ident or ident in seen:errors.append('Missing or duplicate maintained design ID')
@@ -25,7 +25,7 @@ def check(root):
                 if not all(h.get(k) for k in ('version','date','summary')):errors.append(str(ident)+': incomplete change history')
                 try:date.fromisoformat(h.get('date',''))
                 except (TypeError,ValueError):errors.append(str(ident)+': invalid record date')
-        text=p.read_text()
+        text=p.read_text(encoding='utf-8')
         header=f"**Version:** {record.get('version')} · **Status:** {record.get('status')} · **Accountable role:** {record.get('owner_role')}."
         metadata_lines=[line for line in text.splitlines() if line.startswith('**Version:**')]
         if metadata_lines!=[header]:errors.append(str(ident)+': rendered status/version/owner differs from maintained record')

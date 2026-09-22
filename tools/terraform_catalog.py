@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def entries(root: Path = ROOT) -> list[dict]:
     root = root.resolve()
-    doc = json.loads((root / 'terraform/catalog.json').read_text())
+    doc = json.loads((root / 'terraform/catalog.json').read_text(encoding='utf-8'))
     if doc.get('format') != 'hosting-terraform-catalog/1' or not doc.get('entries'):
         raise ValueError('Nonempty Terraform catalogue required')
     rows = doc['entries']
@@ -26,14 +26,14 @@ def entries(root: Path = ROOT) -> list[dict]:
                     or not (p / 'main.tf.json').is_file() or row[field] in paths):
                 raise ValueError('Missing, duplicate or unsafe Terraform path')
             paths.add(row[field])
-        module = json.loads((root / row['module'] / 'main.tf.json').read_text())
-        config = json.loads((root / row['root'] / 'main.tf.json').read_text())
+        module = json.loads((root / row['module'] / 'main.tf.json').read_text(encoding='utf-8'))
+        config = json.loads((root / row['root'] / 'main.tf.json').read_text(encoding='utf-8'))
         source = config['module']['owned']['source']
         if (root / row['root'] / source).resolve() != root / row['module']:
             raise ValueError('Root/module ownership mismatch')
         if module['terraform']['required_providers'] != config['terraform']['required_providers']:
             raise ValueError('Root/module provider mismatch')
-    actual = {str(p.parent.relative_to(root)) for p in (root / 'terraform').rglob('main.tf.json')
+    actual = {p.parent.relative_to(root).as_posix() for p in (root / 'terraform').rglob('main.tf.json')
               if '.terraform' not in p.parts}
     if actual != paths:
         raise ValueError('Unregistered or missing Terraform configuration')

@@ -12,8 +12,10 @@ from urllib.error import HTTPError, URLError
 from unittest.mock import patch
 
 from lab.native_readback_fixture import credentials
-from tools.netbox_ipam import AllocationReader, operate, validate_authority, validate
-from tools.run_files import digest, encoded, load_private, utcnow
+from tools.netbox_ipam import (CLEANUP_CATEGORIES, MAX_QUARANTINE_SECONDS, QUARANTINE_RECEIPT,
+                              RELEASE_EVIDENCE, RELEASE_RECEIPT, AllocationReader, operate,
+                              validate_authority, validate)
+from tools.run_files import digest, encoded, load_private, replace_private, utcnow
 from tools.service_http import JsonService
 
 
@@ -109,6 +111,33 @@ class NetboxTests(unittest.TestCase):
     def run_action(self, action):
         return operate(self.job, action, self.authority, self.client, self.ledger)
 
+    def cleanup(self, status='COMPLETE', observed_at=None):
+        observed_at = (observed_at or utcnow() - timedelta(seconds=40)).isoformat()
+        return {key: {'status': status,
+                      'evidence_ref': None if status == 'NOT_STARTED' else 'EVIDENCE-' + key,
+                      'observed_at': None if status == 'NOT_STARTED' else observed_at}
+                for key in sorted(CLEANUP_CATEGORIES)}
+
+    def release_evidence(self, *, duration=3600, cleanup=None, declared_at=None, request_sha256=None,
+                         change_ref='CHANGE-REUSE-1', format=RELEASE_EVIDENCE, extra=None):
+        value = {'format': format, 'request_sha256': request_sha256 or validate(self.job),
+                 'change_ref': change_ref, 'duration_seconds': duration,
+                 'cleanup': self.cleanup() if cleanup is None else cleanup,
+                 'declared_at': (declared_at or utcnow() - timedelta(seconds=30)).isoformat()}
+        return encoded(value | (extra or {}))
+
+    def run_release(self, action, evidence=None):
+        return operate(self.job, action, self.authority, self.client, self.ledger, evidence)
+
+    def retired(self):
+        self.run_action('reserve')
+        self.run_action('confirm')
+        self.run_action('retire')
+        self.retired_calls = len(self.calls)
+
+    def read_only_since_retirement(self):
+        return all(method == 'GET' for method, _ in self.calls[self.retired_calls:])
+
     def test_reserve_confirm_retire_and_no_reuse(self):
         self.assertEqual(self.run_action('reserve')['allocation_status'], 'reserved')
         self.run_action('reserve')
@@ -182,12 +211,27 @@ class NetboxTests(unittest.TestCase):
 
     def test_exact_authority_binding_and_expiry(self):
         authority = self.authority | dict(request_sha256=validate(self.job), action='reserve',
-                   change_ref='CHANGE-1', cleanup_ref=None, token_sha256=digest(b'fixture'), ca_sha256=None)
+                   change_ref='CHANGE-1', cleanup_ref=None, evidence_sha256=None,
+                   token_sha256=digest(b'fixture'), ca_sha256=None)
         validate_authority(self.job, 'reserve', authority, b'fixture', None)
         for change in [dict(action='retire'), dict(token_sha256='wrong'),
-                       dict(valid_until=(utcnow() - timedelta(seconds=1)).isoformat())]:
+                       dict(valid_until=(utcnow() - timedelta(seconds=1)).isoformat()),
+                       dict(evidence_sha256=digest(b'fixture'))]:
             with self.subTest(change=change), self.assertRaises(ValueError):
                 validate_authority(self.job, 'reserve', authority | change, b'fixture', None)
+        quarantine = authority | dict(action='quarantine', cleanup_ref='CLEANUP-1',
+                                      evidence_sha256=digest(b'fixture'))
+        validate_authority(self.job, 'quarantine', quarantine, b'fixture', None, b'fixture')
+        for change in [dict(evidence_sha256=None), dict(cleanup_ref=None),
+                       dict(evidence_sha256='0' * 64)]:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                validate_authority(self.job, 'quarantine', quarantine | change, b'fixture', None, b'fixture')
+        with self.assertRaises(ValueError):
+            validate_authority(self.job, 'quarantine', quarantine, b'fixture', None, b'other')
+        release = quarantine | dict(action='release')
+        validate_authority(self.job, 'release', release, b'fixture', None, b'fixture')
+        with self.assertRaises(ValueError):
+            validate_authority(self.job, 'release', release, b'fixture', None)
 
     def test_exact_readback_rejects_list_detail_identity_and_status_races(self):
         self.run_action('reserve')
@@ -236,3 +280,114 @@ class NetboxTests(unittest.TestCase):
         self.assertEqual((row['id'], reader.check(row), etag), (4, 'active', 'W/"current"'))
         self.assertTrue(all(method == 'GET' for method, _ in self.calls[count:]))
         self.assertEqual(before, {p: p.read_bytes() for p in self.ledger.rglob('*') if p.is_file()})
+
+    def test_reuse_quarantine_requires_retirement_and_release_requires_quarantine(self):
+        self.run_action('reserve')
+        self.run_action('confirm')
+        with self.assertRaises(ValueError):
+            self.run_release('quarantine', self.release_evidence())
+        with self.assertRaises(ValueError):
+            self.run_release('release', self.release_evidence())
+        with self.assertRaises(ValueError):
+            self.run_release('retire', self.release_evidence())
+        self.assertEqual(type(self).row['status']['value'], 'active')
+        self.assertEqual(self.run_action('retire')['allocation_status'], 'deprecated')
+        with self.assertRaises(ValueError):
+            self.run_release('release', self.release_evidence())
+        self.assertEqual(type(self).row['status']['value'], 'deprecated')
+        self.assertFalse(any(method == 'DELETE' for method, _ in self.calls))
+
+    def test_reuse_quarantine_binds_exact_complete_cleanup(self):
+        self.retired()
+        observed = (utcnow() - timedelta(seconds=10)).isoformat()
+        cases = [('missing category', {k: v for k, v in self.cleanup().items() if k != 'dns'}),
+                 ('extra category', self.cleanup() | {'unmanaged': {'status': 'COMPLETE',
+                     'evidence_ref': 'EVIDENCE-x', 'observed_at': observed}}),
+                 ('incomplete', self.cleanup() | {'dns': {'status': 'PENDING',
+                     'evidence_ref': 'EVIDENCE-dns', 'observed_at': observed}}),
+                 ('unknown state', self.cleanup() | {'dns': {'status': 'DONE',
+                     'evidence_ref': 'EVIDENCE-dns', 'observed_at': observed}}),
+                 ('unclaimed start', self.cleanup() | {'dns': {'status': 'NOT_STARTED',
+                     'evidence_ref': 'EVIDENCE-dns', 'observed_at': None}}),
+                 ('unbounded reference', self.cleanup() | {'dns': {'status': 'COMPLETE',
+                     'evidence_ref': 'x', 'observed_at': observed}}),
+                 ('missing observation', self.cleanup() | {'dns': {'status': 'COMPLETE',
+                     'evidence_ref': 'EVIDENCE-dns', 'observed_at': None}})]
+        for label, cleanup in cases:
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                self.run_release('quarantine', self.release_evidence(cleanup=cleanup))
+        for label, evidence in [('foreign request', self.release_evidence(request_sha256='0' * 64)),
+                ('unknown format', self.release_evidence(format=RELEASE_RECEIPT)),
+                ('zero duration', self.release_evidence(duration=0)),
+                ('bool duration', self.release_evidence(duration=True)),
+                ('unbounded duration', self.release_evidence(duration=MAX_QUARANTINE_SECONDS + 1)),
+                ('unknown procedure', self.release_evidence(change_ref='x')),
+                ('extra field', self.release_evidence(extra={'accepted_by': 'nobody'})),
+                ('duplicate key', encoded({'format': RELEASE_EVIDENCE})[:-2]
+                 + ',"duration_seconds":1,"duration_seconds":1}'.encode())]:
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                self.run_release('quarantine', evidence)
+        self.assertEqual(self.run_release('quarantine',
+                         self.release_evidence(cleanup=self.cleanup('NOT_APPLICABLE')))['reusable'], False)
+        self.assertTrue(self.read_only_since_retirement())
+
+    def test_reuse_quarantine_declaration_and_cleanup_must_be_current(self):
+        self.retired()
+        cases = [('stale declaration', self.release_evidence(declared_at=utcnow() - timedelta(minutes=5))),
+                 ('future declaration', self.release_evidence(declared_at=utcnow() + timedelta(minutes=5))),
+                 ('stale cleanup', self.release_evidence(
+                     cleanup=self.cleanup(observed_at=utcnow() - timedelta(minutes=5)))),
+                 ('cleanup after declaration', self.release_evidence(declared_at=utcnow() - timedelta(seconds=50),
+                     cleanup=self.cleanup(observed_at=utcnow() - timedelta(seconds=10))))]
+        for label, evidence in cases:
+            with self.subTest(label=label), self.assertRaises(ValueError):
+                self.run_release('quarantine', evidence)
+        self.assertTrue(self.read_only_since_retirement())
+
+    def test_declared_reuse_quarantine_is_immutable_and_one_way(self):
+        self.retired()
+        evidence = self.release_evidence()
+        first = self.run_release('quarantine', evidence)
+        self.assertEqual((first['format'], first['allocation_status'], first['reusable'], first['released_at']),
+                         (QUARANTINE_RECEIPT, 'QUARANTINED', False, None))
+        record = next(self.ledger.glob('*/quarantine.json')).read_bytes()
+        self.assertEqual(load_private(next(self.ledger.glob('*/quarantine.json')))['format'], QUARANTINE_RECEIPT)
+        repeat = self.run_release('quarantine', evidence)
+        self.assertEqual(repeat['reuse_not_before'], first['reuse_not_before'])
+        self.assertEqual((repeat['allocation_status'], repeat['reusable']), ('QUARANTINED', False))
+        self.assertEqual(next(self.ledger.glob('*/quarantine.json')).read_bytes(), record)
+        with self.assertRaises(ValueError):
+            self.run_release('quarantine', self.release_evidence(duration=1))
+        with self.assertRaises(ValueError):
+            self.run_action('retire')
+        with self.assertRaises(ValueError):
+            self.run_action('reserve')
+        replace_private(next(self.ledger.glob('*/quarantine.json')),
+                        encoded(load_private(next(self.ledger.glob('*/quarantine.json')))
+                                | {'reuse_not_before': '2000-01-01T00:00:00+00:00'}))
+        with self.assertRaises(ValueError):
+            self.run_release('release', evidence)
+        replace_private(next(self.ledger.glob('*/quarantine.json')), record)
+        with self.assertRaises(ValueError):
+            self.run_release('release', self.release_evidence(duration=1))
+        self.assertEqual(type(self).row['status']['value'], 'deprecated')
+        self.assertTrue(self.read_only_since_retirement())
+        self.assertFalse(any(method == 'DELETE' for method, _ in self.calls))
+
+    def test_release_after_elapsed_quarantine_and_reuse_decision(self):
+        self.retired()
+        evidence = self.release_evidence(duration=1)
+        held = self.run_release('quarantine', evidence)
+        result = self.run_release('release', evidence)
+        self.assertEqual((result['format'], result['allocation_status'], result['reusable']),
+                         (RELEASE_RECEIPT, 'RELEASED', True))
+        self.assertGreaterEqual(result['released_at'], held['reuse_not_before'])
+        self.assertEqual(result['released_at'], load_private(next(self.ledger.glob('*/release.json')))['released_at'])
+        repeat = self.run_release('release', evidence)
+        self.assertEqual((repeat['released_at'], repeat['reusable']), (result['released_at'], True))
+        self.assertEqual(load_private(next(self.ledger.glob('*/head.json')))['allocation_status'], 'RELEASED')
+        for action in ('reserve', 'confirm', 'retire', 'quarantine'):
+            with self.subTest(action=action), self.assertRaises(ValueError):
+                self.run_release(action, evidence) if action in {'quarantine'} else self.run_action(action)
+        self.assertEqual(self.run_action('reconcile')['allocation_status'], 'deprecated')
+        self.assertFalse(any(method == 'DELETE' for method, _ in self.calls))

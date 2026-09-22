@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from zipfile import ZipFile
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from convert_word_docs import Source, field_instruction, escape, slug
+from convert_word_docs import Source, build, field_instruction, escape, slug
 ROOT=Path(__file__).resolve().parents[1]
 W='http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 R='http://schemas.openxmlformats.org/officeDocument/2006/relationships'
@@ -29,6 +29,7 @@ class ConversionTests(unittest.TestCase):
             z.writestr('word/document.xml',f'<w:document xmlns:w="{W}" xmlns:r="{R}" xmlns:a="{A}" xmlns:wp="{WP}"><w:body>{body}</w:body></w:document>')
             for k,v in (extra or {}).items():z.writestr(k,v)
         s=Source(self.root,dict(source=name,id='FIX',title='Fixture',destination='docs/fixture',version='Test fixture',status='Not approved'))
+        self.addCleanup(s.close)
         return s
     def render(self,s,others=()):
         r=s.render({x.path.resolve():x for x in (s,*others)})
@@ -117,3 +118,41 @@ class DecisionTraceTests(unittest.TestCase):
         inv=json.loads((ROOT/'sources/documentation/source_inventory.json').read_text())
         for x in inv['documents']:
             if x['id'] in ('HB10','HB11','AUD11','REV12'):self.assertTrue(x['historical'])
+
+
+class SourceArchiveLifecycleTests(unittest.TestCase):
+    """A refused or completed source must not keep its Word archive open.
+
+    Hosts that lock open files cannot remove or replace a source while a handle
+    remains, so the conversion run and each refusal release the archive explicitly
+    instead of relying on interpreter shutdown.
+    """
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name)
+    def docx(self,body,name='sample.docx'):
+        path=self.root/name
+        with ZipFile(path,'w') as archive:
+            archive.writestr('word/document.xml',f'<w:document xmlns:w="{W}"><w:body>{body}</w:body></w:document>')
+        return path
+    def source(self,body,name='sample.docx'):
+        self.docx(body,name)
+        return Source(self.root,dict(source=name,id='FIX',title='Fixture',destination='docs/fixture',version='Test fixture',status='Not approved'))
+    def test_closed_source_can_be_replaced(self):
+        s=self.source(para('Scope'));s.close();self.assertIsNone(s.zip.fp)
+        (self.root/'sample.docx').unlink()
+    def test_context_manager_releases_the_archive(self):
+        with self.source(para('Scope')) as s:self.assertIsNotNone(s.zip.fp)
+        self.assertIsNone(s.zip.fp)
+    def test_refused_source_does_not_hold_the_archive(self):
+        with self.assertRaisesRegex(ValueError,'Unsupported source feature'):
+            self.source('<w:p><w:r><w:footnoteReference w:id="1"/></w:r></w:p>')
+        (self.root/'sample.docx').unlink()
+    def test_build_releases_every_source(self):
+        (self.root/'sources/documentation').mkdir(parents=True)
+        self.docx(para('Scope and boundary'))
+        (self.root/'sources/documentation/source_inventory.json').write_text(json.dumps(
+            {'documents':[dict(source='sample.docx',id='FIX',title='Fixture',destination='docs/fixture',version='Test fixture',status='Not approved')]}),encoding='utf-8')
+        _,sources=build(self.root)
+        self.assertEqual(len(sources),1)
+        for s in sources:self.assertIsNone(s.zip.fp)

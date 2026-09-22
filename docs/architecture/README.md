@@ -12,6 +12,10 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [RAD — Reference architecture reading view](RAD.md)
 
+[Portable provisioning architecture](../provisioning/architecture.md) is the current
+stage-and-ownership model for the parameter-driven front end; it does not replace the
+reference architecture above.
+
 [Solution design and worked environments](../solutions/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)

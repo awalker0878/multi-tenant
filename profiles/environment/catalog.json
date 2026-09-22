@@ -1,0 +1,86 @@
+{
+  "family": "environment",
+  "description": "Environment profiles bind a portable environment name to a lifecycle and its minimum standards.",
+  "profiles": [
+    {
+      "profile": "development",
+      "rank": 1,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Non-production development environment.",
+      "requires": {
+        "lifecycle": "development",
+        "security_min_rank": 1,
+        "assurance_min_rank": 1,
+        "availability_min_rank": 1,
+        "recovery": false
+      },
+      "limits": [
+        "Not a substitute for a test or qualification environment"
+      ]
+    },
+    {
+      "profile": "test",
+      "rank": 2,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Non-production test environment for functional change.",
+      "requires": {
+        "lifecycle": "test",
+        "security_min_rank": 1,
+        "assurance_min_rank": 1,
+        "availability_min_rank": 1,
+        "recovery": false
+      },
+      "limits": [
+        "Test environments are not eligible for production traffic"
+      ]
+    },
+    {
+      "profile": "qualification",
+      "rank": 3,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Target-specific qualification environment used to collect native evidence.",
+      "requires": {
+        "lifecycle": "qualification",
+        "security_min_rank": 1,
+        "assurance_min_rank": 1,
+        "availability_min_rank": 1,
+        "recovery": false
+      },
+      "limits": [
+        "Qualification results are per target; they do not transfer automatically"
+      ]
+    },
+    {
+      "profile": "production",
+      "rank": 4,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Production environment requiring protected security, high availability and recovery.",
+      "requires": {
+        "lifecycle": "production",
+        "security_min_rank": 2,
+        "assurance_min_rank": 1,
+        "availability_min_rank": 2,
+        "recovery": true
+      },
+      "limits": [
+        "Production activation still requires separate recorded authorization"
+      ]
+    },
+    {
+      "profile": "recovery",
+      "rank": 5,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Declared recovery environment for an already approved production environment.",
+      "requires": {
+        "lifecycle": "recovery",
+        "security_min_rank": 2,
+        "assurance_min_rank": 2,
+        "availability_min_rank": 2,
+        "recovery": true
+      },
+      "limits": [
+        "Recovery realization requires an exercised recovery campaign"
+      ]
+    }
+  ]
+}

@@ -5,6 +5,10 @@ requires evidence connecting vSphere NIC backings to the intended NSX domain.
 Names, independently matching VM/policy snapshots and an accepted mapping record
 alone do not observe that association on the installed systems.
 
+`tools/vmware_network_binding.py` performs that join: it binds campaign VM NICs
+through observed portgroups to owned NSX segments and refuses foreign or
+mismatched association scope.
+
 ## Exact NSX-backed portgroups
 
 `tools/vsphere_network_observe.py` uses profile

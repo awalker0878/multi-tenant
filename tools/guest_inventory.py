@@ -106,7 +106,7 @@ def gate(enabled, outputs, access, known_hosts, targets, hostvars):
     path = Path(known_hosts)
     require(path.is_file() and not path.is_symlink() and path.stat().st_mode & 0o077 == 0,
             'Private non-symlink known-hosts file required')
-    require(path.read_text() == expected_keys, 'Pinned SSH keys changed')
+    require(path.read_text(encoding='utf-8') == expected_keys, 'Pinned SSH keys changed')
     for name, values in expected.items():
         if values['hosting_target']['profile'] == PROFILE:
             verify_assets(values['hosting_target'], access['scope'])

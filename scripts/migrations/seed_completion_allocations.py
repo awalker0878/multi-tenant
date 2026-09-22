@@ -111,7 +111,7 @@ for a in historical:
 base=R/'reference/Portable_Hosting_Delivery_Kits_v1_1'
 family={
  'CT':{'source':str((shared/'tests.csv').relative_to(R)),'records':read(shared/'tests.csv')},
- 'RA':{'source':str((base/'05_Reference_v1_4/registers/realization_verification_addenda.json').relative_to(R)), 'records':json.loads((base/'05_Reference_v1_4/registers/realization_verification_addenda.json').read_text())},
+ 'RA':{'source':str((base/'05_Reference_v1_4/registers/realization_verification_addenda.json').relative_to(R)), 'records':json.loads((base/'05_Reference_v1_4/registers/realization_verification_addenda.json').read_text(encoding='utf-8'))},
  'W14':{'source':str((base/'05_Reference_v1_4/registers/v1_4_verification_assertions.csv').relative_to(R)),'records':read(base/'05_Reference_v1_4/registers/v1_4_verification_assertions.csv')},
  'Q11':{'source':str((shared/'development/qualification_observation_cards.csv').relative_to(R)),'records':read(shared/'development/qualification_observation_cards.csv')},
 }

@@ -1,0 +1,30 @@
+{
+  "family": "assurance",
+  "description": "Assurance profiles state the evidence class expected for the environment.",
+  "profiles": [
+    {
+      "profile": "standard",
+      "rank": 1,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Standard repository-side assurance with audit logging required.",
+      "requires": {"capabilities": ["audit_logging"], "recovery_required": false},
+      "limits": ["Standard assurance does not replace a native qualification campaign"]
+    },
+    {
+      "profile": "elevated",
+      "rank": 2,
+      "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
+      "description": "Elevated assurance requiring dedicated edge context, logging and an exercised recovery path.",
+      "requires": {"capabilities": ["audit_logging", "dedicated_edge_context"], "recovery_required": true},
+      "limits": ["Elevated assurance requires recovery evidence that this repository cannot produce"]
+    },
+    {
+      "profile": "regulatory",
+      "rank": 3,
+      "status": "DEFERRED_NOT_IMPLEMENTED",
+      "description": "Regulated assurance class.",
+      "requires": {"capabilities": ["audit_logging", "service_insertion", "dynamic_routing"], "recovery_required": true},
+      "limits": ["Deferred: no reviewed control mapping or native evidence model exists"]
+    }
+  ]
+}

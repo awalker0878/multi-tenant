@@ -6,6 +6,10 @@ and process restart recovery. It does not issue approvals or establish native
 fencing. Each Terraform, guest, power, IPAM, DNS, campaign and edge adapter retains
 its own validation, credentials, scope, private evidence and uncertainty ledger.
 
+`tools/delivery_steps.py` holds the typed per-kind adapters and the registered
+kind table. `tools/execution_journal.py` records durable ordered events for one
+owned resource; it is not a native writer fence.
+
 ## Workflow contract
 
 A private `hosting-delivery/1` plan contains `source_commit`, `operation_id`, a
@@ -75,6 +79,9 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `restic` | `action`, `restic`, `restic_sha256`, `target` | `config`, `credentials` | `ca_bundle`; restore also requires `receipt`, `manifest`, `restore_authority` |
 | `capacity` | `action`, `database` | `request`, `authority` | `native_ids`; reserve pairs `inputs`, `sizing` to bind actual workload demand |
 | `acceptance` | `purpose` | `acceptance` | None |
+| `retirement_review` | None | `plan`, `evidence` | None |
+| `operations_review` | None | `review` | None |
+| `operations_alerts` | None | `review`, `result`, `acknowledgements` | `release` |
 | `terraform_plan` | `catalog_id`, `terraform`, `terraform_sha256` | `inputs`, `backend`, `environment`, `authority` | `references`, `cloud`, `ca_bundle`, `transition` |
 | `terraform_apply` | `prepared_step` | `approval` | None |
 | `workload_inputs` | `domain_steps`, `selected_input` | `environment` | `vmware_bindings` |
@@ -85,7 +92,7 @@ again immediately before dispatch. Binaries use absolute paths plus separate
 | `target_campaign` | `ssh`, `ssh_sha256` | `plan`, `authority` | None |
 | `edge_policy` | `nft`, `nft_sha256`, `mode` | `spec`, `authority` | None |
 | `edge_containment` | `nft`, `nft_sha256` | `spec`, `authority` | None |
-| `ipam` | `action` | `request`, `authority`, `token_file` | `ca_bundle` |
+| `ipam` | `action` | `request`, `authority`, `token_file` | `ca_bundle`, `release_evidence` |
 | `dns` | `action` | `allocation`, `confirmation`, `job`, `scope`, `authority`, `token_file`, `tsig_file` | `ca_bundle`, `registration_job`, `registration_scope` |
 | `dns_propagation` | `dns_step` | `config`, `secrets` | None |
 
@@ -108,7 +115,13 @@ transition contract and preserves each owner's field/resource restrictions.
 Guest operation IDs are deterministically derived from delivery operation plus
 step ID; their generation matches the delivery. Terraform and other owners keep
 their exact independently approved native operation identities. Files retain
-the schemas documented in each owner's runbook. IPAM and DNS share one native
+the schemas documented in each owner's runbook. `ipam` accepts every registered
+action: `reserve`, `confirm`, `reconcile`, `retire`, `quarantine` and `release`.
+The `release_evidence` binding is required exactly for `quarantine` and `release`,
+and is forwarded as `--release-evidence`. Completion accepts the observed
+`allocation_status` `reserved`, `active`, `deprecated`, `QUARANTINED` or `RELEASED`;
+a `quarantine` step therefore completes with the address still held, and reuse
+remains a separate explicit allocation decision. IPAM and DNS share one native
 allocation ledger. Edge and backup work must execute on their accepted native
 machine; a coordinator does not bypass local machine/namespace checks. Use the
 [remote owner worker](remote-owner-worker.md) for separately hosted edge and

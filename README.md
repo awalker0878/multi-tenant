@@ -57,6 +57,36 @@ NSX segment's realized logical switch; per-port/DFW enforcement remains separate
 Live commissioning, effective enforcement, complete fenced native
 reconciliation and HA/application recovery qualification remain open.
 
+## Portable provisioning interface
+
+The [portable provisioning package](docs/provisioning/README.md) adds a parameter-driven
+front end to the existing compiler. One reviewed YAML request
+(`apiVersion: hosting.platform/v1`, `kind: WorkloadSecurityDomain`) is validated
+against a schema, resolved against reviewed profile catalogs, evaluated by
+standards and semantic rules, placed fail-closed over read-only inventory, expanded
+into a resolved internal desired state, and then handed to the existing
+`tools/compile_wsd.py`. The Terraform roots, the Ansible roles, the state backends
+and every service owner keep their current authority.
+
+The canonical current path is exactly one line; nothing else is a current entry
+point:
+
+```text
+consumer request -> provisioner core -> resolved environment -> existing WSD compiler
+-> Terraform stacks -> delivery runner -> observation -> verification
+```
+
+```sh
+python -m provisioner.cli.main plan examples/requests/internal-production.yaml
+```
+
+`validate`, `resolve`, `plan`, `status`, `verify` and `evidence` all call the same
+core library; `apply` always refuses, because this repository holds no target
+contact, credential or change authority. The five reference requests under
+[`examples/requests`](examples/requests) plan as `PLANNED_DISABLED_NOT_AUTHORIZED`
+with `native_contact: false`, and their deterministic artifacts are replayed by the
+golden regressions.
+
 ## Local review
 
 ```sh

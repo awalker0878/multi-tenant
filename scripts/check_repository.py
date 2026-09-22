@@ -75,14 +75,14 @@ def check(root=ROOT):
                 try:yaml.load(text,Loader=UniqueLoader)
                 except Exception as e:problem('YAML_PARSE',rel,e)
         if not historical and p.suffix=='.html':
-            links=Links();links.feed(p.read_text())
+            links=Links();links.feed(p.read_text(encoding='utf-8'))
             for target in links.targets:local_link(p,target)
     try:
-        expected=json.loads((root/'sources/reference_checksums.json').read_text())
+        expected=json.loads((root/'sources/reference_checksums.json').read_text(encoding='utf-8'))
         for name,digest in expected.items():
             counts['reference_files']+=1;p=root/name
             if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest()!=digest:problem('REFERENCE_BYTES_CHANGED',name)
-        rows=json.loads((root/'sources/artifact_catalog.json').read_text());counts['catalog_artifacts']=len(rows)
+        rows=json.loads((root/'sources/artifact_catalog.json').read_text(encoding='utf-8'));counts['catalog_artifacts']=len(rows)
         if rows!=collect(root):problem('STALE_ARTIFACT_CATALOG','sources/artifact_catalog.json')
     except (OSError,ValueError,TypeError) as e:problem('CATALOG_OR_REFERENCE_ERROR','sources',e)
     try: scopes=terraform_entries(root)
@@ -92,21 +92,21 @@ def check(root=ROOT):
         mod=root/scope['module']/'main.tf.json'
         counts['terraform_module_root_pairs']+=1
         try:
-            m=json.loads(mod.read_text());r=json.loads((root/scope['root']/'main.tf.json').read_text())
+            m=json.loads(mod.read_text(encoding='utf-8'));r=json.loads((root/scope['root']/'main.tf.json').read_text(encoding='utf-8'))
             if not m.get('resource' if scope['kind']=='component' else 'module'):problem('EMPTY_NATIVE_MODULE',mod.parent.name)
             if m['terraform']['required_providers']!=r['terraform']['required_providers']:problem('PROVIDER_PIN_DIVERGENCE',mod.parent.name)
             if not plan_only_mock_tests(mod.parent):problem('UNSAFE_MOCK_TEST',mod.parent.name)
         except (OSError,KeyError,ValueError) as e:problem('NATIVE_SOURCE_STRUCTURE',mod.parent.name,e)
     try:
-        catalog=json.loads((root/'ansible/catalog.json').read_text())
+        catalog=json.loads((root/'ansible/catalog.json').read_text(encoding='utf-8'))
         if catalog['format']!='hosting-ansible-catalog/1':raise ValueError('Unknown Ansible catalogue')
         rows=catalog['playbooks'];registered={row['path'] for row in rows}
-        actual={str(p.relative_to(root/'ansible')) for p in (root/'ansible/playbooks').rglob('*.yml')}
+        actual={p.relative_to(root/'ansible').as_posix() for p in (root/'ansible/playbooks').rglob('*.yml')}
         if registered!=actual or len(rows)!=len(registered):raise ValueError('Unregistered or duplicate Ansible playbook')
         for row in rows:
             if row.get('profile') not in {'local','native-linux'}:raise ValueError('Unknown Ansible profile')
             p=root/'ansible'/row['path'];counts['ansible_playbooks']+=1
-            plays=yaml.load(p.read_text(),Loader=UniqueLoader)
+            plays=yaml.load(p.read_text(encoding='utf-8'),Loader=UniqueLoader)
             for n,play in enumerate(plays):
                 if play.get('gather_facts') is not False or play.get('become') is not False:
                     problem('UNBOUNDED_ANSIBLE_DEFAULT',p.relative_to(root))
@@ -117,12 +117,12 @@ def check(root=ROOT):
                     if play.get('hosts')!='hosting_guests' or play.get('connection')!='ssh' or play.get('serial')!=1 or play.get('any_errors_fatal') is not True:
                         problem('UNBOUNDED_NATIVE_ANSIBLE',p.relative_to(root))
                 else:problem('UNKNOWN_ANSIBLE_PROFILE',p.relative_to(root))
-            if row['profile']=='native-linux' and (len(plays)!=2 or 'hosting_guest_gate' not in p.read_text()):
+            if row['profile']=='native-linux' and (len(plays)!=2 or 'hosting_guest_gate' not in p.read_text(encoding='utf-8')):
                 problem('MISSING_NATIVE_ANSIBLE_GATE',p.relative_to(root))
     except (OSError,ValueError,KeyError,TypeError) as e:problem('ANSIBLE_CATALOG','ansible/catalog.json',e)
     for p in (root/'.github/workflows').glob('*.yml'):
         try:
-            doc=yaml.load(p.read_text(),Loader=yaml.BaseLoader)
+            doc=yaml.load(p.read_text(encoding='utf-8'),Loader=yaml.BaseLoader)
             if doc.get('permissions')!={'contents':'read'}:problem('WORKFLOW_PERMISSION',p.name)
             if 'pull_request_target' in doc.get('on',{}):problem('PR_TARGET_FORBIDDEN',p.name)
             for job in doc.get('jobs',{}).values():

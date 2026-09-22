@@ -59,6 +59,19 @@ host topology, retaining configuration fingerprints and the synthetic reference
 observations. These guards prevent accidental scope expansion; they are not a
 security sandbox against an administrator who changes the code.
 
+## Supporting instruments
+
+The campaign is implemented by [lab/run_ipv6_lab.py](../../lab/run_ipv6_lab.py)
+with three supporting instruments. [lab/ipv6_fixture.py](../../lab/ipv6_fixture.py)
+fixes the WD14 lab policy and accepts no arbitrary inventory or native target
+input; it is a Linux test instrument, not a supported production security edge.
+[lab/ipv6_worker.py](../../lab/ipv6_worker.py) is the private pipe worker for that
+fixed namespace lab, not a remote service. [lab/link_config.py](../../lab/link_config.py)
+is a small original rtnetlink helper for per-interface IPv4 fixture forwarding
+that changes no host-global setting and mounts no `/proc`. Offline
+source/message/guard testing of the same fixture lives in
+`tests/test_ipv6_packet_fixture.py` and `tests/test_routed_report_review.py`.
+
 ## Actual steps and evidence
 
 | Phase | Required observation | A failure means |

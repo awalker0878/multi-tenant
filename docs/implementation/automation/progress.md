@@ -1,6 +1,6 @@
 # Automation implementation progress
 
-**Updated:** 2026-09-21. **Release status:** incomplete; no native platform is qualified by this change. The former `docs/1.0` material is now maintained under engineering, implementation and assurance. The [baseline audit](../../assurance/automation-baseline-audit.md) and its evidence remain historical. Every W01–W29 acceptance package is still open under its [original closure criteria](completion-backlog.md).
+**Updated:** 2026-09-21. **Release status:** incomplete; no native platform is qualified by this change. The former `docs/1.0` material is now maintained under engineering, implementation and assurance. The [baseline audit](../../assurance/automation-baseline-audit.md) and its evidence remain historical. Every W01Ã¢â‚¬â€œW29 acceptance package is still open under its [original closure criteria](completion-backlog.md).
 
 ## Delivered changes
 
@@ -42,11 +42,13 @@ binds live-service cleanup to an exact source/scope, accountable resource owners
 retained-data custody and a topologically ordered action graph. It prevents shared
 resources from blind removal, requires retained-copy/key/disposition records before
 destructive cleanup, enforces DNS withdrawal before IPAM retirement and holds
-capacity release until every applicable cleanup owner is an ancestor. Exact owner
+capacity release until every applicable cleanup owner is an ancestor. Address reuse
+is its own accountable `release_ipam` action: it must follow the observed retirement
+and bind the declared quarantine and observed release boundary. Exact owner
 receipts can be reviewed through the durable delivery runner without issuing a
 native mutation. This is a W25 repository integration increment; actual platform
-cleanup, reuse quarantine, sanitization and service-owner acceptance remain native
-commissioning evidence.
+cleanup, sanitization, reuse-quarantine observation and service-owner acceptance
+remain native commissioning evidence.
 
 Receipt-based workload compilation and bootstrap/withdrawal transition preparation
 are now registered delivery stages. Their adapters invoke the actual three-platform
@@ -132,6 +134,86 @@ prevents renewal and supplies the existing worker revocation handoff. Actual
 OpenSSH tests cover signature/scope changes, unknown attempts and denial; issuer
 custody, endpoint propagation and independent recovery remain explicit boundaries.
 
+The [operations drift, health and capacity review](operations-review.md) classifies
+scheduled configuration, health, capacity and telemetry evidence and routes every
+non-healthy observation to its accountable owner. Configuration drift is compared
+by exact digest, so it is reported as matched, benign, security-critical or
+covered by an active emergency override instead of being accepted as desired
+state; a stale or unknown observation cannot be treated as healthy. The review is
+a registered delivery stage: `enforce()` raises a hold that stops ordinary
+reconciliation, and the containment guard reads that hold's `containment_required`
+flag instead of assuming withdrawal, so benign drift and capacity pressure hold
+the graph without withdrawing the owned edge boundary. Recovery after an
+interruption reloads the recorded review and alert set and re-raises the original
+hold, so an uncertain review is never reclassified as healthy. A healthy review
+still returns no reconciliation authority, no native acceptance and no activation.
+Selected native observers, alert delivery and the owned containment/release
+exercise remain W21 native work.
+
+The [operations review](operations-review.md) now also binds its alerts to
+accountable acknowledgement. Each acknowledgement must name the same review
+digest, the exact alert classification and the accountable route owner, so an
+alert cannot be closed by another route or against another review. An alert that
+is still unanswered one review cadence after it was observed is escalated rather
+than silently carried, and a late response is recorded as late. Containment
+release is authorized only when the release binds exactly the contained alerts,
+every contained alert was acknowledged in time and the release does not precede
+the accountable response; otherwise the stage records the blocking reason and
+holds. `operations_alerts` is a registered delivery stage whose hold never
+requests containment withdrawal, because a missing acknowledgement is an
+accountability failure rather than evidence of an exposed boundary. Notification
+delivery, on-call paging and the owned containment/release exercise remain W21
+native work.
+
+The maintained pages now name every implementing module under `tools/`. The
+[delivery runner](delivery-runner.md) names the typed stage table and the
+per-resource execution journal, [incident containment](incident-containment.md)
+names the predelegated delivery containment,
+[remote owner](remote-owner-worker.md) names the coordinator transport,
+[NSX domain readback](nsx-domain-readback.md) and
+[VMware network binding](vmware-network-binding.md) name their binding modules,
+[Terraform recovery](terraform-recovery.md) names the four per-platform
+reconciliation modules, [vSphere readback](vsphere-readback.md) names the
+task-history, task-activity and clone-source readers, the AHV and Flow activity
+pages name the shared Prism activity module, [Flow readback](nutanix-flow-readback.md)
+names the policy-shape validator, [Terraform execution](terraform-execution.md)
+names the writer-scope catalogue, and the common
+[native readback envelope](../../NATIVE_READBACK.md) names the shared CLI
+plumbing. No page gained a claim the code does not support.
+
+The [task-tree campaign](../../implementation/nutanix-task-tree-readback.md) and its
+CLI regression now build the child environment portably. `lab/run_task_tree_lab.py`
+matches the retained environment names case-insensitively and keeps the platform
+root, because Windows environment names are case-insensitive while `os.environ`
+preserves the on-disk casing: the previous case-sensitive allowlist dropped
+`SYSTEMROOT`, so the child OpenSSL could not load its own configuration and the
+executed-CLI case failed closed with `ssl.SSLError` instead of reaching the fixture.
+The injected fixture credentials also replace any case variant already present, so a
+host cannot silently supply a different reader identity. `tests/test_nutanix_task_tree.py`
+reuses that one helper rather than duplicating the allowlist. The `0o600`
+private-journal assertion is now stated as a POSIX mode-bit control that a host
+without POSIX modes cannot report, and the executed case records `output_mode` and
+`posix_mode_bits_enforced` alongside its result. The Linux campaign and its CI check
+are unchanged.
+
+The [task-tree campaign](../../implementation/nutanix-task-tree-readback.md) now
+accepts `--output` like its sibling labs and refuses a path that already holds a report
+with `REFUSED_EXISTING_REPORT`, so a second local run no longer ends in a
+`FileExistsError` traceback and a completed report is never overwritten.
+
+The [implementation code map](../../implementation/code-map.md) and the
+[routed IPv6 lab](../../implementation/routed-ipv6-lab.md) now name every supporting
+instrument that the maintained lab procedures execute, so no implementing `lab/` module
+is left unowned by a maintained page: `lab/dns_authority.py` (bounded test-only RFC2136
+authority with real TSIG parsing), `lab/native_readback_fixture.py` and
+`lab/nutanix_task_tree_fixture.py` (disposable localhost HTTPS fixtures),
+`lab/mtls_scenarios.py` and `lab/worker.py` (private fixture workers on the permitted
+namespace path), and `lab/ipv6_fixture.py`, `lab/ipv6_worker.py` and
+`lab/link_config.py` (fixed WD14 IPv6 policy, private pipe worker and per-interface
+rtnetlink helper). Each entry repeats the module's own limit Ã¢â‚¬â€ test instrument, private
+worker, synthetic task tree Ã¢â‚¬â€ so the map cannot be read as claiming a production
+service.
+
 | Change | Main commit | What is implemented |
 | --- | --- | --- |
 | Promote the 1.0 documentation | [bf46146](https://github.com/awalker0878/multi-tenant/commit/bf461469d4dc6b1b294d366e6b709d21ad190be7) | Maintained engineering topology, implementation program and assurance audit; repaired links |
@@ -165,7 +247,7 @@ documents the supported operator path and its remaining integration boundaries.
 Terraform defaults remain prepared/restricted. The OpenStack-first increment
 below adds explicitly reviewed power/connectivity transitions. Full adopted
 guest hardening, native drift repair, upgrades and coordinated retirement remain
-unfinished. W01–W29 remain open under their actual acceptance criteria.
+unfinished. W01Ã¢â‚¬â€œW29 remain open under their actual acceptance criteria.
 
 ## Reference service and qualification increment
 
@@ -654,7 +736,7 @@ populate accepted qualification indexes or establish cross-writer fencing.
 
 ## Package disposition and next concrete work
 
-“Partial” credits delivered code or retained functionality, not operational acceptance. “Blocked” identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
+Ã¢â‚¬Å“PartialÃ¢â‚¬Â credits delivered code or retained functionality, not operational acceptance. Ã¢â‚¬Å“BlockedÃ¢â‚¬Â identifies missing target/product/authority inputs required for meaningful implementation or execution. Proposed accountable roles remain in the backlog; no individuals or approvals have been invented.
 
 | Package | Current disposition | Work still required to meet acceptance |
 | --- | --- | --- |
@@ -678,13 +760,13 @@ populate accepted qualification indexes or establish cross-writer fencing.
 | W18 | Partial operator executor delivered | Terraform and guest preparation/execution, bounded commands, durable uncertainty holds, replayed guest completion counters, receipt handoffs and held-attempt review packets are implemented. Integrate the chosen change/automation system with live preflight/reservation, authenticated approval custody, cross-writer fencing, native reconciliation and activation. Provision and recover the actual runner/ledger; no unattended native runner is installed. |
 | W19 | Native implementation/qualification open | Decide offered address families. Compiler currently rejects non-IPv4 internal allocations. Deliver native IPv6/dual-stack modules, guest initialization, routes/policy/services and observations for each selected profile; local IPv6 labs are separate evidence. |
 | W20 | Collector implemented; actual campaigns pending | Use the bound native/guest collector, including v8's complete owned VMware domain intent and attachment binding, in restricted campaigns for all three exact installed tuples. Complete HA/bypass/capacity tests and independently accept exposure/withdrawal evidence. All native indexes remain unqualified. |
-| W21 | Operational integration open | Connect scheduled drift/health/capacity checks to selected observers and alerting, classify emergency/security/unknown drift, and exercise owned incident containment/release. Guest convergence is not a platform drift service. |
+| W21 | Partial classification, alert accountability and delivery gating delivered | Exact configuration drift, declared health, capacity and telemetry states are classified, routed to accountable owners, preserved under an active emergency override and gated in the delivery graph by a containment-aware hold. Alerts now require a review-bound, owner-bound acknowledgement, escalate after one cadence and authorize containment release only against exactly the acknowledged contained alerts. Connect selected native observers and notification delivery, and exercise owned incident containment and release against installed systems. Guest convergence is not a platform drift service. |
 | W22 | Lifecycle implementation open | Add accepted resize/scale/growth, image refresh, patch/reboot, provider/platform/collection upgrades, rotation and replacement workflows with actual maintenance budgets and requalification rules. |
 | W23 | Partial restic capture/restore | Encrypted scoped file capture, confined scheduling and isolated byte verification are implemented and locally exercised. Provision append-only protection, independent retention/keys, catalogues and application-consistent exports; measure native application RPO/RTO. |
 | W24 | Blocked on accepted adoption/recovery design | Deliver exact native import/state mappings, same-service re-creation, supported portable data transitions, and any promised synchronization/cutover/failback with writer exclusion. No blind state move or cross-stack live migration is supplied. |
-| W25 | Partial DNS/IPAM retirement; other authorities remain open | Exact owned A/PTR withdrawal retains tombstones; NetBox deprecation requires current matched cleanup of every managed DNS slot. Complete withdrawal and cleanup across policy/routes/enrollment/native resources, external DNS, retained-copy/key transfer and independent cleanup acceptance. Address/name release and reuse quarantine remain unimplemented. |
+| W25 | Partial DNS/IPAM retirement; other authorities remain open | Exact owned A/PTR withdrawal retains tombstones; NetBox deprecation requires current matched cleanup of every managed DNS slot. Address reuse now has a declared quarantine over the six dependent cleanup categories, an observed release boundary and an accountable `release_ipam` retirement action; reuse stays a new explicit allocation decision. Complete withdrawal and cleanup across policy/routes/enrollment/native resources, external DNS, retained-copy/key transfer and independent cleanup acceptance. |
 | W26 | Partial | Catalogue/provider checks, composition mocks, cluster/inventory negatives, Ansible guards and the real built-in Terraform saved-plan experiment exist. Add actual native operation campaigns, remote backend locking/recovery, service integrations and runtime tests as targets/interfaces are selected. |
-| W27 | Maintained docs delivered; operational acceptance open | Current paths, commands, commits and limits are documented. Add actual as-built records, assigned maintaining owners/cadence, accepted operating MOPs and release evidence after qualification. |
+| W27 | Maintained docs delivered; operational acceptance open | Current paths, commands, commits and limits are documented, and every module under `tools/` is now named by a maintained page so an operator can reach its implementing code from the documentation. Add actual as-built records, assigned maintaining owners/cadence, accepted operating MOPs and release evidence after qualification. |
 | W28 | Conditional; no public profile selected | Select and implement ingress/WAF/LB, PAZ capacity, DNS/certificates, backend identity, HA/recovery and withdrawal; run its independent campaign. Internal OZ/RZ examples do not expose public service. |
 | W29 | Conditional; extensions unselected | For each adopted assurance/bare-metal/container/accelerator/stretch/cross-stack/additional-platform offer, supply its design, real automation and separate native evidence/limits. |
 
