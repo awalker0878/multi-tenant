@@ -1,4 +1,19 @@
 {
+  "catalogs": {
+    "digest": "2b9b4e17ea759038decab932cdf18a2ec3bfa002ab5b17e9f3d3e3535068691a",
+    "versions": {
+      "assurance": "1",
+      "availability": "2",
+      "compute": "3",
+      "environment": "4",
+      "network": "5",
+      "placement": "6",
+      "recovery": "7",
+      "security": "8",
+      "service": "9",
+      "storage": "10"
+    }
+  },
   "description": "Deterministic digests for one reviewed reference request realized on each reviewed platform fixture. Every platform is asked for the same portable request (portable_digest); only spec.platform.preference differs, so the per-platform request_digest differs.",
   "format": "hosting-golden-cross-platform/1",
   "native_contact": false,
@@ -7,11 +22,11 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "0e8f7633b3af9677d133ebce08fa9e56fffe18719da661931e22cddae25a8eb0",
+      "desired_state_digest": "f24e7484b4be8fd48e1795a279674723e881010cf42e29e741b4c58875d28fcf",
       "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
       "fixture": "provisioner/inventory/fixtures/nutanix-reference.json",
       "native_contact": false,
-      "plan_digest": "0328f39a83a87a5f79c7f37f0815f139c3e52bbf4e5d01cde6b60ff3f3382303",
+      "plan_digest": "e7c7827f4da87361489e1503406876f6fff0f1baedb242860621b5b061c98da8",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -26,11 +41,11 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "510c514124128f7c30bd1f0e3bb29c22e794c417ba3e7bd109100296e2667bcd",
+      "desired_state_digest": "23f0497f26ca8732a8214c1a28669da27cdcb1bac6d11629927db6ab5a97f45a",
       "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
       "fixture": "provisioner/inventory/fixtures/openstack-reference.json",
       "native_contact": false,
-      "plan_digest": "d6f5c30da912e9d8ac917bc78d1fe4ceb2265b4858ab5330e3cce36443811532",
+      "plan_digest": "9fe0f9aefa9aa75f6e34688fcc841a88276f66d78b39bca8a524ba92e75aa5bd",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -45,11 +60,11 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "231f008f3e26e8ec6f6c4ad6876fa7b615eee889b9cf3b8fc8ca52ed142b4135",
+      "desired_state_digest": "970eb7362d2349bac678cd6300d571b13adb3d628d40d44ead85f425ed927092",
       "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
       "fixture": "provisioner/inventory/fixtures/vmware-reference.json",
       "native_contact": false,
-      "plan_digest": "c0ea094419a528d04610d0b866e72ed0da8329b2b8868902a48aa6def01f5489",
+      "plan_digest": "a9ed4e7f6d7742ed544f84033c12e43b69e0e47712b9a8ce140f8d302ea6dd29",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE",
