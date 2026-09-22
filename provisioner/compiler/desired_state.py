@@ -19,16 +19,26 @@ from provisioner.placement import eligibility
 from provisioner.services import bindings as service_bindings
 
 
-def _cluster(inventory: Inventory, site_key: str, cluster_id: str) -> tuple[str, Cluster]:
+def _cluster(inventory: Inventory, site_key: str, cell_key: str,
+             cluster_id: str) -> tuple[str, Cluster]:
+    """Resolve a placed cluster inside the cell placement actually selected.
+
+    The cell is part of the placement decision, so cluster identity is unambiguous
+    even when the same cluster id exists in another site or cell: a mismatch is a
+    recorded refusal, never a silent repair.
+    """
     site = inventory.site(site_key)
     for cell in site.cells:
+        if cell.cell != cell_key:
+            continue
         for cluster in cell.clusters:
             if cluster.id == cluster_id:
                 return cell.cell, cluster
     raise ProvisioningError('INVENTORY_INCOMPLETE',
                             f'Placed cluster {cluster_id} is absent from reviewed inventory',
-                            path='inventory.sites', details={'site': site_key,
-                                                             'cluster': cluster_id})
+                            path='inventory.sites',
+                            details={'site': site_key, 'cell': cell_key,
+                                     'cluster': cluster_id})
 
 
 def domain_ids(tenant: str, wsd: str, zones: tuple[str, ...]) -> dict[str, str]:
@@ -56,7 +66,8 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
     site_key = decision.selected['site_key']
     platform = decision.selected['platform']
     zone_clusters = {zone: decision.selected['clusters'][zone] for zone in resolution.zones}
-    selections = {zone: _cluster(inventory, site_key, cluster_id)
+    zone_cells = {zone: decision.selected['cells'][zone] for zone in resolution.zones}
+    selections = {zone: _cluster(inventory, site_key, zone_cells[zone], cluster_id)
                   for zone, cluster_id in zone_clusters.items()}
 
     compute = resolution.compute

@@ -12,8 +12,8 @@
     "format": {"const": "hosting-placement-decision/1"},
     "status": {"enum": ["PLACED", "HOLD_CAPACITY_INSUFFICIENT", "HOLD_SERVICE_UNAVAILABLE",
                         "HOLD_PREFIX_POOL_EXHAUSTED", "HOLD_CAPABILITY_NOT_QUALIFIED",
-                        "HOLD_PLATFORM_NOT_QUALIFIED", "HOLD_NO_ELIGIBLE_PLATFORM",
-                        "HOLD_NO_ELIGIBLE_SITE"]},
+                        "HOLD_PLATFORM_NOT_QUALIFIED", "HOLD_NO_COHERENT_ENVELOPE",
+                        "HOLD_NO_ELIGIBLE_PLATFORM", "HOLD_NO_ELIGIBLE_SITE"]},
     "authority": {"enum": ["AUTHORITATIVE_SITE_STATE", "FIXTURE_NOT_PLACEMENT_AUTHORITY"]},
     "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "selection_rule": {"type": "string", "minLength": 1},
@@ -40,14 +40,45 @@
     "qualification_blockers": {"type": "array", "items": {"type": "string"}},
     "selected": {
       "type": ["object", "null"],
-      "required": ["site_key", "cell_key", "platform", "clusters", "cells"],
+      "required": ["site_key", "cell_key", "platform", "clusters", "cells", "envelope"],
       "additionalProperties": false,
       "properties": {
         "site_key": {"type": ["string", "null"]},
         "cell_key": {"type": ["string", "null"]},
         "platform": {"enum": ["nutanix", "vmware", "openstack", null]},
         "clusters": {"type": "object"},
-        "cells": {"type": "object"}
+        "cells": {"type": "object"},
+        "envelope": {
+          "type": ["object", "null"],
+          "required": ["site_key", "platform", "platform_family", "capability_count",
+                       "available_vcpu", "zones"],
+          "additionalProperties": false,
+          "description": "The coherent site/platform boundary every required zone was realized in, with an explicit zone-to-cell choice.",
+          "properties": {
+            "site_key": {"type": ["string", "null"]},
+            "platform": {"enum": ["nutanix", "vmware", "openstack", null]},
+            "platform_family": {"type": ["string", "null"]},
+            "capability_count": {"type": ["integer", "null"]},
+            "available_vcpu": {"type": ["integer", "null"]},
+            "zones": {
+              "type": "object",
+              "additionalProperties": false,
+              "patternProperties": {
+                "^(OZ|RZ)$": {
+                  "type": "object",
+                  "required": ["cell_key", "cluster_id", "cluster_key", "score"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "cell_key": {"type": "string"},
+                    "cluster_id": {"type": "string"},
+                    "cluster_key": {"type": "string"},
+                    "score": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "candidates": {

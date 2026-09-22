@@ -92,6 +92,54 @@ class FailClosedTest(unittest.TestCase):
         self.assertEqual(
             registry.validate_named(held.to_dict(), 'placement-decision'), [])
 
+    @staticmethod
+    def _selected(**overrides):
+        """A placed selection carrying the coherent site/platform envelope."""
+        selected = {
+            'site_key': 'site-01', 'cell_key': 'cell-01', 'platform': 'openstack',
+            'clusters': {'OZ': 'cluster-oz-01', 'RZ': 'cluster-rz-01'},
+            'cells': {'OZ': 'cell-01', 'RZ': 'cell-01'},
+            'envelope': {
+                'site_key': 'site-01', 'platform': 'openstack',
+                'platform_family': 'openstack', 'capability_count': 14,
+                'available_vcpu': 224,
+                'zones': {zone: {'cell_key': 'cell-01',
+                                 'cluster_id': f'cluster-{zone.lower()}-01',
+                                 'cluster_key': f'site-01/cell-01/cluster-{zone.lower()}-01',
+                                 'score': 7112} for zone in ('OZ', 'RZ')}}}
+        selected.update(overrides)
+        return selected
+
+    def _placed(self, selected):
+        from provisioner.domain.placement import (AUTHORITATIVE, PLACED, PlacementDecision,
+                                                 finalize)
+        return finalize(PlacementDecision(
+            status=PLACED, authority=AUTHORITATIVE, request_digest='a' * 64,
+            selection_rule='highest-envelope-capability-count', selected=selected))
+
+    def test_a_placed_decision_with_an_envelope_validates(self):
+        placed = self._placed(self._selected())
+        self.assertEqual(placed.cells, {'OZ': 'cell-01', 'RZ': 'cell-01'})
+        self.assertEqual(placed.envelope['zones']['RZ']['cluster_key'],
+                         'site-01/cell-01/cluster-rz-01')
+        self.assertEqual(
+            registry.validate_named(placed.to_dict(), 'placement-decision'), [])
+
+    def test_a_placed_decision_without_an_envelope_is_refused(self):
+        selected = self._selected()
+        del selected['envelope']
+        problems = registry.validate_named(self._placed(selected).to_dict(),
+                                           'placement-decision')
+        self.assertTrue(any(p['path'].startswith('$.selected') for p in problems))
+
+    def test_an_envelope_with_an_unknown_zone_is_refused(self):
+        selected = self._selected()
+        selected['envelope']['zones']['AZ'] = selected['envelope']['zones']['OZ']
+        problems = registry.validate_named(self._placed(selected).to_dict(),
+                                           'placement-decision')
+        self.assertTrue(any(p['path'].startswith('$.selected.envelope.zones')
+                            for p in problems))
+
     def test_an_authoritative_placement_decision_validates(self):
         from provisioner.domain.placement import (AUTHORITATIVE, PLACED, PlacementDecision,
                                                  finalize)

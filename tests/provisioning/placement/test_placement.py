@@ -11,7 +11,7 @@ from __future__ import annotations
 import unittest
 
 from provisioner.domain.placement import (AUTHORITATIVE, AUTHORITIES, FIXTURE, STATUSES,
-                                         PlacementDecision)
+                                          HOLD_NO_COHERENT_ENVELOPE, PlacementDecision)
 from provisioner.inventory import model as inventory_model
 from provisioner.inventory.capacity import Demand
 from provisioner.placement import eligibility, resolver
@@ -67,6 +67,40 @@ def two_platform_document(*, status: str) -> dict:
         {'service': name, 'binding_class': 'default', 'site': 'site-02', 'endpoints': {}}
         for name in SERVICES)
     return document
+
+
+def _cell(name: str, *, zones=('OZ', 'RZ'), capabilities=CAPABILITIES, vcpu=64) -> dict:
+    sizes = dict(vcpu) if isinstance(vcpu, dict) else {zone: vcpu for zone in zones}
+    return {'cell': name, 'capabilities': list(capabilities),
+            'clusters': [_cluster(f'{name}-{zone.lower()}', zone, vcpu=sizes[zone])
+                         for zone in zones]}
+
+
+def _site(name: str, cells, *, platform: str = 'openstack', region: str = 'region-01') -> dict:
+    return {'site': name, 'region': region, 'platform': platform, 'defaults': {},
+            'cells': list(cells)}
+
+
+def multi_site_document(*, status: str, sites) -> dict:
+    """A region with an explicit set of reviewed sites, pools and service bindings."""
+    sites = list(sites)
+    zones = tuple(dict.fromkeys(zone for site in sites for cell in site['cells']
+                                for zone in (cluster['zone'] for cluster in cell['clusters'])))
+    return {'format': inventory_model.INVENTORY_FORMAT, 'status': status,
+            'source': 'placement-test', 'sites': sites,
+            'prefix_pools': [_pool(zone, site=site['site']) for site in sites for zone in zones],
+            'services': [{'service': name, 'binding_class': 'default', 'site': site['site'],
+                          'endpoints': {}} for site in sites for name in SERVICES]}
+
+
+def multi_site(*sites, status: str = inventory_model.FIXTURE) -> inventory_model.Inventory:
+    return inventory_model.build(multi_site_document(status=status, sites=sites))
+
+
+def split_zone_inventory() -> inventory_model.Inventory:
+    """One site realizes OZ only and another realizes RZ only."""
+    return multi_site(_site('site-01', [_cell('cell-01', zones=('OZ',))]),
+                      _site('site-02', [_cell('cell-09', zones=('RZ',))]))
 
 
 def authoritative(**kwargs) -> inventory_model.Inventory:
@@ -279,6 +313,167 @@ class CandidateEvaluationTest(unittest.TestCase):
         self.assertEqual(decision.clusters['OZ'], 'cluster-b')
 
 
+class CoherentEnvelopeTest(unittest.TestCase):
+    """Placement must choose one site/platform boundary that realizes every zone.
+
+    `hosting-wsd-environment/1` is single-site and single-platform, so a set of
+    per-zone winners spread over two sites could never be compiled. Placement now
+    selects a complete envelope or holds; it never hands desired-state assembly an
+    incoherent selection to repair.
+    """
+
+    def test_two_sites_with_asymmetric_scores_stay_in_one_site(self):
+        inventory = multi_site(
+            _site('site-01', [_cell('cell-01', vcpu={'OZ': 128, 'RZ': 8})]),
+            _site('site-02', [_cell('cell-09', vcpu={'OZ': 8, 'RZ': 64})]))
+        decision = resolver.place(request(zones=('OZ', 'RZ')), inventory)
+        self.assertEqual(decision.status, 'PLACED')
+        self.assertEqual(decision.site_key, 'site-01')
+        self.assertEqual(decision.cells, {'OZ': 'cell-01', 'RZ': 'cell-01'})
+        # The per-zone best RZ candidate lives in site-02; a coherent envelope must
+        # not borrow it, because the environment contract has one site.
+        self.assertEqual(decision.clusters['RZ'], 'cell-01-rz')
+        self.assertEqual(decision.envelope['zones']['RZ']['cluster_key'],
+                         'site-01/cell-01/cell-01-rz')
+
+    def test_two_platforms_under_auto_select_one_platform(self):
+        inventory = multi_site(
+            _site('site-01', [_cell('cell-01', vcpu=64)], platform='openstack'),
+            _site('site-02', [_cell('cell-01', vcpu=128)], platform='nutanix'))
+        decision = resolver.place(request(zones=('OZ', 'RZ'), platform='auto'), inventory)
+        self.assertEqual(decision.status, 'PLACED')
+        self.assertEqual(decision.site_key, 'site-02')
+        self.assertEqual(decision.platform, 'nutanix')
+        self.assertEqual(decision.envelope['platform_family'], 'nutanix')
+        self.assertEqual(decision.envelope['site_key'], 'site-02')
+
+    def test_zones_split_across_sites_hold_without_a_coherent_envelope(self):
+        decision = resolver.place(request(zones=('OZ', 'RZ')), split_zone_inventory())
+        self.assertEqual(decision.status, HOLD_NO_COHERENT_ENVELOPE)
+        self.assertTrue(decision.held)
+        self.assertIsNone(decision.selected)
+        self.assertTrue(any('no single site and platform realizes every required zone' in reason
+                            for reason in decision.reasons))
+        self.assertTrue(any("'site-02'" in reason and "'site-01'" in reason
+                            for reason in decision.reasons))
+
+    def test_an_incoherent_envelope_fails_before_desired_state_compilation(self):
+        from provisioner.domain.errors import ProvisioningError
+        decision = resolver.place(request(zones=('OZ', 'RZ')), split_zone_inventory())
+        with self.assertRaises(ProvisioningError) as raised:
+            resolver.require_placed(decision)
+        self.assertEqual(raised.exception.code, 'NO_ELIGIBLE_PLACEMENT')
+
+    def test_duplicate_cluster_ids_across_sites_stay_unambiguous(self):
+        inventory = multi_site(
+            _site('site-01', [_cell('cell-01', vcpu=128)]),
+            _site('site-02', [_cell('cell-01', vcpu=8)]))
+        decision = resolver.place(request(zones=('OZ', 'RZ')), inventory)
+        self.assertEqual(decision.site_key, 'site-01')
+        zones = decision.envelope['zones']
+        self.assertEqual(zones['OZ']['cluster_id'], 'cell-01-oz')
+        self.assertEqual(zones['OZ']['cluster_key'], 'site-01/cell-01/cell-01-oz')
+        self.assertEqual(zones['RZ']['cluster_key'], 'site-01/cell-01/cell-01-rz')
+
+    def test_desired_state_resolves_a_cluster_inside_the_selected_cell(self):
+        from provisioner.compiler import desired_state
+        inventory = multi_site(
+            _site('site-01', [_cell('cell-01', vcpu=128)]),
+            _site('site-02', [_cell('cell-01', vcpu=8)]))
+        for site_key in ('site-01', 'site-02'):
+            cell_key, cluster = desired_state._cluster(inventory, site_key, 'cell-01',
+                                                       'cell-01-oz')
+            self.assertEqual(cell_key, 'cell-01')
+            self.assertEqual(cluster.host_ids, ('cell-01-oz-host-01',))
+            self.assertEqual(cluster.capacity.vcpu_total, 128 if site_key == 'site-01' else 8)
+
+    def test_desired_state_refuses_a_cluster_outside_the_selected_cell(self):
+        from provisioner.compiler import desired_state
+        from provisioner.domain.errors import ProvisioningError
+        inventory = multi_site(
+            _site('site-01', [_cell('cell-01', vcpu=128), _cell('cell-02', vcpu=8)]),
+            _site('site-02', [_cell('cell-01', vcpu=8)]))
+        with self.assertRaises(ProvisioningError) as raised:
+            desired_state._cluster(inventory, 'site-01', 'cell-02', 'cell-01-oz')
+        self.assertEqual(raised.exception.code, 'INVENTORY_INCOMPLETE')
+        self.assertEqual(raised.exception.details,
+                         {'site': 'site-01', 'cell': 'cell-02', 'cluster': 'cell-01-oz'})
+
+    def test_two_cells_in_one_site_are_recorded_per_zone(self):
+        inventory = multi_site(_site('site-01', [_cell('cell-01', zones=('OZ',)),
+                                                 _cell('cell-02', zones=('RZ',))]))
+        decision = resolver.place(request(zones=('OZ', 'RZ')), inventory)
+        self.assertEqual(decision.status, 'PLACED')
+        self.assertEqual(decision.site_key, 'site-01')
+        self.assertEqual(decision.cells, {'OZ': 'cell-01', 'RZ': 'cell-02'})
+        self.assertEqual(decision.clusters, {'OZ': 'cell-01-oz', 'RZ': 'cell-02-rz'})
+        self.assertEqual(decision.envelope['capability_count'], 4)
+        self.assertEqual(decision.envelope['available_vcpu'], 128)
+
+    def test_a_site_pin_confines_the_envelope(self):
+        inventory = multi_site(
+            _site('site-01', [_cell('cell-01', vcpu=128)]),
+            _site('site-02', [_cell('cell-09', vcpu=8)]))
+        unpinned = resolver.place(request(zones=('OZ', 'RZ')), inventory)
+        self.assertEqual(unpinned.site_key, 'site-01')
+        pinned = resolver.place(request(zones=('OZ', 'RZ'), site_pin='site-02'), inventory)
+        self.assertEqual(pinned.status, 'PLACED')
+        self.assertEqual(pinned.site_key, 'site-02')
+        self.assertEqual(pinned.clusters, {'OZ': 'cell-09-oz', 'RZ': 'cell-09-rz'})
+
+    def test_a_site_pin_that_cannot_realize_every_zone_holds(self):
+        inventory = multi_site(_site('site-01', [_cell('cell-01', zones=('OZ',))]),
+                               _site('site-02', [_cell('cell-09', vcpu=64)]))
+        decision = resolver.place(request(zones=('OZ', 'RZ'), site_pin='site-01'), inventory)
+        self.assertEqual(decision.status, 'HOLD_NO_ELIGIBLE_SITE')
+        self.assertTrue(any('matching pins' in reason for reason in decision.reasons))
+
+    def test_a_cell_pin_confines_the_envelope(self):
+        inventory = multi_site(_site('site-01', [_cell('cell-01', vcpu=128),
+                                                 _cell('cell-02', vcpu=8)]))
+        decision = resolver.place(request(zones=('OZ', 'RZ'), cell_pin='cell-02'), inventory)
+        self.assertEqual(decision.status, 'PLACED')
+        self.assertEqual(decision.site_key, 'site-01')
+        self.assertEqual(decision.cells, {'OZ': 'cell-02', 'RZ': 'cell-02'})
+        self.assertEqual(decision.envelope['available_vcpu'], 16)
+
+    def test_recovery_placement_is_a_separate_request_not_a_hidden_zone(self):
+        inventory = multi_site(_site('site-01', [_cell('cell-01', zones=('OZ',), vcpu=128)]),
+                               _site('site-02', [_cell('cell-09', vcpu=64)]))
+        primary = resolver.place(request(zones=('OZ',)), inventory)
+        recovery = resolver.place(request(zones=('OZ', 'RZ')), inventory)
+        self.assertEqual(primary.status, 'PLACED')
+        self.assertEqual(primary.site_key, 'site-01')
+        self.assertNotIn('RZ', primary.clusters)
+        # The recovery-enabled environment is its own placement request, and it
+        # resolves to a site that realizes both zones. It is never a second
+        # primary-zone candidate folded into the primary envelope.
+        self.assertEqual(recovery.status, 'PLACED')
+        self.assertEqual(recovery.site_key, 'site-02')
+        self.assertEqual(recovery.clusters, {'OZ': 'cell-09-oz', 'RZ': 'cell-09-rz'})
+        self.assertNotEqual(primary.digest, recovery.digest)
+
+    def test_ties_between_valid_envelopes_break_deterministically(self):
+        first = _site('site-01', [_cell('cell-01', vcpu=64)])
+        second = _site('site-02', [_cell('cell-01', vcpu=64)])
+        forwards = resolver.place(request(zones=('OZ', 'RZ')),
+                                  multi_site(first, second))
+        backwards = resolver.place(request(zones=('OZ', 'RZ')),
+                                   multi_site(second, first))
+        self.assertEqual(forwards.status, 'PLACED')
+        self.assertEqual(forwards.site_key, 'site-01')
+        self.assertEqual(backwards.site_key, 'site-01')
+        self.assertEqual(forwards.digest, backwards.digest)
+
+    def test_ties_between_cells_in_one_site_break_on_cell_key(self):
+        inventory = multi_site(_site('site-01', [_cell('cell-02', vcpu=64),
+                                                 _cell('cell-01', vcpu=64)]))
+        decision = resolver.place(request(zones=('OZ', 'RZ')), inventory)
+        self.assertEqual(decision.cells, {'OZ': 'cell-01', 'RZ': 'cell-01'})
+        self.assertEqual(decision.envelope['capability_count'], 4)
+        self.assertEqual(decision.envelope['available_vcpu'], 128)
+
+
 class FailClosedTest(unittest.TestCase):
     def test_fixture_inventory_is_never_placement_authority(self):
         inventory = demonstration()
@@ -376,6 +571,7 @@ class VocabularyTest(unittest.TestCase):
             resolver.place(request(), authoritative(services=('dns',))).status,
             resolver.place(request(), authoritative(zones=('OZ',), allocations=8)).status,
             resolver.place(request(service_class='data'), reviewed).status,
+            resolver.place(request(zones=('OZ', 'RZ')), split_zone_inventory()).status,
         }
 
     def test_every_declared_status_is_emitted(self):

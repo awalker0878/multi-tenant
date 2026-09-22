@@ -1,9 +1,17 @@
 """Deterministic placement over reviewed inventory.
 
 Placement evaluates every reviewed site, cell and zone, records why each was
-rejected, and selects the best eligible candidate under one stated rule:
+rejected, and selects the best **coherent envelope**: one site and one platform
+that realize *every* required zone, with an explicit per-zone cell/cluster choice.
+Zones are never ranked independently across unrelated sites, because the existing
+`hosting-wsd-environment/1` contract is single-site and single-platform; a
+per-zone winner set spanning two sites could not be compiled, and would only fail
+later as `INVENTORY_INCOMPLETE` after placement had already reported `PLACED`.
 
-    highest capability count, then largest available vCPU, then lowest cell key
+Envelopes are ranked under one stated rule:
+
+    highest capability count, then largest available vCPU, then lowest site key,
+    then lowest cell key, then lowest cluster id
 
 The rule is deliberately boring. It is reproducible from inventory alone and it
 never consults a scheduler, a reservation service or a native platform.
@@ -18,8 +26,10 @@ so tests can inject a controlled source without touching the reviewed registry.
 
 A hold is never a bare failure: the decision records every rejected candidate with
 its exact blockers, and reports the most specific hold status that applies. When no
-candidate was evaluated at all the status is `HOLD_NO_ELIGIBLE_SITE`; otherwise the
-status is the first matching class in `_HOLD_FOR_BLOCKER`, falling back to
+candidate was evaluated at all the status is `HOLD_NO_ELIGIBLE_SITE`; when every
+required zone has an eligible candidate but no single site and platform realizes
+them together the status is `HOLD_NO_COHERENT_ENVELOPE`; otherwise the status is
+the first matching class in `_HOLD_FOR_BLOCKER`, falling back to
 `HOLD_NO_ELIGIBLE_PLATFORM`.
 """
 from __future__ import annotations
@@ -28,15 +38,17 @@ from dataclasses import dataclass
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.placement import (AUTHORITATIVE, FIXTURE, HOLD_CAPACITY_INSUFFICIENT,
-                                          HOLD_CAPABILITY_NOT_QUALIFIED, HOLD_NO_ELIGIBLE_PLATFORM,
-                                          HOLD_NO_ELIGIBLE_SITE, HOLD_PLATFORM_NOT_QUALIFIED,
-                                          HOLD_PREFIX_POOL_EXHAUSTED, HOLD_SERVICE_UNAVAILABLE,
-                                          PLACED, CandidateEvaluation, PlacementDecision, finalize)
+                                          HOLD_CAPABILITY_NOT_QUALIFIED, HOLD_NO_COHERENT_ENVELOPE,
+                                          HOLD_NO_ELIGIBLE_PLATFORM, HOLD_NO_ELIGIBLE_SITE,
+                                          HOLD_PLATFORM_NOT_QUALIFIED, HOLD_PREFIX_POOL_EXHAUSTED,
+                                          HOLD_SERVICE_UNAVAILABLE, PLACED, CandidateEvaluation,
+                                          PlacementDecision, finalize)
 from provisioner.inventory.capacity import Assessment, Demand, assess
 from provisioner.inventory.model import Cell, Cluster, Inventory, Site
 from provisioner.placement import eligibility
 
-SELECTION_RULE = 'highest-capability-count-then-largest-available-vcpu-then-lowest-cell-key'
+SELECTION_RULE = ('highest-envelope-capability-count-then-largest-available-vcpu-then-lowest-site-'
+                  'cell-and-cluster-key')
 SERVICE_NAMES = ('dns', 'ntp', 'identity', 'logging', 'backup')
 
 # Internal blocker classes. Each rejected candidate records why it failed, and the
@@ -95,6 +107,92 @@ class _ZoneOption:
     score: int
     assessment: Assessment
     capability_count: int
+
+
+def _option_key(option: _ZoneOption) -> tuple:
+    return (-option.score, option.cell.cell, option.cluster.id)
+
+
+@dataclass(frozen=True)
+class _Envelope:
+    """One coherent site/platform boundary with an explicit zone-to-cell choice.
+
+    Every required zone is realized inside the same site and the same platform, so
+    the envelope is compatible with the single-site `hosting-wsd-environment/1`
+    contract. Zones may still sit in different cells of that site; the choice is
+    recorded per zone rather than assumed.
+    """
+
+    site: Site
+    options: dict[str, _ZoneOption]
+
+    @property
+    def site_key(self) -> str:
+        return self.site.site
+
+    @property
+    def platform(self) -> str:
+        return self.site.platform
+
+    @property
+    def capability_count(self) -> int:
+        return sum(len(o.cell.capabilities) for o in self.options.values())
+
+    @property
+    def available_vcpu(self) -> int:
+        return sum(o.cluster.capacity.vcpu_available for o in self.options.values())
+
+    def rank(self, zones: tuple[str, ...]) -> tuple:
+        """Deterministic envelope order: capability, then vCPU, then stable keys."""
+        return (-self.capability_count, -self.available_vcpu, self.site_key,
+                tuple(self.options[zone].cell.cell for zone in zones),
+                tuple(self.options[zone].cluster.id for zone in zones))
+
+    def to_dict(self, zones: tuple[str, ...]) -> dict:
+        return {
+            'site_key': self.site_key, 'platform': self.platform,
+            'platform_family': eligibility.PLATFORM_FAMILY[self.platform],
+            'capability_count': self.capability_count,
+            'available_vcpu': self.available_vcpu,
+            'zones': {zone: {'cell_key': self.options[zone].cell.cell,
+                             'cluster_id': self.options[zone].cluster.id,
+                             'cluster_key': self.cluster_key(zone),
+                             'score': self.options[zone].score} for zone in zones}}
+
+    def cluster_key(self, zone: str) -> str:
+        """Unambiguous cluster identity within the selected inventory scope."""
+        return f'{self.site_key}/{self.options[zone].cell.cell}/{self.options[zone].cluster.id}'
+
+
+def _envelopes(request: PlacementRequest,
+               options: dict[str, list[_ZoneOption]]) -> list[_Envelope]:
+    """Every complete envelope, best first.
+
+    A site/platform boundary qualifies only when it realizes *every* required
+    zone; a boundary that covers a subset is not a candidate at all, so zones can
+    never be combined across unrelated sites or platforms.
+    """
+    grouped: dict[tuple[str, str], dict[str, list[_ZoneOption]]] = {}
+    for zone in request.zones:
+        for option in options[zone]:
+            grouped.setdefault((option.site.site, option.site.platform), {}).setdefault(
+                zone, []).append(option)
+    envelopes = []
+    for by_zone in grouped.values():
+        if set(by_zone) != set(request.zones):
+            continue
+        envelopes.append(_Envelope(
+            site=next(iter(by_zone.values()))[0].site,
+            options={zone: sorted(by_zone[zone], key=_option_key)[0] for zone in request.zones}))
+    return sorted(envelopes, key=lambda envelope: envelope.rank(request.zones))
+
+
+def _boundaries(request: PlacementRequest,
+                options: dict[str, list[_ZoneOption]]) -> list[str]:
+    """Where each required zone could have been realized, for an incoherent hold."""
+    return [f'{zone} is eligible only in '
+            f'{sorted({(o.site.site, o.site.platform) for o in options[zone]})}'
+            for zone in request.zones]
 
 
 def _pool_has_room(inventory: Inventory, site: str, zone: str, prefix_length: int) -> tuple[bool, str]:
@@ -219,21 +317,31 @@ def place(request: PlacementRequest, inventory: Inventory,
                        'this decision cannot authorize anything')
 
     missing_zones = [zone for zone in request.zones if not options[zone]]
-    if missing_zones:
+    envelopes = _envelopes(request, options)
+    if not envelopes:
         codes: set[str] = set()
-        for zone in missing_zones:
-            rejected = [(e, c) for e, c in evaluated if e.zone == zone]
-            if not rejected:
+        for zone in request.zones:
+            zone_evaluated = [(e, c) for e, c in evaluated if e.zone == zone]
+            if not zone_evaluated:
                 pins = {'site': request.site_pin, 'cell': request.cell_pin}
                 reasons.append(f'{zone}: no reviewed candidate in region {request.region} '
                                f'for platforms {sorted(platforms)}'
                                + (f' matching pins {pins}' if any(pins.values()) else ''))
                 continue
-            for evaluation, evaluation_codes in rejected:
+            if options[zone]:
+                continue
+            for evaluation, evaluation_codes in zone_evaluated:
                 codes.update(evaluation_codes)
                 reasons.append(f'{zone}: {evaluation.site_key}/{evaluation.cell_key} '
                                f'{evaluation.platform} rejected: ' + '; '.join(evaluation.blockers))
         status = _hold_status(frozenset(codes))
+        if not codes and not missing_zones:
+            # Every zone has an eligible candidate, but no single site and platform
+            # realizes them together. Holding here is what keeps desired-state
+            # assembly from ever having to repair an incoherent selection.
+            status = HOLD_NO_COHERENT_ENVELOPE
+            reasons.append('no single site and platform realizes every required zone: '
+                           + '; '.join(_boundaries(request, options)))
         if qualification_blockers:
             reasons.append('no candidate platform carries native qualification for the required '
                            'capability set: ' + '; '.join(sorted(qualification_blockers)))
@@ -244,16 +352,16 @@ def place(request: PlacementRequest, inventory: Inventory,
             qualification_blockers=tuple(sorted(qualification_blockers)),
             required_capabilities=request.required_capabilities))
 
-    selected: dict = {'site_key': None, 'cell_key': None, 'platform': None,
-                      'clusters': {}, 'cells': {}}
-    for zone in request.zones:
-        best = sorted(options[zone], key=lambda o: (-o.score, o.cell.cell, o.cluster.id))[0]
-        selected['clusters'][zone] = best.cluster.id
-        selected['cells'][zone] = best.cell.cell
-        if selected['site_key'] is None:
-            selected['site_key'] = best.site.site
-            selected['cell_key'] = best.cell.cell
-            selected['platform'] = best.site.platform
+    envelope = envelopes[0]
+    selected: dict = {
+        'site_key': envelope.site_key,
+        'cell_key': envelope.options[request.zones[0]].cell.cell,
+        'platform': envelope.platform,
+        'clusters': {zone: envelope.options[zone].cluster.id for zone in request.zones},
+        'cells': {zone: envelope.options[zone].cell.cell for zone in request.zones},
+        'envelope': envelope.to_dict(request.zones)}
+    reasons.append('the selected envelope realizes every required zone inside one site and '
+                   f'one platform: {envelope.site_key}/{envelope.platform}')
     return finalize(PlacementDecision(
         status=PLACED, authority=authority, request_digest=request.request_digest,
         selection_rule=SELECTION_RULE, selected=selected, candidates=tuple(evaluations),

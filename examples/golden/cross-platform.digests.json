@@ -7,7 +7,7 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "366dafceee8b00c5b0ed1ca6c90c3e962270c8c0f7cd7f4206a2286de52b7420",
+      "desired_state_digest": "0e8f7633b3af9677d133ebce08fa9e56fffe18719da661931e22cddae25a8eb0",
       "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
       "fixture": "provisioner/inventory/fixtures/nutanix-reference.json",
       "native_contact": false,
@@ -26,7 +26,7 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "8f378a9d1583a5140b7de92c1389713cd2b6603b47c73db1ea58af8802283798",
+      "desired_state_digest": "510c514124128f7c30bd1f0e3bb29c22e794c417ba3e7bd109100296e2667bcd",
       "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
       "fixture": "provisioner/inventory/fixtures/openstack-reference.json",
       "native_contact": false,
@@ -45,7 +45,7 @@
       "compiled_files": [
         "tenant-01/wsd-01/domains.tfvars.json"
       ],
-      "desired_state_digest": "67e02c0d43e1f3f9781dd4780c314336662dd7f65aaa6d47fdd8dee200a285f7",
+      "desired_state_digest": "231f008f3e26e8ec6f6c4ad6876fa7b615eee889b9cf3b8fc8ca52ed142b4135",
       "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
       "fixture": "provisioner/inventory/fixtures/vmware-reference.json",
       "native_contact": false,

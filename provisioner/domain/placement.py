@@ -26,6 +26,7 @@ HOLD_CAPABILITY_NOT_QUALIFIED = 'HOLD_CAPABILITY_NOT_QUALIFIED'
 HOLD_CAPACITY_INSUFFICIENT = 'HOLD_CAPACITY_INSUFFICIENT'
 HOLD_SERVICE_UNAVAILABLE = 'HOLD_SERVICE_UNAVAILABLE'
 HOLD_PREFIX_POOL_EXHAUSTED = 'HOLD_PREFIX_POOL_EXHAUSTED'
+HOLD_NO_COHERENT_ENVELOPE = 'HOLD_NO_COHERENT_ENVELOPE'
 
 # Every status this model can emit. `HOLD_NO_ELIGIBLE_SITE` is the only status
 # produced when no candidate was evaluated at all; the remaining holds are
@@ -33,7 +34,8 @@ HOLD_PREFIX_POOL_EXHAUSTED = 'HOLD_PREFIX_POOL_EXHAUSTED'
 # `HOLD_NO_ELIGIBLE_PLATFORM` as the least specific catch-all.
 HOLD_PRIORITY = (HOLD_CAPACITY_INSUFFICIENT, HOLD_SERVICE_UNAVAILABLE,
                  HOLD_PREFIX_POOL_EXHAUSTED, HOLD_CAPABILITY_NOT_QUALIFIED,
-                 HOLD_PLATFORM_NOT_QUALIFIED, HOLD_NO_ELIGIBLE_PLATFORM)
+                 HOLD_PLATFORM_NOT_QUALIFIED, HOLD_NO_COHERENT_ENVELOPE,
+                 HOLD_NO_ELIGIBLE_PLATFORM)
 
 STATUSES = (PLACED, HOLD_NO_ELIGIBLE_SITE) + HOLD_PRIORITY
 
@@ -126,6 +128,16 @@ class PlacementDecision:
     @property
     def clusters(self) -> dict:
         return dict((self.selected or {}).get('clusters', {}))
+
+    @property
+    def cells(self) -> dict:
+        """The cell chosen for every required zone."""
+        return dict((self.selected or {}).get('cells', {}))
+
+    @property
+    def envelope(self) -> dict:
+        """The coherent site/platform boundary the selected zones were realized in."""
+        return dict((self.selected or {}).get('envelope', {}))
 
     def to_dict(self) -> dict:
         limits = ['A placement decision is not an authorization to build']
