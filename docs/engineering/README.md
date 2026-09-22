@@ -61,6 +61,10 @@ These links open the full converted narrative, tables, placeholders, diagrams an
 
 [Qualification campaign evidence packet assurance](qualification-campaign-evidence-assurance.md)
 
+[Portable WSD request contract](../provisioning/request-contract.md), [profile model](../provisioning/profile-model.md)
+and [placement model](../provisioning/placement-model.md) are the current engineering contracts for the
+parameter-driven front end.
+
 [Editable low-level design template](../templates/lld/README.md)
 
 [Documentation home](../README.md) · [Architecture decisions](../adr/README.md)
