@@ -41,7 +41,10 @@ single source of native field shapes.
 
 There is no circular ownership: the compiler never imports `provisioner/`, the
 Terraform roots never import either, and the adapters re-export the compiler's
-field sets rather than restating them.
+field sets rather than restating them. The renderer asks the reviewed module which
+native inputs it declares instead of restating a provider-specific list, which is
+what keeps one portable request compilable on all three platforms — see
+[Terraform execution boundary](terraform-boundary.md#cross-platform-realization).
 
 ## Refusal model
 

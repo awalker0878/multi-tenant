@@ -35,6 +35,11 @@ The native field sets are **re-exported from the existing compiler**
 identities come from `scripts/build_wsd_compositions.COMPONENTS`. The adapter and
 the compiler therefore cannot disagree: there is one declaration, in the compiler.
 
+The same rule governs realization: the environment renderer overlays only the
+inputs the reviewed module declares, and a platform that cannot carry a computed
+fact records `REALIZATION_INPUT_UNAVAILABLE` instead of dropping it. See
+[Terraform execution boundary](terraform-boundary.md#native-input-ownership).
+
 ## Qualification
 
 `qualified` is derived from `eligibility.product_tuple(platform)`. No tuple is
