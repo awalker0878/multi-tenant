@@ -59,7 +59,8 @@ The highest priority is to finish the vertical path rather than add new capabili
 ### GATE-C01 — Native qualification must gate placement
 
 Severity: P0  
-State at baseline: INVALID
+State at baseline: INVALID  
+State: COMPLETE
 
 Affected master-prompt requirements include R7, sections 21-23, 40, 62, 63, 76, 77, 88, 91, 99, and 100.
 
@@ -108,6 +109,24 @@ Add tests proving:
 - placement tests cover both qualified and unqualified registries through controlled fixtures or injected registry data;
 - docs/provisioning/placement-model.md describes the actual fail-closed behavior;
 - docs/NEXT_WORK.md contains only the external act of selecting/qualifying real tuples, not repository-side placement gating work.
+
+#### Completion record
+
+Qualification is now a mandatory placement blocker and a decision is authorized only when the qualification source is authoritative.
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. mandatory blockers | `resolver._candidate()` adds `BLOCKER_QUALIFICATION`; `CandidateEvaluation.eligible` is `not blockers` |
+| 2. four-way distinction | `check_platform_capabilities.eligible()` emits `product_tuple:UNSELECTED`, `capability:<id>:NOT_IMPLEMENTED`, `capability:<id>:NOT_NATIVE_QUALIFIED`, `product_tuple:<tuple>:NOT_NATIVE_QUALIFIED`, plus `assurance_profile:<name>` and cell-local `cell_blockers` |
+| 3. explicit selection cannot bypass | an explicitly preferred platform still has to clear the same blocker set |
+| 4. `platform:auto` rejects unqualified candidates | every candidate is evaluated; an unqualified candidate cannot be eligible |
+| 5. rejected reasons preserved | `CandidateEvaluation.blocker_classes`/`qualification_blockers`/`cell_blockers` are serialized into the placement artifact |
+| 6. fixtures stay non-authoritative | `DeclaredQualification.authoritative` is always `False`; `place()` raises when an authoritative inventory meets a non-authoritative source; `PlacementDecision.authorized` requires `qualification_identity['authoritative']` |
+| 7. no invented qualification | `sources/capabilities/platform_registry.json` is unchanged and still qualifies nothing; the external `native-qualification` conformance check stays `PENDING_EXTERNAL_EVIDENCE` |
+
+New behaviour is fail-closed: `HOLD_PLATFORM_NOT_QUALIFIED` joins `HOLD_PRIORITY` after the specific per-candidate capability hold, an unrecorded qualification is explicit (`UNRECORDED_QUALIFICATION`) rather than an empty object, and a non-authoritative decision carries the limit "Native qualification is absent; this decision rests on a declared qualification assumption".
+
+Regressions: `tests/provisioning/placement/test_placement.py` (qualified and unqualified sources, authoritative/declared refusal), `tests/provisioning/schema/test_schema.py` (unrecorded and declared qualification never authorize), `tests/provisioning/compiler/test_cross_platform.py`, `tests/test_platform_capabilities.py`. `python -m pytest tests/provisioning -q` reports 253 passed / 515 subtests, and `scripts/check_repository.py`, `scripts/check_documentation.py`, and `scripts/check_retired_interfaces.py` pass. The reviewed corpus in `examples/` was regenerated to match; `plan_digest` is unchanged.
 
 ---
 
