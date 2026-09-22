@@ -32,16 +32,23 @@ domain  <-  schemas, profiles, inventory
 profiles <- policy, placement, compiler
 placement <- compiler, execution
 compiler  <- execution, conformance
+service   <- cli
 ```
 
 Nothing in `provisioner/` imports the CLI, and the CLI imports no other command.
+Every command is a thin transport over `provisioner/execution/service.py`, which
+holds the operations they share: `build_context()` loads the request, the reviewed
+inventory and the catalogs, and `plan_for()` runs the pipeline over that context.
 `provisioner/repository.py` is the only module that reaches back into `tools/` and
 `scripts/`; it resolves those modules by name so the existing compiler stays the
 single source of native field shapes.
 
 `tests/provisioning/unit/test_architecture.py` enforces every statement in this
 section, plus the rule that no `provisioner/` source carries a UTF-8 byte-order mark.
-A reversed import edge fails that test rather than only contradicting this page.
+A reversed import edge fails that test rather than only contradicting this page. The
+command rule reads the import graph rather than a naming convention, so both
+`from provisioner.cli import plan` and `from provisioner.cli.plan import plan_for`
+are reported, and a controlled fixture proves the rule rejects that edge.
 
 There is no circular ownership: the compiler never imports `provisioner/`, the
 Terraform roots never import either, and the adapters re-export the compiler's

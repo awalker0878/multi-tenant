@@ -2,11 +2,14 @@
 
 The command line is a transport. Every command calls the same core library the
 pipeline uses; no command decides policy, placement, allocation or authority for
-itself. `apply` exists so the refusal is explicit and machine-readable, not so a
-change can be made.
+itself, and no command imports another command. The operations the commands share —
+loading the request, its reviewed inventory and its catalogs, and building the plan
+— live in `provisioner/execution/service.py`, below the transport. `apply` exists so
+the refusal is explicit and machine-readable, not so a change can be made.
 
 Entry point: `python -m provisioner.cli <command> <request.yaml>`
 Module: `provisioner/cli/`
+Shared service: `provisioner/execution/service.py`
 Result format: `hosting-cli-result/1`
 
 ## Commands
