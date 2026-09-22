@@ -46,6 +46,7 @@ This maintained implementation program carries forward the 1.0 completion plan. 
 | [GitLab state project bootstrap](state-projects.md) | Private native project creation, exact backend handoffs and interrupted recovery |
 | [Offline runtime bootstrap](runtime-bootstrap.md) | Exact artifact builds, installed dependency verification and retained runtime custody |
 | [Dependency-safe retirement](retirement-orchestration.md) | Ordered cleanup evidence, retained-data custody, DNS/IPAM sequencing and capacity-release holds |
+| [Brownfield adoption](brownfield-adoption.md) | Ownership discovery, old-writer fencing, explicit Terraform import and post-import no-op/delta review |
 | [Repository release controls](release-controls.md) | Proposed required reviews/checks, administrator prerequisites and release sequence |
 | [Audit snapshot](../../assurance/automation-baseline-evidence.json) | Machine-readable source inventory and observed CI metadata for this audit |
 
