@@ -1,0 +1,43 @@
+apiVersion: hosting.platform/v1
+kind: WorkloadSecurityDomain
+metadata:
+  tenant: tenant-01
+  name: wsd-multitier-01
+  owner: platform-team
+  description: Multi-tier production workload security domain with distinct operations and restricted zones.
+spec:
+  environment: production
+  security:
+    profile: protected-b-high
+  assurance:
+    profile: elevated
+  platform:
+    preference: auto
+  placement:
+    region: east
+    site: null
+    cell: null
+  availability:
+    profile: high
+  network:
+    profile: internal-ipv4
+  recovery:
+    enabled: true
+    profile: standard
+  capacity:
+    computeProfile: large
+    storageProfile: high-capacity
+  zones:
+    operations:
+      enabled: true
+    restricted:
+      enabled: true
+  services:
+    dns: default
+    ntp: default
+    identity: enterprise
+    logging: protected-b
+    backup: standard
+  exposure:
+    publicIngress: false
+    internetEgress: false
