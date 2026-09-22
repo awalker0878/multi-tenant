@@ -1,7 +1,8 @@
 # Placement model
 
-Placement turns a resolved request into either one deterministic site/cell/platform
-selection or an explicit hold. It is **fail-closed**: a hold is a valid, recorded
+Placement turns a resolved request into either one deterministic **coherent
+envelope** — a site, a platform and a cell/cluster choice for every required zone
+— or an explicit hold. It is **fail-closed**: a hold is a valid, recorded
 outcome, and nothing downstream may substitute a site.
 
 Modules: `provisioner/placement/eligibility.py`, `provisioner/placement/resolver.py`
@@ -27,6 +28,7 @@ candidate it evaluated — eligible or not — with its score and the exact bloc
 | `HOLD_PREFIX_POOL_EXHAUSTED` | a candidate was rejected because no prefix of the resolved length remains |
 | `HOLD_CAPABILITY_NOT_QUALIFIED` | a candidate was rejected because the cell lacks a required capability |
 | `HOLD_PLATFORM_NOT_QUALIFIED` | every candidate was rejected because its platform is not natively qualified for the required capabilities |
+| `HOLD_NO_COHERENT_ENVELOPE` | every required zone had an eligible candidate, but no single site and platform realizes all of them together |
 | `HOLD_NO_ELIGIBLE_PLATFORM` | a candidate was rejected for residency or another reason with no more specific class |
 | `HOLD_NO_ELIGIBLE_SITE` | no candidate was evaluated at all (region, platform or pin matched nothing) |
 
@@ -64,11 +66,49 @@ qualification is authoritative. A decision assembled without a recorded
 qualification records the explicit identity `UNRECORDED`/`NOT_EVALUATED` and is
 never authorized.
 
+## Envelope
+
+The unit of placement is a **coherent envelope**: one site, one platform and an
+explicit cell/cluster choice for *every* required zone. Zones are never ranked
+independently, because `hosting-wsd-environment/1` is a single-site,
+single-platform environment contract — a set of per-zone winners spanning two
+sites could not be compiled, and would only fail later as `INVENTORY_INCOMPLETE`
+after placement had already reported `PLACED`.
+
+A site/platform boundary is a candidate envelope only when it realizes **every**
+required zone. Zones may still sit in different cells of that one site; that
+choice is recorded rather than assumed:
+
+| `selected` field | Content |
+| --- | --- |
+| `site_key`, `platform` | the single boundary every zone was realized in |
+| `cells` | the cell chosen for each required zone |
+| `clusters` | the cluster chosen for each required zone |
+| `envelope` | `site_key`, `platform`, `platform_family`, `capability_count`, `available_vcpu` and a `zones` map of `cell_key`/`cluster_id`/`cluster_key`/`score` |
+
+`envelope.zones.<zone>.cluster_key` is `site/cell/cluster`, so cluster identity is
+unambiguous inside the selected inventory scope even when the same cluster id
+exists in another site or cell. `desired_state._cluster()` resolves strictly inside
+the selected cell; a mismatch is a recorded `INVENTORY_INCOMPLETE` refusal, never a
+silent repair.
+
+If no envelope exists, placement fails **before** desired-state compilation. When
+no candidate was evaluated at all the status is `HOLD_NO_ELIGIBLE_SITE`; when every
+required zone has an eligible candidate but no boundary realizes them together the
+status is `HOLD_NO_COHERENT_ENVELOPE`, and the reasons name where each zone was
+eligible. Recovery is modelled as its own placement request, never as a second
+primary-zone candidate hidden inside the primary site.
+
 ## Determinism
 
-Candidates are ordered by score, then by the stable key (site, cell, platform), so
-the same request over the same inventory always selects the same target and yields
-the same digest. Two different requests never share a placement digest.
+Envelopes are ordered by capability count (descending), then available vCPU
+(descending), then the stable keys `site_key`, the per-zone cell keys and the
+per-zone cluster ids. Within one zone the option is the highest score, then the
+lowest cell key, then the lowest cluster id. Candidates are ordered by the stable
+key (site, cell, zone, platform). The same request over the same inventory
+therefore always selects the same envelope and yields the same digest, regardless
+of the order sites appear in the inventory; two different requests never share a
+placement digest.
 
 ## Native qualification
 
@@ -110,4 +150,7 @@ it evaluated in `qualification` and `qualification_blockers`.
 
 `placement.site` and `placement.cell` narrow the candidate set; they do not bypass
 eligibility, capacity, capability or service checks. A pinned target that fails any
-check produces a hold, not a forced selection.
+check produces a hold, not a forced selection. A pin narrows the envelope, it never
+combines zones across sites: a site pin that cannot realize every required zone
+holds with `HOLD_NO_ELIGIBLE_SITE`, and a cell pin that cannot realize every
+required zone holds the same way.

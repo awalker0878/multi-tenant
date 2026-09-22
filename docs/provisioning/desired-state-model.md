@@ -41,7 +41,7 @@ One entry per zone (`OZ`, and `RZ` when `availability` above `single-zone`):
 | --- | --- |
 | `id` | the deterministic domain identity |
 | `zone` | `OZ` or `RZ` |
-| `cell`, `cluster` | the selected native placement |
+| `cell`, `cluster` | the selected native placement: the cell is the one placement chose for *this* zone inside the coherent envelope, and the cluster is resolved only inside that cell |
 | `prefix` | the allocated prefix for this zone |
 | `gateway_host_number` | the offset gateway inside the prefix |
 | `inputs` | the platform inputs the compiler consumes |
