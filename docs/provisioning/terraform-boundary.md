@@ -72,7 +72,7 @@ by the NSX domain composition that owns the segment. The provisioner records tha
 boundary rather than dropping the fact silently. The plan carries one
 `REALIZATION_INPUT_UNAVAILABLE` warning naming the input and the platform, in the
 `compilation` layer, and the allocation itself still happens — every platform
-allocates the same distinct addresses. `tests/provisioning/test_cross_platform.py`
+allocates the same distinct addresses. `tests/provisioning/compiler/test_cross_platform.py`
 holds the contract, reading the expected field shapes from the reviewed module
 configurations rather than from the accessor the provisioner calls.
 

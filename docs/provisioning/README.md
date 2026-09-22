@@ -57,6 +57,18 @@ requests; [`examples/resolved/`](../../examples/resolved) and
 [`examples/golden/`](../../examples/golden) hold their stored deterministic
 artifacts. See [`examples/README.md`](../../examples/README.md).
 
+## Test layout
+
+Regressions live under `tests/provisioning/`, split into the categories the refactor
+names: `unit`, `schema`, `policy`, `placement`, `compiler`, `adapters`,
+`reconciliation`, `conformance`, `documentation` and `end_to_end`. The shared
+helpers stay in `tests/provisioning/support.py`.
+
+The categories are nested inside `provisioning/` rather than placed at the top of
+`tests/` because a test package must never shadow a top-level source package:
+`policy/`, `profiles/` and `inventory/` already exist at the repository root, so
+`tests/policy/` would resolve as the source package during discovery.
+
 ## What this does not claim
 
 No document here asserts that a site, cell, provider or service has been

@@ -57,4 +57,4 @@ placement target and it cannot authorize execution.
 | adapter used to claim a change | impossible: no adapter has a mutating entry point |
 
 Adding an adapter means adding a compiler table entry, a composition entry, a
-catalog entry, and a regression in `tests/provisioning/test_adapters.py`.
+catalog entry, and a regression in `tests/provisioning/adapters/test_adapters.py`.

@@ -52,6 +52,6 @@ tie-breaking. Rank is never used to substitute one profile for another.
 ## Adding a profile
 
 Add the entry to the catalog with an explicit status, then add a regression to
-`tests/provisioning/test_profiles_policy.py`. A catalog entry without a regression
+`tests/provisioning/policy/test_profiles_policy.py`. A catalog entry without a regression
 is not reviewed. Removing or renaming a profile is a breaking change to the
 request contract and needs a note in the retired-interfaces register.
