@@ -75,6 +75,9 @@ boundary rather than dropping the fact silently. The plan carries one
 allocates the same distinct addresses. `tests/provisioning/compiler/test_cross_platform.py`
 holds the contract, reading the expected field shapes from the reviewed module
 configurations rather than from the accessor the provisioner calls.
+`examples/golden/cross-platform.digests.json` stores the resulting per-platform
+digests and realization gaps, and
+`tests/provisioning/end_to_end/test_golden.py` replays them.
 
 ## Ownership
 

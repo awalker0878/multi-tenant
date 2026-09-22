@@ -16,6 +16,13 @@ their environment and conformance documents plus the `digests.json` index. The
 `PLANNED_DISABLED_NOT_AUTHORIZED` with `native_contact: false`; see the
 [portable provisioning documents](../docs/provisioning/README.md).
 
+`golden/cross-platform.digests.json` records the same portable request realized on
+each reviewed platform fixture. Every platform is asked for the identical portable
+body; only `spec.platform.preference` differs, so `portable_digest` is shared while
+`request_digest` is not. The artifact also stores the per-platform realization
+gaps, which is how the VMware boundary (no address on the workload) stays visible
+rather than being silently dropped.
+
 `neutron_observation.json.example` and `accepted_route_record.json.example` contain
 intentionally unusable placeholders. Populate actual expectations from accepted
 engineering and inventory records, never by treating example values as approvals.

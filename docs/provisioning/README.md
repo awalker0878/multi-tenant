@@ -57,6 +57,13 @@ requests; [`examples/resolved/`](../../examples/resolved) and
 [`examples/golden/`](../../examples/golden) hold their stored deterministic
 artifacts. See [`examples/README.md`](../../examples/README.md).
 
+`provisioner/inventory/fixtures/` holds one reviewed fixture inventory per platform
+(`openstack-reference`, `vmware-reference`, `nutanix-reference`). Every fixture is
+`FIXTURE_NOT_AUTHORITATIVE`, and none of them is a placement authority. They exist
+so the cross-platform contract can be exercised offline; replacing them with
+authoritative site state is tracked as open work in
+[`docs/NEXT_WORK.md`](../NEXT_WORK.md).
+
 ## Test layout
 
 Regressions live under `tests/provisioning/`, split into the categories the refactor
