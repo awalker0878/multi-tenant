@@ -44,6 +44,12 @@ The catalogue and engine verifier include every component/composition/root. CI v
 
 ## Compile cluster-aware inputs
 
+This is the compiler stage of the [one current provisioning path](../../../README.md). A
+reviewed WSD request enters through the [portable provisioning interface](../../provisioning/README.md)
+and reaches this compiler with a resolved `hosting-wsd-environment/1` document; the compiler
+command line below remains the only compiler entry point and the only owner of native field
+shapes.
+
 `tools/compile_wsd.py` consumes `hosting-wsd-environment/1`. Disabled examples for all three platforms live in `examples/environments/`; these describe symbolic qualification fixtures, not selected targets. The register supports qualification, development, test, production and recovery lifecycle labels. A label never changes qualification or authorization requirements. The implemented allocation profile is internal IPv4 OZ/RZ; PAZ and native IPv6 allocations are rejected until their integrations are delivered.
 
 Each cluster records role, zone, physical host identities, trust, eligible tenants/service classes, optional dedicated tenant/WSD and native placement mapping. WSDs select eligible clusters per domain. The compiler checks physical host disjointness, role/zone/trust/entitlement/dedication, stable native names, native field ownership, canonical prefixes and usable nonduplicate guest addresses. It does not reserve capacity or replace authoritative IPAM. Add provider-role clusters to the same register for architectural inventory; WSD allocation can only select workload-role clusters.
