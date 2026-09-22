@@ -190,7 +190,7 @@ class GoldenCorpusCommandTest(unittest.TestCase):
 
     def run_cli(self, *arguments: str) -> tuple[int, dict]:
         completed = subprocess.run(
-            [sys.executable, '-m', 'provisioner.cli.main', *arguments],
+            [sys.executable, '-m', 'provisioner.cli', *arguments],
             cwd=str(support.ROOT), capture_output=True, text=True, encoding='utf-8')
         try:
             payload = json.loads(completed.stdout)

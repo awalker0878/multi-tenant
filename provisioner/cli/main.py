@@ -6,12 +6,14 @@ decides policy, placement, allocation or authority for itself. `apply` exists so
 the refusal is explicit and machine-readable, not so a change can be made.
 
 Usage:
-    python -m provisioner.cli.main plan examples/requests/internal-production.yaml
+    python -m provisioner.cli plan examples/requests/internal-production.yaml
+
+This module is the transport, not an entry point: `provisioner/cli/__main__.py` is
+the one entry point, and the active documents name it.
 """
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
 
 from provisioner.cli import apply as apply_command
@@ -102,7 +104,3 @@ def main(argv=None) -> int:
         return EXIT_INTERNAL
     emit(payload)
     return code if code in (EXIT_OK, EXIT_REFUSED) else EXIT_INTERNAL
-
-
-if __name__ == '__main__':
-    sys.exit(main())

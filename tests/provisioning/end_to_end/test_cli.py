@@ -11,7 +11,7 @@ from pathlib import Path
 from tests.provisioning import support
 
 REQUEST = str(support.REQUEST)
-MODULE = 'provisioner.cli.main'
+MODULE = 'provisioner.cli'
 
 
 def run(*arguments: str) -> tuple[int, dict]:

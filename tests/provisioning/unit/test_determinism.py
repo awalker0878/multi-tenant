@@ -117,7 +117,7 @@ def _fixture():
 
 class CliReplayTest(unittest.TestCase):
     def test_two_plan_invocations_emit_identical_output(self):
-        command = [sys.executable, '-m', 'provisioner.cli.main', 'plan',
+        command = [sys.executable, '-m', 'provisioner.cli', 'plan',
                    str(support.REQUEST)]
         first = subprocess.run(command, cwd=str(support.ROOT), capture_output=True,
                                text=True, encoding='utf-8')

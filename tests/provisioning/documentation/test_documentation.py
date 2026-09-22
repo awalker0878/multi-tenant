@@ -133,6 +133,14 @@ class CommandDocumentationTest(unittest.TestCase):
             with self.subTest(document=str(path.relative_to(support.ROOT))):
                 self.assertNotIn('python -m provisioner.cli.main', text)
 
+    def test_the_transport_is_not_a_second_entry_point(self):
+        package = support.ROOT / 'provisioner' / 'cli'
+        self.assertTrue((package / '__main__.py').is_file(),
+                        'the documented module entry point is missing')
+        self.assertNotIn("__name__ == '__main__'",
+                         (package / 'main.py').read_text(encoding='utf-8'),
+                         'provisioner/cli/main.py is a transport, not an entry point')
+
 
 class ModulePathDocumentationTest(unittest.TestCase):
     def test_documented_module_paths_exist(self):

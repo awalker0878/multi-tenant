@@ -83,6 +83,13 @@
       "enforcement": "the text must not appear in an active document or provisioner source"
     },
     {
+      "interface": "python -m provisioner.cli.main",
+      "kind": "text",
+      "reason": "A second spelling of the one entry point. Two documented invocations of the same transport would be two current stories, and the module would silently succeed without running.",
+      "replacement": "python -m provisioner.cli",
+      "enforcement": "the text must not appear in an active document or provisioner source"
+    },
+    {
       "interface": "scripts/migrations/seed_completion_allocations.py",
       "kind": "path",
       "reason": "One-time seed of the audit allocation records. It refused to run once the maintained records existed, so it was a completed migration artifact rather than a regeneration job.",
