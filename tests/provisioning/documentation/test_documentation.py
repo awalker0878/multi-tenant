@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -16,7 +18,10 @@ from tests.provisioning import support
 DOCS = support.ROOT / 'docs' / 'provisioning'
 INDEX = DOCS / 'README.md'
 
-#: Documents that carry the current module paths.
+#: The one entry point the active documents are allowed to name.
+ENTRY_POINT = 'python -m provisioner.cli '
+
+#: Documents that carry the current entry point and current module paths.
 ACTIVE_DOCUMENTS = (INDEX, DOCS / 'plan-workflow.md', DOCS / 'architecture.md',
                     support.ROOT / 'README.md', support.ROOT / 'docs' / 'NEXT_WORK.md')
 
@@ -111,7 +116,22 @@ class CommandDocumentationTest(unittest.TestCase):
         text = INDEX.read_text(encoding='utf-8')
         for command in ('validate', 'resolve', 'plan', 'status', 'verify', 'evidence', 'apply'):
             with self.subTest(command=command):
-                self.assertIn(f'python -m provisioner.cli {command}', text)
+                self.assertIn(f'{ENTRY_POINT}{command}', text)
+
+    def test_the_documented_entry_point_actually_runs(self):
+        """The index names an entry point; it must execute as documented."""
+        request = support.REQUESTS / 'internal-production.yaml'
+        completed = subprocess.run([sys.executable, '-m', 'provisioner.cli', 'validate',
+                                    str(request)], cwd=str(support.ROOT),
+                                   capture_output=True, text=True)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(json.loads(completed.stdout)['status'], 'VALID')
+
+    def test_only_the_canonical_entry_point_is_documented(self):
+        for path in ACTIVE_DOCUMENTS:
+            text = path.read_text(encoding='utf-8')
+            with self.subTest(document=str(path.relative_to(support.ROOT))):
+                self.assertNotIn('python -m provisioner.cli.main', text)
 
 
 class ModulePathDocumentationTest(unittest.TestCase):

@@ -5,7 +5,7 @@ pipeline uses; no command decides policy, placement, allocation or authority for
 itself. `apply` exists so the refusal is explicit and machine-readable, not so a
 change can be made.
 
-Entry point: `python -m provisioner.cli.main <command> <request.yaml>`
+Entry point: `python -m provisioner.cli <command> <request.yaml>`
 Module: `provisioner/cli/`
 Result format: `hosting-cli-result/1`
 
@@ -90,10 +90,10 @@ refused with `AUTHORITY_REQUIRED`.
 ## Reference run
 
 ```
-python -m provisioner.cli.main validate examples/requests/internal-production.yaml
-python -m provisioner.cli.main resolve  examples/requests/internal-production.yaml
-python -m provisioner.cli.main plan     examples/requests/internal-production.yaml
-python -m provisioner.cli.main status   examples/requests/internal-production.yaml
+python -m provisioner.cli validate examples/requests/internal-production.yaml
+python -m provisioner.cli resolve  examples/requests/internal-production.yaml
+python -m provisioner.cli plan     examples/requests/internal-production.yaml
+python -m provisioner.cli status   examples/requests/internal-production.yaml
 ```
 
 All five reference requests currently plan as `PLANNED_DISABLED_NOT_AUTHORIZED`

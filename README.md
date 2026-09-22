@@ -77,7 +77,7 @@ consumer request -> provisioner core -> resolved environment -> existing WSD com
 ```
 
 ```sh
-python -m provisioner.cli.main plan examples/requests/internal-production.yaml
+python -m provisioner.cli plan examples/requests/internal-production.yaml
 ```
 
 `validate`, `resolve`, `plan`, `status`, `verify` and `evidence` all call the same
