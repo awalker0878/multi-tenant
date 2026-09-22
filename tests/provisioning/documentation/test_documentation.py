@@ -162,7 +162,8 @@ class ServiceProfileMatrixTest(unittest.TestCase):
                 'Recovery': 'recovery', 'Compute': 'compute', 'Storage': 'storage',
                 'Network': 'network', 'Placement (region)': 'placement',
                 'Service': 'service'}
-    ROW = re.compile(r'^\| `([^`]+)` \| (\d+) \| ([^|]+) \|', re.MULTILINE)
+    ROW = re.compile(r'^\| `([^`]+)` \| (\d+) \| ([^|]+) \| [^|]* \| (\d+) \|', re.MULTILINE)
+    REVISION = re.compile(r'^Reviewed as catalog revision `(\d+)`\.$', re.MULTILINE)
 
     def _documented(self) -> dict:
         text = (DOCS / 'service-profile-matrix.md').read_text(encoding='utf-8')
@@ -171,9 +172,9 @@ class ServiceProfileMatrixTest(unittest.TestCase):
             title = section.split('\n', 1)[0].strip()
             if title not in self.FAMILIES:
                 continue
-            for name, rank, status in self.ROW.findall(section):
-                documented.setdefault(self.FAMILIES[title], []).append(
-                    (name, int(rank), status.strip()))
+            documented.setdefault(self.FAMILIES[title], []).extend(
+                (name, int(rank), status.strip(), int(version))
+                for name, rank, status, version in self.ROW.findall(section))
         return documented
 
     def _catalog(self, family: str) -> dict:
@@ -181,26 +182,50 @@ class ServiceProfileMatrixTest(unittest.TestCase):
         return {row['profile']: row
                 for row in json.loads(path.read_text(encoding='utf-8'))['profiles']}
 
+    def _documented_revisions(self) -> dict:
+        text = (DOCS / 'service-profile-matrix.md').read_text(encoding='utf-8')
+        revisions: dict = {}
+        for section in text.split('\n## ')[1:]:
+            title = section.split('\n', 1)[0].strip()
+            if title not in self.FAMILIES:
+                continue
+            found = self.REVISION.findall(section)
+            self.assertEqual(len(found), 1, f'{title} must state exactly one catalog revision')
+            revisions[self.FAMILIES[title]] = int(found[0])
+        return revisions
+
+    def _catalog_revision(self, family: str) -> int:
+        path = support.ROOT / 'profiles' / family / 'catalog.json'
+        return int(json.loads(path.read_text(encoding='utf-8'))['version'])
+
     def test_every_family_is_documented(self):
         documented = self._documented()
         self.assertEqual(sorted(documented), sorted(set(self.FAMILIES.values())))
 
-    def test_documented_profiles_ranks_and_statuses_match_the_catalogs(self):
+    def test_documented_catalog_revisions_match_the_catalogs(self):
+        revisions = self._documented_revisions()
+        self.assertEqual(sorted(revisions), sorted(set(self.FAMILIES.values())))
+        for family, revision in revisions.items():
+            with self.subTest(family=family):
+                self.assertEqual(revision, self._catalog_revision(family))
+
+    def test_documented_profiles_ranks_statuses_and_versions_match_the_catalogs(self):
         for family, rows in self._documented().items():
             catalog = self._catalog(family)
-            for name, rank, status in rows:
+            for name, rank, status, version in rows:
                 key = name if name in catalog else name.split('/')[-1]
                 with self.subTest(family=family, profile=name):
                     self.assertIn(key, catalog)
                     self.assertEqual(catalog[key]['rank'], rank)
                     self.assertEqual(catalog[key]['status'].startswith('IMPLEMENTED'),
                                      'deferred' not in status.lower())
+                    self.assertEqual(int(catalog[key]['version']), version)
 
     def test_every_catalog_profile_is_documented(self):
         for family, rows in self._documented().items():
             catalog = self._catalog(family)
             documented = {name if name in catalog else name.split('/')[-1]
-                          for name, _, _ in rows}
+                          for name, _, _, _ in rows}
             with self.subTest(family=family):
                 self.assertEqual(sorted(documented), sorted(catalog))
 

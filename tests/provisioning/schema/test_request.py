@@ -7,6 +7,7 @@ import unittest
 from provisioner.compiler import normalize
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import digest, loads
+from provisioner.profiles.loader import load_catalogs
 from tests.provisioning.support import reference_document
 
 
@@ -71,7 +72,7 @@ class RequestContractTest(unittest.TestCase):
 
     def test_normalization_applies_every_default(self):
         request = normalize.normalize(copy.deepcopy(self.document), source='<test>')
-        for key in normalize.DEFAULTS:
+        for key in normalize.defaults_for(load_catalogs()):
             self.assertIn(key, request.spec)
 
     def test_normalization_is_idempotent(self):

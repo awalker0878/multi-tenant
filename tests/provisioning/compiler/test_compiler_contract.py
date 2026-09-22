@@ -112,7 +112,7 @@ class ArtifactTest(unittest.TestCase):
 class NormalizeTest(unittest.TestCase):
     def test_defaults_cover_every_group_the_pipeline_needs(self):
         from provisioner.compiler import normalize
-        self.assertEqual(sorted(normalize.DEFAULTS),
+        self.assertEqual(sorted(normalize.defaults_for(support.catalogs())),
                          ['assurance', 'capacity', 'exposure', 'network', 'placement',
                           'recovery', 'services', 'zones'])
 

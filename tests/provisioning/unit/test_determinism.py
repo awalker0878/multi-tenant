@@ -25,12 +25,21 @@ class ReplayTest(unittest.TestCase):
         second = support.reference_plan()
         self.assertEqual(first.digest, second.digest)
 
-    def test_the_plan_digest_binds_request_and_environment(self):
+    def test_the_plan_digest_binds_request_environment_and_reviewed_revisions(self):
         plan = support.reference_plan()
         from provisioner.domain.request import digest as request_digest
         self.assertEqual(plan.digest,
                          request_digest({'request': plan.request.digest,
-                                         'environment': plan.environment}))
+                                         'environment': plan.environment,
+                                         'profiles': plan.resolution.profile_versions,
+                                         'catalogs': plan.resolution.catalog_versions,
+                                         'catalog_digest': plan.resolution.catalog_digest}))
+
+    def test_the_plan_digest_is_not_the_request_digest(self):
+        plan = support.reference_plan()
+        self.assertNotEqual(plan.digest, plan.request.digest)
+        self.assertTrue(plan.resolution.catalog_digest)
+        self.assertEqual(plan.resolution.catalog_digest, support.catalogs().digest)
 
     def test_the_environment_digest_is_stable(self):
         first = support.reference_plan().environment

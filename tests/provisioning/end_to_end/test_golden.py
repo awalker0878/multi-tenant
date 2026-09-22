@@ -68,6 +68,29 @@ class GoldenCorpusTest(unittest.TestCase):
                 payload = json.loads(path.read_text(encoding='utf-8'))
                 self.assertIsNot(payload.get('native_contact'), True, path.name)
 
+    def test_the_corpus_records_the_reviewed_catalog_revisions(self):
+        catalog = support.catalogs()
+        for name, index in (('digests.json', load(GOLDEN, 'digests.json')),
+                            ('cross-platform.digests.json',
+                             load(GOLDEN, 'cross-platform.digests.json'))):
+            with self.subTest(index=name):
+                self.assertEqual(index['catalogs']['versions'], catalog.versions)
+                self.assertEqual(index['catalogs']['digest'], catalog.digest)
+
+    def test_every_resolution_artifact_states_its_reviewed_revision_set(self):
+        catalog = support.catalogs()
+        for name in support.REFERENCE_REQUESTS:
+            with self.subTest(request=name):
+                payload = load(RESOLVED, f'{name}.resolution.json')
+                self.assertEqual(payload['format'], 'hosting-resolved-profile-set/2')
+                self.assertEqual(payload['catalog_versions'], catalog.versions)
+                self.assertEqual(payload['catalog_digest'], catalog.digest)
+                for family, profile in sorted(payload['profiles'].items()):
+                    if family == 'services' or profile is None:
+                        continue
+                    self.assertEqual(payload['profile_versions'][family],
+                                     catalog.get(family, profile).version)
+
 
 class GoldenReplayTest(unittest.TestCase):
     """Recomputing a reference request must reproduce every stored artifact byte for byte."""
@@ -78,6 +101,11 @@ class GoldenReplayTest(unittest.TestCase):
                 plan = support.reference_plan(name)
                 expected = load(RESOLVED, f'{name}.resolution.json')
                 self.assertEqual(expected['profiles'], dict(plan.resolution.profiles))
+                self.assertEqual(expected['profile_versions'],
+                                 dict(plan.resolution.profile_versions))
+                self.assertEqual(expected['catalog_versions'],
+                                 dict(plan.resolution.catalog_versions))
+                self.assertEqual(expected['catalog_digest'], plan.resolution.catalog_digest)
                 self.assertEqual(expected['request_digest'], plan.request.digest)
                 self.assertEqual(expected['policy'], dict(plan.policy))
                 self.assertEqual(expected['services'], dict(plan.resolution.services))
