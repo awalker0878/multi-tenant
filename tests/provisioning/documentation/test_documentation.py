@@ -16,7 +16,13 @@ from tests.provisioning import support
 DOCS = support.ROOT / 'docs' / 'provisioning'
 INDEX = DOCS / 'README.md'
 
-#: The ten active documents the refactor must maintain.
+#: Documents that carry the current module paths.
+ACTIVE_DOCUMENTS = (INDEX, DOCS / 'plan-workflow.md', DOCS / 'architecture.md',
+                    support.ROOT / 'README.md', support.ROOT / 'docs' / 'NEXT_WORK.md')
+
+MODULE_PATH = re.compile(r'provisioner/[A-Za-z0-9_./-]+')
+
+#: The active documents the refactor must maintain.
 REQUIRED = ('README.md', 'architecture.md', 'request-contract.md', 'profile-model.md',
             'placement-model.md', 'desired-state-model.md', 'adapter-contract.md',
             'terraform-boundary.md', 'service-owner-boundary.md', 'plan-workflow.md',
@@ -106,6 +112,69 @@ class CommandDocumentationTest(unittest.TestCase):
         for command in ('validate', 'resolve', 'plan', 'status', 'verify', 'evidence', 'apply'):
             with self.subTest(command=command):
                 self.assertIn(f'python -m provisioner.cli {command}', text)
+
+
+class ModulePathDocumentationTest(unittest.TestCase):
+    def test_documented_module_paths_exist(self):
+        for path in ACTIVE_DOCUMENTS:
+            text = path.read_text(encoding='utf-8')
+            for token in sorted(set(MODULE_PATH.findall(text))):
+                if token in ('provisioner/',) or token.endswith('...'):
+                    continue
+                resolved = support.ROOT / token.rstrip('/.')
+                with self.subTest(document=path.name, module=token):
+                    self.assertTrue(resolved.exists(), f'{path.name} names missing {token}')
+
+
+class ServiceProfileMatrixTest(unittest.TestCase):
+    """The matrix is a view of the catalogs, never a second source of truth."""
+
+    FAMILIES = {'Environment': 'environment', 'Security': 'security',
+                'Assurance': 'assurance', 'Availability': 'availability',
+                'Recovery': 'recovery', 'Compute': 'compute', 'Storage': 'storage',
+                'Network': 'network', 'Placement (region)': 'placement',
+                'Service': 'service'}
+    ROW = re.compile(r'^\| `([^`]+)` \| (\d+) \| ([^|]+) \|', re.MULTILINE)
+
+    def _documented(self) -> dict:
+        text = (DOCS / 'service-profile-matrix.md').read_text(encoding='utf-8')
+        documented: dict = {}
+        for section in text.split('\n## ')[1:]:
+            title = section.split('\n', 1)[0].strip()
+            if title not in self.FAMILIES:
+                continue
+            for name, rank, status in self.ROW.findall(section):
+                documented.setdefault(self.FAMILIES[title], []).append(
+                    (name, int(rank), status.strip()))
+        return documented
+
+    def _catalog(self, family: str) -> dict:
+        path = support.ROOT / 'profiles' / family / 'catalog.json'
+        return {row['profile']: row
+                for row in json.loads(path.read_text(encoding='utf-8'))['profiles']}
+
+    def test_every_family_is_documented(self):
+        documented = self._documented()
+        self.assertEqual(sorted(documented), sorted(set(self.FAMILIES.values())))
+
+    def test_documented_profiles_ranks_and_statuses_match_the_catalogs(self):
+        for family, rows in self._documented().items():
+            catalog = self._catalog(family)
+            for name, rank, status in rows:
+                key = name if name in catalog else name.split('/')[-1]
+                with self.subTest(family=family, profile=name):
+                    self.assertIn(key, catalog)
+                    self.assertEqual(catalog[key]['rank'], rank)
+                    self.assertEqual(catalog[key]['status'].startswith('IMPLEMENTED'),
+                                     'deferred' not in status.lower())
+
+    def test_every_catalog_profile_is_documented(self):
+        for family, rows in self._documented().items():
+            catalog = self._catalog(family)
+            documented = {name if name in catalog else name.split('/')[-1]
+                          for name, _, _ in rows}
+            with self.subTest(family=family):
+                self.assertEqual(sorted(documented), sorted(catalog))
 
 
 class RetiredInterfaceTest(unittest.TestCase):

@@ -13,10 +13,10 @@ portable WSD request (YAML)
   -> profile resolution         provisioner/profiles
   -> policy and semantics       provisioner/policy
   -> placement                  provisioner/placement
-  -> desired state              provisioner/desired_state
+  -> desired state              provisioner/compiler/desired_state.py
   -> existing compile_wsd.py    tools/compile_wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
-  -> delivery and observation   provisioner/delivery, provisioner/observation
+  -> delivery and observation   provisioner/execution/delivery.py, provisioner/observation
 ```
 
 ## Active documents
