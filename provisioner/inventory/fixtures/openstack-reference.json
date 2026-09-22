@@ -1,0 +1,204 @@
+{
+  "format": "hosting-inventory/1",
+  "status": "FIXTURE_NOT_AUTHORITATIVE",
+  "source": "Synthetic reference inventory for repository tests and demonstrations. It describes no real site, holds no credentials and authorizes no placement.",
+  "sites": [
+    {
+      "site": "site-01",
+      "region": "east",
+      "platform": "openstack",
+      "defaults": {
+        "domain_inputs": {
+          "project_id": "11111111-1111-4111-8111-111111111111"
+        },
+        "workload_inputs": {
+          "image_id": "44444444-4444-4444-8444-444444444444"
+        },
+        "by_flavor_class": {
+          "small": {"flavor_id": "mock-flavor-small"},
+          "medium": {"flavor_id": "mock-flavor-medium"},
+          "large": {"flavor_id": "mock-flavor-large"}
+        },
+        "by_storage_class": {}
+      },
+      "cells": [
+        {
+          "cell": "cell-01",
+          "capabilities": [
+            "network_domain",
+            "ipv4",
+            "gateway_policy",
+            "distributed_firewall",
+            "audit_logging",
+            "dedicated_edge_context",
+            "native_load_balancer"
+          ],
+          "clusters": [
+            {
+              "id": "cluster-oz-01",
+              "role": "workload",
+              "zone": "OZ",
+              "trust": "internal-trust",
+              "service_classes": ["standard", "protected-b"],
+              "eligible_tenants": ["tenant-01"],
+              "dedicated_wsd": null,
+              "host_ids": ["host-oz-01", "host-oz-02"],
+              "native": {
+                "compute_availability_zone": "mock-compute-oz",
+                "storage_availability_zone": "mock-storage-oz",
+                "volume_type": "mock-type"
+              },
+              "capacity": {
+                "vcpu_total": 128,
+                "vcpu_committed": 16,
+                "memory_gib_total": 512,
+                "memory_gib_committed": 64,
+                "storage_gib_total": 4096,
+                "storage_gib_committed": 512
+              }
+            },
+            {
+              "id": "cluster-rz-01",
+              "role": "workload",
+              "zone": "RZ",
+              "trust": "internal-trust",
+              "service_classes": ["standard", "protected-b"],
+              "eligible_tenants": ["tenant-01"],
+              "dedicated_wsd": null,
+              "host_ids": ["host-rz-01", "host-rz-02"],
+              "native": {
+                "compute_availability_zone": "mock-compute-rz",
+                "storage_availability_zone": "mock-storage-rz",
+                "volume_type": "mock-type"
+              },
+              "capacity": {
+                "vcpu_total": 128,
+                "vcpu_committed": 16,
+                "memory_gib_total": 512,
+                "memory_gib_committed": 64,
+                "storage_gib_total": 4096,
+                "storage_gib_committed": 512
+              }
+            }
+          ]
+        },
+        {
+          "cell": "cell-02",
+          "capabilities": ["network_domain", "ipv4", "gateway_policy", "audit_logging"],
+          "clusters": [
+            {
+              "id": "cluster-oz-02",
+              "role": "workload",
+              "zone": "OZ",
+              "trust": "internal-trust",
+              "service_classes": ["standard", "protected-b"],
+              "eligible_tenants": ["tenant-01"],
+              "dedicated_wsd": null,
+              "host_ids": ["host-oz-11", "host-oz-12"],
+              "native": {
+                "compute_availability_zone": "mock-compute-oz-2",
+                "storage_availability_zone": "mock-storage-oz-2",
+                "volume_type": "mock-type"
+              },
+              "capacity": {
+                "vcpu_total": 64,
+                "vcpu_committed": 8,
+                "memory_gib_total": 256,
+                "memory_gib_committed": 32,
+                "storage_gib_total": 2048,
+                "storage_gib_committed": 256
+              }
+            },
+            {
+              "id": "cluster-rz-02",
+              "role": "workload",
+              "zone": "RZ",
+              "trust": "internal-trust",
+              "service_classes": ["standard", "protected-b"],
+              "eligible_tenants": ["tenant-01"],
+              "dedicated_wsd": null,
+              "host_ids": ["host-rz-11", "host-rz-12"],
+              "native": {
+                "compute_availability_zone": "mock-compute-rz-2",
+                "storage_availability_zone": "mock-storage-rz-2",
+                "volume_type": "mock-type"
+              },
+              "capacity": {
+                "vcpu_total": 64,
+                "vcpu_committed": 8,
+                "memory_gib_total": 256,
+                "memory_gib_committed": 32,
+                "storage_gib_total": 2048,
+                "storage_gib_committed": 256
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "prefix_pools": [
+    {
+      "pool": "pool-01",
+      "site": "site-01",
+      "zone": "OZ",
+      "cidr": "198.51.100.0/24",
+      "prefix_length": 27,
+      "gateway_host_number": 1,
+      "allocations": []
+    },
+    {
+      "pool": "pool-02",
+      "site": "site-01",
+      "zone": "RZ",
+      "cidr": "198.51.101.0/24",
+      "prefix_length": 27,
+      "gateway_host_number": 1,
+      "allocations": []
+    }
+  ],
+  "services": [
+    {
+      "service": "dns",
+      "binding_class": "dns-internal",
+      "site": "site-01",
+      "endpoints": {
+        "resolvers": ["198.51.100.53", "198.51.101.53"],
+        "zone": "internal.invalid"
+      }
+    },
+    {
+      "service": "ntp",
+      "binding_class": "ntp-internal",
+      "site": "site-01",
+      "endpoints": {
+        "sources": ["198.51.100.123", "198.51.101.123"]
+      }
+    },
+    {
+      "service": "identity",
+      "binding_class": "identity-directory",
+      "site": "site-01",
+      "endpoints": {
+        "realm": "INTERNAL.INVALID",
+        "servers": ["198.51.100.10", "198.51.101.10"]
+      }
+    },
+    {
+      "service": "logging",
+      "binding_class": "logging-protected",
+      "site": "site-01",
+      "endpoints": {
+        "collectors": ["198.51.100.20", "198.51.101.20"]
+      }
+    },
+    {
+      "service": "backup",
+      "binding_class": "backup-isolated",
+      "site": "site-01",
+      "endpoints": {
+        "target": "198.51.100.30"
+      }
+    }
+  ]
+}
