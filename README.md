@@ -68,6 +68,14 @@ into a resolved internal desired state, and then handed to the existing
 `tools/compile_wsd.py`. The Terraform roots, the Ansible roles, the state backends
 and every service owner keep their current authority.
 
+The canonical current path is exactly one line; nothing else is a current entry
+point:
+
+```text
+consumer request -> provisioner core -> resolved environment -> existing WSD compiler
+-> Terraform stacks -> delivery runner -> observation -> verification
+```
+
 ```sh
 python -m provisioner.cli.main plan examples/requests/internal-production.yaml
 ```
