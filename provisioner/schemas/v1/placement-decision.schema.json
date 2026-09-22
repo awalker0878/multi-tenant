@@ -2,22 +2,42 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "hosting.platform/v1/placement-decision",
   "title": "Placement decision",
-  "description": "Deterministic placement result or an explicit fail-closed hold. A fixture decision is a demonstration and is never placement authority.",
+  "description": "Deterministic placement result or an explicit fail-closed hold. Native qualification is a mandatory eligibility filter, so a placed decision always records the qualification source it rests on; a fixture decision is a demonstration and is never placement authority.",
   "type": "object",
   "required": ["format", "status", "authority", "request_digest", "required_capabilities",
-               "selection_rule", "registry_blockers", "selected", "candidates", "reasons",
-               "digest"],
+               "selection_rule", "qualification", "qualification_blockers", "selected",
+               "candidates", "reasons", "digest"],
   "additionalProperties": false,
   "properties": {
     "format": {"const": "hosting-placement-decision/1"},
     "status": {"enum": ["PLACED", "HOLD_CAPACITY_INSUFFICIENT", "HOLD_SERVICE_UNAVAILABLE",
                         "HOLD_PREFIX_POOL_EXHAUSTED", "HOLD_CAPABILITY_NOT_QUALIFIED",
-                        "HOLD_NO_ELIGIBLE_PLATFORM", "HOLD_NO_ELIGIBLE_SITE"]},
+                        "HOLD_PLATFORM_NOT_QUALIFIED", "HOLD_NO_ELIGIBLE_PLATFORM",
+                        "HOLD_NO_ELIGIBLE_SITE"]},
     "authority": {"enum": ["AUTHORITATIVE_SITE_STATE", "FIXTURE_NOT_PLACEMENT_AUTHORITY"]},
     "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "selection_rule": {"type": "string", "minLength": 1},
     "required_capabilities": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-    "registry_blockers": {"type": "array", "items": {"type": "string"}},
+    "qualification": {
+      "type": "object",
+      "required": ["source", "status", "authoritative", "product_tuples"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "minLength": 1},
+        "authoritative": {"type": "boolean"},
+        "product_tuples": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "nutanix": {"type": "string", "minLength": 1},
+            "vmware": {"type": "string", "minLength": 1},
+            "openstack": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "qualification_blockers": {"type": "array", "items": {"type": "string"}},
     "selected": {
       "type": ["object", "null"],
       "required": ["site_key", "cell_key", "platform", "clusters", "cells"],
@@ -35,7 +55,8 @@
       "items": {
         "type": "object",
         "required": ["site_key", "cell_key", "platform", "platform_family", "zone",
-                     "eligible", "score", "blockers", "capability_blockers", "product_tuple"],
+                     "eligible", "score", "blockers", "blocker_classes",
+                     "qualification_blockers", "cell_blockers", "product_tuple"],
         "additionalProperties": false,
         "properties": {
           "site_key": {"type": "string"},
@@ -46,7 +67,12 @@
           "eligible": {"type": "boolean"},
           "score": {"type": "integer"},
           "blockers": {"type": "array", "items": {"type": "string"}},
-          "capability_blockers": {"type": "array", "items": {"type": "string"}},
+          "blocker_classes": {"type": "array",
+                              "items": {"enum": ["residency", "capability", "capacity",
+                                                 "prefix-pool", "service", "qualification"]},
+                              "uniqueItems": true},
+          "qualification_blockers": {"type": "array", "items": {"type": "string"}},
+          "cell_blockers": {"type": "array", "items": {"type": "string"}},
           "product_tuple": {"type": "string"}
         }
       }

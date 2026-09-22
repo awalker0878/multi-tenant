@@ -8,6 +8,14 @@ rejected, and selects the best eligible candidate under one stated rule:
 The rule is deliberately boring. It is reproducible from inventory alone and it
 never consults a scheduler, a reservation service or a native platform.
 
+Native qualification is a mandatory eligibility filter, not a note: a candidate
+whose platform does not carry reviewed native qualification for the required
+capability set is ineligible, so an authoritative inventory can never be placed
+against an unqualified platform. Qualification is evaluated through an explicit
+source (`eligibility.RepositoryQualification` by default, and only for a
+non-authoritative inventory the repository's declared demonstration assumption)
+so tests can inject a controlled source without touching the reviewed registry.
+
 A hold is never a bare failure: the decision records every rejected candidate with
 its exact blockers, and reports the most specific hold status that applies. When no
 candidate was evaluated at all the status is `HOLD_NO_ELIGIBLE_SITE`; otherwise the
@@ -21,9 +29,9 @@ from dataclasses import dataclass
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.placement import (AUTHORITATIVE, FIXTURE, HOLD_CAPACITY_INSUFFICIENT,
                                           HOLD_CAPABILITY_NOT_QUALIFIED, HOLD_NO_ELIGIBLE_PLATFORM,
-                                          HOLD_NO_ELIGIBLE_SITE, HOLD_PREFIX_POOL_EXHAUSTED,
-                                          HOLD_SERVICE_UNAVAILABLE, PLACED, CandidateEvaluation,
-                                          PlacementDecision, finalize)
+                                          HOLD_NO_ELIGIBLE_SITE, HOLD_PLATFORM_NOT_QUALIFIED,
+                                          HOLD_PREFIX_POOL_EXHAUSTED, HOLD_SERVICE_UNAVAILABLE,
+                                          PLACED, CandidateEvaluation, PlacementDecision, finalize)
 from provisioner.inventory.capacity import Assessment, Demand, assess
 from provisioner.inventory.model import Cell, Cluster, Inventory, Site
 from provisioner.placement import eligibility
@@ -38,11 +46,17 @@ BLOCKER_CAPABILITY = 'capability'
 BLOCKER_CAPACITY = 'capacity'
 BLOCKER_PREFIX_POOL = 'prefix-pool'
 BLOCKER_SERVICE = 'service'
+BLOCKER_QUALIFICATION = 'qualification'
 
+# Most specific class first. A capacity, service, prefix-pool or cell capability
+# failure is actionable on its own, so it outranks a platform-wide qualification
+# gap; residency is a per-candidate fact and outranks qualification too.
 _HOLD_FOR_BLOCKER = ((BLOCKER_CAPACITY, HOLD_CAPACITY_INSUFFICIENT),
                      (BLOCKER_SERVICE, HOLD_SERVICE_UNAVAILABLE),
                      (BLOCKER_PREFIX_POOL, HOLD_PREFIX_POOL_EXHAUSTED),
-                     (BLOCKER_CAPABILITY, HOLD_CAPABILITY_NOT_QUALIFIED))
+                     (BLOCKER_CAPABILITY, HOLD_CAPABILITY_NOT_QUALIFIED),
+                     (BLOCKER_RESIDENCY, HOLD_NO_ELIGIBLE_PLATFORM),
+                     (BLOCKER_QUALIFICATION, HOLD_PLATFORM_NOT_QUALIFIED))
 
 
 def _hold_status(codes: frozenset[str]) -> str:
@@ -107,8 +121,8 @@ def _services_present(inventory: Inventory, site: str, services: dict) -> tuple[
 
 
 def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Cluster,
-               inventory: Inventory) -> tuple[CandidateEvaluation, frozenset[str]]:
-    _, platform_blockers = eligibility.gate(
+               inventory: Inventory, qualification) -> tuple[CandidateEvaluation, frozenset[str]]:
+    qualified, qualification_blockers = qualification.gate(
         site.platform, set(request.required_capabilities))
     cell_blockers = eligibility.missing_cell_capabilities(
         cell.capabilities, set(request.required_capabilities))
@@ -125,6 +139,10 @@ def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Clust
     if cell_blockers:
         blockers.append('cell lacks capabilities: ' + ', '.join(cell_blockers))
         codes.add(BLOCKER_CAPABILITY)
+    if not qualified:
+        blockers.append(f'platform {site.platform} is not natively qualified for the required '
+                        'capability set: ' + ', '.join(qualification_blockers))
+        codes.add(BLOCKER_QUALIFICATION)
     if not assessment.sufficient:
         blockers.extend(assessment.blockers)
         codes.add(BLOCKER_CAPACITY)
@@ -135,25 +153,37 @@ def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Clust
         blockers.append('site lacks service bindings: ' + ', '.join(missing_services))
         codes.add(BLOCKER_SERVICE)
 
-    capability_blockers = tuple(platform_blockers) + tuple('cell:' + c for c in cell_blockers)
     score = len(cell.capabilities) * 1000 + min(cluster.capacity.vcpu_available, 999)
     return CandidateEvaluation(
         site_key=site.site, cell_key=cell.cell, platform=site.platform,
         platform_family=eligibility.PLATFORM_FAMILY[site.platform], zone=cluster.zone,
         eligible=not blockers, score=score, blockers=tuple(blockers),
-        capability_blockers=capability_blockers,
-        product_tuple=eligibility.product_tuple(site.platform)), frozenset(codes)
+        blocker_classes=tuple(sorted(codes)),
+        qualification_blockers=tuple(qualification_blockers),
+        cell_blockers=cell_blockers,
+        product_tuple=qualification.product_tuple(site.platform)), frozenset(codes)
 
 
-def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
-    """Evaluate every reviewed candidate and return a decision or an explicit hold."""
+def place(request: PlacementRequest, inventory: Inventory,
+          qualification=None) -> PlacementDecision:
+    """Evaluate every reviewed candidate and return a decision or an explicit hold.
+
+    `qualification` defaults to the reviewed capability registry for an
+    authoritative inventory, and to the repository's declared demonstration
+    assumption for a non-authoritative fixture. An explicit source is only for
+    controlled tests: a non-authoritative source can never authorize a decision.
+    """
+    source = qualification if qualification is not None else eligibility.qualification_for(inventory)
+    if inventory.authoritative and not source.authoritative:
+        raise ValueError('An authoritative inventory cannot be placed against a '
+                         'non-authoritative qualification source')
     platforms = eligibility.PLATFORMS if request.platform_preference == 'auto' \
         else (request.platform_preference,)
 
-    registry_blockers: list[str] = []
+    qualification_blockers: list[str] = []
     for platform in platforms:
-        _, blockers = eligibility.gate(platform, set(request.required_capabilities))
-        registry_blockers.extend(f'{platform}: {b}' for b in blockers)
+        _, blockers = source.gate(platform, set(request.required_capabilities))
+        qualification_blockers.extend(f'{platform}: {b}' for b in blockers)
 
     options: dict[str, list[_ZoneOption]] = {zone: [] for zone in request.zones}
     evaluated: list[tuple[CandidateEvaluation, frozenset[str]]] = []
@@ -169,7 +199,7 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
                 for cluster in cell.zone_clusters(zone):
                     if cluster.role != 'workload':
                         continue
-                    evaluation, codes = _candidate(request, site, cell, cluster, inventory)
+                    evaluation, codes = _candidate(request, site, cell, cluster, inventory, source)
                     evaluated.append((evaluation, codes))
                     if evaluation.eligible:
                         options[zone].append(_ZoneOption(
@@ -180,9 +210,13 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
     evaluations = [evaluation for evaluation, _ in evaluated]
     evaluations.sort(key=lambda e: (e.site_key, e.cell_key, e.zone, e.platform))
     authority = AUTHORITATIVE if inventory.authoritative else FIXTURE
+    identity = source.to_dict(platforms)
     reasons: list[str] = []
     if not inventory.authoritative:
         reasons.append('inventory is a non-authoritative fixture; this decision is a demonstration only')
+    if not identity['authoritative']:
+        reasons.append(f'qualification is {identity["status"]} from {identity["source"]}; '
+                       'this decision cannot authorize anything')
 
     missing_zones = [zone for zone in request.zones if not options[zone]]
     if missing_zones:
@@ -200,12 +234,14 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
                 reasons.append(f'{zone}: {evaluation.site_key}/{evaluation.cell_key} '
                                f'{evaluation.platform} rejected: ' + '; '.join(evaluation.blockers))
         status = _hold_status(frozenset(codes))
-        if registry_blockers and not inventory.authoritative:
-            reasons.append('no platform is natively qualified; fixture inventory was used to demonstrate the path')
+        if qualification_blockers:
+            reasons.append('no candidate platform carries native qualification for the required '
+                           'capability set: ' + '; '.join(sorted(qualification_blockers)))
         return finalize(PlacementDecision(
             status=status, authority=authority, request_digest=request.request_digest,
             selection_rule=SELECTION_RULE, candidates=tuple(evaluations),
-            reasons=tuple(reasons), registry_blockers=tuple(sorted(registry_blockers)),
+            reasons=tuple(reasons), qualification=identity,
+            qualification_blockers=tuple(sorted(qualification_blockers)),
             required_capabilities=request.required_capabilities))
 
     selected: dict = {'site_key': None, 'cell_key': None, 'platform': None,
@@ -218,13 +254,11 @@ def place(request: PlacementRequest, inventory: Inventory) -> PlacementDecision:
             selected['site_key'] = best.site.site
             selected['cell_key'] = best.cell.cell
             selected['platform'] = best.site.platform
-    if registry_blockers:
-        reasons.append('capability registry records no native qualification for the required set: '
-                       + '; '.join(sorted(registry_blockers)))
     return finalize(PlacementDecision(
         status=PLACED, authority=authority, request_digest=request.request_digest,
         selection_rule=SELECTION_RULE, selected=selected, candidates=tuple(evaluations),
-        reasons=tuple(reasons), registry_blockers=tuple(sorted(registry_blockers)),
+        reasons=tuple(reasons), qualification=identity,
+        qualification_blockers=tuple(sorted(qualification_blockers)),
         required_capabilities=request.required_capabilities))
 
 

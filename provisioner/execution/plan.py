@@ -96,8 +96,14 @@ def validate_request(document: dict, source: str, catalog: Catalog) -> tuple[Req
     return request, resolution, policy
 
 
-def place(request: Request, resolution, decision_input: Inventory) -> PlacementDecision:
-    """Place the normalized request over reviewed inventory."""
+def place(request: Request, resolution, decision_input: Inventory,
+          qualification=None) -> PlacementDecision:
+    """Place the normalized request over reviewed inventory.
+
+    `qualification` is only for controlled tests: the reviewed registry is used for
+    an authoritative inventory and the repository's declared demonstration
+    assumption for a non-authoritative fixture.
+    """
     demand = demand_for(resolution.compute['workloads_per_zone'], resolution.compute,
                         resolution.storage)
     placement_request = placement_resolver.PlacementRequest(
@@ -110,7 +116,8 @@ def place(request: Request, resolution, decision_input: Inventory) -> PlacementD
         prefix_length=resolution.network['prefix_length'],
         site_pin=request.spec['placement'].get('site'),
         cell_pin=request.spec['placement'].get('cell'))
-    return placement_resolver.place(placement_request, decision_input)
+    return placement_resolver.place(placement_request, decision_input, qualification)
+
 
 def phases(compile_environment: bool = True) -> tuple[dict, ...]:
     """Which compiler phases this repository can complete without native evidence."""
@@ -126,17 +133,18 @@ def phases(compile_environment: bool = True) -> tuple[dict, ...]:
 
 
 def create_plan(document: dict, source: str, inventory: Inventory, catalog: Catalog,
-                compile_environment: bool = True) -> Plan:
+                compile_environment: bool = True, qualification=None) -> Plan:
     """Run the whole pipeline and return the complete plan."""
     request, resolution, policy = validate_request(document, source, catalog)
-    decision = place(request, resolution, inventory)
+    decision = place(request, resolution, inventory, qualification)
     if decision.held:
         raise ProvisioningError('NO_ELIGIBLE_PLACEMENT',
                                 f'Placement held with status {decision.status}',
                                 path='$.spec.placement',
                                 details={'status': decision.status,
                                          'reasons': list(decision.reasons),
-                                         'registry_blockers': list(decision.registry_blockers)})
+                                         'qualification': dict(decision.qualification),
+                                         'qualification_blockers': list(decision.qualification_blockers)})
     diagnostics = Diagnostics()
     state = compiler_desired_state.build(request, resolution, decision, inventory,
                                          catalog=catalog, diagnostics=diagnostics)

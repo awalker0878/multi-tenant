@@ -106,7 +106,8 @@ def external_checks(plan, observations=(), authorization=None) -> tuple[Check, .
     return (
         _pending('native-qualification',
                  'The capability registry records no qualified product tuple',
-                 {'registry_blockers': list(plan.decision.registry_blockers)}),
+                 {'qualification': dict(plan.decision.qualification),
+                  'qualification_blockers': list(plan.decision.qualification_blockers)}),
         _pending('capacity-confirmation',
                  'The capacity owner must confirm the reservation'),
         _pending('address-confirmation',

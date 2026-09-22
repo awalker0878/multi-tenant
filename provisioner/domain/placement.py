@@ -2,7 +2,9 @@
 
 A placement decision records every candidate that was evaluated, why each was
 rejected and which authority produced the decision. A fixture-derived decision
-is never presented as an authorization to build.
+is never presented as an authorization to build, and a decision can only be
+`authorized` when both the inventory and the qualification it rests on are
+authoritative.
 """
 from __future__ import annotations
 
@@ -19,6 +21,7 @@ AUTHORITIES = (AUTHORITATIVE, FIXTURE)
 PLACED = 'PLACED'
 HOLD_NO_ELIGIBLE_SITE = 'HOLD_NO_ELIGIBLE_SITE'
 HOLD_NO_ELIGIBLE_PLATFORM = 'HOLD_NO_ELIGIBLE_PLATFORM'
+HOLD_PLATFORM_NOT_QUALIFIED = 'HOLD_PLATFORM_NOT_QUALIFIED'
 HOLD_CAPABILITY_NOT_QUALIFIED = 'HOLD_CAPABILITY_NOT_QUALIFIED'
 HOLD_CAPACITY_INSUFFICIENT = 'HOLD_CAPACITY_INSUFFICIENT'
 HOLD_SERVICE_UNAVAILABLE = 'HOLD_SERVICE_UNAVAILABLE'
@@ -26,12 +29,19 @@ HOLD_PREFIX_POOL_EXHAUSTED = 'HOLD_PREFIX_POOL_EXHAUSTED'
 
 # Every status this model can emit. `HOLD_NO_ELIGIBLE_SITE` is the only status
 # produced when no candidate was evaluated at all; the remaining holds are
-# ordered most-specific first so one inventory always yields one status.
+# ordered most-specific first so one inventory always yields one status, with
+# `HOLD_NO_ELIGIBLE_PLATFORM` as the least specific catch-all.
 HOLD_PRIORITY = (HOLD_CAPACITY_INSUFFICIENT, HOLD_SERVICE_UNAVAILABLE,
                  HOLD_PREFIX_POOL_EXHAUSTED, HOLD_CAPABILITY_NOT_QUALIFIED,
-                 HOLD_NO_ELIGIBLE_PLATFORM)
+                 HOLD_PLATFORM_NOT_QUALIFIED, HOLD_NO_ELIGIBLE_PLATFORM)
 
 STATUSES = (PLACED, HOLD_NO_ELIGIBLE_SITE) + HOLD_PRIORITY
+
+# The qualification identity recorded when a decision was assembled without a
+# qualification source. It is explicit, self-describing and never authoritative,
+# so an unrecorded qualification can never authorize a build.
+UNRECORDED_QUALIFICATION = {'source': 'UNRECORDED', 'status': 'NOT_EVALUATED',
+                            'authoritative': False, 'product_tuples': {}}
 
 
 @dataclass(frozen=True)
@@ -46,7 +56,9 @@ class CandidateEvaluation:
     eligible: bool
     score: int
     blockers: tuple[str, ...] = ()
-    capability_blockers: tuple[str, ...] = ()
+    blocker_classes: tuple[str, ...] = ()
+    qualification_blockers: tuple[str, ...] = ()
+    cell_blockers: tuple[str, ...] = ()
     product_tuple: str = 'UNSELECTED'
 
     def to_dict(self) -> dict:
@@ -54,7 +66,9 @@ class CandidateEvaluation:
                 'platform': self.platform, 'platform_family': self.platform_family,
                 'zone': self.zone, 'eligible': self.eligible, 'score': self.score,
                 'blockers': list(self.blockers),
-                'capability_blockers': list(self.capability_blockers),
+                'blocker_classes': list(self.blocker_classes),
+                'qualification_blockers': list(self.qualification_blockers),
+                'cell_blockers': list(self.cell_blockers),
                 'product_tuple': self.product_tuple}
 
 
@@ -69,7 +83,8 @@ class PlacementDecision:
     selected: dict | None = None
     candidates: tuple[CandidateEvaluation, ...] = ()
     reasons: tuple[str, ...] = ()
-    registry_blockers: tuple[str, ...] = ()
+    qualification: dict = field(default_factory=dict)
+    qualification_blockers: tuple[str, ...] = ()
     required_capabilities: tuple[str, ...] = ()
     digest: str = ''
     format: str = PLACEMENT_FORMAT
@@ -85,8 +100,16 @@ class PlacementDecision:
         return self.status != PLACED
 
     @property
+    def qualification_identity(self) -> dict:
+        """The recorded qualification, or the explicit unrecorded identity."""
+        return dict(self.qualification) if self.qualification else dict(UNRECORDED_QUALIFICATION)
+
+    @property
     def authorized(self) -> bool:
-        return self.status == PLACED and self.authority == AUTHORITATIVE
+        """Only a placed decision over authoritative inventory and authoritative
+        qualification can authorize anything. Declared qualification never can."""
+        return (self.status == PLACED and self.authority == AUTHORITATIVE
+                and bool(self.qualification_identity['authoritative']))
 
     @property
     def site_key(self) -> str | None:
@@ -108,11 +131,15 @@ class PlacementDecision:
         limits = ['A placement decision is not an authorization to build']
         if self.authority == FIXTURE:
             limits.append('Fixture placement cannot be promoted to production')
+        if not self.qualification_identity['authoritative']:
+            limits.append('Native qualification is absent; this decision rests on a '
+                          'declared qualification assumption')
         return {'format': self.format, 'status': self.status, 'authority': self.authority,
                 'request_digest': self.request_digest,
                 'selection_rule': self.selection_rule,
                 'required_capabilities': list(self.required_capabilities),
-                'registry_blockers': list(self.registry_blockers),
+                'qualification': self.qualification_identity,
+                'qualification_blockers': list(self.qualification_blockers),
                 'selected': self.selected,
                 'candidates': [c.to_dict() for c in self.candidates],
                 'reasons': list(self.reasons), 'digest': self.digest, 'limits': limits}

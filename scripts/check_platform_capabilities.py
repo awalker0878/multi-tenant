@@ -135,9 +135,18 @@ def eligible(registry: dict, platform: str, required: set[str], assurance_profil
     if platform not in PLATFORMS or not required <= CAPABILITIES:
         raise ValueError('Unknown platform or capability requirement')
     profile = registry['profiles'][platform]
-    blockers = [cap for cap in sorted(required) if profile['capabilities'][cap]['qualification'] != 'NATIVE_QUALIFIED']
-    if profile['product_tuple'] == 'UNSELECTED':
-        blockers.insert(0, 'product_tuple:UNSELECTED')
+    tuple_selected = profile['product_tuple'] != 'UNSELECTED'
+    blockers = []
+    if not tuple_selected:
+        blockers.append('product_tuple:UNSELECTED')
+    for cap in sorted(required):
+        claim = profile['capabilities'][cap]
+        if claim['qualification'] == 'NATIVE_QUALIFIED':
+            continue
+        state = 'NOT_IMPLEMENTED' if claim['source_state'] == 'UNASSESSED' else 'NOT_NATIVE_QUALIFIED'
+        blockers.append(f'capability:{cap}:{state}')
+    if tuple_selected and any(not blocker.startswith('product_tuple:') for blocker in blockers):
+        blockers.insert(0, f'product_tuple:{profile["product_tuple"]}:NOT_NATIVE_QUALIFIED')
     if assurance_profile is not None and assurance_profile not in profile['assurance_profiles']:
         blockers.append('assurance_profile:' + assurance_profile)
     return not blockers, blockers
