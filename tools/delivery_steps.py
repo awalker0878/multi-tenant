@@ -21,9 +21,6 @@ KINDS = {
     'acceptance': ({'purpose'}, {'acceptance'}, set()),
     'retirement_review': (set(), {'plan','evidence'}, set()),
     'operations_review': (set(), {'review'}, set()),
-    'adoption_review': (set(), {'plan','evidence'}, set()),
-    'terraform_adoption_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority','adoption_plan','adoption_evidence'}, {'references','cloud','ca_bundle'}),
-    'terraform_adoption_apply': ({'prepared_step'}, {'approval'}, set()),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
@@ -102,14 +99,6 @@ def validate_packet(step, packet, plan, base):
             from tools.capacity_demand import check_ancestors
             cloud_sha=load_private(upstream/'execution/contact.json')['cloud_sha256'] if plan['scope']['platform']=='openstack' else None
             check_ancestors(step,plan,base,load_private(upstream/'execution/inputs.json'),cloud_sha256=cloud_sha)
-    if kind=='terraform_adoption_apply':
-        upstream=dependency(step,values['prepared_step'],'terraform_adoption_plan',plan,base)
-        require(read_private(upstream/'bundle.json')==read_private(upstream/'execution/bundle.json'),
-                'Prepared adoption bundle changed')
-        bundle=load_private(upstream/'bundle.json'); match_scope(bundle['scope'],plan)
-        require(bundle['source_commit']==plan['source_commit']
-                and bundle['format']=='hosting-terraform-adoption-bundle/1',
-                'Prepared adoption source or bundle changed')
     if kind=='guest_plan':
         dependency(step,values['workload_step'],'terraform_apply',plan,base)
         match_scope(load_private(files['access'])['scope'],plan)
@@ -132,19 +121,6 @@ def validate_packet(step, packet, plan, base):
             from tools.capacity_demand import check_ancestors
             check_ancestors(step,plan,base,load_private(files['inputs']),
                             cloud_sha256=digest(read_private(files['cloud'])) if 'cloud' in files else None)
-    if kind=='terraform_adoption_plan':
-        from tools.terraform_run import select_scope
-        from tools.adoption import validate_evidence
-        from tools.delivery_run import ROOT
-        _,scope,state_key=select_scope(ROOT,values['catalog_id'],load_private(files['inputs']))
-        match_scope(scope,plan)
-        adoption_plan=load_private(files['adoption_plan'])
-        require(adoption_plan['source_commit']==plan['source_commit']
-                and adoption_plan['scope']==plan['scope'],'Foreign Terraform adoption source or scope')
-        validate_evidence(adoption_plan,load_private(files['adoption_evidence']))
-        require(adoption_plan['state']['backend_sha256']==digest(read_private(files['backend']))
-                and adoption_plan['state']['state_key']==state_key,
-                'Terraform adoption state boundary differs')
     if kind=='retirement_review':
         from tools.retirement import validate_evidence
         retirement_plan=load_private(files['plan'])
@@ -156,12 +132,6 @@ def validate_packet(step, packet, plan, base):
         operations=load_private(files['review']); validate(operations)
         require(operations['source_commit']==plan['source_commit']
                 and operations['scope']==plan['scope'], 'Foreign operations review')
-    if kind=='adoption_review':
-        from tools.adoption import validate_evidence
-        adoption_plan=load_private(files['plan'])
-        require(adoption_plan['source_commit']==plan['source_commit']
-                and adoption_plan['scope']==plan['scope'], 'Foreign adoption review')
-        validate_evidence(adoption_plan,load_private(files['evidence']))
     if kind=='acceptance':
         require(values['purpose'] in {'admission','domain','bootstrap','services','activation','post_activation','recovery','retirement'}, 'Unknown acceptance gate')
         accepted=load_private(files['acceptance'])
@@ -219,12 +189,7 @@ def native_owner_ledger(ledger,owner):
 
 
 def prepared_directory(step, packet, plan, base):
-    if step['kind']=='terraform_apply':
-        kind='terraform_plan'
-    elif step['kind']=='terraform_adoption_apply':
-        kind='terraform_adoption_plan'
-    else:
-        kind='guest_plan'
+    kind='terraform_plan' if step['kind']=='terraform_apply' else 'guest_plan'
     return dependency(step,packet['parameters']['prepared_step'],kind,plan,base)/'execution'
 
 
@@ -302,11 +267,6 @@ def dispatch(step, packet, directory, base, plan, root):
         result=evaluate(load_private(files['plan']),load_private(files['evidence']))
         write_new(directory/'retirement-review.json',encoded(result))
         names=['retirement-review.json']
-    elif kind=='adoption_review':
-        from tools.adoption import evaluate
-        result=evaluate(load_private(files['plan']),load_private(files['evidence']))
-        write_new(directory/'adoption-review.json',encoded(result))
-        names=['adoption-review.json']
     elif kind=='operations_review':
         from tools.operations_review import enforce,evaluate
         result=evaluate(load_private(files['review']))
@@ -329,15 +289,6 @@ def dispatch(step, packet, directory, base, plan, root):
         write_new(directory/'bundle.json',read_private(directory/'execution/bundle.json'))
         write_new(directory/'review.json',read_private(directory/'execution/review.json'))
         names=['bundle.json','review.json']
-    elif kind=='terraform_adoption_plan':
-        from tools.terraform_adoption import prepare
-        args={name:files.get(name) for name in ('inputs','backend','environment','authority','adoption_plan',
-                                                'adoption_evidence','references','cloud','ca_bundle')}
-        result=prepare(argparse.Namespace(**args,catalog_id=values['catalog_id'],terraform=Path(values['terraform']),
-                       output=directory/'execution',read_authorized_target=True),root)
-        for name in ('bundle.json','adoption-review.json','pre-import-plan.json','pre-import-review.json'):
-            write_new(directory/name,read_private(directory/'execution'/name))
-        names=['bundle.json','adoption-review.json','pre-import-plan.json','pre-import-review.json']
     elif kind=='terraform_apply':
         from tools.terraform_apply import apply
         from tools.wsd_handoff import execution_outputs
@@ -350,18 +301,6 @@ def dispatch(step, packet, directory, base, plan, root):
         execution_outputs(prepared,bundle['scope']['phase'])
         for name in ('result.json','outputs.json'): write_new(directory/name,read_private(prepared/name))
         names=['result.json','outputs.json']
-    elif kind=='terraform_adoption_apply':
-        from tools.terraform_adoption import execute
-        prepared=prepared_directory(step,packet,plan,base)
-        prior=load_private(prepared.parent/'packet.json')['parameters']
-        require(digest(Path(prior['terraform']).read_bytes())==prior['terraform_sha256'],
-                'Terraform adoption executable changed')
-        result=execute(argparse.Namespace(bundle=prepared,approval=files['approval'],
-                       terraform=Path(prior['terraform']),ledger=owner_ledger(base,'terraform'),
-                       execute_approved_import=True),root)
-        for name in ('result.json','post-import-plan.json','post-import-review.json'):
-            write_new(directory/name,read_private(prepared/name))
-        names=['result.json','post-import-plan.json','post-import-review.json']
     elif kind=='guest_plan':
         from tools.guest_run import prepare
         workload=terraform_execution(values['workload_step'],plan,base)
@@ -626,26 +565,6 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                         and result['production_activation'] is False,'Interrupted restore completion differs')
             for name in names: retain(directory/name,read_private(directory/'execution'/name))
             return complete(step,packet,directory,plan,result,names)
-        if kind=='terraform_adoption_apply':
-            from tools.terraform_apply import scope_ledger
-            prepared=prepared_directory(step,packet,plan,base)
-            require(read_private(prepared/'bundle.json')==read_private(prepared.parent/'bundle.json'),
-                    'Interrupted adoption bundle changed')
-            bundle=load_private(prepared/'bundle.json'); result=load_private(prepared/'result.json')
-            match_scope(bundle['scope'],plan)
-            require(result['status']=='ADOPTED_REQUIRES_EXACT_DELTA_PLAN_REVIEW'
-                    and result['bundle_sha256']==digest(read_private(prepared/'bundle.json'))
-                    and result['operation_id']==bundle['operation_id']
-                    and result['generation']==bundle['generation'],
-                    'Interrupted adoption completion remains held or changed')
-            address=load_private(prepared/'backend.json')['address']
-            with scope_ledger(owner_ledger(base,'terraform'),address,bundle['scope']) as owned:
-                require(c.digest(load_private(owned/'adoption-head.json'))==c.digest(result),
-                        'Later Terraform adoption superseded this handoff')
-            originals={'result.json':'result.json','post-import-plan.json':'post-import-plan.json',
-                       'post-import-review.json':'post-import-review.json'}
-            for name,original in originals.items(): retain(directory/name,read_private(prepared/original))
-            return complete(step,packet,directory,plan,result,list(originals))
         if kind in {'terraform_apply','guest_apply'}:
             prepared=prepared_directory(step,packet,plan,base)
             require(read_private(prepared/'bundle.json')==read_private(prepared.parent/'bundle.json'),'Interrupted bundle changed')

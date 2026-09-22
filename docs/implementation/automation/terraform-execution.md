@@ -131,13 +131,6 @@ It writes a separate private packet under the
 existing executor lock and leaves every ledger byte unchanged. Creates, replacements,
 deletes and unknown identities require separate ownership/adoption reconciliation.
 
-Brownfield ownership transfer now uses the separate
-[brownfield adoption workflow](brownfield-adoption.md). Its import executor shares
-this backend writer lock. An incomplete or held state-import attempt therefore
-blocks ordinary Terraform apply just like an unresolved apply attempt. Completed
-adoption ends at a new post-import plan review; it never authorizes the ordinary
-apply that may follow.
-
 ## Delivery boundary
 
 This increment supplies restricted plan/apply execution and durable attempt

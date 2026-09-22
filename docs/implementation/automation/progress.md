@@ -48,19 +48,6 @@ native mutation. This is a W25 repository integration increment; actual platform
 cleanup, reuse quarantine, sanitization and service-owner acceptance remain native
 commissioning evidence.
 
-The [brownfield adoption workflow](brownfield-adoption.md) adds the W24
-repository path for controlled ownership transfer. Exact native identities,
-normalized current/desired configuration, recovery evidence, state backup/locking,
-shared-resource ownership and old-writer fencing are reviewed before any import.
-The Terraform adoption executor then binds a pre-import saved plan, writes durable
-uncertainty before the first exact import, shares the normal backend writer lock
-and requires a fresh post-import plan with no replacement/delete/exposure and only
-reviewed bounded deltas. An interrupted import blocks ordinary Terraform apply
-until reconciled. Delivery stages expose review, preparation and approved import
-without granting a follow-on apply. Actual installed-provider import semantics,
-native readback, canary/recovery and migration/failback evidence remain W24
-commissioning obligations.
-
 Receipt-based workload compilation and bootstrap/withdrawal transition preparation
 are now registered delivery stages. Their adapters invoke the actual three-platform
 compiler and lifecycle contracts; fixtures verify retained native identities and

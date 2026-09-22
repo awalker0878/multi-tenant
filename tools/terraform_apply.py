@@ -136,10 +136,6 @@ def scope_ledger(ledger, backend_address, expected_scope=None):
         private_path(lock)
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         completed_history(scope,expected_scope)
-        # Brownfield state adoption shares this exact backend writer boundary.
-        # An incomplete/held import must block ordinary plan application.
-        from tools.terraform_adoption import completed_adoption_history
-        completed_adoption_history(scope,expected_scope)
         yield scope
     finally:
         os.close(fd)
