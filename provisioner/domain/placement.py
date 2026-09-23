@@ -45,6 +45,9 @@ STATUSES = (PLACED, HOLD_NO_ELIGIBLE_SITE) + HOLD_PRIORITY
 UNRECORDED_QUALIFICATION = {'source': 'UNRECORDED', 'status': 'NOT_EVALUATED',
                             'authoritative': False, 'product_tuples': {}}
 
+# The explicit product-tuple marker for a decision that selected no platform.
+UNSELECTED_PRODUCT = 'UNSELECTED'
+
 
 @dataclass(frozen=True)
 class CandidateEvaluation:
@@ -61,7 +64,7 @@ class CandidateEvaluation:
     blocker_classes: tuple[str, ...] = ()
     qualification_blockers: tuple[str, ...] = ()
     cell_blockers: tuple[str, ...] = ()
-    product_tuple: str = 'UNSELECTED'
+    product_tuple: str = UNSELECTED_PRODUCT
 
     def to_dict(self) -> dict:
         return {'site_key': self.site_key, 'cell_key': self.cell_key,
@@ -124,6 +127,22 @@ class PlacementDecision:
     @property
     def platform(self) -> str | None:
         return (self.selected or {}).get('platform')
+
+    @property
+    def product_tuple(self) -> str:
+        """The qualified product tuple of the selected platform.
+
+        A product tuple is a function of the platform, so every evaluated candidate
+        for the selected platform agrees; the first one found is the answer. A held
+        decision has no selected platform and therefore no product tuple.
+        """
+        platform = self.platform
+        if not platform:
+            return UNSELECTED_PRODUCT
+        for candidate in self.candidates:
+            if candidate.platform == platform:
+                return candidate.product_tuple
+        return UNSELECTED_PRODUCT
 
     @property
     def clusters(self) -> dict:
