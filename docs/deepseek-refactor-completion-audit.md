@@ -50,9 +50,16 @@ The portable planning architecture is substantially implemented:
 - unsupported public, IPv6-only, dual-stack, GPU, higher-assurance, and similar extensions are explicitly deferred rather than silently claimed;
 - native qualification, production authorization, and fixture-vs-authoritative distinctions are generally documented honestly.
 
-The refactor is not complete because several remaining defects break the integrity chain between eligibility, placement, approval, authoritative allocation, the existing delivery runner, generation-aware execution, and final verification.
+At the audited baseline several defects broke the integrity chain between
+eligibility, placement, approval, authoritative allocation, the existing delivery
+runner, generation-aware execution, and final verification.
 
-The highest priority is to finish the vertical path rather than add new capabilities.
+Every one of those gates is now complete. C01 to C13 each carry `State: COMPLETE` with
+a completion record that names the code, the regression and the verification command, and
+section 12 records the final result. What remains is external: native qualification,
+authoritative inventory, owner-held reservations and registrations, native observation,
+commissioning, production authority and an installed Terraform/Ansible toolchain. None of
+those is repository-side work, and `docs/NEXT_WORK.md` holds only those rows.
 
 ## 4. Ordered completion gates
 
@@ -1628,3 +1635,85 @@ The final repository should be explainable as:
     -> independently observe and reconcile
     -> verify conformance
     -> activate only under separate authority
+
+---
+
+## 12. Final completion record
+
+Status: every repository-side gate C01-C13 is COMPLETE. No gate is BLOCKED_EXTERNAL,
+because no gate had repository-side work left when it was closed; the external items below
+are the separate remaining work recorded in `docs/NEXT_WORK.md`.
+
+### Verified tree
+
+The verified repository-side tree is `0a485ef25e0eb4f20cf9ae91b18c5e80a56d3983`
+(`docs(audit): record GATE-C13 complete`). This record is a documentation commit on top of
+it and changes no code, test, example, schema or digest. The refactor spans the audited
+baseline `1b7756e4df52ebe58ac8d93266977a27915dc3dc` to that tree.
+
+### Gate states
+
+| Gate | State | Repository-side result |
+| --- | --- | --- |
+| C01 | COMPLETE | native qualification gates placement; unqualified and fixture inventory can never authorize |
+| C02 | COMPLETE | coherent multi-zone/cell envelope resolution with explicit refusal statuses |
+| C11 | COMPLETE | dependency direction enforced; all seven CLI commands reach one core library |
+| C08 | COMPLETE | versioned profiles and default ownership |
+| C04 | COMPLETE | generation model with compare-and-set generation records |
+| C03 | COMPLETE | complete reviewed-plan manifest and digest |
+| C05 | COMPLETE | deterministic compiler to the existing `hosting-delivery/1` handoff |
+| C06 | COMPLETE | capacity authority integrated as proposal plus separate owner confirmation |
+| C07 | COMPLETE | IPAM and DNS authority integrated as intent plus separate owner confirmation |
+| C09 | COMPLETE | adapter responsibilities limited to real provider-specific realization |
+| C12 | COMPLETE | conformance language separates repository proposals from confirmed owner state |
+| C10 | COMPLETE | golden cross-platform matrix covers every request and every platform |
+| C13 | COMPLETE | one active documentation story, external-only backlog, classified stale terms, no `OBSOLETE_REMOVE` |
+
+### Actual path trace
+
+Run on the verified tree against `examples/requests/multi-tier.yaml`:
+
+| Step | Command | Result |
+| --- | --- | --- |
+| request -> validation | `python -m provisioner.cli validate examples/requests/multi-tier.yaml` | exit 0, `VALID`, `request_digest d0036fa5...` |
+| versioned policy and profiles | included in the plan's `policy` block | `hosting-policy-diagnostics/1`, `rules_digest 130b6dc1...`, zero errors |
+| resolution | `python -m provisioner.cli resolve examples/requests/multi-tier.yaml` | exit 0, `RESOLVED`, platform-independent intent |
+| qualified coherent placement | included in the plan's `placement` block | `PLACED` with `authority FIXTURE_NOT_PLACEMENT_AUTHORITY` |
+| reviewed plan, manifest and generation | `python -m provisioner.cli plan examples/requests/multi-tier.yaml` | exit 0, `PLANNED_DISABLED_NOT_AUTHORIZED`, `native_contact false`, `generation 1`, `manifest_digest 492dc42d...` |
+| provider-native realization | the plan's `compile_plan`, `compiled_files`, `terraform_scopes` and `ansible_scopes` | `DRAFT_DISABLED_NOT_AUTHORIZED` |
+| delivery runner | the plan's `delivery` block | `PLANNED_DISABLED_NOT_AUTHORIZED` |
+| conformance | the plan's `conformance` block | `BLOCKED_ON_EXTERNAL_EVIDENCE`, `ready false`, proposal authority `REPOSITORY_PROPOSAL_NOT_OWNER_STATE` |
+| separate activation authority | `python -m provisioner.cli apply examples/requests/multi-tier.yaml` | exit 2, `REFUSED`, `native_contact false` |
+| status and verification | `python -m provisioner.cli status` / `verify` | exit 0, `PLANNING_ONLY_NOT_AUTHORIZED` |
+| evidence | `python -m provisioner.cli evidence` | exit 0, `RECORDED` |
+
+### Validation commands and results
+
+| Command | Result |
+| --- | --- |
+| `python -m pytest tests/provisioning -q` | 875 passed / 1401 subtests |
+| `python -m unittest tests.test_platform_family_eligibility` | 26 tests, OK |
+| `python scripts/check_repository.py --output <private path>` | exit 0, no issues |
+| `python scripts/check_documentation.py` | exit 0, 37314 checks, no failures |
+| `python scripts/check_retired_interfaces.py` | exit 0, no issues |
+| `python tools/check_local.py` | cannot pass on this workstation, and the refactor did not cause it: the same 15 failures and 132 errors as the audited baseline, with identical identifier sets. The POSIX-only family needs `os.getuid`, `/etc/machine-id`, `/proc/self/ns/net` and `fcntl` |
+| `python scripts/verify_ansible.py` | NOT RUN TO A RESULT: exit 2, `ansible-playbook executable is not installed` |
+| `python tools/verify_terraform.py --mock-tests` | NOT RUN TO A RESULT: exit 2, `BLOCKED_TOOLCHAIN`, terraform executable is not installed |
+| repository-wide stale-term scan | fifteen required terms classified; no `OBSOLETE_REMOVE` |
+| active-document link scan | 510 documents, zero link targets that do not exist |
+
+The two toolchain commands are recorded as unavailable rather than passed. No native
+qualification, site commissioning, production authorization, reservation, allocation,
+registration, observation or live infrastructure success is claimed anywhere in this
+record: no target was contacted, and `native_contact` is false on every artifact produced
+above.
+
+### Remaining external work
+
+`docs/NEXT_WORK.md` holds fourteen rows, each naming its owner, the missing external input,
+why it matters, the repository-side contract that is already complete, the completion
+condition and the hold point. They cover the Terraform/Ansible toolchain, target selection,
+the qualification campaign, native observers, writer fencing and recovery, the security
+edge, shared-service reply paths, bootstrap dependencies, native IPv6, commissioned
+envelopes, owner-held reservations, owner-held DNS registrations, production authority and
+authoritative site state to replace the non-authoritative placement fixtures.
