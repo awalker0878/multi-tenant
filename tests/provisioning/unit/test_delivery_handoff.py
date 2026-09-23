@@ -25,11 +25,14 @@ import tempfile
 import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
+from provisioner.cli import apply as apply_module
 from provisioner.domain import generation
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import authority as authority_module
 from provisioner.execution import handoff
+from provisioner.execution import service
 from provisioner.placement import eligibility
 
 from tests.provisioning import support
@@ -550,14 +553,41 @@ class ApplyBoundaryTest(unittest.TestCase):
         self.assertEqual(payload['errors'][0]['code'], 'AUTHORITY_REQUIRED')
         self.assertNotIn('delivery', payload)
 
-    def test_a_dirty_checkout_without_a_declared_commit_is_refused(self):
-        plan, record, _ = self._approved()
-        code, payload = _run('apply', REQUEST, '--approved-plan', plan['digest'],
-                             '--approvals', record)
+    def _in_process(self, source: dict, requested: str | None = None) -> tuple[int, dict]:
+        """Run the apply core against one exact repository source reading.
+
+        The checkout's own state is not a property this suite controls, so the
+        source binding is exercised against a declared reading instead of the
+        ambient worktree.
+        """
+        context = service.build_context(support.REQUEST)
+        plan = service.plan_for(context)
+        approval = authority_module.Approval(plan_digest=plan.digest,
+                                             approved_by='reviewer-01',
+                                             authority_ref='CHG-0001')
+        with mock.patch.object(apply_module.repository, 'source_commit',
+                               return_value=source):
+            return apply_module.run(context, approved_plan=plan.digest,
+                                    approvals=(approval,), source_commit=requested)
+
+    def test_a_checkout_that_is_not_clean_without_a_declared_commit_is_refused(self):
+        source = {'status': 'FAILED_INTEGRITY_CHECK', 'commit': 'c' * 40,
+                  'issues': [{'kind': 'WORKTREE_DIFFERS_FROM_HEAD', 'file': 'x'}]}
+        code, payload = self._in_process(source)
         self.assertEqual(code, 2)
         self.assertEqual(payload['errors'][0]['code'], 'ARTIFACT_INTEGRITY_FAILED')
-        self.assertIn('status', payload['errors'][0]['details'])
+        self.assertEqual(payload['errors'][0]['details']['status'],
+                         'FAILED_INTEGRITY_CHECK')
+        self.assertIn('instruction', payload['errors'][0]['details'])
         self.assertNotIn('delivery', payload)
+
+    def test_a_clean_checkout_without_a_declared_commit_binds_the_checkout(self):
+        source = {'status': 'HASHES_MATCH', 'commit': 'c' * 40, 'issues': []}
+        code, payload = self._in_process(source)
+        self.assertEqual(code, 2)
+        self.assertEqual(payload['status'], apply_module.HANDOFF_STATUS)
+        self.assertEqual(payload['delivery']['source_commit'], 'c' * 40)
+        self.assertEqual(payload['source_checkout']['status'], 'HASHES_MATCH')
 
     def test_a_declared_commit_that_is_not_the_checkout_is_refused(self):
         plan, record, _ = self._approved()
