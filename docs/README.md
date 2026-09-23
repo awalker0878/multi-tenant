@@ -29,4 +29,4 @@ Read [the inter-domain boundary](architecture/reference/8-zone-interfaces-routin
 
 Do not silently change inherited requirements while copying them into an ADR. Source-derived ADRs have no recorded organizational acceptance. Initial operational and promised recovery readiness remains a prerequisite to production activation—not a later paperwork step.
 
-[Maintained design workspace](current/README.md) — current editable records, separately versioned from frozen transcriptions. See [completion-audit dispositions](assurance/completion-corrections.md).
+[Maintained design workspace](current/README.md) — current editable records, separately versioned from frozen transcriptions. See [completion-audit dispositions](assurance/completion-corrections.md). The [portable provisioning refactor completion audit](deepseek-refactor-completion-audit.md) is the authoritative record of the gates that produced the current portable path; remaining work is only external and is listed in [next work](NEXT_WORK.md).

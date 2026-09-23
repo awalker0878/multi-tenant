@@ -85,7 +85,11 @@ core library; `apply` always refuses, because this repository holds no target
 contact, credential or change authority. The five reference requests under
 [`examples/requests`](examples/requests) plan as `PLANNED_DISABLED_NOT_AUTHORIZED`
 with `native_contact: false`, and their deterministic artifacts are replayed by the
-golden regressions.
+golden regressions, including the full request-by-platform compatibility matrix.
+The ordered refactor gates that produced this path and their repository-side
+completion status are recorded in the
+[refactor completion audit](docs/deepseek-refactor-completion-audit.md); remaining
+work is only external, and is listed in [next work](docs/NEXT_WORK.md).
 
 ## Local review
 
