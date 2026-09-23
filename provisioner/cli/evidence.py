@@ -11,7 +11,7 @@ from provisioner.domain import evidence as evidence_module
 from provisioner.domain import generation as generation_module
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import digest as request_digest
-from provisioner.execution.service import Context, plan_for
+from provisioner.execution.service import Context, capacity_evidence, plan_for
 
 RESULT_FORMAT = 'hosting-evidence-result/1'
 
@@ -20,8 +20,13 @@ REPOSITORY_LIMITS = ('Evidence records are repository-side only',
                      'Every record is bound to one WSD generation')
 
 
-def records(plan) -> list[dict]:
-    """One evidence record per repository-side artifact the plan produced."""
+def records(plan, capacity=None) -> list[dict]:
+    """One evidence record per repository-side artifact the plan produced.
+
+    `capacity` is the reconciled owner evidence the transport read, if any. The
+    capacity record states the owner's state; it is never a record of our own
+    authority over capacity.
+    """
     request_digest_value = plan.request.digest
     generation = plan.generation
     rows = [
@@ -74,17 +79,29 @@ def records(plan) -> list[dict]:
             {'failed': plan.conformance['failed'],
              'pending': plan.conformance['pending']}, REPOSITORY_LIMITS, generation),
     ]
+    if capacity is not None:
+        rows.append(evidence_module.record(
+            'capacity', f'{plan.request.tenant}/{plan.request.wsd}', request_digest_value,
+            capacity['view']['digest'], 'capacity', capacity['state'],
+            {'state': capacity['state'], 'confirmed': capacity['confirmed'],
+             'may_allocate': capacity['may_allocate'],
+             'operation_id': plan.operation_id,
+             'reservation_id': capacity['binding']['reservation_id'],
+             'view_digest': capacity['view']['digest'],
+             'records_checked': capacity['reconciliation']['records_checked'],
+             'authority': 'CAPACITY_OWNER'}, REPOSITORY_LIMITS, generation))
     return [row.to_dict() for row in rows]
 
 
-def run(context: Context) -> tuple[int, dict]:
+def run(context: Context, reservation_index=None, capacity_facts=None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
         return EXIT_REFUSED, {'format': RESULT_FORMAT, 'status': 'REFUSED',
                               'source': context.source, 'errors': [error.to_dict()],
                               'native_contact': False}
-    rows = records(plan)
+    capacity = capacity_evidence(plan, reservation_index, facts_path=capacity_facts)
+    rows = records(plan, capacity)
     return EXIT_OK, {'format': RESULT_FORMAT, 'status': 'RECORDED',
                      'source': context.source, 'plan_digest': plan.digest,
                      'manifest_digest': plan.manifest_digest,

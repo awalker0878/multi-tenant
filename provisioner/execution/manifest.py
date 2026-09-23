@@ -14,6 +14,7 @@ self-referential.
 """
 from __future__ import annotations
 
+from provisioner.allocations import owner as capacity_owner
 from provisioner.domain.request import digest
 
 MANIFEST_FORMAT = 'hosting-reviewed-plan-manifest/1'
@@ -21,7 +22,7 @@ MANIFEST_FORMAT = 'hosting-reviewed-plan-manifest/1'
 #: The manifest's own terms, in the order a reviewer reads them.
 TERMS = ('format', 'generation', 'request', 'request_identity', 'resolution', 'policy',
          'inventory', 'placement', 'qualification', 'product_tuple', 'capacity',
-         'addresses', 'service_bindings', 'desired_state', 'environment',
+         'capacity_view', 'addresses', 'service_bindings', 'desired_state', 'environment',
          'compiled_inputs', 'terraform', 'ansible', 'delivery', 'classification')
 
 #: Terraform scope keys the manifest binds. `backend` is excluded deliberately: it is
@@ -66,6 +67,19 @@ def capacity_intent(desired_state) -> dict:
     """Every reservation, including the demand and the committed-after position."""
     return {zone: reservation
             for zone, reservation in sorted(desired_state.reservations.items())}
+
+
+def capacity_view_intent(plan) -> dict:
+    """The commissioned capacity the placement decision was taken against.
+
+    The reservations above state the delta a reservation would need. This states the
+    capacity that delta was measured against, so the arithmetic in a plan cannot be
+    re-read against a different commissioned capacity without changing the plan
+    identity. A plan with no reviewed inventory binds the empty digest.
+    """
+    if plan.inventory is None:
+        return {'digest': ''}
+    return {'digest': capacity_owner.view_digest(plan)}
 
 
 def service_binding_intent(desired_state) -> list[dict]:
@@ -130,6 +144,7 @@ def build(plan, delivery_graph: str = '') -> dict:
         'qualification': plan.decision.qualification_identity,
         'product_tuple': plan.decision.product_tuple,
         'capacity': capacity_intent(plan.desired_state),
+        'capacity_view': capacity_view_intent(plan),
         'addresses': address_intent(plan.desired_state),
         'service_bindings': service_binding_intent(plan.desired_state),
         'desired_state': plan.desired_state.digest,
@@ -167,6 +182,8 @@ def review(manifest: dict) -> dict:
             'catalog_digest': manifest['resolution']['catalog_digest'],
             'rules_digest': manifest['policy'].get('rules_digest', ''),
             'rules_failed': list(manifest['policy'].get('rules_failed', [])),
+            'capacity_view': manifest['capacity_view']['digest'],
+            'capacity_zones': sorted(manifest['capacity']),
             'desired_state': manifest['desired_state'],
             'environment': manifest['environment'],
             'terraform': [scope['state_key'] for scope in manifest['terraform']],

@@ -15,9 +15,15 @@ FAILED = 'FAILED'
 STATUSES = (READY, BLOCKED, FAILED)
 
 
-def build(plan, observations=(), authorization=None, subject: str | None = None) -> dict:
-    """Summarise every check into one conformance report."""
-    results = check_set.run(plan, observations, authorization)
+def build(plan, observations=(), authorization=None, subject: str | None = None,
+          capacity=None) -> dict:
+    """Summarise every check into one conformance report.
+
+    `capacity` is the reconciled capacity-owner evidence the transport read, if any.
+    It changes only how the owner's own state is reported, never whether the
+    repository produced that evidence.
+    """
+    results = check_set.run(plan, observations, authorization, capacity)
     failed = sorted(c.name for c in results if c.status == check_set.FAIL)
     pending = sorted(c.name for c in results if c.status == check_set.PENDING)
     blocking = sorted(c.name for c in results if c.mandatory and not c.satisfied)
@@ -46,5 +52,5 @@ def build(plan, observations=(), authorization=None, subject: str | None = None)
                        'Evidence produced for another generation never satisfies this report']}
 
 
-def to_dict(plan, observations=(), authorization=None) -> dict:
-    return build(plan, observations, authorization)
+def to_dict(plan, observations=(), authorization=None, capacity=None) -> dict:
+    return build(plan, observations, authorization, capacity=capacity)

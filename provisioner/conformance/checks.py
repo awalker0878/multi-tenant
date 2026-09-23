@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from provisioner.allocations import owner as capacity_module
 from provisioner.observation import native as native_module
 
 CHECK_FORMAT = 'hosting-conformance-check/1'
@@ -66,6 +67,12 @@ def _pending(name: str, detail: str, evidence: dict | None = None) -> Check:
                  detail=detail, evidence=dict(evidence or {}))
 
 
+def _refused(name: str, detail: str, evidence: dict | None = None) -> Check:
+    """An external answer that is a definite no, reported as the owner's answer."""
+    return Check(name=name, status=FAIL, authority='EXTERNAL', mandatory=name in MANDATORY,
+                 detail=detail, evidence=dict(evidence or {}))
+
+
 def repository_checks(plan, observations=()) -> tuple[Check, ...]:
     """Checks this repository can honestly perform from its own artifacts.
 
@@ -91,8 +98,13 @@ def repository_checks(plan, observations=()) -> tuple[Check, ...]:
                'Placement produced a decision', {'status': plan.decision.status,
                                                  'authority': plan.decision.authority}),
         _check('capacity', bool(plan.desired_state.reservations),
-               'Capacity was reserved against reviewed inventory',
-               {'zones': sorted(plan.desired_state.reservations)}),
+               'The reviewed capacity arithmetic holds; the reservation is an intent, '
+               'not a held reservation',
+               {'zones': sorted(plan.desired_state.reservations),
+                'view_digest': capacity_module.view_digest(plan) if plan.inventory
+                else '',
+                'state': capacity_module.PROPOSED,
+                'authority': 'CAPACITY_OWNER'}),
         _check('addresses', bool(plan.desired_state.domains),
                'Prefixes and addresses were allocated',
                {'domains': [d.domain_id for d in plan.desired_state.domains]}),
@@ -121,8 +133,55 @@ def repository_checks(plan, observations=()) -> tuple[Check, ...]:
     )
 
 
-def external_checks(plan, observations=(), authorization=None) -> tuple[Check, ...]:
-    """Checks that can only pass once evidence produced elsewhere exists."""
+def _capacity_check(plan, capacity) -> Check:
+    """The capacity owner's own answer, reported as the owner's and never as ours.
+
+    Without reconciled owner evidence the check is PENDING and says what the owner
+    still has to supply. With it, the check reports the owner's state: a confirmed
+    reservation is the only state that can satisfy it.
+    """
+    if capacity is None:
+        return _pending('capacity-confirmation',
+                        'The capacity owner must confirm the reservation',
+                        {'state': capacity_module.PROPOSED,
+                         'operation_id': plan.operation_id,
+                         'generation': plan.generation,
+                         'required_facts': list(capacity_module.REQUIRED_FACTS)})
+    reconciliation = capacity['reconciliation']
+    evidence = {'state': reconciliation['state'],
+                'owner': 'capacity-owner',
+                'operation_id': plan.operation_id,
+                'generation': plan.generation,
+                'reservation_id': capacity['binding']['reservation_id'],
+                'view_digest': capacity['view']['digest'],
+                'records_checked': reconciliation['records_checked'],
+                'confirmed': reconciliation['confirmed']}
+    if reconciliation['confirmed']:
+        return Check(name='capacity-confirmation', status=PASS, authority='EXTERNAL',
+                     mandatory=True,
+                     detail='The capacity owner confirmed this reservation identity',
+                     evidence=evidence)
+    refusal = capacity_module.REFUSING_STATES.get(reconciliation['state'])
+    if refusal == capacity_module.REFUSAL_CONFLICT:
+        return _refused('capacity-confirmation',
+                        'The capacity owner refused this reservation identity',
+                        dict(evidence, refusal=refusal))
+    if refusal:
+        return _pending('capacity-confirmation',
+                        'The capacity owner has not settled this reservation outcome',
+                        dict(evidence, refusal=refusal))
+    return _pending('capacity-confirmation',
+                    'The capacity owner must confirm the reservation',
+                    evidence)
+
+
+def external_checks(plan, observations=(), authorization=None, capacity=None) -> tuple[Check, ...]:
+    """Checks that can only pass once evidence produced elsewhere exists.
+
+    `capacity` is the reconciled owner evidence the transport read, if any. Passing
+    it changes only what this repository reports about the owner's state; it never
+    makes a confirmation exist.
+    """
     observed = len(observations)
     bound = native_module.binding(observations, plan.generation)
     return (
@@ -130,8 +189,7 @@ def external_checks(plan, observations=(), authorization=None) -> tuple[Check, .
                  'The capability registry records no qualified product tuple',
                  {'qualification': dict(plan.decision.qualification),
                   'qualification_blockers': list(plan.decision.qualification_blockers)}),
-        _pending('capacity-confirmation',
-                 'The capacity owner must confirm the reservation'),
+        _capacity_check(plan, capacity),
         _pending('address-confirmation',
                  'The IPAM owner must confirm the prefixes and addresses'),
         _pending('service-acceptance',
@@ -149,6 +207,7 @@ def external_checks(plan, observations=(), authorization=None) -> tuple[Check, .
     )
 
 
-def run(plan, observations=(), authorization=None) -> tuple[Check, ...]:
+def run(plan, observations=(), authorization=None, capacity=None) -> tuple[Check, ...]:
     return repository_checks(plan, observations) + external_checks(plan, observations,
-                                                                   authorization)
+                                                                   authorization,
+                                                                   capacity)

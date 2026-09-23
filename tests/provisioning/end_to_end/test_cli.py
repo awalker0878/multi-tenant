@@ -83,9 +83,14 @@ class ReadOnlyCommandTest(unittest.TestCase):
         self.assertEqual(payload['status'], 'RECORDED')
         kinds = {row['kind'] for row in payload['evidence']}
         self.assertEqual(kinds, {'request', 'validation', 'resolution', 'placement',
-                                 'compilation', 'plan', 'generation', 'conformance'})
+                                 'capacity', 'compilation', 'plan', 'generation',
+                                 'conformance'})
         self.assertTrue(all(row['authority'] == 'REPOSITORY_SIDE_ONLY'
                             for row in payload['evidence']))
+        capacity = next(row for row in payload['evidence'] if row['kind'] == 'capacity')
+        self.assertEqual(capacity['status'], 'HOLD_ENVELOPE_NOT_BOUND')
+        self.assertEqual(capacity['details']['authority'], 'CAPACITY_OWNER')
+        self.assertFalse(capacity['details']['may_allocate'])
 
 
 class ApplyRefusalTest(unittest.TestCase):

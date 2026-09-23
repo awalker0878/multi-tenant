@@ -9,7 +9,7 @@ from __future__ import annotations
 from provisioner.cli.support import EXIT_OK, EXIT_REFUSED
 from provisioner.conformance import report as conformance_report
 from provisioner.domain.errors import ProvisioningError
-from provisioner.execution.service import Context, plan_for
+from provisioner.execution.service import Context, capacity_evidence, plan_for
 from provisioner.observation import drift as drift_module
 from provisioner.observation import health as health_module
 from provisioner.observation import native as native_module
@@ -29,7 +29,8 @@ def verification_plan(plan) -> list[dict]:
             for subject, native_id in subjects]
 
 
-def run(context: Context, observations=()) -> tuple[int, dict]:
+def run(context: Context, observations=(), reservation_index=None,
+        capacity_facts=None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
@@ -37,7 +38,8 @@ def run(context: Context, observations=()) -> tuple[int, dict]:
                               'source': context.source, 'errors': [error.to_dict()],
                               'native_contact': False}
 
-    report = conformance_report.build(plan, observations)
+    capacity = capacity_evidence(plan, reservation_index, facts_path=capacity_facts)
+    report = conformance_report.build(plan, observations, capacity=capacity)
     comparison = reconciliation_compare.build(plan.desired_state, observations)
     classification = reconciliation_classify.classify(comparison)
     drift = drift_module.to_dict(plan.desired_state, observations)
@@ -53,6 +55,7 @@ def run(context: Context, observations=()) -> tuple[int, dict]:
         'identity': plan.identity.to_dict(),
         'operation_id': plan.operation_id,
         'conformance': report,
+        'capacity': capacity,
         'verification_plan': verification_plan(plan),
         'observations': native_module.to_dict(observations, plan.desired_state,
                                               plan.generation),
@@ -64,7 +67,9 @@ def run(context: Context, observations=()) -> tuple[int, dict]:
         'native_contact': False,
         'limits': ['Verification is repository-side until native readback exists',
                    'Absent observation is never reported as in sync or healthy',
-                   'An observation from another generation is reported stale, never accepted']}
+                   'An observation from another generation is reported stale, never accepted',
+                   'The capacity confirmation check reports the owner state read from the '
+                   'exported reservation records, and only the owner can satisfy it']}
 
 
 def to_dict(context: Context) -> dict:

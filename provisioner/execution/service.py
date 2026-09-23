@@ -13,6 +13,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from provisioner import repository
+from provisioner.allocations import owner as capacity_owner
 from provisioner.compiler import profiles as compiler_profiles
 from provisioner.domain.generation import require_generation
 from provisioner.domain.request import load as load_document
@@ -58,3 +60,39 @@ def plan_for(context: Context, compile_environment: bool = True):
     return execution_plan.create_plan(context.document, context.source, context.inventory,
                                       context.catalog, compile_environment=compile_environment,
                                       generation=context.generation)
+
+
+def capacity_evidence(plan, reservation_index=None, as_of=None, facts_path=None) -> dict:
+    """What the reviewed capacity arithmetic claims and what the exported records say.
+
+    Every transport that reports capacity reads it the same way: the repository's own
+    compiled binding, reconciled against the repository's own exported reservation
+    evidence. Reconciling is a reading, not a mutation — it never creates, confirms or
+    releases anything, and it reports the state the owner's own records already hold.
+
+    `facts_path` is the recorded owner facts document. Without it the envelope is
+    unbound, the handoff cannot be compiled and the reconciliation says so instead of
+    assuming a confirmation.
+    """
+    facts = capacity_owner.load_facts(facts_path) if facts_path else None
+    envelope = ({'envelope_id': facts['envelope_id'],
+                 'envelope_record_sha256': facts['envelope_record_sha256']}
+                if facts else {})
+    identity = capacity_owner.binding(plan, **envelope)
+    index = (repository.reservation_records(reservation_index)
+             if reservation_index else None)
+    reconciliation = capacity_owner.reconcile(identity, index, as_of=as_of)
+    return {'binding': identity,
+            'view': capacity_owner.capacity_view(plan),
+            'units': capacity_owner.units(plan),
+            'scope': capacity_owner.scope_of(plan),
+            'facts': dict(facts) if facts else None,
+            'handoff': (capacity_owner.handoff_from_facts(plan, facts)
+                        if facts else None),
+            'reconciliation': reconciliation,
+            'review': capacity_owner.review(reconciliation),
+            'state': reconciliation['state'],
+            'confirmed': reconciliation['confirmed'],
+            'may_allocate': reconciliation['may_allocate'],
+            'required_facts': list(capacity_owner.REQUIRED_FACTS),
+            'limits': list(capacity_owner.LIMITS)}

@@ -54,6 +54,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help='The WSD generation the caller claims (defaults to the first)')
     parser.add_argument('--source-commit', default=None,
                         help='The clean 40-hex commit the delivery handoff binds (apply only)')
+    parser.add_argument('--reservation-index', default=None,
+                        help='Exported reservation record index used to reconcile capacity')
+    parser.add_argument('--capacity-facts', default=None,
+                        help='Recorded capacity owner facts used to compile the reservation request')
     return parser
 
 
@@ -86,14 +90,17 @@ def dispatch(argv=None) -> tuple[int, dict]:
     if args.command == 'plan':
         return plan_command.run(context, compile_environment=not args.no_compile)
     if args.command == 'status':
-        return status_command.run(context)
+        return status_command.run(context, args.reservation_index, args.capacity_facts)
     if args.command == 'verify':
-        return verify_command.run(context, _load_observations(args.observations))
+        return verify_command.run(context, _load_observations(args.observations),
+                                  args.reservation_index, args.capacity_facts)
     if args.command == 'evidence':
-        return evidence_command.run(context)
+        return evidence_command.run(context, args.reservation_index, args.capacity_facts)
     approvals = apply_command.load_approvals(args.approvals)
     return apply_command.run(context, args.approved_plan, approvals,
-                             source_commit=args.source_commit)
+                             source_commit=args.source_commit,
+                             reservation_index=args.reservation_index,
+                             capacity_facts=args.capacity_facts)
 
 
 def main(argv=None) -> int:

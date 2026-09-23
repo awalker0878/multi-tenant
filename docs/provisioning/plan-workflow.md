@@ -38,6 +38,8 @@ Exit `3` is an internal failure (an unreadable file, an unknown platform name).
 | `--source-commit COMMIT` | `apply` | the clean 40-hex commit the delivery handoff binds, when the checkout is not itself clean |
 | `--approvals PATH` | `apply` | recorded external approvals bound to a plan digest |
 | `--observations PATH` | `verify` | native observations document |
+| `--reservation-index PATH` | `apply`, `status`, `verify`, `evidence` | exported reservation record index; defaults to the repository export, and is read to reconcile capacity |
+| `--capacity-facts PATH` | `apply`, `status`, `verify`, `evidence` | recorded capacity owner facts used to compile the reservation request |
 
 ## `plan`
 
