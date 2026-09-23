@@ -1,12 +1,14 @@
 """Golden path: every reviewed reference request reproduces its stored artifacts."""
 from __future__ import annotations
 
+import copy
 import json
 import subprocess
 import sys
 import unittest
 from pathlib import Path
 
+from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import canonical_json, digest
 
 from tests.provisioning import support
@@ -18,6 +20,23 @@ BRITTLE = ('timestamp', 'created_at', 'generated_at', 'T00:', 'T12:')
 
 def load(directory: Path, name: str) -> dict:
     return json.loads((directory / name).read_text(encoding='utf-8'))
+
+
+def request_keys(document: dict) -> set:
+    """Every key the request document names, at any depth."""
+    seen: set = set()
+
+    def walk(value):
+        if isinstance(value, dict):
+            for key, child in value.items():
+                seen.add(key)
+                walk(child)
+        elif isinstance(value, list):
+            for child in value:
+                walk(child)
+
+    walk(document)
+    return seen
 
 
 class GoldenCorpusTest(unittest.TestCase):
@@ -167,52 +186,137 @@ class GoldenReplayTest(unittest.TestCase):
 
 
 class CrossPlatformGoldenTest(unittest.TestCase):
-    """One portable request must reproduce its stored digest on every platform."""
+    """The full reference-request x platform matrix, with no cell omitted."""
 
     def corpus(self) -> dict:
         return load(GOLDEN, 'cross-platform.digests.json')
 
-    def test_the_corpus_covers_every_platform_with_a_reviewed_fixture(self):
+    def requests(self) -> dict:
+        return self.corpus()['requests']
+
+    def test_the_corpus_covers_every_request_and_every_platform(self):
         corpus = self.corpus()
-        self.assertEqual(corpus['format'], 'hosting-golden-cross-platform/1')
-        self.assertEqual(sorted(corpus['platforms']), sorted(support.REFERENCE_FIXTURES))
+        self.assertEqual(corpus['format'], 'hosting-golden-cross-platform/2')
+        self.assertIs(corpus['native_contact'], False)
+        self.assertEqual(sorted(corpus['fixtures']), sorted(support.REFERENCE_FIXTURES))
+        self.assertEqual(sorted(self.requests()), sorted(support.REFERENCE_REQUESTS))
+        for name, entry in sorted(self.requests().items()):
+            with self.subTest(request=name):
+                self.assertEqual(entry['request'], f'examples/requests/{name}.yaml')
+                self.assertEqual(sorted(entry['platforms']), sorted(support.PLATFORMS))
+                self.assertEqual(sorted({row['fixture'] for row in entry['refusals']}),
+                                 sorted(support.PLATFORMS))
 
-    def test_every_platform_is_asked_the_same_portable_request(self):
-        portable = []
-        for platform in sorted(support.REFERENCE_FIXTURES):
-            document = support.platform_request(platform)
-            document['spec']['platform'].pop('preference')
-            portable.append(canonical_json(document))
-        self.assertEqual(len(set(portable)), 1)
-        self.assertEqual(len({entry['portable_digest']
-                              for entry in self.corpus()['platforms'].values()}), 1)
+    def test_every_platform_is_asked_the_same_portable_question(self):
+        digests_seen: set = set()
+        for name, entry in sorted(self.requests().items()):
+            with self.subTest(request=name):
+                portable = support.portable_request(name)
+                self.assertEqual(entry['portable_digest'], digest(portable))
+                digests_seen.add(entry['portable_digest'])
+                for platform in sorted(support.PLATFORMS):
+                    expected = copy.deepcopy(portable)
+                    expected['spec']['platform']['preference'] = platform
+                    self.assertEqual(support.platform_request(platform, name), expected)
+        self.assertEqual(len(digests_seen), len(support.REFERENCE_REQUESTS))
 
-    def test_every_platform_reproduces_its_stored_digests(self):
-        for platform, expected in sorted(self.corpus()['platforms'].items()):
-            with self.subTest(platform=platform):
-                plan = support.platform_plan(platform)
-                self.assertEqual(expected['request_digest'], plan.request.digest)
-                self.assertEqual(expected['plan_digest'], plan.digest)
-                self.assertEqual(expected['manifest_digest'], plan.manifest_digest)
-                self.assertEqual(expected['desired_state_digest'], plan.desired_state.digest)
-                self.assertEqual(expected['environment_digest'], digest(plan.environment))
-                self.assertEqual(expected['status'], plan.status)
-                self.assertEqual(expected['stack_roots'],
-                                 sorted({scope['root'] for scope in plan.terraform_scopes}))
-                self.assertEqual(expected['compiled_files'], sorted(plan.compiled))
-                self.assertEqual(expected['realization_gaps'],
-                                 sorted(warning['code'] for warning in plan.warnings))
-                self.assertIs(plan.native_contact, False)
-                self.assertEqual(plan.desired_state.platform, platform)
+    def test_every_cell_reproduces_its_stored_digests(self):
+        for name, entry in sorted(self.requests().items()):
+            for platform, expected in sorted(entry['platforms'].items()):
+                with self.subTest(request=name, platform=platform):
+                    plan = support.platform_plan(platform, name)
+                    self.assertEqual(expected['request_digest'], plan.request.digest)
+                    self.assertEqual(expected['resolution_digest'],
+                                     digest(plan.resolution.to_dict()))
+                    self.assertEqual(expected['placement_digest'], plan.decision.digest)
+                    self.assertEqual(expected['desired_state_digest'],
+                                     plan.desired_state.digest)
+                    self.assertEqual(expected['environment_digest'], digest(plan.environment))
+                    self.assertEqual(expected['plan_digest'], plan.digest)
+                    self.assertEqual(expected['manifest_digest'], plan.manifest_digest)
 
-    def test_an_unavailable_realization_input_is_recorded_not_dropped(self):
-        platforms = self.corpus()['platforms']
+    def test_every_cell_records_its_provider_native_realization_root(self):
+        for name, entry in sorted(self.requests().items()):
+            for platform, expected in sorted(entry['platforms'].items()):
+                with self.subTest(request=name, platform=platform):
+                    plan = support.platform_plan(platform, name)
+                    self.assertEqual(plan.desired_state.platform, platform)
+                    root = f'terraform/stacks/wsd/{platform}/domains'
+                    self.assertEqual(expected['stack_roots'], [root])
+                    self.assertEqual(expected['stack_roots'],
+                                     sorted({scope['root'] for scope in plan.terraform_scopes}))
+                    self.assertEqual(expected['compiled_files'], sorted(plan.compiled))
+                    for other in support.PLATFORMS:
+                        if other != platform:
+                            self.assertNotIn(f'/{other}/', root)
+
+    def test_no_matrix_input_carries_a_provider_native_field(self):
+        native: set = set()
+        for platform in sorted(support.PLATFORMS):
+            native |= support.native_field_names(platform)
+        for name in sorted(self.requests()):
+            for platform in sorted(support.PLATFORMS):
+                with self.subTest(request=name, platform=platform):
+                    keys = request_keys(support.platform_request(platform, name))
+                    self.assertEqual(sorted(keys & native), [])
+        text = (GOLDEN / 'cross-platform.digests.json').read_text(encoding='utf-8')
+        for field in sorted(native):
+            self.assertNotIn(f'"{field}"', text, field)
+
+    def test_every_cell_records_its_expected_realization_gaps(self):
+        for name, entry in sorted(self.requests().items()):
+            for platform, expected in sorted(entry['platforms'].items()):
+                with self.subTest(request=name, platform=platform):
+                    plan = support.platform_plan(platform, name)
+                    self.assertEqual(expected['realization_gaps'],
+                                     sorted(warning['code'] for warning in plan.warnings))
+                    self.assertIn('INVENTORY_NOT_AUTHORITATIVE', expected['realization_gaps'])
+
+    def test_the_vmware_realization_boundary_is_recorded_not_dropped(self):
         # The reviewed VMware module carries the address on the NSX segment, so the
-        # workload phase cannot take one: the plan must say so instead of dropping it.
-        self.assertIn('REALIZATION_INPUT_UNAVAILABLE', platforms['vmware']['realization_gaps'])
-        for platform in ('nutanix', 'openstack'):
-            self.assertNotIn('REALIZATION_INPUT_UNAVAILABLE',
-                             platforms[platform]['realization_gaps'])
+        # workload phase cannot take one: every VMware cell must say so, and no other
+        # platform may report a boundary it does not have.
+        for name, entry in sorted(self.requests().items()):
+            with self.subTest(request=name):
+                self.assertIn('REALIZATION_INPUT_UNAVAILABLE',
+                              entry['platforms']['vmware']['realization_gaps'])
+                for platform in ('nutanix', 'openstack'):
+                    self.assertNotIn('REALIZATION_INPUT_UNAVAILABLE',
+                                     entry['platforms'][platform]['realization_gaps'])
+
+    def test_no_cell_claims_native_contact_or_production_authority(self):
+        for name, entry in sorted(self.requests().items()):
+            for platform, expected in sorted(entry['platforms'].items()):
+                with self.subTest(request=name, platform=platform):
+                    self.assertIs(expected['native_contact'], False)
+                    self.assertEqual(expected['status'], 'PLANNED_DISABLED_NOT_AUTHORIZED')
+                    plan = support.platform_plan(platform, name)
+                    self.assertIs(plan.native_contact, False)
+                    self.assertEqual(plan.status, 'PLANNED_DISABLED_NOT_AUTHORIZED')
+                    self.assertFalse(plan.decision.authorized)
+                    self.assertEqual(plan.conformance['status'],
+                                     'BLOCKED_ON_EXTERNAL_EVIDENCE')
+                    self.assertFalse(plan.conformance['ready'])
+                    self.assertIs(plan.conformance['native_contact'], False)
+
+    def test_every_incompatible_combination_records_its_explicit_refusal(self):
+        for name, entry in sorted(self.requests().items()):
+            recorded = {(row['declared_preference'], row['fixture']): row
+                        for row in entry['refusals']}
+            expected = {(declared, fixture)
+                        for declared in support.PLATFORMS
+                        for fixture in support.PLATFORMS if declared != fixture}
+            with self.subTest(request=name):
+                self.assertEqual(sorted(recorded), sorted(expected))
+            for (declared, fixture), row in sorted(recorded.items()):
+                with self.subTest(request=name, declared=declared, fixture=fixture):
+                    outcome = support.platform_refusal(declared, fixture, name)
+                    self.assertIsInstance(outcome, ProvisioningError)
+                    self.assertEqual(row['code'], outcome.code)
+                    self.assertEqual(row['path'], outcome.path)
+                    self.assertEqual(row['reason'], outcome.message)
+                    self.assertEqual(row['status'], (outcome.details or {}).get('status'))
+                    self.assertNotEqual(row['declared_preference'], row['fixture'])
 
 
 class GoldenCorpusCommandTest(unittest.TestCase):
