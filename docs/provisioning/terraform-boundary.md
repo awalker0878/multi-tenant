@@ -45,15 +45,17 @@ The provisioner never restates a provider-specific field name. It asks the revie
 module what it declares and overlays only the inputs it owns:
 
 ```python
-native_variables(platform, phase)  # tools/compile_wsd.py: the module's own variables
-PROVISIONER_OWNED_INPUTS           # boot_disk_gib, data_disk_gib, ipv4_address
+native_variables(platform, phase)  # the adapter's declared_inputs(phase), read from tools/compile_wsd.py
+PROVISIONER_OWNED_INPUTS           # derived from adapters.COMPUTED_FACTS: boot_disk_gib, data_disk_gib, ipv4_address
 ```
 
 `provisioner/compiler/environment.py` renders the environment document from the
 portable desired state, then overlays an owned input only when the selected
 module declares it. A restated OpenStack field list would have made the Nutanix
 and VMware paths uncompilable; the compiler is the only owner of native shapes, so
-there is nothing to drift.
+there is nothing to drift. Even the list of facts the provisioner computes is owned by
+the selected adapter, so `environment.py` holds no provider-specific knowledge at all.
+See [Platform adapter contract](adapter-contract.md).
 
 ## Cross-platform realization
 
@@ -68,13 +70,21 @@ The request carries no native field. Only the realization differs:
 | `openstack` | `openstack-domain` | `openstack-workload` | `ipv4_address` on the workload |
 
 The vSphere workload module declares no address variable: the address is realized
-by the NSX domain composition that owns the segment. The provisioner records that
-boundary rather than dropping the fact silently. The plan carries one
-`REALIZATION_INPUT_UNAVAILABLE` warning naming the input and the platform, in the
-`compilation` layer, and the allocation itself still happens — every platform
-allocates the same distinct addresses. `tests/provisioning/compiler/test_cross_platform.py`
-holds the contract, reading the expected field shapes from the reviewed module
-configurations rather than from the accessor the provisioner calls.
+by the NSX domain composition that owns the segment. The selected adapter declares
+that boundary — `realization_gaps()` returns one gap document naming the input, the
+platform, the phase and how the platform realizes the fact instead — rather than
+dropping it silently. The plan carries one `REALIZATION_INPUT_UNAVAILABLE` warning
+naming the input and the platform, in the `compilation` layer, and the allocation
+itself still happens — every platform allocates the same distinct addresses. The
+compiler holds no provider-specific branch: the NSX segment mapping is declared as
+data in `tools/compile_wsd.WORKLOAD_NETWORK_BINDING`, keyed by platform, and
+`compile_environment(document, phase, outputs, phase_bindings)` is named for the phase
+it binds rather than for the platform.
+`tests/provisioning/compiler/test_cross_platform.py` holds the contract, reading the
+expected field shapes from the reviewed module configurations rather than from the
+accessor the provisioner calls.
+`tests/provisioning/adapters/test_adapter_contract.py` holds the adapter contract,
+including the rule that no generic module compares a platform name.
 `examples/golden/cross-platform.digests.json` stores the resulting per-platform
 digests and realization gaps, and
 `tests/provisioning/end_to_end/test_golden.py` replays them.

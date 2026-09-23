@@ -28,6 +28,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 | `placement` | the placement decision digest, including every rejected candidate |
 | `qualification` | the qualification reference the selection was gated on |
 | `product_tuple` | the selected product/API/provider/hardware tuple |
+| `realization` | the selected platform's realization contract: family, field shapes, readback identity, binding requirement, security edge, gaps and qualification status |
 | `capacity` | every reservation, its demand and its committed-after position |
 | `capacity_view` | the commissioned capacity snapshot the reservation intent is bound to |
 | `addresses` | every reserved prefix, gateway host number and workload address |
@@ -82,10 +83,11 @@ it. Because the manifest binds every term above, an approval that cites the mani
 digest cites the complete decision; a change to any one term — a reservation target,
 a `committed_after` value, the commissioned capacity snapshot, the addressing
 snapshot, a service endpoint, a binding class, a placement decision,
-a qualification reference, a product tuple, a profile version, a policy rule
-revision, the inventory snapshot, a compiled input, an environment value, a Terraform
-state key or root, an Ansible scope, the delivery graph, the generation or the change
-classification — produces a different digest and the stale approval is refused.
+a qualification reference, a product tuple, a realization contract, a profile version,
+a policy rule revision, the inventory snapshot, a compiled input, an environment value,
+a Terraform state key or root, an Ansible scope, the delivery graph, the generation or
+the change classification — produces a different digest and the stale approval is
+refused.
 
 `apply` then **still refuses** with `EXECUTION_REFUSED_HANDOFF_READY`, and its
 payload carries the manifest, the reviewer-facing `reviewed` projection, the manifest

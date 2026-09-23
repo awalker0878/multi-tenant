@@ -19,11 +19,12 @@ tooling keep their current owners.
 | 6 | Allocation | `provisioner/allocations` | reservations | pool exhaustion, address conflict |
 | 7 | Desired state | `provisioner/compiler/desired_state.py` | `DesiredState` | uncompilable intent, non-positive generation |
 | 8 | Environment document | `provisioner/compiler/environment.py` | environment document | contract violation, private output path |
-| 9 | Compilation | `tools/compile_wsd.py` (existing) | compiled inputs + plan scopes | compiler refusal |
-| 10 | Execution boundary | `provisioner/execution` | Terraform/Ansible/delivery scopes | undeclared catalog scope |
-| 11 | Conformance | `provisioner/conformance` | conformance report | missing mandatory check, observation bound to another generation |
-| 12 | Observation and reconciliation | `provisioner/observation`, `provisioner/reconciliation` | drift classification | unclassifiable drift |
-| 13 | CLI transport | `provisioner/cli` | JSON result document | every refusal above |
+| 9 | Realization contract | `provisioner/adapters` | adapter realization contract | plan realizes another platform, absent zone, native input the module does not accept |
+| 10 | Compilation | `tools/compile_wsd.py` (existing) | compiled inputs + plan scopes | compiler refusal |
+| 11 | Execution boundary | `provisioner/execution` | Terraform/Ansible/delivery scopes | undeclared catalog scope |
+| 12 | Conformance | `provisioner/conformance` | conformance report | missing mandatory check, observation bound to another generation |
+| 13 | Observation and reconciliation | `provisioner/observation`, `provisioner/reconciliation` | drift classification | unclassifiable drift |
+| 14 | CLI transport | `provisioner/cli` | JSON result document | every refusal above |
 
 ## Dependency direction
 
@@ -69,11 +70,24 @@ command rule reads the import graph rather than a naming convention, so both
 are reported, and a controlled fixture proves the rule rejects that edge.
 
 There is no circular ownership: the compiler never imports `provisioner/`, the
-Terraform roots never import either, and the adapters re-export the compiler's
-field sets rather than restating them. The renderer asks the reviewed module which
-native inputs it declares instead of restating a provider-specific list, which is
-what keeps one portable request compilable on all three platforms — see
+Terraform roots never import either, and the adapters project the compiler's field
+sets rather than restating them. The renderer asks the reviewed module which native
+inputs it declares instead of restating a provider-specific list, which is what keeps
+one portable request compilable on all three platforms — see
 [Terraform execution boundary](terraform-boundary.md#cross-platform-realization).
+
+The adapters own the other half of that boundary: *how* a portable decision is
+realized on one platform. `provisioner/adapters/base.py` declares six surfaces —
+capability, placement, phases, readback, security edge and realization gaps — and
+every provider-specific decision lives in a declarative table keyed by platform name
+(`tools/compile_wsd.PLACEMENT`, `NETWORK` and `WORKLOAD_NETWORK_BINDING`) or in the
+adapter's own package. No generic module compares a platform name: the compiler looks
+the selected platform up, and `provisioner/compiler/environment.py` derives even the
+list of facts the provisioner computes from the adapter. A plan whose realization
+contract the adapter cannot satisfy is refused with
+`REALIZATION_CONTRACT_UNSATISFIED` in the `compilation` layer, and the contract is
+bound into the plan manifest so an approval cites it. See
+[Platform adapter contract](adapter-contract.md).
 
 ## Refusal model
 
