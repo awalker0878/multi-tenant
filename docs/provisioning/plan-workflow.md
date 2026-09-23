@@ -101,9 +101,21 @@ external check.
 `verify` evaluates the same reconciled owner readings, so `capacity-confirmation`,
 `address-confirmation` and `dns-registration` report `PASS` only against a
 confirmed authoritative answer and `PENDING_EXTERNAL_EVIDENCE` while the owner has
-not answered. `evidence` records the review evidence for the same readings, including
-the `capacity`, `allocation` and `registration` records, so a later reviewer can see
-which owner states an approval was taken against.
+not answered. A reading that does not name this plan's operation identity, generation
+or view digest is not this plan's evidence: the check it would have settled stays
+`PENDING_EXTERNAL_EVIDENCE` and reports the mismatched keys, so a wrong-generation or
+wrong-plan record never becomes a pass. `evidence` records the review evidence for the
+same readings, including the `capacity`, `allocation` and `registration` records, so a
+later reviewer can see which owner states an approval was taken against.
+
+The conformance summary separates what the repository proposes from what an owner has
+answered. `capacity-proposal`, `address-intent` and `service-binding` are repository-side
+and report planning intent; each names the `confirmation_check` that settles it in its
+evidence, and the report carries a `proposal` block stating the same authority
+(`REPOSITORY_PROPOSAL_NOT_OWNER_STATE`), which owner check settles each proposal, and
+which proposals are still `unconfirmed`. A repository-side row never uses the owner's
+vocabulary: the report refuses to be built with `CONFORMANCE_CLAIM_UNPROVEN` if a
+proposal claims an outcome only an owner can give without that owner's evidence.
 
 ## `apply`
 

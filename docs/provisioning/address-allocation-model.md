@@ -147,14 +147,19 @@ An allocation is addressing, never change authority: `may_allocate` and `may_reg
 are permission for the *owner's* next step, not an authorization for this repository to
 apply anything. `reconcile` is a reading — it allocates, registers and releases nothing.
 
-The `addresses` conformance check is repository-side and reports the reviewed
+The `address-intent` conformance check is repository-side and reports the reviewed
 proposal as intent, naming `PLANNING_PROPOSAL_NOT_AUTHORITATIVE_ALLOCATION` as the
-authority. The `address-confirmation` and `dns-registration` checks are `EXTERNAL`:
-they are `PENDING_EXTERNAL_EVIDENCE` until the owners answer, `PASS` only on a
-confirmed allocation and a registered name, and `FAIL` on a definite refusal. The
-`allocation` and `registration` evidence records are bound to the view digest and
-report the owners' states, so an approval never has to guess whether addressing is
-held.
+authority and `address-confirmation` as the check that settles it. The
+`address-confirmation` and `dns-registration` checks are `EXTERNAL`: they are
+`PENDING_EXTERNAL_EVIDENCE` until the owners answer, `PASS` only on a confirmed
+allocation and a registered name, and `FAIL` on a definite refusal. The `allocation`
+and `registration` evidence records are bound to the view digest and report the owners'
+states, so an approval never has to guess whether addressing is held.
+
+A reading is only evidence for the plan it names. A reconciled addressing reading whose
+operation identity, generation or view digest is not this plan's stays
+`PENDING_EXTERNAL_EVIDENCE` and reports the mismatched keys, so another operation's
+allocation is never read as this operation's.
 
 ## What this does not claim
 

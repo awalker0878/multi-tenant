@@ -85,12 +85,18 @@ state reports `may_apply: false` and `may_activate: false`: a reservation is cap
 never change authority. `reconcile` is a reading — it creates, confirms and releases
 nothing.
 
-The `capacity` conformance check is repository-side and reports the reviewed
-arithmetic as an intent, naming `CAPACITY_OWNER` as the authority. The
-`capacity-confirmation` check is `EXTERNAL`: it is `PENDING_EXTERNAL_EVIDENCE` until
-the owner answers, `PASS` only on `CONFIRMED_BY_OWNER`, and `FAIL` on a definite
-refusal. The `capacity` evidence record is bound to the view digest and reports the
-owner's state, so an approval never has to guess whether capacity is held.
+The `capacity-proposal` conformance check is repository-side: it reports the reviewed
+arithmetic as a proposal, naming `REPOSITORY_CAPACITY_ARITHMETIC` as its authority and
+`capacity-confirmation` as the check that settles it. The `capacity-confirmation` check
+is `EXTERNAL`: it is `PENDING_EXTERNAL_EVIDENCE` until the owner answers, `PASS` only on
+`CONFIRMED_BY_OWNER`, and `FAIL` on a definite refusal. The `capacity` evidence record is
+bound to the view digest and reports the owner's state, so an approval never has to guess
+whether capacity is held.
+
+A reading is only evidence for the plan it names. A reconciled capacity reading whose
+operation identity, generation, plan digest or view digest is not this plan's stays
+`PENDING_EXTERNAL_EVIDENCE` and reports the mismatched keys, so another generation's
+confirmation is never read as this one's and a stale reading never becomes a pass.
 
 ## Concurrency
 
