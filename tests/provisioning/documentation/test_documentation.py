@@ -32,7 +32,7 @@ MODULE_PATH = re.compile(r'provisioner/[A-Za-z0-9_./-]+')
 REQUIRED = ('README.md', 'architecture.md', 'request-contract.md', 'profile-model.md',
             'placement-model.md', 'desired-state-model.md', 'generation-model.md',
             'plan-manifest-model.md', 'delivery-handoff-model.md',
-            'capacity-reservation-model.md',
+            'capacity-reservation-model.md', 'address-allocation-model.md',
             'adapter-contract.md', 'terraform-boundary.md', 'service-owner-boundary.md',
             'plan-workflow.md', 'service-profile-matrix.md')
 
@@ -270,6 +270,56 @@ class CapacityDocumentationTest(unittest.TestCase):
 
     def test_the_document_is_indexed_and_states_its_limit(self):
         self.assertIn('(capacity-reservation-model.md)',
+                      INDEX.read_text(encoding='utf-8'))
+        self.assertIn('does not claim', self.DOC.read_text(encoding='utf-8').lower())
+
+    def test_the_document_claims_no_native_contact(self):
+        text = self.DOC.read_text(encoding='utf-8')
+        self.assertIn('native_contact: false', text)
+        self.assertNotIn('native_contact: true', text)
+
+
+class AddressDocumentationTest(unittest.TestCase):
+    """The addressing document is a view of the module, never a second source of truth."""
+
+    DOC = DOCS / 'address-allocation-model.md'
+
+    def test_the_document_names_every_declared_format(self):
+        from provisioner.allocations import addresses
+        text = self.DOC.read_text(encoding='utf-8')
+        for name in ('VIEW_FORMAT', 'HANDOFF_FORMAT', 'BINDING_FORMAT',
+                     'REGISTRATION_BINDING_FORMAT', 'RECONCILIATION_FORMAT'):
+            with self.subTest(format=name):
+                self.assertIn(getattr(addresses, name), text)
+
+    def test_the_document_names_every_reconciled_state(self):
+        from provisioner.allocations import addresses
+        text = self.DOC.read_text(encoding='utf-8')
+        for state in sorted(addresses.ALLOCATION_STATES):
+            with self.subTest(state=state):
+                self.assertIn(state, text)
+        for state in sorted(addresses.REGISTRATION_STATES):
+            with self.subTest(state=state):
+                self.assertIn(state, text)
+
+    def test_the_document_names_every_settlement_gate(self):
+        from provisioner.allocations import addresses
+        text = self.DOC.read_text(encoding='utf-8')
+        for name in ('require_confirmed', 'require_registered', 'require_releasable',
+                     'require_settled'):
+            with self.subTest(gate=name):
+                self.assertTrue(hasattr(addresses, name))
+                self.assertIn(name, text)
+
+    def test_the_document_names_the_module_and_the_preserved_contracts(self):
+        text = self.DOC.read_text(encoding='utf-8')
+        self.assertIn('provisioner/allocations/addresses.py', text)
+        self.assertIn('provisioner/repository.py', text)
+        self.assertIn('scripts/check_ipam_allocation_preflight.py', text)
+        self.assertIn('scripts/check_dns_registration_preflight.py', text)
+
+    def test_the_document_is_indexed_and_states_its_limit(self):
+        self.assertIn('(address-allocation-model.md)',
                       INDEX.read_text(encoding='utf-8'))
         self.assertIn('does not claim', self.DOC.read_text(encoding='utf-8').lower())
 
