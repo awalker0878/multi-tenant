@@ -758,7 +758,7 @@ The repository already contains NetBox/IPAM, IPAM record, DNS registration, and 
 | Requirement | Where it is satisfied |
 | --- | --- |
 | 1. keep consumer requests free of CIDRs and provider identifiers | no change was needed: `provisioner/domain/request.py` and the schema still accept no prefix, no address and no provider field, and the reviewed request's `spec` is unchanged; the proposed prefix is derived by the repository from the reviewed inventory pool |
-| 2. use the planning allocator only to express intent or a proposed allocation | `provisioner/allocations/addresses.py::address_view` names `PLANNING_PROPOSAL_NOT_AUTHORITATIVE_ALLOCATION` as the authority; the repository `addresses` conformance check reports the proposal as intent and `hosting apply` never allocates |
+| 2. use the planning allocator only to express intent or a proposed allocation | `provisioner/allocations/addresses.py::address_view` names `PLANNING_PROPOSAL_NOT_AUTHORITATIVE_ALLOCATION` as the authority; the repository `address-intent` conformance check reports the proposal as intent and `hosting apply` never allocates |
 | 3. during controlled execution call the existing authoritative IPAM owner path | the compiled allocation intent is the exact document `scripts/check_ipam_allocation_preflight.py::normalized_spec` accepts, reached only through `provisioner/repository.py::ipam_allocation_preflight`; no second owner path, no second allocator and no parallel IPAM client is added |
 | 4. bind the authoritative allocation to WSD identity, generation, parent reservation, site/zone/domain and intent digest | `hosting-address-binding/1` binds `allocation_id`, `operation_id`, `generation`, `plan_digest`, `view_digest`, `reservation_id`, `request_id`, the five delivery scope keys, the zone, the domain, the pool and the allocation intent digest; `parent_spec_sha256`, `allocation_intent_digest` and `registration_intent_digest` are recomputed from the reviewed chain, so a record answering another operation, generation, parent, site, zone, pool or intent is `HOLD_IPAM_IDENTITY_OR_INTENT_CONFLICT` |
 | 5. confirm/observe before using an uncertain result | an `UNCERTAIN` record is `HOLD_DISCOVER_IPAM_OUTCOME` with `next_owner_action = OWNER_DISCOVER_AUTHORITATIVE_OUTCOME` and refuses with `IPAM_ALLOCATION_UNRESOLVED`; `EXISTING_CONFIRMED_IPAM_ALLOCATION` is the only state with `confirmed` true and is reachable only from a live exported record; a malformed or unreadable export is a typed `SCHEMA_VALIDATION_FAILED` refusal rather than a raw `ValueError` |
@@ -1123,7 +1123,8 @@ Regressions: `tests/provisioning/unit/test_architecture.py` (reachable rule, con
 ### GATE-C12 — Conformance language must distinguish proposals from confirmed owner state
 
 Severity: P1/P2  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include sections 38-40, 69, 76, 81, 86-88, and 91.
 
@@ -1152,6 +1153,61 @@ This can mislead reviewers even if the overall report remains blocked.
 - wrong plan/generation external record does not satisfy conformance;
 - missing observation never becomes PASS;
 - required unknown evidence blocks activation.
+
+#### Completion record
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. rename repository-side checks to describe what is actually proven | `provisioner/conformance/checks.py` names them `capacity-proposal`, `address-intent` and `service-binding`, and the comment on `REPOSITORY_CHECKS` states what each one is. The previous names (`capacity`, `addresses`, `services`) are gone from the module, from the tests and from the two active documents that named them |
+| 2. keep owner confirmation as separate mandatory external evidence | `checks.CONFIRMATION_OF` maps each proposal to the owner check that settles it (`capacity-confirmation`, `address-confirmation`, `service-acceptance`). All three owner checks are in `EXTERNAL_CHECKS` and in `MANDATORY`, and no proposal is promoted into one: a satisfied proposal leaves its owner check `PENDING_EXTERNAL_EVIDENCE` and blocking |
+| 3. never use ownership vocabulary for a repository-only proposal | `checks.OWNERSHIP_VOCABULARY` is the seven words. `report.ownership_claims()` reads every repository row's prose and, for the three proposal rows, the values their evidence carries; `report.build()` raises `CONFORMANCE_CLAIM_UNPROVEN` (registered in `provisioner/domain/errors.py` under the `authority` layer) instead of emitting a report in which a proposal claims an outcome only an owner can give. A proposal may use a word only once the owner check that settles it has passed |
+| 4. bind external evidence to plan digest and generation before it can satisfy a check | `checks.evidence_binding(plan, document, keys=..., view_digest=...)` compares the operation identity, generation, plan digest and view digest against the plan's own reading. `CAPACITY_BINDING_KEYS` and `ADDRESS_BINDING_KEYS` name the keys, the operation identity already embeds the claimed generation and the reviewed digest prefix, and the view digest is compared against `capacity_module.view_digest(plan)` / `address_module.view_digest(plan)` rather than the envelope's own copy. `production-authorization` is bound the same way: `_authorization_check` reports a supplied approval as the owner's answer only when it cites `plan.digest` |
+| 5. make stale or wrong-generation evidence remain pending or fail | a reading that fails any comparison returns `PENDING_EXTERNAL_EVIDENCE` with `foreign` naming the mismatched keys and `expected_operation_id`, so it settles nothing. The repository-side `generation` check fails on a stale or generation-less observation, and `native-observation` is external and never PASS from a supplied list |
+
+Regressions: `tests/provisioning/conformance/test_conformance.py` (34 tests) covers all
+four required cases. Proposal-only plan: `ProposalLanguageTest` asserts that no
+repository row's detail and no proposal row's evidence value uses
+`OWNERSHIP_VOCABULARY`, that every proposal is `PASS` with authority `REPOSITORY` while
+the check that settles it is `PENDING_EXTERNAL_EVIDENCE` with authority `EXTERNAL` and in
+`blocking`, that the report is `BLOCKED_ON_EXTERNAL_EVIDENCE` with `ready` false, and that
+the `proposal` block names the same authority (`REPOSITORY_PROPOSAL_NOT_OWNER_STATE`), the
+same `confirmed_by` map and every proposal as `unconfirmed`. Wrong plan/generation record:
+`EvidenceBindingTest` supplies another generation's capacity reading
+(`foreign == ['generation', 'operation_id', 'plan_digest']`), a moved capacity
+`view_digest`, another operation's addressing reading and a moved addressing
+`view_digest`, and asserts each stays `PENDING_EXTERNAL_EVIDENCE` with the mismatched keys
+named; an approval citing another plan digest stays `PENDING_EXTERNAL_EVIDENCE` with
+`foreign == ['plan_digest']`. Missing observation: the `generation` repository check fails
+on a stale or generation-less observation while `native-observation` stays `PENDING` with
+the `bound`/`stale`/`unbound` counts, and a fully bound observation list is still not the
+owner's attestation. Unknown evidence blocks activation:
+`activation.require_conformant` refuses with `ACTIVATION_REFUSED` and a `blocking` list
+containing every mandatory external check, and refuses again when the owners'
+reconciled readings and a matching approval are supplied. The guard itself is pinned by
+`test_a_proposal_that_claims_an_unconfirmed_outcome_is_refused`, which monkeypatches a
+`capacity-proposal` row whose detail says "reserved" and asserts `CONFORMANCE_CLAIM_UNPROVEN`
+with the claim, the word and the settling check in `details`, and by
+`test_a_proposal_that_claims_an_outcome_the_owner_confirmed_is_allowed`.
+
+`provisioner/schemas/v1/conformance-report.schema.json` requires the `proposal` block and
+forbids additional keys inside it. `provisioner/conformance/activation.py` now passes the
+reconciled owner readings through, so a caller that holds the owners' answers is judged
+on them and a caller that holds none is refused by the checks that stay pending.
+`provisioner/execution/plan.py::create_plan` still builds the embedded report without owner
+readings, which is why every plan stays `PLANNED_DISABLED_NOT_AUTHORIZED` with all eight
+external rows pending.
+
+Golden corpus: the check names are part of the conformance artifact, so the five reference
+conformance files and their five digests moved (`internal-development` `ec09aa42?`,
+`internal-production` `85646ec4?`, `multi-tier` `782c3aa2?`, `recovery-enabled`
+`0f0ada26?`, `storage-heavy` `0c1fc5cf?`). No `plan_digest`, `manifest_digest`,
+`desired_state_digest`, `environment_digest` or `resolution` artifact moved, and
+`cross-platform.digests.json` is unchanged.
+
+`python -m pytest tests/provisioning -q` reports 870 passed / 1280 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` all exit 0. Nothing external was contacted and no
+qualification, reservation, allocation, registration or authorization is claimed.
 
 ---
 
