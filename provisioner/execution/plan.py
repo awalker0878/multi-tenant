@@ -19,7 +19,7 @@ from provisioner.domain.generation import (WsdIdentity, identity_of, operation_i
                                            record_for as generation_record_for,
                                            require_generation)
 from provisioner.domain.placement import PlacementDecision
-from provisioner.domain.request import Request, digest as request_digest
+from provisioner.domain.request import Request
 from provisioner.inventory.capacity import demand_for
 from provisioner.inventory.model import Inventory
 from provisioner.placement import resolver as placement_resolver
@@ -27,10 +27,11 @@ from provisioner.policy import diagnostics as policy_diagnostics
 from provisioner.policy import semantic, standards
 from provisioner.profiles.loader import Catalog
 from provisioner.conformance import report as conformance_report
-from provisioner.execution import ansible, delivery as delivery_plan, terraform
+from provisioner.execution import ansible, delivery as delivery_plan, manifest as plan_manifest, terraform
 
 PLAN_FORMAT = 'hosting-provisioning-plan/1'
 PLAN_STATUS = 'PLANNED_DISABLED_NOT_AUTHORIZED'
+MANIFEST_FORMAT = plan_manifest.MANIFEST_FORMAT
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,8 @@ class Plan:
     decision: PlacementDecision
     desired_state: object
     environment: dict
+    inventory: object | None = None
+    manifest: dict = field(default_factory=dict)
     compiled: dict = field(default_factory=dict)
     compile_plan: dict = field(default_factory=dict)
     terraform_scopes: tuple[dict, ...] = ()
@@ -72,32 +75,40 @@ class Plan:
         return operation_id(self.identity, self.generation, self.digest)
 
     @property
+    def manifest_digest(self) -> str:
+        """The identity of the complete reviewed-plan manifest.
+
+        This is the value an external approval cites. It is a digest of the whole
+        reviewed decision — request, resolution, policy rule set, inventory snapshot,
+        placement and qualification, capacity and address intent, service bindings,
+        desired state, environment, compiled inputs, Terraform and Ansible bindings,
+        delivery graph, generation and change classification — not of a partial
+        projection, so an approval cannot be read as covering a plan it was not
+        reviewed against.
+        """
+        return plan_manifest.digest_of(self.manifest)
+
+    @property
     def digest(self) -> str:
         """Stable identity of this exact plan.
 
-        A plan is not identified by its request alone: it is identified by the
-        generation it claims, the request, the rendered environment the existing
-        compiler accepted, and the exact reviewed profile revisions and catalog
-        revisions it resolved against. Bumping a profile or catalog version
-        therefore changes the plan identity even when no request field changed, and
-        so does claiming a later generation — which is what makes a reviewed policy
-        change or a reviewed re-plan visible in every artifact derived from this plan.
+        A plan is not identified by its request alone. The identity is the digest of
+        the complete reviewed-plan manifest, so bumping a profile, a catalog, a policy
+        rule, a compiled input or the inventory snapshot — or claiming a later
+        generation, or changing what any owner operation would do — changes the plan
+        identity even when no request field changed. That is what makes a reviewed
+        change visible in every artifact derived from this plan.
         """
-        return request_digest({
-            'generation': self.generation,
-            'request': self.request.digest,
-            'environment': self.environment,
-            'profiles': self.resolution.profile_versions,
-            'catalogs': self.resolution.catalog_versions,
-            'catalog_digest': self.resolution.catalog_digest,
-        })
+        return self.manifest_digest
 
     def to_dict(self) -> dict:
         return {'format': self.format, 'status': self.status, 'digest': self.digest,
+                'manifest_digest': self.manifest_digest,
                 'generation': self.generation,
                 'identity': self.identity.to_dict(),
                 'operation_id': self.operation_id,
                 'generation_record': generation_record_for(self).to_dict(),
+                'manifest': dict(self.manifest),
                 'request': {'source': self.request.source, 'digest': self.request.digest,
                             'tenant': self.request.tenant, 'wsd': self.request.wsd},
                 'resolution': self.resolution.to_dict(),
@@ -117,7 +128,8 @@ class Plan:
                 'limits': ['A plan is disabled, unqualified and unauthorized',
                            'No native platform was contacted while creating this plan',
                            'Execution requires separate recorded authorization',
-                           'A claimed generation is a change counter, not an approval']}
+                           'A claimed generation is a change counter, not an approval',
+                           'The manifest digest binds the complete reviewed decision, not a summary of it']}
 
 
 def validate_request(document: dict, source: str, catalog: Catalog) -> tuple[Request, object, dict]:
@@ -129,7 +141,8 @@ def validate_request(document: dict, source: str, catalog: Catalog) -> tuple[Req
 
     rules = standards.load_rules()
     violations = policy_diagnostics.collect(request.document, rules, diagnostics)
-    policy = policy_diagnostics.summary(diagnostics, violations, len(rules))
+    policy = policy_diagnostics.summary(diagnostics, violations, len(rules),
+                                        rules_digest=standards.rules_digest(rules))
     diagnostics.raise_if_failed()
     return request, resolution, policy
 
@@ -201,10 +214,16 @@ def create_plan(document: dict, source: str, inventory: Inventory, catalog: Cata
                                                      state.platform))
     ansible_scopes = (ansible.scope('native-linux', 'workloads'),)
     plan = Plan(request=request, resolution=resolution, policy=policy, decision=decision,
-                desired_state=state, environment=environment_document, compiled=compiled,
-                compile_plan=compile_plan, terraform_scopes=terraform_scopes,
-                ansible_scopes=ansible_scopes, phases=phases(compile_environment),
-                diagnostics=diagnostics, generation=generation)
+                desired_state=state, environment=environment_document, inventory=inventory,
+                compiled=compiled, compile_plan=compile_plan,
+                terraform_scopes=terraform_scopes, ansible_scopes=ansible_scopes,
+                phases=phases(compile_environment), diagnostics=diagnostics,
+                generation=generation)
+    # The manifest binds the delivery graph, and the delivery document binds the plan
+    # identity. The graph is therefore bound by identity first, so the plan identity is
+    # a pure function of the reviewed decision and never of its own derived operation ids.
+    plan = replace(plan, manifest=plan_manifest.build(
+        plan, delivery_graph=delivery_plan.graph_digest(state, list(terraform_scopes))))
     plan = replace(plan, delivery=delivery_plan.build(
         state, list(terraform_scopes), plan_digest=plan.digest,
         operation_id=plan.operation_id))

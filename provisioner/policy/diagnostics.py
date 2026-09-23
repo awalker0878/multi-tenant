@@ -50,9 +50,17 @@ def collect(document: dict, rules: list[dict], diagnostics: Diagnostics) -> list
     return violations
 
 
-def summary(diagnostics: Diagnostics, violations: list[dict], rules_evaluated: int) -> dict:
+def summary(diagnostics: Diagnostics, violations: list[dict], rules_evaluated: int,
+            rules_digest: str = '') -> dict:
+    """The policy outcome, plus the identity of the exact rule set that produced it.
+
+    Binding the rule-set digest into the outcome means a reviewed change to a policy
+    rule changes the identity of every plan evaluated against it, even when the
+    outcome counts happen to be identical.
+    """
     return {'format': POLICY_FORMAT,
             'errors': len(diagnostics.errors),
             'warnings': len(diagnostics.warnings),
             'rules_evaluated': rules_evaluated,
-            'rules_failed': sorted({v['rule'] for v in violations})}
+            'rules_failed': sorted({v['rule'] for v in violations}),
+            'rules_digest': rules_digest}

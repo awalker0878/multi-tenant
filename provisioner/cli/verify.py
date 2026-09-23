@@ -47,6 +47,7 @@ def run(context: Context, observations=()) -> tuple[int, dict]:
     return EXIT_OK, {
         'format': RESULT_FORMAT, 'status': report['status'],
         'source': context.source, 'plan_digest': plan.digest,
+        'manifest_digest': plan.manifest_digest,
         'request_digest': plan.request.digest,
         'generation': plan.generation,
         'identity': plan.identity.to_dict(),

@@ -7,7 +7,9 @@ import sys
 import unittest
 
 from provisioner.compiler import artifacts
+from provisioner.execution import delivery
 from provisioner.execution import plan as execution_plan
+from provisioner.policy import standards
 
 from tests.provisioning import support
 
@@ -25,16 +27,67 @@ class ReplayTest(unittest.TestCase):
         second = support.reference_plan()
         self.assertEqual(first.digest, second.digest)
 
-    def test_the_plan_digest_binds_request_environment_and_reviewed_revisions(self):
-        plan = support.reference_plan()
+    def test_the_plan_digest_is_the_complete_reviewed_manifest_digest(self):
         from provisioner.domain.request import digest as request_digest
-        self.assertEqual(plan.digest,
-                         request_digest({'generation': plan.generation,
-                                         'request': plan.request.digest,
-                                         'environment': plan.environment,
-                                         'profiles': plan.resolution.profile_versions,
-                                         'catalogs': plan.resolution.catalog_versions,
-                                         'catalog_digest': plan.resolution.catalog_digest}))
+        from provisioner.execution import manifest as plan_manifest
+        plan = support.reference_plan()
+        self.assertEqual(plan.digest, plan.manifest_digest)
+        self.assertEqual(plan.manifest_digest, request_digest(plan.manifest))
+        self.assertEqual(plan.manifest['format'], plan_manifest.MANIFEST_FORMAT)
+        self.assertEqual(sorted(plan.manifest), sorted(plan_manifest.TERMS))
+
+    def test_the_manifest_binds_every_reviewed_decision(self):
+        from provisioner.domain.request import digest as request_digest
+        plan = support.reference_plan()
+        manifest = plan.manifest
+        self.assertEqual(manifest['generation'], plan.generation)
+        self.assertEqual(manifest['request']['digest'], plan.request.digest)
+        self.assertEqual(manifest['resolution']['catalog_digest'],
+                         plan.resolution.catalog_digest)
+        self.assertEqual(manifest['resolution']['profile_versions'],
+                         dict(plan.resolution.profile_versions))
+        self.assertEqual(manifest['policy']['rules_digest'],
+                         standards.rules_digest())
+        self.assertEqual(manifest['inventory']['digest'], _fixture().document_digest)
+        self.assertEqual(manifest['placement'], plan.decision.digest)
+        self.assertEqual(manifest['qualification'], plan.decision.qualification_identity)
+        self.assertEqual(manifest['product_tuple'], plan.decision.product_tuple)
+        self.assertEqual(manifest['capacity'], dict(plan.desired_state.reservations))
+        self.assertEqual(manifest['service_bindings'],
+                         [dict(b) for b in plan.desired_state.service_bindings])
+        self.assertEqual(manifest['desired_state'], plan.desired_state.digest)
+        self.assertEqual(manifest['environment'], request_digest(plan.environment))
+        self.assertEqual(manifest['compiled_inputs'],
+                         {name: request_digest(value)
+                          for name, value in sorted(plan.compiled.items())})
+        self.assertEqual([scope['state_key'] for scope in manifest['terraform']],
+                         [scope['state_key'] for scope in plan.terraform_scopes])
+        self.assertEqual(manifest['ansible'], [dict(s) for s in plan.ansible_scopes])
+        self.assertEqual(manifest['delivery']['graph'],
+                         delivery.graph_digest(plan.desired_state,
+                                               list(plan.terraform_scopes)))
+        self.assertEqual(manifest['classification'],
+                         {'lifecycle': plan.desired_state.lifecycle,
+                          'disruptive': plan.desired_state.lifecycle == 'production',
+                          'destructive': False, 'rebuild': False})
+
+    def test_the_manifest_carries_no_derived_or_volatile_term(self):
+        plan = support.reference_plan()
+        manifest = plan.manifest
+        # The identity and the delivery operation ids are derived from the manifest, so
+        # binding them here would make the identity self-referential.
+        self.assertNotIn('digest', manifest)
+        self.assertNotIn('manifest_digest', manifest)
+        self.assertNotIn('operation_id', manifest)
+        self.assertNotIn('identity', manifest)
+        self.assertNotIn('plan_digest', manifest['delivery'])
+        self.assertNotIn('operation_id', manifest['delivery'])
+        # A Terraform scope's `backend` is owner-provisioned free text, not a reviewed
+        # decision, so the plan identity must not depend on it.
+        for scope in manifest['terraform']:
+            self.assertNotIn('backend', scope)
+        # No volatile timestamp reaches the identity.
+        self.assertNotIn('timestamp', json.dumps(manifest, sort_keys=True))
 
     def test_the_plan_digest_changes_when_only_the_generation_changes(self):
         plan = support.reference_plan()

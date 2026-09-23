@@ -45,6 +45,7 @@ def run(context: Context) -> tuple[int, dict]:
         'format': RESULT_FORMAT, 'status': plan.status, 'source': context.source,
         'subject': f'{plan.request.tenant}/{plan.request.wsd}',
         'request_digest': plan.request.digest, 'plan_digest': plan.digest,
+        'manifest_digest': plan.manifest_digest,
         'generation': plan.generation,
         'identity': plan.identity.to_dict(),
         'operation_id': plan.operation_id,

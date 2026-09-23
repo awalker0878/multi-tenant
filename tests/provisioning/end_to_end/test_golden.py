@@ -150,6 +150,7 @@ class GoldenReplayTest(unittest.TestCase):
                 expected = index[name]
                 self.assertEqual(expected['request_digest'], plan.request.digest)
                 self.assertEqual(expected['plan_digest'], plan.digest)
+                self.assertEqual(expected['manifest_digest'], plan.manifest_digest)
                 self.assertEqual(expected['resolution_digest'],
                                  digest(plan.resolution.to_dict()))
                 self.assertEqual(expected['placement_digest'], plan.decision.digest)
@@ -192,6 +193,7 @@ class CrossPlatformGoldenTest(unittest.TestCase):
                 plan = support.platform_plan(platform)
                 self.assertEqual(expected['request_digest'], plan.request.digest)
                 self.assertEqual(expected['plan_digest'], plan.digest)
+                self.assertEqual(expected['manifest_digest'], plan.manifest_digest)
                 self.assertEqual(expected['desired_state_digest'], plan.desired_state.digest)
                 self.assertEqual(expected['environment_digest'], digest(plan.environment))
                 self.assertEqual(expected['status'], plan.status)

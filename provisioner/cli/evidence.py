@@ -34,6 +34,7 @@ def records(plan) -> list[dict]:
             'validation', f'{plan.request.tenant}/{plan.request.wsd}', request_digest_value,
             request_digest(plan.policy), 'validated', 'PASSED',
             {'rules_evaluated': plan.policy.get('rules_evaluated'),
+             'rules_digest': plan.policy.get('rules_digest', ''),
              'rules_failed': plan.policy.get('rules_failed', [])}, REPOSITORY_LIMITS,
             generation),
         evidence_module.record(
@@ -62,7 +63,8 @@ def records(plan) -> list[dict]:
         evidence_module.record(
             'plan', f'{plan.request.tenant}/{plan.request.wsd}', request_digest_value,
             plan.digest, 'planned', plan.status,
-            {'terraform_scopes': len(plan.terraform_scopes),
+            {'manifest_digest': plan.manifest_digest,
+             'terraform_scopes': len(plan.terraform_scopes),
              'ansible_scopes': len(plan.ansible_scopes),
              'blocking_operations': plan.delivery.get('blocking', [])}, REPOSITORY_LIMITS,
             generation),
@@ -85,6 +87,7 @@ def run(context: Context) -> tuple[int, dict]:
     rows = records(plan)
     return EXIT_OK, {'format': RESULT_FORMAT, 'status': 'RECORDED',
                      'source': context.source, 'plan_digest': plan.digest,
+                     'manifest_digest': plan.manifest_digest,
                      'request_digest': plan.request.digest,
                      'generation': plan.generation,
                      'operation_id': plan.operation_id,

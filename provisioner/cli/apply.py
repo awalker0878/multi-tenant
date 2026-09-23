@@ -14,6 +14,7 @@ from provisioner.domain import generation as generation_module
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import authority as authority_module
 from provisioner.execution import delivery as delivery_module
+from provisioner.execution import manifest as manifest_module
 from provisioner.execution.service import Context, plan_for
 
 RESULT_FORMAT = 'hosting-apply-result/1'
@@ -48,12 +49,14 @@ def run(context: Context, approved_plan: str | None = None,
         return refuse('AUTHORITY_REQUIRED',
                       'Apply requires the digest of an already reviewed plan',
                       context, plan_digest=plan.digest,
+                      manifest_digest=plan.manifest_digest,
                       instruction='hosting apply <request> --approved-plan <digest>')
 
     if approved_plan != plan.digest:
         return refuse('ARTIFACT_INTEGRITY_FAILED',
                       'The approved digest does not cite the plan produced from this request',
-                      context, approved_plan=approved_plan, plan_digest=plan.digest)
+                      context, approved_plan=approved_plan, plan_digest=plan.digest,
+                      manifest_digest=plan.manifest_digest)
 
     try:
         approval = authority_module.require_approval(plan.digest, approvals)
@@ -66,6 +69,9 @@ def run(context: Context, approved_plan: str | None = None,
     handoff = {
         'format': RESULT_FORMAT, 'status': 'EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY',
         'source': context.source, 'plan_digest': plan.digest,
+        'manifest_digest': plan.manifest_digest,
+        'manifest': dict(plan.manifest),
+        'reviewed': manifest_module.review(plan.manifest),
         'request_digest': plan.request.digest, 'approval': approval.to_dict(),
         'generation': plan.generation,
         'identity': plan.identity.to_dict(),
@@ -83,13 +89,15 @@ def run(context: Context, approved_plan: str | None = None,
                    'Terraform execution and state remain with the stack owner',
                    'This repository holds no execution authority',
                    'A handoff carries one generation; the authoritative record decides '
-                   'whether it is still current'],
+                   'whether it is still current',
+                   'The approved digest binds the complete reviewed manifest, not a summary'],
     }
     error = ProvisioningError(
         'EXECUTION_REFUSED',
         'This repository holds no execution authority; the plan is handed to its owners',
         path='$.apply',
         details={'plan_digest': plan.digest,
+                 'manifest_digest': plan.manifest_digest,
                  'blocking': handoff['blocking'],
                  'handoff_operations': [o['name'] for o in handoff['operations']]})
     return EXIT_REFUSED, {**handoff, 'errors': [error.to_dict()]}

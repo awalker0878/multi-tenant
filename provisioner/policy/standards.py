@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from provisioner.domain.errors import ProvisioningError
+from provisioner.domain.request import digest
 
 ROOT = Path(__file__).resolve().parents[2]
 RULE_ROOT = ROOT / 'policy' / 'rules'
@@ -61,6 +62,16 @@ def load_rules(root: Path = RULE_ROOT) -> list[dict]:
     if not rules:
         raise ProvisioningError('POLICY_VIOLATION', 'No standards policy rules are present')
     return rules
+
+
+def rules_digest(rules: list[dict] | None = None, root: Path = RULE_ROOT) -> str:
+    """The canonical digest of the reviewed rule set.
+
+    A plan cites the exact reviewed policy revision it was evaluated against, so a
+    later rule edit is visible in every plan identity rather than silently reusing
+    the earlier outcome.
+    """
+    return digest(rules if rules is not None else load_rules(root))
 
 
 def evaluate(document: dict, rules: list[dict]) -> list[dict]:

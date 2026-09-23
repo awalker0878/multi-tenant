@@ -25,8 +25,9 @@
       "desired_state_digest": "fba602fcfc6f4486a23ea00ce9e9a395fead3562063699d40f5176e0d7c401ed",
       "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
       "fixture": "provisioner/inventory/fixtures/nutanix-reference.json",
+      "manifest_digest": "6bf41572bc0903a47b6dc437b824de57d82537a1e5ceec57888629bdefae94df",
       "native_contact": false,
-      "plan_digest": "45acb22451a8d2d3d5476c24b51bbfe2837a569b03b5d441abf8838d55c37933",
+      "plan_digest": "6bf41572bc0903a47b6dc437b824de57d82537a1e5ceec57888629bdefae94df",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -44,8 +45,9 @@
       "desired_state_digest": "d9d987f87c2b8630787e86eb9e366eb9f5f903cd46babdcec33dd95e0bea4b8c",
       "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
       "fixture": "provisioner/inventory/fixtures/openstack-reference.json",
+      "manifest_digest": "4d65846ecb3760dccde5dfeb4f104def0d206a7492628e55209e606dc3105e1c",
       "native_contact": false,
-      "plan_digest": "3f92173bfd97091deb67bbeee447705344f3c85ebc193ea4bebb5b6923b99d3c",
+      "plan_digest": "4d65846ecb3760dccde5dfeb4f104def0d206a7492628e55209e606dc3105e1c",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -63,8 +65,9 @@
       "desired_state_digest": "a00cdd8366aa4228d3dcf6715a6bf4cafaf524c72ae84ce99a0c8c41bb2c7d8c",
       "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
       "fixture": "provisioner/inventory/fixtures/vmware-reference.json",
+      "manifest_digest": "7df4f17589d4c89a670ce111eb0dd7c681ceb8304f13ec7b4b2a0563c529af71",
       "native_contact": false,
-      "plan_digest": "ffb8c653e3e4cc1960897b84c94b55e5d6954e7ca41160edffaf59f9156ca2ce",
+      "plan_digest": "7df4f17589d4c89a670ce111eb0dd7c681ceb8304f13ec7b4b2a0563c529af71",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE",
