@@ -52,11 +52,15 @@ def request_identity(request) -> str:
 
 
 def inventory_reference(inventory) -> dict:
-    """The reviewed inventory snapshot this decision was made over."""
+    """The reviewed inventory snapshot this decision was made over.
+
+    The reference is the document's own identity, not the read location: a plan
+    approved on one machine must reproduce on another, so `inventory.origin` is
+    deliberately excluded here.
+    """
     if inventory is None:
-        return {'digest': '', 'status': 'UNRECORDED', 'origin': '', 'authoritative': False}
-    return {'digest': inventory.document_digest, 'status': inventory.status,
-            'origin': inventory.origin, 'authoritative': inventory.authoritative}
+        return {'digest': '', 'source': '', 'status': 'UNRECORDED', 'authoritative': False}
+    return dict(inventory.reference)
 
 
 def address_intent(desired_state) -> dict:

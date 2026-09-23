@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from provisioner.domain.request import load as load_document, digest
+from provisioner.repository import reviewed_source
 
 ROOT = Path(__file__).resolve().parents[2]
 INVENTORY_FORMAT = 'hosting-inventory/1'
@@ -180,6 +181,20 @@ class Inventory:
     def authoritative(self) -> bool:
         return self.status == AUTHORITATIVE
 
+    @property
+    def reference(self) -> dict:
+        """The approval-critical identity of this reviewed inventory document.
+
+        One reviewed document is one decision, so the reference binds the document
+        digest, the source the document declares about itself, its status and its
+        authority — and nothing about where the file happened to be read from. The
+        read location is `origin`, which is diagnostic provenance: binding it would
+        make the same inventory produce a different plan identity on another
+        operating system, in another checkout or under another path spelling.
+        """
+        return {'digest': self.document_digest, 'source': self.source,
+                'status': self.status, 'authoritative': self.authoritative}
+
     def site(self, name: str) -> Site:
         for site in self.sites:
             if site.site == name:
@@ -206,6 +221,16 @@ def _require(document: dict, keys: set[str], where: str) -> None:
     missing = keys - set(document)
     if missing:
         raise ValueError(f'{where}: missing fields {sorted(missing)}')
+
+
+def diagnostic_origin(origin: str) -> str:
+    """The read location, recorded for diagnostics in one platform-neutral spelling.
+
+    A reviewer reading an artifact may want to know which file was read, but the
+    location is never part of the reviewed decision, so it is normalized to POSIX
+    separators here and kept out of the inventory reference.
+    """
+    return str(origin).replace('\\', '/')
 
 
 def _capacity(raw: dict, where: str) -> Capacity:
@@ -320,18 +345,21 @@ def build(document: dict, origin: str = '<in-memory>') -> Inventory:
                      sites=tuple(sorted(sites, key=lambda s: s.site)),
                      prefix_pools=tuple(sorted(pools, key=lambda p: p.pool)),
                      services=tuple(sorted(services, key=lambda s: (s.service, s.site))),
-                     origin=origin, document_digest=digest(document))
+                     origin=diagnostic_origin(origin), document_digest=digest(document))
 
 
 def load(path: Path | str) -> Inventory:
+    """Read a reviewed inventory document, recording where it was read as provenance.
+
+    The read location is recorded with `reviewed_source`, which renders a document
+    inside the checkout as a POSIX repository-relative path. That keeps the
+    diagnostic origin stable across checkouts and operating systems, and it is
+    recorded for diagnostics only: the identity is `Inventory.reference`.
+    """
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f'Inventory not found: {path}')
-    try:
-        relative = str(path.resolve().relative_to(ROOT))
-    except ValueError:
-        relative = str(path)
-    return build(load_document(path), origin=relative)
+    return build(load_document(path), origin=reviewed_source(path))
 
 
 def fixture(name: str = 'openstack-reference') -> Inventory:

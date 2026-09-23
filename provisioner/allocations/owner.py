@@ -227,9 +227,7 @@ def capacity_view(plan) -> dict:
                                                   GIGABYTE)},
         })
     body = {'format': VIEW_FORMAT,
-            'inventory': {'status': inventory.status, 'origin': inventory.origin,
-                          'digest': inventory.document_digest,
-                          'authoritative': inventory.authoritative},
+            'inventory': dict(inventory.reference),
             'site': state.site_key, 'platform': state.platform, 'zones': zones,
             'limits': list(LIMITS)}
     return {**body, 'digest': digest(body)}

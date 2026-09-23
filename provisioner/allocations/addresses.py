@@ -370,8 +370,7 @@ def _inventory(plan) -> dict:
     if inventory is None:
         _refuse('INVENTORY_INCOMPLETE', 'An addressing view requires the reviewed inventory',
                 '$.addresses.inventory')
-    return {'status': inventory.status, 'origin': inventory.origin,
-            'digest': inventory.document_digest, 'authoritative': inventory.authoritative}
+    return dict(inventory.reference)
 
 
 def address_view(plan) -> dict:
@@ -408,7 +407,7 @@ def validate_view(document: dict) -> dict:
                 'An addressing view is a planning proposal and carries no ownership authority',
                 '$.addresses.view', authority=document['authority'])
     if not isinstance(document['inventory'], dict) \
-            or set(document['inventory']) != {'status', 'origin', 'digest', 'authoritative'} \
+            or set(document['inventory']) != {'digest', 'source', 'status', 'authoritative'} \
             or not _sha256(document['inventory']['digest']):
         _refuse('SCHEMA_VALIDATION_FAILED',
                 'An addressing view cites the reviewed inventory it was decided against',
@@ -667,7 +666,7 @@ def source_refs(plan) -> list[str]:
     """The reviewed repository sources a compiled owner document cites."""
     refs = [ENGINEERING_REF]
     try:
-        source = repository.relative(plan.request.source).replace('\\', '/')
+        source = repository.reviewed_source(plan.request.source)
     except Exception:  # pragma: no cover - the reviewed request always has a source
         source = ''
     if source and repository.document_exists(source) and source not in refs:

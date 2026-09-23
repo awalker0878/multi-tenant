@@ -22,14 +22,6 @@ def repository_module(name: str):
     return importlib.import_module(name)
 
 
-def relative(path: Path | str) -> str:
-    path = Path(path)
-    try:
-        return str(path.resolve().relative_to(ROOT))
-    except ValueError:
-        return str(path)
-
-
 def reviewed_source(path: Path | str) -> str:
     """The request path as a reviewed input rather than as an invocation.
 

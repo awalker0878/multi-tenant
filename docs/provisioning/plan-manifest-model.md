@@ -24,7 +24,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 | `request_identity` | the normalized `apiVersion`/`kind`/`metadata`/`spec` identity |
 | `resolution` | resolved profiles, profile versions, catalog versions, catalog digest |
 | `policy` | the evaluated policy summary, including the exact `rules_digest` |
-| `inventory` | the reviewed inventory snapshot digest, status, origin and authority |
+| `inventory` | the reviewed inventory document's own identity: its digest, the source it declares, its status and its authority. The read location is diagnostic provenance and is deliberately excluded, so the same document yields one identity on every operating system and in every checkout |
 | `placement` | the placement decision digest, including every rejected candidate |
 | `qualification` | the qualification reference the selection was gated on |
 | `product_tuple` | the selected product/API/provider/hardware tuple |
@@ -73,7 +73,11 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
   reproducible from the reviewed inputs alone, which is what makes byte-identical
   replay possible. The immutable source identity is bound in the `hosting-delivery/1`
   handoff instead, where the delivery tooling already requires a 40-hex
-  `source_commit`.
+  `source_commit`. The reviewed inventory document follows the same rule: the
+  manifest binds the document's own `source`, `digest`, `status` and `authoritative`
+  flag, and the location the file was read from is retained only as diagnostic
+  provenance, normalized to POSIX separators, so that a Windows and a Linux checkout
+  of the same document produce the same plan digest.
 
 ## Why an approval is provable
 
