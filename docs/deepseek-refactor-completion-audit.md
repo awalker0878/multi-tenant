@@ -1252,6 +1252,7 @@ qualification, reservation, allocation, registration or authorization is claimed
 
 Severity: P1  
 State at baseline: PARTIAL
+State: COMPLETE
 
 Affected requirements include sections 9-16, 45, 51, 54-59, 74-75, 86, 88-96, 101, 103, 105, and 107.
 
@@ -1301,6 +1302,88 @@ Classify meaningful occurrences of:
 as CURRENT_REQUIRED, HISTORICAL_ONLY, TEMPORARY_WITH_EXIT_PLAN, or OBSOLETE_REMOVE.
 
 Resolve every OBSOLETE_REMOVE before completion.
+
+#### Completion record
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. update authoritative active documents instead of adding parallel narratives | the refactor has one narrative. `README.md` and `docs/README.md` point at the provisioning document set, this audit and `docs/NEXT_WORK.md`; the provisioning set itself is the specification of the current path; no second description of the same mechanism was introduced by C01-C13 |
+| 2. keep the master prompt as the governing specification | `docs/deepseek-master-refactor-provisioning-prompt.md` is unedited by this refactor and remains the governing specification named in this audit's header and in every gate record |
+| 3. keep this audit current | every gate C01-C13 now carries `State: COMPLETE` with a completion record that names the code, the regression and the verification command. This file is the single ledger; no gate is complete because a document says so |
+| 4. update the named active documents | `README.md` and `docs/README.md` gained the portable-path pointer; `docs/NEXT_WORK.md` was rewritten; `docs/provisioning/README.md` lists the active set and the test layout; `docs/implementation/README.md`, `docs/architecture/README.md` and `docs/engineering/README.md` already pointed at the provisioning set; `examples/README.md` and `docs/provisioning/terraform-boundary.md` describe the full request-by-platform matrix. The Terraform and Ansible READMEs were not changed because their active contract did not change |
+| 5. remove completed repository-side work from NEXT_WORK and backlogs | `docs/NEXT_WORK.md` no longer carries any completed item. Git is the history; the file holds only rows that a commit cannot close. The W01-W29 acceptance backlog in `docs/implementation/automation/completion-backlog.md` was reviewed and left intact: every one of its closure criteria requires native evidence, so it is external work, not a completed repository-side item |
+| 6. preserve genuinely external blockers | `docs/NEXT_WORK.md` is now a six-column table - owner, missing external evidence/input, why it matters, repository-side contract already completed, completion condition, hold point - with fourteen rows. Each row names the owner of the missing external input and the repository-side contract that is already finished |
+| 7. update the retired-interface register when an interface, path, schema or command is retired | `provisioner/retired_interfaces.json` (format `hosting-retired-interfaces/1`) still holds its eleven entries and needed no new entry: C01-C13 retired no interface, path, schema or command. The gates renamed a library argument (`vmware_bindings` to `phase_bindings`) and added keywords; every caller passes positionally or by the new name, and the adapter contract regression pins that the platform-named argument is gone. The platform-specific `--vmware-bindings` flag and the `vmware_bindings` delivery input key are a different, still-current surface: they name a vCenter/NSX handoff, not the generic compiler |
+| 8. search all active code, docs, tests and examples for stale path, schema, CLI, terminology and implementation references | a repository-wide scan of every tracked text file outside `build/` classified the fifteen required terms (table below). A separate scan of 510 active documents resolved every relative link and found zero targets that do not exist. The scan found one stale caller: `tests/test_platform_family_eligibility.py` still asserted that a mandatory capability blocker is the bare capability name, which the qualification gate had already changed to `capability:<id>:NOT_NATIVE_QUALIFIED`. It is fixed and now also pins `product_tuple:<tuple>:NOT_NATIVE_QUALIFIED` |
+| 9. delete obsolete active code, tests, examples and compatibility paths after callers migrate | no occurrence was classified `OBSOLETE_REMOVE`, so nothing was deleted. Two compatibility modules remain and both are retained deliberately: see the retention paragraph below |
+| 10. leave no temporary migration alias without an explicit compatibility requirement and exit plan | the only two aliases in the tree are the two modules above. Each has named consumers, a documented reason and a written removal condition, so neither is an unexplained leftover |
+
+#### Final stale-term audit
+
+Counts are occurrences across every tracked text file outside `build/`. `compat` is counted
+as a prefix, so its 420 include the 339 `compatibility` hits.
+
+| Term | Occurrences | Meaning found | Classification |
+| --- | --- | --- | --- |
+| `TODO` | 12 | the term inside the governing prompts and this audit's own requirement text; the "do not create another TODO list" and "remove stale TODO language" prohibitions in `docs/production-deepseek-implementation-plan.md`. No source marker | CURRENT_REQUIRED |
+| `FIXME` | 6 | the same requirement text and prohibitions. No source marker | CURRENT_REQUIRED |
+| `TBD` | 6 | the same requirement text, plus the lowercase `'tbd'` placeholder sentinel in `scripts/adr_lifecycle.py`'s not-recorded vocabulary | CURRENT_REQUIRED |
+| `legacy` | 128 | provider "legacy resource" guidance, the Nutanix `legacyErrorMessage` task field, and prepared-receipt readability in `tools/terraform_apply.py` | CURRENT_REQUIRED, HISTORICAL_ONLY |
+| `deprecated` | 144 | mostly the term list and the NetBox native lifecycle status `deprecated`, which is provider vocabulary the IPAM and DNS owners must write and read | CURRENT_REQUIRED |
+| `compat` | 420 | the `compatibility` evidence block of the version/source-provenance gate, the term list, and the local `compat = record['compatibility']` variable in `scripts/check_version_source_provenance.py` | CURRENT_REQUIRED |
+| `compatibility` | 339 | the same gate's evidence block and the `tools/compatibility` entry in the retired-interface register that records the path as removed | CURRENT_REQUIRED |
+| `obsolete` | 79 | the retirement requirement itself: "remove obsolete routes, DNS and access" in requirements, ADRs and runbooks. No obsolete active path is described | CURRENT_REQUIRED |
+| `superseded` | 212 | the ADR lifecycle state `Superseded`, `provisioner/domain/generation.py`'s `SUPERSEDED` generation state, delivery-runner guards that refuse work a later handoff superseded, and the register's reasons for removed paths | CURRENT_REQUIRED |
+| `old` | 3593 | ordinary English in prose ("old writer", "old source") plus historical archive and frozen transcription families | CURRENT_REQUIRED, HISTORICAL_ONLY |
+| `previous` | 601 | the domain vocabulary of chaining: `previous_sha256`, `previous_receipt_sha256`, previous-generation comparison | CURRENT_REQUIRED |
+| `temporary` | 557 | the domain vocabulary of time-bounded grants (temporary migration access, temporary P0 services) and `tempfile.TemporaryDirectory` in tests | CURRENT_REQUIRED |
+| `migration` | 4254 | the frozen transcription and archive families (`sources/**`, `reference/**`, `docs/archive/**`) plus the delivery-migration domain terms | HISTORICAL_ONLY, CURRENT_REQUIRED |
+| `shim` | 12 | the requirement's prohibition, and the register entry that records that no compatibility shim survived the refactor | CURRENT_REQUIRED |
+| `fallback` | 257 | the no-plaintext-fallback and no-IPv4-fallback rules, and explicit-failure paths that refuse a fallback | CURRENT_REQUIRED |
+
+No occurrence was classified `OBSOLETE_REMOVE`, so no term required a deletion.
+
+#### Retained compatibility paths
+
+Two modules remain, both with a named consumer, a documented reason and a removal condition.
+
+`scripts/documentation_controls.py` re-exports the one maintained ADR implementation under
+its former names. Its consumers are `tests/test_main_integration.py` (as `legacy`) and
+`tests/test_completion_remediation.py` (as `control`), and
+`docs/assurance/main-integration-audit.md` records the consolidation decision. The names
+`region`, `block_checks`, `amendment_records`, `render_adrs` and `visible_word` are
+retired-model guards: they raise rather than write. Removal condition: migrate both test
+modules to `adr_lifecycle` and `documentation_structure` directly, then delete the module
+and its row in `docs/assurance/main-integration-audit.md`.
+
+`scripts/build_assurance.py` is the compatibility command for
+`build_assurance_indexes.build`. Its consumer is `tests/test_main_integration.py`, which
+pins the delegation with `test_old_builder_is_same_callable`. Removal condition: drop that
+pin, then delete the command.
+
+Both are compatibility requirements with an exit plan, not unexplained aliases, so
+requirement 10 is satisfied by retaining them with this record.
+
+#### Validation environment
+
+`tools/check_local.py` cannot pass on this workstation, and the refactor did not cause
+that. The command discovers every module under `tests/`, and the POSIX-only family needs
+`os.getuid`, `/etc/machine-id`, `/proc/self/ns/net` and `fcntl`. Run against a detached
+worktree of the audited baseline `1b7756e`, it reports 15 failures and 132 errors. Run
+against this refactor, it reports the same 15 failures and 132 errors, and the two
+identifier sets compare equal with no difference in either direction. The single new
+failure this scan did find - the stale blocker vocabulary in
+`tests/test_platform_family_eligibility.py` - is fixed in `ea792bf`, which is what makes
+the two sets equal.
+
+Regressions: `tests/provisioning` reports 875 passed / 1401 subtests, and
+`tests/test_platform_family_eligibility.py` reports 26 tests. `scripts/check_repository.py`,
+`scripts/check_documentation.py` (37314 checks) and `scripts/check_retired_interfaces.py`
+all exit 0. The repository-wide term scan and the 510-document link scan are recorded
+above. Nothing external was contacted and no qualification, reservation, allocation,
+registration, authorization or native realization is claimed.
+
+---
 
 ## 5. Required implementation order
 
