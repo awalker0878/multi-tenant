@@ -14,10 +14,14 @@ from provisioner.domain import generation as generation_module
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import authority as authority_module
 from provisioner.execution import delivery as delivery_module
+from provisioner.execution import handoff as handoff_module
 from provisioner.execution import manifest as manifest_module
 from provisioner.execution.service import Context, plan_for
+from provisioner import repository
 
 RESULT_FORMAT = 'hosting-apply-result/1'
+HANDOFF_STATUS = 'EXECUTION_REFUSED_HANDOFF_READY'
+NO_CHECKOUT = 'BLOCKED_NO_CURRENT_CHECKOUT'
 
 
 def load_approvals(path) -> tuple:
@@ -36,8 +40,41 @@ def refuse(code: str, message: str, context: Context, **details) -> tuple[int, d
                           'limits': ['This repository never executes a change']}
 
 
+def bind_source_commit(plan, requested: str | None) -> tuple:
+    """Bind one exact clean source commit, or refuse before anything is compiled.
+
+    The delivery runner refuses a handoff whose `source_commit` is not the clean
+    checkout it is running from, so the repository refuses first rather than
+    emitting a graph that cannot be accepted.
+    """
+    source = repository.source_commit()
+    commit = source['commit']
+    if requested is not None:
+        if not handoff_module.SOURCE_COMMIT.match(requested):
+            raise ProvisioningError(
+                'SCHEMA_VALIDATION_FAILED',
+                'A delivery handoff binds one exact clean source commit',
+                path='$.apply', details={'source_commit': requested})
+        if source['status'] != NO_CHECKOUT and requested != commit:
+            raise ProvisioningError(
+                'ARTIFACT_INTEGRITY_FAILED',
+                'The declared source commit is not the commit under review',
+                path='$.apply',
+                details={'source_commit': requested, 'checkout_commit': commit})
+        return requested, source
+    if source['status'] != 'HASHES_MATCH':
+        raise ProvisioningError(
+            'ARTIFACT_INTEGRITY_FAILED',
+            'A delivery handoff binds one exact clean source commit',
+            path='$.apply',
+            details={'status': source['status'], 'issues': source['issues'],
+                     'instruction': 'hosting apply <request> --approved-plan <digest> '
+                                    '--source-commit <40-hex commit>'})
+    return commit, source
+
+
 def run(context: Context, approved_plan: str | None = None,
-        approvals=()) -> tuple[int, dict]:
+        approvals=(), source_commit: str | None = None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
@@ -66,8 +103,17 @@ def run(context: Context, approved_plan: str | None = None,
                               'plan_digest': plan.digest, 'native_contact': False,
                               'limits': ['This repository never executes a change']}
 
+    try:
+        commit, source = bind_source_commit(plan, source_commit)
+        graph = handoff_module.build(plan, commit)
+    except ProvisioningError as error:
+        return EXIT_REFUSED, {'format': RESULT_FORMAT, 'status': 'REFUSED',
+                              'source': context.source, 'errors': [error.to_dict()],
+                              'plan_digest': plan.digest, 'native_contact': False,
+                              'limits': ['This repository never executes a change']}
+
     handoff = {
-        'format': RESULT_FORMAT, 'status': 'EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY',
+        'format': RESULT_FORMAT, 'status': HANDOFF_STATUS,
         'source': context.source, 'plan_digest': plan.digest,
         'manifest_digest': plan.manifest_digest,
         'manifest': dict(plan.manifest),
@@ -78,6 +124,10 @@ def run(context: Context, approved_plan: str | None = None,
         'operation_id': plan.operation_id,
         'generation_record': generation_module.record_for(plan).to_dict(),
         'authority': authority_module.to_dict(),
+        'source_commit': commit,
+        'source_checkout': {'status': source['status'], 'commit': source['commit']},
+        'delivery': graph,
+        'delivery_review': handoff_module.review(graph),
         'phases': [dict(p) for p in plan.phases],
         'terraform_scopes': [dict(s) for s in plan.terraform_scopes],
         'ansible_scopes': [dict(s) for s in plan.ansible_scopes],
@@ -88,6 +138,9 @@ def run(context: Context, approved_plan: str | None = None,
         'limits': ['Every operation is performed by its named owner',
                    'Terraform execution and state remain with the stack owner',
                    'This repository holds no execution authority',
+                   'The compiled graph is executed by the existing delivery runner, '
+                   'which owns the journal, the stage packets and the recovery model',
+                   'Each stage packet is prepared and authorised by the owner of its step',
                    'A handoff carries one generation; the authoritative record decides '
                    'whether it is still current',
                    'The approved digest binds the complete reviewed manifest, not a summary'],
@@ -98,6 +151,7 @@ def run(context: Context, approved_plan: str | None = None,
         path='$.apply',
         details={'plan_digest': plan.digest,
                  'manifest_digest': plan.manifest_digest,
+                 'source_commit': commit,
                  'blocking': handoff['blocking'],
                  'handoff_operations': [o['name'] for o in handoff['operations']]})
     return EXIT_REFUSED, {**handoff, 'errors': [error.to_dict()]}

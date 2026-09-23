@@ -14,6 +14,11 @@ REQUEST = str(support.REQUEST)
 MODULE = 'provisioner.cli'
 
 
+def checkout_commit() -> str:
+    """The commit the checkout reports, so a handoff can bind it explicitly."""
+    return support.source_commit()
+
+
 def run(*arguments: str) -> tuple[int, dict]:
     completed = subprocess.run([sys.executable, '-m', MODULE, *arguments],
                                cwd=str(support.ROOT), capture_output=True, text=True,
@@ -113,13 +118,18 @@ class ApplyRefusalTest(unittest.TestCase):
                                                          'authority_ref': 'CHG-0001'}]}),
                               encoding='utf-8')
             code, payload = run('apply', REQUEST, '--approved-plan', plan['digest'],
-                                '--approvals', str(record))
+                                '--approvals', str(record),
+                                '--source-commit', checkout_commit())
         self.assertEqual(code, 2)
-        self.assertEqual(payload['status'], 'EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY')
+        self.assertEqual(payload['status'], 'EXECUTION_REFUSED_HANDOFF_READY')
         self.assertEqual(payload['errors'][0]['code'], 'EXECUTION_REFUSED')
         self.assertTrue(payload['blocking'])
         self.assertTrue(payload['operations'])
         self.assertFalse(payload['native_contact'])
+        self.assertEqual(payload['delivery']['format'], 'hosting-delivery/1')
+        self.assertEqual(payload['delivery']['source_commit'], checkout_commit())
+        self.assertEqual(payload['delivery']['operation_id'], plan['operation_id'])
+        self.assertEqual(payload['delivery']['generation'], plan['generation'])
 
     def test_an_approval_for_another_digest_is_refused(self):
         code, plan = run('plan', REQUEST)

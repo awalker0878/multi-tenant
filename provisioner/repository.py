@@ -27,3 +27,16 @@ def relative(path: Path | str) -> str:
         return str(path.resolve().relative_to(ROOT))
     except ValueError:
         return str(path)
+
+
+def source_commit(root: Path | str | None = None) -> dict:
+    """The clean checkout commit the existing release verifier reports.
+
+    A delivery handoff binds one exact clean source commit. The repository
+    already owns that answer, so the provisioner asks for it instead of
+    computing a second opinion.
+    """
+    verifier = repository_module('tools.check_release')
+    result = verifier.verify(Path(root) if root is not None else ROOT)
+    return {'status': result.get('status', ''), 'commit': result.get('commit', ''),
+            'issues': list(result.get('issues', []))}

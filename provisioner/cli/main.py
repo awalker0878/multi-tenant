@@ -52,6 +52,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help='Native observations document (verify only)')
     parser.add_argument('--generation', type=int, default=1,
                         help='The WSD generation the caller claims (defaults to the first)')
+    parser.add_argument('--source-commit', default=None,
+                        help='The clean 40-hex commit the delivery handoff binds (apply only)')
     return parser
 
 
@@ -90,7 +92,8 @@ def dispatch(argv=None) -> tuple[int, dict]:
     if args.command == 'evidence':
         return evidence_command.run(context)
     approvals = apply_command.load_approvals(args.approvals)
-    return apply_command.run(context, args.approved_plan, approvals)
+    return apply_command.run(context, args.approved_plan, approvals,
+                             source_commit=args.source_commit)
 
 
 def main(argv=None) -> int:

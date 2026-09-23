@@ -72,3 +72,9 @@ def reference_plan(name: str = 'internal-production', compile_environment: bool 
 
 def golden(name: str) -> dict:
     return json.loads((GOLDEN / name).read_text(encoding='utf-8'))
+
+
+def source_commit() -> str:
+    """The commit the working checkout reports, for handoff-binding tests."""
+    from provisioner import repository
+    return repository.source_commit()['commit']

@@ -36,6 +36,11 @@ REQUEST = str(support.REQUEST)
 MODULE = 'provisioner.cli'
 
 
+def checkout_commit() -> str:
+    """The commit the checkout reports, so a handoff can bind it explicitly."""
+    return support.source_commit()
+
+
 def _two_site_fixture():
     """The reviewed demonstration fixture with a second, equivalent site added.
 
@@ -504,13 +509,14 @@ class ApprovedPlanIdentityTest(unittest.TestCase):
                                 'approved_by': 'reviewer-01',
                                 'authority_ref': 'CHG-0001'}]}), encoding='utf-8')
             code, payload = _run('apply', REQUEST, '--approved-plan', plan['digest'],
-                                 '--approvals', str(record))
+                                 '--approvals', str(record),
+                                 '--source-commit', checkout_commit())
         return code, plan, payload
 
     def test_the_handoff_cites_the_complete_reviewed_manifest(self):
         code, plan, payload = self._handoff()
         self.assertEqual(code, 2)
-        self.assertEqual(payload['status'], 'EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY')
+        self.assertEqual(payload['status'], 'EXECUTION_REFUSED_HANDOFF_READY')
         self.assertEqual(payload['manifest_digest'], plan['digest'])
         self.assertEqual(payload['manifest'], plan['manifest'])
         self.assertEqual(sorted(payload['manifest']), sorted(plan_manifest.TERMS))

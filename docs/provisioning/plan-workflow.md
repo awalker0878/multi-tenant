@@ -22,7 +22,7 @@ Result format: `hosting-cli-result/1`
 | `status` | where the plan stands in the lifecycle | plan status plus reached/held stages | `REFUSED` |
 | `verify` | compare observations against the plan | report status | `REFUSED` |
 | `evidence` | record the review evidence for a plan | `RECORDED` | `REFUSED` |
-| `apply` | always refuses | — | `EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY` |
+| `apply` | compiles the reviewed plan into the existing delivery handoff, then refuses | — | `EXECUTION_REFUSED_HANDOFF_READY` |
 
 Exit `3` is an internal failure (an unreadable file, an unknown platform name).
 
@@ -35,6 +35,7 @@ Exit `3` is an internal failure (an unreadable file, an unknown platform name).
 | `--no-compile` | `plan` | resolve the environment document without invoking the compiler |
 | `--generation N` | all | the WSD generation the caller claims; defaults to `1`, and only a positive integer is accepted |
 | `--approved-plan DIGEST` | `apply` | the digest the caller claims was approved |
+| `--source-commit COMMIT` | `apply` | the clean 40-hex commit the delivery handoff binds, when the checkout is not itself clean |
 | `--approvals PATH` | `apply` | recorded external approvals bound to a plan digest |
 | `--observations PATH` | `verify` | native observations document |
 
@@ -91,15 +92,28 @@ external check.
 ## `apply`
 
 `apply` requires both a `--approved-plan` digest and a recorded approval whose
-`plan_digest` matches the plan the repository would produce. It then **still
-refuses** with `EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY`, because this repository
-holds no target contact, credential or change authority. The refusal payload names
-the external authority, the approval format, the outstanding owner operations and the
-generation, identity and operation identity it would have handed off — one generation
-per handoff, and the authoritative record decides which generation is current. The
-refusal and the handoff payload also carry the complete reviewed-plan manifest, its
-digest and the reviewer-facing `reviewed` projection, so the approval provably cites
-the exact plan that would be executed. See
+`plan_digest` matches the plan the repository would produce. It then compiles that
+plan into the established `hosting-delivery/1` handoff and **still refuses** with
+`EXECUTION_REFUSED_HANDOFF_READY`, because this repository holds no target contact,
+credential or change authority. The compiled graph is executed by the existing
+delivery runner, which owns the journal, the stage packets, the Terraform
+preparation and the uncertain-mutation recovery model; the repository adds no second
+runner, no second journal and no second recovery model. See
+[Delivery handoff](delivery-handoff-model.md).
+
+Before compiling, `apply` binds one exact clean source commit. When the checkout is
+clean it takes the commit from the repository release verifier; when it is not, it
+refuses with `ARTIFACT_INTEGRITY_FAILED` unless the caller names the commit under
+review with `--source-commit`, which must still be the commit the checkout reports.
+A handoff therefore never cites a commit the delivery runner would reject.
+
+The refusal payload names the external authority, the approval format, the
+outstanding owner operations and the generation, identity and operation identity it
+would have handed off — one generation per handoff, and the authoritative record
+decides which generation is current. The refusal and the handoff payload also carry
+the complete reviewed-plan manifest, its digest, the reviewer-facing `reviewed`
+projection and the compiled `delivery` graph with its `delivery_review`, so the
+approval provably cites the exact plan that would be executed. See
 [Reviewed-plan manifest](plan-manifest-model.md).
 
 Approval records are read, never written:
