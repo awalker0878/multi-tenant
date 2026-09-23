@@ -16,6 +16,8 @@ portable WSD request (YAML)
   -> desired state              provisioner/compiler/desired_state.py
   -> existing compile_wsd.py    tools/compile_wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
+  -> hosting-delivery/1         provisioner/execution/handoff.py
+  -> existing delivery runner   tools/delivery_run.py (the only engine)
   -> delivery and observation   provisioner/execution/delivery.py, provisioner/observation
 ```
 
@@ -39,6 +41,7 @@ that cites it cites every reviewed decision. See
 | [Internal desired-state model](desired-state-model.md) | The internal artifact handed to the compiler |
 | [WSD identity and generation model](generation-model.md) | What is being changed, which change it is, and the claim rules |
 | [Reviewed-plan manifest](plan-manifest-model.md) | The complete reviewed decision an approval cites, term by term |
+| [Delivery handoff model](delivery-handoff-model.md) | The compiled `hosting-delivery/1` graph and the existing runner that owns it |
 | [Platform adapter contract](adapter-contract.md) | The read/plan/apply boundary and its refusals |
 | [Terraform execution boundary](terraform-boundary.md) | Root selection, variable files, evidence |
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |

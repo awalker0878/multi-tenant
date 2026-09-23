@@ -68,10 +68,11 @@ revision, the inventory snapshot, a compiled input, an environment value, a Terr
 state key or root, an Ansible scope, the delivery graph, the generation or the change
 classification — produces a different digest and the stale approval is refused.
 
-`apply` then **still refuses** with `EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY`, and its
-payload carries the manifest, the reviewer-facing `reviewed` projection and the
-manifest digest it would have handed to an external execution owner. The projection
-carries the same digest as the manifest, so an approval may cite either.
+`apply` then **still refuses** with `EXECUTION_REFUSED_HANDOFF_READY`, and its
+payload carries the manifest, the reviewer-facing `reviewed` projection, the manifest
+digest and the compiled `hosting-delivery/1` graph it would have handed to an external
+execution owner. The projection carries the same digest as the manifest, so an approval
+may cite either. See [Delivery handoff](delivery-handoff-model.md).
 
 ## Determinism
 

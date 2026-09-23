@@ -31,7 +31,7 @@ MODULE_PATH = re.compile(r'provisioner/[A-Za-z0-9_./-]+')
 #: The active documents the refactor must maintain.
 REQUIRED = ('README.md', 'architecture.md', 'request-contract.md', 'profile-model.md',
             'placement-model.md', 'desired-state-model.md', 'generation-model.md',
-            'plan-manifest-model.md',
+            'plan-manifest-model.md', 'delivery-handoff-model.md',
             'adapter-contract.md', 'terraform-boundary.md', 'service-owner-boundary.md',
             'plan-workflow.md', 'service-profile-matrix.md')
 

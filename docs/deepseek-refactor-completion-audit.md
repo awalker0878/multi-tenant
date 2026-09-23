@@ -486,7 +486,8 @@ repository defines the generation semantics and holds no authoritative ledger.
 ### GATE-C05 — Integrate the portable plan with the existing hosting-delivery/1 runner
 
 Severity: P0/P1  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include R16, sections 27-32, 44, 47, 60, 61, 69, 79, 88, 91, 99, 104, and the final instruction to reuse existing mature mechanisms.
 
@@ -554,6 +555,68 @@ The current documented path becomes:
     -> observation/reconciliation
     -> conformance
     -> separate activation authority
+
+#### Completion record
+
+`hosting apply` still executes nothing, but it now compiles the reviewed plan into
+the exact graph the repository's persistent delivery runner already validates, so the
+refusal is useful rather than terminal. `provisioner/execution/handoff.py` owns the
+compiler; `tools/delivery_run.py` and `tools/delivery_steps.py` remain the engine and
+the typed-step contract.
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. the existing runner is the engine | `handoff.py` imports no `tools.*`; it mirrors `tools.delivery_steps.KINDS`, the declared identifier grammar and the declared action, purpose, mode and stage sets, and a test compares every mirror against the owner's source. `tools.delivery_run.validate` accepts the compiled graph, and `NoBypassTest` proves no second runner, journal or recovery model exists |
+| 2. deterministic compiler to `hosting-delivery/1` | `handoff.build(plan, source_commit, ledger=None)` is a pure function of the reviewed plan plus one clean commit; `HANDOFF_FORMAT` is the declared format and `test_the_graph_is_deterministic` compares two builds byte for byte |
+| 3. responsibilities mapped to existing typed steps | `OPERATION_STEPS` maps all ten reviewed owner operations onto declared kinds; `uncovered()` is total by construction, so an operation with no owning step raises `COMPILATION_FAILED` before a graph exists |
+| 4. every step bound to digest, commit, operation, generation, scope and predecessors | `operation_id` is `{wsd_key}-g{generation}-{manifest_digest[:12]}`, `source_commit` is the one clean checkout, `scope` is `plan.identity.scope`, `generation` is the reviewed generation, and the plan digest binds the complete reviewed manifest; predecessor receipts are bound by the runner's stage packets (`dependencies`), which this module deliberately never restates |
+| 5. reuse of the established mechanisms | every step is a declared kind of `tools/delivery_steps.KINDS`, so Terraform prepare/apply, the WSD transition, the guest plan/apply, capacity, IPAM, DNS, acceptance, the edge policy and the campaigns are discharged by the owner code that already implements them |
+| 6. execution behind the existing opt-in | `authority.EXECUTION_AUTHORITY` stays `EXTERNAL_ONLY`, the runner still requires an explicit `execute=`, and `hosting apply` exits `2` with `EXECUTION_REFUSED` |
+| 7. `hosting apply` can produce the established handoff | once the recorded approval set and the clean commit are supplied, `provisioner/cli/apply.py` compiles the graph and returns it under `delivery` with a `delivery_review` projection; without them it refuses before a graph exists |
+| 8. no second journal, Terraform runner or recovery model | `handoff.py` touches no filesystem, holds no lock and writes no journal; `NoBypassTest` asserts that no module under `provisioner/` names `execution_journal` or `flock` and that only `provisioner/repository.py` reaches `tools.*` |
+
+Regressions: `tests/provisioning/unit/test_delivery_handoff.py` (51 tests / 359
+subtests) covers every required case — a deterministic `hosting-delivery/1` graph
+that `tools.delivery_run.validate` accepts; a source commit, scope, generation and
+operation identity that are all bound; every reviewed owner operation discharged by a
+declared kind; a topology-only graph that carries no parameter, private path or
+receipt; a per-platform scope; an approved-plan digest mismatch, a missing digest, a
+missing approval, a dirty checkout, a declared commit that is not the checkout and a
+commit that is not the declared grammar all refused before a graph exists; a stale
+generation and a changed reviewed state at the same generation refused before a graph
+exists; a mirror that agrees with the runner on the same graphs; and no provisioning
+CLI bypass, no journal, no lock and no execution authority.
+
+`tests/test_delivery_terraform.py` is unchanged: the repository compiles one graph and
+the runner keeps ownership of the receipts, `STEP_STARTED`, `resume_only` and
+renewals, which a regression asserts by reading the runner's source rather than
+restating the model.
+
+Golden corpus: C05 moves no digest. The compiler is a pure function of the reviewed
+plan and the commit, the commit is never part of a digest, and the graph is not part
+of the manifest, so `examples/golden/digests.json` and the cross-platform digests are
+byte-identical to the C03 corpus.
+
+Docs: new `docs/provisioning/delivery-handoff-model.md`, indexed in
+`docs/provisioning/README.md` and registered in the drift guard, plus updates to
+`plan-workflow.md` (the `EXECUTION_REFUSED_HANDOFF_READY` status, the
+`--source-commit` option and the rewritten `apply` section), `plan-manifest-model.md`
+and `README.md`.
+
+`python -m pytest tests/provisioning -q` reports 461 passed / 1116 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` pass. Four orderings are recorded as deliberate
+rather than cosmetic: `source_commit` is bound by the handoff because the reviewed
+manifest deliberately excludes it; `capacity-reservation` precedes the workload phase
+so `tools.capacity_demand.check_ancestors` still proves the workload shape against its
+reservation; `edge-policy` precedes the workload inputs and the narrow bootstrap so no
+workload is created outside the isolated route; and because `edge_policy` carries no
+phase, the activation and post-activation separation is carried by
+`pre-activation-campaign`, `activation` and `post-activation-campaign`. The workloads
+phase is `HELD_PENDING_NATIVE_DOMAIN_OUTPUTS`, so the compiler supplies a compiled
+parameter only for the phase the repository actually compiled and never invents the
+held phase's catalog identity or selected input. No production record is claimed: this
+repository compiles a handoff and holds no execution authority.
 
 ---
 
