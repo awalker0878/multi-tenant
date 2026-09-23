@@ -5,7 +5,7 @@
   "description": "Repository-side conformance result. Activation is refused here; it needs independent native evidence and separate production authorization. Unknown required evidence is never reported as PASS.",
   "type": "object",
   "required": ["format", "status", "subject", "plan_digest", "request_digest", "generation",
-               "identity", "operation_id", "checks",
+               "identity", "operation_id", "checks", "proposal",
                "failed", "pending", "blocking", "ready", "native_contact"],
   "additionalProperties": false,
   "properties": {
@@ -36,6 +36,20 @@
           "detail": {"type": "string"},
           "evidence": {"type": "object"}
         }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "description": "What the repository proposes, and which owner answer is still outstanding. A repository-side check reports a proposal; only the owner check named in confirmed_by settles it.",
+      "required": ["format", "authority", "checks", "confirmed_by", "unconfirmed", "limits"],
+      "additionalProperties": false,
+      "properties": {
+        "format": {"const": "hosting-conformance-proposal/1"},
+        "authority": {"const": "REPOSITORY_PROPOSAL_NOT_OWNER_STATE"},
+        "checks": {"type": "array", "items": {"type": "string"}},
+        "confirmed_by": {"type": "object", "additionalProperties": {"type": "string"}},
+        "unconfirmed": {"type": "array", "items": {"type": "string"}},
+        "limits": {"type": "array", "items": {"type": "string"}}
       }
     },
     "failed": {"type": "array", "items": {"type": "string"}},

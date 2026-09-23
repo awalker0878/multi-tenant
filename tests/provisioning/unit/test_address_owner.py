@@ -1593,12 +1593,14 @@ class SharedEvidenceTest(unittest.TestCase):
         return [item for item in checks if item.name == name][0]
 
     def test_the_repository_address_check_states_intent_not_ownership(self):
-        check = self._check('addresses', service.address_evidence(self.plan, as_of=AS_OF))
+        check = self._check('address-intent',
+                            service.address_evidence(self.plan, as_of=AS_OF))
         self.assertEqual(check.status, 'PASS')
         self.assertEqual(check.authority, 'REPOSITORY')
-        self.assertIn('not authoritative ownership', check.detail)
+        self.assertIn('planning intent, not authoritative ownership', check.detail)
         self.assertEqual(check.evidence['authority'], address_owner.PROPOSAL_AUTHORITY)
         self.assertEqual(check.evidence['view_digest'], address_owner.view_digest(self.plan))
+        self.assertEqual(check.evidence['confirmation_check'], 'address-confirmation')
 
     def test_the_confirmation_check_pends_until_the_owner_records_an_allocation(self):
         check = self._check('address-confirmation',
@@ -1674,7 +1676,7 @@ class SharedEvidenceTest(unittest.TestCase):
         checks = conformance_checks.run(self.plan,
                                        addresses=service.address_evidence(self.plan,
                                                                           as_of=AS_OF))
-        for name in ('addresses', 'address-confirmation', 'dns-registration'):
+        for name in ('address-intent', 'address-confirmation', 'dns-registration'):
             check = [item for item in checks if item.name == name][0]
             self.assertTrue(check.mandatory, name)
 
@@ -1685,7 +1687,7 @@ class SharedEvidenceTest(unittest.TestCase):
         self.assertEqual([item['name'] for item in report['checks']],
                          [item['name'] for item in document['checks']])
         names = [item['name'] for item in document['checks']]
-        self.assertIn('addresses', names)
+        self.assertIn('address-intent', names)
         self.assertIn('address-confirmation', names)
         self.assertIn('dns-registration', names)
 

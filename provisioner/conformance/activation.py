@@ -13,9 +13,17 @@ from provisioner.execution import authority
 ACTIVATION_FORMAT = 'hosting-activation-decision/1'
 
 
-def require_conformant(plan, observations=(), authorization=None) -> dict:
-    """Refuse activation unless every mandatory check is satisfied."""
-    report = conformance_report.build(plan, observations, authorization)
+def require_conformant(plan, observations=(), authorization=None, capacity=None,
+                       addresses=None) -> dict:
+    """Refuse activation unless every mandatory check is satisfied.
+
+    `capacity` and `addresses` are the reconciled owner readings the transport holds,
+    if any. They are passed through so a caller that has the owners' answers is judged
+    on them rather than on their absence; a caller that has none is refused by the
+    checks that stay PENDING, which is the point.
+    """
+    report = conformance_report.build(plan, observations, authorization,
+                                      capacity=capacity, addresses=addresses)
     if not report['ready']:
         raise ProvisioningError(
             'ACTIVATION_REFUSED',
@@ -35,8 +43,10 @@ def require_conformant(plan, observations=(), authorization=None) -> dict:
             'limits': ['Activation is performed by the owning authority, not by this repository']}
 
 
-def to_dict(plan, observations=(), authorization=None) -> dict:
-    report = conformance_report.build(plan, observations, authorization)
+def to_dict(plan, observations=(), authorization=None, capacity=None,
+            addresses=None) -> dict:
+    report = conformance_report.build(plan, observations, authorization,
+                                      capacity=capacity, addresses=addresses)
     return {'format': ACTIVATION_FORMAT,
             'status': 'ELIGIBLE' if report['ready'] and authorization else 'HELD',
             'conformance': report['status'], 'blocking': report['blocking'],

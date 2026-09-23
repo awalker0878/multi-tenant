@@ -1010,12 +1010,13 @@ class SharedEvidenceTest(unittest.TestCase):
         return [item for item in checks if item.name == name][0]
 
     def test_the_repository_capacity_check_states_intent_not_a_held_reservation(self):
-        check = self._check('capacity', service.capacity_evidence(self.plan))
+        check = self._check('capacity-proposal', service.capacity_evidence(self.plan))
         self.assertEqual(check.status, 'PASS')
         self.assertEqual(check.authority, 'REPOSITORY')
-        self.assertIn('intent, not a held reservation', check.detail)
-        self.assertEqual(check.evidence['authority'], 'CAPACITY_OWNER')
+        self.assertIn('the owner has not answered it', check.detail)
+        self.assertEqual(check.evidence['authority'], 'REPOSITORY_CAPACITY_ARITHMETIC')
         self.assertEqual(check.evidence['state'], capacity.PROPOSED)
+        self.assertEqual(check.evidence['confirmation_check'], 'capacity-confirmation')
 
     def test_the_confirmation_check_pends_until_the_owner_records_a_reservation(self):
         check = self._check('capacity-confirmation', service.capacity_evidence(self.plan))

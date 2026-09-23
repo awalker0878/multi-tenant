@@ -21,21 +21,48 @@ PENDING = 'PENDING_EXTERNAL_EVIDENCE'
 NOT_APPLICABLE = 'NOT_APPLICABLE'
 STATUSES = (PASS, FAIL, PENDING, NOT_APPLICABLE)
 
+#: The repository-side checks. Each one reports what this repository can prove from
+#: its own artifacts, which is a proposal: `capacity-proposal` is the reviewed
+#: arithmetic, `address-intent` is the reviewed allocation intent and
+#: `service-binding` is the reviewed binding resolution. None of them is an owner's
+#: answer, so none of them is named as if it were.
 REPOSITORY_CHECKS = ('schema', 'semantics', 'policy', 'profiles', 'placement',
-                     'capacity', 'addresses', 'services', 'compiler',
-                     'environment-contract', 'determinism', 'generation',
+                     'capacity-proposal', 'address-intent', 'service-binding',
+                     'compiler', 'environment-contract', 'determinism', 'generation',
                      'adapter-contract', 'adapter-readback', 'security-edge')
 
 EXTERNAL_CHECKS = ('native-qualification', 'capacity-confirmation',
                    'address-confirmation', 'dns-registration', 'service-acceptance',
                    'native-observation', 'recovery-readiness', 'production-authorization')
 
-MANDATORY = ('schema', 'semantics', 'policy', 'placement', 'capacity', 'addresses',
-             'services', 'compiler', 'environment-contract', 'determinism', 'generation',
+MANDATORY = ('schema', 'semantics', 'policy', 'placement', 'capacity-proposal',
+             'address-intent', 'service-binding', 'compiler', 'environment-contract',
+             'determinism', 'generation',
              'adapter-contract', 'adapter-readback', 'security-edge',
              'native-qualification', 'capacity-confirmation', 'address-confirmation',
              'dns-registration', 'service-acceptance', 'native-observation',
              'production-authorization')
+
+#: Which owner's answer, if any, settles each repository-side proposal. A proposal is
+#: never promoted into an owner's answer: the external check reports separately and
+#: stays PENDING until the owner's own evidence exists. A proposal with no owner is
+#: absent from this map on purpose.
+CONFIRMATION_OF = {'capacity-proposal': 'capacity-confirmation',
+                   'address-intent': 'address-confirmation',
+                   'service-binding': 'service-acceptance'}
+
+#: Words that assert an authoritative outcome. A repository-side check reports a
+#: proposal, so it never uses one: the owner's own answer is a separate row, and
+#: `conformance.report` refuses to build a report in which a repository row claims
+#: an outcome the repository cannot produce.
+OWNERSHIP_VOCABULARY = ('reserved', 'allocated', 'registered', 'accepted', 'observed',
+                        'qualified', 'authorized')
+
+#: The identity keys each reconciled owner reading must carry to be this plan's
+#: reading. The operation identity already embeds the generation and the plan digest
+#: prefix, and it is compared explicitly rather than assumed.
+CAPACITY_BINDING_KEYS = ('operation_id', 'generation', 'plan_digest', 'view_digest')
+ADDRESS_BINDING_KEYS = ('operation_id', 'generation', 'view_digest')
 
 
 @dataclass(frozen=True)
@@ -78,6 +105,21 @@ def _refused(name: str, detail: str, evidence: dict | None = None) -> Check:
                  detail=detail, evidence=dict(evidence or {}))
 
 
+def evidence_binding(plan, document: dict, *, keys, view_digest: str) -> list[str]:
+    """Why a reconciled owner reading is not evidence for this plan, or [] when it is.
+
+    External evidence is only evidence for the plan it names. The operation identity
+    embeds the claimed generation and the reviewed plan digest prefix, so comparing it
+    is comparing both; the view digest is compared as well, because a reading taken
+    against arithmetic that has since moved describes a different proposal. A reading
+    that fails any comparison is not this plan's evidence, so the check it would have
+    settled stays PENDING rather than reporting another operation's outcome as this one's.
+    """
+    expected = {'operation_id': plan.operation_id, 'generation': plan.generation,
+                'plan_digest': plan.digest, 'view_digest': view_digest}
+    return sorted(key for key in keys if document.get(key) != expected[key])
+
+
 def repository_checks(plan, observations=()) -> tuple[Check, ...]:
     """Checks this repository can honestly perform from its own artifacts.
 
@@ -102,20 +144,24 @@ def repository_checks(plan, observations=()) -> tuple[Check, ...]:
         _check('placement', not plan.decision.held,
                'Placement produced a decision', {'status': plan.decision.status,
                                                  'authority': plan.decision.authority}),
-        _check('capacity', bool(plan.desired_state.reservations),
-               'The reviewed capacity arithmetic holds; the reservation is an intent, '
-               'not a held reservation',
+        _check('capacity-proposal', bool(plan.desired_state.reservations),
+               'The reviewed capacity arithmetic holds and compiles into a proposal; '
+               'the owner has not answered it',
                {'zones': sorted(plan.desired_state.reservations),
                 'view_digest': capacity_module.view_digest(plan) if plan.inventory
                 else '',
                 'state': capacity_module.PROPOSED,
-                'authority': 'CAPACITY_OWNER'}),
+                'confirmation_check': CONFIRMATION_OF['capacity-proposal'],
+                'authority': 'REPOSITORY_CAPACITY_ARITHMETIC'}),
         _address_check(plan),
-        _check('services', bool(plan.desired_state.service_bindings),
-               'Every resolved service bound to a reviewed endpoint',
-               {'services': sorted(plan.desired_state.services)}),
+        _check('service-binding', bool(plan.desired_state.service_bindings),
+               'Every resolved service bound to a reviewed endpoint; the service '
+               'owner has not answered it',
+               {'services': sorted(plan.desired_state.services),
+                'confirmation_check': CONFIRMATION_OF['service-binding']}),
         _check('compiler', bool(compiled),
-               'The existing compiler accepted the environment document',
+               'The existing compiler consumed the environment document and returned '
+               'the reviewed files',
                {'files': sorted(compiled)}),
         _check('environment-contract', plan.environment.get('format') == 'hosting-wsd-environment/1',
                'The environment document uses the reviewed contract',
@@ -192,7 +238,7 @@ def _adapter_readback_check(plan) -> Check:
     ok = not any(problems.values())
     return _check('adapter-readback', ok,
                   'Every declared readback identity is produced by a reviewed module and '
-                  'every declared binding is accepted by one' if ok else
+                  'every declared binding is declared by one' if ok else
                   f'The adapter declares identities the reviewed modules do not realize: '
                   f'{problems}',
                   {'platform': adapter.platform, 'readback': sorted(adapter.network_fields),
@@ -249,11 +295,12 @@ def _address_check(plan) -> Check:
     granted it, which is what `address-confirmation` below answers.
     """
     view = address_module.address_view(plan)
-    return _check('addresses', bool(view['domains']),
+    return _check('address-intent', bool(view['domains']),
                   'The proposed prefixes and addresses are internally consistent; they '
                   'are planning intent, not authoritative ownership',
                   {'domains': [domain['zone'] for domain in view['domains']],
                    'view_digest': view['digest'],
+                   'confirmation_check': CONFIRMATION_OF['address-intent'],
                    'authority': view['authority']})
 
 
@@ -292,6 +339,14 @@ def _address_check_confirmation(plan, addresses) -> Check:
                          'view_digest': address_module.view_digest(plan),
                          'authority': address_module.PROPOSAL_AUTHORITY})
     evidence = _address_owner_evidence(plan, addresses)
+    foreign = evidence_binding(plan, addresses['reconciliation'],
+                               keys=ADDRESS_BINDING_KEYS,
+                               view_digest=address_module.view_digest(plan))
+    if foreign:
+        return _pending('address-confirmation',
+                        'The reconciled IPAM reading names another plan or generation, '
+                        'so it is not evidence for this one',
+                        dict(evidence, foreign=foreign, expected_operation_id=plan.operation_id))
     if evidence['confirmed']:
         return Check(name='address-confirmation', status=PASS, authority='EXTERNAL',
                      mandatory=True,
@@ -338,6 +393,14 @@ def _dns_check(plan, addresses) -> Check:
                          'view_digest': address_module.view_digest(plan),
                          'required_observations': list(address_module.REQUIRED_OBSERVATIONS)})
     evidence = dict(_address_owner_evidence(plan, addresses), owner='dns-owner')
+    foreign = evidence_binding(plan, addresses['reconciliation'],
+                               keys=ADDRESS_BINDING_KEYS,
+                               view_digest=address_module.view_digest(plan))
+    if foreign:
+        return _pending('dns-registration',
+                        'The reconciled DNS reading names another plan or generation, '
+                        'so it is not evidence for this one',
+                        dict(evidence, foreign=foreign, expected_operation_id=plan.operation_id))
     if evidence['registered']:
         return Check(name='dns-registration', status=PASS, authority='EXTERNAL',
                      mandatory=True,
@@ -380,6 +443,13 @@ def _capacity_check(plan, capacity) -> Check:
                 'view_digest': capacity['view']['digest'],
                 'records_checked': reconciliation['records_checked'],
                 'confirmed': reconciliation['confirmed']}
+    foreign = evidence_binding(plan, capacity['binding'], keys=CAPACITY_BINDING_KEYS,
+                               view_digest=capacity_module.view_digest(plan))
+    if foreign:
+        return _pending('capacity-confirmation',
+                        'The reconciled capacity reading names another plan or generation, '
+                        'so it is not evidence for this one',
+                        dict(evidence, foreign=foreign, expected_operation_id=plan.operation_id))
     if reconciliation['confirmed']:
         return Check(name='capacity-confirmation', status=PASS, authority='EXTERNAL',
                      mandatory=True,
@@ -397,6 +467,47 @@ def _capacity_check(plan, capacity) -> Check:
     return _pending('capacity-confirmation',
                     'The capacity owner must confirm the reservation',
                     evidence)
+
+
+def _authorization_evidence(plan, authorization) -> dict:
+    """What the supplied approval record is, and whether it names this exact plan.
+
+    An approval is the record of an external decision: it is read, never written, and
+    it is bound to one immutable plan digest. The record is reported here so a
+    reviewer can see whether the one that exists names this plan; a record that names
+    another plan is not this plan's authorization and never satisfies the check.
+    """
+    if authorization is None:
+        return {'authorization': None, 'bound': False, 'record': False,
+                'plan_digest': plan.digest, 'generation': plan.generation}
+    record = (authorization.to_dict() if hasattr(authorization, 'to_dict')
+              else dict(authorization))
+    return {'authorization': record, 'record': True,
+            'bound': record.get('plan_digest') == plan.digest,
+            'plan_digest': plan.digest, 'generation': plan.generation}
+
+
+def _authorization_check(plan, authorization) -> Check:
+    """Whether a recorded external approval names this exact plan.
+
+    The repository never grants approval, so the check stays PENDING until a record
+    exists. Once one does, it is the owner's answer and is reported as such: a record
+    that cites this plan digest satisfies the check, and a record that cites another
+    plan is not evidence for this one and stays PENDING with the mismatch stated.
+    """
+    evidence = _authorization_evidence(plan, authorization)
+    if not evidence['record']:
+        return _pending('production-authorization',
+                        'Separate production authorization must be recorded', evidence)
+    if not evidence['bound']:
+        return _pending('production-authorization',
+                        'The supplied authorization names another plan, so it is not '
+                        'evidence for this one',
+                        dict(evidence, foreign=['plan_digest']))
+    return Check(name='production-authorization', status=PASS, authority='EXTERNAL',
+                 mandatory=True,
+                 detail='A recorded external approval names this exact plan digest',
+                 evidence=evidence)
 
 
 def external_checks(plan, observations=(), authorization=None, capacity=None,
@@ -426,9 +537,7 @@ def external_checks(plan, observations=(), authorization=None, capacity=None,
                   'unbound': bound['unbound']}),
         _pending('recovery-readiness',
                  'Recovery readiness requires an independent restore proof'),
-        _pending('production-authorization',
-                 'Separate production authorization must be recorded',
-                 {'authorization': authorization}),
+        _authorization_check(plan, authorization),
     )
 
 
