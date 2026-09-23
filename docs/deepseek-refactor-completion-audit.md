@@ -623,7 +623,8 @@ repository compiles a handoff and holds no execution authority.
 ### GATE-C06 — Capacity reservation must use the authoritative reservation boundary
 
 Severity: P1  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include R8, sections 29-32, 61, 69, 76, 88, 91, and 99.
 
@@ -650,6 +651,65 @@ That is suitable for planning but is not the authoritative reservation integrati
 - changed capacity envelope invalidates stale reservation preflight;
 - lost response does not trigger duplicate reservation;
 - conflicting concurrent reservation is refused or reconciled through the authoritative owner.
+
+#### Completion record
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. preserve the pure arithmetic as preflight | `provisioner/allocations/reservations.py` is unchanged and still reports `applied: False`; the `capacity` repository check still states that the reviewed arithmetic holds and names `CAPACITY_OWNER` as the authority |
+| 2. compile a capacity-owner operation from the existing mechanisms and records | `provisioner/allocations/owner.py` emits `hosting-capacity-request/1`, which `tools/capacity.validate_request` accepts unchanged; reconciliation reads the repository's existing exported records through `scripts/check_reservation_records.py` (reached only via `provisioner/repository.py`) |
+| 3. bind the request to the exact commissioned envelope/snapshot used during placement | `capacity_view(plan)` binds the inventory digest, status, origin and authority, the site, the platform and every reviewed zone; `binding(plan, envelope_id=..., envelope_record_sha256=...)` binds the view digest, the plan digest, the generation, the operation identity and the envelope |
+| 4. require authoritative confirmation before capacity is held | `CONFIRMED_BY_OWNER` is the only state with `confirmed`/`may_allocate` true and is reachable only from a live exported record; `require_confirmed` refuses otherwise, and the `capacity-confirmation` conformance check is `PASS` only on it |
+| 5. handle uncertain outcomes through observe/reconcile before retry | `HOLD_DISCOVER_RESERVATION_OUTCOME` is derived from an `UNCERTAIN` record or dependency handoff, refuses with `CAPACITY_RESERVATION_UNRESOLVED`, and the check reports `PENDING_EXTERNAL_EVIDENCE` rather than a pass or a definite failure |
+| 6. reconcile a confirmation back into plan/execution evidence | `provisioner/execution/service.py::capacity_evidence` is the single reading every transport calls; the `capacity` evidence kind, the `capacity-confirmation` check, the `apply` payload's `capacity`, `capacity_review` and `capacity_owner_handoff`, and the manifest's `capacity_view` term all carry it |
+| 7. prevent two operations consuming one stale snapshot | `require_exclusive(reservations)` groups recorded rows by `(pool_id, view_digest, cluster)`, skips this operation's own rows and refuses `CAPACITY_RESERVATION_CONFLICT` when the combined demand exceeds the recorded available units |
+
+Regressions: `tests/provisioning/unit/test_capacity_owner.py` (138 tests / 13
+subtests) covers every required case. The mirrored contract is compared against the
+authoritative owner's own source rather than restated: the request key set, the
+request format, the scope keys, the units, the identifier grammar
+(`tools/readback_core.ID`) and the `10 ** 15` unit bound are all read out of
+`tools/capacity.py` and `tools/readback_core.py`, and the compiled request is fed to
+the real `tools.capacity.validate_request`. A proposal is never a reservation: the
+handoff carries no `confirmed` or `held` key, the status is
+`PROPOSED_NOT_CONFIRMED`, `may_apply`/`may_activate` are always false, and the view
+carries no generation. A confirmation is bound to the exact identity: a record for
+another operation or generation, another envelope id or another envelope digest is
+`HOLD_RESERVATION_IDENTITY_OR_INTENT_CONFLICT`, a `RELEASED`/`EXPIRED` record is
+`HOLD_TERMINAL_RESERVATION_NEW_OPERATION_REQUIRED`, a `CONSUMED` record is
+`EXISTING_CONSUMED_RESERVATION`, and each refuses with the mirrored preflight
+vocabulary. A lost response is not retried into a duplicate: the reservation identity
+is derived from the reviewed plan, so a second attempt reconciles the first record.
+Two concurrent operations cannot both be admitted against the same stale view, and a
+malformed review instant, an unreadable database path inside the checkout and an
+unbounded unit count are refused. The preserved preflight is still the preflight: the
+two formats are asserted different, and `reservations.py` still reports `applied:
+False`.
+
+Golden corpus: the reference plans' digests moved once, when `capacity_view` became a
+manifest term, and the corpus is regenerated for it; no digest moved afterwards,
+because the view deliberately carries no generation and the reference export is empty,
+so the default reconciliation is `HOLD_ENVELOPE_NOT_BOUND`.
+
+Docs: new `docs/provisioning/capacity-reservation-model.md`, indexed in
+`docs/provisioning/README.md` and registered in the drift guard, plus updates to
+`plan-manifest-model.md` (the `capacity_view` term and the excluded external capacity
+facts), `delivery-handoff-model.md` (the `capacity-reservation` owner handoff) and
+`plan-workflow.md` (the `--reservation-index` and `--capacity-facts` options and the
+`apply` capacity reading). A new documentation regression keeps the document a view of
+the module by comparing its named formats and reconciled states against
+`provisioner.allocations.owner`.
+
+`python -m pytest tests/provisioning -q` reports 600 passed / 1154 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` pass. Two decisions are recorded as deliberate:
+the compiled owner handoff rides in the `apply` payload rather than as `capacity`
+step parameters, because extending the runner's declared parameter contract is out of
+scope for a repository-side gate; and the `capacity` evidence record is bound to the
+view digest, because that is the reviewed snapshot the intent was compiled against,
+while the owner's answer is reported separately as the reconciliation state. No
+production record is claimed: this repository compiles a reservation intent, reads
+exported evidence and holds no capacity and no reservation authority.
 
 ---
 
