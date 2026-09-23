@@ -14,7 +14,8 @@ from provisioner.domain.request import digest
 EVIDENCE_FORMAT = 'hosting-provisioning-evidence/1'
 
 KINDS = ('request', 'validation', 'resolution', 'placement', 'allocation',
-         'capacity', 'compilation', 'generation', 'plan', 'conformance', 'observation')
+         'registration', 'capacity', 'compilation', 'generation', 'plan',
+         'conformance', 'observation')
 
 
 @dataclass(frozen=True)

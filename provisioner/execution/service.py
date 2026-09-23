@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from provisioner import repository
+from provisioner.allocations import addresses as address_owner
 from provisioner.allocations import owner as capacity_owner
 from provisioner.compiler import profiles as compiler_profiles
 from provisioner.domain.generation import require_generation
@@ -96,3 +97,38 @@ def capacity_evidence(plan, reservation_index=None, as_of=None, facts_path=None)
             'may_allocate': reconciliation['may_allocate'],
             'required_facts': list(capacity_owner.REQUIRED_FACTS),
             'limits': list(capacity_owner.LIMITS)}
+
+
+def address_evidence(plan, reservation_index=None, allocation_index=None,
+                     registration_index=None, as_of=None, resolved=False) -> dict:
+    """What the reviewed addressing proposes and what the exported records say.
+
+    Every transport that reports addressing reads it the same way: the repository's
+    own compiled owner chain, reconciled against the repository's own exported
+    reservation, allocation and registration evidence. Reconciling is a reading, not
+    a mutation — it never reserves, confirms, registers or releases anything, and it
+    reports the state the owner's own records already hold.
+
+    The three index arguments are paths to exported owner evidence. `resolved=True`
+    additionally runs the owners' own preflights, which resolve the staged sibling
+    documents from the checkout; it is the handover check, not the planning path.
+    """
+    handoff = address_owner.handoff(plan, as_of=as_of, resolved=resolved)
+    reconciliation = address_owner.reconcile(
+        plan,
+        reservation_index=reservation_index,
+        allocation_index=allocation_index,
+        registration_index=registration_index,
+        as_of=as_of)
+    return {'view': address_owner.address_view(plan),
+            'view_digest': address_owner.view_digest(plan),
+            'scope': address_owner.scope_of(plan),
+            'handoff': handoff,
+            'reconciliation': reconciliation,
+            'review': address_owner.review(reconciliation),
+            'state': reconciliation['state'],
+            'confirmed': reconciliation['confirmed'],
+            'registered': reconciliation['registered'],
+            'may_allocate': reconciliation['may_allocate'],
+            'may_register': reconciliation['may_register'],
+            'limits': list(reconciliation['limits'])}

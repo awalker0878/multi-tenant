@@ -83,14 +83,22 @@ class ReadOnlyCommandTest(unittest.TestCase):
         self.assertEqual(payload['status'], 'RECORDED')
         kinds = {row['kind'] for row in payload['evidence']}
         self.assertEqual(kinds, {'request', 'validation', 'resolution', 'placement',
-                                 'capacity', 'compilation', 'plan', 'generation',
-                                 'conformance'})
+                                 'capacity', 'allocation', 'registration', 'compilation',
+                                 'plan', 'generation', 'conformance'})
         self.assertTrue(all(row['authority'] == 'REPOSITORY_SIDE_ONLY'
                             for row in payload['evidence']))
         capacity = next(row for row in payload['evidence'] if row['kind'] == 'capacity')
         self.assertEqual(capacity['status'], 'HOLD_ENVELOPE_NOT_BOUND')
         self.assertEqual(capacity['details']['authority'], 'CAPACITY_OWNER')
         self.assertFalse(capacity['details']['may_allocate'])
+        allocation = next(row for row in payload['evidence'] if row['kind'] == 'allocation')
+        self.assertEqual(allocation['status'], 'PENDING_OWNER')
+        self.assertEqual(allocation['details']['authority'], 'IPAM_OWNER')
+        self.assertEqual(allocation['details']['parent_state'], 'ABSENT')
+        self.assertFalse(allocation['details']['may_allocate'])
+        registration = next(row for row in payload['evidence'] if row['kind'] == 'registration')
+        self.assertEqual(registration['details']['authority'], 'DNS_OWNER')
+        self.assertFalse(registration['details']['may_register'])
 
 
 class ApplyRefusalTest(unittest.TestCase):

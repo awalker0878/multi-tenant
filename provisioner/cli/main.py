@@ -58,6 +58,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help='Exported reservation record index used to reconcile capacity')
     parser.add_argument('--capacity-facts', default=None,
                         help='Recorded capacity owner facts used to compile the reservation request')
+    parser.add_argument('--ipam-index', default=None,
+                        help='Exported IPAM allocation record index used to reconcile addressing')
+    parser.add_argument('--dns-index', default=None,
+                        help='Exported DNS registration record index used to reconcile registration')
     return parser
 
 
@@ -90,17 +94,22 @@ def dispatch(argv=None) -> tuple[int, dict]:
     if args.command == 'plan':
         return plan_command.run(context, compile_environment=not args.no_compile)
     if args.command == 'status':
-        return status_command.run(context, args.reservation_index, args.capacity_facts)
+        return status_command.run(context, args.reservation_index, args.capacity_facts,
+                                  args.ipam_index, args.dns_index)
     if args.command == 'verify':
         return verify_command.run(context, _load_observations(args.observations),
-                                  args.reservation_index, args.capacity_facts)
+                                  args.reservation_index, args.capacity_facts,
+                                  args.ipam_index, args.dns_index)
     if args.command == 'evidence':
-        return evidence_command.run(context, args.reservation_index, args.capacity_facts)
+        return evidence_command.run(context, args.reservation_index, args.capacity_facts,
+                                    args.ipam_index, args.dns_index)
     approvals = apply_command.load_approvals(args.approvals)
     return apply_command.run(context, args.approved_plan, approvals,
                              source_commit=args.source_commit,
                              reservation_index=args.reservation_index,
-                             capacity_facts=args.capacity_facts)
+                             capacity_facts=args.capacity_facts,
+                             allocation_index=args.ipam_index,
+                             registration_index=args.dns_index)
 
 
 def main(argv=None) -> int:

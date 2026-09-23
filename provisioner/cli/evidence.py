@@ -11,7 +11,8 @@ from provisioner.domain import evidence as evidence_module
 from provisioner.domain import generation as generation_module
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import digest as request_digest
-from provisioner.execution.service import Context, capacity_evidence, plan_for
+from provisioner.execution.service import (Context, address_evidence, capacity_evidence,
+                                           plan_for)
 
 RESULT_FORMAT = 'hosting-evidence-result/1'
 
@@ -20,12 +21,13 @@ REPOSITORY_LIMITS = ('Evidence records are repository-side only',
                      'Every record is bound to one WSD generation')
 
 
-def records(plan, capacity=None) -> list[dict]:
+def records(plan, capacity=None, addresses=None) -> list[dict]:
     """One evidence record per repository-side artifact the plan produced.
 
-    `capacity` is the reconciled owner evidence the transport read, if any. The
-    capacity record states the owner's state; it is never a record of our own
-    authority over capacity.
+    `capacity` and `addresses` are the reconciled owner evidence the transport read,
+    if any. The capacity record states the capacity owner's state and the allocation
+    and registration records state the addressing owners' state; none of them is a
+    record of our own authority over capacity, addresses or names.
     """
     request_digest_value = plan.request.digest
     generation = plan.generation
@@ -90,10 +92,42 @@ def records(plan, capacity=None) -> list[dict]:
              'view_digest': capacity['view']['digest'],
              'records_checked': capacity['reconciliation']['records_checked'],
              'authority': 'CAPACITY_OWNER'}, REPOSITORY_LIMITS, generation))
+    if addresses is not None:
+        allocations = addresses['reconciliation']['allocations']
+        zones = [{'zone': item['zone'], 'state': item['state'],
+                  'registration_state': item['registration_state'],
+                  'next_owner_action': item['next_owner_action']}
+                 for item in allocations]
+        registrations = [{'zone': item['zone'], 'registration_id': item['registration_id'],
+                          'state': item['registration_state'],
+                          'next_owner_action': item['next_owner_action']}
+                         for item in allocations]
+        rows.append(evidence_module.record(
+            'allocation', f'{plan.request.tenant}/{plan.request.wsd}', request_digest_value,
+            addresses['view']['digest'], 'allocated', addresses['state'],
+            {'state': addresses['state'], 'confirmed': addresses['confirmed'],
+             'may_allocate': addresses['may_allocate'],
+             'parent_state': addresses['reconciliation']['parent']['state'],
+             'operation_id': plan.operation_id,
+             'reservation_id': addresses['reconciliation']['reservation_id'],
+             'view_digest': addresses['view']['digest'], 'zones': zones,
+             'records_checked': addresses['reconciliation']['records_checked'],
+             'authority': 'IPAM_OWNER'}, REPOSITORY_LIMITS, generation))
+        rows.append(evidence_module.record(
+            'registration', f'{plan.request.tenant}/{plan.request.wsd}', request_digest_value,
+            request_digest(addresses['review']), 'allocated', addresses['review']['state'],
+            {'state': addresses['review']['state'],
+             'registered': addresses['registered'],
+             'may_register': addresses['may_register'],
+             'operation_id': plan.operation_id,
+             'view_digest': addresses['view']['digest'],
+             'zones': registrations,
+             'authority': 'DNS_OWNER'}, REPOSITORY_LIMITS, generation))
     return [row.to_dict() for row in rows]
 
 
-def run(context: Context, reservation_index=None, capacity_facts=None) -> tuple[int, dict]:
+def run(context: Context, reservation_index=None, capacity_facts=None,
+        allocation_index=None, registration_index=None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
@@ -101,7 +135,9 @@ def run(context: Context, reservation_index=None, capacity_facts=None) -> tuple[
                               'source': context.source, 'errors': [error.to_dict()],
                               'native_contact': False}
     capacity = capacity_evidence(plan, reservation_index, facts_path=capacity_facts)
-    rows = records(plan, capacity)
+    addresses = address_evidence(plan, reservation_index, allocation_index,
+                                 registration_index)
+    rows = records(plan, capacity, addresses)
     return EXIT_OK, {'format': RESULT_FORMAT, 'status': 'RECORDED',
                      'source': context.source, 'plan_digest': plan.digest,
                      'manifest_digest': plan.manifest_digest,

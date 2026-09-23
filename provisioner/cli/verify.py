@@ -9,7 +9,8 @@ from __future__ import annotations
 from provisioner.cli.support import EXIT_OK, EXIT_REFUSED
 from provisioner.conformance import report as conformance_report
 from provisioner.domain.errors import ProvisioningError
-from provisioner.execution.service import Context, capacity_evidence, plan_for
+from provisioner.execution.service import (Context, address_evidence, capacity_evidence,
+                                           plan_for)
 from provisioner.observation import drift as drift_module
 from provisioner.observation import health as health_module
 from provisioner.observation import native as native_module
@@ -30,7 +31,8 @@ def verification_plan(plan) -> list[dict]:
 
 
 def run(context: Context, observations=(), reservation_index=None,
-        capacity_facts=None) -> tuple[int, dict]:
+        capacity_facts=None, allocation_index=None,
+        registration_index=None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
@@ -39,7 +41,10 @@ def run(context: Context, observations=(), reservation_index=None,
                               'native_contact': False}
 
     capacity = capacity_evidence(plan, reservation_index, facts_path=capacity_facts)
-    report = conformance_report.build(plan, observations, capacity=capacity)
+    addresses = address_evidence(plan, reservation_index, allocation_index,
+                                 registration_index)
+    report = conformance_report.build(plan, observations, capacity=capacity,
+                                      addresses=addresses)
     comparison = reconciliation_compare.build(plan.desired_state, observations)
     classification = reconciliation_classify.classify(comparison)
     drift = drift_module.to_dict(plan.desired_state, observations)
@@ -56,6 +61,7 @@ def run(context: Context, observations=(), reservation_index=None,
         'operation_id': plan.operation_id,
         'conformance': report,
         'capacity': capacity,
+        'addresses': addresses,
         'verification_plan': verification_plan(plan),
         'observations': native_module.to_dict(observations, plan.desired_state,
                                               plan.generation),
@@ -69,7 +75,9 @@ def run(context: Context, observations=(), reservation_index=None,
                    'Absent observation is never reported as in sync or healthy',
                    'An observation from another generation is reported stale, never accepted',
                    'The capacity confirmation check reports the owner state read from the '
-                   'exported reservation records, and only the owner can satisfy it']}
+                   'exported reservation records, and only the owner can satisfy it',
+                   'The address and registration checks report the owner state read from '
+                   'the exported IPAM and DNS records, and only those owners can satisfy them']}
 
 
 def to_dict(context: Context) -> dict:

@@ -25,9 +25,9 @@
       "desired_state_digest": "fba602fcfc6f4486a23ea00ce9e9a395fead3562063699d40f5176e0d7c401ed",
       "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
       "fixture": "provisioner/inventory/fixtures/nutanix-reference.json",
-      "manifest_digest": "6207e269e0bb357894e5f5d1016f3bda78390f9783b022d8319e0af4ce670e39",
+      "manifest_digest": "bcaa9dc6566fe8f21f1335ec2c0b3cb921c7020dc16e4a6b9599ea5a585f15df",
       "native_contact": false,
-      "plan_digest": "6207e269e0bb357894e5f5d1016f3bda78390f9783b022d8319e0af4ce670e39",
+      "plan_digest": "bcaa9dc6566fe8f21f1335ec2c0b3cb921c7020dc16e4a6b9599ea5a585f15df",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -45,9 +45,9 @@
       "desired_state_digest": "d9d987f87c2b8630787e86eb9e366eb9f5f903cd46babdcec33dd95e0bea4b8c",
       "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
       "fixture": "provisioner/inventory/fixtures/openstack-reference.json",
-      "manifest_digest": "ebff9825f249747b4a3d26115913327c26cf0ee025105efea8fa8e77f1b145aa",
+      "manifest_digest": "60c57d4ab87f75f12cac651fe627044c21dec349f4211b0ca97f80d749d7d617",
       "native_contact": false,
-      "plan_digest": "ebff9825f249747b4a3d26115913327c26cf0ee025105efea8fa8e77f1b145aa",
+      "plan_digest": "60c57d4ab87f75f12cac651fe627044c21dec349f4211b0ca97f80d749d7d617",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE"
@@ -65,9 +65,9 @@
       "desired_state_digest": "a00cdd8366aa4228d3dcf6715a6bf4cafaf524c72ae84ce99a0c8c41bb2c7d8c",
       "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
       "fixture": "provisioner/inventory/fixtures/vmware-reference.json",
-      "manifest_digest": "68f4c6fb52eac3cb7557dc430cd0aa0fb10d141b10cdf436cd8ddc5c1f791fbe",
+      "manifest_digest": "667f26240f6227cf50288954081e1948486c6fc948996e7518f207dafca4f4fc",
       "native_contact": false,
-      "plan_digest": "68f4c6fb52eac3cb7557dc430cd0aa0fb10d141b10cdf436cd8ddc5c1f791fbe",
+      "plan_digest": "667f26240f6227cf50288954081e1948486c6fc948996e7518f207dafca4f4fc",
       "portable_digest": "05c7f823328152572279a02a9fa2963ff289a4461be66e5c26679759248390f8",
       "realization_gaps": [
         "INVENTORY_NOT_AUTHORITATIVE",

@@ -10,7 +10,8 @@ from provisioner.cli.support import EXIT_OK, EXIT_REFUSED
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.lifecycle import (EXTERNAL_EVIDENCE_STAGES, REPOSITORY_STAGES,
                                           STAGES)
-from provisioner.execution.service import Context, capacity_evidence, plan_for
+from provisioner.execution.service import (Context, address_evidence, capacity_evidence,
+                                           plan_for)
 
 RESULT_FORMAT = 'hosting-status-result/1'
 
@@ -21,7 +22,8 @@ ARTIFACT_STAGES = (('request', 'request'), ('normalized', 'normalized'),
                    ('compiled', 'compiled'), ('planned', 'planned'))
 
 
-def run(context: Context, reservation_index=None, capacity_facts=None) -> tuple[int, dict]:
+def run(context: Context, reservation_index=None, capacity_facts=None,
+        allocation_index=None, registration_index=None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
@@ -59,6 +61,8 @@ def run(context: Context, reservation_index=None, capacity_facts=None) -> tuple[
                      'operations': len(plan.delivery.get('operations', []))},
         'capacity': capacity_evidence(plan, reservation_index,
                                       facts_path=capacity_facts),
+        'addresses': address_evidence(plan, reservation_index, allocation_index,
+                                      registration_index),
         'conformance': {'status': plan.conformance.get('status'),
                         'failed': plan.conformance.get('failed', []),
                         'pending': plan.conformance.get('pending', [])},
@@ -68,7 +72,11 @@ def run(context: Context, reservation_index=None, capacity_facts=None) -> tuple[
                    'No stage beyond planning can be reached without external evidence',
                    'The generation is the claim the caller made, not a record this repository holds',
                    'A reservation is held only when the capacity owner says so; the '
-                   'capacity block reports the owner state, never a claim of our own']}
+                   'capacity block reports the owner state, never a claim of our own',
+                   'An address is owned only when the IPAM owner says so; the '
+                   'addresses block reports the owner state, never a claim of our own',
+                   'A registration is authoritative only when the DNS owner says so; '
+                   'the addresses block reports the owner state, never a claim of our own']}
 
 
 def to_dict(context: Context) -> dict:

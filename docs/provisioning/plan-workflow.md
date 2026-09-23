@@ -40,6 +40,8 @@ Exit `3` is an internal failure (an unreadable file, an unknown platform name).
 | `--observations PATH` | `verify` | native observations document |
 | `--reservation-index PATH` | `apply`, `status`, `verify`, `evidence` | exported reservation record index; defaults to the repository export, and is read to reconcile capacity |
 | `--capacity-facts PATH` | `apply`, `status`, `verify`, `evidence` | recorded capacity owner facts used to compile the reservation request |
+| `--ipam-index PATH` | `apply`, `status`, `verify`, `evidence` | exported IPAM allocation record index; defaults to the repository export, and is read to reconcile addressing |
+| `--dns-index PATH` | `apply`, `status`, `verify`, `evidence` | exported DNS registration record index; defaults to the repository export, and is read to reconcile registration |
 
 ## `plan`
 
@@ -82,6 +84,11 @@ Reports the lifecycle stages (`request … activated`) split into `REACHED` and
 the conformance summary. It never reports a stage as reached when an earlier stage
 did not produce its artifact for the same request digest.
 
+The payload also carries the reconciled owner readings: `capacity` (with
+`capacity_review`) and `addresses` (with `address_review`), read from the exported
+reservation, IPAM allocation and DNS registration records. Reading an owner's export
+never changes the plan, the plan digest or a stage.
+
 ## `verify`
 
 Compares native observations against the plan. Without observations the report is
@@ -90,6 +97,13 @@ plan's generation: an observation that names no generation is `UNBOUND` and one 
 belongs to another generation is `STALE`, and neither can satisfy current
 conformance. Verification cannot promote fixture placement and cannot satisfy an
 external check.
+
+`verify` evaluates the same reconciled owner readings, so `capacity-confirmation`,
+`address-confirmation` and `dns-registration` report `PASS` only against a
+confirmed authoritative answer and `PENDING_EXTERNAL_EVIDENCE` while the owner has
+not answered. `evidence` records the review evidence for the same readings, including
+the `capacity`, `allocation` and `registration` records, so a later reviewer can see
+which owner states an approval was taken against.
 
 ## `apply`
 
@@ -137,6 +151,13 @@ The payload also carries the capacity reading: the compiled
 the caller supplies `--capacity-facts`, from the recorded owner facts. A reservation
 whose authoritative outcome is a definite refusal or is still unresolved stops the
 handoff. See [Capacity reservation](capacity-reservation-model.md).
+
+The same payload carries the addressing reading: the compiled
+`address_owner_handoff` chain, the reconciled `addresses` state and `address_review`,
+read from the repository's exported IPAM allocation and DNS registration records
+(`--ipam-index`, `--dns-index`). An unresolved or unconfirmed allocation, or an
+unresolved registration, stops the handoff before it is compiled. See
+[Address allocation](address-allocation-model.md).
 
 ## Reference run
 

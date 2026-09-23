@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from provisioner.allocations import addresses as address_module
 from provisioner.allocations import owner as capacity_module
 from provisioner.observation import native as native_module
 
@@ -24,13 +25,14 @@ REPOSITORY_CHECKS = ('schema', 'semantics', 'policy', 'profiles', 'placement',
                      'environment-contract', 'determinism', 'generation')
 
 EXTERNAL_CHECKS = ('native-qualification', 'capacity-confirmation',
-                   'address-confirmation', 'service-acceptance', 'native-observation',
-                   'recovery-readiness', 'production-authorization')
+                   'address-confirmation', 'dns-registration', 'service-acceptance',
+                   'native-observation', 'recovery-readiness', 'production-authorization')
 
 MANDATORY = ('schema', 'semantics', 'policy', 'placement', 'capacity', 'addresses',
              'services', 'compiler', 'environment-contract', 'determinism', 'generation',
              'native-qualification', 'capacity-confirmation', 'address-confirmation',
-             'service-acceptance', 'native-observation', 'production-authorization')
+             'dns-registration', 'service-acceptance', 'native-observation',
+             'production-authorization')
 
 
 @dataclass(frozen=True)
@@ -105,9 +107,7 @@ def repository_checks(plan, observations=()) -> tuple[Check, ...]:
                 else '',
                 'state': capacity_module.PROPOSED,
                 'authority': 'CAPACITY_OWNER'}),
-        _check('addresses', bool(plan.desired_state.domains),
-               'Prefixes and addresses were allocated',
-               {'domains': [d.domain_id for d in plan.desired_state.domains]}),
+        _address_check(plan),
         _check('services', bool(plan.desired_state.service_bindings),
                'Every resolved service bound to a reviewed endpoint',
                {'services': sorted(plan.desired_state.services)}),
@@ -131,6 +131,123 @@ def repository_checks(plan, observations=()) -> tuple[Check, ...]:
                                     row['observation_generation']] for row in stale],
                 'unbound_subjects': [[row['subject'], row['native_id']] for row in unbound]}),
     )
+
+
+def _address_check(plan) -> Check:
+    """The repository's own reading of the reviewed addressing proposal.
+
+    Compiling the proposal validates it against the owners' declared vocabulary, so a
+    proposal that could not be handed to an owner fails here. This says the proposal is
+    internally consistent and carries no ownership authority ? it cannot say the owner
+    granted it, which is what `address-confirmation` below answers.
+    """
+    view = address_module.address_view(plan)
+    return _check('addresses', bool(view['domains']),
+                  'The proposed prefixes and addresses are internally consistent; they '
+                  'are planning intent, not authoritative ownership',
+                  {'domains': [domain['zone'] for domain in view['domains']],
+                   'view_digest': view['digest'],
+                   'authority': view['authority']})
+
+
+def _address_owner_evidence(plan, addresses) -> dict:
+    """The owner-facing evidence both addressing checks report."""
+    reconciliation = addresses['reconciliation']
+    return {'state': reconciliation['state'],
+            'owner': 'ipam-owner',
+            'operation_id': plan.operation_id,
+            'generation': plan.generation,
+            'reservation_id': reconciliation['reservation_id'],
+            'view_digest': reconciliation['view_digest'],
+            'authority': address_module.PROPOSAL_AUTHORITY,
+            'parent_state': reconciliation['parent']['state'],
+            'records_checked': reconciliation['records_checked'],
+            'confirmed': reconciliation['confirmed'],
+            'registered': reconciliation['registered'],
+            'zones': [[item['zone'], item['state'], item['registration_state']]
+                      for item in reconciliation['allocations']]}
+
+
+def _address_check_confirmation(plan, addresses) -> Check:
+    """The IPAM owner's own answer about the allocation, reported as the owner's.
+
+    Without reconciled owner evidence the check is PENDING and says what the owner
+    still has to supply. With it, the check reports the owner's state: a confirmed
+    allocation in every zone is the only state that satisfies it.
+    """
+    if addresses is None:
+        return _pending('address-confirmation',
+                        'The IPAM owner must reserve and confirm every prefix',
+                        {'state': address_module.HOLD_PARENT,
+                         'owner': 'ipam-owner',
+                         'operation_id': plan.operation_id,
+                         'generation': plan.generation,
+                         'view_digest': address_module.view_digest(plan),
+                         'authority': address_module.PROPOSAL_AUTHORITY})
+    evidence = _address_owner_evidence(plan, addresses)
+    if evidence['confirmed']:
+        return Check(name='address-confirmation', status=PASS, authority='EXTERNAL',
+                     mandatory=True,
+                     detail='The IPAM owner confirmed every allocation in this operation',
+                     evidence=evidence)
+    refusals = _allocation_refusals(addresses['reconciliation'])
+    if address_module.REFUSAL_CONFLICT in refusals:
+        return _refused('address-confirmation',
+                        'The IPAM owner refused an allocation that carries a different identity',
+                        dict(evidence, refusals=refusals))
+    if refusals:
+        return _pending('address-confirmation',
+                        'The IPAM owner has not settled every allocation outcome',
+                        dict(evidence, refusals=refusals))
+    return _pending('address-confirmation',
+                    'The IPAM owner must reserve and confirm every prefix', evidence)
+
+
+def _allocation_refusals(reconciliation) -> list[str]:
+    """Every refusal the stopping allocation and registration states raise."""
+    refusals = {address_module.REFUSING_STATES[item['state']]
+                for item in reconciliation['allocations']
+                if item['state'] in address_module.REFUSING_STATES}
+    refusals |= {address_module.REGISTRATION_REFUSING_STATES[item['registration_state']]
+                 for item in reconciliation['allocations']
+                 if item['registration_state'] in address_module.REGISTRATION_REFUSING_STATES}
+    return sorted(refusals)
+
+
+def _dns_check(plan, addresses) -> Check:
+    """The DNS owner's own answer about the registration, reported as the owner's.
+
+    A registration is only usable once the allocation it depends on is confirmed, so
+    the owner's preflight refuses to evaluate the intent before that. An unconfirmed
+    allocation is therefore PENDING here, never PASS.
+    """
+    if addresses is None:
+        return _pending('dns-registration',
+                        'The DNS owner must register every name against a confirmed allocation',
+                        {'state': address_module.REGISTRATION_HOLD_IPAM,
+                         'owner': 'dns-owner',
+                         'operation_id': plan.operation_id,
+                         'generation': plan.generation,
+                         'view_digest': address_module.view_digest(plan),
+                         'required_observations': list(address_module.REQUIRED_OBSERVATIONS)})
+    evidence = dict(_address_owner_evidence(plan, addresses), owner='dns-owner')
+    if evidence['registered']:
+        return Check(name='dns-registration', status=PASS, authority='EXTERNAL',
+                     mandatory=True,
+                     detail='The DNS owner registered every name against the confirmed allocation',
+                     evidence=evidence)
+    refusals = _allocation_refusals(addresses['reconciliation'])
+    if address_module.REGISTRATION_REFUSAL_CONFLICT in refusals:
+        return _refused('dns-registration',
+                        'The DNS owner refused a registration that carries a different identity',
+                        dict(evidence, refusals=refusals))
+    if refusals:
+        return _pending('dns-registration',
+                        'The DNS owner has not settled every registration outcome',
+                        dict(evidence, refusals=refusals))
+    return _pending('dns-registration',
+                    'The DNS owner must register every name against a confirmed allocation',
+                    evidence)
 
 
 def _capacity_check(plan, capacity) -> Check:
@@ -175,12 +292,13 @@ def _capacity_check(plan, capacity) -> Check:
                     evidence)
 
 
-def external_checks(plan, observations=(), authorization=None, capacity=None) -> tuple[Check, ...]:
+def external_checks(plan, observations=(), authorization=None, capacity=None,
+                    addresses=None) -> tuple[Check, ...]:
     """Checks that can only pass once evidence produced elsewhere exists.
 
-    `capacity` is the reconciled owner evidence the transport read, if any. Passing
-    it changes only what this repository reports about the owner's state; it never
-    makes a confirmation exist.
+    `capacity` and `addresses` are the reconciled owner evidence the transport read,
+    if any. Passing them changes only what this repository reports about the owners'
+    state; it never makes a confirmation or a registration exist.
     """
     observed = len(observations)
     bound = native_module.binding(observations, plan.generation)
@@ -190,8 +308,8 @@ def external_checks(plan, observations=(), authorization=None, capacity=None) ->
                  {'qualification': dict(plan.decision.qualification),
                   'qualification_blockers': list(plan.decision.qualification_blockers)}),
         _capacity_check(plan, capacity),
-        _pending('address-confirmation',
-                 'The IPAM owner must confirm the prefixes and addresses'),
+        _address_check_confirmation(plan, addresses),
+        _dns_check(plan, addresses),
         _pending('service-acceptance',
                  'The service owner must accept the WSD as a consumer'),
         _pending('native-observation',
@@ -207,7 +325,8 @@ def external_checks(plan, observations=(), authorization=None, capacity=None) ->
     )
 
 
-def run(plan, observations=(), authorization=None, capacity=None) -> tuple[Check, ...]:
+def run(plan, observations=(), authorization=None, capacity=None,
+        addresses=None) -> tuple[Check, ...]:
     return repository_checks(plan, observations) + external_checks(plan, observations,
                                                                    authorization,
-                                                                   capacity)
+                                                                   capacity, addresses)

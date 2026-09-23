@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from provisioner.allocations import addresses as address_owner
 from provisioner.allocations import owner as capacity_owner
 from provisioner.cli.support import EXIT_REFUSED
 from provisioner.domain import generation as generation_module
@@ -17,7 +18,8 @@ from provisioner.execution import authority as authority_module
 from provisioner.execution import delivery as delivery_module
 from provisioner.execution import handoff as handoff_module
 from provisioner.execution import manifest as manifest_module
-from provisioner.execution.service import Context, capacity_evidence, plan_for
+from provisioner.execution.service import (Context, address_evidence, capacity_evidence,
+                                           plan_for)
 from provisioner import repository
 
 RESULT_FORMAT = 'hosting-apply-result/1'
@@ -76,7 +78,8 @@ def bind_source_commit(plan, requested: str | None) -> tuple:
 
 def run(context: Context, approved_plan: str | None = None,
         approvals=(), source_commit: str | None = None,
-        reservation_index=None, capacity_facts=None) -> tuple[int, dict]:
+        reservation_index=None, capacity_facts=None,
+        allocation_index=None, registration_index=None) -> tuple[int, dict]:
     try:
         plan = plan_for(context)
     except ProvisioningError as error:
@@ -109,6 +112,9 @@ def run(context: Context, approved_plan: str | None = None,
         commit, source = bind_source_commit(plan, source_commit)
         capacity = capacity_evidence(plan, reservation_index, facts_path=capacity_facts)
         capacity_owner.require_settled(capacity['reconciliation'])
+        addresses = address_evidence(plan, reservation_index, allocation_index,
+                                     registration_index)
+        address_owner.require_settled(addresses['reconciliation'])
         graph = handoff_module.build(plan, commit)
     except ProvisioningError as error:
         return EXIT_REFUSED, {'format': RESULT_FORMAT, 'status': 'REFUSED',
@@ -135,6 +141,9 @@ def run(context: Context, approved_plan: str | None = None,
         'capacity': dict(capacity),
         'capacity_review': capacity['review'],
         'capacity_owner_handoff': capacity['handoff'],
+        'addresses': dict(addresses),
+        'address_review': addresses['review'],
+        'address_owner_handoff': addresses['handoff'],
         'phases': [dict(p) for p in plan.phases],
         'terraform_scopes': [dict(s) for s in plan.terraform_scopes],
         'ansible_scopes': [dict(s) for s in plan.ansible_scopes],
@@ -152,7 +161,13 @@ def run(context: Context, approved_plan: str | None = None,
                    'whether it is still current',
                    'The approved digest binds the complete reviewed manifest, not a summary',
                    'A capacity reservation is a compiled proposal until the authoritative '
-                   'owner confirms it; this repository never holds capacity'],
+                   'owner confirms it; this repository never holds capacity',
+                   'An address is a compiled proposal until the authoritative IPAM owner '
+                   'confirms it; this repository never holds an address',
+                   'A name is registered only by the authoritative DNS owner, and only '
+                   'after the bound allocation is confirmed',
+                   'Addressing is released in owner order: dependent DNS and native state '
+                   'withdraws before reusable addressing is released'],
     }
     error = ProvisioningError(
         'EXECUTION_REFUSED',
@@ -162,6 +177,7 @@ def run(context: Context, approved_plan: str | None = None,
                  'manifest_digest': plan.manifest_digest,
                  'source_commit': commit,
                  'capacity_state': capacity['state'],
+                 'address_state': addresses['state'],
                  'reservation_id': capacity['binding']['reservation_id'],
                  'blocking': handoff['blocking'],
                  'handoff_operations': [o['name'] for o in handoff['operations']]})

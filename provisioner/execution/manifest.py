@@ -14,6 +14,7 @@ self-referential.
 """
 from __future__ import annotations
 
+from provisioner.allocations import addresses as address_owner
 from provisioner.allocations import owner as capacity_owner
 from provisioner.domain.request import digest
 
@@ -22,8 +23,9 @@ MANIFEST_FORMAT = 'hosting-reviewed-plan-manifest/1'
 #: The manifest's own terms, in the order a reviewer reads them.
 TERMS = ('format', 'generation', 'request', 'request_identity', 'resolution', 'policy',
          'inventory', 'placement', 'qualification', 'product_tuple', 'capacity',
-         'capacity_view', 'addresses', 'service_bindings', 'desired_state', 'environment',
-         'compiled_inputs', 'terraform', 'ansible', 'delivery', 'classification')
+         'capacity_view', 'addresses', 'allocation_view', 'service_bindings',
+         'desired_state', 'environment', 'compiled_inputs', 'terraform', 'ansible',
+         'delivery', 'classification')
 
 #: Terraform scope keys the manifest binds. `backend` is excluded deliberately: it is
 #: the free text an owner provisions against the reviewed state key, not a reviewed
@@ -55,12 +57,18 @@ def inventory_reference(inventory) -> dict:
             'origin': inventory.origin, 'authoritative': inventory.authoritative}
 
 
-def address_intent(desired_state) -> list[dict]:
-    """Every reserved prefix, gateway host number and workload address, per domain."""
-    return [{'zone': domain.zone, 'prefix': domain.prefix,
-             'gateway_host_number': domain.gateway_host_number,
-             'addresses': sorted(workload.address for workload in domain.workloads)}
-            for domain in sorted(desired_state.domains, key=lambda d: d.prefix)]
+def address_intent(desired_state) -> dict:
+    """The reserved prefixes, gateway host numbers and workload addresses, per domain.
+
+    This is the addressing the reviewed plan *proposes*. It is planning intent, not a
+    claim of ownership: the authoritative allocator may return a different prefix
+    without changing this term, and nothing downstream may read it as held.
+    """
+    return {'authority': address_owner.PROPOSAL_AUTHORITY,
+            'domains': [{'zone': domain.zone, 'prefix': domain.prefix,
+                         'gateway_host_number': domain.gateway_host_number,
+                         'addresses': sorted(workload.address for workload in domain.workloads)}
+                        for domain in sorted(desired_state.domains, key=lambda d: d.prefix)]}
 
 
 def capacity_intent(desired_state) -> dict:
@@ -80,6 +88,19 @@ def capacity_view_intent(plan) -> dict:
     if plan.inventory is None:
         return {'digest': ''}
     return {'digest': capacity_owner.view_digest(plan)}
+
+
+def address_view_intent(plan) -> dict:
+    """The authoritative-allocation view this addressing decision is reconciled against.
+
+    The proposed addressing above states what the plan would like to own. This states
+    the addressing identity the plan was reviewed against, so a plan cannot be
+    re-read against a different authoritative allocation without changing the plan
+    identity. A plan with no reviewed inventory binds the empty digest.
+    """
+    if plan.inventory is None:
+        return {'digest': ''}
+    return {'digest': address_owner.view_digest(plan)}
 
 
 def service_binding_intent(desired_state) -> list[dict]:
@@ -146,6 +167,7 @@ def build(plan, delivery_graph: str = '') -> dict:
         'capacity': capacity_intent(plan.desired_state),
         'capacity_view': capacity_view_intent(plan),
         'addresses': address_intent(plan.desired_state),
+        'allocation_view': address_view_intent(plan),
         'service_bindings': service_binding_intent(plan.desired_state),
         'desired_state': plan.desired_state.digest,
         'environment': digest(plan.environment),
@@ -184,6 +206,9 @@ def review(manifest: dict) -> dict:
             'rules_failed': list(manifest['policy'].get('rules_failed', [])),
             'capacity_view': manifest['capacity_view']['digest'],
             'capacity_zones': sorted(manifest['capacity']),
+            'allocation_view': manifest['allocation_view']['digest'],
+            'address_zones': [domain['zone'] for domain in manifest['addresses']['domains']],
+            'address_authority': manifest['addresses']['authority'],
             'desired_state': manifest['desired_state'],
             'environment': manifest['environment'],
             'terraform': [scope['state_key'] for scope in manifest['terraform']],
