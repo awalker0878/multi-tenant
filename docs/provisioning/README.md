@@ -42,6 +42,7 @@ that cites it cites every reviewed decision. See
 | [WSD identity and generation model](generation-model.md) | What is being changed, which change it is, and the claim rules |
 | [Reviewed-plan manifest](plan-manifest-model.md) | The complete reviewed decision an approval cites, term by term |
 | [Delivery handoff model](delivery-handoff-model.md) | The compiled `hosting-delivery/1` graph and the existing runner that owns it |
+| [Capacity reservation model](capacity-reservation-model.md) | The reservation intent handed to the authoritative capacity owner, and the states it can answer |
 | [Platform adapter contract](adapter-contract.md) | The read/plan/apply boundary and its refusals |
 | [Terraform execution boundary](terraform-boundary.md) | Root selection, variable files, evidence |
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |

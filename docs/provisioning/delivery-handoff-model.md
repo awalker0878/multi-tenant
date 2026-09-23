@@ -93,6 +93,15 @@ assumption in the completion audit:
    [`docs/implementation/automation/delivery-runner.md`](../implementation/automation/delivery-runner.md)
    describes.
 
+## The capacity step's owner handoff
+
+`capacity-reservation` is the one step whose reviewed intent is a compiled owner
+document rather than a parameter value. `hosting apply` carries it in the payload as
+`capacity_owner_handoff` (`hosting-capacity-owner-handoff/1`), together with the
+reconciled `capacity` reading and `capacity_review`. The step's own parameter contract
+is unchanged: the owner still prepares the stage packet. See
+[Capacity reservation](capacity-reservation-model.md).
+
 ## Operation coverage
 
 `Plan.delivery` names ten owner operations. `OPERATION_STEPS` maps every one of them

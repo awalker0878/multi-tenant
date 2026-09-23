@@ -29,6 +29,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 | `qualification` | the qualification reference the selection was gated on |
 | `product_tuple` | the selected product/API/provider/hardware tuple |
 | `capacity` | every reservation, its demand and its committed-after position |
+| `capacity_view` | the commissioned capacity snapshot the reservation intent is bound to |
 | `addresses` | every reserved prefix, gateway host number and workload address |
 | `service_bindings` | every service binding, its endpoints and its binding class |
 | `desired_state` | the internal desired-state digest |
@@ -50,6 +51,12 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
   provisions against the reviewed state key, not a reviewed decision. The manifest
   binds `scope`, `root`, `input`, `state_key`, `catalog_id`, `owner_scope` and
   `status`, and excludes `backend`.
+- **External capacity facts.** The manifest binds the commissioned capacity snapshot
+  as `capacity_view`, because that snapshot is reviewed inventory state. It excludes
+  the reservation identity and the handoff compiled from it: the identity is derived
+  from the plan digest and generation, and the envelope and the owner's answer are
+  external facts the repository cannot review. See
+  [Capacity reservation](capacity-reservation-model.md).
 - **Volatile and checkout state.** No timestamp, run identifier, host name or git
   checkout property is bound. The manifest is reproducible from the reviewed inputs
   alone, which is what makes byte-identical replay possible. The immutable source
@@ -62,7 +69,8 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 `Plan.manifest_digest` and requires a recorded approval whose `plan_digest` matches
 it. Because the manifest binds every term above, an approval that cites the manifest
 digest cites the complete decision; a change to any one term — a reservation target,
-a `committed_after` value, a service endpoint, a binding class, a placement decision,
+a `committed_after` value, the commissioned capacity snapshot, a service endpoint, a
+binding class, a placement decision,
 a qualification reference, a product tuple, a profile version, a policy rule
 revision, the inventory snapshot, a compiled input, an environment value, a Terraform
 state key or root, an Ansible scope, the delivery graph, the generation or the change

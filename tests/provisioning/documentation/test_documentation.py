@@ -32,6 +32,7 @@ MODULE_PATH = re.compile(r'provisioner/[A-Za-z0-9_./-]+')
 REQUIRED = ('README.md', 'architecture.md', 'request-contract.md', 'profile-model.md',
             'placement-model.md', 'desired-state-model.md', 'generation-model.md',
             'plan-manifest-model.md', 'delivery-handoff-model.md',
+            'capacity-reservation-model.md',
             'adapter-contract.md', 'terraform-boundary.md', 'service-owner-boundary.md',
             'plan-workflow.md', 'service-profile-matrix.md')
 
@@ -240,6 +241,42 @@ class ServiceProfileMatrixTest(unittest.TestCase):
                           for name, _, _, _ in rows}
             with self.subTest(family=family):
                 self.assertEqual(sorted(documented), sorted(catalog))
+
+
+class CapacityDocumentationTest(unittest.TestCase):
+    """The capacity document is a view of the module, never a second source of truth."""
+
+    DOC = DOCS / 'capacity-reservation-model.md'
+
+    def test_the_document_names_every_declared_format(self):
+        from provisioner.allocations import owner as capacity
+        text = self.DOC.read_text(encoding='utf-8')
+        for name in ('VIEW_FORMAT', 'HANDOFF_FORMAT', 'BINDING_FORMAT',
+                     'RECONCILIATION_FORMAT', 'REQUEST_FORMAT', 'FACTS_FORMAT'):
+            with self.subTest(format=name):
+                self.assertIn(getattr(capacity, name), text)
+
+    def test_the_document_names_every_reconciled_state(self):
+        from provisioner.allocations import owner as capacity
+        text = self.DOC.read_text(encoding='utf-8')
+        for state in capacity.STATES:
+            with self.subTest(state=state):
+                self.assertIn(state, text)
+
+    def test_the_document_names_the_module_and_the_preserved_preflight(self):
+        text = self.DOC.read_text(encoding='utf-8')
+        self.assertIn('provisioner/allocations/owner.py', text)
+        self.assertIn('provisioner/allocations/reservations.py', text)
+
+    def test_the_document_is_indexed_and_states_its_limit(self):
+        self.assertIn('(capacity-reservation-model.md)',
+                      INDEX.read_text(encoding='utf-8'))
+        self.assertIn('does not claim', self.DOC.read_text(encoding='utf-8').lower())
+
+    def test_the_document_claims_no_native_contact(self):
+        text = self.DOC.read_text(encoding='utf-8')
+        self.assertIn('native_contact: false', text)
+        self.assertNotIn('native_contact: true', text)
 
 
 class RetiredInterfaceTest(unittest.TestCase):

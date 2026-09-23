@@ -129,6 +129,13 @@ approvals:
 An approval that does not cite a digest, an approver and an authority reference is
 refused with `AUTHORITY_REQUIRED`.
 
+The payload also carries the capacity reading: the compiled
+`capacity_owner_handoff` intent, the reconciled `capacity` state and
+`capacity_review`, read from the repository's exported reservation records and, when
+the caller supplies `--capacity-facts`, from the recorded owner facts. A reservation
+whose authoritative outcome is a definite refusal or is still unresolved stops the
+handoff. See [Capacity reservation](capacity-reservation-model.md).
+
 ## Reference run
 
 ```
