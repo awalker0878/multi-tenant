@@ -16,12 +16,20 @@ their environment and conformance documents plus the `digests.json` index. The
 `PLANNED_DISABLED_NOT_AUTHORIZED` with `native_contact: false`; see the
 [portable provisioning documents](../docs/provisioning/README.md).
 
-`golden/cross-platform.digests.json` records the same portable request realized on
-each reviewed platform fixture. Every platform is asked for the identical portable
-body; only `spec.platform.preference` differs, so `portable_digest` is shared while
-`request_digest` is not. The artifact also stores the per-platform realization
-gaps, which is how the VMware boundary (no address on the workload) stays visible
-rather than being silently dropped.
+`golden/cross-platform.digests.json` records the full reference-request x platform
+matrix: every one of the five reviewed portable requests against each of the three
+reviewed platform fixtures, with no cell omitted. A compatible cell is realized and
+stores its deterministic request, resolution, placement, desired-state, environment,
+plan and manifest digests plus its provider-native stack root and realization gaps. A
+cell that is intentionally incompatible — the request selects a different platform
+than the reviewed fixture represents — stores the explicit refusal (code, JSON path,
+status and reason) instead of being dropped. Each request is planned against each
+fixture with only `spec.platform.preference` selected, so every platform is asked the
+same portable body (`portable_digest` is shared across a request's cells) while
+`request_digest` differs. The artifact also stores the per-platform realization gaps,
+which is how the VMware boundary (no address on the workload) stays visible rather
+than being silently dropped. No cell claims native contact, placement authority or
+production authorization.
 
 `neutron_observation.json.example` and `accepted_route_record.json.example` contain
 intentionally unusable placeholders. Populate actual expectations from accepted

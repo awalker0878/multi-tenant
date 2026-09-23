@@ -85,9 +85,11 @@ expected field shapes from the reviewed module configurations rather than from t
 accessor the provisioner calls.
 `tests/provisioning/adapters/test_adapter_contract.py` holds the adapter contract,
 including the rule that no generic module compares a platform name.
-`examples/golden/cross-platform.digests.json` stores the resulting per-platform
-digests and realization gaps, and
-`tests/provisioning/end_to_end/test_golden.py` replays them.
+`examples/golden/cross-platform.digests.json` stores the full reference-request x
+platform matrix: every reviewed request against every reviewed platform fixture,
+with each compatible cell's digests and realization gaps and each intentionally
+incompatible cell's explicit refusal, and
+`tests/provisioning/end_to_end/test_golden.py` replays all of them.
 
 ## Ownership
 
