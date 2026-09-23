@@ -22,8 +22,11 @@ portable WSD request (YAML)
 WSD identity and generation are derived at the desired-state boundary and then bound
 into the plan, the delivery plan, every owner operation, the observations, the
 conformance report and the recorded evidence, so a plan and the operation it would
-start cannot be confused with a later generation of the same WSD. See
-[WSD identity and generation model](generation-model.md).
+start cannot be confused with a later generation of the same WSD. The plan identity
+itself is the digest of the complete reviewed-plan manifest, so an external approval
+that cites it cites every reviewed decision. See
+[WSD identity and generation model](generation-model.md) and
+[Reviewed-plan manifest](plan-manifest-model.md).
 
 ## Active documents
 
@@ -35,6 +38,7 @@ start cannot be confused with a later generation of the same WSD. See
 | [Placement model](placement-model.md) | Fail-closed site/cell selection from read-only inventory |
 | [Internal desired-state model](desired-state-model.md) | The internal artifact handed to the compiler |
 | [WSD identity and generation model](generation-model.md) | What is being changed, which change it is, and the claim rules |
+| [Reviewed-plan manifest](plan-manifest-model.md) | The complete reviewed decision an approval cites, term by term |
 | [Platform adapter contract](adapter-contract.md) | The read/plan/apply boundary and its refusals |
 | [Terraform execution boundary](terraform-boundary.md) | Root selection, variable files, evidence |
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |

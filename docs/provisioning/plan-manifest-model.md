@@ -1,0 +1,93 @@
+# Reviewed-plan manifest
+
+An approval is only worth recording if it can be proven to cite the exact decision a
+reviewer saw. A digest over a partial projection cannot: two plans whose rendered
+environment is byte-identical can still differ in a reservation target, a service
+endpoint, a pinned placement cell, a reviewed profile revision or a later generation,
+and an approval that cites only the projection would silently cover both.
+
+`Plan.manifest` is the complete, canonical reviewed-plan manifest and
+`Plan.digest` — also surfaced as `Plan.manifest_digest` — is the canonical digest of
+that manifest. Format: `hosting-reviewed-plan-manifest/1`.
+Module: `provisioner/execution/manifest.py`.
+
+## Terms
+
+The manifest is an enumeration of reviewed decision terms, in the order a reviewer
+reads them. Each term is either a reviewed decision or a canonical digest of one.
+
+| Term | Binds |
+| --- | --- |
+| `format` | `hosting-reviewed-plan-manifest/1` |
+| `generation` | the claimed WSD generation this decision belongs to |
+| `request` | the request source path and the digest of the file that was read |
+| `request_identity` | the normalized `apiVersion`/`kind`/`metadata`/`spec` identity |
+| `resolution` | resolved profiles, profile versions, catalog versions, catalog digest |
+| `policy` | the evaluated policy summary, including the exact `rules_digest` |
+| `inventory` | the reviewed inventory snapshot digest, status, origin and authority |
+| `placement` | the placement decision digest, including every rejected candidate |
+| `qualification` | the qualification reference the selection was gated on |
+| `product_tuple` | the selected product/API/provider/hardware tuple |
+| `capacity` | every reservation, its demand and its committed-after position |
+| `addresses` | every reserved prefix, gateway host number and workload address |
+| `service_bindings` | every service binding, its endpoints and its binding class |
+| `desired_state` | the internal desired-state digest |
+| `environment` | the rendered environment document digest |
+| `compiled_inputs` | the digest of every input the existing compiler accepted |
+| `terraform` | the reviewed scope, root, input, state key, catalog and owner bindings |
+| `ansible` | the reviewed Ansible scope bindings |
+| `delivery` | the reviewed delivery graph, by identity |
+| `classification` | the approval-relevant disruptive/destructive/rebuild declaration |
+
+## What the manifest deliberately excludes
+
+- **Derived identity.** The delivery `plan_digest`, the `operation_id`, the plan
+  `identity` and the generation echoed onto the delivery graph are all computed
+  *from* the plan, so binding them would make the identity depend on itself. The
+  manifest binds the delivery *graph* by digest instead, computed from a delivery
+  document built without those fields.
+- **Owner-provisioned free text.** A Terraform scope's `backend` is the text an owner
+  provisions against the reviewed state key, not a reviewed decision. The manifest
+  binds `scope`, `root`, `input`, `state_key`, `catalog_id`, `owner_scope` and
+  `status`, and excludes `backend`.
+- **Volatile and checkout state.** No timestamp, run identifier, host name or git
+  checkout property is bound. The manifest is reproducible from the reviewed inputs
+  alone, which is what makes byte-identical replay possible. The immutable source
+  identity is bound in the `hosting-delivery/1` handoff instead, where the delivery
+  tooling already requires a 40-hex `source_commit`.
+
+## Why an approval is provable
+
+`hosting apply --approved-plan <digest>` requires the claimed digest to equal
+`Plan.manifest_digest` and requires a recorded approval whose `plan_digest` matches
+it. Because the manifest binds every term above, an approval that cites the manifest
+digest cites the complete decision; a change to any one term — a reservation target,
+a `committed_after` value, a service endpoint, a binding class, a placement decision,
+a qualification reference, a product tuple, a profile version, a policy rule
+revision, the inventory snapshot, a compiled input, an environment value, a Terraform
+state key or root, an Ansible scope, the delivery graph, the generation or the change
+classification — produces a different digest and the stale approval is refused.
+
+`apply` then **still refuses** with `EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY`, and its
+payload carries the manifest, the reviewer-facing `reviewed` projection and the
+manifest digest it would have handed to an external execution owner. The projection
+carries the same digest as the manifest, so an approval may cite either.
+
+## Determinism
+
+Two requests that differ only in whitespace, key order or an unused field resolve to
+the same manifest and the same digest: the request identity is a canonical digest of
+the normalized document, and every other term is a canonical digest of reviewed
+state. Two different reviewed decisions never collide. The reference digests are
+indexed in [`examples/golden/digests.json`](../../examples/golden/digests.json).
+
+## What this does not claim
+
+The manifest is a reviewed *intent*, not an authorization or an observation. It binds
+no native state, no target contact, no credential and no approval; every plan stays
+`PLANNED_DISABLED_NOT_AUTHORIZED` with `native_contact: false`. The repository has no
+replacement or destroy change-intent model yet, so `classification.destructive` and
+`classification.rebuild` are declared `false` unconditionally and a future
+change-intent model must set them from reviewed input. A qualification reference in
+the manifest records the qualification the decision was gated on; it does not assert
+that the platform is qualified.

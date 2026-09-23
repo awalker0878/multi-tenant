@@ -44,14 +44,23 @@ Produces a `hosting-provisioning-plan/1` document containing the normalized
 request, the resolution, the policy summary, the placement decision (with every
 rejected candidate), the resolved desired state, the environment document, the
 compiled file list, the compile plan scopes, the Terraform and Ansible scopes, the
-compiler phases, the delivery plan and the conformance report.
+compiler phases, the delivery plan, the reviewed-plan manifest and the conformance
+report.
 
-`Plan.digest` is the canonical SHA-256 of the claimed generation, the request digest,
-the rendered environment document, and the exact reviewed profile, catalog and
-catalog-set revisions the plan resolved against. Two requests that differ only in an
-unused field still share a digest, while any real change — a request field, a
-reviewed revision, or a later generation — produces a new one. Two different requests
-never collide. The plan also carries its WSD `identity` and its derived `operation_id`
+`Plan.digest` — also reported as `Plan.manifest_digest` — is the canonical SHA-256 of
+the complete reviewed-plan manifest, not of a summary: the claimed generation, the
+request source digest and normalized identity, the resolved profile and catalog
+revisions, the policy rule-set digest and result, the reviewed inventory snapshot,
+the placement decision, the qualification reference and product tuple, the capacity
+and address intent, the service bindings, the desired state, the rendered environment,
+every compiled input, the Terraform and Ansible scope bindings, the delivery graph and
+the change classification. A change to any one of those terms produces a new digest,
+so an approval that cites it cites the whole decision; two requests that differ only
+in whitespace, key order or an unused field still share a digest, while two different
+reviewed decisions never collide. See
+[Reviewed-plan manifest](plan-manifest-model.md).
+
+The plan also carries its WSD `identity` and its derived `operation_id`
 (`{wsd_key}-g{generation}-{plan_digest[:12]}`), so a plan is never confused with a
 later generation of the same WSD. See
 [WSD identity and generation model](generation-model.md).
@@ -87,7 +96,11 @@ refuses** with `EXECUTION_REFUSED_REPOSITORY_PLAN_ONLY`, because this repository
 holds no target contact, credential or change authority. The refusal payload names
 the external authority, the approval format, the outstanding owner operations and the
 generation, identity and operation identity it would have handed off — one generation
-per handoff, and the authoritative record decides which generation is current.
+per handoff, and the authoritative record decides which generation is current. The
+refusal and the handoff payload also carry the complete reviewed-plan manifest, its
+digest and the reviewer-facing `reviewed` projection, so the approval provably cites
+the exact plan that would be executed. See
+[Reviewed-plan manifest](plan-manifest-model.md).
 
 Approval records are read, never written:
 

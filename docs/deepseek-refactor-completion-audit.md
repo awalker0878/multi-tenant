@@ -199,7 +199,8 @@ Regressions: `tests/provisioning/placement/test_placement.py` adds `CoherentEnve
 ### GATE-C03 — Approved-plan identity must bind the complete reviewed decision
 
 Severity: P0  
-State at baseline: INVALID
+State at baseline: INVALID  
+State: COMPLETE
 
 Affected requirements include sections 25-32, 60, 71, 76, 79, 88, 91, 99, and 104.
 
@@ -262,6 +263,133 @@ Prove semantically identical requests with irrelevant whitespace/order differenc
 #### Completion evidence
 
 hosting apply --approved-plan can prove that the external approval cites exactly the complete plan that would be executed or handed to an execution owner.
+
+#### Completion record
+
+`Plan.digest` was a digest of `request digest + rendered environment document`, which
+is a projection: a reservation target, a service endpoint, a pinned placement cell, a
+reviewed profile revision, the policy rule set, the inventory snapshot or a later
+generation could all move without moving the rendered environment, so an approval
+that cited the old digest did not bind the decision a reviewer saw.
+
+The identity is now the digest of `Plan.manifest`, a complete canonical
+reviewed-plan manifest (`hosting-reviewed-plan-manifest/1`,
+`provisioner/execution/manifest.py`). `Plan.digest` and the new
+`Plan.manifest_digest` are the same value; the second name exists so the
+approval-facing term is explicit. Every manifest term is a reviewed decision or a
+canonical digest of one, and nothing in it is derived from the plan identity, so it
+can be computed before that identity exists.
+
+| Required binding | Where it is satisfied |
+| --- | --- |
+| request digest | `manifest.request.digest` |
+| normalized request identity, where distinct | `manifest.request_identity` — a digest of `apiVersion`/`kind`/`metadata`/`spec`, so two differently-rendered but equivalent requests share one identity while the source digest still names the file that was read |
+| resolved profile identifiers and versions | `manifest.resolution.profiles` and `.profile_versions` |
+| profile-catalog digest or equivalent version set | `manifest.resolution.catalog_versions` and `.catalog_digest` |
+| policy/rule-set digest and result | `manifest.policy` now carries `rules_digest` (new `standards.rules_digest()`, threaded through `policy_diagnostics.summary`) beside the evaluated/failed counts and errors |
+| inventory snapshot/reference digest | `manifest.inventory` — digest, status, origin and authority; a plan built without an inventory records the explicit `UNRECORDED` reference rather than omitting the term |
+| selected product tuple and qualification reference | `manifest.product_tuple` (`UNSELECTED` when held, new `PlacementDecision.product_tuple`) and `manifest.qualification` (the `UNRECORDED` reference when none was recorded) |
+| placement decision digest | `manifest.placement` |
+| capacity/reservation intent digest | `manifest.capacity` — every reservation including its demand and `committed_after` position |
+| IPAM/address intent digest | `manifest.addresses` — every reserved prefix, gateway host number and workload address |
+| service-binding digest | `manifest.service_bindings` — every binding including its endpoints and binding class |
+| desired-state digest | `manifest.desired_state` |
+| environment digest | `manifest.environment` |
+| compiled input digests | `manifest.compiled_inputs` — one digest per input the existing compiler accepted |
+| Terraform scope/root/state-key bindings | `manifest.terraform` — `scope`, `root`, `input`, `state_key`, `catalog_id`, `owner_scope`, `status` |
+| Ansible scope bindings | `manifest.ansible` |
+| delivery graph digest | `manifest.delivery.graph` via the new `delivery.graph_digest(state, scopes)` |
+| generation | `manifest.generation` |
+| source commit or equivalent immutable source identity | bound in the C05 `hosting-delivery/1` handoff, where `tools/delivery_run.py` already requires a 40-hex `source_commit` |
+| disruptive/destructive classification | `manifest.classification` — `lifecycle`, `disruptive`, `destructive`, `rebuild` |
+
+Two terms are excluded deliberately, and tests assert they stay excluded:
+
+- **Derived identity.** The delivery `plan_digest`, the `operation_id`, the plan
+  `identity` and the generation echoed onto the delivery graph are computed *from*
+  the plan. Binding them would make the identity depend on itself. The cycle is
+  removed rather than tolerated: the manifest binds the delivery graph by digest,
+  computed from a delivery document built without `plan_digest`/`operation_id`, and
+  the delivery document is then built from the manifest digest.
+- **Owner-provisioned free text.** A Terraform scope's `backend` is the text an owner
+  provisions against the reviewed state key. It is not a reviewed decision, and
+  binding it would make the plan identity depend on owner state, so the manifest
+  binds the state key instead.
+
+No volatile timestamp, run identifier, host name or checkout property is bound, so
+the manifest is reproducible from the reviewed inputs alone and byte-identical golden
+replay still holds.
+
+Two assumptions are recorded rather than silently made:
+
+1. **Source identity.** The reviewed manifest deliberately stays independent of the
+   git checkout — a checkout property is not a reviewed decision, and binding it
+   would make the plan identity depend on how the repository happened to be cloned.
+   The immutable source identity is bound where it is authoritative and already
+   required: the `hosting-delivery/1` handoff, whose `source_commit` is validated as
+   40 hex by the existing runner. C05 owns that handoff.
+2. **Destructive/rebuild classification.** The repository has no replacement or
+   destroy change-intent model yet, so `classification` declares
+   `destructive: false` and `rebuild: false` unconditionally and derives
+   `disruptive` from the reviewed lifecycle (`production` is disruptive). A
+   production greenfield create changes a production environment and destroys
+   nothing, which is exactly what is declared. A future change-intent model must set
+   `destructive` and `rebuild` from reviewed input; the term exists now so that the
+   identity already binds them.
+
+Regressions: the new `tests/provisioning/unit/test_plan_manifest.py` (48 tests /
+3 subtests) proves the manifest has exactly the declared terms, that
+`Plan.digest == Plan.manifest_digest == canonical_digest(manifest)`, that a fixture
+inventory is recorded as non-authoritative, that no derived identity and no
+`backend` leaks in, and then isolates every required term by replacing it on an
+otherwise identical plan and rebuilding the manifest from the *baseline* delivery
+graph, so the digest change can only come from the term under test: capacity
+reservation target and `committed_after` values, service endpoint, binding class,
+placement, qualification, product tuple, profile version, catalog version, catalog
+digest, policy rule set, inventory snapshot, compiled input, environment, Terraform
+state key, Terraform root, Ansible scope, delivery graph, generation, change
+classification, request digest, request source and request identity. End-to-end
+sensitivity is proved separately for a different reviewed inventory, a different
+platform, a reviewed site pin on one inventory, an edited policy rule (same outcome,
+different rule set) and a bumped profile version. Replay determinism is proved
+across four equivalent JSON renderings of one request and across repeated runs. The
+plan-digest tests in `tests/provisioning/unit/test_determinism.py` were rewritten for
+the manifest, `tests/provisioning/end_to_end/test_golden.py` now replays
+`manifest_digest` as well as `digest`, and
+`tests/provisioning/unit/test_plan_manifest.py::ApprovedPlanIdentityTest` proves the
+completion evidence directly: `hosting apply --approved-plan` cites the complete
+manifest, carries it and the reviewer-facing `reviewed` projection in its handoff
+payload, and refuses a stale digest while naming the current manifest.
+
+Golden corpus: `manifest_digest` was added to the regeneration harness and the
+digest indexes; `examples/golden/digests.json`,
+`examples/golden/cross-platform.digests.json`, the five
+`examples/golden/*.conformance.json` (which cite the plan digest) and the five
+`examples/resolved/*.resolution.json` (which embed the policy summary that gained
+`rules_digest`) were regenerated. A follow-up `--check` run reports every artifact
+unchanged.
+
+Observation: the reviewed demonstration qualification corpus declares the same
+declared product tuple for every platform
+(`DECLARED-DEMONSTRATION-TUPLE-NOT-NATIVE-EVIDENCE`), so the product tuple is not a
+platform discriminator in the fixture corpus; platform identity is carried by the
+placement decision digest, which the manifest also binds. The regression asserts that
+rather than asserting a cross-platform tuple inequality that the corpus does not
+support.
+
+Docs: new `docs/provisioning/plan-manifest-model.md`, indexed from
+`docs/provisioning/README.md` and registered in the documentation drift guard's
+`REQUIRED` set, with a term-by-term table, the exclusions and their reasons, the
+determinism argument and an explicit statement of what the manifest does not claim.
+`docs/provisioning/plan-workflow.md` no longer describes the old projection — it
+documents the manifest digest, the manifest and `reviewed` projection in the `apply`
+payload, and links the new page; `docs/provisioning/generation-model.md` now says the
+generation is a term of the reviewed-plan manifest rather than of a plan digest.
+
+`python -m pytest tests/provisioning -q` reports 410 passed / 741 subtests,
+`python -m pytest tests/test_platform_capabilities.py -q` reports 15 passed, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` all exit 0.
 
 ---
 

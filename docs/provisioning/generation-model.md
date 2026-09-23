@@ -89,16 +89,16 @@ because `:` is outside the scoped-identifier grammar.
 | Artifact | Binding |
 | --- | --- |
 | `DesiredState` | `generation` field, and `identity` derived from it |
-| `Plan` | `generation`, `identity`, `operation_id`; the generation is the first term of the plan digest |
+| `Plan` | `generation`, `identity`, `operation_id`; the generation is the first term of the [reviewed-plan manifest](plan-manifest-model.md), whose digest is the plan identity |
 | Delivery plan | `generation`, `identity`, `operation_id`, `plan_digest` on the plan and on every owner operation |
 | Observations | each observation carries the generation it was read at |
 | Conformance report | `generation`, `identity`, `operation_id` |
 | Evidence | every record carries `generation`, plus a dedicated `generation` record |
 | CLI | `status`, `verify` and `apply` report the generation, identity and operation identity |
 
-Because the generation is part of the plan digest, claiming a later generation
-changes the plan identity, the operation identity and the conformance report without
-changing the request.
+Because the generation is a term of the reviewed-plan manifest, claiming a later
+generation changes the plan identity, the operation identity and the conformance
+report without changing the request.
 
 ## Refusals
 
