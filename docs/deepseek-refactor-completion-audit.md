@@ -914,7 +914,8 @@ and the two new corpus tests in `tests/provisioning/end_to_end/test_golden.py`.
 ### GATE-C09 — Adapter contract must own real realization behavior, not only descriptors
 
 Severity: P1/P2  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include R13, sections 41, 62-64, 84, 88, 91, and 100.
 
@@ -953,6 +954,77 @@ Contract tests for all three platforms must prove:
 - unsupported capability refused;
 - provider-specific native fields never leak into the portable request;
 - adapter declarations cannot drift from the existing compiler/Terraform modules.
+
+#### Completion record
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. define the exact adapter responsibilities that are missing from generic code | `provisioner/adapters/base.py` declares six surfaces: `capability_contract()`, `placement_contract()`, `phase_contract(phase)`, `readback_contract()`, `security_edge_contract()` and `realization_gaps()`. `realization_contract()` returns all six plus `format`, `platform`, `family`, `gap_codes`, `limits` and `native_contact: false`. The five responsibilities the gate names are therefore explicit, named and separately testable rather than implied by a metadata dataclass |
+| 2. move only genuinely provider-specific portable-to-native mapping decisions behind the adapters | exactly one such decision existed. `tools/compile_wsd.py` built the NSX segment mapping inside `if platform == 'vmware':`. It is now the declarative `WORKLOAD_NETWORK_BINDING` table (keyed by platform: `observed_field`, `native_field`, `binding_field`, `binding_identity`, `message`) that the compiler looks up, mirrored as data on `Adapter.binding_requirement` and bound into the plan manifest. No mature provider logic was rewritten to fill a method |
+| 3. keep `tools/compile_wsd.py` as the existing internal compiler where it is already the right authority | the compiler still owns every native field shape. The adapter reads `PLACEMENT`, `NETWORK` and `WORKLOAD_NETWORK_BINDING` out of it through `provisioner/repository.py`, which remains the only module allowed to import `tools/`. `compile_environment(document, phase, outputs, phase_bindings)` is unchanged in behavior and only renamed its last argument away from `vmware_bindings` |
+| 4. make generic provisioning code ask the selected adapter rather than branch on platform-specific assumptions | `provisioner/compiler/environment.py` asks the adapter for the declared inputs (`native_variables` delegates to `declared_inputs(phase)`), for the gap decision (`realization_gaps` delegates to `Adapter.realization_gaps()`) and for the list of facts the provisioner computes (`PROVISIONER_OWNED_INPUTS` derives from `adapters.COMPUTED_FACTS`). `provisioner/execution/plan.py::create_plan` asks `adapters.get(state.platform).validate(plan)` after compilation and refuses with `REALIZATION_CONTRACT_UNSATISFIED` (`compilation` layer, `path: $.spec.platform`, `details = {'platform', 'problems'}`) |
+| 5. each adapter exposes the capability, placement, phase, readback and gap contracts | all five are surfaced per platform and asserted cell by cell. Capability: `product_tuple`, `qualified`, `status: NATIVE_QUALIFICATION_ABSENT`, `blockers: ['product_tuple:UNSELECTED']`, extended by `required=` and `assurance_profile=`. Placement: nutanix `cluster_id`/`storage_container_id`, vmware `resource_pool_id`/`datastore_id`, openstack `compute_availability_zone`/`storage_availability_zone`/`volume_type`. Phases: per-module declared inputs, accepted computed inputs and unavailable inputs. Readback: the domains-phase native identity, split by `produced_by_module` and `produced_by_binding`, with the vmware binding requirement. Gaps: vmware declares `COMPUTED_INPUT_NOT_ACCEPTED` for `ipv4_address`; nutanix and openstack declare none |
+| 6. keep execution and platform contact outside the adapter | every surface, including `to_dict()` and `realization_contract()`, carries `native_contact: false` and a declared `authority` read from reviewed configuration. The adapters expose no mutating entry point and `provisioner/adapters` imports no client, credential or transport. The three new conformance checks that run the contract are repository-side static checks that can never satisfy an external requirement |
+
+Regressions: `tests/provisioning/adapters/test_adapter_contract.py` (97 tests, 14
+classes) covers all nine required cases. Required zones represented: the required zone
+set is derived from `plan.resolution.zones` rather than hard-coded, and a plan with the
+RZ domain removed is refused with a problem naming the absent zone. Placement
+preserved: every emitted workload's native inputs are a superset of the selected
+platform's placement fields and a subset of the adapter's declared union, proven
+against the real compiled workloads phase rather than the accessor. Network intent
+preserved: the readback identity the domains phase must observe is declared and is
+never reported as already observed. Isolation outcome represented: the security-edge
+component, its component list and its `security-edge` owner scope are read from
+`terraform/catalog.json` and matched to the reviewed `security-edge-route` operation.
+Service binding preserved: the service bindings are asserted byte-identical across all
+three platforms, so no adapter can silently reshape them. Recovery intent represented
+when supported: the `backup-retention` operation is read per request and
+`recovery-readiness` is asserted external, never satisfied from the repository alone.
+Unsupported capability refused: an unqualified capability and an unqualified assurance
+profile both appear as blockers, and `REALIZATION_CONTRACT_UNSATISFIED` is asserted
+registered in `errors.CODES` in the `compilation` layer. Provider-specific native
+fields never leak into the portable request: every request key is checked against the
+union of every platform's declared native field names. Adapter declarations cannot
+drift from the compiler or the Terraform modules: the placement and network field sets
+are compared to the compiler tables, the module identities to the reviewed composition
+roots, and the readback identity to the reviewed modules' own `outputs` read from
+`main.tf.json`. A thirteenth class walks the AST of `tools/compile_wsd.py` and of every
+`provisioner/**.py` source and fails on any comparison against a platform-name literal,
+which is the regression that keeps requirement 4 from regressing.
+
+Golden corpus: the reference plans' digests moved once, when `realization` became the
+twenty-third manifest term, and the corpus is regenerated for it
+(`internal-production` `ec0ac3a8?`, `internal-development` `76904660?`, `multi-tier`
+`492dc42d?`, `recovery-enabled` `7a1b2865?`, `storage-heavy` `a68a61bf?`, and the
+cross-platform vmware `4dfb2ddc?`, nutanix `46a9354d?`, openstack `a2ece110?`). No
+digest moved afterwards, because the term is a canonical digest of the reviewed
+declaration and the declaration is read from the compiler and the catalog rather than
+from anything volatile.
+
+Docs: `docs/provisioning/adapter-contract.md` is rewritten around the six surfaces,
+the gap vocabulary, the per-platform declarations, `hosting-platform-adapter/2`, the
+`realization` manifest term and the refusal path, and the "no drift" section now
+states that the adapter projects the compiler rather than re-exporting it. Three
+active documents are updated: `architecture.md` gains the realization-contract stage
+and a paragraph on what the adapters own, `plan-manifest-model.md` gains the
+`realization` term and names it in the provability paragraph, and
+`terraform-boundary.md` corrects the native-input ownership section (the owned inputs
+are now derived from the adapter) and records that the compiler holds no
+provider-specific branch.
+
+`python -m pytest tests/provisioning -q` reports 851 passed / 1278 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` pass. One decision is recorded as deliberate:
+`WORKLOAD_NETWORK_BINDING` lives in the compiler rather than in the adapter package,
+because the compiler is the module that has to perform the lookup and because
+`tests/provisioning/unit/test_architecture.py` forbids `tools/compile_wsd.py` from
+importing `provisioner/`; the adapter surfaces the same declaration as data, so there
+is one source and no second copy. `sources/module_inventory.json` is left unchanged
+and is not enforced by any drift check. No native qualification, no platform contact
+and no production evidence is claimed: the adapters describe reviewed configuration,
+every adapter reports `NATIVE_QUALIFICATION_ABSENT`, and the conformance status stays
+`BLOCKED_ON_EXTERNAL_EVIDENCE` on the same seven external checks.
 
 ---
 
