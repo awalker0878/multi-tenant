@@ -40,6 +40,7 @@ CODES: dict[str, tuple[str, str]] = {
     'COMPILATION_FAILED': ('compilation', 'Correct the resolved desired state; the existing compiler refused it.'),
     'ENVIRONMENT_CONTRACT_INVALID': ('compilation', 'Correct the environment document fields the compiler refused.'),
     'REALIZATION_INPUT_UNAVAILABLE': ('compilation', 'Complete the reviewed platform module or record the gap as an explicit boundary; do not invent the input.'),
+    'REALIZATION_CONTRACT_UNSATISFIED': ('compilation', 'Select a platform whose declared realization contract covers the reviewed request, or complete the missing reviewed module.'),
     'OUTPUT_PATH_NOT_PRIVATE': ('compilation', 'Write generated inputs outside the repository.'),
     'DETERMINISM_VIOLATION': ('compilation', 'Remove the nondeterministic input; output must be reproducible.'),
     'EXECUTION_REFUSED': ('execution', 'Planning only: this repository holds no execution authority.'),

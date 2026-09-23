@@ -58,7 +58,7 @@ class AdapterBoundaryTest(unittest.TestCase):
             payload = adapter.to_dict()
             self.assertFalse(payload['native_contact'])
             self.assertTrue(payload['limits'])
-            self.assertEqual(payload['format'], 'hosting-platform-adapter/1')
+            self.assertEqual(payload['format'], adapter_base.ADAPTER_FORMAT)
 
 
 class TerraformScopeTest(unittest.TestCase):

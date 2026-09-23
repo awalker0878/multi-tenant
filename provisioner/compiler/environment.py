@@ -7,6 +7,7 @@ environment document into Terraform inputs. It is reused, never reimplemented.
 """
 from __future__ import annotations
 
+from provisioner.adapters import base as adapters
 from provisioner.domain.desired_state import DesiredState
 from provisioner.domain.errors import ProvisioningError
 from provisioner.repository import repository_module
@@ -15,7 +16,7 @@ ENVIRONMENT_FORMAT = 'hosting-wsd-environment/1'
 DOMAIN_ID_MAX = 24
 
 #: Workload inputs the provisioner computes itself rather than reading from reviewed inventory.
-PROVISIONER_OWNED_INPUTS = ('boot_disk_gib', 'data_disk_gib', 'ipv4_address')
+PROVISIONER_OWNED_INPUTS = tuple(fact for fact, _ in adapters.COMPUTED_FACTS)
 
 
 def environment_key(state: DesiredState) -> str:
@@ -38,13 +39,14 @@ def workload_name(tenant: str, wsd: str, zone: str, index: int) -> str:
 
 
 def native_variables(platform: str, phase: str = 'workloads') -> frozenset:
-    """Ask the existing compiler which native inputs one reviewed module declares.
+    """Ask the selected adapter which native inputs one reviewed module declares.
 
-    The provisioner never restates a provider-specific field list. The compiler
-    owns the native field shapes, so the provisioner asks it before deciding
-    whether a computed input can be expressed on the selected platform.
+    The provisioner never restates a provider-specific field list. The adapter owns
+    the native field shape for its platform and reads it from the compiler, so the
+    provisioner asks the adapter before deciding whether a computed input can be
+    expressed on the selected platform.
     """
-    return frozenset(repository_module('tools.compile_wsd').native_variables(platform, phase))
+    return adapters.get(platform).declared_inputs(phase)
 
 
 def owned_inputs(workload, declared: frozenset) -> dict:
@@ -59,14 +61,11 @@ def realization_gaps(state: DesiredState) -> tuple[str, ...]:
     """Computed facts the selected platform's reviewed module cannot accept.
 
     A gap is reported rather than silently dropped: an address is allocated for
-    every workload, so a platform that cannot carry it must say so out loud.
+    every workload, so a platform that cannot carry it must say so out loud. The
+    selected adapter declares which facts its own module cannot accept and how the
+    platform realizes them instead, so generic code never branches on a platform name.
     """
-    declared = native_variables(state.platform)
-    dropped = [key for key in PROVISIONER_OWNED_INPUTS if key not in declared]
-    if not dropped:
-        return ()
-    return (f'{state.platform} workload realization inputs accept none of {sorted(dropped)}; '
-            f'the platform realizes those facts through its domain composition instead',)
+    return tuple(gap['message'] for gap in adapters.get(state.platform).realization_gaps())
 
 
 def render(state: DesiredState) -> dict:
@@ -102,8 +101,12 @@ def render(state: DesiredState) -> dict:
 
 
 def compile_document(document: dict, phase: str = 'domains', outputs: dict | None = None,
-                     vmware_bindings: dict | None = None) -> tuple[dict, dict]:
-    """Hand an environment document to the existing compiler, unchanged."""
+                     phase_bindings: dict | None = None) -> tuple[dict, dict]:
+    """Hand an environment document to the existing compiler, unchanged.
+
+    The cross-phase bindings a platform requires are declared by its adapter, so the
+    argument is named for the phase it binds rather than for a platform.
+    """
     if document.get('format') != ENVIRONMENT_FORMAT:
         raise ProvisioningError('ENVIRONMENT_CONTRACT_INVALID',
                                 f'Refusing to compile unknown environment format '
@@ -111,7 +114,7 @@ def compile_document(document: dict, phase: str = 'domains', outputs: dict | Non
                                 path='environment.format')
     module = repository_module('tools.compile_wsd')
     try:
-        return module.compile_environment(document, phase, outputs, vmware_bindings)
+        return module.compile_environment(document, phase, outputs, phase_bindings)
     except (ValueError, KeyError, TypeError) as exc:
         raise ProvisioningError('COMPILATION_FAILED',
                                 f'The existing compiler refused the environment document: {exc}',

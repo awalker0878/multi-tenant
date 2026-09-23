@@ -15,5 +15,11 @@ LIMITS = (
 )
 
 
+#: The vSphere module attaches a workload to the observed NSX quarantine segment and
+#: declares no field for the workload's own portable address, so the address is realized
+#: by that segment rather than dropped.
+REALIZATION_NOTE = ('the workload is realized on the observed NSX quarantine segment instead')
+
+
 def adapter() -> Adapter:
-    return _adapter('vmware', 'nsx-route', LIMITS)
+    return _adapter('vmware', 'nsx-route', LIMITS, REALIZATION_NOTE)

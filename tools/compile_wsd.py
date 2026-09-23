@@ -27,6 +27,20 @@ NETWORK = {
     'vmware': {'quarantine_network_id'},
     'openstack': {'network_id', 'subnet_id', 'security_group_id'},
 }
+# Cross-phase workload-network bindings, declared once here rather than branched on.
+# A platform whose workload network identity is *observed* instead of being produced
+# by its own domain phase declares the accepted observation and the native field that
+# observation populates. The generic compiler reads this table; it never names a
+# platform, and an adapter that must state the same requirement reads it from here.
+WORKLOAD_NETWORK_BINDING = {
+    'vmware': {
+        'observed_field': 'segment_path',
+        'binding_field': 'segment_path',
+        'native_field': 'quarantine_network_id',
+        'binding_identity': 'network_id',
+        'message': 'vCenter network must be explicitly mapped to the observed NSX segment',
+    },
+}
 STATE = 'PREPARED_NOT_QUALIFIED_NOT_SERVICE_READY'
 
 
@@ -81,7 +95,7 @@ def native_inputs(platform, phase, supplied, excluded):
     return values
 
 
-def compile_environment(env, phase='domains', outputs=None, vmware_bindings=None):
+def compile_environment(env, phase='domains', outputs=None, phase_bindings=None):
     fields(env, {'format', 'environment_key', 'site_key', 'platform', 'lifecycle', 'clusters', 'wsds'}, 'environment')
     require(env['format'] == 'hosting-wsd-environment/1', 'Unknown environment format')
     platform = env['platform']
@@ -172,11 +186,13 @@ def compile_environment(env, phase='domains', outputs=None, vmware_bindings=None
                 if phase == 'workloads':
                     native = received[did]
                     require(isinstance(native, dict) and native.get('delivery_state') == STATE, 'Unknown member state')
-                    if platform == 'vmware':
-                        binding = (vmware_bindings or {}).get(key + '/' + did, {})
-                        require(binding.get('segment_path') == native.get('segment_path') and bool(native.get('segment_path')),
-                                'vCenter network must be explicitly mapped to the observed NSX segment')
-                        native = {'quarantine_network_id': binding.get('network_id')}
+                    binding_rule = WORKLOAD_NETWORK_BINDING.get(platform)
+                    if binding_rule is not None:
+                        binding = (phase_bindings or {}).get(key + '/' + did, {})
+                        observed = binding.get(binding_rule['binding_field'])
+                        require(observed == native.get(binding_rule['observed_field']) and bool(observed),
+                                binding_rule['message'])
+                        native = {binding_rule['native_field']: binding.get(binding_rule['binding_identity'])}
                     network_ids = {field: native.get(field) for field in NETWORK[platform]}
                     require(all(isinstance(v, str) and v.strip() for v in network_ids.values()), 'Missing native network identity')
                     members[name] = {**values, **cluster['native'], **network_ids, 'domain_key': did,
