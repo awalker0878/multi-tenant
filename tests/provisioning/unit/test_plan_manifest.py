@@ -117,10 +117,13 @@ class ManifestShapeTest(unittest.TestCase):
     def test_the_manifest_records_the_reviewed_inventory_snapshot(self):
         plan = support.reference_plan()
         inventory = fixture()
+        self.assertEqual(plan.manifest['inventory'], inventory.reference)
         self.assertEqual(plan.manifest['inventory']['digest'], inventory.document_digest)
         self.assertEqual(plan.manifest['inventory']['status'], inventory.status)
-        self.assertEqual(plan.manifest['inventory']['origin'], inventory.origin)
+        self.assertEqual(plan.manifest['inventory']['source'], inventory.source)
         self.assertIs(plan.manifest['inventory']['authoritative'], inventory.authoritative)
+        # The read location is diagnostic provenance, not part of the reviewed identity.
+        self.assertNotIn('origin', plan.manifest['inventory'])
 
     def test_a_fixture_inventory_is_recorded_as_non_authoritative(self):
         plan = support.reference_plan()

@@ -18,9 +18,6 @@ from provisioner.inventory import model as inventory_model
 
 from tests.provisioning import support
 
-FIXTURE_DOCUMENT = (support.ROOT / 'provisioner' / 'inventory' / 'fixtures'
-                    / 'openstack-reference.json')
-
 #: Two spellings of one repository-relative location, as Windows and Linux render it.
 POSIX_ORIGIN = 'provisioner/inventory/fixtures/openstack-reference.json'
 WINDOWS_ORIGIN = 'provisioner\\inventory\\fixtures\\openstack-reference.json'
@@ -32,12 +29,13 @@ CHECKOUTS = ('C:\\repo\\multi-tenant\\provisioner\\inventory\\fixtures'
              '/openstack-reference.json')
 
 
-def _document() -> dict:
-    return json.loads(FIXTURE_DOCUMENT.read_text(encoding='utf-8'))
+def _document(name: str = 'openstack-reference') -> dict:
+    return json.loads((support.ROOT / 'provisioner' / 'inventory' / 'fixtures'
+                       / f'{name}.json').read_text(encoding='utf-8'))
 
 
-def _inventory(origin: str):
-    return inventory_model.build(_document(), origin=origin)
+def _inventory(origin: str, name: str = 'openstack-reference'):
+    return inventory_model.build(_document(name), origin=origin)
 
 
 def _plan(inventory, name: str = 'internal-production'):
@@ -142,7 +140,7 @@ class GoldenCrossPlatformIdentityTest(unittest.TestCase):
                 self.assertFalse(Path(origin).is_absolute())
                 loaded = inventory_model.fixture(name)
                 self.assertEqual(loaded.origin, origin)
-                self.assertEqual(_inventory(origin).reference, loaded.reference)
+                self.assertEqual(_inventory(origin, name).reference, loaded.reference)
 
     def test_every_recorded_cell_reproduces_from_a_posix_origin(self):
         corpus = json.loads((support.GOLDEN / 'cross-platform.digests.json')

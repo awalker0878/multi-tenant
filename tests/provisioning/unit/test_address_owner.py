@@ -784,8 +784,9 @@ class ProposalAuthorityTest(unittest.TestCase):
         self.assertEqual(self.view['site'], self.plan.identity.scope['site_key'])
         self.assertEqual(self.view['platform'], self.plan.identity.scope['platform'])
         self.assertEqual(self.view['wsd'], self.plan.identity.scope['wsd_key'])
+        # The read location is diagnostic provenance, not part of the identity.
         self.assertEqual(set(self.view['inventory']),
-                         {'status', 'origin', 'digest', 'authoritative'})
+                         {'digest', 'source', 'status', 'authoritative'})
         self.assertEqual(self.view['inventory']['digest'],
                          self.plan.inventory.document_digest)
 

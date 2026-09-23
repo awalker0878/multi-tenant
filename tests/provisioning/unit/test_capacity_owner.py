@@ -433,10 +433,10 @@ class CommissionedViewTest(unittest.TestCase):
 
     def test_the_view_names_the_reviewed_inventory_identity(self):
         inventory = self.plan.inventory
-        self.assertEqual(self.view['inventory'],
-                         {'status': inventory.status, 'origin': inventory.origin,
-                          'digest': inventory.document_digest,
-                          'authoritative': inventory.authoritative})
+        self.assertEqual(self.view['inventory'], inventory.reference)
+        # The read location is diagnostic provenance, not part of the identity.
+        self.assertEqual(sorted(self.view['inventory']),
+                         ['authoritative', 'digest', 'source', 'status'])
 
     def test_the_view_names_the_reviewed_site_and_platform(self):
         self.assertEqual(self.view['site'], self.plan.desired_state.site_key)
