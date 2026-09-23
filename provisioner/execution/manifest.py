@@ -17,6 +17,7 @@ from __future__ import annotations
 from provisioner.allocations import addresses as address_owner
 from provisioner.allocations import owner as capacity_owner
 from provisioner.domain.request import digest
+from provisioner.repository import reviewed_source
 
 MANIFEST_FORMAT = 'hosting-reviewed-plan-manifest/1'
 
@@ -153,7 +154,8 @@ def build(plan, delivery_graph: str = '') -> dict:
     return {
         'format': MANIFEST_FORMAT,
         'generation': plan.generation,
-        'request': {'source': plan.request.source, 'digest': plan.request.digest},
+        'request': {'source': reviewed_source(plan.request.source),
+                    'digest': plan.request.digest},
         'request_identity': request_identity(plan.request),
         'resolution': {'profiles': dict(plan.resolution.profiles),
                        'profile_versions': dict(plan.resolution.profile_versions),

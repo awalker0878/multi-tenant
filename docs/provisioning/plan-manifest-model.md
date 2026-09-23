@@ -20,7 +20,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 | --- | --- |
 | `format` | `hosting-reviewed-plan-manifest/1` |
 | `generation` | the claimed WSD generation this decision belongs to |
-| `request` | the request source path and the digest of the file that was read |
+| `request` | the request source path, repository-relative, and the digest of the file that was read |
 | `request_identity` | the normalized `apiVersion`/`kind`/`metadata`/`spec` identity |
 | `resolution` | resolved profiles, profile versions, catalog versions, catalog digest |
 | `policy` | the evaluated policy summary, including the exact `rules_digest` |
@@ -66,10 +66,13 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
   repository reviews the addressing *identity*, not a value an owner has yet to
   return. See [Address allocation](address-allocation-model.md).
 - **Volatile and checkout state.** No timestamp, run identifier, host name or git
-  checkout property is bound. The manifest is reproducible from the reviewed inputs
-  alone, which is what makes byte-identical replay possible. The immutable source
-  identity is bound in the `hosting-delivery/1` handoff instead, where the delivery
-  tooling already requires a 40-hex `source_commit`.
+  checkout property is bound. The request source path is bound **repository-relative
+  in POSIX form**, so the identity does not depend on whether an operator spelled the
+  path relatively or absolutely, or on where the checkout lives. The manifest is
+  reproducible from the reviewed inputs alone, which is what makes byte-identical
+  replay possible. The immutable source identity is bound in the `hosting-delivery/1`
+  handoff instead, where the delivery tooling already requires a 40-hex
+  `source_commit`.
 
 ## Why an approval is provable
 

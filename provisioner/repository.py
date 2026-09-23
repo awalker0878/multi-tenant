@@ -30,6 +30,26 @@ def relative(path: Path | str) -> str:
         return str(path)
 
 
+def reviewed_source(path: Path | str) -> str:
+    """The request path as a reviewed input rather than as an invocation.
+
+    A reviewed plan must not depend on how an operator spelled the path, so the
+    manifest binds the path relative to the repository root in POSIX form, and
+    falls back to the resolved path when the document lives outside the checkout.
+    """
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = ROOT / candidate
+    try:
+        resolved = candidate.resolve()
+    except OSError:
+        return str(path).replace('\\', '/')
+    try:
+        return resolved.relative_to(ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
+
+
 def source_commit(root: Path | str | None = None) -> dict:
     """The clean checkout commit the existing release verifier reports.
 

@@ -489,6 +489,29 @@ class ManifestReplayTest(unittest.TestCase):
         self.assertEqual(first.manifest, second.manifest)
         self.assertEqual(first.manifest_digest, second.manifest_digest)
 
+    def test_the_identity_does_not_depend_on_how_the_path_was_spelled(self):
+        """A reviewed input is the document, not the operator's invocation."""
+        spellings = (str(support.REQUEST),
+                     str(support.REQUEST.relative_to(support.ROOT)),
+                     str(support.REQUEST.parent / '..' / 'requests' / support.REQUEST.name))
+        digests = set()
+        for spelling in spellings:
+            plan = execution_plan.create_plan(support.reference_document(), spelling,
+                                              fixture(), support.catalogs())
+            with self.subTest(spelling=spelling):
+                self.assertEqual(plan.manifest['request']['source'],
+                                 'examples/requests/internal-production.yaml')
+            digests.add(plan.digest)
+        self.assertEqual(len(digests), 1)
+        self.assertEqual(digests, {support.reference_plan().digest})
+
+    def test_the_request_source_is_repository_relative_for_a_checkout_document(self):
+        from provisioner.repository import reviewed_source
+        self.assertEqual(reviewed_source(support.REQUEST),
+                         'examples/requests/internal-production.yaml')
+        self.assertEqual(reviewed_source('<memory>'), '<memory>')
+        self.assertNotIn('\\', reviewed_source(support.REQUEST))
+
 
 def _request(document):
     from provisioner.domain.request import build
