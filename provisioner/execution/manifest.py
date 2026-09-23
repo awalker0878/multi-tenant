@@ -14,6 +14,7 @@ self-referential.
 """
 from __future__ import annotations
 
+from provisioner.adapters import base as adapters
 from provisioner.allocations import addresses as address_owner
 from provisioner.allocations import owner as capacity_owner
 from provisioner.domain.request import digest
@@ -23,8 +24,8 @@ MANIFEST_FORMAT = 'hosting-reviewed-plan-manifest/1'
 
 #: The manifest's own terms, in the order a reviewer reads them.
 TERMS = ('format', 'generation', 'request', 'request_identity', 'resolution', 'policy',
-         'inventory', 'placement', 'qualification', 'product_tuple', 'capacity',
-         'capacity_view', 'addresses', 'allocation_view', 'service_bindings',
+         'inventory', 'placement', 'qualification', 'product_tuple', 'realization',
+         'capacity', 'capacity_view', 'addresses', 'allocation_view', 'service_bindings',
          'desired_state', 'environment', 'compiled_inputs', 'terraform', 'ansible',
          'delivery', 'classification')
 
@@ -70,6 +71,32 @@ def address_intent(desired_state) -> dict:
                          'gateway_host_number': domain.gateway_host_number,
                          'addresses': sorted(workload.address for workload in domain.workloads)}
                         for domain in sorted(desired_state.domains, key=lambda d: d.prefix)]}
+
+
+def realization_intent(plan) -> dict:
+    """The selected platform's declared realization contract.
+
+    The plan is realized by exactly one platform adapter. This binds that adapter's
+    declared realization identity — the reviewed security-edge component that carries
+    the isolation outcome and its owner scope, the declared realization gaps and the
+    native identities the platform requires — so a plan cannot be re-read against a
+    different adapter declaration without changing the plan identity. A change to what
+    a platform declares about its own realization is a reviewed change.
+    """
+    adapter = adapters.get(plan.desired_state.platform)
+    edge = adapter.security_edge_contract()
+    gaps = adapter.realization_gaps()
+    return {'format': adapter.format, 'platform': adapter.platform, 'family': adapter.family,
+            'security_edge': {'component': edge['component'],
+                              'components': list(edge['components']),
+                              'owner_scope': edge['owner_scope']},
+            'gaps': sorted(gap['code'] for gap in gaps),
+            'gap_inputs': sorted(input_name for gap in gaps for input_name in gap['inputs']),
+            'placement_fields': sorted(adapter.placement_fields),
+            'readback_identity': sorted(adapter.network_fields),
+            'binding_requirement': adapter.binding,
+            'status': adapter.capability_contract()['status'],
+            'native_contact': False}
 
 
 def capacity_intent(desired_state) -> dict:
@@ -166,6 +193,7 @@ def build(plan, delivery_graph: str = '') -> dict:
         'placement': plan.decision.digest,
         'qualification': plan.decision.qualification_identity,
         'product_tuple': plan.decision.product_tuple,
+        'realization': realization_intent(plan),
         'capacity': capacity_intent(plan.desired_state),
         'capacity_view': capacity_view_intent(plan),
         'addresses': address_intent(plan.desired_state),
@@ -201,6 +229,8 @@ def review(manifest: dict) -> dict:
             'placement': manifest['placement'],
             'qualification': manifest['qualification'],
             'product_tuple': manifest['product_tuple'],
+            'realization': manifest['realization']['security_edge']['component'],
+            'realization_gaps': list(manifest['realization']['gaps']),
             'profile_versions': manifest['resolution']['profile_versions'],
             'catalog_versions': manifest['resolution']['catalog_versions'],
             'catalog_digest': manifest['resolution']['catalog_digest'],

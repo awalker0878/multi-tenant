@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 
+from provisioner.adapters import base as adapters
 from provisioner.compiler import desired_state as compiler_desired_state
 from provisioner.compiler import environment as compiler_environment
 from provisioner.compiler import normalize as compiler_normalize
@@ -219,6 +220,18 @@ def create_plan(document: dict, source: str, inventory: Inventory, catalog: Cata
                 terraform_scopes=terraform_scopes, ansible_scopes=ansible_scopes,
                 phases=phases(compile_environment), diagnostics=diagnostics,
                 generation=generation)
+    # The selected platform's adapter owns the provider-specific half of this boundary.
+    # Generic code never branches on a platform name: it asks the adapter whether the
+    # reviewed plan is one that platform's declared realization contract covers, and
+    # refuses the plan if it is not, rather than emitting a plan that claims a
+    # realization the platform cannot perform.
+    refused = adapters.get(state.platform).validate(plan)
+    if refused:
+        raise ProvisioningError(
+            'REALIZATION_CONTRACT_UNSATISFIED',
+            f'The selected platform {state.platform!r} cannot realize the reviewed plan',
+            path='$.spec.platform',
+            details={'platform': state.platform, 'problems': list(refused)})
     # The manifest binds the delivery graph, and the delivery document binds the plan
     # identity. The graph is therefore bound by identity first, so the plan identity is
     # a pure function of the reviewed decision and never of its own derived operation ids.

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from provisioner.adapters import base as adapter_module
 from provisioner.allocations import addresses as address_module
 from provisioner.allocations import owner as capacity_module
 from provisioner.observation import native as native_module
@@ -22,7 +23,8 @@ STATUSES = (PASS, FAIL, PENDING, NOT_APPLICABLE)
 
 REPOSITORY_CHECKS = ('schema', 'semantics', 'policy', 'profiles', 'placement',
                      'capacity', 'addresses', 'services', 'compiler',
-                     'environment-contract', 'determinism', 'generation')
+                     'environment-contract', 'determinism', 'generation',
+                     'adapter-contract', 'adapter-readback', 'security-edge')
 
 EXTERNAL_CHECKS = ('native-qualification', 'capacity-confirmation',
                    'address-confirmation', 'dns-registration', 'service-acceptance',
@@ -30,6 +32,7 @@ EXTERNAL_CHECKS = ('native-qualification', 'capacity-confirmation',
 
 MANDATORY = ('schema', 'semantics', 'policy', 'placement', 'capacity', 'addresses',
              'services', 'compiler', 'environment-contract', 'determinism', 'generation',
+             'adapter-contract', 'adapter-readback', 'security-edge',
              'native-qualification', 'capacity-confirmation', 'address-confirmation',
              'dns-registration', 'service-acceptance', 'native-observation',
              'production-authorization')
@@ -130,7 +133,111 @@ def repository_checks(plan, observations=()) -> tuple[Check, ...]:
                 'stale_subjects': [[row['subject'], row['native_id'],
                                     row['observation_generation']] for row in stale],
                 'unbound_subjects': [[row['subject'], row['native_id']] for row in unbound]}),
+        _adapter_contract_check(plan),
+        _adapter_readback_check(plan),
+        _security_edge_check(plan),
     )
+
+
+def _adapter_contract_check(plan) -> Check:
+    """Whether the selected platform's adapter covers the reviewed plan.
+
+    The adapter owns the provider-specific half of the portable-to-native boundary.
+    This reports whether the reviewed plan is one that platform's declared realization
+    contract covers — the reviewed composition roots exist, both zones the request
+    requires are represented, reviewed inventory supplied every declared placement
+    input and no workload declares a native input the reviewed module does not accept.
+    """
+    adapter = adapter_module.get(plan.desired_state.platform)
+    problems = adapter.validate(plan)
+    contract = adapter.realization_contract()
+    return _check('adapter-contract', not problems,
+                  'The selected adapter covers the reviewed plan'
+                  if not problems else
+                  f'The selected adapter refuses the reviewed plan: {list(problems)}',
+                  {'adapter': contract['format'], 'platform': adapter.platform,
+                   'family': adapter.family, 'surfaces': sorted(contract),
+                   'problems': list(problems), 'native_contact': False})
+
+
+def _adapter_readback_check(plan) -> Check:
+    """Whether the adapter's declared readback and binding agree with the reviewed modules.
+
+    A readback identity is only real if the reviewed domain module actually produces it,
+    either as its own output or through the cross-phase binding the platform declares. A
+    binding is only usable if the reviewed workload module accepts the native field it
+    populates, and the field the binding observes must be one the reviewed domain module
+    outputs. The compiler's declared native field sets must also equal the reviewed
+    modules' declared variables, so a declaration cannot drift away from the artifact
+    that would actually be applied.
+    """
+    adapter = adapter_module.get(plan.desired_state.platform)
+    contract = adapter.readback_contract()
+    binding = adapter.binding
+    domains = adapter_module.module_contract(adapter.domains_module)
+    workloads = adapter_module.module_contract(adapter.workloads_module)
+    accounted = set(contract['produced_by_module']) | set(contract['produced_by_binding'])
+    problems = {
+        'readback_not_produced': sorted(set(adapter.network_fields) - accounted),
+        'observed_field_not_output': sorted(value for key, value in binding.items()
+                                            if key in ('observed_field', 'binding_field')
+                                            and value not in domains['outputs']),
+        'binding_target_not_accepted': sorted(value for key, value in binding.items()
+                                              if key == 'native_field'
+                                              and value not in workloads['variables']),
+        'declared_inputs_not_declared_by_module': sorted(
+            (adapter.declared_inputs('domains') - domains['variables'])
+            | (adapter.declared_inputs('workloads') - workloads['variables'])),
+    }
+    ok = not any(problems.values())
+    return _check('adapter-readback', ok,
+                  'Every declared readback identity is produced by a reviewed module and '
+                  'every declared binding is accepted by one' if ok else
+                  f'The adapter declares identities the reviewed modules do not realize: '
+                  f'{problems}',
+                  {'platform': adapter.platform, 'readback': sorted(adapter.network_fields),
+                   'modules': [domains['module'], workloads['module']],
+                   'binding': binding, 'problems': problems,
+                   'authority': 'reviewed Terraform module configuration'})
+
+
+def _security_edge_check(plan) -> Check:
+    """Whether the reviewed catalog realizes the adapter's declared security edge.
+
+    The isolation outcome of a domain is carried by a security-edge component the
+    reviewed Terraform catalog owns, and handed over by a security-edge owner
+    operation in the delivery graph. The check proves the reviewed catalog declares
+    that component and that the plan hands it over; it does not claim the edge was
+    realized, which requires native qualification.
+    """
+    from provisioner.execution import terraform
+    adapter = adapter_module.get(plan.desired_state.platform)
+    declared = adapter.edge_components
+    entries = {entry['id']: entry for entry in terraform.catalog()['entries']
+               if entry['platform'] == adapter.platform
+               and entry['owner_scope'] == adapter_module.EDGE_SCOPE}
+    problems = []
+    if not declared:
+        problems.append('no reviewed security-edge component is declared')
+    if adapter.security_edge not in declared:
+        problems.append(f'the declared edge realization {adapter.security_edge!r} is not a '
+                        f'reviewed {adapter_module.EDGE_SCOPE} component')
+    if sorted(entries) != sorted(declared):
+        problems.append('the adapter and the reviewed catalog disagree about the '
+                        'security-edge components')
+    operations = [op['name'] for op in plan.delivery.get('operations', [])
+                  if op.get('owner') == 'security-edge-owner']
+    if not operations:
+        problems.append('the delivery graph hands over no security-edge operation')
+    return _check('security-edge', not problems,
+                  'The reviewed catalog declares the security-edge realization and the '
+                  'plan hands it over' if not problems else
+                  f'The security-edge realization is not declared: {problems}',
+                  {'platform': adapter.platform, 'component': adapter.security_edge,
+                   'components': sorted(declared), 'owner_scope': adapter_module.EDGE_SCOPE,
+                   'operations': sorted(operations), 'problems': problems,
+                   'authority': 'terraform/catalog.json',
+                   'realized': False})
 
 
 def _address_check(plan) -> Check:
