@@ -249,8 +249,10 @@ class PlatformFamilyEligibilityTests(unittest.TestCase):
         result = self.evaluate()
         nutanix = next(x for x in result['evaluations'] if x['platform'] == 'nutanix')
         self.assertFalse(nutanix['family_capability_eligible'])
-        self.assertTrue(any(x in self.request['mandatory_capabilities']
-                            for x in nutanix['mandatory_blockers']))
+        self.assertIn('product_tuple:selected-but-unqualified:NOT_NATIVE_QUALIFIED',
+                      nutanix['mandatory_blockers'])
+        self.assertTrue(all(f'capability:{x}:NOT_NATIVE_QUALIFIED' in nutanix['mandatory_blockers']
+                            for x in self.request['mandatory_capabilities']))
 
     def test_candidate_subset_does_not_expand_scope(self):
         self.qualify('nutanix')
