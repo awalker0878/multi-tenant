@@ -40,3 +40,21 @@ def source_commit(root: Path | str | None = None) -> dict:
     result = verifier.verify(Path(root) if root is not None else ROOT)
     return {'status': result.get('status', ''), 'commit': result.get('commit', ''),
             'issues': list(result.get('issues', []))}
+
+
+def reservation_records(path: Path | str | None = None) -> dict:
+    """The repository's exported reservation record evidence.
+
+    The authoritative reservation system is external. The repository exports what
+    that system recorded and already owns the contract for reading it, so the
+    provisioner asks for the export instead of defining a second record model.
+    """
+    module = repository_module('scripts.check_reservation_records')
+    return module.load(Path(path) if path is not None else module.INDEX)
+
+
+def validate_reservation_records(index: dict, *, as_of, root: Path | str | None = None) -> dict:
+    """Validate an exported reservation record index with the repository's checker."""
+    module = repository_module('scripts.check_reservation_records')
+    return module.validate(index, as_of=as_of,
+                           root=Path(root) if root is not None else ROOT)
