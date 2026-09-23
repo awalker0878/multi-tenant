@@ -808,7 +808,7 @@ and `verify` owner readings and the `apply` addressing reading). A new documenta
 regression keeps the document a view of the module by comparing its named formats,
 reconciled states and settlement gates against `provisioner.allocations.addresses`.
 
-`python -m pytest tests/provisioning -q` reports 752 passed / 1200 subtests, and
+`python -m pytest tests/provisioning -q` reports 754 passed / 1204 subtests, and
 `scripts/check_repository.py`, `scripts/check_documentation.py` and
 `scripts/check_retired_interfaces.py` pass. Two decisions are recorded as deliberate:
 the compiled owner handoff rides in the `apply` payload rather than as `ipam`/`dns`
@@ -821,6 +821,16 @@ under the declared root `runtime/address-handoff/`, which is ignored and is neve
 written by this repository. No production record is claimed: this repository compiles
 allocation and registration intents, reads exported evidence, and holds no address,
 no prefix, no name and no IPAM or DNS authority.
+
+One defect was found and fixed while closing this gate, in code this refactor owns.
+The manifest bound the request source exactly as the operator spelled it, so the same
+reviewed request reached through a relative path and through an absolute path had
+different digests. That contradicted the manifest's own documented contract — no
+checkout property, reproducible from the reviewed inputs alone — and made an approved
+digest depend on the invocation. `provisioner/repository.py::reviewed_source` now
+binds the path repository-relative in POSIX form, a regression asserts that a
+relative, an absolute and an interior-`..` spelling replay to one plan, and the
+golden corpus is regenerated once for the normalized source.
 
 ---
 
