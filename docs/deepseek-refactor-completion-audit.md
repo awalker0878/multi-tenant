@@ -716,7 +716,8 @@ exported evidence and holds no capacity and no reservation authority.
 ### GATE-C07 — IPAM and DNS must use the authoritative owner lifecycle
 
 Severity: P1  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include R9, R10, sections 31-32, 37, 61, 69, 76, 79, 88, and 91.
 
@@ -751,6 +752,75 @@ The repository already contains NetBox/IPAM, IPAM record, DNS registration, and 
 - lost IPAM/DNS reply is reconciled, not duplicated;
 - DNS cannot be registered before the bound IPAM allocation is confirmed;
 - retirement cannot release address ownership before dependent registration/native teardown is complete.
+
+#### Completion record
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| 1. keep consumer requests free of CIDRs and provider identifiers | no change was needed: `provisioner/domain/request.py` and the schema still accept no prefix, no address and no provider field, and the reviewed request's `spec` is unchanged; the proposed prefix is derived by the repository from the reviewed inventory pool |
+| 2. use the planning allocator only to express intent or a proposed allocation | `provisioner/allocations/addresses.py::address_view` names `PLANNING_PROPOSAL_NOT_AUTHORITATIVE_ALLOCATION` as the authority; the repository `addresses` conformance check reports the proposal as intent and `hosting apply` never allocates |
+| 3. during controlled execution call the existing authoritative IPAM owner path | the compiled allocation intent is the exact document `scripts/check_ipam_allocation_preflight.py::normalized_spec` accepts, reached only through `provisioner/repository.py::ipam_allocation_preflight`; no second owner path, no second allocator and no parallel IPAM client is added |
+| 4. bind the authoritative allocation to WSD identity, generation, parent reservation, site/zone/domain and intent digest | `hosting-address-binding/1` binds `allocation_id`, `operation_id`, `generation`, `plan_digest`, `view_digest`, `reservation_id`, `request_id`, the five delivery scope keys, the zone, the domain, the pool and the allocation intent digest; `parent_spec_sha256`, `allocation_intent_digest` and `registration_intent_digest` are recomputed from the reviewed chain, so a record answering another operation, generation, parent, site, zone, pool or intent is `HOLD_IPAM_IDENTITY_OR_INTENT_CONFLICT` |
+| 5. confirm/observe before using an uncertain result | an `UNCERTAIN` record is `HOLD_DISCOVER_IPAM_OUTCOME` with `next_owner_action = OWNER_DISCOVER_AUTHORITATIVE_OUTCOME` and refuses with `IPAM_ALLOCATION_UNRESOLVED`; `EXISTING_CONFIRMED_IPAM_ALLOCATION` is the only state with `confirmed` true and is reachable only from a live exported record; a malformed or unreadable export is a typed `SCHEMA_VALIDATION_FAILED` refusal rather than a raw `ValueError` |
+| 6. generate DNS registration only from confirmed authoritative allocation state | the registration intent is compiled only from a confirmed allocation scope; the repository `dns-registration` check and `require_registered` are `PASS` only on `EXISTING_REGISTERED_DNS_IDEMPOTENT`, and `HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` refuses with `IPAM_ALLOCATION_UNCONFIRMED` before registration is even considered |
+| 7. bind DNS registration to the confirmed allocation and the complete normalized DNS intent | `hosting-dns-registration-binding/1` adds `registration_id` and the allocation confirmation digest to the allocation binding; `repository.dns_registration_spec` normalizes the intent through `scripts/check_dns_registration_preflight.py`, and `registration_intent_digest` binds the normalized intent |
+| 8. implement retirement release ordering using the existing owner contracts | `require_releasable` refuses `ADDRESS_RELEASE_ORDER_VIOLATION` while a reusable allocation's dependent registration is live, while the exported cleanup is incomplete, and while a `RELEASED` allocation's name is only `TOMBSTONED`; the owner's own `scripts/check_ipam_allocation_records.py` and `scripts/check_dns_registration_records.py` enforce the same ordering |
+| 9. never release reusable addressing before dependent native state is safely withdrawn | `QUARANTINED_REGISTRATION_STATES` and `WITHDRAWN_REGISTRATION_STATES` gate the release, and a `QUARANTINED`/`RELEASED` allocation must carry a complete cleanup, a `REUSE_NOT_BEFORE` instant and a release that does not predate it |
+
+Regressions: `tests/provisioning/unit/test_address_owner.py` (146 tests) covers every
+required case. The mirrored contract is compared against the authoritative owners'
+own source rather than restated: the intent key sets, formats, families, kinds,
+policies, statuses, record types, observation states and cleanup keys are read out of
+`scripts/check_ipam_allocation_preflight.py`, `scripts/check_dns_registration_preflight.py`,
+`scripts/check_ipam_allocation_records.py` and `scripts/check_dns_registration_records.py`,
+and every compiled intent is fed to the real preflight. A proposal is never ownership:
+a missing record is `IPAM_INTENT_READY_EXTERNAL_RESERVE_NOT_EXECUTED`, the handoff
+carries no allocated value, and the reconciliation contains no literal prefix or
+address. A confirmed allocation may differ from the proposal without changing the
+approved plan: the plan digest and manifest bind the addressing *identity*, the view
+deliberately carries no generation, and reading the owner's answer changes neither.
+A mismatch is a hold, not a silent adoption: a tampered parent reservation yields
+`parent.state = CONFLICT` with both zones `HOLD_IPAM_IDENTITY_OR_INTENT_CONFLICT`, a
+tampered allocation record yields a conflict in one zone while the other stays
+untouched, and each refuses with the mirrored vocabulary. A lost reply is reconciled,
+not duplicated: `allocation_id_for`, `registration_id_for` and both operation
+identities are derived from the reviewed plan, so a second attempt reconciles the
+first record instead of creating a second allocation or a second name. Registration
+cannot precede confirmation: `HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` and the
+`require_registered` ordering are asserted. Retirement cannot release ownership early:
+a `QUARANTINED` allocation with a `RELEASE_PENDING` name yields
+`HOLD_IPAM_RELEASE_LIFECYCLE`/`HOLD_DNS_RELEASE_LIFECYCLE` and
+`require_releasable` refuses, while a `TOMBSTONED` name is releasable and a
+`RELEASED` allocation with a `TOMBSTONED` name is not.
+
+Golden corpus: the reference plans' digests moved once, when `allocation_view` became
+a manifest term, and the corpus is regenerated for it; no digest moved afterwards,
+because the view deliberately carries no generation and no derived identity, and the
+reference export is empty, so the default reconciliation is `PENDING_OWNER` with
+`parent.state = NOT_HELD`.
+
+Docs: new `docs/provisioning/address-allocation-model.md`, indexed in
+`docs/provisioning/README.md` and registered in the drift guard, plus updates to
+`plan-manifest-model.md` (the `allocation_view` term and the excluded external
+addressing facts), `delivery-handoff-model.md` (the addressing steps' owner handoff)
+and `plan-workflow.md` (the `--ipam-index` and `--dns-index` options, the `status`
+and `verify` owner readings and the `apply` addressing reading). A new documentation
+regression keeps the document a view of the module by comparing its named formats,
+reconciled states and settlement gates against `provisioner.allocations.addresses`.
+
+`python -m pytest tests/provisioning -q` reports 752 passed / 1200 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` pass. Two decisions are recorded as deliberate:
+the compiled owner handoff rides in the `apply` payload rather than as `ipam`/`dns`
+step parameters, because extending the runner's declared parameter contract is out of
+scope for a repository-side gate; and the `allocation` evidence record is bound to the
+view digest, because that is the reviewed snapshot the intents were compiled against,
+while the owners' answers are reported separately as the reconciliation state. The
+sibling documents the owners' preflights resolve from disk are staged by the operator
+under the declared root `runtime/address-handoff/`, which is ignored and is never
+written by this repository. No production record is claimed: this repository compiles
+allocation and registration intents, reads exported evidence, and holds no address,
+no prefix, no name and no IPAM or DNS authority.
 
 ---
 

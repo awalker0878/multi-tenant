@@ -102,6 +102,18 @@ reconciled `capacity` reading and `capacity_review`. The step's own parameter co
 is unchanged: the owner still prepares the stage packet. See
 [Capacity reservation](capacity-reservation-model.md).
 
+## The addressing steps' owner handoff
+
+`address-allocation` and `dns-registration` are the other two steps whose reviewed
+intent is a compiled owner document rather than a parameter value. `hosting apply`
+carries the whole reviewed chain in the payload as `address_owner_handoff`
+(`hosting-address-owner-handoff/1`) — the compiled capacity request, the compiled
+reservation intent, one allocation intent and one registration intent per reviewed
+zone, the staged sibling references and the per-document digests — together with the
+reconciled `addresses` reading and `address_review`. Both step kinds are declared
+kinds of `tools.delivery_steps.KINDS`, and the two steps still prepare their own
+stage packets. See [Address allocation](address-allocation-model.md).
+
 ## Operation coverage
 
 `Plan.delivery` names ten owner operations. `OPERATION_STEPS` maps every one of them
@@ -133,6 +145,7 @@ refuses before compiling rather than emitting a graph the runner must reject:
 | the claimed digest is not this plan | `ARTIFACT_INTEGRITY_FAILED` |
 | no recorded approval for that digest | `AUTHORITY_REQUIRED` |
 | the checkout is not the commit under review | `ARTIFACT_INTEGRITY_FAILED` |
+| an owner has not answered on addressing | `IPAM_ALLOCATION_UNRESOLVED` |
 | a reviewed operation has no typed step | `COMPILATION_FAILED` |
 | a malformed graph | `SCHEMA_VALIDATION_FAILED` |
 

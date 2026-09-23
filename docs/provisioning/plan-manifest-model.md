@@ -31,6 +31,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 | `capacity` | every reservation, its demand and its committed-after position |
 | `capacity_view` | the commissioned capacity snapshot the reservation intent is bound to |
 | `addresses` | every reserved prefix, gateway host number and workload address |
+| `allocation_view` | the addressing snapshot the allocation and registration intents are bound to |
 | `service_bindings` | every service binding, its endpoints and its binding class |
 | `desired_state` | the internal desired-state digest |
 | `environment` | the rendered environment document digest |
@@ -57,6 +58,13 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
   from the plan digest and generation, and the envelope and the owner's answer are
   external facts the repository cannot review. See
   [Capacity reservation](capacity-reservation-model.md).
+- **External addressing facts.** The manifest binds the addressing snapshot as
+  `allocation_view`, for the same reason: it is reviewed inventory state that the
+  allocation and registration intents are compiled against. It excludes the
+  allocation identity, the allocation and registration intents and the owners'
+  answers, because the authoritative prefix is the IPAM owner's value and the
+  repository reviews the addressing *identity*, not a value an owner has yet to
+  return. See [Address allocation](address-allocation-model.md).
 - **Volatile and checkout state.** No timestamp, run identifier, host name or git
   checkout property is bound. The manifest is reproducible from the reviewed inputs
   alone, which is what makes byte-identical replay possible. The immutable source
@@ -69,8 +77,8 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 `Plan.manifest_digest` and requires a recorded approval whose `plan_digest` matches
 it. Because the manifest binds every term above, an approval that cites the manifest
 digest cites the complete decision; a change to any one term — a reservation target,
-a `committed_after` value, the commissioned capacity snapshot, a service endpoint, a
-binding class, a placement decision,
+a `committed_after` value, the commissioned capacity snapshot, the addressing
+snapshot, a service endpoint, a binding class, a placement decision,
 a qualification reference, a product tuple, a profile version, a policy rule
 revision, the inventory snapshot, a compiled input, an environment value, a Terraform
 state key or root, an Ansible scope, the delivery graph, the generation or the change
