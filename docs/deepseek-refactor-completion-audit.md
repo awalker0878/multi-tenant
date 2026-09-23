@@ -1031,7 +1031,8 @@ every adapter reports `NATIVE_QUALIFICATION_ABSENT`, and the conformance status 
 ### GATE-C10 — Cross-platform golden coverage must include every compatible reference request
 
 Severity: P2  
-State at baseline: PARTIAL
+State at baseline: PARTIAL  
+State: COMPLETE
 
 Affected requirements include R20, sections 41-44, 64, 71, 88, 93, 99, and 100.
 
@@ -1067,6 +1068,42 @@ For each matrix cell:
 - no provider-native fields in input;
 - expected realization gaps explicitly recorded;
 - no fixture claims native contact or production authority.
+
+#### Completion record
+
+| Requirement | Where it is satisfied |
+| --- | --- |
+| the compatibility matrix `reference request x compatible platform fixture` | `examples/golden/cross-platform.digests.json` (format `hosting-golden-cross-platform/2`) carries `requests.<request>.platforms.<platform>` for all five reference requests against all three reviewed platform fixtures (15 realized cells) and `requests.<request>.refusals` for every one of the six declared-platform/fixture-platform pairs that differ (30 refusal rows). No cell of the 5 x 3 x 3 cross product is omitted |
+| store and test the explicit refusal for an intentionally incompatible scenario | a reviewed fixture represents exactly one platform, so a request that selects a different platform is the intentional incompatibility. `tests/provisioning/support.py::platform_refusal` plans the combination and returns the raised `ProvisioningError`; each refusal row stores its `code` (`NO_ELIGIBLE_PLACEMENT`), `path` (`$.spec.placement`), `status` (`HOLD_NO_ELIGIBLE_SITE`) and `reason`, and `test_every_incompatible_combination_records_its_explicit_refusal` replays all 30 and asserts every row against the live refusal |
+| same portable semantics in every cell | each request is planned against each fixture with only `spec.platform.preference` selected. `portable_digest` is stored once per request (the body with no platform selected) and `test_every_platform_is_asked_the_same_portable_question` asserts each stored digest equals the recomputed one, that the five digests are distinct, and that `support.platform_request(platform, name)` differs from the portable body only in that one key |
+| deterministic request/profile/placement/desired-state/environment/plan digests | every realized cell stores `request_digest`, `resolution_digest`, `placement_digest`, `desired_state_digest`, `environment_digest`, `plan_digest` and `manifest_digest`; `test_every_cell_reproduces_its_stored_digests` recomputes all seven from a fresh plan |
+| expected provider-native realization root | every realized cell stores `stack_roots`; `test_every_cell_records_its_provider_native_realization_root` asserts it is exactly `terraform/stacks/wsd/<platform>/domains`, that the plan's Terraform scopes agree, that `desired_state.platform` is the fixture's platform, that the compiled file list matches, and that no other platform's segment appears in the path |
+| no provider-native fields in input | `support.native_field_names(platform)` reads the names from the reviewed `tools.compile_wsd` declaration; `test_no_matrix_input_carries_a_provider_native_field` asserts no request document names any of them at any depth and that no native field name appears anywhere in the corpus text |
+| expected realization gaps explicitly recorded | every realized cell stores `realization_gaps`; `test_every_cell_records_its_expected_realization_gaps` asserts it equals the plan's warning codes and always contains `INVENTORY_NOT_AUTHORITATIVE`, and `test_the_vmware_realization_boundary_is_recorded_not_dropped` asserts `REALIZATION_INPUT_UNAVAILABLE` is present on every VMware cell and absent on Nutanix and OpenStack |
+| no fixture claims native contact or production authority | the corpus carries `native_contact: false`, and `test_no_cell_claims_native_contact_or_production_authority` asserts every cell's `status` is `PLANNED_DISABLED_NOT_AUTHORIZED`, the plan's `native_contact` and `conformance['native_contact']` are false, `decision.authorized` is false, and `conformance['status']` is `BLOCKED_ON_EXTERNAL_EVIDENCE` with `ready` false |
+
+Regressions: `tests/provisioning/end_to_end/test_golden.py::CrossPlatformGoldenTest`
+holds the nine required cases, and the pre-existing `GoldenCorpusTest` cases keep covering
+the shared corpus invariants (no brittle field, no `native_contact: true`, reviewed
+catalog revisions). `tests/provisioning/support.py` gained `PLATFORMS`,
+`native_field_names()`, `portable_request()` and `platform_refusal()`, so the matrix is
+built from the reviewed fixtures and the reviewed compiler declaration rather than a
+second hand-written copy of either.
+
+Corpus: `examples/golden/cross-platform.digests.json` moved from
+`hosting-golden-cross-platform/1` to `hosting-golden-cross-platform/2`. The format now
+indexes requests first (`requests.<request>.platforms`, `requests.<request>.refusals`) and
+moves `fixture` and `portable_digest` from the per-platform cell to a top-level `fixtures`
+block and the per-request `portable_digest`. The previous three `internal-production`
+cells reproduce byte for byte apart from that relocation; `examples/golden/digests.json`,
+the resolution artifacts and the conformance artifacts are unchanged and no `plan_digest`
+moved.
+
+`python -m pytest tests/provisioning -q` reports 875 passed / 1402 subtests, and
+`scripts/check_repository.py`, `scripts/check_documentation.py` and
+`scripts/check_retired_interfaces.py` all exit 0. Nothing external was contacted and no
+qualification, placement authority, native contact or production authorization is
+claimed.
 
 ---
 
