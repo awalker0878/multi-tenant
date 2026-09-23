@@ -54,12 +54,48 @@ At the audited baseline several defects broke the integrity chain between
 eligibility, placement, approval, authoritative allocation, the existing delivery
 runner, generation-aware execution, and final verification.
 
-Every one of those gates is now complete. C01 to C13 each carry `State: COMPLETE` with
-a completion record that names the code, the regression and the verification command, and
-section 12 records the final result. What remains is external: native qualification,
-authoritative inventory, owner-held reservations and registrations, native observation,
-commissioning, production authority and an installed Terraform/Ansible toolchain. None of
-those is repository-side work, and `docs/NEXT_WORK.md` holds only those rows.
+C01 to C13 were each recorded as `State: COMPLETE` with a completion record that names
+the code, the regression and the verification command, and section 12 recorded a final
+result. That completion claim is suspended by the post-completion validation recorded
+below: four gates are reopened because repository-side defects were found after the
+final record was written.
+
+What remains external is unchanged: native qualification, authoritative inventory,
+owner-held reservations and registrations, native observation, commissioning, production
+authority and an installed Terraform/Ansible toolchain. None of those is repository-side
+work, and `docs/NEXT_WORK.md` holds only those rows.
+
+### Post-completion validation reopening
+
+`docs/deepseek-refactor-post-audit-corrective-action.md` is the authoritative corrective
+specification for this reopening. It was produced after the final completion record was
+committed, from a validation run of the hosted workflow on the exact recorded tree.
+
+Observed evidence:
+
+| Fact | Value |
+| --- | --- |
+| Workflow | `.github/workflows/validate.yml` — `Architecture and automation validation` |
+| Run id | `35917384798` |
+| Head commit | `469bbd82ac5c02f9f4786bb8c977b095b589b1a3` (`docs(audit): record final repository-side completion`) |
+| `repository` job | failure |
+| `terraform` job | success |
+| `ansible` job | success |
+
+The failing `repository` job is the contradiction this reopening records: a gate that
+cites a hosted validation as its verification cannot be COMPLETE while that validation
+is red on the tree the record names. The corrective specification identifies four
+defects (F01 to F04), and the gates whose completion records depend on them are reopened:
+
+| Gate | Reopened because |
+| --- | --- |
+| C03 | F01 — approved-plan identity is OS-dependent, so the digest does not bind one reviewed decision across platforms |
+| C05 | F02 — approval binds an owner-operation summary while the executable topology is built after approval, so the approved digest does not bind the topology that runs |
+| C10 | F01 and F03 — the cross-platform golden matrix asserts per-OS plan identity, and generated navigation does not match its generator |
+| C13 | F03 and F04 — the generated documentation is not reproducible from its generator, and the completion claim is contradicted by the hosted workflow |
+
+Each reopened gate returns to COMPLETE only when the corrective specification's own
+acceptance criteria hold and the hosted workflow is green on the exact final head.
 
 ## 4. Ordered completion gates
 
@@ -207,7 +243,12 @@ Regressions: `tests/provisioning/placement/test_placement.py` adds `CoherentEnve
 
 Severity: P0  
 State at baseline: INVALID  
-State: COMPLETE
+State: REOPENED
+
+Reopened by defect F01 of `docs/deepseek-refactor-post-audit-corrective-action.md`: the
+manifest bound a filesystem/read origin whose separators are OS-dependent, so the same
+inventory produced different plan digests on Windows and Linux and the identity did not
+bind one reviewed decision across platforms.
 
 Affected requirements include sections 25-32, 60, 71, 76, 79, 88, 91, 99, and 104.
 
@@ -494,7 +535,13 @@ repository defines the generation semantics and holds no authoritative ledger.
 
 Severity: P0/P1  
 State at baseline: PARTIAL  
-State: COMPLETE
+State: REOPENED
+
+Reopened by defect F02 of `docs/deepseek-refactor-post-audit-corrective-action.md`: the
+approved identity bound an owner-operation summary (`delivery.graph_digest`) rather than
+the executable reviewed topology in `provisioner/execution/handoff.py`, which was built
+only after approval was checked. The approval therefore did not bind the topology that
+executes.
 
 Affected requirements include R16, sections 27-32, 44, 47, 60, 61, 69, 79, 88, 91, 99, 104, and the final instruction to reuse existing mature mechanisms.
 
@@ -1039,7 +1086,12 @@ every adapter reports `NATIVE_QUALIFICATION_ABSENT`, and the conformance status 
 
 Severity: P2  
 State at baseline: PARTIAL  
-State: COMPLETE
+State: REOPENED
+
+Reopened by defects F01 and F03 of `docs/deepseek-refactor-post-audit-corrective-action.md`:
+the golden matrix asserted a plan identity that moved with the checkout's path separator,
+and the generated documentation that the gate cites was not reproducible from its
+generator, so the hosted `repository` job failed on the recorded tree.
 
 Affected requirements include R20, sections 41-44, 64, 71, 88, 93, 99, and 100.
 
@@ -1259,7 +1311,12 @@ qualification, reservation, allocation, registration or authorization is claimed
 
 Severity: P1  
 State at baseline: PARTIAL
-State: COMPLETE
+State: REOPENED
+
+Reopened by defects F03 and F04 of `docs/deepseek-refactor-post-audit-corrective-action.md`:
+the generated navigation documents were not reproducible from their generator, and this
+audit's completion claim was contradicted by the hosted `repository` job failing on the
+tree the claim named.
 
 Affected requirements include sections 9-16, 45, 51, 54-59, 74-75, 86, 88-96, 101, 103, 105, and 107.
 
@@ -1640,9 +1697,15 @@ The final repository should be explainable as:
 
 ## 12. Final completion record
 
-Status: every repository-side gate C01-C13 is COMPLETE. No gate is BLOCKED_EXTERNAL,
-because no gate had repository-side work left when it was closed; the external items below
-are the separate remaining work recorded in `docs/NEXT_WORK.md`.
+Status: SUSPENDED. C01, C02, C04, C06, C07, C08, C09, C11 and C12 remain COMPLETE.
+C03, C05, C10 and C13 are REOPENED by
+`docs/deepseek-refactor-post-audit-corrective-action.md`, because the hosted
+`Architecture and automation validation` workflow (run `35917384798`) failed its
+`repository` job on the exact tree this record names. No gate is BLOCKED_EXTERNAL: the
+reopened gates have repository-side work. The external items below remain the separate
+remaining work recorded in `docs/NEXT_WORK.md`, and no gate may be restored to COMPLETE
+until the corrective specification's acceptance criteria hold and the workflow is green
+on the exact final head.
 
 ### Verified tree
 
@@ -1660,14 +1723,14 @@ baseline `1b7756e4df52ebe58ac8d93266977a27915dc3dc` to that tree.
 | C11 | COMPLETE | dependency direction enforced; all seven CLI commands reach one core library |
 | C08 | COMPLETE | versioned profiles and default ownership |
 | C04 | COMPLETE | generation model with compare-and-set generation records |
-| C03 | COMPLETE | complete reviewed-plan manifest and digest |
-| C05 | COMPLETE | deterministic compiler to the existing `hosting-delivery/1` handoff |
+| C03 | REOPENED | complete reviewed-plan manifest and digest; identity is OS-dependent (F01) |
+| C05 | REOPENED | deterministic compiler to the existing `hosting-delivery/1` handoff; approval does not bind the executed topology (F02) |
 | C06 | COMPLETE | capacity authority integrated as proposal plus separate owner confirmation |
 | C07 | COMPLETE | IPAM and DNS authority integrated as intent plus separate owner confirmation |
 | C09 | COMPLETE | adapter responsibilities limited to real provider-specific realization |
 | C12 | COMPLETE | conformance language separates repository proposals from confirmed owner state |
-| C10 | COMPLETE | golden cross-platform matrix covers every request and every platform |
-| C13 | COMPLETE | one active documentation story, external-only backlog, classified stale terms, no `OBSOLETE_REMOVE` |
+| C10 | REOPENED | golden cross-platform matrix covers every request and every platform; asserts a per-OS identity and cites a red hosted job (F01, F03) |
+| C13 | REOPENED | one active documentation story, external-only backlog, classified stale terms, no `OBSOLETE_REMOVE`; generated docs not reproducible (F03, F04) |
 
 ### Actual path trace
 
