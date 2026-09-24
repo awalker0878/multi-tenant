@@ -423,6 +423,15 @@ def build(plan, source_commit: str, ledger=None) -> dict:
             'COMPILATION_FAILED',
             'Every reviewed owner operation needs a typed delivery step',
             path='$.handoff.steps', details={'uncovered': sorted(missing)})
+    approved = plan.manifest.get('delivery', {}).get('topology_digest', '')
+    compiled = digest(approval_projection(plan, graph))
+    if compiled != approved:
+        raise ProvisioningError(
+            'APPROVAL_TOPOLOGY_MISMATCH',
+            'The compiled delivery topology is not the topology the reviewed plan binds',
+            path='$.handoff.steps',
+            details={'approved_topology_digest': approved,
+                     'compiled_topology_digest': compiled})
     return validate(graph)
 
 

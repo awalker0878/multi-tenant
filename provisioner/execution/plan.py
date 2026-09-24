@@ -232,11 +232,12 @@ def create_plan(document: dict, source: str, inventory: Inventory, catalog: Cata
             f'The selected platform {state.platform!r} cannot realize the reviewed plan',
             path='$.spec.platform',
             details={'platform': state.platform, 'problems': list(refused)})
-    # The manifest binds the delivery graph, and the delivery document binds the plan
-    # identity. The graph is therefore bound by identity first, so the plan identity is
-    # a pure function of the reviewed decision and never of its own derived operation ids.
-    plan = replace(plan, manifest=plan_manifest.build(
-        plan, delivery_graph=delivery_plan.graph_digest(state, list(terraform_scopes))))
+    # The manifest binds the reviewed delivery topology by identity, and the delivery
+    # document binds the plan identity. The topology is therefore bound first, so the
+    # plan identity is a pure function of the reviewed decision and never of its own
+    # derived operation ids. `handoff.build` re-derives this same topology from the
+    # graph it compiles and refuses a graph the manifest does not bind.
+    plan = replace(plan, manifest=plan_manifest.build(plan))
     plan = replace(plan, delivery=delivery_plan.build(
         state, list(terraform_scopes), plan_digest=plan.digest,
         operation_id=plan.operation_id))

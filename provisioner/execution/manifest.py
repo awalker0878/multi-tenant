@@ -11,6 +11,11 @@ owner-provisioned free text: it is reproducible from the reviewed inputs alone.
 Terms that would be derived from the manifest itself (the delivery `plan_digest`
 and the operation identities) are excluded, so the identity is never
 self-referential.
+
+The `delivery` term binds the identity of the *reviewed topology intent* — the
+sequence, kinds, dependencies, operation bindings and reviewed parameters that
+`provisioner.execution.handoff` declares and compiles — so an approval that cites
+this manifest cites the exact sequence that would be staged, not a summary of it.
 """
 from __future__ import annotations
 
@@ -34,10 +39,6 @@ TERMS = ('format', 'generation', 'request', 'request_identity', 'resolution', 'p
 #: decision, and binding it would make the plan identity depend on owner state.
 TERRAFORM_SCOPE_KEYS = ('scope', 'root', 'input', 'state_key', 'catalog_id',
                         'owner_scope', 'status')
-
-#: The delivery graph keys the manifest binds, excluding every derived identity.
-DELIVERY_KEYS = ('status', 'blocking', 'terraform', 'operations')
-DELIVERY_OPERATION_KEYS = ('name', 'owner', 'status', 'blocking', 'details')
 
 
 def request_identity(request) -> str:
@@ -156,9 +157,24 @@ def ansible_intent(scopes) -> list[dict]:
     return [dict(scope) for scope in scopes]
 
 
-def delivery_intent(graph: str) -> dict:
-    """The reviewed delivery graph, by identity."""
-    return {'graph': graph, 'keys': list(DELIVERY_KEYS)}
+def delivery_intent(plan) -> dict:
+    """The reviewed delivery topology, by identity.
+
+    The manifest binds the digest of the reviewed topology intent — the sequence, the
+    kinds, the dependencies, the operation bindings and the parameters the reviewed
+    decision fixes — and nothing else about delivery. The owner-operation summary
+    (`provisioner.execution.delivery`) states *which owners* must act; the topology
+    intent states *what will be staged*, and only the latter is what the runner
+    executes. Binding both would bind two identities for one decision and let a
+    change to the executed sequence pass unnoticed.
+
+    `handoff` owns the topology declaration, and `handoff` imports the platform
+    eligibility module, which imports `provisioner.repository`. The import is made
+    here, inside the function, so the manifest module graph stays free of that
+    dependency and no cycle is created at import time.
+    """
+    from provisioner.execution import handoff
+    return {'topology_digest': handoff.topology_digest(plan)}
 
 
 def classification(desired_state) -> dict:
@@ -175,7 +191,7 @@ def classification(desired_state) -> dict:
             'destructive': False, 'rebuild': False}
 
 
-def build(plan, delivery_graph: str = '') -> dict:
+def build(plan) -> dict:
     """The complete reviewed-plan manifest of one plan.
 
     Every term is either a reviewed decision or a digest of one. Nothing here is
@@ -208,7 +224,7 @@ def build(plan, delivery_graph: str = '') -> dict:
         'compiled_inputs': compiled_input_intent(plan.compiled),
         'terraform': terraform_intent(plan.terraform_scopes),
         'ansible': ansible_intent(plan.ansible_scopes),
-        'delivery': delivery_intent(delivery_graph),
+        'delivery': delivery_intent(plan),
         'classification': classification(plan.desired_state),
     }
 
@@ -249,5 +265,5 @@ def review(manifest: dict) -> dict:
             'environment': manifest['environment'],
             'terraform': [scope['state_key'] for scope in manifest['terraform']],
             'ansible': [scope.get('profile', '') for scope in manifest['ansible']],
-            'delivery': manifest['delivery']['graph'],
+            'delivery': manifest['delivery']['topology_digest'],
             'classification': manifest['classification']}
