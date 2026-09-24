@@ -18,6 +18,7 @@ from pathlib import Path
 
 from provisioner.cli import apply as apply_command
 from provisioner.cli import evidence as evidence_command
+from provisioner.cli import mobility as mobility_command
 from provisioner.cli import plan as plan_command
 from provisioner.cli import resolve as resolve_command
 from provisioner.cli import status as status_command
@@ -28,7 +29,7 @@ from provisioner.domain.errors import ProvisioningError
 from provisioner.execution.service import build_context
 
 PROGRAM = 'hosting'
-COMMANDS = ('validate', 'resolve', 'plan', 'apply', 'status', 'verify', 'evidence')
+COMMANDS = ('validate', 'resolve', 'plan', 'mobility-plan', 'apply', 'status', 'verify', 'evidence')
 
 DESCRIPTION = ('Portable hosting provisioning interface. '
                'Planning is enabled; execution is refused by design.')
@@ -39,7 +40,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument('command', choices=COMMANDS, help='Command to run')
     parser.add_argument('request', help='Path to a portable request document')
     parser.add_argument('--inventory', default=None,
-                        help='Reviewed inventory document (defaults to the non-authoritative fixture)')
+                        help='Reviewed source inventory document (defaults to the non-authoritative fixture)')
+    parser.add_argument('--target-inventory', default=None,
+                        help='Reviewed target inventory for mobility-plan; defaults to that platform fixture')
+    parser.add_argument('--mobility-intent', default=None,
+                        help='WorkloadMobility document used by mobility-plan')
     parser.add_argument('--profiles-root', default=None,
                         help='Alternate profile catalog root; the repository catalogs are the default')
     parser.add_argument('--approved-plan', default=None,
@@ -93,6 +98,8 @@ def dispatch(argv=None) -> tuple[int, dict]:
         return resolve_command.run(context)
     if args.command == 'plan':
         return plan_command.run(context, compile_environment=not args.no_compile)
+    if args.command == 'mobility-plan':
+        return mobility_command.run(context, args.mobility_intent, args.target_inventory)
     if args.command == 'status':
         return status_command.run(context, args.reservation_index, args.capacity_facts,
                                   args.ipam_index, args.dns_index)
