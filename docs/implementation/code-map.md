@@ -230,7 +230,7 @@ Current native qualification requires exact site/service/platform/security-edge 
 
 ## Production activation and initial-readiness assurance
 
-Design: [IK §7 controlled production activation](../implementation/delivery-guide/7-tenant-provisioning-and-controlled-production-activation.md) · [PROV §4 safe activation](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [IT §7 gate decision](../templates/implementation-mop/7-gate-decision-and-production-activation.md)
+Design: [IK §7 controlled production activation](delivery-guide/7-tenant-provisioning-and-controlled-production-activation.md) · [PROV §4 safe activation](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [IT §7 gate decision](../templates/implementation-mop/7-gate-decision-and-production-activation.md)
 
 Implementation: [active production activation assurance index](../../sources/capabilities/production_activation_assurance_index.json) · [assurance validator](../../scripts/check_production_activation_assurance.py) · [readiness preflight](../../scripts/check_production_activation_readiness.py) · [engineering boundary](../engineering/production-activation-and-initial-readiness-assurance.md)
 
