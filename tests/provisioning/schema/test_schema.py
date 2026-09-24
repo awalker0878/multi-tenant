@@ -50,6 +50,12 @@ class RegistryTest(unittest.TestCase):
         self.assertEqual(
             registry.validate_named(plan.conformance, 'conformance-report'), [])
 
+    def test_the_workload_mobility_contract_validates(self):
+        from provisioner.domain.request import load
+        document = load(
+            support.ROOT / 'examples/mobility/internal-production-openstack-to-nutanix.yaml')
+        self.assertEqual(registry.validate_named(document, 'workload-mobility'), [])
+
 
 class FailClosedTest(unittest.TestCase):
     def test_a_native_identifier_in_the_request_is_refused(self):
