@@ -6,7 +6,7 @@ from copy import deepcopy
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import digest
 from provisioner.portability import bundle as portability_bundle
-from provisioner.portability import capabilities, cutover, data as data_transfer, policy_translation
+from provisioner.portability import capabilities, cutover, data as data_transfer, handoff, policy_translation
 from provisioner.schemas import registry
 
 MIGRATION_FORMAT = 'hosting-workload-migration-plan/1'
@@ -118,6 +118,9 @@ def build(source_plan, target_plan, mobility: dict, artifact_resolutions: dict |
                 + list(transfer_plan['blockers'])
                 + _transfer_blockers(source_plan, mobility))
     artifact_resolutions = dict(artifact_resolutions or {})
+    delivery_topology = handoff.topology_intent(
+        target_plan, policy_plan=translated_policy, data_plan=transfer_plan,
+        cutover_plan=cutover_plan, artifact_realizations=artifact_resolutions)
     for side in ('source', 'target'):
         reference = artifact_resolutions.get(side)
         if reference and reference.get('status') != 'AUTHORITATIVE':
@@ -149,6 +152,7 @@ def build(source_plan, target_plan, mobility: dict, artifact_resolutions: dict |
         'cutover': cutover_plan,
         'transfer': deepcopy(mobility['spec']),
         'artifact_realizations': artifact_resolutions,
+        'delivery': delivery_topology,
         'capabilities': capabilities.dimensions(source_plan),
         'blockers': blockers,
         'stages': _stages(blockers),
