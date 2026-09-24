@@ -3,13 +3,17 @@
 A delivery plan enumerates every operation this decision needs and names the owner
 that must perform it. It exists so a reviewer can see the external boundaries
 before anything is executed. No operation is ever performed here.
+
+The document this module builds states *which owners* must act. It deliberately
+carries no approval identity of its own: the reviewed topology that would be staged
+is declared by `provisioner.execution.handoff`, and the manifest binds that
+topology's identity, so there is exactly one identity for what a reviewer approved.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
 from provisioner.domain.errors import ProvisioningError
-from provisioner.domain.request import digest
 from provisioner.execution import terraform
 
 DELIVERY_FORMAT = 'hosting-delivery-plan/1'
@@ -154,22 +158,3 @@ def require_unblocked(delivery: dict) -> None:
                                 'Blocking owner operations are outstanding',
                                 path='$.delivery',
                                 details={'blocking': delivery['blocking']})
-
-
-def graph_digest(state, scopes: list[dict]) -> str:
-    """The identity of the delivery graph a reviewed plan requires.
-
-    The graph is the operations this decision needs and the owner each is handed to.
-    It is a pure function of the reviewed decision, so it can be bound into the plan
-    manifest before the derived plan identity exists. The derived keys (`plan_digest`,
-    `operation_id` and the per-operation operation identities) are deliberately
-    excluded: they are computed from the manifest, so including them here would make
-    the identity self-referential.
-    """
-    document = build(state, scopes)
-    return digest({'status': document['status'],
-                   'blocking': document['blocking'],
-                   'terraform': document['terraform'],
-                   'operations': [{k: operation[k] for k in
-                                   ('name', 'owner', 'status', 'blocking', 'details')}
-                                  for operation in document['operations']]})
