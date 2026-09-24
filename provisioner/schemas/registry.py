@@ -17,6 +17,7 @@ SCHEMAS = {
     'resolved-desired-state': 'v1/resolved-desired-state.schema.json',
     'placement-decision': 'v1/placement-decision.schema.json',
     'conformance-report': 'v1/conformance-report.schema.json',
+    'workload-mobility': 'v1/workload-mobility.schema.json',
 }
 
 SUPPORTED_KEYWORDS = {
