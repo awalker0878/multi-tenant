@@ -1,0 +1,27 @@
+{
+  "format": "hosting-portable-workload-artifacts/1",
+  "status": "FIXTURE_NOT_AUTHORITATIVE",
+  "source": "reviewed portability fixture registry",
+  "artifacts": {
+    "artifact://linux/rhel9-base": {
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "architecture": "x86_64",
+      "firmware": "uefi",
+      "formats": ["qcow2", "vmdk", "ova"],
+      "platforms": {
+        "openstack": {
+          "image_id": "44444444-4444-4444-8444-444444444444"
+        },
+        "nutanix": {
+          "image_id": "mock-nutanix-image"
+        },
+        "vmware": {
+          "template_uuid": "mock-template-uuid",
+          "guest_id": "rhel9_64Guest",
+          "scsi_type": "pvscsi",
+          "firmware": "efi"
+        }
+      }
+    }
+  }
+}
