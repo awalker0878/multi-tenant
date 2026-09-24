@@ -7,7 +7,7 @@ import sys
 import unittest
 
 from provisioner.compiler import artifacts
-from provisioner.execution import delivery
+from provisioner.execution import handoff
 from provisioner.execution import plan as execution_plan
 from provisioner.policy import standards
 
@@ -63,9 +63,8 @@ class ReplayTest(unittest.TestCase):
         self.assertEqual([scope['state_key'] for scope in manifest['terraform']],
                          [scope['state_key'] for scope in plan.terraform_scopes])
         self.assertEqual(manifest['ansible'], [dict(s) for s in plan.ansible_scopes])
-        self.assertEqual(manifest['delivery']['graph'],
-                         delivery.graph_digest(plan.desired_state,
-                                               list(plan.terraform_scopes)))
+        self.assertEqual(manifest['delivery']['topology_digest'],
+                         handoff.topology_digest(plan))
         self.assertEqual(manifest['classification'],
                          {'lifecycle': plan.desired_state.lifecycle,
                           'disruptive': plan.desired_state.lifecycle == 'production',

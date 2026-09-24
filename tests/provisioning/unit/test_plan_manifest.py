@@ -6,8 +6,9 @@ bound into the manifest digest, that nothing derived or volatile is, and that a
 differently-formatted but equivalent request still replays to the same plan.
 
 Most binding tests isolate one term by replacing it on an otherwise identical plan
-and rebuilding the manifest from the *baseline* delivery graph, so the digest change
-can only come from the term under test.
+and rebuilding the manifest, so the digest change can only come from the term under
+test. The reviewed delivery topology is derived from the plan itself rather than
+injected, so a term the topology does not read leaves the delivery term untouched.
 """
 from __future__ import annotations
 
@@ -23,7 +24,7 @@ from unittest import mock
 
 from provisioner.domain.placement import UNSELECTED_PRODUCT
 from provisioner.domain.request import digest as canonical_digest
-from provisioner.execution import delivery
+from provisioner.execution import handoff
 from provisioner.execution import manifest as plan_manifest
 from provisioner.execution import plan as execution_plan
 from provisioner.inventory import model as inventory_model
@@ -74,18 +75,20 @@ def _run(*arguments: str) -> tuple[int, dict]:
     return completed.returncode, payload
 
 
-def _graph(plan) -> str:
-    return delivery.graph_digest(plan.desired_state, list(plan.terraform_scopes))
+def _renamed(step_id: str, **changes) -> tuple:
+    """The reviewed delivery sequence with exactly one step replaced."""
+    return tuple(replace(step, **changes) if step.id == step_id else step
+                 for step in handoff.STEPS)
 
 
-def _rebuild(plan, graph: str | None = None, **overrides) -> dict:
+def _rebuild(plan, **overrides) -> dict:
     """The manifest of `plan` with exactly `overrides` replaced.
 
-    `graph=None` reuses the baseline delivery graph, so a test that replaces a
-    desired-state or scope term can prove that term is bound on its own.
+    The reviewed delivery topology is a pure function of the plan, so it is not
+    injected here: a test that replaces a term the topology does not read proves that
+    term is bound on its own.
     """
-    changed = replace(plan, **overrides)
-    return plan_manifest.build(changed, delivery_graph=_graph(plan) if graph is None else graph)
+    return plan_manifest.build(replace(plan, **overrides))
 
 
 def _isolated(plan, **overrides) -> str:
@@ -323,11 +326,15 @@ class ManifestBindingTest(unittest.TestCase):
         changed = self.assert_bound('ansible scope', ansible_scopes=scopes)
         self.assertEqual(changed['ansible'][0]['phase'], 'reviewed-elsewhere')
 
-    def test_the_digest_changes_when_the_delivery_graph_changes(self):
-        changed = _rebuild(self.plan, graph='0' * 64)
+    def test_the_digest_changes_when_the_delivery_topology_changes(self):
+        """A changed executable topology changes the identity, and nothing else."""
+        with mock.patch.object(handoff, 'STEPS',
+                               _renamed('workload-plan', needs=('admission',))):
+            changed = _rebuild(self.plan)
         self.assertNotEqual(canonical_digest(changed), self.baseline)
-        self.assertEqual(changed['delivery']['graph'], '0' * 64)
-        # The graph is the only delivery term, so nothing else moved.
+        self.assertNotEqual(changed['delivery']['topology_digest'],
+                            self.plan.manifest['delivery']['topology_digest'])
+        # The topology is the only delivery term, so nothing else moved.
         self.assertEqual({key: value for key, value in changed.items() if key != 'delivery'},
                          {key: value for key, value in self.plan.manifest.items()
                           if key != 'delivery'})
