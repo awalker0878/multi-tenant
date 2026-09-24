@@ -6,7 +6,7 @@ from copy import deepcopy
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import digest
 from provisioner.portability import bundle as portability_bundle
-from provisioner.portability import capabilities, data as data_transfer, policy_translation
+from provisioner.portability import capabilities, cutover, data as data_transfer, policy_translation
 from provisioner.schemas import registry
 
 MIGRATION_FORMAT = 'hosting-workload-migration-plan/1'
@@ -112,6 +112,7 @@ def build(source_plan, target_plan, mobility: dict, artifact_resolutions: dict |
     equivalence = capabilities.compare(source_plan, target_plan)
     translated_policy = policy_translation.compile(portable['policy'], target_plan)
     transfer_plan = data_transfer.compile(mobility, source_plan, target_plan)
+    cutover_plan = cutover.compile(mobility, source_plan, target_plan)
     blockers = (list(equivalence['blockers'])
                 + list(translated_policy['blockers'])
                 + list(transfer_plan['blockers'])
@@ -145,6 +146,7 @@ def build(source_plan, target_plan, mobility: dict, artifact_resolutions: dict |
         'equivalence': equivalence,
         'policy_translation': translated_policy,
         'data_transfer': transfer_plan,
+        'cutover': cutover_plan,
         'transfer': deepcopy(mobility['spec']),
         'artifact_realizations': artifact_resolutions,
         'capabilities': capabilities.dimensions(source_plan),
