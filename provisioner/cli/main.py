@@ -45,6 +45,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help='Reviewed target inventory for mobility-plan; defaults to that platform fixture')
     parser.add_argument('--mobility-intent', default=None,
                         help='WorkloadMobility document used by mobility-plan')
+    parser.add_argument('--artifact-registry', default=None,
+                        help='Reviewed logical-artifact to native-realization registry for mobility-plan')
     parser.add_argument('--profiles-root', default=None,
                         help='Alternate profile catalog root; the repository catalogs are the default')
     parser.add_argument('--approved-plan', default=None,
@@ -99,7 +101,8 @@ def dispatch(argv=None) -> tuple[int, dict]:
     if args.command == 'plan':
         return plan_command.run(context, compile_environment=not args.no_compile)
     if args.command == 'mobility-plan':
-        return mobility_command.run(context, args.mobility_intent, args.target_inventory)
+        return mobility_command.run(context, args.mobility_intent, args.target_inventory,
+                                    args.artifact_registry)
     if args.command == 'status':
         return status_command.run(context, args.reservation_index, args.capacity_facts,
                                   args.ipam_index, args.dns_index)
