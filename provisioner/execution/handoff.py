@@ -13,6 +13,12 @@ mapping from the plan's owner operations to the typed steps that discharge them,
 so a reviewer can see that no responsibility is missing, that every step is a
 declared kind of the existing runner, and that no second runner exists.
 
+This module also owns the *reviewed topology intent*: the sequence, the kinds, the
+dependencies, the operation bindings and the parameters the reviewed decision
+fixes. The plan manifest binds its digest, and `build` refuses any graph whose
+projection is not that approved topology, so the approval an operator holds covers
+the exact sequence that would be staged.
+
 Nothing here executes, contacts a platform or holds authority.
 """
 from __future__ import annotations
@@ -22,6 +28,7 @@ from dataclasses import dataclass
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.generation import SCOPE_KEYS, claim, record_for
+from provisioner.domain.request import digest
 from provisioner.placement.eligibility import PLATFORMS
 
 #: The graph format the existing runner validates. It is the declared contract.
@@ -29,6 +36,14 @@ HANDOFF_FORMAT = 'hosting-delivery/1'
 HANDOFF_KEYS = ('format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps')
 STEP_KEYS = ('id', 'kind', 'needs')
 SOURCE_COMMIT = re.compile(r'^[0-9a-f]{40}$')
+
+#: The reviewed topology intent format. This is the approval-relevant half of the
+#: handoff: the sequence, the kinds, the dependencies, the operation bindings and the
+#: parameters the reviewed decision fixes. It carries no commit, no generation, no
+#: scope and no operation identity, because none of those is a reviewed decision.
+TOPOLOGY_FORMAT = 'hosting-delivery-topology-intent/1'
+TOPOLOGY_KEYS = ('format', 'steps', 'operationBindings', 'reviewedParameters',
+                 'compiledCatalogIds')
 
 #: Mirrors `tools.delivery_steps.KINDS`, the declared typed-step contract, and
 #: `tools.readback_core.ID`, the declared identifier grammar. The tools are the
@@ -299,6 +314,48 @@ def reviewed_parameters(plan) -> dict:
     return values
 
 
+def topology_intent(plan) -> dict:
+    """The reviewed delivery topology, as one canonical declaration.
+
+    The manifest binds the digest of this document, so an external approval that
+    cites the plan cites the exact sequence, kinds, dependencies, operation bindings
+    and reviewed parameters that will be staged. A change to any of them changes the
+    approved identity, which is what makes the approval provable rather than
+    descriptive.
+
+    Everything here is a reviewed decision. The clean source commit, the generation,
+    the scope and the derived operation identity are execution-time bindings and are
+    deliberately absent: they are not decisions a reviewer approved.
+    """
+    return {
+        'format': TOPOLOGY_FORMAT,
+        'steps': [step.to_dict() for step in STEPS],
+        'operationBindings': dict(sorted(OPERATION_STEPS.items())),
+        'reviewedParameters': {step_id: dict(parameters) for step_id, parameters
+                               in sorted(reviewed_parameters(plan).items())},
+        'compiledCatalogIds': dict(sorted(catalog_ids(plan).items())),
+    }
+
+
+def topology_digest(plan) -> str:
+    """The approved identity of the reviewed delivery topology."""
+    return digest(topology_intent(plan))
+
+
+def approval_projection(plan, graph: dict) -> dict:
+    """The reviewed topology as the compiled `hosting-delivery/1` graph states it.
+
+    `build` compares the digest of this projection with the digest the manifest
+    binds. The projection is deliberately built by *reading the graph*, not by
+    restating the declaration: a comparison that read `STEPS` on both sides would
+    prove nothing about what would actually execute.
+    """
+    projection = topology_intent(plan)
+    projection['steps'] = [{key: (list(step[key]) if key == 'needs' else step[key])
+                            for key in STEP_KEYS} for step in graph['steps']]
+    return projection
+
+
 def _declared_parameters(kind: str) -> frozenset:
     """Mirror of the declared parameter set of one kind.
 
@@ -347,6 +404,12 @@ def build(plan, source_commit: str, ledger=None) -> dict:
     refused *before* a graph exists, so no handoff can be compiled for a superseded
     claim. The repository itself holds no authoritative ledger and therefore passes
     none; the interface is the one the generation model already declares.
+
+    The compiled topology must be the topology the reviewed plan binds. The approval
+    an operator holds cites the plan digest, so a step, a dependency, an operation
+    binding or a reviewed parameter that differs from the approved one would stage a
+    delivery the approval does not cover. That mismatch is refused here, before the
+    graph leaves this module, rather than discovered by the runner mid-delivery.
     """
     if ledger is not None:
         claim(ledger, record_for(plan))
