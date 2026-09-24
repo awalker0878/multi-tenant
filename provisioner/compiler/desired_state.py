@@ -48,7 +48,8 @@ def domain_ids(tenant: str, wsd: str, zones: tuple[str, ...]) -> dict[str, str]:
 
 def build(request: Request, resolution, decision: PlacementDecision, inventory: Inventory,
           catalog=None, diagnostics: Diagnostics | None = None,
-          generation: int = 1, workload_artifact: dict | None = None) -> DesiredState:
+          generation: int = 1, workload_artifact: dict | None = None,
+          workload_native_inputs: dict | None = None) -> DesiredState:
     """Assemble the resolved desired state from placement and allocation.
 
     `generation` is the claimed change counter for this WSD identity. It is carried
@@ -90,9 +91,11 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
                 if catalog is not None else ())
     domain_inputs = site.domain_inputs()
     artifact_ref = workload_artifact.get('artifactRef') if workload_artifact else None
+    by_artifact = site.defaults.get('by_artifact', {})
     try:
         workload_inputs = site.workload_inputs(
-            compute['flavor_class'], resolution.storage['storage_class'], artifact_ref)
+            compute['flavor_class'], resolution.storage['storage_class'],
+            artifact_ref if artifact_ref in by_artifact else None)
     except KeyError as exc:
         raise ProvisioningError(
             'INVENTORY_INCOMPLETE',
@@ -101,6 +104,16 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
             path='inventory.sites.defaults.by_artifact',
             details={'site': site_key, 'platform': platform,
                      'artifact_ref': artifact_ref}) from exc
+    if workload_native_inputs:
+        workload_inputs.update(workload_native_inputs)
+    elif artifact_ref is not None and artifact_ref not in by_artifact:
+        raise ProvisioningError(
+            'REALIZATION_INPUT_UNAVAILABLE',
+            f'No reviewed native realization was supplied for workload artifact '
+            f'{artifact_ref!r} on {platform}',
+            path='$.spec.artifact.image',
+            details={'site': site_key, 'platform': platform,
+                     'artifact_ref': artifact_ref})
 
     domains: list[DomainIntent] = []
     for zone_allocation in allocation_record.zones:
