@@ -114,10 +114,16 @@ class Site:
     def domain_inputs(self) -> dict:
         return dict(self.defaults.get('domain_inputs', {}))
 
-    def workload_inputs(self, flavor_class: str, storage_class: str) -> dict:
+    def workload_inputs(self, flavor_class: str, storage_class: str,
+                        artifact_ref: str | None = None) -> dict:
         merged = dict(self.defaults.get('workload_inputs', {}))
         merged.update(self.defaults.get('by_flavor_class', {}).get(flavor_class, {}))
         merged.update(self.defaults.get('by_storage_class', {}).get(storage_class, {}))
+        if artifact_ref is not None:
+            artifacts = self.defaults.get('by_artifact', {})
+            if artifact_ref not in artifacts:
+                raise KeyError(artifact_ref)
+            merged.update(artifacts[artifact_ref])
         return merged
 
     def to_dict(self) -> dict:
@@ -265,7 +271,7 @@ def build(document: dict, origin: str = '<in-memory>') -> Inventory:
             raise ValueError(f'Duplicate inventory site: {site_raw["site"]}')
         seen_sites.add(site_raw['site'])
         defaults = dict(site_raw['defaults'])
-        unknown = set(defaults) - {'domain_inputs', 'workload_inputs', 'by_flavor_class', 'by_storage_class'}
+        unknown = set(defaults) - {'domain_inputs', 'workload_inputs', 'by_flavor_class', 'by_storage_class', 'by_artifact'}
         if unknown:
             raise ValueError(f'{site_raw["site"]}: unknown native default group')
         cells: list[Cell] = []
