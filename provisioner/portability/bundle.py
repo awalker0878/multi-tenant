@@ -17,13 +17,16 @@ def _workloads(plan) -> list[dict]:
     rows = []
     for domain in plan.desired_state.domains:
         for workload in domain.workloads:
-            rows.append({
+            row = {
                 'name': workload.name,
                 'zone': domain.zone,
                 'compute': {'vcpu': workload.vcpu, 'memory_gib': workload.memory_gib},
                 'storage': {'boot_disk_gib': workload.boot_disk_gib,
                             'data_disk_gib': workload.data_disk_gib},
-            })
+            }
+            if getattr(workload, 'artifact', None):
+                row['artifact'] = dict(workload.artifact)
+            rows.append(row)
     return sorted(rows, key=lambda row: (row['zone'], row['name']))
 
 
