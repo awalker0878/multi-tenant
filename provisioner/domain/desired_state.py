@@ -24,11 +24,15 @@ class WorkloadIntent:
     boot_disk_gib: int
     data_disk_gib: int
     inputs: dict = field(default_factory=dict)
+    artifact: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
-        return {'name': self.name, 'address': self.address, 'vcpu': self.vcpu,
-                'memory_gib': self.memory_gib, 'boot_disk_gib': self.boot_disk_gib,
-                'data_disk_gib': self.data_disk_gib, 'inputs': dict(self.inputs)}
+        row = {'name': self.name, 'address': self.address, 'vcpu': self.vcpu,
+               'memory_gib': self.memory_gib, 'boot_disk_gib': self.boot_disk_gib,
+               'data_disk_gib': self.data_disk_gib, 'inputs': dict(self.inputs)}
+        if self.artifact:
+            row['artifact'] = dict(self.artifact)
+        return row
 
 
 @dataclass(frozen=True)
