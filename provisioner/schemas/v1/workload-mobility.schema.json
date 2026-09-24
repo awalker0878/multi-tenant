@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hosting.platform/v1/workload-mobility",
+  "title": "Portable workload mobility intent",
+  "description": "Migration-specific intent layered on a portable WorkloadSecurityDomain request. No provider-native IDs or credentials are accepted.",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {"const": "hosting.platform/v1"},
+    "kind": {"const": "WorkloadMobility"},
+    "metadata": {
+      "type": "object",
+      "required": ["tenant", "name", "owner"],
+      "additionalProperties": false,
+      "properties": {
+        "tenant": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,23}$"},
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+        "owner": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,40}$"}
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["source", "target", "strategy", "artifact", "data", "security", "cutover"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {"$ref": "#/definitions/source"},
+        "target": {"$ref": "#/definitions/target"},
+        "strategy": {
+          "type": "object",
+          "required": ["mode"],
+          "additionalProperties": false,
+          "properties": {"mode": {"enum": ["rebuild-restore", "image-convert", "replicate"]}}
+        },
+        "artifact": {
+          "type": "object",
+          "required": ["image"],
+          "additionalProperties": false,
+          "properties": {"image": {"$ref": "#/definitions/image"}}
+        },
+        "data": {
+          "type": "object",
+          "required": ["datasets"],
+          "additionalProperties": false,
+          "properties": {
+            "datasets": {"type": "array", "minItems": 1, "maxItems": 32,
+                         "items": {"$ref": "#/definitions/dataset"}}
+          }
+        },
+        "security": {
+          "type": "object",
+          "required": ["secrets", "keys"],
+          "additionalProperties": false,
+          "properties": {
+            "secrets": {"enum": ["rebind", "external-provider"]},
+            "keys": {"enum": ["rebind", "external-kms"]}
+          }
+        },
+        "cutover": {
+          "type": "object",
+          "required": ["maxDowntimeSeconds", "maxDataLossSeconds", "rollbackWindowSeconds"],
+          "additionalProperties": false,
+          "properties": {
+            "maxDowntimeSeconds": {"type": "integer", "minimum": 0, "maximum": 604800},
+            "maxDataLossSeconds": {"type": "integer", "minimum": 0, "maximum": 604800},
+            "rollbackWindowSeconds": {"type": "integer", "minimum": 0, "maximum": 2592000}
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "source": {
+      "type": "object",
+      "required": ["platform"],
+      "additionalProperties": false,
+      "properties": {"platform": {"enum": ["nutanix", "vmware", "openstack"]}}
+    },
+    "target": {
+      "type": "object",
+      "required": ["platform", "region"],
+      "additionalProperties": false,
+      "properties": {
+        "platform": {"enum": ["nutanix", "vmware", "openstack"]},
+        "region": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+        "site": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+        "cell": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9-]{1,40}$"}
+      }
+    },
+    "image": {
+      "type": "object",
+      "required": ["artifactRef", "sha256", "format", "architecture", "firmware"],
+      "additionalProperties": false,
+      "properties": {
+        "artifactRef": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "format": {"enum": ["raw", "qcow2", "vmdk", "vhdx", "ova", "oci"]},
+        "architecture": {"enum": ["x86_64", "arm64"]},
+        "firmware": {"enum": ["bios", "uefi"]}
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "required": ["name", "method", "consistency", "sourceRef", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$"},
+        "method": {"enum": ["backup-restore", "block-copy", "object-copy", "database-native"]},
+        "consistency": {"enum": ["crash", "application"]},
+        "sourceRef": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}
