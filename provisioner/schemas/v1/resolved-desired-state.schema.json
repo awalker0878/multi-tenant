@@ -112,7 +112,19 @@
                 "memory_gib": {"type": "integer", "minimum": 1},
                 "boot_disk_gib": {"type": "integer", "minimum": 1},
                 "data_disk_gib": {"type": "integer", "minimum": 0},
-                "inputs": {"type": "object"}
+                "inputs": {"type": "object"},
+                "artifact": {
+                  "type": "object",
+                  "required": ["artifactRef", "sha256", "format", "architecture", "firmware"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "artifactRef": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$"},
+                    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                    "format": {"enum": ["raw", "qcow2", "vmdk", "vhdx", "ova", "oci"]},
+                    "architecture": {"enum": ["x86_64", "arm64"]},
+                    "firmware": {"enum": ["bios", "uefi"]}
+                  }
+                }
               }
             }
           }
