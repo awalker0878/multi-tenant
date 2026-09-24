@@ -32,8 +32,8 @@ def load(path: Path | str | None = None) -> dict:
     return document
 
 
-def resolve(image: dict, platform: str, path: Path | str | None = None) -> dict:
-    """Resolve one logical artifact into reviewed native inputs for a platform."""
+def resolve(image: dict, platform: str, site: str, path: Path | str | None = None) -> dict:
+    """Resolve one logical artifact into reviewed native inputs for one selected site."""
     document = load(path)
     artifact_ref = image['artifactRef']
     row = document['artifacts'].get(artifact_ref)
@@ -57,13 +57,16 @@ def resolve(image: dict, platform: str, path: Path | str | None = None) -> dict:
             details={'artifact_ref': artifact_ref, 'expected': expected,
                      'registry': actual, 'format': image['format'],
                      'formats': list(row.get('formats', []))})
-    native = row.get('platforms', {}).get(platform)
+    platform_sites = row.get('platforms', {}).get(platform)
+    site_entry = platform_sites.get(site) if isinstance(platform_sites, dict) else None
+    native = site_entry.get('native_inputs') if isinstance(site_entry, dict) else None
     if not isinstance(native, dict) or not native:
         raise ProvisioningError(
             'REALIZATION_INPUT_UNAVAILABLE',
-            f'Artifact {artifact_ref!r} has no reviewed realization for {platform}',
+            f'Artifact {artifact_ref!r} has no reviewed realization for '
+            f'{platform}/{site}',
             path='$.spec.target.platform',
-            details={'artifact_ref': artifact_ref, 'platform': platform})
+            details={'artifact_ref': artifact_ref, 'platform': platform, 'site': site})
     reference = {
         'format': document['format'],
         'status': document.get('status', ''),
@@ -72,5 +75,6 @@ def resolve(image: dict, platform: str, path: Path | str | None = None) -> dict:
         'artifact_ref': artifact_ref,
         'artifact_sha256': row['sha256'],
         'platform': platform,
+        'site': site,
     }
     return {'reference': reference, 'native_inputs': dict(native)}
