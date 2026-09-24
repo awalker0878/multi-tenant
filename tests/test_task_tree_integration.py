@@ -26,7 +26,7 @@ class NavigationIntegrationTests(unittest.TestCase):
     def test_task_and_commissioning_navigation_match_generator(self):
         actual = self.navigation()
         for name in ('docs/engineering/README.md', 'docs/implementation/README.md'):
-            self.assertEqual(actual[name], (ROOT/name).read_text())
+            self.assertEqual(actual[name], (ROOT/name).read_text(encoding='utf-8'))
 
     def test_capability_registry_navigation_survives_regeneration(self):
         text = self.navigation()['docs/engineering/README.md']

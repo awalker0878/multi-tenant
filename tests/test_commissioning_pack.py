@@ -339,11 +339,27 @@ class IntegrationTests(unittest.TestCase):
             builder.navigation()
         return captured
 
+    def assert_navigation_matches_source(self, name):
+        """The generated navigation bytes must be exactly the committed bytes."""
+        self.assertEqual(self.navigation()[name], (ROOT/name).read_text(encoding='utf-8'))
+
     def test_generated_implementation_navigation_matches(self):
-        self.assertEqual(self.navigation()['docs/implementation/README.md'], (ROOT/'docs/implementation/README.md').read_text())
+        self.assert_navigation_matches_source('docs/implementation/README.md')
 
     def test_generated_engineering_navigation_preserves_ipv6(self):
-        self.assertEqual(self.navigation()['docs/engineering/README.md'], (ROOT/'docs/engineering/README.md').read_text())
+        self.assert_navigation_matches_source('docs/engineering/README.md')
+
+    def test_generated_engineering_navigation_matches_source(self):
+        self.assert_navigation_matches_source('docs/engineering/README.md')
+
+    def test_generated_implementation_navigation_matches_source(self):
+        self.assert_navigation_matches_source('docs/implementation/README.md')
+
+    def test_portable_provisioning_navigation_survives_regeneration(self):
+        engineering = self.navigation()['docs/engineering/README.md']
+        for destination in ('../provisioning/request-contract.md', '../provisioning/profile-model.md', '../provisioning/placement-model.md'):
+            self.assertIn(destination, engineering)
+        self.assertIn('../provisioning/README.md', self.navigation()['docs/implementation/README.md'])
 
     def test_generated_navigation_keeps_both_work_packages(self):
         actual = self.navigation()['docs/implementation/README.md']
