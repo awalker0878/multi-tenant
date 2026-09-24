@@ -97,7 +97,7 @@ def _stages(blockers: list[str]) -> list[dict]:
     ]
 
 
-def build(source_plan, target_plan, mobility: dict) -> dict:
+def build(source_plan, target_plan, mobility: dict, artifact_resolutions: dict | None = None) -> dict:
     """Build a deterministic mobility plan; never execute or imply success."""
     mobility = validate_intent(mobility)
     _identity_matches(source_plan, mobility)
@@ -111,6 +111,11 @@ def build(source_plan, target_plan, mobility: dict) -> dict:
     portable = portability_bundle.build(source_plan)
     equivalence = capabilities.compare(source_plan, target_plan)
     blockers = list(equivalence['blockers']) + _transfer_blockers(source_plan, mobility)
+    artifact_resolutions = dict(artifact_resolutions or {})
+    for side in ('source', 'target'):
+        reference = artifact_resolutions.get(side)
+        if reference and reference.get('status') != 'AUTHORITATIVE':
+            blockers.append(f'{side.upper()}_ARTIFACT_MAPPING_NOT_AUTHORITATIVE')
     blockers = sorted(set(blockers))
     repository_blocked = any(item.startswith('MIGRATION_MODE_NOT_IMPLEMENTED')
                              for item in blockers)
@@ -134,6 +139,7 @@ def build(source_plan, target_plan, mobility: dict) -> dict:
         'portability_bundle': portable,
         'equivalence': equivalence,
         'transfer': deepcopy(mobility['spec']),
+        'artifact_realizations': artifact_resolutions,
         'capabilities': capabilities.dimensions(source_plan),
         'blockers': blockers,
         'stages': _stages(blockers),
