@@ -63,6 +63,39 @@ def plan_for(context: Context, compile_environment: bool = True):
                                       generation=context.generation)
 
 
+def mobility_plan_for(context: Context, mobility_path, target_inventory_path=None):
+    """Plan one cross-platform migration from the same portable WSD intent.
+
+    The WSD request remains the owner of workload and policy semantics. The mobility
+    document adds only migration-specific source/target, artifact, data, secret/key
+    rebinding and cutover requirements. Both source and target are planned through
+    the same existing provisioning core before the portability layer compares them.
+    """
+    from provisioner.portability import migration
+
+    mobility_target = Path(mobility_path)
+    mobility = load_document(mobility_target)
+    migration.validate_intent(mobility)
+
+    source_document = migration.source_request(context.document, mobility)
+    source = execution_plan.create_plan(
+        source_document, context.source, context.inventory, context.catalog,
+        compile_environment=True, generation=context.generation)
+
+    target_platform = mobility['spec']['target']['platform']
+    target_inventory = (
+        inventory_model.load(target_inventory_path)
+        if target_inventory_path
+        else inventory_model.fixture(f'{target_platform}-reference')
+    )
+    target_document = migration.target_request(context.document, mobility)
+    target = execution_plan.create_plan(
+        target_document, context.source, target_inventory, context.catalog,
+        compile_environment=True, generation=context.generation)
+
+    return migration.build(source, target, mobility)
+
+
 def capacity_evidence(plan, reservation_index=None, as_of=None, facts_path=None) -> dict:
     """What the reviewed capacity arithmetic claims and what the exported records say.
 
