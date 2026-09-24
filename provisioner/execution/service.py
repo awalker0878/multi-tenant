@@ -71,21 +71,25 @@ def mobility_plan_for(context: Context, mobility_path, target_inventory_path=Non
     rebinding and cutover requirements. Both source and target are planned through
     the same existing provisioning core before the portability layer compares them.
     """
-    from provisioner.portability import migration
+    from provisioner.portability import artifacts, migration
 
     mobility_target = Path(mobility_path)
     mobility = load_document(mobility_target)
     migration.validate_intent(mobility)
 
     artifact = dict(mobility['spec']['artifact']['image'])
+    source_platform = mobility['spec']['source']['platform']
+    target_platform = mobility['spec']['target']['platform']
+    source_artifact = artifacts.resolve(artifact, source_platform)
+    target_artifact = artifacts.resolve(artifact, target_platform)
 
     source_document = migration.source_request(context.document, mobility)
     source = execution_plan.create_plan(
         source_document, context.source, context.inventory, context.catalog,
         compile_environment=True, generation=context.generation,
-        workload_artifact=artifact)
+        workload_artifact=artifact,
+        workload_native_inputs=source_artifact['native_inputs'])
 
-    target_platform = mobility['spec']['target']['platform']
     target_inventory = (
         inventory_model.load(target_inventory_path)
         if target_inventory_path
@@ -95,9 +99,13 @@ def mobility_plan_for(context: Context, mobility_path, target_inventory_path=Non
     target = execution_plan.create_plan(
         target_document, context.source, target_inventory, context.catalog,
         compile_environment=True, generation=context.generation,
-        workload_artifact=artifact)
+        workload_artifact=artifact,
+        workload_native_inputs=target_artifact['native_inputs'])
 
-    return migration.build(source, target, mobility)
+    return migration.build(
+        source, target, mobility,
+        artifact_resolutions={'source': source_artifact['reference'],
+                              'target': target_artifact['reference']})
 
 
 def capacity_evidence(plan, reservation_index=None, as_of=None, facts_path=None) -> dict:
