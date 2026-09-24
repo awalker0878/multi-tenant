@@ -48,7 +48,7 @@ def domain_ids(tenant: str, wsd: str, zones: tuple[str, ...]) -> dict[str, str]:
 
 def build(request: Request, resolution, decision: PlacementDecision, inventory: Inventory,
           catalog=None, diagnostics: Diagnostics | None = None,
-          generation: int = 1) -> DesiredState:
+          generation: int = 1, workload_artifact: dict | None = None) -> DesiredState:
     """Assemble the resolved desired state from placement and allocation.
 
     `generation` is the claimed change counter for this WSD identity. It is carried
@@ -89,8 +89,18 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
     bindings = (service_bindings.resolve(resolution, catalog, inventory, site_key)
                 if catalog is not None else ())
     domain_inputs = site.domain_inputs()
-    workload_inputs = site.workload_inputs(compute['flavor_class'],
-                                          resolution.storage['storage_class'])
+    artifact_ref = workload_artifact.get('artifactRef') if workload_artifact else None
+    try:
+        workload_inputs = site.workload_inputs(
+            compute['flavor_class'], resolution.storage['storage_class'], artifact_ref)
+    except KeyError as exc:
+        raise ProvisioningError(
+            'INVENTORY_INCOMPLETE',
+            f'Reviewed site {site_key} has no native realization for workload artifact '
+            f'{artifact_ref!r}',
+            path='inventory.sites.defaults.by_artifact',
+            details={'site': site_key, 'platform': platform,
+                     'artifact_ref': artifact_ref}) from exc
 
     domains: list[DomainIntent] = []
     for zone_allocation in allocation_record.zones:
@@ -102,7 +112,8 @@ def build(request: Request, resolution, decision: PlacementDecision, inventory: 
                            memory_gib=compute['memory_gib'],
                            boot_disk_gib=compute['boot_disk_gib'],
                            data_disk_gib=resolution.storage['data_disk_gib'],
-                           inputs=dict(workload_inputs))
+                           inputs=dict(workload_inputs),
+                           artifact=dict(workload_artifact or {}))
             for index, address in enumerate(zone_allocation.prefix.addresses))
         domains.append(DomainIntent(
             domain_id=ids[zone_allocation.zone], zone=zone_allocation.zone,
