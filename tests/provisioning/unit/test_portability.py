@@ -23,9 +23,9 @@ def mobility_document():
 class ArtifactResolutionTest(unittest.TestCase):
     def test_same_logical_artifact_resolves_to_platform_native_inputs(self):
         image = mobility_document()['spec']['artifact']['image']
-        openstack = artifacts.resolve(image, 'openstack')
-        nutanix = artifacts.resolve(image, 'nutanix')
-        vmware = artifacts.resolve(image, 'vmware')
+        openstack = artifacts.resolve(image, 'openstack', 'site-01')
+        nutanix = artifacts.resolve(image, 'nutanix', 'site-01')
+        vmware = artifacts.resolve(image, 'vmware', 'site-01')
         self.assertEqual(openstack['reference']['artifact_ref'], image['artifactRef'])
         self.assertEqual(nutanix['reference']['artifact_sha256'], image['sha256'])
         self.assertIn('image_id', openstack['native_inputs'])
@@ -37,7 +37,7 @@ class ArtifactResolutionTest(unittest.TestCase):
         image = copy.deepcopy(mobility_document()['spec']['artifact']['image'])
         image['sha256'] = 'c' * 64
         with self.assertRaises(ProvisioningError) as raised:
-            artifacts.resolve(image, 'openstack')
+            artifacts.resolve(image, 'openstack', 'site-01')
         self.assertEqual(raised.exception.code, 'ARTIFACT_INTEGRITY_FAILED')
 
 
