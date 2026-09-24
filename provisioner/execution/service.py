@@ -63,13 +63,15 @@ def plan_for(context: Context, compile_environment: bool = True):
                                       generation=context.generation)
 
 
-def mobility_plan_for(context: Context, mobility_path, target_inventory_path=None):
+def mobility_plan_for(context: Context, mobility_path, target_inventory_path=None,
+                      artifact_registry_path=None):
     """Plan one cross-platform migration from the same portable WSD intent.
 
-    The WSD request remains the owner of workload and policy semantics. The mobility
-    document adds only migration-specific source/target, artifact, data, secret/key
-    rebinding and cutover requirements. Both source and target are planned through
-    the same existing provisioning core before the portability layer compares them.
+    Planning is deliberately two-pass. The first pass uses the normal placement
+    engine to select the exact source and target sites without any migration
+    realization. The logical workload artifact is then resolved for those selected
+    sites, and the second pass rebuilds both reviewed plans with the exact native
+    image/template inputs bound to the portable artifact digest.
     """
     from provisioner.portability import artifacts, migration
 
@@ -78,24 +80,34 @@ def mobility_plan_for(context: Context, mobility_path, target_inventory_path=Non
     migration.validate_intent(mobility)
 
     artifact = dict(mobility['spec']['artifact']['image'])
-    source_platform = mobility['spec']['source']['platform']
     target_platform = mobility['spec']['target']['platform']
-    source_artifact = artifacts.resolve(artifact, source_platform)
-    target_artifact = artifacts.resolve(artifact, target_platform)
-
     source_document = migration.source_request(context.document, mobility)
-    source = execution_plan.create_plan(
-        source_document, context.source, context.inventory, context.catalog,
-        compile_environment=True, generation=context.generation,
-        workload_artifact=artifact,
-        workload_native_inputs=source_artifact['native_inputs'])
-
+    target_document = migration.target_request(context.document, mobility)
     target_inventory = (
         inventory_model.load(target_inventory_path)
         if target_inventory_path
         else inventory_model.fixture(f'{target_platform}-reference')
     )
-    target_document = migration.target_request(context.document, mobility)
+
+    source_placement = execution_plan.create_plan(
+        source_document, context.source, context.inventory, context.catalog,
+        compile_environment=False, generation=context.generation)
+    target_placement = execution_plan.create_plan(
+        target_document, context.source, target_inventory, context.catalog,
+        compile_environment=False, generation=context.generation)
+
+    source_artifact = artifacts.resolve(
+        artifact, source_placement.desired_state.platform,
+        source_placement.desired_state.site_key, artifact_registry_path)
+    target_artifact = artifacts.resolve(
+        artifact, target_placement.desired_state.platform,
+        target_placement.desired_state.site_key, artifact_registry_path)
+
+    source = execution_plan.create_plan(
+        source_document, context.source, context.inventory, context.catalog,
+        compile_environment=True, generation=context.generation,
+        workload_artifact=artifact,
+        workload_native_inputs=source_artifact['native_inputs'])
     target = execution_plan.create_plan(
         target_document, context.source, target_inventory, context.catalog,
         compile_environment=True, generation=context.generation,
