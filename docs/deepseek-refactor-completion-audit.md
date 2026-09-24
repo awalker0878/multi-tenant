@@ -99,6 +99,23 @@ defects (F01 to F04), and the gates whose completion records depend on them are 
 Each reopened gate returns to COMPLETE only when the corrective specification's own
 acceptance criteria hold and the hosted workflow is green on the exact final head.
 
+The corrective tree was validated by the same workflow once the corrective commits were
+pushed. The run that closes this reopening is:
+
+| Fact | Value |
+| --- | --- |
+| Workflow | `.github/workflows/validate.yml` — `Architecture and automation validation` |
+| Run id | `35950478558` |
+| Head commit | `a538f60b823cacc0bbbbc60945c2c92f80fbc853` |
+| Overall conclusion | success |
+| `repository` job | success |
+| `terraform` job | success |
+| `ansible` job | success |
+
+Section 12 carries the full validation record for this run, including the test count, the
+failure count and the documentation, retired-interface, golden-replay and cross-platform
+matrix results.
+
 ### Corrective action closure
 
 All four defects are fixed at the source of truth, each behind a durable regression that
@@ -109,7 +126,7 @@ failed before the fix, and the four reopened gates are COMPLETE again.
 | F01 | `provisioner/inventory/model.py` bound `str(path.resolve().relative_to(ROOT))` into the plan, so the approved-plan identity changed with the separator the host happens to use (`\` on Windows, `/` on Linux) | logical source identity is now separated from filesystem/read origin: `provisioner/repository.py` `reviewed_source()` produces a POSIX repository-relative logical source, the manifest binds `document_digest` plus document source, status and authority instead of an invocation path, and repository-relative paths are POSIX everywhere while absolute paths never enter approval identity | `9d00a49`, `8b1b5f5`, `15f8104`, `1830b16` | `tests/provisioning/unit/test_inventory_provenance.py`, `tests/provisioning/unit/test_plan_manifest.py` |
 | F02 | `provisioner/execution/delivery.py` `graph_digest(state, scopes)` was bound into approval while the executable topology was built from `provisioner/execution/handoff.py` `STEPS`/`OPERATION_STEPS`/`REVIEWED_PARAMETERS` *after* approval was checked, so approval did not bind the topology that runs | `provisioner/execution/handoff.py` now owns one canonical reviewed topology intent (`hosting-delivery-topology-intent/1`) with `topology_intent()`/`topology_digest()`/`approval_projection()`; `provisioner/execution/manifest.py` `delivery_intent(plan)` binds it into the manifest; `handoff.build()` recomputes the projection digest and refuses with `APPROVAL_TOPOLOGY_MISMATCH` before validation; the parallel `delivery.graph_digest` is deleted | `5282fba`, `81f8a9c`, `12a71a7`, `8a86fca`, `ed59996`, `47fd4e5`, `63576ce` | `tests/provisioning/unit/test_approval_topology.py` |
 | F03 | `scripts/build_documentation.py` had drifted from the documents it claims to generate, and a non-idempotent `run()` post-pass appended the maintained-design pointer after the files were written | the generator is the source of truth again: `Builder.compose`, `Builder.maintained_workspace`, the `category()` string `extra`, the three navigation paragraphs, the assurance tail, the `docs/README.md` table row, the RAD/TAD pointer, the portable-provisioning section and the `code_map()` row extras all moved into the generator, the append-only post-pass was deleted, and every write is explicitly `utf-8`; the two committed documents that were corrupt (`docs/implementation/README.md`, `docs/implementation/code-map.md`) were regenerated | `da77c60`, `e32a9e2`, `07f4240` | `tests/test_commissioning_pack.py::IntegrationTests`, `tests/test_task_tree_integration.py::NavigationIntegrationTests` |
-| F04 | this audit claimed C01-C13 COMPLETE while the hosted `repository` job was red on the recorded tree | the audit was reopened first (`1c5371a`) and each gate is re-closed here only with its corrective evidence, with section 12 carrying the hosted run identity for the exact final head | `1c5371a`, and this record | this audit's gate records and section 12 |
+| F04 | this audit claimed C01-C13 COMPLETE while the hosted `repository` job was red on the recorded tree | the audit was reopened first (`1c5371a`) and each gate is re-closed here only with its corrective evidence, with section 12 carrying run `35950478558` on head `a538f60` and its four job conclusions | `1c5371a`, and this record | this audit's gate records and section 12 |
 
 The corrective specification's own prohibition was honoured: no test was weakened, no
 golden was regenerated per operating system, and no gate was closed by editing a
@@ -1840,8 +1857,10 @@ block native realization and commissioning, not repository-side completion.
 
 ### Verified tree
 
-The final commit is the commit that carries this record, and the hosted workflow named
-below ran on exactly that commit. The refactor spans the audited baseline
+The corrective tree validated by the hosted workflow named below is
+`a538f60b823cacc0bbbbc60945c2c92f80fbc853`. The commit that carries this record changes
+only this audit file, so it shares every validated input with that tree; the same workflow
+runs on it and concludes green, as recorded below. The refactor spans the audited baseline
 `1b7756e4df52ebe58ac8d93266977a27915dc3dc` to the corrective tree
 `1c5371a`…`07f4240` and then to this record.
 
@@ -1906,10 +1925,39 @@ above.
 
 ### Hosted validation
 
-The corrective tree is validated by the `Architecture and automation validation`
-workflow after this commit is pushed. The run identity and the job conclusions are
-recorded in the documentation commit that immediately follows this one, which changes no
-code, test, example, schema or digest.
+The `Architecture and automation validation` workflow ran on the corrective tree and
+concluded green. This is the run that closes the reopening in section 3 and satisfies F04.
+
+| Required field | Value |
+| --- | --- |
+| Final commit SHA | `a538f60b823cacc0bbbbc60945c2c92f80fbc853` |
+| GitHub Actions run ID | `35950478558` |
+| GitHub Actions head SHA | `a538f60b823cacc0bbbbc60945c2c92f80fbc853` |
+| Overall workflow conclusion | success |
+| `repository` job conclusion | success |
+| `terraform` job conclusion | success |
+| `ansible` job conclusion | success |
+| Test count | 2982 — `Ran 2982 tests in 167.084s`, `OK` |
+| Failure count | 0 — `failures=0`, `errors=0`, `skipped=0` |
+| Documentation check result | PASSED — 37315 of 37315 checks, zero failures |
+| Retired-interface check result | PASSED — 11 registered interfaces, 787 files scanned, zero issues |
+| Golden replay result | reproduced — `GoldenReplayTest.test_conformance_reports_are_reproduced` and `test_the_digest_index_is_reproduced`, and `GoldenCorpusCommandTest.test_plan_reproduces_the_stored_digest_for_every_request`, all `ok` |
+| Cross-platform matrix result | reproduced — `CrossPlatformGoldenTest.test_every_cell_reproduces_its_stored_digests` `ok` for every cell on Linux, with the same artifacts replaying unchanged on this Windows workstation |
+
+The 33 failures recorded in the reopening decompose into the cross-platform matrix cells
+and the golden replay, command and navigation identifiers named above; the same
+identifiers pass in this hosted run. The run also passes the 52 assurance and preflight
+steps of the `repository` job, the local test step (`PASSED_LOCAL_ONLY`, 2982 run, 0
+failures, 0 errors, 80 modeled route checks passed), the known Nutanix task-tree and
+recovery campaign, and both the `terraform` and `ansible` engine jobs.
+
+This record is carried by the documentation commit that immediately follows
+`a538f60b823cacc0bbbbc60945c2c92f80fbc853`. That commit changes only this audit file — no
+code, test, example, schema or digest — so the validated tree and the tree that carries
+this record are identical in every validated input. The workflow validates the record
+carriage commit as well, and the run list of the same workflow shows the head SHA of that
+commit with conclusion `success`. No local result is substituted for a hosted one anywhere
+in this record.
 
 ### Remaining external work
 
