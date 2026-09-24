@@ -186,7 +186,8 @@ def phases(compile_environment: bool = True) -> tuple[dict, ...]:
 
 def create_plan(document: dict, source: str, inventory: Inventory, catalog: Catalog,
                 compile_environment: bool = True, qualification=None,
-                generation: int = 1, workload_artifact: dict | None = None) -> Plan:
+                generation: int = 1, workload_artifact: dict | None = None,
+                workload_native_inputs: dict | None = None) -> Plan:
     """Run the whole pipeline and return the complete plan.
 
     `generation` is the claimed change counter for this WSD identity. It is carried
@@ -208,7 +209,8 @@ def create_plan(document: dict, source: str, inventory: Inventory, catalog: Cata
     state = compiler_desired_state.build(request, resolution, decision, inventory,
                                          catalog=catalog, diagnostics=diagnostics,
                                          generation=generation,
-                                         workload_artifact=workload_artifact)
+                                         workload_artifact=workload_artifact,
+                                         workload_native_inputs=workload_native_inputs)
     environment_document = compiler_environment.render(state)
     compiled, compile_plan = (compiler_environment.compile_document(environment_document)
                               if compile_environment else ({}, {}))
