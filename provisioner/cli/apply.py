@@ -18,15 +18,12 @@ from provisioner.execution import authority as authority_module
 from provisioner.execution import delivery as delivery_module
 from provisioner.execution import handoff as handoff_module
 from provisioner.execution import manifest as manifest_module
+from provisioner.execution import source as source_module
 from provisioner.execution.service import (Context, address_evidence, capacity_evidence,
                                            plan_for)
-from provisioner import repository
 
 RESULT_FORMAT = 'hosting-apply-result/1'
 HANDOFF_STATUS = 'EXECUTION_REFUSED_HANDOFF_READY'
-NO_CHECKOUT = 'BLOCKED_NO_CURRENT_CHECKOUT'
-
-
 def load_approvals(path) -> tuple:
     """Read recorded approvals. An approval is external evidence, never a request field."""
     if path is None:
@@ -41,39 +38,6 @@ def refuse(code: str, message: str, context: Context, **details) -> tuple[int, d
                           'source': context.source, 'errors': [error.to_dict()],
                           'native_contact': False,
                           'limits': ['This repository never executes a change']}
-
-
-def bind_source_commit(plan, requested: str | None) -> tuple:
-    """Bind one exact clean source commit, or refuse before anything is compiled.
-
-    The delivery runner refuses a handoff whose `source_commit` is not the clean
-    checkout it is running from, so the repository refuses first rather than
-    emitting a graph that cannot be accepted.
-    """
-    source = repository.source_commit()
-    commit = source['commit']
-    if requested is not None:
-        if not handoff_module.SOURCE_COMMIT.match(requested):
-            raise ProvisioningError(
-                'SCHEMA_VALIDATION_FAILED',
-                'A delivery handoff binds one exact clean source commit',
-                path='$.apply', details={'source_commit': requested})
-        if source['status'] != NO_CHECKOUT and requested != commit:
-            raise ProvisioningError(
-                'ARTIFACT_INTEGRITY_FAILED',
-                'The declared source commit is not the commit under review',
-                path='$.apply',
-                details={'source_commit': requested, 'checkout_commit': commit})
-        return requested, source
-    if source['status'] != 'HASHES_MATCH':
-        raise ProvisioningError(
-            'ARTIFACT_INTEGRITY_FAILED',
-            'A delivery handoff binds one exact clean source commit',
-            path='$.apply',
-            details={'status': source['status'], 'issues': source['issues'],
-                     'instruction': 'hosting apply <request> --approved-plan <digest> '
-                                    '--source-commit <40-hex commit>'})
-    return commit, source
 
 
 def run(context: Context, approved_plan: str | None = None,
@@ -109,7 +73,10 @@ def run(context: Context, approved_plan: str | None = None,
                               'limits': ['This repository never executes a change']}
 
     try:
-        commit, source = bind_source_commit(plan, source_commit)
+        commit, source = source_module.bind(
+            source_commit,
+            instruction='hosting apply <request> --approved-plan <digest> '
+                        '--source-commit <40-hex commit>')
         capacity = capacity_evidence(plan, reservation_index, facts_path=capacity_facts)
         capacity_owner.require_settled(capacity['reconciliation'])
         addresses = address_evidence(plan, reservation_index, allocation_index,
