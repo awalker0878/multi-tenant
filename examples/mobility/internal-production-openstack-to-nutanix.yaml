@@ -1,0 +1,37 @@
+apiVersion: hosting.platform/v1
+kind: WorkloadMobility
+metadata:
+  tenant: tenant-01
+  name: wsd-01
+  owner: platform-team
+spec:
+  source:
+    platform: openstack
+  target:
+    platform: nutanix
+    region: east
+    site: null
+    cell: null
+  strategy:
+    mode: rebuild-restore
+  artifact:
+    image:
+      artifactRef: artifact://linux/rhel9-base
+      sha256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      format: qcow2
+      architecture: x86_64
+      firmware: uefi
+  data:
+    datasets:
+      - name: application-data
+        method: backup-restore
+        consistency: application
+        sourceRef: backup://tenant-01/wsd-01/application-data
+        sha256: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  security:
+    secrets: rebind
+    keys: external-kms
+  cutover:
+    maxDowntimeSeconds: 3600
+    maxDataLossSeconds: 300
+    rollbackWindowSeconds: 86400
