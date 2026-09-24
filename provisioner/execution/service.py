@@ -77,10 +77,13 @@ def mobility_plan_for(context: Context, mobility_path, target_inventory_path=Non
     mobility = load_document(mobility_target)
     migration.validate_intent(mobility)
 
+    artifact = dict(mobility['spec']['artifact']['image'])
+
     source_document = migration.source_request(context.document, mobility)
     source = execution_plan.create_plan(
         source_document, context.source, context.inventory, context.catalog,
-        compile_environment=True, generation=context.generation)
+        compile_environment=True, generation=context.generation,
+        workload_artifact=artifact)
 
     target_platform = mobility['spec']['target']['platform']
     target_inventory = (
@@ -91,7 +94,8 @@ def mobility_plan_for(context: Context, mobility_path, target_inventory_path=Non
     target_document = migration.target_request(context.document, mobility)
     target = execution_plan.create_plan(
         target_document, context.source, target_inventory, context.catalog,
-        compile_environment=True, generation=context.generation)
+        compile_environment=True, generation=context.generation,
+        workload_artifact=artifact)
 
     return migration.build(source, target, mobility)
 
