@@ -9,7 +9,7 @@ import unittest
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import load
-from provisioner.portability import bundle, capabilities, migration, policy
+from provisioner.portability import artifacts, bundle, capabilities, migration, policy
 
 from tests.provisioning import support
 
@@ -18,6 +18,27 @@ MOBILITY = support.ROOT / 'examples' / 'mobility' / 'internal-production-opensta
 
 def mobility_document():
     return load(MOBILITY)
+
+
+class ArtifactResolutionTest(unittest.TestCase):
+    def test_same_logical_artifact_resolves_to_platform_native_inputs(self):
+        image = mobility_document()['spec']['artifact']['image']
+        openstack = artifacts.resolve(image, 'openstack')
+        nutanix = artifacts.resolve(image, 'nutanix')
+        vmware = artifacts.resolve(image, 'vmware')
+        self.assertEqual(openstack['reference']['artifact_ref'], image['artifactRef'])
+        self.assertEqual(nutanix['reference']['artifact_sha256'], image['sha256'])
+        self.assertIn('image_id', openstack['native_inputs'])
+        self.assertIn('image_id', nutanix['native_inputs'])
+        self.assertIn('template_uuid', vmware['native_inputs'])
+        self.assertNotEqual(openstack['native_inputs'], vmware['native_inputs'])
+
+    def test_artifact_digest_drift_is_refused(self):
+        image = copy.deepcopy(mobility_document()['spec']['artifact']['image'])
+        image['sha256'] = 'c' * 64
+        with self.assertRaises(ProvisioningError) as raised:
+            artifacts.resolve(image, 'openstack')
+        self.assertEqual(raised.exception.code, 'ARTIFACT_INTEGRITY_FAILED')
 
 
 class PortabilityBundleTest(unittest.TestCase):
@@ -126,6 +147,10 @@ class MobilityCliTest(unittest.TestCase):
         self.assertEqual(payload['source']['platform'], 'openstack')
         self.assertEqual(payload['target']['platform'], 'nutanix')
         self.assertEqual(payload['readiness'], 'HELD')
+        self.assertIn('SOURCE_ARTIFACT_MAPPING_NOT_AUTHORITATIVE', payload['blockers'])
+        self.assertIn('TARGET_ARTIFACT_MAPPING_NOT_AUTHORITATIVE', payload['blockers'])
+        artifact = payload['portability_bundle']['workloads'][0]['artifact']
+        self.assertEqual(artifact['artifactRef'], 'artifact://linux/rhel9-base')
         self.assertFalse(payload['native_contact'])
 
 
