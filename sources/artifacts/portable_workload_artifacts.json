@@ -7,19 +7,35 @@
       "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "architecture": "x86_64",
       "firmware": "uefi",
-      "formats": ["qcow2", "vmdk", "ova"],
+      "formats": [
+        "qcow2",
+        "vmdk",
+        "ova"
+      ],
       "platforms": {
         "openstack": {
-          "image_id": "44444444-4444-4444-8444-444444444444"
+          "site-01": {
+            "native_inputs": {
+              "image_id": "44444444-4444-4444-8444-444444444444"
+            }
+          }
         },
         "nutanix": {
-          "image_id": "mock-nutanix-image"
+          "site-01": {
+            "native_inputs": {
+              "image_id": "mock-nutanix-image"
+            }
+          }
         },
         "vmware": {
-          "template_uuid": "mock-template-uuid",
-          "guest_id": "rhel9_64Guest",
-          "scsi_type": "pvscsi",
-          "firmware": "efi"
+          "site-01": {
+            "native_inputs": {
+              "template_uuid": "mock-template-uuid",
+              "guest_id": "rhel9_64Guest",
+              "scsi_type": "pvscsi",
+              "firmware": "efi"
+            }
+          }
         }
       }
     }
