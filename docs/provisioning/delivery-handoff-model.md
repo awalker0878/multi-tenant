@@ -93,6 +93,35 @@ assumption in the completion audit:
    [`docs/implementation/automation/delivery-runner.md`](../implementation/automation/delivery-runner.md)
    describes.
 
+## The approved topology identity
+
+The manifest binds the digest of the **reviewed topology intent**
+(`hosting-delivery-topology-intent/1`), and this module owns that intent. It carries
+the four things that decide what would be staged:
+
+| Key | Value |
+| --- | --- |
+| `steps` | the ordered sequence, each step's `id`, `kind` and `needs` |
+| `operationBindings` | every owner operation mapped to the step that discharges it |
+| `reviewedParameters` | the parameter values the reviewed decision already fixes, per step |
+| `compiledCatalogIds` | the catalog entry of every compiled phase, once the environment compiled |
+
+It carries no commit, no generation, no scope and no operation identity: those are
+execution-time bindings, not decisions a reviewer approved. Because the manifest
+binds this digest, a change to a step, a dependency, a step kind, an operation
+binding or a reviewed parameter changes the plan identity and the stale approval is
+refused.
+
+`build()` then re-proves the binding against what it actually emits.
+`approval_projection(plan, graph)` reads the *compiled graph* — not the declaration —
+and reduces it to the same intent shape, and `build()` compares
+`digest(approval_projection(plan, graph))` with
+`manifest['delivery']['topology_digest']`. A mismatch is refused with
+`APPROVAL_TOPOLOGY_MISMATCH` before the graph is validated or returned, so the
+approval an operator holds provably covers the sequence that would execute. Reading
+the graph rather than re-reading `STEPS` on both sides is the point: a comparison
+that restated the declaration would prove nothing about what would run.
+
 ## The capacity step's owner handoff
 
 `capacity-reservation` is the one step whose reviewed intent is a compiled owner
@@ -147,6 +176,7 @@ refuses before compiling rather than emitting a graph the runner must reject:
 | the checkout is not the commit under review | `ARTIFACT_INTEGRITY_FAILED` |
 | an owner has not answered on addressing | `IPAM_ALLOCATION_UNRESOLVED` |
 | a reviewed operation has no typed step | `COMPILATION_FAILED` |
+| the compiled topology is not the approved topology | `APPROVAL_TOPOLOGY_MISMATCH` |
 | a malformed graph | `SCHEMA_VALIDATION_FAILED` |
 
 The first four refuse before anything is compiled. Nothing in this path can invoke
@@ -157,8 +187,11 @@ target contact and no execution authority.
 
 The compiler is a pure function of the reviewed plan and the commit, so the same
 reviewed plan always compiles to the same graph and a resumed delivery recognises
-its own plan instead of creating a second one. The runner, not this repository, owns
-the journal, the stage packets, the completed-step receipts and the
+its own plan instead of creating a second one. The graph a resumed delivery
+recognises is also the graph the manifest binds: the approved topology identity is
+re-derived from the compiled graph on every call, so a resumed delivery cannot pick
+up a sequence that differs from the approved one. The runner, not this repository,
+owns the journal, the stage packets, the completed-step receipts and the
 uncertain-mutation recovery model; a resumed execution reuses the receipts of the
 steps that already completed. There is no second journal, no second Terraform runner
 and no second recovery model.

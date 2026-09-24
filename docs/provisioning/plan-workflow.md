@@ -58,11 +58,11 @@ request source digest and normalized identity, the resolved profile and catalog
 revisions, the policy rule-set digest and result, the reviewed inventory snapshot,
 the placement decision, the qualification reference and product tuple, the capacity
 and address intent, the service bindings, the desired state, the rendered environment,
-every compiled input, the Terraform and Ansible scope bindings, the delivery graph and
-the change classification. A change to any one of those terms produces a new digest,
-so an approval that cites it cites the whole decision; two requests that differ only
-in whitespace, key order or an unused field still share a digest, while two different
-reviewed decisions never collide. See
+every compiled input, the Terraform and Ansible scope bindings, the reviewed delivery
+topology and the change classification. A change to any one of those terms produces a
+new digest, so an approval that cites it cites the whole decision; two requests that
+differ only in whitespace, key order or an unused field still share a digest, while
+two different reviewed decisions never collide. See
 [Reviewed-plan manifest](plan-manifest-model.md).
 
 The plan also carries its WSD `identity` and its derived `operation_id`
@@ -128,6 +128,13 @@ delivery runner, which owns the journal, the stage packets, the Terraform
 preparation and the uncertain-mutation recovery model; the repository adds no second
 runner, no second journal and no second recovery model. See
 [Delivery handoff](delivery-handoff-model.md).
+
+`apply` also re-proves that the graph it would hand over is the topology the approved
+manifest binds. `handoff.build` reduces the compiled graph to the reviewed topology
+intent and compares its digest with `manifest['delivery']['topology_digest']`; a
+step, a dependency, an operation binding or a reviewed parameter that is not the
+approved one is refused with `APPROVAL_TOPOLOGY_MISMATCH` before the graph is
+returned, so an approval never covers a sequence that differs from what would run.
 
 Before compiling, `apply` binds one exact clean source commit. When the checkout is
 clean it takes the commit from the repository release verifier; when it is not, it

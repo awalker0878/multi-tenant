@@ -39,7 +39,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 | `compiled_inputs` | the digest of every input the existing compiler accepted |
 | `terraform` | the reviewed scope, root, input, state key, catalog and owner bindings |
 | `ansible` | the reviewed Ansible scope bindings |
-| `delivery` | the reviewed delivery graph, by identity |
+| `delivery` | the identity of the reviewed delivery *topology intent*: the sequence, the kinds, the dependencies, the operation-to-step bindings and the parameters the reviewed decision fixes. The owner-operation summary is not bound, because the summary states *which owners* act while the topology states *what will be staged*, and only the latter is executed |
 | `classification` | the approval-relevant disruptive/destructive/rebuild declaration |
 
 ## What the manifest deliberately excludes
@@ -47,8 +47,15 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 - **Derived identity.** The delivery `plan_digest`, the `operation_id`, the plan
   `identity` and the generation echoed onto the delivery graph are all computed
   *from* the plan, so binding them would make the identity depend on itself. The
-  manifest binds the delivery *graph* by digest instead, computed from a delivery
-  document built without those fields.
+  manifest binds the reviewed topology *intent* by digest instead, and the intent is
+  computed from the reviewed decision alone: it carries no commit, no generation, no
+  scope and no operation identity.
+- **A parallel delivery identity.** The owner-operation summary
+  (`provisioner.execution.delivery`) is not bound as a second delivery term. It names
+  the owners who must act; the topology intent names the sequence that would be
+  staged, and the compiled `hosting-delivery/1` graph must project back onto exactly
+  the bound topology or `handoff.build` refuses it. Binding both would give one
+  decision two identities and let a change to the executed sequence pass unnoticed.
 - **Owner-provisioned free text.** A Terraform scope's `backend` is the text an owner
   provisions against the reviewed state key, not a reviewed decision. The manifest
   binds `scope`, `root`, `input`, `state_key`, `catalog_id`, `owner_scope` and
@@ -89,9 +96,16 @@ a `committed_after` value, the commissioned capacity snapshot, the addressing
 snapshot, a service endpoint, a binding class, a placement decision,
 a qualification reference, a product tuple, a realization contract, a profile version,
 a policy rule revision, the inventory snapshot, a compiled input, an environment value,
-a Terraform state key or root, an Ansible scope, the delivery graph, the generation or
-the change classification — produces a different digest and the stale approval is
-refused.
+a Terraform state key or root, an Ansible scope, the reviewed delivery topology, the
+generation or the change classification — produces a different digest and the stale
+approval is refused.
+
+A topology change is bound *and* re-proved at execution time. `handoff.build` derives
+the same intent from the compiled `hosting-delivery/1` graph and compares its digest
+with `manifest['delivery']['topology_digest']`; a step, a dependency, an operation
+binding or a reviewed parameter that is not the approved one is refused with
+`APPROVAL_TOPOLOGY_MISMATCH` before the graph leaves the repository. See
+[Delivery handoff](delivery-handoff-model.md).
 
 `apply` then **still refuses** with `EXECUTION_REFUSED_HANDOFF_READY`, and its
 payload carries the manifest, the reviewer-facing `reviewed` projection, the manifest
