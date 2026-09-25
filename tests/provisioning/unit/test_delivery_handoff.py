@@ -1,7 +1,7 @@
 """The reviewed delivery handoff: the plan compiled into the existing runner's graph.
 
 The portable package plans and refuses. What has to be provable here is that the
-refusal is *useful*: the reviewed plan compiles into the exact `hosting-delivery/1`
+refusal is *useful*: the reviewed plan compiles into the exact `hosting-delivery/2`
 graph the repository's persistent delivery runner already validates, that every
 reviewed owner operation is discharged by a declared typed step, that one clean
 source commit and one generation are bound, and that nothing in this repository
@@ -373,13 +373,19 @@ class GraphTest(unittest.TestCase):
                          f'{self.plan.identity.wsd_key}-g{self.plan.generation}'
                          f'-{self.plan.digest[:12]}')
 
-    def test_the_graph_carries_topology_only(self):
-        """No parameter, private path or receipt belongs in the graph."""
+    def test_the_graph_carries_reviewed_values_but_no_private_runtime_inputs(self):
+        """Approval-relevant values are bound; secrets, binaries and receipts are not."""
         text = json.dumps(self.graph, sort_keys=True)
-        for term in ('catalog_id', 'terraform_sha256', 'nft', 'ssh', 'password',
+        for term in ('terraform_sha256', 'nft_sha256', 'ssh_sha256', 'password',
                      'token', 'private_key', 'restic_sha256'):
             with self.subTest(term=term):
                 self.assertNotIn(term, text)
+        self.assertEqual(self.graph['operation_bindings'],
+                         dict(sorted(handoff.OPERATION_STEPS.items())))
+        self.assertEqual(self.graph['reviewed_parameters'],
+                         handoff.reviewed_parameters(self.plan))
+        self.assertEqual(self.graph['compiled_catalog_ids'],
+                         dict(sorted(handoff.catalog_ids(self.plan).items())))
         for step in self.graph['steps']:
             with self.subTest(step=step['id']):
                 self.assertEqual(sorted(step), ['id', 'kind', 'needs'])
@@ -524,7 +530,7 @@ class ApplyBoundaryTest(unittest.TestCase):
         self.assertEqual(payload['status'], 'EXECUTION_REFUSED_HANDOFF_READY')
         self.assertEqual(payload['errors'][0]['code'], 'EXECUTION_REFUSED')
         self.assertFalse(payload['native_contact'])
-        self.assertEqual(payload['delivery']['format'], 'hosting-delivery/1')
+        self.assertEqual(payload['delivery']['format'], 'hosting-delivery/2')
         self.assertEqual(payload['delivery']['source_commit'], checkout_commit())
         self.assertEqual(payload['delivery']['operation_id'], plan['operation_id'])
         self.assertEqual(payload['delivery']['generation'], plan['generation'])
