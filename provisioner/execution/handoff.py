@@ -32,8 +32,9 @@ from provisioner.domain.request import digest
 from provisioner.placement.eligibility import PLATFORMS
 
 #: The graph format the existing runner validates. It is the declared contract.
-HANDOFF_FORMAT = 'hosting-delivery/1'
-HANDOFF_KEYS = ('format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps')
+HANDOFF_FORMAT = 'hosting-delivery/2'
+HANDOFF_KEYS = ('format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps',
+                'operation_bindings', 'reviewed_parameters', 'compiled_catalog_ids')
 STEP_KEYS = ('id', 'kind', 'needs')
 SOURCE_COMMIT = re.compile(r'^[0-9a-f]{40}$')
 
@@ -255,6 +256,12 @@ def validate(graph: dict) -> dict:
     steps = graph['steps']
     if not isinstance(steps, list) or not 1 <= len(steps) <= 100:
         refuse('A bounded delivery graph is required')
+    operation_bindings = graph['operation_bindings']
+    reviewed_parameters = graph['reviewed_parameters']
+    compiled_catalog_ids = graph['compiled_catalog_ids']
+    if not isinstance(operation_bindings, dict) or not isinstance(reviewed_parameters, dict) \
+            or not isinstance(compiled_catalog_ids, dict):
+        refuse('Delivery approval projections must be mappings')
     seen: set[str] = set()
     for step in steps:
         if not isinstance(step, dict) or set(step) != set(STEP_KEYS):
@@ -270,6 +277,22 @@ def validate(graph: dict) -> dict:
         if seen and not needs:
             refuse('Every subsequent step retains a dependency', step=step)
         seen.add(step['id'])
+    if not set(operation_bindings.values()) <= seen:
+        refuse('Every operation binding must name a delivery step',
+               operation_bindings=operation_bindings)
+    if not set(reviewed_parameters) <= seen:
+        refuse('Reviewed parameters must name delivery steps',
+               reviewed_parameters=sorted(reviewed_parameters))
+    for step_id, values in reviewed_parameters.items():
+        if not isinstance(values, dict):
+            refuse('Reviewed step parameters must be mappings', step_id=step_id)
+        declared = _declared_parameters(step_of(step_id).kind)
+        if not set(values) <= declared:
+            refuse('Reviewed parameters must be declared by the step kind',
+                   step_id=step_id, parameters=sorted(values), declared=sorted(declared))
+    if any(not isinstance(k, str) or not isinstance(v, str)
+           for k, v in compiled_catalog_ids.items()):
+        refuse('Compiled catalog identities must be text mappings')
     return graph
 
 
@@ -353,6 +376,12 @@ def approval_projection(plan, graph: dict) -> dict:
     projection = topology_intent(plan)
     projection['steps'] = [{key: (list(step[key]) if key == 'needs' else step[key])
                             for key in STEP_KEYS} for step in graph['steps']]
+    projection['operationBindings'] = dict(graph['operation_bindings'])
+    projection['reviewedParameters'] = {
+        step_id: dict(values)
+        for step_id, values in sorted(graph['reviewed_parameters'].items())
+    }
+    projection['compiledCatalogIds'] = dict(sorted(graph['compiled_catalog_ids'].items()))
     return projection
 
 
@@ -416,7 +445,10 @@ def build(plan, source_commit: str, ledger=None) -> dict:
     graph = {'format': HANDOFF_FORMAT, 'source_commit': source_commit,
              'operation_id': plan.operation_id, 'generation': plan.generation,
              'scope': plan.identity.scope,
-             'steps': [step.to_dict() for step in STEPS]}
+             'steps': [step.to_dict() for step in STEPS],
+             'operation_bindings': dict(sorted(OPERATION_STEPS.items())),
+             'reviewed_parameters': reviewed_parameters(plan),
+             'compiled_catalog_ids': dict(sorted(catalog_ids(plan).items()))}
     missing = uncovered(operation_names(plan))
     if missing:
         raise ProvisioningError(
