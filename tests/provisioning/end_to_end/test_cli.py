@@ -176,7 +176,7 @@ class TransportTest(unittest.TestCase):
         completed = subprocess.run([sys.executable, '-m', MODULE, '--help'],
                                    cwd=str(support.ROOT), capture_output=True, text=True)
         self.assertEqual(completed.returncode, 0)
-        for command in ('validate', 'resolve', 'plan', 'mobility-plan', 'apply', 'status', 'verify',
+        for command in ('validate', 'resolve', 'plan', 'mobility-plan', 'mobility-apply', 'apply', 'status', 'verify',
                         'evidence'):
             self.assertIn(command, completed.stdout)
 
