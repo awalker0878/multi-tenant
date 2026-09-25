@@ -34,9 +34,12 @@ def validate(job):
     require(isinstance(job['delivery']['dependencies'],dict),'Exact predecessor binding required')
     for key,value in job['delivery']['dependencies'].items():
         c.identifier(key); require(re.fullmatch('[0-9a-f]{64}',value),'Exact predecessor receipt required')
-    plan={'format':'hosting-delivery/1','source_commit':job['source_commit'],'scope':job['scope'],
+    plan={'format':'hosting-delivery/2','source_commit':job['source_commit'],'scope':job['scope'],
           'operation_id':job['job_id'],'generation':job['generation'],
-          'steps':[{'id':'owner','kind':job['kind'],'needs':[]}]}
+          'steps':[{'id':'owner','kind':job['kind'],'needs':[]}],
+          'operation_bindings':{'owner':'owner'},
+          'reviewed_parameters':{'owner':dict(job['parameters'])},
+          'compiled_catalog_ids':{}}
     delivery.validate(plan)
     from tools.delivery_steps import KINDS as schemas
     params,required,optional=schemas[job['kind']]
