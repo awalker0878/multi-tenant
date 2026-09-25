@@ -16,8 +16,8 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 
 def validate(plan):
     from tools.delivery_steps import KINDS
-    c.exact_keys(plan, {'format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps'})
-    require(plan['format'] == 'hosting-delivery/1' and isinstance(plan['source_commit'], str)
+    c.exact_keys(plan, {'format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps', 'operation_bindings', 'reviewed_parameters', 'compiled_catalog_ids'})
+    require(plan['format'] == 'hosting-delivery/2' and isinstance(plan['source_commit'], str)
             and re.fullmatch(r'[0-9a-f]{40}', plan['source_commit']), 'Exact delivery source required')
     c.identifier(plan['operation_id'])
     require(type(plan['generation']) is int and plan['generation'] > 0, 'Positive delivery generation required')
@@ -25,6 +25,10 @@ def validate(plan):
     for value in plan['scope'].values(): c.identifier(value)
     require(plan['scope']['platform'] in {'nutanix', 'vmware', 'openstack'}, 'Unknown delivery platform')
     require(isinstance(plan['steps'], list) and 1 <= len(plan['steps']) <= 100, 'Bounded delivery graph required')
+    require(isinstance(plan['operation_bindings'],dict)
+            and isinstance(plan['reviewed_parameters'],dict)
+            and isinstance(plan['compiled_catalog_ids'],dict),
+            'Delivery approval projections must be mappings')
     seen = set()
     for step in plan['steps']:
         c.exact_keys(step, {'id', 'kind', 'needs'})
@@ -34,6 +38,14 @@ def validate(plan):
                 and set(step['needs']) <= seen, 'Delivery graph must be topologically ordered without missing dependencies')
         if seen: require(step['needs'], 'Every subsequent step must retain a dependency')
         seen.add(step['id'])
+    require(set(plan['operation_bindings'].values()) <= seen,
+            'Operation binding names an unknown delivery step')
+    require(set(plan['reviewed_parameters']) <= seen,
+            'Reviewed parameters name an unknown delivery step')
+    for step_id, values in plan['reviewed_parameters'].items():
+        c.identifier(step_id); require(isinstance(values,dict),'Reviewed step parameters must be a mapping')
+    for phase,catalog_id in plan['compiled_catalog_ids'].items():
+        c.identifier(phase); c.identifier(catalog_id)
 
 
 def safe_name(value):
@@ -49,6 +61,10 @@ def packet(path, plan, step, receipts):
     require(value['dependencies'] == {key: c.digest(receipts[key]) for key in step['needs']},
             'Stage packet does not bind all exact predecessor receipts')
     require(isinstance(value['parameters'], dict) and isinstance(value['files'], dict), 'Typed stage inputs required')
+    reviewed = plan['reviewed_parameters'].get(step['id'], {})
+    require(all(name in value['parameters'] and value['parameters'][name] == expected
+                for name, expected in reviewed.items()),
+            'Stage packet differs from approved reviewed parameters')
     for name, binding in value['files'].items():
         c.identifier(name)
         c.exact_keys(binding, {'path', 'sha256'})
