@@ -19,6 +19,7 @@ from pathlib import Path
 from provisioner.cli import apply as apply_command
 from provisioner.cli import evidence as evidence_command
 from provisioner.cli import mobility as mobility_command
+from provisioner.cli import mobility_apply as mobility_apply_command
 from provisioner.cli import plan as plan_command
 from provisioner.cli import resolve as resolve_command
 from provisioner.cli import status as status_command
@@ -29,7 +30,7 @@ from provisioner.domain.errors import ProvisioningError
 from provisioner.execution.service import build_context
 
 PROGRAM = 'hosting'
-COMMANDS = ('validate', 'resolve', 'plan', 'mobility-plan', 'apply', 'status', 'verify', 'evidence')
+COMMANDS = ('validate', 'resolve', 'plan', 'mobility-plan', 'mobility-apply', 'apply', 'status', 'verify', 'evidence')
 
 DESCRIPTION = ('Portable hosting provisioning interface. '
                'Planning is enabled; execution is refused by design.')
@@ -103,6 +104,12 @@ def dispatch(argv=None) -> tuple[int, dict]:
     if args.command == 'mobility-plan':
         return mobility_command.run(context, args.mobility_intent, args.target_inventory,
                                     args.artifact_registry)
+    if args.command == 'mobility-apply':
+        approvals = apply_command.load_approvals(args.approvals)
+        return mobility_apply_command.run(
+            context, args.mobility_intent, args.target_inventory, args.artifact_registry,
+            approved_plan=args.approved_plan, approvals=approvals,
+            source_commit=args.source_commit)
     if args.command == 'status':
         return status_command.run(context, args.reservation_index, args.capacity_facts,
                                   args.ipam_index, args.dns_index)
