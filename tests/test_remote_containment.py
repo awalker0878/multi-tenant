@@ -41,8 +41,8 @@ class RemoteContainmentTests(unittest.TestCase):
         return worker.serve({'format':'hosting-owner-request/1','action':action,'job_id':'incident-01',
                              'job_sha256':c.digest(self.job)},self.spool,self.ledger)
     def test_incident_bypasses_held_forward_graph_but_keeps_shared_native_ledger(self):
-        plan={'format':'hosting-delivery/1','source_commit':'a'*40,'scope':self.spec['scope'],'operation_id':'failed-forward',
-              'generation':1,'steps':[{'id':'edge','kind':'edge_policy','needs':[]}]}
+        plan={'format':'hosting-delivery/2','source_commit':'a'*40,'scope':self.spec['scope'],'operation_id':'failed-forward',
+              'generation':1,'steps':[{'id':'edge','kind':'edge_policy','needs':[]}], 'operation_bindings':{},'reviewed_parameters':{},'compiled_catalog_ids':{}}
         inbox=self.base/'forward'; inbox.mkdir(mode=0o700)
         # A held forward graph with no completed edge stage cannot block withdrawal.
         delivery.run(plan,inbox,self.ledger,execute=True)
@@ -63,8 +63,8 @@ class RemoteContainmentTests(unittest.TestCase):
     def test_remote_failure_hook_transports_only_containment_and_retains_receipt(self):
         from tools import remote_owner
         import base64,struct
-        plan={'format':'hosting-delivery/1','source_commit':'a'*40,'scope':self.spec['scope'],'operation_id':'central',
-              'generation':1,'steps':[{'id':'verify','kind':'acceptance','needs':[]}]}
+        plan={'format':'hosting-delivery/2','source_commit':'a'*40,'scope':self.spec['scope'],'operation_id':'central',
+              'generation':1,'steps':[{'id':'verify','kind':'acceptance','needs':[]}], 'operation_bindings':{},'reviewed_parameters':{},'compiled_catalog_ids':{}}
         self.job['delivery']['plan_sha256']=c.digest(plan); self.save_job()
         raw=struct.pack('>I',11)+b'ssh-ed25519'+struct.pack('>I',32)+b'x'*32
         target={'format':'hosting-owner-target/1','address':'192.0.2.1','port':22,'user':'owner',
