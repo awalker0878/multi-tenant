@@ -12,8 +12,9 @@ owned resource; it is not a native writer fence.
 
 ## Workflow contract
 
-A private `hosting-delivery/1` plan contains `source_commit`, `operation_id`, a
-positive integer `generation`, `scope` and `steps`. Scope has exactly
+A private `hosting-delivery/2` plan contains `source_commit`, `operation_id`, a
+positive integer `generation`, `scope`, `steps`, `operation_bindings`,
+`reviewed_parameters` and `compiled_catalog_ids`. Scope has exactly
 `environment_key`, `site_key`, `platform`, `tenant_key` and `wsd_key`. The platform
 is `openstack`, `nutanix` or `vmware`. Each step has `id`, `kind` and `needs`, an
 explicit list of earlier step IDs. IDs are unique; cycles, missing dependencies,
@@ -32,7 +33,7 @@ own reviewed graphs and must not depend on successful ordinary activation.
 
 ```json
 {
-  "format": "hosting-delivery/1",
+  "format": "hosting-delivery/2",
   "source_commit": "<actual-clean-commit>",
   "operation_id": "change-001",
   "generation": 1,
@@ -44,7 +45,10 @@ own reviewed graphs and must not depend on successful ordinary activation.
     {"id": "admission", "kind": "acceptance", "needs": []},
     {"id": "domain-plan", "kind": "terraform_plan", "needs": ["admission"]},
     {"id": "domain-apply", "kind": "terraform_apply", "needs": ["domain-plan"]}
-  ]
+  ],
+  "operation_bindings": {},
+  "reviewed_parameters": {"admission": {"purpose": "admission"}},
+  "compiled_catalog_ids": {}
 }
 ```
 
@@ -65,8 +69,11 @@ and authority are available. Each packet has exactly:
 | `parameters` | Typed parameters from the adapter table below |
 | `files` | Map from adapter input names to `{ "path": "/absolute/private/file", "sha256": "<SHA256-of-file-bytes>" }` |
 
-The runner returns `WAITING_STAGE_INPUTS` with the next step and exact dependency
-digests when its packet is missing. This lets a change platform collect a newly
+The runner first checks that every approval-bound value under
+`reviewed_parameters[step_id]` is present with the exact same value in the stage
+packet. A legal but different action, mode, purpose, dependency selector or catalog
+ID is rejected before the owner is dispatched. The runner then returns
+`WAITING_STAGE_INPUTS` with the next step and exact dependency digests when its packet is missing. This lets a change platform collect a newly
 generated saved plan, obtain its actual approval, then publish the apply packet.
 No approval for an unknown future plan is generated. File bytes are checked
 again immediately before dispatch. Binaries use absolute paths plus separate
