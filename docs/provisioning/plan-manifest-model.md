@@ -53,7 +53,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
 - **A parallel delivery identity.** The owner-operation summary
   (`provisioner.execution.delivery`) is not bound as a second delivery term. It names
   the owners who must act; the topology intent names the sequence that would be
-  staged, and the compiled `hosting-delivery/1` graph must project back onto exactly
+  staged, and the compiled `hosting-delivery/2` graph must project back onto exactly
   the bound topology or `handoff.build` refuses it. Binding both would give one
   decision two identities and let a change to the executed sequence pass unnoticed.
 - **Owner-provisioned free text.** A Terraform scope's `backend` is the text an owner
@@ -78,7 +78,7 @@ reads them. Each term is either a reviewed decision or a canonical digest of one
   in POSIX form**, so the identity does not depend on whether an operator spelled the
   path relatively or absolutely, or on where the checkout lives. The manifest is
   reproducible from the reviewed inputs alone, which is what makes byte-identical
-  replay possible. The immutable source identity is bound in the `hosting-delivery/1`
+  replay possible. The immutable source identity is bound in the `hosting-delivery/2`
   handoff instead, where the delivery tooling already requires a 40-hex
   `source_commit`. The reviewed inventory document follows the same rule: the
   manifest binds the document's own `source`, `digest`, `status` and `authoritative`
@@ -101,7 +101,7 @@ generation or the change classification — produces a different digest and the 
 approval is refused.
 
 A topology change is bound *and* re-proved at execution time. `handoff.build` derives
-the same intent from the compiled `hosting-delivery/1` graph and compares its digest
+the same intent from the compiled `hosting-delivery/2` graph and compares its digest
 with `manifest['delivery']['topology_digest']`; a step, a dependency, an operation
 binding or a reviewed parameter that is not the approved one is refused with
 `APPROVAL_TOPOLOGY_MISMATCH` before the graph leaves the repository. See
@@ -109,7 +109,7 @@ binding or a reviewed parameter that is not the approved one is refused with
 
 `apply` then **still refuses** with `EXECUTION_REFUSED_HANDOFF_READY`, and its
 payload carries the manifest, the reviewer-facing `reviewed` projection, the manifest
-digest and the compiled `hosting-delivery/1` graph it would have handed to an external
+digest and the compiled `hosting-delivery/2` graph it would have handed to an external
 execution owner. The projection carries the same digest as the manifest, so an approval
 may cite either. See [Delivery handoff](delivery-handoff-model.md).
 
