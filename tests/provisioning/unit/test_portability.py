@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import copy
 from pathlib import Path
+import json
 import subprocess
 import sys
+import tempfile
 import unittest
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import load
-from provisioner.portability import artifacts, bundle, capabilities, migration, policy
+from provisioner.portability import artifacts, bundle, capabilities, handoff as mobility_handoff, migration, policy
 
 from tests.provisioning import support
 
@@ -131,6 +133,44 @@ class MobilityPlanTest(unittest.TestCase):
             self.assertEqual(target['spec'][key], self.source.request.document['spec'][key])
 
 
+
+class MobilityDeliveryTest(unittest.TestCase):
+    def setUp(self):
+        self.intent = mobility_document()
+        self.source = support.platform_plan('openstack')
+        self.target = support.platform_plan('nutanix')
+        self.plan = migration.build(self.source, self.target, self.intent)
+
+    def test_mobility_topology_binds_every_reviewed_subdecision(self):
+        topology = self.plan['delivery']
+        self.assertEqual(topology['operation_bindings'],
+                         dict(sorted(mobility_handoff.OPERATION_BINDINGS.items())))
+        self.assertEqual(topology['policy_digest'],
+                         self.plan['policy_translation']['digest'])
+        self.assertEqual(topology['data_transfer_digest'],
+                         self.plan['data_transfer']['digest'])
+        self.assertEqual(topology['cutover_digest'], self.plan['cutover']['digest'])
+
+    def test_mobility_plan_compiles_to_existing_delivery_v2(self):
+        graph = mobility_handoff.build(self.target, self.plan, 'a' * 40)
+        self.assertEqual(graph['format'], 'hosting-delivery/2')
+        self.assertEqual(graph['reviewed_plan_digest'], self.plan['digest'])
+        self.assertEqual(graph['scope'], self.target.identity.scope)
+        self.assertEqual(graph['steps'], self.plan['delivery']['steps'])
+        self.assertEqual(graph['operation_bindings'],
+                         self.plan['delivery']['operation_bindings'])
+        self.assertEqual(graph['reviewed_parameters'],
+                         self.plan['delivery']['reviewed_parameters'])
+        self.assertTrue(graph['operation_id'].startswith('mobility-'))
+
+    def test_tampered_mobility_plan_is_refused_before_handoff(self):
+        changed = copy.deepcopy(self.plan)
+        changed['cutover']['objectives']['max_downtime_seconds'] += 1
+        with self.assertRaises(ProvisioningError) as raised:
+            mobility_handoff.build(self.target, changed, 'a' * 40)
+        self.assertEqual(raised.exception.code, 'ARTIFACT_INTEGRITY_FAILED')
+
+
 class MobilityCliTest(unittest.TestCase):
     def test_active_cli_plans_the_mobility_contract(self):
         completed = subprocess.run(
@@ -141,7 +181,6 @@ class MobilityCliTest(unittest.TestCase):
              '--target-inventory', str(support.ROOT / 'provisioner/inventory/fixtures/nutanix-reference.json')],
             cwd=str(support.ROOT), capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(completed.returncode, 0, completed.stderr + completed.stdout)
-        import json
         payload = json.loads(completed.stdout)
         self.assertEqual(payload['format'], 'hosting-mobility-plan-result/1')
         self.assertEqual(payload['source']['platform'], 'openstack')
@@ -152,6 +191,39 @@ class MobilityCliTest(unittest.TestCase):
         artifact = payload['portability_bundle']['workloads'][0]['artifact']
         self.assertEqual(artifact['artifactRef'], 'artifact://linux/rhel9-base')
         self.assertFalse(payload['native_contact'])
+
+
+    def test_mobility_apply_refuses_a_held_plan_before_handoff(self):
+        base = [
+            str(support.REQUEST),
+            '--inventory', str(support.ROOT / 'provisioner/inventory/fixtures/openstack-reference.json'),
+            '--mobility-intent', str(MOBILITY),
+            '--target-inventory', str(support.ROOT / 'provisioner/inventory/fixtures/nutanix-reference.json'),
+        ]
+        planned = subprocess.run(
+            [sys.executable, '-m', 'provisioner.cli', 'mobility-plan', *base],
+            cwd=str(support.ROOT), capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(planned.returncode, 0, planned.stderr + planned.stdout)
+        plan = json.loads(planned.stdout)
+        with tempfile.TemporaryDirectory() as directory:
+            approval = Path(directory) / 'approval.json'
+            approval.write_text(json.dumps({
+                'format': 'hosting-plan-approval-set/1',
+                'approvals': [{
+                    'plan_digest': plan['digest'],
+                    'approved_by': 'reviewer-01',
+                    'authority_ref': 'CHG-MIG-001',
+                }],
+            }), encoding='utf-8')
+            applied = subprocess.run(
+                [sys.executable, '-m', 'provisioner.cli', 'mobility-apply', *base,
+                 '--approved-plan', plan['digest'], '--approvals', str(approval)],
+                cwd=str(support.ROOT), capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(applied.returncode, 2, applied.stderr + applied.stdout)
+        payload = json.loads(applied.stdout)
+        self.assertEqual(payload['errors'][0]['code'], 'MIGRATION_NOT_READY')
+        self.assertNotIn('delivery', payload)
+        self.assertTrue(payload['blockers'])
 
 
 if __name__ == '__main__':
