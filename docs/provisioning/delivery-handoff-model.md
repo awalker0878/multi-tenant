@@ -17,7 +17,7 @@ portable WSD request (YAML)
   -> provisioner (schema, profiles, policy, placement, desired state)
   -> tools/compile_wsd.py (the existing compiler)
   -> reviewed immutable plan (Plan.manifest_digest)
-  -> hosting-delivery/1 (provisioner/execution/handoff.py)
+  -> hosting-delivery/2 (provisioner/execution/handoff.py)
   -> tools/delivery_run.py (the existing runner)
   -> owner operations (the typed stage packets)
   -> observation and reconciliation (provisioner/observation)
@@ -36,17 +36,21 @@ change.
 
 | Key | Value |
 | --- | --- |
-| `format` | `hosting-delivery/1` |
+| `format` | `hosting-delivery/2` |
 | `source_commit` | the clean 40-hex commit under review |
 | `operation_id` | `Plan.operation_id` (`{wsd_key}-g{generation}-{plan_digest[:12]}`) |
 | `generation` | `Plan.generation`, a positive integer |
 | `scope` | `Plan.identity.scope` — the five delivery scope keys |
 | `steps` | the reviewed sequence below |
+| `operation_bindings` | owner operation → delivery step mapping |
+| `reviewed_parameters` | approval-bound parameter subset per step |
+| `compiled_catalog_ids` | compiled phase → reviewed catalog ID mapping |
 
-The graph carries **topology only**. It contains no parameter value, no private
-path, no host fact and no predecessor receipt, because every one of those belongs to
-the stage packet the owner of that step prepares and signs. A handoff that carried
-them would be a second, unverified source of private state.
+The graph carries the approval-bound topology plus the subset of parameter values
+already fixed by review. It deliberately does **not** carry private runtime paths,
+credentials, executable locations/digests or predecessor receipts; those remain in the
+stage packet the owner prepares. The runner compares every reviewed parameter in the
+plan with the corresponding packet value before an owner is dispatched.
 
 The reviewed sequence is the ordinary WSD delivery, topologically ordered:
 
@@ -177,6 +181,7 @@ refuses before compiling rather than emitting a graph the runner must reject:
 | an owner has not answered on addressing | `IPAM_ALLOCATION_UNRESOLVED` |
 | a reviewed operation has no typed step | `COMPILATION_FAILED` |
 | the compiled topology is not the approved topology | `APPROVAL_TOPOLOGY_MISMATCH` |
+| a stage packet changes an approval-bound parameter | runner refusal before owner dispatch |
 | a malformed graph | `SCHEMA_VALIDATION_FAILED` |
 
 The first four refuse before anything is compiled. Nothing in this path can invoke
