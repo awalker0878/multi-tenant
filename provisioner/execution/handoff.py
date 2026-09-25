@@ -35,7 +35,8 @@ from provisioner.placement.eligibility import PLATFORMS
 #: The graph format the existing runner validates. It is the declared contract.
 HANDOFF_FORMAT = 'hosting-delivery/2'
 HANDOFF_KEYS = ('format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps',
-                'operation_bindings', 'reviewed_parameters', 'compiled_catalog_ids')
+                'reviewed_plan_digest', 'operation_bindings', 'reviewed_parameters',
+                'compiled_catalog_ids')
 STEP_KEYS = ('id', 'kind', 'needs')
 SOURCE_COMMIT = re.compile(r'^[0-9a-f]{40}$')
 
@@ -245,6 +246,10 @@ def validate(graph: dict) -> dict:
     generation = graph['generation']
     if isinstance(generation, bool) or not isinstance(generation, int) or generation < 1:
         refuse('A delivery generation is a positive integer', generation=generation)
+    reviewed_plan_digest = graph['reviewed_plan_digest']
+    if not isinstance(reviewed_plan_digest, str) or not re.fullmatch(r'[0-9a-f]{64}', reviewed_plan_digest):
+        refuse('A delivery binds one exact reviewed plan digest',
+               reviewed_plan_digest=reviewed_plan_digest)
     scope = graph['scope']
     if not isinstance(scope, dict) or set(scope) != set(SCOPE_KEYS):
         refuse('A delivery scope carries exactly the declared keys',
@@ -284,10 +289,11 @@ def validate(graph: dict) -> dict:
     if not set(reviewed_parameters) <= seen:
         refuse('Reviewed parameters must name delivery steps',
                reviewed_parameters=sorted(reviewed_parameters))
+    step_kinds = {step['id']: step['kind'] for step in steps}
     for step_id, values in reviewed_parameters.items():
         if not isinstance(values, dict):
             refuse('Reviewed step parameters must be mappings', step_id=step_id)
-        declared = _declared_parameters(step_of(step_id).kind)
+        declared = _declared_parameters(step_kinds[step_id])
         if not set(values) <= declared:
             refuse('Reviewed parameters must be declared by the step kind',
                    step_id=step_id, parameters=sorted(values), declared=sorted(declared))
@@ -445,7 +451,7 @@ def build(plan, source_commit: str, ledger=None) -> dict:
         claim(ledger, record_for(plan))
     graph = {'format': HANDOFF_FORMAT, 'source_commit': source_commit,
              'operation_id': plan.operation_id, 'generation': plan.generation,
-             'scope': plan.identity.scope,
+             'scope': plan.identity.scope, 'reviewed_plan_digest': plan.digest,
              'steps': [step.to_dict() for step in STEPS],
              'operation_bindings': dict(sorted(OPERATION_STEPS.items())),
              'reviewed_parameters': reviewed_parameters(plan),
@@ -479,6 +485,7 @@ def review(graph: dict) -> dict:
             },
             'compiled_catalog_ids': dict(sorted(graph['compiled_catalog_ids'].items())),
             'source_commit': graph['source_commit'], 'operation_id': graph['operation_id'],
+            'reviewed_plan_digest': graph['reviewed_plan_digest'],
             'generation': graph['generation'], 'scope': dict(graph['scope']),
             'limits': ['Reviewed parameter values are part of the delivery-plan digest '
                        'and are enforced against owner stage packets',
