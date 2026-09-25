@@ -33,9 +33,9 @@ class CapacityDemandTests(unittest.TestCase):
         self.request['units']=demand.derive(self.inputs,self.catalog)['units']
         self.inbox=self.base/'inbox'; self.inbox.mkdir(mode=0o700)
         self.ledger=self.base/'delivery'; self.ledger.mkdir(mode=0o700)
-        self.plan={'format':'hosting-delivery/1','source_commit':'a'*40,'operation_id':'delivery-01','generation':1,
+        self.plan={'format':'hosting-delivery/2','source_commit':'a'*40,'operation_id':'delivery-01','generation':1,
             'scope':self.request['scope'],'steps':[{'id':'reserve','kind':'capacity','needs':[]},
-            {'id':'plan','kind':'terraform_plan','needs':['reserve']},{'id':'apply','kind':'terraform_apply','needs':['plan']}]}
+            {'id':'plan','kind':'terraform_plan','needs':['reserve']},{'id':'apply','kind':'terraform_apply','needs':['plan']}], 'operation_bindings':{},'reviewed_parameters':{},'compiled_catalog_ids':{}}
         self.offer('reserve',{}, {'action':'reserve','database':str(self.path)},
             {'request':self.request,'authority':self.authority('reserve'),'inputs':self.inputs,'sizing':self.catalog})
         source=patch.object(delivery,'verify',return_value={'status':'HASHES_MATCH','commit':'a'*40})
