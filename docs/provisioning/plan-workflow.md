@@ -125,7 +125,7 @@ proposal claims an outcome only an owner can give without that owner's evidence.
 
 `apply` requires both a `--approved-plan` digest and a recorded approval whose
 `plan_digest` matches the plan the repository would produce. It then compiles that
-plan into the established `hosting-delivery/1` handoff and **still refuses** with
+plan into the established `hosting-delivery/2` handoff and **still refuses** with
 `EXECUTION_REFUSED_HANDOFF_READY`, because this repository holds no target contact,
 credential or change authority. The compiled graph is executed by the existing
 delivery runner, which owns the journal, the stage packets, the Terraform
@@ -134,7 +134,8 @@ runner, no second journal and no second recovery model. See
 [Delivery handoff](delivery-handoff-model.md).
 
 `apply` also re-proves that the graph it would hand over is the topology the approved
-manifest binds. `handoff.build` reduces the compiled graph to the reviewed topology
+manifest binds. Delivery v2 carries the reviewed parameter subset directly, and the
+runner requires every incoming stage packet to match those values before dispatch. `handoff.build` reduces the compiled graph to the reviewed topology
 intent and compares its digest with `manifest['delivery']['topology_digest']`; a
 step, a dependency, an operation binding or a reviewed parameter that is not the
 approved one is refused with `APPROVAL_TOPOLOGY_MISMATCH` before the graph is
