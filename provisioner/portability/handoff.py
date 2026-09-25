@@ -126,6 +126,12 @@ def build(target_plan, migration_plan: dict, source_commit: str) -> dict:
     only the target execution scope; source fencing/retirement remain separately
     authorized source-side responsibilities recorded by the mobility decision.
     """
+    migration_body = {key: value for key, value in migration_plan.items() if key != 'digest'}
+    if digest(migration_body) != migration_plan.get('digest'):
+        from provisioner.domain.errors import ProvisioningError
+        raise ProvisioningError('ARTIFACT_INTEGRITY_FAILED',
+                                'Mobility plan digest does not reproduce',
+                                path='$.digest')
     topology = migration_plan.get('delivery', {})
     if not isinstance(topology, dict) or 'digest' not in topology:
         from provisioner.domain.errors import ProvisioningError
