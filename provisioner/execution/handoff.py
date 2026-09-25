@@ -6,9 +6,10 @@ already accepts, so an operator holding the recorded authority stages the typed
 stage packets and resumes one delivery instead of re-deciding the sequence by hand.
 
 The compiler is a pure function of the reviewed plan plus the clean source commit.
-It emits topology only: `hosting-delivery/1` carries no parameter, no private path
-and no receipt, because every parameter, file binding and predecessor digest
-belongs to the stage packet its owner prepares. What this module does add is the
+`hosting-delivery/2` carries the approval-bound topology, operation bindings,
+reviewed parameter subset and compiled catalog identities. Private runtime paths,
+credentials, executable bindings and predecessor receipts still belong to the stage
+packet its owner prepares. What this module does add is the
 mapping from the plan's owner operations to the typed steps that discharge them,
 so a reviewer can see that no responsibility is missing, that every step is a
 declared kind of the existing runner, and that no second runner exists.
@@ -219,7 +220,7 @@ def operation_names(plan) -> list[str]:
 
 
 def validate(graph: dict) -> dict:
-    """Refuse any graph the declared `hosting-delivery/1` contract would refuse.
+    """Refuse any graph the declared `hosting-delivery/2` contract would refuse.
 
     This mirrors the pure shape contract `tools.delivery_run.validate` enforces, so
     the transport can refuse a malformed handoff without importing the runner.
@@ -366,7 +367,7 @@ def topology_digest(plan) -> str:
 
 
 def approval_projection(plan, graph: dict) -> dict:
-    """The reviewed topology as the compiled `hosting-delivery/1` graph states it.
+    """The reviewed topology as the compiled `hosting-delivery/2` graph states it.
 
     `build` compares the digest of this projection with the digest the manifest
     binds. The projection is deliberately built by *reading the graph*, not by
@@ -471,10 +472,17 @@ def review(graph: dict) -> dict:
     """The reviewer-facing summary of a compiled handoff."""
     return {'format': HANDOFF_FORMAT, 'steps': len(graph['steps']),
             'kinds': sorted({step['kind'] for step in graph['steps']}),
-            'operations': {name: OPERATION_STEPS[name] for name in sorted(OPERATION_STEPS)},
+            'operations': dict(graph['operation_bindings']),
+            'reviewed_parameters': {
+                step_id: dict(values)
+                for step_id, values in sorted(graph['reviewed_parameters'].items())
+            },
+            'compiled_catalog_ids': dict(sorted(graph['compiled_catalog_ids'].items())),
             'source_commit': graph['source_commit'], 'operation_id': graph['operation_id'],
             'generation': graph['generation'], 'scope': dict(graph['scope']),
-            'limits': ['The graph carries topology only; every parameter and file '
-                       'binding belongs to the stage packet its owner prepares',
+            'limits': ['Reviewed parameter values are part of the delivery-plan digest '
+                       'and are enforced against owner stage packets',
+                       'Private file bindings, credentials, executable paths and predecessor '
+                       'receipts remain stage-packet inputs',
                        'The existing delivery runner is the only engine',
                        'This repository compiles the handoff and executes nothing']}
