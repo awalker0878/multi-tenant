@@ -139,7 +139,7 @@ class ApplyRefusalTest(unittest.TestCase):
         self.assertTrue(payload['blocking'])
         self.assertTrue(payload['operations'])
         self.assertFalse(payload['native_contact'])
-        self.assertEqual(payload['delivery']['format'], 'hosting-delivery/1')
+        self.assertEqual(payload['delivery']['format'], 'hosting-delivery/2')
         self.assertEqual(payload['delivery']['source_commit'], checkout_commit())
         self.assertEqual(payload['delivery']['operation_id'], plan['operation_id'])
         self.assertEqual(payload['delivery']['generation'], plan['generation'])
