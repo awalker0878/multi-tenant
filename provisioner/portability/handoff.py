@@ -7,6 +7,7 @@ parameters; it owns no executor, journal or native mutation.
 from __future__ import annotations
 
 from provisioner.domain.request import digest
+from provisioner.execution import handoff as delivery_handoff
 from provisioner.execution.handoff import Step
 
 FORMAT = 'hosting-mobility-delivery-topology/1'
@@ -38,6 +39,22 @@ STEPS = (
          ('pre-cutover-campaign', 'target-bootstrap-acceptance')),
     Step('post-cutover-campaign', 'target_campaign', ('cutover-authorization',)),
 )
+
+OPERATION_BINDINGS = {
+    'migration-admission': 'migration-admission',
+    'target-capacity': 'target-capacity-reservation',
+    'target-addressing': 'target-address-allocation',
+    'target-dns': 'target-dns-registration',
+    'target-domain': 'target-domain-apply',
+    'target-security-policy': 'target-edge-policy',
+    'target-workloads': 'target-workload-apply',
+    'target-guest-configuration': 'target-guest-apply',
+    'dataset-transfer': 'dataset-restore',
+    'target-services': 'target-service-acceptance',
+    'cutover-qualification': 'pre-cutover-campaign',
+    'cutover-authorization': 'cutover-authorization',
+    'post-cutover-qualification': 'post-cutover-campaign',
+}
 
 REVIEWED_PARAMETERS = {
     'migration-admission': {'purpose': 'admission'},
@@ -83,6 +100,7 @@ def topology_intent(target_plan, *, policy_plan: dict, data_plan: dict,
         'scope': dict(target_plan.identity.scope),
         'generation': target_plan.generation,
         'steps': [step.to_dict() for step in STEPS],
+        'operation_bindings': dict(sorted(OPERATION_BINDINGS.items())),
         'reviewed_parameters': parameters,
         'policy_digest': policy_plan['digest'],
         'data_transfer_digest': data_plan['digest'],
@@ -93,9 +111,56 @@ def topology_intent(target_plan, *, policy_plan: dict, data_plan: dict,
         },
         'source_retirement': 'separate-source-scope-after-target-acceptance',
         'limits': [
-            'This topology is executed only by the existing hosting-delivery/1 runner',
+            'This topology is executed only by the existing hosting-delivery/2 runner',
             'Private binaries, credentials, runtime paths and predecessor receipts remain owner packet inputs',
             'Source retirement is deliberately not mixed into the target platform scope',
         ],
     }
     return {**body, 'digest': digest(body)}
+
+
+def build(target_plan, migration_plan: dict, source_commit: str) -> dict:
+    """Compile one reviewed mobility decision into the existing delivery-v2 graph.
+
+    The full mobility digest is the graph's reviewed-plan binding. The graph carries
+    only the target execution scope; source fencing/retirement remain separately
+    authorized source-side responsibilities recorded by the mobility decision.
+    """
+    topology = migration_plan.get('delivery', {})
+    if not isinstance(topology, dict) or 'digest' not in topology:
+        from provisioner.domain.errors import ProvisioningError
+        raise ProvisioningError('COMPILATION_FAILED',
+                                'Mobility plan carries no reviewed delivery topology',
+                                path='$.delivery')
+    body = {key: value for key, value in topology.items() if key != 'digest'}
+    if digest(body) != topology['digest']:
+        from provisioner.domain.errors import ProvisioningError
+        raise ProvisioningError('ARTIFACT_INTEGRITY_FAILED',
+                                'Mobility delivery topology digest does not reproduce',
+                                path='$.delivery.digest')
+    if topology.get('scope') != target_plan.identity.scope:
+        from provisioner.domain.errors import ProvisioningError
+        raise ProvisioningError('PORTABILITY_POLICY_MISMATCH',
+                                'Mobility delivery scope differs from the target WSD scope',
+                                path='$.delivery.scope')
+
+    operation_id = (
+        f'mobility-{target_plan.identity.wsd_key}-g{target_plan.generation}-'
+        f'{migration_plan["digest"][:12]}'
+    )
+    graph = {
+        'format': delivery_handoff.HANDOFF_FORMAT,
+        'source_commit': source_commit,
+        'operation_id': operation_id,
+        'generation': target_plan.generation,
+        'scope': dict(target_plan.identity.scope),
+        'reviewed_plan_digest': migration_plan['digest'],
+        'steps': [dict(step) for step in topology['steps']],
+        'operation_bindings': dict(topology['operation_bindings']),
+        'reviewed_parameters': {
+            step_id: dict(values)
+            for step_id, values in topology['reviewed_parameters'].items()
+        },
+        'compiled_catalog_ids': dict(sorted(catalog_ids(target_plan).items())),
+    }
+    return delivery_handoff.validate(graph)
