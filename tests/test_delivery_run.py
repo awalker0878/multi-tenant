@@ -14,7 +14,7 @@ class DeliveryTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup); self.base=Path(self.temp.name)
         self.inbox=self.base/'inbox'; self.inbox.mkdir(mode=0o700)
         self.ledger=self.base/'ledger'; self.ledger.mkdir(mode=0o700)
-        self.plan=dict(format='hosting-delivery/2',source_commit='a'*40,operation_id='op-test',generation=1,
+        self.plan=dict(format='hosting-delivery/2',source_commit='a'*40,operation_id='op-test',generation=1,reviewed_plan_digest='0'*64,
             scope=dict(environment_key='lab',site_key='site-01',platform='openstack',tenant_key='tenant-01',wsd_key='wsd-01'),
             steps=[{'id':'admit','kind':'acceptance','needs':[]},{'id':'ready','kind':'acceptance','needs':['admit']}], operation_bindings={},reviewed_parameters={},compiled_catalog_ids={})
         self.source=patch.object(d,'verify',return_value={'status':'HASHES_MATCH','commit':'a'*40})
