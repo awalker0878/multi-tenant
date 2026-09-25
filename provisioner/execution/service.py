@@ -25,6 +25,17 @@ from provisioner.profiles.loader import Catalog
 
 
 @dataclass(frozen=True)
+class MobilitySession:
+    """One fully resolved source/target mobility planning session."""
+
+    source_plan: object
+    target_plan: object
+    migration_plan: dict
+    mobility_document: dict
+    mobility_path: Path
+
+
+@dataclass(frozen=True)
 class Context:
     """Everything an operation needs before it runs: the request and its reviewed inputs."""
 
@@ -63,15 +74,14 @@ def plan_for(context: Context, compile_environment: bool = True):
                                       generation=context.generation)
 
 
-def mobility_plan_for(context: Context, mobility_path, target_inventory_path=None,
-                      artifact_registry_path=None):
-    """Plan one cross-platform migration from the same portable WSD intent.
+def mobility_session_for(context: Context, mobility_path, target_inventory_path=None,
+                         artifact_registry_path=None) -> MobilitySession:
+    """Resolve source/target plans and one immutable mobility decision.
 
-    Planning is deliberately two-pass. The first pass uses the normal placement
-    engine to select the exact source and target sites without any migration
-    realization. The logical workload artifact is then resolved for those selected
-    sites, and the second pass rebuilds both reviewed plans with the exact native
-    image/template inputs bound to the portable artifact digest.
+    Planning is deliberately two-pass. The first pass selects exact source/target
+    sites through the normal placement engine. The logical workload artifact is then
+    resolved against those sites, and the second pass builds the reviewed plans with
+    the exact platform-native image/template inputs bound to the portable artifact.
     """
     from provisioner.portability import artifacts, migration
 
@@ -114,10 +124,21 @@ def mobility_plan_for(context: Context, mobility_path, target_inventory_path=Non
         workload_artifact=artifact,
         workload_native_inputs=target_artifact['native_inputs'])
 
-    return migration.build(
+    decision = migration.build(
         source, target, mobility,
         artifact_resolutions={'source': source_artifact['reference'],
                               'target': target_artifact['reference']})
+    return MobilitySession(source_plan=source, target_plan=target,
+                           migration_plan=decision,
+                           mobility_document=mobility,
+                           mobility_path=mobility_target)
+
+
+def mobility_plan_for(context: Context, mobility_path, target_inventory_path=None,
+                      artifact_registry_path=None):
+    """Return the reviewed mobility decision from the shared mobility session."""
+    return mobility_session_for(context, mobility_path, target_inventory_path,
+                                artifact_registry_path).migration_plan
 
 
 def capacity_evidence(plan, reservation_index=None, as_of=None, facts_path=None) -> dict:
