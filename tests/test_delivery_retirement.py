@@ -40,7 +40,7 @@ class DeliveryRetirementTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.base=Path(self.temp.name); self.directory=self.base/'review'; self.directory.mkdir(mode=0o700)
         self.plan={'format':'hosting-delivery/2','source_commit':SOURCE,'operation_id':'delivery-retire',
-                   'generation':1,'scope':deepcopy(SCOPE),
+                   'generation':1,'reviewed_plan_digest':'0'*64,'scope':deepcopy(SCOPE),
                    'steps':[{'id':'retirement','kind':'retirement_review','needs':[]}], 'operation_bindings':{},'reviewed_parameters':{},'compiled_catalog_ids':{}}
         self.step=self.plan['steps'][0]
         self.retirement=retirement_plan()
