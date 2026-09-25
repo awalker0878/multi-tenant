@@ -103,7 +103,7 @@ class CommandDocumentationTest(unittest.TestCase):
 
     def test_documented_commands_match_the_command_line(self):
         from provisioner.cli.main import COMMANDS
-        documented = set(re.findall(r'^\| `([a-z]+)` \|', self._commands_table(),
+        documented = set(re.findall(r'^\| `([a-z-]+)` \|', self._commands_table(),
                                     flags=re.MULTILINE))
         self.assertEqual(documented, set(COMMANDS))
 
@@ -127,7 +127,7 @@ class CommandDocumentationTest(unittest.TestCase):
 
     def test_index_documents_the_module_invocation(self):
         text = INDEX.read_text(encoding='utf-8')
-        for command in ('validate', 'resolve', 'plan', 'status', 'verify', 'evidence', 'apply'):
+        for command in ('validate', 'resolve', 'plan', 'mobility-plan', 'mobility-apply', 'status', 'verify', 'evidence', 'apply'):
             with self.subTest(command=command):
                 self.assertIn(f'{ENTRY_POINT}{command}', text)
 
