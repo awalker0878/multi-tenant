@@ -36,6 +36,7 @@ def validate(job):
         c.identifier(key); require(re.fullmatch('[0-9a-f]{64}',value),'Exact predecessor receipt required')
     plan={'format':'hosting-delivery/2','source_commit':job['source_commit'],'scope':job['scope'],
           'operation_id':job['job_id'],'generation':job['generation'],
+          'reviewed_plan_digest':job['delivery']['plan_sha256'],
           'steps':[{'id':'owner','kind':job['kind'],'needs':[]}],
           'operation_bindings':{'owner':'owner'},
           'reviewed_parameters':{'owner':dict(job['parameters'])},
