@@ -16,11 +16,12 @@ from tools.run_files import (current_window, digest, encoded, load_private, priv
 
 def validate(plan):
     from tools.delivery_steps import KINDS
-    c.exact_keys(plan, {'format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps', 'operation_bindings', 'reviewed_parameters', 'compiled_catalog_ids'})
+    c.exact_keys(plan, {'format', 'source_commit', 'operation_id', 'generation', 'scope', 'steps', 'reviewed_plan_digest', 'operation_bindings', 'reviewed_parameters', 'compiled_catalog_ids'})
     require(plan['format'] == 'hosting-delivery/2' and isinstance(plan['source_commit'], str)
             and re.fullmatch(r'[0-9a-f]{40}', plan['source_commit']), 'Exact delivery source required')
     c.identifier(plan['operation_id'])
     require(type(plan['generation']) is int and plan['generation'] > 0, 'Positive delivery generation required')
+    require(isinstance(plan['reviewed_plan_digest'],str) and c.HEX.fullmatch(plan['reviewed_plan_digest']), 'Exact reviewed plan digest required')
     c.exact_keys(plan['scope'], {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'})
     for value in plan['scope'].values(): c.identifier(value)
     require(plan['scope']['platform'] in {'nutanix', 'vmware', 'openstack'}, 'Unknown delivery platform')
