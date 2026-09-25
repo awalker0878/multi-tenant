@@ -20,8 +20,8 @@ class DeliveryQuotaTests(unittest.TestCase):
         self.base_path.mkdir(parents=True,mode=0o700)
         self.directory=self.base_path/'steps'/'quota'; self.directory.mkdir(parents=True,mode=0o700)
         self.step={'id':'quota','kind':'openstack_quota','needs':[]}
-        self.plan=dict(format='hosting-delivery/1',source_commit='a'*40,operation_id='delivery-01',generation=1,
-            scope=self.request['scope']|{'wsd_key':'wsd-a'},steps=[self.step])
+        self.plan=dict(format='hosting-delivery/2',source_commit='a'*40,operation_id='delivery-01',generation=1,
+            scope=self.request['scope']|{'wsd_key':'wsd-a'},steps=[self.step], operation_bindings={},reviewed_parameters={},compiled_catalog_ids={})
         self.packet=dict(format='hosting-delivery-step/1',plan_sha256=c.digest(self.plan),step_id='quota',
             dependencies={},parameters={},files={})
         for name,raw in {'request':encoded(self.request),'authority':encoded(self.authority()),'token':self.token,'ca':self.ca}.items():
