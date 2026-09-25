@@ -15,7 +15,7 @@ class DeliveryTerraformTests(TerraformRunFixture, unittest.TestCase):
         super().setUp()
         self.inbox=self.base/'inbox'; self.inbox.mkdir(mode=0o700)
         self.ledger=self.base/'delivery-ledger'; self.ledger.mkdir(mode=0o700)
-        self.plan=dict(format='hosting-delivery/2',source_commit=self.source,operation_id='delivery-01',generation=1,
+        self.plan=dict(format='hosting-delivery/2',source_commit=self.source,operation_id='delivery-01',generation=1,reviewed_plan_digest='0'*64,
             scope={k:v for k,v in self.scope.items() if k!='phase'},
             steps=[dict(id='plan',kind='terraform_plan',needs=[]),dict(id='apply',kind='terraform_apply',needs=['plan'])], operation_bindings={},reviewed_parameters={},compiled_catalog_ids={})
         self.offer('plan',{},dict(catalog_id=self.args.catalog_id,terraform=str(self.binary),terraform_sha256=digest(self.binary.read_bytes())),
