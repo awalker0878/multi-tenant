@@ -48,7 +48,7 @@ that cites it cites every reviewed decision. See
 | [Platform adapter contract](adapter-contract.md) | The six realization surfaces, the gap vocabulary and the platform-name-free compiler |
 | [Terraform execution boundary](terraform-boundary.md) | Root selection, variable files, evidence |
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |
-| [Plan workflow](plan-workflow.md) | `validate resolve plan status verify evidence apply` |
+| [Plan workflow](plan-workflow.md) | `validate resolve plan mobility-plan status verify evidence apply` |
 | [Supported service-profile matrix](service-profile-matrix.md) | What is implemented, what is deferred, why |
 | [Refactor completion audit](../deepseek-refactor-completion-audit.md) | Ordered completion gates, required regressions, repository-side vs external exit criteria |
 | [DeepSeek completion execution prompt](../deepseek-refactor-completion-execution-prompt.md) | Authoritative execution sequence for closing every repository-side audit gate with small commits |
@@ -59,6 +59,7 @@ that cites it cites every reviewed decision. See
 python -m provisioner.cli validate <request.yaml>
 python -m provisioner.cli resolve  <request.yaml>
 python -m provisioner.cli plan     <request.yaml>
+python -m provisioner.cli mobility-plan <request.yaml> --mobility-intent <mobility.yaml>
 python -m provisioner.cli status   <request.yaml>
 python -m provisioner.cli verify   <request.yaml>
 python -m provisioner.cli evidence <request.yaml>
