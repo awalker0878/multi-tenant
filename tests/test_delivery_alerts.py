@@ -18,7 +18,7 @@ class DeliveryAlertsTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.base=Path(self.temp.name); self.directory=self.base/'alerts'; self.directory.mkdir(mode=0o700)
         self.plan={'format':'hosting-delivery/2','source_commit':SOURCE,'operation_id':'delivery-alerts',
-                   'generation':1,'scope':deepcopy(SCOPE),
+                   'generation':1,'reviewed_plan_digest':'0'*64,'scope':deepcopy(SCOPE),
                    'steps':[{'id':'alerts','kind':'operations_alerts','needs':[]}], 'operation_bindings':{},'reviewed_parameters':{},'compiled_catalog_ids':{}}
         self.step=self.plan['steps'][0]
 
