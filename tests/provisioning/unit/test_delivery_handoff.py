@@ -565,7 +565,7 @@ class ApplyBoundaryTest(unittest.TestCase):
         approval = authority_module.Approval(plan_digest=plan.digest,
                                              approved_by='reviewer-01',
                                              authority_ref='CHG-0001')
-        with mock.patch.object(apply_module.repository, 'source_commit',
+        with mock.patch.object(apply_module.source_module.repository, 'source_commit',
                                return_value=source):
             return apply_module.run(context, approved_plan=plan.digest,
                                     approvals=(approval,), source_commit=requested)
