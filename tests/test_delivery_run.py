@@ -92,6 +92,13 @@ class DeliveryTests(unittest.TestCase):
             value=deepcopy(self.plan); mutation(value)
             with self.assertRaises(ValueError): d.validate(value)
         with patch.object(d,'verify',return_value={'status':'FAILED_INTEGRITY_CHECK'}),self.assertRaises(ValueError): self.run_delivery()
+    def test_packet_cannot_change_reviewed_parameter_after_approval(self):
+        self.plan['reviewed_parameters']={'admit':{'purpose':'admission'}}
+        self.offer('admit',{},'services')
+        with self.assertRaisesRegex(ValueError,'approved reviewed parameters'):
+            self.run_delivery()
+        self.assertFalse(any(self.ledger.glob('*/runs/*/steps/*/packet.json')))
+
     def test_malformed_packet_does_not_reserve_an_attempt(self):
         self.offer('admit',{}); path=self.inbox/'admit.json'; value=load_private(path)
         value['parameters']['command']='arbitrary'; replace_private(path,encoded(value))
