@@ -13,7 +13,7 @@ Ledger authority: `EXTERNAL_LEDGER_ONLY`
 ## Identity
 
 The identity is the five identifiers that name one WSD, exactly as the existing
-`hosting-delivery/1` scope names them:
+`hosting-delivery/2` scope names them:
 
 | Component | Meaning |
 | --- | --- |
