@@ -75,6 +75,7 @@ def _delivery_document(plan, generation=_UNSET) -> dict:
     return {'format': 'hosting-delivery/2', 'source_commit': '0' * 40,
             'operation_id': plan.operation_id,
             'generation': plan.generation if generation is _UNSET else generation,
+            'reviewed_plan_digest': '0' * 64,
             'scope': plan.identity.scope,
             'steps': [{'id': 'first-step', 'kind': 'guest_plan', 'needs': []}], 'operation_bindings': {}, 'reviewed_parameters': {}, 'compiled_catalog_ids': {}}
 
