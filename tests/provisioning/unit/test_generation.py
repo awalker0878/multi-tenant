@@ -72,11 +72,11 @@ _UNSET = object()
 
 
 def _delivery_document(plan, generation=_UNSET) -> dict:
-    return {'format': 'hosting-delivery/1', 'source_commit': '0' * 40,
+    return {'format': 'hosting-delivery/2', 'source_commit': '0' * 40,
             'operation_id': plan.operation_id,
             'generation': plan.generation if generation is _UNSET else generation,
             'scope': plan.identity.scope,
-            'steps': [{'id': 'first-step', 'kind': 'guest_plan', 'needs': []}]}
+            'steps': [{'id': 'first-step', 'kind': 'guest_plan', 'needs': []}], 'operation_bindings': {}, 'reviewed_parameters': {}, 'compiled_catalog_ids': {}}
 
 
 def observed(subject: str, native_id: str, generation_value):
