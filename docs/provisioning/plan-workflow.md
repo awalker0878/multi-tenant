@@ -19,6 +19,7 @@ Result format: `hosting-cli-result/1`
 | `validate` | syntax, schema, semantics, standards | `VALID` | `REFUSED` with every diagnostic |
 | `resolve` | normalize, resolve profiles, validate, policy | `RESOLVED` | `REFUSED` |
 | `plan` | the whole pipeline through compilation | `PLANNED_DISABLED_NOT_AUTHORIZED` | `REFUSED` |
+| `mobility-plan` | compare source/target realizations, bind portable policy/artifact/data/cutover intent, and compile a disabled migration topology | migration plan | `REFUSED` |
 | `status` | where the plan stands in the lifecycle | plan status plus reached/held stages | `REFUSED` |
 | `verify` | compare observations against the plan | report status | `REFUSED` |
 | `evidence` | record the review evidence for a plan | `RECORDED` | `REFUSED` |
@@ -30,7 +31,10 @@ Exit `3` is an internal failure (an unreadable file, an unknown platform name).
 
 | Option | Applies to | Meaning |
 | --- | --- | --- |
-| `--inventory PATH` | all | reviewed inventory; defaults to the non-authoritative fixture |
+| `--inventory PATH` | all | reviewed source inventory; defaults to the non-authoritative fixture |
+| `--target-inventory PATH` | `mobility-plan` | reviewed target inventory; defaults to the selected target platform fixture |
+| `--mobility-intent PATH` | `mobility-plan` | reviewed `WorkloadMobility` document carrying migration-specific artifact, dataset, rebind and cutover intent |
+| `--artifact-registry PATH` | `mobility-plan` | reviewed logical-artifact-to-native-realization registry; repository registry is the default |
 | `--profiles-root PATH` | all | alternate catalog root; the repository catalogs are the default |
 | `--no-compile` | `plan` | resolve the environment document without invoking the compiler |
 | `--generation N` | all | the WSD generation the caller claims; defaults to `1`, and only a positive integer is accepted |
