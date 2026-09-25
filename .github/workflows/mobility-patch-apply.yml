@@ -1,0 +1,38 @@
+name: Apply isolated mobility candidate
+on:
+  push:
+    branches: [implementation/mobility-integrity-closure]
+    paths: [.github/mobility-candidate.json]
+permissions:
+  contents: write
+concurrency:
+  group: mobility-candidate-application
+  cancel-in-progress: false
+jobs:
+  apply:
+    if: github.ref == 'refs/heads/implementation/mobility-integrity-closure'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Verify and apply the tested commit series
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          python - <<'PY'
+          import base64, hashlib, json, os, pathlib, subprocess, zlib
+          payload=json.loads(pathlib.Path('.github/mobility-candidate.json').read_text())
+          assert payload['base_commit']=='8dcbd973cfc4c97a211a6b92bcefee12cc8cd43f'
+          subprocess.run(['git','merge-base','--is-ancestor',payload['base_commit'],'HEAD'],check=True)
+          changed=set(subprocess.check_output(['git','diff','--name-only',payload['base_commit'],'HEAD'],text=True).splitlines())
+          assert changed <= {'.github/workflows/mobility-patch-apply.yml','.github/mobility-candidate.json'}, changed
+          patch=zlib.decompress(base64.b64decode(payload['patch_zlib_base64'],validate=True))
+          assert hashlib.sha256(patch).hexdigest()==payload['patch_sha256']
+          assert b'diff --git a/.github/' not in patch
+          target=pathlib.Path(os.environ['RUNNER_TEMP'])/'mobility-series.patch'
+          target.write_bytes(patch)
+          subprocess.run(['git','am',str(target)],check=True)
+          PY
+          git push origin HEAD:implementation/mobility-integrity-closure
