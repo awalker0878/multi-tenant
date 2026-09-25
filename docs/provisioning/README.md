@@ -17,7 +17,7 @@ portable WSD request (YAML)
   -> realization contract       provisioner/adapters
   -> existing compile_wsd.py    tools/compile_wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
-  -> hosting-delivery/1         provisioner/execution/handoff.py
+  -> hosting-delivery/2         provisioner/execution/handoff.py
   -> existing delivery runner   tools/delivery_run.py (the only engine)
   -> delivery and observation   provisioner/execution/delivery.py, provisioner/observation
 ```
@@ -42,7 +42,7 @@ that cites it cites every reviewed decision. See
 | [Internal desired-state model](desired-state-model.md) | The internal artifact handed to the compiler |
 | [WSD identity and generation model](generation-model.md) | What is being changed, which change it is, and the claim rules |
 | [Reviewed-plan manifest](plan-manifest-model.md) | The complete reviewed decision an approval cites, term by term |
-| [Delivery handoff model](delivery-handoff-model.md) | The compiled `hosting-delivery/1` graph and the existing runner that owns it |
+| [Delivery handoff model](delivery-handoff-model.md) | The compiled `hosting-delivery/2` graph and the existing runner that owns it |
 | [Capacity reservation model](capacity-reservation-model.md) | The reservation intent handed to the authoritative capacity owner, and the states it can answer |
 | [Address allocation model](address-allocation-model.md) | The allocation and DNS registration intents handed to the authoritative owners, and the states they can answer |
 | [Platform adapter contract](adapter-contract.md) | The six realization surfaces, the gap vocabulary and the platform-name-free compiler |
