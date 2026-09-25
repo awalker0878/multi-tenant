@@ -199,7 +199,7 @@ class TopologyDriftTest(unittest.TestCase):
                                              authority_ref='CHG-0001')
         changed = _renamed('workload-plan', needs=('admission',))
         with mock.patch.object(apply_module, 'plan_for', return_value=plan), \
-                mock.patch.object(apply_module.repository, 'source_commit',
+                mock.patch.object(apply_module.source_module.repository, 'source_commit',
                                   return_value=CLEAN_CHECKOUT), \
                 mock.patch.object(handoff, 'STEPS', changed):
             code, payload = apply_module.run(context, approved_plan=plan.digest,
