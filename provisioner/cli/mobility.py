@@ -31,6 +31,6 @@ def run(context: Context, mobility_intent, target_inventory=None,
                               'errors': [error.to_dict()], 'native_contact': False}
     payload = dict(plan)
     payload['format'] = RESULT_FORMAT
-    payload['source'] = context.source
+    payload['request_source'] = context.source
     payload['mobility_source'] = str(mobility_intent)
     return EXIT_OK, payload
