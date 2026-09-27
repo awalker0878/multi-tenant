@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class _StrictModel(BaseModel):
@@ -141,6 +141,36 @@ class StoredWorkload(_StrictModel):
 
 class WorkloadPage(_StrictModel):
     items: list[StoredWorkload]
+    next_after: str | None = Field(alias='nextAfter')
+
+
+class EnvironmentCreate(_StrictModel):
+    """Human-declared selector; the caller cannot assert observed readiness."""
+    environment_id: str = Field(alias='environmentId', pattern=_ID)
+    display_name: str = Field(alias='displayName', min_length=1, max_length=256,
+                              pattern=r'^[^\x00-\x1f\x7f]+$')
+    site_id: str = Field(alias='siteId', pattern=_ID)
+    security_domain_id: str = Field(alias='securityDomainId', pattern=_ID)
+    endpoint_id: str = Field(alias='endpointId', pattern=_ID)
+    native_scope_id: str = Field(alias='nativeScopeId', min_length=1, max_length=512)
+    platform_family: Literal['vmware', 'nutanix', 'openstack'] = Field(alias='platformFamily')
+
+    @field_validator('native_scope_id')
+    @classmethod
+    def valid_native_scope(cls, value: str) -> str:
+        if not value.strip() or any(ord(char) < 32 or ord(char) == 127 for char in value):
+            raise ValueError('Native scope must be a bounded non-control selector')
+        return value
+
+
+class EnvironmentView(EnvironmentCreate):
+    status: Literal['DECLARED_UNVERIFIED']
+    record_digest: str = Field(alias='recordDigest', pattern='^[0-9a-f]{64}$')
+    registered_at: datetime = Field(alias='registeredAt')
+
+
+class EnvironmentPage(_StrictModel):
+    items: list[EnvironmentView]
     next_after: str | None = Field(alias='nextAfter')
 
 

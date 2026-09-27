@@ -112,6 +112,7 @@ class PostgresHttpTests(unittest.TestCase):
         self._enroll('operator', [('EXECUTION_OPERATOR', source),
                                   ('EXECUTION_OPERATOR', destination)])
         self._enroll('one-sided', [('JOB_READER', source)])
+        self._enroll('environment-reader', [('JOB_READER', source)])
 
         # Production requires verify-full TLS. The disposable CI PostgreSQL
         # service listens only on localhost and has no server certificate.
@@ -211,6 +212,37 @@ class PostgresHttpTests(unittest.TestCase):
         self.assertEqual(self.client.get(
             '/v1/wsds/wsd-01/workloads/' + planned['metadata']['workloadId'],
             headers=self._auth('reader')).status_code, 200)
+
+        source_scope = self.selected['spec']['source']
+        declared = {
+            'environmentId': 'declared-' + uuid4().hex,
+            'displayName': 'Unverified source candidate',
+            'siteId': source_scope['locationId'],
+            'securityDomainId': source_scope['securityDomainId'],
+            'endpointId': source_scope['endpointId'],
+            'nativeScopeId': source_scope['nativeScopeId'],
+            'platformFamily': source_scope['platformFamily'],
+        }
+        endpoint = '/v1/environments'
+        self.assertEqual(self.client.post(endpoint, headers=self._auth('reader'),
+                                          json=declared).status_code, 404)
+        created_environment = self.client.post(endpoint,
+                                                headers=self._auth('operator'),
+                                                json=declared)
+        self.assertEqual(created_environment.status_code, 201,
+                         created_environment.text)
+        self.assertEqual(created_environment.json()['status'],
+                         'DECLARED_UNVERIFIED')
+        self.assertEqual(self.client.post(endpoint, headers=self._auth('operator'),
+                                          json=declared).status_code, 409)
+        available = self.client.get(endpoint + '?wsdId=' + source_scope['securityDomainId'],
+                                    headers=self._auth('environment-reader'))
+        self.assertEqual(available.status_code, 200, available.text)
+        self.assertEqual([item['environmentId'] for item in available.json()['items']],
+                         [declared['environmentId']])
+        for name in ('reader', 'foreign'):
+            self.assertEqual(self.client.get(endpoint + '/' + declared['environmentId'],
+                                             headers=self._auth(name)).status_code, 404)
 
         review_url = f'/v1/plans/{plan_id}/review'
         self.assertEqual(self.client.get(

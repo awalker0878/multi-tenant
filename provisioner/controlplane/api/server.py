@@ -23,6 +23,7 @@ from provisioner.controlplane.jobs.repository import JobRepository
 from provisioner.controlplane.evidence.runtime import (EvidenceHold,
     EvidenceRuntimeConfig, build_gate)
 from provisioner.controlplane.persistence.store import EnterpriseRecordStore
+from provisioner.controlplane.persistence.environments import EnvironmentRepository
 
 from .http import create_app
 from .portal import PortalConfig
@@ -165,6 +166,7 @@ def create_postgres_app(settings: ServiceSettings, *,
     ledger = PostgresAuthority(authority_connect)
     authority = AuthorityService(identities, ledger, ledger)
     records = EnterpriseRecordStore(runtime_connect)
+    environments = EnvironmentRepository(runtime_connect)
     jobs = JobRepository(runtime_connect, ledger)
     if evidence_gate is None and settings.evidence_config is None:
         raise ValueError('Independent evidence configuration is required')
@@ -173,7 +175,8 @@ def create_postgres_app(settings: ServiceSettings, *,
         gate = build_gate(settings.evidence_config, connection_factory=runtime_connect)
         for tenant in settings.evidence_config.startup_scopes():
             gate.require(tenant)
-    return create_app(records, authority, jobs, portal_config=settings.portal,
+    return create_app(records, authority, jobs, environments,
+                      portal_config=settings.portal,
                       evidence_gate=gate)
 
 

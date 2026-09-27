@@ -35,11 +35,16 @@ from provisioner.controlplane.persistence.store import (
     RecordValidationError, RevisionConflict, StoredRecord, TenantContext,
     canonical_record_digest,
 )
+from provisioner.controlplane.persistence.environments import (
+    EnvironmentConflict, EnvironmentDeclaration, EnvironmentRepository,
+    RegisteredEnvironment,
+)
 from provisioner.domain.enterprise_records import validate_record
 
 from .body_limit import BodyLimitMiddleware
 from .portal import PortalConfig, mount_portal
 from .models import (AccessPage, ApprovalReceipt, ApprovalRequest,
+                     EnvironmentCreate, EnvironmentPage, EnvironmentView,
                      ErrorResponse, JobEventPage, JobEventView, JobView,
                      PlanReview, RevocationReceipt, RevocationRequest, StoredWorkload,
                      WorkloadCreate, WorkloadPage)
@@ -94,6 +99,18 @@ def _event_view(event: JobEvent) -> JobEventView:
     })
 
 
+def _environment_view(row: RegisteredEnvironment) -> EnvironmentView:
+    declaration, scope = row.declaration, row.scope
+    return EnvironmentView.model_validate({
+        'environmentId': declaration.environment_id,
+        'displayName': declaration.display_name,
+        'siteId': scope.site_id, 'securityDomainId': scope.security_domain_id,
+        'endpointId': scope.endpoint_id, 'nativeScopeId': scope.native_scope_id,
+        'platformFamily': scope.platform_family, 'status': row.status,
+        'recordDigest': row.record_digest, 'registeredAt': row.registered_at,
+    })
+
+
 def _review_scope(scope: PlanScope) -> dict:
     return {'organizationId': scope.organization_id,
             'tenantId': scope.tenant_id, 'siteId': scope.site_id,
@@ -118,7 +135,8 @@ def _planned_only(record: dict) -> None:
 
 
 def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
-               jobs: JobRepository, *, evidence_gate: EvidenceMutationGate,
+               jobs: JobRepository, environments: EnvironmentRepository, *,
+               evidence_gate: EvidenceMutationGate,
                max_body_bytes: int = 1024 * 1024,
                clock: Callable[[], datetime] | None = None,
                portal_config: PortalConfig | None = None) -> FastAPI:
@@ -126,6 +144,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
     if (not isinstance(records, EnterpriseRecordStore)
             or not isinstance(authority, AuthorityService)
             or not isinstance(jobs, JobRepository)
+            or not isinstance(environments, EnvironmentRepository)
             or evidence_gate is None
             or not callable(getattr(evidence_gate, 'require', None))):
         raise TypeError('Real record, authority, job and evidence services are required')
@@ -203,6 +222,39 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                 pass
         raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
 
+    def environment_scopes(active: _Session, wsd_id: str) -> tuple[PlanScope, ...]:
+        scopes = []
+        seen = set()
+        for grant in active.principal.grants:
+            scope = grant.scope
+            if (not isinstance(scope, PlanScope)
+                    or scope.security_domain_id != wsd_id
+                    or grant.role not in (JOB_READER, EXECUTION_OPERATOR)):
+                continue
+            try:
+                require_scoped_role(active.principal, grant.role, scope, now())
+            except (AuthenticationFailed, AuthorityDenied):
+                continue
+            key = (scope.site_id, scope.endpoint_id,
+                   scope.native_scope_id, scope.platform_family)
+            if key not in seen:
+                scopes.append(scope)
+                seen.add(key)
+        if not scopes:
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+        return tuple(scopes)
+
+    def visible_environment(active: _Session, environment_id: str) -> RegisteredEnvironment:
+        row = environments.get(context(active), environment_id)
+        if row is not None:
+            for role in (JOB_READER, EXECUTION_OPERATOR):
+                try:
+                    require_scoped_role(active.principal, role, row.scope, now())
+                    return row
+                except (AuthenticationFailed, AuthorityDenied):
+                    pass
+        raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+
     @app.get('/v1/access/scopes', response_model=AccessPage,
              responses=_ERRORS, tags=['access'])
     def access_scopes(active: _Session = Depends(session)) -> AccessPage:
@@ -249,6 +301,56 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
         next_after = page[-1].record['metadata']['workloadId'] if len(rows) > limit else None
         return WorkloadPage.model_validate({'items': [_stored(row) for row in page],
                                             'nextAfter': next_after})
+
+    @app.get('/v1/environments', response_model=EnvironmentPage,
+             responses=_ERRORS, tags=['environments'])
+    def list_environments(
+            wsd_id: Annotated[str, Query(alias='wsdId', pattern=_ID_PATTERN)],
+            limit: Annotated[int, Query(ge=1, le=100)] = 50,
+            after: Annotated[str | None, Query(pattern=_ID_PATTERN)] = None,
+            active: _Session = Depends(session)) -> EnvironmentPage:
+        scopes = environment_scopes(active, wsd_id)
+        rows = environments.list(context(active), wsd_id, scopes,
+                                 after=after, limit=limit + 1)
+        page = rows[:limit]
+        cursor = page[-1].declaration.environment_id if len(rows) > limit else None
+        return EnvironmentPage.model_validate({
+            'items': [_environment_view(row).model_dump(by_alias=True) for row in page],
+            'nextAfter': cursor,
+        })
+
+    @app.get('/v1/environments/{environment_id}', response_model=EnvironmentView,
+             responses=_ERRORS, tags=['environments'])
+    def get_environment(
+            environment_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            active: _Session = Depends(session)) -> EnvironmentView:
+        return _environment_view(visible_environment(active, environment_id))
+
+    @app.post('/v1/environments', status_code=201,
+              response_model=EnvironmentView, responses=_ERRORS,
+              tags=['environments'])
+    def register_environment(
+            response: Response, declaration: EnvironmentCreate,
+            active: _Session = Depends(session)) -> EnvironmentView:
+        require_evidence(active)
+        scope = PlanScope(active.principal.organization_id,
+                          active.principal.tenant_id, declaration.site_id,
+                          declaration.security_domain_id, declaration.endpoint_id,
+                          declaration.native_scope_id, declaration.platform_family)
+        try:
+            require_scoped_role(active.principal, EXECUTION_OPERATOR, scope, now())
+        except (AuthenticationFailed, AuthorityDenied):
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found') from None
+        row = EnvironmentDeclaration(declaration.environment_id,
+                                     declaration.display_name, scope)
+        try:
+            stored = environments.create(context(active), row,
+                                         AuditContext(active.principal.subject, uuid4().hex))
+        except EnvironmentConflict:
+            raise _ApiError(409, 'ENVIRONMENT_CONFLICT',
+                            'Environment registration already exists') from None
+        response.headers['Location'] = f'/v1/environments/{declaration.environment_id}'
+        return _environment_view(stored)
 
     @app.get('/v1/wsds/{wsd_id}/workloads/{workload_id}', response_model=StoredWorkload,
              responses=_ERRORS, tags=['workloads'])

@@ -29,6 +29,9 @@ from provisioner.controlplane.persistence.store import (
     EnterpriseRecordStore, RecordValidationError, RevisionConflict, StoredRecord,
     canonical_record_digest,
 )
+from provisioner.controlplane.persistence.environments import (
+    EnvironmentConflict, EnvironmentRepository, RegisteredEnvironment,
+)
 from provisioner.domain.enterprise_records import validate_record
 from tests.provisioning.schema.test_enterprise_records import SOURCE, TARGET, plan, workload
 
@@ -210,14 +213,41 @@ class _Jobs(JobRepository):
         return tuple(event for event in events if event.sequence > after_sequence)[:limit]
 
 
+class _Environments(EnvironmentRepository):
+    def __init__(self):
+        self.rows = {}
+        self.audit = None
+
+    def create(self, ctx, declaration, audit):
+        key = (ctx.organization_id, ctx.tenant_id, declaration.environment_id)
+        if key in self.rows:
+            raise EnvironmentConflict('duplicate')
+        self.audit = audit
+        row = RegisteredEnvironment(declaration, audit.actor_id,
+                                    declaration.digest(), NOW)
+        self.rows[key] = row
+        return row
+
+    def get(self, ctx, environment_id):
+        return self.rows.get((ctx.organization_id, ctx.tenant_id, environment_id))
+
+    def list(self, ctx, wsd_id, scopes, *, after=None, limit=51):
+        return sorted((row for (org, tenant, identifier), row in self.rows.items()
+                       if (org, tenant, row.scope.security_domain_id) ==
+                       (ctx.organization_id, ctx.tenant_id, wsd_id)
+                       and identifier > (after or '') and row.scope in scopes),
+                      key=lambda row: row.declaration.environment_id)[:limit]
+
+
 class ControlApiTests(unittest.TestCase):
     def setUp(self):
         self.records = _Records()
         self.jobs = _Jobs()
+        self.environments = _Environments()
         self.identity = _Identity()
         authority = AuthorityService(self.identity, _Plans(), _Ledger(),
                                      clock=lambda: NOW)
-        self.app = create_app(self.records, authority, self.jobs,
+        self.app = create_app(self.records, authority, self.jobs, self.environments,
                               evidence_gate=_VerifiedEvidence(),
                               max_body_bytes=8192, clock=lambda: NOW)
         self.client = TestClient(self.app)
@@ -225,10 +255,63 @@ class ControlApiTests(unittest.TestCase):
     def auth(self, token):
         return {'Authorization': f'Bearer {token}'}
 
+    def test_environment_declaration_is_unverified_and_exact_scope_visible(self):
+        source = {
+            'environmentId': 'declared-source', 'displayName': 'Candidate source',
+            'siteId': SOURCE_SCOPE.site_id,
+            'securityDomainId': SOURCE_SCOPE.security_domain_id,
+            'endpointId': SOURCE_SCOPE.endpoint_id,
+            'nativeScopeId': SOURCE_SCOPE.native_scope_id,
+            'platformFamily': SOURCE_SCOPE.platform_family,
+        }
+        self.assertEqual(self.client.post('/v1/environments', json=source).status_code, 401)
+        self.assertEqual(self.client.post('/v1/environments', headers=self.auth('reader'),
+                                          json=source).status_code, 404)
+        forged = self.client.post('/v1/environments', headers=self.auth('operator'),
+                                  json=source | {'status': 'QUALIFIED'})
+        self.assertEqual(forged.status_code, 422)
+        created = self.client.post('/v1/environments', headers=self.auth('operator'),
+                                   json=source)
+        self.assertEqual(created.status_code, 201, created.text)
+        self.assertEqual(created.json()['status'], 'DECLARED_UNVERIFIED')
+        self.assertEqual(created.headers['location'], '/v1/environments/declared-source')
+        self.assertEqual(self.environments.audit.actor_id, 'operator')
+        self.assertEqual(self.client.post('/v1/environments',
+                                          headers=self.auth('operator'),
+                                          json=source).status_code, 409)
+        listed = self.client.get('/v1/environments?wsdId=wsd-01',
+                                 headers=self.auth('job-reader'))
+        self.assertEqual(listed.status_code, 200, listed.text)
+        self.assertEqual([row['environmentId'] for row in listed.json()['items']],
+                         ['declared-source'])
+        self.assertEqual(self.client.get('/v1/environments/declared-source',
+                                         headers=self.auth('one-sided')).status_code, 200)
+        for token in ('reader', 'other-wsd', 'other-tenant'):
+            self.assertEqual(self.client.get('/v1/environments/declared-source',
+                                             headers=self.auth(token)).status_code, 404)
+            self.assertEqual(self.client.get('/v1/environments?wsdId=wsd-01',
+                                             headers=self.auth(token)).status_code, 404)
+        target = source | {
+            'environmentId': 'declared-target',
+            'siteId': TARGET_SCOPE.site_id,
+            'securityDomainId': TARGET_SCOPE.security_domain_id,
+            'endpointId': TARGET_SCOPE.endpoint_id,
+            'nativeScopeId': TARGET_SCOPE.native_scope_id,
+            'platformFamily': TARGET_SCOPE.platform_family,
+        }
+        self.assertEqual(self.client.post('/v1/environments',
+                                          headers=self.auth('operator'),
+                                          json=target).status_code, 201)
+        self.assertEqual(self.client.get('/v1/environments/declared-target',
+                                         headers=self.auth('one-sided')).status_code, 404)
+        self.assertEqual(self.client.get('/v1/environments?wsdId=wsd-02',
+                                         headers=self.auth('one-sided')).status_code, 404)
+
     def test_app_composition_requires_explicit_evidence_gate(self):
         authority = AuthorityService(self.identity, _Plans(), _Ledger(), clock=lambda: NOW)
         with self.assertRaises(TypeError):
-            create_app(self.records, authority, self.jobs, evidence_gate=None)
+            create_app(self.records, authority, self.jobs, self.environments,
+                       evidence_gate=None)
 
     def test_evidence_outage_holds_creates_approvals_and_jobs_but_allows_revocation(self):
         class Held:
@@ -238,6 +321,7 @@ class ControlApiTests(unittest.TestCase):
         ledger = _Ledger()
         authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
         client = TestClient(create_app(self.records, authority, self.jobs,
+                                       self.environments,
                                        clock=lambda: NOW, evidence_gate=Held()))
         attempts = (
             ('/v1/wsds/wsd-01/workloads', 'editor', draft(), {}),
@@ -379,6 +463,7 @@ class ControlApiTests(unittest.TestCase):
         ledger = _Ledger(empty=True)
         authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
         client = TestClient(create_app(self.records, authority, self.jobs,
+                                       self.environments,
                                        evidence_gate=_VerifiedEvidence(),
                                        max_body_bytes=8192, clock=lambda: NOW))
         url = '/v1/plans/plan-01/approvals'
@@ -443,6 +528,7 @@ class ControlApiTests(unittest.TestCase):
         ledger = _Ledger(empty=True)
         authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
         client = TestClient(create_app(self.records, authority, self.jobs,
+                                       self.environments,
                                        evidence_gate=_VerifiedEvidence(),
                                        max_body_bytes=8192, clock=lambda: NOW))
         url = '/v1/plans/plan-01/approvals'
