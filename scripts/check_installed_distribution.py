@@ -58,6 +58,7 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0015_worker_directory_audit_actions.sql',
     'provisioner/controlplane/persistence/migrations/0016_site_worker_role_binding.sql',
     'provisioner/controlplane/persistence/migrations/0017_site_lock_guards.sql',
+    'provisioner/controlplane/persistence/migrations/0018_site_role_superuser_classification.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/style.css',

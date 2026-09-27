@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0017`
+for the migration role. The runner applies packaged migrations `0001`–`0018`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -145,6 +145,9 @@ check inside the lock functions. The site login cannot make another tenant or
 site visible by setting `app.*` or switching roles. The migration also binds
 existing jobs to their admitted workload revision; an ambiguous old job stops
 the upgrade for reviewed state conversion.
+Migration `0018` excludes privileged administrative sessions that use `SET ROLE`
+for isolated tests from the site-login classifier; it retains the binding for
+real non-superuser site logins and the restrictive row policies.
 
 The audit/history trigger forbids UPDATE and DELETE, and the restricted runtime
 role cannot TRUNCATE or change the trigger. Migration `0008` chains every

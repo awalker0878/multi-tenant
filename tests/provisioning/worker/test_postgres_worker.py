@@ -362,6 +362,38 @@ class WorkerPostgresTests(unittest.TestCase):
                 operation_kind='VM_POWER', operation_scope=self.scope,
                 lease_key='lease-01', lease_epoch=2, use=lambda *_: None)
 
+    def test_site_classifier_keeps_trusted_runtime_plan_visible(self):
+        with self.psycopg.connect(self.runtime_dsn) as connection:
+            self._tenant(connection)
+            self.assertEqual(connection.execute(
+                'SELECT hosting_controlplane.is_site_worker_role()').fetchone(),
+                (False,))
+            self.assertEqual(connection.execute(
+                'SELECT count(*) FROM hosting_controlplane.enterprise_records '
+                "WHERE record_kind = 'MigrationPlan' AND record_id = %s",
+                (self.plan['metadata']['planId'],)).fetchone(), (1,))
+
+        # Superusers are implicitly members of any PostgreSQL role. Test the
+        # legacy isolated harness that connects as an admin and then SET ROLEs
+        # to a non-superuser runtime, while session_user remains the admin.
+        admin_dsn = os.environ.get('HOSTING_TEST_POSTGRES_ADMIN_DSN')
+        if admin_dsn:
+            from psycopg import sql
+            from psycopg.conninfo import conninfo_to_dict
+
+            runtime_role = conninfo_to_dict(self.runtime_dsn)['user']
+            with self.psycopg.connect(admin_dsn) as connection:
+                connection.execute(sql.SQL('SET ROLE {}').format(
+                    sql.Identifier(runtime_role)))
+                self._tenant(connection)
+                self.assertEqual(connection.execute(
+                    'SELECT hosting_controlplane.is_site_worker_role()').fetchone(),
+                    (False,))
+                self.assertEqual(connection.execute(
+                    'SELECT count(*) FROM hosting_controlplane.enterprise_records '
+                    "WHERE record_kind = 'MigrationPlan' AND record_id = %s",
+                    (self.plan['metadata']['planId'],)).fetchone(), (1,))
+
     @unittest.skipUnless(os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN'),
                          'Requires a dedicated site PostgreSQL login')
     def test_bound_site_role_cannot_escape_tenant_or_site_with_forged_guc(self):
@@ -559,6 +591,11 @@ class WorkerPostgresTests(unittest.TestCase):
             roles=(VaultDynamicRole('vault:site-read', 'platform/creds/site-read',
                                     self.scope, 'DISCOVER_READ', timedelta(minutes=2)),))
         _require_read_only_role(site_connect, settings)
+        with site_connect() as connection:
+            self._tenant(connection)
+            self.assertEqual(connection.execute(
+                'SELECT hosting_controlplane.is_site_worker_role()').fetchone(),
+                (True,))
         site_grants = PostgresWorkerGrants(site_connect, NativeLeaseAuthority(site_connect))
         references = []
         site_grants.with_authorized_reference(
