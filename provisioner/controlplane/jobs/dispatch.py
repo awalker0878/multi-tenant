@@ -8,7 +8,7 @@ workflow/job/plan revision/digest. This module never executes native work.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Callable, Protocol
 
 from provisioner.controlplane.authority import AuthorityDenied
 
@@ -31,7 +31,8 @@ class DispatchResult:
 class OutboxDispatcher:
     def __init__(self, jobs: JobRepository, workflow: DurableWorkflowStarter,
                  *, dispatcher_id: str, namespace: str,
-                 start_history_retention_seconds: int):
+                 start_history_retention_seconds: int,
+                 evidence_guard: Callable):
         if jobs is None or workflow is None or not callable(getattr(workflow, 'start', None)):
             raise ValueError('Durable job and workflow services are required')
         self.jobs = jobs
@@ -44,12 +45,18 @@ class OutboxDispatcher:
                 not 1 <= start_history_retention_seconds <= 30 * 86400):
             raise ValueError('Configured workflow history retention is required')
         self.start_history_retention_seconds = start_history_retention_seconds
+        if not callable(evidence_guard):
+            raise TypeError('Evidence mutation guard must be callable')
+        self.evidence_guard = evidence_guard
 
     def run_one(self, context, *, lease_seconds: int = 30) -> DispatchResult | None:
         message = self.jobs.claim_start(context, dispatcher_id=self.dispatcher_id,
                                         lease_seconds=lease_seconds)
         if message is None:
             return None
+        # A failed external evidence read leaves this durable outbox intent
+        # claimed but undelivered. Its lease can expire and retry after repair.
+        self.evidence_guard(context)
         try:
             job = self.jobs.revalidate_start(context, message)
         except (AdmissionRefused, AuthorityDenied):

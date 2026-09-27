@@ -11,6 +11,7 @@ from provisioner.controlplane.authority.model import AuthorizedPlan, FrozenPlan
 from provisioner.controlplane.jobs import (AdmissionConflict, AdmissionRefused,
                                             JobRepository, OutboxDispatcher,
                                             OutboxMessage, StartReceipt)
+from provisioner.controlplane.evidence.gate import EvidenceHold
 from provisioner.controlplane.jobs.repository import (_digest, _ensure_plan,
     _ensure_workload, _progress_detail)
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
@@ -158,11 +159,24 @@ class _Jobs:
 
 
 class DispatchContractTest(unittest.TestCase):
+    def test_evidence_hold_leaves_outbox_undelivered(self):
+        jobs, workflow = _Jobs(), _Workflow()
+        dispatcher = OutboxDispatcher(jobs, workflow,
+                                      dispatcher_id='dispatch-1', namespace='site-a',
+                                      start_history_retention_seconds=86400,
+                                      evidence_guard=lambda _: (_ for _ in ()).throw(
+                                          EvidenceHold('unavailable')))
+        with self.assertRaises(EvidenceHold):
+            dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
+        self.assertEqual(workflow.starts, 0)
+        self.assertFalse(jobs.acked)
+
     def test_crash_after_workflow_start_retries_same_logical_run(self):
         jobs, workflow = _Jobs(), _Workflow()
         dispatcher = OutboxDispatcher(jobs, workflow,
                                       dispatcher_id='dispatch-1', namespace='site-a',
-                                      start_history_retention_seconds=86400)
+                                      start_history_retention_seconds=86400,
+                                      evidence_guard=lambda _: None)
         with self.assertRaises(ConnectionError):
             dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
         result = dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
@@ -177,7 +191,8 @@ class DispatchContractTest(unittest.TestCase):
             'a' * 64, _digest(jobs.payload))
         dispatcher = OutboxDispatcher(jobs, workflow,
                                       dispatcher_id='dispatch-1', namespace='site-a',
-                                      start_history_retention_seconds=86400)
+                                      start_history_retention_seconds=86400,
+                                      evidence_guard=lambda _: None)
         with self.assertRaises(AdmissionConflict):
             dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
         self.assertFalse(jobs.acked)

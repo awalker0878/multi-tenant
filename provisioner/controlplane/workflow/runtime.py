@@ -18,6 +18,9 @@ from temporalio.worker import Worker
 
 from provisioner.controlplane.authority import postgres as authority_postgres
 from provisioner.controlplane.jobs import JobRepository, OutboxDispatcher
+from provisioner.controlplane.evidence.runtime import (EvidenceRuntimeConfig,
+                                                      build_gate)
+from provisioner.controlplane.evidence.gate import EvidenceHold
 from provisioner.controlplane.jobs.repository import _tenant
 from provisioner.controlplane.persistence import TenantContext
 
@@ -116,19 +119,29 @@ def main(argv: list[str] | None = None) -> int:
     context = TenantContext(args.organization_id, args.tenant_id)
     jobs = JobRepository(_connect, authority_postgres)
     workflow = TemporalWorkflowStarter(settings)
+    try:
+        evidence_config = EvidenceRuntimeConfig.from_environment()
+        if evidence_config.postgres_dsn != _required('HOSTING_WORKFLOW_POSTGRES_DSN'):
+            raise ValueError('Workflow and evidence database roles must match')
+        gate = build_gate(evidence_config)
+        gate.require(context)
+    except Exception:
+        raise SystemExit('Workflow signed evidence configuration is unavailable') from None
     if args.mode == 'dispatch':
         if not args.dispatcher_id:
             parser.error('dispatch requires a stable dispatcher ID')
         dispatcher = OutboxDispatcher(
             jobs, workflow, dispatcher_id=args.dispatcher_id,
             namespace=settings.namespace,
-            start_history_retention_seconds=int(_required('HOSTING_TEMPORAL_START_RETENTION_SECONDS')))
+            start_history_retention_seconds=int(_required('HOSTING_TEMPORAL_START_RETENTION_SECONDS')),
+            evidence_guard=gate.require)
     try:
         while True:
             if args.mode == 'dispatch':
                 result = dispatcher.run_one(context)
                 busy = result is not None
             else:
+                gate.require(context)
                 busy = any(project_one(jobs, workflow, context, job_id)
                            for job_id in _pending_jobs(context))
             if args.once:
@@ -137,6 +150,8 @@ def main(argv: list[str] | None = None) -> int:
                 time.sleep(1)
     except KeyboardInterrupt:
         return 0
+    except EvidenceHold:
+        raise SystemExit('Workflow mutations held by independent evidence') from None
 
 
 if __name__ == '__main__':

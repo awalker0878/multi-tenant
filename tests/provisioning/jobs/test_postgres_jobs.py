@@ -238,7 +238,8 @@ class JobPostgresTest(unittest.TestCase):
         workflow = Workflow()
         dispatcher = OutboxDispatcher(self.jobs, workflow,
                                       dispatcher_id='site-a', namespace='mobility-test',
-                                      start_history_retention_seconds=86400)
+                                      start_history_retention_seconds=86400,
+                                      evidence_guard=lambda _: None)
         with self.assertRaises(ConnectionError):
             dispatcher.run_one(self.tenant, lease_seconds=1)
         # Simulate lease expiry without a time-based sleep. The first run is
@@ -305,7 +306,8 @@ class JobPostgresTest(unittest.TestCase):
         result = OutboxDispatcher(self.jobs, ExistingWorkflow(),
                                   dispatcher_id='retry-claim',
                                   namespace='mobility-test',
-                                  start_history_retention_seconds=86400).run_one(self.tenant)
+                                  start_history_retention_seconds=86400,
+                                  evidence_guard=lambda _: None).run_one(self.tenant)
         self.assertEqual(result.disposition, 'STARTED')
         self.assertEqual(self.jobs.get(self.tenant, job.job_id).status, 'SUCCEEDED')
         self.assertEqual([event.event_type for event in
@@ -325,7 +327,8 @@ class JobPostgresTest(unittest.TestCase):
         workflow = LostStart()
         dispatcher = OutboxDispatcher(
             self.jobs, workflow, dispatcher_id='retention-dispatch',
-            namespace='mobility-test', start_history_retention_seconds=1)
+            namespace='mobility-test', start_history_retention_seconds=1,
+            evidence_guard=lambda _: None)
         with self.assertRaises(ConnectionError):
             dispatcher.run_one(self.tenant, lease_seconds=1)
         time.sleep(1.2)

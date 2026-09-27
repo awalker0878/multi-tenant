@@ -154,7 +154,8 @@ def _recover(address: str, state: Path) -> None:
     # service restart. Temporal describes the retained run and validates memo.
     dispatcher = OutboxDispatcher(
         jobs, starter, dispatcher_id='gate-after-restart', namespace='default',
-        start_history_retention_seconds=86400)
+        start_history_retention_seconds=86400,
+        evidence_guard=lambda _: None)  # B09 restart gate; B13 verifies the real retention port.
     for _ in range(60):
         try:
             result = dispatcher.run_one(ctx)
