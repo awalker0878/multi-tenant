@@ -1,0 +1,11 @@
+# The wheel build reads these reviewed assets from the source tree. A source
+# archive must carry them so building the wheel from an sdist is equivalent.
+graft profiles
+graft policy
+graft sources
+graft terraform
+graft ansible
+graft config
+graft docs
+global-exclude *.pyc
+global-exclude .DS_Store
