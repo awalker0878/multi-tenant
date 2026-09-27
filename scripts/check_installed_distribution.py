@@ -41,6 +41,12 @@ for module in (provisioner, scripts, tools):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
     'provisioner/schemas/v1/enterprise-record.schema.json',
+    'provisioner/controlplane/persistence/migrations/0001_controlplane.sql',
+    'provisioner/controlplane/persistence/migrations/0002_jobs.sql',
+    'provisioner/controlplane/persistence/migrations/0003_authority.sql',
+    'provisioner/controlplane/persistence/migrations/0004_worker_grants.sql',
+    'provisioner/controlplane/persistence/migrations/0005_native_registry.sql',
+    'provisioner/controlplane/persistence/migrations/0006_evidence.sql',
     'profiles/security/catalog.json', 'policy/rules/standards.json',
     'sources/capabilities/platform_registry.json', 'terraform/catalog.json',
 ):
