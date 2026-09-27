@@ -16,6 +16,7 @@ from temporalio import activity
 from temporalio.api.enums.v1 import NamespaceState
 from temporalio.api.workflowservice.v1 import DescribeNamespaceRequest
 from temporalio.client import Client
+from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Replayer, Worker
 
 from provisioner.controlplane.workflow.admitted_job import (
@@ -50,6 +51,22 @@ def _adapter(address: str) -> TemporalWorkflowStarter:
         insecure_loopback_for_tests=True))
 
 
+async def _start_after_namespace_cache(starter: TemporalWorkflowStarter,
+                                       payload: dict):
+    """Auto-setup registration precedes propagation to the frontend cache."""
+    for _ in range(60):
+        try:
+            return await asyncio.to_thread(
+                starter.start, namespace='default',
+                workflow_id=payload['job_id'], payload=payload)
+        except RPCError as exc:
+            if (exc.status != RPCStatusCode.NOT_FOUND
+                    or 'Namespace default is not found' not in exc.message):
+                raise
+        await asyncio.sleep(1)
+    raise RuntimeError('Temporal default namespace did not reach the workflow frontend cache')
+
+
 async def _prepare(address: str, state: Path) -> None:
     await _ready(address)
     job_id = 'recovery-' + uuid4().hex
@@ -57,8 +74,7 @@ async def _prepare(address: str, state: Path) -> None:
                'organization_id': 'org-recovery', 'tenant_id': 'tenant-recovery',
                'plan_id': 'plan-recovery', 'plan_revision': 1,
                'plan_digest': 'a' * 64, 'revocation_epoch': 0}
-    receipt = await asyncio.to_thread(_adapter(address).start, namespace='default',
-                                      workflow_id=job_id, payload=payload)
+    receipt = await _start_after_namespace_cache(_adapter(address), payload)
     state.write_text(json.dumps({'payload': payload, 'run_id': receipt.run_id}))
 
 
@@ -67,8 +83,7 @@ async def _recover(address: str, state: Path) -> None:
     stored = json.loads(state.read_text())
     payload = stored['payload']
     starter = _adapter(address)
-    receipt = await asyncio.to_thread(starter.start, namespace='default',
-                                      workflow_id=payload['job_id'], payload=payload)
+    receipt = await _start_after_namespace_cache(starter, payload)
     if receipt.run_id != stored['run_id']:
         raise RuntimeError('Server restart created a second run')
     calls = []

@@ -4,6 +4,7 @@ import unittest
 
 from temporalio import activity
 from temporalio.testing import WorkflowEnvironment
+from temporalio.service import RPCError, RPCStatusCode
 from temporalio.worker import Replayer, Worker
 
 from provisioner.controlplane.jobs import AdmissionConflict
@@ -12,6 +13,7 @@ from provisioner.controlplane.workflow.admitted_job import (
 from provisioner.controlplane.workflow.approval_gate import ApprovalCheck, GateResult
 from provisioner.controlplane.workflow.temporal_adapter import (
     TemporalConnection, TemporalWorkflowStarter)
+from tests.provisioning.workflow.temporal_recovery_gate import _start_after_namespace_cache
 
 
 PAYLOAD = {'format': 'hosting-workflow-start/1', 'job_id': 'job-1',
@@ -21,6 +23,21 @@ PAYLOAD = {'format': 'hosting-workflow-start/1', 'job_id': 'job-1',
 
 
 class TemporalAdapterTests(unittest.IsolatedAsyncioTestCase):
+    async def test_self_hosted_namespace_cache_lag_retries_exact_start(self):
+        class Starter:
+            calls = 0
+
+            def start(self, **kwargs):
+                self.calls += 1
+                if self.calls == 1:
+                    raise RPCError('Namespace default is not found.',
+                                   RPCStatusCode.NOT_FOUND, b'')
+                return kwargs['workflow_id']
+
+        starter = Starter()
+        self.assertEqual(await _start_after_namespace_cache(starter, PAYLOAD), 'job-1')
+        self.assertEqual(starter.calls, 2)
+
     async def test_idempotent_start_verified_by_run_and_memo(self):
         async with await WorkflowEnvironment.start_local() as env:
             starter = TemporalWorkflowStarter(TemporalConnection(
