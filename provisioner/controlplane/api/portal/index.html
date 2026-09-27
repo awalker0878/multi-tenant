@@ -13,7 +13,7 @@
     <div>
       <p class="eyebrow">Enterprise hosting</p>
       <h1>Workload mobility</h1>
-      <p class="subtitle">Scoped workload records and recorded job activity</p>
+      <p class="subtitle">Declared environments, scoped workloads and recorded job activity</p>
     </div>
     <div class="identity">
       <p id="session-status" role="status" aria-live="polite">Checking identity configuration…</p>
@@ -26,6 +26,33 @@
 
   <main>
     <p id="page-error" class="notice error" role="alert" hidden></p>
+    <section class="panel" aria-labelledby="environments-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Environment declarations</p>
+          <h2 id="environments-heading">Candidate scopes</h2>
+        </div>
+        <span class="tag">Unverified</span>
+      </div>
+      <p>These rows are human declarations, not discovered or qualified environments. A declaration does not establish connectivity, capacity, ownership or migration authority.</p>
+      <form id="environment-form" class="lookup">
+        <label for="environment-selector">Authorized WSD</label>
+        <select id="environment-selector" disabled><option value="">Choose a WSD</option></select>
+        <label for="environment-wsd">WSD ID</label>
+        <input id="environment-wsd" required maxlength="128" autocomplete="off" spellcheck="false" placeholder="wsd-01">
+        <button type="submit">Show declarations</button>
+      </form>
+      <p id="environment-status" class="muted" role="status" aria-live="polite">Sign in to load environment declarations.</p>
+      <div class="table-wrap">
+        <table>
+          <caption>Authorized, unverified environment declarations in this WSD</caption>
+          <thead><tr><th scope="col">Name</th><th scope="col">ID</th><th scope="col">Site</th><th scope="col">Platform</th><th scope="col">Endpoint</th><th scope="col">Native scope</th><th scope="col">Status</th></tr></thead>
+          <tbody id="environment-rows"></tbody>
+        </table>
+      </div>
+      <button id="more-environments" class="quiet" type="button" hidden>Load more declarations</button>
+    </section>
+
     <section class="panel" aria-labelledby="portfolio-heading">
       <div class="section-heading">
         <div>

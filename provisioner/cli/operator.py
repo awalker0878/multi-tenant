@@ -82,6 +82,19 @@ def build_parser() -> argparse.ArgumentParser:
     groups = parser.add_subparsers(dest='resource', required=True)
     groups.add_parser('scopes', help='Show active authorized WSD and native scopes')
 
+    environments = groups.add_parser('environments',
+                                     help='List or declare unverified environment selectors')
+    environment_actions = environments.add_subparsers(dest='action', required=True)
+    environment_list = environment_actions.add_parser('list')
+    environment_list.add_argument('--wsd', required=True)
+    environment_list.add_argument('--limit', type=int, default=50)
+    environment_list.add_argument('--after')
+    environment_get = environment_actions.add_parser('get')
+    environment_get.add_argument('--id', required=True)
+    environment_register = environment_actions.add_parser('register')
+    environment_register.add_argument('--file', required=True,
+                                      help='Unverified selector JSON without status')
+
     workloads = groups.add_parser('workloads', help='Browse or submit planned workload records')
     workload_actions = workloads.add_subparsers(dest='action', required=True)
     listing = workload_actions.add_parser('list')
@@ -136,6 +149,17 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
     """Map CLI verbs to the same API operations used by the portal."""
     if args.resource == 'scopes':
         return 'GET', '/v1/access/scopes', None, None
+    if args.resource == 'environments':
+        if args.action == 'get':
+            return 'GET', '/v1/environments/' + _identity(args.id), None, None
+        if args.action == 'register':
+            return 'POST', '/v1/environments', None, _document(args.file)
+        if not 1 <= args.limit <= 100:
+            raise ValueError('Limit must be between 1 and 100')
+        params = {'wsdId': _identity(args.wsd), 'limit': args.limit}
+        if args.after:
+            params['after'] = _identity(args.after)
+        return 'GET', '/v1/environments', params, None
     if args.resource == 'plans':
         return 'GET', '/v1/plans/' + _identity(args.id) + '/review', None, None
     if args.resource == 'workloads':

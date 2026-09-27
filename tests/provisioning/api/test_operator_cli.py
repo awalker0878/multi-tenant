@@ -58,6 +58,38 @@ class OperatorCliTests(unittest.TestCase):
         self.assertEqual(created[0], 0)
         self.assertEqual([request.method for request in requests], ['GET', 'POST'])
 
+    def test_environment_registration_and_read_use_unverified_api_contract(self):
+        declaration = {
+            'environmentId': 'environment-01', 'displayName': 'Candidate only',
+            'siteId': 'site-01', 'securityDomainId': 'wsd-01',
+            'endpointId': 'endpoint-01', 'nativeScopeId': 'cluster-01',
+            'platformFamily': 'vmware',
+        }
+        seen = []
+        def handler(request):
+            seen.append((request.method, request.url.path))
+            if request.method == 'POST':
+                self.assertEqual(json.loads(request.content), declaration)
+                return httpx.Response(201, json=declaration | {
+                    'status': 'DECLARED_UNVERIFIED', 'recordDigest': 'a' * 64,
+                    'registeredAt': '2026-09-27T12:00:00Z'})
+            if request.url.path.endswith('/environment-01'):
+                return httpx.Response(200, json=declaration | {'status': 'DECLARED_UNVERIFIED'})
+            self.assertEqual(request.url.params['wsdId'], 'wsd-01')
+            return httpx.Response(200, json={'items': [declaration | {
+                'status': 'DECLARED_UNVERIFIED'}], 'nextAfter': None})
+        with tempfile.TemporaryDirectory() as directory:
+            file = Path(directory) / 'environment.json'
+            file.write_text(json.dumps(declaration), encoding='utf-8')
+            registered = self.invoke(['environments', 'register', '--file', str(file)], handler)
+        listed = self.invoke(['environments', 'list', '--wsd', 'wsd-01'], handler)
+        selected = self.invoke(['environments', 'get', '--id', 'environment-01'], handler)
+        self.assertEqual([registered[0], listed[0], selected[0]], [0, 0, 0])
+        self.assertEqual(json.loads(registered[1])['status'], 'DECLARED_UNVERIFIED')
+        self.assertEqual(seen, [('POST', '/v1/environments'),
+                                ('GET', '/v1/environments'),
+                                ('GET', '/v1/environments/environment-01')])
+
     def test_job_submit_requires_stable_key_and_sends_no_approval_body(self):
         def handler(request):
             self.assertEqual(request.method, 'POST')

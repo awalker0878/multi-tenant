@@ -13,6 +13,9 @@ let stepUpRequested = false;
 let activeWsd = null;
 let workloadCursor = null;
 let workloadRequest = 0;
+let environmentWsd = null;
+let environmentCursor = null;
+let environmentRequest = 0;
 let activeJob = null;
 let eventCursor = 0;
 let eventHasMore = false;
@@ -38,9 +41,17 @@ function clearSession(message = 'This tab has no active token.') {
   if (pending?.popup && !pending.popup.closed) pending.popup.close();
   pending = null;
   activeWsd = null;
+  environmentWsd = null;
   activeJob = null;
   workloadCursor = null;
   workloadRequest++;
+  environmentCursor = null;
+  environmentRequest++;
+  $('environment-rows').replaceChildren();
+  $('environment-selector').replaceChildren(new Option('Choose a WSD', ''));
+  $('environment-selector').disabled = true;
+  $('more-environments').hidden = true;
+  $('environment-status').textContent = 'Sign in to load environment declarations.';
   eventCursor = 0;
   eventHasMore = false;
   jobRequest++;
@@ -274,6 +285,16 @@ async function loadScopes() {
     $('workload-status').textContent = ids.length
       ? `${ids.length} WSD read selector(s) available. Choose one to load recorded workloads.`
       : 'No WSD read grants were returned for this identity.';
+    const environmentIds = [...new Set(scopes.items
+      .filter((item) => item.kind === 'NATIVE' &&
+        ['JOB_READER', 'EXECUTION_OPERATOR'].includes(item.role))
+      .map((item) => item.securityDomainId))].filter((id) => idPattern.test(id)).sort();
+    $('environment-selector').replaceChildren(new Option('Choose a WSD', ''));
+    for (const id of environmentIds) $('environment-selector').add(new Option(id, id));
+    $('environment-selector').disabled = environmentIds.length === 0;
+    $('environment-status').textContent = environmentIds.length
+      ? `${environmentIds.length} WSD declaration selector(s) available.`
+      : 'No exact native read grants were returned for environment declarations.';
   } catch (error) {
     if (tokenVersion !== version) return;
     $('workload-status').textContent = error.message;
@@ -284,6 +305,44 @@ function textCell(row, value) {
   const cell = document.createElement('td');
   cell.textContent = String(value ?? 'Unknown');
   row.append(cell);
+}
+
+async function loadEnvironments(reset = false) {
+  const wsd = $('environment-wsd').value.trim();
+  if (!idPattern.test(wsd)) {
+    $('environment-status').textContent = 'Enter a valid WSD ID.';
+    return;
+  }
+  if (reset || environmentWsd !== wsd) {
+    environmentWsd = wsd;
+    environmentCursor = null;
+    $('environment-rows').replaceChildren();
+    $('more-environments').hidden = true;
+  }
+  const cursor = environmentCursor;
+  const requestNumber = ++environmentRequest;
+  $('environment-status').textContent = 'Loading authorized declarations…';
+  try {
+    const query = `?wsdId=${encodeURIComponent(wsd)}&limit=50` +
+      (cursor ? `&after=${encodeURIComponent(cursor)}` : '');
+    const page = await apiGet('/v1/environments' + query);
+    if (environmentWsd !== wsd || environmentCursor !== cursor ||
+        !accessToken || requestNumber !== environmentRequest) return;
+    for (const item of page.items) {
+      if (item.securityDomainId !== wsd || item.status !== 'DECLARED_UNVERIFIED') {
+        throw new Error('The API returned an inconsistent environment declaration.');
+      }
+      const row = document.createElement('tr');
+      for (const field of ['displayName', 'environmentId', 'siteId', 'platformFamily',
+        'endpointId', 'nativeScopeId', 'status']) textCell(row, item[field]);
+      $('environment-rows').append(row);
+    }
+    environmentCursor = page.nextAfter;
+    $('more-environments').hidden = !environmentCursor;
+    $('environment-status').textContent = `${$('environment-rows').childElementCount} unverified declaration(s) in ${wsd}.`;
+  } catch (error) {
+    if (requestNumber === environmentRequest) $('environment-status').textContent = error.message;
+  }
 }
 
 async function loadWorkloads(reset = false) {
@@ -532,6 +591,14 @@ async function recordApproval() {
 window.addEventListener('message', receiveAuthorization);
 $('sign-in').addEventListener('click', () => signIn(false));
 $('clear-session').addEventListener('click', () => clearSession());
+$('environment-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  loadEnvironments(true);
+});
+$('environment-selector').addEventListener('change', (event) => {
+  if (event.target.value) $('environment-wsd').value = event.target.value;
+});
+$('more-environments').addEventListener('click', () => loadEnvironments());
 $('workload-form').addEventListener('submit', (event) => {
   event.preventDefault();
   loadWorkloads(true);

@@ -1,6 +1,6 @@
 # Control API, portal and operator CLI
 
-The first control-plane slice lets an authenticated sysadmin browse workload records in an exact workload security domain (WSD), record approvals, admit an already approved migration plan as a job, and read the persisted job timeline. The portal and `hosting-operator` CLI call the same HTTP API. An access scope in the portal is a verified role assignment; it is **not** a claim that an environment has been deployed or qualified.
+The first control-plane slice lets an authenticated sysadmin register and browse **unverified environment declarations**, browse workload records in an exact workload security domain (WSD), record approvals, admit an already approved migration plan as a job, and read the persisted job timeline. The portal and `hosting-operator` CLI call the same HTTP API. A declaration is a human-entered selector, **not** proof that an environment is deployed, reachable, owned, discovered or qualified.
 
 ## Deploy the service
 
@@ -42,12 +42,15 @@ Obtain a short-lived control API access token through the organization's approve
 
 ```text
 <approved SSO tool producing one token line> | hosting-operator --api-url https://control.example.org --token-stdin scopes
+<approved SSO tool producing one token line> | hosting-operator --api-url https://control.example.org --token-stdin environments list --wsd wsd-01
 <approved SSO tool producing one token line> | hosting-operator --api-url https://control.example.org --token-stdin workloads list --wsd wsd-01
 <approved SSO tool producing one token line> | hosting-operator --api-url https://control.example.org --token-stdin plans review --id plan-01
 <approved SSO tool producing one token line> | hosting-operator --api-url https://control.example.org --token-stdin jobs events --id job-01
 ```
 
 Each CLI invocation reads one token line. The job submit command requires a stable `--idempotency-key` retained by the operator for retries. It cannot bypass four current plan approvals, separation of duties, exact source/destination scopes, or the transactional admission recheck. Its response is the persisted `QUEUED` job, not a claim that a native operation has begun.
+
+`environments register --file declaration.json` accepts only a display name, stable environment ID and exact site/WSD/endpoint/native-scope/platform selector. The API derives organization, tenant and audit actor from SSO; the caller cannot supply status or capability claims. Registration requires the exact native `EXECUTION_OPERATOR` grant and returns immutable `DECLARED_UNVERIFIED`. List/get require an exact native `JOB_READER` or `EXECUTION_OPERATOR` grant. This operation does not contact a platform or grant a worker access. The portal displays the same scoped declarations as unverified candidates.
 
 An approver must first review the current plan through `plans review --id PLAN_ID`. The response contains the current revision and digest, source and destination scopes, route method, selected resource counts, and downtime/data-loss/rollback limits. It does not contain native mappings or the plan author. After checking those facts, obtain a freshly stepped-up SSO token and pass `--expected-revision` and `--expected-digest` with `approvals record`. If the plan changes before recording, the API returns `PLAN_REVIEW_STALE` and no approval is written. The portal applies the same binding when its optional step-up ACR is configured.
 
@@ -58,6 +61,9 @@ An approver must first review the current plan through `plans review --id PLAN_I
 | HTTP operation | Behavior |
 | --- | --- |
 | `GET /v1/access/scopes` | Current verified WSD/site role selectors, not environment inventory |
+| `POST /v1/environments` | Record an immutable human declaration with unverified status and exact native-scope authorization |
+| `GET /v1/environments?wsdId=...` | Page only the tenant/WSD declarations covered by the actor's exact native grants |
+| `GET /v1/environments/{environmentId}` | Read one declaration under the same exact native-scope grant |
 | `GET /v1/wsds/{wsdId}/workloads` | SQL-filtered workload page within one authorized WSD |
 | `GET /v1/wsds/{wsdId}/workloads/{workloadId}` | Workload within the same authorized WSD |
 | `POST /v1/wsds/{wsdId}/workloads` | Create a canonical `PLANNED` workload without native-binding claims |

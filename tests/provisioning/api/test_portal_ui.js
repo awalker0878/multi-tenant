@@ -61,7 +61,7 @@ function deferred() {
 }
 
 async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = digest,
-  exchange, scopes } = {}) {
+  exchange, scopes, environments } = {}) {
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id)) elements.set(id, new Element(id));
@@ -94,6 +94,7 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
     });
     if (url === '/portal/token') return exchange ? exchange() : json({ access_token: 'opaque', token_type: 'Bearer' });
     if (url === '/v1/access/scopes') return scopes ? scopes() : json({ items: [] });
+    if (url.startsWith('/v1/environments?')) return environments ? environments(url) : json({ items: [], nextAfter: null });
     if (url === '/v1/plans/plan-01/review') return json(samplePlan());
     if (url === '/v1/plans/plan-01/approvals') {
       approvalRequests.push(JSON.parse(options.body));
@@ -201,7 +202,8 @@ test('late responses from an old actor never replace or sign out a new actor', a
     const waiting = deferred();
     let calls = 0;
     const { context, element, beginAuth, authenticate, json } = await harness({
-      exchange: () => json({ access_token: ++calls === 1 ? 'old-actor' : 'new-actor', token_type: 'Bearer' }),
+      // A refreshed token can have the same bytes; generation still separates responses.
+      exchange: () => { calls++; return json({ access_token: 'same-opaque-token', token_type: 'Bearer' }); },
       scopes: () => calls === 1 ? waiting.promise : json({ items: [{
         kind: 'PORTFOLIO', role: 'WORKLOAD_READER', securityDomainId: 'new-wsd'
       }] })
@@ -220,4 +222,27 @@ test('late responses from an old actor never replace or sign out a new actor', a
     assert.equal(element('clear-session').disabled, false);
     assert.equal(element('sign-in').disabled, true);
   }
+});
+
+test('the portal shows exact native-scope declarations as unverified', async () => {
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: (url) => {
+      assert.match(url, /wsdId=wsd-01/);
+      return json({ items: [{ environmentId: 'environment-01', displayName: 'Candidate',
+        siteId: 'site-01', securityDomainId: 'wsd-01', endpointId: 'endpoint-01',
+        nativeScopeId: 'cluster-01', platformFamily: 'vmware',
+        status: 'DECLARED_UNVERIFIED' }], nextAfter: null });
+    }
+  });
+  await authenticate(false);
+  assert.equal(element('environment-selector').children[1].value, 'wsd-01');
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  assert.equal(element('environment-rows').children.length, 1);
+  assert.equal(element('environment-rows').children[0].children.at(-1).textContent,
+    'DECLARED_UNVERIFIED');
+  context.clearSession();
+  assert.equal(element('environment-rows').children.length, 0);
 });
