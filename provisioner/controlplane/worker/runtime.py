@@ -98,6 +98,8 @@ class SiteWorkerSettings:
                        or role.scope.site_id != self.site_id for role in self.roles)
                 or len({role.reference for role in self.roles}) != len(self.roles)
                 or len({role.scope for role in self.roles}) != len(self.roles)
+                or len({(role.scope.organization_id, role.scope.tenant_id,
+                         role.scope.site_id) for role in self.roles}) != 1
                 or (self.vault_client_certificate is None) !=
                    (self.vault_client_key is None)):
             raise ValueError('A dedicated read-only site role and exact routes are required')
@@ -150,16 +152,56 @@ def _connect(dsn: str):
     return psycopg.connect(dsn, connect_timeout=5, autocommit=False)
 
 
-def _require_read_only_role(connect: Callable, expected_role: str) -> None:
+def _require_read_only_role(connect: Callable, settings: SiteWorkerSettings) -> None:
     """Refuse privileged, grant-writing or mutable site database identities."""
     with connect() as connection:
         if connection.autocommit:
             raise RuntimeError('Site database transactions are required')
         role = connection.execute(
-            'SELECT current_user, rolsuper, rolbypassrls FROM pg_catalog.pg_roles '
+            'SELECT current_user, session_user, rolsuper, rolbypassrls, '
+            "pg_has_role(session_user, 'hosting_site_worker_roles', 'member') "
+            'FROM pg_catalog.pg_roles '
             'WHERE rolname = current_user').fetchone()
-        if role != (expected_role, False, False):
-            raise RuntimeError('The dedicated site PostgreSQL role is unavailable')
+        if role != (settings.postgres_role, settings.postgres_role,
+                    False, False, True):
+            raise RuntimeError('The bound site PostgreSQL login is unavailable')
+        group = connection.execute(
+            'SELECT rolcanlogin, rolsuper, rolbypassrls, rolcreaterole, rolcreatedb '
+            'FROM pg_catalog.pg_roles WHERE rolname = %s',
+            ('hosting_site_worker_roles',)).fetchone()
+        if group != (False, False, False, False, False):
+            raise RuntimeError('The site worker group must be unprivileged')
+        unexpected_membership = connection.execute(
+            'SELECT coalesce(bool_or(pg_has_role(session_user, r.oid, %s)), false) '
+            'FROM pg_catalog.pg_roles r WHERE r.rolname NOT IN '
+            '(session_user, %s)',
+            ('member', 'hosting_site_worker_roles')).fetchone()
+        if unexpected_membership != (False,):
+            raise RuntimeError('Site login has another role membership')
+        group_privileges = connection.execute(
+            "SELECT has_schema_privilege('hosting_site_worker_roles', "
+            "'hosting_controlplane', 'CREATE'), "
+            "has_database_privilege('hosting_site_worker_roles', "
+            "current_database(), 'CREATE'), "
+            "coalesce(bool_or(has_table_privilege('hosting_site_worker_roles', "
+            "c.oid, 'SELECT') OR has_table_privilege('hosting_site_worker_roles', "
+            "c.oid, 'INSERT') OR has_table_privilege('hosting_site_worker_roles', "
+            "c.oid, 'UPDATE') OR has_table_privilege('hosting_site_worker_roles', "
+            "c.oid, 'DELETE') OR has_table_privilege('hosting_site_worker_roles', "
+            "c.oid, 'TRUNCATE') OR has_table_privilege('hosting_site_worker_roles', "
+            "c.oid, 'TRIGGER')), false) "
+            'FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n '
+            "ON n.oid = c.relnamespace WHERE n.nspname = 'hosting_controlplane' "
+            "AND c.relkind IN ('r', 'p')"
+        ).fetchone()
+        if group_privileges != (False, False, False):
+            raise RuntimeError('Site worker group has table or create privileges')
+        scope = settings.roles[0].scope
+        if connection.execute(
+            'SELECT hosting_controlplane.site_worker_role_matches(%s, %s, %s)',
+            (scope.organization_id, scope.tenant_id, scope.site_id)
+        ).fetchone() != (True,):
+            raise RuntimeError('Site PostgreSQL login does not match its immutable scope')
         if connection.execute(
             "SELECT has_schema_privilege(current_user, 'hosting_controlplane', 'CREATE'), "
             "has_database_privilege(current_user, current_database(), 'CREATE')"
@@ -205,7 +247,7 @@ def create_site_worker_runtime(settings: SiteWorkerSettings, *,
     if not isinstance(settings, SiteWorkerSettings):
         raise TypeError('Validated site worker settings are required')
     connect = connection_factory or (lambda: _connect(settings.postgres_dsn))
-    _require_read_only_role(connect, settings.postgres_role)
+    _require_read_only_role(connect, settings)
     verifier = MutualTlsWorkerVerifier(
         server_certificate=settings.server_certificate, server_key=settings.server_key,
         trust_bundle=settings.trust_bundle, crl_bundle=settings.crl_bundle,

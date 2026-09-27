@@ -94,17 +94,34 @@ hand off a tightly scoped read credential.
 ## Installed site service
 
 Run `hosting-site-worker` under a dedicated service account in the site
-management zone. Its PostgreSQL credential must use a separate **read-only**
-role: `SELECT` on `operation_jobs`, `worker_grants`, `enterprise_records`,
+management zone. A database administrator creates the NOLOGIN
+`hosting_site_worker_roles` group before migration 0016, then creates a unique
+LOGIN member for each organization, tenant and site. The migration owner binds
+that login to exactly one scope in the immutable `site_worker_role_bindings`
+table. Do not reuse one site login across sites. Its credential has **read-only**
+grants: `SELECT` on `operation_jobs`, `worker_grants`, `enterprise_records`,
 `audit_events`, `plan_approvals`, and `native_containment_holds`; `EXECUTE` on
 `lock_job_scope`, `lock_authority_scope`, `lock_worker_scope`, and
-`lock_native_worker_scope` (migration 0014). The listener checks that role at
-startup, including absence of table write and database/schema create grants.
+`lock_native_worker_scope` (migrations 0014 and 0017), plus the 0016 binding
+check. Restrictive RLS and the lock functions use `session_user` to enforce
+the immutable scope even if a caller changes the tenant GUC or runs `SET ROLE`.
+The listener checks the binding at startup, including absence of table write
+and database/schema create grants.
+Deploy on a PostgreSQL minor patched for CVE-2024-10976 (17.1 or newer in
+the 17 series; CI uses 17.11). Before enabling each production login, test
+its exact organization, tenant and site tuple against a live grant, a foreign
+tenant and an unrelated site in the same tenant. The unrelated rows must stay
+invisible even when the login sets a different `app.tenant_id`; the matching
+read grant must remain usable. Recheck after changing role membership or
+PostgreSQL versions. See the PostgreSQL security notice:
+<https://www.postgresql.org/support/security/CVE-2024-10976/>.
 The lock functions serialize authorization with revocation and owner changes
 without giving the listener UPDATE on native ownership. Run migrations and
 enrollment with different credentials outside this process.
 
-Configure all required variables before starting the service:
+The trusted runtime role also needs `EXECUTE` on `lock_native_worker_scope`
+for B11 intent checks. It must remain a separate login. Configure all required
+variables before starting the site service:
 
 | Setting | Meaning |
 |---|---|

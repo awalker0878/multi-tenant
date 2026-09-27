@@ -26,6 +26,11 @@ def main() -> int:
     with psycopg.connect(admin_dsn, autocommit=True) as connection:
         admin_role = connection.execute('SELECT current_user').fetchone()[0]
         database = connection.execute('SELECT current_database()').fetchone()[0]
+        if connection.execute(
+                "SELECT 1 FROM pg_roles WHERE rolname = 'hosting_site_worker_roles'"
+        ).fetchone() is None:
+            connection.execute(
+                'CREATE ROLE hosting_site_worker_roles NOLOGIN NOSUPERUSER NOBYPASSRLS')
         identities = [dsn for dsn in (
             migration_dsn, runtime_dsn, authority_dsn, enrollment_dsn,
             directory_resolver_dsn, directory_writer_dsn, site_worker_dsn) if dsn]
@@ -48,6 +53,8 @@ def main() -> int:
             ).format(role, secret))
             connection.execute(sql.SQL('GRANT CONNECT ON DATABASE {} TO {}').format(
                 sql.Identifier(database), role))
+            if dsn == site_worker_dsn:
+                connection.execute(sql.SQL('GRANT hosting_site_worker_roles TO {}').format(role))
         connection.execute(sql.SQL('GRANT CREATE ON DATABASE {} TO {}').format(
             sql.Identifier(database), sql.Identifier(roles[0])))
         apply_migrations(lambda: psycopg.connect(migration_dsn))

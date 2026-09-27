@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0015`
+for the migration role. The runner applies packaged migrations `0001`–`0017`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -135,6 +135,16 @@ same allowlist for draft preview databases that already applied the earlier
 enforced, any disposable preview database with the old `0012` checksum must
 be rebuilt from a fresh bootstrap before using this revision. Do not rewrite
 its ledger or add a runtime compatibility path.
+
+Before `0016`, the database administrator creates the restricted NOLOGIN
+`hosting_site_worker_roles` group. A dedicated site login belongs only to
+that group and is bound by the migration owner to one organization, tenant and
+site in `site_worker_role_bindings`. Migration `0016` restricts its table reads
+to live, admitted work for that binding; `0017` applies the same `session_user`
+check inside the lock functions. The site login cannot make another tenant or
+site visible by setting `app.*` or switching roles. The migration also binds
+existing jobs to their admitted workload revision; an ambiguous old job stops
+the upgrade for reviewed state conversion.
 
 The audit/history trigger forbids UPDATE and DELETE, and the restricted runtime
 role cannot TRUNCATE or change the trigger. Migration `0008` chains every

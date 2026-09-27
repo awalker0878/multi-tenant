@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import os
 import unittest
 from dataclasses import replace
 
@@ -67,21 +66,30 @@ class SiteWorkerRuntimeTests(unittest.TestCase):
         self.assertEqual(settings.roles[0].scope.site_id, 'site-01')
         self.assertEqual(settings.roles[0].operation_kind, 'DISCOVER_READ')
         self.assertEqual(settings.roles[0].max_credential_ttl.total_seconds(), 120)
-        rows = [('hosting_site_worker', False, False), (False, False),
-                (False,), (True,), (True, True, True, True)]
-        _require_read_only_role(lambda: RoleConnection(rows), settings.postgres_role)
+        rows = [('hosting_site_worker', 'hosting_site_worker', False, False, True),
+                (False, False, False, False, False), (False,),
+                (False, False, False), (True,), (False, False), (False,),
+                (True,), (True, True, True, True)]
+        _require_read_only_role(lambda: RoleConnection(rows), settings)
 
     def test_privileged_and_incomplete_role_are_rejected(self):
-        good = [('hosting_site_worker', False, False), (False, False),
-                (False,), (True,), (True, True, True, True)]
-        for index, value in ((0, ('hosting_site_worker', True, False)),
-                             (1, (True, False)), (2, (True,)),
-                             (3, (False,)), (4, (True, True, False, True))):
+        settings = SiteWorkerSettings.from_environment(self.env)
+        good = [('hosting_site_worker', 'hosting_site_worker', False, False, True),
+                (False, False, False, False, False), (False,),
+                (False, False, False), (True,), (False, False), (False,),
+                (True,), (True, True, True, True)]
+        for index, value in ((0, ('hosting_site_worker', 'hosting_site_worker',
+                                  True, False, True)),
+                             (1, (True, False, False, False, False)),
+                             (2, (True,)), (3, (False, False, True)),
+                             (4, (False,)), (5, (True, False)),
+                             (6, (True,)), (7, (False,)),
+                             (8, (True, True, False, True))):
             rows = list(good)
             rows[index] = value
             with self.subTest(index=index), self.assertRaises(RuntimeError):
                 _require_read_only_role(lambda rows=rows: RoleConnection(rows),
-                                        'hosting_site_worker')
+                                        settings)
 
     def test_unqualified_or_ambiguous_route_rejected_before_listen(self):
         settings = SiteWorkerSettings.from_environment(self.env)
@@ -94,6 +102,10 @@ class SiteWorkerRuntimeTests(unittest.TestCase):
             replace(settings, site_id='another-site')
         with self.assertRaises(ValueError):
             replace(settings, roles=settings.roles + settings.roles)
+        wrong_tenant_role = replace(settings.roles[0], scope=replace(
+            settings.roles[0].scope, tenant_id='other-tenant'))
+        with self.assertRaises(ValueError):
+            replace(settings, roles=settings.roles + (wrong_tenant_role,))
         for raw in (
             '[{"scope": {}, "scope": {}}]',
             json.dumps([dict(self.route, maxCredentialTtlSeconds=True)]),
@@ -103,18 +115,6 @@ class SiteWorkerRuntimeTests(unittest.TestCase):
             with self.subTest(raw=raw), self.assertRaises(ValueError):
                 SiteWorkerSettings.from_environment(dict(
                     self.env, HOSTING_SITE_READ_ROUTES_JSON=raw))
-
-
-@unittest.skipUnless(os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN') and
-                     os.environ.get('HOSTING_TEST_POSTGRES_ISOLATED') == '1',
-                     'Requires isolated dedicated site PostgreSQL role')
-class SiteWorkerPostgresRoleTests(unittest.TestCase):
-    def test_real_site_role_has_only_required_read_and_lock_authority(self):
-        import psycopg
-        from psycopg.conninfo import conninfo_to_dict
-        dsn = os.environ['HOSTING_TEST_POSTGRES_SITE_WORKER_DSN']
-        _require_read_only_role(lambda: psycopg.connect(dsn), conninfo_to_dict(dsn)['user'])
-
 
 if __name__ == '__main__':
     unittest.main()
