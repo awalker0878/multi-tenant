@@ -37,7 +37,7 @@ jobs:
       - name: Confirm current checkout integrity before generated reports
         run: python tools/check_release.py
       - name: Install repository and local protocol-test dependencies
-        run: python -m pip install -r requirements-repository.txt
+        run: python -m pip install -r requirements-repository.txt -e '.[controlplane]' 'httpx==0.28.1'
       - name: Repository hygiene and frozen-artifact links
         run: python scripts/check_repository.py
       - name: Markdown source coverage, diagrams, forms, anchors and ADR traceability
