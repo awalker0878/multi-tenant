@@ -12,8 +12,11 @@ from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
 from provisioner.controlplane.persistence.migrate import apply_migrations
 from provisioner.controlplane.worker import (GrantDenied, GrantRequest,
+                                             EnrollmentDecision,
                                              PostgresWorkerGrants,
-                                             VerifiedWorkerIdentity)
+                                             PostgresWorkerEnrollment,
+                                             VerifiedWorkerIdentity,
+                                             WorkerCapability)
 from provisioner.domain.enterprise_records import plan_digest
 from tests.provisioning.schema.test_enterprise_records import plan, workload
 
@@ -32,10 +35,32 @@ class LockedTestLease:
             raise GrantDenied('Native operation lease is no longer current')
 
 
+class TestWorkerVerifier:
+    def verify(self, evidence):
+        if not isinstance(evidence, VerifiedWorkerIdentity):
+            raise GrantDenied('mTLS peer is required')
+        return evidence
+
+
+class TestEnrollmentAuthorizer:
+    def require_enrollment(self, approval, context, identity, capabilities):
+        if approval != 'approved-enrollment':
+            raise GrantDenied('Administrative approval is required')
+        return EnrollmentDecision('site-security-admin', 'corr-enrollment',
+                                  'ticket-enrollment')
+
+    def require_revocation(self, approval, context, worker_subject, fingerprint):
+        if approval != 'approved-revocation':
+            raise GrantDenied('Administrative approval is required')
+        return EnrollmentDecision('site-security-admin', 'corr-revocation',
+                                  'ticket-revocation')
+
+
 @unittest.skipUnless(os.environ.get('HOSTING_TEST_POSTGRES_MIGRATION_DSN') and
                      os.environ.get('HOSTING_TEST_POSTGRES_RUNTIME_DSN') and
+                     os.environ.get('HOSTING_TEST_POSTGRES_ENROLLMENT_DSN') and
                      os.environ.get('HOSTING_TEST_POSTGRES_ISOLATED') == '1',
-                     'Requires isolated PostgreSQL migration/runtime roles')
+                     'Requires isolated PostgreSQL migration/runtime/enrollment roles')
 class WorkerPostgresTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -46,6 +71,7 @@ class WorkerPostgresTests(unittest.TestCase):
         cls.psycopg = psycopg
         cls.migration_dsn = os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']
         cls.runtime_dsn = os.environ['HOSTING_TEST_POSTGRES_RUNTIME_DSN']
+        cls.enrollment_dsn = os.environ['HOSTING_TEST_POSTGRES_ENROLLMENT_DSN']
         apply_migrations(lambda: psycopg.connect(cls.migration_dsn))
 
     def _tenant(self, connection):
@@ -141,6 +167,13 @@ class WorkerPostgresTests(unittest.TestCase):
                  self.identity.subject, self.scope.site_id,
                  self.identity.certificate_sha256, now + timedelta(hours=1)))
             connection.execute(
+                'INSERT INTO hosting_controlplane.worker_certificate_versions '
+                '(organization_id, tenant_id, worker_subject, certificate_sha256, '
+                'expires_at) VALUES (%s, %s, %s, %s, %s)',
+                (self.context.organization_id, self.context.tenant_id,
+                 self.identity.subject, self.identity.certificate_sha256,
+                 now + timedelta(hours=1)))
+            connection.execute(
                 'INSERT INTO hosting_controlplane.worker_capabilities '
                 '(organization_id, tenant_id, worker_subject, site_id, '
                 'security_domain_id, endpoint_id, native_scope_id, platform_family, '
@@ -154,6 +187,64 @@ class WorkerPostgresTests(unittest.TestCase):
         self.lease = LockedTestLease()
         self.grants = PostgresWorkerGrants(
             lambda: self.psycopg.connect(self.runtime_dsn), self.lease)
+        self.enrollment = PostgresWorkerEnrollment(
+            lambda: self.psycopg.connect(self.enrollment_dsn),
+            TestWorkerVerifier(), TestEnrollmentAuthorizer())
+
+    def test_certificate_rotation_invalidates_old_grant_and_revoke_blocks_new(self):
+        old_grant = self.grants.issue_grant(self.context, self.identity, self.request)
+        replacement = replace(self.identity, certificate_sha256=uuid4().hex + uuid4().hex)
+        with self.assertRaises(GrantDenied):
+            self.enrollment.enroll(replacement, self.context, 'unapproved')
+        self.enrollment.enroll(replacement, self.context, 'approved-enrollment')
+        with self.psycopg.connect(self.migration_dsn) as connection:
+            self._tenant(connection)
+            event = connection.execute(
+                'SELECT actor_id, correlation_id, action, details '
+                'FROM hosting_controlplane.audit_events '
+                'WHERE organization_id = %s AND tenant_id = %s '
+                "AND action = 'WORKER_CERT_ROTATE' AND record_id = %s",
+                (self.context.organization_id, self.context.tenant_id,
+                 replacement.certificate_sha256)).fetchone()
+            self.assertEqual(event[0:3], ('site-security-admin',
+                                          'corr-enrollment', 'WORKER_CERT_ROTATE'))
+            self.assertEqual(event[3]['approval_id'], 'ticket-enrollment')
+        with self.assertRaises(GrantDenied):
+            self.grants.with_authorized_reference(
+                self.context, self.identity, old_grant.grant_id,
+                job_id=self.job_id, step_id='step-01', operation_id='operation-01',
+                operation_kind='VM_POWER', operation_scope=self.scope,
+                lease_key='lease-01', lease_epoch=2, use=lambda *_: None)
+        renewed = self.grants.issue_grant(
+            self.context, replacement, replace(self.request, step_id='step-02'))
+        self.enrollment.revoke(self.context, 'approved-revocation',
+                               worker_subject=replacement.subject,
+                               certificate_sha256=replacement.certificate_sha256)
+        with self.assertRaises(GrantDenied):
+            self.grants.with_authorized_reference(
+                self.context, replacement, renewed.grant_id,
+                job_id=self.job_id, step_id='step-02', operation_id='operation-01',
+                operation_kind='VM_POWER', operation_scope=self.scope,
+                lease_key='lease-01', lease_epoch=2, use=lambda *_: None)
+
+    def test_first_enrollment_needs_admin_approval_and_scope(self):
+        new_identity = replace(self.identity, subject='new-worker-01',
+                               certificate_sha256=uuid4().hex + uuid4().hex)
+        cap = WorkerCapability(self.scope, 'VM_POWER', 'vault:site-power')
+        with self.assertRaises(GrantDenied):
+            self.enrollment.enroll(new_identity, self.context, 'unapproved',
+                                   capabilities=(cap,))
+        with self.assertRaises(GrantDenied):
+            self.enrollment.enroll(replace(new_identity, site_id='wrong-site'),
+                                   self.context, 'approved-enrollment', capabilities=(cap,))
+        self.enrollment.enroll(new_identity, self.context, 'approved-enrollment',
+                               capabilities=(cap,))
+        with self.psycopg.connect(self.enrollment_dsn) as connection:
+            self._tenant(connection)
+            with self.assertRaises(self.psycopg.Error):
+                connection.execute('INSERT INTO hosting_controlplane.worker_grants '
+                                   '(organization_id) VALUES (%s)',
+                                   (self.context.organization_id,))
 
     def test_grant_exact_scope_certificate_site_and_revocation(self):
         with self.assertRaises(GrantDenied):
