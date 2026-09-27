@@ -1,8 +1,8 @@
 # Architecture decision register
 
-These are decisions from the architecture and engineering sources, not a generic list of software choices. Source-derived records use the lifecycle state shown below. The initial conversion remains Proposed; any later Accepted, Rejected or Superseded record requires actual decision metadata and independently reviewed evidence. Rendering does not authenticate that authority or issue native qualification.
+The source-derived records below preserve architecture and engineering decisions. ADR-0039–ADR-0041 record proposed product direction for enterprise workload mobility; they do not claim a historical source approval or native release. Source-derived records use the lifecycle state shown below. The initial conversion remains Proposed; any later Accepted, Rejected or Superseded record requires actual decision metadata and independently reviewed evidence. Rendering does not authenticate that authority or issue native qualification.
 
-The repository numbering and original source numbering are separate. AD-01–AD-15, RD14-01–RD14-05 and DEV-ADR-01 are mapped below; thematic decisions are linked to their source chapters without inventing a historical identifier.
+The repository numbering and original source numbering are separate. AD-01–AD-15, RD14-01–RD14-05 and DEV-ADR-01 are mapped below; thematic decisions are linked to their source chapters without inventing a historical identifier. The new product records have no historical source decision ID.
 
 | Record | Source decision | Source / status |
 | --- | --- | --- |
@@ -44,6 +44,9 @@ The repository numbering and original source numbering are separate. AD-01–AD-
 | [ADR-0036 — Require initial operational and recovery readiness before production activation](0036-require-initial-operational-and-recovery-readiness-before-production-activation.md) | RD14-04 | [WD §9](../solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md); Proposed |
 | [ADR-0037 — Define independent telemetry and collection-loss behaviour](0037-define-independent-telemetry-and-collection-loss-behaviour.md) | Chapter-derived | [RA §26](../architecture/reference/26-operating-model-capacity-and-observability.md); Proposed |
 | [ADR-0038 — Govern images and privileged dependency provenance across their lifecycle](0038-govern-images-and-privileged-dependency-provenance-across-their-lifecycle.md) | Chapter-derived | [RA §22](../architecture/reference/22-vendor-platform-and-shared-service-commissioning.md); Proposed |
+| [ADR-0039 — Build an enterprise workload mobility product](0039-build-an-enterprise-workload-mobility-product.md) | New product direction | Proposed; executable application and evidence gates |
+| [ADR-0040 — Separate workloads and applications from security domains](0040-separate-workload-application-and-security-domain.md) | New product domain model | Proposed; workload/application identities distinct from WSD |
+| [ADR-0041 — Assign one authority per state and remove superseded runtime paths](0041-authority-state-and-no-shim-transition.md) | New product ownership and transition decision | Proposed; single execution authority and canonical contracts |
 
 ## Add or change a decision
 

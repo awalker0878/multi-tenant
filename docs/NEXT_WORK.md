@@ -1,16 +1,46 @@
-# Remaining implementation after Increment04
+# Next work: executable product and native release
 
-The following remain separate from this release's local execution evidence. Each row names
-its owner, the missing external input, why it matters, the repository-side contract that is
-already complete, the completion condition and the hold point. The portable provisioning
-refactor (audit gates C01-C13) is repository-side complete; nothing in this table is
-repository-side work that a commit could close. See the
-[portable provisioning documents](provisioning/README.md) and the
-[refactor completion audit](deepseek-refactor-completion-audit.md).
+The C01–C13 refactor gates describe a completed **planning interface refactor**, not
+an executable provisioning and migration product. The current public `apply` and
+`mobility-apply` paths refuse execution. Generated provisioning steps and mobility
+handoffs leave native lifecycle, cross-scope data transfer, source fencing and useful
+service acceptance incomplete. See the
+[full audit and implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
+for source evidence, 50 sequenced work items, deletion gates and route acceptance.
+The [portable provisioning documents](provisioning/README.md) and
+[refactor completion audit](deepseek-refactor-completion-audit.md) remain historical
+records for the smaller scope they covered.
 
-| Owner | Missing external evidence/input | Why it matters | Repository-side contract completed | Completion condition | Hold point |
+## Repository implementation
+
+| Wave | Work to deliver in the repository | Exit condition |
+| --- | --- | --- |
+| 0, B01–B05 | Fix the delivery-format regression; adopt the product/identity/authority ADRs; define canonical workload/application, plan, transfer and activity contracts; inventory every old consumer/record; package runtime code and remove checkout imports. | Required CI passes at the delivery revision; schemas cover existing multi-VM workloads, same-family moves and unknown facts; deletion register names every retained state conversion. |
+| 1, B06–B13 | Multiuser API, SSO and scoped approvals; product database, outbox and durable workflows; fenced site workers, audit store, console and thin CLI. | One authenticated, restart-safe and idempotent execution authority with revoked/stale grants rejected. |
+| 2, B14–B22 | Read-only platform inventory, application dependency review, safe adoption, destination comparison and current route capability. | An operator can see observed source identities, viable destinations, blockers, unknowns and remediation without implying execution approval. |
+| 3, B23–B29 | Complete provisioning graph from saved plans through native postconditions, guest readiness, service activation, reservations and day-two actions. | A qualified workload reaches useful service through one authorized job and survives interrupted operations without blind replay. |
+| 4, B30–B37 | First real application migration: cross-scope transfer, per-dataset verification, source fencing, final sync, traffic cutover, application acceptance and recovery. | A VMware Linux application migrates to a qualified OpenStack target with one accepted writer and rehearsed recovery. |
+| 5, B38–B43 | Cold VM conversion, same-family relocation, other directed platform routes, application-native sync and scheduled waves. | Each advertised method and direction has independent guest, policy, data and recovery qualification. |
+| 6, B44–B50 | Operations, retained-state conversion, deletion of superseded paths, native qualification and release controls. | No dual mutation path or implicit fallback remains; supported routes have current installed-tuple and operational evidence. |
+
+Product architecture direction is documented in
+[ADR-0039](adr/0039-build-an-enterprise-workload-mobility-product.md),
+[ADR-0040](adr/0040-separate-workload-application-and-security-domain.md) and
+[ADR-0041](adr/0041-authority-state-and-no-shim-transition.md).
+Implementation status must be measured by executable behavior, tests and native
+qualification separately. A completed document, fixture or contract cannot close an
+unimplemented product path.
+
+## Site and organizational release inputs
+
+The following inputs remain necessary alongside repository implementation. The bounded
+contracts and local tools in this table do not make the full workflow executable or
+authorize native target contact. Each selected site and migration route needs current
+evidence from its actual owners.
+
+| Owner | Missing external evidence/input | Why it matters | Existing bounded implementation | Completion condition | Hold point |
 |---|---|---|---|---|---|
-| Toolchain owner | A verified Terraform/provider toolchain, committed locks and a hosted CI run that actually executes backend-disabled module/root, provider-schema and plan-only mock validation. | No engine-level check has run, so module and root correctness is unproven and no native apply can be considered. | `tools/verify_terraform.py`, the module/root catalogue, `terraform/catalog.json` and the pinned provider locks are committed and ready to run. | A CI run that reports the real Terraform version, enumerates every module and root and exports provider schemas and plan-only mocks. | Before native apply |
+| Toolchain owner | Release-revision Terraform/provider checks, pinned locks and review of any new native engine or provider change. | Terraform and Ansible checks passed at the audited revision, but an earlier passing engine job does not qualify a future changed release or installed target. | `tools/verify_terraform.py`, the module/root catalogue, `terraform/catalog.json` and pinned provider locks provide a bounded validation path. | The exact release revision runs required Terraform/Ansible checks and any new provider schema or plan-only validation; native qualification remains separate. | Before native apply |
 | Platform and security owner | The actual site/cell, installed hardware/product/API/provider/backend/feature/licence tuple, EC/SE and management/OOB realization, permitted disposable campaign scope, data restrictions, credential custody, stop authority and time-bounded target-contact authority. | Target selection is the prerequisite for every native gate; an unselected target would leave any campaign unbound. | The target-selection gate, its schema and its fail-closed validation are implemented and exercised against fixtures. | A recorded decision naming the exact tuple and authorities and reviewed by the owners. | Before native connection or provisioning |
 | Qualification campaign owner | A campaign packet bound to the exact selected change/contact/stop authority, native API/observer/writer scopes, custody/workspace/data restrictions, permitted/prohibited operations, cleanup and contact window, plus retained native attempts, positive controls, artifact hashes, freshness and reviewed not-applicable decisions. | Qualification is the only source of placement eligibility; unbound evidence would let placement outrun its authority. | The campaign gate, its freshness window, packet-to-dossier traceability and the `PlatformProfile` dossier refusal of untraceable or stale evidence are implemented. | The independent qualification authority publishes a dossier the gate accepts with no residual gaps. | Before native qualification publication |
 | Platform observers | The exact installed API/profile, omission/default behavior, native RBAC, version-token semantics and complete accepted task/entity coverage, plus supported VM/Flow/route or composite-task profiles where the chosen service scope requires them. | Reconciliation cannot distinguish a real change from an unread field, so conformance would rest on unproven reads. | The native readback contract, the generation/plan-bound observation binding and the `native-observation` external check are implemented and tested against recorded shapes. | Observations produced by the selected profiles that cover the accepted entity set with the omission/default semantics recorded. | Before relying on native readback |
@@ -25,6 +55,7 @@ repository-side work that a commit could close. See the
 | Operations/authority | Exact-scope G0/G1/G2 prerequisites, initial G4 recovery/operations readiness, current operating authority and a tested reversible G3 withdrawal plan, plus the externally executed exposure change and the recorded live entry/reply, dependency and telemetry evidence. | Production exposure is only safe under separately granted authority. | The production activation assurance gate, its prerequisite structure and its withdrawal/reversal contract are implemented. | Current evidence for every prerequisite and a recorded activation decision; failed or unknown activation is withdrawn. | Before production |
 | Provisioning interface owner | Reviewed authoritative site state to replace the non-authoritative per-platform inventory fixtures, and the qualified product tuples the placement registry leaves empty; also the missing realization for each deferred profile. | Until then placement stays `FIXTURE_NOT_PLACEMENT_AUTHORITY` and no plan is a placement authority. | The fixture-backed placement path, the `FIXTURE_NOT_PLACEMENT_AUTHORITY` verdict, the empty qualified-tuple registry and the deferred-profile refusal are implemented and tested. | Authoritative site state and qualified tuples accepted by the same gate, and a deferred profile promoted only once its realization exists. | Before a plan is treated as a placement authority |
 
-These are not closed because there are more files or passing synthetic fixtures.
-[Current backlog](../sources/implementation_backlog.csv) identifies each remaining
-evidence dependency and the part delivered in this increment.
+These gates do not close because more files or synthetic fixtures pass.
+[The historical backlog](../sources/implementation_backlog.csv) records the earlier
+evidence dependencies; use the [product implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
+for current repository work and release acceptance.
