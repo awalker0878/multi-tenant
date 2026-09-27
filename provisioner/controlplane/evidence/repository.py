@@ -24,6 +24,11 @@ _SENSITIVE = re.compile(
     r'password|secret|credential|token|privatekey|accesskey|apikey|authorization|cookie|dsn',
     re.IGNORECASE)
 _URL = re.compile(r'(?i)\b[a-z][a-z0-9+.-]*://|\b(?:bearer|basic)\s+[a-z0-9+/=-]+')
+_SECRET_VALUE = re.compile(
+    r'(?i)(?:-----BEGIN [A-Z ]*PRIVATE KEY-----|'
+    r'\b(?:password|secret|credential|token|api[_-]?key)\s*[:=]\s*\S+|'
+    r'\b(?:gh[pousr]_|sk_(?:live|test)_|AKIA)[A-Za-z0-9_-]{10,}|'
+    r'\beyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,})')
 KINDS = frozenset({'OBSERVATION', 'NATIVE_RECEIPT', 'TRANSFER_MANIFEST',
                    'VERIFICATION_RESULT', 'RECOVERY_DECISION'})
 
@@ -114,8 +119,9 @@ def _validated_artifact(value: dict) -> bytes:
         elif isinstance(item, list):
             for child in item:
                 inspect(child, depth + 1)
-        elif isinstance(item, str) and _URL.search(item):
-            raise ValueError('Evidence cannot embed URLs or authorization values')
+        elif isinstance(item, str) and (
+                len(item) > 512 or _URL.search(item) or _SECRET_VALUE.search(item)):
+            raise ValueError('Evidence cannot embed URLs, long text or credential values')
         elif item is not None and not isinstance(item, (str, int, float, bool)):
             raise ValueError('Evidence artifact contains a non-JSON value')
 

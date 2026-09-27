@@ -44,7 +44,10 @@ class EvidenceContractTests(unittest.TestCase):
                 {'password': 'example'}, {'nested': {'api_key': 'example'}},
                 {'headers': [{'Authorization': 'example'}]},
                 {'endpoint': 'https://example.invalid/path?token=example'},
-                {'note': 'Bearer example'}, {'n': float('nan')}):
+                {'note': 'Bearer example'}, {'note': 'password=canary-value'},
+                {'note': '-----BEGIN PRIVATE KEY-----'},
+                {'note': 'sk_test_12345678901234567890'},
+                {'note': 'x' * 513}, {'n': float('nan')}):
             with self.subTest(artifact=artifact), self.assertRaises(ValueError):
                 _validated_artifact(artifact)
         self.assertEqual(_validated_artifact({'result': 'PASS', 'digest': 'abc'}),
