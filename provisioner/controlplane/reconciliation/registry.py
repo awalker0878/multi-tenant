@@ -10,7 +10,9 @@ Neither a lease timeout nor a string supplied by a client is proof of safety.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+import hashlib
+import json
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 from typing import Callable, Protocol
 
@@ -53,11 +55,20 @@ class GrantVerifier(Protocol):
 class EvidenceVerifier(Protocol):
     def verify_native_observation(self, cursor, operation: 'NativeOperation',
                                   observation: 'NativeObservation') -> None:
-        """Check independently collected, authentic native/task evidence."""
+        """Check authentic native/task state against a fresh platform readback.
+
+        This is called again under the resolution transaction after old-worker
+        exclusion. A previously signed observation alone is not a current
+        no-effect result when a platform request might arrive late.
+        """
 
     def verify_owner_exclusion(self, cursor, lease: OwnerLease, scope: PlanScope,
                                evidence: 'OwnerRecoveryEvidence') -> None:
-        """Check native quiescence and actual old-worker/credential fencing."""
+        """Check current native quiescence and actual old-worker/credential fencing.
+
+        The proof must exclude delayed platform requests by the old worker,
+        including requests already handed to a queue or an accepted task.
+        """
 
 
 @dataclass(frozen=True)
@@ -131,6 +142,23 @@ def _digest(value) -> bool:
 
 def _fresh(observed_at: datetime, now: datetime) -> bool:
     return _aware(observed_at) and now - _FRESHNESS <= observed_at <= now
+
+
+def _resolution_digest(observation: NativeObservation,
+                       exclusion: OwnerRecoveryEvidence) -> str:
+    """Bind both reviewers to one native observation and one exclusion proof."""
+    evidence = {
+        'purpose': 'native-operation-resolution-v1',
+        'observation_id': observation.observation_id,
+        'native_digest': observation.evidence_digest,
+        'native_observed_at': observation.observed_at.isoformat(),
+        'exclusion_native_digest': exclusion.native_evidence_digest,
+        'worker_fence_digest': exclusion.worker_fence_digest,
+        'exclusion_observed_at': exclusion.observed_at.isoformat(),
+        'incident_id': exclusion.incident_id,
+    }
+    return hashlib.sha256(json.dumps(evidence, sort_keys=True, separators=(',', ':'))
+                          .encode('utf-8')).hexdigest()
 
 
 def _identity(principal: VerifiedPrincipal, role: str,
@@ -294,7 +322,7 @@ class NativeOperationRegistry:
 
     @staticmethod
     def _owner(cursor, ctx: TenantContext, lease: OwnerLease,
-               *, live: bool | None) -> None:
+               *, live: bool | None) -> datetime:
         if not isinstance(lease, OwnerLease) or (
                 lease.organization_id, lease.tenant_id) != (
                 ctx.organization_id, ctx.tenant_id):
@@ -314,6 +342,7 @@ class NativeOperationRegistry:
                 or (live is True and row[6] <= now)
                 or (live is False and row[6] > now)):
             raise OperationConflict('Owner epoch, worker or lease state changed')
+        return row[6]
 
     @staticmethod
     def _containment(cursor, binding: NativeBinding) -> None:
@@ -525,18 +554,49 @@ class NativeOperationRegistry:
 
     def review_outcome(self, ctx: TenantContext, operation_id: str,
                        observation_id: str, principal: VerifiedPrincipal,
-                       scope: PlanScope, *, decision: str, incident_id: str) -> bool:
-        """Two distinct stepped-up reviewers must attest one fresh observation."""
-        if decision not in ('NO_EFFECT', 'EFFECT_PRESENT') or not _key(incident_id):
-            raise ValueError('A concrete outcome and incident reference are required')
+                       scope: PlanScope, *, decision: str,
+                       exclusion: OwnerRecoveryEvidence) -> bool:
+        """Two reviewers attest one fresh readback and old-worker exclusion.
+
+        A native no-effect result alone cannot release an uncertain request:
+        the expired owner must first be fenced from submitting it late.
+        """
+        if decision not in ('NO_EFFECT', 'EFFECT_PRESENT'):
+            raise ValueError('A concrete outcome is required')
+        if not isinstance(exclusion, OwnerRecoveryEvidence):
+            raise TypeError('Independent owner exclusion evidence is required')
         with self._connect() as connection, connection.cursor() as cursor:
             _tenant(cursor, ctx)
-            op = self._get(cursor, ctx, operation_id)
-            _scope(ctx, scope, op.binding, op.security_domain_id)
+            # Read the immutable binding, then lock owner before intent. Other
+            # paths take this same lock order; reversal can deadlock recovery.
+            cursor.execute(
+                f'SELECT {_SELECT} FROM hosting_controlplane.native_operation_intents '
+                'WHERE organization_id = %s AND tenant_id = %s AND operation_id = %s',
+                (ctx.organization_id, ctx.tenant_id, operation_id))
+            previous = cursor.fetchone()
+            if previous is None:
+                raise OperationConflict('Operation is not visible in this tenant')
+            proposed = _row(previous)
+            _scope(ctx, scope, proposed.binding, proposed.security_domain_id)
             now = self._clock(cursor)
             actor = _identity(principal, EXECUTION_OPERATOR, scope, now)
+            # The owner lock serializes review with containment and owner
+            # transitions. An expired cooperative lease is not itself a fence.
+            lease = OwnerLease(proposed.binding, ctx.organization_id, ctx.tenant_id,
+                               proposed.security_domain_id, proposed.workload_id,
+                               proposed.worker_id, proposed.owner_epoch, now)
+            lease = replace(lease, expires_at=self._owner(cursor, ctx, lease,
+                                                           live=False))
+            self._containment(cursor, proposed.binding)
+            op = self._get(cursor, ctx, operation_id)
+            if op != proposed:
+                raise OperationConflict('Operation changed during recovery')
             if op.state not in ('IN_FLIGHT', 'TASK_ACCEPTED', 'UNCERTAIN'):
                 raise RecoveryHeld('Operation cannot be resolved from this state')
+            now = self._clock(cursor)
+            if not _fresh(exclusion.observed_at, now):
+                raise RecoveryHeld('Fresh worker exclusion evidence is required')
+            self._evidence.verify_owner_exclusion(cursor, lease, scope, exclusion)
             cursor.execute(
                 'SELECT evidence_digest, observer_subject, native_task_id, outcome, '
                 'native_quiesced, observed_at FROM '
@@ -549,13 +609,19 @@ class NativeOperationRegistry:
                     or not _fresh(observed[5], now) or actor in
                     (op.worker_id, observed[1])):
                 raise RecoveryHeld('Fresh independent quiesced outcome is required')
+            observation = NativeObservation(observation_id, observed[0], observed[1],
+                                            observed[2], observed[3], observed[4],
+                                            observed[5])
+            self._evidence.verify_native_observation(cursor, op, observation)
+            resolution_digest = _resolution_digest(observation, exclusion)
             cursor.execute(
                 'INSERT INTO hosting_controlplane.native_operation_reviews '
                 '(organization_id, tenant_id, operation_id, reviewer_subject, '
                 'observation_id, evidence_digest, decision, incident_id) '
                 'VALUES (%s, %s, %s, %s, %s, %s, %s, %s) ON CONFLICT DO NOTHING',
                 (ctx.organization_id, ctx.tenant_id, operation_id, actor,
-                 observation_id, observed[0], decision, incident_id))
+                 observation_id, resolution_digest, decision,
+                 exclusion.incident_id))
             cursor.execute(
                 'SELECT reviewer_subject, observation_id, evidence_digest, '
                 'decision, incident_id FROM hosting_controlplane.native_operation_reviews '
@@ -563,8 +629,8 @@ class NativeOperationRegistry:
                 (ctx.organization_id, ctx.tenant_id, operation_id))
             reviews = cursor.fetchall()
             if len(reviews) > 2 or any(row[1:] !=
-                                       (observation_id, observed[0], decision,
-                                        incident_id) for row in reviews):
+                                       (observation_id, resolution_digest, decision,
+                                        exclusion.incident_id) for row in reviews):
                 raise RecoveryHeld('Conflicting operator review holds the operation')
             if len(reviews) != 2:
                 return False
@@ -573,7 +639,7 @@ class NativeOperationRegistry:
                 'outcome = %s, resolution_evidence_digest = %s, '
                 'updated_at = clock_timestamp() WHERE organization_id = %s '
                 'AND tenant_id = %s AND operation_id = %s',
-                (decision, observed[0], ctx.organization_id, ctx.tenant_id,
+                (decision, resolution_digest, ctx.organization_id, ctx.tenant_id,
                  operation_id))
             return True
 

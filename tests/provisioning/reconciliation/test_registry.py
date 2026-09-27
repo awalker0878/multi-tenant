@@ -39,13 +39,18 @@ class NativeRegistryValidationTest(unittest.TestCase):
 
 
 class _TestEvidence:
+    def __init__(self):
+        self.fenced = False
+        self.native_current = True
+
     def verify_native_observation(self, cursor, operation, observation):
-        if observation.evidence_digest != 'a' * 64:
+        if observation.evidence_digest != 'a' * 64 or not self.native_current:
             raise RecoveryHeld('Untrusted native observation')
 
     def verify_owner_exclusion(self, cursor, lease, scope, evidence):
         if (evidence.native_evidence_digest != 'b' * 64
-                or evidence.worker_fence_digest != 'c' * 64):
+                or evidence.worker_fence_digest not in ('c' * 64, 'e' * 64)
+                or not self.fenced):
             raise RecoveryHeld('Native exclusion or worker fence is unverified')
 
 
@@ -130,8 +135,9 @@ class NativeRegistryPostgresTest(unittest.TestCase):
                              lease_key=self.lease_key, job_id=self.job_id,
                              operation_id=self.operation_id,
                              worker_identity=self.identity)
+        self.evidence = _TestEvidence()
         self.registry = NativeOperationRegistry(
-            self.runtime, grants=_TestGrant(self.leases), evidence=_TestEvidence())
+            self.runtime, grants=_TestGrant(self.leases), evidence=self.evidence)
 
     def runtime(self):
         return self.psycopg.connect(self.runtime_dsn)
@@ -158,6 +164,16 @@ class NativeRegistryPostgresTest(unittest.TestCase):
             worker_identity=self.identity, operation_id=self.operation_id,
             operation_kind='VM_POWER', request_digest='f' * 64)
 
+    def expire_owner(self):
+        with self.runtime() as connection:
+            self.tenant_sql(connection)
+            connection.execute(
+                'UPDATE hosting_controlplane.native_ownership SET '
+                "lease_expires_at = clock_timestamp() - interval '1 second' "
+                'WHERE platform_family = %s AND endpoint_id = %s '
+                'AND native_scope_id = %s AND resource_kind = %s AND native_id = %s',
+                self.binding.key())
+
     def test_uncertain_timeout_never_replays_and_blocks_owner_release(self):
         self.assertEqual(self.prepare().state, 'PREPARED')
         self.assertTrue(self.registry.claim_once(
@@ -171,14 +187,8 @@ class NativeRegistryPostgresTest(unittest.TestCase):
         self.assertEqual(self.prepare().state, 'UNCERTAIN')
         with self.assertRaises(self.psycopg.Error):
             self.store.release_owner_lease(self.ctx, self.owner, self.audit)
-        with self.runtime() as connection:
-            self.tenant_sql(connection)
-            connection.execute(
-                'UPDATE hosting_controlplane.native_ownership SET '
-                "lease_expires_at = clock_timestamp() - interval '1 second' "
-                'WHERE platform_family = %s AND endpoint_id = %s '
-                'AND native_scope_id = %s AND resource_kind = %s AND native_id = %s',
-                self.binding.key())
+        self.expire_owner()
+        self.evidence.fenced = True
         with self.assertRaises(RecoveryHeld):
             self.registry.clear_expired_owner(
                 self.ctx, self.owner, self.scope,
@@ -194,22 +204,42 @@ class NativeRegistryPostgresTest(unittest.TestCase):
                                      'a' * 64, 'independent-reader', None,
                                      'NO_EFFECT', True, datetime.now(timezone.utc))
         self.registry.observe(self.ctx, self.operation_id, observed)
+        exclusion = OwnerRecoveryEvidence('b' * 64, 'c' * 64,
+                                          datetime.now(timezone.utc), 'incident-1')
+        with self.assertRaises(OperationConflict):
+            self.registry.review_outcome(
+                self.ctx, self.operation_id, observed.observation_id,
+                self.operator('operator-2'), self.scope, decision='NO_EFFECT',
+                exclusion=exclusion)
+        self.expire_owner()
+        with self.assertRaises(RecoveryHeld):
+            self.registry.review_outcome(
+                self.ctx, self.operation_id, observed.observation_id,
+                self.operator('operator-2'), self.scope, decision='NO_EFFECT',
+                exclusion=exclusion)
+        self.evidence.fenced = True
         self.assertFalse(self.registry.review_outcome(
             self.ctx, self.operation_id, observed.observation_id,
             self.operator('operator-2'), self.scope,
-            decision='NO_EFFECT', incident_id='incident-1'))
+            decision='NO_EFFECT', exclusion=exclusion))
+        self.evidence.native_current = False
+        with self.assertRaises(RecoveryHeld):
+            self.registry.review_outcome(
+                self.ctx, self.operation_id, observed.observation_id,
+                self.operator('operator-3'), self.scope,
+                decision='NO_EFFECT', exclusion=exclusion)
+        self.evidence.native_current = True
+        different_fence = OwnerRecoveryEvidence('b' * 64, 'e' * 64,
+                                               exclusion.observed_at, 'incident-1')
+        with self.assertRaises(RecoveryHeld):
+            self.registry.review_outcome(
+                self.ctx, self.operation_id, observed.observation_id,
+                self.operator('operator-3'), self.scope,
+                decision='NO_EFFECT', exclusion=different_fence)
         self.assertTrue(self.registry.review_outcome(
             self.ctx, self.operation_id, observed.observation_id,
             self.operator('operator-3'), self.scope,
-            decision='NO_EFFECT', incident_id='incident-1'))
-        with self.runtime() as connection:
-            self.tenant_sql(connection)
-            connection.execute(
-                'UPDATE hosting_controlplane.native_ownership SET '
-                "lease_expires_at = clock_timestamp() - interval '1 second' "
-                'WHERE platform_family = %s AND endpoint_id = %s '
-                'AND native_scope_id = %s AND resource_kind = %s AND native_id = %s',
-                self.binding.key())
+            decision='NO_EFFECT', exclusion=exclusion))
         evidence = OwnerRecoveryEvidence('b' * 64, 'c' * 64,
                                          datetime.now(timezone.utc), 'incident-1')
         with self.assertRaises(RecoveryHeld):
