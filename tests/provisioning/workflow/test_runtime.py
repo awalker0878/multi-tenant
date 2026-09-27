@@ -2,11 +2,13 @@
 import unittest
 from unittest.mock import patch, sentinel
 from types import SimpleNamespace
+from temporalio.common import VersioningBehavior
 
 from provisioner.controlplane.jobs import StartReceipt
 from provisioner.controlplane.persistence import TenantContext
 from provisioner.controlplane.workflow.approval_gate import GateResult
-from provisioner.controlplane.workflow.runtime import _connect, project_one
+from provisioner.controlplane.workflow.runtime import (
+    _connect, _worker_deployment_config, project_one)
 
 
 class RuntimeConnectionTests(unittest.TestCase):
@@ -18,6 +20,23 @@ class RuntimeConnectionTests(unittest.TestCase):
                 self.assertIs(_connect(), sentinel.connection)
         connect.assert_called_once_with(
             'postgresql://runtime@db.example/control', connect_timeout=5)
+
+    def test_worker_requires_an_immutable_versioned_deployment(self):
+        with patch.dict('os.environ', {
+                'HOSTING_TEMPORAL_WORKER_DEPLOYMENT': 'mobility-management',
+                'HOSTING_TEMPORAL_WORKER_BUILD_ID': 'a' * 40}):
+            config = _worker_deployment_config()
+            self.assertTrue(config.use_worker_versioning)
+            self.assertEqual(config.default_versioning_behavior, VersioningBehavior.PINNED)
+            self.assertEqual(config.version.deployment_name, 'mobility-management')
+            self.assertEqual(config.version.build_id, 'a' * 40)
+        for invalid in ('latest', 'a' * 12, 'A' * 40, 'a' * 39):
+            with self.subTest(invalid=invalid):
+                with patch.dict('os.environ', {
+                        'HOSTING_TEMPORAL_WORKER_DEPLOYMENT': 'mobility-management',
+                        'HOSTING_TEMPORAL_WORKER_BUILD_ID': invalid}):
+                    with self.assertRaises(ValueError):
+                        _worker_deployment_config()
 
 
 class GateProjectionTests(unittest.TestCase):

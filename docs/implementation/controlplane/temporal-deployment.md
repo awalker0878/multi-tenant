@@ -50,8 +50,13 @@ reconciles the original run ID, the Activity rechecks live PostgreSQL
 authority, and the projector records one held outcome. This crosses the
 database/engine failure boundary without enabling a native side effect.
 The SDK local tests also cover a waiting approval Signal, timer expiry, scope
-rejection and worker replacement. These checks do not exercise PostgreSQL
-restore, actual versioned worker deployments or an offline image mirror.
+rejection and worker replacement. The same self-hosted CI service runs
+`worker_version_gate`: two versioned Worker builds share one task queue, the
+operator changes the Current build and then rolls it back, and each approval
+Activity records which build ran it. An open old execution remains pinned to
+the old build after Current moves. The gate uses identical Workflow source at
+both versions; representative production history replay after a code change,
+PostgreSQL restore and an offline image mirror need separate qualification.
 
 ## On-prem operational profile
 
@@ -76,6 +81,7 @@ Required environment variables for the installed runtime:
 | `HOSTING_TEMPORAL_ADDRESS`, `HOSTING_TEMPORAL_NAMESPACE`, `HOSTING_TEMPORAL_TASK_QUEUE` | Private Frontend address and a scoped namespace/queue |
 | `HOSTING_TEMPORAL_CA`, `HOSTING_TEMPORAL_CLIENT_CERT`, `HOSTING_TEMPORAL_CLIENT_KEY`, `HOSTING_TEMPORAL_SERVER_NAME` | Verified mTLS for every production RPC |
 | `HOSTING_TEMPORAL_START_RETENTION_SECONDS` | Outbox uncertainty window, strictly less than guaranteed namespace retention |
+| `HOSTING_TEMPORAL_WORKER_DEPLOYMENT`, `HOSTING_TEMPORAL_WORKER_BUILD_ID` | Required for worker mode; one stable deployment name and the full immutable 40-character commit or 64-character digest for this installed release |
 | `HOSTING_TEMPORAL_INSECURE_LOOPBACK_TEST=1` | Test-only exception; rejects all non-loopback addresses |
 
 Dispatcher and projector modes also require the independently configured B13
@@ -91,13 +97,25 @@ context. The worker's read-only role needs `SELECT` on scoped jobs, plans,
 approvals and `EXECUTE` on the narrowly scoped `lock_job_scope` and
 `lock_authority_scope` functions; the definer functions lock rows under FORCE
 RLS without giving the worker arbitrary `UPDATE` rights. Grant the worker only
-its Temporal task-queue access:
+its Temporal task-queue access. Worker mode refuses an unversioned release;
+its Workflows default to `PINNED`. Supply the build ID from the verified
+artifact manifest and never reuse a build ID for different bits:
 
 ```sh
 python -m provisioner.controlplane.workflow.runtime worker
 python -m provisioner.controlplane.workflow.runtime dispatch --organization-id org-a --tenant-id tenant-a --dispatcher-id dispatch-a
 python -m provisioner.controlplane.workflow.runtime project --organization-id org-a --tenant-id tenant-a
 ```
+
+For an upgrade, start the new build beside the old one, verify it registers on
+the same deployment and queue, then ramp and set Current through the approved
+Temporal operator identity. Keep the old worker build and image until its
+pinned executions drain. To roll back, return Current to the old build for
+new executions; existing executions stay pinned to the build on which they
+started. Replaying history from a genuinely changed build and recovering a
+bad pinned version require a reviewed history/reset procedure and are release
+gates before native actions. Do not change version routing in the product
+request path; deployment control belongs to the Temporal operator.
 
 The network policy must allow the Frontend only from authorized API/dispatcher
 and worker nodes, the server components only to their persistence stores, and

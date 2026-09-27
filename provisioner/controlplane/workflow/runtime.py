@@ -8,13 +8,15 @@ from __future__ import annotations
 import argparse
 import asyncio
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import psycopg
 from temporalio.client import Client
-from temporalio.worker import Worker
+from temporalio.common import VersioningBehavior, WorkerDeploymentVersion
+from temporalio.worker import Worker, WorkerDeploymentConfig
 
 from provisioner.controlplane.authority import postgres as authority_postgres
 from provisioner.controlplane.jobs import JobRepository, OutboxDispatcher
@@ -54,14 +56,30 @@ def _connect():
                            connect_timeout=5)
 
 
+def _worker_deployment_config() -> WorkerDeploymentConfig:
+    """Pin executions to one immutable release until that version drains."""
+    name = _required('HOSTING_TEMPORAL_WORKER_DEPLOYMENT')
+    build_id = _required('HOSTING_TEMPORAL_WORKER_BUILD_ID')
+    if not re.fullmatch(r'[A-Za-z][A-Za-z0-9._-]{0,63}', name):
+        raise ValueError('Temporal Worker deployment name must be a bounded identifier')
+    if not re.fullmatch(r'(?:[0-9a-f]{40}|[0-9a-f]{64})', build_id):
+        raise ValueError('Temporal Worker build ID must be a full immutable commit or digest')
+    return WorkerDeploymentConfig(
+        version=WorkerDeploymentVersion(deployment_name=name, build_id=build_id),
+        use_worker_versioning=True,
+        default_versioning_behavior=VersioningBehavior.PINNED)
+
+
 async def _worker(settings: TemporalConnection) -> None:
+    deployment = _worker_deployment_config()
     verifier = PostgresApprovalVerifier(_connect, authority_postgres)
     client = await Client.connect(settings.target_host, namespace=settings.namespace,
                                   tls=settings.tls())
     with ThreadPoolExecutor(max_workers=8) as executor:
         worker = Worker(client, task_queue=settings.task_queue,
                         workflows=[AdmittedMigrationJob],
-                        activities=[verifier.verify_job], activity_executor=executor)
+                        activities=[verifier.verify_job], activity_executor=executor,
+                        deployment_config=deployment)
         await worker.run()
 
 

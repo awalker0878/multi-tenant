@@ -126,6 +126,8 @@ jobs:
         run: python -m tests.provisioning.workflow.temporal_recovery_gate recover --state /tmp/temporal-recovery.json
       - name: Reconcile the product outbox and pin the original Temporal run
         run: python -m tests.provisioning.workflow.postgres_temporal_gate recover --state /tmp/postgres-temporal.json
+      - name: Route pinned approvals through Worker upgrade and rollback
+        run: python -m tests.provisioning.workflow.worker_version_gate
       - name: Show service logs after a failure
         if: failure()
         run: docker compose -f deploy/temporal/compose.integration.yml logs --tail=160

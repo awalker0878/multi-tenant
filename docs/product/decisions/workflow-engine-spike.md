@@ -27,7 +27,7 @@ Temporal's current [self-hosted deployment guide](https://docs.temporal.io/self-
 | Worker loss and resumption | Local Temporal development server retained a pending execution; first worker stopped, a notice was signaled while no worker ran, and a second worker completed the gate | Server and database process were not killed or restored |
 | Deterministic replay | Fetched the completed history and replayed it with the current Workflow definition | No history from an older production build exists |
 | Scope and authority binding | Wrong-tenant notice never reached the Activity; malformed evidence caused a hold; admitted job Activity rechecks B07 quorum | Complete HTTP-to-PostgreSQL-to-Temporal integration awaits the configured deployment |
-| Worker upgrade | A new worker process resumed the same Workflow code | Changed Workflow definitions, deployment pinning and actual server Worker Versioning were not tested |
+| Worker upgrade | A new worker process resumed the same Workflow code; the persisted Server gate routes pinned waits to two registered Worker builds across a Current-version upgrade and rollback | Builds use identical Workflow source; replay of histories from changed definitions and old-build drainage on a qualified cluster remain pending |
 | Restricted network | The local development server used loopback | Air-gapped image supply, mTLS, authorization, firewall, DNS, data residency and no-egress operation remain untested |
 
 The test server emitted a capability warning about preserving heartbeat details after Activity failure. The spike has no long-running native Activity and does not claim to qualify that behavior. A matched production Server/SDK combination must prove heartbeats and retry semantics before native actions are enabled.
