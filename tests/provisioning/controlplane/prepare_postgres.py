@@ -74,6 +74,8 @@ def main() -> int:
             'GRANT SELECT, INSERT ON hosting_controlplane.worker_grants TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_worker_scope('
             'text, text, text, text, text, text, text, text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION '
+            'hosting_controlplane.lock_native_worker_scope(text, text, text) TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_job_scope('
             'text, text, text) TO {}',
             'GRANT SELECT, INSERT, UPDATE ON '
@@ -129,7 +131,7 @@ def main() -> int:
                 'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.directory_subjects TO {}',
                 'GRANT SELECT, INSERT, DELETE ON hosting_controlplane.directory_sessions TO {}',
                 'GRANT INSERT ON hosting_controlplane.directory_sync_events TO {}',
-                'GRANT INSERT ON hosting_controlplane.audit_events TO {}',
+                'GRANT SELECT, INSERT ON hosting_controlplane.audit_events TO {}',
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.directory_state_digest(text, text) TO {}',
                 'GRANT SELECT, UPDATE ON hosting_controlplane.plan_authority_state TO {}',
