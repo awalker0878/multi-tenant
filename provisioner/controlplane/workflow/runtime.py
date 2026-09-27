@@ -43,8 +43,7 @@ def _settings() -> TemporalConnection:
         client_key=Path(os.environ['HOSTING_TEMPORAL_CLIENT_KEY']) if not testing else None,
         server_name=os.environ.get('HOSTING_TEMPORAL_SERVER_NAME'),
         insecure_loopback_for_tests=testing,
-        rpc_timeout_seconds=int(os.environ.get('HOSTING_TEMPORAL_RPC_TIMEOUT_SECONDS', '10')),
-        approval_timeout_seconds=int(os.environ.get('HOSTING_APPROVAL_TIMEOUT_SECONDS', '3600')))
+        rpc_timeout_seconds=int(os.environ.get('HOSTING_TEMPORAL_RPC_TIMEOUT_SECONDS', '10')))
 
 
 def _connect():

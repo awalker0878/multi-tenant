@@ -20,8 +20,8 @@ from temporalio.exceptions import WorkflowAlreadyStartedError
 
 from provisioner.controlplane.jobs.repository import AdmissionConflict, StartReceipt, _digest
 
-from .admitted_job import AdmittedMigrationJob
-from .approval_gate import GateInput, GateResult, _valid_id
+from .admitted_job import AdmittedInput, AdmittedMigrationJob
+from .approval_gate import GateResult, _valid_id
 
 _PAYLOAD_KEYS = frozenset({'format', 'job_id', 'organization_id', 'tenant_id',
                            'plan_id', 'plan_revision', 'plan_digest', 'revocation_epoch'})
@@ -40,15 +40,12 @@ class TemporalConnection:
     server_name: str | None = None
     insecure_loopback_for_tests: bool = False
     rpc_timeout_seconds: int = 10
-    approval_timeout_seconds: int = 3600
 
     def __post_init__(self) -> None:
         if not self.target_host or not _valid_id(self.namespace) or not _valid_id(self.task_queue):
             raise ValueError('Temporal host, namespace and task queue are required')
         if type(self.rpc_timeout_seconds) is not int or not 1 <= self.rpc_timeout_seconds <= 60:
             raise ValueError('Temporal RPC timeout must be between 1 and 60 seconds')
-        if type(self.approval_timeout_seconds) is not int or not 1 <= self.approval_timeout_seconds <= 2592000:
-            raise ValueError('Approval timeout must be between one second and 30 days')
         if self.insecure_loopback_for_tests:
             if self.target_host.split(':')[0] not in ('127.0.0.1', 'localhost', '[::1]'):
                 raise ValueError('Insecure Temporal is only allowed on loopback in tests')
@@ -66,7 +63,7 @@ class TemporalConnection:
                          verification_server_name=self.server_name)
 
 
-def _gate_input(workflow_id: str, payload: dict, timeout: int) -> GateInput:
+def _admitted_input(workflow_id: str, payload: dict) -> AdmittedInput:
     if (type(payload) is not dict or frozenset(payload) != _PAYLOAD_KEYS
             or payload.get('format') != 'hosting-workflow-start/1'
             or payload.get('job_id') != workflow_id
@@ -75,10 +72,10 @@ def _gate_input(workflow_id: str, payload: dict, timeout: int) -> GateInput:
             or payload['revocation_epoch'] < 0):
         raise AdmissionConflict('Invalid exact outbox workflow binding')
     try:
-        return GateInput(workflow_id, payload['organization_id'], payload['tenant_id'],
-                         payload['plan_id'], payload['plan_revision'],
-                         payload['plan_digest'], payload['revocation_epoch'],
-                         _digest(payload), timeout)
+        return AdmittedInput(workflow_id, payload['organization_id'], payload['tenant_id'],
+                             payload['plan_id'], payload['plan_revision'],
+                             payload['plan_digest'], payload['revocation_epoch'],
+                             _digest(payload))
     except (ValueError, TypeError, KeyError) as exc:
         raise AdmissionConflict('Invalid exact outbox workflow binding') from exc
 
@@ -97,14 +94,14 @@ class TemporalWorkflowStarter:
     def start(self, *, namespace: str, workflow_id: str, payload: dict) -> StartReceipt:
         if namespace != self.connection.namespace:
             raise AdmissionConflict('Outbox and Temporal namespaces differ')
-        gate = _gate_input(workflow_id, payload, self.connection.approval_timeout_seconds)
+        gate = _admitted_input(workflow_id, payload)
         try:
             asyncio.get_running_loop()
         except RuntimeError:
             return asyncio.run(self._start(gate, namespace))
         raise RuntimeError('Run the synchronous dispatcher outside an asyncio event loop')
 
-    async def _start(self, gate: GateInput, namespace: str) -> StartReceipt:
+    async def _start(self, gate: AdmittedInput, namespace: str) -> StartReceipt:
         client = await Client.connect(self.connection.target_host, namespace=namespace,
                                       tls=self.connection.tls())
         deadline = timedelta(seconds=self.connection.rpc_timeout_seconds)
@@ -112,8 +109,7 @@ class TemporalWorkflowStarter:
                    'tenant_id': gate.tenant_id, 'plan_id': gate.plan_id,
                    'plan_revision': gate.plan_revision, 'plan_digest': gate.plan_digest,
                    'revocation_epoch': gate.revocation_epoch,
-                   'payload_digest': gate.payload_digest,
-                   'approval_timeout_seconds': gate.approval_timeout_seconds}
+                   'payload_digest': gate.payload_digest}
         try:
             handle = await client.start_workflow(
                 AdmittedMigrationJob.run, gate, id=gate.job_id,

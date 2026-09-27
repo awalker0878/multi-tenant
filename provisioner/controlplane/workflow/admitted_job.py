@@ -8,22 +8,46 @@ reconciliation; this workflow cannot start one implicitly.
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import timedelta
 
 from temporalio import workflow
 from temporalio.common import RetryPolicy
 from temporalio.exceptions import ActivityError
 
-from .approval_gate import (ApprovalCheck, GateInput, GateResult,
+from .approval_gate import (ApprovalCheck, GateResult,
                             _valid_digest, _valid_id)
 
 VERIFY_ADMITTED_JOB_ACTIVITY = 'verify_admitted_migration_job'
 
 
+@dataclass(frozen=True)
+class AdmittedInput:
+    job_id: str
+    organization_id: str
+    tenant_id: str
+    plan_id: str
+    plan_revision: int
+    plan_digest: str
+    revocation_epoch: int
+    payload_digest: str
+
+    def __post_init__(self) -> None:
+        if not all(_valid_id(value) for value in (
+                self.job_id, self.organization_id, self.tenant_id, self.plan_id)):
+            raise ValueError('Admitted job identifiers must be bounded non-secret IDs')
+        if type(self.plan_revision) is not int or self.plan_revision <= 0:
+            raise ValueError('Admitted job needs an exact positive plan revision')
+        if type(self.revocation_epoch) is not int or self.revocation_epoch < 0:
+            raise ValueError('Admitted job needs a nonnegative revocation epoch')
+        if not _valid_digest(self.plan_digest) or not _valid_digest(self.payload_digest):
+            raise ValueError('Admitted job needs exact SHA-256 digests')
+
+
 @workflow.defn(name='AdmittedMigrationJob')
 class AdmittedMigrationJob:
     @workflow.run
-    async def run(self, input: GateInput) -> GateResult:
+    async def run(self, input: AdmittedInput) -> GateResult:
         try:
             check = await workflow.execute_activity(
                 VERIFY_ADMITTED_JOB_ACTIVITY, input, result_type=ApprovalCheck,
