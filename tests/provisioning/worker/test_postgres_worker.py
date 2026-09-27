@@ -4,13 +4,19 @@ from __future__ import annotations
 import json
 import os
 import unittest
+from copy import deepcopy
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from uuid import uuid4
 
 from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
+from provisioner.controlplane.persistence.store import NativeBinding
 from provisioner.controlplane.persistence.migrate import apply_migrations
+from provisioner.controlplane.reconciliation.registry import NativeLeaseAuthority
+from provisioner.controlplane.worker.runtime import SiteWorkerSettings, _require_read_only_role
+from provisioner.controlplane.worker.vault import VaultDynamicRole
 from provisioner.controlplane.worker import (GrantDenied, GrantRequest,
                                              EnrollmentDecision,
                                              PostgresWorkerGrants,
@@ -355,6 +361,270 @@ class WorkerPostgresTests(unittest.TestCase):
                 job_id=self.job_id, step_id='step-01', operation_id='operation-01',
                 operation_kind='VM_POWER', operation_scope=self.scope,
                 lease_key='lease-01', lease_epoch=2, use=lambda *_: None)
+
+    @unittest.skipUnless(os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN'),
+                         'Requires a dedicated site PostgreSQL login')
+    def test_bound_site_role_cannot_escape_tenant_or_site_with_forged_guc(self):
+        from psycopg.conninfo import conninfo_to_dict
+
+        site_dsn = os.environ['HOSTING_TEST_POSTGRES_SITE_WORKER_DSN']
+        site_role = conninfo_to_dict(site_dsn)['user']
+        site_connect = lambda: self.psycopg.connect(site_dsn)
+        now = datetime.now(timezone.utc)
+        binding = NativeBinding.from_record(
+            self.workload['spec']['machines'][0]['bindings'][0]['binding'])
+        other_binding = replace(binding, native_id='vm-unrelated-' + uuid4().hex[:12])
+        other_lease = 'lease-unrelated-' + uuid4().hex[:12]
+        other = deepcopy(self.plan)
+        other['metadata']['planId'] = 'other-plan-' + uuid4().hex[:12]
+        for item in (other['spec']['source'], other['spec']['destination']):
+            item['locationId'] = 'site-unrelated'
+        other['metadata']['planDigest'] = plan_digest(other)
+        other_scope = PlanScope.from_record(other['spec']['source'])
+        other_job = 'other-job-' + uuid4().hex[:12]
+        foreign_workload = deepcopy(self.workload)
+        foreign_workload['metadata']['tenantId'] = self.foreign.tenant_id
+        foreign_workload['metadata']['workloadId'] = 'foreign-workload-' + uuid4().hex[:12]
+        foreign_plan = deepcopy(self.plan)
+        foreign_plan['metadata']['tenantId'] = self.foreign.tenant_id
+        foreign_plan['metadata']['planId'] = 'foreign-plan-' + uuid4().hex[:12]
+        foreign_plan['spec']['workloadId'] = foreign_workload['metadata']['workloadId']
+        for item in (foreign_plan['spec']['source'], foreign_plan['spec']['destination']):
+            item['tenantId'] = self.foreign.tenant_id
+        foreign_plan['metadata']['planDigest'] = plan_digest(foreign_plan)
+        foreign_job = 'foreign-job-' + uuid4().hex[:12]
+        foreign_grant = 'foreign-grant-' + uuid4().hex[:12]
+        with self.psycopg.connect(self.migration_dsn) as connection:
+            self._tenant(connection)
+            connection.execute(
+                'INSERT INTO hosting_controlplane.native_ownership '
+                '(platform_family, endpoint_id, native_scope_id, resource_kind, native_id, '
+                'organization_id, tenant_id, security_domain_id, workload_id, worker_id, '
+                'lease_epoch, lease_expires_at) VALUES '
+                '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (*binding.key(), self.context.organization_id, self.context.tenant_id,
+                 self.scope.security_domain_id, self.workload['metadata']['workloadId'],
+                 self.identity.subject, 2, now + timedelta(minutes=10)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.native_operation_leases '
+                '(organization_id, tenant_id, lease_key, job_id, operation_id, '
+                'platform_family, endpoint_id, native_scope_id, resource_kind, native_id, '
+                'site_id, security_domain_id, worker_id, owner_epoch, expires_at) '
+                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (self.context.organization_id, self.context.tenant_id,
+                 'lease-01', self.job_id, 'operation-01', *binding.key(),
+                 self.scope.site_id, self.scope.security_domain_id,
+                 self.identity.subject, 2, now + timedelta(minutes=5)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.enterprise_records '
+                '(organization_id, tenant_id, record_kind, record_id, revision, '
+                'record_json, record_digest) VALUES (%s, %s, %s, %s, 1, %s::jsonb, %s)',
+                (self.context.organization_id, self.context.tenant_id,
+                 'MigrationPlan', other['metadata']['planId'], json.dumps(other),
+                 canonical_record_digest(other)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.audit_events '
+                '(organization_id, tenant_id, actor_id, correlation_id, action, '
+                'record_kind, record_id, revision, record_digest) VALUES '
+                "(%s, %s, 'other-author', 'other-correlation', 'RECORD_CREATE', "
+                "'MigrationPlan', %s, 1, %s)",
+                (self.context.organization_id, self.context.tenant_id,
+                 other['metadata']['planId'], canonical_record_digest(other)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.operation_jobs '
+                '(organization_id, tenant_id, job_id, idempotency_key, plan_id, '
+                'plan_revision, plan_digest, source_scope, destination_scope, '
+                'actor_subject, approval_ids, revocation_epoch, status) VALUES '
+                '(%s, %s, %s, %s, %s, 1, %s, %s::jsonb, %s::jsonb, '
+                "%s, '[]'::jsonb, 0, 'STARTED')",
+                (self.context.organization_id, self.context.tenant_id,
+                 other_job, 'other-key-' + other_job, other['metadata']['planId'],
+                 other['metadata']['planDigest'], json.dumps(other['spec']['source']),
+                 json.dumps(other['spec']['destination']), 'other-operator'))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.native_ownership '
+                '(platform_family, endpoint_id, native_scope_id, resource_kind, native_id, '
+                'organization_id, tenant_id, security_domain_id, workload_id, worker_id, '
+                'lease_epoch, lease_expires_at) VALUES '
+                '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (*other_binding.key(), self.context.organization_id,
+                 self.context.tenant_id, self.scope.security_domain_id,
+                 self.workload['metadata']['workloadId'], 'other-worker', 1,
+                 now + timedelta(minutes=10)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.native_operation_leases '
+                '(organization_id, tenant_id, lease_key, job_id, operation_id, '
+                'platform_family, endpoint_id, native_scope_id, resource_kind, native_id, '
+                'site_id, security_domain_id, worker_id, owner_epoch, expires_at) '
+                'VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (self.context.organization_id, self.context.tenant_id,
+                 other_lease, other_job, 'other-operation', *other_binding.key(),
+                 'site-unrelated', self.scope.security_domain_id, 'other-worker',
+                 1, now + timedelta(minutes=5)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.plan_approvals '
+                '(approval_id, organization_id, tenant_id, plan_id, plan_revision, '
+                'plan_digest, revocation_epoch, role, site_id, security_domain_id, '
+                'endpoint_id, native_scope_id, platform_family, approver_subject, '
+                'issued_at, expires_at) VALUES '
+                '(%s, %s, %s, %s, 1, %s, 0, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                ('other-approval-' + other_job, self.context.organization_id,
+                 self.context.tenant_id, other['metadata']['planId'],
+                 other['metadata']['planDigest'], 'SOURCE_OWNER', other_scope.site_id,
+                 other_scope.security_domain_id, other_scope.endpoint_id,
+                 other_scope.native_scope_id, other_scope.platform_family,
+                 'other-reviewer', now - timedelta(minutes=1),
+                 now + timedelta(minutes=10)))
+            connection.execute(
+                "SELECT set_config('app.tenant_id', %s, true)",
+                (self.foreign.tenant_id,))
+            for record in (foreign_workload, foreign_plan):
+                name = ('workloadId' if record['kind'] == 'Workload' else 'planId')
+                connection.execute(
+                    'INSERT INTO hosting_controlplane.enterprise_records '
+                    '(organization_id, tenant_id, record_kind, record_id, revision, '
+                    'record_json, record_digest) VALUES (%s, %s, %s, %s, 1, %s::jsonb, %s)',
+                    (self.foreign.organization_id, self.foreign.tenant_id,
+                     record['kind'], record['metadata'][name], json.dumps(record),
+                     canonical_record_digest(record)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.operation_jobs '
+                '(organization_id, tenant_id, job_id, idempotency_key, plan_id, '
+                'plan_revision, plan_digest, source_scope, destination_scope, '
+                'actor_subject, approval_ids, revocation_epoch, status) VALUES '
+                '(%s, %s, %s, %s, %s, 1, %s, %s::jsonb, %s::jsonb, '
+                "%s, '[]'::jsonb, 0, 'STARTED')",
+                (self.foreign.organization_id, self.foreign.tenant_id,
+                 foreign_job, 'key-' + foreign_job,
+                 foreign_plan['metadata']['planId'], foreign_plan['metadata']['planDigest'],
+                 json.dumps(foreign_plan['spec']['source']),
+                 json.dumps(foreign_plan['spec']['destination']), 'foreign-operator'))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.worker_enrollments '
+                '(organization_id, tenant_id, worker_subject, site_id, '
+                'certificate_sha256, expires_at) VALUES (%s, %s, %s, %s, %s, %s)',
+                (self.foreign.organization_id, self.foreign.tenant_id,
+                 'foreign-worker', self.scope.site_id, 'b' * 64,
+                 now + timedelta(minutes=10)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.worker_grants '
+                '(organization_id, tenant_id, grant_id, job_id, plan_id, '
+                'plan_revision, plan_digest, approval_ids, revocation_epoch, '
+                'worker_subject, certificate_sha256, step_id, operation_id, '
+                'operation_kind, site_id, security_domain_id, endpoint_id, '
+                'native_scope_id, platform_family, lease_key, lease_epoch, '
+                'issued_at, expires_at) VALUES '
+                '(%s, %s, %s, %s, %s, 1, %s, %s::jsonb, 0, %s, %s, %s, %s, '
+                '%s, %s, %s, %s, %s, %s, %s, 2, %s, %s)',
+                (self.foreign.organization_id, self.foreign.tenant_id,
+                 foreign_grant, foreign_job, foreign_plan['metadata']['planId'],
+                 foreign_plan['metadata']['planDigest'], '[]', 'foreign-worker',
+                 'b' * 64, 'step-foreign', 'operation-foreign', 'DISCOVER_READ',
+                 self.scope.site_id, self.scope.security_domain_id,
+                 self.scope.endpoint_id, self.scope.native_scope_id,
+                 self.scope.platform_family, 'lease-foreign', now,
+                 now + timedelta(minutes=2)))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.audit_events '
+                '(organization_id, tenant_id, actor_id, correlation_id, action, '
+                'record_kind, record_id, revision, record_digest) VALUES '
+                "(%s, %s, 'foreign-actor', 'foreign-correlation', 'RECORD_CREATE', "
+                "'Workload', 'foreign-marker', 1, %s)",
+                (self.foreign.organization_id, self.foreign.tenant_id, 'a' * 64))
+
+        read = replace(self.request, step_id='step-site-read',
+                       operation_kind='DISCOVER_READ')
+        grant = self.grants.issue_grant(self.context, self.identity, read)
+        with site_connect() as connection:
+            self._tenant(connection)
+            self.assertEqual(connection.execute(
+                'SELECT count(*) FROM hosting_controlplane.worker_grants '
+                'WHERE grant_id = %s', (grant.grant_id,)).fetchone(), (0,))
+        with self.psycopg.connect(self.migration_dsn) as connection:
+            self._tenant(connection)
+            connection.execute(
+                'INSERT INTO hosting_controlplane.site_worker_role_bindings '
+                '(role_name, organization_id, tenant_id, site_id) VALUES (%s, %s, %s, %s)',
+                (site_role, self.context.organization_id,
+                 self.context.tenant_id, self.scope.site_id))
+        settings = SiteWorkerSettings(
+            postgres_dsn=f'postgresql://{site_role}@db.example/control?'
+                'sslmode=verify-full&connect_timeout=5&sslrootcert=/etc/db-ca.pem',
+            postgres_role=site_role, site_id=self.scope.site_id,
+            bind_ip='127.0.0.1', bind_port=8443,
+            server_certificate=Path('/etc/site.pem'), server_key=Path('/etc/site.key'),
+            trust_bundle=Path('/etc/site-ca.pem'), crl_bundle=Path('/etc/site.crl'),
+            trust_domain='workers.example', vault_url='https://vault.example:8200',
+            vault_ca=Path('/etc/vault-ca.pem'), vault_token_file=Path('/run/vault/token'),
+            roles=(VaultDynamicRole('vault:site-read', 'platform/creds/site-read',
+                                    self.scope, 'DISCOVER_READ', timedelta(minutes=2)),))
+        _require_read_only_role(site_connect, settings)
+        site_grants = PostgresWorkerGrants(site_connect, NativeLeaseAuthority(site_connect))
+        references = []
+        site_grants.with_authorized_reference(
+            self.context, self.identity, grant.grant_id, job_id=self.job_id,
+            step_id=read.step_id, operation_id=read.operation_id,
+            operation_kind='DISCOVER_READ', operation_scope=self.scope,
+            lease_key='lease-01', lease_epoch=2,
+            use=lambda reference, *_: references.append(reference))
+        self.assertEqual(references, ['vault:site-read'])
+
+        with site_connect() as connection:
+            self._tenant(connection)
+            for table, column, marker in (
+                    ('operation_jobs', 'job_id', other_job),
+                    ('enterprise_records', 'record_id', other['metadata']['planId']),
+                    ('audit_events', 'record_id', other['metadata']['planId']),
+                    ('plan_approvals', 'approval_id', 'other-approval-' + other_job)):
+                found = connection.execute(
+                    f'SELECT count(*) FROM hosting_controlplane.{table} WHERE {column} = %s',
+                    (marker,)).fetchone()[0]
+                self.assertEqual(found, 0, table)
+            connection.execute("SELECT set_config('app.tenant_id', %s, true)",
+                               (self.foreign.tenant_id,))
+            self.assertEqual(connection.execute(
+                "SELECT count(*) FROM hosting_controlplane.audit_events "
+                "WHERE record_id = 'foreign-marker'").fetchone(), (0,))
+            self.assertEqual(connection.execute(
+                'SELECT count(*) FROM hosting_controlplane.worker_grants '
+                'WHERE grant_id = %s', (foreign_grant,)).fetchone(), (0,))
+
+        with site_connect() as connection:
+            self._tenant(connection)
+            with self.assertRaises(self.psycopg.Error):
+                connection.execute('SELECT hosting_controlplane.lock_job_scope(%s, %s, %s)',
+                                   (self.context.organization_id,
+                                    self.context.tenant_id, other_job))
+
+        with site_connect() as connection:
+            self._tenant(connection)
+            with self.assertRaises(self.psycopg.Error):
+                connection.execute(
+                    'SELECT * FROM hosting_controlplane.lock_authority_scope(%s, %s, %s)',
+                    (self.context.organization_id, self.context.tenant_id,
+                     other['metadata']['planId'])).fetchall()
+
+        worker_scope_sql = (
+            'SELECT * FROM hosting_controlplane.lock_worker_scope('
+            '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)')
+        worker_scope_args = (self.context.organization_id, self.context.tenant_id,
+                             self.identity.subject, self.identity.certificate_sha256,
+                             self.scope.site_id, self.scope.security_domain_id,
+                             self.scope.endpoint_id, self.scope.native_scope_id,
+                             self.scope.platform_family, 'DISCOVER_READ')
+        for args in (worker_scope_args[:4] + ('site-unrelated',) + worker_scope_args[5:],
+                     worker_scope_args[:-1] + ('VM_POWER',)):
+            with site_connect() as connection:
+                self._tenant(connection)
+                with self.assertRaises(self.psycopg.Error):
+                    connection.execute(worker_scope_sql, args).fetchall()
+
+        with site_connect() as connection:
+            self._tenant(connection)
+            self.assertEqual(connection.execute(
+                'SELECT * FROM hosting_controlplane.lock_native_worker_scope(%s, %s, %s)',
+                (self.context.organization_id, self.context.tenant_id,
+                 other_lease)).fetchall(), [])
 
 
 if __name__ == '__main__':
