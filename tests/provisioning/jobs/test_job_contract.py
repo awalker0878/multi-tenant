@@ -11,7 +11,8 @@ from provisioner.controlplane.authority.model import AuthorizedPlan, FrozenPlan
 from provisioner.controlplane.jobs import (AdmissionConflict, AdmissionRefused,
                                             JobRepository, OutboxDispatcher,
                                             OutboxMessage, StartReceipt)
-from provisioner.controlplane.jobs.repository import _digest, _ensure_plan, _ensure_workload
+from provisioner.controlplane.jobs.repository import (_digest, _ensure_plan,
+    _ensure_workload, _progress_detail)
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
 from tests.provisioning.schema.test_enterprise_records import plan, workload
 
@@ -90,6 +91,22 @@ class AdmissionContractTest(unittest.TestCase):
             with self.assertRaises(AdmissionConflict):
                 repository.mark_started(self.tenant, message, forged, namespace='ns')
 
+    def test_progress_metadata_rejects_secrets_urls_and_raw_errors(self):
+        _progress_detail({'stepId': 'approval-gate', 'phase': 'APPROVAL',
+                          'reasonCode': 'APPROVAL_REQUIRED', 'completed': 1,
+                          'total': 4, 'evidenceDigest': 'a' * 64})
+        for detail in ({'token': 'secret'},
+                       {'stepId': 'https://internal.example/credential'},
+                       {'phase': 'Bearer abcdef'},
+                       {'reasonCode': 'eyJhbGciOiJIUzI1NiJ9'},
+                       {'reasonCode': {'rawError': 'secret'}},
+                       {'evidenceDigest': 'secret'},
+                       {'stepId': ['approval-gate']},
+                       {'completed': True},
+                       {'completed': 2, 'total': 1}):
+            with self.subTest(detail=detail), self.assertRaises(ValueError):
+                _progress_detail(detail)
+
 
 class _Workflow:
     def __init__(self):
@@ -125,6 +142,9 @@ class _Jobs:
     def revalidate_start(self, context, message):
         return self.job
 
+    def record_start_attempt(self, context, message, *, namespace, retention_seconds):
+        self.attempted = (namespace, retention_seconds)
+
     def mark_started(self, context, message, receipt, *, namespace):
         if self.fail_after_workflow_start:
             self.fail_after_workflow_start = False
@@ -141,7 +161,8 @@ class DispatchContractTest(unittest.TestCase):
     def test_crash_after_workflow_start_retries_same_logical_run(self):
         jobs, workflow = _Jobs(), _Workflow()
         dispatcher = OutboxDispatcher(jobs, workflow,
-                                      dispatcher_id='dispatch-1', namespace='site-a')
+                                      dispatcher_id='dispatch-1', namespace='site-a',
+                                      start_history_retention_seconds=86400)
         with self.assertRaises(ConnectionError):
             dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
         result = dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
@@ -155,7 +176,8 @@ class DispatchContractTest(unittest.TestCase):
             'site-a', 'job-1', 'foreign-run', 'other-job', 'plan-1', 1,
             'a' * 64, _digest(jobs.payload))
         dispatcher = OutboxDispatcher(jobs, workflow,
-                                      dispatcher_id='dispatch-1', namespace='site-a')
+                                      dispatcher_id='dispatch-1', namespace='site-a',
+                                      start_history_retention_seconds=86400)
         with self.assertRaises(AdmissionConflict):
             dispatcher.run_one(TenantContext('org-01', 'tenant-01'))
         self.assertFalse(jobs.acked)
