@@ -41,6 +41,10 @@ class AuthorityDenied(PermissionError):
     """Identity, scope, plan, approval or lease failed the authority policy."""
 
 
+class PlanRevisionChanged(AuthorityDenied):
+    """The plan no longer has the revision/digest the human reviewed."""
+
+
 class IdentityProvider(Protocol):
     def authenticate(self, credential: object) -> VerifiedPrincipal:
         """Verify externally issued identity, role scopes and session assurance."""
@@ -222,8 +226,29 @@ class AuthorityService:
             raise AuthorityDenied('Plan lies outside the verified tenant')
         return plan
 
+    def review_plan(self, credential: object, plan_id: str) -> FrozenPlan:
+        """Read the current persisted plan for one exact scoped human reviewer.
+
+        A review page must be opened from this authenticated decision. Showing
+        a plan does not approve it; record_approval requires recent step-up and
+        a separate actor. The transport should compare this immutable binding
+        to the record it presents before returning redacted fields.
+        """
+        principal = self.authenticate(credential)
+        if principal.kind != 'HUMAN':
+            raise AuthorityDenied('A human plan reviewer is required')
+        plan = self._plan(principal, plan_id)
+        at = _now(self._clock)
+        _authenticated(principal, at)
+        if not any(grant.role == role and grant.scope == scope and
+                   grant.expires_at > at for grant in principal.grants
+                   for role, scope in _requirements(plan)):
+            raise AuthorityDenied('No reviewer grant for the exact plan scope')
+        return plan
+
     def record_approval(self, credential: object, plan_id: str, role: str,
-                        *, ttl: timedelta) -> PlanApproval:
+                        *, ttl: timedelta, expected_revision: int,
+                        expected_digest: str) -> PlanApproval:
         principal = self.authenticate(credential)
         at = _now(self._clock)
         if principal.kind != 'HUMAN' or principal.step_up_at is None or not (
@@ -232,6 +257,10 @@ class AuthorityService:
         if not isinstance(ttl, timedelta) or not (timedelta(0) < ttl <= MAX_APPROVAL_TTL):
             raise AuthorityDenied('Approval lifetime is out of bounds')
         plan = self._plan(principal, plan_id)
+        if (type(expected_revision) is not int or expected_revision != plan.revision
+                or not isinstance(expected_digest, str)
+                or expected_digest != plan.digest):
+            raise PlanRevisionChanged('Reviewed plan revision or digest changed')
         if principal.subject == plan.author_subject:
             raise AuthorityDenied('Plan author cannot approve this revision')
         required = dict(_requirements(plan))

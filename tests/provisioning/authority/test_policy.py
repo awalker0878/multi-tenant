@@ -106,7 +106,9 @@ class AuthorityPolicyTests(unittest.TestCase):
     def approve_all(self):
         for index, (role, _) in enumerate(self.roles):
             self.service.record_approval(f'reviewer-{index}', 'plan-1',
-                                         role, ttl=timedelta(minutes=20))
+                                         role, ttl=timedelta(minutes=20),
+                                         expected_revision=PLAN.revision,
+                                         expected_digest=PLAN.digest)
 
     def test_independent_quorum_and_exact_plan_admit(self):
         self.approve_all()
@@ -118,17 +120,32 @@ class AuthorityPolicyTests(unittest.TestCase):
                           decision.revocation_epoch))
         self.assertLessEqual(decision.expires_at, NOW + timedelta(seconds=30))
 
+    def test_plan_review_requires_scoped_reviewer_and_approval_selected_binding(self):
+        self.assertEqual(self.service.review_plan('reviewer-0', 'plan-1'), PLAN)
+        with self.assertRaises(AuthorityDenied):
+            self.service.review_plan('operator', 'plan-1')
+        self.plans.plan = replace(PLAN, revision=2, digest='b' * 64)
+        with self.assertRaises(AuthorityDenied):
+            self.service.record_approval(
+                'reviewer-0', 'plan-1', SOURCE_OWNER,
+                ttl=timedelta(minutes=5), expected_revision=PLAN.revision,
+                expected_digest=PLAN.digest)
+
     def test_forged_client_approval_or_identity_is_never_a_credential(self):
         with self.assertRaises(AuthenticationFailed):
             self.service.authorize_submission({'approved_by': 'reviewer-0'}, 'plan-1')
         with self.assertRaises(AuthenticationFailed):
             self.service.record_approval({'role': SOURCE_OWNER}, 'plan-1',
-                                         SOURCE_OWNER, ttl=timedelta(minutes=5))
+                                         SOURCE_OWNER, ttl=timedelta(minutes=5),
+                                         expected_revision=PLAN.revision,
+                                         expected_digest=PLAN.digest)
 
     def test_no_self_approval_or_self_execution(self):
         with self.assertRaises(AuthorityDenied):
             self.service.record_approval('author', 'plan-1', SOURCE_OWNER,
-                                         ttl=timedelta(minutes=5))
+                                         ttl=timedelta(minutes=5),
+                                         expected_revision=PLAN.revision,
+                                         expected_digest=PLAN.digest)
         self.approve_all()
         self.provider.identities['author'] = identity(
             'author', ((EXECUTION_OPERATOR, SOURCE),
@@ -153,16 +170,22 @@ class AuthorityPolicyTests(unittest.TestCase):
                 'reviewer-0', ((SOURCE_OWNER, wrong_scope),))
             with self.subTest(scope=wrong_scope), self.assertRaises(AuthorityDenied):
                 self.service.record_approval('reviewer-0', 'plan-1', SOURCE_OWNER,
-                                             ttl=timedelta(minutes=5))
+                                             ttl=timedelta(minutes=5),
+                                             expected_revision=PLAN.revision,
+                                             expected_digest=PLAN.digest)
 
     def test_duplicate_actor_and_wrong_execution_scope_fail(self):
         self.service.record_approval('reviewer-0', 'plan-1', SOURCE_OWNER,
-                                     ttl=timedelta(minutes=5))
+                                     ttl=timedelta(minutes=5),
+                                     expected_revision=PLAN.revision,
+                                     expected_digest=PLAN.digest)
         self.provider.identities['reviewer-0'] = identity(
             'reviewer-0', ((DESTINATION_OWNER, TARGET),))
         with self.assertRaises(AuthorityDenied):
             self.service.record_approval('reviewer-0', 'plan-1', DESTINATION_OWNER,
-                                         ttl=timedelta(minutes=5))
+                                         ttl=timedelta(minutes=5),
+                                         expected_revision=PLAN.revision,
+                                         expected_digest=PLAN.digest)
         self.provider.identities['operator'] = identity(
             'operator', ((EXECUTION_OPERATOR, SOURCE),))
         with self.assertRaises(AuthorityDenied):
@@ -174,7 +197,9 @@ class AuthorityPolicyTests(unittest.TestCase):
             step_up=NOW - timedelta(minutes=6))
         with self.assertRaises(AuthorityDenied):
             self.service.record_approval('reviewer-0', 'plan-1', SOURCE_OWNER,
-                                         ttl=timedelta(minutes=5))
+                                         ttl=timedelta(minutes=5),
+                                         expected_revision=PLAN.revision,
+                                         expected_digest=PLAN.digest)
         self.provider.identities['reviewer-0'] = identity(
             'reviewer-0', ((SOURCE_OWNER, SOURCE),))
         self.approve_all()

@@ -93,7 +93,9 @@ class PostgresAuthorityTests(unittest.TestCase):
     def _approve(self):
         for index, (role, _) in enumerate(self.roles):
             self.service.record_approval(f'reviewer-{index}', 'plan-01', role,
-                                         ttl=timedelta(minutes=20))
+                                         ttl=timedelta(minutes=20),
+                                         expected_revision=self.plan['metadata']['revision'],
+                                         expected_digest=self.plan['metadata']['planDigest'])
 
     def _revalidate(self, decision, method=revalidate_admission):
         with self.psycopg.connect(self.runtime_dsn) as connection:
@@ -153,7 +155,9 @@ class PostgresAuthorityTests(unittest.TestCase):
                                   (EXECUTION_OPERATOR, self.target)))
         with self.assertRaises(AuthorityDenied):
             self.service.record_approval('author', 'plan-01', SOURCE_OWNER,
-                                         ttl=timedelta(minutes=5))
+                                         ttl=timedelta(minutes=5),
+                                         expected_revision=self.plan['metadata']['revision'],
+                                         expected_digest=self.plan['metadata']['planDigest'])
         self._approve()
         with self.assertRaises(AuthorityDenied):
             self.service.authorize_submission('author', 'plan-01')
