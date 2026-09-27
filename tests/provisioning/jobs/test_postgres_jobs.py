@@ -280,6 +280,12 @@ class JobPostgresTest(unittest.TestCase):
         message = self.jobs.claim_start(self.tenant, dispatcher_id='first-claim',
                                         lease_seconds=1)
         self.assertEqual(message.job_id, job.job_id)
+        # The workflow could only have emitted a terminal event after an
+        # external start attempt was durably recorded. Its response/ACK may
+        # still be lost, leaving the outbox available for duplicate lookup.
+        self.jobs.record_start_attempt(
+            self.tenant, message, namespace='mobility-test',
+            retention_seconds=86400)
         self.jobs.append_progress(
             self.tenant, job.job_id, event_key='workflow-finished',
             event_type='WORKFLOW_FINISHED', status='SUCCEEDED', detail={})
