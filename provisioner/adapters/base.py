@@ -28,7 +28,8 @@ from dataclasses import dataclass
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.placement import eligibility
-from provisioner.repository import ROOT, repository_module
+from provisioner import repository
+from provisioner.repository import ROOT
 
 ADAPTER_FORMAT = 'hosting-platform-adapter/2'
 CONTRACT_FORMAT = 'hosting-adapter-realization-contract/1'
@@ -58,14 +59,6 @@ COMPUTED_FACTS = (('boot_disk_gib', 'boot_disk_gib'), ('data_disk_gib', 'data_di
                   ('ipv4_address', 'ipv4_address'))
 
 _DEFAULT_REALIZATION = 'the platform realizes those facts through its domain composition instead'
-
-
-def _compiler():
-    return repository_module('tools.compile_wsd')
-
-
-def _components():
-    return repository_module('scripts.build_wsd_compositions').COMPONENTS
 
 
 def _catalog():
@@ -116,7 +109,7 @@ def binding_requirement(platform: str) -> tuple[tuple[str, str], ...]:
     the requirement a plan binds and the requirement the compiler enforces are one
     declaration rather than two opinions.
     """
-    rule = _compiler().WORKLOAD_NETWORK_BINDING.get(platform)
+    rule = repository.compiler_declarations()['workload_network_binding'].get(platform)
     return () if rule is None else tuple(sorted(rule.items()))
 
 
@@ -164,7 +157,7 @@ class Adapter:
         The adapter keeps no second copy of a provider field list: it asks the
         compiler, so the two can never disagree.
         """
-        return frozenset(_compiler().native_variables(self.platform, phase))
+        return repository.native_variables(self.platform, phase)
 
     def computed_facts(self, phase: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
         """The computed facts one phase can carry, and the ones it cannot.
@@ -340,12 +333,12 @@ class Adapter:
 
 def _adapter(platform: str, security_edge: str, limits: tuple[str, ...],
              realization_note: str = '') -> Adapter:
-    modules = _components()[platform]
-    compiler = _compiler()
+    modules = repository.composition_components()[platform]
+    compiler = repository.compiler_declarations()
     return Adapter(platform=platform, family=eligibility.PLATFORM_FAMILY[platform],
                    domains_module=modules['domains'], workloads_module=modules['workloads'],
-                   placement_fields=frozenset(compiler.PLACEMENT[platform]),
-                   network_fields=frozenset(compiler.NETWORK[platform]),
+                   placement_fields=frozenset(compiler['placement'][platform]),
+                   network_fields=frozenset(compiler['network'][platform]),
                    security_edge=security_edge, edge_components=edge_components(platform),
                    binding_requirement=binding_requirement(platform),
                    realization_note=realization_note, limits=limits)

@@ -14,7 +14,7 @@ from provisioner.domain.request import load as load_document
 from provisioner.execution.plan import create_plan
 from provisioner.inventory.model import fixture
 from provisioner.profiles.loader import load_catalogs
-from provisioner.repository import repository_module
+from tools import compile_wsd
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUESTS = ROOT / 'examples' / 'requests'
@@ -59,8 +59,7 @@ def native_field_names(platform: str) -> set:
     checked against the artifact the platform layer consumes rather than a second
     hand-written copy of the same list.
     """
-    module = repository_module('tools.compile_wsd')
-    return set(module.PLACEMENT[platform]) | set(module.NETWORK[platform])
+    return set(compile_wsd.PLACEMENT[platform]) | set(compile_wsd.NETWORK[platform])
 
 
 def platform_request(platform: str, name: str = 'internal-production') -> dict:

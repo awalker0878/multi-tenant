@@ -1,7 +1,6 @@
 """Access to reviewed source assets and installed owner tooling."""
 from __future__ import annotations
 
-import importlib
 import json
 from pathlib import Path
 
@@ -17,9 +16,46 @@ def asset_path(relative_path: str) -> Path:
     packaged = ASSET_ROOT / path
     return packaged if packaged.is_file() else ROOT / path
 
-def repository_module(name: str):
-    """Import an installed owner module, failing loudly if it is absent."""
-    return importlib.import_module(name)
+
+def capability_registry() -> dict:
+    """Load the reviewed platform capability registry from its owner."""
+    from scripts import check_platform_capabilities
+    return check_platform_capabilities.load()
+
+
+def capability_ids() -> frozenset[str]:
+    from scripts import check_platform_capabilities
+    return frozenset(check_platform_capabilities.CAPABILITIES)
+
+
+def capability_eligible(registry: dict, platform: str, required: set[str],
+                        assurance_profile: str | None = None) -> tuple[bool, list[str]]:
+    from scripts import check_platform_capabilities
+    return check_platform_capabilities.eligible(registry, platform, required,
+                                                assurance_profile)
+
+
+def compiler_declarations() -> dict:
+    """Native field and binding declarations owned by the reviewed compiler."""
+    from tools import compile_wsd
+    return {'placement': compile_wsd.PLACEMENT, 'network': compile_wsd.NETWORK,
+            'workload_network_binding': compile_wsd.WORKLOAD_NETWORK_BINDING}
+
+
+def native_variables(platform: str, phase: str) -> frozenset[str]:
+    from tools import compile_wsd
+    return compile_wsd.native_variables(platform, phase)
+
+
+def composition_components() -> dict:
+    from scripts import build_wsd_compositions
+    return build_wsd_compositions.COMPONENTS
+
+
+def compile_environment(document: dict, phase: str, outputs: dict | None,
+                        phase_bindings: dict | None) -> tuple[dict, dict]:
+    from tools import compile_wsd
+    return compile_wsd.compile_environment(document, phase, outputs, phase_bindings)
 
 
 def reviewed_source(path: Path | str) -> str:
@@ -49,7 +85,7 @@ def source_commit(root: Path | str | None = None) -> dict:
     already owns that answer, so the provisioner asks for it instead of
     computing a second opinion.
     """
-    verifier = repository_module('tools.check_release')
+    from tools import check_release as verifier
     result = verifier.verify(Path(root) if root is not None else ROOT)
     return {'status': result.get('status', ''), 'commit': result.get('commit', ''),
             'issues': list(result.get('issues', []))}
@@ -62,13 +98,13 @@ def reservation_records(path: Path | str | None = None) -> dict:
     that system recorded and already owns the contract for reading it, so the
     provisioner asks for the export instead of defining a second record model.
     """
-    module = repository_module('scripts.check_reservation_records')
+    from scripts import check_reservation_records as module
     return module.load(Path(path) if path is not None else module.INDEX)
 
 
 def validate_reservation_records(index: dict, *, as_of, root: Path | str | None = None) -> dict:
     """Validate an exported reservation record index with the repository's checker."""
-    module = repository_module('scripts.check_reservation_records')
+    from scripts import check_reservation_records as module
     return module.validate(index, as_of=as_of,
                            root=Path(root) if root is not None else ROOT)
 
@@ -81,21 +117,21 @@ def ipam_allocation_records(path: Path | str | None = None) -> dict:
     provisioner asks for the export instead of defining a second record model.
     The exported record deliberately carries no allocated address or prefix value.
     """
-    module = repository_module('scripts.check_ipam_allocation_records')
+    from scripts import check_ipam_allocation_records as module
     return module.load(Path(path) if path is not None else module.INDEX)
 
 
 def validate_ipam_allocation_records(index: dict, *, as_of,
                                      root: Path | str | None = None) -> dict:
     """Validate an exported IPAM allocation index with the repository's checker."""
-    module = repository_module('scripts.check_ipam_allocation_records')
+    from scripts import check_ipam_allocation_records as module
     return module.validate(index, as_of=as_of,
                            root=Path(root) if root is not None else ROOT)
 
 
 def dns_registration_records(path: Path | str | None = None) -> dict:
     """The repository's exported authoritative DNS registration evidence."""
-    module = repository_module('scripts.check_dns_registration_records')
+    from scripts import check_dns_registration_records as module
     return module.load(Path(path) if path is not None else module.INDEX)
 
 
@@ -107,7 +143,7 @@ def validate_dns_registration_records(index: dict, *, ipam_index=None, as_of,
     allocation it was derived from, so a registration whose bound allocation is
     absent, unconformed or of another family is refused here rather than used.
     """
-    module = repository_module('scripts.check_dns_registration_records')
+    from scripts import check_dns_registration_records as module
     return module.validate(index, ipam_index=ipam_index, as_of=as_of,
                            root=Path(root) if root is not None else ROOT)
 
@@ -120,7 +156,7 @@ def ipam_allocation_preflight(intent: dict, *, reservation_index=None,
     validates the shape, resolves the declared parent reservation and reports what
     the authoritative IPAM system has recorded. It never returns an address.
     """
-    module = repository_module('scripts.check_ipam_allocation_preflight')
+    from scripts import check_ipam_allocation_preflight as module
     return module.evaluate(intent, reservation_index=reservation_index,
                            allocation_index=allocation_index, as_of=as_of)
 
@@ -132,7 +168,7 @@ def ipam_allocation_spec(intent: dict, *, as_of, parent_envelope_record_sha256=N
     asks for the normalization instead of restating the contract. The declared parent
     reservation intent and its capacity request must resolve inside the checkout.
     """
-    module = repository_module('scripts.check_ipam_allocation_preflight')
+    from scripts import check_ipam_allocation_preflight as module
     return module.normalized_spec(intent, as_of=as_of,
                                   parent_envelope_record_sha256=parent_envelope_record_sha256)
 
@@ -140,7 +176,7 @@ def ipam_allocation_spec(intent: dict, *, as_of, parent_envelope_record_sha256=N
 def dns_registration_preflight(intent: dict, *, ipam_index=None, dns_index=None,
                                as_of=None) -> dict:
     """Run the repository's authoritative DNS registration preflight on an intent."""
-    module = repository_module('scripts.check_dns_registration_preflight')
+    from scripts import check_dns_registration_preflight as module
     return module.evaluate(intent, ipam_index=ipam_index, dns_index=dns_index,
                            as_of=as_of)
 
@@ -153,14 +189,14 @@ def declared_contracts() -> dict:
     the declared vocabulary, so a compiled document and the checker that will judge
     it can never disagree about a key set, a status or an identifier grammar.
     """
-    site = repository_module('scripts.check_site_service_eligibility')
-    capacity = repository_module('scripts.check_site_service_capacity')
-    reservation = repository_module('scripts.check_reservation_preflight')
-    allocation = repository_module('scripts.check_ipam_allocation_preflight')
-    allocation_records = repository_module('scripts.check_ipam_allocation_records')
-    registration = repository_module('scripts.check_dns_registration_preflight')
-    registration_records = repository_module('scripts.check_dns_registration_records')
-    records = repository_module('scripts.check_reservation_records')
+    from scripts import check_site_service_eligibility as site
+    from scripts import check_site_service_capacity as capacity
+    from scripts import check_reservation_preflight as reservation
+    from scripts import check_ipam_allocation_preflight as allocation
+    from scripts import check_ipam_allocation_records as allocation_records
+    from scripts import check_dns_registration_preflight as registration
+    from scripts import check_dns_registration_records as registration_records
+    from scripts import check_reservation_records as records
     return {
         'identifier': site.ID.pattern,
         'capacity_request': {
@@ -215,7 +251,7 @@ def declared_contracts() -> dict:
 
 def capacity_request_shape(document: dict) -> dict:
     """Validate a portable site-service capacity request with the repository checker."""
-    module = repository_module('scripts.check_site_service_eligibility')
+    from scripts import check_site_service_eligibility as module
     module.validate_request(document, None)
     return document
 
@@ -229,51 +265,51 @@ def reservation_intent_spec(intent: dict, capacity_request: dict, *, as_of,
     `capacity_request_ref` must still resolve inside the checkout, which is why a
     compiled chain is staged before it is handed to the owner.
     """
-    module = repository_module('scripts.check_reservation_preflight')
+    from scripts import check_reservation_preflight as module
     return module.normalized_spec(intent, capacity_request, as_of=as_of,
                                   envelope_record_sha256=envelope_record_sha256)
 
 
 def dns_registration_spec(intent: dict, *, as_of, ipam_confirmation_sha256=None) -> dict:
     """Normalize a portable DNS registration intent in memory with the owner's preflight."""
-    module = repository_module('scripts.check_dns_registration_preflight')
+    from scripts import check_dns_registration_preflight as module
     return module.normalized_spec(intent, as_of=as_of,
                                   ipam_confirmation_sha256=ipam_confirmation_sha256)
 
 
 def allocation_prefix_shape(family, kind, prefix_length) -> None:
     """Refuse an IPAM prefix shape the authoritative record contract would refuse."""
-    module = repository_module('scripts.check_ipam_allocation_records')
+    from scripts import check_ipam_allocation_records as module
     module.validate_prefix_shape(family, kind, prefix_length)
 
 
 def opaque_external_ref(value, label) -> str:
     """Refuse an opaque external reference the IPAM contract would refuse."""
-    module = repository_module('scripts.check_ipam_allocation_records')
+    from scripts import check_ipam_allocation_records as module
     return module.opaque_external_ref(value, label)
 
 
 def opaque_dns_ref(value, label) -> str:
     """Refuse an opaque DNS reference the registration contract would refuse."""
-    module = repository_module('scripts.check_dns_registration_records')
+    from scripts import check_dns_registration_records as module
     return module.opaque_ref(value, label)
 
 
 def instant(value, label):
     """Read a timezone-aware instant with the repository record contract."""
-    module = repository_module('scripts.check_reservation_records')
+    from scripts import check_reservation_records as module
     return module.instant(value, label)
 
 
 def canonical_record_digest(document: dict) -> str:
     """The repository's canonical digest of a reservation-shaped document."""
-    module = repository_module('scripts.check_reservation_records')
+    from scripts import check_reservation_records as module
     return module.canonical_digest(document)
 
 
 def canonical_dns_intent_digest(document: dict) -> str:
     """The repository's canonical digest of a normalized DNS registration intent."""
-    module = repository_module('scripts.check_dns_registration_preflight')
+    from scripts import check_dns_registration_preflight as module
     return module.canonical_digest(document)
 
 

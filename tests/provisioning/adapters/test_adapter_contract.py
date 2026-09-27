@@ -33,7 +33,8 @@ from provisioner.conformance import checks as conformance_checks
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import manifest as plan_manifest
 from provisioner.execution.plan import create_plan
-from provisioner.repository import repository_module
+from scripts import build_wsd_compositions
+from tools import compile_wsd
 
 from tests.provisioning import support
 
@@ -79,7 +80,7 @@ DOMAIN_READBACK = {
 
 
 def compiler():
-    return repository_module('tools.compile_wsd')
+    return compile_wsd
 
 
 def plans():
@@ -681,7 +682,7 @@ class AdapterCompilerAgreementTest(unittest.TestCase):
                              frozenset(compiler().NETWORK[platform]), platform)
 
     def test_the_module_identities_are_the_reviewed_composition_roots(self):
-        roots = repository_module('scripts.build_wsd_compositions').COMPONENTS
+        roots = build_wsd_compositions.COMPONENTS
         for platform in PLATFORMS:
             adapter = adapter_base.get(platform)
             self.assertEqual((adapter.domains_module, adapter.workloads_module),

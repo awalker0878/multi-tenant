@@ -10,7 +10,7 @@ from __future__ import annotations
 from provisioner.adapters import base as adapters
 from provisioner.domain.desired_state import DesiredState
 from provisioner.domain.errors import ProvisioningError
-from provisioner.repository import repository_module
+from provisioner import repository
 
 ENVIRONMENT_FORMAT = 'hosting-wsd-environment/1'
 DOMAIN_ID_MAX = 24
@@ -112,9 +112,8 @@ def compile_document(document: dict, phase: str = 'domains', outputs: dict | Non
                                 f'Refusing to compile unknown environment format '
                                 f'{document.get("format")!r}',
                                 path='environment.format')
-    module = repository_module('tools.compile_wsd')
     try:
-        return module.compile_environment(document, phase, outputs, phase_bindings)
+        return repository.compile_environment(document, phase, outputs, phase_bindings)
     except (ValueError, KeyError, TypeError) as exc:
         raise ProvisioningError('COMPILATION_FAILED',
                                 f'The existing compiler refused the environment document: {exc}',
