@@ -45,7 +45,8 @@ class AdapterBoundaryTest(unittest.TestCase):
         for platform, adapter in adapter_base.adapters().items():
             self.assertFalse(adapter.qualified, platform)
             self.assertEqual(adapter.product_tuple, 'UNSELECTED')
-            self.assertEqual(adapter.to_dict()['status'], 'NATIVE_QUALIFICATION_ABSENT')
+            self.assertEqual(adapter.capability_contract()['status'],
+                             'NATIVE_QUALIFICATION_ABSENT')
 
     def test_adapter_shape_matches_the_capability_registry(self):
         registry = eligibility.registry()
@@ -55,10 +56,10 @@ class AdapterBoundaryTest(unittest.TestCase):
 
     def test_adapter_serialisation_never_contacts_a_platform(self):
         for adapter in adapter_base.adapters().values():
-            payload = adapter.to_dict()
+            payload = adapter.realization_contract()
             self.assertFalse(payload['native_contact'])
             self.assertTrue(payload['limits'])
-            self.assertEqual(payload['format'], adapter_base.ADAPTER_FORMAT)
+            self.assertEqual(payload['format'], adapter_base.CONTRACT_FORMAT)
 
 
 class TerraformScopeTest(unittest.TestCase):

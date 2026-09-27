@@ -169,8 +169,8 @@ class AdapterRegistryTest(unittest.TestCase):
 
     def test_the_registry_is_a_pure_function_of_the_repository(self):
         first, second = adapter_base.adapters(), adapter_base.adapters()
-        self.assertEqual([a.to_dict() for a in first.values()],
-                         [a.to_dict() for a in second.values()])
+        self.assertEqual([a.realization_contract() for a in first.values()],
+                         [a.realization_contract() for a in second.values()])
 
     def test_an_unknown_platform_is_refused(self):
         with self.assertRaises(ValueError):
@@ -180,20 +180,27 @@ class AdapterRegistryTest(unittest.TestCase):
         for platform, adapter in adapter_base.adapters().items():
             self.assertFalse(adapter.qualified, platform)
             self.assertEqual(adapter.product_tuple, 'UNSELECTED', platform)
-            self.assertEqual(adapter.to_dict()['status'], adapter_base.NOT_QUALIFIED, platform)
+            self.assertEqual(adapter.capability_contract()['status'],
+                             adapter_base.NOT_QUALIFIED, platform)
 
     def test_serialisation_never_contacts_a_platform(self):
         for platform, adapter in adapter_base.adapters().items():
-            document = adapter.to_dict()
+            document = adapter.realization_contract()
             self.assertFalse(document['native_contact'], platform)
-            self.assertFalse(document['realization']['native_contact'], platform)
             self.assertTrue(document['limits'], platform)
-            self.assertEqual(document['format'], adapter_base.ADAPTER_FORMAT, platform)
+            self.assertEqual(document['format'], adapter_base.CONTRACT_FORMAT, platform)
 
-    def test_the_adapter_format_is_versioned(self):
-        self.assertEqual(adapter_base.ADAPTER_FORMAT, 'hosting-platform-adapter/2')
+    def test_the_realization_contract_format_is_versioned(self):
+        self.assertEqual(adapter_base.CONTRACT_FORMAT,
+                         'hosting-adapter-realization-contract/1')
         for adapter in adapter_base.adapters().values():
-            self.assertEqual(adapter.format, adapter_base.ADAPTER_FORMAT)
+            self.assertEqual(adapter.realization_contract()['format'],
+                             adapter_base.CONTRACT_FORMAT)
+
+    def test_retired_adapter_projections_are_absent(self):
+        for adapter in adapter_base.adapters().values():
+            for name in ('placement_shape', 'network_shape', 'to_dict'):
+                self.assertFalse(hasattr(adapter, name), f'{adapter.platform}/{name}')
 
 
 class RealizationContractSurfaceTest(unittest.TestCase):
@@ -327,7 +334,7 @@ class PlacementPreservedTest(unittest.TestCase):
         for platform in PLATFORMS:
             adapter = adapter_base.get(platform)
             self.assertEqual(sorted(adapter.placement_fields), sorted(PLACEMENT_FIELDS[platform]))
-            self.assertEqual(adapter.placement_shape()['required'],
+            self.assertEqual(adapter.placement_contract()['fields'],
                              sorted(compiler().PLACEMENT[platform]))
 
     def test_the_placement_identity_reaches_the_compiled_workloads(self):
@@ -368,7 +375,7 @@ class NetworkIntentPreservedTest(unittest.TestCase):
         for platform in PLATFORMS:
             contract = adapter_base.get(platform).readback_contract()
             self.assertEqual(contract['identity'], sorted(NETWORK_FIELDS[platform]), platform)
-            self.assertEqual(adapter_base.get(platform).network_shape()['required'],
+            self.assertEqual(contract['identity'],
                              sorted(compiler().NETWORK[platform]), platform)
 
     def test_every_readback_identity_is_produced_by_a_reviewed_module_or_binding(self):

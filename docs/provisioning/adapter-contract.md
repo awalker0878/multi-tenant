@@ -6,7 +6,7 @@ platform requires, the edge realization and the inputs the platform cannot carry
 never provisions, never contacts a platform and never decides placement.
 
 Modules: `provisioner/adapters/base.py`, `provisioner/adapters/{nutanix,vmware,openstack}/`
-Format: `hosting-platform-adapter/2`
+Manifest realization term format: `hosting-platform-adapter/2`
 Contract format: `hosting-adapter-realization-contract/1`
 Gap format: `hosting-adapter-realization-gap/1`
 
@@ -51,7 +51,7 @@ adapter.realization_note  # how the platform realizes a fact its module cannot a
 adapter.product_tuple     # reviewed product tuple, or 'UNSELECTED' (property)
 adapter.qualified         # True only when a product tuple is qualified (property)
 adapter.limits            # the declared limits of this declaration
-adapter.to_dict()         # JSON form, always with native_contact: False
+adapter.realization_contract()  # canonical JSON declaration, with native_contact: False
 ```
 
 `module(phase)`, `declared_inputs(phase)` and `computed_facts(phase)` answer
@@ -59,9 +59,10 @@ per-phase questions. `module_contract(component)` returns the reviewed Terraform
 module's own `variables` and `outputs` sets, read from the reviewed configuration,
 which is what the readback surface is checked against.
 
-`placement_shape()` and `network_shape()` state which side supplies each field:
-placement fields come from inventory cluster native identity, network fields come
-from native readback after the domains phase.
+The `placement` and `readback` contract surfaces state which side supplies each
+field: placement fields come from inventory cluster native identity, while network
+fields must be observed after the domains phase. The old shape methods and nested
+adapter JSON projection were retired; use `realization_contract()` for serialization.
 
 ## No drift
 
