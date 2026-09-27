@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 import ssl
 import threading
 import unittest
@@ -102,6 +103,15 @@ class VaultIssuerTests(unittest.TestCase):
 
     def test_insecure_agent_token_file_is_rejected(self):
         self.token_file.chmod(0o644)
+        with self.assertRaises(GrantDenied):
+            self.issue()
+        self.assertFalse(self.server.seen)
+
+    @unittest.skipUnless(hasattr(os, 'mkfifo') and hasattr(os, 'O_NONBLOCK'),
+                         'Nonblocking FIFO open is required on this platform')
+    def test_replaced_agent_token_fifo_fails_without_blocking_listener(self):
+        self.token_file.unlink()
+        os.mkfifo(self.token_file, 0o600)
         with self.assertRaises(GrantDenied):
             self.issue()
         self.assertFalse(self.server.seen)

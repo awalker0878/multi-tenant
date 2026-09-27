@@ -90,3 +90,37 @@ unreviewed intent endpoint. Qualified platform adapters must later bind the
 canonical native request, operation intent and independent reconciliation
 before enabling a mutation route. Until then the worker listener can only
 hand off a tightly scoped read credential.
+
+## Installed site service
+
+Run `hosting-site-worker` under a dedicated service account in the site
+management zone. Its PostgreSQL credential must use a separate **read-only**
+role: `SELECT` on `operation_jobs`, `worker_grants`, `enterprise_records`,
+`audit_events`, `plan_approvals`, and `native_containment_holds`; `EXECUTE` on
+`lock_job_scope`, `lock_authority_scope`, `lock_worker_scope`, and
+`lock_native_worker_scope` (migration 0014). The listener checks that role at
+startup, including absence of table write and database/schema create grants.
+The lock functions serialize authorization with revocation and owner changes
+without giving the listener UPDATE on native ownership. Run migrations and
+enrollment with different credentials outside this process.
+
+Configure all required variables before starting the service:
+
+| Setting | Meaning |
+|---|---|
+| `HOSTING_SITE_POSTGRES_DSN`, `HOSTING_SITE_POSTGRES_ROLE` | Dedicated role and PostgreSQL URI with `sslmode=verify-full`, `connect_timeout=5`, and absolute `sslrootcert` path; URI user must match the role. |
+| `HOSTING_SITE_ID`, `HOSTING_SITE_BIND_IP`, `HOSTING_SITE_BIND_PORT` | Exact site and management address; port 1–65535. Firewall access to enrolled workers. |
+| `HOSTING_SITE_TLS_CERT`, `HOSTING_SITE_TLS_KEY`, `HOSTING_SITE_TLS_CA`, `HOSTING_SITE_TLS_CRL`, `HOSTING_SITE_TRUST_DOMAIN` | Listener certificate/key, approved worker CA and current CRLs, and worker SPIFFE domain. |
+| `HOSTING_SITE_VAULT_URL`, `HOSTING_SITE_VAULT_CA`, `HOSTING_SITE_VAULT_TOKEN_FILE` | HTTPS Vault address, pinned CA, and private Vault Agent token file. |
+| `HOSTING_SITE_VAULT_NAMESPACE`, `HOSTING_SITE_VAULT_CLIENT_CERT`, `HOSTING_SITE_VAULT_CLIENT_KEY` | Optional namespace and paired Vault client certificate/key. |
+| `HOSTING_SITE_READ_ROUTES_JSON` | Nonempty exact read-route array. Duplicate fields, overlapping scopes, mutation kinds and unreviewed Vault references are rejected. |
+
+Each route contains `scope` (the seven canonical plan scope fields),
+`reference`, `apiPath`, and `maxCredentialTtlSeconds`. For example, a reviewed
+route can map `vault:site-read` to `platform/creds/site-read` for one exact
+`organizationId`, `tenantId`, `locationId`, `securityDomainId`, `endpointId`,
+`nativeScopeId`, and `platformFamily`. The Vault role must independently
+enforce that same read-only scope and no longer than the configured lease;
+the service cannot infer those native privileges from the role name. Do not
+place tokens or platform secrets in route JSON. Stop the service if CRL
+refresh fails, and reload the verifier context after approved PKI rotation.

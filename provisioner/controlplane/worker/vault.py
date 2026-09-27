@@ -97,7 +97,10 @@ class VaultDynamicCredentialIssuer:
             self._tls.load_cert_chain(str(client_certificate), str(client_key))
 
     def _token(self) -> str:
-        flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_CLOEXEC', 0)
+        # Nonblocking open prevents a replaced token path pointing at a FIFO
+        # from pinning one of the bounded listener threads before fstat runs.
+        flags = (os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0)
+                 | getattr(os, 'O_CLOEXEC', 0) | getattr(os, 'O_NONBLOCK', 0))
         try:
             descriptor = os.open(self._token_file, flags)
             try:
