@@ -23,10 +23,10 @@ records for the smaller scope they covered.
 | 5, B38–B43 | Cold VM conversion, same-family relocation, other directed platform routes, application-native sync and scheduled waves. | Each advertised method and direction has independent guest, policy, data and recovery qualification. |
 | 6, B44–B50 | Operations, retained-state conversion, deletion of superseded paths, native qualification and release controls. | No dual mutation path or implicit fallback remains; supported routes have current installed-tuple and operational evidence. |
 
-Product architecture direction is documented in
-[ADR-0039](adr/0039-build-an-enterprise-workload-mobility-product.md),
-[ADR-0040](adr/0040-separate-workload-application-and-security-domain.md) and
-[ADR-0041](adr/0041-authority-state-and-no-shim-transition.md).
+Product architecture direction is documented in the
+[product mandate](product/decisions/product-mandate.md),
+[workload and security boundary](product/decisions/workload-and-security-boundary.md)
+and [state ownership](product/decisions/state-ownership.md) decisions.
 Implementation status must be measured by executable behavior, tests and native
 qualification separately. A completed document, fixture or contract cannot close an
 unimplemented product path.

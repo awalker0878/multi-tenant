@@ -1,11 +1,11 @@
-# ADR-0040 — Separate workloads and applications from security domains
+# Product decision — Separate workloads and applications from security domains
 
 **Status:** Proposed<br>
 **Decision class:** New product direction; organizational adoption pending<br>
 **Date:** 2026-09-26<br>
 **Accountable role:** Product/domain architecture and tenant security owners; named organizational acceptance is pending<br>
 **Scope:** Canonical inventory, assessment, provisioning and migration model; no site realization is approved<br>
-**Basis:** [ADR-0018](0018-separate-tenant-administration-wsd-lifecycle-and-domain-realization.md), [RA §7](../architecture/reference/7-tenant-environments-and-security-domain-placement.md), current `provisioner` WSD request and mobility models
+**Basis:** [ADR-0018](../../adr/0018-separate-tenant-administration-wsd-lifecycle-and-domain-realization.md), [RA §7](../../architecture/reference/7-tenant-environments-and-security-domain-placement.md), current `provisioner` WSD request and mobility models
 
 ## Context
 
@@ -32,7 +32,7 @@ The plan may select a single VM, an application group, a subset of a WSD or a wa
 - Extending the WSD request with an optional flat VM list would conflate security-domain lifecycle and workload identity while leaving application dependencies unclear.
 - Treating native VM names as primary keys would break across rename, clone and migration.
 
-These are product modeling choices. [ADR-0018](0018-separate-tenant-administration-wsd-lifecycle-and-domain-realization.md) continues to govern tenant and domain realization.
+These are product modeling choices. [ADR-0018](../../adr/0018-separate-tenant-administration-wsd-lifecycle-and-domain-realization.md) continues to govern tenant and domain realization.
 
 ## Consequences and delivery obligations
 
@@ -46,4 +46,4 @@ These are product modeling choices. [ADR-0018](0018-separate-tenant-administrati
 
 Canonical schemas, admission checks and behavioral tests must cover single VM, multi-VM application, partial WSD and incomplete discovery cases. Native qualification and operational adoption remain separate.
 
-[Decision register](README.md)
+[Implementation plan](../enterprise-workload-mobility-audit-and-implementation-plan.md)

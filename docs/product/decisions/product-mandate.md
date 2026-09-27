@@ -1,11 +1,11 @@
-# ADR-0039 — Build an enterprise workload mobility product
+# Product decision — Build an enterprise workload mobility product
 
 **Status:** Proposed<br>
 **Decision class:** New product direction; organizational adoption pending<br>
 **Date:** 2026-09-26<br>
 **Accountable role:** Product and architecture owners; named organizational acceptance is pending<br>
 **Scope:** Future product behavior across qualified on-premises environments; no site or platform authorization is implied<br>
-**Basis:** [Enterprise workload mobility audit and implementation plan](../product/enterprise-workload-mobility-audit-and-implementation-plan.md) at `e5347986cb736df525c1fc3ace100af26d2d4f27`, [portable provisioning interface](../provisioning/README.md), [automation delivery program](../implementation/automation/README.md) and [ADR-0013](0013-compose-provisioning-across-separate-platform-and-service-authorities.md)
+**Basis:** [Enterprise workload mobility audit and implementation plan](../enterprise-workload-mobility-audit-and-implementation-plan.md) at `e5347986cb736df525c1fc3ace100af26d2d4f27`, [portable provisioning interface](../../provisioning/README.md), [automation delivery program](../../implementation/automation/README.md) and [ADR-0013](../../adr/0013-compose-provisioning-across-separate-platform-and-service-authorities.md)
 
 ## Context
 
@@ -25,7 +25,7 @@ Allow assessment when facts are incomplete, but display unknowns and block execu
 - Exposing the current local runner directly as a multiuser API would give local journals and recorded approval strings authority they do not possess.
 - Building one generic platform mover would obscure directed capabilities, native identity, data consistency and recovery limitations.
 
-These are new product choices, not historical infrastructure decisions. Native platform, shared-service and security authorities remain separate under [ADR-0013](0013-compose-provisioning-across-separate-platform-and-service-authorities.md).
+These are new product choices, not historical infrastructure decisions. Native platform, shared-service and security authorities remain separate under [ADR-0013](../../adr/0013-compose-provisioning-across-separate-platform-and-service-authorities.md).
 
 ## Consequences and delivery obligations
 
@@ -38,6 +38,6 @@ These are new product choices, not historical infrastructure decisions. Native p
 
 ## Acceptance
 
-Product engineering may implement this proposed direction. A production release requires a named adopting authority, independently protected approval and native evidence for each advertised tuple and route. The current repository does not provide that release evidence. See [remaining work](../NEXT_WORK.md).
+Product engineering may implement this proposed direction. A production release requires a named adopting authority, independently protected approval and native evidence for each advertised tuple and route. The current repository does not provide that release evidence. See [remaining work](../../NEXT_WORK.md).
 
-[Decision register](README.md)
+[Implementation plan](../enterprise-workload-mobility-audit-and-implementation-plan.md)

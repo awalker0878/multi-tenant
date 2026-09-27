@@ -1,11 +1,11 @@
-# ADR-0041 — Assign one authority per state and remove superseded runtime paths
+# Product decision — Assign one authority per state and remove superseded runtime paths
 
 **Status:** Proposed<br>
 **Decision class:** New product direction; organizational adoption pending<br>
 **Date:** 2026-09-26<br>
 **Accountable role:** Product architecture, platform owners and operations; named organizational acceptance is pending<br>
 **Scope:** Product control plane, native operations and upgrade; no live target contact is authorized<br>
-**Basis:** [ADR-0013](0013-compose-provisioning-across-separate-platform-and-service-authorities.md), [ADR-0016](0016-assign-one-authoritative-writer-per-native-object-and-sensitive-subresource.md), [ADR-0031](0031-discover-uncertain-native-outcomes-instead-of-blind-replay-or-rollback.md), [ADR-0033](0033-separate-live-service-retirement-from-retained-data-disposal.md)
+**Basis:** [ADR-0013](../../adr/0013-compose-provisioning-across-separate-platform-and-service-authorities.md), [ADR-0016](../../adr/0016-assign-one-authoritative-writer-per-native-object-and-sensitive-subresource.md), [ADR-0031](../../adr/0031-discover-uncertain-native-outcomes-instead-of-blind-replay-or-rollback.md), [ADR-0033](../../adr/0033-separate-live-service-retirement-from-retained-data-disposal.md)
 
 ## Context
 
@@ -48,4 +48,4 @@ The specific workflow engine and persistence implementation require a technical 
 
 One mutation owner advances each job/resource after migration. No active caller or retained record requires old runtime semantics, and no unsupported route can return success-shaped output. Actual production acceptance still requires enterprise authority and native evidence.
 
-[Decision register](README.md)
+[Implementation plan](../enterprise-workload-mobility-audit-and-implementation-plan.md)
