@@ -64,6 +64,7 @@ jobs:
           python -m unittest discover -s tests/provisioning/authority -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/jobs -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/api -p 'test_*.py' -v
+          python -m unittest discover -s tests/provisioning/worker -p 'test_*.py' -v
   repository:
     runs-on: ubuntu-24.04
     timeout-minutes: 15

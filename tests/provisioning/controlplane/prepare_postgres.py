@@ -64,6 +64,11 @@ def main() -> int:
             'hosting_controlplane.plan_approvals, hosting_controlplane.plan_revocations TO {}',
             'GRANT EXECUTE ON FUNCTION '
             'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
+            'GRANT SELECT ON hosting_controlplane.worker_enrollments, '
+            'hosting_controlplane.worker_capabilities TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.worker_grants TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_worker_scope('
+            'text, text, text, text, text, text, text, text, text, text) TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
             connection.execute(sql.SQL(statement).format(runtime))
