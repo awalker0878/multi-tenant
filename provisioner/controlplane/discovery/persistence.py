@@ -393,9 +393,30 @@ class DiscoveryRepository:
                 'AND native_scope_id = %s AND platform_family = %s '
                 'AND generation > %s ORDER BY generation LIMIT %s',
                 (*self._scope_args(ctx, scope, environment_id), after, limit)).fetchall()
-        return [StoredGeneration(environment_id, row[0], row[1], scope, row[2],
-                                 row[3], row[4], row[5], tuple(row[6]),
-                                 tuple(row[7]), row[8]) for row in rows]
+        return [self._generation_row(environment_id, scope, row) for row in rows]
+
+    @staticmethod
+    def _generation_row(environment_id: str, scope: PlanScope, row
+                        ) -> StoredGeneration:
+        return StoredGeneration(environment_id, row[0], row[1], scope, row[2],
+                                row[3], row[4], row[5], tuple(row[6]),
+                                tuple(row[7]), row[8])
+
+    def latest_generation(self, ctx: TenantContext, scope: PlanScope,
+                          environment_id: str) -> StoredGeneration | None:
+        """Return only the latest generation of this exact native selector."""
+        self._require_scope(ctx, scope, environment_id)
+        with self._session(ctx) as connection:
+            row = connection.execute(
+                'SELECT generation, campaign_id, authorization_digest, result_digest, '
+                'captured_at, completeness, collection_errors, missing_privileges, '
+                'object_count FROM hosting_controlplane.discovery_generations '
+                'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
+                'AND site_id = %s AND security_domain_id = %s AND endpoint_id = %s '
+                'AND native_scope_id = %s AND platform_family = %s '
+                'ORDER BY generation DESC LIMIT 1',
+                self._scope_args(ctx, scope, environment_id)).fetchone()
+        return self._generation_row(environment_id, scope, row) if row else None
 
     def list_observations(self, ctx: TenantContext, scope: PlanScope,
                           environment_id: str, generation: int, *,

@@ -96,6 +96,8 @@ class DiscoveryPersistenceTests(unittest.TestCase):
                                 ('COLLECTION_ERROR',))
         self.assertEqual(first.generation, 1)
         self.assertEqual(partial.generation, 2)
+        self.assertEqual(self.reader.latest_generation(
+            self.ctx, self.scope, self.environment_id).generation, 2)
         self.assertEqual(self.reader.list_absence_candidates(
             self.ctx, self.scope, self.environment_id, 2), [])
         with self.psycopg.connect(self.ingest_dsn) as connection:
@@ -114,6 +116,8 @@ class DiscoveryPersistenceTests(unittest.TestCase):
         final = self._publish(self._campaign('final'), 'COMPLETE',
                               (self._object('vm-1', 'New name'),))
         self.assertEqual(final.generation, 3)
+        self.assertEqual(self.reader.latest_generation(
+            self.ctx, self.scope, self.environment_id), final)
         self.assertEqual(self.reader.list_absence_candidates(
             self.ctx, self.scope, self.environment_id, 3), [('vm', 'vm-2', 1)])
         old = self.reader.list_observations(self.ctx, self.scope,
@@ -149,6 +153,8 @@ class DiscoveryPersistenceTests(unittest.TestCase):
                                'site-2', 'wsd-1', 'endpoint-1', 'scope-1', 'vmware')
         self.assertEqual(self.reader.list_generations(
             self.ctx, other_site, self.environment_id), [])
+        self.assertIsNone(self.reader.latest_generation(
+            self.ctx, other_site, self.environment_id))
         self.assertEqual(self.reader.list_observations(
             self.ctx, other_site, self.environment_id, 1), [])
         with self.assertRaises(ValueError):
@@ -167,6 +173,8 @@ class DiscoveryPersistenceTests(unittest.TestCase):
                     (self.environment_id,))
 
     def test_refuses_unverified_publication_wrong_role_and_site_sql(self):
+        self.assertIsNone(self.reader.latest_generation(
+            self.ctx, self.scope, self.environment_id))
         campaign = self._campaign('denied')
         unverified = DiscoveryRepository(lambda: self.psycopg.connect(self.ingest_dsn),
                                          ingest_role='hosting_discovery_ingest')
