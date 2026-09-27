@@ -164,6 +164,33 @@ class OIDCTests(unittest.TestCase):
         self.assertEqual(self.fetches, [JWKS_URI, JWKS_URI])
         self.assert_rejected(self.token())
 
+    def test_unknown_kids_and_failed_refresh_have_shared_cooldowns(self):
+        self.provider.authenticate(self.token())
+        now = self.provider._cache_until - self.provider._jwks_ttl / 2
+        with patch('provisioner.controlplane.authority.oidc.time.monotonic', return_value=now):
+            self.assert_rejected(self.token(kid='untrusted-1'))
+            self.assert_rejected(self.token(kid='untrusted-2'))
+        self.assertEqual(self.fetches, [JWKS_URI, JWKS_URI])
+
+        self.keys = [self.jwk(self.private_b, 'key-b')]
+        with patch('provisioner.controlplane.authority.oidc.time.monotonic',
+                   return_value=now + 16):
+            self.assertEqual(self.provider.authenticate(
+                self.token(private_key=self.private_b, kid='key-b')).subject, 'user-a')
+        self.assertEqual(len(self.fetches), 3)
+
+        attempts = []
+        def offline(_url):
+            attempts.append(1)
+            raise OSError('offline')
+        self.provider._fetch = offline
+        with patch('provisioner.controlplane.authority.oidc.time.monotonic',
+                   return_value=now + 32):
+            self.assert_rejected(self.token(kid='untrusted-3'))
+            self.assert_rejected(self.token(kid='untrusted-4'))
+            self.assert_rejected(self.token(private_key=self.private_b, kid='key-b'))
+        self.assertEqual(len(attempts), 1)
+
     def test_duplicate_kid_invalid_jwk_and_fetch_failure_never_reuse_stale_keys(self):
         self.provider.authenticate(self.token())
         self.keys = [self.jwk(self.private_a, 'key-a'), self.jwk(self.private_b, 'key-a')]

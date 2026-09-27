@@ -86,8 +86,9 @@ class OIDCIdentityProvider:
     ``fetch_jwks`` is an internal deployment/test port. Production uses the
     bounded, TLS-validating downloader. Neither a JWT header nor its claims
     can select a different key server, organization, tenant or role grant.
-    A removed key is rejected after the short cache TTL; an unknown kid causes
-    one immediate refresh to support signing-key rotation.
+    A removed key is rejected after the short cache TTL. An unknown kid may
+    trigger one immediate refresh for rotation, with a shared cooldown so
+    unauthenticated key IDs cannot drive an unbounded stream of downloads.
     """
 
     def __init__(self, *, issuer: str, audience: str, jwks_uri: str,
@@ -114,6 +115,8 @@ class OIDCIdentityProvider:
         self._fetch = fetch_jwks or _download_jwks
         self._keys: dict[str, object] = {}
         self._cache_until = 0.0
+        self._unknown_refresh_after = 0.0
+        self._retry_after = 0.0
         self._lock = Lock()
 
     def _refresh(self) -> None:
@@ -144,11 +147,24 @@ class OIDCIdentityProvider:
             keys[kid] = public
         self._keys = keys
         self._cache_until = time.monotonic() + self._jwks_ttl
+        self._retry_after = 0.0
 
     def _key(self, kid: str) -> object:
         with self._lock:
-            if time.monotonic() >= self._cache_until or kid not in self._keys:
+            now = time.monotonic()
+            if now >= self._cache_until:
+                if now < self._retry_after:
+                    raise ValueError('Pinned JWKS refresh is temporarily unavailable')
+                self._retry_after = now + 15
                 # Never fall back to an expired or stale cache on network errors.
+                self._refresh()
+                if kid not in self._keys:
+                    self._unknown_refresh_after = now + 15
+            elif kid not in self._keys:
+                if now < self._unknown_refresh_after or now < self._retry_after:
+                    raise ValueError('Signing key is absent from the pinned JWKS')
+                self._unknown_refresh_after = now + 15
+                self._retry_after = now + 15
                 self._refresh()
             if kid not in self._keys:
                 raise ValueError('Signing key is absent from the pinned JWKS')
