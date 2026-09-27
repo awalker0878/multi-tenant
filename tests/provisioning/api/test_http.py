@@ -26,12 +26,13 @@ from provisioner.controlplane.authority.service import (
 from provisioner.controlplane.jobs.repository import Job, JobEvent, JobRepository
 from provisioner.controlplane.persistence.store import (
     EnterpriseRecordStore, RecordValidationError, RevisionConflict, StoredRecord,
+    canonical_record_digest,
 )
 from provisioner.domain.enterprise_records import validate_record
-from tests.provisioning.schema.test_enterprise_records import SOURCE, TARGET, workload
+from tests.provisioning.schema.test_enterprise_records import SOURCE, TARGET, plan, workload
 
 NOW = datetime(2026, 9, 27, 1, 0, tzinfo=timezone.utc)
-PLAN_DIGEST = 'a' * 64
+PLAN_DIGEST = plan()['metadata']['planDigest']
 SOURCE_SCOPE = PlanScope.from_record(SOURCE)
 TARGET_SCOPE = PlanScope.from_record(TARGET)
 PORTFOLIO = PortfolioScope('org-01', 'tenant-01', 'wsd-01')
@@ -53,9 +54,10 @@ def draft() -> dict:
 class _Identity:
     def __init__(self):
         expires = NOW + timedelta(hours=1)
-        def principal(subject, grants, *, tenant='tenant-01'):
+        def principal(subject, grants, *, tenant='tenant-01', step_up=False):
             return VerifiedPrincipal(subject, 'org-01', tenant, 'HUMAN',
-                                     NOW - timedelta(minutes=5), expires, None,
+                                     NOW - timedelta(minutes=5), expires,
+                                     NOW - timedelta(minutes=1) if step_up else None,
                                      tuple(RoleGrant(role, scope, expires)
                                            for role, scope in grants))
         self.tokens = {
@@ -79,6 +81,8 @@ class _Identity:
                                     [(JOB_READER, SOURCE_SCOPE),
                                      (JOB_READER, TARGET_SCOPE)]),
             'one-sided': principal('one-sided', [(JOB_READER, SOURCE_SCOPE)]),
+            'approver': principal('approver-new',
+                                  [(SOURCE_OWNER, SOURCE_SCOPE)], step_up=True),
         }
 
     def authenticate(self, credential):
@@ -97,23 +101,38 @@ class _Plans:
 
 
 class _Ledger:
+    def __init__(self, *, empty=False):
+        self.empty = empty
+        self.recorded = []
+        self.revocations = []
+
     def snapshot(self, plan):
         roles = ((SOURCE_OWNER, SOURCE_SCOPE), (DESTINATION_OWNER, TARGET_SCOPE),
                  (SOURCE_SECURITY, SOURCE_SCOPE),
                  (DESTINATION_SECURITY, TARGET_SCOPE))
-        return ApprovalSnapshot('org-01', 'tenant-01', 'plan-01', 1, PLAN_DIGEST, 0,
-                                tuple(PlanApproval(f'approval-{number}', 'org-01',
+        approvals = tuple(PlanApproval(f'approval-{number}', 'org-01',
                                                    'tenant-01', 'plan-01', 1, PLAN_DIGEST,
                                                    role, scope, f'approver-{number}',
                                                    NOW - timedelta(minutes=1),
                                                    NOW + timedelta(minutes=30), 0)
-                                      for number, (role, scope) in enumerate(roles)))
+                          for number, (role, scope) in enumerate(roles))
+        return ApprovalSnapshot('org-01', 'tenant-01', 'plan-01', 1, PLAN_DIGEST, 0,
+                                () if self.empty else approvals)
+
+    def append_if_current(self, plan, approval, expected_epoch):
+        self.recorded.append(approval)
+
+    def revoke_if_current(self, plan, expected_epoch, actor_subject, reason):
+        self.revocations.append((actor_subject, reason))
+        return expected_epoch + 1
 
 
 class _Records(EnterpriseRecordStore):
     def __init__(self):
         self.rows = {}
         self.audit = None
+        document = plan()
+        self.plan_row = StoredRecord(document, 1, canonical_record_digest(document))
 
     def create(self, ctx, record, audit):
         if validate_record(record):
@@ -133,6 +152,12 @@ class _Records(EnterpriseRecordStore):
         return row
 
     def get(self, ctx, kind, record_id, *, wsd_id=None):
+        if kind == 'MigrationPlan':
+            assert wsd_id is None
+            if (ctx.organization_id, ctx.tenant_id, record_id) == (
+                    'org-01', 'tenant-01', 'plan-01'):
+                return self.plan_row
+            return None
         assert kind == 'Workload' and wsd_id is not None
         return self.rows.get((ctx.organization_id, ctx.tenant_id, wsd_id, record_id))
 
@@ -270,6 +295,14 @@ class ControlApiTests(unittest.TestCase):
         self.assertEqual(understated.status_code, 413)
         self.assertFalse(self.records.rows)
 
+    def test_access_scopes_are_verified_role_selectors(self):
+        response = self.client.get('/v1/access/scopes', headers=self.auth('reader'))
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()['items'][0]['kind'], 'PORTFOLIO')
+        self.assertEqual(response.json()['items'][0]['securityDomainId'], 'wsd-01')
+        self.assertNotIn('environmentStatus', response.text)
+        self.assertEqual(self.client.get('/v1/access/scopes').status_code, 401)
+
     def test_job_admission_and_persisted_timeline_scope(self):
         url = '/v1/plans/plan-01/jobs'
         headers = self.auth('operator') | {'Idempotency-Key': 'req-01'}
@@ -300,6 +333,86 @@ class ControlApiTests(unittest.TestCase):
         self.assertEqual(result.status_code, 403)
         self.assertFalse(self.jobs.submissions)
 
+    def test_step_up_approval_and_revocation_have_durable_receipts(self):
+        ledger = _Ledger(empty=True)
+        authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
+        client = TestClient(create_app(self.records, authority, self.jobs,
+                                       max_body_bytes=8192, clock=lambda: NOW))
+        url = '/v1/plans/plan-01/approvals'
+        forged = client.post(url, headers=self.auth('approver'),
+                             json={'role': SOURCE_OWNER, 'ttlSeconds': 300,
+                                   'approvalIds': ['forged']})
+        self.assertEqual(forged.status_code, 422)
+        self.assertFalse(ledger.recorded)
+        approved = client.post(url, headers=self.auth('approver'),
+                               json={'role': SOURCE_OWNER, 'ttlSeconds': 300,
+                                     'expectedPlanRevision': 1,
+                                     'expectedPlanDigest': PLAN_DIGEST})
+        self.assertEqual(approved.status_code, 201, approved.text)
+        self.assertEqual(approved.json()['planId'], 'plan-01')
+        self.assertEqual(ledger.recorded[0].approver_subject, 'approver-new')
+        self.assertNotIn('approverSubject', approved.text)
+        revoked = client.post('/v1/plans/plan-01/revoke',
+                              headers=self.auth('approver'),
+                              json={'reason': 'Owner withdrew approval'})
+        self.assertEqual(revoked.status_code, 200, revoked.text)
+        self.assertEqual(revoked.json()['revocationEpoch'], 1)
+        self.assertEqual(ledger.revocations,
+                         [('approver-new', 'Owner withdrew approval')])
+
+    def test_approval_without_step_up_fails(self):
+        result = self.client.post('/v1/plans/plan-01/approvals',
+                                  headers=self.auth('editor'),
+                                  json={'role': SOURCE_OWNER, 'ttlSeconds': 300,
+                                        'expectedPlanRevision': 1,
+                                        'expectedPlanDigest': PLAN_DIGEST})
+        self.assertEqual(result.status_code, 403)
+
+    def test_review_is_exactly_scoped_and_redacts_mappings_and_author(self):
+        url = '/v1/plans/plan-01/review'
+        self.assertEqual(self.client.get(url).status_code, 401)
+        self.assertEqual(self.client.get(url, headers=self.auth('reader')).status_code, 404)
+        self.assertEqual(self.client.get(url, headers=self.auth('other-tenant')).status_code, 404)
+        reviewed = self.client.get(url, headers=self.auth('approver'))
+        self.assertEqual(reviewed.status_code, 200, reviewed.text)
+        facts = reviewed.json()
+        self.assertEqual((facts['planRevision'], facts['planDigest']), (1, PLAN_DIGEST))
+        self.assertEqual(facts['source']['securityDomainId'], 'wsd-01')
+        self.assertEqual(facts['destination']['securityDomainId'], 'wsd-02')
+        self.assertEqual(facts['routeMethod'], 'SAME_PLATFORM_RELOCATION')
+        self.assertEqual(facts['selectedMachineCount'], 2)
+        self.assertEqual(facts['maxDowntimeSeconds'], 3600)
+        self.assertEqual(facts['eligibleRoles'], [SOURCE_OWNER])
+        for confidential in ('machineMappings', 'targetNetworkRef',
+                             'authorSubject', 'approvalIds'):
+            self.assertNotIn(confidential, reviewed.text)
+        self.assertEqual(self.client.get(url, headers=self.auth('editor')).status_code, 404)
+
+    def test_review_fails_closed_if_record_and_authority_disagree(self):
+        self.records.plan_row = StoredRecord(
+            self.records.plan_row.record, 2, self.records.plan_row.digest)
+        response = self.client.get('/v1/plans/plan-01/review',
+                                   headers=self.auth('approver'))
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.json()['error']['code'], 'PLAN_REVIEW_STALE')
+
+    def test_approval_requires_reviewed_binding_and_rejects_stale_revision(self):
+        ledger = _Ledger(empty=True)
+        authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
+        client = TestClient(create_app(self.records, authority, self.jobs,
+                                       max_body_bytes=8192, clock=lambda: NOW))
+        url = '/v1/plans/plan-01/approvals'
+        absent = client.post(url, headers=self.auth('approver'),
+                             json={'role': SOURCE_OWNER, 'ttlSeconds': 300})
+        self.assertEqual(absent.status_code, 422)
+        stale = client.post(url, headers=self.auth('approver'),
+                            json={'role': SOURCE_OWNER, 'ttlSeconds': 300,
+                                  'expectedPlanRevision': 1,
+                                  'expectedPlanDigest': '0' * 64})
+        self.assertEqual(stale.status_code, 409, stale.text)
+        self.assertEqual(stale.json()['error']['code'], 'PLAN_REVIEW_STALE')
+        self.assertFalse(ledger.recorded)
+
     def test_openapi_declares_security_and_request_contract(self):
         spec = self.client.get('/openapi.json').json()
         create = spec['paths']['/v1/wsds/{wsd_id}/workloads']['post']
@@ -308,6 +421,10 @@ class ControlApiTests(unittest.TestCase):
         self.assertTrue(create['security'])
         self.assertEqual(spec['components']['schemas']['WorkloadCreate']['properties']['kind']['const'],
                          'Workload')
+        self.assertTrue(spec['paths']['/v1/plans/{plan_id}/review']['get']['security'])
+        approval = spec['components']['schemas']['ApprovalRequest']['required']
+        self.assertIn('expectedPlanRevision', approval)
+        self.assertIn('expectedPlanDigest', approval)
         self.assertEqual(self.client.get('/docs').status_code, 404)
 
 

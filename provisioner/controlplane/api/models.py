@@ -175,3 +175,89 @@ class JobEventView(_StrictModel):
 class JobEventPage(_StrictModel):
     items: list[JobEventView]
     next_after: int | None = Field(alias='nextAfter')
+
+
+class PortfolioAccess(_StrictModel):
+    kind: Literal['PORTFOLIO']
+    role: str
+    organization_id: str = Field(alias='organizationId')
+    tenant_id: str = Field(alias='tenantId')
+    security_domain_id: str = Field(alias='securityDomainId')
+    expires_at: datetime = Field(alias='expiresAt')
+
+
+class NativeAccess(_StrictModel):
+    kind: Literal['NATIVE']
+    role: str
+    organization_id: str = Field(alias='organizationId')
+    tenant_id: str = Field(alias='tenantId')
+    site_id: str = Field(alias='siteId')
+    security_domain_id: str = Field(alias='securityDomainId')
+    endpoint_id: str = Field(alias='endpointId')
+    native_scope_id: str = Field(alias='nativeScopeId')
+    platform_family: str = Field(alias='platformFamily')
+    expires_at: datetime = Field(alias='expiresAt')
+
+
+class AccessPage(_StrictModel):
+    """Verified role selectors, not a deployed environment inventory."""
+    items: list[PortfolioAccess | NativeAccess]
+
+
+class ReviewScope(_StrictModel):
+    organization_id: str = Field(alias='organizationId')
+    tenant_id: str = Field(alias='tenantId')
+    site_id: str = Field(alias='siteId')
+    security_domain_id: str = Field(alias='securityDomainId')
+    endpoint_id: str = Field(alias='endpointId')
+    native_scope_id: str = Field(alias='nativeScopeId')
+    platform_family: str = Field(alias='platformFamily')
+
+
+class PlanReview(_StrictModel):
+    """Allowlisted decision facts from a current, authority-bound plan."""
+    plan_id: str = Field(alias='planId')
+    plan_revision: int = Field(alias='planRevision', ge=1)
+    plan_digest: str = Field(alias='planDigest', pattern='^[0-9a-f]{64}$')
+    frozen_at: datetime = Field(alias='frozenAt')
+    workload_id: str = Field(alias='workloadId')
+    workload_revision: int = Field(alias='workloadRevision', ge=1)
+    source_snapshot_id: str = Field(alias='sourceSnapshotId')
+    destination_snapshot_id: str = Field(alias='destinationSnapshotId')
+    source: ReviewScope
+    destination: ReviewScope
+    route_method: str = Field(alias='routeMethod')
+    selected_machine_count: int = Field(alias='selectedMachineCount', ge=1)
+    selected_dataset_count: int = Field(alias='selectedDatasetCount', ge=0)
+    max_downtime_seconds: int = Field(alias='maxDowntimeSeconds', ge=0)
+    max_data_loss_seconds: int = Field(alias='maxDataLossSeconds', ge=0)
+    rollback_window_seconds: int = Field(alias='rollbackWindowSeconds', ge=0)
+    eligible_roles: list[Literal['SOURCE_OWNER', 'DESTINATION_OWNER',
+                                 'SOURCE_SECURITY', 'DESTINATION_SECURITY']] = Field(alias='eligibleRoles')
+
+
+class ApprovalRequest(_StrictModel):
+    role: Literal['SOURCE_OWNER', 'DESTINATION_OWNER',
+                  'SOURCE_SECURITY', 'DESTINATION_SECURITY']
+    ttl_seconds: int = Field(alias='ttlSeconds', ge=1, le=28800)
+    expected_plan_revision: int = Field(alias='expectedPlanRevision', ge=1)
+    expected_plan_digest: str = Field(alias='expectedPlanDigest', pattern='^[0-9a-f]{64}$')
+
+
+class ApprovalReceipt(_StrictModel):
+    approval_id: str = Field(alias='approvalId')
+    plan_id: str = Field(alias='planId')
+    plan_revision: int = Field(alias='planRevision', ge=1)
+    plan_digest: str = Field(alias='planDigest', pattern='^[0-9a-f]{64}$')
+    role: str
+    expires_at: datetime = Field(alias='expiresAt')
+
+
+class RevocationRequest(_StrictModel):
+    reason: str = Field(min_length=1, max_length=512,
+                        pattern=r'^[^\x00-\x1f\x7f]+$')
+
+
+class RevocationReceipt(_StrictModel):
+    plan_id: str = Field(alias='planId')
+    revocation_epoch: int = Field(alias='revocationEpoch', ge=1)

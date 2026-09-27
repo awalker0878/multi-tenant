@@ -8,7 +8,7 @@ No endpoint starts native work or invents workflow progress.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Annotated, Callable
 from uuid import uuid4
 
@@ -18,10 +18,12 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette.exceptions import HTTPException
 
-from provisioner.controlplane.authority.model import PortfolioScope, VerifiedPrincipal
+from provisioner.controlplane.authority.model import (PlanScope, PortfolioScope,
+                                                     VerifiedPrincipal)
 from provisioner.controlplane.authority.service import (
-    EXECUTION_OPERATOR, JOB_READER, WORKLOAD_EDITOR, WORKLOAD_READER,
-    AuthenticationFailed, AuthorityDenied, AuthorityService,
+    DESTINATION_OWNER, DESTINATION_SECURITY, EXECUTION_OPERATOR, JOB_READER,
+    SOURCE_OWNER, SOURCE_SECURITY, WORKLOAD_EDITOR, WORKLOAD_READER,
+    AuthenticationFailed, AuthorityDenied, AuthorityService, PlanRevisionChanged,
     require_scoped_role, require_workload_role,
 )
 from provisioner.controlplane.jobs.repository import (
@@ -30,11 +32,16 @@ from provisioner.controlplane.jobs.repository import (
 from provisioner.controlplane.persistence.store import (
     AuditContext, EnterpriseRecordStore, RecordNotFound,
     RecordValidationError, RevisionConflict, StoredRecord, TenantContext,
+    canonical_record_digest,
 )
+from provisioner.domain.enterprise_records import validate_record
 
 from .body_limit import BodyLimitMiddleware
-from .models import (ErrorResponse, JobEventPage, JobEventView, JobView,
-                     StoredWorkload, WorkloadCreate, WorkloadPage)
+from .portal import PortalConfig, mount_portal
+from .models import (AccessPage, ApprovalReceipt, ApprovalRequest,
+                     ErrorResponse, JobEventPage, JobEventView, JobView,
+                     PlanReview, RevocationReceipt, RevocationRequest, StoredWorkload,
+                     WorkloadCreate, WorkloadPage)
 
 _ID_PATTERN = r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'
 _BEARER = HTTPBearer(auto_error=False, description='Enterprise SSO bearer credential; verified by the server identity provider.')
@@ -86,6 +93,15 @@ def _event_view(event: JobEvent) -> JobEventView:
     })
 
 
+def _review_scope(scope: PlanScope) -> dict:
+    return {'organizationId': scope.organization_id,
+            'tenantId': scope.tenant_id, 'siteId': scope.site_id,
+            'securityDomainId': scope.security_domain_id,
+            'endpointId': scope.endpoint_id,
+            'nativeScopeId': scope.native_scope_id,
+            'platformFamily': scope.platform_family}
+
+
 def _planned_only(record: dict) -> None:
     """A human draft cannot claim native discovery/ownership through this API."""
     for machine in record['spec']['machines']:
@@ -102,7 +118,8 @@ def _planned_only(record: dict) -> None:
 
 def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                jobs: JobRepository, *, max_body_bytes: int = 1024 * 1024,
-               clock: Callable[[], datetime] | None = None) -> FastAPI:
+               clock: Callable[[], datetime] | None = None,
+               portal_config: PortalConfig | None = None) -> FastAPI:
     """Compose supplied durable services; no development auth or in-memory fallback."""
     if (not isinstance(records, EnterpriseRecordStore)
             or not isinstance(authority, AuthorityService)
@@ -174,6 +191,38 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             except (AuthenticationFailed, AuthorityDenied):
                 pass
         raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+
+    @app.get('/v1/access/scopes', response_model=AccessPage,
+             responses=_ERRORS, tags=['access'])
+    def access_scopes(active: _Session = Depends(session)) -> AccessPage:
+        """List fresh role selectors; a grant does not prove an environment exists."""
+        items = []
+        at = now()
+        principal = active.principal
+        for grant in principal.grants:
+            scope = grant.scope
+            if (grant.expires_at <= at
+                    or (scope.organization_id, scope.tenant_id) !=
+                       (principal.organization_id, principal.tenant_id)):
+                continue
+            row = {'role': grant.role, 'organizationId': scope.organization_id,
+                   'tenantId': scope.tenant_id,
+                   'securityDomainId': scope.security_domain_id,
+                   'expiresAt': grant.expires_at}
+            if isinstance(scope, PortfolioScope):
+                row['kind'] = 'PORTFOLIO'
+            elif isinstance(scope, PlanScope):
+                row.update({'kind': 'NATIVE', 'siteId': scope.site_id,
+                            'endpointId': scope.endpoint_id,
+                            'nativeScopeId': scope.native_scope_id,
+                            'platformFamily': scope.platform_family})
+            else:
+                continue
+            items.append(row)
+        items.sort(key=lambda row: (row['kind'], row['securityDomainId'],
+                                    row['role'], row.get('siteId', ''),
+                                    row.get('endpointId', '')))
+        return AccessPage.model_validate({'items': items})
 
     @app.get('/v1/wsds/{wsd_id}/workloads', response_model=WorkloadPage,
              responses=_ERRORS, tags=['workloads'])
@@ -258,6 +307,117 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
         response.headers['Location'] = f'/v1/jobs/{job.job_id}'
         return _job_view(job)
 
+    @app.get('/v1/plans/{plan_id}/review', response_model=PlanReview,
+             responses=_ERRORS, tags=['approvals'])
+    def review_plan(
+            plan_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            active: _Session = Depends(session)) -> PlanReview:
+        """Show only approved decision facts, bound to current B07/B06 state.
+
+        The plan may change immediately after this read. Approval POST must
+        present this revision and digest, which B07 checks again on write.
+        """
+        try:
+            frozen = authority.review_plan(active.credential, plan_id)
+        except AuthenticationFailed:
+            raise _ApiError(401, 'AUTHENTICATION_REQUIRED', 'Verified identity is required') from None
+        except AuthorityDenied:
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found') from None
+        if (frozen.organization_id, frozen.tenant_id) != (
+                active.principal.organization_id, active.principal.tenant_id):
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+        row = records.get(context(active), 'MigrationPlan', plan_id)
+        if row is None:
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+        record = row.record
+        try:
+            if (not isinstance(record, dict) or validate_record(record)
+                    or canonical_record_digest(record) != row.digest
+                    or row.revision != frozen.revision
+                    or record['metadata']['planDigest'] != frozen.digest
+                    or record['metadata']['planId'] != frozen.plan_id
+                    or PlanScope.from_record(record['spec']['source']) != frozen.source
+                    or PlanScope.from_record(record['spec']['destination']) != frozen.destination):
+                raise ValueError('Plan is not the same validated record')
+            spec, meta = record['spec'], record['metadata']
+            frozen_at = datetime.fromisoformat(meta['frozenAt'].replace('Z', '+00:00'))
+        except (KeyError, TypeError, ValueError):
+            raise _ApiError(409, 'PLAN_REVIEW_STALE', 'Current plan cannot be reviewed') from None
+        roles = ((SOURCE_OWNER, frozen.source),
+                 (DESTINATION_OWNER, frozen.destination),
+                 (SOURCE_SECURITY, frozen.source),
+                 (DESTINATION_SECURITY, frozen.destination))
+        eligible = []
+        for role, scope in roles:
+            try:
+                require_scoped_role(active.principal, role, scope, now())
+                if active.principal.subject != frozen.author_subject:
+                    eligible.append(role)
+            except (AuthenticationFailed, AuthorityDenied):
+                pass
+        return PlanReview.model_validate({
+            'planId': frozen.plan_id, 'planRevision': frozen.revision,
+            'planDigest': frozen.digest, 'frozenAt': frozen_at,
+            'workloadId': spec['workloadId'],
+            'workloadRevision': spec['workloadRevision'],
+            'sourceSnapshotId': spec['sourceSnapshotId'],
+            'destinationSnapshotId': spec['destinationSnapshotId'],
+            'source': _review_scope(frozen.source),
+            'destination': _review_scope(frozen.destination),
+            'routeMethod': spec['route']['method'],
+            'selectedMachineCount': len(spec['selectedMachineIds']),
+            'selectedDatasetCount': len(spec['selectedDatasetIds']),
+            'maxDowntimeSeconds': spec['maxDowntimeSeconds'],
+            'maxDataLossSeconds': spec['maxDataLossSeconds'],
+            'rollbackWindowSeconds': spec['rollbackWindowSeconds'],
+            'eligibleRoles': eligible,
+        })
+
+    @app.post('/v1/plans/{plan_id}/approvals', status_code=201,
+              response_model=ApprovalReceipt, responses=_ERRORS, tags=['approvals'])
+    def record_approval(
+            plan_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            decision: ApprovalRequest,
+            active: _Session = Depends(session)) -> ApprovalReceipt:
+        """Record an independently verified, current step-up decision.
+
+        This durable receipt does not claim that a workflow has advanced.
+        """
+        try:
+            approval = authority.record_approval(
+                active.credential, plan_id, decision.role,
+                ttl=timedelta(seconds=decision.ttl_seconds),
+                expected_revision=decision.expected_plan_revision,
+                expected_digest=decision.expected_plan_digest)
+        except AuthenticationFailed:
+            raise _ApiError(401, 'AUTHENTICATION_REQUIRED', 'Verified identity is required') from None
+        except PlanRevisionChanged:
+            raise _ApiError(409, 'PLAN_REVIEW_STALE', 'Reviewed plan has changed') from None
+        except AuthorityDenied:
+            raise _ApiError(403, 'APPROVAL_DENIED', 'Approval was not recorded') from None
+        return ApprovalReceipt.model_validate({
+            'approvalId': approval.approval_id, 'planId': approval.plan_id,
+            'planRevision': approval.plan_revision,
+            'planDigest': approval.plan_digest, 'role': approval.role,
+            'expiresAt': approval.expires_at,
+        })
+
+    @app.post('/v1/plans/{plan_id}/revoke', response_model=RevocationReceipt,
+              responses=_ERRORS, tags=['approvals'])
+    def revoke_approvals(
+            plan_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            decision: RevocationRequest,
+            active: _Session = Depends(session)) -> RevocationReceipt:
+        try:
+            epoch = authority.revoke_approvals(
+                active.credential, plan_id, decision.reason)
+        except AuthenticationFailed:
+            raise _ApiError(401, 'AUTHENTICATION_REQUIRED', 'Verified identity is required') from None
+        except AuthorityDenied:
+            raise _ApiError(403, 'REVOCATION_DENIED', 'Approval revocation was not recorded') from None
+        return RevocationReceipt.model_validate({'planId': plan_id,
+                                                 'revocationEpoch': epoch})
+
     @app.get('/v1/jobs/{job_id}', response_model=JobView,
              responses=_ERRORS, tags=['jobs'])
     def get_job(job_id: Annotated[str, Path(pattern=_ID_PATTERN)],
@@ -278,4 +438,5 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
         return JobEventPage.model_validate({'items': [_event_view(event) for event in page],
                                             'nextAfter': next_after})
 
+    mount_portal(app, portal_config)
     return app
