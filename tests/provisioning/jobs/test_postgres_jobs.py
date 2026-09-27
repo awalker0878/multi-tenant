@@ -1,8 +1,8 @@
 """Opt-in PostgreSQL contract: real transactions, uniqueness, RLS and replay.
 
-Run only against a throwaway database with HOSTING_TEST_POSTGRES_ISOLATED=1 and
-HOSTING_TEST_POSTGRES_DSN. This test creates schema migrations and a no-login
-runtime role. It is not a fixture or replacement for native qualification.
+Run only against a throwaway database with HOSTING_TEST_POSTGRES_ISOLATED=1,
+an admin DSN and a separate non-bypass migration owner. This test creates a
+no-login runtime role. It is not a replacement for native qualification.
 """
 from __future__ import annotations
 
@@ -37,7 +37,8 @@ class JobPostgresTest(unittest.TestCase):
 
         cls.psycopg = psycopg
         cls.dsn = os.environ['HOSTING_TEST_POSTGRES_DSN']
-        apply_migrations(lambda: psycopg.connect(cls.dsn))
+        migration_dsn = os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']
+        apply_migrations(lambda: psycopg.connect(migration_dsn))
         with psycopg.connect(cls.dsn) as connection:
             connection.execute(
                 "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles "
@@ -97,6 +98,10 @@ class JobPostgresTest(unittest.TestCase):
             frozen.revision, frozen.digest, frozen.source, frozen.destination,
             approvals, 0, now + timedelta(hours=1), 'operator-01')
         with self.psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "SELECT set_config('app.organization_id', %s, true), "
+                "set_config('app.tenant_id', %s, true)",
+                (self.tenant.organization_id, self.tenant.tenant_id))
             connection.execute(
                 'INSERT INTO hosting_controlplane.enterprise_records '
                 '(organization_id, tenant_id, record_kind, record_id, revision, '
