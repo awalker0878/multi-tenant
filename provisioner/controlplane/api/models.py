@@ -174,6 +174,41 @@ class EnvironmentPage(_StrictModel):
     next_after: str | None = Field(alias='nextAfter')
 
 
+class DiscoveryGenerationView(_StrictModel):
+    """Allowlisted read-only campaign outcome, not placement authority."""
+    environment_id: str = Field(alias='environmentId', pattern=_ID)
+    generation: int = Field(ge=1)
+    campaign_id: str = Field(alias='campaignId', pattern=_ID)
+    result_digest: str = Field(alias='resultDigest', pattern='^[0-9a-f]{64}$')
+    captured_at: datetime = Field(alias='capturedAt')
+    completeness: Literal['COMPLETE', 'PARTIAL', 'UNKNOWN']
+    object_count: int = Field(alias='objectCount', ge=0)
+    collection_error_count: int = Field(alias='collectionErrorCount', ge=0)
+    missing_privilege_count: int = Field(alias='missingPrivilegeCount', ge=0)
+
+
+class DiscoveryGenerationPage(_StrictModel):
+    items: list[DiscoveryGenerationView]
+    next_after: int | None = Field(alias='nextAfter')
+
+
+class ObservedObjectView(_StrictModel):
+    """Identity and bounded summary only; native facts are never sent raw."""
+    resource_kind: Literal['vm', 'disk', 'nic', 'volume', 'image', 'network',
+                           'pool', 'cluster', 'host', 'datastore', 'quota'] = Field(alias='resourceKind')
+    native_id: str = Field(alias='nativeId', min_length=1, max_length=512)
+    display_name: str | None = Field(alias='displayName', max_length=256)
+    unknown_count: int = Field(alias='unknownCount', ge=0)
+    object_digest: str = Field(alias='objectDigest', pattern='^[0-9a-f]{64}$')
+
+
+class ObservedObjectPage(_StrictModel):
+    environment_id: str = Field(alias='environmentId', pattern=_ID)
+    generation: int = Field(ge=1)
+    items: list[ObservedObjectView]
+    next_after: str | None = Field(alias='nextAfter')
+
+
 class ErrorDetail(_StrictModel):
     code: str
     message: str
