@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
@@ -60,6 +61,36 @@ class VerifiedWsdTransition:
     plan_digest: str
     grant_digest: str
     observation_digest: str
+
+
+@dataclass(frozen=True)
+class BindingPromotion:
+    resource_kind: str
+    machine_id: str
+    component_id: str
+    source_binding: tuple[str, str, str, str, str]
+    target_binding: tuple[str, str, str, str, str]
+
+
+@dataclass(frozen=True)
+class VerifiedBindingCutover:
+    """Trusted cutover decision for native binding promotion.
+
+    The future authority boundary must verify the grant and observation digests
+    before constructing this value; the record validator only binds identities.
+    """
+    organization_id: str
+    tenant_id: str
+    workload_id: str
+    wsd_id: str
+    plan_id: str
+    plan_revision: int
+    plan_digest: str
+    source_snapshot_id: str
+    destination_snapshot_id: str
+    grant_digest: str
+    observation_digest: str
+    promotions: tuple[BindingPromotion, ...]
 
 
 def _binding_in_scope(binding: dict, scope: dict) -> bool:
@@ -141,6 +172,9 @@ def _workload(record: dict, problems: list[dict]) -> None:
                 owner = (resource_kind, machine['machineId'], component_id)
                 _duplicates([_binding_key(b['binding']) for b in resource['bindings']],
                             path + '.bindings', problems)
+                if sum(h['role'] == 'SOURCE' for h in resource['bindings']) > 1:
+                    _problem(problems, path + '.bindings',
+                             'Logical resource has more than one current SOURCE binding')
                 for history in resource['bindings']:
                     binding = history['binding']
                     if binding['resourceKind'] != resource_kind:
@@ -376,8 +410,135 @@ def validate_destination_activation(workload: dict, destination_wsd_id: str) -> 
     return problems
 
 
+def _verify_binding_cutover(previous: dict, current: dict, promoted: list[tuple],
+                            plan: dict | None, cutover: VerifiedBindingCutover | None,
+                            transition: VerifiedWsdTransition | None,
+                            problems: list[dict]) -> None:
+    path = '$.spec.machines'
+    if (not isinstance(cutover, VerifiedBindingCutover) or plan is None
+            or validate_record(plan) or plan['kind'] != 'MigrationPlan'):
+        _problem(problems, path, 'Target promotion requires a verified binding cutover and exact plan')
+        return
+    meta, spec = plan['metadata'], plan['spec']
+    before = previous['metadata']
+    after = current['metadata']
+    same_wsd = before['wsdId'] == after['wsdId']
+    expected = (before['organizationId'], before['tenantId'], before['workloadId'],
+                before['wsdId'], meta['planId'], meta['revision'], meta['planDigest'],
+                spec['sourceSnapshotId'], spec['destinationSnapshotId'])
+    actual = (cutover.organization_id, cutover.tenant_id, cutover.workload_id,
+              cutover.wsd_id, cutover.plan_id, cutover.plan_revision,
+              cutover.plan_digest, cutover.source_snapshot_id,
+              cutover.destination_snapshot_id)
+    if (actual != expected or meta['organizationId'] != before['organizationId']
+            or meta['tenantId'] != before['tenantId']
+            or spec['workloadId'] != before['workloadId']
+            or spec['source']['securityDomainId'] != before['wsdId']
+            or spec['destination']['securityDomainId'] != after['wsdId']
+            or not all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in
+                       (cutover.grant_digest, cutover.observation_digest))):
+        _problem(problems, path, 'Cutover does not bind the accepted workload, WSD and exact plan')
+        return
+    if (spec['source']['organizationId'] != before['organizationId']
+            or spec['destination']['organizationId'] != before['organizationId']
+            or spec['source']['tenantId'] != before['tenantId']
+            or spec['destination']['tenantId'] != before['tenantId']):
+        _problem(problems, path, 'Cutover requires matching organization and tenant scopes')
+        return
+    if same_wsd:
+        if (previous['spec']['membership']['state'] != 'ACCEPTED'
+                or current['spec']['membership']['state'] != 'ACCEPTED'
+                or spec['workloadRevision'] != before['revision']):
+            _problem(problems, path, 'Same-WSD cutover requires accepted membership and exact workload revision')
+            return
+    else:
+        pending = previous['spec']['membership']['transition']
+        if (not isinstance(transition, VerifiedWsdTransition)
+                or previous['spec']['membership']['state'] != 'OBSERVED'
+                or current['spec']['membership']['state'] != 'ACCEPTED'
+                or pending is None
+                or (pending['planId'], pending['planRevision'], pending['planDigest']) != (
+                    meta['planId'], meta['revision'], meta['planDigest'])
+                or (pending['grantDigest'], pending['observationDigest']) != (
+                    cutover.grant_digest, cutover.observation_digest)
+                or (transition.grant_digest, transition.observation_digest) != (
+                    cutover.grant_digest, cutover.observation_digest)
+                or spec['workloadRevision'] > before['revision']):
+            _problem(problems, path, 'WSD cutover does not bind the observed membership transition')
+            return
+    expected_promotions = set(cutover.promotions)
+    if not expected_promotions or len(expected_promotions) != len(cutover.promotions):
+        _problem(problems, path, 'Cutover promotions are empty or duplicate')
+        return
+    mappings = {m['machineId']: m for m in spec['machineMappings']}
+    actual_promotions: set[BindingPromotion] = set()
+    if not same_wsd:
+        all_vm_ids = {m['machineId'] for m in previous['spec']['machines']}
+        promoted_vm_ids = {machine_id for kind, machine_id, *_ in promoted if kind == 'vm'}
+        if (set(spec['selectedMachineIds']) != all_vm_ids
+                or {m['machineId'] for m in current['spec']['machines']} != all_vm_ids
+                or promoted_vm_ids != all_vm_ids):
+            _problem(problems, path, 'WSD acceptance requires promotion of every workload VM')
+        crossing_platform_scope = (spec['source']['endpointId'], spec['source']['nativeScopeId']) != (
+            spec['destination']['endpointId'], spec['destination']['nativeScopeId'])
+        for machine in previous['spec']['machines']:
+            mapping = mappings.get(machine['machineId'])
+            if mapping is None or not machine['disksComplete'] or not machine['nicsComplete']:
+                _problem(problems, path, 'WSD acceptance requires complete mappings for every workload VM')
+                continue
+            for kind, resources, mapped_ids, key_name in (
+                    ('disk', machine['disks'], {d['diskId'] for d in mapping['diskMappings']}, 'diskId'),
+                    ('nic', machine['nics'], {n['nicId'] for n in mapping['nicMappings']}, 'nicId')):
+                resource_ids = {resource[key_name] for resource in resources}
+                required = {resource[key_name] for resource in resources if
+                            crossing_platform_scope or any(h['role'] == 'TARGET' for h in resource['bindings'])}
+                promoted_ids = {component_id for promoted_kind, machine_id, component_id, *_ in promoted
+                                if promoted_kind == kind and machine_id == machine['machineId']}
+                if mapped_ids != resource_ids or not required <= promoted_ids:
+                    _problem(problems, path, 'WSD acceptance has unmapped or unpromoted disk/NIC resources')
+    for kind, machine_id, component_id, target, old_resource, new_resource in promoted:
+        matches = [p for p in expected_promotions if (
+            p.resource_kind, p.machine_id, p.component_id, p.target_binding) == (
+                kind, machine_id, component_id, target)]
+        if len(matches) != 1:
+            _problem(problems, path, 'Promoted target binding is absent from exact cutover decision')
+            continue
+        promotion = matches[0]
+        actual_promotions.add(promotion)
+        mapping = mappings.get(machine_id)
+        if (mapping is None
+                or (kind == 'vm' and (component_id != machine_id
+                                      or _binding_key(mapping['sourceBinding']) != promotion.source_binding))
+                or (kind == 'disk' and component_id not in {d['diskId'] for d in mapping['diskMappings']})
+                or (kind == 'nic' and component_id not in {n['nicId'] for n in mapping['nicMappings']})):
+            _problem(problems, path, 'Promoted resource is absent from selected plan mapping')
+        source = next((h for h in old_resource['bindings'] if
+                       _binding_key(h['binding']) == promotion.source_binding
+                       and h['role'] == 'SOURCE'
+                       and h['lastObservedSnapshotId'] == spec['sourceSnapshotId']), None)
+        retired_source = next((h for h in new_resource['bindings'] if
+                               _binding_key(h['binding']) == promotion.source_binding
+                               and h['role'] == 'RETIRED'), None)
+        target_history = next((h for h in old_resource['bindings'] if
+                               _binding_key(h['binding']) == promotion.target_binding
+                               and h['role'] == 'TARGET'
+                               and h['lastObservedSnapshotId'] == spec['destinationSnapshotId']), None)
+        if source is None or target_history is None or retired_source is None:
+            _problem(problems, path, 'Cutover needs observed source/target and retired source binding')
+        source_scope, destination_scope = spec['source'], spec['destination']
+        for identity, scope in ((promotion.source_binding, source_scope),
+                                (promotion.target_binding, destination_scope)):
+            if (identity[0], identity[1], identity[4]) != (
+                    scope['endpointId'], scope['nativeScopeId'], scope['platformFamily']):
+                _problem(problems, path, 'Cutover binding lies outside selected platform scope')
+    if actual_promotions != expected_promotions:
+        _problem(problems, path, 'Cutover decision includes unpromoted or missing native bindings')
+
+
 def validate_workload_successor(previous: dict, current: dict, *,
-                                verified_transition: VerifiedWsdTransition | None = None) -> list[dict]:
+                                verified_transition: VerifiedWsdTransition | None = None,
+                                verified_cutover: VerifiedBindingCutover | None = None,
+                                plan: dict | None = None) -> list[dict]:
     """Preserve identity/history; accept a WSD move only with a verified decision.
 
     The caller must independently authenticate the decision and native evidence.
@@ -398,6 +559,7 @@ def validate_workload_successor(previous: dict, current: dict, *,
     next_membership = current['spec']['membership']
     old_history = prior_membership['history']
     new_history = next_membership['history']
+    authorized_promotion = False
     if new_history[:len(old_history)] != old_history:
         _problem(problems, '$.spec.membership.history', 'Accepted transition history is append-only')
     if before['wsdId'] == after['wsdId']:
@@ -429,14 +591,17 @@ def validate_workload_successor(previous: dict, current: dict, *,
                         event['observationDigest'])
             if recorded != expected[3:]:
                 _problem(problems, '$.spec.membership.history', 'Accepted history does not match observed transition')
-            if verified_transition is None or (
+            if not isinstance(verified_transition, VerifiedWsdTransition) or (
                     verified_transition.organization_id, verified_transition.tenant_id,
                     verified_transition.workload_id, verified_transition.from_wsd_id,
                     verified_transition.to_wsd_id, verified_transition.plan_id,
                     verified_transition.plan_revision, verified_transition.plan_digest,
                     verified_transition.grant_digest, verified_transition.observation_digest) != expected:
                 _problem(problems, '$.spec.membership', 'Independent transition authorization and observation required')
+            else:
+                authorized_promotion = recorded == expected[3:]
     new_machines = {m['machineId']: m for m in current['spec']['machines']}
+    promoted: list[tuple] = []
     for index, old_machine in enumerate(previous['spec']['machines']):
         new_machine = new_machines.get(old_machine['machineId'])
         if new_machine is None:
@@ -455,4 +620,37 @@ def validate_workload_successor(previous: dict, current: dict, *,
                 new_bindings = {(tuple(_binding_key(h['binding'])), h['firstSeenSnapshotId']) for h in new_resource['bindings']}
                 if not old_bindings <= new_bindings:
                     _problem(problems, f'$.spec.machines[{index}].{collection}', 'Historical native binding cannot be rewritten or removed')
+                next_by_identity = {(_binding_key(h['binding']), h['firstSeenSnapshotId']): h
+                                    for h in new_resource['bindings']}
+                if old_resource['bindings']:
+                    for identity, new_history in next_by_identity.items():
+                        if identity not in old_bindings and new_history['role'] == 'SOURCE':
+                            _problem(problems, f'$.spec.machines[{index}].{collection}',
+                                     'New native SOURCE binding must first be staged as TARGET')
+                allowed = {'SOURCE': {'SOURCE', 'RETIRED'},
+                           'TARGET': {'TARGET', 'SOURCE', 'RETIRED'},
+                           'RETIRED': {'RETIRED'}}
+                for history in old_resource['bindings']:
+                    identity = (_binding_key(history['binding']), history['firstSeenSnapshotId'])
+                    successor = next_by_identity.get(identity)
+                    if successor is not None and successor['role'] not in allowed[history['role']]:
+                        _problem(problems, f'$.spec.machines[{index}].{collection}',
+                                 'Native binding role transition is not allowed')
+                    if (successor is not None and history['role'] == 'TARGET'
+                            and successor['role'] == 'SOURCE'):
+                        resource_kind = 'vm' if logical_id is None else (
+                            'disk' if logical_id == 'diskId' else 'nic')
+                        component_id = old_machine['machineId'] if logical_id is None else old_resource[logical_id]
+                        promoted.append((resource_kind, old_machine['machineId'],
+                                         component_id, _binding_key(history['binding']),
+                                         old_resource, new_resource))
+    if before['wsdId'] != after['wsdId'] and not promoted:
+        _problem(problems, '$.spec.machines', 'WSD acceptance requires a native binding cutover')
+    if promoted:
+        if before['wsdId'] != after['wsdId'] and not authorized_promotion:
+            _problem(problems, '$.spec.machines',
+                     'Target promotion requires the accepted, verified WSD transition')
+        else:
+            _verify_binding_cutover(previous, current, promoted, plan,
+                                    verified_cutover, verified_transition, problems)
     return problems

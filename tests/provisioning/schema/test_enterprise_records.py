@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import unittest
 from copy import deepcopy
+from dataclasses import replace
 
-from provisioner.domain.enterprise_records import (VerifiedWsdTransition, plan_digest,
+from provisioner.domain.enterprise_records import (BindingPromotion, VerifiedBindingCutover,
+                                                   VerifiedWsdTransition, plan_digest,
                                                    validate_destination_activation,
                                                    validate_record, validate_workload_successor)
 from provisioner.schemas import registry
@@ -73,6 +75,55 @@ def workload() -> dict:
                      for number in (1, 2)
                  ], 'unknownFields': []}
     }
+
+
+def stage_target_bindings(item: dict) -> None:
+    for vm in item['spec']['machines']:
+        for resource in (vm, *vm['disks'], *vm['nics']):
+            original = resource['bindings'][0]['binding']
+            target_binding = deepcopy(original)
+            target_binding['endpointId'] = TARGET['endpointId']
+            target_binding['nativeScopeId'] = TARGET['nativeScopeId']
+            target_binding['nativeId'] = 'target-' + original['nativeId']
+            resource['bindings'].append(
+                {'binding': target_binding, 'role': 'TARGET',
+                 'firstSeenSnapshotId': 'snapshot-02',
+                 'lastObservedSnapshotId': 'snapshot-02'})
+
+
+def promote_target_bindings(item: dict) -> None:
+    for vm in item['spec']['machines']:
+        for resource in (vm, *vm['disks'], *vm['nics']):
+            resource['bindings'][0]['role'] = 'RETIRED'
+            resource['bindings'][1]['role'] = 'SOURCE'
+
+
+def native_key(binding_record: dict) -> tuple[str, str, str, str, str]:
+    return (binding_record['endpointId'], binding_record['nativeScopeId'],
+            binding_record['resourceKind'], binding_record['nativeId'],
+            binding_record['platformFamily'])
+
+
+def binding_cutover(item: dict, selected_plan: dict) -> VerifiedBindingCutover:
+    promotions = []
+    for vm in item['spec']['machines']:
+        for kind, resources in (('vm', [vm]), ('disk', vm['disks']), ('nic', vm['nics'])):
+            for resource in resources:
+                component_id = (vm['machineId'] if kind == 'vm' else
+                                resource['diskId'] if kind == 'disk' else resource['nicId'])
+                promotions.append(BindingPromotion(
+                    kind, vm['machineId'], component_id,
+                    native_key(resource['bindings'][0]['binding']),
+                    native_key(resource['bindings'][1]['binding'])))
+    meta, spec = selected_plan['metadata'], selected_plan['spec']
+    return VerifiedBindingCutover(
+        organization_id='org-01', tenant_id='tenant-01',
+        workload_id='workload-01', wsd_id='wsd-01',
+        plan_id=meta['planId'], plan_revision=meta['revision'],
+        plan_digest=meta['planDigest'], source_snapshot_id=spec['sourceSnapshotId'],
+        destination_snapshot_id=spec['destinationSnapshotId'],
+        grant_digest=DIGEST, observation_digest='b' * 64,
+        promotions=tuple(promotions))
 
 
 def plan(source: dict = SOURCE, target: dict = TARGET) -> dict:
@@ -205,6 +256,98 @@ class EnterpriseRecordTest(unittest.TestCase):
         self.assert_invalid(selected_plan, '$.spec.machineMappings[0].sourceBinding',
                             workload=item)
 
+    def test_each_logical_resource_has_at_most_one_source_binding(self):
+        for collection, kind, native_id in (('bindings', 'vm', 'new-vm'),
+                                            ('disks', 'disk', 'new-disk'),
+                                            ('nics', 'nic', 'new-nic')):
+            item = workload()
+            machine_record = item['spec']['machines'][0]
+            resource = (machine_record if collection == 'bindings' else
+                        machine_record[collection][0])
+            resource['bindings'].append(history(kind, native_id))
+            problems = validate_record(item)
+            self.assertTrue(any('more than one current SOURCE binding' in p['message']
+                                for p in problems), (collection, problems))
+
+    def test_retired_binding_cannot_be_reactivated(self):
+        earlier = workload()
+        earlier['spec']['machines'][0]['bindings'][0]['role'] = 'RETIRED'
+        later = deepcopy(earlier)
+        later['metadata']['revision'] = 2
+        later['spec']['machines'][0]['bindings'][0]['role'] = 'SOURCE'
+        problems = validate_workload_successor(earlier, later)
+        self.assertTrue(any('role transition is not allowed' in p['message']
+                            for p in problems), problems)
+
+    def test_new_source_cannot_skip_target_staging_for_existing_resource(self):
+        earlier = workload()
+        later = deepcopy(earlier)
+        later['metadata']['revision'] = 2
+        vm = later['spec']['machines'][0]
+        vm['bindings'][0]['role'] = 'RETIRED'
+        staged = deepcopy(vm['bindings'][0])
+        staged['binding']['endpointId'] = TARGET['endpointId']
+        staged['binding']['nativeScopeId'] = TARGET['nativeScopeId']
+        staged['binding']['nativeId'] = 'new-vm-direct-source'
+        staged['firstSeenSnapshotId'] = 'snapshot-02'
+        staged['lastObservedSnapshotId'] = 'snapshot-02'
+        staged['role'] = 'SOURCE'
+        vm['bindings'].append(staged)
+        self.assertEqual(validate_record(later), [])
+        problems = validate_workload_successor(earlier, later)
+        self.assertTrue(any('must first be staged as TARGET' in p['message']
+                            for p in problems), problems)
+
+    def test_same_wsd_target_promotion_requires_future_verified_cutover(self):
+        earlier = workload()
+        stage_target_bindings(earlier)
+        later = deepcopy(earlier)
+        later['metadata']['revision'] = 2
+        promote_target_bindings(later)
+        problems = validate_workload_successor(earlier, later)
+        self.assertTrue(any('Target promotion requires' in p['message']
+                            for p in problems), problems)
+        same_wsd_target = deepcopy(TARGET)
+        same_wsd_target['securityDomainId'] = 'wsd-01'
+        selected_plan = plan(target=same_wsd_target)
+        decision = binding_cutover(earlier, selected_plan)
+        self.assertEqual(validate_workload_successor(
+            earlier, later, plan=selected_plan, verified_cutover=decision), [])
+        stale_decision = replace(decision, destination_snapshot_id='stale-snapshot')
+        self.assertTrue(validate_workload_successor(
+            earlier, later, plan=selected_plan, verified_cutover=stale_decision))
+        stale_plan = deepcopy(selected_plan)
+        stale_plan['spec']['workloadRevision'] = 2
+        stale_plan['metadata']['planDigest'] = plan_digest(stale_plan)
+        self.assertTrue(validate_workload_successor(
+            earlier, later, plan=stale_plan,
+            verified_cutover=replace(decision, plan_digest=stale_plan['metadata']['planDigest'])))
+        retired_source = deepcopy(earlier)
+        for vm in retired_source['spec']['machines']:
+            for resource in (vm, *vm['disks'], *vm['nics']):
+                resource['bindings'][0]['role'] = 'RETIRED'
+        retired_target = deepcopy(retired_source)
+        retired_target['metadata']['revision'] = 2
+        for vm in retired_target['spec']['machines']:
+            for resource in (vm, *vm['disks'], *vm['nics']):
+                resource['bindings'][1]['role'] = 'SOURCE'
+        self.assertTrue(validate_workload_successor(
+            retired_source, retired_target, plan=selected_plan,
+            verified_cutover=decision))
+        pending = deepcopy(earlier)
+        pending['spec']['membership'] = {
+            'state': 'PENDING', 'candidateWsdId': 'wsd-02',
+            'transition': {'planId': selected_plan['metadata']['planId'],
+                           'planRevision': selected_plan['metadata']['revision'],
+                           'planDigest': selected_plan['metadata']['planDigest'],
+                           'grantDigest': None, 'observationDigest': None},
+            'history': []}
+        premature = deepcopy(pending)
+        premature['metadata']['revision'] = 2
+        promote_target_bindings(premature)
+        self.assertTrue(validate_workload_successor(
+            pending, premature, plan=selected_plan, verified_cutover=decision))
+
     def test_missing_disk_and_nic_mappings_are_refused(self):
         item = plan()
         item['spec']['machineMappings'][0]['diskMappings'].pop()
@@ -275,6 +418,12 @@ class EnterpriseRecordTest(unittest.TestCase):
         item['spec']['source']['securityDomainId'] = 'wrong-wsd'
         item['metadata']['planDigest'] = plan_digest(item)
         self.assert_invalid(item, '$.spec.source.securityDomainId', workload=workload())
+        item = plan()
+        item['spec']['machineMappings'][0]['sourceBinding']['platformFamily'] = 'nutanix'
+        item['metadata']['planDigest'] = plan_digest(item)
+        problems = validate_record(item)
+        self.assertTrue(any('does not match source scope' in p['message']
+                            for p in problems), problems)
 
     def test_observation_tracks_unknowns_and_freshness(self):
         item = {
@@ -366,11 +515,19 @@ class EnterpriseRecordTest(unittest.TestCase):
         observed['spec']['membership']['state'] = 'OBSERVED'
         observed['spec']['membership']['transition']['grantDigest'] = DIGEST
         observed['spec']['membership']['transition']['observationDigest'] = 'b' * 64
+        stage_target_bindings(observed)
         self.assertEqual(validate_workload_successor(pending, observed), [])
         self.assertTrue(validate_destination_activation(observed, 'wsd-02'))
+        premature = deepcopy(observed)
+        premature['metadata']['revision'] = 4
+        promote_target_bindings(premature)
+        problems = validate_workload_successor(observed, premature)
+        self.assertTrue(any('Target promotion requires' in p['message']
+                            for p in problems), problems)
         accepted = deepcopy(observed)
         accepted['metadata']['revision'] = 4
         accepted['metadata']['wsdId'] = 'wsd-02'
+        promote_target_bindings(accepted)
         accepted['spec']['membership'] = {
             'state': 'ACCEPTED', 'candidateWsdId': None, 'transition': None,
             'history': [{'fromWsdId': 'wsd-01', 'toWsdId': 'wsd-02',
@@ -378,19 +535,43 @@ class EnterpriseRecordTest(unittest.TestCase):
                          'planDigest': selected_plan['metadata']['planDigest'],
                          'grantDigest': DIGEST, 'observationDigest': 'b' * 64,
                          'acceptedAt': '2026-09-26T15:00:00Z'}]}
-        self.assertTrue(validate_workload_successor(observed, accepted))
+        problems = validate_workload_successor(observed, accepted)
+        self.assertTrue(any('Target promotion requires' in p['message']
+                            for p in problems), problems)
         verified = VerifiedWsdTransition(
             organization_id='org-01', tenant_id='tenant-01', workload_id='workload-01',
             from_wsd_id='wsd-01', to_wsd_id='wsd-02', plan_id='plan-01',
             plan_revision=1, plan_digest=selected_plan['metadata']['planDigest'],
             grant_digest=DIGEST, observation_digest='b' * 64)
-        self.assertEqual(validate_workload_successor(observed, accepted,
-                                                     verified_transition=verified), [])
+        observed_cutover = binding_cutover(observed, selected_plan)
+        self.assertTrue(validate_workload_successor(observed, accepted,
+                                                    verified_transition=verified))
+        untouched = deepcopy(accepted)
+        untouched['spec']['machines'] = deepcopy(observed['spec']['machines'])
+        problems = validate_workload_successor(
+            observed, untouched, verified_transition=verified,
+            verified_cutover=observed_cutover, plan=selected_plan)
+        self.assertTrue(any('requires a native binding cutover' in p['message']
+                            for p in problems), problems)
+        partial = deepcopy(accepted)
+        partial['spec']['machines'][1] = deepcopy(observed['spec']['machines'][1])
+        partial_cutover = replace(
+            observed_cutover,
+            promotions=tuple(p for p in observed_cutover.promotions if p.machine_id == 'machine-1'))
+        problems = validate_workload_successor(
+            observed, partial, verified_transition=verified,
+            verified_cutover=partial_cutover, plan=selected_plan)
+        self.assertTrue(any('promotion of every workload VM' in p['message']
+                            for p in problems), problems)
+        self.assertEqual(validate_workload_successor(
+            observed, accepted, verified_transition=verified,
+            verified_cutover=observed_cutover, plan=selected_plan), [])
         self.assertEqual(validate_destination_activation(accepted, 'wsd-02'), [])
         self.assertTrue(validate_destination_activation(accepted, 'wsd-01'))
         accepted['spec']['membership']['history'][0]['grantDigest'] = 'c' * 64
-        self.assertTrue(validate_workload_successor(observed, accepted,
-                                                    verified_transition=verified))
+        self.assertTrue(validate_workload_successor(
+            observed, accepted, verified_transition=verified,
+            verified_cutover=observed_cutover, plan=selected_plan))
 
     def test_registered_schema_rejects_a_second_public_request_kind(self):
         self.assertEqual(registry.validate_named(workload(), 'enterprise-record'), [])
