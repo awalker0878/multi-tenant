@@ -17,14 +17,17 @@ def main() -> int:
     migration_dsn = os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']
     runtime_dsn = os.environ['HOSTING_TEST_POSTGRES_RUNTIME_DSN']
     authority_dsn = os.environ.get('HOSTING_TEST_POSTGRES_AUTHORITY_DSN')
+    enrollment_dsn = os.environ.get('HOSTING_TEST_POSTGRES_ENROLLMENT_DSN')
+    directory_resolver_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_RESOLVER_DSN')
+    directory_writer_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN')
     from provisioner.controlplane.persistence.migrate import apply_migrations
 
     with psycopg.connect(admin_dsn, autocommit=True) as connection:
         admin_role = connection.execute('SELECT current_user').fetchone()[0]
         database = connection.execute('SELECT current_database()').fetchone()[0]
-        identities = [migration_dsn, runtime_dsn]
-        if authority_dsn:
-            identities.append(authority_dsn)
+        identities = [dsn for dsn in (
+            migration_dsn, runtime_dsn, authority_dsn, enrollment_dsn,
+            directory_resolver_dsn, directory_writer_dsn) if dsn]
         roles = []
         for dsn in identities:
             settings = conninfo_to_dict(dsn)
@@ -56,6 +59,7 @@ def main() -> int:
             'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.enterprise_records TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.enterprise_record_history TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.audit_events TO {}',
+            'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.native_ownership TO {}',
             'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.operation_jobs, '
             'hosting_controlplane.job_outbox TO {}',
@@ -69,6 +73,8 @@ def main() -> int:
             'GRANT SELECT, INSERT ON hosting_controlplane.worker_grants TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_worker_scope('
             'text, text, text, text, text, text, text, text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_job_scope('
+            'text, text, text) TO {}',
             'GRANT SELECT, INSERT, UPDATE ON '
             'hosting_controlplane.native_operation_leases, '
             'hosting_controlplane.native_operation_intents TO {}',
@@ -80,11 +86,12 @@ def main() -> int:
             'GRANT SELECT, INSERT, UPDATE ON '
             'hosting_controlplane.evidence_streams TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.evidence_entries TO {}',
+            'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
             connection.execute(sql.SQL(statement).format(runtime))
         if authority_dsn:
-            writer = sql.Identifier(roles[2])
+            writer = sql.Identifier(conninfo_to_dict(authority_dsn)['user'])
             for statement in (
                 'GRANT SELECT ON hosting_controlplane.enterprise_records, '
                 'hosting_controlplane.audit_events TO {}',
@@ -93,6 +100,34 @@ def main() -> int:
                 'hosting_controlplane.plan_revocations TO {}',
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
+                'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(writer))
+        if enrollment_dsn:
+            writer = sql.Identifier(conninfo_to_dict(enrollment_dsn)['user'])
+            for statement in (
+                'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.worker_enrollments, '
+                'hosting_controlplane.worker_certificate_versions TO {}',
+                'GRANT INSERT ON hosting_controlplane.worker_capabilities TO {}',
+                'GRANT INSERT ON hosting_controlplane.audit_events TO {}',
+                'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(writer))
+        if directory_resolver_dsn:
+            resolver = sql.Identifier(conninfo_to_dict(directory_resolver_dsn)['user'])
+            connection.execute(sql.SQL('GRANT SELECT ON '
+                'hosting_controlplane.directory_subjects, '
+                'hosting_controlplane.directory_sessions TO {}').format(resolver))
+        if directory_writer_dsn:
+            writer = sql.Identifier(conninfo_to_dict(directory_writer_dsn)['user'])
+            for statement in (
+                'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.directory_subjects TO {}',
+                'GRANT SELECT, INSERT, DELETE ON hosting_controlplane.directory_sessions TO {}',
+                'GRANT INSERT ON hosting_controlplane.directory_sync_events TO {}',
+                'GRANT SELECT, UPDATE ON hosting_controlplane.plan_authority_state TO {}',
+                'GRANT SELECT ON hosting_controlplane.plan_approvals, '
+                'hosting_controlplane.operation_jobs TO {}',
+                'GRANT INSERT ON hosting_controlplane.plan_revocations TO {}',
                 'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
             ):
                 connection.execute(sql.SQL(statement).format(writer))
