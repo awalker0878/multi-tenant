@@ -67,6 +67,8 @@ class VaultIssuerTests(unittest.TestCase):
             roles=(VaultDynamicRole('vault:site-power',
                                     'platform/creds/site-power', self.scope,
                                     'VM_POWER', timedelta(minutes=2)),))
+        # Require the same strict chain rules Python 3.13 enables by default.
+        self.issuer._tls.verify_flags |= ssl.VERIFY_X509_STRICT
 
     def tearDown(self):
         self.server.shutdown()

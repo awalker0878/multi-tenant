@@ -24,6 +24,10 @@ class TestPki:
                    .not_valid_before(now - timedelta(days=1))
                    .not_valid_after(now + timedelta(days=2))
                    .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
+                   .add_extension(x509.SubjectKeyIdentifier.from_public_key(
+                       self.ca_key.public_key()), critical=False)
+                   .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                       self.ca_key.public_key()), critical=False)
                    .add_extension(x509.KeyUsage(digital_signature=True,
                                                 content_commitment=False,
                                                 key_encipherment=False,
@@ -51,6 +55,10 @@ class TestPki:
                    .not_valid_before(now - timedelta(minutes=1))
                    .not_valid_after(now + timedelta(hours=1))
                    .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
+                   .add_extension(x509.SubjectKeyIdentifier.from_public_key(
+                       key.public_key()), critical=False)
+                   .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                       self.ca_key.public_key()), critical=False)
                    .add_extension(x509.KeyUsage(digital_signature=True,
                                                 content_commitment=False,
                                                 key_encipherment=False,
@@ -76,7 +84,10 @@ class TestPki:
         now = datetime.now(timezone.utc)
         builder = (x509.CertificateRevocationListBuilder()
                    .issuer_name(self.name).last_update(now - timedelta(minutes=1))
-                   .next_update(now + timedelta(hours=1)))
+                   .next_update(now + timedelta(hours=1))
+                   .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                       self.ca_key.public_key()), critical=False)
+                   .add_extension(x509.CRLNumber(1), critical=False))
         for serial in serials:
             revoked = (x509.RevokedCertificateBuilder().serial_number(serial)
                        .revocation_date(now - timedelta(seconds=30)).build())

@@ -27,6 +27,8 @@ class WorkerPkiTests(unittest.TestCase):
             server_key=self.pki.root / 'server.key',
             trust_bundle=self.pki.root / 'ca.pem', crl_bundle=self.pki.root / 'crl.pem',
             trust_domain='workers.example')
+        # Match Python 3.13's default strict X.509 verification on older CI.
+        self.verifier.context.verify_flags |= ssl.VERIFY_X509_STRICT
 
     def tearDown(self):
         self.pki.close()
@@ -49,6 +51,7 @@ class WorkerPkiTests(unittest.TestCase):
             thread = threading.Thread(target=serve, daemon=True)
             thread.start()
             client = ssl.create_default_context(cafile=str(self.pki.root / 'ca.pem'))
+            client.verify_flags |= ssl.VERIFY_X509_STRICT
             client.load_cert_chain(str(self.pki.root / (name + '.pem')),
                                    str(self.pki.root / (name + '.key')))
             try:
