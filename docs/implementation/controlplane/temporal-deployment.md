@@ -54,22 +54,30 @@ same approved jurisdiction. A candidate chart/server tuple is chart `1.6.0`,
 server `1.32.0`, Python SDK `1.33.0`; the integration fixture above exercises
 server `1.29.1`, so validate the chosen tuple in an isolated environment before
 adoption. Pin mirrored image digests and chart archive checksums for each
-release. The operator owns schema migrations and rollback order. No embedded
+release. `deploy/temporal/values.onprem.example.yaml` is a renderable candidate
+with private Frontend, external PostgreSQL stores, existing secrets and mTLS;
+it requires site-specific DNS, certificate SANs, database trust roots and
+namespace authorization before installation. The operator owns schema
+migrations and rollback order. No embedded
 auto-setup container or development server belongs in the on-prem deployment.
 
 Required environment variables for the installed runtime:
 
 | Variable | Purpose |
 | --- | --- |
-| `HOSTING_WORKFLOW_POSTGRES_DSN` | Non-superuser, non-BYPASSRLS runtime connection to the product database |
+| `HOSTING_WORKFLOW_POSTGRES_DSN` | Non-superuser, non-BYPASSRLS product database connection; a read-only Activity role in the worker process, a tenant-scoped job writer role in dispatcher/projector processes |
 | `HOSTING_TEMPORAL_ADDRESS`, `HOSTING_TEMPORAL_NAMESPACE`, `HOSTING_TEMPORAL_TASK_QUEUE` | Private Frontend address and a scoped namespace/queue |
 | `HOSTING_TEMPORAL_CA`, `HOSTING_TEMPORAL_CLIENT_CERT`, `HOSTING_TEMPORAL_CLIENT_KEY`, `HOSTING_TEMPORAL_SERVER_NAME` | Verified mTLS for every production RPC |
 | `HOSTING_TEMPORAL_START_RETENTION_SECONDS` | Outbox uncertainty window, strictly less than guaranteed namespace retention |
 | `HOSTING_TEMPORAL_INSECURE_LOOPBACK_TEST=1` | Test-only exception; rejects all non-loopback addresses |
 
-Start the installed runtime as separate supervised processes. Provision one
-dispatcher/projector per authorized tenant context; give the worker only the
-read-only product database role and Temporal task-queue access:
+Start the installed runtime as separate supervised processes with distinct
+database credentials. Provision one dispatcher/projector per authorized tenant
+context. The worker's read-only role needs `SELECT` on scoped jobs, plans,
+approvals and `EXECUTE` on the narrowly scoped `lock_job_scope` and
+`lock_authority_scope` functions; the definer functions lock rows under FORCE
+RLS without giving the worker arbitrary `UPDATE` rights. Grant the worker only
+its Temporal task-queue access:
 
 ```sh
 python -m provisioner.controlplane.workflow.runtime worker

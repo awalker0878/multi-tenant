@@ -16,8 +16,8 @@ from temporalio.client import Client
 from temporalio.worker import Replayer, Worker
 
 from provisioner.controlplane.workflow.admitted_job import (
-    AdmittedMigrationJob, VERIFY_ADMITTED_JOB_ACTIVITY)
-from provisioner.controlplane.workflow.approval_gate import ApprovalCheck, GateInput, GateResult
+    AdmittedInput, AdmittedMigrationJob, VERIFY_ADMITTED_JOB_ACTIVITY)
+from provisioner.controlplane.workflow.approval_gate import ApprovalCheck, GateResult
 from provisioner.controlplane.workflow.temporal_adapter import (
     TemporalConnection, TemporalWorkflowStarter)
 
@@ -62,7 +62,7 @@ async def _recover(address: str, state: Path) -> None:
     calls = []
 
     @activity.defn(name=VERIFY_ADMITTED_JOB_ACTIVITY)
-    async def verify(job: GateInput) -> ApprovalCheck:
+    async def verify(job: AdmittedInput) -> ApprovalCheck:
         calls.append(job.job_id)
         return ApprovalCheck(True, job.job_id, job.organization_id, job.tenant_id,
                              job.plan_id, job.plan_revision, job.plan_digest,

@@ -8,8 +8,8 @@ from temporalio.worker import Replayer, Worker
 
 from provisioner.controlplane.jobs import AdmissionConflict
 from provisioner.controlplane.workflow.admitted_job import (
-    AdmittedMigrationJob, VERIFY_ADMITTED_JOB_ACTIVITY)
-from provisioner.controlplane.workflow.approval_gate import ApprovalCheck, GateInput, GateResult
+    AdmittedInput, AdmittedMigrationJob, VERIFY_ADMITTED_JOB_ACTIVITY)
+from provisioner.controlplane.workflow.approval_gate import ApprovalCheck, GateResult
 from provisioner.controlplane.workflow.temporal_adapter import (
     TemporalConnection, TemporalWorkflowStarter)
 
@@ -54,7 +54,7 @@ class TemporalAdapterTests(unittest.IsolatedAsyncioTestCase):
         calls = []
 
         @activity.defn(name=VERIFY_ADMITTED_JOB_ACTIVITY)
-        async def verify(request: GateInput) -> ApprovalCheck:
+        async def verify(request: AdmittedInput) -> ApprovalCheck:
             calls.append(request)
             return ApprovalCheck(True, request.job_id, request.organization_id,
                                  request.tenant_id, request.plan_id,
