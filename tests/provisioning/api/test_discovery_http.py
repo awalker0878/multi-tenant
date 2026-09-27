@@ -51,6 +51,11 @@ class _Discovery(DiscoveryRepository):
         rows = [row for row in self.generations if row.generation > after]
         return rows[:limit]
 
+    def latest_generation(self, ctx, scope, environment_id):
+        self.scopes.append((ctx, scope, environment_id))
+        return max(self.generations, key=lambda row: row.generation,
+                   default=None)
+
     def list_observations(self, ctx, scope, environment_id, generation,
                           *, after=None, limit=51):
         self.scopes.append((ctx, scope, environment_id))
@@ -124,6 +129,19 @@ class DiscoveryHttpTests(unittest.TestCase):
                                          headers=self.auth('operator')).status_code, 422)
         self.assertEqual(self.client.get(path.replace('/2/', '/3/'),
                                          headers=self.auth('operator')).status_code, 404)
+
+    def test_latest_generation_is_scoped_and_bounded(self):
+        path = '/v1/environments/env-01/discovery/generations/latest'
+        self.assertEqual(self.client.get(path, headers=self.auth('reader')).status_code,
+                         404)
+        current = self.client.get(path, headers=self.auth('operator'))
+        self.assertEqual(current.status_code, 200, current.text)
+        self.assertEqual(current.json()['generation'], 2)
+        self.assertEqual(current.json()['resultDigest'], '2' * 64)
+        self.assertTrue(all(scope == SOURCE_SCOPE for _, scope, _ in self.discovery.scopes))
+        self.discovery.generations = []
+        self.assertEqual(self.client.get(path, headers=self.auth('operator')).status_code,
+                         404)
 
     def test_foreign_backend_row_fails_closed(self):
         self.discovery.foreign = True

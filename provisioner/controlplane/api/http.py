@@ -425,6 +425,22 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             'nextAfter': cursor,
         })
 
+    @app.get('/v1/environments/{environment_id}/discovery/generations/latest',
+             response_model=DiscoveryGenerationView, responses=_ERRORS,
+             tags=['discovery'])
+    def latest_discovery_generation(
+            environment_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            active: _Session = Depends(session)) -> DiscoveryGenerationView:
+        environment = visible_environment(active, environment_id)
+        row = discovery_repository().latest_generation(
+            context(active), environment.scope, environment_id)
+        if row is None:
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+        if row.environment_id != environment_id or row.scope != environment.scope:
+            raise _ApiError(503, 'DISCOVERY_UNAVAILABLE',
+                            'Read-only discovery is unavailable')
+        return _generation_view(row)
+
     @app.get('/v1/environments/{environment_id}/discovery/generations/{generation}/objects',
              response_model=ObservedObjectPage, responses=_ERRORS,
              tags=['discovery'])
