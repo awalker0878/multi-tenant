@@ -36,8 +36,10 @@ import tools
 from provisioner import repository
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
+from provisioner.controlplane.discovery import ahv, model, openstack, routes, vmware, vmware_rest
 
-for module in (provisioner, scripts, tools):
+for module in (provisioner, scripts, tools, ahv, model, openstack,
+               routes, vmware, vmware_rest):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
     'provisioner/schemas/v1/enterprise-record.schema.json',
