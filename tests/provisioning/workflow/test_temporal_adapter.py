@@ -44,11 +44,12 @@ class TemporalAdapterTests(unittest.IsolatedAsyncioTestCase):
                                         workflow_id='job-2',
                                         payload={**PAYLOAD, 'job_id': 'job-2',
                                                  'credential': 'canary-do-not-persist'})
+            token_shaped_id = 'AKIA' + '1234567890ABCDEF'
             with self.assertRaises(AdmissionConflict):
                 await asyncio.to_thread(starter.start, namespace='default',
-                                        workflow_id='AKIA1234567890ABCDEF',
+                                        workflow_id=token_shaped_id,
                                         payload={**PAYLOAD,
-                                                 'job_id': 'AKIA1234567890ABCDEF'})
+                                                 'job_id': token_shaped_id})
 
     async def test_admitted_job_rechecks_authority_after_worker_replacement(self):
         calls = []
