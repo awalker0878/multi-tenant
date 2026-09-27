@@ -23,13 +23,15 @@ from provisioner.controlplane.workflow.temporal_adapter import (
 
 
 async def _ready(address: str) -> None:
+    last_failure = 'no connection attempt'
     for _ in range(60):
         try:
             await Client.connect(address, namespace='default')
             return
-        except Exception:
+        except Exception as exc:
+            last_failure = type(exc).__name__
             await asyncio.sleep(1)
-    raise RuntimeError('Self-hosted Temporal did not become ready')
+    raise RuntimeError(f'Self-hosted Temporal did not become ready ({last_failure})')
 
 
 def _adapter(address: str) -> TemporalWorkflowStarter:

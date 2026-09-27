@@ -38,5 +38,7 @@ volumes:
   temporal_test_db:
 
 networks:
-  temporal_test_private:
-    internal: true
+  # An ordinary project bridge is required for Docker's host-published
+  # loopback port. Production egress restrictions use enclave network policy;
+  # this disposable fixture makes no restricted-egress qualification claim.
+  temporal_test_private: {}

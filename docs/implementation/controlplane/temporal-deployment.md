@@ -21,10 +21,10 @@ uses the runtime database role with enforced RLS and no direct native credential
 ## Disposable persistence and recovery gate
 
 `deploy/temporal/compose.integration.yml` runs self-hosted Temporal Server
-`1.29.1` with PostgreSQL `17.6`, a private container network, persistent test
+`1.29.1` with PostgreSQL `17.6`, a project-local bridge, persistent test
 database volume and a loopback-only Frontend. `auto-setup` initializes schema
 for this **disposable test only**. The UI and database ports are not published.
-It has no TLS, mTLS, authorization, backup or high availability and must never
+It has no egress isolation, TLS, mTLS, authorization, backup or high availability and must never
 be used for workloads or production credentials.
 
 With Python 3.12+ and `pip install -e '.[controlplane]'` in a disposable lab:
