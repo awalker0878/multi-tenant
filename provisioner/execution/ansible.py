@@ -10,9 +10,9 @@ import functools
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import loads
-from provisioner.repository import ROOT
+from provisioner.repository import asset_path
 
-CATALOG_PATH = ROOT / 'ansible' / 'catalog.json'
+CATALOG_PATH = asset_path('ansible/catalog.json')
 CATALOG_FORMAT = 'hosting-ansible-catalog/1'
 PROFILES = ('local', 'native-linux')
 

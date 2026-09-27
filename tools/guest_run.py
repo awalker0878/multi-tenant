@@ -12,6 +12,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
+from provisioner.repository import ASSET_ROOT, asset_path
 from tools.check_release import verify
 from tools.compile_wsd import identity
 from tools.guest_inventory import build, gate
@@ -68,12 +69,16 @@ def runtime_record(python, ssh):
 
 
 def source_paths(root):
-    paths = [root / PLAYBOOK, root / 'scripts/__init__.py', root / 'scripts/build_wsd_compositions.py',
-             root / 'ansible/filter_plugins/guest_filters.py',
-             root / 'ansible/callback_plugins/hosting_guest_result.py']
+    def reviewed(name):
+        return asset_path(name) if root == ROOT else root / name
+
+    paths = [reviewed(PLAYBOOK), root / 'scripts/__init__.py', root / 'scripts/build_wsd_compositions.py',
+             reviewed('ansible/filter_plugins/guest_filters.py'),
+             reviewed('ansible/callback_plugins/hosting_guest_result.py')]
     paths += list((root / 'tools').glob('*.py'))
     for role in ('linux_guest_baseline', 'linux_guest_services', 'linux_guest_backup'):
-        paths += [p for p in (root / 'ansible/roles' / role).rglob('*') if p.is_file()]
+        tasks = reviewed(f'ansible/roles/{role}/tasks/main.yml')
+        paths += [p for p in tasks.parents[1].rglob('*') if p.is_file()]
     return sorted(paths)
 
 
@@ -156,7 +161,8 @@ def prepare(args, root=ROOT):
         (directory / name).mkdir(mode=0o700)
     for path in source_paths(root):
         require(not path.is_symlink(), 'Execution source symlink is unsupported')
-        copied = directory / 'source' / path.relative_to(root)
+        relative = path.relative_to(ASSET_ROOT) if path.is_relative_to(ASSET_ROOT) else path.relative_to(root)
+        copied = directory / 'source' / relative
         copied.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         for parent in copied.parents:
             if parent == directory: break

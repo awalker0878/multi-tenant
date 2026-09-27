@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=80,<85", "wheel>=0.45,<1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hosting-provisioner"
+version = "0.1.0"
+description = "Portable hosting provisioning and workload mobility planning"
+requires-python = ">=3.12"
+dependencies = [
+  "PyYAML==6.0.2",
+  "Jinja2==3.1.6",
+  "dnspython==2.8.0",
+  "cryptography==46.0.4",
+]
+
+[project.scripts]
+hosting = "provisioner.cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["provisioner*", "tools", "scripts"]
+namespaces = false
+
+[tool.setuptools.package-data]
+provisioner = ["inventory/fixtures/*.json", "schemas/v1/*.json", "retired_interfaces.json"]
+
