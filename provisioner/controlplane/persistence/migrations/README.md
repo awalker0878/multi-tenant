@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0014`
+for the migration role. The runner applies packaged migrations `0001`–`0015`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -111,6 +111,10 @@ role. Grant that role `EXECUTE` on this helper and the existing job, authority
 and worker lock helpers; grant `SELECT` only on `operation_jobs`,
 `worker_grants`, `enterprise_records`, `audit_events`, `plan_approvals`, and
 `native_containment_holds`. It must have no DML, DDL or table ownership.
+Migration `0015` restores the worker enrollment, rotation and revocation audit
+actions that `0012` inadvertently omitted from the action constraint. It also
+retains `DIRECTORY_SYNC`, so both histories remain appendable without changing
+the checksum of an already applied migration.
 
 The audit/history trigger forbids UPDATE and DELETE, and the restricted runtime
 role cannot TRUNCATE or change the trigger. Migration `0008` chains every
