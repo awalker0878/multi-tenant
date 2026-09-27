@@ -20,7 +20,7 @@ from provisioner.controlplane.authority.model import PlanScope
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _FIELD = re.compile(r'^[A-Za-z][A-Za-z0-9._:-]{0,127}$')
-_KINDS = frozenset({'vm', 'disk', 'nic', 'volume', 'image', 'network', 'pool',
+_KINDS = frozenset({'vm', 'disk', 'nic', 'volume', 'dataset', 'image', 'network', 'pool',
                     'cluster', 'host', 'datastore', 'quota'})
 _FAMILIES = frozenset({'vmware', 'nutanix', 'openstack'})
 _UNKNOWN_REASONS = frozenset({'MISSING_PRIVILEGE', 'NOT_RETURNED',
