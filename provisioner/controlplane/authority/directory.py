@@ -29,6 +29,7 @@ _PLAN_SCOPE = frozenset({'organizationId', 'tenantId', 'locationId',
                          'securityDomainId', 'endpointId', 'nativeScopeId',
                          'platformFamily'})
 _PORTFOLIO_SCOPE = frozenset({'organizationId', 'tenantId', 'securityDomainId'})
+_SIGNED_PROVENANCE = 'signed-iam-full-subject/1'
 
 
 class DirectorySyncRefused(ValueError):
@@ -95,7 +96,7 @@ def _snapshot(payload: dict, *, issuer: str, audience: str,
             or type(payload['active']) is not bool
             or type(payload['generation']) is not int or payload['generation'] < 1
             or type(payload['issuedAt']) is not int
-            or abs(payload['issuedAt'] - int(now.timestamp())) > 300
+            or not 0 <= int(now.timestamp()) - payload['issuedAt'] <= 300
             or not isinstance(payload['grants'], list)
             or len(payload['grants']) > 100
             or not isinstance(payload['sessions'], list)
@@ -171,7 +172,7 @@ class PostgresRoleDirectory:
                 "SELECT set_config('app.organization_id', %s, true), "
                 "set_config('app.tenant_id', %s, true)", (organization, tenant))
             cursor.execute(
-                'SELECT revision, record_digest, details->>\'stateDigest\' '
+                'SELECT revision, record_digest, details '
                 'FROM hosting_controlplane.audit_events '
                 'WHERE organization_id = %s AND tenant_id = %s '
                 "AND action = 'DIRECTORY_SYNC' AND record_kind = 'DirectorySubject' "
@@ -182,7 +183,16 @@ class PostgresRoleDirectory:
             cursor.execute('SELECT hosting_controlplane.directory_state_digest(%s, %s)',
                            (issuer, subject))
             state_digest = cursor.fetchone()[0]
-            if state_digest is None or marker != (generation, signed_digest, state_digest):
+            # Migration 0012 backfilled a marker for historical materialized
+            # rows without re-verifying the IAM signature. Only a fresh signed
+            # full-subject generation applied by this writer establishes the
+            # post-cutover provenance required to authenticate.
+            trusted_details = {
+                'stateDigest': state_digest,
+                'provenance': _SIGNED_PROVENANCE,
+            }
+            if (state_digest is None or
+                    marker != (generation, signed_digest, trusted_details)):
                 raise AuthenticationFailed('Directory generation lacks a matching audit marker')
         items = json.loads(raw) if isinstance(raw, str) else raw
         if not isinstance(items, list):
@@ -263,6 +273,33 @@ class SignedDirectorySync:
                     return False
                 if prior[2] >= payload['generation']:
                     raise DirectorySyncRefused('IAM snapshot generation was replayed or conflicted')
+                cursor.execute(
+                    'SELECT revision, record_digest, details, occurred_at '
+                    'FROM hosting_controlplane.audit_events '
+                    'WHERE organization_id = %s AND tenant_id = %s '
+                    "AND action = 'DIRECTORY_SYNC' AND record_kind = 'DirectorySubject' "
+                    'AND record_id = %s AND actor_id = %s '
+                    'ORDER BY audit_sequence DESC LIMIT 1',
+                    (payload['organizationId'], payload['tenantId'], subject,
+                     'iam-sync:' + self._issuer))
+                marker = cursor.fetchone()
+                cursor.execute('SELECT hosting_controlplane.directory_state_digest(%s, %s)',
+                               (self._issuer, subject))
+                prior_state_digest = cursor.fetchone()[0]
+                if (marker is None or marker[:2] != (prior[2], prior[3])
+                        or prior_state_digest is None):
+                    raise DirectorySyncRefused('Prior IAM generation lacks its audit binding')
+                legacy_details = {'stateDigest': prior_state_digest}
+                signed_details = dict(legacy_details, provenance=_SIGNED_PROVENANCE)
+                if marker[2] == legacy_details:
+                    # The 0012 backfill attested only old database state. A
+                    # pre-cutover signed snapshot, even of a higher generation,
+                    # cannot authorize this subject after the cutover.
+                    issued_at = datetime.fromtimestamp(payload['issuedAt'], timezone.utc)
+                    if issued_at <= marker[3]:
+                        raise DirectorySyncRefused('IAM snapshot predates directory cutover')
+                elif marker[2] != signed_details:
+                    raise DirectorySyncRefused('Prior IAM materialization differs from audit')
             cursor.execute(
                 'INSERT INTO hosting_controlplane.directory_subjects '
                 '(issuer, subject, organization_id, tenant_id, identity_kind, active, '
@@ -299,7 +336,8 @@ class SignedDirectorySync:
                 (payload['organizationId'], payload['tenantId'],
                  'iam-sync:' + self._issuer, digest, subject,
                  payload['generation'], digest,
-                 json.dumps({'stateDigest': state_digest})))
+                 json.dumps({'stateDigest': state_digest,
+                             'provenance': _SIGNED_PROVENANCE})))
             if prior is not None:
                 cursor.execute(
                     'SELECT plan_id, revocation_epoch FROM '

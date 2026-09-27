@@ -72,6 +72,11 @@ marker, so a selective directory rollback cannot restore an older session.
 Checkpoint and restore the tenant audit
 stream alongside directory state; session IDs and role grants are absent from
 the audit marker.
+Migration 0012 backfills a state marker for historical directory rows, but
+that marker cannot authenticate users. The resolver requires provenance from
+a newly verified, higher-generation signed full-subject IAM update before an
+existing subject can log in after cutover. A replay of the same generation
+does not promote the historical marker.
 
 ## Installed checkpoint runner and mutation hold
 

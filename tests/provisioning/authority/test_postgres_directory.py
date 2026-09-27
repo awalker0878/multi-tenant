@@ -108,6 +108,62 @@ class DirectoryPostgresTests(unittest.TestCase):
         with self.assertRaises(DirectorySyncRefused):
             self.sync.apply(raw + b' ', signature)
 
+    def test_historical_backfill_requires_fresh_signed_generation(self):
+        historical = self.payload()
+        raw, signature = self.signed(historical)
+        digest = hashlib.sha256(raw).hexdigest()
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:
+            owner.execute("SELECT set_config('app.organization_id', %s, true), "
+                          "set_config('app.tenant_id', %s, true)",
+                          (self.ctx.organization_id, self.ctx.tenant_id))
+            owner.execute(
+                'INSERT INTO hosting_controlplane.directory_subjects '
+                '(issuer, subject, organization_id, tenant_id, identity_kind, '
+                'active, grants, generation, signed_digest) VALUES '
+                '(%s, %s, %s, %s, %s, %s, %s::jsonb, %s, %s)',
+                (self.issuer, self.subject, self.ctx.organization_id,
+                 self.ctx.tenant_id, 'HUMAN', True,
+                 json.dumps(historical['grants']), 1, digest))
+            owner.execute(
+                'INSERT INTO hosting_controlplane.directory_sessions '
+                '(issuer, subject, session_id, expires_at) VALUES (%s, %s, %s, %s)',
+                (self.issuer, self.subject, self.session,
+                 datetime.fromtimestamp(historical['sessions'][0]['expiresAt'],
+                                        timezone.utc)))
+            owner.execute(
+                'INSERT INTO hosting_controlplane.directory_sync_events '
+                '(issuer, subject, generation, signed_digest) VALUES (%s, %s, %s, %s)',
+                (self.issuer, self.subject, 1, digest))
+            state_digest = owner.execute(
+                'SELECT hosting_controlplane.directory_state_digest(%s, %s)',
+                (self.issuer, self.subject)).fetchone()[0]
+            owner.execute(
+                'INSERT INTO hosting_controlplane.audit_events '
+                '(organization_id, tenant_id, actor_id, correlation_id, action, '
+                'record_kind, record_id, revision, record_digest, details, occurred_at) VALUES '
+                "(%s, %s, %s, %s, 'DIRECTORY_SYNC', 'DirectorySubject', "
+                '%s, 1, %s, %s::jsonb, %s)',
+                (self.ctx.organization_id, self.ctx.tenant_id,
+                 'iam-sync:' + self.issuer, digest, self.subject, digest,
+                 json.dumps({'stateDigest': state_digest}),
+                 self.now - timedelta(minutes=1)))
+        # The migration's backfilled digest matches current state, yet cannot
+        # attest that the old materialization came from the signed IAM feed.
+        with self.assertRaises(PermissionError):
+            self.directory.resolve(self.issuer, self.subject, self.session)
+        self.assertFalse(self.sync.apply(raw, signature))
+        with self.assertRaises(PermissionError):
+            self.directory.resolve(self.issuer, self.subject, self.session)
+        stale = self.payload(2)
+        stale['issuedAt'] = int((self.now - timedelta(minutes=2)).timestamp())
+        with self.assertRaises(DirectorySyncRefused):
+            self.sync.apply(*self.signed(stale))
+        with self.assertRaises(PermissionError):
+            self.directory.resolve(self.issuer, self.subject, self.session)
+        self.assertTrue(self.sync.apply(*self.signed(self.payload(2))))
+        self.assertEqual([grant.role for grant in self.directory.resolve(
+            self.issuer, self.subject, self.session).grants], ['SOURCE_OWNER'])
+
     def test_role_generation_invalidates_existing_plan_authority(self):
         self.sync.apply(*self.signed(self.payload()))
         w, p = deepcopy(workload()), deepcopy(plan())
@@ -179,8 +235,10 @@ class DirectoryPostgresTests(unittest.TestCase):
         self.assertEqual([(row[0], row[1]) for row in audit_rows], [
             (1, hashlib.sha256(first).hexdigest()),
             (2, hashlib.sha256(second).hexdigest())])
-        self.assertTrue(all(len(json.loads(row[2])['stateDigest']) == 64
-                            for row in audit_rows))
+        self.assertTrue(all(
+            len(json.loads(row[2])['stateDigest']) == 64 and
+            json.loads(row[2])['provenance'] == 'signed-iam-full-subject/1'
+            for row in audit_rows))
         self.assertNotIn(self.session, repr(audit_rows))
 
         # Changing another session invalidates this otherwise valid session:

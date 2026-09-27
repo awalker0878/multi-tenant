@@ -10,7 +10,9 @@ ALTER TABLE hosting_controlplane.audit_events
     DROP CONSTRAINT audit_events_action_check,
     ADD CONSTRAINT audit_events_action_check CHECK (action IN
         ('RECORD_CREATE', 'RECORD_UPDATE', 'LEASE_ACQUIRE',
-         'LEASE_RENEW', 'LEASE_RELEASE', 'DIRECTORY_SYNC'));
+         'LEASE_RENEW', 'LEASE_RELEASE', 'WORKER_CERT_ENROLL',
+         'WORKER_CERT_ROTATE', 'WORKER_CERT_REVOKE', 'WORKER_REVOKE',
+         'DIRECTORY_SYNC'));
 CREATE INDEX audit_directory_latest
     ON hosting_controlplane.audit_events
     (organization_id, tenant_id, actor_id, record_id, audit_sequence DESC)

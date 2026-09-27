@@ -37,6 +37,9 @@ GRANT SELECT ON hosting_controlplane.plan_authority_state,
 GRANT EXECUTE ON FUNCTION
     hosting_controlplane.lock_authority_scope(text, text, text)
     TO hosting_runtime;
+GRANT EXECUTE ON FUNCTION
+    hosting_controlplane.lock_native_worker_scope(text, text, text)
+    TO hosting_runtime;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane
     TO hosting_runtime;
 -- Provision a separate authority writer for approval and revocation DML.
@@ -67,7 +70,7 @@ is never shared with a request/user credential. Its lookup must be global
 because tenant identity is not known until that lookup succeeds. Provision a
 separate IAM sync writer with `SELECT, INSERT, UPDATE` on
 `directory_subjects`, `SELECT, INSERT, DELETE` on `directory_sessions`,
-`INSERT` on `directory_sync_events` and tenant-scoped `audit_events`,
+`INSERT` on `directory_sync_events`, `SELECT, INSERT` on tenant-scoped `audit_events`,
 `EXECUTE` on `directory_state_digest(text, text)`, and sequence usage. To invalidate active
 plan authority in the same transaction, it also needs `SELECT, UPDATE` on
 `plan_authority_state`, `SELECT` on `plan_approvals` and `operation_jobs`, and
@@ -88,6 +91,19 @@ restore or edit of mutable directory state. Audit chain checkpointing
 further detects a stale whole-database prefix. Deploy the migration and
 corresponding resolver/writer together; checkpoint the new audit suffix
 before releasing the site under its configured lag policy.
+The backfilled marker does not establish that a pre-cutover materialized row
+was genuinely sourced from IAM. The resolver accepts only a marker bearing
+the provenance emitted by the post-cutover signature-verifying writer. For
+each existing subject, the IAM connector must send a fresh, signed, full
+subject snapshot with a generation higher than the stored one. Replaying an
+identical old generation leaves the subject held. Keep authentication held for
+unrefreshed subjects; checkpoint the resulting audit suffix before site
+release. This cutover cannot be satisfied by a database edit or by marking
+the 0012 backfill as trusted.
+The signed `issuedAt` must also be later than the backfill marker's
+`occurred_at`; signed snapshots generated before cutover are rejected even if
+their generation is higher. IAM connector clocks must not issue future-dated
+snapshots, and its timestamp has whole-second precision.
 
 Migration 0010 records the namespace, first external start time, configured
 history deadline, payload digest, and accepted run ID. The dispatcher commits
@@ -111,10 +127,14 @@ role. Grant that role `EXECUTE` on this helper and the existing job, authority
 and worker lock helpers; grant `SELECT` only on `operation_jobs`,
 `worker_grants`, `enterprise_records`, `audit_events`, `plan_approvals`, and
 `native_containment_holds`. It must have no DML, DDL or table ownership.
-Migration `0015` restores the worker enrollment, rotation and revocation audit
-actions that `0012` inadvertently omitted from the action constraint. It also
-retains `DIRECTORY_SYNC`, so both histories remain appendable without changing
-the checksum of an already applied migration.
+Migration `0012` preserves all four worker certificate/revocation actions from
+`0007` while adding `DIRECTORY_SYNC`; the isolated upgrade test seeds worker
+audit history before applying `0012` onward. Migration `0015` reasserts this
+same allowlist for draft preview databases that already applied the earlier
+`0012` bytes. Since this branch is unreleased and migration checksums are
+enforced, any disposable preview database with the old `0012` checksum must
+be rebuilt from a fresh bootstrap before using this revision. Do not rewrite
+its ledger or add a runtime compatibility path.
 
 The audit/history trigger forbids UPDATE and DELETE, and the restricted runtime
 role cannot TRUNCATE or change the trigger. Migration `0008` chains every
