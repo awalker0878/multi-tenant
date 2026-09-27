@@ -75,16 +75,27 @@ class JobPostgresTest(unittest.TestCase):
 
     def setUp(self):
         self.key_prefix = uuid4().hex[:12]
-        selected = deepcopy(plan())
-        observed = deepcopy(workload())
+        # Outbox claims are tenant scoped. Give each test its own tenant so an
+        # unfinished intent from an earlier test cannot be claimed here.
+        organization_id = 'org-' + self.key_prefix
+        tenant_id = 'tenant-' + self.key_prefix
+        def scoped(value):
+            if isinstance(value, dict):
+                return {key: scoped(item) for key, item in value.items()}
+            if isinstance(value, list):
+                return [scoped(item) for item in value]
+            return {'org-01': organization_id,
+                    'tenant-01': tenant_id}.get(value, value) if isinstance(value, str) else value
+        selected = scoped(deepcopy(plan()))
+        observed = scoped(deepcopy(workload()))
         observed['metadata']['workloadId'] = 'job-workload-' + uuid4().hex
         selected['spec']['workloadId'] = observed['metadata']['workloadId']
         selected['metadata']['planId'] = 'job-plan-' + uuid4().hex
         selected['metadata']['planDigest'] = plan_digest(selected)
         self.selected = selected
         self.observed = observed
-        self.tenant = TenantContext('org-01', 'tenant-01')
-        self.foreign = TenantContext('org-01', 'tenant-foreign')
+        self.tenant = TenantContext(organization_id, tenant_id)
+        self.foreign = TenantContext(organization_id, 'tenant-foreign')
         frozen = FrozenPlan.from_record(selected, author_subject='plan-author')
         self.frozen = frozen
         now = datetime.now(timezone.utc)
