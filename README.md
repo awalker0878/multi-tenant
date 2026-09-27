@@ -1,6 +1,6 @@
 # Enterprise Workload Mobility and Secure Hosting
 
-Infrastructure architecture and implementation workspace for an enterprise product that will discover, assess, provision and migrate workloads between qualified on-premises environments. This repository is public; actual inventories, credentials, plans, state and native evidence belong in private operator systems. The executable product is under development; the current public CLI cannot perform an end-to-end provisioning or migration job.
+Infrastructure architecture and implementation workspace for an enterprise product that will discover, assess, provision and migrate workloads between qualified on-premises environments. Actual inventories, credentials, plans, state and native evidence belong in private operator systems. The executable product is under development; the current CLI cannot perform an end-to-end provisioning or migration job.
 
 ## Read the architecture and engineering in Git
 
