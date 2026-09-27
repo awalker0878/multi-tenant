@@ -50,7 +50,8 @@ def _settings() -> TemporalConnection:
 
 
 def _connect():
-    return psycopg.connect(_required('HOSTING_WORKFLOW_POSTGRES_DSN'))
+    return psycopg.connect(_required('HOSTING_WORKFLOW_POSTGRES_DSN'),
+                           connect_timeout=5)
 
 
 async def _worker(settings: TemporalConnection) -> None:

@@ -1,11 +1,23 @@
 """The B08 gate must never report a workload migrated."""
 import unittest
+from unittest.mock import patch, sentinel
 from types import SimpleNamespace
 
 from provisioner.controlplane.jobs import StartReceipt
 from provisioner.controlplane.persistence import TenantContext
 from provisioner.controlplane.workflow.approval_gate import GateResult
-from provisioner.controlplane.workflow.runtime import project_one
+from provisioner.controlplane.workflow.runtime import _connect, project_one
+
+
+class RuntimeConnectionTests(unittest.TestCase):
+    def test_postgres_connection_has_bounded_timeout(self):
+        with patch.dict('os.environ', {'HOSTING_WORKFLOW_POSTGRES_DSN':
+                                      'postgresql://runtime@db.example/control'}):
+            with patch('provisioner.controlplane.workflow.runtime.psycopg.connect',
+                       return_value=sentinel.connection) as connect:
+                self.assertIs(_connect(), sentinel.connection)
+        connect.assert_called_once_with(
+            'postgresql://runtime@db.example/control', connect_timeout=5)
 
 
 class GateProjectionTests(unittest.TestCase):
