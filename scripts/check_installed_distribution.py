@@ -72,6 +72,9 @@ assert any(e.name == 'hosting-operator' and e.value == 'provisioner.cli.operator
            for e in distribution.entry_points)
 assert any(e.name == 'hosting-api' and e.value == 'provisioner.controlplane.api.server:main'
            for e in distribution.entry_points)
+assert any(e.name == 'hosting-evidence' and
+           e.value == 'provisioner.controlplane.evidence.runtime:main'
+           for e in distribution.entry_points)
 
 result = main(['plan', str(request)])
 for name, module in sys.modules.items():
