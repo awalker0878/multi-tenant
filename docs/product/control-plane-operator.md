@@ -21,7 +21,7 @@ Provide the following settings through a secret manager or protected process env
 
 The human role directory is fed by signed, bounded IAM snapshots using a separately credentialed writer. A JWT alone never establishes tenant membership or a grant. The API queries current enrollment/session/grants on each request. The issuer must provide RS256 `at+jwt` access tokens with the required audience and claims as specified in the [OIDC verifier](../../provisioner/controlplane/authority/oidc.py).
 
-Run `hosting-api` behind a dedicated HTTPS reverse proxy on the same host. The proxy must set the external `Host` and overwrite `X-Forwarded-Proto`; the service trusts forwarded headers only from loopback. Apply a matching ingress request-size limit. The service does not start if any required identity or database configuration is absent.
+Run `hosting-api` behind a dedicated HTTPS reverse proxy on the same host. The proxy must set the external `Host` and overwrite `X-Forwarded-Proto`; the service trusts forwarded headers only from loopback. Apply a matching ingress request-size limit. The service requires identity, database and independently retained evidence configuration from [the checkpoint runner guide](../../provisioner/controlplane/evidence/README.md). Drafts, approvals and job submissions return `EVIDENCE_HOLD` if the signed tenant state cannot be verified; revocation remains available during an evidence incident.
 
 To enable the portal, additionally set the five required portal settings below. Its redirect URI is exactly `<HOSTING_PORTAL_ORIGIN>/portal/callback`; register that HTTPS URI as an OIDC public client using Authorization Code, PKCE S256 and `form_post`. With these settings absent, `/portal/` is unavailable.
 

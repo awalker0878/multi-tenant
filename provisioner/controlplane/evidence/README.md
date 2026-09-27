@@ -30,9 +30,9 @@ API parameters. Validate retention and restore behavior with the chosen
 on-prem endpoint and a separate custodian before enabling a site.
 
 `VaultTransitSigner` and `VaultTransitVerifier` use a separately administered
-HTTPS Vault Transit sign/verify API. The client takes a short-lived token
-provider, an explicit TLS trust context, and a bounded timeout. The signer
-does not read the private key; the verifier has a trust map from stable key
+HTTPS Vault Transit sign/verify API. The clients take separate short-lived
+token providers, an explicit TLS trust context, and a bounded timeout. The
+signer does not read the private key; the verifier has a trust map from stable key
 labels to Transit mount/key names and rejects removed labels. Give signing
 and verification separate Vault policies and tokens. Vault key rotation
 preserves old signature versions only while policy permits verification;
@@ -65,6 +65,63 @@ operator can alter the suffix; set the maximum acceptable lag in site policy
 and hold mutation on a missed threshold. On database restore, keep the site
 observation-only until both audit and evidence streams verify against their
 independent checkpoint stores; a stale prefix cannot be accepted.
+
+## Installed checkpoint runner and mutation hold
+
+Install the `controlplane` extra and run `hosting-evidence` with a dedicated,
+non-superuser PostgreSQL runtime role. It has four modes:
+
+```sh
+hosting-evidence inspect --organization-id org-a --tenant-id tenant-a
+hosting-evidence enroll --organization-id org-a --tenant-id tenant-a \
+  --expected-audit-sequence 0 --expected-audit-head <64-character-attested-head>
+hosting-evidence verify --organization-id org-a --tenant-id tenant-a
+hosting-evidence checkpoint --organization-id org-a --tenant-id tenant-a
+hosting-evidence run --organization-id org-a --tenant-id tenant-a --interval-seconds 10
+```
+
+Before first enrollment, an operator independently compares
+`inspect_baseline()` with an approved pre-enrollment export. An existing
+tenant's sequence may be nonzero. The runner never silently enrolls a missing
+checkpoint. Run one supervised `run` process per authorized tenant. Failure
+exits nonzero so the supervisor alerts; a repaired service resumes by
+checking the existing signed prefix. Keep the runner separate from the API
+and rotate its scoped Vault/S3 credentials through protected agent files.
+
+The installed `hosting-api` requires all settings below plus a protected JSON
+scope inventory file, such as
+`[{"organizationId":"org-a","tenantId":"tenant-a"}]`. It verifies every
+listed scope at startup. Every authenticated tenant mutation also verifies
+its own scope, including a newly enrolled tenant absent from the startup
+inventory. The API refuses new workload drafts, approvals and job admission
+with `EVIDENCE_HOLD` (503) when a signature, retained object, database chain or
+configured lag cannot be proven. Approval revocation remains available to
+remove authority during an incident. Installed Temporal dispatcher and
+projector modes require the same gate and hold their job mutations; a claimed
+outbox lease can expire and retry after repair without starting a workflow.
+
+| Environment variable | Required value |
+| --- | --- |
+| `HOSTING_RUNTIME_DSN` | Product runtime PostgreSQL DSN with `sslmode=verify-full`; the workflow dispatcher/projector also sets identical `HOSTING_WORKFLOW_POSTGRES_DSN` |
+| `HOSTING_EVIDENCE_S3_ENDPOINT`, `HOSTING_EVIDENCE_S3_REGION`, `HOSTING_EVIDENCE_S3_CA` | Approved HTTPS S3-compatible Object Lock endpoint, region and CA file |
+| `HOSTING_EVIDENCE_S3_ACCESS_KEY_ID`, `HOSTING_EVIDENCE_S3_SECRET_FILE` | Scoped key ID and private 0600 secret file; no secret in a URL |
+| `HOSTING_EVIDENCE_ARTIFACT_BUCKET`, `HOSTING_EVIDENCE_CHECKPOINT_BUCKET` | Separate retained artifact and independently administered checkpoint buckets |
+| `HOSTING_EVIDENCE_RETENTION_DAYS`, `HOSTING_EVIDENCE_MAX_UNANCHORED_COUNT` | Site retention and maximum permitted unsigned suffix; zero requires checkpointing between audited writes |
+| `HOSTING_EVIDENCE_VAULT_URL`, `HOSTING_EVIDENCE_VAULT_CA`, `HOSTING_EVIDENCE_VAULT_VERIFY_TOKEN_FILE` | HTTPS Transit endpoint, CA and private 0600 verification Agent token file |
+| `HOSTING_EVIDENCE_VAULT_SIGN_TOKEN_FILE` | Runner only: separate private 0600 signing Agent token file; omit from API, dispatcher and projector |
+| `HOSTING_EVIDENCE_VAULT_MOUNT`, `HOSTING_EVIDENCE_VAULT_KEY`, `HOSTING_EVIDENCE_VAULT_KEY_ID` | Exact Transit sign key and stable trust label |
+| `HOSTING_EVIDENCE_VAULT_TRUST_JSON` | Explicit trust mapping, e.g. `{"evidence-2026":["transit","checkpoints"]}`; retain older labels until their checkpoint horizon or deliberately hold revoked streams |
+| `HOSTING_EVIDENCE_SCOPES_FILE` | API startup inventory only; owner-protected JSON array of tenant scopes |
+| `HOSTING_EVIDENCE_S3_PREFIX`, `HOSTING_EVIDENCE_S3_KMS_KEY_ID` | Optional namespace prefix and storage encryption key |
+
+The product runtime role needs the existing evidence stream/entry grants and
+`SELECT` on `audit_streams` and `audit_events`. The checkpoint process needs
+the same evidence DML for first-use enrollment. The API and projector perform
+full chain and retained artifact verification at each gated mutation. This is
+deliberately conservative but can become expensive with large tenant audit
+histories: benchmark it against the site portfolio and retain the hold if
+verification exceeds its SLO. A future authenticated incremental index may
+optimize reads only after preserving the independent full verification gate.
 
 The JSON input guard refuses credential-shaped field names, URLs, long text,
 and common secret-like values. It cannot prove arbitrary free text is

@@ -42,6 +42,13 @@ The first process starts a job without a worker. The server restarts while
 PostgreSQL stays up. A second process rejects a duplicate start unless the
 exact retained run binding matches, starts a new worker, receives the queued
 task, checks one approval Activity, reads the pinned result and replays history.
+The CI `temporal_recovery` job also runs `postgres_temporal_gate` with a separate
+disposable product PostgreSQL service and its restricted roles. It commits an
+approved job and outbox attempt, starts the workflow, then exits before the
+outbox acknowledgement. After the Temporal restart, a fresh dispatcher
+reconciles the original run ID, the Activity rechecks live PostgreSQL
+authority, and the projector records one held outcome. This crosses the
+database/engine failure boundary without enabling a native side effect.
 The SDK local tests also cover a waiting approval Signal, timer expiry, scope
 rejection and worker replacement. These checks do not exercise PostgreSQL
 restore, actual versioned worker deployments or an offline image mirror.
@@ -70,6 +77,13 @@ Required environment variables for the installed runtime:
 | `HOSTING_TEMPORAL_CA`, `HOSTING_TEMPORAL_CLIENT_CERT`, `HOSTING_TEMPORAL_CLIENT_KEY`, `HOSTING_TEMPORAL_SERVER_NAME` | Verified mTLS for every production RPC |
 | `HOSTING_TEMPORAL_START_RETENTION_SECONDS` | Outbox uncertainty window, strictly less than guaranteed namespace retention |
 | `HOSTING_TEMPORAL_INSECURE_LOOPBACK_TEST=1` | Test-only exception; rejects all non-loopback addresses |
+
+Dispatcher and projector modes also require the independently configured B13
+evidence gate from `provisioner/controlplane/evidence/README.md`.
+`HOSTING_RUNTIME_DSN` must be identical to `HOSTING_WORKFLOW_POSTGRES_DSN` in
+these processes. At startup and before mutations, they verify the tenant's
+signed audit and artifact streams and enforce the configured maximum unsigned
+suffix. The worker's read-only Activity mode does not itself write a job event.
 
 Start the installed runtime as separate supervised processes with distinct
 database credentials. Provision one dispatcher/projector per authorized tenant
