@@ -21,6 +21,7 @@ def main() -> int:
     directory_resolver_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_RESOLVER_DSN')
     directory_writer_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN')
     site_worker_dsn = os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN')
+    discovery_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DISCOVERY_DSN')
     from provisioner.controlplane.persistence.migrate import apply_migrations
 
     with psycopg.connect(admin_dsn, autocommit=True) as connection:
@@ -33,7 +34,8 @@ def main() -> int:
                 'CREATE ROLE hosting_site_worker_roles NOLOGIN NOSUPERUSER NOBYPASSRLS')
         identities = [dsn for dsn in (
             migration_dsn, runtime_dsn, authority_dsn, enrollment_dsn,
-            directory_resolver_dsn, directory_writer_dsn, site_worker_dsn) if dsn]
+            directory_resolver_dsn, directory_writer_dsn, site_worker_dsn,
+            discovery_dsn) if dsn]
         roles = []
         for dsn in identities:
             settings = conninfo_to_dict(dsn)
@@ -97,6 +99,10 @@ def main() -> int:
             'hosting_controlplane.evidence_streams TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.evidence_entries TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.environment_registrations TO {}',
+            'GRANT SELECT ON hosting_controlplane.discovery_campaigns, '
+            'hosting_controlplane.discovery_generations, '
+            'hosting_controlplane.discovery_observations, '
+            'hosting_controlplane.discovery_absence_candidates TO {}',
             'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
@@ -168,6 +174,17 @@ def main() -> int:
                 'hosting_controlplane.lock_native_worker_scope(text, text, text) TO {}',
             ):
                 connection.execute(sql.SQL(statement).format(worker))
+        if discovery_dsn:
+            ingest = sql.Identifier(conninfo_to_dict(discovery_dsn)['user'])
+            for statement in (
+                'GRANT SELECT ON hosting_controlplane.environment_registrations TO {}',
+                'GRANT INSERT ON hosting_controlplane.audit_events TO {}',
+                'GRANT SELECT, INSERT ON hosting_controlplane.discovery_campaigns, '
+                'hosting_controlplane.discovery_generations, '
+                'hosting_controlplane.discovery_observations, '
+                'hosting_controlplane.discovery_absence_candidates TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(ingest))
     print('PostgreSQL control-plane test roles and grants are ready')
     return 0
 
