@@ -10,7 +10,7 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 
 from provisioner.controlplane.api.portal import PortalConfig
-from provisioner.controlplane.api.server import ServiceSettings, create_postgres_app
+from provisioner.controlplane.api.server import ServiceSettings, create_postgres_app, main
 from tests.provisioning.evidence.test_runtime import environment as evidence_environment
 
 
@@ -34,6 +34,16 @@ class _VerifiedEvidence:
 
 
 class ServerCompositionTests(unittest.TestCase):
+    def test_unreadable_evidence_startup_file_does_not_reveal_its_path(self):
+        with (patch('provisioner.controlplane.api.server.ServiceSettings.from_environment',
+                    return_value=settings()),
+              patch('provisioner.controlplane.api.server.create_postgres_app',
+                    side_effect=FileNotFoundError('/private/evidence/scopes.json'))):
+            with self.assertRaises(SystemExit) as caught:
+                main()
+        self.assertEqual(str(caught.exception),
+                         'Control API configuration or database authority is unavailable')
+
     def test_installed_settings_require_evidence_and_startup_checks_scopes(self):
         values = evidence_environment() | {
             'HOSTING_AUTHORITY_DSN': settings().authority_dsn,

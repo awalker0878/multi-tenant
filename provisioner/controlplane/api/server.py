@@ -182,7 +182,7 @@ def main() -> int:
     try:
         settings = ServiceSettings.from_environment()
         app = create_postgres_app(settings)
-    except (ValueError, RuntimeError, EvidenceHold, psycopg.Error):
+    except (ValueError, RuntimeError, OSError, EvidenceHold, psycopg.Error):
         # DSNs and OIDC values must never be echoed in startup failures.
         raise SystemExit('Control API configuration or database authority is unavailable') from None
     uvicorn.run(app, host=settings.listen_host, port=settings.listen_port,
