@@ -159,8 +159,13 @@ class PostgresWorkerGrants:
     @staticmethod
     def _job(cursor, context: TenantContext, job_id: str):
         cursor.execute(
+            'SELECT hosting_controlplane.lock_job_scope(%s, %s, %s)',
+            (context.organization_id, context.tenant_id, job_id))
+        if cursor.fetchone() != (True,):
+            raise GrantDenied('Job is unavailable in the worker tenant')
+        cursor.execute(
             f'SELECT {_JOB_SELECT} FROM hosting_controlplane.operation_jobs '
-            'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s FOR SHARE',
+            'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s',
             (context.organization_id, context.tenant_id, job_id))
         row = cursor.fetchone()
         if row is None:
@@ -347,8 +352,8 @@ class PostgresWorkerGrants:
                       lease_key: str, lease_epoch: int) -> WorkerGrant:
         """B11 may call under its transaction before recording an intent.
 
-        This method is intentionally conservative until B11 wires its lease
-        authority: a missing source is an exception at construction time.
+        Construction requires B11's lease authority. The caller owns the
+        transaction, including the native intent write and all row locks.
         """
         def capture(_reference: str, grant: WorkerGrant, _expiry: datetime):
             return grant

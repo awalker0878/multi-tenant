@@ -272,9 +272,11 @@ class NativeLeaseAuthority:
         cursor.execute(
             'SELECT job_id, operation_id, platform_family, endpoint_id, '
             'native_scope_id, resource_kind, native_id, site_id, '
-            'security_domain_id, worker_id, owner_epoch, expires_at '
-            'FROM hosting_controlplane.native_operation_leases WHERE '
-            'organization_id = %s AND tenant_id = %s AND lease_key = %s FOR SHARE',
+            'security_domain_id, worker_id, owner_epoch, expires_at, '
+            'owner_organization_id, owner_tenant_id, '
+            'owner_security_domain_id, owner_worker_id, '
+            'owner_lease_epoch, owner_lease_expires_at '
+            'FROM hosting_controlplane.lock_native_worker_scope(%s, %s, %s)',
             (context.organization_id, context.tenant_id, lease_key))
         row = cursor.fetchone()
         if row is None:
@@ -286,16 +288,10 @@ class NativeLeaseAuthority:
                 job_id, operation_id, scope.site_id, worker_subject,
                 lease_epoch) or row[11] <= now:
             raise OperationConflict('Operation lease expired or belongs to another worker')
-        cursor.execute(
-            'SELECT organization_id, tenant_id, security_domain_id, worker_id, '
-            'lease_epoch, lease_expires_at FROM hosting_controlplane.native_ownership '
-            'WHERE platform_family = %s AND endpoint_id = %s AND native_scope_id = %s '
-            'AND resource_kind = %s AND native_id = %s FOR SHARE', binding.key())
-        owner = cursor.fetchone()
-        if (owner is None or tuple(owner[:5]) !=
+        if (tuple(row[12:17]) !=
                 (context.organization_id, context.tenant_id,
                  scope.security_domain_id, worker_subject, lease_epoch)
-                or owner[5] is None or owner[5] <= now):
+                or row[17] is None or row[17] <= now):
             raise OperationConflict('Native owner is stale or held by another worker')
         NativeOperationRegistry._containment(cursor, binding)
 
@@ -579,7 +575,6 @@ class NativeOperationRegistry:
             proposed = _row(previous)
             _scope(ctx, scope, proposed.binding, proposed.security_domain_id)
             now = self._clock(cursor)
-            actor = _identity(principal, EXECUTION_OPERATOR, scope, now)
             # The owner lock serializes review with containment and owner
             # transitions. An expired cooperative lease is not itself a fence.
             lease = OwnerLease(proposed.binding, ctx.organization_id, ctx.tenant_id,
@@ -594,6 +589,7 @@ class NativeOperationRegistry:
             if op.state not in ('IN_FLIGHT', 'TASK_ACCEPTED', 'UNCERTAIN'):
                 raise RecoveryHeld('Operation cannot be resolved from this state')
             now = self._clock(cursor)
+            actor = _identity(principal, EXECUTION_OPERATOR, scope, now)
             if not _fresh(exclusion.observed_at, now):
                 raise RecoveryHeld('Fresh worker exclusion evidence is required')
             self._evidence.verify_owner_exclusion(cursor, lease, scope, exclusion)
