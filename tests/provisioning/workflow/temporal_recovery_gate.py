@@ -8,10 +8,13 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+from datetime import timedelta
 from pathlib import Path
 from uuid import uuid4
 
 from temporalio import activity
+from temporalio.api.enums.v1 import NamespaceState
+from temporalio.api.workflowservice.v1 import DescribeNamespaceRequest
 from temporalio.client import Client
 from temporalio.worker import Replayer, Worker
 
@@ -24,13 +27,20 @@ from provisioner.controlplane.workflow.temporal_adapter import (
 
 async def _ready(address: str) -> None:
     last_failure = 'no connection attempt'
-    for _ in range(60):
+    for _ in range(90):
         try:
-            await Client.connect(address, namespace='default')
-            return
+            client = await Client.connect(address, namespace='default')
+            description = await client.workflow_service.describe_namespace(
+                DescribeNamespaceRequest(namespace='default'),
+                timeout=timedelta(seconds=2))
+            if (description.namespace_info.name == 'default'
+                    and description.namespace_info.state ==
+                    NamespaceState.NAMESPACE_STATE_REGISTERED):
+                return
+            last_failure = 'namespace is not registered'
         except Exception as exc:
             last_failure = type(exc).__name__
-            await asyncio.sleep(1)
+        await asyncio.sleep(1)
     raise RuntimeError(f'Self-hosted Temporal did not become ready ({last_failure})')
 
 

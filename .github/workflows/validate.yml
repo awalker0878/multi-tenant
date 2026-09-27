@@ -71,6 +71,10 @@ jobs:
           python -m unittest discover -s tests/provisioning/reconciliation -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/evidence -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/workflow -p 'test_*.py' -v
+      - name: Validate the packaged portal browser flow
+        run: |
+          node --check provisioner/controlplane/api/portal/app.js
+          node --test tests/provisioning/api/test_portal_ui.js
       - name: Restore control-plane state into an observation-only database
         run: python -m tests.provisioning.controlplane.restore_gate
   temporal_recovery:
