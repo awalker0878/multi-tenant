@@ -21,7 +21,7 @@ from uuid import UUID
 
 from provisioner.controlplane.authority.model import PlanScope
 
-from .model import (DiscoveryCampaignAuthorization, DiscoveryFact,
+from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact,
                     DiscoveryObject, DiscoveryPage, NativeIdentity,
                     assemble_discovery_result)
 

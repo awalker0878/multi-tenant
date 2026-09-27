@@ -36,9 +36,10 @@ import tools
 from provisioner import repository
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
-from provisioner.controlplane.discovery import (adoption, ahv, assessment, grouping,
-                                                 model, openstack, persistence, routes,
-                                                 vmware, vmware_rest)
+from provisioner.controlplane.discovery import (adoption, assessment, grouping,
+                                                 model, persistence, routes)
+from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
+                                                          vmware_rest)
 
 for module in (provisioner, scripts, tools, adoption, ahv, assessment, grouping,
                model, openstack, persistence, routes, vmware, vmware_rest):

@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.discovery.model import (
     DiscoveryCampaignAuthorization, assemble_discovery_result)
-from provisioner.controlplane.discovery.openstack import (
+from provisioner.controlplane.discovery.adapters.openstack import (
     OpenStackDiscoveryHeld, OpenStackHTTPError, OpenStackServiceEndpoints,
     collect_openstack_project)
 

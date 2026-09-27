@@ -5,8 +5,8 @@ from dataclasses import replace
 import unittest
 
 from provisioner.controlplane.authority.model import PlanScope
-from provisioner.controlplane.discovery.vmware import EnumerationHeld
-from provisioner.controlplane.discovery.vmware_rest import (
+from provisioner.controlplane.discovery.adapters.vmware import EnumerationHeld
+from provisioner.controlplane.discovery.adapters.vmware_rest import (
     FolderSelection, RestResponse, enumerate_visible_vms,
 )
 

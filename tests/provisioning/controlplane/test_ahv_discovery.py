@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
 from provisioner.controlplane.authority.model import PlanScope
-from provisioner.controlplane.discovery.ahv import (API_VERSION, COLLECTOR_ID,
+from provisioner.controlplane.discovery.adapters.ahv import (API_VERSION, COLLECTOR_ID,
                                                    VM_PATH, collect_ahv_vms)
 from provisioner.controlplane.discovery.model import (
     DiscoveryCampaignAuthorization, assemble_discovery_result)

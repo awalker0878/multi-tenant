@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from provisioner.controlplane.authority.model import PlanScope
-from provisioner.controlplane.discovery.vmware import (
+from provisioner.controlplane.discovery.adapters.vmware import (
     EnumerationHeld, VmPage, VmSummary, compare_generations, enumerate_vms,
 )
 
@@ -120,7 +120,7 @@ class VMwareEnumerationTests(unittest.TestCase):
 
     def test_deadline_after_slow_reader_holds_instead_of_publishing(self):
         fetch, _ = reader(VmPage(SCOPE, None, (VM1,), None, 1))
-        with patch('provisioner.controlplane.discovery.vmware.time.monotonic',
+        with patch('provisioner.controlplane.discovery.adapters.vmware.time.monotonic',
                    side_effect=(0, 2)):
             with self.assertRaisesRegex(EnumerationHeld, 'deadline'):
                 enumerate_vms(SCOPE, fetch, max_seconds=1)

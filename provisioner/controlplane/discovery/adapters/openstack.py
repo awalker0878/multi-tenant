@@ -22,7 +22,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from provisioner.controlplane.authority.model import PlanScope
 
-from .model import (DiscoveryCampaignAuthorization, DiscoveryFact, DiscoveryObject,
+from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact, DiscoveryObject,
                     DiscoveryPage, NativeIdentity)
 
 
