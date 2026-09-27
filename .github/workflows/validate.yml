@@ -79,9 +79,30 @@ jobs:
         run: python -m tests.provisioning.controlplane.restore_gate
   temporal_recovery:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci_migration_only
+          POSTGRES_DB: hosting_controlplane_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d hosting_controlplane_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       TEMPORAL_TEST_DB_PASSWORD: ci_disposable_temporal_only
+      HOSTING_TEST_POSTGRES_ADMIN_DSN: postgresql://postgres:ci_migration_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_MIGRATION_DSN: postgresql://hosting_migration_owner:ci_owner_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_RUNTIME_DSN: postgresql://hosting_runtime:ci_runtime_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_AUTHORITY_DSN: postgresql://hosting_authority:ci_authority_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_ENROLLMENT_DSN: postgresql://hosting_enrollment:ci_enrollment_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_DIRECTORY_RESOLVER_DSN: postgresql://hosting_directory_resolver:ci_directory_resolver_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN: postgresql://hosting_directory_writer:ci_directory_writer_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_ISOLATED: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -91,14 +112,20 @@ jobs:
           python-version: '3.13'
       - name: Install pinned Temporal client and workflow dependencies
         run: python -m pip install -e '.[controlplane]'
+      - name: Prepare disposable product PostgreSQL roles and migrations
+        run: python -m tests.provisioning.controlplane.prepare_postgres
       - name: Start disposable self-hosted Temporal on PostgreSQL
         run: docker compose -f deploy/temporal/compose.integration.yml up -d
       - name: Persist a pending workflow without a worker
         run: python -m tests.provisioning.workflow.temporal_recovery_gate prepare --state /tmp/temporal-recovery.json
+      - name: Commit a product job and start Temporal before its outbox ACK
+        run: python -m tests.provisioning.workflow.postgres_temporal_gate prepare --state /tmp/postgres-temporal.json
       - name: Restart Temporal while retaining its database
         run: docker compose -f deploy/temporal/compose.integration.yml restart temporal
       - name: Recover the same run and replay its history
         run: python -m tests.provisioning.workflow.temporal_recovery_gate recover --state /tmp/temporal-recovery.json
+      - name: Reconcile the product outbox and pin the original Temporal run
+        run: python -m tests.provisioning.workflow.postgres_temporal_gate recover --state /tmp/postgres-temporal.json
       - name: Show service logs after a failure
         if: failure()
         run: docker compose -f deploy/temporal/compose.integration.yml logs --tail=160
