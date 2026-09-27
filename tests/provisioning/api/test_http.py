@@ -24,6 +24,7 @@ from provisioner.controlplane.authority.service import (
     AuthorityService, AuthenticationFailed,
 )
 from provisioner.controlplane.jobs.repository import Job, JobEvent, JobRepository
+from provisioner.controlplane.evidence.gate import EvidenceHold
 from provisioner.controlplane.persistence.store import (
     EnterpriseRecordStore, RecordValidationError, RevisionConflict, StoredRecord,
     canonical_record_digest,
@@ -37,6 +38,13 @@ SOURCE_SCOPE = PlanScope.from_record(SOURCE)
 TARGET_SCOPE = PlanScope.from_record(TARGET)
 PORTFOLIO = PortfolioScope('org-01', 'tenant-01', 'wsd-01')
 OTHER = PortfolioScope('org-01', 'tenant-01', 'wsd-02')
+
+
+class _VerifiedEvidence:
+    """Focused HTTP transport tests inject a passing independent gate."""
+
+    def require(self, context):
+        assert context.organization_id == 'org-01'
 
 
 def draft() -> dict:
@@ -210,11 +218,45 @@ class ControlApiTests(unittest.TestCase):
         authority = AuthorityService(self.identity, _Plans(), _Ledger(),
                                      clock=lambda: NOW)
         self.app = create_app(self.records, authority, self.jobs,
+                              evidence_gate=_VerifiedEvidence(),
                               max_body_bytes=8192, clock=lambda: NOW)
         self.client = TestClient(self.app)
 
     def auth(self, token):
         return {'Authorization': f'Bearer {token}'}
+
+    def test_app_composition_requires_explicit_evidence_gate(self):
+        authority = AuthorityService(self.identity, _Plans(), _Ledger(), clock=lambda: NOW)
+        with self.assertRaises(TypeError):
+            create_app(self.records, authority, self.jobs, evidence_gate=None)
+
+    def test_evidence_outage_holds_creates_approvals_and_jobs_but_allows_revocation(self):
+        class Held:
+            def require(self, context):
+                raise EvidenceHold('unavailable')
+
+        ledger = _Ledger()
+        authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
+        client = TestClient(create_app(self.records, authority, self.jobs,
+                                       clock=lambda: NOW, evidence_gate=Held()))
+        attempts = (
+            ('/v1/wsds/wsd-01/workloads', 'editor', draft(), {}),
+            ('/v1/plans/plan-01/jobs', 'operator', {}, {'Idempotency-Key': 'held-job'}),
+            ('/v1/plans/plan-01/approvals', 'approver',
+             {'role': SOURCE_OWNER, 'ttlSeconds': 300,
+              'expectedPlanRevision': 1, 'expectedPlanDigest': PLAN_DIGEST}, {}),
+        )
+        for path, actor, body, headers in attempts:
+            result = client.post(path, headers=self.auth(actor) | headers, json=body)
+            self.assertEqual((result.status_code, result.json()['error']['code']),
+                             (503, 'EVIDENCE_HOLD'))
+        self.assertFalse(self.records.rows)
+        self.assertFalse(self.jobs.submissions)
+        self.assertFalse(ledger.recorded)
+        revoked = client.post('/v1/plans/plan-01/revoke',
+                              headers=self.auth('approver'),
+                              json={'reason': 'Credential incident'})
+        self.assertEqual(revoked.status_code, 200)
 
     def test_workload_create_and_scoped_read(self):
         item = draft()
@@ -337,6 +379,7 @@ class ControlApiTests(unittest.TestCase):
         ledger = _Ledger(empty=True)
         authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
         client = TestClient(create_app(self.records, authority, self.jobs,
+                                       evidence_gate=_VerifiedEvidence(),
                                        max_body_bytes=8192, clock=lambda: NOW))
         url = '/v1/plans/plan-01/approvals'
         forged = client.post(url, headers=self.auth('approver'),
@@ -400,6 +443,7 @@ class ControlApiTests(unittest.TestCase):
         ledger = _Ledger(empty=True)
         authority = AuthorityService(self.identity, _Plans(), ledger, clock=lambda: NOW)
         client = TestClient(create_app(self.records, authority, self.jobs,
+                                       evidence_gate=_VerifiedEvidence(),
                                        max_body_bytes=8192, clock=lambda: NOW))
         url = '/v1/plans/plan-01/approvals'
         absent = client.post(url, headers=self.auth('approver'),

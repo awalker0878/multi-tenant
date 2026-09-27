@@ -133,7 +133,8 @@ class PostgresHttpTests(unittest.TestCase):
 
         with patch('provisioner.controlplane.authority.oidc._download_jwks',
                    new=local_jwks):
-            self.app = create_postgres_app(settings)
+            self.app = create_postgres_app(settings, evidence_gate=type(
+                'ExplicitTestEvidenceGate', (), {'require': lambda _, ctx: None})())
         self.client = TestClient(self.app)
 
     def _enroll(self, name, roles, *, tenant=None, subject=None):

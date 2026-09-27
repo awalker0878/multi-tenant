@@ -29,6 +29,7 @@ from provisioner.controlplane.authority.service import (
 from provisioner.controlplane.jobs.repository import (
     AdmissionConflict, AdmissionRefused, Job, JobEvent, JobRepository,
 )
+from provisioner.controlplane.evidence.gate import EvidenceHold, EvidenceMutationGate
 from provisioner.controlplane.persistence.store import (
     AuditContext, EnterpriseRecordStore, RecordNotFound,
     RecordValidationError, RevisionConflict, StoredRecord, TenantContext,
@@ -45,7 +46,7 @@ from .models import (AccessPage, ApprovalReceipt, ApprovalRequest,
 
 _ID_PATTERN = r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'
 _BEARER = HTTPBearer(auto_error=False, description='Enterprise SSO bearer credential; verified by the server identity provider.')
-_ERRORS = {code: {'model': ErrorResponse} for code in (400, 401, 403, 404, 409, 413, 422)}
+_ERRORS = {code: {'model': ErrorResponse} for code in (400, 401, 403, 404, 409, 413, 422, 503)}
 
 
 @dataclass(frozen=True)
@@ -117,14 +118,17 @@ def _planned_only(record: dict) -> None:
 
 
 def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
-               jobs: JobRepository, *, max_body_bytes: int = 1024 * 1024,
+               jobs: JobRepository, *, evidence_gate: EvidenceMutationGate,
+               max_body_bytes: int = 1024 * 1024,
                clock: Callable[[], datetime] | None = None,
                portal_config: PortalConfig | None = None) -> FastAPI:
     """Compose supplied durable services; no development auth or in-memory fallback."""
     if (not isinstance(records, EnterpriseRecordStore)
             or not isinstance(authority, AuthorityService)
-            or not isinstance(jobs, JobRepository)):
-        raise TypeError('Real record, authority and job services are required')
+            or not isinstance(jobs, JobRepository)
+            or evidence_gate is None
+            or not callable(getattr(evidence_gate, 'require', None))):
+        raise TypeError('Real record, authority, job and evidence services are required')
     if type(max_body_bytes) is not int or max_body_bytes < 1:
         raise ValueError('max_body_bytes must be a positive integer')
     now = clock or (lambda: datetime.now(timezone.utc))
@@ -168,6 +172,13 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
     def context(active: _Session) -> TenantContext:
         return TenantContext(active.principal.organization_id,
                              active.principal.tenant_id)
+
+    def require_evidence(active: _Session) -> None:
+        try:
+            evidence_gate.require(context(active))
+        except EvidenceHold:
+            raise _ApiError(503, 'EVIDENCE_HOLD',
+                            'Independent evidence checkpoint requires operator review') from None
 
     def portfolio(active: _Session, wsd_id: str, role: str) -> PortfolioScope:
         scope = PortfolioScope(active.principal.organization_id,
@@ -259,6 +270,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             document: WorkloadCreate,
             active: _Session = Depends(session)) -> StoredWorkload:
         portfolio(active, wsd_id, WORKLOAD_EDITOR)
+        require_evidence(active)
         record = document.canonical_document()
         meta = record['metadata']
         if (meta['organizationId'], meta['tenantId'], meta['wsdId']) != (
@@ -288,6 +300,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             idempotency_key: Annotated[str, Header(alias='Idempotency-Key',
                                                    pattern=_ID_PATTERN)],
             active: _Session = Depends(session)) -> JobView:
+        require_evidence(active)
         try:
             authorized = authority.authorize_submission(active.credential, plan_id)
         except (AuthenticationFailed, AuthorityDenied):
@@ -383,6 +396,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
 
         This durable receipt does not claim that a workflow has advanced.
         """
+        require_evidence(active)
         try:
             approval = authority.record_approval(
                 active.credential, plan_id, decision.role,

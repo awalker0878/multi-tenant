@@ -20,6 +20,8 @@ from provisioner.controlplane.authority.oidc import OIDCIdentityProvider
 from provisioner.controlplane.authority.postgres import PostgresAuthority
 from provisioner.controlplane.authority.service import AuthorityService
 from provisioner.controlplane.jobs.repository import JobRepository
+from provisioner.controlplane.evidence.runtime import (EvidenceHold,
+    EvidenceRuntimeConfig, build_gate)
 from provisioner.controlplane.persistence.store import EnterpriseRecordStore
 
 from .http import create_app
@@ -55,6 +57,7 @@ class ServiceSettings:
     oidc_audience: str
     oidc_jwks_uri: str
     step_up_acr: frozenset[str]
+    evidence_config: EvidenceRuntimeConfig | None = None
     portal: PortalConfig | None = None
     listen_host: str = '127.0.0.1'
     listen_port: int = 8080
@@ -66,6 +69,10 @@ class ServiceSettings:
             _secure_dsn(value, name)
         if len({self.runtime_dsn, self.authority_dsn, self.directory_dsn}) != 3:
             raise ValueError('Runtime, authority and directory credentials must be distinct')
+        if self.evidence_config is not None and (
+                not isinstance(self.evidence_config, EvidenceRuntimeConfig)
+                or self.evidence_config.postgres_dsn != self.runtime_dsn):
+            raise ValueError('Evidence verification must use this runtime database role')
         if not self.oidc_issuer or not self.oidc_audience or not self.oidc_jwks_uri:
             raise ValueError('Pinned OIDC issuer, audience and JWKS URI are required')
         if (not isinstance(self.step_up_acr, frozenset) or not self.step_up_acr
@@ -114,6 +121,8 @@ class ServiceSettings:
             oidc_audience=_required(values, 'HOSTING_OIDC_AUDIENCE'),
             oidc_jwks_uri=_required(values, 'HOSTING_OIDC_JWKS_URI'),
             step_up_acr=acr,
+            evidence_config=EvidenceRuntimeConfig.from_environment(
+                values, require_scopes=True),
             portal=portal,
             listen_host=values.get('HOSTING_LISTEN_HOST', '127.0.0.1'),
             listen_port=port,
@@ -136,7 +145,8 @@ def _role_name(connect) -> str:
         return row[0]
 
 
-def create_postgres_app(settings: ServiceSettings) -> FastAPI:
+def create_postgres_app(settings: ServiceSettings, *,
+                        evidence_gate=None) -> FastAPI:
     """Probe all three real DB roles, then wire the durable repositories."""
     if not isinstance(settings, ServiceSettings):
         raise TypeError('Validated service settings are required')
@@ -156,7 +166,15 @@ def create_postgres_app(settings: ServiceSettings) -> FastAPI:
     authority = AuthorityService(identities, ledger, ledger)
     records = EnterpriseRecordStore(runtime_connect)
     jobs = JobRepository(runtime_connect, ledger)
-    return create_app(records, authority, jobs, portal_config=settings.portal)
+    if evidence_gate is None and settings.evidence_config is None:
+        raise ValueError('Independent evidence configuration is required')
+    gate = evidence_gate
+    if gate is None:
+        gate = build_gate(settings.evidence_config, connection_factory=runtime_connect)
+        for tenant in settings.evidence_config.startup_scopes():
+            gate.require(tenant)
+    return create_app(records, authority, jobs, portal_config=settings.portal,
+                      evidence_gate=gate)
 
 
 def main() -> int:
@@ -164,7 +182,7 @@ def main() -> int:
     try:
         settings = ServiceSettings.from_environment()
         app = create_postgres_app(settings)
-    except (ValueError, RuntimeError, psycopg.Error):
+    except (ValueError, RuntimeError, EvidenceHold, psycopg.Error):
         # DSNs and OIDC values must never be echoed in startup failures.
         raise SystemExit('Control API configuration or database authority is unavailable') from None
     uvicorn.run(app, host=settings.listen_host, port=settings.listen_port,

@@ -2,12 +2,16 @@
 from __future__ import annotations
 
 import unittest
+import json
+import tempfile
+from pathlib import Path
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
 from provisioner.controlplane.api.portal import PortalConfig
 from provisioner.controlplane.api.server import ServiceSettings, create_postgres_app
+from tests.provisioning.evidence.test_runtime import environment as evidence_environment
 
 
 def settings(**updates):
@@ -24,7 +28,40 @@ def settings(**updates):
     return ServiceSettings(**values)
 
 
+class _VerifiedEvidence:
+    def require(self, context):
+        pass
+
+
 class ServerCompositionTests(unittest.TestCase):
+    def test_installed_settings_require_evidence_and_startup_checks_scopes(self):
+        values = evidence_environment() | {
+            'HOSTING_AUTHORITY_DSN': settings().authority_dsn,
+            'HOSTING_DIRECTORY_DSN': settings().directory_dsn,
+            'HOSTING_OIDC_ISSUER': 'https://id.example.org/',
+            'HOSTING_OIDC_AUDIENCE': 'hosting-api',
+            'HOSTING_OIDC_JWKS_URI': 'https://id.example.org/keys',
+            'HOSTING_STEP_UP_ACR': 'urn:enterprise:step-up',
+        }
+        values['HOSTING_RUNTIME_DSN'] = settings().runtime_dsn
+        with self.assertRaises(ValueError):
+            ServiceSettings.from_environment(values)
+        with tempfile.TemporaryDirectory() as directory:
+            scope_file = Path(directory) / 'scopes.json'
+            scope_file.write_text(json.dumps([{'organizationId': 'org',
+                                               'tenantId': 'tenant'}]))
+            values['HOSTING_EVIDENCE_SCOPES_FILE'] = str(scope_file)
+            configured = ServiceSettings.from_environment(values)
+            seen = []
+            gate = type('Gate', (), {'require': lambda _, ctx: seen.append(ctx)})()
+            with (patch('provisioner.controlplane.api.server._role_name',
+                        side_effect=['runtime', 'authority', 'directory']),
+                  patch('provisioner.controlplane.api.server.build_gate',
+                        return_value=gate)):
+                create_postgres_app(configured)
+            self.assertEqual([(ctx.organization_id, ctx.tenant_id) for ctx in seen],
+                             [('org', 'tenant')])
+
     def test_missing_directory_fails_closed(self):
         with self.assertRaises(ValueError):
             ServiceSettings.from_environment({
@@ -46,8 +83,12 @@ class ServerCompositionTests(unittest.TestCase):
 
     def test_real_repositories_are_composed_only_after_role_probe(self):
         with patch('provisioner.controlplane.api.server._role_name',
+                   side_effect=['runtime', 'authority', 'directory']):
+            with self.assertRaises(ValueError):
+                create_postgres_app(settings())
+        with patch('provisioner.controlplane.api.server._role_name',
                    side_effect=['runtime', 'authority', 'directory']) as probe:
-            app = create_postgres_app(settings())
+            app = create_postgres_app(settings(), evidence_gate=_VerifiedEvidence())
         self.assertEqual(probe.call_count, 3)
         spec = TestClient(app).get('/openapi.json').json()
         self.assertIn('/v1/access/scopes', spec['paths'])
@@ -69,7 +110,7 @@ class ServerCompositionTests(unittest.TestCase):
         configured = settings(oidc_issuer='https://id.example.org', portal=portal)
         with patch('provisioner.controlplane.api.server._role_name',
                    side_effect=['runtime', 'authority', 'directory']):
-            app = create_postgres_app(configured)
+            app = create_postgres_app(configured, evidence_gate=_VerifiedEvidence())
         response = TestClient(app, base_url=portal.origin).get('/portal/')
         self.assertEqual(response.status_code, 200)
         self.assertIn('Content-Security-Policy', response.headers)
@@ -96,7 +137,7 @@ class ServerCompositionTests(unittest.TestCase):
         with patch('provisioner.controlplane.api.server._role_name',
                    side_effect=['runtime', 'runtime', 'directory']):
             with self.assertRaises(RuntimeError):
-                create_postgres_app(settings())
+                create_postgres_app(settings(), evidence_gate=_VerifiedEvidence())
 
 
 if __name__ == '__main__':
