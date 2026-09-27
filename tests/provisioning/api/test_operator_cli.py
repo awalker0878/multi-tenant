@@ -128,14 +128,16 @@ class OperatorCliTests(unittest.TestCase):
         self.assertNotIn('sensitive', err)
         self.assertNotIn('opaque-access-token', err)
 
-    def test_nonlocal_http_is_refused_before_network(self):
+    def test_cleartext_http_is_refused_even_on_loopback_before_reading_token(self):
         def unexpected(_request):
             self.fail('Network request must not be sent')
-        code, out, err = self.invoke(['scopes'], unexpected,
-                                     api_url='http://control.example')
-        self.assertEqual(code, 3)
-        self.assertEqual(out, '')
-        self.assertEqual(json.loads(err), {'error': 'INVALID_INPUT'})
+        for url in ('http://control.example', 'http://localhost:8080',
+                    'http://127.0.0.1:8080', 'http://[::1]:8080'):
+            with self.subTest(url=url):
+                code, out, err = self.invoke(['scopes'], unexpected, api_url=url)
+                self.assertEqual(code, 3)
+                self.assertEqual(out, '')
+                self.assertEqual(json.loads(err), {'error': 'INVALID_INPUT'})
 
     def test_redirect_is_refused_without_forwarding_token(self):
         calls = []

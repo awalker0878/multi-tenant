@@ -34,11 +34,11 @@ To enable the portal, additionally set the five required portal settings below. 
 | `HOSTING_PORTAL_SCOPE` | Scope containing `openid`, without `offline_access` |
 | `HOSTING_PORTAL_STEP_UP_ACR` | Optional one ACR from `HOSTING_STEP_UP_ACR`; enables a fresh IdP reauthentication before portal approval |
 
-The portal keeps its access token in the active page's memory, uses a self-hosted script/style bundle and a restrictive Content Security Policy, and does not store tokens in URLs, cookies or browser storage. Closing or reloading the page requires signing in again. An independently managed TLS proxy, IdP client registration and IAM sync are still required to use it.
+The portal keeps its access token in the active page's memory, uses a self-hosted script/style bundle and a restrictive Content Security Policy, and does not store tokens in URLs, cookies or browser storage. Clearing or switching identity invalidates pending code exchanges and earlier API responses in that tab; closing or reloading the page requires signing in again. An independently managed TLS proxy, IdP client registration and IAM sync are still required to use it.
 
 ## Operator flow
 
-Obtain a short-lived control API access token through the organization's approved SSO method and pipe it to `hosting-operator --token-stdin`. The CLI refuses non-HTTPS API URLs except loopback for local integration tests. It validates TLS, does not follow redirects or use proxy settings from the environment, and does not print the token.
+Obtain a short-lived control API access token through the organization's approved SSO method and pipe it to `hosting-operator --token-stdin`. The CLI requires HTTPS even for loopback URLs. It validates TLS, does not follow redirects or use proxy settings from the environment, and does not print the token.
 
 ```text
 <approved SSO tool producing one token line> | hosting-operator --api-url https://control.example.org --token-stdin scopes

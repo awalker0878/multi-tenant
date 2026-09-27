@@ -37,8 +37,7 @@ def _base_url(value: str) -> str:
                 or parsed.password is not None or parsed.query or parsed.fragment
                 or not parsed.hostname or parsed.port == 0):
             raise ValueError
-        if parsed.scheme != 'https' and not (
-                parsed.scheme == 'http' and parsed.hostname in ('127.0.0.1', '::1', 'localhost')):
+        if parsed.scheme != 'https':
             raise ValueError
         if '//' in parsed.path or '..' in parsed.path.split('/'):
             raise ValueError
