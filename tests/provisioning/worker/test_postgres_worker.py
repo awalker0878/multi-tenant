@@ -184,12 +184,44 @@ class WorkerPostgresTests(unittest.TestCase):
                  self.scope.security_domain_id, self.scope.endpoint_id,
                  self.scope.native_scope_id, self.scope.platform_family,
                  'VM_POWER', 'secret-ref-' + suffix))
+            connection.execute(
+                'INSERT INTO hosting_controlplane.worker_capabilities '
+                '(organization_id, tenant_id, worker_subject, site_id, '
+                'security_domain_id, endpoint_id, native_scope_id, platform_family, '
+                'operation_kind, credential_ref) VALUES '
+                '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (self.context.organization_id, self.context.tenant_id,
+                 self.identity.subject, self.scope.site_id,
+                 self.scope.security_domain_id, self.scope.endpoint_id,
+                 self.scope.native_scope_id, self.scope.platform_family,
+                 'DISCOVER_READ', 'vault:site-read'))
         self.lease = LockedTestLease()
         self.grants = PostgresWorkerGrants(
             lambda: self.psycopg.connect(self.runtime_dsn), self.lease)
         self.enrollment = PostgresWorkerEnrollment(
             lambda: self.psycopg.connect(self.enrollment_dsn),
             TestWorkerVerifier(), TestEnrollmentAuthorizer())
+
+    def test_read_grant_requires_existing_job_approval_enrollment_and_b11_lease(self):
+        request = replace(self.request, step_id='step-read',
+                          operation_kind='DISCOVER_READ')
+        grant = self.grants.issue_grant(self.context, self.identity, request)
+        references = []
+        self.grants.with_authorized_reference(
+            self.context, self.identity, grant.grant_id,
+            job_id=self.job_id, step_id=request.step_id,
+            operation_id=request.operation_id, operation_kind='DISCOVER_READ',
+            operation_scope=self.scope, lease_key='lease-01', lease_epoch=2,
+            use=lambda reference, *_: references.append(reference))
+        self.assertEqual(references, ['vault:site-read'])
+        self.lease.epoch = 3
+        with self.assertRaises(GrantDenied):
+            self.grants.with_authorized_reference(
+                self.context, self.identity, grant.grant_id,
+                job_id=self.job_id, step_id=request.step_id,
+                operation_id=request.operation_id, operation_kind='DISCOVER_READ',
+                operation_scope=self.scope, lease_key='lease-01', lease_epoch=2,
+                use=lambda *_: None)
 
     def test_certificate_rotation_invalidates_old_grant_and_revoke_blocks_new(self):
         old_grant = self.grants.issue_grant(self.context, self.identity, self.request)
