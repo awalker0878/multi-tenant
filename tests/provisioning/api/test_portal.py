@@ -64,8 +64,8 @@ class PortalTests(unittest.TestCase):
     def test_self_hosted_assets_and_origin_policy(self):
         page = self.client.get('/portal/')
         self.assertEqual(page.status_code, 200)
-        self.assertIn('/portal/app.js', page.text)
-        self.assertIn('/portal/style.css', page.text)
+        self.assertIn('src="app.js"', page.text)
+        self.assertIn('href="style.css"', page.text)
         self.assertEqual(page.headers['cache-control'], 'no-store')
         self.assertIn("default-src 'none'", page.headers['content-security-policy'])
         self.assertIn("frame-ancestors 'none'", page.headers['content-security-policy'])
