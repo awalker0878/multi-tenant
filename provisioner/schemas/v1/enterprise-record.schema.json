@@ -46,10 +46,11 @@
       }
     },
     "bindingHistory": {
-      "type": "object", "required": ["binding", "role", "firstSeenSnapshotId"], "additionalProperties": false,
+      "type": "object", "required": ["binding", "role", "firstSeenSnapshotId", "lastObservedSnapshotId"], "additionalProperties": false,
       "properties": {
         "binding": {"$ref": "#/definitions/binding"}, "role": {"enum": ["SOURCE", "TARGET", "RETIRED"]},
-        "firstSeenSnapshotId": {"$ref": "#/definitions/id"}
+        "firstSeenSnapshotId": {"$ref": "#/definitions/id"},
+        "lastObservedSnapshotId": {"$ref": "#/definitions/id"}
       }
     },
     "integerFact": {

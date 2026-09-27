@@ -25,7 +25,8 @@ def binding(kind: str, native_id: str) -> dict:
 
 
 def history(kind: str, native_id: str) -> dict:
-    return {'binding': binding(kind, native_id), 'role': 'SOURCE', 'firstSeenSnapshotId': 'snapshot-01'}
+    return {'binding': binding(kind, native_id), 'role': 'SOURCE',
+            'firstSeenSnapshotId': 'snapshot-01', 'lastObservedSnapshotId': 'snapshot-01'}
 
 
 def machine(number: int) -> dict:
@@ -180,6 +181,30 @@ class EnterpriseRecordTest(unittest.TestCase):
         item['spec']['machines'][0]['cpuCount'] = {'state': 'UNKNOWN', 'value': 4}
         self.assert_invalid(item, '$')
 
+    def test_colons_in_logical_ids_cannot_hide_shared_native_binding(self):
+        item = workload()
+        first, second = item['spec']['machines']
+        first['machineId'], first['disks'][0]['diskId'] = 'a:b', 'c'
+        second['machineId'], second['disks'][0]['diskId'] = 'a', 'b:c'
+        item['spec']['datasets'][0]['machineId'] = 'a:b'
+        item['spec']['datasets'][1]['machineId'] = 'a'
+        second['disks'][0]['bindings'][0]['binding'] = deepcopy(
+            first['disks'][0]['bindings'][0]['binding'])
+        problems = validate_record(item)
+        self.assertTrue(any('bound to two logical resources' in p['message']
+                            for p in problems), problems)
+
+    def test_migration_source_binding_must_be_active_in_selected_snapshot(self):
+        item = workload()
+        selected_plan = plan()
+        item['spec']['machines'][0]['bindings'][0]['role'] = 'RETIRED'
+        self.assert_invalid(selected_plan, '$.spec.machineMappings[0].sourceBinding',
+                            workload=item)
+        item['spec']['machines'][0]['bindings'][0]['role'] = 'SOURCE'
+        item['spec']['machines'][0]['bindings'][0]['lastObservedSnapshotId'] = 'stale-snapshot'
+        self.assert_invalid(selected_plan, '$.spec.machineMappings[0].sourceBinding',
+                            workload=item)
+
     def test_missing_disk_and_nic_mappings_are_refused(self):
         item = plan()
         item['spec']['machineMappings'][0]['diskMappings'].pop()
@@ -318,7 +343,8 @@ class EnterpriseRecordTest(unittest.TestCase):
             {'binding': {'endpointId': 'vcenter-02', 'nativeScopeId': 'dc2',
                          'nativeId': 'vm-target-1', 'resourceKind': 'vm',
                          'platformFamily': 'vmware'},
-             'role': 'TARGET', 'firstSeenSnapshotId': 'snapshot-02'})
+             'role': 'TARGET', 'firstSeenSnapshotId': 'snapshot-02',
+             'lastObservedSnapshotId': 'snapshot-02'})
         self.assertEqual(validate_workload_successor(earlier, later), [])
         later['spec']['machines'][0]['bindings'][0]['binding']['nativeId'] = 'rewritten'
         self.assertTrue(validate_workload_successor(earlier, later))

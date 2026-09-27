@@ -116,7 +116,7 @@ def _workload(record: dict, problems: list[dict]) -> None:
     machine_ids = {machine['machineId'] for machine in machines}
     _duplicates([m['machineId'] for m in machines], '$.spec.machines', problems)
     _duplicates([d['datasetId'] for d in spec['datasets']], '$.spec.datasets', problems)
-    native_owner: dict[tuple, str] = {}
+    native_owner: dict[tuple, tuple[str, str, str]] = {}
     for index, machine in enumerate(machines):
         path = f'$.spec.machines[{index}]'
         _check_unknown_fields(machine, ('guestProfile', 'cpuCount', 'memoryMiB', 'firmware'),
@@ -136,7 +136,9 @@ def _workload(record: dict, problems: list[dict]) -> None:
         for resource_kind, resources in (('vm', [machine]), ('disk', machine['disks']),
                                          ('nic', machine['nics'])):
             for resource in resources:
-                owner = f'{machine["machineId"]}:{resource.get("diskId", resource.get("nicId", "vm"))}'
+                component_id = (machine['machineId'] if resource_kind == 'vm' else
+                                resource['diskId'] if resource_kind == 'disk' else resource['nicId'])
+                owner = (resource_kind, machine['machineId'], component_id)
                 _duplicates([_binding_key(b['binding']) for b in resource['bindings']],
                             path + '.bindings', problems)
                 for history in resource['bindings']:
@@ -260,8 +262,11 @@ def _plan(record: dict, problems: list[dict], workload: dict | None) -> None:
         if machine is None:
             _problem(problems, path + '.machineId', 'Machine is not in the bound workload')
             continue
-        if mapping['sourceBinding'] not in [h['binding'] for h in machine['bindings']]:
-            _problem(problems, path + '.sourceBinding', 'Source binding was not observed for this machine')
+        if not any(h['binding'] == mapping['sourceBinding'] and h['role'] == 'SOURCE'
+                   and h['lastObservedSnapshotId'] == spec['sourceSnapshotId']
+                   for h in machine['bindings']):
+            _problem(problems, path + '.sourceBinding',
+                     'Source binding must be active and observed in selected source snapshot')
         if not machine['disksComplete'] or not machine['nicsComplete']:
             _problem(problems, path, 'Selected machine has incomplete disk or NIC inventory')
         if {d['diskId'] for d in mapping['diskMappings']} != {d['diskId'] for d in machine['disks']}:
