@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0011`
+for the migration role. The runner applies packaged migrations `0001`–`0012`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -51,13 +51,18 @@ provide defense in depth; authentication and authorization remain mandatory.
 OIDC enrollment uses a separate pre-tenant directory boundary (0009). The
 OIDC access token supplies only issuer, subject, and session ID; it cannot
 provide roles or tenant membership. Provision one dedicated directory resolver
-role with `USAGE` on the schema and `SELECT` only on `directory_subjects` and
-`directory_sessions`. The resolver connection has no generic SQL endpoint and
+role with `USAGE` on the schema and `SELECT` only on `directory_subjects`,
+`directory_sessions` and tenant-RLS-protected `audit_events`. The resolver
+sets the resolved tenant scope before checking the latest signed-directory
+audit marker and the digest of the complete current directory materialization.
+Grant it `EXECUTE` on `directory_state_digest(text, text)`. The resolver
+connection has no generic SQL endpoint and
 is never shared with a request/user credential. Its lookup must be global
 because tenant identity is not known until that lookup succeeds. Provision a
 separate IAM sync writer with `SELECT, INSERT, UPDATE` on
 `directory_subjects`, `SELECT, INSERT, DELETE` on `directory_sessions`,
-`INSERT` on `directory_sync_events`, and sequence usage. To invalidate active
+`INSERT` on `directory_sync_events` and tenant-scoped `audit_events`,
+`EXECUTE` on `directory_state_digest(text, text)`, and sequence usage. To invalidate active
 plan authority in the same transaction, it also needs `SELECT, UPDATE` on
 `plan_authority_state`, `SELECT` on `plan_approvals` and `operation_jobs`, and
 `INSERT` on `plan_revocations`. Both roles must be NOSUPERUSER NOBYPASSRLS.
@@ -66,6 +71,17 @@ runtime roles. The IAM sync accepts only a full canonical JSON subject snapshot
 with a detached signature from the configured Ed25519 public key. Generation
 numbers advance monotonically, replacing all sessions and role grants; an IAM
 change increments epochs for existing approvals/jobs of the changed subject.
+Migration `0012` appends a `DIRECTORY_SYNC` audit marker for each existing
+directory subject while directory writes are locked. New signed snapshots
+append the marker in the same transaction as the grants, sessions and epoch
+changes. The marker binds the latest signed digest and generation plus a
+digest of the complete materialized row and session set, without copying
+session identifiers or grants into audit details. A resolver rejects the
+directory row if its latest audit marker differs, including after a selective
+restore or edit of mutable directory state. Audit chain checkpointing
+further detects a stale whole-database prefix. Deploy the migration and
+corresponding resolver/writer together; checkpoint the new audit suffix
+before releasing the site under its configured lag policy.
 
 Migration 0010 records the namespace, first external start time, configured
 history deadline, payload digest, and accepted run ID. The dispatcher commits

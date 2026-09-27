@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import hashlib
 import unittest
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
@@ -153,6 +154,66 @@ class DirectoryPostgresTests(unittest.TestCase):
                 'SELECT revocation_epoch FROM hosting_controlplane.plan_authority_state '
                 'WHERE plan_id = %s', (p['metadata']['planId'],)).fetchone()[0]
         self.assertEqual(epoch, 1)
+
+    def test_audit_binding_rejects_selective_directory_rollback(self):
+        first, first_signature = self.signed(self.payload())
+        self.sync.apply(first, first_signature)
+        second_payload = self.payload(2)
+        second_payload['grants'] = []
+        second_payload['sessions'].append({
+            'sessionId': 'spare-' + self.session,
+            'expiresAt': int((self.now + timedelta(minutes=20)).timestamp())})
+        second, second_signature = self.signed(second_payload)
+        self.sync.apply(second, second_signature)
+        self.assertEqual(self.directory.resolve(
+            self.issuer, self.subject, self.session).grants, ())
+        with self.psycopg.connect(self.runtime_dsn) as connection:
+            connection.execute("SELECT set_config('app.organization_id', %s, true), "
+                               "set_config('app.tenant_id', %s, true)",
+                               (self.ctx.organization_id, self.ctx.tenant_id))
+            audit_rows = connection.execute(
+                'SELECT revision, record_digest, details::text '
+                'FROM hosting_controlplane.audit_events '
+                "WHERE action = 'DIRECTORY_SYNC' AND record_id = %s "
+                'ORDER BY audit_sequence', (self.subject,)).fetchall()
+        self.assertEqual([(row[0], row[1]) for row in audit_rows], [
+            (1, hashlib.sha256(first).hexdigest()),
+            (2, hashlib.sha256(second).hexdigest())])
+        self.assertTrue(all(len(json.loads(row[2])['stateDigest']) == 64
+                            for row in audit_rows))
+        self.assertNotIn(self.session, repr(audit_rows))
+
+        # Changing another session invalidates this otherwise valid session:
+        # the marker binds the complete live materialization.
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:
+            owner.execute(
+                'DELETE FROM hosting_controlplane.directory_sessions '
+                'WHERE issuer = %s AND subject = %s AND session_id = %s',
+                (self.issuer, self.subject, 'spare-' + self.session))
+        with self.assertRaises(PermissionError):
+            self.directory.resolve(self.issuer, self.subject, self.session)
+
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:
+            owner.execute(
+                'INSERT INTO hosting_controlplane.directory_sessions '
+                '(issuer, subject, session_id, expires_at) VALUES (%s, %s, %s, %s)',
+                (self.issuer, self.subject, 'spare-' + self.session,
+                 datetime.fromtimestamp(
+                     second_payload['sessions'][1]['expiresAt'], timezone.utc)))
+        self.assertEqual(self.directory.resolve(
+            self.issuer, self.subject, self.session).grants, ())
+
+        # Simulate restoration of just mutable directory state while the
+        # independently checkpointed audit stream still records generation 2.
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:
+            owner.execute(
+                'UPDATE hosting_controlplane.directory_subjects '
+                'SET generation = 1, signed_digest = %s, grants = %s::jsonb '
+                'WHERE issuer = %s AND subject = %s',
+                (hashlib.sha256(first).hexdigest(),
+                 json.dumps(self.payload()['grants']), self.issuer, self.subject))
+        with self.assertRaises(PermissionError):
+            self.directory.resolve(self.issuer, self.subject, self.session)
 
 
 if __name__ == '__main__':

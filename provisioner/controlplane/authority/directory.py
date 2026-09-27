@@ -150,19 +150,40 @@ class PostgresRoleDirectory:
                     (issuer, subject, session_id))):
             raise AuthenticationFailed('Directory identity is incomplete')
         with self._connect() as connection, connection.cursor() as cursor:
+            # Both reads must see the same committed generation while an IAM
+            # replacement may be racing this authentication request.
+            cursor.execute('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ')
             _runtime_role(cursor)
             cursor.execute(
                 'SELECT d.organization_id, d.tenant_id, d.identity_kind, '
-                'd.active, d.grants FROM hosting_controlplane.directory_subjects d '
+                'd.active, d.grants, d.generation, d.signed_digest '
+                'FROM hosting_controlplane.directory_subjects d '
                 'JOIN hosting_controlplane.directory_sessions s '
                 'ON s.issuer = d.issuer AND s.subject = d.subject '
                 'WHERE d.issuer = %s AND d.subject = %s AND s.session_id = %s '
                 'AND s.expires_at > clock_timestamp()',
                 (issuer, subject, session_id))
             row = cursor.fetchone()
-        if row is None or row[3] is not True:
-            raise AuthenticationFailed('Session is not enrolled or has been revoked')
-        organization, tenant, kind, _, raw = row
+            if row is None or row[3] is not True:
+                raise AuthenticationFailed('Session is not enrolled or has been revoked')
+            organization, tenant, kind, _, raw, generation, signed_digest = row
+            cursor.execute(
+                "SELECT set_config('app.organization_id', %s, true), "
+                "set_config('app.tenant_id', %s, true)", (organization, tenant))
+            cursor.execute(
+                'SELECT revision, record_digest, details->>\'stateDigest\' '
+                'FROM hosting_controlplane.audit_events '
+                'WHERE organization_id = %s AND tenant_id = %s '
+                "AND action = 'DIRECTORY_SYNC' AND record_kind = 'DirectorySubject' "
+                'AND record_id = %s AND actor_id = %s '
+                'ORDER BY audit_sequence DESC LIMIT 1',
+                (organization, tenant, subject, 'iam-sync:' + issuer))
+            marker = cursor.fetchone()
+            cursor.execute('SELECT hosting_controlplane.directory_state_digest(%s, %s)',
+                           (issuer, subject))
+            state_digest = cursor.fetchone()[0]
+            if state_digest is None or marker != (generation, signed_digest, state_digest):
+                raise AuthenticationFailed('Directory generation lacks a matching audit marker')
         items = json.loads(raw) if isinstance(raw, str) else raw
         if not isinstance(items, list):
             raise AuthenticationFailed('Persisted directory grants are invalid')
@@ -265,6 +286,20 @@ class SignedDirectorySync:
                 'INSERT INTO hosting_controlplane.directory_sync_events '
                 '(issuer, subject, generation, signed_digest) VALUES (%s, %s, %s, %s)',
                 (self._issuer, subject, payload['generation'], digest))
+            cursor.execute('SELECT hosting_controlplane.directory_state_digest(%s, %s)',
+                           (self._issuer, subject))
+            state_digest = cursor.fetchone()[0]
+            if state_digest is None:
+                raise DirectorySyncRefused('IAM state was not persisted in this transaction')
+            cursor.execute(
+                'INSERT INTO hosting_controlplane.audit_events '
+                '(organization_id, tenant_id, actor_id, correlation_id, action, '
+                'record_kind, record_id, revision, record_digest, details) VALUES '
+                "(%s, %s, %s, %s, 'DIRECTORY_SYNC', 'DirectorySubject', %s, %s, %s, %s::jsonb)",
+                (payload['organizationId'], payload['tenantId'],
+                 'iam-sync:' + self._issuer, digest, subject,
+                 payload['generation'], digest,
+                 json.dumps({'stateDigest': state_digest})))
             if prior is not None:
                 cursor.execute(
                     'SELECT plan_id, revocation_epoch FROM '

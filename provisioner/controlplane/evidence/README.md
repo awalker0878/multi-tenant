@@ -65,6 +65,13 @@ operator can alter the suffix; set the maximum acceptable lag in site policy
 and hold mutation on a missed threshold. On database restore, keep the site
 observation-only until both audit and evidence streams verify against their
 independent checkpoint stores; a stale prefix cannot be accepted.
+Signed IAM directory changes also append a scoped `DIRECTORY_SYNC` marker in
+the same transaction. The login resolver compares the live signed generation,
+payload digest and complete materialized state digest with its latest audit
+marker, so a selective directory rollback cannot restore an older session.
+Checkpoint and restore the tenant audit
+stream alongside directory state; session IDs and role grants are absent from
+the audit marker.
 
 ## Installed checkpoint runner and mutation hold
 
