@@ -15,17 +15,19 @@ from provisioner.controlplane.workflow.approval_gate import (
 )
 
 
-PLAN = GateInput('org-1', 'tenant-1', 'plan-1', 3, 'a' * 64, 3600)
+PLAN = GateInput('job-1', 'org-1', 'tenant-1', 'plan-1', 3,
+                 'a' * 64, 0, 'c' * 64, 3600)
 
 
 def notice(approval_id='approval-1', *, tenant_id='tenant-1'):
-    return ApprovalNotice(PLAN.organization_id, tenant_id, PLAN.plan_id,
+    return ApprovalNotice(PLAN.job_id, PLAN.organization_id, tenant_id, PLAN.plan_id,
                           PLAN.plan_revision, PLAN.plan_digest, approval_id)
 
 
 def decision(request, *, authorized=True, digest='b' * 64):
-    return ApprovalCheck(authorized, request.organization_id, request.tenant_id,
-                         request.plan_id, request.plan_revision, request.plan_digest,
+    return ApprovalCheck(authorized, request.job_id, request.organization_id,
+                         request.tenant_id, request.plan_id, request.plan_revision,
+                         request.plan_digest, PLAN.revocation_epoch,
                          request.approval_id, digest)
 
 
@@ -110,8 +112,9 @@ class ApprovalGateTests(unittest.IsolatedAsyncioTestCase):
 
     def test_rejects_unbounded_or_unbound_input(self):
         with self.assertRaises(ValueError):
-            GateInput('org', 'tenant', 'plan', 0, 'a' * 64, 3600)
+            GateInput('job', 'org', 'tenant', 'plan', 0, 'a' * 64, 0, 'c' * 64, 3600)
         with self.assertRaises(ValueError):
-            GateInput('org', 'tenant', 'plan', 1, 'x' * 64, 3600)
+            GateInput('job', 'org', 'tenant', 'plan', 1, 'x' * 64, 0, 'c' * 64, 3600)
         with self.assertRaises(ValueError):
-            GateInput('org', 'tenant', 'plan', 1, 'a' * 64, 3600 * 24 * 31)
+            GateInput('job', 'org', 'tenant', 'plan', 1, 'a' * 64, 0, 'c' * 64,
+                      3600 * 24 * 31)
