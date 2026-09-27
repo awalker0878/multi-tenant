@@ -88,15 +88,18 @@ class PostgresHttpTests(unittest.TestCase):
                          tenantId=self.ctx.tenant_id)
         selected['metadata']['planDigest'] = plan_digest(selected)
         self.observed, self.selected = observed, selected
-        author = 'plan-author-' + suffix
-        self.store.create(self.ctx, observed, AuditContext(author, 'http-workload-' + suffix))
-        self.store.create(self.ctx, selected, AuditContext(author, 'http-plan-' + suffix))
+        self.author_subject = 'plan-author-' + suffix
+        self.store.create(self.ctx, observed, AuditContext(
+            self.author_subject, 'http-workload-' + suffix))
+        self.store.create(self.ctx, selected, AuditContext(
+            self.author_subject, 'http-plan-' + suffix))
 
         source, destination = selected['spec']['source'], selected['spec']['destination']
         portfolio = {'organizationId': self.ctx.organization_id,
                      'tenantId': self.ctx.tenant_id, 'securityDomainId': 'wsd-01'}
         self._enroll('reader', [('WORKLOAD_READER', portfolio)])
         self._enroll('editor', [('WORKLOAD_EDITOR', portfolio)])
+        self._enroll('author', [('SOURCE_OWNER', source)], subject=self.author_subject)
         foreign_portfolio = dict(portfolio, tenantId=self.foreign_tenant)
         self._enroll('foreign', [('WORKLOAD_READER', foreign_portfolio)],
                      tenant=self.foreign_tenant)
@@ -133,8 +136,8 @@ class PostgresHttpTests(unittest.TestCase):
             self.app = create_postgres_app(settings)
         self.client = TestClient(self.app)
 
-    def _enroll(self, name, roles, *, tenant=None):
-        subject = name + '-' + self.ctx.organization_id
+    def _enroll(self, name, roles, *, tenant=None, subject=None):
+        subject = subject or name + '-' + self.ctx.organization_id
         session = 'session-' + name + '-' + self.ctx.organization_id
         payload = {
             'format': 'hosting-directory-snapshot/1', 'issuer': _ISSUER,
@@ -222,6 +225,12 @@ class PostgresHttpTests(unittest.TestCase):
         self.assertNotIn('authorSubject', reviewed.text)
 
         approval_url = f'/v1/plans/{plan_id}/approvals'
+        self_approval = self.client.post(
+            approval_url, headers=self._auth('author', step_up=True),
+            json={'role': 'SOURCE_OWNER', 'ttlSeconds': 300,
+                  'expectedPlanRevision': binding['planRevision'],
+                  'expectedPlanDigest': binding['planDigest']})
+        self.assertEqual(self_approval.status_code, 403, self_approval.text)
         stale = self.client.post(approval_url, headers=self._auth('source-owner', step_up=True),
                                  json={'role': 'SOURCE_OWNER', 'ttlSeconds': 300,
                                        'expectedPlanRevision': 1,
@@ -260,6 +269,24 @@ class PostgresHttpTests(unittest.TestCase):
         self.assertEqual(events.status_code, 200, events.text)
         self.assertEqual(events.json()['items'][0]['eventType'], 'JOB_ADMITTED')
         self.assertEqual(events.json()['items'][0]['status'], 'QUEUED')
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_RUNTIME_DSN']) as connection:
+            connection.execute(
+                "SELECT set_config('app.organization_id', %s, true), "
+                "set_config('app.tenant_id', %s, true)",
+                (self.ctx.organization_id, self.ctx.tenant_id))
+            approvals = connection.execute(
+                'SELECT count(*) FROM hosting_controlplane.plan_approvals '
+                'WHERE organization_id = %s AND tenant_id = %s AND plan_id = %s',
+                (self.ctx.organization_id, self.ctx.tenant_id, plan_id)).fetchone()[0]
+            outbox = connection.execute(
+                'SELECT count(*) FROM hosting_controlplane.job_outbox '
+                'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s',
+                (self.ctx.organization_id, self.ctx.tenant_id, job_id)).fetchone()[0]
+            persisted_events = connection.execute(
+                'SELECT count(*) FROM hosting_controlplane.job_events '
+                'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s',
+                (self.ctx.organization_id, self.ctx.tenant_id, job_id)).fetchone()[0]
+        self.assertEqual((approvals, outbox, persisted_events), (4, 1, 1))
 
         revoked = deepcopy(self.snapshots['reader'])
         revoked.update(generation=2, active=False, grants=[], sessions=[],
