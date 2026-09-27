@@ -22,16 +22,10 @@ from provisioner.controlplane.persistence.migrate import apply_migrations
 from tests.provisioning.schema.test_enterprise_records import SOURCE, binding, workload
 
 
-TABLES = (
+REQUIRED_TABLES = (
     'enterprise_records', 'enterprise_record_history', 'audit_events',
     'native_ownership', 'schema_migrations',
 )
-ORDER_BY = {
-    'enterprise_records': 'record_kind, record_id',
-    'enterprise_record_history': 'record_kind, record_id, revision',
-    'audit_events': 'event_id',
-    'native_ownership': 'platform_family, endpoint_id, native_scope_id, resource_kind, native_id',
-}
 
 
 def _container() -> str:
@@ -64,16 +58,25 @@ def _client(container: str, password: str, command: str, user: str,
                            stderr=subprocess.PIPE, check=True)
 
 
-def _snapshot(connection, organization_id: str, tenant_id: str) -> dict:
-    result = {}
-    for table in TABLES[:-1]:
-        # Fixed, reviewed table identifiers. Tenant IDs remain parameters.
-        result[table] = connection.execute(
-            f'SELECT * FROM hosting_controlplane.{table} '
-            'WHERE organization_id = %s AND tenant_id = %s '
-            f'ORDER BY {ORDER_BY[table]}',
-            (organization_id, tenant_id)).fetchall()
-    result['schema_migrations'] = connection.execute(
+def _snapshot(connection) -> dict:
+    from psycopg import sql
+
+    tables = connection.execute(
+        "SELECT c.relname FROM pg_catalog.pg_class c "
+        "JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace "
+        "WHERE n.nspname = 'hosting_controlplane' AND c.relkind = 'r' "
+        'ORDER BY c.relname').fetchall()
+    names = [name for (name,) in tables]
+    if not set(REQUIRED_TABLES) <= set(names):
+        raise AssertionError('Core control-plane tables are missing')
+    # This is a disposable CI database, and the snapshot uses the authorized
+    # backup/admin role to inspect every tenant and every migration-owned table.
+    result = {'tables': {}}
+    for table in names:
+        rows = connection.execute(sql.SQL('SELECT * FROM hosting_controlplane.{}').format(
+            sql.Identifier(table))).fetchall()
+        result['tables'][table] = sorted(rows, key=repr)
+    result['migration_ledger'] = connection.execute(
         'SELECT version, script_digest FROM hosting_controlplane.schema_migrations '
         'ORDER BY version').fetchall()
     result['sequences'] = connection.execute(
@@ -89,6 +92,18 @@ def _snapshot(connection, organization_id: str, tenant_id: str) -> dict:
     return result
 
 
+def _unsafe_public_definer_functions(connection) -> list[str]:
+    rows = connection.execute(
+        "SELECT p.proname FROM pg_catalog.pg_proc p "
+        "JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace "
+        "WHERE n.nspname = 'hosting_controlplane' AND p.prosecdef "
+        "AND EXISTS (SELECT 1 FROM pg_catalog.aclexplode(" 
+        "COALESCE(p.proacl, pg_catalog.acldefault('f', p.proowner))) a "
+        "WHERE a.grantee = 0 AND a.privilege_type = 'EXECUTE') "
+        'ORDER BY p.proname').fetchall()
+    return [name for (name,) in rows]
+
+
 def main() -> int:
     if os.environ.get('HOSTING_TEST_POSTGRES_ISOLATED') != '1':
         raise RuntimeError('Restore gate runs only against the disposable CI database')
@@ -102,6 +117,8 @@ def main() -> int:
     admin_info = conninfo_to_dict(admin_dsn)
     migration_info = conninfo_to_dict(migration_dsn)
     original_db = admin_info['dbname']
+    if original_db != 'hosting_controlplane_test':
+        raise RuntimeError('Restore gate requires the named disposable CI database')
     restore_db = 'hosting_restore_' + uuid4().hex[:16]
     container = _container()
     suffix = uuid4().hex[:14]
@@ -129,7 +146,7 @@ def main() -> int:
     restored_migration_dsn = make_conninfo(migration_dsn, dbname=restore_db)
     restored_runtime_dsn = make_conninfo(runtime_dsn, dbname=restore_db)
     with psycopg.connect(admin_dsn) as source:
-        before = _snapshot(source, ctx.organization_id, ctx.tenant_id)
+        before = _snapshot(source)
     with psycopg.connect(admin_dsn, autocommit=True) as admin:
         admin.execute(sql.SQL('CREATE DATABASE {} OWNER {}').format(
             sql.Identifier(restore_db), sql.Identifier(migration_info['user'])))
@@ -163,9 +180,20 @@ def main() -> int:
                         restored_owner.execute(sql.SQL(
                             'ALTER TABLE hosting_controlplane.{} FORCE ROW LEVEL SECURITY'
                         ).format(sql.Identifier(table)))
+                # --no-acl intentionally omits runtime grants, but also omits
+                # source REVOKEs. Reapply deny-first defaults before inspection.
+                restored_owner.execute(
+                    'REVOKE ALL ON SCHEMA hosting_controlplane FROM PUBLIC')
+                restored_owner.execute(
+                    'REVOKE ALL ON ALL TABLES IN SCHEMA hosting_controlplane FROM PUBLIC')
+                restored_owner.execute(
+                    'REVOKE ALL ON ALL SEQUENCES IN SCHEMA hosting_controlplane FROM PUBLIC')
+                restored_owner.execute(
+                    'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA hosting_controlplane FROM PUBLIC')
 
         with psycopg.connect(restored_admin_dsn) as restored_admin:
-            after = _snapshot(restored_admin, ctx.organization_id, ctx.tenant_id)
+            after = _snapshot(restored_admin)
+            public_definers = _unsafe_public_definer_functions(restored_admin)
             owner = restored_admin.execute(
                 "SELECT r.rolsuper, r.rolbypassrls "
                 "FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n "
@@ -178,6 +206,8 @@ def main() -> int:
                                  'sequence state, migration ledger, or RLS flags differ')
         if owner != (False, False):
             raise AssertionError('Restored authority function owner bypasses row security')
+        if public_definers:
+            raise AssertionError('Restored SECURITY DEFINER functions are PUBLIC executable')
         if apply_migrations(lambda: psycopg.connect(restored_migration_dsn)) != []:
             raise AssertionError('Restored migration ledger was not current')
         # --no-acl omits runtime grants. This site remains observation-only
