@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
@@ -236,7 +237,8 @@ class JobPostgresTest(unittest.TestCase):
 
         workflow = Workflow()
         dispatcher = OutboxDispatcher(self.jobs, workflow,
-                                      dispatcher_id='site-a', namespace='mobility-test')
+                                      dispatcher_id='site-a', namespace='mobility-test',
+                                      start_history_retention_seconds=86400)
         with self.assertRaises(ConnectionError):
             dispatcher.run_one(self.tenant, lease_seconds=1)
         # Simulate lease expiry without a time-based sleep. The first run is
@@ -248,14 +250,26 @@ class JobPostgresTest(unittest.TestCase):
                 (job.job_id,))
         self.assertEqual(dispatcher.run_one(self.tenant).disposition, 'STARTED')
         self.assertEqual(len(workflow.runs), 1)
+        binding = self.jobs.start_run(self.tenant, job.job_id)
+        self.assertEqual((binding.namespace, binding.run_id),
+                         ('mobility-test', 'run-01'))
+        with self.psycopg.connect(self.dsn) as connection:
+            connection.execute(
+                "SELECT set_config('app.organization_id', %s, true), "
+                "set_config('app.tenant_id', %s, true)",
+                (self.tenant.organization_id, self.tenant.tenant_id))
+            with self.assertRaises(self.psycopg.Error):
+                connection.execute(
+                    'UPDATE hosting_controlplane.job_outbox SET start_run_id = %s '
+                    'WHERE job_id = %s', ('forged-run', job.job_id))
         progress = self.jobs.append_progress(
             self.tenant, job.job_id, event_key='workflow-event-01',
             event_type='WAITING_FOR_REVIEW', status='WAITING_APPROVAL',
-            detail={'step': 'approval-gate'})
+            detail={'stepId': 'approval-gate'})
         replay = self.jobs.append_progress(
             self.tenant, job.job_id, event_key='workflow-event-01',
             event_type='WAITING_FOR_REVIEW', status='WAITING_APPROVAL',
-            detail={'step': 'approval-gate'})
+            detail={'stepId': 'approval-gate'})
         self.assertEqual(progress.sequence, replay.sequence)
         self.assertEqual([event.sequence for event in
                           self.jobs.events(self.tenant, job.job_id)], [1, 2, 3])
@@ -284,12 +298,37 @@ class JobPostgresTest(unittest.TestCase):
 
         result = OutboxDispatcher(self.jobs, ExistingWorkflow(),
                                   dispatcher_id='retry-claim',
-                                  namespace='mobility-test').run_one(self.tenant)
+                                  namespace='mobility-test',
+                                  start_history_retention_seconds=86400).run_one(self.tenant)
         self.assertEqual(result.disposition, 'STARTED')
         self.assertEqual(self.jobs.get(self.tenant, job.job_id).status, 'SUCCEEDED')
         self.assertEqual([event.event_type for event in
                           self.jobs.events(self.tenant, job.job_id)],
                          ['JOB_ADMITTED', 'WORKFLOW_FINISHED'])
+
+    def test_uncertain_start_past_history_window_holds_without_replay(self):
+        job = self.jobs.submit(self.tenant, self.decision,
+                               idempotency_key=self.key('retention-bound'))
+
+        class LostStart:
+            calls = 0
+            def start(self, *, namespace, workflow_id, payload):
+                self.calls += 1
+                raise ConnectionError('result of durable start is unknown')
+
+        workflow = LostStart()
+        dispatcher = OutboxDispatcher(
+            self.jobs, workflow, dispatcher_id='retention-dispatch',
+            namespace='mobility-test', start_history_retention_seconds=1)
+        with self.assertRaises(ConnectionError):
+            dispatcher.run_one(self.tenant, lease_seconds=1)
+        time.sleep(1.2)
+        result = dispatcher.run_one(self.tenant)
+        self.assertEqual(result.disposition, 'HELD')
+        self.assertEqual(workflow.calls, 1)
+        self.assertEqual(self.jobs.get(self.tenant, job.job_id).status, 'HELD')
+        self.assertEqual(self.jobs.events(self.tenant, job.job_id)[-1].event_type,
+                         'START_RETENTION_HOLD')
 
 
 if __name__ == '__main__':

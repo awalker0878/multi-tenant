@@ -21,6 +21,18 @@ from provisioner.controlplane.persistence import TenantContext, canonical_record
 from provisioner.domain.enterprise_records import validate_record
 
 _KEY = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+_EVENT_TYPE = re.compile(r'^[A-Z][A-Z0-9_]{0,47}$')
+_DIGEST = re.compile(r'^[0-9a-f]{64}$')
+_STEPS = frozenset({'admission', 'workflow-start', 'approval-gate',
+                    'observe', 'prepare', 'provision', 'transfer', 'cutover',
+                    'verify', 'cleanup', 'reconcile'})
+_PHASES = frozenset({'DISCOVERY', 'PREPARE', 'APPROVAL', 'PROVISION',
+                     'TRANSFER', 'CUTOVER', 'VERIFY', 'CLEANUP', 'RECONCILE'})
+_REASONS = frozenset({'AUTHORITY_REVOKED', 'APPROVAL_REQUIRED',
+                      'NATIVE_UNCERTAIN', 'CAPACITY_UNAVAILABLE',
+                      'VALIDATION_FAILED', 'WORKFLOW_FAILED',
+                      'OPERATOR_HOLD', 'RECOVERY_REQUIRED', 'POLICY_DENIED',
+                      'TIMEOUT', 'CANCELLED', 'UNKNOWN'})
 
 
 class AdmissionRefused(ValueError):
@@ -29,6 +41,10 @@ class AdmissionRefused(ValueError):
 
 class AdmissionConflict(ValueError):
     """Idempotency key or exact plan is already bound to another submission."""
+
+
+class StartHistoryExpired(AdmissionRefused):
+    """An uncertain start is older than the guaranteed workflow history window."""
 
 
 class AdmissionAuthority(Protocol):
@@ -114,6 +130,23 @@ def _digest(value: dict) -> str:
     canonical = json.dumps(value, sort_keys=True, separators=(',', ':'),
                            ensure_ascii=False, allow_nan=False).encode('utf-8')
     return hashlib.sha256(canonical).hexdigest()
+
+
+def _progress_detail(detail: dict) -> None:
+    """Projection metadata only; raw errors, URLs and secrets belong nowhere here."""
+    if (not isinstance(detail, dict) or not set(detail) <=
+            {'stepId', 'phase', 'reasonCode', 'evidenceDigest', 'completed', 'total'}
+            or any(not isinstance(detail[key], str) or detail[key] not in allowed
+                   for key, allowed in (('stepId', _STEPS), ('phase', _PHASES),
+                                        ('reasonCode', _REASONS)) if key in detail)
+            or ('evidenceDigest' in detail and
+                (not isinstance(detail['evidenceDigest'], str) or
+                 _DIGEST.fullmatch(detail['evidenceDigest']) is None))
+            or any(type(detail[key]) is not int or not 0 <= detail[key] <= 10**12
+                   for key in ('completed', 'total') if key in detail)
+            or ('completed' in detail and 'total' in detail and
+                detail['completed'] > detail['total'])):
+        raise ValueError('Progress detail must contain only reviewed metadata fields')
 
 
 def _job(row) -> Job:
@@ -333,11 +366,12 @@ class JobRepository:
                         event_type: str, status: str, detail: dict) -> JobEvent:
         """Trusted workflow-event consumer only; event_key makes redelivery safe."""
         if (not isinstance(event_key, str) or not _KEY.fullmatch(event_key)
-                or not isinstance(event_type, str) or not _KEY.fullmatch(event_type)
+                or not isinstance(event_type, str) or not _EVENT_TYPE.fullmatch(event_type)
                 or status not in ('WAITING_APPROVAL', 'RUNNING', 'HELD',
                                   'SUCCEEDED', 'FAILED', 'CANCELLED')
                 or not isinstance(detail, dict)):
             raise ValueError('Invalid progress event')
+        _progress_detail(detail)
         with self._connect() as connection:
             with connection.cursor() as cursor:
                 _tenant(cursor, context)
@@ -458,17 +492,95 @@ class JobRepository:
                 self._authority.revalidate_start(cursor, job, now)
                 return job
 
+    def record_start_attempt(self, context, message: OutboxMessage, *,
+                             namespace: str, retention_seconds: int) -> None:
+        """Commit immutable start binding before calling an external workflow.
+
+        ``retention_seconds`` must not exceed guaranteed namespace history
+        retention. If an earlier start is no longer observable, never retry
+        blindly; operator reconciliation must decide whether it ran.
+        """
+        if (not isinstance(namespace, str) or not _KEY.fullmatch(namespace)
+                or type(retention_seconds) is not int
+                or not 1 <= retention_seconds <= 30 * 86400):
+            raise ValueError('Exact namespace and bounded retention required')
+        with self._connect() as connection, connection.cursor() as cursor:
+            _tenant(cursor, context)
+            cursor.execute(
+                'SELECT status FROM hosting_controlplane.operation_jobs '
+                'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s FOR SHARE',
+                (context.organization_id, context.tenant_id, message.job_id))
+            current = cursor.fetchone()
+            if current is None or current[0] in ('HELD', 'CANCELLED', 'FAILED'):
+                raise AdmissionRefused('Job has stopped before workflow handoff')
+            cursor.execute(
+                'SELECT payload, claim_token, claimed_until, start_namespace, '
+                'first_start_attempted_at, start_retention_until, '
+                'start_payload_digest, start_run_id FROM '
+                'hosting_controlplane.job_outbox WHERE organization_id = %s '
+                'AND tenant_id = %s AND outbox_id = %s AND job_id = %s '
+                'AND delivered_at IS NULL FOR UPDATE',
+                (context.organization_id, context.tenant_id,
+                 message.outbox_id, message.job_id))
+            row = cursor.fetchone()
+            cursor.execute('SELECT clock_timestamp()')
+            now = cursor.fetchone()[0]
+            if (row is None or row[1] != message.claim_token
+                    or row[2] is None or row[2] <= now
+                    or _json(row[0]) != message.payload):
+                raise AdmissionRefused('Outbox claim changed before workflow handoff')
+            if current[0] == 'SUCCEEDED' and row[4] is None:
+                raise AdmissionRefused('Terminal job has no prior workflow start attempt')
+            digest = _digest(message.payload)
+            if row[4] is not None:
+                if (row[3] != namespace or row[6] != digest or row[7] is not None):
+                    raise AdmissionConflict('Workflow start binding differs from original attempt')
+                from datetime import timedelta
+                if now >= min(row[5], row[4] + timedelta(seconds=retention_seconds)):
+                    raise StartHistoryExpired('Uncertain workflow start needs operator reconciliation')
+                return
+            cursor.execute(
+                'UPDATE hosting_controlplane.job_outbox SET start_namespace = %s, '
+                'first_start_attempted_at = %s, '
+                "start_retention_until = %s + (%s * interval '1 second'), "
+                'start_payload_digest = %s WHERE organization_id = %s '
+                'AND tenant_id = %s AND outbox_id = %s',
+                (namespace, now, now, retention_seconds, digest,
+                 context.organization_id, context.tenant_id, message.outbox_id))
+
+    def start_run(self, context, job_id: str) -> StartReceipt | None:
+        """Return the durable run binding; never infer it from a workflow ID."""
+        with self._connect() as connection, connection.cursor() as cursor:
+            _tenant(cursor, context)
+            cursor.execute(
+                'SELECT start_namespace, start_run_id, payload, '
+                'start_payload_digest FROM hosting_controlplane.job_outbox '
+                'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s '
+                'AND delivered_at IS NOT NULL',
+                (context.organization_id, context.tenant_id, job_id))
+            row = cursor.fetchone()
+        if row is None or row[0] is None or row[1] is None:
+            return None
+        payload = _json(row[2])
+        if _digest(payload) != row[3]:
+            raise AdmissionConflict('Durable workflow payload binding is inconsistent')
+        return StartReceipt(row[0], job_id, row[1], job_id,
+                            payload['plan_id'], payload['plan_revision'],
+                            payload['plan_digest'], row[3])
+
     def mark_started(self, context, message: OutboxMessage,
                      receipt: StartReceipt, *, namespace: str) -> bool:
         """Acknowledge only after workflow returned a matching durable receipt."""
         payload = message.payload
-        if not isinstance(receipt, StartReceipt) or not namespace or (
+        if (not isinstance(receipt, StartReceipt) or not namespace or (
                 receipt.namespace, receipt.workflow_id, receipt.job_id,
                 receipt.plan_id, receipt.plan_revision, receipt.plan_digest,
                 receipt.payload_digest) != (
                 namespace, message.job_id, message.job_id,
                 payload['plan_id'], payload['plan_revision'],
-                payload['plan_digest'], _digest(payload)) or not receipt.run_id:
+                payload['plan_digest'], _digest(payload)) or
+                not isinstance(receipt.run_id, str) or
+                _KEY.fullmatch(receipt.run_id) is None):
             raise AdmissionConflict('Workflow receipt does not bind the exact outbox intent')
         with self._connect() as connection:
             with connection.cursor() as cursor:
@@ -483,15 +595,29 @@ class JobRepository:
                 cursor.execute(
                     'UPDATE hosting_controlplane.job_outbox SET '
                     'delivered_at = clock_timestamp(), claim_token = NULL, '
-                    'claimed_by = NULL, claimed_until = NULL '
+                    'claimed_by = NULL, claimed_until = NULL, start_run_id = %s '
                     'WHERE organization_id = %s AND tenant_id = %s AND outbox_id = %s '
                     'AND job_id = %s AND claim_token = %s AND delivered_at IS NULL '
                     'AND payload = %s::jsonb '
-                    'AND claimed_until >= clock_timestamp() RETURNING job_id',
-                    (context.organization_id, context.tenant_id,
+                    'AND start_namespace = %s AND start_payload_digest = %s '
+                    'AND start_run_id IS NULL AND claimed_until >= clock_timestamp() '
+                    'RETURNING job_id',
+                    (receipt.run_id, context.organization_id, context.tenant_id,
                      message.outbox_id, message.job_id, message.claim_token,
-                     json.dumps(message.payload)))
+                     json.dumps(message.payload), namespace, _digest(message.payload)))
                 if cursor.fetchone() is None:
+                    cursor.execute(
+                        'SELECT delivered_at, start_namespace, start_run_id, '
+                        'start_payload_digest FROM hosting_controlplane.job_outbox '
+                        'WHERE organization_id = %s AND tenant_id = %s AND '
+                        'outbox_id = %s AND job_id = %s',
+                        (context.organization_id, context.tenant_id,
+                         message.outbox_id, message.job_id))
+                    bound = cursor.fetchone()
+                    if (bound is not None and bound[0] is not None and
+                            (bound[1], bound[2], bound[3]) !=
+                            (namespace, receipt.run_id, _digest(message.payload))):
+                        raise AdmissionConflict('Workflow intent has a different durable run')
                     return False
                 status, sequence = current
                 if status == 'HELD':
@@ -517,8 +643,11 @@ class JobRepository:
                      message.job_id, next_sequence, 'STARTED'))
                 return True
 
-    def hold_start(self, context, message: OutboxMessage) -> bool:
+    def hold_start(self, context, message: OutboxMessage, *,
+                   reason: str = 'AUTHORITY_HOLD') -> bool:
         """Stop dispatch on failed authority recheck; no workflow is started."""
+        if reason not in ('AUTHORITY_HOLD', 'START_RETENTION_HOLD'):
+            raise ValueError('Unknown hold reason')
         with self._connect() as connection:
             with connection.cursor() as cursor:
                 _tenant(cursor, context)
@@ -547,7 +676,9 @@ class JobRepository:
                 cursor.execute(
                     'INSERT INTO hosting_controlplane.job_events '
                     '(organization_id, tenant_id, job_id, sequence, event_key, event_type, status) '
-                    "VALUES (%s, %s, %s, %s, 'start-authority-hold', 'AUTHORITY_HOLD', 'HELD')",
+                    'VALUES (%s, %s, %s, %s, %s, %s, %s)',
                     (context.organization_id, context.tenant_id,
-                     message.job_id, sequence + 1))
+                     message.job_id, sequence + 1,
+                     'start-authority-hold' if reason == 'AUTHORITY_HOLD'
+                     else 'start-retention-hold', reason, 'HELD'))
                 return True
