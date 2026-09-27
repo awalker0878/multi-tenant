@@ -107,6 +107,8 @@ async function signIn(forApproval = false) {
   const state = randomBase64Url();
   const verifier = randomBase64Url();
   const nonce = randomBase64Url();
+  // A new login supersedes any code exchange still in flight for this tab.
+  tokenVersion++;
   pending = { popup, state, verifier, started: Date.now(), forApproval };
   const attempt = pending;
   setTimeout(() => {
@@ -117,6 +119,7 @@ async function signIn(forApproval = false) {
   }, 5 * 60 * 1000);
   try {
     const challenge = await challengeFor(verifier);
+    if (pending !== attempt) return;
     const url = new URL(config.authorizeUrl);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('response_mode', 'form_post');
@@ -136,6 +139,7 @@ async function signIn(forApproval = false) {
     popup.location.replace(url.href);
     announce('Complete enterprise sign-in in the popup.');
   } catch (_) {
+    if (pending !== attempt) return;
     popup.close();
     pending = null;
     announce('Could not start enterprise sign-in.', true);
@@ -148,6 +152,7 @@ async function receiveAuthorization(event) {
   if (!data || data.kind !== 'mobility-oidc-response' || data.state !== pending.state || data.issuer !== config.issuer) return;
   const { verifier, popup, started, forApproval } = pending;
   pending = null;
+  const exchangeVersion = tokenVersion;
   if (!popup.closed) popup.close();
   if (Date.now() - started > 5 * 60 * 1000) {
     announce('Sign-in timed out. Please try again.', true);
@@ -165,7 +170,9 @@ async function receiveAuthorization(event) {
     });
     if (!response.ok) throw new Error('exchange');
     const result = await response.json();
+    if (tokenVersion !== exchangeVersion) return;
     if (result.token_type !== 'Bearer' || typeof result.access_token !== 'string' || !result.access_token) throw new Error('token');
+    if (expiryTimer) clearTimeout(expiryTimer);
     accessToken = result.access_token;
     tokenVersion++;
     stepUpRequested = forApproval;
@@ -180,6 +187,7 @@ async function receiveAuthorization(event) {
       : 'Token acquired for this tab. Enter a WSD, job or plan ID to load records.');
     await loadScopes();
   } catch (_) {
+    if (tokenVersion !== exchangeVersion) return;
     clearSession('Enterprise sign-in failed. Please try again.');
     $('page-error').hidden = false;
     $('page-error').textContent = 'The identity provider did not complete the code exchange.';
@@ -188,34 +196,43 @@ async function receiveAuthorization(event) {
 
 async function apiGet(path) {
   if (!accessToken) throw new Error('Sign in first.');
+  const credential = accessToken;
+  const version = tokenVersion;
   const response = await fetch(path, {
     method: 'GET', credentials: 'omit', cache: 'no-store',
-    headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' }
+    headers: { Authorization: `Bearer ${credential}`, Accept: 'application/json' }
   });
+  if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
   if (response.status === 401) {
     clearSession('Token rejected or expired. Sign in again.');
     throw new Error('Token rejected or expired.');
   }
   if (response.status === 404) throw new Error('Record unavailable or outside your authorized scope.');
   if (!response.ok) throw new Error(`The API returned HTTP ${response.status}.`);
-  return response.json();
+  const result = await response.json();
+  if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
+  return result;
 }
 
 async function apiPost(path, body) {
   if (!accessToken) throw new Error('Sign in first.');
+  const credential = accessToken;
+  const version = tokenVersion;
   let response;
   try {
     response = await fetch(path, {
       method: 'POST', credentials: 'omit', cache: 'no-store',
-      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json',
+      headers: { Authorization: `Bearer ${credential}`, Accept: 'application/json',
         'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
   } catch (_) {
+    if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
     const error = new Error('Approval result is unknown. Check the approval audit before retrying.');
     error.unknown = true;
     throw error;
   }
+  if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
   if (response.status === 401) {
     clearSession('Token rejected or expired. Sign in again.');
     throw new Error('Token rejected or expired.');
@@ -232,8 +249,11 @@ async function apiPost(path, body) {
     throw error;
   }
   try {
-    return await response.json();
+    const result = await response.json();
+    if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
+    return result;
   } catch (_) {
+    if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
     const error = new Error('Approval result is unknown. Check the approval audit before retrying.');
     error.unknown = true;
     throw error;
@@ -241,8 +261,10 @@ async function apiPost(path, body) {
 }
 
 async function loadScopes() {
+  const version = tokenVersion;
   try {
     const scopes = await apiGet('/v1/access/scopes');
+    if (tokenVersion !== version) return;
     const ids = [...new Set(scopes.items
       .filter((item) => item.kind === 'PORTFOLIO' && item.role === 'WORKLOAD_READER')
       .map((item) => item.securityDomainId))].filter((id) => idPattern.test(id)).sort();
@@ -253,6 +275,7 @@ async function loadScopes() {
       ? `${ids.length} WSD read selector(s) available. Choose one to load recorded workloads.`
       : 'No WSD read grants were returned for this identity.';
   } catch (error) {
+    if (tokenVersion !== version) return;
     $('workload-status').textContent = error.message;
   }
 }
@@ -298,7 +321,7 @@ async function loadWorkloads(reset = false) {
       ? `Showing ${$('workload-rows').childElementCount} recorded workload(s) in ${wsd}.`
       : 'No workloads were returned for this WSD.';
   } catch (error) {
-    $('workload-status').textContent = error.message;
+    if (requestNumber === workloadRequest) $('workload-status').textContent = error.message;
   }
 }
 
@@ -334,8 +357,10 @@ async function loadJob(reset = false) {
     await loadEvents();
     $('job-status').textContent = `Last recorded event sequence: ${job.lastEventSequence}.`;
   } catch (error) {
-    $('job-status').textContent = error.message;
-    $('job-details').hidden = true;
+    if (requestNumber === jobRequest) {
+      $('job-status').textContent = error.message;
+      $('job-details').hidden = true;
+    }
   }
 }
 
@@ -489,6 +514,7 @@ async function recordApproval() {
     approvalSubmitted = true;
     $('approval-status').textContent = `Approval ${receipt.approvalId} recorded for ${role}, revision ${receipt.planRevision}, digest ${receipt.planDigest}; expires ${receipt.expiresAt}.`;
   } catch (error) {
+    if (reviewedPlan !== plan || currentTokenVersion !== tokenVersion) return;
     if (error.stale) {
       clearReview(error.message);
       return;
@@ -496,8 +522,10 @@ async function recordApproval() {
     $('approval-status').textContent = error.message;
     if (error.unknown) approvalSubmitted = true;
   } finally {
-    approvalBusy = false;
-    updateApprovalControls();
+    if (reviewedPlan === plan && currentTokenVersion === tokenVersion) {
+      approvalBusy = false;
+      updateApprovalControls();
+    }
   }
 }
 
@@ -518,7 +546,11 @@ $('job-form').addEventListener('submit', (event) => {
 });
 $('refresh-job').addEventListener('click', () => loadJob());
 $('more-events').addEventListener('click', async () => {
-  try { await loadEvents(); } catch (error) { $('job-status').textContent = error.message; }
+  const version = tokenVersion;
+  const jobId = activeJob;
+  try { await loadEvents(); } catch (error) {
+    if (version === tokenVersion && jobId === activeJob) $('job-status').textContent = error.message;
+  }
 });
 $('review-form').addEventListener('submit', (event) => {
   event.preventDefault();

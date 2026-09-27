@@ -54,7 +54,14 @@ function samplePlan() {
   };
 }
 
-async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = digest } = {}) {
+function deferred() {
+  let resolve;
+  const promise = new Promise((done) => { resolve = done; });
+  return { promise, resolve };
+}
+
+async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = digest,
+  exchange, scopes } = {}) {
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id)) elements.set(id, new Element(id));
@@ -85,8 +92,8 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
       redirectUri: origin + '/portal/callback', clientId: 'portal',
       audience: 'hosting-api', scope: 'openid profile', stepUpAcr
     });
-    if (url === '/portal/token') return json({ access_token: 'opaque', token_type: 'Bearer' });
-    if (url === '/v1/access/scopes') return json({ items: [] });
+    if (url === '/portal/token') return exchange ? exchange() : json({ access_token: 'opaque', token_type: 'Bearer' });
+    if (url === '/v1/access/scopes') return scopes ? scopes() : json({ items: [] });
     if (url === '/v1/plans/plan-01/review') return json(samplePlan());
     if (url === '/v1/plans/plan-01/approvals') {
       approvalRequests.push(JSON.parse(options.body));
@@ -104,17 +111,22 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
   };
   vm.runInNewContext(script, context, { filename: portal });
   await new Promise(setImmediate);
-  async function authenticate(forApproval) {
+  async function beginAuth(forApproval) {
     await context.signIn(forApproval);
     const popup = popups.at(-1);
     const params = new URL(popup.authUrl).searchParams;
-    await context.receiveAuthorization({ origin, source: popup, data: {
+    const finish = () => context.receiveAuthorization({ origin, source: popup, data: {
       kind: 'mobility-oidc-response', state: params.get('state'), issuer,
       code: 'code12345', error: null
     } });
+    return { params, finish };
+  }
+  async function authenticate(forApproval) {
+    const { params, finish } = await beginAuth(forApproval);
+    await finish();
     return params;
   }
-  return { context, element, authenticate, approvalRequests };
+  return { context, element, authenticate, beginAuth, approvalRequests, json };
 }
 
 test('approval requires configured step-up and fresh exact plan review', async () => {
@@ -168,4 +180,44 @@ test('approval controls remain hidden when step-up is not configured', async () 
   assert.equal(element('approval-panel').hidden, true);
   await context.recordApproval();
   assert.equal(approvalRequests.length, 0);
+});
+
+test('clearing the tab during token exchange cannot restore the old identity', async () => {
+  const waiting = deferred();
+  const { context, element, beginAuth, json } = await harness({ exchange: () => waiting.promise });
+  const { finish } = await beginAuth(false);
+  const completion = finish();
+  context.clearSession('Signed out.');
+  waiting.resolve(json({ access_token: 'old-actor', token_type: 'Bearer' }));
+  await completion;
+  assert.equal(element('clear-session').disabled, true);
+  assert.equal(element('sign-in').disabled, false);
+  assert.equal(element('session-status').textContent, 'Signed out.');
+  await assert.rejects(context.apiGet('/v1/access/scopes'), /Sign in first/);
+});
+
+test('late responses from an old actor never replace or sign out a new actor', async () => {
+  for (const oldStatus of [200, 401]) {
+    const waiting = deferred();
+    let calls = 0;
+    const { context, element, beginAuth, authenticate, json } = await harness({
+      exchange: () => json({ access_token: ++calls === 1 ? 'old-actor' : 'new-actor', token_type: 'Bearer' }),
+      scopes: () => calls === 1 ? waiting.promise : json({ items: [{
+        kind: 'PORTFOLIO', role: 'WORKLOAD_READER', securityDomainId: 'new-wsd'
+      }] })
+    });
+    const { finish } = await beginAuth(false);
+    const oldCompletion = finish();
+    await new Promise(setImmediate);
+    context.clearSession('Switch identity.');
+    await authenticate(false);
+    assert.equal(element('wsd-selector').children[1].value, 'new-wsd');
+    waiting.resolve(oldStatus === 200 ? json({ items: [{
+      kind: 'PORTFOLIO', role: 'WORKLOAD_READER', securityDomainId: 'old-wsd'
+    }] }) : json({ error: {} }, 401));
+    await oldCompletion;
+    assert.equal(element('wsd-selector').children[1].value, 'new-wsd');
+    assert.equal(element('clear-session').disabled, false);
+    assert.equal(element('sign-in').disabled, true);
+  }
 });
