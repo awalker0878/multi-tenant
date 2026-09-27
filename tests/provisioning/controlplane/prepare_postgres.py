@@ -77,6 +77,9 @@ def main() -> int:
             'hosting_controlplane.native_operation_reviews, '
             'hosting_controlplane.native_owner_recovery_reviews, '
             'hosting_controlplane.native_containment_holds TO {}',
+            'GRANT SELECT, INSERT, UPDATE ON '
+            'hosting_controlplane.evidence_streams TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.evidence_entries TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
             connection.execute(sql.SQL(statement).format(runtime))
