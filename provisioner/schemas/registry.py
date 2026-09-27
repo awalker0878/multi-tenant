@@ -18,6 +18,7 @@ SCHEMAS = {
     'placement-decision': 'v1/placement-decision.schema.json',
     'conformance-report': 'v1/conformance-report.schema.json',
     'workload-mobility': 'v1/workload-mobility.schema.json',
+    'enterprise-record': 'v1/enterprise-record.schema.json',
 }
 
 SUPPORTED_KEYWORDS = {
