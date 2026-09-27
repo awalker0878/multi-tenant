@@ -1,14 +1,18 @@
 # PostgreSQL control-plane migrations
 
-Install the `controlplane` extra, provision a dedicated migration role and a
-separate runtime role, then run `python -m
+Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
+NOBYPASSRLS` migration role with `CREATE` on the database and a separate
+runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
 for the migration role. The runner applies packaged `0001_*.sql`, `0002_*.sql`,
 and later migrations in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
 
-The runtime role must be `NOSUPERUSER NOBYPASSRLS`, must not own the tables or
+The migration role owns the schema, tables, triggers, and SECURITY DEFINER
+functions. It must not be a superuser or have BYPASSRLS; FORCE RLS must still
+apply inside the authority lock function. The runtime role must be `NOSUPERUSER
+NOBYPASSRLS`, must not own the tables or
 schema, must not inherit the migration role, and must not have `CREATE`,
 `DELETE`, or `TRUNCATE` on product tables. The migration role grants only the
 required permissions after migrations:
@@ -28,9 +32,14 @@ GRANT SELECT, INSERT ON hosting_controlplane.job_events TO hosting_runtime;
 GRANT SELECT ON hosting_controlplane.plan_authority_state,
     hosting_controlplane.plan_approvals,
     hosting_controlplane.plan_revocations TO hosting_runtime;
+GRANT EXECUTE ON FUNCTION
+    hosting_controlplane.lock_authority_scope(text, text, text)
+    TO hosting_runtime;
 GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane
     TO hosting_runtime;
 -- Provision a separate authority writer for approval and revocation DML.
+-- Grant EXECUTE on lock_authority_scope to that writer as well, plus only the
+-- exact authority-table DML it needs. No UPDATE on append-only approvals.
 ```
 
 The service sets `app.organization_id` and `app.tenant_id` with transaction-local

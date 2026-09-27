@@ -55,7 +55,8 @@ class PostgresStoreTests(unittest.TestCase):
         suffix = uuid4().hex[:12]
         self.ctx = TenantContext('org-' + suffix, 'tenant-a')
         self.other = TenantContext(self.ctx.organization_id, 'tenant-b')
-        self.audit = AuditContext('operator-01', 'test-' + suffix)
+        self.audit = AuditContext('issuer|https://idp.example/subjects/operator@example.com',
+                                  'test-' + suffix)
 
     def _workload(self, ctx: TenantContext) -> dict:
         record = workload()

@@ -1,4 +1,4 @@
-"""Apply packaged PostgreSQL migrations with one transactional advisory lock.
+"""Apply packaged PostgreSQL migrations under a session advisory lock.
 
 Run with an independently provisioned migration role. It must never be the
 service's runtime role. The runtime uses no DDL permission.
@@ -23,10 +23,16 @@ def apply_migrations(connection_factory: Callable) -> list[str]:
         raise RuntimeError('Packaged PostgreSQL migrations are incomplete or unordered')
     changed = []
     with connection_factory() as connection:
+        # Apply each file in an independent explicit transaction below.
+        connection.autocommit = True
+        role = connection.execute(
+            'SELECT rolsuper, rolbypassrls FROM pg_catalog.pg_roles '
+            'WHERE rolname = current_user').fetchone()
+        if role is None or role[0] or role[1]:
+            raise RuntimeError('Migration owner must be NOSUPERUSER NOBYPASSRLS')
         # A session lock persists across separate per-file transactions. With
         # autocommit on, each ``transaction()`` has its own all-or-nothing DDL
         # and version-ledger insert; an interrupted run resumes at the next file.
-        connection.autocommit = True
         connection.execute('SELECT pg_advisory_lock(1414676272, 1129141068)')
         try:
             exists = connection.execute(
