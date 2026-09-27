@@ -12,10 +12,17 @@ import re
 import ssl
 from typing import Callable
 from urllib.parse import urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 _NAME = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')
 _SIGNATURE = re.compile(r'^vault:v[1-9][0-9]*:[A-Za-z0-9+/]+={0,2}$')
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    """A Vault response cannot choose another destination for its token."""
+
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        return None
 
 
 class VaultTransitClient:
@@ -44,7 +51,8 @@ class VaultTransitClient:
         request = Request(f'{self._origin}/v1/{mount}/{operation}/{key}', body,
                           headers={'Content-Type': 'application/json', 'X-Vault-Token': token},
                           method='POST')
-        with urlopen(request, timeout=self._timeout, context=self._tls) as response:
+        opener = build_opener(HTTPSHandler(context=self._tls), _NoRedirect())
+        with opener.open(request, timeout=self._timeout) as response:
             raw = response.read(65537)
         if len(raw) > 65536:
             raise ValueError('Vault response exceeded size limit')

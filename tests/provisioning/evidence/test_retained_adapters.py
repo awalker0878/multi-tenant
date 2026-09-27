@@ -7,9 +7,15 @@ import io
 import json
 import unittest
 from datetime import datetime, timedelta, timezone
+from email.message import Message
+from unittest.mock import patch
+from urllib.error import HTTPError
+from urllib.request import HTTPSHandler
+from urllib.response import addinfourl
 
 from provisioner.controlplane.evidence import (S3ObjectLockArtifactStore,
                                                S3ObjectLockCheckpointStore,
+                                               VaultTransitClient,
                                                VaultTransitSigner,
                                                VaultTransitVerifier)
 
@@ -129,6 +135,44 @@ class RetainedAdapterTests(unittest.TestCase):
             verifier.verify(signer.key_id, b'tampered', signature)
         with self.assertRaises(ValueError):
             verifier.verify('revoked-key', b'{"head":"abc"}', signature)
+
+    def test_vault_redirect_does_not_forward_service_token(self):
+        target = 'https://other.example.test/collect'
+
+        class RedirectingHTTPS(HTTPSHandler):
+            def __init__(self):
+                super().__init__()
+                self.requests = []
+
+            def https_open(self, request):
+                self.requests.append((request.full_url,
+                                      request.get_header('X-vault-token')))
+                headers = Message()
+                if request.full_url.startswith('https://vault.example.test/'):
+                    headers['Location'] = target
+                    response = addinfourl(io.BytesIO(b''), headers,
+                                           request.full_url, 302)
+                    response.msg = 'Found'
+                    return response
+                response = addinfourl(io.BytesIO(b'{"data":{"valid":true}}'),
+                                       headers, request.full_url, 200)
+                response.msg = 'OK'
+                return response
+
+        transport = RedirectingHTTPS()
+        client = VaultTransitClient('https://vault.example.test',
+                                    lambda: 'scoped-vault-token')
+        # Replace only the network transport. urllib's real redirect handling
+        # still runs, so an accidental follow would call this mock at target.
+        with patch('provisioner.controlplane.evidence.vault.HTTPSHandler',
+                   return_value=transport):
+            with self.assertRaises(HTTPError) as rejected:
+                client.post('transit', 'verify', 'checkpoint', {'input': 'abc'})
+        self.assertEqual(rejected.exception.code, 302)
+        self.assertEqual(transport.requests, [
+            ('https://vault.example.test/v1/transit/verify/checkpoint',
+             'scoped-vault-token')])
+        self.assertFalse(any(url == target for url, _ in transport.requests))
 
 
 if __name__ == '__main__':
