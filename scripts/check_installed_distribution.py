@@ -68,23 +68,36 @@ raise SystemExit(result)
 def run(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.pop('PYTHONPATH', None)
-    return subprocess.run(args, cwd=cwd, env=env, text=True,
-                          capture_output=True, check=True)
+    completed = subprocess.run(args, cwd=cwd, env=env, text=True,
+                               capture_output=True)
+    if completed.returncode:
+        raise RuntimeError(f'Installed-wheel check failed (exit {completed.returncode}): '
+                           f'{args[:4]}\nstdout:\n{completed.stdout[-8000:]}\n'
+                           f'stderr:\n{completed.stderr[-8000:]}')
+    return completed
 
 
 def main() -> None:
     with tempfile.TemporaryDirectory(prefix='hosting-wheel-') as directory:
         scratch = Path(directory)
+        archives = scratch / 'archives'
         wheels = scratch / 'wheels'
         installed = scratch / 'installed'
         foreign = scratch / 'foreign'
+        archives.mkdir()
         wheels.mkdir()
         foreign.mkdir()
         request = foreign / 'request.yaml'
         shutil.copyfile(ROOT / 'examples/requests/internal-production.yaml', request)
 
+        # Build through the source distribution to test MANIFEST.in as well as
+        # the wheel: published source archives must not lose reviewed assets.
+        run(sys.executable, 'setup.py', 'sdist', '--dist-dir', str(archives), cwd=ROOT)
+        source_archives = list(archives.glob('hosting_provisioner-*.tar.gz'))
+        if len(source_archives) != 1:
+            raise AssertionError(f'Expected one source archive, found {source_archives}')
         run(sys.executable, '-m', 'pip', 'wheel', '--no-build-isolation',
-            '--no-deps', '--wheel-dir', str(wheels), str(ROOT), cwd=foreign)
+            '--no-deps', '--wheel-dir', str(wheels), str(source_archives[0]), cwd=foreign)
         built = list(wheels.glob('hosting_provisioner-*.whl'))
         if len(built) != 1:
             raise AssertionError(f'Expected one built wheel, found {built}')
@@ -98,7 +111,8 @@ def main() -> None:
                 or result.get('status') != 'PLANNED_DISABLED_NOT_AUTHORIZED'
                 or result.get('native_contact') is not False):
             raise AssertionError(f'Installed planning result unexpected: {result}')
-        print(json.dumps({'status': 'PASSED', 'wheel': built[0].name,
+        print(json.dumps({'status': 'PASSED', 'sdist': source_archives[0].name,
+                          'wheel': built[0].name,
                           'plan_status': result['status'],
                           'native_contact': result['native_contact']}, sort_keys=True))
 
