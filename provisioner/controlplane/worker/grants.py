@@ -173,7 +173,7 @@ class PostgresWorkerGrants:
     def _authorize(self, cursor, context: TenantContext, identity: VerifiedWorkerIdentity,
                    job, *, operation_id: str, operation_kind: str,
                    operation_scope: PlanScope, lease_key: str, lease_epoch: int,
-                   at: datetime) -> tuple[str, datetime]:
+                   at: datetime) -> tuple[str, datetime, datetime]:
         _identity(context, identity, at)
         if operation_scope not in (job.source, job.destination):
             raise GrantDenied('Operation scope differs from the approved job')
@@ -184,7 +184,19 @@ class PostgresWorkerGrants:
             cursor, context, lease_key=lease_key, lease_epoch=lease_epoch,
             job_id=job.job_id, operation_id=operation_id,
             scope=operation_scope, worker_subject=identity.subject)
-        return credential_ref, min(identity.expires_at, enrollment_expiry)
+        # The locks above may have waited past a certificate, approval, lease
+        # or grant deadline. Re-read the database clock under those locks.
+        cursor.execute('SELECT clock_timestamp()')
+        current = cursor.fetchone()[0]
+        _identity(context, identity, current)
+        if enrollment_expiry <= current:
+            raise GrantDenied('Worker enrollment expired while waiting for authority')
+        authority_postgres.revalidate_start(cursor, job, current)
+        self._leases.require_current(
+            cursor, context, lease_key=lease_key, lease_epoch=lease_epoch,
+            job_id=job.job_id, operation_id=operation_id,
+            scope=operation_scope, worker_subject=identity.subject)
+        return credential_ref, min(identity.expires_at, enrollment_expiry), current
 
     def issue_grant(self, context: TenantContext, identity: VerifiedWorkerIdentity,
                     request: GrantRequest) -> WorkerGrant:
@@ -197,7 +209,7 @@ class PostgresWorkerGrants:
                 cursor.execute('SELECT clock_timestamp()')
                 at = cursor.fetchone()[0]
                 job = self._job(cursor, context, request.job_id)
-                _, identity_expiry = self._authorize(
+                _, identity_expiry, issued_at = self._authorize(
                     cursor, context, identity, job,
                     operation_id=request.operation_id,
                     operation_kind=request.operation_kind,
@@ -206,8 +218,8 @@ class PostgresWorkerGrants:
                 # The authority check verifies every approval's validity at
                 # issue time. Grant lifetime remains short and is rechecked
                 # against approvals at each subsequent use.
-                expires = min(at + request.ttl, identity_expiry)
-                if expires <= at:
+                expires = min(issued_at + request.ttl, identity_expiry)
+                if expires <= issued_at:
                     raise GrantDenied('Worker identity expired before grant issue')
                 grant_id = uuid4().hex
                 scope = request.operation_scope
@@ -228,7 +240,7 @@ class PostgresWorkerGrants:
                      request.step_id, request.operation_id, request.operation_kind,
                      scope.site_id, scope.security_domain_id, scope.endpoint_id,
                      scope.native_scope_id, scope.platform_family,
-                     request.lease_key, request.lease_epoch, at, expires))
+                     request.lease_key, request.lease_epoch, issued_at, expires))
                 return WorkerGrant(
                     grant_id, context.organization_id, context.tenant_id,
                     job.plan_id, job.plan_revision, job.plan_digest,
@@ -236,7 +248,7 @@ class PostgresWorkerGrants:
                     request.step_id, request.operation_id,
                     request.operation_kind, scope, request.lease_key,
                     request.lease_epoch, job.approval_ids,
-                    job.revocation_epoch, at, expires)
+                    job.revocation_epoch, issued_at, expires)
 
     @staticmethod
     def _load(cursor, context: TenantContext, grant_id: str):
@@ -314,10 +326,12 @@ class PostgresWorkerGrants:
             job.approval_ids, job.revocation_epoch) != (
                 plan_id, revision, digest, approvals, epoch):
             raise GrantDenied('Grant differs from the immutable job authority')
-        reference, identity_expiry = self._authorize(
+        reference, identity_expiry, checked_at = self._authorize(
             cursor, context, identity, job, operation_id=operation_id,
             operation_kind=operation_kind, operation_scope=operation_scope,
             lease_key=lease_key, lease_epoch=lease_epoch, at=at)
+        if expires <= checked_at:
+            raise GrantDenied('Worker grant expired while waiting for authority')
         grant = WorkerGrant(grant_id, context.organization_id,
                             context.tenant_id, plan_id, revision, digest,
                             job.source, job.destination, subject, step_id,
