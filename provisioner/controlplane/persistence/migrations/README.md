@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0012`
+for the migration role. The runner applies packaged migrations `0001`–`0014`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -20,6 +20,8 @@ required permissions after migrations:
 ```sql
 GRANT USAGE ON SCHEMA hosting_controlplane TO hosting_runtime;
 GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.enterprise_records
+    TO hosting_runtime;
+GRANT SELECT, INSERT ON hosting_controlplane.environment_registrations
     TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.enterprise_record_history
     TO hosting_runtime;
@@ -47,6 +49,10 @@ The service sets `app.organization_id` and `app.tenant_id` with transaction-loca
 role must have no arbitrary SQL endpoint: PostgreSQL custom settings can be
 changed by a role able to issue SQL. Composite tenant keys and forced RLS
 provide defense in depth; authentication and authorization remain mandatory.
+Migration `0013` stores append-only human environment declarations under forced
+tenant RLS. Its generated status is always `DECLARED_UNVERIFIED`. The API checks
+the exact native site, WSD, endpoint, scope and platform grant before insertion
+or returning a row; this registry grants no native access or execution authority.
 
 OIDC enrollment uses a separate pre-tenant directory boundary (0009). The
 OIDC access token supplies only issuer, subject, and session ID; it cannot
@@ -95,6 +101,16 @@ Migration `0011` offers `lock_job_scope(text, text, text)` to the read-only
 workflow Activity role. Grant it `EXECUTE` on that function and `SELECT` on
 `operation_jobs`; it does not need UPDATE permission to hold the job row stable
 while checking current authority in its own transaction.
+
+Migration `0013` registers environment enrollment under the verified tenant
+and security-domain scope. Grant the API/runtime role `SELECT, INSERT` on
+`environment_registrations`; the existing scoped audit INSERT records the
+registration. Other roles do not need access to this table. Migration `0014`
+adds `lock_native_worker_scope(text, text, text)` for a dedicated site worker
+role. Grant that role `EXECUTE` on this helper and the existing job, authority
+and worker lock helpers; grant `SELECT` only on `operation_jobs`,
+`worker_grants`, `enterprise_records`, `audit_events`, `plan_approvals`, and
+`native_containment_holds`. It must have no DML, DDL or table ownership.
 
 The audit/history trigger forbids UPDATE and DELETE, and the restricted runtime
 role cannot TRUNCATE or change the trigger. Migration `0008` chains every

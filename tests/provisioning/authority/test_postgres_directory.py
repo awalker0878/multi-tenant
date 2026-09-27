@@ -203,6 +203,21 @@ class DirectoryPostgresTests(unittest.TestCase):
         self.assertEqual(self.directory.resolve(
             self.issuer, self.subject, self.session).grants, ())
 
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:
+            owner.execute(
+                'UPDATE hosting_controlplane.directory_subjects SET grants = %s::jsonb '
+                'WHERE issuer = %s AND subject = %s',
+                (json.dumps(self.payload()['grants']), self.issuer, self.subject))
+        with self.assertRaises(PermissionError):
+            self.directory.resolve(self.issuer, self.subject, self.session)
+        with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:
+            owner.execute(
+                "UPDATE hosting_controlplane.directory_subjects SET grants = '[]'::jsonb "
+                'WHERE issuer = %s AND subject = %s',
+                (self.issuer, self.subject))
+        self.assertEqual(self.directory.resolve(
+            self.issuer, self.subject, self.session).grants, ())
+
         # Simulate restoration of just mutable directory state while the
         # independently checkpointed audit stream still records generation 2.
         with self.psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']) as owner:

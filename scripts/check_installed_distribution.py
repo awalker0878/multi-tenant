@@ -52,6 +52,9 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0009_directory.sql',
     'provisioner/controlplane/persistence/migrations/0010_workflow_run_binding.sql',
     'provisioner/controlplane/persistence/migrations/0011_job_gate_lock.sql',
+    'provisioner/controlplane/persistence/migrations/0012_directory_audit_binding.sql',
+    'provisioner/controlplane/persistence/migrations/0013_environment_registrations.sql',
+    'provisioner/controlplane/persistence/migrations/0014_worker_read_lock.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/style.css',
@@ -74,6 +77,9 @@ assert any(e.name == 'hosting-api' and e.value == 'provisioner.controlplane.api.
            for e in distribution.entry_points)
 assert any(e.name == 'hosting-evidence' and
            e.value == 'provisioner.controlplane.evidence.runtime:main'
+           for e in distribution.entry_points)
+assert any(e.name == 'hosting-site-worker' and
+           e.value == 'provisioner.controlplane.worker.runtime:main'
            for e in distribution.entry_points)
 
 result = main(['plan', str(request)])

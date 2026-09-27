@@ -48,6 +48,7 @@ jobs:
       HOSTING_TEST_POSTGRES_ENROLLMENT_DSN: postgresql://hosting_enrollment:ci_enrollment_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DIRECTORY_RESOLVER_DSN: postgresql://hosting_directory_resolver:ci_directory_resolver_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN: postgresql://hosting_directory_writer:ci_directory_writer_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_SITE_WORKER_DSN: postgresql://hosting_site_worker:ci_site_worker_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DSN: postgresql://postgres:ci_migration_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_ISOLATED: '1'
     steps:

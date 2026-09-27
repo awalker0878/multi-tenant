@@ -20,6 +20,7 @@ def main() -> int:
     enrollment_dsn = os.environ.get('HOSTING_TEST_POSTGRES_ENROLLMENT_DSN')
     directory_resolver_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_RESOLVER_DSN')
     directory_writer_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN')
+    site_worker_dsn = os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN')
     from provisioner.controlplane.persistence.migrate import apply_migrations
 
     with psycopg.connect(admin_dsn, autocommit=True) as connection:
@@ -27,7 +28,7 @@ def main() -> int:
         database = connection.execute('SELECT current_database()').fetchone()[0]
         identities = [dsn for dsn in (
             migration_dsn, runtime_dsn, authority_dsn, enrollment_dsn,
-            directory_resolver_dsn, directory_writer_dsn) if dsn]
+            directory_resolver_dsn, directory_writer_dsn, site_worker_dsn) if dsn]
         roles = []
         for dsn in identities:
             settings = conninfo_to_dict(dsn)
@@ -86,6 +87,7 @@ def main() -> int:
             'GRANT SELECT, INSERT, UPDATE ON '
             'hosting_controlplane.evidence_streams TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.evidence_entries TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.environment_registrations TO {}',
             'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
@@ -117,13 +119,19 @@ def main() -> int:
             resolver = sql.Identifier(conninfo_to_dict(directory_resolver_dsn)['user'])
             connection.execute(sql.SQL('GRANT SELECT ON '
                 'hosting_controlplane.directory_subjects, '
-                'hosting_controlplane.directory_sessions TO {}').format(resolver))
+                'hosting_controlplane.directory_sessions, '
+                'hosting_controlplane.audit_events TO {}').format(resolver))
+            connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.directory_state_digest(text, text) TO {}').format(resolver))
         if directory_writer_dsn:
             writer = sql.Identifier(conninfo_to_dict(directory_writer_dsn)['user'])
             for statement in (
                 'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.directory_subjects TO {}',
                 'GRANT SELECT, INSERT, DELETE ON hosting_controlplane.directory_sessions TO {}',
                 'GRANT INSERT ON hosting_controlplane.directory_sync_events TO {}',
+                'GRANT INSERT ON hosting_controlplane.audit_events TO {}',
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.directory_state_digest(text, text) TO {}',
                 'GRANT SELECT, UPDATE ON hosting_controlplane.plan_authority_state TO {}',
                 'GRANT SELECT ON hosting_controlplane.plan_approvals, '
                 'hosting_controlplane.operation_jobs TO {}',
@@ -131,6 +139,26 @@ def main() -> int:
                 'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
             ):
                 connection.execute(sql.SQL(statement).format(writer))
+        if site_worker_dsn:
+            worker = sql.Identifier(conninfo_to_dict(site_worker_dsn)['user'])
+            for statement in (
+                'GRANT SELECT ON hosting_controlplane.operation_jobs, '
+                'hosting_controlplane.worker_grants, '
+                'hosting_controlplane.enterprise_records, '
+                'hosting_controlplane.audit_events, '
+                'hosting_controlplane.plan_approvals, '
+                'hosting_controlplane.native_containment_holds TO {}',
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.lock_job_scope(text, text, text) TO {}',
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.lock_worker_scope('
+                'text, text, text, text, text, text, text, text, text, text) TO {}',
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.lock_native_worker_scope(text, text, text) TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(worker))
     print('PostgreSQL control-plane test roles and grants are ready')
     return 0
 
