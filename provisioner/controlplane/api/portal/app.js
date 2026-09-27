@@ -16,6 +16,11 @@ let workloadRequest = 0;
 let environmentWsd = null;
 let environmentCursor = null;
 let environmentRequest = 0;
+let discoveryEnvironment = null;
+let discoveryGeneration = null;
+let discoveryCursor = null;
+let discoveryRequest = 0;
+let discoveryObjectRequest = 0;
 let activeJob = null;
 let eventCursor = 0;
 let eventHasMore = false;
@@ -47,6 +52,10 @@ function clearSession(message = 'This tab has no active token.') {
   workloadRequest++;
   environmentCursor = null;
   environmentRequest++;
+  clearDiscovery('Sign in and load environment declarations to select a source.');
+  $('discovery-environment').replaceChildren(new Option('Choose an environment', ''));
+  $('discovery-environment').disabled = true;
+  $('show-discovery').disabled = true;
   $('environment-rows').replaceChildren();
   $('environment-selector').replaceChildren(new Option('Choose a WSD', ''));
   $('environment-selector').disabled = true;
@@ -89,6 +98,18 @@ function clearReview(message = 'Load the current plan review before deciding.') 
   $('approval-confirm').disabled = true;
   $('approve').disabled = true;
   $('review-status').textContent = message;
+}
+
+function clearDiscovery(message = 'Choose an authorized environment to load observations.') {
+  discoveryEnvironment = null;
+  discoveryGeneration = null;
+  discoveryCursor = null;
+  discoveryRequest++;
+  discoveryObjectRequest++;
+  $('discovery-rows').replaceChildren();
+  $('discovery-details').hidden = true;
+  $('more-discovery').hidden = true;
+  $('discovery-status').textContent = message;
 }
 
 function randomBase64Url(bytes = 32) {
@@ -218,7 +239,11 @@ async function apiGet(path) {
     clearSession('Token rejected or expired. Sign in again.');
     throw new Error('Token rejected or expired.');
   }
-  if (response.status === 404) throw new Error('Record unavailable or outside your authorized scope.');
+  if (response.status === 404) {
+    const error = new Error('Record unavailable or outside your authorized scope.');
+    error.notFound = true;
+    throw error;
+  }
   if (!response.ok) throw new Error(`The API returned HTTP ${response.status}.`);
   const result = await response.json();
   if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
@@ -318,6 +343,10 @@ async function loadEnvironments(reset = false) {
     environmentCursor = null;
     $('environment-rows').replaceChildren();
     $('more-environments').hidden = true;
+    clearDiscovery();
+    $('discovery-environment').replaceChildren(new Option('Choose an environment', ''));
+    $('discovery-environment').disabled = true;
+    $('show-discovery').disabled = true;
   }
   const cursor = environmentCursor;
   const requestNumber = ++environmentRequest;
@@ -336,12 +365,108 @@ async function loadEnvironments(reset = false) {
       for (const field of ['displayName', 'environmentId', 'siteId', 'platformFamily',
         'endpointId', 'nativeScopeId', 'status']) textCell(row, item[field]);
       $('environment-rows').append(row);
+      if (!idPattern.test(item.environmentId)) throw new Error('Invalid environment identity.');
+      $('discovery-environment').add(new Option(
+        `${item.displayName} · ${item.environmentId} · ${item.platformFamily}`,
+        item.environmentId));
     }
+    $('discovery-environment').disabled = $('discovery-environment').children.length <= 1;
+    $('show-discovery').disabled = $('discovery-environment').disabled;
     environmentCursor = page.nextAfter;
     $('more-environments').hidden = !environmentCursor;
     $('environment-status').textContent = `${$('environment-rows').childElementCount} unverified declaration(s) in ${wsd}.`;
   } catch (error) {
     if (requestNumber === environmentRequest) $('environment-status').textContent = error.message;
+  }
+}
+
+function discoveryCoverage(completeness) {
+  if (completeness === 'COMPLETE') return 'Reported complete page chain; native visibility unverified';
+  if (completeness === 'PARTIAL') return 'Partial; inventory gaps present';
+  return 'Unknown; inventory coverage unverified';
+}
+
+async function loadDiscovery() {
+  const environmentId = $('discovery-environment').value;
+  clearDiscovery('Loading the latest recorded observation…');
+  if (!idPattern.test(environmentId) || $('discovery-environment').disabled) {
+    $('discovery-status').textContent = 'Choose an authorized environment declaration.';
+    return;
+  }
+  discoveryEnvironment = environmentId;
+  const requestNumber = ++discoveryRequest;
+  try {
+    const page = await apiGet(`/v1/environments/${encodeURIComponent(environmentId)}/discovery/generations/latest`);
+    if (discoveryEnvironment !== environmentId || requestNumber !== discoveryRequest || !accessToken) return;
+    if (page.environmentId !== environmentId || !Number.isInteger(page.generation) ||
+        page.generation < 1 || !['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(page.completeness) ||
+        !digestPattern.test(page.resultDigest) ||
+        !['objectCount', 'collectionErrorCount', 'missingPrivilegeCount'].every((key) =>
+          Number.isInteger(page[key]) && page[key] >= 0) ||
+        (page.completeness === 'COMPLETE' &&
+          (page.collectionErrorCount > 0 || page.missingPrivilegeCount > 0))) {
+      throw new Error('The observation summary does not match this environment.');
+    }
+    discoveryGeneration = page.generation;
+    $('discovery-generation').textContent = String(page.generation);
+    $('discovery-completeness').textContent = discoveryCoverage(page.completeness);
+    $('discovery-captured').textContent = displayTime(page.capturedAt);
+    $('discovery-count').textContent = String(page.objectCount);
+    $('discovery-errors').textContent = String(page.collectionErrorCount);
+    $('discovery-privileges').textContent = String(page.missingPrivilegeCount);
+    $('discovery-details').hidden = false;
+    $('discovery-status').textContent = `Generation ${page.generation}: ${discoveryCoverage(page.completeness)}. Identity summaries only; no native qualification or execution approval.`;
+    await loadObservedObjects();
+  } catch (error) {
+    if (requestNumber === discoveryRequest && discoveryEnvironment === environmentId) {
+      $('discovery-status').textContent = error.notFound
+        ? 'No observation is available for this environment under your current access.'
+        : error.message;
+      $('discovery-details').hidden = true;
+      $('discovery-rows').replaceChildren();
+      $('more-discovery').hidden = true;
+    }
+  }
+}
+
+async function loadObservedObjects() {
+  if (!discoveryEnvironment || !discoveryGeneration) return;
+  const environmentId = discoveryEnvironment;
+  const generation = discoveryGeneration;
+  const cursor = discoveryCursor;
+  const requestNumber = ++discoveryObjectRequest;
+  try {
+    const query = '?limit=50' + (cursor ? `&after=${encodeURIComponent(cursor)}` : '');
+    const page = await apiGet(`/v1/environments/${encodeURIComponent(environmentId)}/discovery/generations/${generation}/objects${query}`);
+    if (discoveryEnvironment !== environmentId || discoveryGeneration !== generation ||
+        discoveryCursor !== cursor || requestNumber !== discoveryObjectRequest || !accessToken) return;
+    if (page.environmentId !== environmentId || page.generation !== generation ||
+        !Array.isArray(page.items) || page.items.length > 50 ||
+        (page.nextAfter !== null && (typeof page.nextAfter !== 'string' ||
+          page.nextAfter.length === 0 || page.nextAfter === cursor))) {
+      throw new Error('The observation page changed while loading.');
+    }
+    for (const item of page.items) {
+      if (typeof item.resourceKind !== 'string' || typeof item.nativeId !== 'string' ||
+          !Number.isInteger(item.unknownCount) || item.unknownCount < 0 ||
+          (item.displayName !== null && typeof item.displayName !== 'string')) {
+        throw new Error('The API returned an invalid identity summary.');
+      }
+      const row = document.createElement('tr');
+      for (const value of [item.resourceKind, item.nativeId,
+        item.displayName ?? 'Unknown', item.unknownCount]) textCell(row, value);
+      $('discovery-rows').append(row);
+    }
+    discoveryCursor = page.nextAfter;
+    $('more-discovery').hidden = !discoveryCursor;
+  } catch (error) {
+    if (discoveryEnvironment === environmentId && discoveryGeneration === generation &&
+        requestNumber === discoveryObjectRequest) {
+      $('discovery-status').textContent = `Identity list is incomplete: ${error.message}`;
+      $('discovery-rows').replaceChildren();
+      $('more-discovery').hidden = true;
+      discoveryCursor = null;
+    }
   }
 }
 
@@ -599,6 +724,12 @@ $('environment-selector').addEventListener('change', (event) => {
   if (event.target.value) $('environment-wsd').value = event.target.value;
 });
 $('more-environments').addEventListener('click', () => loadEnvironments());
+$('discovery-environment').addEventListener('change', () => clearDiscovery());
+$('discovery-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  loadDiscovery();
+});
+$('more-discovery').addEventListener('click', () => loadObservedObjects());
 $('workload-form').addEventListener('submit', (event) => {
   event.preventDefault();
   loadWorkloads(true);

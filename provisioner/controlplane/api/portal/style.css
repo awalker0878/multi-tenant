@@ -38,6 +38,9 @@ td { overflow-wrap: anywhere; }
 .job-details div { min-width: 10rem; }
 .job-details dt { color: #567; font-size: .78rem; font-weight: 700; text-transform: uppercase; }
 .job-details dd { margin: .2rem 0 0; font-weight: 650; overflow-wrap: anywhere; }
+#discovery-details { margin: 1rem 0; }
+#discovery-completeness { max-width: 19rem; }
+#discovery-rows td:nth-child(2) { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .timeline { list-style: none; border-left: 2px solid #b9d5d8; margin: 1.25rem 0; padding: 0 0 0 1.2rem; }
 .timeline li { position: relative; margin: 0 0 1.1rem; }
 .timeline li::before { content: ""; position: absolute; width: .65rem; height: .65rem; border-radius: 50%; left: -1.62rem; top: .25rem; background: #15838b; border: 2px solid white; }
