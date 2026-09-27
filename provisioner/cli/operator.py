@@ -20,6 +20,8 @@ from urllib.parse import quote, urlsplit
 import httpx
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+_DISCOVERY_CURSOR = re.compile(r'^[A-Za-z0-9_-]{1,4096}$')
+_MAX_GENERATION = 2**63 - 1
 _MAX_DOCUMENT = 1024 * 1024
 _MAX_RESPONSE = 8 * 1024 * 1024
 
@@ -28,6 +30,13 @@ def _identity(value: str) -> str:
     if not _ID.fullmatch(value):
         raise ValueError('Identity must be a 1–128 character platform ID')
     return quote(value, safe='')
+
+
+def _discovery_after(value: str) -> str:
+    # Treat the server cursor as an opaque query value, never as a URL/path.
+    if not isinstance(value, str) or _DISCOVERY_CURSOR.fullmatch(value) is None:
+        raise ValueError('Invalid bounded discovery cursor')
+    return value
 
 
 def _base_url(value: str) -> str:
@@ -95,6 +104,19 @@ def build_parser() -> argparse.ArgumentParser:
     environment_register.add_argument('--file', required=True,
                                       help='Unverified selector JSON without status')
 
+    discovery = groups.add_parser('discovery',
+                                  help='Browse read-only inventory generations and objects')
+    discovery_actions = discovery.add_subparsers(dest='action', required=True)
+    generations = discovery_actions.add_parser('generations')
+    generations.add_argument('--environment', required=True)
+    generations.add_argument('--after', type=int, default=0)
+    generations.add_argument('--limit', type=int, default=50)
+    objects = discovery_actions.add_parser('objects')
+    objects.add_argument('--environment', required=True)
+    objects.add_argument('--generation', type=int, required=True)
+    objects.add_argument('--after', help='Opaque nextAfter value from the API')
+    objects.add_argument('--limit', type=int, default=50)
+
     workloads = groups.add_parser('workloads', help='Browse or submit planned workload records')
     workload_actions = workloads.add_subparsers(dest='action', required=True)
     listing = workload_actions.add_parser('list')
@@ -160,6 +182,22 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
         if args.after:
             params['after'] = _identity(args.after)
         return 'GET', '/v1/environments', params, None
+    if args.resource == 'discovery':
+        prefix = '/v1/environments/' + _identity(args.environment)
+        if not 1 <= args.limit <= 100:
+            raise ValueError('Discovery limit must be between 1 and 100')
+        if args.action == 'generations':
+            if not 0 <= args.after <= _MAX_GENERATION:
+                raise ValueError('Invalid discovery generation cursor')
+            return ('GET', prefix + '/discovery/generations',
+                    {'after': args.after, 'limit': args.limit}, None)
+        if not 1 <= args.generation <= _MAX_GENERATION:
+            raise ValueError('Invalid discovery generation')
+        params = {'limit': args.limit}
+        if args.after is not None:
+            params['after'] = _discovery_after(args.after)
+        return ('GET', prefix + '/discovery/generations/'
+                + str(args.generation) + '/objects', params, None)
     if args.resource == 'plans':
         return 'GET', '/v1/plans/' + _identity(args.id) + '/review', None, None
     if args.resource == 'workloads':
