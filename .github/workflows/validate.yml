@@ -161,13 +161,13 @@ jobs:
       - name: Native reference planning inputs and original W14 associations
         run: python scripts/commissioning_pack.py check > build/reports/native_reference_planning.json
       - name: Current exact-tuple version, source provenance and lifecycle records
-        run: python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
+        run: python -m provisioner.qualification.provenance --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
       - name: Version/source readiness must remain held without a selected supported tuple
         run: python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE > build/reports/version_source_readiness.json
       - name: Current exact-tuple native qualification dossiers
-        run: python scripts/check_platform_qualification.py > build/reports/platform_native_qualification.json
+        run: python -m provisioner.qualification.native > build/reports/platform_native_qualification.json
       - name: Platform capability registry evidence boundary
-        run: python scripts/check_platform_capabilities.py > build/reports/platform_capability_registry.json
+        run: python -m provisioner.qualification.registry > build/reports/platform_capability_registry.json
       - name: Platform-family pre-placement must remain held without native qualification
         run: python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM > build/reports/platform_family_eligibility.json
       - name: Current site cell and service-class capacity envelopes
@@ -239,11 +239,11 @@ jobs:
       - name: Bootstrap service readiness must remain held without current target dependencies
         run: python scripts/check_bootstrap_service_readiness.py examples/bootstrap_service_readiness_intent.json.example --as-of 2026-09-19T14:30:00Z --expected-status HOLD_NO_CURRENT_BOOTSTRAP_SERVICE_ASSURANCE > build/reports/bootstrap_service_readiness.json
       - name: Exported actual-target selection assurance remains non-authoritative
-        run: python scripts/check_target_selection_assurance.py --as-of 2026-09-19T15:30:00Z > build/reports/target_selection_assurance.json
+        run: python -m provisioner.qualification.target_selection --as-of 2026-09-19T15:30:00Z > build/reports/target_selection_assurance.json
       - name: Target-selection readiness must remain held without an actual selected target
         run: python scripts/check_target_selection_readiness.py examples/target_selection_readiness_intent.json.example --as-of 2026-09-19T15:30:00Z --expected-status HOLD_NO_CURRENT_TARGET_SELECTION > build/reports/target_selection_readiness.json
       - name: Exported qualification-campaign evidence remains non-authoritative
-        run: python scripts/check_qualification_campaign_assurance.py --as-of 2026-09-19T16:30:00Z > build/reports/qualification_campaign_assurance.json
+        run: python -m provisioner.qualification.campaign --as-of 2026-09-19T16:30:00Z > build/reports/qualification_campaign_assurance.json
       - name: Qualification-campaign readiness must remain held without native campaign evidence
         run: python scripts/check_qualification_campaign_readiness.py examples/qualification_campaign_readiness_intent.json.example --as-of 2026-09-19T16:30:00Z --expected-status HOLD_NO_CURRENT_QUALIFICATION_CAMPAIGN_EVIDENCE > build/reports/qualification_campaign_readiness.json
       - name: Local regressions and route-model checks

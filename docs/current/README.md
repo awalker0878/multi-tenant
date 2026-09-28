@@ -6,12 +6,19 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 
 | Record | Purpose |
 |---|---|
-| [RAD-M01](RAD-adoption.md) | Baseline applicability, deviations and architecture handoff |
-| [TAD-M01](TAD-infrastructure.md) | Technical components, native realization and ownership |
+| [RAD-M01](RAD-adoption.md) | Workload mobility, capability boundaries, adoption and architecture handoff |
+| [TAD-M01](TAD-infrastructure.md) | Control application, discovery, profiles, native realization and recovery ownership |
 | [SOL-M01](internal-hosting-solution.md) | Existing internal reference fixture selected as a solution profile |
 | [SOL-M02](public-hosting-design-profile.md) | New public-extension design profile, not a complete installed service |
-| [ICD-M01](interface-agreements.md) | Producer/consumer interface obligations |
+| [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
+
+The six records are at **version 0.2 (Proposed)** following the 28 September 2026
+mobility review. They describe the authenticated control application, durable discovery
+and comparison, 97 explicit capability dimensions, mandatory workload/service profile
+requirements, migrated qualification owners, and the remaining admitted native workflow
+and operating-acceptance gaps. The [B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md)
+remains the implementation backlog; coverage in this register does not close its gates.
 
 [Source-scope decision inventory](../assurance/source-scope.md) · [Frozen source reading paths](../README.md) · [ADR lifecycle](../adr/README.md)
 
