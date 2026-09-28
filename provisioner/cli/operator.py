@@ -24,6 +24,9 @@ _DISCOVERY_CURSOR = re.compile(r'^[A-Za-z0-9_-]{1,4096}$')
 _MAX_GENERATION = 2**63 - 1
 _MAX_DOCUMENT = 1024 * 1024
 _MAX_RESPONSE = 8 * 1024 * 1024
+_ASSESSMENT_METHODS = ('REBUILD_RESTORE', 'COLD_VM_CONVERSION',
+                       'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE',
+                       'WARM_VM_TRANSFER')
 
 
 def _identity(value: str) -> str:
@@ -117,6 +120,26 @@ def build_parser() -> argparse.ArgumentParser:
     objects.add_argument('--after', help='Opaque nextAfter value from the API')
     objects.add_argument('--limit', type=int, default=50)
 
+    assessments = groups.add_parser('assessments',
+                                    help='Compare observed workloads and pinned destinations')
+    assessment_actions = assessments.add_subparsers(dest='action', required=True)
+    compare = assessment_actions.add_parser('compare',
+                                            help='Read-only assessment; does not approve execution')
+    compare.add_argument('--source-environment', required=True)
+    compare.add_argument('--source-generation', type=int, required=True)
+    compare.add_argument('--workload-native-id', required=True,
+                         help='VM native identity from the selected source generation')
+    compare.add_argument('--destination', nargs=2, action='append', required=True,
+                         metavar=('ENVIRONMENT', 'GENERATION'),
+                         help='Repeat for 2–20 distinct destination environments')
+    compare.add_argument('--capacity', nargs=3, action='append', default=[],
+                         metavar=('ENVIRONMENT', 'KIND', 'NATIVE_ID'),
+                         help='Optional observed pool, cluster, quota or datastore for a destination')
+    compare.add_argument('--method', choices=_ASSESSMENT_METHODS, required=True)
+    compare.add_argument('--guest-profile', required=True)
+    compare.add_argument('--network-mode', required=True)
+    compare.add_argument('--data-mode', required=True)
+
     workloads = groups.add_parser('workloads', help='Browse or submit planned workload records')
     workload_actions = workloads.add_subparsers(dest='action', required=True)
     listing = workload_actions.add_parser('list')
@@ -171,6 +194,42 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
     """Map CLI verbs to the same API operations used by the portal."""
     if args.resource == 'scopes':
         return 'GET', '/v1/access/scopes', None, None
+    if args.resource == 'assessments':
+        _identity(args.source_environment)
+        if not 1 <= args.source_generation <= _MAX_GENERATION:
+            raise ValueError('A positive source observation generation is required')
+        def native(value):
+            if (not isinstance(value, str) or not 1 <= len(value) <= 512
+                    or not value.strip()
+                    or any(ord(char) < 32 or ord(char) == 127 for char in value)):
+                raise ValueError('A bounded native identity without control characters is required')
+            return value
+        if not 2 <= len(args.destination) <= 20:
+            raise ValueError('Compare between 2 and 20 distinct destinations')
+        destinations = {}
+        for environment, raw_generation in args.destination:
+            _identity(environment)
+            if (not re.fullmatch(r'[1-9][0-9]{0,18}', raw_generation)
+                    or int(raw_generation) > _MAX_GENERATION):
+                raise ValueError('A positive destination observation generation is required')
+            if environment == args.source_environment or environment in destinations:
+                raise ValueError('Source and destination environments must all be distinct')
+            destinations[environment] = {'environmentId': environment,
+                                         'generation': int(raw_generation)}
+        for environment, kind, identity in args.capacity:
+            if (environment not in destinations or 'capacityKind' in destinations[environment]
+                    or kind not in {'pool', 'cluster', 'quota', 'datastore'}):
+                raise ValueError('Each capacity selection must name one destination and supported kind')
+            destinations[environment].update(capacityKind=kind, capacityNativeId=native(identity))
+        for value in (args.guest_profile, args.network_mode, args.data_mode):
+            _identity(value)
+        return 'POST', '/v1/assessments/compare', None, {
+            'source': {'environmentId': args.source_environment,
+                       'generation': args.source_generation},
+            'workloadNativeId': native(args.workload_native_id),
+            'destinations': list(destinations.values()), 'method': args.method,
+            'guestProfile': args.guest_profile, 'networkMode': args.network_mode,
+            'dataMode': args.data_mode}
     if args.resource == 'environments':
         if args.action == 'get':
             return 'GET', '/v1/environments/' + _identity(args.id), None, None
