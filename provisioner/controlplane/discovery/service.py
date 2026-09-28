@@ -8,14 +8,14 @@ must supply an independently backed provider before enabling the endpoint.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from typing import Callable, Protocol
 
 from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.persistence.store import TenantContext
 
-from .assessment import (AssessmentEngine, AssessmentScopeAccess,
+from .assessment import (AssessmentEngine, AssessmentIssue, AssessmentScopeAccess,
                          DestinationAssessment, DestinationOption, ReviewedFinding)
 from .model import NativeIdentity, _utc
 from .normalization import (NormalizedDiscovery, NormalizationHeld,
@@ -71,6 +71,9 @@ class VerifiedAssessmentEnvironment:
 
 
 class AssessmentRepository(Protocol):
+    def latest_generation(self, ctx: TenantContext, scope: PlanScope,
+                          environment_id: str) -> StoredGeneration | None: ...
+
     def get_generation(self, ctx: TenantContext, scope: PlanScope,
                        environment_id: str, generation: int
                        ) -> StoredGeneration | None: ...
@@ -111,8 +114,15 @@ class AssessmentInputBinding:
     selection: AssessmentSelection
     installation: InstalledTuple
     discovery: NormalizedDiscovery | None
+    latest: StoredGeneration | None = None
+
+    @property
+    def superseded(self) -> bool:
+        return self.latest is not None and self.latest.generation > self.selection.generation
 
     def to_document(self) -> dict:
+        if self.latest is None:
+            raise NormalizationHeld('Current generation metadata was not verified')
         scope = self.installation.scope
         return {'environmentId': self.selection.environment_id,
                 'generation': self.selection.generation,
@@ -120,7 +130,15 @@ class AssessmentInputBinding:
                 'platformFamily': scope.platform_family,
                 'productTupleId': self.installation.product_tuple_id,
                 'productTupleDigest': self.installation.product_tuple_digest,
-                'observation': self.discovery.binding() if self.discovery else None}
+                'observation': self.discovery.binding() if self.discovery else None,
+                'superseded': self.superseded,
+                'latestObservation': {
+                    'generation': self.latest.generation,
+                    'rawSnapshotDigest': self.latest.result_digest,
+                    'capturedAt': self.latest.captured_at.isoformat(),
+                    'collectionCompleteness': self.latest.completeness,
+                    'collectionErrors': list(self.latest.collection_errors),
+                    'missingPrivileges': list(self.latest.missing_privileges)}}
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,7 +165,7 @@ class AssessmentService:
                  clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
                  max_snapshot_age: timedelta = timedelta(hours=24)):
         if (not all(callable(getattr(repository, method, None))
-                    for method in ('get_generation', 'list_observations'))
+                    for method in ('get_generation', 'list_observations', 'latest_generation'))
                 or not all(callable(getattr(trusted_inputs, method, None))
                            for method in ('resolve_environment', 'route_claims',
                                           'reviewed_findings'))
@@ -214,6 +232,59 @@ class AssessmentService:
         result = hydrate_generation(generation, tuple(observations))
         return AssessmentInputBinding(selection, environment.installation,
                                       normalize_discovery(result))
+
+    def _with_latest(self, ctx: TenantContext, binding: AssessmentInputBinding,
+                     now: datetime) -> AssessmentInputBinding:
+        """Retain historical inputs while independently checking their currency.
+
+        The latest header is metadata only. Its facts never replace or fill in
+        the immutable selected generation, even after a partial collection.
+        """
+        scope, selection = binding.installation.scope, binding.selection
+        latest = self._repository.latest_generation(ctx, scope, selection.environment_id)
+        if (not isinstance(latest, StoredGeneration)
+                or latest.environment_id != selection.environment_id or latest.scope != scope
+                or type(latest.generation) is not int or latest.generation < 1
+                or not isinstance(latest.result_digest, str)
+                or re.fullmatch(r'[0-9a-f]{64}', latest.result_digest) is None
+                or not isinstance(latest.authorization_digest, str)
+                or re.fullmatch(r'[0-9a-f]{64}', latest.authorization_digest) is None
+                or not isinstance(latest.campaign_id, str) or not _ID.fullmatch(latest.campaign_id)
+                or not _utc(latest.captured_at) or latest.captured_at > now
+                or latest.completeness not in ('COMPLETE', 'PARTIAL', 'UNKNOWN')
+                or type(latest.object_count) is not int or not 0 <= latest.object_count <= 100000
+                or not isinstance(latest.collection_errors, tuple)
+                or not isinstance(latest.missing_privileges, tuple)
+                or len(latest.collection_errors) > 64 or len(latest.missing_privileges) > 64
+                or any(not isinstance(value, str) or not _ID.fullmatch(value)
+                       for value in latest.collection_errors)
+                or any(not isinstance(value, str)
+                       or re.fullmatch(r'[A-Za-z][A-Za-z0-9_.:-]{0,127}', value) is None
+                       for value in latest.missing_privileges)
+                or latest.completeness == 'COMPLETE'
+                and (latest.collection_errors or latest.missing_privileges)):
+            raise NormalizationHeld('Current exact-scope generation metadata is unavailable')
+        if binding.discovery is not None:
+            raw = binding.discovery.original
+            pinned = StoredGeneration(selection.environment_id, selection.generation,
+                raw.campaign_id, raw.scope, raw.authorization_digest, raw.digest,
+                raw.captured_at, raw.completeness, raw.collection_errors,
+                raw.missing_privileges, len(raw.objects))
+            if latest.generation < selection.generation or (
+                    latest.generation == selection.generation and latest != pinned):
+                raise NormalizationHeld('Current generation contradicts the selected observation')
+        elif latest.generation == selection.generation:
+            raise NormalizationHeld('Current generation is missing its selected observation')
+        return replace(binding, latest=latest)
+
+    @staticmethod
+    def _supersession_issue(binding: AssessmentInputBinding, side: str) -> AssessmentIssue:
+        return AssessmentIssue('UNKNOWN', side + '_SNAPSHOT_SUPERSEDED',
+            f'The pinned {side.lower()} generation {binding.selection.generation} is historical; '
+            f'latest generation {binding.latest.generation} is {binding.latest.completeness}. '
+            'Current eligibility has not been established.',
+            'Load and assess the latest generation, resolve incomplete collection or missing '
+            'privileges, and renew reviews against its exact observation digests.')
 
     def compare(self, ctx: TenantContext, actor_subject: str,
                 source: AssessmentSelection, workload_native_id: str,
@@ -287,4 +358,16 @@ class AssessmentService:
                 or set(by_destination) != {item.installation for item in targets}):
             raise RuntimeError('Assessment destinations differ from the pinned selections')
         ordered = tuple(by_destination[item.installation] for item in targets)
-        return AssessmentComparison(now, source_input, destination_inputs, ordered)
+        # Check currency after assembling the historical comparison. All exact
+        # scopes were authorized before either historical or latest reads.
+        source_input = self._with_latest(ctx, source_input, now)
+        destination_inputs = tuple(self._with_latest(ctx, binding, now)
+                                   for binding in destination_inputs)
+        current_assessments = []
+        for assessment, binding in zip(ordered, destination_inputs):
+            superseded = tuple(self._supersession_issue(item, side)
+                               for item, side in ((source_input, 'SOURCE'), (binding, 'DESTINATION'))
+                               if item.superseded)
+            current_assessments.append(replace(assessment, status='UNKNOWN',
+                issues=assessment.issues + superseded) if superseded else assessment)
+        return AssessmentComparison(now, source_input, destination_inputs, tuple(current_assessments))

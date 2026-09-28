@@ -57,7 +57,22 @@ class Repository:
         self.results = {(name, 7): inventory(name) for name in INSTALLATIONS}
         self.reads = []
         self.header_patch = {}
+        self.latest_patch = {}
+        self.latest_missing = False
         self.drop_last = False
+
+    def latest_generation(self, ctx, scope, environment_id):
+        generations = [generation for name, generation in self.results if name == environment_id]
+        self.reads.append((environment_id, max(generations, default=0), 'latest'))
+        if self.latest_missing or not generations:
+            return None
+        generation = max(generations)
+        result = self.results[environment_id, generation]
+        assert result.scope == scope
+        return replace(StoredGeneration(environment_id, generation, result.campaign_id,
+            result.scope, result.authorization_digest, result.digest, result.captured_at,
+            result.completeness, result.collection_errors, result.missing_privileges,
+            len(result.objects)), **self.latest_patch)
 
     def get_generation(self, ctx, scope, environment_id, generation):
         self.reads.append((environment_id, generation, 'header'))
@@ -149,10 +164,12 @@ class AssessmentServiceTests(unittest.TestCase):
         self.assertEqual([item.destination.scope.platform_family for item in result.assessments],
                          ['vmware', 'nutanix'])
         self.assertTrue(all('ROUTE_NOT_CATALOGUED' in item.unknowns for item in result.assessments))
-        self.assertTrue(all(read[1] == 7 for read in self.repository.reads))
+        self.assertTrue(all(read[1] == 7 for read in self.repository.reads if read[2] != 'latest'))
         document = result.to_document()
         self.assertFalse(document['executionAuthorized'])
         self.assertEqual(document['sourceInput']['generation'], 7)
+        self.assertTrue(document['sourceInput']['superseded'])
+        self.assertEqual(document['sourceInput']['latestObservation']['generation'], 8)
         self.assertNotEqual(document['sourceInput']['observation']['rawSnapshotDigest'],
                             document['sourceInput']['observation']['assessmentSnapshotDigest'])
 
@@ -160,6 +177,10 @@ class AssessmentServiceTests(unittest.TestCase):
         self.inputs.qualified = True
         result = self.compare()
         self.assertEqual([item.status for item in result.assessments], ['ELIGIBLE', 'ELIGIBLE'])
+        self.assertFalse(result.source.superseded)
+        self.assertEqual(result.source.latest.generation, 7)
+        self.assertEqual(result.to_document()['sourceInput']['latestObservation']['rawSnapshotDigest'],
+                         result.source.discovery.original.digest)
         self.assertTrue(all(not item.execution_authorized for item in result.assessments))
         self.inputs.raw_review = True
         result = self.compare()
@@ -201,14 +222,67 @@ class AssessmentServiceTests(unittest.TestCase):
 
     def test_missing_stale_and_partial_generation_are_visible_unknowns(self):
         self.repository.results.pop(('source', 7))
+        self.repository.results['source', 8] = inventory('source')
         result = self.compare()
         self.assertIn('SOURCE_SNAPSHOT_MISSING', result.assessments[0].unknowns)
+        self.repository.results.pop(('source', 8))
         self.repository.results['source', 7] = inventory('source', at=NOW - timedelta(days=2))
         result = self.compare()
         self.assertIn('SOURCE_SNAPSHOT_STALE', result.assessments[0].unknowns)
         self.repository.results['source', 7] = inventory('source', partial=True)
         result = self.compare()
         self.assertIn('SOURCE_SNAPSHOT_INCOMPLETE', result.assessments[0].unknowns)
+
+    def test_new_complete_partial_or_unknown_generation_withholds_current_eligibility(self):
+        self.inputs.qualified = True
+        historical = self.compare()
+        for name, side, completeness in (
+                ('source', 'SOURCE', 'COMPLETE'), ('target-a', 'DESTINATION', 'COMPLETE'),
+                ('source', 'SOURCE', 'PARTIAL'), ('target-a', 'DESTINATION', 'UNKNOWN')):
+            with self.subTest(name=name, completeness=completeness):
+                latest = inventory(name, at=NOW, partial=completeness == 'PARTIAL')
+                if completeness != 'COMPLETE':
+                    latest = replace(latest, completeness=completeness, objects=(),
+                                     missing_privileges=('inventory.read',))
+                self.repository.results[name, 8] = latest
+                result = self.compare()
+                self.assertEqual(result.assessments[0].status, 'UNKNOWN')
+                self.assertIn(side + '_SNAPSHOT_SUPERSEDED', result.assessments[0].unknowns)
+                self.assertEqual(result.assessments[1].status,
+                                 'UNKNOWN' if name == 'source' else 'ELIGIBLE')
+                self.assertEqual(result.source.discovery, historical.source.discovery)
+                self.assertEqual([binding.discovery for binding in result.destinations],
+                                 [binding.discovery for binding in historical.destinations])
+                binding = result.source if name == 'source' else result.destinations[0]
+                self.assertEqual(binding.to_document()['latestObservation']['rawSnapshotDigest'], latest.digest)
+                self.assertEqual(binding.to_document()['latestObservation']['collectionCompleteness'], completeness)
+                self.assertFalse(any(read == (name, 8, 'objects') for read in self.repository.reads))
+                self.repository.results.pop((name, 8))
+
+    def test_missing_or_inconsistent_latest_metadata_fails_closed(self):
+        self.repository.latest_missing = True
+        with self.assertRaises(NormalizationHeld):
+            self.compare()
+        self.repository.latest_missing = False
+        for patch in ({'generation': 6}, {'environment_id': 'other'},
+                      {'scope': replace(INSTALLATIONS['source'].scope, site_id='other')},
+                      {'result_digest': 'b' * 64}, {'captured_at': NOW + timedelta(seconds=1)},
+                      {'completeness': 'INVALID'}, {'missing_privileges': ('inventory.read',)}):
+            with self.subTest(patch=patch):
+                self.repository.latest_patch = patch
+                with self.assertRaises(NormalizationHeld):
+                    self.compare()
+
+    def test_new_generation_arriving_during_review_is_reported(self):
+        review = self.inputs.reviewed_findings
+        def findings(*args):
+            self.repository.results['source', 8] = inventory('source', partial=True)
+            return review(*args)
+        self.inputs.qualified = True
+        self.inputs.reviewed_findings = findings
+        result = self.compare()
+        self.assertTrue(result.source.superseded)
+        self.assertEqual([item.status for item in result.assessments], ['UNKNOWN', 'UNKNOWN'])
 
     def test_wrong_scope_or_truncated_repository_snapshot_fails_closed(self):
         for patch in ({'generation': 8}, {'environment_id': 'other'},

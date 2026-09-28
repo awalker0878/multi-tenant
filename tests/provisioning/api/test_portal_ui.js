@@ -427,7 +427,10 @@ function comparisonResponse(body) {
   const input = (selection) => ({ ...selection,
     endpointId: 'endpoint-' + selection.environmentId,
     nativeScopeId: 'scope-' + selection.environmentId, platformFamily: 'vmware',
-    productTupleId: 'reviewed-tuple', productTupleDigest: digest, observation: null });
+    productTupleId: 'reviewed-tuple', productTupleDigest: digest, observation: null,
+    superseded: false, latestObservation: { generation: selection.generation,
+      rawSnapshotDigest: digest, capturedAt: '2026-09-28T11:00:00Z',
+      collectionCompleteness: 'COMPLETE', collectionErrors: [], missingPrivileges: [] } });
   const sourceInput = input(body.source);
   const destinationInputs = body.destinations.map(input);
   return { format: 'hosting-discovery-comparison/1', executionAuthorized: false,
@@ -588,7 +591,15 @@ test('mismatched generations, wrong workload and approval claims refuse the enti
     (response) => { response.assessments[0].workload.nativeId = 'another-vm'; },
     (response) => { response.assessments[0].executionAuthorized = true; },
     (response) => { response.executionAuthorized = true; },
-    (response) => { response.assessments[0].status = 'SUCCEEDED'; }
+    (response) => { response.assessments[0].status = 'SUCCEEDED'; },
+    (response) => { delete response.sourceInput.latestObservation; },
+    (response) => { response.sourceInput.latestObservation.generation++; },
+    (response) => { response.destinationInputs[0].superseded = true; },
+    (response) => {
+      response.sourceInput.latestObservation.generation++;
+      response.sourceInput.superseded = true;
+      response.assessments[0].status = 'ELIGIBLE';
+    }
   ]) {
     let json;
     const target = await comparisonHarness({ comparison: (body) => {
@@ -602,6 +613,32 @@ test('mismatched generations, wrong workload and approval claims refuse the enti
     assert.equal(target.element('comparison-results').children.length, 0);
     assert.match(target.element('comparison-status').textContent, /does not match|differs/);
   }
+});
+
+test('superseded pins show historical generation and latest collection uncertainty', async () => {
+  let json;
+  const target = await comparisonHarness({ comparison: (body) => {
+    const response = comparisonResponse(body);
+    response.sourceInput.superseded = true;
+    response.sourceInput.latestObservation.generation++;
+    response.sourceInput.latestObservation.collectionCompleteness = 'PARTIAL';
+    response.sourceInput.latestObservation.missingPrivileges = ['inventory.read'];
+    for (const assessment of response.assessments) {
+      assessment.status = 'UNKNOWN';
+      assessment.issues.push({ severity: 'UNKNOWN', code: 'SOURCE_SNAPSHOT_SUPERSEDED',
+        reason: 'A newer partial observation exists.',
+        remediation: 'Load the latest generation and resolve missing privileges.' });
+    }
+    return json(response);
+  } });
+  json = target.json;
+  await target.context.compareDestinations();
+  assert.equal(target.element('comparison-results').hidden, false);
+  const text = descendantText(target.element('comparison-results'));
+  assert.match(text, /Source: pinned generation 7; latest observed generation 8 \(PARTIAL\)/);
+  assert.match(text, /Historical pin; current eligibility unknown/);
+  assert.match(text, /SOURCE_SNAPSHOT_SUPERSEDED/);
+  assert.match(text, /Load the latest generation and resolve missing privileges/);
 });
 
 test('late destination generation cannot repopulate selections after source change', async () => {

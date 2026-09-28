@@ -26,10 +26,21 @@ SCOPES = {'source': SOURCE_SCOPE, 'target': TARGET_SCOPE,
 class Repository(DiscoveryRepository):
     def __init__(self):
         self.reads = []
+        self.latest_reads = []
+        self.latest_missing = False
         self.corrupt = False
 
     def get_generation(self, ctx, scope, environment_id, generation):
         self.reads.append((environment_id, generation))
+        return self.header(scope, environment_id, generation)
+
+    def latest_generation(self, ctx, scope, environment_id):
+        self.latest_reads.append((scope, environment_id))
+        if self.latest_missing:
+            return None
+        return self.header(scope, environment_id, {'source': 7, 'target': 3, 'target-2': 4}[environment_id])
+
+    def header(self, scope, environment_id, generation):
         result = DiscoveryResult('campaign-' + environment_id, 'a' * 64, scope,
                                  NOW - timedelta(minutes=1), 'COMPLETE', (), (), ())
         return StoredGeneration(environment_id, generation, result.campaign_id, scope,
@@ -105,6 +116,8 @@ class AssessmentHttpTests(unittest.TestCase):
         self.assertEqual(value['destinationInputs'][0]['generation'], 3)
         self.assertEqual(value['assessments'][0]['status'], 'UNKNOWN')
         self.assertEqual(self.repository.reads, [('source', 7), ('target', 3), ('target-2', 4)])
+        self.assertEqual(self.repository.latest_reads, [(SCOPES[name], name)
+                         for name in ('source', 'target', 'target-2')])
         self.assertEqual(self.inputs.credentials, ['operator'])
         self.assertEqual(response.headers['cache-control'], 'no-store')
 
@@ -113,6 +126,7 @@ class AssessmentHttpTests(unittest.TestCase):
             response = self.request(token)
             self.assertEqual(response.status_code, 404, response.text)
         self.assertEqual(self.repository.reads, [])
+        self.assertEqual(self.repository.latest_reads, [])
         self.assertEqual(self.inputs.credentials, [])
 
     def test_reversed_destination_selections_keep_results_with_their_generation_bindings(self):
@@ -135,6 +149,12 @@ class AssessmentHttpTests(unittest.TestCase):
         self.assertEqual((response.status_code, response.json()['error']['code']),
                          (503, 'ASSESSMENT_UNAVAILABLE'))
         self.repository.corrupt = True
+        response = self.request()
+        self.assertEqual((response.status_code, response.json()['error']['code']),
+                         (503, 'ASSESSMENT_UNAVAILABLE'))
+
+    def test_missing_latest_generation_fails_closed(self):
+        self.repository.latest_missing = True
         response = self.request()
         self.assertEqual((response.status_code, response.json()['error']['code']),
                          (503, 'ASSESSMENT_UNAVAILABLE'))

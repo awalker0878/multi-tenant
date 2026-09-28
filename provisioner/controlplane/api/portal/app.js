@@ -734,9 +734,21 @@ async function requestComparison(body) {
 }
 
 function validateComparison(result, body) {
+  const currentMetadata = (binding) => {
+    const latest = binding?.latestObservation;
+    return latest && Number.isSafeInteger(latest.generation) && latest.generation > 0 &&
+      typeof latest.rawSnapshotDigest === 'string' && /^[0-9a-f]{64}$/.test(latest.rawSnapshotDigest) &&
+      typeof latest.capturedAt === 'string' && !Number.isNaN(Date.parse(latest.capturedAt)) &&
+      ['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(latest.collectionCompleteness) &&
+      ['collectionErrors', 'missingPrivileges'].every((key) => Array.isArray(latest[key]) &&
+        latest[key].length <= 64 && latest[key].every((value) => typeof value === 'string')) &&
+      binding.superseded === (latest.generation > binding.generation) &&
+      (!binding.observation || (latest.generation >= binding.generation &&
+        (latest.generation !== binding.generation || latest.rawSnapshotDigest === binding.observation.rawSnapshotDigest)));
+  };
   const bound = (binding, selection) => binding && binding.environmentId === selection.environmentId &&
     binding.generation === selection.generation && typeof binding.endpointId === 'string' &&
-    typeof binding.nativeScopeId === 'string' && typeof binding.platformFamily === 'string';
+    typeof binding.nativeScopeId === 'string' && typeof binding.platformFamily === 'string' && currentMetadata(binding);
   const installed = (tuple, binding) => tuple &&
     ['endpointId', 'nativeScopeId', 'platformFamily', 'productTupleId', 'productTupleDigest']
       .every((key) => typeof binding[key] === 'string' && tuple[key] === binding[key]);
@@ -758,6 +770,9 @@ function validateComparison(result, body) {
         !Array.isArray(item.issues) || item.issues.length > 200 || item.issues.some((issue) =>
           !issue || !['BLOCKER', 'UNKNOWN', 'CONDITION'].includes(issue.severity) ||
           !['code', 'reason', 'remediation'].every((key) => typeof issue[key] === 'string' && issue[key].length > 0)) ||
+        [[result.sourceInput, 'SOURCE'], [binding, 'DESTINATION']].some(([input, side]) =>
+          input.superseded && (item.status !== 'UNKNOWN' || !item.issues.some((issue) =>
+            issue.severity === 'UNKNOWN' && issue.code === `${side}_SNAPSHOT_SUPERSEDED`))) ||
         !item.estimate || !['NONE', 'LOW'].includes(item.estimate.confidence) ||
         !['transferBytes', 'copyPhaseSeconds'].every((key) => item.estimate[key] === null ||
           (Number.isSafeInteger(item.estimate[key]) && item.estimate[key] >= 0)) ||
@@ -780,6 +795,13 @@ function renderComparison(result, selections) {
     status.textContent = `${item.status} · assessment only`;
     const observation = document.createElement('p');
     observation.textContent = `Generation ${selection.generation} · ${item.destination.platformFamily} · Route maturity: ${item.routeMaturity}`;
+    const currency = document.createElement('p');
+    currency.className = 'muted';
+    currency.textContent = [[result.sourceInput, 'Source'], [result.destinationInputs[index], 'Destination']]
+      .map(([input, side]) => `${side}: pinned generation ${input.generation}; latest observed generation ` +
+        `${input.latestObservation.generation} (${input.latestObservation.collectionCompleteness})` +
+        (input.superseded ? '. Historical pin; current eligibility unknown.' : '.'))
+      .join(' ');
     const issues = document.createElement('ul');
     issues.className = 'assessment-issues';
     for (const issue of item.issues) {
@@ -801,7 +823,7 @@ function renderComparison(result, selections) {
     const basis = document.createElement('p');
     basis.className = 'muted';
     basis.textContent = item.estimate.basis.join(' · ');
-    card.append(title, status, observation, issues, estimate, basis);
+    card.append(title, status, observation, currency, issues, estimate, basis);
     cards.push(card);
   });
   $('comparison-results').replaceChildren(...cards);
