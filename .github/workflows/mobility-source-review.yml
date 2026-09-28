@@ -1,0 +1,39 @@
+name: Mobility source review bundle
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/mobility-source-review.yml'
+  push:
+    branches: ['implementation/all-waves']
+    paths:
+      - '.github/workflows/mobility-source-review.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  source-review:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out exact revision without retained credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Bundle tracked source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/mobility-source-review"
+          git rev-parse HEAD > "$RUNNER_TEMP/mobility-source-review/revision.txt"
+          git archive --format=tar.gz HEAD > "$RUNNER_TEMP/mobility-source-review/source.tar.gz"
+          (cd "$RUNNER_TEMP/mobility-source-review" && sha256sum source.tar.gz > source.sha256)
+      - name: Retain private review bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: mobility-source-review-${{ github.sha }}
+          path: ${{ runner.temp }}/mobility-source-review/
+          if-no-files-found: error
+          retention-days: 1
