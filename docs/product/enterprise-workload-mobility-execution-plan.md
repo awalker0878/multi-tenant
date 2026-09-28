@@ -377,3 +377,27 @@ ISA, encryption/key, shared-disk and passthrough mapping and attributed applicat
 requirements. REST VM-info does not supply SOAP ConfigInfo security fields.
 The native live-migration hint is not directed route or entitlement qualification.
 No native system or guest was contacted; no execution or qualification gate changed.
+
+### B10/B14/B16 continuation — signed native reads
+
+The [VMware HTTPS transport](../engineering/vmware-discovery-https.md) now invokes
+the current collector using independently signed exact-campaign session material.
+Scope/folder selection, API release, URL, pinned IP, CA and token bytes are bound;
+the live enrolled credential and independent read-only witness are rechecked
+before connection, before sending credentials, after response and at collection
+return. Native issuance, original result-signature publication, deployed PKI/Vault
+composition and independent visibility reconciliation still require integration.
+
+The transport restricts requests to reviewed folder lists and VM IDs actually
+returned by those lists. Real loopback TLS tests cover wrong identities, revoked
+credentials, rotation/replay, response tampering/framing, deadlines and bounds.
+OpenStack now rejects expired/future campaigns before their first read and checks
+UTC monotonicity and validity around every page/quota read, including error paths.
+The regression previously reproduced a native GET after campaign expiry.
+
+These are repository/automated-verification increments, not native acceptance of
+B10/B14/B16 or completion of Wave 2. AHV/OpenStack HTTPS credential clients, native
+visibility reconciliation and B17 persisted application/dependency review remain
+open. No collector identity, normalizer or qualification claim is silently upgraded;
+no compatibility shim, mutation endpoint, login fallback or production grant is
+introduced. Existing later-wave dependencies and completion columns still apply.

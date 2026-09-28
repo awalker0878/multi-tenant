@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.6 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -158,6 +158,22 @@ state, application policy, complete controller/boot mappings and deployed transp
 remain separate work. A native live-migration hint is not route qualification.
 See the [Wave 2 collector follow-up](../product/wave2-discovery-architecture.md#native-hardware-collection-follow-up--28-september-2026).
 
+
+### Signed native discovery transport
+
+The VMware collector now has a package-owned HTTPS transport with signed native
+session custody, pinned IP/hostname/CA, exact folder/list-derived detail paths,
+finite I/O and total deadlines, strict response parsing and per-use live authority.
+The native attestor is independent of campaign/collector signing identities. Its
+credential reference must match the signed campaign enrollment and current native
+read-only witness. Token bytes never enter observations or logs. This is an actual
+GET implementation, not a claim of deployed Vault/session issuance or completeness.
+
+OpenStack checks campaign validity before every page/quota GET and after native
+responses, including errors. A late response or regressing clock cannot publish
+fresh evidence. See [native read custody and tests](../engineering/vmware-discovery-https.md)
+for exact fields, deployment obligations and rejection cases. Independent visibility
+reconciliation, remaining site integration and native qualification remain open.
 
 ## Engineering and implementation handoff
 

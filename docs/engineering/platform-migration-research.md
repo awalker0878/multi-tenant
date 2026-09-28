@@ -142,3 +142,13 @@ now produces common campaign evidence with hardware and reviewed folder identity
 Raw observation changes require fresh signed reviews. Visible REST enumeration
 remains partial; absent or malformed hardware is not a safe default. This narrows
 but does not close the remaining full fact mapping and site credential integration.
+
+## Transport and credential follow-up
+
+[Signed VMware native discovery](vmware-discovery-https.md) now implements the
+GET transport and exact-session custody boundary for the existing collector. The
+Broadcom session header/lifecycle references support the wire authentication only;
+no server release, RBAC coverage or native qualification is inferred from them.
+OpenStack campaign-clock regressions now block native reads before expiry violations
+rather than detecting them only when a page is appended. This advances existing
+B10/B14/B16, leaving native issuance/site deployment and independent coverage open.

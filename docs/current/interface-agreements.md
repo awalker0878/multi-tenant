@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -88,6 +88,22 @@ AHV keeps tagged disk backing and explicit boot/security/device observations rat
 than applying SDK request defaults. Consumer normalization and compatibility remain
 separate from native qualification and execution approval.
 
+
+### Signed native discovery transport
+
+The VMware collector now has a package-owned HTTPS transport with signed native
+session custody, pinned IP/hostname/CA, exact folder/list-derived detail paths,
+finite I/O and total deadlines, strict response parsing and per-use live authority.
+The native attestor is independent of campaign/collector signing identities. Its
+credential reference must match the signed campaign enrollment and current native
+read-only witness. Token bytes never enter observations or logs. This is an actual
+GET implementation, not a claim of deployed Vault/session issuance or completeness.
+
+OpenStack checks campaign validity before every page/quota GET and after native
+responses, including errors. A late response or regressing clock cannot publish
+fresh evidence. See [native read custody and tests](../engineering/vmware-discovery-https.md)
+for exact fields, deployment obligations and rejection cases. Independent visibility
+reconciliation, remaining site integration and native qualification remain open.
 
 ## Engineering and implementation handoff
 

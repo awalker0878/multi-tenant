@@ -182,3 +182,16 @@ redaction, immutable digests, scope/role/version mismatches, native read failure
 clock expiry, campaign budgets and normalized output. Real native captures,
 privilege-loss enumeration reconciliation and signed transport campaigns remain
 required under B14/B15/B18/B47; these unit fixtures do not replace them.
+
+## Signed native HTTPS transport follow-up
+
+The [VMware native read transport](../engineering/vmware-discovery-https.md) connects
+the existing collector to real bounded HTTPS using independently signed session
+material and current campaign/enrollment/native-witness checks. It pins IP, TLS
+hostname and CA, restricts paths to the selected folders and their observed VM IDs,
+and rejects expired, revoked, rotated, ambiguous or oversized inputs. Loopback TLS
+is a protocol test, not a vCenter qualification. The output remains visible-only
+and partial; original collector signatures and mTLS ingestion are still required.
+OpenStack now verifies campaign validity before each native GET as well as after
+responses, so an expired campaign cannot perform even its first read. Actual site
+credential issuance and AHV/OpenStack HTTPS composition remain open.
