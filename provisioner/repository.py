@@ -1,24 +1,24 @@
-"""Access to the existing repository tooling.
-
-The provisioner reuses the repository's mature tools instead of reimplementing
-them. This module is the single place that puts the repository root on the import
-path so those tools can be imported by name.
-"""
+"""Access to reviewed source assets and installed owner tooling."""
 from __future__ import annotations
 
 import importlib
 import json
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+ASSET_ROOT = Path(__file__).resolve().parent / '_assets'
 
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
+def asset_path(relative_path: str) -> Path:
+    """Locate a reviewed runtime asset in the package or source checkout."""
+    path = Path(relative_path)
+    if path.is_absolute() or '..' in path.parts:
+        raise ValueError(f'Unsafe runtime asset path: {relative_path}')
+    packaged = ASSET_ROOT / path
+    return packaged if packaged.is_file() else ROOT / path
 
 def repository_module(name: str):
-    """Import an existing repository module, failing loudly if it is absent."""
+    """Import an installed owner module, failing loudly if it is absent."""
     return importlib.import_module(name)
 
 

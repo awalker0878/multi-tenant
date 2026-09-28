@@ -411,9 +411,12 @@ class GraphTest(unittest.TestCase):
         self.assertTrue(review['limits'])
 
     def test_a_malformed_graph_is_refused_by_the_mirror(self):
-        cases = {'format': 'hosting-delivery/2', 'source_commit': 'a' * 39,
-                 'operation_id': 'wsd:01', 'generation': 0, 'generation': True}
-        for key, value in cases.items():
+        cases = [('format', 'hosting-delivery/3'),
+                 ('source_commit', 'a' * 39),
+                 ('operation_id', 'wsd:01'),
+                 ('generation', 0),
+                 ('generation', True)]
+        for key, value in cases:
             with self.subTest(key=key, value=value):
                 graph = {**self.graph, key: value}
                 with self.assertRaises(ProvisioningError):

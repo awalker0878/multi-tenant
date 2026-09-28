@@ -135,6 +135,7 @@ class Adapter:
     binding_requirement: tuple[tuple[str, str], ...] = ()
     realization_note: str = ''
     limits: tuple[str, ...] = ()
+    # This version labels the realization term bound into the reviewed plan manifest.
     format: str = ADAPTER_FORMAT
 
     # -- identity ------------------------------------------------------------
@@ -336,32 +337,6 @@ class Adapter:
                     problems.append(f'workload {workload.name} declares native inputs the '
                                     f'reviewed {self.platform} module does not accept: {unknown}')
         return tuple(problems)
-
-    # -- compatibility projections -------------------------------------------
-
-    def placement_shape(self) -> dict:
-        return {'required': sorted(self.placement_fields),
-                'supplied_by': 'inventory cluster native identity'}
-
-    def network_shape(self) -> dict:
-        return {'required': sorted(self.network_fields),
-                'supplied_by': 'native readback after the domain phase'}
-
-    def to_dict(self) -> dict:
-        return {'format': self.format, 'platform': self.platform, 'family': self.family,
-                'product_tuple': self.product_tuple,
-                'qualified': self.qualified,
-                'status': QUALIFIED if self.qualified else NOT_QUALIFIED,
-                'modules': {'domains': self.domains_module, 'workloads': self.workloads_module},
-                'placement_shape': self.placement_shape(),
-                'network_shape': self.network_shape(),
-                'security_edge': self.security_edge,
-                'edge_components': list(self.edge_components),
-                'binding_requirement': self.binding,
-                'realization': self.realization_contract(),
-                'limits': list(self.limits),
-                'native_contact': False}
-
 
 def _adapter(platform: str, security_edge: str, limits: tuple[str, ...],
              realization_note: str = '') -> Adapter:

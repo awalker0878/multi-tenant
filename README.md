@@ -1,6 +1,6 @@
-# Portable Multi-Tenant Secure Hosting
+# Enterprise Workload Mobility and Secure Hosting
 
-Infrastructure architecture, engineering and implementation workspace. This repository is public; actual inventories, credentials, plans, state and native evidence belong in private operator systems.
+Infrastructure architecture and implementation workspace for an enterprise product that will discover, assess, provision and migrate workloads between qualified on-premises environments. Actual inventories, credentials, plans, state and native evidence belong in private operator systems. The executable product is under development; the current CLI cannot perform an end-to-end provisioning or migration job.
 
 ## Read the architecture and engineering in Git
 
@@ -18,9 +18,9 @@ The Word library is now available as full linked Markdown chapters, tables, diag
 | Operations and working forms | [Operations](docs/operations/README.md) · [HLD/LLD/MOP templates](docs/templates/README.md) |
 | Provenance and original artifacts | [Migration record](docs/DOCUMENTATION_MIGRATION.md) · [Source files and workbooks](docs/ARTIFACT_CATALOG.md) |
 
-## Implementation boundaries
+## Product direction and implementation boundaries
 
-The infrastructure architecture remains authoritative. Terraform and Ansible implement separately owned resource and verification responsibilities; they do not define a new hosting application. Native code remains candidate implementation until its actual supported target and evidence are accepted. The supplied source records distinguish local fixtures, native readback and formal operating authorization.
+The [full audit and implementation plan](docs/product/enterprise-workload-mobility-audit-and-implementation-plan.md) defines the sequenced delivery. The [product mandate](docs/product/decisions/product-mandate.md) defines the future operator application; [workload/application identity](docs/product/decisions/workload-and-security-boundary.md) is distinct from the WSD security and placement boundary; [state and writer ownership](docs/product/decisions/state-ownership.md) governs the transition to one executable path. The infrastructure architecture remains the basis for topology, isolation and service ownership. Terraform and Ansible retain separately owned resource and guest configuration responsibilities within the future workflow. Native code remains candidate implementation until its installed target and evidence are accepted. Local fixtures, native readback and formal operating authorization are distinct.
 
 The ten native Terraform primitives are retained under `terraform/modules`; their execution roots now live under `terraform/stacks/components`. Six WSD compositions add separate domain and workload roots under `terraform/stacks/wsd`. Cluster-aware input compilation and a bound Linux guest Ansible profile connect those scopes without changing the native quarantine defaults. The integrated audit correction preserves production connectivity and resource semantics. Current source publication is recorded by Git and exact CI results; ZIP-era statements describe their original delivery only. Historical test reports remain historical, and no infrastructure is deployed by this repository review.
 
@@ -68,8 +68,9 @@ into a resolved internal desired state, and then handed to the existing
 `tools/compile_wsd.py`. The Terraform roots, the Ansible roles, the state backends
 and every service owner keep their current authority.
 
-The canonical current path is exactly one line; nothing else is a current entry
-point:
+The current request-to-plan and delivery-artifact path is shown below. The
+generated delivery graph does not yet complete the native bootstrap, activation
+and migration lifecycle:
 
 ```text
 consumer request -> provisioner core -> resolved environment -> existing WSD compiler
@@ -80,16 +81,18 @@ consumer request -> provisioner core -> resolved environment -> existing WSD com
 python -m provisioner.cli plan examples/requests/internal-production.yaml
 ```
 
-`validate`, `resolve`, `plan`, `status`, `verify` and `evidence` all call the same
-core library; `apply` always refuses, because this repository holds no target
-contact, credential or change authority. The five reference requests under
+`validate`, `resolve`, `plan`, `status`, `verify` and `evidence` use the current
+core library. Public `apply` and `mobility-apply` refuse execution; lower-level
+native tools have narrower scoped actions, but they are not a complete approved
+product workflow. The five reference requests under
 [`examples/requests`](examples/requests) plan as `PLANNED_DISABLED_NOT_AUTHORIZED`
 with `native_contact: false`, and their deterministic artifacts are replayed by the
 golden regressions, including the full request-by-platform compatibility matrix.
-The ordered refactor gates that produced this path and their repository-side
-completion status are recorded in the
-[refactor completion audit](docs/deepseek-refactor-completion-audit.md); remaining
-work is only external, and is listed in [next work](docs/NEXT_WORK.md).
+The [refactor completion audit](docs/deepseek-refactor-completion-audit.md) describes
+its historical repository-side gates. [Next work](docs/NEXT_WORK.md) tracks both
+executable product implementation and the separate site, service and native
+evidence required for release. Passing local contract tests does not make a
+migration direction or a provisioning lifecycle operational.
 
 ## Local review
 

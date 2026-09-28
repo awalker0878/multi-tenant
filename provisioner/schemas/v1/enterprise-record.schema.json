@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "hosting.platform/v1/enterprise-record",
+  "title": "Enterprise workload and migration records",
+  "description": "Versioned internal product records. These are not a second WorkloadSecurityDomain request API.",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {"const": "hosting.platform/v1"},
+    "kind": {"enum": ["Workload", "ApplicationGroup", "ObservationSnapshot", "MigrationPlan", "TransferManifest", "ActivityResult"]},
+    "metadata": {"type": "object"},
+    "spec": {"type": "object"}
+  },
+  "oneOf": [
+    {"properties": {"kind": {"const": "Workload"}, "metadata": {"$ref": "#/definitions/workloadMetadata"}, "spec": {"$ref": "#/definitions/workload"}}},
+    {"properties": {"kind": {"const": "ApplicationGroup"}, "metadata": {"$ref": "#/definitions/applicationMetadata"}, "spec": {"$ref": "#/definitions/application"}}},
+    {"properties": {"kind": {"const": "ObservationSnapshot"}, "metadata": {"$ref": "#/definitions/observationMetadata"}, "spec": {"$ref": "#/definitions/observation"}}},
+    {"properties": {"kind": {"const": "MigrationPlan"}, "metadata": {"$ref": "#/definitions/planMetadata"}, "spec": {"$ref": "#/definitions/plan"}}},
+    {"properties": {"kind": {"const": "TransferManifest"}, "metadata": {"$ref": "#/definitions/transferMetadata"}, "spec": {"$ref": "#/definitions/transfer"}}},
+    {"properties": {"kind": {"const": "ActivityResult"}, "metadata": {"$ref": "#/definitions/activityMetadata"}, "spec": {"$ref": "#/definitions/activity"}}}
+  ],
+  "definitions": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"},
+    "nativeId": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"},
+    "ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/id"}},
+    "unknownFields": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+    "platformFamily": {"enum": ["vmware", "nutanix", "openstack"]},
+    "scope": {
+      "type": "object", "required": ["organizationId", "tenantId", "securityDomainId", "endpointId", "nativeScopeId", "locationId", "platformFamily"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "securityDomainId": {"$ref": "#/definitions/id"},
+        "endpointId": {"$ref": "#/definitions/id"}, "nativeScopeId": {"$ref": "#/definitions/nativeId"},
+        "locationId": {"$ref": "#/definitions/id"}, "platformFamily": {"$ref": "#/definitions/platformFamily"}
+      }
+    },
+    "binding": {
+      "type": "object", "required": ["endpointId", "nativeScopeId", "nativeId", "resourceKind", "platformFamily"], "additionalProperties": false,
+      "properties": {
+        "endpointId": {"$ref": "#/definitions/id"}, "nativeScopeId": {"$ref": "#/definitions/nativeId"},
+        "nativeId": {"$ref": "#/definitions/nativeId"}, "resourceKind": {"enum": ["vm", "disk", "nic", "volume", "dataset", "network"]},
+        "platformFamily": {"$ref": "#/definitions/platformFamily"}
+      }
+    },
+    "bindingHistory": {
+      "type": "object", "required": ["binding", "role", "firstSeenSnapshotId", "lastObservedSnapshotId"], "additionalProperties": false,
+      "properties": {
+        "binding": {"$ref": "#/definitions/binding"}, "role": {"enum": ["SOURCE", "TARGET", "RETIRED"]},
+        "firstSeenSnapshotId": {"$ref": "#/definitions/id"},
+        "lastObservedSnapshotId": {"$ref": "#/definitions/id"}
+      }
+    },
+    "integerFact": {
+      "oneOf": [
+        {"type": "object", "required": ["state", "value"], "additionalProperties": false,
+         "properties": {"state": {"const": "KNOWN"}, "value": {"type": "integer", "minimum": 0}}},
+        {"type": "object", "required": ["state", "reason"], "additionalProperties": false,
+         "properties": {"state": {"const": "UNKNOWN"}, "reason": {"type": "string", "minLength": 1}}}
+      ]
+    },
+    "stringFact": {
+      "oneOf": [
+        {"type": "object", "required": ["state", "value"], "additionalProperties": false,
+         "properties": {"state": {"const": "KNOWN"}, "value": {"type": "string", "minLength": 1}}},
+        {"type": "object", "required": ["state", "reason"], "additionalProperties": false,
+         "properties": {"state": {"const": "UNKNOWN"}, "reason": {"type": "string", "minLength": 1}}}
+      ]
+    },
+    "disk": {
+      "type": "object", "required": ["diskId", "bindings", "slot", "sizeBytes", "format", "unknownFields"], "additionalProperties": false,
+      "properties": {
+        "diskId": {"$ref": "#/definitions/id"}, "bindings": {"type": "array", "items": {"$ref": "#/definitions/bindingHistory"}},
+        "slot": {"type": "integer", "minimum": 0}, "sizeBytes": {"$ref": "#/definitions/integerFact"},
+        "format": {"$ref": "#/definitions/stringFact"}, "unknownFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "nic": {
+      "type": "object", "required": ["nicId", "bindings", "slot", "network", "address", "unknownFields"], "additionalProperties": false,
+      "properties": {
+        "nicId": {"$ref": "#/definitions/id"}, "bindings": {"type": "array", "items": {"$ref": "#/definitions/bindingHistory"}},
+        "slot": {"type": "integer", "minimum": 0}, "network": {"$ref": "#/definitions/stringFact"},
+        "address": {"$ref": "#/definitions/stringFact"}, "unknownFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "dataset": {
+      "type": "object", "required": ["datasetId", "kind", "machineId", "sourceBindings", "consistencyGroupId", "sizeBytes", "unknownFields"], "additionalProperties": false,
+      "properties": {
+        "datasetId": {"$ref": "#/definitions/id"}, "kind": {"enum": ["volume", "file-tree", "object", "database"]},
+        "machineId": {"oneOf": [{"type": "null"}, {"$ref": "#/definitions/id"}]}, "sourceBindings": {"type": "array", "items": {"$ref": "#/definitions/binding"}},
+        "consistencyGroupId": {"$ref": "#/definitions/id"}, "sizeBytes": {"$ref": "#/definitions/integerFact"},
+        "unknownFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "workloadMetadata": {
+      "type": "object", "required": ["organizationId", "tenantId", "workloadId", "wsdId", "revision", "ownerId", "criticality"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "workloadId": {"$ref": "#/definitions/id"}, "wsdId": {"$ref": "#/definitions/id"},
+        "revision": {"type": "integer", "minimum": 1}, "ownerId": {"$ref": "#/definitions/id"},
+        "criticality": {"enum": ["low", "moderate", "high", "unknown"]}
+      }
+    },
+    "membershipTransition": {
+      "type": "object", "required": ["planId", "planRevision", "planDigest", "grantDigest", "observationDigest"], "additionalProperties": false,
+      "properties": {
+        "planId": {"$ref": "#/definitions/id"}, "planRevision": {"type": "integer", "minimum": 1},
+        "planDigest": {"$ref": "#/definitions/digest"},
+        "grantDigest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "observationDigest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "membershipEvent": {
+      "type": "object", "required": ["fromWsdId", "toWsdId", "planId", "planRevision", "planDigest", "grantDigest", "observationDigest", "acceptedAt"], "additionalProperties": false,
+      "properties": {
+        "fromWsdId": {"$ref": "#/definitions/id"}, "toWsdId": {"$ref": "#/definitions/id"},
+        "planId": {"$ref": "#/definitions/id"}, "planRevision": {"type": "integer", "minimum": 1},
+        "planDigest": {"$ref": "#/definitions/digest"}, "grantDigest": {"$ref": "#/definitions/digest"},
+        "observationDigest": {"$ref": "#/definitions/digest"}, "acceptedAt": {"$ref": "#/definitions/timestamp"}
+      }
+    },
+    "membership": {
+      "type": "object", "required": ["state", "candidateWsdId", "transition", "history"], "additionalProperties": false,
+      "properties": {
+        "state": {"enum": ["ACCEPTED", "PENDING", "OBSERVED"]},
+        "candidateWsdId": {"oneOf": [{"type": "null"}, {"$ref": "#/definitions/id"}]},
+        "transition": {"oneOf": [{"type": "null"}, {"$ref": "#/definitions/membershipTransition"}]},
+        "history": {"type": "array", "items": {"$ref": "#/definitions/membershipEvent"}}
+      }
+    },
+    "machine": {
+      "type": "object", "required": ["machineId", "displayName", "bindings", "guestProfile", "cpuCount", "memoryMiB", "firmware", "disks", "disksComplete", "nics", "nicsComplete", "unknownFields"], "additionalProperties": false,
+      "properties": {
+        "machineId": {"$ref": "#/definitions/id"}, "displayName": {"type": "string", "minLength": 1},
+        "bindings": {"type": "array", "items": {"$ref": "#/definitions/bindingHistory"}},
+        "guestProfile": {"$ref": "#/definitions/stringFact"}, "cpuCount": {"$ref": "#/definitions/integerFact"},
+        "memoryMiB": {"$ref": "#/definitions/integerFact"}, "firmware": {"$ref": "#/definitions/stringFact"},
+        "disks": {"type": "array", "items": {"$ref": "#/definitions/disk"}}, "disksComplete": {"type": "boolean"},
+        "nics": {"type": "array", "items": {"$ref": "#/definitions/nic"}}, "nicsComplete": {"type": "boolean"},
+        "unknownFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "workload": {
+      "type": "object", "required": ["state", "name", "membership", "machines", "datasets", "unknownFields"], "additionalProperties": false,
+      "properties": {
+        "state": {"enum": ["PLANNED", "DISCOVERED", "MANAGED"]}, "name": {"type": "string", "minLength": 1},
+        "membership": {"$ref": "#/definitions/membership"},
+        "machines": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/machine"}},
+        "datasets": {"type": "array", "items": {"$ref": "#/definitions/dataset"}},
+        "unknownFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "applicationMetadata": {
+      "type": "object", "required": ["organizationId", "tenantId", "applicationGroupId", "revision", "ownerId"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "applicationGroupId": {"$ref": "#/definitions/id"}, "revision": {"type": "integer", "minimum": 1},
+        "ownerId": {"$ref": "#/definitions/id"}
+      }
+    },
+    "dependency": {
+      "type": "object", "required": ["dependencyId", "sourceWorkloadId", "targetRef", "protocol", "reviewState"], "additionalProperties": false,
+      "properties": {
+        "dependencyId": {"$ref": "#/definitions/id"}, "sourceWorkloadId": {"$ref": "#/definitions/id"},
+        "targetRef": {"$ref": "#/definitions/id"}, "protocol": {"$ref": "#/definitions/stringFact"},
+        "reviewState": {"enum": ["REVIEWED", "UNREVIEWED", "UNKNOWN"]}
+      }
+    },
+    "consistencyGroup": {
+      "type": "object", "required": ["groupId", "datasetIds"], "additionalProperties": false,
+      "properties": {"groupId": {"$ref": "#/definitions/id"}, "datasetIds": {"$ref": "#/definitions/ids"}}
+    },
+    "application": {
+      "type": "object", "required": ["name", "workloadIds", "datasetIds", "dependencies", "startupOrder", "consistencyGroups", "acceptanceTestIds", "unknownFields"], "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1}, "workloadIds": {"$ref": "#/definitions/ids"},
+        "datasetIds": {"$ref": "#/definitions/ids"}, "dependencies": {"type": "array", "items": {"$ref": "#/definitions/dependency"}},
+        "startupOrder": {"$ref": "#/definitions/ids"}, "consistencyGroups": {"type": "array", "items": {"$ref": "#/definitions/consistencyGroup"}},
+        "acceptanceTestIds": {"$ref": "#/definitions/ids"}, "unknownFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "observationMetadata": {
+      "type": "object", "required": ["organizationId", "tenantId", "snapshotId", "capturedAt", "expiresAt"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "snapshotId": {"$ref": "#/definitions/id"}, "capturedAt": {"$ref": "#/definitions/timestamp"},
+        "expiresAt": {"$ref": "#/definitions/timestamp"}
+      }
+    },
+    "observationFact": {
+      "oneOf": [
+        {"type": "object", "required": ["field", "state", "value"], "additionalProperties": false,
+         "properties": {"field": {"$ref": "#/definitions/id"}, "state": {"const": "OBSERVED"},
+                        "value": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]}}},
+        {"type": "object", "required": ["field", "state", "reason"], "additionalProperties": false,
+         "properties": {"field": {"$ref": "#/definitions/id"}, "state": {"const": "UNKNOWN"},
+                        "reason": {"type": "string", "minLength": 1}}}
+      ]
+    },
+    "observedObject": {
+      "type": "object", "required": ["binding", "presence", "revisionToken", "facts", "missingFields"], "additionalProperties": false,
+      "properties": {
+        "binding": {"$ref": "#/definitions/binding"}, "presence": {"enum": ["PRESENT", "ABSENT", "UNKNOWN"]},
+        "revisionToken": {"$ref": "#/definitions/stringFact"},
+        "facts": {"type": "array", "items": {"$ref": "#/definitions/observationFact"}},
+        "missingFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "observation": {
+      "type": "object", "required": ["endpointId", "readScopes", "completeness", "privileges", "objects", "collectionErrors", "missingFields"], "additionalProperties": false,
+      "properties": {
+        "endpointId": {"$ref": "#/definitions/id"},
+        "readScopes": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/nativeId"}},
+        "completeness": {"enum": ["COMPLETE", "PARTIAL", "UNKNOWN"]},
+        "privileges": {"$ref": "#/definitions/ids"},
+        "objects": {"type": "array", "items": {"$ref": "#/definitions/observedObject"}},
+        "collectionErrors": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "missingFields": {"$ref": "#/definitions/unknownFields"}
+      }
+    },
+    "planMetadata": {
+      "type": "object", "required": ["organizationId", "tenantId", "planId", "revision", "planDigest", "frozenAt"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "planId": {"$ref": "#/definitions/id"}, "revision": {"type": "integer", "minimum": 1},
+        "planDigest": {"$ref": "#/definitions/digest"}, "frozenAt": {"$ref": "#/definitions/timestamp"}
+      }
+    },
+    "diskMapping": {
+      "type": "object", "required": ["diskId", "targetVolumeRef"], "additionalProperties": false,
+      "properties": {"diskId": {"$ref": "#/definitions/id"}, "targetVolumeRef": {"$ref": "#/definitions/id"}}
+    },
+    "nicMapping": {
+      "type": "object", "required": ["nicId", "targetNetworkRef", "addressMode"], "additionalProperties": false,
+      "properties": {"nicId": {"$ref": "#/definitions/id"}, "targetNetworkRef": {"$ref": "#/definitions/id"},
+                     "addressMode": {"enum": ["READDRESS", "PRESERVE_ISOLATED", "NAT_PROXY", "L2_EXTENSION"]}}
+    },
+    "machineMapping": {
+      "type": "object", "required": ["machineId", "sourceBinding", "targetMachineId", "targetPlacementRef", "diskMappings", "nicMappings"], "additionalProperties": false,
+      "properties": {
+        "machineId": {"$ref": "#/definitions/id"}, "sourceBinding": {"$ref": "#/definitions/binding"},
+        "targetMachineId": {"$ref": "#/definitions/id"}, "targetPlacementRef": {"$ref": "#/definitions/id"},
+        "diskMappings": {"type": "array", "items": {"$ref": "#/definitions/diskMapping"}},
+        "nicMappings": {"type": "array", "items": {"$ref": "#/definitions/nicMapping"}}
+      }
+    },
+    "datasetMapping": {
+      "type": "object", "required": ["datasetId", "targetRef", "consistencyGroupId"], "additionalProperties": false,
+      "properties": {
+        "datasetId": {"$ref": "#/definitions/id"}, "targetRef": {"$ref": "#/definitions/id"},
+        "consistencyGroupId": {"$ref": "#/definitions/id"}
+      }
+    },
+    "route": {
+      "type": "object", "required": ["routeId", "method", "qualificationDigest", "guestProfile", "driverVersion"], "additionalProperties": false,
+      "properties": {
+        "routeId": {"$ref": "#/definitions/id"},
+        "method": {"enum": ["REBUILD_RESTORE", "COLD_VM_CONVERSION", "SAME_PLATFORM_RELOCATION", "APPLICATION_NATIVE", "WARM_VM_TRANSFER"]},
+        "qualificationDigest": {"$ref": "#/definitions/digest"},
+        "guestProfile": {"$ref": "#/definitions/id"}, "driverVersion": {"type": "string", "minLength": 1}
+      }
+    },
+    "plan": {
+      "type": "object", "required": ["workloadId", "workloadRevision", "applicationGroupId", "sourceSnapshotId", "destinationSnapshotId", "source", "destination", "route", "selectedMachineIds", "selectedDatasetIds", "machineMappings", "datasetMappings", "policyDigest", "acceptanceTestIds", "maxDowntimeSeconds", "maxDataLossSeconds", "rollbackWindowSeconds"], "additionalProperties": false,
+      "properties": {
+        "workloadId": {"$ref": "#/definitions/id"}, "workloadRevision": {"type": "integer", "minimum": 1},
+        "applicationGroupId": {"oneOf": [{"type": "null"}, {"$ref": "#/definitions/id"}]},
+        "sourceSnapshotId": {"$ref": "#/definitions/id"}, "destinationSnapshotId": {"$ref": "#/definitions/id"},
+        "source": {"$ref": "#/definitions/scope"}, "destination": {"$ref": "#/definitions/scope"},
+        "route": {"$ref": "#/definitions/route"},
+        "selectedMachineIds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/definitions/id"}},
+        "selectedDatasetIds": {"$ref": "#/definitions/ids"},
+        "machineMappings": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/machineMapping"}},
+        "datasetMappings": {"type": "array", "items": {"$ref": "#/definitions/datasetMapping"}},
+        "policyDigest": {"$ref": "#/definitions/digest"}, "acceptanceTestIds": {"$ref": "#/definitions/ids"},
+        "maxDowntimeSeconds": {"type": "integer", "minimum": 0}, "maxDataLossSeconds": {"type": "integer", "minimum": 0},
+        "rollbackWindowSeconds": {"type": "integer", "minimum": 0}
+      }
+    },
+    "transferMetadata": {
+      "type": "object", "required": ["organizationId", "tenantId", "transferId", "planId", "planRevision", "planDigest"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "transferId": {"$ref": "#/definitions/id"}, "planId": {"$ref": "#/definitions/id"},
+        "planRevision": {"type": "integer", "minimum": 1}, "planDigest": {"$ref": "#/definitions/digest"}
+      }
+    },
+    "sourceReceipt": {
+      "type": "object", "required": ["sourceScope", "datasetId", "snapshotId", "receiptDigest"], "additionalProperties": false,
+      "properties": {
+        "sourceScope": {"$ref": "#/definitions/scope"}, "datasetId": {"$ref": "#/definitions/id"},
+        "snapshotId": {"$ref": "#/definitions/id"}, "receiptDigest": {"$ref": "#/definitions/digest"}
+      }
+    },
+    "transferGrant": {
+      "type": "object", "required": ["grantId", "grantDigest", "sourceScope", "destinationScope"], "additionalProperties": false,
+      "properties": {
+        "grantId": {"$ref": "#/definitions/id"}, "grantDigest": {"$ref": "#/definitions/digest"},
+        "sourceScope": {"$ref": "#/definitions/scope"}, "destinationScope": {"$ref": "#/definitions/scope"}
+      }
+    },
+    "transfer": {
+      "type": "object", "required": ["sourceScope", "destinationScope", "sourceWorkloadId", "targetWorkloadId", "datasetId", "consistencyGroupId", "sourceSnapshotId", "sourceReceipt", "sourceNativeBinding", "targetRef", "sourceFormat", "targetFormat", "expectedBytes", "encryptionKeyRef", "transportId", "grant"], "additionalProperties": false,
+      "properties": {
+        "sourceScope": {"$ref": "#/definitions/scope"}, "destinationScope": {"$ref": "#/definitions/scope"},
+        "sourceWorkloadId": {"$ref": "#/definitions/id"}, "targetWorkloadId": {"$ref": "#/definitions/id"},
+        "datasetId": {"$ref": "#/definitions/id"}, "consistencyGroupId": {"$ref": "#/definitions/id"},
+        "sourceSnapshotId": {"$ref": "#/definitions/id"}, "sourceReceipt": {"$ref": "#/definitions/sourceReceipt"},
+        "sourceNativeBinding": {"$ref": "#/definitions/binding"}, "targetRef": {"$ref": "#/definitions/id"},
+        "sourceFormat": {"type": "string", "minLength": 1}, "targetFormat": {"type": "string", "minLength": 1},
+        "expectedBytes": {"$ref": "#/definitions/integerFact"},
+        "encryptionKeyRef": {"$ref": "#/definitions/id"}, "transportId": {"$ref": "#/definitions/id"},
+        "grant": {"$ref": "#/definitions/transferGrant"}
+      }
+    },
+    "activityMetadata": {
+      "type": "object", "required": ["organizationId", "tenantId", "activityId", "operationId", "attempt", "planId", "planRevision", "planDigest", "observedAt"], "additionalProperties": false,
+      "properties": {
+        "organizationId": {"$ref": "#/definitions/id"}, "tenantId": {"$ref": "#/definitions/id"},
+        "activityId": {"$ref": "#/definitions/id"}, "operationId": {"$ref": "#/definitions/id"},
+        "attempt": {"type": "integer", "minimum": 1}, "planId": {"$ref": "#/definitions/id"},
+        "planRevision": {"type": "integer", "minimum": 1}, "planDigest": {"$ref": "#/definitions/digest"},
+        "observedAt": {"$ref": "#/definitions/timestamp"}
+      }
+    },
+    "activity": {
+      "type": "object", "required": ["status", "effects", "nativeTaskId", "evidenceDigests", "failureCode", "continuationRef", "retry"], "additionalProperties": false,
+      "properties": {
+        "status": {"enum": ["COMPLETED", "RUNNING", "FAILED", "OUTCOME_UNKNOWN"]},
+        "effects": {"enum": ["NONE", "KNOWN", "UNKNOWN"]},
+        "nativeTaskId": {"type": ["string", "null"]},
+        "evidenceDigests": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/digest"}},
+        "failureCode": {"type": ["string", "null"]}, "continuationRef": {"type": ["string", "null"]},
+        "retry": {"enum": ["SAFE", "RECONCILE", "NEVER"]}
+      }
+    }
+  }
+}

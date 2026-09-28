@@ -18,6 +18,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from provisioner.repository import asset_path
 
 from tools.check_release import verify
 from tools.compile_wsd import identity
@@ -224,7 +225,8 @@ def prepare(args, root=ROOT):
     write_new(operation / 'backend.hcl', ''.join(f'{k} = {json.dumps(v)}\n' for k, v in sorted(settings.items())).encode())
     authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json')
     version = strict_loads(read_private(operation / 'version.json'))['terraform_version']
-    require(version == json.loads((root / 'config/toolchain.json').read_text(encoding='utf-8'))['terraform'], 'Terraform version differs from the pinned toolchain')
+    toolchain = asset_path('config/toolchain.json') if root == ROOT else root / 'config/toolchain.json'
+    require(version == json.loads(toolchain.read_text(encoding='utf-8'))['terraform'], 'Terraform version differs from the pinned toolchain')
     current_window(authority)
     authorized_command(authority, binary, directory, ['init', '-input=false', '-no-color', '-lockfile=readonly',
             '-reconfigure', f'-backend-config={operation / "backend.hcl"}'], env, operation / 'init.log')

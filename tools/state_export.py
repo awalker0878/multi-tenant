@@ -17,6 +17,7 @@ import uuid
 
 ROOT=Path(__file__).resolve().parents[1]
 if __package__ in (None,''): sys.path.insert(0,str(ROOT))
+from provisioner.repository import asset_path
 from tools import readback_core as c,state_project as projects
 from tools.check_release import verify
 from tools.run_files import (current_window,digest,encoded,file_map,load_private,new_directory,private_path,
@@ -132,7 +133,8 @@ def capture(request,project,receipt,authority,token,*,ca_file=None,client=None,r
             return projects.project_observation(project,get(project_path),call,identifier)
         before=observe_project()
         require(before==receipt['project'],'Project identity, restrictions or custody changed since acceptance')
-        version=json.loads((root/'config/toolchain.json').read_text(encoding='utf-8'))['terraform']
+        toolchain = asset_path('config/toolchain.json') if root == ROOT else root/'config/toolchain.json'
+        version=json.loads(toolchain.read_text(encoding='utf-8'))['terraform']
         states=[]
         for expected in request['states']:
             key=expected['state_key']; path=urlsplit(backends[key]['address']).path
