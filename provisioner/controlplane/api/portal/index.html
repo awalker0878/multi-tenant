@@ -86,6 +86,54 @@
       <button id="more-discovery" class="quiet" type="button" hidden>Load more observed identities</button>
     </section>
 
+    <section class="panel" aria-labelledby="comparison-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">Destination assessment</p><h2 id="comparison-heading">Compare migration options</h2></div>
+        <span class="tag">Read only</span>
+      </div>
+      <p>Select an observed VM above, then add at least two destinations. Each selection pins the latest available observation generation. Assessment results describe blockers, missing facts and conditions; they do not approve execution.</p>
+      <p id="comparison-source" class="muted">Load source observations first.</p>
+      <div class="lookup">
+        <label for="comparison-workload">Observed VM</label>
+        <select id="comparison-workload" required disabled><option value="">Choose an observed VM</option></select>
+      </div>
+      <form id="destination-form" class="lookup">
+        <label for="destination-wsd">Destination WSD</label>
+        <select id="destination-wsd" required disabled><option value="">Choose an authorized WSD</option></select>
+        <button id="show-destinations" type="submit" disabled>Show destinations</button>
+      </form>
+      <div class="lookup">
+        <label for="destination-environment">Candidate environment</label>
+        <select id="destination-environment" disabled><option value="">Choose an environment</option></select>
+        <button id="add-destination" type="button" disabled>Add latest observation</button>
+        <button id="more-destinations" class="quiet" type="button" hidden>Load more candidates</button>
+      </div>
+      <p id="destination-status" class="muted" role="status" aria-live="polite">Sign in to choose authorized destinations.</p>
+      <div class="table-wrap">
+        <table>
+          <caption>Selected destinations and pinned observation generations</caption>
+          <thead><tr><th scope="col">Destination</th><th scope="col">Generation and coverage</th><th scope="col">Optional observed capacity</th><th scope="col">Selection</th></tr></thead>
+          <tbody id="destination-rows"></tbody>
+        </table>
+      </div>
+      <form id="comparison-form" class="comparison-form">
+        <label for="comparison-method">Migration method</label>
+        <select id="comparison-method" required>
+          <option value="REBUILD_RESTORE">Rebuild and restore</option>
+          <option value="COLD_VM_CONVERSION">Cold VM conversion</option>
+          <option value="SAME_PLATFORM_RELOCATION">Same-platform relocation</option>
+          <option value="APPLICATION_NATIVE">Application-native transfer</option>
+          <option value="WARM_VM_TRANSFER">Warm VM transfer</option>
+        </select>
+        <label for="comparison-guest">Guest profile</label><input id="comparison-guest" required maxlength="128" autocomplete="off" spellcheck="false">
+        <label for="comparison-network">Network mode</label><input id="comparison-network" required maxlength="128" autocomplete="off" spellcheck="false">
+        <label for="comparison-data">Data mode</label><input id="comparison-data" required maxlength="128" autocomplete="off" spellcheck="false">
+        <button id="compare-destinations" type="submit" disabled>Compare destinations</button>
+      </form>
+      <p id="comparison-status" class="muted" role="status" aria-live="polite">Choose an observed VM and at least two destinations.</p>
+      <div id="comparison-results" class="comparison-results" hidden></div>
+    </section>
+
     <section class="panel" aria-labelledby="portfolio-heading">
       <div class="section-heading">
         <div>
