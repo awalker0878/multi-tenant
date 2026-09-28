@@ -40,6 +40,12 @@ def _utc(value: datetime) -> bool:
             and value.utcoffset().total_seconds() == 0)
 
 
+def native_scope_key(scope: PlanScope) -> tuple[str, ...]:
+    """Native identity stays the same when site or WSD labels differ."""
+    return (scope.organization_id, scope.tenant_id, scope.endpoint_id,
+            scope.native_scope_id, scope.platform_family)
+
+
 @dataclass(frozen=True)
 class InstalledTuple:
     """Exact observed installation and native scope, including versioned tuple digest."""
@@ -74,7 +80,7 @@ class RouteKey:
                 or not all(_identifier(value) for value in (
                     self.guest_profile, self.network_mode, self.data_mode))):
             raise ValueError('An exact directed route and supported method are required')
-        if self.source.scope == self.destination.scope:
+        if native_scope_key(self.source.scope) == native_scope_key(self.destination.scope):
             raise ValueError('A route needs distinct source and destination native scopes')
         if (self.method == 'SAME_PLATFORM_RELOCATION'
                 and self.source.scope.platform_family != self.destination.scope.platform_family):

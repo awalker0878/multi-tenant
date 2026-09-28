@@ -17,7 +17,7 @@ from provisioner.controlplane.authority.model import PlanScope
 
 from .model import DiscoveryFact, DiscoveryObject, DiscoveryResult, NativeIdentity
 from .routes import (METHODS, InstalledTuple, RouteCatalogue, RouteKey,
-                     _utc)
+                     _utc, native_scope_key)
 
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
@@ -269,9 +269,10 @@ class AssessmentEngine:
                 or not isinstance(destinations, tuple) or len(destinations) < 2
                 or any(not isinstance(option, DestinationOption)
                        for option in destinations)
-                or len({_option_key(option) for option in destinations})
+                or len({native_scope_key(option.installation.scope) for option in destinations})
                 != len(destinations)
-                or any(option.installation == source for option in destinations)
+                or any(native_scope_key(option.installation.scope) == native_scope_key(source.scope)
+                       for option in destinations)
                 or not all(isinstance(value, str) and _ID.fullmatch(value)
                            for value in (method, guest_profile, network_mode, data_mode))
                 or not _utc(as_of)

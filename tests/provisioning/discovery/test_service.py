@@ -1,6 +1,7 @@
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 import unittest
+from unittest.mock import patch
 
 from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.discovery.assessment import AssessmentScopeAccess, ReviewedFinding
@@ -173,6 +174,16 @@ class AssessmentServiceTests(unittest.TestCase):
                     self.compare()
                 self.assertEqual(self.repository.reads, [])
                 setattr(self.inputs, field, None)
+
+    def test_native_scope_aliases_are_refused_before_any_inventory_read(self):
+        for existing in ('source', 'target-a'):
+            alias = replace(INSTALLATIONS['target-b'], scope=replace(
+                INSTALLATIONS[existing].scope, site_id='different-site',
+                security_domain_id='different-domain'))
+            with self.subTest(existing=existing), patch.dict(INSTALLATIONS, {'target-b': alias}):
+                with self.assertRaisesRegex(ValueError, 'distinct native scopes'):
+                    self.compare()
+                self.assertEqual(self.repository.reads, [])
 
     def test_response_preserves_destination_binding_when_request_order_is_reversed(self):
         result = self.service.compare(CTX, 'operator-1', AssessmentSelection('source', 7), 'vm-1',

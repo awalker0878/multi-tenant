@@ -21,7 +21,7 @@ from .model import NativeIdentity, _utc
 from .normalization import (NormalizedDiscovery, NormalizationHeld,
                             hydrate_generation, normalize_discovery)
 from .persistence import StoredGeneration, StoredObservation
-from .routes import InstalledTuple, METHODS, RouteCatalogue, RouteClaim, RouteKey
+from .routes import InstalledTuple, METHODS, RouteCatalogue, RouteClaim, RouteKey, native_scope_key
 
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
@@ -242,7 +242,7 @@ class AssessmentService:
         # Authorize every scope before reading any inventory. Aliases for one
         # native scope cannot pad out a multi-destination comparison.
         scopes = (origin.installation.scope, *(item.installation.scope for item in targets))
-        if len(set(scopes)) != len(scopes):
+        if len({native_scope_key(scope) for scope in scopes}) != len(scopes):
             raise ValueError('Assessment environments must name distinct native scopes')
         workload = NativeIdentity(scopes[0].endpoint_id, scopes[0].native_scope_id,
                                   scopes[0].platform_family, 'vm', workload_native_id)
