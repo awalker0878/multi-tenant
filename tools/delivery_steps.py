@@ -24,9 +24,10 @@ KINDS = {
     'operations_alerts': (set(), {'review', 'result', 'acknowledgements'}, {'release'}),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
+    'terraform_approval': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
     'guest_apply': ({'prepared_step'}, {'approval'}, set()),
-    'vsphere_power': (set(), {'request','authority','session'}, {'ca_file'}),
+    'vsphere_power': ({'workload_step','member'}, {'request','authority','session'}, {'ca_file'}),
     'target_campaign': ({'ssh','ssh_sha256'}, {'plan','authority'}, set()),
     'edge_policy': ({'nft','nft_sha256','mode'}, {'spec','authority'}, set()),
     'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle','release_evidence'}),
@@ -91,11 +92,26 @@ def validate_packet(step, packet, plan, base):
         else:
             require(restore_files.issubset(files) and isinstance(values['target'],str)
                     and Path(values['target']).is_absolute(),'Exact restore input set required')
-    if kind in {'terraform_apply','guest_apply'}:
-        upstream=dependency(step,values['prepared_step'], 'terraform_plan' if kind=='terraform_apply' else 'guest_plan',plan,base)
+    if kind in {'terraform_apply','terraform_approval','guest_apply'}:
+        upstream=dependency(step,values['prepared_step'], 'terraform_plan' if kind in {'terraform_apply','terraform_approval'} else 'guest_plan',plan,base)
         require(read_private(upstream/'bundle.json')==read_private(upstream/'execution/bundle.json'), 'Prepared owner bundle changed')
         bundle=load_private(upstream/'bundle.json'); match_scope(bundle['scope'],plan)
         require(bundle['source_commit']==plan['source_commit'],'Prepared owner source changed')
+        if kind=='terraform_approval':
+            from tools.terraform_apply import validate_bundle
+            from tools.delivery_run import ROOT
+            prior=load_private(upstream/'packet.json')['parameters']
+            validate_bundle(upstream/'execution',load_private(files['approval']),Path(prior['terraform']),ROOT)
+        if kind=='terraform_apply':
+            approvals=[item for item in plan['steps'] if item['id'] in step['needs']
+                       and item['kind']=='terraform_approval']
+            for approval_step in approvals:
+                approved=base/'steps'/approval_step['id']
+                accepted=load_private(approved/'result.json')
+                require(accepted['status']=='EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED'
+                        and accepted['bundle_sha256']==digest(read_private(upstream/'bundle.json'))
+                        and read_private(approved/'approval.json')==read_private(files['approval']),
+                        'Apply approval differs from its explicit reviewed-plan gate')
         if kind=='terraform_apply' and bundle['scope']['phase']=='workloads':
             from tools.capacity_demand import check_ancestors
             cloud_sha=load_private(upstream/'execution/contact.json')['cloud_sha256'] if plan['scope']['platform']=='openstack' else None
@@ -118,6 +134,16 @@ def validate_packet(step, packet, plan, base):
         from tools.delivery_run import ROOT
         _,scope,_=select_scope(ROOT,values['catalog_id'],load_private(files['inputs']))
         match_scope(scope,plan)
+        transitions=[item for item in plan['steps'] if item['id'] in step['needs']
+                     and item['kind']=='platform_transition']
+        require(len(transitions)<=1,'One exact lifecycle transition per saved plan required')
+        if transitions:
+            require('transition' in files,'Lifecycle plan requires its prepared transition')
+            original=base/'steps'/transitions[0]['id']/'transition.json'
+            require(read_private(original)==read_private(files['transition']),
+                    'Lifecycle plan changed its prepared transition')
+            from tools.lifecycle_transition import validate as validate_transition
+            validate_transition(load_private(original),scope,read_private(files['inputs']))
         if scope['phase']=='workloads':
             from tools.capacity_demand import check_ancestors
             check_ancestors(step,plan,base,load_private(files['inputs']),
@@ -151,6 +177,7 @@ def validate_packet(step, packet, plan, base):
                 and accepted['step_id']==step['id'] and accepted['dependencies']==packet['dependencies']
                 and accepted['purpose']==values['purpose'], 'Acceptance does not bind this delivery gate')
         match_scope(accepted['scope'],plan); c.text(accepted['acceptance_ref']); current_window(accepted)
+        if values['purpose']=='bootstrap': bootstrap_postconditions(step,plan,base)
     if kind in {'edge_policy','edge_containment','target_campaign','ipam','dns','capacity'}:
         field={'edge_policy':'spec','edge_containment':'spec','target_campaign':'plan','ipam':'request','dns':'allocation','capacity':'request'}[kind]
         value=load_private(files[field]); match_scope(value['scope'],plan)
@@ -180,7 +207,15 @@ def validate_packet(step, packet, plan, base):
                 owner_binding(values['database'],value,sizing,require_live=False)
     if kind=='vsphere_power':
         from tools.vsphere_power import validate
-        request=load_private(files['request']); validate(request)
+        request=load_private(files['request']); resource=validate(request)
+        upstream=dependency(step,values['workload_step'],'terraform_apply',plan,base)
+        execution=terraform_execution(values['workload_step'],plan,base)
+        from tools.wsd_handoff import execution_outputs
+        outputs,_,_=execution_outputs(execution,'workloads')
+        member=outputs['members']['value'].get(values['member'])
+        require(member is not None and resource['expected']['config']['uuid']==member['vm_id']
+                and request['desired_power']=='poweredOn',
+                'Bootstrap power must bind the exact applied workload UUID and power-on intent')
         require(plan['scope']['platform']=='vmware' and request['source_commit']==plan['source_commit']
                 and request['snapshot']['tenant_id']==plan['scope']['tenant_key']
                 and request['snapshot']['scope_id']==plan['scope']['wsd_key'], 'Foreign native power handoff')
@@ -313,6 +348,14 @@ def dispatch(step, packet, directory, base, plan, root):
         write_new(directory/'bundle.json',read_private(directory/'execution/bundle.json'))
         write_new(directory/'review.json',read_private(directory/'execution/review.json'))
         names=['bundle.json','review.json']
+    elif kind=='terraform_approval':
+        upstream=dependency(step,values['prepared_step'],'terraform_plan',plan,base)
+        approval=load_private(files['approval'])
+        write_new(directory/'approval.json',encoded(approval))
+        result={'status':'EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED',
+                'bundle_sha256':digest(read_private(upstream/'bundle.json')),
+                'approval_sha256':digest(encoded(approval))}
+        write_new(directory/'result.json',encoded(result)); names=['approval.json','result.json']
     elif kind=='terraform_apply':
         from tools.terraform_apply import apply
         from tools.wsd_handoff import execution_outputs
@@ -379,10 +422,126 @@ def dispatch(step, packet, directory, base, plan, root):
 
 def complete(step,packet,directory,plan,result,names):
     from tools.delivery_run import artifact_receipt
+    typed_postcondition(step,result,directory,packet,plan)
     completion={'format':'hosting-delivery-owner-completion/1','plan_sha256':c.digest(plan),'step_id':step['id'],
                 'packet_sha256':c.digest(packet),'status':result['status'],'artifacts':artifact_receipt(directory,names)}
     write_new(directory/'owner-completion.json',encoded(completion))
     return result,names+['owner-completion.json']
+
+
+def campaign_postcondition(result, campaign, raw):
+    """A collection status alone cannot discharge native/traffic verification."""
+    from tools.qualify_target import validate
+    cases=validate(campaign)
+    require(isinstance(result,dict)
+            and result.get('status')=='COLLECTED_REQUIRES_INDEPENDENT_ACCEPTANCE'
+            and result.get('scope')==campaign['scope']
+            and result.get('source_commit')==campaign['source_commit']
+            and result.get('plan_sha256')==digest(raw)
+            and result.get('production_qualified') is False,
+            'Campaign completion is not bound to the exact native observation plan')
+    for key in ('native_before_sha256','native_after_sha256'):
+        require(isinstance(result.get(key),str) and c.HEX.fullmatch(result[key]),
+                'Campaign requires native observations before and after traffic')
+    observations=result.get('cases')
+    require(isinstance(observations,list) and len(observations)==len(cases)
+            and {row.get('id') for row in observations}==set(cases)
+            and all(row.get('passed') is True for row in observations),
+            'Campaign requires every exact traffic case to pass')
+    require(c.timestamp(result['started_at'])<=c.timestamp(result['completed_at'])<=c.timestamp(c.now()),
+            'Campaign completion chronology is invalid')
+
+
+def typed_postcondition(step,result,directory,packet,plan):
+    """Validate the owner's typed result before publishing a completion marker.
+
+    These statuses keep planning, application, observation and independent
+    acceptance distinct. None grants production activation.
+    """
+    expected={
+        'platform_transition':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW',
+        'workload_inputs':'BOUND_WORKLOAD_DRAFT_REQUIRES_REVIEW',
+        'terraform_plan':'AWAITING_EXACT_PLAN_REVIEW',
+        'terraform_approval':'EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED',
+        'terraform_apply':'APPLIED_REQUIRES_NATIVE_ACCEPTANCE',
+        'vsphere_power':'POWER_CHANGED_REQUIRES_NATIVE_ACCEPTANCE',
+    }
+    if step['kind'] in expected:
+        require(result.get('status')==expected[step['kind']],
+                'Delivery owner has not met its typed postcondition')
+    if step['kind']=='target_campaign':
+        raw=read_private(packet['files']['plan']['path'])
+        campaign_postcondition(result,c.strict_loads(raw),raw)
+    if step['kind']=='vsphere_power':
+        request=load_private(packet['files']['request']['path'])
+        require(result.get('request_sha256')==c.digest(request)
+                and result.get('native_acceptance') is False
+                and result.get('production_activation') is False,
+                'Power result changed its exact operation binding')
+
+
+def bootstrap_postconditions(step,plan,base):
+    """Refuse external bootstrap acceptance until real native effects exist.
+
+    Transition preparation is only a review input. Require successful exact-plan
+    applies, every VMware power operation, and a native/traffic campaign, all as
+    explicit dependencies with the same workload outputs.
+    """
+    from tools.wsd_handoff import execution_outputs
+    dependencies=[item for item in plan['steps'] if item['id'] in step['needs']]
+    require(not any(item['kind']=='platform_transition' for item in dependencies),
+            'A transition draft cannot satisfy bootstrap acceptance')
+    applies=[item for item in dependencies if item['kind']=='terraform_apply']
+    executions={}
+    for item in applies:
+        directory=terraform_execution(item['id'],plan,base)
+        bundle=load_private(directory/'bundle.json')
+        outputs,_,_=execution_outputs(directory,bundle['scope']['phase'])
+        require('transition.json' in bundle['artifacts'],
+                'Bootstrap requires applied lifecycle plans, not initial creation')
+        transition=load_private(directory/'transition.json')
+        require(transition['scope']==bundle['scope'] and transition['target_stage']=='bootstrap'
+                and digest(read_private(directory/'transition.json'))==bundle['artifacts']['transition.json'],
+                'Bootstrap apply lacks its exact sealed transition')
+        require(bundle['scope']['phase'] not in executions,'Duplicate bootstrap phase')
+        executions[bundle['scope']['phase']]=outputs
+    require('domains' in executions,'Bootstrap needs an applied native domain transition')
+    powers=[item for item in dependencies if item['kind']=='vsphere_power']
+    if plan['scope']['platform']=='vmware':
+        require(powers and 'workloads' not in executions,'Every VMware workload needs its fenced power owner')
+        identities=set()
+        for item in powers:
+            directory=base/'steps'/item['id']; packet=load_private(directory/'packet.json')
+            result=load_private(directory/'result.json')
+            typed_postcondition(item,result,directory,packet,plan)
+            request=load_private(packet['files']['request']['path'])
+            identities.add(request['snapshot']['resources'][0]['expected']['config']['uuid'])
+            outputs,_,_=execution_outputs(terraform_execution(packet['parameters']['workload_step'],plan,base),'workloads')
+            if 'workloads' in executions:
+                require(executions['workloads']==outputs,'Power operations reference different workload applies')
+            executions['workloads']=outputs
+        require(len(identities)==len(powers) and identities==
+                {member['vm_id'] for member in executions['workloads']['members']['value'].values()},
+                'Power results must cover every applied VM exactly once')
+    else:
+        require('workloads' in executions and not powers,'Bootstrap needs applied workload power and NIC transitions')
+    campaigns=[item for item in dependencies if item['kind']=='target_campaign']
+    require(len(campaigns)==1,'Bootstrap requires one exact native observation campaign')
+    directory=base/'steps'/campaigns[0]['id']; packet=load_private(directory/'packet.json')
+    raw=read_private(packet['files']['plan']['path']); campaign=c.strict_loads(raw)
+    result=load_private(directory/'result.json'); campaign_postcondition(result,campaign,raw)
+    require(campaign['format']=={'openstack':'hosting-target-campaign/2',
+                                'nutanix':'hosting-target-campaign/4',
+                                'vmware':'hosting-target-campaign/8'}[plan['scope']['platform']],
+            'Bootstrap campaign must observe native workload and domain bindings')
+    asset=campaign['assets']['inventory']; inventory=read_private(asset['path'])
+    require(digest(inventory)==asset['sha256'] and
+            c.strict_loads(inventory)['all']['vars']['hosting_workload_outputs']==executions['workloads'],
+            'Bootstrap campaign observed another workload execution')
+    if 'domain_outputs' in campaign['assets']:
+        asset=campaign['assets']['domain_outputs']; raw=read_private(asset['path'])
+        require(digest(raw)==asset['sha256'] and c.strict_loads(raw)==executions['domains'],
+                'Bootstrap campaign observed another domain execution')
 
 
 def retain(path,raw):
@@ -655,4 +814,9 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     require(completed['format']=='hosting-delivery-owner-completion/1' and completed['plan_sha256']==c.digest(plan)
             and completed['step_id']==step['id'] and completed['packet_sha256']==c.digest(packet), 'Owner completion binding differs')
     require(artifact_receipt(directory,list(completed['artifacts']))==completed['artifacts'], 'Owner completion artifacts changed')
-    return {'status':completed['status']},list(completed['artifacts'])+['owner-completion.json']
+    result=load_private(directory/'result.json') if (directory/'result.json').exists() else {'status':completed['status']}
+    require(result.get('status')==completed['status'],'Retained owner status changed')
+    typed_postcondition(step,result,directory,packet,plan)
+    if step['kind']=='acceptance' and packet['parameters']['purpose']=='bootstrap':
+        bootstrap_postconditions(step,plan,base)
+    return result,list(completed['artifacts'])+['owner-completion.json']

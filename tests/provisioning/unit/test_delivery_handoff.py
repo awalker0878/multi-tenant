@@ -212,7 +212,7 @@ class SequenceTest(unittest.TestCase):
                  'backup-retention': 'restic',
                  'native-qualification': 'target_campaign',
                  'production-authorization': 'acceptance',
-                 'guest-configuration': 'guest_plan'}
+                 'guest-configuration': 'guest_apply'}
         self.assertEqual(sorted(handoff.OPERATION_STEPS), sorted(kinds))
         for operation, step_id in sorted(handoff.OPERATION_STEPS.items()):
             with self.subTest(operation=operation):
@@ -398,7 +398,10 @@ class GraphTest(unittest.TestCase):
                 self.assertEqual(graph['scope']['platform'], platform)
                 self.assertEqual(graph['scope'], plan.identity.scope)
                 self.assertEqual(graph['operation_id'], plan.operation_id)
-                self.assertEqual(graph['steps'], self.graph['steps'])
+                self.assertEqual(graph['steps'], [step.to_dict() for step in handoff.sequence(plan)])
+                if platform == 'vmware':
+                    self.assertTrue(any(step['kind'] == 'vsphere_power' for step in graph['steps']))
+                    self.assertFalse(any(step['id'] == 'workload-bootstrap' for step in graph['steps']))
 
     def test_the_review_projection_names_the_coverage(self):
         review = handoff.review(self.graph)
