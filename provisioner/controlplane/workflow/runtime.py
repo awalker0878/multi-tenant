@@ -11,6 +11,8 @@ import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 import psycopg
@@ -83,19 +85,50 @@ async def _worker(settings: TemporalConnection) -> None:
         await worker.run()
 
 
-def _pending_jobs(context: TenantContext, *, limit: int = 32) -> tuple[str, ...]:
+@dataclass(frozen=True)
+class ProjectionCursor:
+    """Immutable job ordering key; status changes never move the scan boundary."""
+    created_at: datetime
+    job_id: str
+
+    def __post_init__(self):
+        if (not isinstance(self.created_at, datetime)
+                or self.created_at.tzinfo is None
+                or not isinstance(self.job_id, str) or not self.job_id):
+            raise ValueError('Projection cursor requires an exact timestamp and job ID')
+
+
+@dataclass(frozen=True)
+class ProjectionBatch:
+    checked: int
+    progressed: bool
+    next_cursor: ProjectionCursor | None
+
+
+def _pending_jobs(context: TenantContext, *, limit: int = 32,
+                  after: ProjectionCursor | None = None) -> tuple[ProjectionCursor, ...]:
+    if type(limit) is not int or not 1 <= limit <= 128:
+        raise ValueError('Projection page size must be between 1 and 128')
+    if after is not None and not isinstance(after, ProjectionCursor):
+        raise TypeError('An immutable projection cursor is required')
+    query = (
+        'SELECT j.job_id, j.created_at FROM hosting_controlplane.operation_jobs j '
+        'JOIN hosting_controlplane.job_outbox o '
+        'ON (j.organization_id, j.tenant_id, j.job_id) = '
+        '(o.organization_id, o.tenant_id, o.job_id) '
+        'WHERE j.organization_id = %s AND j.tenant_id = %s '
+        "AND j.status = 'STARTED' AND o.delivered_at IS NOT NULL "
+        'AND o.start_run_id IS NOT NULL ')
+    parameters = [context.organization_id, context.tenant_id]
+    if after is not None:
+        query += 'AND (j.created_at, j.job_id) > (%s, %s) '
+        parameters.extend((after.created_at, after.job_id))
+    query += 'ORDER BY j.created_at, j.job_id LIMIT %s'
+    parameters.append(limit)
     with _connect() as connection, connection.cursor() as cursor:
         _tenant(cursor, context)
-        cursor.execute(
-            'SELECT j.job_id FROM hosting_controlplane.operation_jobs j '
-            'JOIN hosting_controlplane.job_outbox o '
-            'ON (j.organization_id, j.tenant_id, j.job_id) = '
-            '(o.organization_id, o.tenant_id, o.job_id) '
-            'WHERE j.organization_id = %s AND j.tenant_id = %s '
-            "AND j.status = 'STARTED' AND o.delivered_at IS NOT NULL "
-            'AND o.start_run_id IS NOT NULL ORDER BY j.created_at LIMIT %s',
-            (context.organization_id, context.tenant_id, limit))
-        return tuple(row[0] for row in cursor.fetchall())
+        cursor.execute(query, tuple(parameters))
+        return tuple(ProjectionCursor(row[1], row[0]) for row in cursor.fetchall())
 
 
 def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
@@ -119,6 +152,28 @@ def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
         detail={'stepId': 'approval-gate', 'phase': 'APPROVAL',
                 'reasonCode': 'OPERATOR_HOLD' if passed else 'UNKNOWN'})
     return True
+
+
+def project_batch(jobs: JobRepository, workflow: TemporalWorkflowStarter,
+                  context: TenantContext, *, after: ProjectionCursor | None = None,
+                  limit: int = 32) -> ProjectionBatch:
+    """Check every job in one bounded, fair keyset page.
+
+    An unfinished workflow is not a progress result and cannot monopolize the
+    oldest page. After the final page the next scan wraps, so earlier pending jobs
+    remain observable. The cursor only schedules readback; it carries no workflow
+    completion or native execution authority and can safely reset on restart.
+    """
+    pending = _pending_jobs(context, limit=limit, after=after)
+    if not pending and after is not None:
+        pending = _pending_jobs(context, limit=limit)
+    progressed = False
+    for candidate in pending:
+        # Evaluate every row even when an earlier projection made progress.
+        if project_one(jobs, workflow, context, candidate.job_id):
+            progressed = True
+    return ProjectionBatch(len(pending), progressed,
+                           pending[-1] if len(pending) == limit else None)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -154,6 +209,7 @@ def main(argv: list[str] | None = None) -> int:
             namespace=settings.namespace,
             start_history_retention_seconds=int(_required('HOSTING_TEMPORAL_START_RETENTION_SECONDS')),
             evidence_guard=gate.require)
+    projection_cursor = None
     try:
         while True:
             if args.mode == 'dispatch':
@@ -161,8 +217,9 @@ def main(argv: list[str] | None = None) -> int:
                 busy = result is not None
             else:
                 gate.require(context)
-                busy = any(project_one(jobs, workflow, context, job_id)
-                           for job_id in _pending_jobs(context))
+                batch = project_batch(jobs, workflow, context, after=projection_cursor)
+                busy = batch.progressed
+                projection_cursor = batch.next_cursor
             if args.once:
                 return 0
             if not busy:
