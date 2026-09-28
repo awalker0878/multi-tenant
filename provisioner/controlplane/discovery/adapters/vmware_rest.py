@@ -21,16 +21,19 @@ import hashlib
 import json
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
-from typing import Callable
+from typing import Callable, Protocol
 from urllib.parse import urlencode
 
 from provisioner.controlplane.authority.model import PlanScope
 from .vmware import EnumerationHeld, VmSummary, _valid_summary
+from .vmware_hardware import observe_vm
+from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact, DiscoveryObject, DiscoveryPage,
+                     _object_json, _utc, assemble_discovery_result)
 
 API_RELEASE = '8.0.3.0'
-PROFILE = 'vcenter-rest-vm-list-8.0.3.0-visible-only'
+PROFILE = 'vcenter-rest-vm-info-8.0.3.0-visible-only-2'
 _FOLDER = re.compile(r'group-v[1-9][0-9]{0,15}\Z')
 _DATACENTER = re.compile(r'datacenter-[1-9][0-9]{0,15}\Z')
 _SHA256 = re.compile(r'[0-9a-f]{64}\Z')
@@ -63,6 +66,7 @@ class VisibleVmObservation:
     observed_at: datetime
     items: tuple[VmSummary, ...]
     digest: str
+    objects: tuple[DiscoveryObject, ...]
     status: str = 'SCOPED_VISIBLE_ONLY'
     native_qualified: bool = False
     ownership_accepted: bool = False
@@ -86,7 +90,9 @@ def _request(fetch_get: Callable, scope: PlanScope, path: str,
 def enumerate_visible_vms(selection: FolderSelection,
                           fetch_get: Callable[[PlanScope, str, str], RestResponse], *,
                           max_vms: int = _MAX_VMS,
-                          max_seconds: int = _MAX_SECONDS) -> VisibleVmObservation:
+                          max_seconds: int = _MAX_SECONDS,
+                          clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+                          ) -> VisibleVmObservation:
     """Scan each exact folder; return nothing if any native read is inconclusive.
 
     The injected transport must pin TLS origin to `scope.endpoint_id`, verify
@@ -116,6 +122,7 @@ def enumerate_visible_vms(selection: FolderSelection,
     deadline = time.monotonic() + max_seconds
     found: dict[str, VmSummary] = {}
     instance_ids: set[str] = set()
+    observations: dict[str, DiscoveryObject] = {}
     for folder in selection.folder_ids:
         query = urlencode((('folders', folder),
                            ('datacenters', selection.scope.native_scope_id)))
@@ -140,21 +147,113 @@ def enumerate_visible_vms(selection: FolderSelection,
             if (not isinstance(detail, dict) or detail.get('name') != row['name']
                     or not isinstance(detail.get('identity'), dict)):
                 raise EnumerationHeld('VM identity unavailable or changed during scan')
+            # Both endpoints are read sequentially, not transactionally. A
+            # conflicting returned summary/detail fact is not a coherent VM.
+            for summary_key, owner, field in (
+                    ('cpu_count', detail.get('cpu'), 'count'),
+                    ('memory_size_mib', detail.get('memory'), 'size_mib'),
+                    ('power_state', detail, 'power_state')):
+                if (summary_key in row and isinstance(owner, dict) and field in owner
+                        and (type(row[summary_key]) is not type(owner[field])
+                             or row[summary_key] != owner[field])):
+                    raise EnumerationHeld('VM hardware changed during scan')
             item = VmSummary(vm_id, detail['identity'].get('instance_uuid'),
                              row['name'])
             _valid_summary(item)
             if item.instance_uuid in instance_ids:
                 raise EnumerationHeld('Duplicate vCenter instance UUID')
+            obj = observe_vm(selection.scope, vm_id, item.instance_uuid, detail)
+            observations[vm_id] = replace(obj, facts=(*obj.facts,
+                DiscoveryFact.known('nativeFolderId', folder),
+                DiscoveryFact.known('folderCoverageDigest', selection.coverage_digest)))
             found[vm_id] = item
             instance_ids.add(item.instance_uuid)
     ordered = tuple(found[key] for key in sorted(found))
+    objects = tuple(observations[key] for key in sorted(observations))
+    observed_at = clock()
+    if not _utc(observed_at):
+        raise EnumerationHeld('VM observation time must be UTC')
     encoded = json.dumps({
         'scope': vars(selection.scope), 'profile': PROFILE,
         'folders': selection.folder_ids,
         'folderCoverageDigest': selection.coverage_digest,
         'items': [vars(item) for item in ordered],
+        'observedAt': observed_at.isoformat(),
+        'objects': [_object_json(obj) for obj in objects],
     }, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
     return VisibleVmObservation(selection.scope, PROFILE, selection.folder_ids,
                                 selection.coverage_digest,
-                                datetime.now(timezone.utc), ordered,
-                                hashlib.sha256(encoded).hexdigest())
+                                observed_at, ordered,
+                                hashlib.sha256(encoded).hexdigest(), objects)
+
+
+class VmwareGetTransport(Protocol):
+    """Externally verified read-only endpoint; never arbitrary URLs or secrets.
+
+    The site worker owns TLS origin/CA, bounded response decoding, timeout,
+    redirect rejection and current native credential/witness verification.
+    """
+    scope: PlanScope
+    api_release: str
+    read_only: bool
+
+    def get(self, path: str) -> RestResponse: ...
+
+
+def collect_vmware_vms(
+    campaign: DiscoveryCampaignAuthorization, selection: FolderSelection,
+    transport: VmwareGetTransport, *,
+    clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+) -> tuple[DiscoveryPage, ...]:
+    """Emit common campaign pages from visible VM-info without claiming coverage.
+
+    Emitted page cursors partition the captured result, not a nonexistent native
+    REST cursor. A native read failure discards the incomplete scan and emits
+    UNKNOWN, never an empty COMPLETE snapshot. Independent visibility reconciliation
+    and campaign/credential verification remain the site worker's responsibility.
+    """
+    if (not isinstance(campaign, DiscoveryCampaignAuthorization)
+            or not isinstance(selection, FolderSelection)
+            or campaign.scope != selection.scope or campaign.collector_id != PROFILE
+            or 'vm' not in campaign.allowed_kinds
+            or getattr(transport, 'scope', None) != campaign.scope
+            or getattr(transport, 'api_release', None) != API_RELEASE
+            or getattr(transport, 'read_only', None) is not True
+            or not callable(getattr(transport, 'get', None))):
+        raise ValueError('VMware campaign, collector and read credential binding required')
+
+    def current_time():
+        timestamp = clock()
+        if not _utc(timestamp) or not campaign.issued_at <= timestamp < campaign.expires_at:
+            raise ValueError('Expired campaign cannot read or issue discovery evidence')
+        return timestamp
+
+    def fetch(scope, path, release):
+        current_time()
+        response = transport.get(path)
+        current_time()
+        return response
+
+    current_time()
+    try:
+        observation = enumerate_visible_vms(
+            selection, fetch, max_vms=min(_MAX_VMS, campaign.max_objects,
+                                         campaign.max_pages * campaign.max_page_size),
+            clock=current_time)
+    except EnumerationHeld:
+        return (DiscoveryPage(campaign.campaign_id, campaign.scope, 1, None, None,
+                              current_time(), (), 'UNKNOWN', ('NATIVE_READ_INCONCLUSIVE',)),)
+    timestamp = current_time()
+    objects = observation.objects
+    size = campaign.max_page_size
+    count = max(1, (len(objects) + size - 1) // size)
+    pages = tuple(DiscoveryPage(
+        campaign.campaign_id, campaign.scope, index + 1,
+        None if index == 0 else str(index),
+        str(index + 1) if index + 1 < count else None,
+        timestamp, objects[index * size:(index + 1) * size],
+        'PARTIAL' if index + 1 == count else None,
+        ('VISIBLE_INVENTORY_ONLY',) if index + 1 == count else (),
+    ) for index in range(count))
+    assemble_discovery_result(campaign, pages, checked_at=timestamp)
+    return pages
