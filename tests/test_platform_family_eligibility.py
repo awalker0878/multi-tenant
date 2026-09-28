@@ -13,9 +13,9 @@ import unittest
 from provisioner.qualification import registry as capabilities
 from scripts import check_platform_family_eligibility as admission
 from provisioner.qualification import native as qualification
-from scripts import check_version_source_provenance as provenance
-from scripts import check_qualification_campaign_assurance as campaign
-from scripts import check_target_selection_assurance as target
+from provisioner.qualification import provenance as provenance
+from provisioner.qualification import campaign as campaign
+from provisioner.qualification import target_selection as target
 from tests.qualification_fixture_support import campaign_record, target_record
 
 ROOT = Path(__file__).resolve().parents[1]

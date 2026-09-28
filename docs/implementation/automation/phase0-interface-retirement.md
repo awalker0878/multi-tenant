@@ -83,3 +83,14 @@ This closes the relocation of these two owners, **not all of B05**. Other compil
 execution and evidence owners still reside in top-level packages. The conversion
 and independent reconciliation conditions above still apply before removing a
 runner with retained state or a potentially active native task.
+
+### Complete qualification dependency closure
+
+The installed qualification package also owns version/source provenance, native
+target selection and campaign evidence. Its five modules (`registry`, `native`,
+`provenance`, `target_selection`, `campaign`) contain the implementations, not
+forwarding wrappers. Every in-tree caller and CLI was migrated; the five old
+script paths are prohibited by the retirement register. Architecture tests reject
+any package qualification import back into `scripts` or `tools`, and the installed
+wheel check requires all five owners to resolve outside the source checkout.
+Other execution owners and retained-state conversion remain separate B05 work.

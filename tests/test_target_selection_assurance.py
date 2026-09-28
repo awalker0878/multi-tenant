@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import json, subprocess, sys, unittest
 from pathlib import Path
-from scripts import check_target_selection_assurance as assurance
+from provisioner.qualification import target_selection as assurance
 from scripts import check_target_selection_readiness as readiness
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -133,7 +133,7 @@ class TargetSelectionAssuranceTests(unittest.TestCase):
 
     def test_cli_grants_no_target_contact_authority(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_target_selection_assurance.py'),
+            sys.executable, '-m', 'provisioner.qualification.target_selection',
             '--as-of','2026-09-19T15:30:00Z'
         ],capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)

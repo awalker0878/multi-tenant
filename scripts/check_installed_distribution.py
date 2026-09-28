@@ -36,7 +36,7 @@ import scripts
 import tools
 import hosting_resources
 from provisioner import repository
-from provisioner.qualification import native, registry
+from provisioner.qualification import campaign, native, provenance, registry, target_selection
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
 from provisioner.controlplane.discovery import (adoption, assessment, grouping,
@@ -45,7 +45,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, scripts, tools, hosting_resources, native, registry, adoption, ahv, assessment, grouping,
+for module in (provisioner, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -83,6 +83,9 @@ for relative in ('profiles/security/catalog.json', 'policy/rules/standards.json'
 assert hosting_resources.SOURCE_ROOT is None
 assert importlib.util.find_spec('scripts.check_platform_capabilities') is None
 assert importlib.util.find_spec('scripts.check_platform_qualification') is None
+assert importlib.util.find_spec('scripts.check_version_source_provenance') is None
+assert importlib.util.find_spec('scripts.check_qualification_campaign_assurance') is None
+assert importlib.util.find_spec('scripts.check_target_selection_assurance') is None
 assert registry.validate(registry.load())['capabilities_per_platform'] == len(registry.CAPABILITIES)
 assert callable(validate_record)
 

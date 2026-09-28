@@ -116,6 +116,27 @@
       "reason": "Runtime owner moved into the installed qualification package; all known imports and commands were migrated without a compatibility wrapper.",
       "replacement": "provisioner/qualification/native.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_version_source_provenance.py",
+      "kind": "path",
+      "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
+      "replacement": "provisioner/qualification/provenance.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_qualification_campaign_assurance.py",
+      "kind": "path",
+      "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
+      "replacement": "provisioner/qualification/campaign.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_target_selection_assurance.py",
+      "kind": "path",
+      "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
+      "replacement": "provisioner/qualification/target_selection.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }

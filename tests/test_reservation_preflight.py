@@ -11,12 +11,12 @@ import sys
 import unittest
 
 from provisioner.qualification import native as qualification
-from scripts import check_qualification_campaign_assurance as campaign
+from provisioner.qualification import campaign as campaign
 from scripts import check_reservation_preflight as preflight
 from scripts import check_reservation_records as records
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as sitecheck
-from scripts import check_version_source_provenance as provenance
+from provisioner.qualification import provenance as provenance
 from tests.qualification_fixture_support import campaign_index, target_index
 
 ROOT=Path(__file__).resolve().parents[1]

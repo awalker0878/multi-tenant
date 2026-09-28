@@ -8,7 +8,7 @@
     "ACPT-001"
   ],
   "assurance_index": "sources/capabilities/qualification_campaign_evidence_index.json",
-  "checker": "scripts/check_qualification_campaign_assurance.py",
+  "checker": "provisioner/qualification/campaign.py",
   "preflight": "scripts/check_qualification_campaign_readiness.py",
   "engineering": "docs/engineering/qualification-campaign-evidence-assurance.md",
   "current_records": 0,

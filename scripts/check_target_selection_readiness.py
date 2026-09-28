@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0,str(ROOT))
-from scripts import check_target_selection_assurance as assurance
+from provisioner.qualification import target_selection as assurance
 
 FORMAT='portable-hosting-target-selection-readiness-intent/1'
 STATUS='PLANNING_ONLY_NOT_AUTHORIZED'

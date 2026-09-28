@@ -55,10 +55,15 @@ large-estate qualification remain open.
 `provisioner/domain/capabilities.py` is the sole owner of the 97-dimension vocabulary.
 `provisioner/qualification/registry.py` validates complete per-platform declarations;
 `provisioner/qualification/native.py` validates current exact-tuple native dossiers.
-The old script entry points were removed and their consumers migrated without
-wrappers. Run them as `python -m provisioner.qualification.registry` and
-`python -m provisioner.qualification.native`. Other runtime owners still require
-relocation; this change does not close B05.
+The full qualification dependency chain is package-owned: `provenance.py`
+validates version/source records, `target_selection.py` validates selected native
+campaign scope, and `campaign.py` validates target-bound campaign observations.
+All five old script entry points were removed and their consumers migrated without
+wrappers or import-path mutation. Run the owners using
+`python -m provisioner.qualification.<owner>`, where `<owner>` is `registry`,
+`native`, `provenance`, `target_selection` or `campaign`. None imports the legacy
+scripts/tools packages. Other runtime owners still require relocation; this change
+does not close B05.
 
 Registry version 2 binds the vocabulary digest and validates bounded, duplicate-free
 JSON, explicit capability rows, controlled evidence links and resource-root

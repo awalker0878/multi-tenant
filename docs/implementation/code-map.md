@@ -182,7 +182,7 @@ Current assurance requires named operating decision owners, accepted as-built/su
 
 Design: [G32 version and source provenance](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G32) · [Implementation tuple and decision package](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [Support tuple evidence checklist](../engineering/vendor-cards/7-support-tuple-variations-and-evidence-checklist.md)
 
-Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../scripts/check_version_source_provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../provisioner/qualification/native.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
+Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../provisioner/qualification/provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../provisioner/qualification/native.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
 
 A current native qualification now requires the same exact product/API/provider/hardware/licence tuple to have CURRENT_SUPPORTED provenance. Source review, installed compatibility and native qualification remain separate evidence states; none grants placement or activation authority.
 
@@ -272,7 +272,7 @@ Current bootstrap qualification requires authoritative reservation/IPAM/DNS life
 
 Design: [IK §1 implementation workplan](delivery-guide/1-implementation-workplan-and-required-inputs.md) · [VND §7 implementation tuple](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [GM §4 open decision package](../assurance/gap-map/4-open-decision-package-for-implementation.md)
 
-Implementation: [active target-selection assurance index](../../sources/capabilities/target_selection_assurance_index.json) · [assurance validator](../../scripts/check_target_selection_assurance.py) · [readiness preflight](../../scripts/check_target_selection_readiness.py) · [engineering boundary](../engineering/actual-target-selection-assurance.md)
+Implementation: [active target-selection assurance index](../../sources/capabilities/target_selection_assurance_index.json) · [assurance validator](../../provisioner/qualification/target_selection.py) · [readiness preflight](../../scripts/check_target_selection_readiness.py) · [engineering boundary](../engineering/actual-target-selection-assurance.md)
 
 Current target selection records the externally chosen site/cell, exact platform tuple references, security-edge/management/backend realization, restricted native API/observer/writer campaign scope, credential custody, evidence workspace, permitted/prohibited operations, cleanup and time-bounded target-contact authority. CI does not select or contact a target, retrieve credentials, run native tests, apply or activate.
 
@@ -280,7 +280,7 @@ Current target selection records the externally chosen site/cell, exact platform
 
 Design: [Native campaign procedure](native-reference/campaign.md) · [QCP §6 evidence packet](../assurance/qualification-campaign/6-build-an-evidence-packet-a-reviewer-can-challenge.md) · [QCP §8 disposition](../assurance/qualification-campaign/8-close-defects-and-issue-a-scoped-campaign-disposition.md) · [QUAL §5 applicability/evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md)
 
-Implementation: [active campaign evidence index](../../sources/capabilities/qualification_campaign_evidence_index.json) · [evidence validator](../../scripts/check_qualification_campaign_assurance.py) · [review-readiness preflight](../../scripts/check_qualification_campaign_readiness.py) · [engineering boundary](../engineering/qualification-campaign-evidence-assurance.md)
+Implementation: [active campaign evidence index](../../sources/capabilities/qualification_campaign_evidence_index.json) · [evidence validator](../../provisioner/qualification/campaign.py) · [review-readiness preflight](../../scripts/check_qualification_campaign_readiness.py) · [engineering boundary](../engineering/qualification-campaign-evidence-assurance.md)
 
 Current campaign assurance binds the reviewed target and service/topology scope to the exact restricted change/contact/stop authority, native API/observer/writer scopes, credential custody, evidence workspace, data restrictions, permitted/prohibited operations, cleanup and contact window, plus explicit applicability, retained attempts, healthy positive controls, freshness and residual gaps. Attempts outside the authorized window are rejected; evidence collected inside it may remain current after contact authority later expires, without granting new target contact. A complete packet remains review input only.
 

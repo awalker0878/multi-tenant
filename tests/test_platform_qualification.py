@@ -11,8 +11,8 @@ import unittest
 
 from provisioner.qualification import registry as capabilities
 from provisioner.qualification import native as q
-from scripts import check_version_source_provenance as provenance
-from scripts import check_qualification_campaign_assurance as campaign
+from provisioner.qualification import provenance as provenance
+from provisioner.qualification import campaign as campaign
 from tests.qualification_fixture_support import campaign_index, target_index
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -12,9 +12,6 @@ import argparse, json, re
 from datetime import datetime, timezone
 from pathlib import Path
 
-if __package__ in (None, ''):
-    import sys
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 INDEX=ROOT/'sources/capabilities/target_selection_assurance_index.json'
 FORMAT='portable-hosting-target-selection-assurance-index/1'

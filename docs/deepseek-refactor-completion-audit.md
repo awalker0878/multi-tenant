@@ -1535,7 +1535,7 @@ as a prefix, so its 420 include the 339 `compatibility` hits.
 | `TBD` | 6 | the same requirement text, plus the lowercase `'tbd'` placeholder sentinel in `scripts/adr_lifecycle.py`'s not-recorded vocabulary | CURRENT_REQUIRED |
 | `legacy` | 128 | provider "legacy resource" guidance, the Nutanix `legacyErrorMessage` task field, and prepared-receipt readability in `tools/terraform_apply.py` | CURRENT_REQUIRED, HISTORICAL_ONLY |
 | `deprecated` | 144 | mostly the term list and the NetBox native lifecycle status `deprecated`, which is provider vocabulary the IPAM and DNS owners must write and read | CURRENT_REQUIRED |
-| `compat` | 420 | the `compatibility` evidence block of the version/source-provenance gate, the term list, and the local `compat = record['compatibility']` variable in `scripts/check_version_source_provenance.py` | CURRENT_REQUIRED |
+| `compat` | 420 | the `compatibility` evidence block of the version/source-provenance gate, the term list, and the local `compat = record['compatibility']` variable in `provisioner/qualification/provenance.py` | CURRENT_REQUIRED |
 | `compatibility` | 339 | the same gate's evidence block and the `tools/compatibility` entry in the retired-interface register that records the path as removed | CURRENT_REQUIRED |
 | `obsolete` | 79 | the retirement requirement itself: "remove obsolete routes, DNS and access" in requirements, ADRs and runbooks. No obsolete active path is described | CURRENT_REQUIRED |
 | `superseded` | 212 | the ADR lifecycle state `Superseded`, `provisioner/domain/generation.py`'s `SUPERSEDED` generation state, delivery-runner guards that refuse work a later handoff superseded, and the register's reasons for removed paths | CURRENT_REQUIRED |

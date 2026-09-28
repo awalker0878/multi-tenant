@@ -16,7 +16,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from scripts import check_qualification_campaign_assurance as campaign
+from provisioner.qualification import campaign as campaign
 
 FORMAT = 'portable-hosting-qualification-campaign-readiness-intent/1'
 STATUS = 'PLANNING_ONLY_NOT_AUTHORIZED'

@@ -17,8 +17,8 @@ import re
 
 from hosting_resources import RESOURCE_ROOT as ROOT
 from provisioner.domain.capabilities import CAPABILITIES, PLATFORMS
-from scripts import check_version_source_provenance as provenance
-from scripts import check_qualification_campaign_assurance as campaign
+from provisioner.qualification import provenance as provenance
+from provisioner.qualification import campaign as campaign
 
 INDEX = ROOT / 'sources/capabilities/qualification_index.json'
 FORMAT = 'portable-hosting-native-qualification-index/1'
