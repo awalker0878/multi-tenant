@@ -171,8 +171,18 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
     stored_manifest = Path(receipt['manifest_path'])
     require(stored_manifest.is_absolute() and '..' not in stored_manifest.parts
             and str(stored_manifest) == receipt['manifest_path'], 'Canonical stored manifest path required')
-    require(expected['source'] == config['source'] and expected['scope'] == config['scope']
+    require(expected['format'] == 'hosting-file-manifest/1'
+            and expected['source'] == config['source'] and expected['scope'] == config['scope']
             and expected['member'] == config['member'], 'Foreign restore manifest')
+    require(expected['captured_at'] == receipt['captured_at']
+            and expected['consistency_ref'] == config['consistency_ref']
+            and type(receipt['file_count']) is int
+            and receipt['file_count'] == len(expected['files'])
+            and receipt['application_consistency'] == 'EXTERNAL_EXPORT_OWNER'
+            and receipt['native_qualification'] is False,
+            'Capture metadata differs from the immutable source manifest')
+    require(timestamp(receipt['captured_at']) <= timestamp(receipt['completed_at']) <= utcnow(),
+            'Capture timestamps are inconsistent or future-dated')
     require(not Path(target).exists(), 'Restore requires a new isolated destination')
     started = time.monotonic()
     client.repository()

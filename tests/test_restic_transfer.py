@@ -225,6 +225,37 @@ class TransferTests(unittest.TestCase):
         self.assertFalse(self.target.exists())
         self.assertFalse((self.root / 'operation/transfer-receipt.json').exists())
 
+    def test_source_freshness_and_consistency_metadata_cannot_be_repackaged(self):
+        original_receipt = deepcopy(self.receipt)
+        for key, value in (
+                ('captured_at', (utcnow() + timedelta(hours=1)).isoformat()),
+                ('file_count', self.receipt['file_count'] + 1),
+                ('application_consistency', 'APPLICATION_CONSISTENT'),
+                ('native_qualification', True)):
+            self.receipt = original_receipt | {key: value}
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'Capture metadata'):
+                restic_run.restore(self.config, self.receipt, self.manifest, self.engine,
+                                   self.root / 'unused-operation', self.target)
+            self.assertEqual(self.calls, [])
+        self.receipt = original_receipt
+        with self.assertRaisesRegex(ValueError, 'Capture metadata'):
+            restic_run.restore(self.config | {'consistency_ref': 'OTHER-OWNER'},
+                               self.receipt, self.manifest, self.engine,
+                               self.root / 'unused-operation', self.target)
+        self.assertEqual(self.calls, [])
+        self.assertFalse(self.target.exists())
+
+    def test_capture_completion_cannot_precede_capture_or_be_future_dated(self):
+        original = self.receipt['completed_at']
+        for completion in ((utcnow() - timedelta(days=1)).isoformat(),
+                           (utcnow() + timedelta(hours=1)).isoformat()):
+            self.receipt['completed_at'] = completion
+            with self.subTest(completion=completion), self.assertRaisesRegex(ValueError, 'Capture timestamps'):
+                restic_run.restore(self.config, self.receipt, self.manifest, self.engine,
+                                   self.root / 'unused-operation', self.target)
+        self.receipt['completed_at'] = original
+        self.assertEqual(self.calls, [])
+
     def test_running_command_deadline_cannot_outlive_current_owner_lease(self):
         from tools.restic_transfer import GuardedRestic
         self.leases.lease = replace(self.leases.lease, expires_at=self.now + timedelta(seconds=1))
