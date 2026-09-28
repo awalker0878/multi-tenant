@@ -27,6 +27,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from provisioner.adapters import base as adapters
+from provisioner.adapters.base import WorkloadLifecycleMode
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.generation import SCOPE_KEYS, claim, record_for
 from provisioner.domain.request import digest
@@ -216,19 +218,20 @@ def sequence(plan) -> tuple[Step, ...]:
     profile. Compile actual per-member power steps instead of emitting an
     unsupported Terraform transition or a planning receipt as completed power.
     """
-    if plan.identity.scope['platform'] != 'vmware':
+    lifecycle=adapters.get(plan.identity.scope['platform']).workload_lifecycle
+    if lifecycle.mode is WorkloadLifecycleMode.SAVED_PLAN:
         return STEPS
     scope = plan.identity.scope
     wsds = [wsd for wsd in plan.environment['wsds']
             if (wsd['tenant_key'], wsd['wsd_key']) ==
                (scope['tenant_key'], scope['wsd_key'])]
     if len(wsds) != 1:
-        raise ProvisioningError('COMPILATION_FAILED', 'Exact VMware WSD required')
+        raise ProvisioningError('COMPILATION_FAILED', 'Exact per-member lifecycle WSD required')
     members = sorted(name for domain in wsds[0]['domains'] for name in domain['workloads'])
-    powers = tuple(Step('bootstrap-power-' + digest(name)[:16], 'vsphere_power',
+    powers = tuple(Step('bootstrap-power-' + digest(name)[:16], lifecycle.owner_kind,
                         ('workload-apply', 'bootstrap-apply')) for name in members)
     if not powers:
-        raise ProvisioningError('COMPILATION_FAILED', 'Owned VMware workloads required')
+        raise ProvisioningError('COMPILATION_FAILED', 'Owned workloads required for per-member lifecycle')
     result = []
     for step in STEPS:
         if step.id == 'workload-bootstrap':
@@ -246,7 +249,7 @@ def sequence(plan) -> tuple[Step, ...]:
 
 
 def power_members(plan) -> dict[str, str]:
-    if plan.identity.scope['platform'] != 'vmware':
+    if adapters.get(plan.identity.scope['platform']).workload_lifecycle.mode is not WorkloadLifecycleMode.PER_MEMBER_OWNER:
         return {}
     return {'bootstrap-power-' + digest(name)[:16]: name
             for wsd in plan.environment['wsds']
@@ -392,7 +395,7 @@ def reviewed_parameters(plan) -> dict:
     step_ids = {step.id for step in selected_steps}
     values = {step_id: dict(parameters) for step_id, parameters in REVIEWED_PARAMETERS.items()
               if step_id in step_ids}
-    if plan.identity.scope['platform'] == 'vmware':
+    if adapters.get(plan.identity.scope['platform']).workload_lifecycle.mode is WorkloadLifecycleMode.PER_MEMBER_OWNER:
         values['guest-plan']['workload_step'] = 'workload-apply'
         values.update({step_id: {'workload_step': 'workload-apply', 'member': member}
                        for step_id, member in power_members(plan).items()})

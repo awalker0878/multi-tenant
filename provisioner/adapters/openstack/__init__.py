@@ -6,7 +6,8 @@ decisions recorded outside this repository.
 """
 from __future__ import annotations
 
-from provisioner.adapters.base import Adapter, _adapter
+from provisioner.adapters.base import (Adapter, WorkloadLifecycle,
+                                       WorkloadLifecycleMode, _adapter)
 
 LIMITS = (
     'OpenStack product tuple is unselected in the capability registry',
@@ -15,5 +16,8 @@ LIMITS = (
 )
 
 
+WORKLOAD_LIFECYCLE = WorkloadLifecycle(WorkloadLifecycleMode.SAVED_PLAN, 'terraform_apply')
+
 def adapter() -> Adapter:
-    return _adapter('openstack', 'openstack-route', LIMITS)
+    return _adapter('openstack', 'openstack-route', LIMITS,
+                    workload_lifecycle=WORKLOAD_LIFECYCLE)
