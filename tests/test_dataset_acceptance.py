@@ -38,6 +38,11 @@ class DatasetAcceptanceTests(unittest.TestCase):
         self.assertFalse(result['native_qualification'])
         self.assertFalse(result['production_activation'])
 
+    def test_group_cannot_hide_a_selected_dataset_by_omitting_its_binding_and_proof(self):
+        row=self.rows[0]
+        with self.assertRaisesRegex(ValueError,'every selected canonical mapping'):
+            validate_group('group-01',[row],{row['step_id']:self.records[row['step_id']]},self.scope)
+
     def test_missing_extra_duplicate_and_unbound_children_are_held(self):
         for records in ({}, {self.rows[0]['step_id']: self.records[self.rows[0]['step_id']]},
                         self.records | {'unexpected': self.records[self.rows[0]['step_id']]}):

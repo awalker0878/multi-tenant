@@ -12,6 +12,12 @@ class DeliveryTransferTests(unittest.TestCase):
         from tests.test_restic_transfer import TransferTests
         self.fixture=TransferTests(); self.fixture.setUp(); self.addCleanup(self.fixture.doCleanups)
         f=self.fixture
+        from provisioner.domain.enterprise_records import plan_digest
+        f.plan['spec']['selectedDatasetIds']=['dataset-1']
+        f.plan['spec']['datasetMappings']=[row for row in f.plan['spec']['datasetMappings']
+                                           if row['datasetId']=='dataset-1']
+        f.plan['metadata']['planDigest']=plan_digest(f.plan)
+        f.transfer['metadata']['planDigest']=f.plan['metadata']['planDigest']
         binary=f.root/'restic'; binary.write_bytes(b'fixture-only'); binary.chmod(0o700)
         f.config['restic_sha256']=digest(binary.read_bytes())
         f.envelope['source_config_sha256']=digest(encoded(f.config))

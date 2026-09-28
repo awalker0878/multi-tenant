@@ -35,6 +35,7 @@ def validate_group(group_id, datasets, records, scope):
             unique[key].add(value)
     require(isinstance(records, dict) and set(records) == unique['step_id'],
             'Every dataset child must supply its distinct completed restore evidence')
+    declared_mappings={(row['dataset_id'],row['target_ref']) for row in datasets}
     captures, restores, proofs, plan_digests, observation_ids = set(), set(), {}, set(), set()
     for row in datasets:
         record = records[row['step_id']]
@@ -52,6 +53,11 @@ def validate_group(group_id, datasets, records, scope):
                     (row['dataset_id'], row['target_ref'], group_id)
                 and envelope['destination_execution_scope'] == scope,
                 'Dataset child is directed to another plan, group or destination')
+        selected_group={(mapping['datasetId'],mapping['targetRef'])
+                        for mapping in envelope['migration_plan']['spec']['datasetMappings']
+                        if mapping['consistencyGroupId']==group_id}
+        require(declared_mappings==selected_group,
+                'Dataset group must cover every selected canonical mapping')
         require(proof.get('format') == RECEIPT_FORMAT
                 and proof.get('status') == restored.get('status') ==
                     'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
