@@ -224,6 +224,11 @@ class SignedFileDiscoveryTrustStore:
         self._digest: str | None = None
         self._lock = RLock()
 
+    @property
+    def authority_public_key(self) -> Ed25519PublicKey:
+        """Public trust-root identity for enforcing independent native custody."""
+        return self._authority
+
     def current_policy(self, checked_at: datetime) -> DiscoveryTrustPolicy:
         if not _utc(checked_at):
             raise DiscoveryTrustDenied('A trusted UTC verification clock is required')
@@ -319,7 +324,9 @@ class SignedDiscoveryIngestVerifier:
     def _verify(self, campaign: DiscoveryCampaignAuthorization,
                 result: DiscoveryResult | None, environment_id: str,
                 checked_at: datetime, campaign_signature: DiscoverySignature,
-                result_signature: DiscoverySignature | None) -> VerificationEvidence:
+                result_signature: DiscoverySignature | None,
+                expected_credential_reference: str | None = None,
+                native_authority_public_key: Ed25519PublicKey | None = None) -> VerificationEvidence:
         campaign_bytes = campaign_signing_bytes(campaign, environment_id)
         if not _utc(checked_at) or not campaign.issued_at <= checked_at < campaign.expires_at:
             raise DiscoveryTrustDenied('Campaign is not currently valid')
@@ -348,6 +355,17 @@ class SignedDiscoveryIngestVerifier:
         if not collectors or len({entry.credential_reference for entry in collectors}) != 1:
             raise DiscoveryTrustDenied('Exact enrolled collector credential is unavailable')
         collector = collectors[0]
+        if (expected_credential_reference is not None
+                and (not _id(expected_credential_reference)
+                     or collector.credential_reference != expected_credential_reference)):
+            raise DiscoveryTrustDenied('Native material differs from the enrolled credential')
+        if expected_credential_reference is not None:
+            root = getattr(self._trust, 'authority_public_key', None)
+            if (not isinstance(root, Ed25519PublicKey)
+                    or not isinstance(native_authority_public_key, Ed25519PublicKey)
+                    or native_authority_public_key.public_bytes_raw() in
+                    {root.public_bytes_raw(), *(_decode(e.public_key, 32) for e in policy.enrollments)}):
+                raise DiscoveryTrustDenied('Independent native material signing authority required')
         try:
             Ed25519PublicKey.from_public_bytes(_decode(issuer.public_key, 32)).verify(
                 _decode(campaign_signature.signature, 64), campaign_bytes)
@@ -402,6 +420,17 @@ class BoundDiscoveryIngestVerifier:
                         environment_id: str, checked_at: datetime) -> VerificationEvidence:
         return self.verifier._verify(campaign, None, environment_id, checked_at,
                                      self.campaign_signature, None)
+
+    def verify_read_credential(self, campaign: DiscoveryCampaignAuthorization,
+                               environment_id: str, checked_at: datetime,
+                               credential_reference: str,
+                               native_authority_public_key: Ed25519PublicKey) -> VerificationEvidence:
+        """Bind actual material to the same live credential as the signed campaign."""
+        if not _id(credential_reference):
+            raise DiscoveryTrustDenied('An exact native credential reference is required')
+        return self.verifier._verify(campaign, None, environment_id, checked_at,
+            self.campaign_signature, None, expected_credential_reference=credential_reference,
+            native_authority_public_key=native_authority_public_key)
 
     def verify_result(self, campaign: DiscoveryCampaignAuthorization,
                       result: DiscoveryResult, environment_id: str,

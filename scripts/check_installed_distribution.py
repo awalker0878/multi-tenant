@@ -45,6 +45,8 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
+    from provisioner.controlplane.discovery import native_credentials
+    from provisioner.controlplane.discovery.adapters import vmware_https
     for platform in components.COMPONENTS:
         for phase in ('domains', 'workloads'):
             assert wsd.native_variables(platform, phase)
@@ -71,7 +73,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, components, wsd, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, components, wsd, native_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
