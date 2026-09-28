@@ -134,7 +134,7 @@ jobs:
           python -m unittest tests.test_capability_coverage tests.test_platform_capabilities tests.test_platform_qualification -v
           python -m unittest discover -s tests/provisioning/policy -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/placement -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/golden -p 'test_*.py' -v
+          python -m unittest tests.provisioning.end_to_end.test_golden -v
           python -m provisioner.qualification.registry
           python scripts/check_documentation.py
       - name: Publish only by ordinary fast-forward
