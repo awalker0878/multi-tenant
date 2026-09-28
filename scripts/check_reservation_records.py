@@ -16,7 +16,10 @@ import json
 from pathlib import Path
 import re
 
-ROOT=Path(__file__).resolve().parents[1]
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
 INDEX=ROOT/'sources/capabilities/reservation_record_index.json'
 FORMAT='portable-hosting-reservation-record-index/2'
 STATUS='EXPORTED_RESERVATION_EVIDENCE_NOT_RESERVATION_AUTHORITY'

@@ -11,9 +11,9 @@ import json
 from pathlib import Path
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if __package__ in (None, ''):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
 from scripts import check_platform_qualification as qualification
 
 REGISTRY = ROOT / 'sources/capabilities/platform_registry.json'

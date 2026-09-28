@@ -12,7 +12,10 @@ import argparse, json, re
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
 INDEX=ROOT/'sources/capabilities/target_selection_assurance_index.json'
 FORMAT='portable-hosting-target-selection-assurance-index/1'
 STATUS='EXPORTED_TARGET_SELECTION_EVIDENCE_NOT_TARGET_CONTACT_AUTHORITY'

@@ -16,9 +16,9 @@ from pathlib import Path
 import re
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if __package__ in (None, ''):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
 from scripts import check_target_selection_assurance as target
 
 INDEX = ROOT / 'sources/capabilities/qualification_campaign_evidence_index.json'

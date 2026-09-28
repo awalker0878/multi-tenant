@@ -11,8 +11,8 @@ from pathlib import Path
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.request import digest
+from hosting_resources import RESOURCE_ROOT as ROOT
 
-ROOT = Path(__file__).resolve().parents[2]
 RULE_ROOT = ROOT / 'policy' / 'rules'
 
 SEVERITIES = ('error', 'warning')

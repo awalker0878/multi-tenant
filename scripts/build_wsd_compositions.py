@@ -7,7 +7,10 @@ import copy
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
 COMPONENTS = {
     'nutanix': {'domains': 'nutanix-domain', 'workloads': 'nutanix-workload'},
     'vmware': {'domains': 'nsx-domain', 'workloads': 'vsphere-workload'},

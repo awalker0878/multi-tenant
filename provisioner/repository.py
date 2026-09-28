@@ -4,17 +4,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-ASSET_ROOT = Path(__file__).resolve().parent / '_assets'
+from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT, resource_path
+
+ROOT = RESOURCE_ROOT
+ASSET_ROOT = RESOURCE_ROOT
 
 
 def asset_path(relative_path: str) -> Path:
-    """Locate a reviewed runtime asset in the package or source checkout."""
-    path = Path(relative_path)
-    if path.is_absolute() or '..' in path.parts:
-        raise ValueError(f'Unsafe runtime asset path: {relative_path}')
-    packaged = ASSET_ROOT / path
-    return packaged if packaged.is_file() else ROOT / path
+    """Locate a reviewed runtime asset in the selected distribution root."""
+    return resource_path(relative_path)
 
 
 def capability_registry() -> dict:
@@ -65,9 +63,11 @@ def reviewed_source(path: Path | str) -> str:
     manifest binds the path relative to the repository root in POSIX form, and
     falls back to the resolved path when the document lives outside the checkout.
     """
+    if str(path).startswith('<') and str(path).endswith('>'):
+        return str(path)
     candidate = Path(path)
     if not candidate.is_absolute():
-        candidate = ROOT / candidate
+        candidate = (SOURCE_ROOT or Path.cwd()) / candidate
     try:
         resolved = candidate.resolve()
     except OSError:
@@ -75,7 +75,10 @@ def reviewed_source(path: Path | str) -> str:
     try:
         return resolved.relative_to(ROOT).as_posix()
     except ValueError:
-        return resolved.as_posix()
+        try:
+            return 'provisioner/' + resolved.relative_to(Path(__file__).resolve().parent).as_posix()
+        except ValueError:
+            return resolved.as_posix()
 
 
 def source_commit(root: Path | str | None = None) -> dict:
@@ -86,7 +89,11 @@ def source_commit(root: Path | str | None = None) -> dict:
     computing a second opinion.
     """
     from tools import check_release as verifier
-    result = verifier.verify(Path(root) if root is not None else ROOT)
+    if root is None and SOURCE_ROOT is None:
+        return {'status': 'BLOCKED_NO_CURRENT_CHECKOUT', 'commit': '',
+                'issues': [{'kind': 'CURRENT_GIT_CHECKOUT_REQUIRED',
+                            'action': 'Supply an explicit source checkout for a source-bound handoff.'}]}
+    result = verifier.verify(Path(root) if root is not None else SOURCE_ROOT)
     return {'status': result.get('status', ''), 'commit': result.get('commit', ''),
             'issues': list(result.get('issues', []))}
 
@@ -322,7 +329,7 @@ def repository_document(relative_path: Path | str) -> dict:
     target = Path(relative_path)
     if target.is_absolute() or '..' in target.parts or '\\' in str(relative_path):
         raise ValueError(f'Repository reference must be normalized and relative: {relative_path}')
-    return json.loads((ROOT / target).read_text(encoding='utf-8'))
+    return json.loads(resource_path(target).read_text(encoding='utf-8'))
 
 
 def document_exists(relative_path: Path | str) -> bool:
@@ -330,4 +337,7 @@ def document_exists(relative_path: Path | str) -> bool:
     target = Path(str(relative_path))
     if target.is_absolute() or '..' in target.parts or '\\' in str(relative_path):
         return False
-    return (ROOT / target).is_file()
+    try:
+        return resource_path(target).is_file()
+    except ValueError:
+        return False

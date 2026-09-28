@@ -33,6 +33,7 @@ sys.path.insert(0, str(site))
 import provisioner
 import scripts
 import tools
+import hosting_resources
 from provisioner import repository
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
@@ -41,7 +42,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, scripts, tools, adoption, ahv, assessment, grouping,
+for module in (provisioner, scripts, tools, hosting_resources, adoption, ahv, assessment, grouping,
                model, openstack, persistence, routes, vmware, vmware_rest):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
@@ -68,13 +69,14 @@ for relative in (
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/style.css',
-    'profiles/security/catalog.json', 'policy/rules/standards.json',
-    'sources/capabilities/platform_registry.json', 'terraform/catalog.json',
 ):
     assert (site / relative).is_file(), relative
-for relative in ('ansible/catalog.json', 'config/toolchain.json'):
+for relative in ('profiles/security/catalog.json', 'policy/rules/standards.json',
+                 'sources/capabilities/platform_registry.json', 'terraform/catalog.json',
+                 'ansible/catalog.json', 'config/toolchain.json'):
     asset = repository.asset_path(relative).resolve()
-    assert asset.is_file() and asset.is_relative_to(site / 'provisioner' / '_assets'), asset
+    assert asset.is_file() and asset.is_relative_to(site / 'hosting_resources' / '_assets'), asset
+assert hosting_resources.SOURCE_ROOT is None
 assert callable(validate_record)
 
 distribution = next(d for d in importlib.metadata.distributions(path=[str(site)])
@@ -94,7 +96,7 @@ assert any(e.name == 'hosting-site-worker' and
 
 result = main(['plan', str(request)])
 for name, module in sys.modules.items():
-    if name.split('.')[0] in ('provisioner', 'tools', 'scripts'):
+    if name.split('.')[0] in ('provisioner', 'tools', 'scripts', 'hosting_resources'):
         path = getattr(module, '__file__', None)
         if path is not None:
             assert Path(path).resolve().is_relative_to(site), (name, path)
@@ -106,7 +108,7 @@ def run(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.pop('PYTHONPATH', None)
     completed = subprocess.run(args, cwd=cwd, env=env, text=True,
-                               capture_output=True)
+                               capture_output=True, timeout=120)
     if completed.returncode:
         raise RuntimeError(f'Installed-wheel check failed (exit {completed.returncode}): '
                            f'{args[:4]}\nstdout:\n{completed.stdout[-8000:]}\n'
@@ -121,15 +123,19 @@ def main() -> None:
         wheels = scratch / 'wheels'
         installed = scratch / 'installed'
         foreign = scratch / 'foreign'
+        source = scratch / 'source'
         archives.mkdir()
         wheels.mkdir()
         foreign.mkdir()
         request = foreign / 'request.yaml'
         shutil.copyfile(ROOT / 'examples/requests/internal-production.yaml', request)
+        shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns(
+            '.git', '.venv', '__pycache__', '.pytest_cache', 'build', 'dist',
+            '*.egg-info'))
 
         # Build through the source distribution to test MANIFEST.in as well as
         # the wheel: published source archives must not lose reviewed assets.
-        run(sys.executable, 'setup.py', 'sdist', '--dist-dir', str(archives), cwd=ROOT)
+        run(sys.executable, 'setup.py', 'sdist', '--dist-dir', str(archives), cwd=source)
         source_archives = list(archives.glob('hosting_provisioner-*.tar.gz'))
         if len(source_archives) != 1:
             raise AssertionError(f'Expected one source archive, found {source_archives}')
@@ -140,6 +146,7 @@ def main() -> None:
             raise AssertionError(f'Expected one built wheel, found {built}')
         run(sys.executable, '-m', 'pip', 'install', '--no-index', '--no-deps',
             '--target', str(installed), str(built[0]), cwd=foreign)
+        shutil.rmtree(source)
 
         completed = run(sys.executable, '-I', '-c', CHILD, str(installed),
                         str(ROOT), str(request), cwd=foreign)

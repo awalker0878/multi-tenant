@@ -1,9 +1,8 @@
-"""Bundle reviewed planning assets at the paths used by the installed runtime.
+"""Bundle reviewed planning resources in the distribution's own package.
 
-The existing owner tools resolve these files relative to their installed Python
-modules. The wheel therefore carries the same tree layout as the source checkout.
-Do not install an ``ansible`` directory at site-packages root: it would overwrite
-files owned by the separate ansible-core distribution.
+No data directory is installed at site-packages root, where it could collide with
+another distribution. Source references retain their relative paths inside the
+resource package, so reviewed evidence links have the same meaning after install.
 """
 
 import json
@@ -15,7 +14,7 @@ from setuptools.command.build_py import build_py
 
 
 class BuildRuntime(build_py):
-    """Copy reviewed, non-Python inputs alongside the owner modules."""
+    """Copy reviewed inputs below the package that owns their resource API."""
 
     def run(self):
         source = Path(__file__).resolve().parent
@@ -61,8 +60,8 @@ class BuildRuntime(build_py):
             raise FileNotFoundError(f'Incomplete runtime distribution: {missing}')
 
         super().run()
-        destination = Path(self.build_lib)
-        for directory in ("profiles", "policy", "sources", "terraform"):
+        destination = Path(self.build_lib) / 'hosting_resources' / '_assets'
+        for directory in ("profiles", "policy", "sources", "terraform", "ansible", "config"):
             for item in sorted((source / directory).rglob("*")):
                 if not item.is_file() or "__pycache__" in item.parts:
                     continue
@@ -73,15 +72,6 @@ class BuildRuntime(build_py):
             target = destination / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             copy2(source / relative, target)
-        # Ansible is already a Python distribution's top-level package. Keep
-        # this project's playbooks and plugins inside our own package instead.
-        for directory in ("ansible", "config"):
-            for item in sorted((source / directory).rglob("*")):
-                if not item.is_file() or "__pycache__" in item.parts:
-                    continue
-                target = destination / "provisioner" / "_assets" / item.relative_to(source)
-                target.parent.mkdir(parents=True, exist_ok=True)
-                copy2(item, target)
 
 
 setup(cmdclass={"build_py": BuildRuntime})

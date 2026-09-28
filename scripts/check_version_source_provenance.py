@@ -14,7 +14,10 @@ import json
 from pathlib import Path
 import re
 
-ROOT=Path(__file__).resolve().parents[1]
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
 INDEX=ROOT/'sources/capabilities/version_source_provenance_index.json'
 FORMAT='portable-hosting-version-source-provenance-index/1'
 STATUS='EXPORTED_VERSION_SOURCE_PROVENANCE_NOT_NATIVE_QUALIFICATION'

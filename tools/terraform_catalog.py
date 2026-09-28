@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+from hosting_resources import RESOURCE_ROOT as ROOT
 
 
 def entries(root: Path = ROOT) -> list[dict]:

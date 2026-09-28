@@ -8,12 +8,12 @@ treats a fixture as a placement authority.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from importlib.resources import as_file, files
 from pathlib import Path
 
 from provisioner.domain.request import load as load_document, digest
 from provisioner.repository import reviewed_source
 
-ROOT = Path(__file__).resolve().parents[2]
 INVENTORY_FORMAT = 'hosting-inventory/1'
 
 AUTHORITATIVE = 'AUTHORITATIVE'
@@ -369,4 +369,7 @@ def load(path: Path | str) -> Inventory:
 
 
 def fixture(name: str = 'openstack-reference') -> Inventory:
-    return load(Path(__file__).resolve().parent / 'fixtures' / f'{name}.json')
+    if not name or Path(name).name != name or '/' in name or '\\' in name:
+        raise ValueError('Fixture name must identify one packaged inventory')
+    with as_file(files(__package__).joinpath('fixtures', f'{name}.json')) as path:
+        return load(path)

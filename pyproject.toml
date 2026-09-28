@@ -33,7 +33,7 @@ hosting-evidence = "provisioner.controlplane.evidence.runtime:main"
 hosting-site-worker = "provisioner.controlplane.worker.runtime:main"
 
 [tool.setuptools.packages.find]
-include = ["provisioner*", "tools", "scripts"]
+include = ["provisioner*", "hosting_resources", "tools", "scripts"]
 namespaces = false
 
 [tool.setuptools.package-data]
