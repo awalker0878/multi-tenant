@@ -24,6 +24,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git config user.name 'Repository review'
+          git config user.email 'review@users.noreply.github.com'
           python - <<'PY'
           import hashlib, os, subprocess
           from pathlib import Path
@@ -39,27 +41,11 @@ jobs:
           if subprocess.check_output(['git','write-tree'],env=env).decode().strip()!='027c02b96dfcadcdb8ccd602fe7129dc6cf0a3b6':
               raise SystemExit('Concurrent source changes detected; publication refused')
           PY
-      - name: Apply the reviewed relocation without compatibility entry points
-        run: python .github/compiler-owner-refactor.py
-      - name: Install repository and wheel-test dependencies
-        run: python -m pip install -r requirements-repository.txt 'setuptools>=80,<85' 'wheel>=0.45,<1'
-      - name: Verify compiler, callers, retirement and unchanged golden outputs
+      - name: Apply reviewed relocation and prepare the exact delivery worktree
         shell: bash
         run: |
           set -euo pipefail
-          python -m unittest tests.test_compile_wsd tests.test_wsd_compiler_input tests.test_private_handoff_json tests.test_retired_interfaces tests.provisioning.adapters.test_adapters tests.provisioning.adapters.test_adapter_contract tests.provisioning.compiler.test_cross_platform tests.provisioning.unit.test_architecture tests.provisioning.end_to_end.test_golden
-          python -m unittest tests.test_main_integration tests.provisioning.documentation.test_documentation
-          python scripts/build_wsd_compositions.py --check
-          python scripts/check_documentation.py
-          python scripts/check_repository.py
-          python scripts/check_retired_interfaces.py
-          python scripts/check_installed_distribution.py
-      - name: Verify exact reviewed output and publish by ordinary fast-forward
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name 'Repository review'
-          git config user.email 'review@users.noreply.github.com'
+          python .github/compiler-owner-refactor.py
           git add README.md docs provisioner scripts setup.py sources/documentation/current_design_records.json tests tools
           python - <<'PY'
           import os, subprocess
@@ -71,8 +57,32 @@ jobs:
           actual=subprocess.check_output(['git','write-tree'],env=env).decode().strip()
           if actual!='c6ebf21cbd95229e81903c0304d1e37091cc3e55':
               raise SystemExit('Reviewed output tree mismatch: '+actual)
-          print('Exact reviewed source tree verified:',actual)
+          commit=subprocess.check_output(['git','commit-tree',actual,'-p','HEAD','-m','Exact reviewed delivery tree for validation']).decode().strip()
+          destination=Path(os.environ['RUNNER_TEMP'])/'compiler-reviewed'
+          subprocess.run(['git','worktree','add','--detach',str(destination),commit],check=True)
+          print('Exact reviewed delivery tree verified:',actual)
           PY
+      - name: Install repository and wheel-test dependencies
+        run: python -m pip install -r requirements-repository.txt 'setuptools>=80,<85' 'wheel>=0.45,<1'
+      - name: Verify the delivery tree without publication transport
+        shell: bash
+        working-directory: ${{ runner.temp }}/compiler-reviewed
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^{tree})" = c6ebf21cbd95229e81903c0304d1e37091cc3e55
+          python -m unittest tests.test_compile_wsd tests.test_wsd_compiler_input tests.test_private_handoff_json tests.test_retired_interfaces tests.provisioning.adapters.test_adapters tests.provisioning.adapters.test_adapter_contract tests.provisioning.compiler.test_cross_platform tests.provisioning.unit.test_architecture tests.provisioning.end_to_end.test_golden
+          python -m unittest tests.test_main_integration tests.provisioning.documentation.test_documentation
+          python scripts/build_wsd_compositions.py --check
+          python scripts/check_documentation.py
+          python scripts/check_repository.py
+          python scripts/check_retired_interfaces.py
+          python scripts/check_installed_distribution.py
+          test -z "$(git status --porcelain --untracked-files=no)"
+      - name: Publish reviewed implementation by ordinary fast-forward
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code
           git commit -m 'refactor(compiler): own WSD implementation and declarations without legacy wrappers'
           test -z "$(git status --porcelain --untracked-files=no)"
           git push origin HEAD:refs/heads/implementation/all-waves
