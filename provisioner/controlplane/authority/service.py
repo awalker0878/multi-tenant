@@ -335,6 +335,14 @@ class AuthorityService:
     def require_worker_step(self, credential: object, grant_id: str, *, step_id: str,
                             operation_id: str, operation_kind: str,
                             operation_scope: PlanScope) -> WorkerGrant:
+        """Return the current grant; command runners must also bound its window."""
+        return self.require_worker_step_window(
+            credential, grant_id, step_id=step_id, operation_id=operation_id,
+            operation_kind=operation_kind, operation_scope=operation_scope)[0]
+
+    def require_worker_step_window(self, credential: object, grant_id: str, *, step_id: str,
+                            operation_id: str, operation_kind: str,
+                            operation_scope: PlanScope) -> tuple[WorkerGrant, datetime]:
         """Revalidate current grant, plan, approvals and owner lease before a step.
 
         B10 must supply enrolled worker identities, a durable grant ledger and a
@@ -365,11 +373,15 @@ class AuthorityService:
                 or grant.issued_at > at or grant.expires_at <= at
                 or grant.expires_at - grant.issued_at > MAX_WORKER_GRANT_TTL):
             raise AuthorityDenied('Grant is expired, revoked or for another operation')
-        require_scoped_role(worker, WORKER, grant.operation_scope, at)
+        worker_role = require_scoped_role(worker, WORKER, grant.operation_scope, at)
         lease = self._leases.current(grant.lease_key)
         if (not isinstance(lease, LeaseState)
                 or (lease.lease_key, lease.epoch, lease.owner_subject) !=
                 (grant.lease_key, grant.lease_epoch, worker.subject)
                 or lease.expires_at <= at):
             raise AuthorityDenied('Owner lease is stale or held by another worker')
-        return grant
+        # A grant may outlive its identity, role, approval quorum or lease. A
+        # subprocess must stop by the earliest independently verified expiry.
+        # This deadline is not a substitute for native intent/reconciliation.
+        return grant, min(grant.expires_at, worker.expires_at, worker_role.expires_at,
+                          lease.expires_at, *(a.expires_at for a in approvals))

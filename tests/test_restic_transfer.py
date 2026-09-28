@@ -225,6 +225,32 @@ class TransferTests(unittest.TestCase):
         self.assertFalse(self.target.exists())
         self.assertFalse((self.root / 'operation/transfer-receipt.json').exists())
 
+    def test_running_command_deadline_cannot_outlive_current_owner_lease(self):
+        from tools.restic_transfer import GuardedRestic
+        self.leases.lease = replace(self.leases.lease, expires_at=self.now + timedelta(seconds=1))
+        _grant, deadline = self.guard.check_window(self.envelope)
+        self.assertEqual(deadline, self.leases.lease.expires_at)
+        with patch('tools.run_files.utcnow', return_value=self.now), \
+             patch('time.monotonic', return_value=1000):
+            GuardedRestic(self.engine, self.guard, self.envelope).repository()
+        self.assertEqual(self.engine.deadline, 1001)
+
+    def test_corrupt_native_tags_and_restored_bytes_never_emit_acceptance(self):
+        self.native['tags'] = []
+        with self.assertRaisesRegex(ValueError, 'Native snapshot'):
+            self.restore(transfer=self.envelope, transfer_guard=self.guard)
+        self.assertNotIn('restore', self.calls)
+        self.assertFalse(self.target.exists())
+
+    def test_corrupt_restored_bytes_are_retained_but_never_accepted(self):
+        self.captured[str(self.source / 'payload')] = b'corrupted recovered data'
+        with self.assertRaisesRegex(ValueError, 'Recovered useful file bytes'):
+            self.restore(transfer=self.envelope, transfer_guard=self.guard)
+        self.assertTrue(self.target.exists())
+        self.assertTrue((self.root / 'operation/attempt.json').exists())
+        self.assertFalse((self.root / 'operation/receipt.json').exists())
+        self.assertFalse((self.root / 'operation/transfer-receipt.json').exists())
+
     def test_trusted_worker_entrypoint_checks_machine_isolation_and_seals_binding(self):
         original = Path.read_text
         def machine(path, *args, **kwargs):

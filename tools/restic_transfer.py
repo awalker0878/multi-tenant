@@ -116,12 +116,15 @@ class TransferGuard:
                 'Trusted worker authority and immutable transfer binding required')
 
     def check(self, envelope):
+        return self.check_window(envelope)[0]
+
+    def check_window(self, envelope):
         require(digest(encoded(envelope)) == self.expected_manifest_sha256,
                 'Transfer differs from the immutable runtime mapping')
         transfer = envelope['transfer']
         meta, spec = transfer['metadata'], transfer['spec']
         destination = PlanScope.from_record(spec['destinationScope'])
-        grant = self.authority.require_worker_step(
+        grant, deadline = self.authority.require_worker_step_window(
             self.credential, self.grant_id, step_id=self.step_id,
             operation_id=self.operation_id, operation_kind='RESTORE_DATA',
             operation_scope=destination)
@@ -133,7 +136,7 @@ class TransferGuard:
                 and spec['grant']['grantId'] == grant.grant_id
                 and spec['grant']['grantDigest'] == grant_digest(grant),
                 'Transfer grant does not bind the original source and destination')
-        return grant
+        return grant, deadline
 
 
 def destination_receipt(envelope, source_receipt, restore_receipt):
@@ -166,9 +169,9 @@ class GuardedRestic:
     def _check(self):
         import time
         from tools.run_files import utcnow
-        grant = self.guard.check(self.envelope)
+        _grant, deadline = self.guard.check_window(self.envelope)
         self.client.deadline = min(self.client.deadline, time.monotonic() +
-                                   (grant.expires_at - utcnow()).total_seconds())
+                                   (deadline - utcnow()).total_seconds())
 
     def repository(self):
         self._check()
