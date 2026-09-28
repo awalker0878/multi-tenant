@@ -22,6 +22,15 @@ from tools.run_files import (digest, encoded, file_map, load_private, new_direct
 from tools.wsd_handoff import execution_outputs
 
 PLAYBOOK = 'ansible/playbooks/native/configure_linux.yml'
+# The controller snapshot owns the pure guest gate's entire package import
+# closure. Copy source markers so hosting_resources selects this sealed root,
+# never an installed distribution or the preparing checkout.
+GUEST_PACKAGE_SOURCE = (
+    '.hosting-root', 'pyproject.toml', 'hosting_resources/__init__.py',
+    'provisioner/__init__.py', 'provisioner/domain/__init__.py',
+    'provisioner/domain/errors.py', 'provisioner/compiler/__init__.py',
+    'provisioner/compiler/wsd.py', 'provisioner/compiler/components.py',
+)
 REFERENCES = {'target_binding_ref', 'bootstrap_ref', 'writer_coordination_ref', 'runtime_ref', 'recovery_ref'}
 RUNTIME_INSPECT = r'''
 import hashlib, importlib, importlib.metadata, json, pathlib, sys
@@ -72,9 +81,9 @@ def source_paths(root):
     def reviewed(name):
         return asset_path(name) if root == ROOT else root / name
 
-    paths = [reviewed(PLAYBOOK), root / 'scripts/__init__.py', root / 'scripts/build_wsd_compositions.py',
-             reviewed('ansible/filter_plugins/guest_filters.py'),
+    paths = [reviewed(PLAYBOOK), reviewed('ansible/filter_plugins/guest_filters.py'),
              reviewed('ansible/callback_plugins/hosting_guest_result.py')]
+    paths += [root / name for name in GUEST_PACKAGE_SOURCE]
     paths += list((root / 'tools').glob('*.py'))
     for role in ('linux_guest_baseline', 'linux_guest_services', 'linux_guest_backup'):
         tasks = reviewed(f'ansible/roles/{role}/tasks/main.yml')

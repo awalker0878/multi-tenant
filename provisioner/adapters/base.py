@@ -17,7 +17,7 @@ Execution and platform contact stay with the owner tools that already own them, 
 
 Nothing here restates the compiler. Every declaration is read from the module that
 already owns it — `provisioner.compiler.wsd` for the native field sets, the declared native
-variables and the declared cross-phase binding rules; `scripts.build_wsd_compositions`
+variables and the declared cross-phase binding rules; `provisioner.compiler.components`
 for the module identities; `terraform/catalog.json` for the reviewed security-edge
 realization; the capability registry for qualification — so an adapter and the
 compiler cannot drift apart, and a generic stage asks the adapter instead of
