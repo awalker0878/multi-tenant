@@ -19,18 +19,13 @@ import sys
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
+from provisioner.domain.capabilities import CAPABILITIES, PLATFORMS
 from scripts import check_version_source_provenance as provenance
 from scripts import check_qualification_campaign_assurance as campaign
 
 INDEX = ROOT / 'sources/capabilities/qualification_index.json'
 FORMAT = 'portable-hosting-native-qualification-index/1'
 STATUS = 'ENGINEERING_QUALIFICATION_RECORDS_NOT_PRODUCTION_AUTHORITY'
-CAPABILITIES = {
-    'network_domain', 'ipv4', 'ipv6', 'distributed_firewall', 'gateway_policy',
-    'dynamic_routing', 'service_insertion', 'native_load_balancer',
-    'dedicated_edge_context', 'audit_logging'
-}
-PLATFORMS = {'nutanix', 'vmware-nsx', 'openstack'}
 CAMPAIGN_PLATFORM = {'nutanix':'NUTANIX', 'vmware-nsx':'VMWARE_NSX', 'openstack':'OPENSTACK'}
 ID = re.compile(r'^[A-Z][A-Z0-9_.-]{2,127}$')
 TUPLE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_.:-]{2,191}$')

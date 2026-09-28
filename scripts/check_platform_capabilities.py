@@ -14,17 +14,12 @@ import sys
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
+from provisioner.domain.capabilities import CAPABILITIES, PLATFORMS, catalog_digest
 from scripts import check_platform_qualification as qualification
 
 REGISTRY = ROOT / 'sources/capabilities/platform_registry.json'
-CAPABILITIES = {
-    'network_domain', 'ipv4', 'ipv6', 'distributed_firewall', 'gateway_policy',
-    'dynamic_routing', 'service_insertion', 'native_load_balancer',
-    'dedicated_edge_context', 'audit_logging'
-}
 SOURCE_STATES = {'UNASSESSED', 'DOCUMENTED_EXPECTATION', 'CANDIDATE_SOURCE', 'LOCAL_FIXTURE_ONLY'}
 QUALIFICATIONS = {'NOT_QUALIFIED', 'NATIVE_QUALIFIED'}
-PLATFORMS = {'nutanix', 'vmware-nsx', 'openstack'}
 
 
 def load(path: Path = REGISTRY) -> dict:
@@ -39,20 +34,30 @@ def load(path: Path = REGISTRY) -> dict:
                 raise ValueError('Duplicate JSON property')
             result[key] = value
         return result
-    return json.loads(raw, object_pairs_hook=pairs)
+    def reject(_):
+        raise ValueError('Non-finite JSON number')
+    value = json.loads(raw, object_pairs_hook=pairs, parse_constant=reject)
+    if not isinstance(value, dict):
+        raise ValueError('Capability registry must be a JSON object')
+    return value
 
 
 def validate(registry: dict, root: Path = ROOT, qualification_index=None, provenance_index=None,
              campaign_evidence_index=None, target_selection_index=None, as_of=None) -> dict:
-    if set(registry) != {'format', 'status', 'reviewed_source_revision', 'qualification_rule', 'capability_ids', 'profiles'}:
+    if not isinstance(registry, dict) or set(registry) != {
+            'format', 'status', 'reviewed_source_revision', 'qualification_rule',
+            'capability_catalog_sha256', 'capability_ids', 'profiles'}:
         raise ValueError('Unexpected registry fields')
-    if registry['format'] != 'portable-hosting-capability-registry/1':
+    if registry['format'] != 'portable-hosting-capability-registry/2':
         raise ValueError('Unsupported capability-registry format')
     if registry['status'] != 'ENGINEERING_EVIDENCE_REGISTRY_NOT_PLACEMENT_AUTHORITY':
         raise ValueError('Registry status must retain its engineering-evidence boundary')
-    if set(registry['capability_ids']) != CAPABILITIES or len(registry['capability_ids']) != len(CAPABILITIES):
+    if registry['capability_catalog_sha256'] != catalog_digest():
+        raise ValueError('Capability registry vocabulary digest does not match the reviewed catalog')
+    ids = qualification.unique_strings(registry['capability_ids'], 'capability_ids')
+    if set(ids) != CAPABILITIES:
         raise ValueError('Portable capability vocabulary differs from the reviewed profile')
-    if set(registry['profiles']) != PLATFORMS:
+    if not isinstance(registry['profiles'], dict) or set(registry['profiles']) != PLATFORMS:
         raise ValueError('Exactly the three implemented platform families are required')
 
     if qualification_index is None:
@@ -67,13 +72,18 @@ def validate(registry: dict, root: Path = ROOT, qualification_index=None, proven
     source_refs = set()
     qualified = 0
     for name, profile in registry['profiles'].items():
-        if set(profile) != {'platform_family', 'product_tuple', 'terraform_providers', 'assurance_profiles', 'capabilities'}:
+        if not isinstance(profile, dict) or set(profile) != {
+                'platform_family', 'product_tuple', 'terraform_providers',
+                'assurance_profiles', 'capabilities'}:
             raise ValueError(f'{name}: unexpected profile fields')
+        qualification.bounded(profile['platform_family'], f'{name}: platform family')
+        qualification.bounded(profile['product_tuple'], f'{name}: product tuple', 192)
+        qualification.unique_strings(profile['assurance_profiles'],
+                                     f'{name}: assurance profiles', allow_empty=True)
+        qualification.unique_strings(profile['terraform_providers'], f'{name}: providers')
         if profile['product_tuple'] == 'UNSELECTED' and profile['assurance_profiles']:
             raise ValueError(f'{name}: an unselected native tuple cannot advertise an assurance profile')
-        if not isinstance(profile['terraform_providers'], list) or not profile['terraform_providers']:
-            raise ValueError(f'{name}: provider-interface record required')
-        if set(profile['capabilities']) != CAPABILITIES:
+        if not isinstance(profile['capabilities'], dict) or set(profile['capabilities']) != CAPABILITIES:
             raise ValueError(f'{name}: portable capability set is incomplete')
 
         tuple_records = [
@@ -82,17 +92,22 @@ def validate(registry: dict, root: Path = ROOT, qualification_index=None, proven
         ] if profile['product_tuple'] != 'UNSELECTED' else []
 
         for cap, claim in profile['capabilities'].items():
-            if set(claim) != {'source_state', 'qualification', 'evidence_refs', 'native_evidence_refs'}:
+            if not isinstance(claim, dict) or set(claim) != {
+                    'source_state', 'qualification', 'evidence_refs', 'native_evidence_refs'}:
                 raise ValueError(f'{name}/{cap}: unexpected claim fields')
-            if claim['source_state'] not in SOURCE_STATES or claim['qualification'] not in QUALIFICATIONS:
+            if (not isinstance(claim['source_state'], str)
+                    or not isinstance(claim['qualification'], str)
+                    or claim['source_state'] not in SOURCE_STATES
+                    or claim['qualification'] not in QUALIFICATIONS):
                 raise ValueError(f'{name}/{cap}: unsupported state')
-            if not isinstance(claim['evidence_refs'], list) or not claim['evidence_refs']:
-                raise ValueError(f'{name}/{cap}: repository evidence reference required')
-            if not isinstance(claim['native_evidence_refs'], list):
-                raise ValueError(f'{name}/{cap}: native evidence list required')
-            for ref in claim['evidence_refs']:
-                if not isinstance(ref, str) or ref.startswith('/') or '..' in Path(ref).parts or not (root / ref).exists():
-                    raise ValueError(f'{name}/{cap}: invalid repository evidence reference')
+            refs = qualification.unique_strings(claim['evidence_refs'],
+                                                f'{name}/{cap}: evidence refs')
+            qualification.unique_strings(claim['native_evidence_refs'],
+                                         f'{name}/{cap}: native refs', allow_empty=True)
+            for ref in refs:
+                qualification.repository_ref(ref, root)
+                if not (root / ref).resolve().is_relative_to(root.resolve()):
+                    raise ValueError(f'{name}/{cap}: evidence reference escapes resource root')
                 source_refs.add(ref)
 
             if claim['qualification'] == 'NATIVE_QUALIFIED':
