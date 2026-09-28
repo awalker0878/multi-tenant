@@ -211,6 +211,16 @@ class AssessmentServiceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             AssessmentService(self.repository, None)
 
+    def test_opaque_oidc_actor_subject_is_not_restricted_to_record_ids(self):
+        for actor in ('editor@example.org', 'auth0|federated-operator'):
+            with self.subTest(actor=actor):
+                result = self.service.compare(CTX, actor, AssessmentSelection('source', 7), 'vm-1',
+                    tuple(AssessmentDestination(AssessmentSelection(name, 7), 'pool', 'pool-1')
+                          for name in ('target-a', 'target-b')),
+                    method='COLD_VM_CONVERSION', guest_profile='linux-uefi',
+                    network_mode='routed', data_mode='offline')
+                self.assertEqual(len(result.assessments), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

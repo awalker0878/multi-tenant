@@ -221,7 +221,8 @@ class AssessmentService:
                 method: str, guest_profile: str, network_mode: str, data_mode: str
                 ) -> AssessmentComparison:
         if (not isinstance(ctx, TenantContext)
-                or not isinstance(actor_subject, str) or not _ID.fullmatch(actor_subject)
+                or not isinstance(actor_subject, str) or not 1 <= len(actor_subject) <= 256
+                or any(ord(char) < 32 or ord(char) == 127 for char in actor_subject)
                 or not isinstance(source, AssessmentSelection)
                 or not isinstance(destinations, tuple) or not 2 <= len(destinations) <= 20
                 or any(not isinstance(item, AssessmentDestination) for item in destinations)

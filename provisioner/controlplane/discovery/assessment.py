@@ -46,9 +46,11 @@ class AssessmentScopeAccess:
     def __post_init__(self) -> None:
         if (not isinstance(self.scope, PlanScope)
                 or self.purpose not in ('SOURCE_READ', 'DESTINATION_READ')
-                or not all(isinstance(value, str) and _ID.fullmatch(value)
-                           for value in (self.actor_subject,
-                                         self.authorization_reference))
+                or not isinstance(self.actor_subject, str)
+                or not 1 <= len(self.actor_subject) <= 512
+                or any(ord(char) < 32 or ord(char) == 127 for char in self.actor_subject)
+                or not isinstance(self.authorization_reference, str)
+                or not _ID.fullmatch(self.authorization_reference)
                 or not _utc(self.observed_at) or not _utc(self.expires_at)
                 or self.expires_at <= self.observed_at):
             raise ValueError('Invalid exact-scope read selection')
