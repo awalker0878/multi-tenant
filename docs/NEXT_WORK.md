@@ -1,5 +1,9 @@
 # Next work: executable product and native release
 
+The current [all-wave execution plan](product/enterprise-workload-mobility-execution-plan.md)
+tracks B01–B50 at revision `3cbc0c1e`, corrects delivery dependencies, and defines
+small-commit implementation series. The original audit below remains historical.
+
 The C01–C13 refactor gates describe a completed **planning interface refactor**, not
 an executable provisioning and migration product. The current public `apply` and
 `mobility-apply` paths refuse execution. Generated provisioning steps and mobility

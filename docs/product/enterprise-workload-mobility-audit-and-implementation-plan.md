@@ -2,6 +2,9 @@
 
 ## Repository audit and full implementation plan
 
+> Historical audit at the revision below. For the corrected current B01–B50 status,
+> dependencies and implementation order, use the [all-wave execution plan](enterprise-workload-mobility-execution-plan.md).
+
 **Repository:** `awalker0878/multi-tenant`  
 **Audited revision:** `e5347986cb736df525c1fc3ace100af26d2d4f27` (`main`)  
 **Audit date:** 26 September 2026  
