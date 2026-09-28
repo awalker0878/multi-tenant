@@ -19,6 +19,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 CHILD = r'''
 import importlib.metadata
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -35,6 +36,7 @@ import scripts
 import tools
 import hosting_resources
 from provisioner import repository
+from provisioner.qualification import native, registry
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
 from provisioner.controlplane.discovery import (adoption, assessment, grouping,
@@ -43,7 +45,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, scripts, tools, hosting_resources, adoption, ahv, assessment, grouping,
+for module in (provisioner, scripts, tools, hosting_resources, native, registry, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -79,6 +81,9 @@ for relative in ('profiles/security/catalog.json', 'policy/rules/standards.json'
     asset = repository.asset_path(relative).resolve()
     assert asset.is_file() and asset.is_relative_to(site / 'hosting_resources' / '_assets'), asset
 assert hosting_resources.SOURCE_ROOT is None
+assert importlib.util.find_spec('scripts.check_platform_capabilities') is None
+assert importlib.util.find_spec('scripts.check_platform_qualification') is None
+assert registry.validate(registry.load())['capabilities_per_platform'] == len(registry.CAPABILITIES)
 assert callable(validate_record)
 
 distribution = next(d for d in importlib.metadata.distributions(path=[str(site)])

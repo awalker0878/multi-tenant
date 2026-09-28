@@ -9,8 +9,8 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_platform_capabilities as capabilities
-from scripts import check_platform_qualification as q
+from provisioner.qualification import registry as capabilities
+from provisioner.qualification import native as q
 from scripts import check_version_source_provenance as provenance
 from scripts import check_qualification_campaign_assurance as campaign
 from tests.qualification_fixture_support import campaign_index, target_index
@@ -163,7 +163,7 @@ class QualificationIndexTests(unittest.TestCase):
 
     def test_current_cli_reports_no_native_records(self):
         run=subprocess.run(
-            [sys.executable,str(ROOT/'scripts/check_platform_qualification.py'),
+            [sys.executable, '-m', 'provisioner.qualification.native',
              '--as-of','2026-09-18T16:00:00Z'],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)

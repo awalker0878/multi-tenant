@@ -9,13 +9,10 @@ qualification dossier.
 from __future__ import annotations
 import json
 from pathlib import Path
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 from provisioner.domain.capabilities import CAPABILITIES, PLATFORMS, catalog_digest
-from scripts import check_platform_qualification as qualification
+from provisioner.qualification import native as qualification
 
 REGISTRY = ROOT / 'sources/capabilities/platform_registry.json'
 SOURCE_STATES = {'UNASSESSED', 'DOCUMENTED_EXPECTATION', 'CANDIDATE_SOURCE', 'LOCAL_FIXTURE_ONLY'}

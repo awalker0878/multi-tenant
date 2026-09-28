@@ -130,8 +130,8 @@ class NavigationIntegrationTests(unittest.TestCase):
         workflow = yaml.safe_load((ROOT/'.github/workflows/validate.yml').read_text())
         commands = [s.get('run', '') for s in workflow['jobs']['repository']['steps']]
         self.assertTrue(any('scripts/commissioning_pack.py check' in s for s in commands))
-        self.assertTrue(any('scripts/check_platform_capabilities.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_platform_qualification.py' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.registry' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.native' in s for s in commands))
         self.assertTrue(any('scripts/check_platform_family_eligibility.py' in s for s in commands))
         self.assertTrue(any('scripts/check_site_service_capacity.py' in s for s in commands))
         self.assertTrue(any('scripts/check_site_service_eligibility.py' in s for s in commands))

@@ -17,19 +17,19 @@ def asset_path(relative_path: str) -> Path:
 
 def capability_registry() -> dict:
     """Load the reviewed platform capability registry from its owner."""
-    from scripts import check_platform_capabilities
-    return check_platform_capabilities.load()
+    from provisioner.qualification import registry as capability_owner
+    return capability_owner.load()
 
 
 def capability_ids() -> frozenset[str]:
-    from scripts import check_platform_capabilities
-    return frozenset(check_platform_capabilities.CAPABILITIES)
+    from provisioner.domain.capabilities import CAPABILITIES
+    return CAPABILITIES
 
 
 def capability_eligible(registry: dict, platform: str, required: set[str],
                         assurance_profile: str | None = None) -> tuple[bool, list[str]]:
-    from scripts import check_platform_capabilities
-    return check_platform_capabilities.eligible(registry, platform, required,
+    from provisioner.qualification import registry as capability_owner
+    return capability_owner.eligible(registry, platform, required,
                                                 assurance_profile)
 
 

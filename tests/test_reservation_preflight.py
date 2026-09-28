@@ -10,7 +10,7 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_platform_qualification as qualification
+from provisioner.qualification import native as qualification
 from scripts import check_qualification_campaign_assurance as campaign
 from scripts import check_reservation_preflight as preflight
 from scripts import check_reservation_records as records

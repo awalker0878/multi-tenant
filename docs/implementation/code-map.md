@@ -102,7 +102,7 @@ Current documentation checks are separate from native engine/CI or platform runs
 
 Design: [Cross-vendor realization model](../architecture/reference/15-cross-vendor-realization-model.md) · [Site qualification and evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md)
 
-Implementation: [machine-readable registry](../../sources/capabilities/platform_registry.json) · [registry checker](../../scripts/check_platform_capabilities.py) · [engineering evidence boundary](../engineering/platform-capability-registry.md)
+Implementation: [machine-readable registry](../../sources/capabilities/platform_registry.json) · [registry checker](../../provisioner/qualification/registry.py) · [engineering evidence boundary](../engineering/platform-capability-registry.md)
 
 The registry distinguishes candidate source and local fixtures from native qualification. It currently makes no platform production-eligible and does not perform placement.
 
@@ -110,7 +110,7 @@ The registry distinguishes candidate source and local fixtures from native quali
 
 Design: [Site qualification and evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md) · [QUAL-001 / ASSUR-003 requirements](../assurance/requirements.md#QUAL-001)
 
-Implementation: [active qualification index](../../sources/capabilities/qualification_index.json) · [dossier validator](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/platform-native-qualification.md)
+Implementation: [active qualification index](../../sources/capabilities/qualification_index.json) · [dossier validator](../../provisioner/qualification/native.py) · [engineering boundary](../engineering/platform-native-qualification.md)
 
 A native-qualified registry claim must be backed by a current exact-tuple dossier with tested limits, owners, independent approval, matching CURRENT_SUPPORTED provenance and native evidence that exactly matches current latest-passing artifacts from a target-bound qualification campaign. The dossier cannot extend evidence validity beyond campaign freshness. The active index is intentionally empty and grants no placement or activation authority.
 
@@ -182,7 +182,7 @@ Current assurance requires named operating decision owners, accepted as-built/su
 
 Design: [G32 version and source provenance](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G32) · [Implementation tuple and decision package](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [Support tuple evidence checklist](../engineering/vendor-cards/7-support-tuple-variations-and-evidence-checklist.md)
 
-Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../scripts/check_version_source_provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
+Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../scripts/check_version_source_provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../provisioner/qualification/native.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
 
 A current native qualification now requires the same exact product/API/provider/hardware/licence tuple to have CURRENT_SUPPORTED provenance. Source review, installed compatibility and native qualification remain separate evidence states; none grants placement or activation authority.
 

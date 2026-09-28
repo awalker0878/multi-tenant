@@ -6,8 +6,8 @@ import tempfile
 import unittest
 
 from provisioner.domain import capabilities as vocabulary
-from scripts import check_platform_capabilities as registry
-from scripts import check_platform_qualification as qualification
+from provisioner.qualification import registry as registry
+from provisioner.qualification import native as qualification
 
 
 class CapabilityCoverageTests(unittest.TestCase):

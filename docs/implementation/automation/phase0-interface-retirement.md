@@ -68,3 +68,18 @@ and package-owned runtime work, respectively. The remaining mutation-path retire
 depend on the durable execution service and native route tests. A future release
 must update this ledger with the actual state inventory, conversion report and
 deletion proof; an unchecked “no consumers” assertion is not a deletion gate.
+
+## Package-owner retirement checkpoint — 28 September 2026
+
+Capability-registry and native-qualification validation now live in
+`provisioner/qualification/registry.py` and `provisioner/qualification/native.py`.
+Their former script files were deleted, not replaced by imports, redirects or
+wrappers. Runtime imports, CI commands, task metadata, source references and
+documentation now use the package owners; the retired-interface register forbids
+restoring the old files. Installed-distribution checks verify that the old imports
+are absent and the new owners execute from the installed package.
+
+This closes the relocation of these two owners, **not all of B05**. Other compiler,
+execution and evidence owners still reside in top-level packages. The conversion
+and independent reconciliation conditions above still apply before removing a
+runner with retained state or a potentially active native task.

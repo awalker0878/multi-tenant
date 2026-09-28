@@ -8,7 +8,7 @@
   "checker": "scripts/check_version_source_provenance.py",
   "preflight": "scripts/check_version_source_readiness.py",
   "engineering": "docs/engineering/version-source-provenance-and-lifecycle-assurance.md",
-  "qualification_integration": "scripts/check_platform_qualification.py",
+  "qualification_integration": "provisioner/qualification/native.py",
   "current_records": 0,
   "authority": {
     "may_claim_native_qualification": false,

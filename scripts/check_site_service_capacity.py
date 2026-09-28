@@ -20,7 +20,7 @@ if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
-from scripts import check_platform_qualification as qualification
+from provisioner.qualification import native as qualification
 
 INDEX = ROOT / 'sources/capabilities/site_service_capacity_index.json'
 FORMAT = 'portable-hosting-site-service-capacity/2'

@@ -14,10 +14,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 from provisioner.domain.capabilities import CAPABILITIES, PLATFORMS
 from scripts import check_version_source_provenance as provenance

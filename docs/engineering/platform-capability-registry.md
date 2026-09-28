@@ -76,7 +76,7 @@ Changing a profile requirement changes its reviewed revision and derived plan
 identity. Reassess and obtain new approval; do not reinterpret an already approved
 plan under the expanded catalogue. Preserve signed historical evidence unchanged.
 
-Run `python scripts/check_platform_capabilities.py` and the capability,
+Run `python -m provisioner.qualification.registry` and the capability,
 qualification and family-eligibility tests. These are repository checks and make
 no native contact.
 

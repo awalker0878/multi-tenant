@@ -158,7 +158,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 
 ## Platform capability registry
 
-`python scripts/check_platform_capabilities.py` validates the machine-readable engineering registry without contacting a platform or performing placement. Repository code, provider locks, documentation and local fixtures may support `CANDIDATE_SOURCE` or `LOCAL_FIXTURE_ONLY` states, but only a selected installed tuple with separately controlled native evidence can become `NATIVE_QUALIFIED`. The current registry intentionally has zero production-eligible platforms.
+`python -m provisioner.qualification.registry` validates the machine-readable engineering registry without contacting a platform or performing placement. Repository code, provider locks, documentation and local fixtures may support `CANDIDATE_SOURCE` or `LOCAL_FIXTURE_ONLY` states, but only a selected installed tuple with separately controlled native evidence can become `NATIVE_QUALIFIED`. The current registry intentionally has zero production-eligible platforms.
 
 
 ## Pre-placement platform-family eligibility
@@ -168,7 +168,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 
 ## Native PlatformProfile qualification dossier
 
-`python scripts/check_platform_qualification.py` validates the active exact-tuple qualification index, including owners, applicable tests, tested limits, evidence hashes/freshness, approval validity, matching current version/source provenance and current target-bound campaign evidence. Every dossier evidence reference must match a current campaign packet's latest-passing artifact reference, digest and observation time, and the dossier cannot extend validity beyond campaign freshness. The current index is intentionally empty. `scripts/check_platform_capabilities.py` then refuses any future `NATIVE_QUALIFIED` claim that lacks a current matching dossier for the same tuple/capability/evidence scope. Tests also reject missing campaign support, artifact/digest/time mismatch and evidence-lifetime inflation. Neither check contacts a platform, selects a site, reserves capacity, applies infrastructure or issues production authorization.
+`python -m provisioner.qualification.native` validates the active exact-tuple qualification index, including owners, applicable tests, tested limits, evidence hashes/freshness, approval validity, matching current version/source provenance and current target-bound campaign evidence. Every dossier evidence reference must match a current campaign packet's latest-passing artifact reference, digest and observation time, and the dossier cannot extend validity beyond campaign freshness. The current index is intentionally empty. `provisioner/qualification/registry.py` then refuses any future `NATIVE_QUALIFIED` claim that lacks a current matching dossier for the same tuple/capability/evidence scope. Tests also reject missing campaign support, artifact/digest/time mismatch and evidence-lifetime inflation. Neither check contacts a platform, selects a site, reserves capacity, applies infrastructure or issues production authorization.
 
 
 ## Site/service-class capacity eligibility

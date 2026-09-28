@@ -21,7 +21,7 @@ class BuildRuntime(build_py):
         required = {
             'tools/__init__.py', 'tools/compile_wsd.py', 'tools/check_release.py',
             'scripts/__init__.py', 'scripts/build_wsd_compositions.py',
-            'scripts/check_platform_capabilities.py',
+            'provisioner/qualification/registry.py',
             'sources/capabilities/platform_registry.json',
             'policy/rules/standards.json', 'profiles/security/catalog.json',
             'terraform/catalog.json', 'ansible/catalog.json', 'config/toolchain.json',

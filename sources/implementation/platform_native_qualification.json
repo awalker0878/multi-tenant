@@ -9,7 +9,7 @@
     "ACPT-001"
   ],
   "qualification_index": "sources/capabilities/qualification_index.json",
-  "checker": "scripts/check_platform_qualification.py",
+  "checker": "provisioner/qualification/native.py",
   "engineering": "docs/engineering/platform-native-qualification.md",
   "disabled_example": "examples/native_platform_qualification.json.example",
   "current_records": 0,

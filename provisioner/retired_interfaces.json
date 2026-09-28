@@ -102,6 +102,20 @@
       "reason": "The provisioner must not restate native field shapes; it re-exports the compiler's.",
       "replacement": "provisioner/adapters/base.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_platform_capabilities.py",
+      "kind": "path",
+      "reason": "Runtime owner moved into the installed qualification package; all known imports and commands were migrated without a compatibility wrapper.",
+      "replacement": "provisioner/qualification/registry.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_platform_qualification.py",
+      "kind": "path",
+      "reason": "Runtime owner moved into the installed qualification package; all known imports and commands were migrated without a compatibility wrapper.",
+      "replacement": "provisioner/qualification/native.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }

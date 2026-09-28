@@ -31,7 +31,7 @@
     "allow the PlatformProfile dossier to publish only evidence that still matches the current campaign packet"
   ],
   "formal_authorization": "NOT_ISSUED",
-  "qualification_integration": "scripts/check_platform_qualification.py",
+  "qualification_integration": "provisioner/qualification/native.py",
   "authorization_binding": {
     "target_selection": "sources/capabilities/target_selection_assurance_index.json",
     "exact_refs": [

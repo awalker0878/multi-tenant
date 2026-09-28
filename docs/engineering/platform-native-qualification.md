@@ -122,7 +122,7 @@ The qualification approval is also not the authorization required by `ACPT-001`.
 Current repository state:
 
 ```sh
-python scripts/check_platform_qualification.py
+python -m provisioner.qualification.native
 ```
 
 The expected result is a valid **empty** index:

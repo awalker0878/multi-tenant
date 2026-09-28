@@ -20,7 +20,7 @@ if __package__ in (None, ''):
 from hosting_resources import RESOURCE_ROOT as ROOT
 
 from scripts import check_site_service_capacity as capacity
-from scripts import check_platform_qualification as qualification
+from provisioner.qualification import native as qualification
 
 FORMAT='portable-hosting-site-service-demand/1'
 STATUS='PLANNING_ONLY_NOT_AUTHORIZED'
