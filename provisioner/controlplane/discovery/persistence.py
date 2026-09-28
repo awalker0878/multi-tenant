@@ -167,11 +167,6 @@ class DiscoveryRepository:
             raise TypeError('An immutable discovery campaign is required')
         self._require_scope(ctx, campaign.scope, environment_id)
         with self._session(ctx, write=True) as connection:
-            # The database clock, not the caller's clock or signed issue time,
-            # decides whether a campaign can still be registered.
-            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
-            if not campaign.issued_at <= checked_at < campaign.expires_at:
-                raise ValueError('Discovery campaign is outside its validity window')
             environment = connection.execute(
                 'SELECT 1 FROM hosting_controlplane.environment_registrations '
                 'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
@@ -180,6 +175,15 @@ class DiscoveryRepository:
                 self._scope_args(ctx, campaign.scope, environment_id)).fetchone()
             if environment is None:
                 raise ValueError('No exact declared environment selector exists')
+            # A competing admission may hold this lock past expiry or revocation.
+            # Check live authority only after the serialization wait has finished.
+            key = hashlib.sha256(_json(('campaign', ctx.organization_id,
+                                       ctx.tenant_id, campaign.campaign_id)).encode()).digest()
+            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
+                               (int.from_bytes(key[:8], 'big', signed=True),))
+            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
+            if not campaign.issued_at <= checked_at < campaign.expires_at:
+                raise ValueError('Discovery campaign is outside its validity window')
             # The verifier must independently recheck active enrollment and the
             # campaign issuer now. A constructible evidence object is not passed
             # by a web caller and is not accepted without this callback.
@@ -188,12 +192,7 @@ class DiscoveryRepository:
                     or proof.authorization_digest != campaign.digest()
                     or proof.result_digest is not None):
                 raise ValueError('Campaign verifier did not bind exact authorization')
-            # Serialize admission retries by immutable campaign identity. Live
-            # authority is checked above even when identical bytes already exist.
-            key = hashlib.sha256(_json(('campaign', ctx.organization_id,
-                                       ctx.tenant_id, campaign.campaign_id)).encode()).digest()
-            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
-                               (int.from_bytes(key[:8], 'big', signed=True),))
+            # Live authority is checked even when identical bytes already exist.
             existing = connection.execute(
                 'SELECT environment_id, authorization_digest '
                 'FROM hosting_controlplane.discovery_campaigns '
@@ -266,7 +265,6 @@ class DiscoveryRepository:
         if rebuilt.digest != result.digest:
             raise ValueError('Discovery result digest is stale')
         with self._session(ctx, write=True) as connection:
-            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
             row = connection.execute(
                 'SELECT site_id, security_domain_id, endpoint_id, native_scope_id, '
                 'platform_family, authority_reference, collector_id, allowed_kinds, '
@@ -280,6 +278,14 @@ class DiscoveryRepository:
             if row is None:
                 raise ValueError('Campaign was not registered for this environment')
             campaign = self._campaign_from_row(ctx, result.campaign_id, row)
+            # Serialize all campaigns for this scope before reading trusted time
+            # or verifying live authority. A lock wait must not preserve stale
+            # enrollment, witness, revocation or campaign validity decisions.
+            key = hashlib.sha256(_json(self._scope_args(
+                ctx, campaign.scope, environment_id)).encode('utf-8')).digest()
+            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
+                               (int.from_bytes(key[:8], 'big', signed=True),))
+            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
             if (campaign.scope != result.scope
                     or result.authorization_digest != campaign.digest()
                     or not campaign.issued_at <= result.captured_at <= checked_at
@@ -294,13 +300,6 @@ class DiscoveryRepository:
                     or proof.authorization_digest != campaign.digest()
                     or proof.result_digest != result.digest):
                 raise ValueError('Result verifier did not bind exact provenance')
-            # Serialize per exact scope, including competing campaigns. The
-            # hashed advisory key can collide only by conservatively serializing
-            # unrelated scopes; the tenant/environment SQL key remains exact.
-            key = hashlib.sha256(_json(self._scope_args(
-                ctx, campaign.scope, environment_id)).encode('utf-8')).digest()
-            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
-                               (int.from_bytes(key[:8], 'big', signed=True),))
             # A response lost after commit must not create another generation.
             # Changed bytes under the same campaign remain a hard conflict.
             existing = connection.execute(

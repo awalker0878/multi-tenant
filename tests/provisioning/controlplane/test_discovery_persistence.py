@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import os
+import hashlib
+import threading
 import unittest
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
@@ -14,6 +16,7 @@ from provisioner.controlplane.discovery.model import (
 from provisioner.controlplane.discovery.persistence import (
     DiscoveryConflict, DiscoveryRepository, VerificationEvidence,
 )
+from provisioner.controlplane.discovery.model import _json
 from provisioner.controlplane.persistence.environments import (
     EnvironmentDeclaration, EnvironmentRepository,
 )
@@ -239,6 +242,88 @@ class DiscoveryPersistenceTests(unittest.TestCase):
                                       ingest_verifier=RevokedVerifier())
         with self.assertRaises(PermissionError):
             revoked.publish_verified_result(self.ctx, self.environment_id, result)
+
+    def test_authority_and_database_time_are_checked_after_admission_lock_waits(self):
+        for mode in ('campaign', 'result'):
+            with self.subTest(mode=mode):
+                campaign = self._campaign('lock-' + mode)
+                result = DiscoveryResult(campaign.campaign_id, campaign.digest(), campaign.scope,
+                    datetime.now(timezone.utc), 'COMPLETE', (self._object('vm-1', 'Name'),), (), ())
+                if mode == 'result':
+                    self.writer.register_verified_campaign(self.ctx, self.environment_id, campaign)
+                waiting, revoked = threading.Event(), threading.Event()
+                verified_at, errors = [], []
+                release_time = []
+                connect = self.psycopg.connect
+                dsn = self.ingest_dsn
+
+                class LockObservedConnection:
+                    """Real SQL; expose only the instant the caller reaches its lock."""
+                    def __init__(self):
+                        self.connection = connect(dsn)
+
+                    def __enter__(self):
+                        self.connection.__enter__()
+                        return self
+
+                    def __exit__(self, *args):
+                        return self.connection.__exit__(*args)
+
+                    def __getattr__(self, name):
+                        return getattr(self.connection, name)
+
+                    def execute(self, statement, *args, **kwargs):
+                        if 'pg_advisory_xact_lock' in statement:
+                            waiting.set()
+                        return self.connection.execute(statement, *args, **kwargs)
+
+                class LiveVerifier(_IndependentTestVerifier):
+                    def _check(self, checked_at):
+                        verified_at.append(checked_at)
+                        if revoked.is_set():
+                            raise PermissionError('Authority revoked during serialization wait')
+
+                    def verify_campaign(self, value, environment_id, checked_at):
+                        self._check(checked_at)
+                        return super().verify_campaign(value, environment_id, checked_at)
+
+                    def verify_result(self, value, observed, environment_id, checked_at):
+                        self._check(checked_at)
+                        return super().verify_result(value, observed, environment_id, checked_at)
+
+                writer = DiscoveryRepository(LockObservedConnection,
+                    ingest_role='hosting_discovery_ingest', ingest_verifier=LiveVerifier())
+
+                def submit():
+                    try:
+                        if mode == 'campaign':
+                            writer.register_verified_campaign(self.ctx, self.environment_id, campaign)
+                        else:
+                            writer.publish_verified_result(self.ctx, self.environment_id, result)
+                    except Exception as exc:
+                        errors.append(exc)
+
+                identity = (('campaign', self.ctx.organization_id, self.ctx.tenant_id,
+                             campaign.campaign_id) if mode == 'campaign' else
+                            self.writer._scope_args(self.ctx, self.scope, self.environment_id))
+                key = int.from_bytes(hashlib.sha256(_json(identity).encode()).digest()[:8],
+                                     'big', signed=True)
+                thread = threading.Thread(target=submit, daemon=True)
+                with connect(dsn) as blocker:
+                    blocker.execute('SELECT pg_advisory_xact_lock(%s::bigint)', (key,))
+                    thread.start()
+                    reached_lock = waiting.wait(timeout=5)
+                    revoked.set()
+                    release_time.append(blocker.execute('SELECT clock_timestamp()').fetchone()[0])
+                thread.join(timeout=10)
+                self.assertTrue(reached_lock, 'Writer never reached the serialization lock')
+                self.assertFalse(thread.is_alive(), 'Writer did not finish after the lock released')
+                self.assertEqual(len(errors), 1)
+                self.assertIsInstance(errors[0], PermissionError)
+                self.assertEqual(len(verified_at), 1)
+                self.assertGreaterEqual(verified_at[0], release_time[0])
+                self.assertEqual(self.reader.list_generations(
+                    self.ctx, self.scope, self.environment_id), [])
 
 
 if __name__ == '__main__':
