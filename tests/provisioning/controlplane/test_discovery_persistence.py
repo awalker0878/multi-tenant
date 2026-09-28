@@ -118,6 +118,12 @@ class DiscoveryPersistenceTests(unittest.TestCase):
         self.assertEqual(final.generation, 3)
         self.assertEqual(self.reader.latest_generation(
             self.ctx, self.scope, self.environment_id), final)
+        self.assertEqual(self.reader.get_generation(
+            self.ctx, self.scope, self.environment_id, 1), first)
+        self.assertIsNone(self.reader.get_generation(
+            self.ctx, self.scope, self.environment_id, 99))
+        with self.assertRaises(ValueError):
+            self.reader.get_generation(self.ctx, self.scope, self.environment_id, True)
         self.assertEqual(self.reader.list_absence_candidates(
             self.ctx, self.scope, self.environment_id, 3), [('vm', 'vm-2', 1)])
         old = self.reader.list_observations(self.ctx, self.scope,
@@ -155,6 +161,8 @@ class DiscoveryPersistenceTests(unittest.TestCase):
             self.ctx, other_site, self.environment_id), [])
         self.assertIsNone(self.reader.latest_generation(
             self.ctx, other_site, self.environment_id))
+        self.assertIsNone(self.reader.get_generation(
+            self.ctx, other_site, self.environment_id, 1))
         self.assertEqual(self.reader.list_observations(
             self.ctx, other_site, self.environment_id, 1), [])
         with self.assertRaises(ValueError):
@@ -190,9 +198,12 @@ class DiscoveryPersistenceTests(unittest.TestCase):
                                                   campaign)
         self.writer.register_verified_campaign(self.ctx, self.environment_id,
                                                campaign)
+        self.writer.register_verified_campaign(self.ctx, self.environment_id,
+                                               campaign)
+        from dataclasses import replace
         with self.assertRaises(DiscoveryConflict):
             self.writer.register_verified_campaign(self.ctx, self.environment_id,
-                                                   campaign)
+                                                   replace(campaign, max_objects=99))
         if self.site_dsn:
             with self.psycopg.connect(self.site_dsn) as site:
                 site.execute(
@@ -201,6 +212,33 @@ class DiscoveryPersistenceTests(unittest.TestCase):
                     (self.ctx.organization_id, self.ctx.tenant_id))
                 with self.assertRaises(self.psycopg.Error):
                     site.execute('SELECT * FROM hosting_controlplane.discovery_campaigns')
+
+    def test_identical_result_retry_has_one_generation_and_rechecks_authority(self):
+        campaign = self._campaign('retry')
+        self.writer.register_verified_campaign(self.ctx, self.environment_id, campaign)
+        result = DiscoveryResult(campaign.campaign_id, campaign.digest(), campaign.scope,
+                                 datetime.now(timezone.utc), 'COMPLETE',
+                                 (self._object('vm-1', 'Name'),), (), ())
+        first = self.writer.publish_verified_result(self.ctx, self.environment_id, result)
+        second = self.writer.publish_verified_result(self.ctx, self.environment_id, result)
+        self.assertEqual(first, second)
+        self.assertEqual(len(self.reader.list_generations(
+            self.ctx, self.scope, self.environment_id)), 1)
+        changed = DiscoveryResult(campaign.campaign_id, campaign.digest(), campaign.scope,
+                                  result.captured_at, 'COMPLETE',
+                                  (self._object('vm-1', 'Changed'),), (), ())
+        with self.assertRaises(DiscoveryConflict):
+            self.writer.publish_verified_result(self.ctx, self.environment_id, changed)
+
+        class RevokedVerifier(_IndependentTestVerifier):
+            def verify_result(self, *_args):
+                raise PermissionError('Collector revoked')
+
+        revoked = DiscoveryRepository(lambda: self.psycopg.connect(self.ingest_dsn),
+                                      ingest_role='hosting_discovery_ingest',
+                                      ingest_verifier=RevokedVerifier())
+        with self.assertRaises(PermissionError):
+            revoked.publish_verified_result(self.ctx, self.environment_id, result)
 
 
 if __name__ == '__main__':

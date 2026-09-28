@@ -188,6 +188,21 @@ class DiscoveryRepository:
                     or proof.authorization_digest != campaign.digest()
                     or proof.result_digest is not None):
                 raise ValueError('Campaign verifier did not bind exact authorization')
+            # Serialize admission retries by immutable campaign identity. Live
+            # authority is checked above even when identical bytes already exist.
+            key = hashlib.sha256(_json(('campaign', ctx.organization_id,
+                                       ctx.tenant_id, campaign.campaign_id)).encode()).digest()
+            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
+                               (int.from_bytes(key[:8], 'big', signed=True),))
+            existing = connection.execute(
+                'SELECT environment_id, authorization_digest '
+                'FROM hosting_controlplane.discovery_campaigns '
+                'WHERE organization_id = %s AND tenant_id = %s AND campaign_id = %s',
+                (ctx.organization_id, ctx.tenant_id, campaign.campaign_id)).fetchone()
+            if existing is not None:
+                if existing != (environment_id, campaign.digest()):
+                    raise DiscoveryConflict('Campaign identity has different content or scope')
+                return
             try:
                 connection.execute(
                     'INSERT INTO hosting_controlplane.discovery_campaigns '
@@ -286,6 +301,21 @@ class DiscoveryRepository:
                 ctx, campaign.scope, environment_id)).encode('utf-8')).digest()
             connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
                                (int.from_bytes(key[:8], 'big', signed=True),))
+            # A response lost after commit must not create another generation.
+            # Changed bytes under the same campaign remain a hard conflict.
+            existing = connection.execute(
+                'SELECT generation, campaign_id, authorization_digest, result_digest, '
+                'captured_at, completeness, collection_errors, missing_privileges, '
+                'object_count FROM hosting_controlplane.discovery_generations '
+                'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
+                'AND site_id = %s AND security_domain_id = %s AND endpoint_id = %s '
+                'AND native_scope_id = %s AND platform_family = %s AND campaign_id = %s',
+                (*self._scope_args(ctx, campaign.scope, environment_id),
+                 campaign.campaign_id)).fetchone()
+            if existing is not None:
+                if existing[2] != campaign.digest() or existing[3] != result.digest:
+                    raise DiscoveryConflict('Campaign result has different immutable content')
+                return self._generation_row(environment_id, campaign.scope, existing)
             generation = connection.execute(
                 'SELECT COALESCE(MAX(generation), 0) + 1 '
                 'FROM hosting_controlplane.discovery_generations '
@@ -416,6 +446,23 @@ class DiscoveryRepository:
                 'AND native_scope_id = %s AND platform_family = %s '
                 'ORDER BY generation DESC LIMIT 1',
                 self._scope_args(ctx, scope, environment_id)).fetchone()
+        return self._generation_row(environment_id, scope, row) if row else None
+
+    def get_generation(self, ctx: TenantContext, scope: PlanScope,
+                       environment_id: str, generation: int) -> StoredGeneration | None:
+        """Read one exact generation without silently advancing a saved selection."""
+        self._require_scope(ctx, scope, environment_id)
+        if type(generation) is not int or generation < 1:
+            raise ValueError('An exact positive generation is required')
+        with self._session(ctx) as connection:
+            row = connection.execute(
+                'SELECT generation, campaign_id, authorization_digest, result_digest, '
+                'captured_at, completeness, collection_errors, missing_privileges, '
+                'object_count FROM hosting_controlplane.discovery_generations '
+                'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
+                'AND site_id = %s AND security_domain_id = %s AND endpoint_id = %s '
+                'AND native_scope_id = %s AND platform_family = %s AND generation = %s',
+                (*self._scope_args(ctx, scope, environment_id), generation)).fetchone()
         return self._generation_row(environment_id, scope, row) if row else None
 
     def list_observations(self, ctx: TenantContext, scope: PlanScope,
