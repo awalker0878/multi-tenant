@@ -244,6 +244,18 @@ class DiscoveryIngestTlsTests(unittest.TestCase):
             ['retained', 'campaign-commit', 'retained', 'result-commit'])
         self.assertEqual(len(self.retained_requests), 2)
 
+    def test_tls_trust_rotation_during_admission_rejects_old_socket_before_custody(self):
+        original = RecordingRepository.register_verified_campaign
+        def rotate_then_verify(repository, context, environment, campaign):
+            self.tls.reload_trust()
+            return original(repository, context, environment, campaign)
+        with patch.object(RecordingRepository, 'register_verified_campaign', rotate_then_verify):
+            status, _headers, body = self.request()
+        self.assertEqual(status, 403)
+        self.assertEqual(body['error'], 'DISCOVERY_AUTHORITY_DENIED')
+        self.assertEqual(self.events, [])
+        self.assertEqual(list(self.evidence.iterdir()), [])
+
     def test_missing_or_untrusted_client_certificate_fails_tls_before_repository(self):
         with self.assertRaises((ssl.SSLError, OSError, http.client.HTTPException)):
             self.request(worker=None)

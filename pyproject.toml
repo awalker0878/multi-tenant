@@ -31,6 +31,7 @@ hosting-operator = "provisioner.cli.operator:main"
 hosting-api = "provisioner.controlplane.api.server:main"
 hosting-evidence = "provisioner.controlplane.evidence.runtime:main"
 hosting-site-worker = "provisioner.controlplane.worker.runtime:main"
+hosting-discovery-ingest = "provisioner.controlplane.discovery.runtime:main"
 
 [tool.setuptools.packages.find]
 include = ["provisioner*", "hosting_resources", "tools", "scripts"]

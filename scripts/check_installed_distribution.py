@@ -38,12 +38,14 @@ from provisioner import repository
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
 from provisioner.controlplane.discovery import (adoption, assessment, grouping,
-                                                 model, persistence, routes)
+                                                 ingest, model, persistence, routes,
+                                                 runtime, trust, witness)
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
 for module in (provisioner, scripts, tools, hosting_resources, adoption, ahv, assessment, grouping,
-               model, openstack, persistence, routes, vmware, vmware_rest):
+               ingest, model, openstack, persistence, routes, runtime, trust,
+               vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
     'provisioner/schemas/v1/enterprise-record.schema.json',
@@ -92,6 +94,9 @@ assert any(e.name == 'hosting-evidence' and
            for e in distribution.entry_points)
 assert any(e.name == 'hosting-site-worker' and
            e.value == 'provisioner.controlplane.worker.runtime:main'
+           for e in distribution.entry_points)
+assert any(e.name == 'hosting-discovery-ingest' and
+           e.value == 'provisioner.controlplane.discovery.runtime:main'
            for e in distribution.entry_points)
 
 result = main(['plan', str(request)])
