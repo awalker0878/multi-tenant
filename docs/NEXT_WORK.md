@@ -4,12 +4,14 @@ The [execution plan](product/enterprise-workload-mobility-execution-plan.md) is 
 single current B01–B50 backlog. The [original audit](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
 and older automation/refactor ledgers remain historical evidence, not parallel
 completion authorities. Do not restart a superseded increment or mark the programme
-complete from its old W/C counts.
+complete from its old W/C counts. Use the
+[provisioning implementation index](provisioning/README.md) to locate maintained
+contracts, runtime owners and verification instructions.
 
 ## Current checkpoint
 
 The capability/profile pass gives all three platforms explicit coverage of 97
-workload dimensions, removes duplicated vocabulary and two obsolete runtime entry
+workload dimensions, removes duplicated vocabulary and five obsolete qualification entry
 points, enforces compute/storage/service requirements and retains every selected
 profile limitation. It updates the maintained RAD/TAD and associated design records.
 All selected installed tuples, native qualifications and release acceptance remain
