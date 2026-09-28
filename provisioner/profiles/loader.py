@@ -21,6 +21,7 @@ from pathlib import Path
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.capabilities import CAPABILITIES
+from provisioner.domain.capability_properties import parse_requirements
 from provisioner.domain.request import digest
 from hosting_resources import RESOURCE_ROOT as ROOT
 
@@ -42,6 +43,20 @@ CATALOG_KEYS = {'family', 'version', 'description', 'default', 'services', 'defa
                 'requestDefaults', 'profiles'}
 ENTRY_KEYS = {'profile', 'version', 'rank', 'status', 'description', 'requires',
               'platform_inputs', 'limits'}
+
+
+REQUIREMENT_KEYS = {
+    'assurance': frozenset(['capabilities', 'constraints', 'recovery_required']),
+    'availability': frozenset(['capabilities', 'constraints', 'min_workloads_per_zone', 'zones']),
+    'compute': frozenset(['boot_disk_gib', 'capabilities', 'constraints', 'flavor_class', 'memory_gib', 'vcpu', 'workloads_per_zone']),
+    'environment': frozenset(['assurance_min_rank', 'availability_min_rank', 'capabilities', 'constraints', 'lifecycle', 'recovery', 'security_min_rank']),
+    'network': frozenset(['address_family', 'capabilities', 'constraints', 'gateway_host_number', 'prefix_length']),
+    'placement': frozenset(['capabilities', 'constraints', 'selection']),
+    'recovery': frozenset(['capabilities', 'constraints', 'independent_site', 'recovery_zone', 'services']),
+    'security': frozenset(['capabilities', 'constraints', 'internet_egress', 'public_ingress', 'service_class', 'trust', 'zones']),
+    'service': frozenset(['binding_class', 'capabilities', 'constraints', 'service']),
+    'storage': frozenset(['capabilities', 'constraints', 'data_disk_gib', 'storage_class']),
+}
 
 
 def _relative(path: Path) -> str:
@@ -247,6 +262,9 @@ def _load_one(path: Path) -> tuple[str, dict]:
         if not isinstance(requirements, dict) or not isinstance(inputs, dict):
             raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile requirements and inputs must be mappings',
                                     path=relative)
+        if set(requirements) - REQUIREMENT_KEYS[family]:
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Unknown profile requirement field',
+                                    path=relative)
         capabilities = requirements.get('capabilities', [])
         if (not isinstance(capabilities, list)
                 or any(not isinstance(cap, str) for cap in capabilities)
@@ -258,6 +276,10 @@ def _load_one(path: Path) -> tuple[str, dict]:
                 or any(not isinstance(limit, str) or not limit.strip() for limit in limits)):
             raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile limits must be nonempty text entries',
                                     path=relative)
+        try:
+            parse_requirements(requirements.get('constraints', []), capabilities)
+        except ValueError as exc:
+            raise ProvisioningError('UNSUPPORTED_PROFILE', str(exc), path=relative) from exc
         entry_version = _version(row.get('version'), f'Profile {row.get("profile")}', relative)
         rank_key = (row['profile'].split('/', 1)[0] if '/' in row['profile'] else family, row['rank'])
         if row['profile'] in profiles or rank_key in ranks:

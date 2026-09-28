@@ -16,7 +16,7 @@ and invalid profile metadata rather than coercing them. Unsupported/deferred
 profiles remain refused. A profile being resolvable means its policy can be
 expanded; it is not proof of native execution, entitlement or qualification.
 
-This revision changes the reviewed compute/storage/recovery/service catalogue and
+This revision changes the reviewed security/compute/storage catalogue and
 profile versions. Existing plans need reassessment and new approval; do not reuse
 an approval made against the previous catalogue digest. The regenerated examples
 remain synthetic, disabled and unauthorized.
@@ -53,15 +53,19 @@ Reviewed as catalog revision `4`.
 
 ## Security
 
-Reviewed as catalog revision `8`.
+Reviewed as catalog revision `15`.
 
 | Profile | Rank | Status | Service class | Version |
 | --- | --- | --- | --- | --- |
-| `internal-baseline` | 1 | implemented | `standard` | 1 |
-| `protected-b-medium` | 2 | implemented | `protected-b`, distributed firewall | 1 |
-| `protected-b-high` | 3 | implemented | `protected-b`, dedicated edge context, native load balancer | 1 |
+| `internal-baseline` | 1 | implemented | `standard` | 2 |
+| `protected-b-medium` | 2 | implemented | `protected-b`, distributed firewall | 2 |
+| `protected-b-high` | 3 | implemented | `protected-b`, dedicated edge context, native load balancer | 2 |
 
 All three declare `public_ingress: false` and `internet_egress: false`.
+They require independent routing context and enforced deny-default gateway policy;
+profiles selecting distributed firewalling additionally require enforced policy
+across every selected workload NIC. Monitor mode or a gateway-only firewall does
+not fulfill that obligation.
 
 ## Assurance
 
@@ -94,24 +98,26 @@ Reviewed as catalog revision `13`.
 
 ## Compute
 
-Reviewed as catalog revision `11`.
+Reviewed as catalog revision `16`.
 
 | Profile | Rank | Status | Guest | Version |
 | --- | --- | --- | --- | --- |
-| `small` | 1 | implemented | 2 vCPU / 4 GiB / 40 GiB boot | 2 |
-| `medium` | 2 | implemented | 4 vCPU / 8 GiB / 60 GiB boot | 2 |
-| `large` | 3 | implemented | 8 vCPU / 16 GiB / 80 GiB boot | 2 |
-| `gpu` | 4 | **deferred** | no reviewed accelerator capacity or scheduling model | 2 |
+| `small` | 1 | implemented | 2 vCPU / 4 GiB / 40 GiB boot | 3 |
+| `medium` | 2 | implemented | 4 vCPU / 8 GiB / 60 GiB boot | 3 |
+| `large` | 3 | implemented | 8 vCPU / 16 GiB / 80 GiB boot | 3 |
+| `gpu` | 4 | **deferred** | no reviewed accelerator capacity or scheduling model | 3 |
+
+All compute profiles now explicitly require x86_64; GPU remains deferred.
 
 ## Storage
 
-Reviewed as catalog revision `12`.
+Reviewed as catalog revision `17`.
 
 | Profile | Rank | Status | Requires | Version |
 | --- | --- | --- | --- | --- |
 | `standard` | 1 | implemented | boot disk only | 2 |
 | `high-capacity` | 2 | implemented | boot disk plus a 100 GiB protected data volume | 2 |
-| `encrypted-high-capacity` | 3 | **deferred** | key custody and encryption qualification are not implemented | 2 |
+| `encrypted-high-capacity` | 3 | **deferred** | key custody and encryption qualification are not implemented | 3 |
 
 ## Network
 

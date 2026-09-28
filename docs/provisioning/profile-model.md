@@ -101,7 +101,7 @@ The result is a `Resolution` with no remaining `auto` value: `format`, `compute`
 `lifecycle`, `limits`, `network`, `platform_inputs`, `profiles`, `required_capabilities`,
 `service_class`, `services`, `storage`, `trust`, `zones`, and the reviewed revision
 set it resolved against — `profile_versions`, `catalog_versions`, `catalog_digest`.
-The resolution format is `hosting-profile-resolution/2`.
+The resolution format is `hosting-profile-resolution/3`.
 
 ## Rank
 
@@ -124,3 +124,20 @@ profile that changed and the `version` of its catalog. The golden corpus then ha
 be regenerated, because a plan binds the revision set and the change is visible in
 the desired state, the plan digest and the conformance report. That is the intended
 cost: a reviewed policy change must be visible in review.
+
+## Typed semantic constraints
+
+Profiles may declare bounded `requires.constraints` beneath existing capability
+IDs. Each entry contains exactly `property`, `operator` (`eq`, `gte`, `lte`) and
+`value`. Enumerations and booleans accept equality only; integer inequalities do
+not accept boolean or floating values. Every property must have its capability
+in `requires.capabilities`. All profile constraints intersect and contradictions
+fail before compilation. Resolution format 3 and the complete catalogue digest
+bind the property interpretation to plans.
+
+Placement evaluates each selected cluster's immutable `capability_properties`;
+missing observations cannot be borrowed from another cluster or inferred from a
+platform name. Policy capsule/realization format 2 requires destination constraints
+to entail the source obligations. See the
+[research decision record](../engineering/platform-migration-research.md) for types,
+version changes, known limitations and qualification boundaries.

@@ -68,6 +68,14 @@
                 "memory_gib_committed": 64,
                 "storage_gib_total": 4096,
                 "storage_gib_committed": 512
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             },
             {
@@ -98,6 +106,14 @@
                 "memory_gib_committed": 64,
                 "storage_gib_total": 4096,
                 "storage_gib_committed": 512
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             }
           ]
@@ -150,6 +166,14 @@
                 "memory_gib_committed": 32,
                 "storage_gib_total": 2048,
                 "storage_gib_committed": 256
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             },
             {
@@ -180,6 +204,14 @@
                 "memory_gib_committed": 32,
                 "storage_gib_total": 2048,
                 "storage_gib_committed": 256
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             }
           ]

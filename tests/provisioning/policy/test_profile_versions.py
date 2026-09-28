@@ -297,7 +297,7 @@ class VersionedIdentityTest(unittest.TestCase):
     def test_the_resolution_records_the_reviewed_revision_set(self):
         catalog = support.catalogs()
         resolution = support.reference_plan().resolution
-        self.assertEqual(resolution.format, 'hosting-profile-resolution/2')
+        self.assertEqual(resolution.format, 'hosting-profile-resolution/3')
         self.assertEqual(resolution.catalog_versions, catalog.versions)
         self.assertEqual(resolution.catalog_digest, catalog.digest)
         self.assertEqual(sorted(resolution.profile_versions),

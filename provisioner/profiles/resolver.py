@@ -13,9 +13,11 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from provisioner.domain.errors import ProvisioningError
+from provisioner.domain.capability_properties import (PropertyRequirement, contract_digest, merge_requirements,
+                                                     parse_requirements)
 from provisioner.profiles.loader import Catalog, Profile
 
-RESOLUTION_FORMAT = 'hosting-profile-resolution/2'
+RESOLUTION_FORMAT = 'hosting-profile-resolution/3'
 
 
 @dataclass(frozen=True)
@@ -35,6 +37,8 @@ class Resolution:
     limits: tuple[str, ...] = ()
     trust: str = ''
     service_class: str = ''
+    capability_constraints: tuple[PropertyRequirement, ...] = ()
+    capability_property_schema_digest: str = field(default_factory=contract_digest)
     format: str = RESOLUTION_FORMAT
 
     def to_dict(self) -> dict:
@@ -44,6 +48,8 @@ class Resolution:
                 'catalog_digest': self.catalog_digest,
                 'lifecycle': self.lifecycle, 'zones': list(self.zones),
                 'required_capabilities': list(self.required_capabilities),
+                'capability_constraints': [r.to_dict() for r in self.capability_constraints],
+                'capability_property_schema_digest': self.capability_property_schema_digest,
                 'compute': dict(self.compute), 'storage': dict(self.storage),
                 'network': dict(self.network), 'services': dict(self.services),
                 'platform_inputs': dict(self.platform_inputs),
@@ -124,6 +130,11 @@ def resolve(spec: dict, catalogs: Catalog) -> Resolution:
                 compute, storage, region, *service_profiles.values())
     if recovery is not None:
         selected += (recovery,)
+    try:
+        constraints = merge_requirements(*(parse_requirements(
+            p.requires.get('constraints', []), p.requires.get('capabilities', [])) for p in selected))
+    except ValueError as exc:
+        raise ProvisioningError('UNSUPPORTED_PROFILE', str(exc), path='$.spec') from exc
     limits = tuple(dict.fromkeys(limit for profile in selected
                                  for limit in profile.limits))
     return Resolution(
@@ -156,6 +167,7 @@ def resolve(spec: dict, catalogs: Catalog) -> Resolution:
         lifecycle=environment.requires.get('lifecycle', environment.profile),
         zones=zones,
         required_capabilities=tuple(sorted(capabilities)),
+        capability_constraints=constraints,
         compute={'vcpu': compute.requires['vcpu'], 'memory_gib': compute.requires['memory_gib'],
                  'boot_disk_gib': compute.requires['boot_disk_gib'],
                  'workloads_per_zone': compute.requires['workloads_per_zone'],

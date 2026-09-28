@@ -37,6 +37,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from provisioner.domain.errors import ProvisioningError
+from provisioner.domain.capability_properties import PropertyRequirement, evaluate
 from provisioner.domain.placement import (AUTHORITATIVE, FIXTURE, HOLD_CAPACITY_INSUFFICIENT,
                                           HOLD_CAPABILITY_NOT_QUALIFIED, HOLD_NO_COHERENT_ENVELOPE,
                                           HOLD_NO_ELIGIBLE_PLATFORM, HOLD_NO_ELIGIBLE_SITE,
@@ -97,6 +98,7 @@ class PlacementRequest:
     prefix_length: int = 27
     site_pin: str | None = None
     cell_pin: str | None = None
+    capability_constraints: tuple[PropertyRequirement, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -234,6 +236,10 @@ def _candidate(request: PlacementRequest, site: Site, cell: Cell, cluster: Clust
     if not cluster.supports(request.trust, request.service_class, request.tenant, request.wsd):
         blockers.append('cluster residency does not match trust, service class or tenant eligibility')
         codes.add(BLOCKER_RESIDENCY)
+    property_blockers = evaluate(request.capability_constraints, cluster.capability_properties)
+    if property_blockers:
+        blockers.extend(property_blockers)
+        codes.add(BLOCKER_CAPABILITY)
     if cell_blockers:
         blockers.append('cell lacks capabilities: ' + ', '.join(cell_blockers))
         codes.add(BLOCKER_CAPABILITY)

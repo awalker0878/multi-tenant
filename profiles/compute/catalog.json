@@ -1,12 +1,12 @@
 {
   "family": "compute",
-  "version": "11",
+  "version": "16",
   "description": "Compute profiles state portable guest sizing. Native flavour, template and image identity are resolved from reviewed inventory, never from the request.",
   "default": "medium",
   "profiles": [
     {
       "profile": "small",
-      "version": "2",
+      "version": "3",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Two-vCPU guest.",
@@ -20,6 +20,13 @@
           "boot_volume",
           "cpu_topology",
           "vm_create"
+        ],
+        "constraints": [
+          {
+            "property": "cpu_topology.architecture",
+            "operator": "eq",
+            "value": "x86_64"
+          }
         ]
       },
       "platform_inputs": {
@@ -30,12 +37,13 @@
         }
       },
       "limits": [
-        "Sizing is a request, not a native capacity confirmation"
+        "Sizing is a request, not a native capacity confirmation",
+        "This profile targets x86_64; changing ISA requires a separately reviewed application rebuild, not disk conversion"
       ]
     },
     {
       "profile": "medium",
-      "version": "2",
+      "version": "3",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Four-vCPU guest.",
@@ -49,6 +57,13 @@
           "boot_volume",
           "cpu_topology",
           "vm_create"
+        ],
+        "constraints": [
+          {
+            "property": "cpu_topology.architecture",
+            "operator": "eq",
+            "value": "x86_64"
+          }
         ]
       },
       "platform_inputs": {
@@ -59,12 +74,13 @@
         }
       },
       "limits": [
-        "Sizing is a request, not a native capacity confirmation"
+        "Sizing is a request, not a native capacity confirmation",
+        "This profile targets x86_64; changing ISA requires a separately reviewed application rebuild, not disk conversion"
       ]
     },
     {
       "profile": "large",
-      "version": "2",
+      "version": "3",
       "rank": 3,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Eight-vCPU guest.",
@@ -78,6 +94,13 @@
           "boot_volume",
           "cpu_topology",
           "vm_create"
+        ],
+        "constraints": [
+          {
+            "property": "cpu_topology.architecture",
+            "operator": "eq",
+            "value": "x86_64"
+          }
         ]
       },
       "platform_inputs": {
@@ -88,12 +111,13 @@
         }
       },
       "limits": [
-        "Sizing is a request, not a native capacity confirmation"
+        "Sizing is a request, not a native capacity confirmation",
+        "This profile targets x86_64; changing ISA requires a separately reviewed application rebuild, not disk conversion"
       ]
     },
     {
       "profile": "gpu",
-      "version": "2",
+      "version": "3",
       "rank": 4,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Accelerator-attached guest.",
@@ -108,11 +132,19 @@
           "cpu_topology",
           "gpu_passthrough",
           "vm_create"
+        ],
+        "constraints": [
+          {
+            "property": "cpu_topology.architecture",
+            "operator": "eq",
+            "value": "x86_64"
+          }
         ]
       },
       "platform_inputs": {},
       "limits": [
-        "Deferred: no reviewed accelerator capacity or scheduling model exists"
+        "Deferred: no reviewed accelerator capacity or scheduling model exists",
+        "This profile targets x86_64; changing ISA requires a separately reviewed application rebuild, not disk conversion"
       ]
     }
   ]

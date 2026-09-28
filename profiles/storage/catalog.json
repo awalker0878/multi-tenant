@@ -1,6 +1,6 @@
 {
   "family": "storage",
-  "version": "12",
+  "version": "17",
   "description": "Storage profiles state portable data sizing and the reviewed storage class. Native datastore, storage container and volume-type identity come from inventory.",
   "default": "standard",
   "profiles": [
@@ -44,7 +44,7 @@
     },
     {
       "profile": "encrypted-high-capacity",
-      "version": "2",
+      "version": "3",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Encrypted protected data volume.",
@@ -57,10 +57,18 @@
           "disk_order",
           "storage_encryption",
           "storage_placement"
+        ],
+        "constraints": [
+          {
+            "property": "storage_encryption.destination_key_ready",
+            "operator": "eq",
+            "value": true
+          }
         ]
       },
       "limits": [
-        "Deferred: key custody and encryption qualification are not implemented"
+        "Deferred: key custody and encryption qualification are not implemented",
+        "Source ciphertext or a KMS name is not destination key availability; guest, hypervisor and backend encryption are distinct"
       ]
     }
   ]
