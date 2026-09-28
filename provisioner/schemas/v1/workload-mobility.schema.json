@@ -108,7 +108,18 @@
         "method": {"enum": ["backup-restore", "block-copy", "object-copy", "database-native"]},
         "consistency": {"enum": ["crash", "application"]},
         "sourceRef": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$"},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "transferManifest": {
+          "type": "object",
+          "required": ["datasetId", "targetRef", "consistencyGroupId", "sha256"],
+          "additionalProperties": false,
+          "properties": {
+            "datasetId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+            "targetRef": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+            "consistencyGroupId": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
       }
     }
   }

@@ -12,34 +12,8 @@ from provisioner.execution.handoff import Step
 
 FORMAT = 'hosting-mobility-delivery-topology/1'
 
-STEPS = (
-    Step('migration-admission', 'acceptance'),
-    Step('target-capacity-reservation', 'capacity', ('migration-admission',)),
-    Step('target-address-allocation', 'ipam', ('target-capacity-reservation',)),
-    Step('target-dns-registration', 'dns', ('target-address-allocation',)),
-    Step('target-dns-propagation', 'dns_propagation', ('target-dns-registration',)),
-    Step('target-domain-plan', 'terraform_plan', ('target-address-allocation',)),
-    Step('target-domain-apply', 'terraform_apply', ('target-domain-plan',)),
-    Step('target-domain-acceptance', 'acceptance', ('target-domain-apply',)),
-    Step('target-edge-policy', 'edge_policy', ('target-domain-acceptance',)),
-    Step('target-workload-inputs', 'workload_inputs',
-         ('target-domain-apply', 'target-edge-policy')),
-    Step('target-workload-plan', 'terraform_plan', ('target-workload-inputs',)),
-    Step('target-workload-apply', 'terraform_apply', ('target-workload-plan',)),
-    Step('target-bootstrap', 'platform_transition',
-         ('target-domain-apply', 'target-edge-policy')),
-    Step('target-bootstrap-acceptance', 'acceptance', ('target-bootstrap',)),
-    Step('target-guest-plan', 'guest_plan', ('target-workload-apply',)),
-    Step('target-guest-apply', 'guest_apply', ('target-guest-plan',)),
-    Step('dataset-restore', 'restic', ('target-guest-apply',)),
-    Step('target-service-acceptance', 'acceptance',
-         ('target-guest-apply', 'target-dns-propagation', 'dataset-restore')),
-    Step('pre-cutover-campaign', 'target_campaign', ('target-service-acceptance',)),
-    Step('cutover-authorization', 'acceptance',
-         ('pre-cutover-campaign', 'target-bootstrap-acceptance')),
-    Step('post-cutover-campaign', 'target_campaign', ('cutover-authorization',)),
-)
-
+# These top-level responsibilities remain stable; dataset-specific bindings are
+# appended from the reviewed data plan rather than sharing a restore receipt.
 OPERATION_BINDINGS = {
     'migration-admission': 'migration-admission',
     'target-capacity': 'target-capacity-reservation',
@@ -49,32 +23,81 @@ OPERATION_BINDINGS = {
     'target-security-policy': 'target-edge-policy',
     'target-workloads': 'target-workload-apply',
     'target-guest-configuration': 'target-guest-apply',
-    'dataset-transfer': 'dataset-restore',
+    'dataset-transfer': 'target-service-acceptance',
     'target-services': 'target-service-acceptance',
     'cutover-qualification': 'pre-cutover-campaign',
     'cutover-authorization': 'cutover-authorization',
     'post-cutover-qualification': 'post-cutover-campaign',
 }
 
-REVIEWED_PARAMETERS = {
-    'migration-admission': {'purpose': 'admission'},
-    'target-capacity-reservation': {'action': 'reserve'},
-    'target-address-allocation': {'action': 'reserve'},
-    'target-dns-registration': {'action': 'register'},
-    'target-dns-propagation': {'dns_step': 'target-dns-registration'},
-    'target-domain-apply': {'prepared_step': 'target-domain-plan'},
-    'target-domain-acceptance': {'purpose': 'domain'},
-    'target-edge-policy': {'mode': 'bootstrap'},
-    'target-workload-inputs': {'domain_steps': ['target-domain-apply']},
-    'target-workload-apply': {'prepared_step': 'target-workload-plan'},
-    'target-bootstrap': {'prior_step': 'target-domain-apply', 'stage': 'bootstrap'},
-    'target-bootstrap-acceptance': {'purpose': 'bootstrap'},
-    'target-guest-plan': {'workload_step': 'target-workload-apply', 'mode': 'configure'},
-    'target-guest-apply': {'prepared_step': 'target-guest-plan'},
-    'dataset-restore': {'action': 'restore'},
-    'target-service-acceptance': {'purpose': 'services'},
-    'cutover-authorization': {'purpose': 'activation'},
-}
+
+def _target_step(name):
+    return {'admission': 'migration-admission',
+            'pre-activation-campaign': 'pre-cutover-campaign',
+            'activation': 'cutover-authorization',
+            'post-activation-campaign': 'post-cutover-campaign'}.get(name, 'target-' + name)
+
+
+def _dataset_sequence(data_plan):
+    steps, parameters, bindings, groups = [], {}, {}, {}
+    for row in data_plan['datasets']:
+        name = row['name']
+        step_id = 'dataset-restore-' + name
+        selected = (row['transfer_binding'] or {}) if row['delivery_kind'] == 'dataset_restore' else {}
+        group_id = selected.get('consistency_group_id')
+        # Missing mappings remain explicitly unbound. The plan is held and the
+        # runner refuses null bindings; no grant, digest or group is invented.
+        key = ('group', group_id) if group_id is not None else ('unbound', name)
+        item = {'step_id': step_id, 'dataset_id': selected.get('dataset_id'),
+                'target_ref': selected.get('target_ref'),
+                'transfer_manifest_sha256': selected.get('transfer_manifest_sha256')}
+        groups.setdefault(key, []).append(item)
+        steps.append(Step(step_id, 'dataset_restore', ('target-guest-apply',)))
+        parameters[step_id] = {'action': 'restore', 'source_scope': dict(row['source_scope']),
+                              'dataset_id': item['dataset_id'],
+                              'target_ref': item['target_ref'],
+                              'consistency_group_id': group_id,
+                              'transfer_manifest_sha256': item['transfer_manifest_sha256']}
+        bindings['dataset-transfer-' + name] = step_id
+    joins = []
+    for key, datasets in sorted(groups.items()):
+        join = 'dataset-group-' + digest(list(key))[:16]
+        steps.append(Step(join, 'dataset_acceptance', tuple(row['step_id'] for row in datasets)))
+        parameters[join] = {'group_id': key[1] if key[0] == 'group' else None,
+                            'datasets': datasets}
+        bindings[join] = join
+        joins.append(join)
+    return steps, parameters, bindings, joins
+
+
+def sequence(target_plan, data_plan):
+    """Reuse the ordinary native bootstrap graph and join every dataset group."""
+    dataset_steps, dataset_parameters, dataset_bindings, joins = _dataset_sequence(data_plan)
+    steps = []
+    for step in delivery_handoff.sequence(target_plan):
+        if step.id == 'backup-retention':
+            steps.extend(dataset_steps)
+            continue
+        dependencies = []
+        for predecessor in step.needs:
+            dependencies.extend(joins if predecessor == 'backup-retention'
+                                else [_target_step(predecessor)])
+        steps.append(Step(_target_step(step.id), step.kind, tuple(dependencies)))
+    parameters = {}
+    references = {'prepared_step', 'prior_step', 'workload_step', 'dns_step'}
+    for step_id, values in delivery_handoff.reviewed_parameters(target_plan).items():
+        if step_id == 'backup-retention':
+            continue
+        values = dict(values)
+        for key in references & values.keys():
+            values[key] = _target_step(values[key])
+        if 'domain_steps' in values:
+            values['domain_steps'] = [_target_step(value) for value in values['domain_steps']]
+        parameters[_target_step(step_id)] = values
+    parameters.update(dataset_parameters)
+    bindings = dict(OPERATION_BINDINGS)
+    bindings.update(dataset_bindings)
+    return steps, parameters, bindings
 
 
 def catalog_ids(target_plan) -> dict:
@@ -88,19 +111,14 @@ def catalog_ids(target_plan) -> dict:
 def topology_intent(target_plan, *, policy_plan: dict, data_plan: dict,
                     cutover_plan: dict, artifact_realizations: dict) -> dict:
     """The approval-critical target delivery topology for one migration."""
-    catalogs = catalog_ids(target_plan)
-    parameters = {key: dict(value) for key, value in REVIEWED_PARAMETERS.items()}
-    if catalogs.get('domains'):
-        parameters['target-domain-plan'] = {'catalog_id': catalogs['domains']}
-    if catalogs.get('workloads'):
-        parameters['target-workload-plan'] = {'catalog_id': catalogs['workloads']}
+    steps, parameters, bindings = sequence(target_plan, data_plan)
 
     body = {
         'format': FORMAT,
         'scope': dict(target_plan.identity.scope),
         'generation': target_plan.generation,
-        'steps': [step.to_dict() for step in STEPS],
-        'operation_bindings': dict(sorted(OPERATION_BINDINGS.items())),
+        'steps': [step.to_dict() for step in steps],
+        'operation_bindings': dict(sorted(bindings.items())),
         'reviewed_parameters': parameters,
         'policy_digest': policy_plan['digest'],
         'data_transfer_digest': data_plan['digest'],
@@ -113,6 +131,8 @@ def topology_intent(target_plan, *, policy_plan: dict, data_plan: dict,
         'limits': [
             'This topology is executed only by the existing hosting-delivery/2 runner',
             'Private binaries, credentials, runtime paths and predecessor receipts remain owner packet inputs',
+            'Every dataset has a distinct manifest-bound restore and all consistency groups join before service acceptance',
+            'File-byte verification is separate from application consistency, native qualification and cutover authority',
             'Source retirement is deliberately not mixed into the target platform scope',
         ],
     }
