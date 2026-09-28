@@ -7,7 +7,7 @@ resource package, so reviewed evidence links have the same meaning after install
 
 import json
 from pathlib import Path
-from shutil import copy2
+from shutil import copy2, rmtree
 
 from setuptools import setup
 from setuptools.command.build_py import build_py
@@ -59,8 +59,22 @@ class BuildRuntime(build_py):
         if missing:
             raise FileNotFoundError(f'Incomplete runtime distribution: {missing}')
 
+        build_root = Path(self.build_lib)
+        destination = build_root / 'hosting_resources' / '_assets'
+        # Setuptools reuses build/lib. A previously built layout must not leak
+        # shared data directories or deleted resources into the next wheel.
+        retired = [build_root / name for name in
+                   ('profiles', 'policy', 'sources', 'terraform', 'ansible', 'config', 'docs')]
+        retired.extend((build_root / 'provisioner' / '_assets', destination))
+        for path in retired:
+            if path.is_symlink() or not path.resolve().is_relative_to(build_root.resolve()):
+                raise ValueError(f'Unsafe runtime build directory: {path}')
+            if path.exists():
+                if not path.is_dir():
+                    raise ValueError(f'Runtime build directory is not a directory: {path}')
+                rmtree(path)
+
         super().run()
-        destination = Path(self.build_lib) / 'hosting_resources' / '_assets'
         for directory in ("profiles", "policy", "sources", "terraform", "ansible", "config"):
             for item in sorted((source / directory).rglob("*")):
                 if not item.is_file() or "__pycache__" in item.parts:

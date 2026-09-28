@@ -35,6 +35,15 @@ class InstalledDistributionTest(unittest.TestCase):
         cls.work.mkdir()
         cls.env = {key: value for key, value in os.environ.items()
                    if not key.startswith(('PYTHON', 'PIP_'))}
+        cls.staging = cls.base / 'incremental-build'
+        cls.retired = ('profiles', 'policy', 'sources', 'terraform', 'ansible',
+                       'config', 'docs', 'provisioner/_assets')
+        for relative in (*cls.retired, 'hosting_resources/_assets/obsolete'):
+            path = cls.staging / relative / 'stale.json'
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('{}', encoding='utf-8')
+        cls.run_checked([sys.executable, 'setup.py', 'build_py', '--build-lib',
+                         str(cls.staging)], cwd=cls.source)
         cls.run_checked([sys.executable, 'setup.py', 'sdist', '--dist-dir',
                          str(cls.base / 'dist')], cwd=cls.source)
         archive, = (cls.base / 'dist').glob('*.tar.gz')
@@ -79,6 +88,12 @@ class InstalledDistributionTest(unittest.TestCase):
                      'terraform/catalog.json', 'ansible/catalog.json',
                      'config/toolchain.json'):
             self.assertIn('hosting_resources/_assets/' + name, members)
+
+    def test_incremental_build_removes_retired_and_deleted_resources(self):
+        for relative in self.retired:
+            self.assertFalse((self.staging / relative).exists(), relative)
+        self.assertFalse((self.staging / 'hosting_resources/_assets/obsolete').exists())
+        self.assertTrue((self.staging / 'hosting_resources/_assets/terraform/catalog.json').is_file())
 
     def test_installed_planning_loads_owner_modules_and_all_resources(self):
         result = self.probe('''
