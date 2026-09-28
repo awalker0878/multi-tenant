@@ -54,6 +54,7 @@ TOPOLOGY_KEYS = ('format', 'steps', 'operationBindings', 'reviewedParameters',
 #: against them, so a kind or a grammar the runner adds cannot drift unnoticed.
 KINDS = frozenset({
     'openstack_quota', 'edge_containment', 'remote_owner', 'restic',
+    'dataset_restore', 'dataset_acceptance',
     'platform_transition', 'workload_inputs', 'capacity', 'acceptance',
     'retirement_review', 'operations_review', 'operations_alerts', 'terraform_plan',
     'terraform_apply', 'terraform_approval', 'guest_plan', 'guest_apply', 'vsphere_power', 'target_campaign',
@@ -483,6 +484,9 @@ _DECLARED_PARAMETERS = {
     'edge_containment': frozenset({'nft', 'nft_sha256'}),
     'remote_owner': frozenset({'ssh', 'ssh_sha256'}),
     'restic': frozenset({'action', 'restic', 'restic_sha256', 'target'}),
+    'dataset_restore': frozenset({'action','restic','restic_sha256','target','transfer_manifest_sha256',
+                                  'dataset_id','target_ref','consistency_group_id','source_scope'}),
+    'dataset_acceptance': frozenset({'group_id','datasets'}),
     'platform_transition': frozenset({'prior_step', 'stage'}),
     'workload_inputs': frozenset({'domain_steps', 'selected_input'}),
     'capacity': frozenset({'action', 'database'}),

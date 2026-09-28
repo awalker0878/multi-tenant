@@ -15,6 +15,9 @@ KINDS = {
     'edge_containment': ({'nft','nft_sha256'}, {'spec','authority'}, set()),
     'remote_owner': ({'ssh','ssh_sha256'}, {'job','target','ssh_key','ssh_certificate'}, set()),
     'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority','transfer_manifest'}),
+    'dataset_restore': ({'action','restic','restic_sha256','target','transfer_manifest_sha256','dataset_id','target_ref','consistency_group_id','source_scope'},
+                        {'config','credentials','receipt','manifest','restore_authority','transfer_manifest'}, {'ca_bundle'}),
+    'dataset_acceptance': ({'group_id','datasets'}, set(), set()),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
@@ -81,10 +84,11 @@ def validate_packet(step, packet, plan, base):
             'plan_sha256':c.digest(plan),'step_id':step['id'],'dependencies':packet['dependencies']},
             'Remote owner job belongs to another coordinator handoff')
         remote_owner.validate(load_private(files['target']),job)
-    if kind=='restic':
+    if kind in {'restic','dataset_restore'}:
         from tools.restic_run import validate
         config=load_private(files['config']); validate(config)
-        restic_transfer(packet,files,plan)
+        transfer=restic_transfer(packet,files,plan)
+        if kind=='dataset_restore': dataset_binding(values,transfer)
         require(config['restic_sha256']==values['restic_sha256'],'Backup executable binding changed')
         require(values['action'] in {'backup','restore'},'Unknown backup transition')
         restore_files={'receipt','manifest','restore_authority'}
@@ -149,6 +153,7 @@ def validate_packet(step, packet, plan, base):
             from tools.capacity_demand import check_ancestors
             check_ancestors(step,plan,base,load_private(files['inputs']),
                             cloud_sha256=digest(read_private(files['cloud'])) if 'cloud' in files else None)
+    if kind=='dataset_acceptance': dataset_group(step,packet,base,plan)
     if kind=='retirement_review':
         from tools.retirement import validate_evidence
         retirement_plan=load_private(files['plan'])
@@ -274,8 +279,12 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
                        owner_ledger(base,'edge_policy'),directory/'execution')
         write_new(directory/'containment.json',read_private(directory/'execution/containment.json'))
         names=['containment.json']
-    elif kind=='restic':
+    elif kind in {'restic','dataset_restore'}:
         from tools.restic_run import execute
+        if kind=='dataset_restore':
+            from tools.restic_transfer import TransferGuard
+            require(isinstance(transfer_guard,TransferGuard) and transfer_guard.step_id==step['id'],
+                    'Dataset restore requires live trusted worker authority for this exact child step')
         result=execute(values['action'],load_private(files['config']),load_private(files['credentials']),
             values['restic'],directory/'execution',ca_file=files.get('ca_bundle'),
             receipt=load_private(files['receipt']) if 'receipt' in files else None,
@@ -316,6 +325,9 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
             for name,value in {'result.json':result,'capacity-request.json':request,'sizing.json':sizing,
                                'demand.json':bind_request(request,load_private(files['inputs']),sizing)}.items():
                 write_new(directory/name,encoded(value)); names.append(name)
+    elif kind=='dataset_acceptance':
+        result=dataset_group(step,packet,base,plan)
+        write_new(directory/'result.json',encoded(result)); names=['result.json']
     elif kind=='retirement_review':
         from tools.retirement import evaluate
         result=evaluate(load_private(files['plan']),load_private(files['evidence']))
@@ -435,6 +447,33 @@ def complete(step,packet,directory,plan,result,names):
     return result,names+['owner-completion.json']
 
 
+def dataset_binding(values,transfer):
+    require(values['action']=='restore' and transfer is not None,
+            'Dataset restore requires an exact cross-scope transfer')
+    spec=transfer['transfer']['spec']
+    require(values['source_scope']==transfer['source_execution_scope']
+            and values['transfer_manifest_sha256']==digest(encoded(transfer))
+            and (values['dataset_id'],values['target_ref'],values['consistency_group_id'])==
+                (spec['datasetId'],spec['targetRef'],spec['consistencyGroupId']),
+            'Dataset restore differs from the reviewed manifest or mapping')
+
+
+def dataset_group(step,packet,base,plan):
+    from tools.dataset_acceptance import validate_group
+    values=packet['parameters']; datasets=values['datasets']
+    require(isinstance(datasets,list) and datasets,'A dataset group requires every declared member')
+    require(set(step['needs'])=={row['step_id'] for row in datasets},
+            'Dataset group must depend on exactly its declared restore steps')
+    records={}
+    for row in datasets:
+        path=dependency(step,row['step_id'],'dataset_restore',plan,base)
+        records[row['step_id']]={
+            'transfer_manifest':load_private(path/'transfer-manifest.json'),
+            'transfer_receipt':load_private(path/'transfer-receipt.json'),
+            'restore_receipt':load_private(path/'receipt.json')}
+    return validate_group(values['group_id'],datasets,records,plan['scope'])
+
+
 def restic_transfer(packet,files,plan):
     """Separate source ownership from the destination transfer evidence.
 
@@ -491,6 +530,8 @@ def typed_postcondition(step,result,directory,packet,plan):
         'terraform_approval':'EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED',
         'terraform_apply':'APPLIED_REQUIRES_NATIVE_ACCEPTANCE',
         'vsphere_power':'POWER_CHANGED_REQUIRES_NATIVE_ACCEPTANCE',
+        'dataset_restore':'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
+        'dataset_acceptance':'DATASET_GROUP_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
     }
     if step['kind'] in expected:
         require(result.get('status')==expected[step['kind']],
@@ -685,6 +726,10 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='dataset_acceptance':
+            result=dataset_group(step,packet,base,plan)
+            retain(directory/'result.json',encoded(result))
+            return complete(step,packet,directory,plan,result,['result.json'])
         if kind=='openstack_quota':
             return quota_dispatch(step,packet,directory,base,plan,root,observe=True,recovery_authority=recovery_authority)
         if kind=='dns_propagation':
@@ -769,9 +814,10 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                     'Recovered incident receipt changed')
             retain(directory/'containment.json',read_private(original))
             return complete(step,packet,directory,plan,result,['containment.json'])
-        if kind=='restic':
+        if kind in {'restic','dataset_restore'}:
             files=file_paths(packet); values=packet['parameters']; config=load_private(files['config'])
             transfer=restic_transfer(packet,files,plan)
+            if kind=='dataset_restore': dataset_binding(values,transfer)
             context=load_private(directory/'execution/context.json')
             original=load_private(files['receipt']) if 'receipt' in files else None
             expected=load_private(files['manifest']) if 'manifest' in files else None
@@ -854,6 +900,8 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     result=load_private(directory/'result.json') if (directory/'result.json').exists() else {'status':completed['status']}
     require(result.get('status')==completed['status'],'Retained owner status changed')
     typed_postcondition(step,result,directory,packet,plan)
+    if step['kind']=='dataset_acceptance':
+        require(result==dataset_group(step,packet,base,plan),'Retained dataset group evidence changed')
     if step['kind']=='acceptance' and packet['parameters']['purpose']=='bootstrap':
         bootstrap_postconditions(step,plan,base)
     return result,list(completed['artifacts'])+['owner-completion.json']
