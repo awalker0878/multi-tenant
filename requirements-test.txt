@@ -1,1 +1,3 @@
 -r requirements-runtime.txt
+setuptools>=80,<85
+wheel>=0.45,<1
