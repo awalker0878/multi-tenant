@@ -34,6 +34,13 @@ def proof(side: str, selected: InstalledTuple, digest: str) -> QualificationEvid
 
 
 class DirectedRouteTests(unittest.TestCase):
+    def test_same_platform_relocation_is_not_a_cross_family_method(self):
+        with self.assertRaises(ValueError):
+            replace(KEY, method='SAME_PLATFORM_RELOCATION')
+        same_family = replace(TARGET, scope=replace(TARGET.scope, platform_family='vmware'))
+        route = replace(KEY, destination=same_family, method='SAME_PLATFORM_RELOCATION')
+        self.assertEqual(RouteCatalogue().evaluate(route, as_of=NOW).status, 'UNKNOWN')
+
     def test_exact_direction_and_destination_only(self):
         catalogue = RouteCatalogue((RouteClaim(
             KEY, 'NATIVE_QUALIFIED', (proof('SOURCE_EXIT', SOURCE, '1'),

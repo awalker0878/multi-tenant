@@ -19,6 +19,29 @@ class _StrictModel(BaseModel):
 _ID = r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'
 
 
+class AssessmentSelectionInput(_StrictModel):
+    environment_id: str = Field(alias='environmentId', pattern=_ID)
+    generation: int = Field(ge=1, le=2**63 - 1)
+
+
+class AssessmentDestinationInput(AssessmentSelectionInput):
+    capacity_kind: Literal['pool', 'cluster', 'quota', 'datastore'] | None = Field(
+        default=None, alias='capacityKind')
+    capacity_native_id: str | None = Field(default=None, alias='capacityNativeId',
+                                          min_length=1, max_length=512)
+
+
+class AssessmentRequest(_StrictModel):
+    source: AssessmentSelectionInput
+    workload_native_id: str = Field(alias='workloadNativeId', min_length=1, max_length=512)
+    destinations: list[AssessmentDestinationInput] = Field(min_length=2, max_length=20)
+    method: Literal['REBUILD_RESTORE', 'COLD_VM_CONVERSION',
+                    'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE', 'WARM_VM_TRANSFER']
+    guest_profile: str = Field(alias='guestProfile', pattern=_ID)
+    network_mode: str = Field(alias='networkMode', pattern=_ID)
+    data_mode: str = Field(alias='dataMode', pattern=_ID)
+
+
 class KnownInteger(_StrictModel):
     state: Literal['KNOWN']
     value: int = Field(ge=0)

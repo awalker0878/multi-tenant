@@ -76,6 +76,9 @@ class RouteKey:
             raise ValueError('An exact directed route and supported method are required')
         if self.source.scope == self.destination.scope:
             raise ValueError('A route needs distinct source and destination native scopes')
+        if (self.method == 'SAME_PLATFORM_RELOCATION'
+                and self.source.scope.platform_family != self.destination.scope.platform_family):
+            raise ValueError('Same-platform relocation requires matching platform families')
 
 
 @dataclass(frozen=True)

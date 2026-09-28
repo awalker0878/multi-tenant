@@ -46,11 +46,15 @@ from provisioner.controlplane.persistence.environments import (
 from provisioner.controlplane.discovery.persistence import (
     DiscoveryRepository, StoredGeneration, StoredObservation,
 )
+from provisioner.controlplane.discovery.service import (
+    AssessmentDestination, AssessmentSelection, AssessmentService,
+)
+from provisioner.controlplane.discovery.normalization import NormalizationHeld
 from provisioner.domain.enterprise_records import validate_record
 
 from .body_limit import BodyLimitMiddleware
 from .portal import PortalConfig, mount_portal
-from .models import (AccessPage, ApprovalReceipt, ApprovalRequest,
+from .models import (AccessPage, ApprovalReceipt, ApprovalRequest, AssessmentRequest,
                      DiscoveryGenerationPage, DiscoveryGenerationView,
                      EnvironmentCreate, EnvironmentPage, EnvironmentView,
                      ErrorResponse, JobEventPage, JobEventView, JobView,
@@ -206,6 +210,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                jobs: JobRepository, environments: EnvironmentRepository, *,
                evidence_gate: EvidenceMutationGate,
                discovery: DiscoveryRepository | None = None,
+               assessment_inputs=None,
                max_body_bytes: int = 1024 * 1024,
                clock: Callable[[], datetime] | None = None,
                portal_config: PortalConfig | None = None) -> FastAPI:
@@ -215,6 +220,8 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             or not isinstance(jobs, JobRepository)
             or not isinstance(environments, EnvironmentRepository)
             or discovery is not None and not isinstance(discovery, DiscoveryRepository)
+            or assessment_inputs is not None and (
+                discovery is None or not callable(getattr(assessment_inputs, 'bind', None)))
             or evidence_gate is None
             or not callable(getattr(evidence_gate, 'require', None))):
         raise TypeError('Real record, authority, job and evidence services are required')
@@ -483,6 +490,44 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                       for row in page],
             'nextAfter': cursor,
         })
+
+    @app.post('/v1/assessments/compare', responses=_ERRORS, tags=['discovery'])
+    def compare_destinations(document: AssessmentRequest,
+                             active: _Session = Depends(session)) -> dict:
+        # Resolve every selection before any inventory is read. No request can
+        # supply its own installed tuple, qualification, principal or findings.
+        visible_environment(active, document.source.environment_id)
+        for target in document.destinations:
+            visible_environment(active, target.environment_id)
+        if assessment_inputs is None:
+            raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
+                            'Independently verified assessment inputs are unavailable')
+        try:
+            service = AssessmentService(discovery_repository(),
+                                        assessment_inputs.bind(active.credential), clock=now)
+            comparison = service.compare(
+                context(active), active.principal.subject,
+                AssessmentSelection(document.source.environment_id,
+                                    document.source.generation),
+                document.workload_native_id,
+                tuple(AssessmentDestination(
+                    AssessmentSelection(target.environment_id, target.generation),
+                    target.capacity_kind, target.capacity_native_id)
+                    for target in document.destinations),
+                method=document.method, guest_profile=document.guest_profile,
+                network_mode=document.network_mode, data_mode=document.data_mode)
+        except (PermissionError, AuthenticationFailed, AuthorityDenied):
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found') from None
+        except NormalizationHeld:
+            raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
+                            'Pinned inventory integrity requires operator review') from None
+        except ValueError:
+            raise _ApiError(422, 'ASSESSMENT_SELECTION_INVALID',
+                            'Assessment selection or route is invalid') from None
+        except (RuntimeError, OSError):
+            raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
+                            'Verified assessment inputs are temporarily unavailable') from None
+        return comparison.to_document()
 
     @app.post('/v1/environments', status_code=201,
               response_model=EnvironmentView, responses=_ERRORS,
