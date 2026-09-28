@@ -1,0 +1,78 @@
+name: Publish reviewed compiler ownership
+on:
+  push:
+    branches: ['implementation/all-waves']
+    paths: ['.github/workflows/compiler-owner-refactor.yml']
+permissions:
+  contents: write
+concurrency:
+  group: reviewed-compiler-publication
+  cancel-in-progress: false
+jobs:
+  reviewed-compiler:
+    if: github.ref == 'refs/heads/implementation/all-waves'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Verify reviewed source and transformation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, os, subprocess
+          from pathlib import Path
+          expected={
+            '.github/compiler-owner-refactor.py':'9e847955f094a1a55eec2e0ea44f15196b8c53a6948817a182a0c993aa0663d9',
+            '.github/compiler-owner-input-tests.py':'b317023051b34a33be642049e7088a795b3f7e8a3c004b932b1a69610de513ce'}
+          for path,checksum in expected.items():
+              if hashlib.sha256(Path(path).read_bytes()).hexdigest()!=checksum:
+                  raise SystemExit('Reviewed transport checksum mismatch: '+path)
+          env=dict(os.environ,GIT_INDEX_FILE=str(Path(os.environ['RUNNER_TEMP'])/'review-input-index'))
+          subprocess.run(['git','read-tree','HEAD'],env=env,check=True)
+          subprocess.run(['git','update-index','--force-remove',*expected,'.github/workflows/compiler-owner-refactor.yml'],env=env,check=True)
+          if subprocess.check_output(['git','write-tree'],env=env).decode().strip()!='027c02b96dfcadcdb8ccd602fe7129dc6cf0a3b6':
+              raise SystemExit('Concurrent source changes detected; publication refused')
+          PY
+      - name: Apply the reviewed relocation without compatibility entry points
+        run: python .github/compiler-owner-refactor.py
+      - name: Install repository and wheel-test dependencies
+        run: python -m pip install -r requirements-repository.txt 'setuptools>=80,<85' 'wheel>=0.45,<1'
+      - name: Verify compiler, callers, retirement and unchanged golden outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest tests.test_compile_wsd tests.test_wsd_compiler_input tests.test_private_handoff_json tests.test_retired_interfaces tests.provisioning.adapters.test_adapters tests.provisioning.adapters.test_adapter_contract tests.provisioning.compiler.test_cross_platform tests.provisioning.unit.test_architecture tests.provisioning.end_to_end.test_golden
+          python -m unittest tests.test_main_integration tests.provisioning.documentation.test_documentation
+          python scripts/build_wsd_compositions.py --check
+          python scripts/check_documentation.py
+          python scripts/check_repository.py
+          python scripts/check_retired_interfaces.py
+          python scripts/check_installed_distribution.py
+      - name: Verify exact reviewed output and publish by ordinary fast-forward
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'Repository review'
+          git config user.email 'review@users.noreply.github.com'
+          git add README.md docs provisioner scripts setup.py sources/documentation/current_design_records.json tests tools
+          python - <<'PY'
+          import os, subprocess
+          from pathlib import Path
+          candidate=subprocess.check_output(['git','write-tree']).decode().strip()
+          env=dict(os.environ,GIT_INDEX_FILE=str(Path(os.environ['RUNNER_TEMP'])/'review-output-index'))
+          subprocess.run(['git','read-tree',candidate],env=env,check=True)
+          subprocess.run(['git','update-index','--force-remove','.github/compiler-owner-refactor.py','.github/compiler-owner-input-tests.py','.github/workflows/compiler-owner-refactor.yml'],env=env,check=True)
+          actual=subprocess.check_output(['git','write-tree'],env=env).decode().strip()
+          if actual!='c6ebf21cbd95229e81903c0304d1e37091cc3e55':
+              raise SystemExit('Reviewed output tree mismatch: '+actual)
+          print('Exact reviewed source tree verified:',actual)
+          PY
+          git commit -m 'refactor(compiler): own WSD implementation and declarations without legacy wrappers'
+          test -z "$(git status --porcelain --untracked-files=no)"
+          git push origin HEAD:refs/heads/implementation/all-waves
