@@ -63,7 +63,8 @@ The equivalent CLI command is:
 ```
 
 Repeat `--destination ENVIRONMENT GENERATION` for 2–20 distinct destinations.
-The source cannot also be a destination. `--capacity ENVIRONMENT KIND NATIVE_ID`
+The source cannot also be a destination; two declarations for the same native
+endpoint/scope cannot count as distinct candidates. `--capacity ENVIRONMENT KIND NATIVE_ID`
 is optional per destination; supported kinds are `pool`, `cluster`, `quota` and
 `datastore`. These values select observations; they do not assert qualification.
 
@@ -93,6 +94,11 @@ foreign identities; unavailable assessment configuration returns
 the [assessment evidence guide](../operations/assessment-evidence-ingest.md).
 Missing route or control evidence produces explicit unknowns. The response pins
 raw and normalized input digests and reports `executionAuthorized: false`.
+It also identifies a selected generation superseded by a newer observation.
+Historical pins remain unchanged; any newer source or destination generation,
+including partial or unknown coverage, withholds current eligibility with a
+snapshot-superseded reason. Refresh the selection and review the new inputs
+rather than carrying an earlier positive result forward.
 
 ## Interpret a destination assessment
 

@@ -43,7 +43,9 @@ Required checks and native qualification must still bind the final delivery revi
   and control inputs feed generation-pinned normalization and the scoped compare
   API, portal and CLI. Tests cover signature/revocation negatives, actual local
   TLS, real PostgreSQL role/RLS and publication, API access and stale UI state.
-  Conflicting VM/NIC/quota facts remain unknown. Native collector/profile and
+  Conflicting VM/NIC/quota facts remain unknown; duplicate native scopes cannot
+  pad destination counts, and superseded generation pins cannot retain current
+  eligibility. Native collector/profile and
   credential wiring, complete fact coverage, persisted owner/dependency review,
   scheduling and estate qualification still keep Wave 2 partial.
 - B24's lower-level delivery path now includes bootstrap prepare/plan/apply and

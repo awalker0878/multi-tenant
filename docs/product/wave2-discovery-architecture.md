@@ -76,6 +76,10 @@ generations/digests and report `ELIGIBLE`, `CONDITIONAL`, `BLOCKED` or `UNKNOWN`
 with reasons, remediation and confidence. Copy-phase estimates are explicitly
 uncertain. The [operator guide](wave2-operator-guide.md) describes selectors and
 failure behavior. Comparisons never mint plan approval or start a native job.
+Multiple registrations for one native scope cannot pad the comparison. A newer
+generation supersedes an older pin for current eligibility even when the new
+collection is partial or unknown; the historical digest stays unchanged and the
+new observation metadata and hold reason remain visible.
 
 ## Remaining delivery and acceptance sequence
 

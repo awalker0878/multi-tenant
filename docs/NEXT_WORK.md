@@ -57,7 +57,10 @@ pinned generations, normalizes supported facts and returns reasons, remediation,
 confidence and input digests. Missing routes, capacity or reviews remain unknown;
 contradictory CPU, memory, NIC or quota facts cannot become a generous capacity
 estimate. The [operator guide](product/wave2-operator-guide.md) describes API,
-portal and thin-CLI use. No comparison grants execution authority.
+portal and thin-CLI use. Duplicate declarations for one native scope cannot pad
+destination counts. A newer observation withholds current eligibility for an old
+pin, including when the new generation is partial or unknown. No comparison
+grants execution authority.
 
 Remaining repository work includes native collector transport/credential wiring,
 complete per-platform VM/device/capacity fact coverage, persisted application
