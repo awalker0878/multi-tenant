@@ -7,13 +7,18 @@ DDL and IAM synchronization run with separate credentials outside this service.
 from __future__ import annotations
 
 import os
+import base64
+import binascii
 from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Mapping
 
 import psycopg
 import uvicorn
 from fastapi import FastAPI
 from psycopg.conninfo import conninfo_to_dict
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from provisioner.controlplane.authority.directory import PostgresRoleDirectory
 from provisioner.controlplane.authority.oidc import OIDCIdentityProvider
@@ -61,10 +66,27 @@ class ServiceSettings:
     step_up_acr: frozenset[str]
     evidence_config: EvidenceRuntimeConfig | None = None
     portal: PortalConfig | None = None
+    assessment_trust_path: str | None = None
+    assessment_authority_public_key: str | None = None
+    assessment_minimum_revision: int | None = None
     listen_host: str = '127.0.0.1'
     listen_port: int = 8080
 
     def __post_init__(self) -> None:
+        assessment = (self.assessment_trust_path, self.assessment_authority_public_key,
+                      self.assessment_minimum_revision)
+        if any(value is not None for value in assessment):
+            if (not all(value is not None for value in assessment)
+                    or not isinstance(self.assessment_trust_path, str)
+                    or not Path(self.assessment_trust_path).is_absolute()
+                    or type(self.assessment_minimum_revision) is not int
+                    or self.assessment_minimum_revision < 1):
+                raise ValueError('Assessment trust requires an absolute path, pinned key and revision')
+            try:
+                Ed25519PublicKey.from_public_bytes(base64.b64decode(
+                    self.assessment_authority_public_key, validate=True))
+            except (ValueError, TypeError, binascii.Error):
+                raise ValueError('Assessment authority key must be base64 raw Ed25519') from None
         for value, name in ((self.runtime_dsn, 'HOSTING_RUNTIME_DSN'),
                             (self.authority_dsn, 'HOSTING_AUTHORITY_DSN'),
                             (self.directory_dsn, 'HOSTING_DIRECTORY_DSN')):
@@ -115,6 +137,18 @@ class ServiceSettings:
             port = int(values.get('HOSTING_LISTEN_PORT', '8080'))
         except ValueError:
             raise ValueError('HOSTING_LISTEN_PORT must be an integer') from None
+        assessment = {}
+        names = ('HOSTING_ASSESSMENT_TRUST_PATH',
+                 'HOSTING_ASSESSMENT_AUTHORITY_PUBLIC_KEY',
+                 'HOSTING_ASSESSMENT_MINIMUM_REVISION')
+        if any(values.get(name) for name in names):
+            try:
+                revision = int(_required(values, names[2]))
+            except ValueError:
+                raise ValueError('HOSTING_ASSESSMENT_MINIMUM_REVISION must be a positive integer') from None
+            assessment = dict(assessment_trust_path=_required(values, names[0]),
+                              assessment_authority_public_key=_required(values, names[1]),
+                              assessment_minimum_revision=revision)
         return cls(
             runtime_dsn=_required(values, 'HOSTING_RUNTIME_DSN'),
             authority_dsn=_required(values, 'HOSTING_AUTHORITY_DSN'),
@@ -128,6 +162,7 @@ class ServiceSettings:
             portal=portal,
             listen_host=values.get('HOSTING_LISTEN_HOST', '127.0.0.1'),
             listen_port=port,
+            **assessment,
         )
 
 
@@ -169,6 +204,20 @@ def create_postgres_app(settings: ServiceSettings, *,
     records = EnterpriseRecordStore(runtime_connect)
     environments = EnvironmentRepository(runtime_connect)
     discovery = DiscoveryRepository(runtime_connect)
+    assessment_inputs = None
+    if settings.assessment_trust_path is not None:
+        from provisioner.controlplane.discovery.assessment_inputs import (
+            AssessmentInputRepository, DurableAssessmentInputs,
+            SignedFileAssessmentTrustStore,
+        )
+        trust = SignedFileAssessmentTrustStore(
+            settings.assessment_trust_path,
+            authority_public_key=Ed25519PublicKey.from_public_bytes(base64.b64decode(
+                settings.assessment_authority_public_key, validate=True)),
+            minimum_revision=settings.assessment_minimum_revision)
+        trust.current_policy(datetime.now(timezone.utc))
+        assessment_inputs = DurableAssessmentInputs(
+            AssessmentInputRepository(runtime_connect, trust), authority, environments)
     jobs = JobRepository(runtime_connect, ledger)
     if evidence_gate is None and settings.evidence_config is None:
         raise ValueError('Independent evidence configuration is required')
@@ -179,6 +228,7 @@ def create_postgres_app(settings: ServiceSettings, *,
             gate.require(tenant)
     return create_app(records, authority, jobs, environments,
                       discovery=discovery,
+                      assessment_inputs=assessment_inputs,
                       portal_config=settings.portal,
                       evidence_gate=gate)
 
