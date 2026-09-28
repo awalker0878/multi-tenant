@@ -101,7 +101,7 @@ target-operation campaign conclusions; the engine still checks independent,
 current, exact tuple evidence before returning a candidate route.
 
 CONTROL evidence binds both original and normalized generation digests with
-`normalizerVersion` equal to `hosting-assessment-normalizer/1`. An original
+`normalizerVersion` equal to `hosting-assessment-normalizer/2`. An original
 discovery digest alone cannot approve transformed assessment facts. Every control
 has its own reviewer and evidence digest. A replacement generation or tuple
 requires new matching reviews.

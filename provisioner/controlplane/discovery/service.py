@@ -321,8 +321,11 @@ class AssessmentService:
         destination_inputs = tuple(self._load(ctx, item.selection, target)
                                    for item, target in zip(destinations, targets))
         routes = tuple(RouteKey(origin.installation, target.installation, method,
-                                guest_profile, network_mode, data_mode) for target in targets)
-        claims = self._inputs.route_claims(ctx, actor_subject, routes, now)
+                                guest_profile, network_mode, data_mode)
+                       if method != 'SAME_PLATFORM_RELOCATION' or
+                       origin.installation.scope.platform_family == target.installation.scope.platform_family
+                       else None for target in targets)
+        claims = self._inputs.route_claims(ctx, actor_subject, tuple(r for r in routes if r is not None), now)
         if (not isinstance(claims, tuple)
                 or any(not isinstance(claim, RouteClaim) or claim.key not in routes
                        for claim in claims)):
@@ -331,7 +334,7 @@ class AssessmentService:
         for selection, target, binding, route in zip(
                 destinations, targets, destination_inputs, routes):
             findings = self._inputs.reviewed_findings(
-                ctx, actor_subject, route, source_input.discovery, binding.discovery, now)
+                ctx, actor_subject, route, source_input.discovery, binding.discovery, now) if route is not None else ()
             if (not isinstance(findings, tuple)
                     or any(not isinstance(item, ReviewedFinding) or item.route != route
                            for item in findings)):

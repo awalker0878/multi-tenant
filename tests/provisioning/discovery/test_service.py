@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 import unittest
 from unittest.mock import patch
 
+from provisioner.domain.capability_properties import contract_digest
 from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.discovery.assessment import AssessmentScopeAccess, ReviewedFinding
 from provisioner.controlplane.discovery.model import (
@@ -36,12 +37,23 @@ def inventory(name, *, at=NOW - timedelta(minutes=30), partial=False):
         kind, native_id = 'vm', 'vm-1'
         values = {'vcpuCount': 4, 'memorySizeBytes': 8000, 'diskCapacityBytes': 20000,
                   'guestProfile': 'linux-uefi', 'networkMode': 'routed', 'dataMode': 'offline',
-                  'nics': [{'extId': 'nic-1', 'subnetExtId': 'subnet-1'}]}
+                  'nics': [{'extId': 'nic-1', 'subnetExtId': 'subnet-1'}],
+                  'architecture': 'x86_64', 'firmware': 'uefi',
+                  'secureBootEnabled': False, 'vtpmEnabled': False,
+                  'storageEncrypted': False, 'sharedDisks': False,
+                  'passthroughDevices': [], 'memoryStateRequired': False,
+                  'capabilityPropertySchemaDigest': contract_digest(),
+                  'requiredCapabilities': [], 'capabilityRequirements': []}
     else:
         kind, native_id = 'pool', 'pool-1'
         values = {'availableVcpu': 16, 'availableMemoryBytes': 100000,
                   'availableStorageBytes': 100000, 'supportedGuestProfiles': ['linux-uefi'],
-                  'supportedNetworkModes': ['routed'], 'supportedDataModes': ['offline']}
+                  'supportedNetworkModes': ['routed'], 'supportedDataModes': ['offline'],
+                  'capabilityPropertySchemaDigest': contract_digest(),
+                  'observedCapabilities': ['cpu_topology', 'vm_create', 'secure_boot', 'guest_drivers'],
+                  'capabilityProperties': {'cpu_topology.architecture': 'x86_64',
+                      'vm_create.firmware': 'uefi', 'secure_boot.enabled': False,
+                      'guest_drivers.verified': True}}
     obj = DiscoveryObject(NativeIdentity(scope.endpoint_id, scope.native_scope_id,
                                          scope.platform_family, kind, native_id),
                           tuple(DiscoveryFact.known(key, value) for key, value in values.items()))

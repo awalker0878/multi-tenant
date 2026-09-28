@@ -11,12 +11,16 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from provisioner.domain.capabilities import CAPABILITIES
+from provisioner.domain.capability_properties import (contract_digest, parse_requirements,
+                                                    validate_observations)
+
 from .model import (DiscoveryFact, DiscoveryObject, DiscoveryResult, _digest,
                     _object_json)
 from .persistence import StoredGeneration, StoredObservation
 
 
-NORMALIZER_VERSION = 'hosting-assessment-normalizer/1'
+NORMALIZER_VERSION = 'hosting-assessment-normalizer/2'
 _MAX = 2**63 - 1
 _MIB = 1024**2
 _GIB = 1024**3
@@ -172,7 +176,51 @@ def _network_bindings(value: object) -> list[dict] | None:
     return bindings
 
 
+def _semantic_properties(facts: dict[str, DiscoveryFact], *, source: bool) -> None:
+    names = ('capabilityPropertySchemaDigest', 'requiredCapabilities', 'capabilityRequirements') if source else (
+        'capabilityPropertySchemaDigest', 'capabilityProperties', 'observedCapabilities')
+    for name in names:
+        if name not in facts:
+            facts[name] = DiscoveryFact.unknown(name, 'NOT_RETURNED')
+    schema = _value(facts, 'capabilityPropertySchemaDigest')
+    if schema is not None and schema != contract_digest():
+        facts['capabilityPropertySchemaDigest'] = DiscoveryFact.unknown(
+            'capabilityPropertySchemaDigest', 'COLLECTION_ERROR')
+    if source:
+        capabilities = _value(facts, 'requiredCapabilities')
+        valid = (isinstance(capabilities, list) and len(capabilities) <= len(CAPABILITIES)
+                 and all(isinstance(cap, str) and cap in CAPABILITIES for cap in capabilities)
+                 and len(set(capabilities)) == len(capabilities))
+        if capabilities is not None and not valid:
+            facts['requiredCapabilities'] = DiscoveryFact.unknown('requiredCapabilities', 'COLLECTION_ERROR')
+        name = 'capabilityRequirements'
+        value = _value(facts, name)
+        if value is not None:
+            try:
+                if not valid:
+                    raise ValueError('Missing capability owners')
+                parsed = parse_requirements(value, capabilities)
+                facts[name] = DiscoveryFact.known(name, [r.to_dict() for r in parsed])
+            except (ValueError, TypeError):
+                facts[name] = DiscoveryFact.unknown(name, 'COLLECTION_ERROR')
+    else:
+        available = _value(facts, 'observedCapabilities')
+        if available is not None and (not isinstance(available, list)
+                or len(available) > len(CAPABILITIES)
+                or any(not isinstance(cap, str) or cap not in CAPABILITIES for cap in available)
+                or len(set(available)) != len(available)):
+            facts['observedCapabilities'] = DiscoveryFact.unknown('observedCapabilities', 'COLLECTION_ERROR')
+        name = 'capabilityProperties'
+        value = _value(facts, name)
+        if value is not None:
+            try:
+                facts[name] = DiscoveryFact.known(name, dict(validate_observations(value)))
+            except (ValueError, TypeError):
+                facts[name] = DiscoveryFact.unknown(name, 'COLLECTION_ERROR')
+
+
 def _vm(facts: dict[str, DiscoveryFact]) -> None:
+    _semantic_properties(facts, source=True)
     cpu = _number(facts, 'vcpuCount', minimum=1, alias='vcpus')
     sockets, cores = (facts.get(name) for name in ('numSockets', 'numCoresPerSocket'))
     if all(item is not None and item.state == 'KNOWN' for item in (sockets, cores)):
@@ -230,6 +278,7 @@ def _vm(facts: dict[str, DiscoveryFact]) -> None:
 
 
 def _capacity(facts: dict[str, DiscoveryFact]) -> None:
+    _semantic_properties(facts, source=False)
     for field, quota_key, scale in (
         ('availableVcpu', 'cores', 1),
         ('availableMemoryBytes', 'ram', _MIB),

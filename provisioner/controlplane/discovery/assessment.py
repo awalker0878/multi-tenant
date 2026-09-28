@@ -15,6 +15,7 @@ from typing import Literal
 
 from provisioner.controlplane.authority.model import PlanScope
 
+from .compatibility import check_compatibility
 from .model import DiscoveryFact, DiscoveryObject, DiscoveryResult, NativeIdentity
 from .routes import (METHODS, InstalledTuple, RouteCatalogue, RouteKey,
                      _utc, native_scope_key)
@@ -337,6 +338,11 @@ class AssessmentEngine:
         if method not in METHODS:
             add('BLOCKER', 'METHOD_UNSUPPORTED', 'The migration method is unsupported.',
                 'Choose a supported method and qualify an exact directed route.')
+        elif (method == 'SAME_PLATFORM_RELOCATION'
+              and source.scope.platform_family != option.installation.scope.platform_family):
+            add('BLOCKER', 'RELOCATION_REQUIRES_SAME_PLATFORM',
+                'Native relocation is not cross-hypervisor migration.',
+                'Select and qualify a directed conversion or rebuild route.')
         else:
             key = RouteKey(source, option.installation, method, guest, network, data)
             route = self.routes.evaluate(key, as_of=as_of)
@@ -451,6 +457,9 @@ class AssessmentEngine:
                     add('BLOCKER', code,
                         'The destination does not support the selected profile or mode.',
                         'Choose a supported route or an independently qualified destination.')
+
+        for severity, code, reason, remediation in check_compatibility(selected, target, method):
+            add(severity, code, reason, remediation)
 
         findings = {control: [finding for finding in option.findings
                               if finding.control == control]

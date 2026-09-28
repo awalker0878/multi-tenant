@@ -81,7 +81,7 @@ class SignedFixture:
                 'evidenceDigest': '3' * 64, 'observedAt': (NOW - timedelta(minutes=2)).isoformat(),
                 'sourceRawSnapshotDigest': '4' * 64, 'destinationRawSnapshotDigest': '5' * 64,
                 'sourceSnapshotDigest': '6' * 64, 'destinationSnapshotDigest': '7' * 64,
-                'normalizerVersion': 'hosting-assessment-normalizer/1'}
+                'normalizerVersion': 'hosting-assessment-normalizer/2'}
         return {'format': 'hosting-assessment-evidence/1', 'evidenceId': kind + '-evidence',
                 'kind': kind, 'revision': 1, 'issuedAt': (NOW - timedelta(minutes=1)).isoformat(),
                 'expiresAt': (NOW + timedelta(minutes=30)).isoformat(), 'payload': payload}
@@ -104,6 +104,12 @@ class AssessmentInputTrustTests(unittest.TestCase):
         document = document or self.fixture.document()
         return self.fixture.trust.verify(parse_evidence(document),
                                          signatures or self.fixture.sign(document), NOW)
+
+    def test_old_normalizer_review_is_rejected_even_with_fresh_signatures(self):
+        document = self.fixture.document('CONTROL')
+        document['payload']['normalizerVersion'] = 'hosting-assessment-normalizer/1'
+        with self.assertRaises(AssessmentInputDenied):
+            self.verify(document)
 
     def test_real_signatures_verify_all_three_evidence_kinds(self):
         for kind in ('INSTALLATION', 'ROUTE', 'CONTROL'):
