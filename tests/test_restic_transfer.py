@@ -157,6 +157,8 @@ class TransferTests(unittest.TestCase):
         self.assertEqual(target['source_receipt_sha256'], digest(original))
         self.assertEqual(target['dataset_id'], 'dataset-1')
         self.assertEqual(target['target_ref'], 'target-dataset-1')
+        self.assertEqual(target['target_machine_id'], Path('/etc/machine-id').read_text().strip())
+        self.assertEqual(target['restore_root'], str(self.target))
         self.assertFalse(target['application_acceptance'])
         self.assertFalse(target['native_qualification'])
         self.assertEqual(original, encoded(self.receipt))
@@ -297,6 +299,9 @@ class TransferTests(unittest.TestCase):
                 target=self.target, restore_authority=self.restore_authority)
         context = load_private(self.root / 'runtime/context.json')
         self.assertEqual(context['transfer_manifest_sha256'], digest(encoded(self.envelope)))
+        target_receipt = load_private(self.root / 'runtime/transfer-receipt.json')
+        self.assertEqual(target_receipt['target_machine_id'], context['machine_id'])
+        self.assertEqual(target_receipt['restore_root'], context['target'])
         self.assertEqual(load_private(self.root / 'runtime/transfer-manifest.json'), self.envelope)
         self.assertTrue((self.root / 'runtime/transfer-receipt.json').exists())
 

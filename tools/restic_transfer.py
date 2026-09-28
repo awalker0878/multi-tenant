@@ -18,7 +18,7 @@ from provisioner.domain.enterprise_records import validate_record
 from tools.run_files import digest, encoded, require
 
 FORMAT = 'hosting-restic-transfer/1'
-RECEIPT_FORMAT = 'hosting-restic-transfer-receipt/1'
+RECEIPT_FORMAT = 'hosting-restic-transfer-receipt/2'
 _SCOPE_KEYS = {'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'}
 _KEYS = {'format', 'migration_plan', 'transfer', 'source_execution_scope',
          'destination_execution_scope', 'source_config_sha256', 'repository_id',
@@ -142,6 +142,11 @@ class TransferGuard:
 def destination_receipt(envelope, source_receipt, restore_receipt):
     """A separate target receipt; neither source evidence artifact is rewritten."""
     spec = envelope['transfer']['spec']
+    require(restore_receipt.get('format') == 'hosting-restic-restore-receipt/1'
+            and isinstance(restore_receipt.get('target_machine_id'), str)
+            and re.fullmatch(r'[0-9a-f]{32}', restore_receipt['target_machine_id'])
+            and restore_receipt.get('restore_root') == envelope['target'],
+            'Destination receipt requires observed restore machine and exact root')
     return {'format': RECEIPT_FORMAT,
             'status': 'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
             'scope': envelope['destination_execution_scope'],
@@ -155,7 +160,9 @@ def destination_receipt(envelope, source_receipt, restore_receipt):
             'dataset_id': spec['datasetId'], 'target_ref': spec['targetRef'],
             'snapshot_id': envelope['snapshot_id'], 'repository_id': envelope['repository_id'],
             'file_manifest_sha256': envelope['file_manifest_sha256'],
-            'restore_root': envelope['target'], 'file_count': restore_receipt['file_count'],
+            'restore_root': restore_receipt['restore_root'],
+            'target_machine_id': restore_receipt['target_machine_id'],
+            'file_count': restore_receipt['file_count'],
             'completed_at': restore_receipt['completed_at'],
             'application_acceptance': False, 'production_activation': False,
             'native_qualification': False}

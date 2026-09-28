@@ -205,6 +205,58 @@ class DeliveryTransferTests(unittest.TestCase):
         self.assertEqual(self.fixture.calls,calls)
         self.assertIn('transfer-receipt.json',names)
 
+    def test_interrupted_transfer_rejects_substituted_actual_machine_even_with_matching_receipt(self):
+        from tools.restic_transfer import destination_receipt
+        with patch.object(steps,'complete',side_effect=InterruptedError('coordinator lost')):
+            with self.assertRaises(InterruptedError): self.dispatch(transfer_guard=self.fixture.guard)
+        execution=self.directory/'execution'
+        restored=load_private(execution/'receipt.json')
+        restored['target_machine_id']='e'*32
+        replace_private(execution/'receipt.json',encoded(restored))
+        destination=destination_receipt(self.fixture.envelope,self.fixture.receipt,restored)
+        replace_private(execution/'transfer-receipt.json',encoded(destination))
+        replace_private(self.directory/'receipt.json',encoded(restored))
+        replace_private(self.directory/'transfer-receipt.json',encoded(destination))
+        calls=list(self.fixture.calls)
+        with self.assertRaisesRegex(ValueError,'actual authorized restore machine and root'):
+            self.recover()
+        self.assertEqual(self.fixture.calls,calls)
+        self.assertFalse((self.directory/'owner-completion.json').exists())
+
+    def test_interrupted_transfer_rejects_legacy_unobserved_restore_identity(self):
+        with patch.object(steps,'complete',side_effect=InterruptedError('coordinator lost')):
+            with self.assertRaises(InterruptedError): self.dispatch(transfer_guard=self.fixture.guard)
+        source=self.directory/'execution/receipt.json'; restored=load_private(source)
+        for field in ('format','target_machine_id','restore_root'): restored.pop(field)
+        replace_private(source,encoded(restored))
+        calls=list(self.fixture.calls)
+        with self.assertRaisesRegex(ValueError,'observed restore machine and exact root'):
+            self.recover()
+        self.assertEqual(self.fixture.calls,calls)
+        self.assertFalse((self.directory/'owner-completion.json').exists())
+
+    def test_completed_transfer_returns_and_revalidates_actual_restore_identity(self):
+        from tools.delivery_run import artifact_receipt
+        from tools.restic_transfer import destination_receipt
+        original,_=self.dispatch(transfer_guard=self.fixture.guard)
+        calls=list(self.fixture.calls)
+        result,_=self.recover()
+        self.assertEqual(result,original)
+        self.assertEqual(result['target_machine_id'],self.fixture.restore_authority['machine_id'])
+        self.assertEqual(result['restore_root'],str(self.fixture.target))
+        # Model a retained, internally hashed completion from an older producer:
+        # checksums alone must not bless a different actual restore machine.
+        restored=load_private(self.directory/'receipt.json'); restored['target_machine_id']='e'*32
+        replace_private(self.directory/'receipt.json',encoded(restored))
+        replace_private(self.directory/'transfer-receipt.json',encoded(destination_receipt(
+            self.fixture.envelope,self.fixture.receipt,restored)))
+        completion=load_private(self.directory/'owner-completion.json')
+        completion['artifacts']=artifact_receipt(self.directory,list(completion['artifacts']))
+        replace_private(self.directory/'owner-completion.json',encoded(completion))
+        with self.assertRaisesRegex(ValueError,'actual authorized restore machine and root'):
+            self.recover()
+        self.assertEqual(self.fixture.calls,calls)
+
     def test_missing_destination_receipt_cannot_be_reconstructed_or_replayed(self):
         with patch.object(steps,'complete',side_effect=InterruptedError('coordinator lost')):
             with self.assertRaises(InterruptedError): self.dispatch(transfer_guard=self.fixture.guard)

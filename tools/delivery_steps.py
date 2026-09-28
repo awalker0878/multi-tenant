@@ -543,6 +543,35 @@ def campaign_postcondition(result, campaign, raw):
             'Campaign completion chronology is invalid')
 
 
+def transfer_postcondition(packet,directory,plan):
+    """Bind retained transfer evidence to the restore owner's actual host/root."""
+    from tools.restic_transfer import destination_receipt
+    files=file_paths(packet); values=packet['parameters']
+    transfer=restic_transfer(packet,files,plan)
+    config=load_private(files['config']); original=load_private(files['receipt'])
+    manifest=load_private(files['manifest']); authority=load_private(files['restore_authority'])
+    context=load_private(directory/'context.json'); restored=load_private(directory/'receipt.json')
+    require(context=={'action':'restore','config_sha256':digest(encoded(config)),
+        'receipt_sha256':digest(encoded(original)),'manifest_sha256':digest(encoded(manifest)),
+        'authority_sha256':digest(encoded(authority)),'machine_id':authority['machine_id'],
+        'target':values['target'],'transfer_manifest_sha256':digest(encoded(transfer))},
+        'Retained transfer execution context differs')
+    require(restored.get('format')=='hosting-restic-restore-receipt/1'
+            and restored.get('target_machine_id')==context['machine_id']==authority['machine_id']
+            and restored.get('restore_root')==context['target']==authority['target']==values['target']
+            and restored.get('status')=='RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
+            and restored.get('scope')==config['scope'] and restored.get('member')==config['member']
+            and restored.get('snapshot_id')==original['snapshot_id']
+            and restored.get('file_count')==len(manifest['files'])
+            and restored.get('production_activation') is False,
+            'Retained transfer requires its actual authorized restore machine and root')
+    destination=load_private(directory/'transfer-receipt.json')
+    require(load_private(directory/'transfer-manifest.json')==transfer
+            and destination==destination_receipt(transfer,original,restored),
+            'Retained destination receipt differs from its actual restore proof')
+    return destination
+
+
 def typed_postcondition(step,result,directory,packet,plan):
     """Validate the owner's typed result before publishing a completion marker.
 
@@ -562,6 +591,9 @@ def typed_postcondition(step,result,directory,packet,plan):
     if step['kind'] in expected:
         require(result.get('status')==expected[step['kind']],
                 'Delivery owner has not met its typed postcondition')
+    if step['kind'] in {'restic','dataset_restore'} and 'transfer_manifest' in packet['files']:
+        require(result==transfer_postcondition(packet,directory,plan),
+                'Delivery result differs from its retained transfer proof')
     if step['kind']=='target_campaign':
         raw=read_private(packet['files']['plan']['path'])
         campaign_postcondition(result,c.strict_loads(raw),raw)
@@ -935,6 +967,9 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     require(artifact_receipt(directory,list(completed['artifacts']))==completed['artifacts'], 'Owner completion artifacts changed')
     result=load_private(directory/'result.json') if (directory/'result.json').exists() else {'status':completed['status']}
     require(result.get('status')==completed['status'],'Retained owner status changed')
+    if step['kind'] in {'restic','dataset_restore'} and 'transfer_manifest' in packet['files']:
+        result=transfer_postcondition(packet,directory,plan)
+        require(result['status']==completed['status'],'Retained transfer owner status changed')
     typed_postcondition(step,result,directory,packet,plan)
     if step['kind']=='dataset_acceptance':
         require(result==dataset_group(step,packet,base,plan),'Retained dataset group evidence changed')

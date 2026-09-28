@@ -62,6 +62,36 @@ class DatasetPlanCoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'canonical destination'):
             validate_coverage(self.groups, self.scope | {'site_key': 'foreign-site'})
 
+    def test_same_machine_restore_roots_cannot_overlap_across_groups(self):
+        for nested in (False, True):
+            changed = deepcopy(self.groups)
+            first = next(iter(changed[0]['group_result']['transfers'].values()))
+            second = next(iter(changed[1]['group_result']['transfers'].values()))
+            second['target_machine_id'] = first['target_machine_id']
+            second['restore_root'] = first['restore_root'] + ('/nested' if nested else '')
+            with self.subTest(nested=nested), self.assertRaisesRegex(ValueError, 'same machine must not overlap'):
+                validate_coverage(changed, self.scope)
+
+    def test_the_same_isolated_path_on_different_observed_machines_is_valid(self):
+        changed = deepcopy(self.groups)
+        first = next(iter(changed[0]['group_result']['transfers'].values()))
+        second = next(iter(changed[1]['group_result']['transfers'].values()))
+        first['target_machine_id'] = 'a' * 32
+        second['target_machine_id'] = 'b' * 32
+        second['restore_root'] = first['restore_root']
+        result = validate_coverage(changed, self.scope)
+        self.assertEqual(result['dataset_ids'], ['dataset-1', 'dataset-2'])
+
+    def test_old_group_proofs_without_observed_machine_and_root_are_refused(self):
+        changed = deepcopy(self.groups)
+        changed[0]['group_result']['format'] = 'hosting-dataset-group-verification/1'
+        with self.assertRaisesRegex(ValueError, 'canonical destination'):
+            validate_coverage(changed, self.scope)
+        changed = deepcopy(self.groups)
+        del next(iter(changed[0]['group_result']['transfers'].values()))['target_machine_id']
+        with self.assertRaisesRegex(ValueError, 'proof identities'):
+            validate_coverage(changed, self.scope)
+
     def test_receipts_cannot_be_reused_between_different_groups(self):
         for field in ('source_receipt_sha256', 'restore_receipt_sha256',
                       'transfer_manifest_sha256', 'transfer_receipt_sha256'):

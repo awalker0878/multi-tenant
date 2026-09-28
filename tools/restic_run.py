@@ -184,6 +184,8 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
     require(timestamp(receipt['captured_at']) <= timestamp(receipt['completed_at']) <= utcnow(),
             'Capture timestamps are inconsistent or future-dated')
     require(not Path(target).exists(), 'Restore requires a new isolated destination')
+    target_machine_id = Path('/etc/machine-id').read_text().strip()
+    require(re.fullmatch('[0-9a-f]{32}', target_machine_id), 'Observed restore machine identity required')
     started = time.monotonic()
     client.repository()
     snapshots = json.loads(client.command(['snapshots', receipt['snapshot_id']]))
@@ -200,7 +202,9 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
     require(digest(recovered_manifest.read_bytes()) == receipt['manifest_sha256'], 'Recovered manifest differs')
     actual = manifest(target / config['source'].lstrip('/'))
     require(actual == expected['files'], 'Recovered useful file bytes differ from the capture manifest')
-    result = {'status': 'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
+    result = {'format': 'hosting-restic-restore-receipt/1',
+              'status': 'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
+              'target_machine_id': target_machine_id, 'restore_root': str(target),
               'snapshot_id': receipt['snapshot_id'], 'scope': config['scope'], 'member': config['member'],
               'file_count': len(actual), 'restore_seconds': round(time.monotonic() - started, 3),
               'data_age_seconds': round((utcnow() - timestamp(receipt['captured_at'])).total_seconds(), 3),

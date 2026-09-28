@@ -7,15 +7,29 @@ promote application consistency from a successful file copy.
 from __future__ import annotations
 
 import re
+from pathlib import Path
 from provisioner.domain.enterprise_records import validate_record
 from tools.restic_transfer import FORMAT, RECEIPT_FORMAT
 from tools.run_files import digest, encoded, require
 
-FORMAT_GROUP = 'hosting-dataset-group-verification/1'
+FORMAT_GROUP = 'hosting-dataset-group-verification/2'
 STATUS = 'DATASET_GROUP_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
 _FIELDS = {'step_id', 'dataset_id', 'target_ref', 'transfer_manifest_sha256'}
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _SHA = re.compile(r'^[0-9a-f]{64}$')
+
+
+def _unique_restore_root(roots, machine_id, raw_path):
+    require(isinstance(machine_id, str) and re.fullmatch(r'[0-9a-f]{32}', machine_id)
+            and isinstance(raw_path, str), 'Observed target machine and restore root required')
+    path = Path(raw_path)
+    require(path.is_absolute() and path != Path('/') and '..' not in path.parts
+            and str(path) == raw_path, 'Canonical isolated restore root required')
+    existing = roots.setdefault(machine_id, [])
+    require(not any(path.is_relative_to(previous) or previous.is_relative_to(path)
+                    for previous in existing),
+            'Dataset restore roots on the same machine must not overlap')
+    existing.append(path)
 
 
 def validate_group(group_id, datasets, records, scope):
@@ -37,6 +51,7 @@ def validate_group(group_id, datasets, records, scope):
             'Every dataset child must supply its distinct completed restore evidence')
     declared_mappings={(row['dataset_id'],row['target_ref']) for row in datasets}
     captures, restores, proofs, plan_digests, observation_ids = set(), set(), {}, set(), set()
+    roots = {}
     for row in datasets:
         record = records[row['step_id']]
         require(isinstance(record, dict) and set(record) == {
@@ -59,6 +74,7 @@ def validate_group(group_id, datasets, records, scope):
         require(declared_mappings==selected_group,
                 'Dataset group must cover every selected canonical mapping')
         require(proof.get('format') == RECEIPT_FORMAT
+                and restored.get('format') == 'hosting-restic-restore-receipt/1'
                 and proof.get('status') == restored.get('status') ==
                     'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
                 and proof['transfer_manifest_sha256'] == row['transfer_manifest_sha256']
@@ -73,7 +89,8 @@ def validate_group(group_id, datasets, records, scope):
                 and proof['snapshot_id'] == restored['snapshot_id'] == envelope['snapshot_id']
                 and proof['repository_id'] == envelope['repository_id']
                 and proof['file_manifest_sha256'] == envelope['file_manifest_sha256']
-                and proof['restore_root'] == envelope['target']
+                and proof['restore_root'] == restored['restore_root'] == envelope['target']
+                and proof['target_machine_id'] == restored['target_machine_id']
                 and proof['file_count'] == restored['file_count']
                 and type(proof['file_count']) is int and proof['file_count'] > 0
                 and proof['completed_at'] == restored['completed_at']
@@ -84,11 +101,14 @@ def validate_group(group_id, datasets, records, scope):
         require(proof['source_receipt_sha256'] not in captures
                 and proof['restore_receipt_sha256'] not in restores,
                 'One capture or restore receipt cannot complete multiple datasets')
+        _unique_restore_root(roots, proof['target_machine_id'], proof['restore_root'])
         captures.add(proof['source_receipt_sha256']); restores.add(proof['restore_receipt_sha256'])
         plan_digests.add(proof['migration_plan_digest'])
         observation_ids.add(spec['sourceSnapshotId'])
         proofs[row['step_id']] = {'dataset_id': row['dataset_id'], 'target_ref': row['target_ref'],
                                  'source_receipt_sha256': proof['source_receipt_sha256'],
+                                 'target_machine_id': proof['target_machine_id'],
+                                 'restore_root': proof['restore_root'],
                                  'transfer_manifest_sha256': row['transfer_manifest_sha256'],
                                  'transfer_receipt_sha256': digest(encoded(proof)),
                                  'restore_receipt_sha256': proof['restore_receipt_sha256']}
@@ -116,7 +136,8 @@ def validate_coverage(records, scope):
     unique = {key: set() for key in ('dataset_id', 'target_ref', 'source_receipt_sha256',
                                     'restore_receipt_sha256', 'transfer_manifest_sha256',
                                     'transfer_receipt_sha256', 'step_id')}
-    transfer_keys = set(unique) - {'step_id'}
+    transfer_keys = (set(unique) - {'step_id'}) | {'target_machine_id', 'restore_root'}
+    roots = {}
     for record in records:
         require(isinstance(record, dict) and set(record) == {'group_result', 'migration_plan'},
                 'Exact group verification and canonical plan required')
@@ -149,12 +170,14 @@ def validate_coverage(records, scope):
         for step_id, transfer in transfers.items():
             require(isinstance(transfer, dict) and set(transfer) == transfer_keys,
                     'Complete distinct dataset proof identities required')
-            for key, value in {'step_id': step_id, **transfer}.items():
+            for key in unique:
+                value = step_id if key == 'step_id' else transfer[key]
                 expression = _SHA if key.endswith('_sha256') else _ID
                 require(isinstance(value, str) and expression.fullmatch(value)
                         and value not in unique[key],
                         'Datasets, mappings and capture/restore proofs cannot be reused across groups')
                 unique[key].add(value)
+            _unique_restore_root(roots, transfer['target_machine_id'], transfer['restore_root'])
             actual.add((transfer['dataset_id'], transfer['target_ref']))
         require(actual == expected and result.get('dataset_ids') == sorted(row[0] for row in expected),
                 'Group verification is missing a selected canonical dataset')
@@ -162,7 +185,7 @@ def validate_coverage(records, scope):
         group_results[group_id] = digest(encoded(result))
     require(declared_mappings == canonical_mappings,
             'All selected canonical dataset groups must complete before services acceptance')
-    return {'format': 'hosting-dataset-plan-verification/1',
+    return {'format': 'hosting-dataset-plan-verification/2',
             'status': 'DATASET_PLAN_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
             'scope': dict(scope), 'migration_plan_digest': plan_digest,
             'dataset_ids': sorted(unique['dataset_id']),

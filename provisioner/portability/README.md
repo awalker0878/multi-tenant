@@ -40,8 +40,11 @@ file and transfer envelope alone cannot enable a foreign-scope restore.
 
 The original capture manifest and receipt retain their source scope. The ordinary
 restore receipt also retains that provenance. A separate
-`hosting-restic-transfer-receipt/1` binds destination scope and member, exact
-dataset/target, native snapshot, source/restore receipts and verified bytes.
+`hosting-restic-transfer-receipt/2` binds destination scope and member, exact
+dataset/target, native snapshot, source/restore receipts, observed target machine ID, isolated root and verified bytes.
+Equal or nested restore roots on the same observed machine are rejected within
+and across groups; the same path on distinct observed machines remains valid.
+Older transfer/group receipts missing this binding cannot satisfy current gates.
 Group verification requires a distinct source capture and restore receipt for
 every child, complete group membership, and one exact canonical plan and source
 observation. Missing, duplicated, substituted or misdirected evidence holds the

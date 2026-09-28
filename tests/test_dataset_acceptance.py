@@ -1,18 +1,21 @@
 """All dataset children must prove distinct, correctly directed file restores."""
 from copy import deepcopy
+from pathlib import Path
 import unittest
 
 from tools.dataset_acceptance import STATUS, validate_group
 from tools.restic_transfer import TransferGuard
+from tools.restic_run import manifest as observed_files
 from tools.run_files import digest, encoded, load_private
 import test_restic_transfer as harness
 
 
 class DatasetAcceptanceTests(unittest.TestCase):
     def setUp(self):
-        self.rows = []; self.records = {}
+        self.rows = []; self.records = {}; self.fixtures = []
         for number in (1, 2):
             fixture = harness.TransferTests(); fixture.setUp(); self.addCleanup(fixture.doCleanups)
+            self.fixtures.append(fixture)
             spec = fixture.envelope['transfer']['spec']
             spec['datasetId'] = spec['sourceReceipt']['datasetId'] = f'dataset-{number}'
             spec['targetRef'] = f'target-dataset-{number}'
@@ -37,6 +40,43 @@ class DatasetAcceptanceTests(unittest.TestCase):
         self.assertFalse(result['application_acceptance'])
         self.assertFalse(result['native_qualification'])
         self.assertFalse(result['production_activation'])
+
+    def test_nested_restore_cannot_invalidate_an_already_verified_dataset_and_complete_group(self):
+        first = self.fixtures[0]
+        original_data = first.target / str(first.source).lstrip('/')
+        original_data.chmod(0o700)
+        self.assertEqual(observed_files(original_data), first.manifest['files'])
+        nested = harness.TransferTests(); nested.setUp(); self.addCleanup(nested.doCleanups)
+        nested.target = original_data / 'nested-restore'
+        nested.envelope['target'] = str(nested.target)
+        spec = nested.transfer['spec']
+        spec['datasetId'] = spec['sourceReceipt']['datasetId'] = 'dataset-2'
+        spec['targetRef'] = 'target-dataset-2'
+        spec['sourceNativeBinding']['nativeId'] = 'volume-2'
+        nested.configure_authority()
+        restored = nested.restore(transfer=nested.envelope, transfer_guard=nested.guard)
+        # The second operation created a new isolated root, but it changed the
+        # first dataset's tree after that dataset's checksum receipt was issued.
+        self.assertNotEqual(observed_files(original_data), first.manifest['files'])
+        rows, records = deepcopy(self.rows), deepcopy(self.records)
+        rows[1]['transfer_manifest_sha256'] = digest(encoded(nested.envelope))
+        records[rows[1]['step_id']] = {'transfer_manifest': nested.envelope,
+            'transfer_receipt': load_private(nested.root / 'operation/transfer-receipt.json'),
+            'restore_receipt': restored}
+        with self.assertRaisesRegex(ValueError, 'same machine must not overlap'):
+            validate_group('group-01', rows, records, self.scope)
+
+    def test_wrong_machine_and_legacy_transfer_receipts_do_not_prove_staging(self):
+        for update in ({'target_machine_id': 'e' * 32},
+                       {'format': 'hosting-restic-transfer-receipt/1'}):
+            records = deepcopy(self.records)
+            records[self.rows[1]['step_id']]['transfer_receipt'].update(update)
+            with self.subTest(update=update), self.assertRaisesRegex(ValueError, 'completion does not prove'):
+                validate_group('group-01', self.rows, records, self.scope)
+        records = deepcopy(self.records)
+        del records[self.rows[1]['step_id']]['restore_receipt']['target_machine_id']
+        with self.assertRaises((ValueError, KeyError)):
+            validate_group('group-01', self.rows, records, self.scope)
 
     def test_group_cannot_hide_a_selected_dataset_by_omitting_its_binding_and_proof(self):
         row=self.rows[0]
