@@ -1,10 +1,11 @@
 """Destination-scoped restore evidence remains bound to source and live authority."""
 from pathlib import Path
+from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
 from tools import delivery_steps as steps, restic_run
-from tools.run_files import digest, encoded, load_private, read_private, write_new
+from tools.run_files import digest, encoded, load_private, read_private, write_new, replace_private, utcnow
 
 
 class DeliveryTransferTests(unittest.TestCase):
@@ -123,6 +124,61 @@ class DeliveryTransferTests(unittest.TestCase):
         calls=list(self.fixture.calls)
         result,_=steps.recover(group,packet,path,self.fixture.root,self.plan,restic_run.ROOT)
         self.assertEqual(result['status'],'DATASET_GROUP_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED')
+        self.assertEqual(self.fixture.calls,calls)
+
+    def service_gate(self):
+        from tools import readback_core as c
+        group,group_packet,group_path=self.group_packet()
+        service={'id':'services','kind':'acceptance','needs':['group']}
+        self.plan['steps'].append(service)
+        accepted=dict(format='hosting-delivery-acceptance/1',plan_sha256=c.digest(self.plan),
+            step_id=service['id'],scope=self.plan['scope'],dependencies={'group':'a'*64},
+            purpose='services',valid_from=(utcnow()-timedelta(seconds=1)).isoformat(),
+            valid_until=(utcnow()+timedelta(minutes=5)).isoformat(),acceptance_ref='APP-OWNER-ACCEPTED')
+        source=self.fixture.root/'service-acceptance.json'; write_new(source,encoded(accepted))
+        packet={'parameters':{'purpose':'services'},'dependencies':accepted['dependencies'],
+                'files':{'acceptance':{'path':str(source),'sha256':digest(read_private(source))}}}
+        self.dispatch(transfer_guard=self.fixture.guard)
+        write_new(group_path/'packet.json',encoded(group_packet))
+        steps.dispatch(group,group_packet,group_path,self.fixture.root,self.plan,restic_run.ROOT)
+        destination=self.fixture.root/'steps/services'; destination.mkdir(mode=0o700)
+        return service,packet,destination
+
+    def test_service_acceptance_retains_complete_canonical_dataset_coverage(self):
+        service,packet,path=self.service_gate()
+        result,names=steps.dispatch(service,packet,path,self.fixture.root,self.plan,restic_run.ROOT)
+        self.assertEqual(result['status'],'EXTERNAL_ACCEPTANCE_RECORDED')
+        self.assertIn('dataset-coverage.json',names)
+        coverage=load_private(path/'dataset-coverage.json')
+        self.assertEqual(coverage['dataset_ids'],['dataset-1'])
+        self.assertFalse(coverage['application_acceptance'])
+
+    def test_service_acceptance_cannot_omit_an_entire_selected_canonical_group(self):
+        from provisioner.domain.enterprise_records import plan_digest
+        f=self.fixture
+        f.plan['spec']['selectedDatasetIds'].append('dataset-2')
+        f.plan['spec']['datasetMappings'].append({'datasetId':'dataset-2',
+            'targetRef':'target-dataset-2','consistencyGroupId':'group-02'})
+        f.plan['metadata']['planDigest']=plan_digest(f.plan)
+        f.transfer['metadata']['planDigest']=f.plan['metadata']['planDigest']
+        f.configure_authority()
+        source=Path(self.packet['files']['transfer_manifest']['path'])
+        replace_private(source,encoded(f.envelope))
+        self.packet['files']['transfer_manifest']['sha256']=digest(read_private(source))
+        service,packet,path=self.service_gate()
+        with self.assertRaisesRegex(ValueError,'All selected canonical dataset groups'):
+            steps.dispatch(service,packet,path,f.root,self.plan,restic_run.ROOT)
+        self.assertFalse((path/'owner-completion.json').exists())
+
+    def test_interrupted_service_acceptance_recomputes_coverage_without_transfer_replay(self):
+        service,packet,path=self.service_gate()
+        calls=list(self.fixture.calls)
+        with patch.object(steps,'complete',side_effect=InterruptedError('coordinator lost')):
+            with self.assertRaises(InterruptedError):
+                steps.dispatch(service,packet,path,self.fixture.root,self.plan,restic_run.ROOT)
+        result,names=steps.recover(service,packet,path,self.fixture.root,self.plan,restic_run.ROOT)
+        self.assertEqual(result['status'],'EXTERNAL_ACCEPTANCE_RECORDED')
+        self.assertIn('dataset-coverage.json',names)
         self.assertEqual(self.fixture.calls,calls)
 
     def test_file_transfer_manifest_alone_is_held_before_repository_contact(self):

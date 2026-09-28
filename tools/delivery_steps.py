@@ -184,6 +184,7 @@ def validate_packet(step, packet, plan, base):
                 and accepted['purpose']==values['purpose'], 'Acceptance does not bind this delivery gate')
         match_scope(accepted['scope'],plan); c.text(accepted['acceptance_ref']); current_window(accepted)
         if values['purpose']=='bootstrap': bootstrap_postconditions(step,plan,base)
+        if values['purpose']=='services': dataset_coverage(step,base,plan)
     if kind in {'edge_policy','edge_containment','target_campaign','ipam','dns','capacity'}:
         field={'edge_policy':'spec','edge_containment':'spec','target_campaign':'plan','ipam':'request','dns':'allocation','capacity':'request'}[kind]
         value=load_private(files[field]); match_scope(value['scope'],plan)
@@ -358,6 +359,11 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
         write_new(directory/'acceptance.json',encoded(accepted))
         result={'status':'EXTERNAL_ACCEPTANCE_RECORDED','acceptance_ref':accepted['acceptance_ref']}
         names=['acceptance.json']
+        if values['purpose']=='services':
+            coverage=dataset_coverage(step,base,plan)
+            if coverage is not None:
+                write_new(directory/'dataset-coverage.json',encoded(coverage))
+                names.append('dataset-coverage.json')
     elif kind=='terraform_plan':
         from tools.terraform_run import prepare
         args={name:files.get(name) for name in ('inputs','backend','environment','authority','references','cloud','ca_bundle','transition')}
@@ -445,6 +451,26 @@ def complete(step,packet,directory,plan,result,names):
                 'packet_sha256':c.digest(packet),'status':result['status'],'artifacts':artifact_receipt(directory,names)}
     write_new(directory/'owner-completion.json',encoded(completion))
     return result,names+['owner-completion.json']
+
+
+def dataset_coverage(step,base,plan):
+    """Close the canonical plan's complete dataset set before service acceptance."""
+    from tools.dataset_acceptance import validate_coverage
+    groups=[item for item in plan['steps'] if item['id'] in step['needs']
+            and item['kind']=='dataset_acceptance']
+    if not groups:
+        return None
+    records=[]
+    for group in groups:
+        directory=dependency(step,group['id'],'dataset_acceptance',plan,base)
+        packet=load_private(directory/'packet.json')
+        observed=dataset_group(group,packet,base,plan)
+        require(observed==load_private(directory/'result.json'),
+                'Retained dataset group differs from its exact child proofs')
+        first=packet['parameters']['datasets'][0]['step_id']
+        envelope=load_private(base/'steps'/first/'transfer-manifest.json')
+        records.append({'group_result':observed,'migration_plan':envelope['migration_plan']})
+    return validate_coverage(records,plan['scope'])
 
 
 def dataset_binding(values,transfer):
@@ -726,6 +752,16 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='acceptance' and packet['parameters']['purpose']=='services':
+            validate_packet(step,packet,plan,base)
+            accepted=load_private(packet['files']['acceptance']['path'])
+            retain(directory/'acceptance.json',encoded(accepted))
+            names=['acceptance.json']; coverage=dataset_coverage(step,base,plan)
+            if coverage is not None:
+                retain(directory/'dataset-coverage.json',encoded(coverage))
+                names.append('dataset-coverage.json')
+            result={'status':'EXTERNAL_ACCEPTANCE_RECORDED','acceptance_ref':accepted['acceptance_ref']}
+            return complete(step,packet,directory,plan,result,names)
         if kind=='dataset_acceptance':
             result=dataset_group(step,packet,base,plan)
             retain(directory/'result.json',encoded(result))
@@ -902,6 +938,11 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     typed_postcondition(step,result,directory,packet,plan)
     if step['kind']=='dataset_acceptance':
         require(result==dataset_group(step,packet,base,plan),'Retained dataset group evidence changed')
+    if step['kind']=='acceptance' and packet['parameters']['purpose']=='services':
+        coverage=dataset_coverage(step,base,plan)
+        if coverage is not None:
+            require(coverage==load_private(directory/'dataset-coverage.json'),
+                    'Retained canonical dataset coverage changed')
     if step['kind']=='acceptance' and packet['parameters']['purpose']=='bootstrap':
         bootstrap_postconditions(step,plan,base)
     return result,list(completed['artifacts'])+['owner-completion.json']
