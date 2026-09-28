@@ -26,13 +26,24 @@
         {
           "cell": "cell-01",
           "capabilities": [
-            "network_domain",
-            "ipv4",
-            "gateway_policy",
-            "distributed_firewall",
             "audit_logging",
+            "backup_restore",
+            "boot_volume",
+            "cpu_topology",
+            "data_volumes",
             "dedicated_edge_context",
-            "native_load_balancer"
+            "disk_order",
+            "distributed_firewall",
+            "dns_registration",
+            "gateway_policy",
+            "identity_join",
+            "ipv4",
+            "log_forwarding",
+            "native_load_balancer",
+            "network_domain",
+            "storage_placement",
+            "time_sync",
+            "vm_create"
           ],
           "clusters": [
             {
@@ -100,10 +111,21 @@
         {
           "cell": "cell-02",
           "capabilities": [
-            "network_domain",
-            "ipv4",
+            "audit_logging",
+            "backup_restore",
+            "boot_volume",
+            "cpu_topology",
+            "data_volumes",
+            "disk_order",
+            "dns_registration",
             "gateway_policy",
-            "audit_logging"
+            "identity_join",
+            "ipv4",
+            "log_forwarding",
+            "network_domain",
+            "storage_placement",
+            "time_sync",
+            "vm_create"
           ],
           "clusters": [
             {

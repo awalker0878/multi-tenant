@@ -140,14 +140,14 @@ class CatalogVersionTest(unittest.TestCase):
     def test_a_duplicate_catalog_version_is_refused(self):
         with self.assertRaises(ProvisioningError) as caught:
             edited_catalogs(lambda root: _edit(root / 'storage' / 'catalog.json',
-                                               lambda d: d.__setitem__('version', '3')))
+                                               lambda d: d.__setitem__('version', support.catalogs().version('compute'))))
         self.assertEqual(caught.exception.code, 'UNSUPPORTED_PROFILE')
         self.assertIn('revision ladder', str(caught.exception))
 
     def test_a_version_bump_changes_the_catalog_digest(self):
         baseline = support.catalogs()
         bumped = edited_catalogs(lambda root: _edit(root / 'compute' / 'catalog.json',
-                                                    lambda d: d.__setitem__('version', '11')))
+                                                    lambda d: d.__setitem__('version', str(max(map(int, support.catalogs().versions.values())) + 1))))
         self.assertEqual(bumped.family('compute').keys(), baseline.family('compute').keys())
         self.assertNotEqual(bumped.version('compute'), baseline.version('compute'))
         self.assertNotEqual(bumped.digest, baseline.digest)
@@ -157,7 +157,7 @@ class CatalogVersionTest(unittest.TestCase):
         baseline = support.catalogs()
         bumped = edited_catalogs(lambda root: _edit(
             root / 'storage' / 'catalog.json',
-            lambda d: set_profile_version(d, 'standard', '2')))
+            lambda d: set_profile_version(d, 'standard', str(int(support.catalogs().get('storage', 'standard').version) + 1))))
         self.assertNotEqual(bumped.get('storage', 'standard').version,
                             baseline.get('storage', 'standard').version)
         self.assertNotEqual(bumped.digest, baseline.digest)
@@ -339,7 +339,7 @@ class VersionedIdentityTest(unittest.TestCase):
         baseline = support.reference_plan()
         bumped = edited_catalogs(lambda root: _edit(
             root / 'storage' / 'catalog.json',
-            lambda d: set_profile_version(d, 'standard', '2')))
+            lambda d: set_profile_version(d, 'standard', str(int(support.catalogs().get('storage', 'standard').version) + 1))))
         changed = execution_plan.create_plan(support.reference_document(), 'in-memory',
                                             fixture(), bumped)
         self.assertEqual(changed.request.digest, baseline.request.digest)
@@ -353,7 +353,7 @@ class VersionedIdentityTest(unittest.TestCase):
     def test_a_catalog_version_bump_changes_desired_state_and_plan_identity(self):
         baseline = support.reference_plan()
         bumped = edited_catalogs(lambda root: _edit(
-            root / 'compute' / 'catalog.json', lambda d: d.__setitem__('version', '11')))
+            root / 'compute' / 'catalog.json', lambda d: d.__setitem__('version', str(max(map(int, support.catalogs().versions.values())) + 1))))
         changed = execution_plan.create_plan(support.reference_document(), 'in-memory',
                                             fixture(), bumped)
         self.assertEqual(changed.request.digest, baseline.request.digest)

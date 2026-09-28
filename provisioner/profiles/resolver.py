@@ -120,8 +120,12 @@ def resolve(spec: dict, catalogs: Catalog) -> Resolution:
         _merge_capabilities(capabilities, recovery)
 
     zones = tuple(availability.requires.get('zones', ('OZ',)))
-    limits = tuple(dict.fromkeys(list(environment.limits) + list(security.limits)
-                                 + list(availability.limits) + list(network.limits)))
+    selected = (environment, security, assurance, availability, network,
+                compute, storage, region, *service_profiles.values())
+    if recovery is not None:
+        selected += (recovery,)
+    limits = tuple(dict.fromkeys(limit for profile in selected
+                                 for limit in profile.limits))
     return Resolution(
         profiles={
             'environment': environment.profile,

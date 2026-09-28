@@ -1,35 +1,67 @@
 {
   "family": "storage",
-  "version": "10",
+  "version": "12",
   "description": "Storage profiles state portable data sizing and the reviewed storage class. Native datastore, storage container and volume-type identity come from inventory.",
   "default": "standard",
   "profiles": [
     {
       "profile": "standard",
-      "version": "1",
+      "version": "2",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Boot disk only.",
-      "requires": {"data_disk_gib": 0, "storage_class": "standard"},
-      "limits": ["No additional data volume is provisioned"]
+      "requires": {
+        "data_disk_gib": 0,
+        "storage_class": "standard",
+        "capabilities": [
+          "boot_volume",
+          "storage_placement"
+        ]
+      },
+      "limits": [
+        "No additional data volume is provisioned"
+      ]
     },
     {
       "profile": "high-capacity",
-      "version": "1",
+      "version": "2",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Boot disk plus a protected data volume.",
-      "requires": {"data_disk_gib": 100, "storage_class": "protected"},
-      "limits": ["Protection class is requested; native storage policy qualification remains external"]
+      "requires": {
+        "data_disk_gib": 100,
+        "storage_class": "protected",
+        "capabilities": [
+          "boot_volume",
+          "data_volumes",
+          "disk_order",
+          "storage_placement"
+        ]
+      },
+      "limits": [
+        "Protection class is requested; native storage policy qualification remains external"
+      ]
     },
     {
       "profile": "encrypted-high-capacity",
-      "version": "1",
+      "version": "2",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Encrypted protected data volume.",
-      "requires": {"data_disk_gib": 100, "storage_class": "encrypted"},
-      "limits": ["Deferred: key custody and encryption qualification are not implemented"]
+      "requires": {
+        "data_disk_gib": 100,
+        "storage_class": "encrypted",
+        "capabilities": [
+          "boot_volume",
+          "data_volumes",
+          "disk_order",
+          "storage_encryption",
+          "storage_placement"
+        ]
+      },
+      "limits": [
+        "Deferred: key custody and encryption qualification are not implemented"
+      ]
     }
   ]
 }
