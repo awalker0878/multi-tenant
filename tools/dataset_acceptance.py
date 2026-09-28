@@ -87,7 +87,9 @@ def validate_group(group_id, datasets, records, scope):
         captures.add(proof['source_receipt_sha256']); restores.add(proof['restore_receipt_sha256'])
         plan_digests.add(proof['migration_plan_digest'])
         observation_ids.add(spec['sourceSnapshotId'])
-        proofs[row['step_id']] = {'transfer_manifest_sha256': row['transfer_manifest_sha256'],
+        proofs[row['step_id']] = {'dataset_id': row['dataset_id'], 'target_ref': row['target_ref'],
+                                 'source_receipt_sha256': proof['source_receipt_sha256'],
+                                 'transfer_manifest_sha256': row['transfer_manifest_sha256'],
                                  'transfer_receipt_sha256': digest(encoded(proof)),
                                  'restore_receipt_sha256': proof['restore_receipt_sha256']}
     require(len(plan_digests) == len(observation_ids) == 1,
@@ -95,5 +97,75 @@ def validate_group(group_id, datasets, records, scope):
     return {'format': FORMAT_GROUP, 'status': STATUS, 'group_id': group_id,
             'scope': dict(scope), 'dataset_ids': sorted(unique['dataset_id']),
             'migration_plan_digest': next(iter(plan_digests)), 'transfers': proofs,
+            'application_acceptance': False, 'native_qualification': False,
+            'production_activation': False}
+
+
+def validate_coverage(records, scope):
+    """Verify the complete selected canonical plan after all group joins.
+
+    The runner must first recompute each group against authenticated retained
+    child artifacts and compare that value with the retained group result. This
+    pure join prevents a caller's legacy dataset subset from hiding an entire
+    group selected by the canonical plan; it supplies no execution authority.
+    """
+    require(isinstance(records, list) and 1 <= len(records) <= 32,
+            'Complete canonical dataset group coverage required')
+    group_results, declared_mappings, canonical_mappings = {}, set(), None
+    plan_digest = None
+    unique = {key: set() for key in ('dataset_id', 'target_ref', 'source_receipt_sha256',
+                                    'restore_receipt_sha256', 'transfer_manifest_sha256',
+                                    'transfer_receipt_sha256', 'step_id')}
+    transfer_keys = set(unique) - {'step_id'}
+    for record in records:
+        require(isinstance(record, dict) and set(record) == {'group_result', 'migration_plan'},
+                'Exact group verification and canonical plan required')
+        result, plan = record['group_result'], record['migration_plan']
+        require(isinstance(plan, dict) and plan.get('kind') == 'MigrationPlan'
+                and not validate_record(plan), 'Valid canonical dataset plan required')
+        selected = {(row['datasetId'], row['targetRef'], row['consistencyGroupId'])
+                    for row in plan['spec']['datasetMappings']}
+        if canonical_mappings is None:
+            canonical_mappings, plan_digest = selected, plan['metadata']['planDigest']
+        require(selected == canonical_mappings and plan['metadata']['planDigest'] == plan_digest,
+                'All completed groups must belong to one exact canonical plan')
+        require(isinstance(result, dict) and result.get('format') == FORMAT_GROUP
+                and result.get('status') == STATUS and result.get('scope') == scope
+                and result.get('migration_plan_digest') == plan_digest
+                and result.get('application_acceptance') is False
+                and result.get('native_qualification') is False
+                and result.get('production_activation') is False,
+                'Dataset group is not verified for this canonical destination')
+        group_id = result.get('group_id')
+        require(isinstance(group_id, str) and _ID.fullmatch(group_id)
+                and group_id not in group_results,
+                'Every canonical consistency group must appear exactly once')
+        expected = {(dataset_id, target_ref) for dataset_id, target_ref, group in selected
+                    if group == group_id}
+        transfers = result.get('transfers')
+        require(expected and isinstance(transfers, dict) and len(transfers) == len(expected),
+                'Group verification must include every selected dataset mapping')
+        actual = set()
+        for step_id, transfer in transfers.items():
+            require(isinstance(transfer, dict) and set(transfer) == transfer_keys,
+                    'Complete distinct dataset proof identities required')
+            for key, value in {'step_id': step_id, **transfer}.items():
+                expression = _SHA if key.endswith('_sha256') else _ID
+                require(isinstance(value, str) and expression.fullmatch(value)
+                        and value not in unique[key],
+                        'Datasets, mappings and capture/restore proofs cannot be reused across groups')
+                unique[key].add(value)
+            actual.add((transfer['dataset_id'], transfer['target_ref']))
+        require(actual == expected and result.get('dataset_ids') == sorted(row[0] for row in expected),
+                'Group verification is missing a selected canonical dataset')
+        declared_mappings.update((dataset_id, target_ref, group_id) for dataset_id, target_ref in actual)
+        group_results[group_id] = digest(encoded(result))
+    require(declared_mappings == canonical_mappings,
+            'All selected canonical dataset groups must complete before services acceptance')
+    return {'format': 'hosting-dataset-plan-verification/1',
+            'status': 'DATASET_PLAN_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
+            'scope': dict(scope), 'migration_plan_digest': plan_digest,
+            'dataset_ids': sorted(unique['dataset_id']),
+            'group_results': dict(sorted(group_results.items())),
             'application_acceptance': False, 'native_qualification': False,
             'production_activation': False}
