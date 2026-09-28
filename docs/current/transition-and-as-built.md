@@ -1,10 +1,10 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.1 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
-New maintained transition/as-built record replacing no historical original; current and intermediate states must be observed.
+Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.
 
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [OPS §3](../operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md) · [OPS §6](../operations/recovery-transition/6-migrate-and-fail-back-without-conflicting-writers.md) · [QUAL §7](../assurance/site-qualification/7-operating-accountability-handover-and-change.md).
 
@@ -17,6 +17,57 @@ A lost native response may leave running work. Retain request/plan/state-generat
 After target writes, failback requires an assessed reverse-consistency process; restarting the old source is not a universal rollback. Retire obsolete live paths and credentials while retaining held data, usable keys and accountable copies. Record the evidence for sanitization rather than infer it from an object disappearing.
 
 The as-built record compares intended and actual resources, interfaces, versions and ownership. Explain every deviation, test its effect and record open risks or conditions. Distinguish a code test, native qualification, initial operating readiness and formal authorization.
+
+### Application migration transitions
+
+A reviewed plan separates source inventory/adoption, isolated target provisioning,
+initial transfer, rehearsal, source quiesce/fencing, final synchronization, traffic
+switch, target write admission, stabilization and source retirement. Each transition
+binds the immutable plan, exact dataset/member set, authority, native IDs, expected
+postconditions and a safe hold/recovery decision. The complete graph is still an
+implementation deliverable; these phases do not describe an already accepted run.
+
+Keep data integrity and metadata expectations per dataset, complete consistency-group
+joins and independent source/target observations. An interruption after an external
+effect must reconcile the actual native task and resource before another attempt.
+In-flight or uncertain writers are not cleared because a worker lease, SSH session
+or workflow task expired. Source shutdown and source-writer exclusion are distinct.
+
+Before target writes, rollback may restore the original serving path only when the
+approved strategy and observations allow it. After target writes, use the explicitly
+qualified reverse-sync, restore or repair procedure. Record the divergence interval,
+accepted loss limits, fencing and measured recovery result; do not present stale
+source restart as generic failback.
+
+### Revision and retained-state conversion
+
+The expanded profile requirements change catalogue revisions and derived plan
+digests. Preserve old signed plans/receipts as immutable history. Reassess open work
+under the new catalogue and obtain new approvals; do not reinterpret old signatures
+under new requirements or silently replace their source receipts.
+
+The capability and native-qualification owners were moved into the installed package
+and their former script entry points removed without wrappers. The retirement
+register guards against reintroduction. This does not remove other runners with
+retained state: inventory their files and native operations, freeze new writes,
+drain or hold in-flight work, reconcile independently, convert exact old schemas
+in an offline importer and verify counts/identities before enabling one replacement
+writer. Conversion failure preserves the hold and original evidence.
+
+### Current as-built and release record
+
+The repository's engineering profiles have no selected installed tuples or native-
+qualified claims. The admitted Temporal job is an authority gate, not a completed
+provisioning/migration run. Discovery has signed publication/comparison components;
+collector/profile wiring, persistent owner/dependency review and scheduling remain
+open. Lower-level provisioning and transfer contracts do not close the missing
+orchestration, fencing, cutover and post-write recovery paths.
+
+Record B01–B50 implementation, automated verification, native qualification and
+operating acceptance separately in the [execution plan](../product/enterprise-workload-mobility-execution-plan.md).
+Required release evidence includes actual restore/HA/DR, security and failure tests,
+measured performance, incident ownership, a controlled pilot and accepted directed
+routes. No site or production workload was changed by this repository revision.
 
 ## Engineering and implementation handoff
 

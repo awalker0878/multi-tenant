@@ -1,5 +1,22 @@
 # Test strategy and actual evidence levels
 
+## Capability/profile reconciliation checks
+
+Run `python -m provisioner.qualification.registry` and
+`python -m provisioner.qualification.native`; the former script entry points are
+retired. `tests/test_capability_coverage.py` checks complete per-platform dimension
+coverage, shared vocabulary ownership, digest/format mismatch, unqualified-feature
+refusal, malformed data and evidence-root containment.
+
+`tests/provisioning/policy/test_profile_integrity.py` verifies complete selected
+limitations, strict catalogue input, mandatory workload requirements and rejection
+of a network-capable destination missing VM support. The policy, placement,
+documentation and golden-replay suites must pass together after a profile revision.
+The five-request by three-platform corpus remains synthetic and unauthorized; no
+regenerated digest grants native or production acceptance. Installed-wheel checks
+also verify new qualification owners and absence of their retired imports.
+
+
 ## Service and activation implementation tests
 
 The reference adapter tests verify state-key separation, NetBox conditional-write

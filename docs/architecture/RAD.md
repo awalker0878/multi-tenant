@@ -1,5 +1,10 @@
 # RAD — Reference architecture reading view
 
+**Current maintained design:** [RAD-adoption.md](../current/RAD-adoption.md) covers the
+workload mobility application, authority, discovery, profiles and current execution
+boundaries. The chapters below preserve the infrastructure source lineage; they
+are not the current product completion ledger.
+
 This is a new **composition / navigation view of available source content**, not a recovered standalone RAD or TAD file. The original standalone v1.2 package was not available in the supplied commit-ready ZIP. All substantive chapters below are full source transcriptions, with source/version and original file links.
 
 | Design concern | Full source chapters |

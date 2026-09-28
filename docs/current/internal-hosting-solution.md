@@ -1,10 +1,10 @@
 # SOL-M01 — Internal two-tenant protected workload solution
 
-**Version:** 0.1 · **Status:** Proposed · **Accountable role:** Hosting solution architect.
+**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Hosting solution architect.
 
 ## Scope and authority
 
-A newly maintained selection view of the existing two-tenant OZ/RZ reference fixture; no fresh addresses or service promises are invented.
+A maintained internal two-tenant reference solution for isolated provisioning and application migration; fixture values are not current allocations or service promises.
 
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [WD §2](../solutions/internal-protected-workload/2-reference-decisions-and-infrastructure-boundaries.md) · [WD §5](../solutions/internal-protected-workload/5-dedicated-handoff-inventory-and-route-ownership.md) · [WD §9](../solutions/internal-protected-workload/9-build-sequence-with-explicit-acceptance-dependencies.md) · [RA §28](../architecture/reference/28-architecture-acceptance-and-verification.md).
 
@@ -17,6 +17,49 @@ The path is workload → native gateway → domain-specific security context →
 Require the selected image/template, storage/placement profile, mandatory policy, permitted bootstrap clients and protection/key dependencies before admitting a workload. Network disconnection and guest power state are distinct properties on each stack. A native task completion or matching API projection does not prove quarantine or readiness.
 
 Tests need healthy control endpoints and a temporary same-domain probe when a fixture otherwise has only one endpoint per domain. Account for temporary test demand and cleanup; do not describe route absence as firewall denial.
+
+### Operator provisioning and migration scenario
+
+Use the existing two-tenant internal fixture to exercise isolation and planning
+across all three platform families without inventing installed site parameters.
+An operator selects reviewed profiles, receives explicit requirement/unknown-fact
+blockers, compares eligible destinations and creates an immutable proposed plan.
+The capability catalogue now covers compute/storage/guest/data/service/operation
+requirements as well as networking. Every selected profile's limitations must be
+visible; a successful synthetic placement remains unauthorized.
+
+The first application-migration scenario in the execution plan is rebuild/restore,
+not arbitrary transparent VM mobility. Bind every workload, dataset, dependency,
+source/target native scope and approved directed route. Construct an isolated target,
+rehearse restore and service readiness without production side effects, then require
+source quiesce/fencing, final synchronization and independent activation evidence.
+The current admitted workflow does not yet execute that complete chain. Whole-VM
+capture/conversion, Windows and additional directions need their own implementation
+and qualification, not a renamed fixture.
+
+### Site engineering and qualification inputs
+
+Supply actual installed product/API/provider/hardware/licence tuples, native resource
+IDs, compute/storage/network constraints, credential scopes and service-owner
+agreements through controlled operator systems. Address preservation, disk/NIC order,
+firmware, secure boot, vTPM, accelerators, shared disks and guest dependencies must be
+assessed explicitly. Missing facts hold the affected strategy. Do not infer that a
+feature exists merely because the platform profile contains its capability row.
+
+Service usability requires accepted DNS, identity, time, trust, logging, monitoring
+and backup/restore outcomes in addition to VM reachability. Retain the selected
+policy/route equivalence assessment and the separate activation decision. After
+target writes, use a qualified reverse-sync/restore/repair path; retain the source
+until its declared retention and retirement gates are met.
+
+### Current evidence boundary
+
+The reviewed example corpus still contains five requests across three platform
+realizations. Catalogue changes regenerate their resolution, placement, desired-state
+and plan fingerprints; the examples remain `PLANNED_DISABLED_NOT_AUTHORIZED` with
+no native contact. The [all-waves plan](../product/enterprise-workload-mobility-execution-plan.md)
+and [current TAD](TAD-infrastructure.md) distinguish implemented components from the
+unfinished native workflow and operating acceptance.
 
 ## Engineering and implementation handoff
 

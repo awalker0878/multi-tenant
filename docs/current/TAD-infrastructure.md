@@ -1,10 +1,10 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.1 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
-Technical decomposition across the fabric, hosting stacks, security edge and shared services.
+Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.
 
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §3](../architecture/reference/3-system-context-and-physical-hosting-topology.md) · [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [RA §15](../architecture/reference/15-cross-vendor-realization-model.md) · [PROV §3](../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md).
 
@@ -17,6 +17,98 @@ All inter-domain transitions have named adjacent authorities and the complete re
 Separate virtual disk I/O, guest file/object access, storage replication, backup transfer and their control planes. Shared service consumption grants only an endpoint/operation/resource scope, not provider administration. Identity, DNS, time, state, keys, backup catalogue and emergency access form a recovery dependency graph which must remain viable for the declared failure.
 
 Native realization must name the actual product/API/provider/feature/entitlement combination. No single provider provisions or qualifies the complete environment. VMware/NSX, Nutanix and OpenStack offer different forwarding and control mechanisms; portability is a demonstrated outcome rather than topology identity.
+
+### Control application and durable authority
+
+`provisioner/controlplane/api` owns authenticated API and portal transport;
+`provisioner/cli/operator.py` is a client, not an alternate local controller.
+PostgreSQL persistence and row-level security bind business records to authorized
+scopes. Immutable plan revisions and their digests survive retries and are checked
+against current approvals/revocations before admitting work. Transactional outbox
+records avoid treating a successful network dispatch as committed business state.
+
+`provisioner/controlplane/workflow` owns Temporal orchestration. The current
+`AdmittedMigrationJob` checks the admitted authority and returns `GATE_PASSED` or a
+hold; this is not yet the provisioning/migration graph. Native worker execution
+must continue to use durable job/run bindings, resource claims, one-writer intents,
+credential boundaries and independent reconciliation. Do not add a direct API-to-
+Terraform execution shortcut or equate worker liveness with operation completion.
+
+### Discovery and comparison path
+
+The VMware, AHV and OpenStack discovery adapters are bounded read-only components.
+A separate mTLS ingest service validates signed campaign/result identity and native
+read-credential witnesses before publication. Original signed bytes and hashes are
+retained; ingest and ordinary application SQL roles remain isolated. Publication
+locks and generation rechecks prevent stale results from replacing current state.
+
+Installed-tuple, directed-route and control inputs are durable signed records.
+Normalization and comparison pin those inputs and the relevant inventory generations;
+conflicting/missing VM, disk, NIC, quota and dependency facts do not become confirmed
+absence. Duplicate scope declarations cannot create artificial destination diversity.
+A comparison is advice, not ownership adoption or an execution grant. Full collector,
+profile and credential wiring, persisted owner/dependency review, scheduling and
+large-estate qualification remain open.
+
+### Profiles and qualification runtime
+
+`provisioner/domain/capabilities.py` is the sole owner of the 97-dimension vocabulary.
+`provisioner/qualification/registry.py` validates complete per-platform declarations;
+`provisioner/qualification/native.py` validates current exact-tuple native dossiers.
+The old script entry points were removed and their consumers migrated without
+wrappers. Run them as `python -m provisioner.qualification.registry` and
+`python -m provisioner.qualification.native`. Other runtime owners still require
+relocation; this change does not close B05.
+
+Registry version 2 binds the vocabulary digest and validates bounded, duplicate-free
+JSON, explicit capability rows, controlled evidence links and resource-root
+containment. Native-qualified claims require current provenance and target-bound
+campaign evidence. Portable compute/storage/recovery/service profiles declare their
+own mandatory capabilities; the resolver retains limitations from every selected
+profile. A changed catalogue revision invalidates previous derived plan identity
+and requires reassessment rather than approval reuse.
+
+### Provisioning and useful-service execution
+
+The lower-level execution code separates native domain/workload provisioning,
+private saved Terraform plans, provider task observation, fenced VM lifecycle,
+guest configuration and service-owner handoffs. A complete admitted workflow must
+compose those effects using exact approved inputs and fresh per-effect authority.
+Allocate and confirm capacity, address space and staging budgets transactionally;
+keep reservations until independently reconciled release, not until a client exits.
+
+Preserve per-member disk/NIC order, boot/firmware and guest identity. Reject layouts
+that cannot be represented or qualified. Native create success must be followed by
+independent VM/storage/network/policy observation, approved guest configuration,
+DNS/identity/time/trust/logging/monitoring/backup postconditions and controlled
+activation. Terraform, native lifecycle code and guest automation must not compete
+for the same field or resource writer. Unknown outcomes remain held until observed.
+
+### Migration data plane and recovery
+
+The cross-scope transfer contracts preserve the original source repository/snapshot
+identity and signed receipt rather than minting target-side source evidence. Each
+dataset has an exact source and target identity, bounded transfer budget, metadata
+policy and integrity record. Consistency-group joins require complete declared
+dataset coverage. A logical `targetRef` is neither a filesystem path nor a native ID.
+
+Before exposing a mutation path, complete the independently observed target dataset/
+root binding, trusted mTLS-worker-to-transfer authority, dynamically scoped native
+repository credentials and independent filesystem/old-writer observations. Receipt
+validation alone does not implement these integrations. Isolation must suppress
+production side effects during rehearsal. Quiesce/fence, final sync, traffic switch,
+target write admission, source retention and post-write recovery have separate
+approval, evidence and failure boundaries.
+
+### Verification and operating topology
+
+Use the installed wheel outside the checkout to verify resource ownership and imports.
+Repository tests exercise profile negatives, all three planning realizations,
+authority, signatures, local TLS, database roles and recovery fixtures in their
+appropriate CI jobs. The [execution plan](../product/enterprise-workload-mobility-execution-plan.md)
+retains unclosed native routes, HA/DR, restore, operating acceptance and release
+qualification. Neither a fixture throughput result nor a package build establishes
+estate-scale performance, native support or production authorization.
 
 ## Engineering and implementation handoff
 

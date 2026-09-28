@@ -1,121 +1,54 @@
-# Next work: executable product and native release
+# Next work — enterprise workload mobility
 
-The current [all-wave execution plan](product/enterprise-workload-mobility-execution-plan.md)
-tracks the B01–B50 baseline at revision `3cbc0c1e`, adds the current implementation
-checkpoint, corrects dependencies, and defines small-commit implementation series.
-The original audit remains historical.
+The [execution plan](product/enterprise-workload-mobility-execution-plan.md) is the
+single current B01–B50 backlog. The [original audit](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
+and older automation/refactor ledgers remain historical evidence, not parallel
+completion authorities. Do not restart a superseded increment or mark the programme
+complete from its old W/C counts.
 
-The C01–C13 refactor gates describe a completed **planning interface refactor**, not
-an executable provisioning and migration product. The current public `apply` and
-`mobility-apply` paths refuse execution. Lower-level delivery now has a real
-bootstrap plan/apply/readback chain, guarded cross-scope restore and per-dataset
-verification joins. The admitted Temporal workflow still does not drive those
-native stages; complete source fencing, cutover and useful-service acceptance
-remain implementation work. See the
-[full audit and implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
-for source evidence, 50 sequenced work items, deletion gates and route acceptance.
-The [portable provisioning documents](provisioning/README.md) and
-[refactor completion audit](deepseek-refactor-completion-audit.md) remain historical
-records for the smaller scope they covered.
+## Current checkpoint
 
-## Repository implementation
+The capability/profile pass gives all three platforms explicit coverage of 97
+workload dimensions, removes duplicated vocabulary and two obsolete runtime entry
+points, enforces compute/storage/service requirements and retains every selected
+profile limitation. It updates the maintained RAD/TAD and associated design records.
+All selected installed tuples, native qualifications and release acceptance remain
+open. A capability row is not an executed feature.
 
-| Wave | Work to deliver in the repository | Exit condition |
-| --- | --- | --- |
-| 0, B01–B05 | Fix the delivery-format regression; adopt the product/identity/authority ADRs; define canonical workload/application, plan, transfer and activity contracts; inventory every old consumer/record; package runtime code and remove checkout imports. | Required CI passes at the delivery revision; schemas cover existing multi-VM workloads, same-family moves and unknown facts; deletion register names every retained state conversion. |
-| 1, B06–B13 | Multiuser API, SSO and scoped approvals; product database, outbox and durable workflows; fenced site workers, audit store, console and thin CLI. | One authenticated, restart-safe and idempotent execution authority with revoked/stale grants rejected. |
-| 2, B14–B22 | Read-only platform inventory, application dependency review, safe adoption, destination comparison and current route capability. | An operator can see observed source identities, viable destinations, blockers, unknowns and remediation without implying execution approval. |
-| 3, B23–B29 | Complete provisioning graph from saved plans through native postconditions, guest readiness, service activation, reservations and day-two actions. | A qualified workload reaches useful service through one authorized job and survives interrupted operations without blind replay. |
-| 4, B30–B37 | First real application migration: cross-scope transfer, per-dataset verification, source fencing, final sync, traffic cutover, application acceptance and recovery. | A VMware Linux application migrates to a qualified OpenStack target with one accepted writer and rehearsed recovery. |
-| 5, B38–B43 | Cold VM conversion, same-family relocation, other directed platform routes, application-native sync and scheduled waves. | Each advertised method and direction has independent guest, policy, data and recovery qualification. |
-| 6, B44–B50 | Operations, retained-state conversion, deletion of superseded paths, native qualification and release controls. | No dual mutation path or implicit fallback remains; supported routes have current installed-tuple and operational evidence. |
+## Next implementation sequence
 
-Product architecture direction is documented in the
-[product mandate](product/decisions/product-mandate.md),
-[workload and security boundary](product/decisions/workload-and-security-boundary.md)
-and [state ownership](product/decisions/state-ownership.md) decisions.
-Implementation status must be measured by executable behavior, tests and native
-qualification separately. A completed document, fixture or contract cannot close an
-unimplemented product path.
+**B05 — finish installed ownership.** Continue moving the remaining compiler,
+execution and evidence owners into the package, migrating all callers and removing
+obsolete paths. Preserve resource digests and prove isolated installed operation.
+Apply retained-state conversion/reconciliation before removing any active writer.
 
-## Wave 2 checkpoint: read-only discovery and comparison
+**B14–B22 — finish trusted discovery.** Wire native collectors to installed profiles
+and independently verified read credentials; complete fact coverage and unknown-state
+handling; persist owner/dependency reviews and no-change adoption proposals; add
+bounded scheduling, resume/freshness rules and measured estate-scale campaigns.
 
-Wave 2, B14–B22, remains **in progress**. The separate
-[discovery ingest process](discovery-ingest.md) authenticates the actual collector
-over pinned mTLS, checks independently signed campaign/result provenance and a
-fresh separately signed native read-credential witness, and retains original
-signed request bytes and verification evidence before publication. The database
-writer is separate from human API and site-worker roles. Revoked, stale,
-wrong-scope or unverifiable evidence is refused; signed file custody still needs
-independent deployment, retention and rollback-floor controls.
+**B23–B29 — compose useful provisioning.** Integrate transactional reservations,
+fenced native effects, complete VM/disk/NIC/guest state, service-owner postconditions
+and activation into admitted durable workflows. The existing authority-gate workflow
+must not be relabelled as that implementation. Add crash/replay and independent
+native reconciliation cases for every external effect.
 
-[Signed assessment inputs](operations/assessment-evidence-ingest.md) persist
-installed tuples, directed route claims and independent control findings in an
-append-only tenant store. Reads revalidate original provenance and current
-reviewer authority. The scoped `POST /v1/assessments/compare` service reconstructs
-pinned generations, normalizes supported facts and returns reasons, remediation,
-confidence and input digests. Missing routes, capacity or reviews remain unknown;
-contradictory CPU, memory, NIC or quota facts cannot become a generous capacity
-estimate. The [operator guide](product/wave2-operator-guide.md) describes API,
-portal and thin-CLI use. Duplicate declarations for one native scope cannot pad
-destination counts. A newer observation withholds current eligibility for an old
-pin, including when the new generation is partial or unknown. No comparison
-grants execution authority.
+**B30–B37 — finish first application migration.** Compose native source/target dataset
+bindings, trusted worker transfer authority and dynamic credentials; independently
+verify filesystem outcomes and old-writer exclusion. Complete isolated rehearsal,
+quiesce/fence, final sync, cutover, target write admission and pre-/post-write recovery.
+Qualify the exact initial directed route rather than advertising reciprocal support.
 
-Remaining repository work includes native collector transport/credential wiring,
-complete per-platform VM/device/capacity fact coverage, persisted application
-owner/dependency review, discovery scheduling/rate limits, operational freshness
-and the estate benchmark. The existing VMware visible-list reader cannot prove
-full folder or privilege coverage. Installed profile, native IAM/RBAC witness,
-policy, security and recovery campaigns still require selected real sites and
-independent owners. The 50,000-workload/100-endpoint and latency targets remain
-unmeasured. None of these inputs can be synthesized from a selector or fixture.
+**B38–B50 — route breadth and supported release.** Implement and qualify whole-VM
+capture/conversion, Windows and additional directions, then HA/DR, security, scale,
+retained-state conversion, pilot and operating handover. A fixture result cannot
+substitute for an installed-target or application-acceptance campaign.
 
-## Next integrated execution work
+## Closure evidence
 
-Private installed package resources now serve reviewed planning/compiler/catalogue
-assets through one selected root; installed-wheel tests reject resource fallback
-and stale build layouts. B05 remains open because generic `tools`/`scripts` runtime
-owners and source-bound native execution still need migration.
-
-For B24, connect the admitted durable workflow to the real delivery stages with
-current native ownership, credentials, leases and interruption reconciliation.
-For B30/B31, compose the mutation-worker resolver, credential custody and native
-intent registry with guarded cross-scope restore, distinct source/destination
-receipts, dataset mappings and complete consistency-group joins. These lower-level
-repairs still need independently observed target dataset/root bindings, a trusted
-mTLS worker-to-transfer authority adapter and native filesystem/old-writer
-exclusion observations. Stable capture/mapping identity must remain separate from
-expiring attempt grants; a target selector cannot be treated as a path. They do
-not by themselves execute a control-plane migration. Source fencing,
-traffic switch, post-write recovery, native route expansion and most Wave 4–6
-release work remain open under the all-wave execution plan.
-
-## Site and organizational release inputs
-
-The following inputs remain necessary alongside repository implementation. The bounded
-contracts and local tools in this table do not make the full workflow executable or
-authorize native target contact. Each selected site and migration route needs current
-evidence from its actual owners.
-
-| Owner | Missing external evidence/input | Why it matters | Existing bounded implementation | Completion condition | Hold point |
-|---|---|---|---|---|---|
-| Toolchain owner | Release-revision Terraform/provider checks, pinned locks and review of any new native engine or provider change. | Terraform and Ansible checks passed at the audited revision, but an earlier passing engine job does not qualify a future changed release or installed target. | `tools/verify_terraform.py`, the module/root catalogue, `terraform/catalog.json` and pinned provider locks provide a bounded validation path. | The exact release revision runs required Terraform/Ansible checks and any new provider schema or plan-only validation; native qualification remains separate. | Before native apply |
-| Platform and security owner | The actual site/cell, installed hardware/product/API/provider/backend/feature/licence tuple, EC/SE and management/OOB realization, permitted disposable campaign scope, data restrictions, credential custody, stop authority and time-bounded target-contact authority. | Target selection is the prerequisite for every native gate; an unselected target would leave any campaign unbound. | The target-selection gate, its schema and its fail-closed validation are implemented and exercised against fixtures. | A recorded decision naming the exact tuple and authorities and reviewed by the owners. | Before native connection or provisioning |
-| Qualification campaign owner | A campaign packet bound to the exact selected change/contact/stop authority, native API/observer/writer scopes, custody/workspace/data restrictions, permitted/prohibited operations, cleanup and contact window, plus retained native attempts, positive controls, artifact hashes, freshness and reviewed not-applicable decisions. | Qualification is the only source of placement eligibility; unbound evidence would let placement outrun its authority. | The campaign gate, its freshness window, packet-to-dossier traceability and the `PlatformProfile` dossier refusal of untraceable or stale evidence are implemented. | The independent qualification authority publishes a dossier the gate accepts with no residual gaps. | Before native qualification publication |
-| Platform observers | The exact installed API/profile, omission/default behavior, native RBAC, version-token semantics and complete accepted task/entity coverage, plus supported VM/Flow/route or composite-task profiles where the chosen service scope requires them. | Reconciliation cannot distinguish a real change from an unread field, so conformance would rest on unproven reads. | The native readback contract, the generation/plan-bound observation binding and the `native-observation` external check are implemented and tested against recorded shapes. | Observations produced by the selected profiles that cover the accepted entity set with the omission/default semantics recorded. | Before relying on native readback |
-| Recovery owner | Real scoped native writer fencing, current containment/quarantine evidence and the same-generation source-of-truth/data-impact/shared-dependency reconciliation decision. | An interrupted mutation cannot be safely resumed or reversed without proven writer exclusion. | The writer-fencing and reconciliation contract, the generation binding and the fail-closed refusal of unbound evidence are implemented. | A recorded fencing and reconciliation decision for the actual platform, with any approved forward repair, compensation or import kept as a separate mutation plan. | Before resuming interrupted mutations |
-| Security/network owner | The actual EC/SE or distributed/shared ZIP realization and current pairwise authority, deny-first policy, native route/bypass, inspection/logging, management separation, HA/failure, capacity and path evidence. | Unproven security-edge behavior would let traffic reach a workload without a qualified treatment. | The security-edge/ZIP assurance gate and its readiness verdicts are implemented and exercised against fixtures. | Current native evidence for the selected realization with no unproven bypass. | Before approved connectivity |
-| Shared-service routing owner | Origin-specific service-reply evidence for every offered service binding and family: endpoint entitlement, forward/reply route ownership, alternate-path/no-transit review, source validation, missing-route/edge-failure/reverse-initiation tests, telemetry, survivor capacity and binding/version revocation. | A binding without a proven reply path is not a usable service. | The service-reply gate, its per-binding and per-family structure and its readiness verdicts are implemented. | Current evidence for every offered binding and family. | Before shared-service use |
-| Shared-service owners | Current authoritative IPAM/DNS, selected address-assignment/DHCP-metadata behavior, resolver/time/trust/artifact/telemetry/service-reply dependencies, restricted management and steady-state transition evidence, plus separate identity/crypto and storage-lifecycle evidence; the backup/restore gate remains the protection record. | Bootstrap services are consumed before steady state, so an unproven dependency blocks the first workload. | The bootstrap, identity/crypto and storage-lifecycle gates and their dependency composition are implemented and tested. | Current evidence for every listed dependency with the temporary-to-steady-state transition recorded. | Before offered service promises |
-| IPv6 engineering | Native IPv6 evidence for the selected site/service/platform/security-edge mode: addressing/local protocols, route/security parity, MTU/PMTU, shared-service dependencies, failure/recovery and operational acceptance, with no-IPv4-fallback evidence for IPv6-only or an independent IPv4 campaign for dual-stack. | The routed laboratory proves the model, not the installed address-family behavior. | The native IPv6 assurance gate and the family-separation rule are implemented and tested. | Current native evidence for the selected mode. | Before native dual-stack/IPv6 offer |
-| Capacity/service owner | The exact approved `PlatformProfile` dossier digest, approval decision and target-bound campaign/site/cell scope for the commissioned envelope. | Capacity must not follow a reused qualification ID whose contents changed. | The commissioning gate, the envelope digest binding and the fail-closed refusal of a moved digest are implemented. | A commissioned envelope pinned to its exact approved qualification state, with re-approval recorded if that state changes. | Before reservation/admission |
-| Reservation owner | External reservations bound to the SHA-256 of the exact commissioned envelope evaluated at reservation time, and downstream IPAM verification that the reconstructed parent-reservation spec still matches the authoritative record. | The same envelope ID with different contents is a reconciliation conflict, not an idempotent retry. | The reservation preflight, the envelope digest binding and the reconciliation-conflict behavior are implemented and tested. | Owner-held reservations that carry and verify the exact envelope digest. | Before authoritative reservation/IPAM use |
-| DNS owner | Each DNS registration bound to the stable confirmed-IPAM allocation/realization digest and the full normalized DNS intent digest. | A reused allocation or registration ID with changed confirmation, name, zone, TTL, observation or owner scope must fail closed rather than appear idempotent. | The DNS registration intent, the immutable binding and the fail-closed mismatch behavior are implemented and tested. | Owner-held registrations that carry and verify both digests. | Before authoritative DNS mutation/use |
-| Operations/authority | Exact-scope G0/G1/G2 prerequisites, initial G4 recovery/operations readiness, current operating authority and a tested reversible G3 withdrawal plan, plus the externally executed exposure change and the recorded live entry/reply, dependency and telemetry evidence. | Production exposure is only safe under separately granted authority. | The production activation assurance gate, its prerequisite structure and its withdrawal/reversal contract are implemented. | Current evidence for every prerequisite and a recorded activation decision; failed or unknown activation is withdrawn. | Before production |
-| Provisioning interface owner | Reviewed authoritative site state to replace the non-authoritative per-platform inventory fixtures, and the qualified product tuples the placement registry leaves empty; also the missing realization for each deferred profile. | Until then placement stays `FIXTURE_NOT_PLACEMENT_AUTHORITY` and no plan is a placement authority. | The fixture-backed placement path, the `FIXTURE_NOT_PLACEMENT_AUTHORITY` verdict, the empty qualified-tuple registry and the deferred-profile refusal are implemented and tested. | Authoritative site state and qualified tuples accepted by the same gate, and a deferred profile promoted only once its realization exists. | Before a plan is treated as a placement authority |
-
-These gates do not close because more files or synthetic fixtures pass.
-[The historical backlog](../sources/implementation_backlog.csv) records the earlier
-evidence dependencies; use the [product implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
-for current repository work and release acceptance.
+Record implementation, automated verification, native qualification and operational
+acceptance separately, bound to exact revisions/scopes. Keep unsupported features,
+unknown inventory facts, expired authority and uncertain native outcomes blocked.
+See the [retirement register](implementation/automation/phase0-interface-retirement.md)
+and [current transition record](current/transition-and-as-built.md) before deleting
+an execution path with potentially live work.

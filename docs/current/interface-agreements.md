@@ -1,10 +1,10 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.1 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
-Per-interface working design obligations across independently governed infrastructure.
+Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.
 
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [NBD §6](../engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md) · [SVC §1](../architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md).
 
@@ -15,6 +15,42 @@ For each interface identify producer, actual client, native endpoint, permitted 
 The agreement identifies version/feature compatibility, failure detection, retry/backpressure, log attribution, identity/key expiry and recovery order. Define who can change a next hop, firewall scope, service credential or data object, and which observer can independently verify it.
 
 Use a bounded allocation and lifecycle reference across owners rather than credentials or large state dumps. Include expected generation, operation identity and safe stopping conditions for partial success. Name release/retention conditions before reusing an address, attachment, service identity or data copy.
+
+### Control-application interfaces
+
+| Boundary | Required binding and refusal condition |
+|---|---|
+| Operator to API | Verified organization/tenant identity, entitlement, immutable plan revision/digest, applicable approval and revocation state. A browser/CLI parameter is not authority. |
+| API to workflow | Committed job and transactional outbox, exact workflow/run binding and idempotency identity. Dispatch success is not native completion; admission does not approve arbitrary later effects. |
+| Collector to discovery ingest | Separate read-only mTLS identity, signed campaign/result, independent native credential witness, exact scope, completeness and freshness. Retain original signed bytes; a discovery credential cannot mint a write grant. |
+| Site worker to native owner | Approved operation/resource identity, bounded grant, resource claim and durable intent. Expiry, scope change or uncertain completion prevents a blind retry. |
+| Native owner to observer | Exact native IDs and task/attempt identity, independently observed postconditions and complete observation scope. An echoed request or task acknowledgement is insufficient. |
+| Source to data-transfer worker | Original repository/snapshot/dataset identity and signed source receipt, separate target binding, integrity/metadata policy and consistency-group membership. Never reconstruct source evidence from target claims. |
+| Workload to shared-service owner | Scoped endpoint, operation, entitlement and accepted service outcome. Consuming a resolver, identity service or backup repository does not grant provider administration. |
+| Evidence producer to custodian | Original signed content, digest, scope, issuer, validity and controlled retention. Local test artifacts cannot populate native qualification as if they were site observations. |
+
+These are contract obligations, not a statement that every interface is fully wired.
+In particular, the admitted workflow still stops at its authority gate and the data
+transfer path still needs independent native target/root and worker-authority
+composition. Record those gaps instead of presenting a handoff document as execution.
+
+### Versioning, qualification and ownership
+
+The registry now uses a digest-bound 97-dimension vocabulary shared by installed
+registry and native-dossier validators. Every platform explicitly declares each
+capability. A caller supplies requirements, not support assertions; native support
+requires a current exact-tuple dossier and directed routes remain separately qualified.
+Portable catalogue/profile revision changes require reassessment and new plan identity.
+
+Commands and import owners for qualification now reside in `provisioner.qualification`;
+the former scripts are removed. Consumers must migrate rather than use an alias.
+Other retained execution interfaces require the documented freeze/drain/reconcile
+and historical-state conversion before their competing writers can be removed.
+
+An agreement must also define failure/retry limits, credential renewal/revocation,
+lease expiry, unknown outcomes and independent recovery. Include write cutover and
+post-write recovery ownership explicitly: neither producer may assume the other has
+excluded the old writer or admitted target writes.
 
 ## Engineering and implementation handoff
 

@@ -1,40 +1,51 @@
-# Implementation Increment 04 — scope and evidence boundary
+# Current implementation scope and evidence boundary
 
-## New executed code
+The [all-waves execution plan](product/enterprise-workload-mobility-execution-plan.md)
+is the current B01–B50 delivery baseline. Earlier numbered implementation increments,
+W01–W29 and C01–C13 records describe narrower historical scopes; they are not current
+product-completion claims. This record replaces the obsolete Increment 04-only scope.
 
-- GET-only HTTPS transport with exact origins/paths, strict JSON/framing and bounded reads.
-- NSX Local Manager selected-object/configuration and intent-realization observation.
-- Nutanix networking/prism v4.3 selected VPC/subnet and known-single-task observation.
-- Offline interrupted-change history/binding/freshness and hold-point review.
-- Disposable HTTPS scripted native-readback fault campaign and additional regressions.
+## Implemented repository components
 
-These are reusable implementation tools tied to existing infrastructure work packages,
-not a new hosting application, service API, scheduler or authorization engine.
+The repository includes the authenticated control application/portal/CLI foundation,
+PostgreSQL business state and isolation, approval/admission/outbox primitives,
+Temporal authority gating, scoped workers and native-intent/evidence controls.
+Read-only VMware/AHV/OpenStack discovery components, signed mTLS result publication,
+generation-pinned normalization and destination comparison have repository tests.
 
-## Existing capabilities retained
+Portable planning, reviewed Terraform roots, native lifecycle/readback primitives,
+guest/service handoffs and cross-scope transfer/integrity contracts are present.
+They are not yet a fully composed admitted provisioning or migration workflow.
+`AdmittedMigrationJob` verifies authority and stops at its gate result.
 
-The ten native Terraform module/root pairs are unchanged candidate source. The
-Neutron GET-only reader, exact route/plan/input checks, scoped RFC2136 DNS client and
-fixed IPv4 routing/mTLS lab retain their documented scopes. All 139 reference files
-and 50 Terraform source files remain byte-for-byte unchanged.
+The registry explicitly covers 97 workload capability dimensions for every platform.
+One package-owned vocabulary feeds registry and native qualification validators;
+registry version 2 binds its digest. Compute/storage/recovery/service profiles now
+supply mandatory workload capabilities, preserve every selected limitation and
+reject ambiguous/malformed catalogue input. All platform tuples remain unselected
+and no capability is native-qualified. Unsupported/deferred profiles stay refused.
 
-The new Nutanix reader does not inspect VM, route or Flow-policy resources. The NSX
-reader does not establish complete hierarchy, transport-node enforcement, Global
-Manager/project-root variants or packet-path correctness. The existing Neutron
-reader is not silently promoted into the new two-platform task-triage profile.
+## Removed obsolete runtime paths
 
-## Not implemented or not executed
+The capability-registry and native-qualification script owners were moved into
+`provisioner/qualification/registry.py` and `provisioner/qualification/native.py`.
+All known consumers were migrated and the old files deleted, with retirement and
+installed-package checks. No compatibility wrapper was retained. This is a partial
+B05 closure, not a claim that every top-level owner has been relocated.
 
-No native hosting change, firewall/context selection, state import/unlock, task
-cancel/replay, readback-triggered repair, production activation or data deletion was
-performed. Native target selection, actual read privileges, expected tokens, full
-inventory selection and qualification remain implementation obligations.
+## Still unimplemented or unqualified
 
-Terraform is still unavailable; no engine validation, provider schema, dependency
-lock or mock-plan pass is asserted. A retry of the official binary download failed
-at runtime DNS resolution. The quality records state that blocker independently
-from the passing local code and packet checks.
+Complete native collector/profile/credential wiring, persisted dependency review,
+scheduling/estate-scale discovery, admitted native provisioning, all guest/service
+postconditions, independently bound data-transfer workers, source fencing, final
+sync, cutover, post-write recovery and directed whole-VM route breadth remain open.
+HA/DR, native security/failure/recovery campaigns, pilot and operating acceptance
+must be demonstrated for the exact installed scope before release.
 
-Hashes and private journals support consistency, not authorizer authenticity or
-immutable custody. Record-only fencing does not fence a native writer. Selected
-configuration match is not a security certification or operating authorization.
+## Verification meaning
+
+Use the current [RAD](current/RAD-adoption.md), [TAD](current/TAD-infrastructure.md),
+[testing guide](TESTING.md) and execution plan together. Repository/unit/protocol
+fixtures, real CI database tests, native qualification and production authorization
+are distinct evidence. No native site, workload, credential or production data was
+contacted or changed by this review. Historical signed evidence remains immutable.

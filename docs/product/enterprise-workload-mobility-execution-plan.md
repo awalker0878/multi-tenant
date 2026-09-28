@@ -64,6 +64,42 @@ Required checks and native qualification must still bind the final delivery revi
   most Waves 4–6 implementation and release acceptance remain open. No local
   fixture, synthetic benchmark or passing CI result establishes native support.
 
+### Capability/profile and architecture alignment — 28 September 2026
+
+This review used `implementation/all-waves` at
+`e40489cf9177d1689a8c49dec5d427ff4ab36431` as the implementation source, against the
+unchanged B01–B50 baseline above. It does not promote the baseline table into a
+claim that all work is now complete.
+
+The platform registry now explicitly covers 97 dimensions across compute, storage,
+network, security, guest, discovery, migration, services and operations. A single
+package-owned vocabulary and digest replace duplicated network-only lists. Registry
+format 2 rejects omitted rows and the older incomplete format. Newly enumerated
+features remain unassessed; all installed tuples remain unselected and all native
+claims remain unqualified until independently demonstrated.
+
+Compute/storage/recovery/service profile requirements now participate in placement.
+Every selected profile's limitations survive resolution. Strict catalogue parsing
+rejects duplicate properties, malformed identities/requirements and unknown
+capabilities. Updated catalogue/profile versions and regenerated five-request,
+three-platform examples remain disabled, non-authoritative fixtures. Existing
+approved plans require reassessment, not reinterpretation under the new digest.
+
+Registry and native-dossier validators now live in `provisioner.qualification`.
+Their former script files were deleted, their consumers migrated and their absence
+covered by retirement/installed-distribution checks; no compatibility wrappers were
+left. Other runtime owners and retained execution-state conversion keep B05 open.
+
+The maintained RAD, TAD, internal/public solution, interface and transition records
+are revised together, with explicit control-application, discovery, authority,
+profile, transfer and recovery boundaries. Obsolete increment-only current-scope
+and next-work narratives are replaced by the B01–B50 scope. Frozen source
+transcriptions and signed historical evidence are preserved as history.
+
+This slice does not complete admitted provisioning, transfer-worker composition,
+source fencing, final sync/cutover, post-write recovery or the native route/release
+campaigns. Their implementation and qualification requirements remain open below.
+
 ## 2. Corrected dependencies and delivery order
 
 | Correction | Required sequence and reason |
