@@ -1,7 +1,9 @@
 # Wave 2 read-only discovery and comparison
 
-Status: implementation design for B14–B22. No native route is qualified by
-this document or by a fixture-backed test.
+Status: B14–B22 are partially implemented. Authenticated publication and scoped
+comparison are available in the repository; native collector integration, full
+fact coverage, scheduling and estate acceptance remain open. No native route is
+qualified by this document or by fixture-backed tests.
 
 ## Authority and state boundaries
 
@@ -12,63 +14,90 @@ job-bound, already owned native object. Brownfield enumeration has a separate
 campaign authority; it must not create a dummy native owner, broaden a site SQL
 login or reuse a mutation lease to obtain read access.
 
-The control plane admits a campaign only for an enrolled site worker and an
-exact organization, tenant, WSD, site, endpoint, native scope and platform
-family. Admission binds a selected installed API/version profile, a read-only
-Vault role, a bounded time window, page/object/request budgets, a collection
-field set and an issuer/audit identity. Site mTLS and its immutable database
-role binding remain required. The worker receives only a one-use wrapped read
-credential and makes allowlisted GET requests to its configured management
-endpoint. A human bearer token or registration body never supplies an endpoint
-URL, credential path or collector result authority.
+The separate [discovery ingest service](../discovery-ingest.md) verifies the
+actual collector's mTLS connection against its pinned TLS context and CRL,
+independently signed campaign authority, collector result signatures and fresh
+native read-credential witness. Campaigns bind an exact organization, tenant,
+WSD, site, endpoint, native scope and platform family, collector identity,
+approval reference, allowed resource kinds, time window and page/object budgets.
+Signed enrollment separately binds the credential reference. The witness has a
+different pinned authority and binds an independently retained native IAM/RBAC
+observation. Current signatures, enrollment, witness freshness and revocation are
+rechecked with the database clock before publication.
 
-Campaign, page and snapshot records are append-only. The ingestion boundary
-authenticates the site worker, checks the campaign epoch and exact scope, page
-sequence and digest, and records collector/API provenance. The site login cannot
-write tenant records directly. A new generation becomes **complete** only after
-the terminal cursor, all pages, required permission/field coverage and budget
-checks pass. An error, changed cursor, duplicate native identity, unsupported
-API version, lost permission or timeout produces an explicitly partial/unknown
-generation. No partial generation tombstones a previously seen VM or proves
-absence. A complete, same-scope generation can record absence while preserving
-the native ID and rename history. Names are display attributes, not keys.
+The listener retains original signed request bytes and a fsynced verification
+record before inserting campaign or result state. Dedicated ingest SQL roles,
+forced tenant RLS and append-only records separate publication from human API
+reads and site-worker access. A forwarded certificate, bearer token or environment
+registration cannot supply result authority. Signed policy revision floors,
+independent custody and actual native witness production remain deployment
+obligations; a protected local file is not independent recovery evidence.
 
-Only endpoint-scoped, currently authorized reads expose observations to an
-operator. Observation is distinct from the accepted workload binding and from
-native ownership. Brownfield adoption produces a reviewed no-change proposal;
-an ownership collision, mismatched native identity, unknown source fact or
-unaccepted policy dependency holds it. Adoption does not invoke provisioning.
+Campaigns, generations, observations and absence candidates are durable and
+append-only. The page assembler checks sequence, cursor chain, identity and
+collection budgets, preserving errors and missing privileges as partial/unknown
+coverage. The HTTP publication is a bounded signed aggregate, not proof that
+every claimed native page was actually read. Native collector transport,
+constrained credential retrieval, installed API/field-profile binding and full
+coverage reconciliation still need integration. The 1 MiB request limit must be
+accounted for when designing campaigns and resumable publication.
+
+Partial generations cannot establish absence or retire a native object. Even
+complete same-scope inventory produces an absence candidate, not deletion or
+ownership authority. Native IDs remain identity keys across renames. Only
+currently authorized endpoint-scoped reads expose generation summaries and
+object identities to an operator; raw collector credentials are never returned.
+Brownfield adoption and application grouping currently provide review models,
+not persisted owner acceptance or native mutation.
 
 ## Comparison semantics
 
-The catalogue keys a directed route by exact source and destination installed
-tuples, method, guest, data and network modes. Source export qualification,
-destination operation qualification, policy translation and recovery evidence
-are independent. Expired or absent evidence is not inferred from a family,
-reverse direction or similar version. Assessment reports `ELIGIBLE`,
-`CONDITIONAL`, `BLOCKED` or `UNKNOWN`, with each hard constraint, unknown,
-remediation and confidence source visible. A comparison is information for a
-sysadmin; it never mints a plan approval or starts a native job.
+[Signed assessment inputs](../operations/assessment-evidence-ingest.md) retain
+independently reviewed installed tuples, directed route claims and control
+findings in a separate append-only tenant store. Readback verifies both retained
+signature provenance and live reviewer authority; revoked, expired, mismatched or
+tampered evidence cannot fall back to an older accepted claim. A route binds exact
+source and destination tuples, method, guest profile, data mode and network mode.
+Source-exit and target-operation conclusions are independent. Family similarity
+and the reverse direction do not imply support.
 
-## Delivery and acceptance sequence
+The assessment service reconstructs the selected immutable generations and binds
+normalized facts to original result digests and a normalizer version. Conflicting
+CPU, memory, NIC or capacity aliases remain unknown, including contradictions
+between available capacity and fully observed quota arithmetic. Independent
+policy, security and recovery reviews bind both original and normalized source
+and destination snapshot digests. Missing facts and incomplete coverage remain
+visible; normalization cannot create qualification.
 
-1. Implement immutable scope/page/campaign models and a durable generation
-   store with exact-scope authorization and change history.
-2. Add independently reviewed VMware, AHV and OpenStack GET-only collectors.
-   Prove pagination, stable IDs, project/tenant isolation, missing privileges,
-   error/timeout handling and installed API compatibility against selected
-   native lab environments. Existing exact-ID readback tools can verify a
-   selected object; they are not enumeration implementations.
-3. Add optional enrichment with source attribution, reviewed application
-   grouping and explicit unknown dependencies/consistency groups.
-4. Publish a directed, time-bound route ledger and deterministic assessment
-   engine. Show observed portfolio and two or more destination comparisons in
-   the portal and thin CLI without implying an executable migration.
-5. Exercise change reconciliation and an agreed estate benchmark. The plan's
-   50,000 workload/100 endpoint target and p95 under two seconds are proposed
-   acceptance targets, not achieved measurements.
+The authenticated `POST /v1/assessments/compare` endpoint, portal and thin CLI
+compare one observed native VM with 2–20 distinct authorized destinations. Each
+request rechecks exact-scope access and installed authority. Results retain input
+generations/digests and report `ELIGIBLE`, `CONDITIONAL`, `BLOCKED` or `UNKNOWN`,
+with reasons, remediation and confidence. Copy-phase estimates are explicitly
+uncertain. The [operator guide](wave2-operator-guide.md) describes selectors and
+failure behavior. Comparisons never mint plan approval or start a native job.
 
-The Wave 2 repository exit is a working read-only operator path with stable
-source identities, scoped generations, blockers, unknowns and remediation.
-Native B14–B16 acceptance requires a real installed platform tuple and an
-independent inventory comparison; site qualification stays held without it.
+## Remaining delivery and acceptance sequence
+
+1. Connect the existing bounded VMware, AHV and OpenStack GET adapters to
+   independently admitted campaigns and site credential custody. Bind the actual
+   installed profile, required field coverage and retained native page evidence.
+   Complete VM/device/network/storage/capacity normalization one platform at a time.
+2. Qualify pagination, stable IDs, project/tenant isolation, missing privileges,
+   timeout behavior and installed API compatibility on selected native sites.
+   Reconcile independently collected inventory, including VMware's visible-list
+   limit and inherited privilege omissions.
+3. Persist attributed enrichments, reviewed application membership, owner and
+   dependency decisions, consistency groups and no-change adoption review state.
+4. Add bounded scheduling, per-endpoint concurrency/rate budgets, resumable
+   publication and operational freshness. Keep retry authority distinct from a
+   still-current independent signed campaign.
+5. Exercise reconciliation and reproducible synthetic scale measurements, then
+   perform the agreed native estate benchmark. The plan's 50,000-workload/100-
+   endpoint target and p95 under two seconds require measured operation-specific
+   evidence; synthetic model timing cannot qualify native or PostgreSQL latency.
+
+The repository exit is a deployable read-only path from authorized collection to
+useful scoped comparisons. Real installed platform tuples, native inventory
+reconciliation and reviewed destination claims remain separate qualification
+requirements. Wave 2 stays partial until its remaining repository work is complete.

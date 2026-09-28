@@ -27,6 +27,41 @@ Terraform, native APIs, Ansible and service owners are execution mechanisms behi
 Keep exact native identity, approved immutable plans, one writer per owned resource, uncertainty holds and independently verified postconditions.
 Do not remove these controls as “shims.” Remove obsolete representations and competing mutation entry points after verified consumer and state migration.
 
+### Implementation checkpoint after the baseline
+
+The B01–B50 table below remains a historical snapshot of `3cbc0c1e`; these
+subsequent changes refine the remaining work without changing that baseline.
+Required checks and native qualification must still bind the final delivery revision.
+
+- B05 now packages reviewed planning/compiler/catalogue assets privately through
+  `hosting_resources`, with one selected resource root and installed wheel/sdist
+  checks against checkout fallback and stale build layouts. Generic `tools` and
+  `scripts` runtime owners and source-bound execution still keep B05 open.
+- Wave 2 now has a separate signed campaign/result mTLS listener, independent
+  native credential witnesses, original signature custody before publication,
+  and isolated ingest SQL roles. Durable signed installed-tuple, directed-route
+  and control inputs feed generation-pinned normalization and the scoped compare
+  API, portal and CLI. Tests cover signature/revocation negatives, actual local
+  TLS, real PostgreSQL role/RLS and publication, API access and stale UI state.
+  Conflicting VM/NIC/quota facts remain unknown. Native collector/profile and
+  credential wiring, complete fact coverage, persisted owner/dependency review,
+  scheduling and estate qualification still keep Wave 2 partial.
+- B24's lower-level delivery path now includes bootstrap prepare/plan/apply and
+  native readback, with typed native lifecycle dispatch and per-VM fenced power
+  handling. The admitted Temporal workflow does not yet drive the complete
+  native provisioning, guest, service and activation chain.
+- B30/B31 now guard cross-scope source/destination authority, retain original
+  source receipts, and enforce exact canonical dataset coverage and complete
+  consistency-group joins. Mutation-worker composition remains missing: an
+  independently observed target dataset/root binding, a trusted adapter from
+  mTLS worker identity to transfer authority, qualified dynamic repository
+  credentials, and independent filesystem observation/old-writer exclusion for
+  native intent reconciliation. A `targetRef` is neither a native ID nor a path.
+  Persisted transfer identity must remain separate from expiring attempt grants.
+- Source fencing, final sync/cutover, post-write recovery, route expansion and
+  most Waves 4–6 implementation and release acceptance remain open. No local
+  fixture, synthetic benchmark or passing CI result establishes native support.
+
 ## 2. Corrected dependencies and delivery order
 
 | Correction | Required sequence and reason |
@@ -173,20 +208,28 @@ Use a current-main branch. The old `implementation/mobility-integrity-closure` b
 | 15 | Complete operational HA/DR, alert delivery, sandbox and supply chain; rehearse retained-state conversion and old-writer shutdown. | Upgrade/replay/restore/import reconciliation and deletion proof. |
 | 16 | Run final qualification on the post-conversion code, conduct accepted pilot and publish supported release. | B47–B50 evidence at final artifact revision; no unverified completion flags. |
 
-## 5. First implementable slice: discovery provenance
+## 5. Discovery provenance slice and remaining integration
 
-Start at `provisioner/controlplane/discovery/persistence.py`, whose `DiscoveryIngestVerifier` already separates trusted verification from storage.
-Implement a concrete verifier using separately configured trust and current authority/enrollment sources; do not accept a verifier choice, trust key, endpoint URL or credential path from a human request.
-Bind campaign digest, exact `PlanScope`, collector identity, issuer/epoch, installed API profile, read-credential witness, field/resource limits and validity window.
-Bind the signed collector result to the same campaign and immutable result digest; verify current revocation/enrollment at admission and publication using the trusted service clock.
-Keep signer and collector roles distinct; possession of an enrolled certificate alone does not grant campaign authority or prove inventory completeness.
-Use the dedicated ingest database role. Human API and site reader logins cannot insert observations or bypass provenance checks.
-Persist audit/provenance with campaign/result records; retries of identical accepted bytes return the same logical outcome and conflicting bytes hold.
-If required independent issuer, enrollment, credential or revocation evidence is unavailable, refuse publication with an actionable hold.
+The first slice now has a concrete `DiscoveryIngestVerifier`, signed authority
+and enrollment, independently signed read-credential witnesses, a pinned mTLS
+listener and original evidence retention before dedicated-role publication.
+Real PostgreSQL tests exercise valid admission/publication, exact retries,
+changed-content conflicts and role isolation; signature, scope, freshness,
+revocation and TLS negatives are also covered. See the
+[ingest contract](../discovery-ingest.md) and
+[comparison architecture](wave2-discovery-architecture.md).
 
-First-series acceptance: valid admitted campaign/result reaches the existing scoped generation read path through real PostgreSQL; forged or modified signatures, wrong scope/collector/result digest, revoked issuer/worker, future/expired evidence and missing credential witness all fail before publication.
-Also test duplicate publication, changed content under an existing ID, role misuse and authority revocation between admission and result submission.
-This closes a concrete repository integration gap. It does not qualify a site's collector coverage, create a production assessment or grant provisioning/migration authority.
+Complete the native side next: admitted collector transport and credential
+retrieval, installed API/profile and field-set binding, full per-platform facts,
+page evidence and independently reconciled coverage. Campaign signatures and an
+aggregate result digest do not themselves prove native completeness. Preserve
+separate issuer/collector/witness authority, exact scope, bounded budgets and
+live revocation checks as these pieces are integrated. Scheduling may select
+work; it cannot issue campaign or credential authority.
+
+The implementation sequence above remains the complete ordered programme;
+several series have begun but none of these changes grants provisioning or
+migration authority or closes native site qualification.
 
 ## 6. External inputs and final release holds
 

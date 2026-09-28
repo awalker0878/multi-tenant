@@ -1,7 +1,8 @@
 # Wave 2 operator guide: observed inventory and destination comparison
 
-Status: read-only repository implementation in progress. The production site
-ingestion and native qualification path is not deployed. See the
+Status: authenticated ingestion and read-only destination comparison are
+implemented in the repository. Native collector integration, production
+deployment and site qualification remain open. See the
 [architecture and acceptance sequence](wave2-discovery-architecture.md).
 
 ## Read an authorized generation
@@ -45,12 +46,58 @@ authorized environment, including coverage and collection gaps. It clears
 stale rows if the selection changes or a page fails. No operator write
 endpoint admits a discovery campaign or accepts native rows.
 
+## Compare authorized destinations
+
+The portal's **Compare migration options** section uses the selected source's
+observed VM inventory. Select the workload, then a destination WSD and **Show
+destinations**. Add the latest observation for each candidate. The source and
+destination generation numbers remain pinned during comparison; changing scope
+or logging out clears stale selections and results. Supply the method, guest
+profile, network mode and data mode. Where capacity should be evaluated, select
+the observed capacity kind and exact native ID for that destination.
+
+The equivalent CLI command is:
+
+```text
+<approved SSO token source> | hosting-operator --api-url https://control.example.org --token-stdin assessments compare --source-environment source-01 --source-generation 7 --workload-native-id vm-01 --destination target-01 3 --destination target-02 4 --capacity target-01 pool pool-01 --method REBUILD_RESTORE --guest-profile linux --network-mode routed --data-mode backup-restore
+```
+
+Repeat `--destination ENVIRONMENT GENERATION` for 2–20 distinct destinations.
+The source cannot also be a destination. `--capacity ENVIRONMENT KIND NATIVE_ID`
+is optional per destination; supported kinds are `pool`, `cluster`, `quota` and
+`datastore`. These values select observations; they do not assert qualification.
+
+The authenticated API is `POST /v1/assessments/compare`. Its request has no
+operator-supplied tuple claims, reviews, credentials or success flags:
+
+```json
+{
+  "source": {"environmentId": "source-01", "generation": 7},
+  "workloadNativeId": "vm-01",
+  "destinations": [
+    {"environmentId": "target-01", "generation": 3,
+     "capacityKind": "pool", "capacityNativeId": "pool-01"},
+    {"environmentId": "target-02", "generation": 4}
+  ],
+  "method": "REBUILD_RESTORE",
+  "guestProfile": "linux",
+  "networkMode": "routed",
+  "dataMode": "backup-restore"
+}
+```
+
+Each selected environment needs the same exact-scope read grant as inventory.
+Missing installation proof or scope access refuses the request without exposing
+foreign identities; unavailable assessment configuration returns
+`ASSESSMENT_UNAVAILABLE`. Configure the independently signed durable inputs in
+the [assessment evidence guide](../operations/assessment-evidence-ingest.md).
+Missing route or control evidence produces explicit unknowns. The response pins
+raw and normalized input digests and reports `executionAuthorized: false`.
+
 ## Interpret a destination assessment
 
-The assessment engine currently runs inside trusted service code; it is not
-exposed as a public API or CLI command. It compares at least two *distinct*
-installed destinations against one observed native VM in a deterministic
-order. Each directed route binds exact source and destination organization,
+The service compares installed destinations against one observed native VM in
+a deterministic order. Each directed route binds exact source and destination organization,
 tenant, site, WSD, endpoint, native scope, product tuple ID and digest, method,
 guest profile, network mode and data mode. Reverse direction and same-family
 site moves need their own route records. Source and target qualification
@@ -90,10 +137,12 @@ conformance tests, not deployed native collectors or proof of coverage.
 Before publishing production observations, the site owner must select and
 qualify the actual installed API/product tuple, constrained read credential,
 endpoint routing, paging/permission coverage and an independent inventory
-reconciliation. A separately operated campaign issuer, signed authority,
-enrolled worker, mTLS/PKI, read-only Vault role and result provenance verifier
-must be wired to the dedicated PostgreSQL ingest role. The repository rejects
-ingest without that verifier and role. Owner/security teams must qualify
+reconciliation. Deploy the separate [discovery ingest service](../discovery-ingest.md)
+with its dedicated PostgreSQL role, pinned mTLS/PKI, independently signed issuer
+and collector enrollment, fresh native read-credential witness and durable
+signature custody. Its implemented verifier refuses missing or invalid inputs.
+The independent campaign/witness producers and native collector credential
+retrieval still require actual site integration and qualification. Owner/security teams must qualify
 policy translation, recovery, capacity and the selected route on actual
 source and destination sites. The proposed 50,000-workload/100-endpoint
 benchmark and p95 under two seconds remain unmeasured acceptance targets.

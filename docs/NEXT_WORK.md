@@ -1,14 +1,17 @@
 # Next work: executable product and native release
 
 The current [all-wave execution plan](product/enterprise-workload-mobility-execution-plan.md)
-tracks B01–B50 at revision `3cbc0c1e`, corrects delivery dependencies, and defines
-small-commit implementation series. The original audit below remains historical.
+tracks the B01–B50 baseline at revision `3cbc0c1e`, adds the current implementation
+checkpoint, corrects dependencies, and defines small-commit implementation series.
+The original audit remains historical.
 
 The C01–C13 refactor gates describe a completed **planning interface refactor**, not
 an executable provisioning and migration product. The current public `apply` and
-`mobility-apply` paths refuse execution. Generated provisioning steps and mobility
-handoffs leave native lifecycle, cross-scope data transfer, source fencing and useful
-service acceptance incomplete. See the
+`mobility-apply` paths refuse execution. Lower-level delivery now has a real
+bootstrap plan/apply/readback chain, guarded cross-scope restore and per-dataset
+verification joins. The admitted Temporal workflow still does not drive those
+native stages; complete source fencing, cutover and useful-service acceptance
+remain implementation work. See the
 [full audit and implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
 for source evidence, 50 sequenced work items, deletion gates and route acceptance.
 The [portable provisioning documents](provisioning/README.md) and
@@ -37,40 +40,53 @@ unimplemented product path.
 
 ## Wave 2 checkpoint: read-only discovery and comparison
 
-Wave 2, B14–B22, is **in progress**. The repository now has exact-scope discovery
-campaign/page/result models, an append-only PostgreSQL inventory schema and guarded
-repository, scoped HTTP generation/object reads, bounded GET-only adapter code for
-VMware, AHV and OpenStack, and comparison-only grouping, adoption, directed route
-and destination assessment models. The [operator guide](product/wave2-operator-guide.md)
-describes the available reads and the evidence each status needs. The thin CLI
-has read-only generation/object commands. The portal now shows the latest
-authorized generation and paged observed identities; the comparison engine is
-not a production assessment API.
+Wave 2, B14–B22, remains **in progress**. The separate
+[discovery ingest process](discovery-ingest.md) authenticates the actual collector
+over pinned mTLS, checks independently signed campaign/result provenance and a
+fresh separately signed native read-credential witness, and retains original
+signed request bytes and verification evidence before publication. The database
+writer is separate from human API and site-worker roles. Revoked, stale,
+wrong-scope or unverifiable evidence is refused; signed file custody still needs
+independent deployment, retention and rollback-floor controls.
 
-These pieces do not close B14–B22. The current repository does not deploy an
-authenticated site discovery campaign admission/ingest service, independently
-verify issuer/collector provenance against enterprise IAM and PKI, or qualify
-installed source and destination product tuples. The storage writer refuses
-publication without a dedicated ingest role and an independently configured
-verifier. VMware's bounded visible VM list cannot prove full privilege or
-folder coverage. Native reconciliation, application owner review, selected
-capacity and policy/security/recovery evidence, operator comparison UI/CLI,
-and the proposed estate-scale latency benchmark remain acceptance work. No
-discovery, adoption proposal or `ELIGIBLE` comparison grants plan approval or
-native provisioning/migration authority.
+[Signed assessment inputs](operations/assessment-evidence-ingest.md) persist
+installed tuples, directed route claims and independent control findings in an
+append-only tenant store. Reads revalidate original provenance and current
+reviewer authority. The scoped `POST /v1/assessments/compare` service reconstructs
+pinned generations, normalizes supported facts and returns reasons, remediation,
+confidence and input digests. Missing routes, capacity or reviews remain unknown;
+contradictory CPU, memory, NIC or quota facts cannot become a generous capacity
+estimate. The [operator guide](product/wave2-operator-guide.md) describes API,
+portal and thin-CLI use. No comparison grants execution authority.
 
-To complete the operator comparison path, first establish signed, revocable
-read campaigns with enrolled site mTLS submitters and independently witnessed
-read credentials. Qualify each installed source and destination API tuple and
-persist its expiry and evidence digest separately from a human environment
-declaration. Then normalize full VM and capacity facts from verified,
-generation-pinned observations; persist directed source-exit and
-target-operate route claims and independently reviewed policy, security and
-recovery findings. Only after those durable inputs exist should the scoped
-assessment service expose destination reasons and remediation in the API and
-portal. Finally, run native omission/privilege tests and the 50,000-workload,
-100-endpoint freshness and latency campaign. None of these missing inputs may
-be synthesized from a declared selector or a fixture.
+Remaining repository work includes native collector transport/credential wiring,
+complete per-platform VM/device/capacity fact coverage, persisted application
+owner/dependency review, discovery scheduling/rate limits, operational freshness
+and the estate benchmark. The existing VMware visible-list reader cannot prove
+full folder or privilege coverage. Installed profile, native IAM/RBAC witness,
+policy, security and recovery campaigns still require selected real sites and
+independent owners. The 50,000-workload/100-endpoint and latency targets remain
+unmeasured. None of these inputs can be synthesized from a selector or fixture.
+
+## Next integrated execution work
+
+Private installed package resources now serve reviewed planning/compiler/catalogue
+assets through one selected root; installed-wheel tests reject resource fallback
+and stale build layouts. B05 remains open because generic `tools`/`scripts` runtime
+owners and source-bound native execution still need migration.
+
+For B24, connect the admitted durable workflow to the real delivery stages with
+current native ownership, credentials, leases and interruption reconciliation.
+For B30/B31, compose the mutation-worker resolver, credential custody and native
+intent registry with guarded cross-scope restore, distinct source/destination
+receipts, dataset mappings and complete consistency-group joins. These lower-level
+repairs still need independently observed target dataset/root bindings, a trusted
+mTLS worker-to-transfer authority adapter and native filesystem/old-writer
+exclusion observations. Stable capture/mapping identity must remain separate from
+expiring attempt grants; a target selector cannot be treated as a path. They do
+not by themselves execute a control-plane migration. Source fencing,
+traffic switch, post-write recovery, native route expansion and most Wave 4–6
+release work remain open under the all-wave execution plan.
 
 ## Site and organizational release inputs
 
