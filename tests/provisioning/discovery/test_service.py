@@ -174,6 +174,20 @@ class AssessmentServiceTests(unittest.TestCase):
                 self.assertEqual(self.repository.reads, [])
                 setattr(self.inputs, field, None)
 
+    def test_response_preserves_destination_binding_when_request_order_is_reversed(self):
+        result = self.service.compare(CTX, 'operator-1', AssessmentSelection('source', 7), 'vm-1',
+            tuple(AssessmentDestination(AssessmentSelection(name, 7), 'pool', 'pool-1')
+                  for name in ('target-b', 'target-a')),
+            method='COLD_VM_CONVERSION', guest_profile='linux-uefi',
+            network_mode='routed', data_mode='offline')
+        document = result.to_document()
+        self.assertEqual([row['environmentId'] for row in document['destinationInputs']],
+                         ['target-b', 'target-a'])
+        for binding, assessment in zip(document['destinationInputs'], document['assessments']):
+            self.assertEqual(binding['endpointId'], assessment['destination']['endpointId'])
+            self.assertEqual(binding['nativeScopeId'], assessment['destination']['nativeScopeId'])
+            self.assertEqual(binding['productTupleDigest'], assessment['destination']['productTupleDigest'])
+
     def test_missing_stale_and_partial_generation_are_visible_unknowns(self):
         self.repository.results.pop(('source', 7))
         result = self.compare()

@@ -279,4 +279,12 @@ class AssessmentService:
             workload, tuple(options), method=method, guest_profile=guest_profile,
             network_mode=network_mode, data_mode=data_mode, as_of=now,
             source_access=origin.access, max_snapshot_age=self._max_age)
-        return AssessmentComparison(now, source_input, destination_inputs, assessments)
+        # The pure engine sorts native tuples for deterministic comparison. The
+        # transport's generation bindings retain the operator's selection order;
+        # restore that same order before presenting the two arrays together.
+        by_destination = {item.destination: item for item in assessments}
+        if (len(by_destination) != len(targets)
+                or set(by_destination) != {item.installation for item in targets}):
+            raise RuntimeError('Assessment destinations differ from the pinned selections')
+        ordered = tuple(by_destination[item.installation] for item in targets)
+        return AssessmentComparison(now, source_input, destination_inputs, ordered)

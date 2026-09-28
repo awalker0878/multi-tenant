@@ -115,6 +115,15 @@ class AssessmentHttpTests(unittest.TestCase):
         self.assertEqual(self.repository.reads, [])
         self.assertEqual(self.inputs.credentials, [])
 
+    def test_reversed_destination_selections_keep_results_with_their_generation_bindings(self):
+        response = self.request(body={**self.body, 'destinations': list(reversed(self.body['destinations']))})
+        self.assertEqual(response.status_code, 200, response.text)
+        value = response.json()
+        self.assertEqual([item['environmentId'] for item in value['destinationInputs']],
+                         ['target-2', 'target'])
+        for binding, assessment in zip(value['destinationInputs'], value['assessments']):
+            self.assertEqual(binding['endpointId'], assessment['destination']['endpointId'])
+
     def test_request_cannot_claim_native_eligibility_or_supply_authority(self):
         for field in ('claims', 'principal', 'productTupleDigest', 'executionAuthorized'):
             response = self.request(body={**self.body, field: True})
