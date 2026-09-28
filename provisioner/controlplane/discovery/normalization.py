@@ -236,24 +236,30 @@ def _capacity(facts: dict[str, DiscoveryFact]) -> None:
         ('availableStorageBytes', 'gigabytes', _GIB),
     ):
         normalized = _number(facts, field, minimum=0)
-        if field not in facts:
-            # A configured quota is never available capacity. Both consumed
-            # usage and pending reservations must be observed in this snapshot.
-            inputs = tuple(facts.get(name) for name in ('limits', 'usage', 'reservations'))
-            values = tuple(_value(facts, name) for name in ('limits', 'usage', 'reservations'))
-            if all(isinstance(value, dict) and quota_key in value for value in values):
-                limit, used, reserved = (value[quota_key] for value in values)
-                if limit == -1 and type(limit) is int:
-                    normalized = DiscoveryFact.unknown(field, 'NOT_SUPPORTED')
-                elif all(_integer(value) for value in (limit, used, reserved)):
-                    available = max(0, limit - used - reserved) * scale
-                    normalized = (DiscoveryFact.known(field, available)
-                                  if available <= _MAX else
-                                  DiscoveryFact.unknown(field, 'COLLECTION_ERROR'))
-                else:
-                    normalized = DiscoveryFact.unknown(field, 'COLLECTION_ERROR')
+        # A configured quota is never available capacity. Both consumed usage
+        # and pending reservations must be observed in this snapshot. When an
+        # available value also exists, neither conflicting claim can win.
+        inputs = tuple(facts.get(name) for name in ('limits', 'usage', 'reservations'))
+        values = tuple(_value(facts, name) for name in ('limits', 'usage', 'reservations'))
+        if all(isinstance(value, dict) and quota_key in value for value in values):
+            limit, used, reserved = (value[quota_key] for value in values)
+            if limit == -1 and type(limit) is int:
+                calculated = DiscoveryFact.unknown(field, 'NOT_SUPPORTED')
+            elif all(_integer(value) for value in (limit, used, reserved)):
+                available = max(0, limit - used - reserved) * scale
+                calculated = (DiscoveryFact.known(field, available)
+                              if available <= _MAX else
+                              DiscoveryFact.unknown(field, 'COLLECTION_ERROR'))
             else:
-                normalized = _unknown(field, *inputs)
+                calculated = DiscoveryFact.unknown(field, 'COLLECTION_ERROR')
+            if field not in facts:
+                normalized = calculated
+            elif normalized.state == 'KNOWN' and (
+                    calculated.reason == 'COLLECTION_ERROR'
+                    or calculated.state == 'KNOWN' and calculated.value() != normalized.value()):
+                normalized = DiscoveryFact.unknown(field, 'COLLECTION_ERROR')
+        elif field not in facts:
+            normalized = _unknown(field, *inputs)
         facts[field] = normalized
     for name in ('supportedGuestProfiles', 'supportedNetworkModes', 'supportedDataModes'):
         facts[name] = _text(facts, name, multiple=True)

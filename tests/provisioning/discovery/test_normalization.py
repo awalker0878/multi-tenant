@@ -192,6 +192,31 @@ class NormalizationTests(unittest.TestCase):
                                    'reservations': {'cores': 0}}, kind='quota')
         self.assertEqual(unlimited['availableVcpu'].reason, 'NOT_SUPPORTED')
 
+    def test_canonical_capacity_cannot_override_observed_quota_exhaustion(self):
+        raw = {'availableVcpu': 100, 'availableMemoryBytes': 100 * 1024**2,
+               'availableStorageBytes': 100 * 1024**3,
+               'limits': {'cores': 4, 'ram': 4, 'gigabytes': 4},
+               'usage': {'cores': 4, 'ram': 4, 'gigabytes': 4},
+               'reservations': {'cores': 0, 'ram': 0, 'gigabytes': 0},
+               'supportedGuestProfiles': ['linux'], 'supportedNetworkModes': ['routed'],
+               'supportedDataModes': ['backup-restore']}
+        result, facts = normalized(raw, kind='quota')
+        for field in ('availableVcpu', 'availableMemoryBytes', 'availableStorageBytes'):
+            self.assertEqual(facts[field].state, 'UNKNOWN')
+            self.assertEqual(facts[field].reason, 'COLLECTION_ERROR')
+        self.assertEqual(result.original.completeness, 'COMPLETE')
+        self.assertEqual(result.inventory.completeness, 'PARTIAL')
+
+    def test_matching_capacity_and_quota_arithmetic_remain_known(self):
+        _, facts = normalized({'availableVcpu': 14, 'availableMemoryBytes': 700 * 1024**2,
+            'availableStorageBytes': 60 * 1024**3,
+            'limits': {'cores': 20, 'ram': 1000, 'gigabytes': 100},
+            'usage': {'cores': 4, 'ram': 200, 'gigabytes': 30},
+            'reservations': {'cores': 2, 'ram': 100, 'gigabytes': 10}}, kind='quota')
+        self.assertEqual(facts['availableVcpu'].value(), 14)
+        self.assertEqual(facts['availableMemoryBytes'].value(), 700 * 1024**2)
+        self.assertEqual(facts['availableStorageBytes'].value(), 60 * 1024**3)
+
 
 if __name__ == '__main__':
     unittest.main()
