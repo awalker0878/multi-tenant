@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -89,6 +89,20 @@ Use the [all-waves execution plan](../product/enterprise-workload-mobility-execu
 for B01–B50 closure. Repository code, automated checks, installed native qualification
 and operational acceptance are four separate evidence columns. Prior W/C ledger
 completion and current CI success do not close this product programme.
+
+### Semantic portability and research boundaries
+
+The migration contract now includes typed capability properties beneath the existing
+97 IDs. A feature name does not establish equivalence: routing context, policy
+rule model, enforcement coverage, performance guarantees, encryption/key custody
+and hardware preservation remain distinct requirements. Every selected profile
+contributes constraints; incompatible intersections are rejected, never overridden.
+The destination must enforce the source requirement or a demonstrably stronger
+compatible requirement. Vendor documentation supports design assumptions, not
+installed qualification or mutation authority.
+
+See [verified research decisions](../engineering/platform-migration-research.md) and
+[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
 
 ## Engineering and implementation handoff
 

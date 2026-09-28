@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -123,6 +123,24 @@ appropriate CI jobs. The [execution plan](../product/enterprise-workload-mobilit
 retains unclosed native routes, HA/DR, restore, operating acceptance and release
 qualification. Neither a fixture throughput result nor a package build establishes
 estate-scale performance, native support or production authorization.
+
+### Typed property and observed migration compatibility
+
+`provisioner/domain/capability_properties.py` owns the property schema, digest,
+constraint intersection/implication and conditional realization checks. Resolution
+format 3 feeds per-cluster property observations into placement. Policy capsule and
+realization format 2 retain source obligations and reject weaker destination plans.
+Discovery normalizer 2 retains explicit source requirements and target observed
+sets/properties; existing independent signed reviews pin both normalized snapshots.
+`discovery/compatibility.py` checks firmware, architecture, secure boot, vTPM state,
+encryption layer/keys, shared/passthrough devices, drivers and measured warm-copy
+convergence. These are comparison checks, not new native execution paths.
+The OpenStack collector whitelists port security/binding/group/QoS/address and
+volume encryption/multiattach/type attributes. It never promotes metadata, a
+feature flag or a volume type name into an enforced-policy or native support claim.
+
+See [verified research decisions](../engineering/platform-migration-research.md) and
+[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
 
 ## Engineering and implementation handoff
 

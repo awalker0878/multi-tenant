@@ -13,8 +13,8 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 | [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
 
-TAD-M01 is **version 0.3 (Proposed)**; the other five records remain
-**version 0.2 (Proposed)** following the 28 September 2026
+TAD-M01 is **version 0.4 (Proposed)**; the other five records are
+**version 0.3 (Proposed)** following the 28 September 2026
 mobility review. They describe the authenticated control application, durable discovery
 and comparison, 97 explicit capability dimensions, mandatory workload/service profile
 requirements, migrated qualification owners, and the remaining admitted native workflow
@@ -24,3 +24,8 @@ remains the implementation backlog; coverage in this register does not close its
 [Source-scope decision inventory](../assurance/source-scope.md) · [Frozen source reading paths](../README.md) · [ADR lifecycle](../adr/README.md)
 
 Run `python scripts/check_documentation.py`: immutable transcription checks and current-design structure are separately reported. Semantic correctness and accepting authority require real review; do not use this gate as an approval service.
+
+The
+[verified research record](../engineering/platform-migration-research.md) identifies
+accepted assumptions, rejected recommendations and remaining native evidence.
+The existing B01–B50 plan remains the only implementation backlog.

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -51,6 +51,24 @@ An agreement must also define failure/retry limits, credential renewal/revocatio
 lease expiry, unknown outcomes and independent recovery. Include write cutover and
 post-write recovery ownership explicitly: neither producer may assume the other has
 excluded the old writer or admitted target writes.
+
+### Versioned capability and discovery property interfaces
+
+Profile `requires.constraints` entries have exactly `property`, `operator` and
+`value`; the property owner must occur in required capabilities. The property
+vocabulary/digest is closed and integers exclude booleans. Resolution format 3
+and policy capsule/realization format 2 carry this digest. Old inputs require
+new review, not a compatibility translation.
+Discovery normalizer 2 requires source `requiredCapabilities`,
+`capabilityRequirements`, `capabilityPropertySchemaDigest` and destination
+`observedCapabilities`, `capabilityProperties`, `capabilityPropertySchemaDigest`.
+These are observed/reviewed inputs, not client-issued authorization. Signed
+control findings must retain raw and normalized snapshot digests and the current
+normalizer. Missing, malformed and stale fields stay unknown; exact typed
+mismatches remain blockers. Comparison never sets `executionAuthorized` true.
+
+See [verified research decisions](../engineering/platform-migration-research.md) and
+[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
 
 ## Engineering and implementation handoff
 

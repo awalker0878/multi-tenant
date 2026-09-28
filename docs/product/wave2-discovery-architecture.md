@@ -105,3 +105,21 @@ The repository exit is a deployable read-only path from authorized collection to
 useful scoped comparisons. Real installed platform tuples, native inventory
 reconciliation and reviewed destination claims remain separate qualification
 requirements. Wave 2 stays partial until its remaining repository work is complete.
+
+
+## Platform semantic comparison increment
+
+Normalizer `hosting-assessment-normalizer/2` now binds typed source requirements
+and target observed capability/property sets to the current property schema digest.
+Old-normalizer signed reviews cannot authorize the new interpretation. Whole-VM
+compatibility requires explicit source boot/architecture/security/device facts and
+target driver/key/writer readiness, with unknowns preserved. Warm-transfer
+comparison requires bounded dirty-rate and throughput samples; disk pre-copy never
+claims preserved running memory. Cross-family native relocation is a per-target
+blocker, not a reason to discard all destination rows.
+
+OpenStack reads additionally retain bounded native port binding/security/group/
+QoS/address and volume encryption/multiattach/type facts. These do not create
+policy-equivalence findings or installed support. Missing extension/privilege data
+stays unknown. Full VMware/AHV fact wiring and independent native qualification
+remain open under the [existing wave plan](enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).

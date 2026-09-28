@@ -289,3 +289,57 @@ Final completion means the declared support matrix works through the supported p
 - [Discovery architecture](wave2-discovery-architecture.md) and [operator guide](wave2-operator-guide.md) distinguish declared selectors, trusted ingestion, stored observations and comparison-only artifacts.
 - `provisioner/controlplane/discovery/model.py`, `persistence.py`, `routes.py` and `assessment.py` implement bounded models, verifier-required publication and pure comparison; their existence does not supply production trust or native qualification.
 - [Control-plane operator guide](control-plane-operator.md) describes the authenticated foundation and explicitly excludes later native provisioning and workload migration activities.
+
+
+## 8. Research-driven acceptance and implementation delta
+
+The 28 September 2026 [verified research decisions](../engineering/platform-migration-research.md)
+are integrated here, not adopted as a new four-wave or B01–B15 roadmap. Preserve
+B01–B50 identifiers, baseline rows, authority boundaries and dependencies. The
+research's approximate paths, active-owner deletion advice, unsupported blanket
+feature claims and illustrative completion dates are rejected.
+
+### Implemented repository increment
+
+Typed semantic properties beneath the existing 97 capability IDs now flow from
+strict profile catalogues through resolution, scoped cluster placement and portable
+policy translation. Profile resolution format 3 and policy capsule/realization
+format 2 bind the property interpretation digest and reject weaker/old inputs.
+The existing security/compute profiles impose explicit routing, enforcement,
+NIC-coverage and architecture requirements; deferred encryption stays deferred.
+
+Discovery normalizer 2 and comparison check exact source requirements against the
+selected target's observed capabilities/properties. Whole-VM hardware/driver/key/
+writer requirements and warm-transfer convergence are checked before eligibility;
+positive route/control evidence cannot fill missing native facts. Old-normalizer
+signed control evidence is rejected. Mixed same-platform-relocation comparisons
+retain all authorized destination rows and block cross-hypervisor ones.
+OpenStack collection now observes bounded port-security/binding/group/QoS/address
+and volume-encryption/multiattach/type fields without inventing qualification.
+All updated examples remain non-authoritative and disabled.
+
+This increment has local regression tests, not native acceptance. Do not mark an
+entire B item VERIFIED from this subsection. Store exact final-revision CI results
+in the PR/delivery record; qualification and operations remain separate columns.
+
+### Existing wave owners and expanded closure tests
+
+| Existing wave / B items | Required implementation and acceptance expansion | Current boundary and closure evidence |
+|---|---|---|
+| Wave 0 — B03/B04/B05 | Keep canonical property types and bounded parsers; reject old interpretation rather than shim it. Migrate every real consumer before deleting a legacy path. | Property contract and version rejection implemented. Package qualification owners are active, not deletion targets. B05 retained runtime/state migration remains open; installed-wheel and retirement tests are required. |
+| Wave 1 — B06–B13 | Bind requirements, observations, approvals, immutable revisions, reviewer authority and worker credentials; per-effect rechecks cannot use an earlier comparison as permission. | Existing signature/RLS/outbox/lease controls retained. Old-normalizer review rejection added. Native claim import must retain original sources, timestamps, tuple, publisher and independent evidence custody. |
+| Wave 2 — B14/B15/B16 | Collect per-VM firmware/architecture, controllers/disks/NIC order, boot/security/key state, shared/passthrough devices and optional service/driver/extension facts. Bind exact API/driver/tool versions, project/scope and completeness. | OpenStack attribute capture and malformed/missing-field tests implemented. VMware/AHV full fact mapping, installed profiles, credential transports and independent coverage reconciliation remain open. Never infer safe boot or encryption absence from a friendly profile name. |
+| Wave 2 — B17/B18 | Attribute source policy and dependency/consistency decisions; version the complete source/destination/guest/tool/backend tuple. Keep six directed inter-family routes distinct and distinguish each method. | Current tuple/route authority retained. Property schema and explicit observed/source capability sets enforced. Exact released support matrices, entitlement, expiration and native claims still need qualified owner evidence. |
+| Wave 2 — B19/B20/B22 | Compare scoped property values, all source requirements and measured transfer assumptions; expose stable blocker/unknown reasons and remediation without hiding other destinations. | Typed comparison and relocation error isolation implemented; old signed reviews invalidated. Persisted owner enrichment, complete UI review flow, scheduling, freshness and estate benchmark still required. |
+| Wave 3 — B23/B25/B26 | Reserve real VM/storage/transfer/retention capacity; map firmware, disks, NICs, keys, drivers, shared devices and huge pages. Distinguish QoS minimum guarantees from ceilings and encryption layers from each other. | Planning/placement and comparison prerequisites implemented. Actual native realization, resource reservations, driver preparation, encryption transition and observation-bound postconditions remain open. Test unknown versus false and malformed integers as well as happy paths. |
+| Wave 3 — B24/B27/B28/B29 | Realize policy outcomes with exact ordered/additive semantics, all-NIC enforcement, routing/VRF and datapath constraints. Qualify LB/VPN/service insertion as separately installed services; do not assume Neutron core or Flow networking supplies them. | Property conflicts, NSX VRF HA, DPDK prerequisites and SR-IOV bypass checks implemented. Native rule compilation/readback, positive app flows, negative isolation/bypass, MTU/reply paths, HA and service-owner acceptance still required. |
+| Wave 4 — B30–B37 | Retain per-dataset consistency and metadata, isolate rehearsal, independently exclude old writers, final-sync, switch traffic and admit target writes. Split pre-write return from post-write reverse-sync/restore/forward repair. | Existing safe cutover contract retained; the research's unconditional source restart is rejected. Transfer-worker composition, native effect graph and actual first application campaign remain open. Inject failure before/after every effect and first-write boundary. |
+| Wave 5 — B38/B39/B40/B41/B42/B43 | Qualify each directed source/target method independently; pin converter/Move/guest/backend versions. Cold/warm disks do not imply RAM migration, same-family does not imply topology support, common disk format does not imply boot or key portability. | Whole-VM hardware/key/driver checks, warm convergence and cross-family relocation blocking implemented in comparison only. Native capture/conversion/transport, application-native sync, device handling and dependency-wave execution remain open. No reversed-route or vTPM recreation shortcut. |
+| Wave 6 — B44–B50 | Qualify HA/DR, retained source and restore/key custody, supply chain, privileged isolation, final native support matrix, conversion, pilot and operating owner on final code. | No new native or production completion. Each campaign must cover declared guest/device/network/storage controls, permitted/denied flows, one-writer recovery, measured objectives and final artifact digest. |
+
+Use the existing small-commit sequence: property contracts and profile/placement
+integration, comparison and signed-input revision, one native collector at a time,
+then native realization/workflow increments with their actual tests. This change
+adds no competing sequence or fictitious lab access. A missing capability fact
+remains UNKNOWN; an explicit incompatible observation is BLOCKED. Neither can be
+turned into an execution grant by an operator-supplied success flag.

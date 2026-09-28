@@ -1,6 +1,6 @@
 # SOL-M01 — Internal two-tenant protected workload solution
 
-**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Hosting solution architect.
+**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Hosting solution architect.
 
 ## Scope and authority
 
@@ -60,6 +60,19 @@ and plan fingerprints; the examples remain `PLANNED_DISABLED_NOT_AUTHORIZED` wit
 no native contact. The [all-waves plan](../product/enterprise-workload-mobility-execution-plan.md)
 and [current TAD](TAD-infrastructure.md) distinguish implemented components from the
 unfinished native workflow and operating acceptance.
+
+### Explicit profile semantics in internal examples
+
+Internal reference profiles now require independent routing contexts, enforced
+deny-default gateway policy and x86_64 compute; profiles selecting distributed
+firewalling also require enforcement across every selected workload NIC. Test
+inventory supplies explicit per-cluster properties solely for disabled planning.
+No source profile is weakened to fit a target. Unknown hardware/key/service facts
+must be observed and reviewed before a migration comparison becomes useful;
+application rebuilding is distinct from preserving an opaque whole VM.
+
+See [verified research decisions](../engineering/platform-migration-research.md) and
+[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
 
 ## Engineering and implementation handoff
 

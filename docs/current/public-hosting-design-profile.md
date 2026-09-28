@@ -1,6 +1,6 @@
 # SOL-M02 — Public service hosting design profile
 
-**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Security and hosting solution architects.
+**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Security and hosting solution architects.
 
 ## Scope and authority
 
@@ -31,6 +31,18 @@ suppress production side effects and must not publish public DNS or activate a
 public route implicitly. Keep this design profile deferred until its own engineering,
 implementation and acceptance conditions are demonstrated; it is not inherited from
 a successful internal IPv4 fixture.
+
+### No inferred public-edge or service equivalence
+
+The semantic property contract does not enable this deferred public design.
+An NSX or Nutanix product name, Neutron core API, or an overlay identifier cannot
+supply ingress protection, load-balancing, VPN, route ownership or isolation.
+Selected backend, service, rule scope and enforcement state require native
+observation and independent positive/negative tests. Gateway protection cannot
+silently substitute for a mandatory all-NIC distributed policy.
+
+See [verified research decisions](../engineering/platform-migration-research.md) and
+[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
 
 ## Engineering and implementation handoff
 

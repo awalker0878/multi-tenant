@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -68,6 +68,22 @@ operating acceptance separately in the [execution plan](../product/enterprise-wo
 Required release evidence includes actual restore/HA/DR, security and failure tests,
 measured performance, incident ownership, a controlled pilot and accepted directed
 routes. No site or production workload was changed by this repository revision.
+
+### Research increment and unchanged execution acceptance
+
+This increment changes profile, policy and observation interpretation; rebuild
+planning fixtures and re-review new plan/snapshot digests rather than relabeling
+old evidence. Local tests cover typed requirements, unknowns, source preservation,
+native attribute parsing and destination isolation. Native feature realization,
+complete admitted workflows, fencing, final synchronization and cutover remain
+separate implementation and qualification obligations.
+Retain the pre-target-write versus post-write recovery boundary. Once target data
+has changed, returning to the retained source needs an independently reviewed
+reverse-sync/restore/repair decision. A failed target check does not authorize
+source restart, key disposal, old-writer activation or target deletion.
+
+See [verified research decisions](../engineering/platform-migration-research.md) and
+[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
 
 ## Engineering and implementation handoff
 
