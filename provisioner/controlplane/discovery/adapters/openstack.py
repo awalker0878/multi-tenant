@@ -18,13 +18,13 @@ import re
 import ipaddress
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Mapping, Protocol
+from typing import Callable, Mapping, Protocol
 from urllib.parse import parse_qs, urlsplit
 
 from provisioner.controlplane.authority.model import PlanScope
 
 from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact, DiscoveryObject,
-                    DiscoveryPage, NativeIdentity)
+                    DiscoveryPage, NativeIdentity, _utc)
 
 
 _PROJECT = re.compile(r'(?:[0-9a-f]{32}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\Z')
@@ -318,6 +318,7 @@ def collect_openstack_project(
     campaign: DiscoveryCampaignAuthorization,
     endpoints: OpenStackServiceEndpoints,
     transport: ProjectReadTransport,
+    *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
 ) -> tuple[DiscoveryPage, ...]:
     """Read one bound project or return terminal PARTIAL on native service loss.
 
@@ -333,9 +334,30 @@ def collect_openstack_project(
             or endpoints.project_id != campaign.scope.native_scope_id
             or getattr(transport, 'bound_scope', None) != campaign.scope
             or getattr(transport, 'authenticated_project_id', None) != endpoints.project_id
-            or not callable(getattr(transport, 'get_json', None))):
+            or not callable(getattr(transport, 'get_json', None))
+            or not callable(clock)):
         raise ValueError('Verified exact project, route and read campaign required')
 
+    previous_time = campaign.issued_at
+
+    def current_time() -> datetime:
+        nonlocal previous_time
+        at = clock()
+        if (not _utc(at) or not previous_time <= at < campaign.expires_at):
+            raise OpenStackDiscoveryHeld('Campaign expired or discovery clock regressed')
+        previous_time = at
+        return at
+
+    def read(endpoint: str, path: str, params: Mapping[str, str]):
+        # No first request, next page or quota read may begin after expiry.
+        current_time()
+        try:
+            return _read(transport, endpoint, path, params)
+        finally:
+            # A late success/error is not publishable discovery evidence.
+            current_time()
+
+    current_time()
     pages: list[DiscoveryPage] = []
     seen: set[tuple[str, str]] = set()
     cursor: str | None = None
@@ -345,9 +367,7 @@ def collect_openstack_project(
     def append(objects: tuple[DiscoveryObject, ...], next_cursor: str | None,
                *, error: str | None = None, privilege: str | None = None) -> bool:
         nonlocal cursor, object_count, has_unknown
-        at = datetime.now(timezone.utc)
-        if not campaign.issued_at <= at < campaign.expires_at:
-            raise OpenStackDiscoveryHeld('Campaign expired during native read')
+        at = current_time()
         object_count += len(objects)
         if object_count > campaign.max_objects:
             object_count -= len(objects)
@@ -377,7 +397,7 @@ def collect_openstack_project(
             if service == 'compute':
                 params['all_tenants'] = 'false'
             try:
-                response = _read(transport, endpoints.for_service(service), path, params)
+                response = read(endpoints.for_service(service), path, params)
             except OpenStackDiscoveryHeld:
                 raise
             except Exception as exc:
@@ -425,7 +445,7 @@ def collect_openstack_project(
         path = (f'os-quota-sets/{endpoints.project_id}' if service != 'network'
                 else f'quotas/{endpoints.project_id}')
         try:
-            response = _read(transport, endpoint, path, {})
+            response = read(endpoint, path, {})
         except OpenStackDiscoveryHeld:
             raise
         except Exception as exc:
