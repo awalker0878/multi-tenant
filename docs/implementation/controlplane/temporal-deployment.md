@@ -58,6 +58,16 @@ the old build after Current moves. The gate uses identical Workflow source at
 both versions; representative production history replay after a code change,
 PostgreSQL restore and an offline image mirror need separate qualification.
 
+Registration polling requires the exact deployment name and build ID to appear;
+a successful deployment description containing only an older build is still
+pending. The gate allows at most 30 polls with a five-second bound on each RPC,
+refreshes the conflict token on retry, and fails without selecting a different
+or unversioned build. Missing registrations and precondition races may retry;
+authorization errors, cancellation and RPC timeouts remain failures. Deterministic
+regressions cover delayed registration, exhaustion, cross-deployment rejection,
+fresh conflict tokens and fail-closed RPC handling; they complement rather than
+replace the self-hosted upgrade/rollback engine gate.
+
 ## On-prem operational profile
 
 The intended deployment is the official self-hosted Temporal Helm chart, with
