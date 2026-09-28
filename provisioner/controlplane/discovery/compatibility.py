@@ -69,19 +69,6 @@ def check_compatibility(source: DiscoveryObject | None, target: DiscoveryObject 
             'The selected target realization lacks valid observed property semantics.',
             'Observe the selected target datapath, storage and control configuration with exact native identities.')
 
-    available = _fact(target, 'observedCapabilities')
-    if (not isinstance(available, list) or len(available) > len(CAPABILITIES)
-            or any(not isinstance(cap, str) or cap not in CAPABILITIES for cap in available)
-            or len(set(available)) != len(available)):
-        add('UNKNOWN', 'DESTINATION_CAPABILITY_SET_UNVERIFIED',
-            'The selected native capability set is missing or ambiguous.',
-            'Collect a complete observed set; route reviews do not supply omitted feature facts.')
-    else:
-        for missing in sorted(set(required_capabilities) - set(available)):
-            add('BLOCKER', 'REQUIRED_CAPABILITY_ABSENT',
-                'The selected target does not advertise required capability ' + missing + '.',
-                'Choose and qualify a target that satisfies every source requirement; do not drop it.')
-
     derived = []
     if method in _WHOLE_VM:
         for name, prop, values in (
@@ -137,6 +124,27 @@ def check_compatibility(source: DiscoveryObject | None, target: DiscoveryObject 
                 'Use an independently qualified memory-state route or an approved application restart strategy.')
         if method in {'COLD_VM_CONVERSION', 'WARM_VM_TRANSFER'}:
             derived.append(PropertyRequirement('guest_drivers.verified', 'eq', True))
+    # Hardware observations create requirements independently of a reviewed
+    # profile. A matching property must not reconstruct an absent capability.
+    # Preserving explicitly disabled Secure Boot does not require enabling it.
+    derived_capabilities = {
+        requirement.property.split('.', 1)[0] for requirement in derived
+        if not (requirement.property == 'secure_boot.enabled' and requirement.value is False)
+    }
+    required_capabilities = set(required_capabilities) | derived_capabilities
+    available = _fact(target, 'observedCapabilities')
+    if (not isinstance(available, list) or len(available) > len(CAPABILITIES)
+            or any(not isinstance(cap, str) or cap not in CAPABILITIES for cap in available)
+            or len(set(available)) != len(available)):
+        add('UNKNOWN', 'DESTINATION_CAPABILITY_SET_UNVERIFIED',
+            'The selected native capability set is missing or ambiguous.',
+            'Collect a complete observed set; route reviews do not supply omitted feature facts.')
+    else:
+        for missing in sorted(set(required_capabilities) - set(available)):
+            add('BLOCKER', 'REQUIRED_CAPABILITY_ABSENT',
+                'The selected target does not advertise required capability ' + missing + '.',
+                'Choose and qualify a target that satisfies every source requirement; do not drop it.')
+
     try:
         combined = merge_requirements(requirements, tuple(derived))
     except ValueError:

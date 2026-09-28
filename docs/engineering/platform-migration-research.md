@@ -102,7 +102,10 @@ Whole-VM comparison requires actual source architecture, firmware, secure-boot,
 vTPM, encryption, shared-disk and passthrough facts, plus an application-reviewed
 memory-state requirement. Encryption needs the observed layer and destination key
 readiness; shared disks and passthrough need qualified writer/device mappings.
-Conversion needs verified destination guest drivers. Warm transfer additionally
+Hardware-derived requirements also require their capability IDs in the selected
+observed target set; matching properties alone cannot reconstruct missing support.
+Explicitly disabled optional hardware is not silently enabled. Conversion needs
+verified destination guest drivers. Warm transfer additionally
 requires bounded measured dirty-rate and throughput samples and blocks a
 nonconvergent observed rate. These checks neither predict total downtime nor
 implement data transfer. Comparisons always keep `executionAuthorized` false.
