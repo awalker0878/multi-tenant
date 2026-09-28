@@ -328,7 +328,7 @@ in the PR/delivery record; qualification and operations remain separate columns.
 |---|---|---|
 | Wave 0 — B03/B04/B05 | Keep canonical property types and bounded parsers; reject old interpretation rather than shim it. Migrate every real consumer before deleting a legacy path. | Property contract and version rejection implemented. Package qualification owners are active, not deletion targets. B05 retained runtime/state migration remains open; installed-wheel and retirement tests are required. |
 | Wave 1 — B06–B13 | Bind requirements, observations, approvals, immutable revisions, reviewer authority and worker credentials; per-effect rechecks cannot use an earlier comparison as permission. | Existing signature/RLS/outbox/lease controls retained. Old-normalizer review rejection added. Native claim import must retain original sources, timestamps, tuple, publisher and independent evidence custody. |
-| Wave 2 — B14/B15/B16 | Collect per-VM firmware/architecture, controllers/disks/NIC order, boot/security/key state, shared/passthrough devices and optional service/driver/extension facts. Bind exact API/driver/tool versions, project/scope and completeness. | OpenStack attribute capture and malformed/missing-field tests implemented. VMware/AHV full fact mapping, installed profiles, credential transports and independent coverage reconciliation remain open. Never infer safe boot or encryption absence from a friendly profile name. |
+| Wave 2 — B14/B15/B16 | Collect per-VM firmware/architecture, controllers/disks/NIC order, boot/security/key state, shared/passthrough devices and optional service/driver/extension facts. Bind exact API/driver/tool versions, project/scope and completeness. | OpenStack attribute capture and malformed/missing-field tests implemented. VMware REST campaign/VM-info and AHV typed boot/device mapping are implemented in the follow-up below. Full fact coverage, installed profiles, credential transports and independent reconciliation remain open. Never infer safe boot or encryption absence from a friendly profile name. |
 | Wave 2 — B17/B18 | Attribute source policy and dependency/consistency decisions; version the complete source/destination/guest/tool/backend tuple. Keep six directed inter-family routes distinct and distinguish each method. | Current tuple/route authority retained. Property schema and explicit observed/source capability sets enforced. Exact released support matrices, entitlement, expiration and native claims still need qualified owner evidence. |
 | Wave 2 — B19/B20/B22 | Compare scoped property values, all source requirements and measured transfer assumptions; expose stable blocker/unknown reasons and remediation without hiding other destinations. | Typed comparison and relocation error isolation implemented; old signed reviews invalidated. Persisted owner enrichment, complete UI review flow, scheduling, freshness and estate benchmark still required. |
 | Wave 3 — B23/B25/B26 | Reserve real VM/storage/transfer/retention capacity; map firmware, disks, NICs, keys, drivers, shared devices and huge pages. Distinguish QoS minimum guarantees from ceilings and encryption layers from each other. | Planning/placement and comparison prerequisites implemented. Actual native realization, resource reservations, driver preparation, encryption transition and observation-bound postconditions remain open. Test unknown versus false and malformed integers as well as happy paths. |
@@ -343,3 +343,37 @@ then native realization/workflow increments with their actual tests. This change
 adds no competing sequence or fictitious lab access. A missing capability fact
 remains UNKNOWN; an explicit incompatible observation is BLOCKED. Neither can be
 turned into an execution grant by an operator-supplied success flag.
+
+
+### Native hardware collection follow-up — 28 September 2026
+
+B14/B15 now retain more native facts without manufacturing capability claims.
+AHV's VMM v4.0 collector records the explicit boot union, returned Secure Boot and
+vTPM booleans, native live-migration hint, disk bus/index and NIC model/MAC/link
+state. A tagged volume-group attachment cannot masquerade as a VmDisk or supply
+its disk-image capacity. Duplicate addresses, malformed types and oversized facts
+remain unknown; missing SDK response fields never acquire request defaults.
+
+The VMware REST collector now retains VM-info CPU, memory, firmware, disk layout,
+NIC model/MAC/link and native network bindings, with instance UUID and reviewed
+folder identity/digest. Summary/detail disagreements hold the scan. Its new
+`collect_vmware_vms` path emits the common campaign pages and rechecks campaign
+lifetime around each native GET. Those pages are always `PARTIAL` for visible-only
+REST inventory, even when the result is empty. Native read failures emit `UNKNOWN`
+without publishing a truncated scan as complete; expiry cannot produce late evidence.
+The emitted cursors partition the captured observations, not a native paging API.
+
+Collector identities are `nutanix-ahv-v4.0-hardware-2` and
+`vcenter-rest-vm-info-8.0.3.0-visible-only-2`. Re-admit campaigns and reissue the
+matching worker/credential witnesses; old collector identities are rejected rather
+than aliased. Raw hardware and folder-evidence changes affect snapshot digests.
+The normalizer remains version 2: its interpretation is unchanged, and the changed
+raw snapshots require new signed review bindings. No existing approval is restamped.
+
+This is bounded read-only mapping and campaign integration, not completion of
+B14/B15 or Wave 2. Site transport/credential wiring and independent visibility
+reconciliation remain open, as do full controller/boot-order/opaque-network,
+ISA, encryption/key, shared-disk and passthrough mapping and attributed application
+requirements. REST VM-info does not supply SOAP ConfigInfo security fields.
+The native live-migration hint is not directed route or entitlement qualification.
+No native system or guest was contacted; no execution or qualification gate changed.

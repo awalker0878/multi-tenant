@@ -132,3 +132,13 @@ transfer workers, fencing, final sync, cutover, post-write recovery or B47–B50
 The [wave-plan acceptance expansion](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta)
 allocates those obligations without new B identifiers. Native qualification remains
 unselected; production mutation is neither enabled nor attempted.
+
+## Native discovery continuation
+
+The [Wave 2 collector follow-up](../product/wave2-discovery-architecture.md#native-hardware-collection-follow-up--28-september-2026)
+implements additional B14/B15 mapping and documents its primary API sources.
+AHV now retains typed boot/vTPM and disk/NIC hardware facts; VMware REST VM-info
+now produces common campaign evidence with hardware and reviewed folder identity.
+Raw observation changes require fresh signed reviews. Visible REST enumeration
+remains partial; absent or malformed hardware is not a safe default. This narrows
+but does not close the remaining full fact mapping and site credential integration.

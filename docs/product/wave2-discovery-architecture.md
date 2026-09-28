@@ -123,3 +123,62 @@ QoS/address and volume encryption/multiattach/type facts. These do not create
 policy-equivalence findings or installed support. Missing extension/privilege data
 stays unknown. Full VMware/AHV fact wiring and independent native qualification
 remain open under the [existing wave plan](enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
+
+
+### Native hardware collection follow-up — 28 September 2026
+
+B14/B15 now retain more native facts without manufacturing capability claims.
+AHV's VMM v4.0 collector records the explicit boot union, returned Secure Boot and
+vTPM booleans, native live-migration hint, disk bus/index and NIC model/MAC/link
+state. A tagged volume-group attachment cannot masquerade as a VmDisk or supply
+its disk-image capacity. Duplicate addresses, malformed types and oversized facts
+remain unknown; missing SDK response fields never acquire request defaults.
+
+The VMware REST collector now retains VM-info CPU, memory, firmware, disk layout,
+NIC model/MAC/link and native network bindings, with instance UUID and reviewed
+folder identity/digest. Summary/detail disagreements hold the scan. Its new
+`collect_vmware_vms` path emits the common campaign pages and rechecks campaign
+lifetime around each native GET. Those pages are always `PARTIAL` for visible-only
+REST inventory, even when the result is empty. Native read failures emit `UNKNOWN`
+without publishing a truncated scan as complete; expiry cannot produce late evidence.
+The emitted cursors partition the captured observations, not a native paging API.
+
+Collector identities are `nutanix-ahv-v4.0-hardware-2` and
+`vcenter-rest-vm-info-8.0.3.0-visible-only-2`. Re-admit campaigns and reissue the
+matching worker/credential witnesses; old collector identities are rejected rather
+than aliased. Raw hardware and folder-evidence changes affect snapshot digests.
+The normalizer remains version 2: its interpretation is unchanged, and the changed
+raw snapshots require new signed review bindings. No existing approval is restamped.
+
+This is bounded read-only mapping and campaign integration, not completion of
+B14/B15 or Wave 2. Site transport/credential wiring and independent visibility
+reconciliation remain open, as do full controller/boot-order/opaque-network,
+ISA, encryption/key, shared-disk and passthrough mapping and attributed application
+requirements. REST VM-info does not supply SOAP ConfigInfo security fields.
+The native live-migration hint is not directed route or entitlement qualification.
+No native system or guest was contacted; no execution or qualification gate changed.
+
+### Native schema references for this follow-up
+
+Read 28 September 2026. These document response shapes, not installed tuple support.
+
+- [vCenter VM-info REST schema](https://developer.broadcom.com/xapis/vsphere-automation-api/latest/api/vcenter/vm/vm/get/)
+  defines the CPU/memory/boot objects and disk/NIC maps. Do not import fields from
+  a different API family; `efi_legacy_boot` is not Secure Boot enablement.
+- [AHV v4.0 Disk](https://developers.nutanix.com/api/v1/sdk/namespaces/main/vmm/versions/v4.0/languages/python/ntnx_vmm_py_client.models.vmm.v4.ahv.config.Disk.html)
+  distinguishes VmDisk and ADSFVolumeGroupReference backing members;
+  [DiskBusType](https://developers.nutanix.com/api/v1/sdk/namespaces/main/vmm/versions/v4.0/languages/python/ntnx_vmm_py_client.models.vmm.v4.ahv.config.DiskBusType.html)
+  documents the supported response enum, including SPAPR. A bus type does not prove ISA.
+- [AHV v4.0 UefiBoot](https://developers.nutanix.com/api/v1/sdk/namespaces/main/vmm/versions/v4.0/languages/python/ntnx_vmm_py_client.models.vmm.v4.ahv.config.UefiBoot.html),
+  [VtpmConfig](https://developers.nutanix.com/api/v1/sdk/namespaces/main/vmm/versions/v4.0/languages/python/ntnx_vmm_py_client.models.vmm.v4.ahv.config.VtpmConfig.html)
+  and [EmulatedNic](https://developers.nutanix.com/api/v1/sdk/namespaces/main/vmm/versions/v4.0/languages/python/ntnx_vmm_py_client.models.vmm.v4.ahv.config.EmulatedNic.html)
+  supply separate observations. API/SDK construction defaults are not returned facts.
+
+Regression coverage lives in `tests/provisioning/controlplane/test_ahv_hardware.py`
+and `tests/provisioning/discovery/test_vmware_hardware.py`, alongside existing
+collector, normalization and ingestion tests. It covers missing versus false/empty,
+union/type confusion, overflow, duplicate device identities/slots, fact-size bounds,
+redaction, immutable digests, scope/role/version mismatches, native read failures,
+clock expiry, campaign budgets and normalized output. Real native captures,
+privilege-loss enumeration reconciliation and signed transport campaigns remain
+required under B14/B15/B18/B47; these unit fixtures do not replace them.

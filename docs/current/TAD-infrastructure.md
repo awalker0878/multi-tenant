@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -141,6 +141,23 @@ feature flag or a volume type name into an enforced-policy or native support cla
 
 See [verified research decisions](../engineering/platform-migration-research.md) and
 [existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
+
+### Bounded native hardware observations
+
+AHV VMM v4.0 boot/vTPM and typed disk/NIC facts now enter common discovery pages.
+The parser rejects disk-backing union confusion and retains bus/index separately
+from array order. VMware REST VM-info contributes CPU, memory, firmware and
+whitelisted disk/NIC facts through common campaign pages; folder review identity
+and all captured hardware are digest-bound. Visible REST inventory remains partial
+and cannot prove absence. Inconclusive reads discard the scan; expired campaigns
+cannot issue late evidence. Neither parser ingests native secrets or guest data.
+
+Collector profile revisions require new admitted campaigns and credential witnesses.
+The normalizer's existing raw/normalized bindings remain in force. ISA, guest/key
+state, application policy, complete controller/boot mappings and deployed transport
+remain separate work. A native live-migration hint is not route qualification.
+See the [Wave 2 collector follow-up](../product/wave2-discovery-architecture.md#native-hardware-collection-follow-up--28-september-2026).
+
 
 ## Engineering and implementation handoff
 

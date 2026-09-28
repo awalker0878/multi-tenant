@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -69,6 +69,25 @@ mismatches remain blockers. Comparison never sets `executionAuthorized` true.
 
 See [verified research decisions](../engineering/platform-migration-research.md) and
 [existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
+
+### Revised native collector contracts
+
+AHV uses `nutanix-ahv-v4.0-hardware-2`; VMware VM-info uses
+`vcenter-rest-vm-info-8.0.3.0-visible-only-2`. Old profile IDs are not compatibility
+aliases. The site worker must verify campaign admission, current read credentials,
+exact native endpoint/scope, API release, TLS origin and response/timeout budgets.
+It signs the new raw observation with a matching independent credential witness;
+collector output alone is never admitted inventory or mutation authority.
+
+VMware now emits common `DiscoveryPage` records. Its cursors partition one captured
+visible set; they do not assert a native pagination mechanism or complete privileges.
+Empty visible results remain partial; a failed scan is unknown. Recheck the campaign
+before and after every read and before publication. Folder-review and hardware facts
+are part of the immutable snapshot, so changes require fresh signed reviews.
+AHV keeps tagged disk backing and explicit boot/security/device observations rather
+than applying SDK request defaults. Consumer normalization and compatibility remain
+separate from native qualification and execution approval.
+
 
 ## Engineering and implementation handoff
 
