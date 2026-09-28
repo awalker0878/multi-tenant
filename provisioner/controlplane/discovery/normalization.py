@@ -112,12 +112,18 @@ def _value(facts: dict[str, DiscoveryFact], name: str) -> object | None:
 def _number(facts: dict[str, DiscoveryFact], name: str, *, minimum: int,
             alias: str | None = None, multiplier: int = 1) -> DiscoveryFact:
     item = facts.get(name)
+    source = facts.get(alias) if alias else None
     if item is not None:
         if item.state == 'UNKNOWN':
             return item
+        # A canonical name does not outrank a contradictory native observation.
+        if source is not None and source.state == 'KNOWN':
+            native = source.value()
+            if (not _integer(native, minimum=minimum) or native * multiplier > _MAX
+                    or item.value() != native * multiplier):
+                return DiscoveryFact.unknown(name, 'COLLECTION_ERROR')
         return (item if _integer(item.value(), minimum=minimum)
                 else DiscoveryFact.unknown(name, 'COLLECTION_ERROR'))
-    source = facts.get(alias) if alias else None
     if source is None or source.state == 'UNKNOWN':
         return _unknown(name, source)
     value = source.value()
@@ -145,16 +151,39 @@ def _native_id(value: object) -> bool:
             and all(ord(char) >= 32 and ord(char) != 127 for char in value))
 
 
+def _network_bindings(value: object) -> list[dict] | None:
+    if not isinstance(value, list) or len(value) > 256:
+        return None
+    bindings = []
+    for nic in value:
+        if not isinstance(nic, dict):
+            return None
+        for canonical, native in (('nativeNicId', 'extId'),
+                                  ('nativeNetworkId', 'subnetExtId')):
+            if canonical in nic and native in nic and nic[canonical] != nic[native]:
+                return None
+        nic_id = nic.get('nativeNicId', nic.get('extId'))
+        network_id = nic.get('nativeNetworkId', nic.get('subnetExtId'))
+        if not _native_id(nic_id) or not _native_id(network_id):
+            return None
+        bindings.append({'nativeNicId': nic_id, 'nativeNetworkId': network_id})
+    if len({item['nativeNicId'] for item in bindings}) != len(bindings):
+        return None
+    return bindings
+
+
 def _vm(facts: dict[str, DiscoveryFact]) -> None:
     cpu = _number(facts, 'vcpuCount', minimum=1, alias='vcpus')
-    if 'vcpuCount' not in facts and 'vcpus' not in facts:
-        sockets, cores = (_value(facts, name) for name in
-                          ('numSockets', 'numCoresPerSocket'))
-        cpu = (DiscoveryFact.known('vcpuCount', sockets * cores)
-               if _integer(sockets, minimum=1) and _integer(cores, minimum=1)
-               and sockets * cores <= _MAX else
-               _unknown('vcpuCount', facts.get('numSockets'),
-                        facts.get('numCoresPerSocket')))
+    sockets, cores = (facts.get(name) for name in ('numSockets', 'numCoresPerSocket'))
+    if all(item is not None and item.state == 'KNOWN' for item in (sockets, cores)):
+        valid = (_integer(sockets.value(), minimum=1) and _integer(cores.value(), minimum=1)
+                 and sockets.value() * cores.value() <= _MAX)
+        if not valid or cpu.state == 'KNOWN' and cpu.value() != sockets.value() * cores.value():
+            cpu = DiscoveryFact.unknown('vcpuCount', 'COLLECTION_ERROR')
+        elif 'vcpuCount' not in facts and 'vcpus' not in facts:
+            cpu = DiscoveryFact.known('vcpuCount', sockets.value() * cores.value())
+    elif 'vcpuCount' not in facts and 'vcpus' not in facts:
+        cpu = _unknown('vcpuCount', sockets, cores)
     facts['vcpuCount'] = cpu
     facts['memorySizeBytes'] = _number(facts, 'memorySizeBytes', minimum=1,
                                       alias='memoryMiB', multiplier=_MIB)
@@ -186,21 +215,15 @@ def _vm(facts: dict[str, DiscoveryFact]) -> None:
     if network_input is None or network_input.state == 'UNKNOWN':
         facts['networkBindings'] = _unknown('networkBindings', network_input)
     else:
-        nics = network_input.value()
-        bindings = []
-        if isinstance(nics, list) and len(nics) <= 256:
-            for nic in nics:
-                if not isinstance(nic, dict):
-                    break
-                nic_id = nic.get('nativeNicId', nic.get('extId'))
-                network_id = nic.get('nativeNetworkId', nic.get('subnetExtId'))
-                if not _native_id(nic_id) or not _native_id(network_id):
-                    break
-                bindings.append({'nativeNicId': nic_id, 'nativeNetworkId': network_id})
-        valid = (isinstance(nics, list) and len(bindings) == len(nics)
-                 and len({item['nativeNicId'] for item in bindings}) == len(bindings))
+        bindings = _network_bindings(network_input.value())
+        native_input = facts.get('nics') if 'networkBindings' in facts else None
+        if bindings is not None and native_input is not None and native_input.state == 'KNOWN':
+            native = _network_bindings(native_input.value())
+            if native is None or {item['nativeNicId']: item['nativeNetworkId'] for item in native} != {
+                    item['nativeNicId']: item['nativeNetworkId'] for item in bindings}:
+                bindings = None
         facts['networkBindings'] = (DiscoveryFact.known('networkBindings', bindings)
-                                    if valid else DiscoveryFact.unknown(
+                                    if bindings is not None else DiscoveryFact.unknown(
                                         'networkBindings', 'COLLECTION_ERROR'))
     if 'measuredTransferBytes' in facts:
         facts['measuredTransferBytes'] = _number(facts, 'measuredTransferBytes', minimum=0)
@@ -262,10 +285,16 @@ def normalize_discovery(result: DiscoveryResult) -> NormalizedDiscovery:
             for canonical, native in (('attachedVmId', 'device_id'),
                                       ('nativeNetworkId', 'network_id')):
                 item = facts.get(canonical, facts.get(native))
-                facts[canonical] = (DiscoveryFact.known(canonical, item.value())
-                                    if item and item.state == 'KNOWN'
-                                    and _native_id(item.value()) else
-                                    _unknown(canonical, item))
+                alias = facts.get(native) if canonical in facts else None
+                if (item is not None and item.state == 'KNOWN'
+                        and alias is not None and alias.state == 'KNOWN'
+                        and item.value() != alias.value()):
+                    facts[canonical] = DiscoveryFact.unknown(canonical, 'COLLECTION_ERROR')
+                else:
+                    facts[canonical] = (DiscoveryFact.known(canonical, item.value())
+                                        if item and item.state == 'KNOWN'
+                                        and _native_id(item.value()) else
+                                        _unknown(canonical, item))
         if len(facts) > 64:
             raise NormalizationHeld('Normalization exceeds the object fact budget')
         objects.append(DiscoveryObject(obj.identity, tuple(sorted(

@@ -89,6 +89,66 @@ class NormalizationTests(unittest.TestCase):
         self.assertEqual(item.required_privilege, 'VM_CONFIG_READ')
         self.assertEqual(item.reason, 'MISSING_PRIVILEGE')
 
+    def test_conflicting_numeric_aliases_never_understate_source_requirements(self):
+        for values, canonical in (
+                ({'vcpuCount': 4, 'vcpus': 64}, 'vcpuCount'),
+                ({'vcpuCount': 4, 'numSockets': 8, 'numCoresPerSocket': 8}, 'vcpuCount'),
+                ({'vcpus': 4, 'numSockets': 8, 'numCoresPerSocket': 8}, 'vcpuCount'),
+                ({'vcpuCount': 4, 'vcpus': 4, 'numSockets': 8,
+                  'numCoresPerSocket': 8}, 'vcpuCount'),
+                ({'memorySizeBytes': 1024**3, 'memoryMiB': 65536}, 'memorySizeBytes'),
+                ({'memorySizeBytes': 1024**3, 'memoryMiB': True}, 'memorySizeBytes'),
+                ({'memorySizeBytes': 1024**3, 'memoryMiB': 2**63 - 1}, 'memorySizeBytes'),
+                ({'numSockets': 2**62, 'numCoresPerSocket': 4}, 'vcpuCount'),
+                ({'vcpuCount': 4, 'numSockets': True, 'numCoresPerSocket': 4}, 'vcpuCount')):
+            with self.subTest(values=values):
+                result, facts = normalized(values)
+                self.assertEqual(facts[canonical].state, 'UNKNOWN')
+                self.assertEqual(facts[canonical].reason, 'COLLECTION_ERROR')
+                self.assertEqual(result.inventory.completeness, 'PARTIAL')
+                self.assertEqual(result.original.completeness, 'COMPLETE')
+
+    def test_agreeing_numeric_aliases_and_socket_counts_remain_known(self):
+        _, facts = normalized({'vcpuCount': 8, 'vcpus': 8,
+            'numSockets': 2, 'numCoresPerSocket': 4,
+            'memorySizeBytes': 8 * 1024**3, 'memoryMiB': 8192})
+        self.assertEqual(facts['vcpuCount'].value(), 8)
+        self.assertEqual(facts['memorySizeBytes'].value(), 8 * 1024**3)
+        _, volume = normalized({'diskCapacityBytes': 10 * 1024**3, 'size_gib': 20},
+                               kind='volume')
+        self.assertEqual(volume['diskCapacityBytes'].reason, 'COLLECTION_ERROR')
+
+    def test_conflicting_nic_aliases_cannot_hide_a_different_attachment(self):
+        canonical = [{'nativeNicId': 'nic-a', 'nativeNetworkId': 'net-a'}]
+        for aliases in (
+                [{'extId': 'nic-a', 'subnetExtId': 'net-b'}],
+                [{'extId': 'nic-b', 'subnetExtId': 'net-a'}],
+                [], [{}], True):
+            with self.subTest(aliases=aliases):
+                _, facts = normalized({'networkBindings': canonical, 'nics': aliases})
+                self.assertEqual(facts['networkBindings'].state, 'UNKNOWN')
+                self.assertEqual(facts['networkBindings'].reason, 'COLLECTION_ERROR')
+        for mixed in ({'nativeNicId': 'nic-a', 'extId': 'nic-b', 'nativeNetworkId': 'net-a'},
+                      {'nativeNicId': 'nic-a', 'nativeNetworkId': 'net-a', 'subnetExtId': 'net-b'}):
+            with self.subTest(mixed=mixed):
+                _, facts = normalized({'networkBindings': [mixed]})
+                self.assertEqual(facts['networkBindings'].reason, 'COLLECTION_ERROR')
+
+    def test_nic_alias_order_does_not_create_a_false_conflict(self):
+        canonical = [{'nativeNicId': 'nic-a', 'nativeNetworkId': 'net-a'},
+                     {'nativeNicId': 'nic-b', 'nativeNetworkId': 'net-b'}]
+        _, facts = normalized({'networkBindings': canonical, 'nics': [
+            {'extId': 'nic-b', 'subnetExtId': 'net-b'},
+            {'extId': 'nic-a', 'subnetExtId': 'net-a'}]})
+        self.assertEqual(facts['networkBindings'].value(), canonical)
+
+    def test_port_aliases_cannot_change_native_vm_or_network_ownership(self):
+        for values, field in (({'attachedVmId': 'vm-a', 'device_id': 'vm-b'}, 'attachedVmId'),
+                              ({'nativeNetworkId': 'net-a', 'network_id': 'net-b'}, 'nativeNetworkId')):
+            with self.subTest(values=values):
+                _, facts = normalized(values, kind='nic')
+                self.assertEqual(facts[field].reason, 'COLLECTION_ERROR')
+
     def test_disk_contradictions_and_invalid_sizes_never_create_capacity(self):
         for values in (
                 {'diskCapacityBytes': 99, 'disks': [{'extId': 'd', 'diskSizeBytes': 10}]},
