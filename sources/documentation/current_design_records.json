@@ -30,7 +30,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.2",
+    "version": "0.3",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -53,6 +53,11 @@
         "version": "0.2",
         "date": "2026-09-28",
         "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Moved the actual WSD compiler and component declarations into package ownership without a shim; bounded file input, migrated callers and verified isolated compiler imports while preserving generated native inputs."
       }
     ]
   },

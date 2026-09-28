@@ -6,7 +6,7 @@ prove packet enforcement, renew apply authority or release a held operation.
 import ipaddress
 import re
 from tools import nsx_domain_observe as domain, lifecycle_transition as lifecycle, readback_core as c
-from tools.compile_wsd import STATE
+from provisioner.compiler.wsd import STATE
 from tools.run_files import require
 from tools.terraform_run import ROOT, select_scope
 

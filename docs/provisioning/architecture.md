@@ -3,9 +3,10 @@
 ## Purpose
 
 `provisioner/` converts one reviewed portable request into a deterministic internal
-desired state that the **existing** compiler already understands. It is an additive
-front end: the compiler, the Terraform roots, the Ansible roles and the delivery
-tooling keep their current owners.
+desired state consumed by the package-owned WSD compiler. The original compiler
+implementation now lives in `provisioner/compiler/wsd.py`, with its component map
+in `provisioner/compiler/components.py`; there is no old-path wrapper. Terraform
+roots, Ansible roles and the remaining delivery tools retain their owners.
 
 ## Stages and owners
 
@@ -20,7 +21,7 @@ tooling keep their current owners.
 | 7 | Desired state | `provisioner/compiler/desired_state.py` | `DesiredState` | uncompilable intent, non-positive generation |
 | 8 | Environment document | `provisioner/compiler/environment.py` | environment document | contract violation, private output path |
 | 9 | Realization contract | `provisioner/adapters` | adapter realization contract | plan realizes another platform, absent zone, native input the module does not accept |
-| 10 | Compilation | `tools/compile_wsd.py` (existing) | compiled inputs + plan scopes | compiler refusal |
+| 10 | Compilation | `provisioner/compiler/wsd.py` (existing) | compiled inputs + plan scopes | compiler refusal |
 | 11 | Execution boundary | `provisioner/execution` | Terraform/Ansible/delivery scopes | undeclared catalog scope |
 | 12 | Conformance | `provisioner/conformance` | conformance report | missing mandatory check, observation bound to another generation |
 | 13 | Observation and reconciliation | `provisioner/observation`, `provisioner/reconciliation` | drift classification | unclassifiable drift |
@@ -41,8 +42,10 @@ Every command is a thin transport over `provisioner/execution/service.py`, which
 holds the operations they share: `build_context()` loads the request, the reviewed
 inventory and the catalogs, and `plan_for()` runs the pipeline over that context.
 `provisioner/repository.py` is the only module that reaches back into `tools/` and
-`scripts/`; it resolves those modules by name so the existing compiler stays the
-single source of native field shapes.
+`scripts/` for owners not yet migrated under B05. The compiler has no such
+backreach: it reads reviewed assets through `hosting_resources` and shares the
+component declaration with the build-only composition renderer. Native field
+shapes remain declared exactly once.
 
 ## Reviewed policy inputs
 
@@ -80,7 +83,7 @@ The adapters own the other half of that boundary: *how* a portable decision is
 realized on one platform. `provisioner/adapters/base.py` declares six surfaces —
 capability, placement, phases, readback, security edge and realization gaps — and
 every provider-specific decision lives in a declarative table keyed by platform name
-(`tools/compile_wsd.PLACEMENT`, `NETWORK` and `WORKLOAD_NETWORK_BINDING`) or in the
+(`provisioner.compiler.wsd.PLACEMENT`, `NETWORK` and `WORKLOAD_NETWORK_BINDING`) or in the
 adapter's own package. No generic module compares a platform name: the compiler looks
 the selected platform up, and `provisioner/compiler/environment.py` derives even the
 list of facts the provisioner computes from the adapter. A plan whose realization

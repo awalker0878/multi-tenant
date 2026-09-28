@@ -67,8 +67,8 @@ adapter JSON projection were retired; use `realization_contract()` for serializa
 ## No drift
 
 The native field sets are **read from the existing compiler**
-(`tools/compile_wsd.PLACEMENT` / `tools/compile_wsd.NETWORK`) and the module
-identities come from `scripts/build_wsd_compositions.COMPONENTS`. The adapter and the
+(`provisioner.compiler.wsd.PLACEMENT` / `provisioner.compiler.wsd.NETWORK`) and the module
+identities come from `scripts/components.COMPONENTS`. The adapter and the
 compiler therefore cannot disagree: there is one declaration, in the compiler, and the
 adapter is a typed projection of it. `provisioner/compiler/environment.py` reaches the
 compiler through `provisioner/repository.py`, which is the only module allowed to
@@ -94,7 +94,7 @@ if platform == 'vmware':        # removed
 
 That decision now lives in two declarative places and nowhere else:
 
-* `tools/compile_wsd.WORKLOAD_NETWORK_BINDING` — a table keyed by platform holding
+* `provisioner.compiler.wsd.WORKLOAD_NETWORK_BINDING` — a table keyed by platform holding
   `observed_field`, `native_field`, `binding_field`, `binding_identity` and the
   message a reviewer reads. The compiler looks the selected platform up; it never
   compares a platform name.
@@ -104,7 +104,7 @@ That decision now lives in two declarative places and nowhere else:
 `compile_environment(document, phase, outputs, phase_bindings)` is named for the phase
 it binds rather than for the platform, so the argument cannot silently become
 provider-specific again. `tests/provisioning/adapters/test_adapter_contract.py` walks
-the AST of `tools/compile_wsd.py` and of every `provisioner/**.py` source and fails on
+the AST of `provisioner/compiler/wsd.py` and of every `provisioner/**.py` source and fails on
 any comparison against a platform-name literal.
 
 ## Qualification

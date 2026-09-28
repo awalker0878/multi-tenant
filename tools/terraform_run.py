@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT))
 from provisioner.repository import asset_path
 
 from tools.check_release import verify
-from tools.compile_wsd import identity
+from provisioner.compiler.wsd import identity
 from tools.neutron_observe import strict_loads
 from tools.plan_review import review
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,

@@ -13,8 +13,9 @@ from scripts import check_retired_interfaces as retirement
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
-    'tools/old_compile.py': ('path', 'tools/compile_wsd.py'),
-    'tools/compile_wsd_v2.py': ('path', 'tools/compile_wsd.py'),
+    'tools/compile_wsd.py': ('path', 'provisioner/compiler/wsd.py'),
+    'tools/old_compile.py': ('path', 'provisioner/compiler/wsd.py'),
+    'tools/compile_wsd_v2.py': ('path', 'provisioner/compiler/wsd.py'),
     'provisioner/legacy': ('path', 'provisioner'),
     'tools/compatibility': ('path', 'migrate the caller, then delete'),
     'terraform/legacy': ('path', 'terraform/catalog.json'),

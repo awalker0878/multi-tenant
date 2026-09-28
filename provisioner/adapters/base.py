@@ -13,10 +13,10 @@ nothing else. Its reviewed contracts include:
 
 An adapter never provisions, never contacts a platform and never decides placement.
 Execution and platform contact stay with the owner tools that already own them, and
-`tools/compile_wsd.py` stays the authority for what a reviewed module accepts.
+`provisioner/compiler/wsd.py` stays the authority for what a reviewed module accepts.
 
 Nothing here restates the compiler. Every declaration is read from the module that
-already owns it — `tools.compile_wsd` for the native field sets, the declared native
+already owns it — `provisioner.compiler.wsd` for the native field sets, the declared native
 variables and the declared cross-phase binding rules; `scripts.build_wsd_compositions`
 for the module identities; `terraform/catalog.json` for the reviewed security-edge
 realization; the capability registry for qualification — so an adapter and the
@@ -230,7 +230,7 @@ class Adapter:
                 'fields': sorted(self.placement_fields),
                 'supplied_by': 'reviewed inventory cluster native identity',
                 'provisioner_owned': False,
-                'authority': 'tools.compile_wsd.PLACEMENT',
+                'authority': 'provisioner.compiler.wsd.PLACEMENT',
                 'native_contact': False}
 
     def phase_contract(self, phase: str) -> dict:
@@ -244,7 +244,7 @@ class Adapter:
                 'unavailable_inputs': list(refused),
                 'readback_identity': sorted(self.network_fields) if phase == 'domains' else [],
                 'binding_requirement': self.binding if phase == 'workloads' else {},
-                'authority': 'tools.compile_wsd.native_variables',
+                'authority': 'provisioner.compiler.wsd.native_variables',
                 'native_contact': False}
 
     def readback_contract(self) -> dict:
@@ -265,7 +265,7 @@ class Adapter:
                                               if key == 'native_field'),
                 'observed_field': binding.get('observed_field', ''),
                 'binding': binding,
-                'authority': 'tools.compile_wsd.NETWORK',
+                'authority': 'provisioner.compiler.wsd.NETWORK',
                 'native_contact': False}
 
     def security_edge_contract(self) -> dict:

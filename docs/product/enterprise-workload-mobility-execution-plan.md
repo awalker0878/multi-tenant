@@ -37,6 +37,10 @@ Required checks and native qualification must still bind the final delivery revi
   `hosting_resources`, with one selected resource root and installed wheel/sdist
   checks against checkout fallback and stale build layouts. Generic `tools` and
   `scripts` runtime owners and source-bound execution still keep B05 open.
+  The actual WSD compiler and component declarations are now package-owned; its
+  old executable was deleted, callers migrated, and isolated compiler imports
+  reject legacy owner dependencies. Generated native inputs and resources retain
+  their existing identities. This relocation does not close retained-state work.
 - Wave 2 now has a separate signed campaign/result mTLS listener, independent
   native credential witnesses, original signature custody before publication,
   and isolated ingest SQL roles. Durable signed installed-tuple, directed-route

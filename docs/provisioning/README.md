@@ -15,7 +15,7 @@ portable WSD request (YAML)
   -> placement                  provisioner/placement
   -> desired state              provisioner/compiler/desired_state.py
   -> realization contract       provisioner/adapters
-  -> existing compile_wsd.py    tools/compile_wsd.py
+  -> existing compile_wsd.py    provisioner/compiler/wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
   -> hosting-delivery/2         provisioner/execution/handoff.py
   -> existing delivery runner   tools/delivery_run.py (the only engine)

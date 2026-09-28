@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from tools.check_release import verify
-from tools.compile_wsd import STATE
+from provisioner.compiler.wsd import STATE
 from tools.plan_review import review
 from tools import readback_core as c
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,

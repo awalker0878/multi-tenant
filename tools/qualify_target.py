@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import nutanix_flow_activity_observe
 from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
-from tools.compile_wsd import STATE
+from provisioner.compiler.wsd import STATE
 from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe
 from tools import nsx_segment_observe, nsx_domain_switch_observe, nsx_domain_binding, vmware_network_binding
 from tools import recovery_review, vsphere_port_observe

@@ -19,7 +19,8 @@ open. A capability row is not an executed feature.
 
 ## Next implementation sequence
 
-**B05 — finish installed ownership.** Continue moving the remaining compiler,
+**B05 — finish installed ownership.** WSD compilation and component declarations
+are now package-owned without a legacy entry point. Continue moving the remaining
 execution and evidence owners into the package, migrating all callers and removing
 obsolete paths. Preserve resource digests and prove isolated installed operation.
 Apply retained-state conversion/reconciliation before removing any active writer.

@@ -30,14 +30,14 @@
       "interface": "tools/old_compile.py",
       "kind": "path",
       "reason": "Superseded compiler wrapper. There is exactly one compiler entry point.",
-      "replacement": "tools/compile_wsd.py",
+      "replacement": "provisioner/compiler/wsd.py",
       "enforcement": "the path must not exist"
     },
     {
       "interface": "tools/compile_wsd_v2.py",
       "kind": "path",
       "reason": "A second compiler wrapper would duplicate native field ownership.",
-      "replacement": "tools/compile_wsd.py",
+      "replacement": "provisioner/compiler/wsd.py",
       "enforcement": "the path must not exist"
     },
     {
@@ -136,6 +136,13 @@
       "kind": "path",
       "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
       "replacement": "provisioner/qualification/target_selection.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/compile_wsd.py",
+      "kind": "path",
+      "reason": "The actual compiler is package-owned; all callers migrated, with no forwarding file, path mutation or build-script/native-observer dependency.",
+      "replacement": "provisioner/compiler/wsd.py",
       "enforcement": "the path must not exist"
     }
   ]

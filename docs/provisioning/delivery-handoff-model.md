@@ -15,7 +15,7 @@ repository tooling, so the transport cannot reach into the runner's module graph
 ```
 portable WSD request (YAML)
   -> provisioner (schema, profiles, policy, placement, desired state)
-  -> tools/compile_wsd.py (the existing compiler)
+  -> provisioner/compiler/wsd.py (the existing compiler)
   -> reviewed immutable plan (Plan.manifest_digest)
   -> hosting-delivery/2 (provisioner/execution/handoff.py)
   -> tools/delivery_run.py (the existing runner)

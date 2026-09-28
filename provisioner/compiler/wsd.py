@@ -5,16 +5,13 @@ from __future__ import annotations
 import argparse
 import ipaddress
 import json
+import math
 import os
 import re
-import sys
 from pathlib import Path
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
-from scripts.build_wsd_compositions import COMPONENTS
-from tools.neutron_observe import strict_loads
+from provisioner.compiler.components import COMPONENTS
 
 ROLES = {'management', 'security-edge', 'shared-services', 'trust', 'workload',
          'data', 'protection', 'recovery', 'qualification'}
@@ -212,6 +209,37 @@ def compile_environment(env, phase='domains', outputs=None, phase_bindings=None)
                               'Backend must be provisioned and matched to state_key by its owner']}
 
 
+INPUT_LIMIT = 4 * 1024 * 1024
+
+
+def _read_json(path: Path):
+    """Reject oversized or ambiguous handoff input before creating any output."""
+    with path.open('rb') as stream:
+        raw = stream.read(INPUT_LIMIT + 1)
+    if len(raw) > INPUT_LIMIT:
+        raise ValueError('Compiler JSON input exceeds bounded size')
+
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError('Duplicate JSON key')
+            result[key] = value
+        return result
+
+    def reject(_value):
+        raise ValueError('Non-finite JSON number')
+
+    def finite_float(value):
+        number = float(value)
+        if not math.isfinite(number):
+            raise ValueError('Non-finite JSON number')
+        return number
+
+    return json.loads(raw, object_pairs_hook=pairs, parse_constant=reject,
+                      parse_float=finite_float)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('environment', type=Path)
@@ -222,9 +250,9 @@ def main():
     args = parser.parse_args()
     try:
         require(not args.output.resolve().is_relative_to(ROOT), 'Use private output storage outside the repository')
-        files, plan = compile_environment(strict_loads(args.environment.read_bytes()), args.phase,
-            strict_loads(args.domain_outputs.read_bytes()) if args.domain_outputs else None,
-            strict_loads(args.vmware_bindings.read_bytes()) if args.vmware_bindings else None)
+        files, plan = compile_environment(_read_json(args.environment), args.phase,
+            _read_json(args.domain_outputs) if args.domain_outputs else None,
+            _read_json(args.vmware_bindings) if args.vmware_bindings else None)
         # No overwrite: an existing reviewed input set is immutable to this compiler.
         args.output.mkdir(mode=0o700, parents=False, exist_ok=False)
         for name, data in {**files, 'scopes.json': plan}.items():
@@ -234,7 +262,7 @@ def main():
                 json.dump(data, stream, indent=2); stream.write('\n')
         print(json.dumps({'status': plan['status'], 'scopes': len(plan['scopes'])}))
         return 0
-    except (OSError, ValueError, KeyError, TypeError) as exc:
+    except (OSError, ValueError, KeyError, TypeError, RecursionError) as exc:
         print(json.dumps({'status': 'REJECTED', 'reason': str(exc)}))
         return 2
 

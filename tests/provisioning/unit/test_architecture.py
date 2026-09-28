@@ -157,13 +157,17 @@ class DependencyDirectionTest(unittest.TestCase):
                                                   'tools', 'scripts', 'psycopg')),
                                  f'operator CLI bypasses the authenticated control API via {name}')
 
-    def test_the_existing_compiler_never_imports_the_portable_core(self):
-        compiler = support.ROOT / 'tools' / 'compile_wsd.py'
-        self.assertTrue(compiler.is_file())
-        for name in _absolute_imports(compiler):
-            with self.subTest(imports=name):
-                self.assertFalse(name.startswith('provisioner'),
-                                 f'compile_wsd.py imports {name}')
+    def test_the_package_owned_compiler_has_only_low_level_dependencies(self):
+        for filename in ('wsd.py', 'components.py'):
+            compiler = PACKAGE / 'compiler' / filename
+            self.assertTrue(compiler.is_file())
+            for name in _absolute_imports(compiler):
+                with self.subTest(module=filename, imports=name):
+                    self.assertFalse(name.startswith(('tools', 'scripts')),
+                                     f'{filename} imports legacy owner {name}')
+                    if name.startswith('provisioner'):
+                        self.assertEqual(name, 'provisioner.compiler.components')
+            self.assertNotIn('sys.path', compiler.read_text(encoding='utf-8'))
 
 
 if __name__ == '__main__':

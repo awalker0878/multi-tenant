@@ -35,24 +35,24 @@ def capability_eligible(registry: dict, platform: str, required: set[str],
 
 def compiler_declarations() -> dict:
     """Native field and binding declarations owned by the reviewed compiler."""
-    from tools import compile_wsd
+    from provisioner.compiler import wsd as compile_wsd
     return {'placement': compile_wsd.PLACEMENT, 'network': compile_wsd.NETWORK,
             'workload_network_binding': compile_wsd.WORKLOAD_NETWORK_BINDING}
 
 
 def native_variables(platform: str, phase: str) -> frozenset[str]:
-    from tools import compile_wsd
+    from provisioner.compiler import wsd as compile_wsd
     return compile_wsd.native_variables(platform, phase)
 
 
 def composition_components() -> dict:
-    from scripts import build_wsd_compositions
-    return build_wsd_compositions.COMPONENTS
+    from provisioner.compiler import components as native_components
+    return native_components.COMPONENTS
 
 
 def compile_environment(document: dict, phase: str, outputs: dict | None,
                         phase_bindings: dict | None) -> tuple[dict, dict]:
-    from tools import compile_wsd
+    from provisioner.compiler import wsd as compile_wsd
     return compile_wsd.compile_environment(document, phase, outputs, phase_bindings)
 
 

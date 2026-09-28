@@ -31,7 +31,33 @@ assert Path.cwd() != checkout and not Path.cwd().is_relative_to(checkout)
 assert not any(Path(item).resolve() == checkout for item in sys.path if item)
 sys.path.insert(0, str(site))
 
-import provisioner
+# Compiler execution must work without importing the legacy owner packages.
+import importlib.abc
+class NoLegacyCompilerImports(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('Compiler imported legacy owner: '+fullname)
+        return None
+
+blocker = NoLegacyCompilerImports()
+sys.meta_path.insert(0, blocker)
+compiler_path = list(sys.path)
+try:
+    import provisioner
+    from provisioner.compiler import components, wsd
+    for platform in components.COMPONENTS:
+        for phase in ('domains', 'workloads'):
+            assert wsd.native_variables(platform, phase)
+        environment = json.loads((request.parent / 'environments' /
+                                  (platform+'.json.example')).read_text())
+        inputs, summary = wsd.compile_environment(environment)
+        assert inputs and summary['native_contact'] is False
+        assert summary['status'] == 'DRAFT_DISABLED_NOT_AUTHORIZED'
+        assert all(value['allow_restricted_build'] is False for value in inputs.values())
+    assert sys.path == compiler_path
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('tools.compile_wsd') is None
 import scripts
 import tools
 import hosting_resources
@@ -45,7 +71,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, components, wsd, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -142,6 +168,7 @@ def main() -> None:
         foreign.mkdir()
         request = foreign / 'request.yaml'
         shutil.copyfile(ROOT / 'examples/requests/internal-production.yaml', request)
+        shutil.copytree(ROOT / 'examples/environments', foreign / 'environments')
         shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns(
             '.git', '.venv', '__pycache__', '.pytest_cache', 'build', 'dist',
             '*.egg-info'))

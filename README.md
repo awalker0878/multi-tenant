@@ -87,7 +87,7 @@ front end to the existing compiler. One reviewed YAML request
 against a schema, resolved against reviewed profile catalogs, evaluated by
 standards and semantic rules, placed fail-closed over read-only inventory, expanded
 into a resolved internal desired state, and then handed to the existing
-`tools/compile_wsd.py`. The Terraform roots, the Ansible roles, the state backends
+`provisioner/compiler/wsd.py`. The Terraform roots, the Ansible roles, the state backends
 and every service owner keep their current authority.
 
 The current request-to-plan and delivery-artifact path is shown below. The

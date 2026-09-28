@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from test_compile_wsd import example, receipts
-from tools.compile_wsd import compile_environment
+from provisioner.compiler.wsd import compile_environment
 from tools.run_files import digest, encoded, load_private, utcnow, write_new
 from tools.wsd_handoff import compile_runs
 

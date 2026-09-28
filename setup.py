@@ -19,8 +19,8 @@ class BuildRuntime(build_py):
     def run(self):
         source = Path(__file__).resolve().parent
         required = {
-            'tools/__init__.py', 'tools/compile_wsd.py', 'tools/check_release.py',
-            'scripts/__init__.py', 'scripts/build_wsd_compositions.py',
+            'tools/__init__.py', 'provisioner/compiler/wsd.py', 'tools/check_release.py',
+            'scripts/__init__.py', 'provisioner/compiler/components.py',
             'provisioner/qualification/registry.py',
             'sources/capabilities/platform_registry.json',
             'policy/rules/standards.json', 'profiles/security/catalog.json',

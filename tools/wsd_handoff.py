@@ -12,7 +12,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import readback_core as c
-from tools.compile_wsd import compile_environment
+from provisioner.compiler.wsd import compile_environment
 from tools.run_files import (digest, encoded, load_private, new_directory,
                             read_private, require, utcnow, write_new)
 from tools.terraform_apply import verify_outputs

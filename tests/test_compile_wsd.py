@@ -2,7 +2,7 @@ import copy
 import json
 import unittest
 
-from tools.compile_wsd import COMPONENTS, NETWORK, ROOT, STATE, compile_environment
+from provisioner.compiler.wsd import COMPONENTS, NETWORK, ROOT, STATE, compile_environment
 
 
 def example(platform='nutanix'):

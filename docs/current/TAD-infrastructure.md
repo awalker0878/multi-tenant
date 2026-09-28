@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.2 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -9,6 +9,15 @@ Technical decomposition of the control application, durable authority, discovery
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §3](../architecture/reference/3-system-context-and-physical-hosting-topology.md) · [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [RA §15](../architecture/reference/15-cross-vendor-realization-model.md) · [PROV §3](../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md).
 
 ## Design content
+
+The WSD compiler is installed at `provisioner/compiler/wsd.py`, with one native
+component map at `provisioner/compiler/components.py`. All callers migrated and
+the old executable was deleted without a shim. Compilation depends only on
+reviewed package assets and low-level declarations, not build scripts or native
+observers. Its JSON input boundary is bounded and rejects ambiguous input before
+output creation. Native field shapes, generated resources, disabled outputs and
+state keys are preserved; retained execution ownership still requires B05 work.
+
 
 A commissioned hosting cell provides accepted transport, eligible compute/storage, controlled management and finite attachment/security capacity. The fabric carries the supported underlay and approved physical services; it does not silently federate vendor overlays. Each independent domain instance maps to the chosen VPC, Tier-1/upstream context, Neutron/backend context or qualified physical realization.
 

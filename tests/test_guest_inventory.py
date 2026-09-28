@@ -10,7 +10,7 @@ import json
 import subprocess
 import sys
 
-from tools.compile_wsd import STATE
+from provisioner.compiler.wsd import STATE
 from tools.guest_inventory import build, gate
 
 
@@ -55,7 +55,7 @@ class GuestInventoryTests(unittest.TestCase):
 
     def test_cli_accepts_one_receipted_workload_run_without_manual_output_copy(self):
         from tools.run_files import digest, encoded, utcnow, write_new
-        from tools.compile_wsd import ROOT
+        from provisioner.compiler.wsd import ROOT
         outputs, access = fixture()
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)

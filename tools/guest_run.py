@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
 from provisioner.repository import ASSET_ROOT, asset_path
 from tools.check_release import verify
-from tools.compile_wsd import identity
+from provisioner.compiler.wsd import identity
 from tools.guest_inventory import build, gate
 from tools.guest_services import PROFILE, verify_assets
 from tools.run_files import (digest, encoded, file_map, load_private, new_directory,

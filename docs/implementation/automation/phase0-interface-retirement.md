@@ -94,3 +94,22 @@ script paths are prohibited by the retirement register. Architecture tests rejec
 any package qualification import back into `scripts` or `tools`, and the installed
 wheel check requires all five owners to resolve outside the source checkout.
 Other execution owners and retained-state conversion remain separate B05 work.
+
+### Package-owned WSD compilation
+
+The implementation formerly at `tools/compile_wsd.py` now lives at
+`provisioner/compiler/wsd.py`; its native component map lives at
+`provisioner/compiler/components.py`. All in-tree imports, current commands,
+architecture links, packaging requirements and tests were migrated. The old file
+is deleted and prohibited by the retirement register, not retained as a wrapper.
+The build-only composition renderer consumes the same package declaration. The
+compiler no longer imports `tools`, `scripts`, a networking observer or a path
+bootstrap. Its private JSON-file boundary rejects duplicate keys, non-finite
+constants and inputs exceeding 4 MiB before creating output.
+
+Native input shapes, disabled Terraform inputs, state keys and generated resource
+bytes are unchanged by relocation. Installed-wheel checks block all `tools` and
+`scripts` imports while importing the compiler and loading native declarations
+for all three platforms and both phases. Existing compiled plans remain disabled;
+this code ownership change does not migrate retained execution state, reauthorize
+old plans or close the rest of B05.
