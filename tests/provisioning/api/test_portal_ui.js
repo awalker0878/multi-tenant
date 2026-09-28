@@ -26,7 +26,9 @@ class Element {
   }
   replaceChildren(...children) {
     this.children = children;
-    if (this.name === 'approval-role' || this.name === 'wsd-selector') this.value = children[0]?.value ?? '';
+    if (['approval-role', 'wsd-selector', 'discovery-environment'].includes(this.name)) {
+      this.value = children[0]?.value ?? '';
+    }
   }
   append(...children) { this.children.push(...children); }
   add(child) { this.children.push(child); }
@@ -61,7 +63,7 @@ function deferred() {
 }
 
 async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = digest,
-  exchange, scopes, environments } = {}) {
+  exchange, scopes, environments, discovery, observedObjects } = {}) {
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id)) elements.set(id, new Element(id));
@@ -95,6 +97,12 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
     if (url === '/portal/token') return exchange ? exchange() : json({ access_token: 'opaque', token_type: 'Bearer' });
     if (url === '/v1/access/scopes') return scopes ? scopes() : json({ items: [] });
     if (url.startsWith('/v1/environments?')) return environments ? environments(url) : json({ items: [], nextAfter: null });
+    if (url.match(/^\/v1\/environments\/[^/]+\/discovery\/generations\/latest$/)) {
+      return discovery ? discovery(url) : json({ error: {} }, 404);
+    }
+    if (url.match(/^\/v1\/environments\/[^/]+\/discovery\/generations\/[0-9]+\/objects\?/)) {
+      return observedObjects ? observedObjects(url) : json({ items: [], nextAfter: null });
+    }
     if (url === '/v1/plans/plan-01/review') return json(samplePlan());
     if (url === '/v1/plans/plan-01/approvals') {
       approvalRequests.push(JSON.parse(options.body));
@@ -245,4 +253,165 @@ test('the portal shows exact native-scope declarations as unverified', async () 
     'DECLARED_UNVERIFIED');
   context.clearSession();
   assert.equal(element('environment-rows').children.length, 0);
+});
+
+const environment = (id = 'environment-01') => ({
+  environmentId: id, displayName: `Candidate ${id}`, siteId: 'site-01',
+  securityDomainId: 'wsd-01', endpointId: 'endpoint-01', nativeScopeId: 'cluster-01',
+  platformFamily: 'vmware', status: 'DECLARED_UNVERIFIED'
+});
+const generation = (id = 'environment-01', completeness = 'PARTIAL') => ({
+  environmentId: id, generation: 7, campaignId: 'campaign-07', resultDigest: digest,
+  capturedAt: '2026-09-27T15:00:00Z', completeness, objectCount: 2,
+  collectionErrorCount: 1, missingPrivilegeCount: 1
+});
+
+test('authorized environment renders generation gaps and only paged identity summaries', async () => {
+  const requests = [];
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: () => json({ items: [environment()], nextAfter: null }),
+    discovery: (url) => {
+      requests.push(url);
+      return json(generation());
+    },
+    observedObjects: (url) => {
+      requests.push(url);
+      if (!url.includes('&after=')) return json({ environmentId: 'environment-01',
+        generation: 7, items: [{ resourceKind: 'vm', nativeId: 'vm-101',
+          displayName: 'Database', unknownCount: 2, objectDigest: digest,
+          facts: [{ name: 'secret_raw_fact', value: 'must-never-render' }] }],
+        nextAfter: 'opaque-page' });
+      return json({ environmentId: 'environment-01', generation: 7,
+        items: [{ resourceKind: 'vm', nativeId: 'vm-102', displayName: null,
+          unknownCount: 0, objectDigest: digest }], nextAfter: null });
+    }
+  });
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  await context.loadDiscovery();
+  assert.equal(element('discovery-details').hidden, false);
+  assert.match(element('discovery-completeness').textContent, /Partial/);
+  assert.equal(element('discovery-errors').textContent, '1');
+  assert.equal(element('discovery-rows').children.length, 1);
+  assert.equal(element('discovery-rows').children[0].children[1].textContent, 'vm-101');
+  assert.equal(element('discovery-rows').children[0].children[2].textContent, 'Database');
+  assert.equal(element('more-discovery').hidden, false);
+  await context.loadObservedObjects();
+  assert.equal(element('discovery-rows').children.length, 2);
+  assert.equal(element('more-discovery').hidden, true);
+  assert.equal(requests.length, 3);
+  assert.ok(requests[2].includes('/generations/7/objects?limit=50&after=opaque-page'));
+  assert.ok(!JSON.stringify(element('discovery-rows').children).includes('secret_raw_fact'));
+});
+
+test('reported complete still says visibility is unverified; token change clears observations', async () => {
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: () => json({ items: [environment()], nextAfter: null }),
+    discovery: () => json({ ...generation('environment-01', 'COMPLETE'),
+      collectionErrorCount: 0, missingPrivilegeCount: 0 }),
+    observedObjects: () => json({ environmentId: 'environment-01', generation: 7,
+      items: [], nextAfter: null })
+  });
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  await context.loadDiscovery();
+  assert.match(element('discovery-completeness').textContent, /native visibility unverified/i);
+  assert.equal(element('discovery-details').hidden, false);
+  context.clearSession();
+  assert.equal(element('discovery-rows').children.length, 0);
+  assert.equal(element('discovery-details').hidden, true);
+  assert.equal(element('discovery-environment').disabled, true);
+});
+
+test('no available generation leaves identity table empty', async () => {
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: () => json({ items: [environment()], nextAfter: null }),
+    discovery: () => json({ error: {} }, 404)
+  });
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  await context.loadDiscovery();
+  assert.match(element('discovery-status').textContent, /No observation is available/);
+  assert.equal(element('discovery-details').hidden, true);
+  assert.equal(element('discovery-rows').children.length, 0);
+});
+
+test('contradictory complete summary is rejected before identity rendering', async () => {
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: () => json({ items: [environment()], nextAfter: null }),
+    discovery: () => json(generation('environment-01', 'COMPLETE'))
+  });
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  await context.loadDiscovery();
+  assert.match(element('discovery-status').textContent, /does not match/);
+  assert.equal(element('discovery-details').hidden, true);
+});
+
+test('old actor or changed environment cannot install late discovery response', async () => {
+  const waiting = deferred();
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: () => json({ items: [environment('environment-01'),
+      environment('environment-02')], nextAfter: null }),
+    discovery: (url) => url.includes('environment-01') ? waiting.promise :
+      json(generation('environment-02', 'UNKNOWN')),
+    observedObjects: () => json({ environmentId: 'environment-02', generation: 7,
+      items: [], nextAfter: null })
+  });
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  const old = context.loadDiscovery();
+  element('discovery-environment').value = 'environment-02';
+  context.clearDiscovery();
+  await context.loadDiscovery();
+  waiting.resolve(json(generation('environment-01')));
+  await old;
+  assert.equal(element('discovery-generation').textContent, '7');
+  assert.match(element('discovery-completeness').textContent, /Unknown/);
+  context.clearSession();
+  assert.equal(element('discovery-details').hidden, true);
+});
+
+test('late object page cannot repopulate rows after token clearance', async () => {
+  const waiting = deferred();
+  const { context, element, authenticate, json } = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER',
+      securityDomainId: 'wsd-01' }] }),
+    environments: () => json({ items: [environment()], nextAfter: null }),
+    discovery: () => json(generation()),
+    observedObjects: () => waiting.promise
+  });
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  const loading = context.loadDiscovery();
+  await new Promise(setImmediate);
+  context.clearSession('Signed out.');
+  waiting.resolve(json({ environmentId: 'environment-01', generation: 7,
+    items: [{ resourceKind: 'vm', nativeId: 'vm-101', displayName: 'Old actor VM',
+      unknownCount: 0, objectDigest: digest }], nextAfter: null }));
+  await loading;
+  assert.equal(element('discovery-rows').children.length, 0);
+  assert.equal(element('discovery-details').hidden, true);
 });

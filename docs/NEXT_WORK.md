@@ -31,6 +31,43 @@ Implementation status must be measured by executable behavior, tests and native
 qualification separately. A completed document, fixture or contract cannot close an
 unimplemented product path.
 
+## Wave 2 checkpoint: read-only discovery and comparison
+
+Wave 2, B14–B22, is **in progress**. The repository now has exact-scope discovery
+campaign/page/result models, an append-only PostgreSQL inventory schema and guarded
+repository, scoped HTTP generation/object reads, bounded GET-only adapter code for
+VMware, AHV and OpenStack, and comparison-only grouping, adoption, directed route
+and destination assessment models. The [operator guide](product/wave2-operator-guide.md)
+describes the available reads and the evidence each status needs. The thin CLI
+has read-only generation/object commands. The portal now shows the latest
+authorized generation and paged observed identities; the comparison engine is
+not a production assessment API.
+
+These pieces do not close B14–B22. The current repository does not deploy an
+authenticated site discovery campaign admission/ingest service, independently
+verify issuer/collector provenance against enterprise IAM and PKI, or qualify
+installed source and destination product tuples. The storage writer refuses
+publication without a dedicated ingest role and an independently configured
+verifier. VMware's bounded visible VM list cannot prove full privilege or
+folder coverage. Native reconciliation, application owner review, selected
+capacity and policy/security/recovery evidence, operator comparison UI/CLI,
+and the proposed estate-scale latency benchmark remain acceptance work. No
+discovery, adoption proposal or `ELIGIBLE` comparison grants plan approval or
+native provisioning/migration authority.
+
+To complete the operator comparison path, first establish signed, revocable
+read campaigns with enrolled site mTLS submitters and independently witnessed
+read credentials. Qualify each installed source and destination API tuple and
+persist its expiry and evidence digest separately from a human environment
+declaration. Then normalize full VM and capacity facts from verified,
+generation-pinned observations; persist directed source-exit and
+target-operate route claims and independently reviewed policy, security and
+recovery findings. Only after those durable inputs exist should the scoped
+assessment service expose destination reasons and remediation in the API and
+portal. Finally, run native omission/privilege tests and the 50,000-workload,
+100-endpoint freshness and latency campaign. None of these missing inputs may
+be synthesized from a declared selector or a fixture.
+
 ## Site and organizational release inputs
 
 The following inputs remain necessary alongside repository implementation. The bounded

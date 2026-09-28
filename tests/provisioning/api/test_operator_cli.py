@@ -90,6 +90,64 @@ class OperatorCliTests(unittest.TestCase):
                                 ('GET', '/v1/environments'),
                                 ('GET', '/v1/environments/environment-01')])
 
+    def test_discovery_generations_and_objects_are_scoped_read_only_calls(self):
+        seen = []
+        cursor = 'WyJ2bSIsInZtLTEiXQ'
+        def handler(request):
+            seen.append((request.method, request.url.path,
+                         dict(request.url.params)))
+            self.assertEqual(request.method, 'GET')
+            self.assertEqual(request.content, b'')
+            self.assertEqual(request.headers['Authorization'],
+                             'Bearer opaque-access-token')
+            self.assertNotIn('opaque-access-token', str(request.url))
+            if request.url.path.endswith('/generations'):
+                return httpx.Response(200, json={
+                    'items': [{'generation': 2, 'completeness': 'PARTIAL'}],
+                    'nextAfter': 2})
+            return httpx.Response(200, json={
+                'environmentId': 'environment-01', 'generation': 2,
+                'items': [{'nativeId': 'vm-01', 'resourceKind': 'vm'}],
+                'nextAfter': None})
+        generations = self.invoke([
+            'discovery', 'generations', '--environment', 'environment-01',
+            '--after', '1', '--limit', '2'], handler)
+        objects = self.invoke([
+            'discovery', 'objects', '--environment', 'environment-01',
+            '--generation', '2', '--after', cursor, '--limit', '10'], handler)
+        self.assertEqual((generations[0], objects[0]), (0, 0))
+        self.assertEqual(json.loads(generations[1])['items'][0]['completeness'],
+                         'PARTIAL')
+        self.assertEqual(json.loads(objects[1])['items'][0]['nativeId'], 'vm-01')
+        self.assertEqual(seen, [
+            ('GET', '/v1/environments/environment-01/discovery/generations',
+             {'after': '1', 'limit': '2'}),
+            ('GET', '/v1/environments/environment-01/discovery/generations/2/objects',
+             {'after': cursor, 'limit': '10'}),
+        ])
+
+    def test_discovery_rejects_path_cursor_and_budget_injection_before_http(self):
+        def unexpected(_request):
+            self.fail('Invalid discovery command must not contact the API')
+        for command in (
+                ['discovery', 'generations', '--environment', '../foreign'],
+                ['discovery', 'generations', '--environment', 'env-01',
+                 '--after', '-1'],
+                ['discovery', 'generations', '--environment', 'env-01',
+                 '--limit', '101'],
+                ['discovery', 'objects', '--environment', 'env-01',
+                 '--generation', '0'],
+                ['discovery', 'objects', '--environment', 'env-01',
+                 '--generation', '1', '--after', '../foreign?token=x'],
+                ['discovery', 'objects', '--environment', 'env-01',
+                 '--generation', '1', '--after', 'a' * 4097]):
+            with self.subTest(command=command):
+                code, out, err = self.invoke(command, unexpected)
+                self.assertEqual(code, 3)
+                self.assertEqual(out, '')
+                self.assertEqual(json.loads(err), {'error': 'INVALID_INPUT'})
+                self.assertNotIn('opaque-access-token', err)
+
     def test_job_submit_requires_stable_key_and_sends_no_approval_body(self):
         def handler(request):
             self.assertEqual(request.method, 'POST')

@@ -20,6 +20,7 @@ from provisioner.controlplane.authority.oidc import OIDCIdentityProvider
 from provisioner.controlplane.authority.postgres import PostgresAuthority
 from provisioner.controlplane.authority.service import AuthorityService
 from provisioner.controlplane.jobs.repository import JobRepository
+from provisioner.controlplane.discovery.persistence import DiscoveryRepository
 from provisioner.controlplane.evidence.runtime import (EvidenceHold,
     EvidenceRuntimeConfig, build_gate)
 from provisioner.controlplane.persistence.store import EnterpriseRecordStore
@@ -167,6 +168,7 @@ def create_postgres_app(settings: ServiceSettings, *,
     authority = AuthorityService(identities, ledger, ledger)
     records = EnterpriseRecordStore(runtime_connect)
     environments = EnvironmentRepository(runtime_connect)
+    discovery = DiscoveryRepository(runtime_connect)
     jobs = JobRepository(runtime_connect, ledger)
     if evidence_gate is None and settings.evidence_config is None:
         raise ValueError('Independent evidence configuration is required')
@@ -176,6 +178,7 @@ def create_postgres_app(settings: ServiceSettings, *,
         for tenant in settings.evidence_config.startup_scopes():
             gate.require(tenant)
     return create_app(records, authority, jobs, environments,
+                      discovery=discovery,
                       portal_config=settings.portal,
                       evidence_gate=gate)
 

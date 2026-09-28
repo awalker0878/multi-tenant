@@ -7,6 +7,10 @@ No endpoint starts native work or invents workflow progress.
 """
 from __future__ import annotations
 
+import base64
+import binascii
+import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Callable
@@ -39,17 +43,23 @@ from provisioner.controlplane.persistence.environments import (
     EnvironmentConflict, EnvironmentDeclaration, EnvironmentRepository,
     RegisteredEnvironment,
 )
+from provisioner.controlplane.discovery.persistence import (
+    DiscoveryRepository, StoredGeneration, StoredObservation,
+)
 from provisioner.domain.enterprise_records import validate_record
 
 from .body_limit import BodyLimitMiddleware
 from .portal import PortalConfig, mount_portal
 from .models import (AccessPage, ApprovalReceipt, ApprovalRequest,
+                     DiscoveryGenerationPage, DiscoveryGenerationView,
                      EnvironmentCreate, EnvironmentPage, EnvironmentView,
                      ErrorResponse, JobEventPage, JobEventView, JobView,
-                     PlanReview, RevocationReceipt, RevocationRequest, StoredWorkload,
+                     ObservedObjectPage, ObservedObjectView, PlanReview,
+                     RevocationReceipt, RevocationRequest, StoredWorkload,
                      WorkloadCreate, WorkloadPage)
 
 _ID_PATTERN = r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'
+_CURSOR = re.compile(r'^[A-Za-z0-9_-]{1,4096}$')
 _BEARER = HTTPBearer(auto_error=False, description='Enterprise SSO bearer credential; verified by the server identity provider.')
 _ERRORS = {code: {'model': ErrorResponse} for code in (400, 401, 403, 404, 409, 413, 422, 503)}
 
@@ -111,6 +121,64 @@ def _environment_view(row: RegisteredEnvironment) -> EnvironmentView:
     })
 
 
+def _generation_view(row: StoredGeneration) -> DiscoveryGenerationView:
+    return DiscoveryGenerationView.model_validate({
+        'environmentId': row.environment_id, 'generation': row.generation,
+        'campaignId': row.campaign_id, 'resultDigest': row.result_digest,
+        'capturedAt': row.captured_at, 'completeness': row.completeness,
+        'objectCount': row.object_count,
+        'collectionErrorCount': len(row.collection_errors),
+        'missingPrivilegeCount': len(row.missing_privileges),
+    })
+
+
+def _observation_view(row: StoredObservation) -> ObservedObjectView:
+    display_name = None
+    for fact in row.facts:
+        if (fact.get('name') == 'name' and fact.get('state') == 'KNOWN'
+                and isinstance(fact.get('value'), str)):
+            candidate = fact['value']
+            if (1 <= len(candidate) <= 256
+                    and all(ord(char) >= 32 and ord(char) != 127
+                            for char in candidate)):
+                display_name = candidate
+            break
+    return ObservedObjectView.model_validate({
+        'resourceKind': row.identity.resource_kind,
+        'nativeId': row.identity.native_id,
+        'displayName': display_name,
+        'unknownCount': sum(fact.get('state') == 'UNKNOWN' for fact in row.facts),
+        'objectDigest': row.object_digest,
+    })
+
+
+def _object_cursor(kind: str, native_id: str) -> str:
+    raw = json.dumps([kind, native_id], separators=(',', ':'),
+                     ensure_ascii=False).encode('utf-8')
+    return base64.urlsafe_b64encode(raw).decode('ascii').rstrip('=')
+
+
+def _read_object_cursor(value: str | None) -> tuple[str, str] | None:
+    if value is None:
+        return None
+    if not isinstance(value, str) or _CURSOR.fullmatch(value) is None:
+        raise _ApiError(422, 'REQUEST_INVALID', 'Invalid inventory page cursor')
+    try:
+        raw = base64.urlsafe_b64decode(value + '=' * (-len(value) % 4))
+        pair = json.loads(raw)
+    except (ValueError, UnicodeError, binascii.Error):
+        raise _ApiError(422, 'REQUEST_INVALID', 'Invalid inventory page cursor') from None
+    if (not isinstance(pair, list) or len(pair) != 2
+            or not all(isinstance(item, str) for item in pair)
+            or pair[0] not in {'vm', 'disk', 'nic', 'volume', 'image', 'network',
+                              'pool', 'cluster', 'host', 'datastore', 'quota'}
+            or not 1 <= len(pair[1]) <= 512
+            or any(ord(char) < 32 or ord(char) == 127 for char in pair[1])
+            or _object_cursor(pair[0], pair[1]) != value):
+        raise _ApiError(422, 'REQUEST_INVALID', 'Invalid inventory page cursor')
+    return pair[0], pair[1]
+
+
 def _review_scope(scope: PlanScope) -> dict:
     return {'organizationId': scope.organization_id,
             'tenantId': scope.tenant_id, 'siteId': scope.site_id,
@@ -137,6 +205,7 @@ def _planned_only(record: dict) -> None:
 def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                jobs: JobRepository, environments: EnvironmentRepository, *,
                evidence_gate: EvidenceMutationGate,
+               discovery: DiscoveryRepository | None = None,
                max_body_bytes: int = 1024 * 1024,
                clock: Callable[[], datetime] | None = None,
                portal_config: PortalConfig | None = None) -> FastAPI:
@@ -145,6 +214,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             or not isinstance(authority, AuthorityService)
             or not isinstance(jobs, JobRepository)
             or not isinstance(environments, EnvironmentRepository)
+            or discovery is not None and not isinstance(discovery, DiscoveryRepository)
             or evidence_gate is None
             or not callable(getattr(evidence_gate, 'require', None))):
         raise TypeError('Real record, authority, job and evidence services are required')
@@ -255,6 +325,12 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                     pass
         raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
 
+    def discovery_repository() -> DiscoveryRepository:
+        if discovery is None:
+            raise _ApiError(503, 'DISCOVERY_UNAVAILABLE',
+                            'Read-only discovery is unavailable')
+        return discovery
+
     @app.get('/v1/access/scopes', response_model=AccessPage,
              responses=_ERRORS, tags=['access'])
     def access_scopes(active: _Session = Depends(session)) -> AccessPage:
@@ -325,6 +401,88 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             environment_id: Annotated[str, Path(pattern=_ID_PATTERN)],
             active: _Session = Depends(session)) -> EnvironmentView:
         return _environment_view(visible_environment(active, environment_id))
+
+    @app.get('/v1/environments/{environment_id}/discovery/generations',
+             response_model=DiscoveryGenerationPage, responses=_ERRORS,
+             tags=['discovery'])
+    def list_discovery_generations(
+            environment_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            limit: Annotated[int, Query(ge=1, le=100)] = 50,
+            after: Annotated[int, Query(ge=0)] = 0,
+            active: _Session = Depends(session)) -> DiscoveryGenerationPage:
+        environment = visible_environment(active, environment_id)
+        rows = discovery_repository().list_generations(
+            context(active), environment.scope, environment_id,
+            after=after, limit=limit + 1)
+        if any(row.environment_id != environment_id or row.scope != environment.scope
+               for row in rows):
+            raise _ApiError(503, 'DISCOVERY_UNAVAILABLE',
+                            'Read-only discovery is unavailable')
+        page = rows[:limit]
+        cursor = page[-1].generation if len(rows) > limit else None
+        return DiscoveryGenerationPage.model_validate({
+            'items': [_generation_view(row).model_dump(by_alias=True) for row in page],
+            'nextAfter': cursor,
+        })
+
+    @app.get('/v1/environments/{environment_id}/discovery/generations/latest',
+             response_model=DiscoveryGenerationView, responses=_ERRORS,
+             tags=['discovery'])
+    def latest_discovery_generation(
+            environment_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            active: _Session = Depends(session)) -> DiscoveryGenerationView:
+        environment = visible_environment(active, environment_id)
+        row = discovery_repository().latest_generation(
+            context(active), environment.scope, environment_id)
+        if row is None:
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+        if row.environment_id != environment_id or row.scope != environment.scope:
+            raise _ApiError(503, 'DISCOVERY_UNAVAILABLE',
+                            'Read-only discovery is unavailable')
+        return _generation_view(row)
+
+    @app.get('/v1/environments/{environment_id}/discovery/generations/{generation}/objects',
+             response_model=ObservedObjectPage, responses=_ERRORS,
+             tags=['discovery'])
+    def list_observed_objects(
+            environment_id: Annotated[str, Path(pattern=_ID_PATTERN)],
+            generation: Annotated[int, Path(ge=1)],
+            limit: Annotated[int, Query(ge=1, le=100)] = 50,
+            after: Annotated[str | None, Query(max_length=4096)] = None,
+            active: _Session = Depends(session)) -> ObservedObjectPage:
+        environment = visible_environment(active, environment_id)
+        repository = discovery_repository()
+        generations = repository.list_generations(
+            context(active), environment.scope, environment_id,
+            after=generation - 1, limit=1)
+        if not generations or generations[0].generation != generation:
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+        if (generations[0].environment_id != environment_id
+                or generations[0].scope != environment.scope):
+            raise _ApiError(503, 'DISCOVERY_UNAVAILABLE',
+                            'Read-only discovery is unavailable')
+        rows = repository.list_observations(
+            context(active), environment.scope, environment_id, generation,
+            after=_read_object_cursor(after), limit=limit + 1)
+        if any(row.generation != generation
+               or (row.identity.endpoint_id, row.identity.native_scope_id,
+                   row.identity.platform_family) !=
+                  (environment.scope.endpoint_id,
+                   environment.scope.native_scope_id,
+                   environment.scope.platform_family)
+               for row in rows):
+            raise _ApiError(503, 'DISCOVERY_UNAVAILABLE',
+                            'Read-only discovery is unavailable')
+        page = rows[:limit]
+        cursor = (_object_cursor(page[-1].identity.resource_kind,
+                                 page[-1].identity.native_id)
+                  if len(rows) > limit else None)
+        return ObservedObjectPage.model_validate({
+            'environmentId': environment_id, 'generation': generation,
+            'items': [_observation_view(row).model_dump(by_alias=True)
+                      for row in page],
+            'nextAfter': cursor,
+        })
 
     @app.post('/v1/environments', status_code=201,
               response_model=EnvironmentView, responses=_ERRORS,

@@ -36,8 +36,13 @@ import tools
 from provisioner import repository
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
+from provisioner.controlplane.discovery import (adoption, assessment, grouping,
+                                                 model, persistence, routes)
+from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
+                                                          vmware_rest)
 
-for module in (provisioner, scripts, tools):
+for module in (provisioner, scripts, tools, adoption, ahv, assessment, grouping,
+               model, openstack, persistence, routes, vmware, vmware_rest):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
     'provisioner/schemas/v1/enterprise-record.schema.json',
@@ -59,6 +64,7 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0016_site_worker_role_binding.sql',
     'provisioner/controlplane/persistence/migrations/0017_site_lock_guards.sql',
     'provisioner/controlplane/persistence/migrations/0018_site_role_superuser_classification.sql',
+    'provisioner/controlplane/persistence/migrations/0019_discovery_inventory.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/style.css',

@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0018`
+for the migration role. The runner applies packaged migrations `0001`–`0019`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -23,6 +23,10 @@ GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.enterprise_records
     TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.environment_registrations
     TO hosting_runtime;
+GRANT SELECT ON hosting_controlplane.discovery_campaigns,
+    hosting_controlplane.discovery_generations,
+    hosting_controlplane.discovery_observations,
+    hosting_controlplane.discovery_absence_candidates TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.enterprise_record_history
     TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.audit_events TO hosting_runtime;
@@ -148,6 +152,24 @@ the upgrade for reviewed state conversion.
 Migration `0018` excludes privileged administrative sessions that use `SET ROLE`
 for isolated tests from the site-login classifier; it retains the binding for
 real non-superuser site logins and the restrictive row policies.
+
+Migration `0019` adds append-only discovery campaigns, generations, native
+observations, and candidate absences under tenant RLS and an exact immutable
+environment selector. Only comparable COMPLETE generations can propose an
+absence. A candidate is not a tombstone, owner release, or execution grant.
+Provision a separate `NOSUPERUSER NOBYPASSRLS` discovery ingestion LOGIN role
+with `SELECT` on `environment_registrations`, `SELECT, INSERT` on the four
+discovery tables, and `INSERT` on `audit_events`. Each campaign and published
+generation adds an exact-digest event to the tenant audit chain in the same
+transaction. Grant the API runtime `SELECT` on the discovery tables only.
+Site worker logins receive no discovery table privilege. The ingest role needs
+no UPDATE, DELETE, TRUNCATE, or other control-plane DML. The repository refuses
+publication without a production verifier that independently checks signed
+issuer authority, active collector enrollment, read-only native credentials,
+and result provenance at each call. External signed audit checkpoints must
+still be evaluated before site release after a database restore. A human
+declaration or B10 mutation grant cannot establish any of those facts. The
+isolated CI verifier is test-only.
 
 The audit/history trigger forbids UPDATE and DELETE, and the restricted runtime
 role cannot TRUNCATE or change the trigger. Migration `0008` chains every

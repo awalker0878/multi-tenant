@@ -53,6 +53,39 @@
       <button id="more-environments" class="quiet" type="button" hidden>Load more declarations</button>
     </section>
 
+    <section class="panel" aria-labelledby="discovery-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Read-only inventory</p>
+          <h2 id="discovery-heading">Observed source identities</h2>
+        </div>
+        <span class="tag">Assessment only</span>
+      </div>
+      <p>Choose an authorized environment declaration above. Observations can be incomplete, stale or limited to objects visible to the collector. They do not establish ownership, placement or migration approval.</p>
+      <form id="discovery-form" class="lookup">
+        <label for="discovery-environment">Environment</label>
+        <select id="discovery-environment" required disabled><option value="">Choose an environment</option></select>
+        <button id="show-discovery" type="submit" disabled>Show observations</button>
+      </form>
+      <p id="discovery-status" class="muted" role="status" aria-live="polite">Sign in and load environment declarations to select a source.</p>
+      <dl id="discovery-details" class="job-details" hidden>
+        <div><dt>Generation</dt><dd id="discovery-generation"></dd></div>
+        <div><dt>Coverage</dt><dd id="discovery-completeness"></dd></div>
+        <div><dt>Captured</dt><dd id="discovery-captured"></dd></div>
+        <div><dt>Objects</dt><dd id="discovery-count"></dd></div>
+        <div><dt>Collection errors</dt><dd id="discovery-errors"></dd></div>
+        <div><dt>Missing privileges</dt><dd id="discovery-privileges"></dd></div>
+      </dl>
+      <div class="table-wrap">
+        <table>
+          <caption>Identity summaries from the selected read-only observation generation</caption>
+          <thead><tr><th scope="col">Kind</th><th scope="col">Native ID</th><th scope="col">Name</th><th scope="col">Unknown facts</th></tr></thead>
+          <tbody id="discovery-rows"></tbody>
+        </table>
+      </div>
+      <button id="more-discovery" class="quiet" type="button" hidden>Load more observed identities</button>
+    </section>
+
     <section class="panel" aria-labelledby="portfolio-heading">
       <div class="section-heading">
         <div>
