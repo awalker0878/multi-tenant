@@ -18,6 +18,9 @@ PACKAGE = support.ROOT / 'provisioner'
 BACKREACH_MODULE = PACKAGE / 'repository.py'
 #: Modules that own the transport rather than a single command.
 TRANSPORT_MODULES = frozenset({'__init__.py', '__main__.py', 'main.py', 'support.py'})
+# The enterprise operator talks to the control API; it is not a local owner
+# command and must not import the planning or delivery execution modules.
+API_ONLY_COMMANDS = frozenset({'operator.py'})
 #: The one module that holds the operations every command delegates to.
 SERVICE_MODULE = 'provisioner.execution.service'
 
@@ -132,13 +135,27 @@ class DependencyDirectionTest(unittest.TestCase):
             self.assertEqual(_command_couplings('provisioner.cli.main', fixture), [])
 
     def test_every_command_delegates_to_the_shared_service(self):
-        """No command builds a plan of its own, and none reaches for a peer to do it."""
+        """Local owner commands share one service, not peer command modules."""
         for path in _sources(PACKAGE / 'cli'):
-            if path.name in TRANSPORT_MODULES:
+            if path.name in TRANSPORT_MODULES | API_ONLY_COMMANDS:
                 continue
             with self.subTest(command=_module_name(path)):
                 self.assertIn(SERVICE_MODULE, _absolute_imports(path),
                               f'{_module_name(path)} does not use {SERVICE_MODULE}')
+
+    def test_operator_cli_has_only_the_remote_api_boundary(self):
+        path = PACKAGE / 'cli' / 'operator.py'
+        self.assertTrue(path.is_file(), 'enterprise operator CLI is missing')
+        imports = _absolute_imports(path)
+        self.assertIn('httpx', imports)
+        for name in imports:
+            with self.subTest(imports=name):
+                self.assertFalse(name.startswith(('provisioner.execution',
+                                                  'provisioner.repository',
+                                                  'provisioner.adapters',
+                                                  'provisioner.controlplane',
+                                                  'tools', 'scripts', 'psycopg')),
+                                 f'operator CLI bypasses the authenticated control API via {name}')
 
     def test_the_existing_compiler_never_imports_the_portable_core(self):
         compiler = support.ROOT / 'tools' / 'compile_wsd.py'

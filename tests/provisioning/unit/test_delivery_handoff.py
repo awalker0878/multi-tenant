@@ -674,11 +674,31 @@ class NoBypassTest(unittest.TestCase):
 
     def test_every_command_still_routes_through_the_shared_service(self):
         for path in sorted((self.PACKAGE / 'cli').glob('*.py')):
-            if path.name in ('__init__.py', '__main__.py', 'main.py', 'support.py'):
+            if path.name in ('__init__.py', '__main__.py', 'main.py',
+                             'support.py', 'operator.py'):
                 continue
             with self.subTest(command=path.name):
                 self.assertIn('execution.service',
                               path.read_text(encoding='utf-8'))
+
+    def test_operator_command_cannot_bypass_the_control_api(self):
+        path = self.PACKAGE / 'cli' / 'operator.py'
+        self.assertTrue(path.is_file())
+        tree = ast.parse(path.read_text(encoding='utf-8'))
+        imported = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imported.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and not node.level:
+                imported.add(node.module or '')
+        self.assertIn('httpx', imported)
+        for name in imported:
+            with self.subTest(imports=name):
+                self.assertFalse(name.startswith(('provisioner.execution',
+                                                  'provisioner.repository',
+                                                  'provisioner.adapters',
+                                                  'provisioner.controlplane',
+                                                  'tools', 'scripts', 'psycopg')))
 
 
 if __name__ == '__main__':

@@ -7,5 +7,7 @@ graft terraform
 graft ansible
 graft config
 graft docs
+recursive-include provisioner/controlplane/api/portal *.html *.js *.css
+recursive-include provisioner/controlplane/persistence/migrations *.sql
 global-exclude *.pyc
 global-exclude .DS_Store

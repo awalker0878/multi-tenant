@@ -12,8 +12,8 @@ import unittest
 
 from provisioner.compiler.environment import compile_document
 from provisioner.inventory import model as inventory_model
-from provisioner.repository import repository_module
 from provisioner.placement import eligibility
+from tools import compile_wsd
 
 from tests.provisioning import support
 
@@ -30,7 +30,7 @@ DOMAIN_READBACK = {
 
 
 def compiler():
-    return repository_module('tools.compile_wsd')
+    return compile_wsd
 
 
 def native_fields(platform):

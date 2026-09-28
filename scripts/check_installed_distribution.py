@@ -41,6 +41,27 @@ for module in (provisioner, scripts, tools):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
     'provisioner/schemas/v1/enterprise-record.schema.json',
+    'provisioner/controlplane/persistence/migrations/0001_controlplane.sql',
+    'provisioner/controlplane/persistence/migrations/0002_jobs.sql',
+    'provisioner/controlplane/persistence/migrations/0003_authority.sql',
+    'provisioner/controlplane/persistence/migrations/0004_worker_grants.sql',
+    'provisioner/controlplane/persistence/migrations/0005_native_registry.sql',
+    'provisioner/controlplane/persistence/migrations/0006_evidence.sql',
+    'provisioner/controlplane/persistence/migrations/0007_worker_certificate_rotation.sql',
+    'provisioner/controlplane/persistence/migrations/0008_audit_chain.sql',
+    'provisioner/controlplane/persistence/migrations/0009_directory.sql',
+    'provisioner/controlplane/persistence/migrations/0010_workflow_run_binding.sql',
+    'provisioner/controlplane/persistence/migrations/0011_job_gate_lock.sql',
+    'provisioner/controlplane/persistence/migrations/0012_directory_audit_binding.sql',
+    'provisioner/controlplane/persistence/migrations/0013_environment_registrations.sql',
+    'provisioner/controlplane/persistence/migrations/0014_worker_read_lock.sql',
+    'provisioner/controlplane/persistence/migrations/0015_worker_directory_audit_actions.sql',
+    'provisioner/controlplane/persistence/migrations/0016_site_worker_role_binding.sql',
+    'provisioner/controlplane/persistence/migrations/0017_site_lock_guards.sql',
+    'provisioner/controlplane/persistence/migrations/0018_site_role_superuser_classification.sql',
+    'provisioner/controlplane/api/portal/index.html',
+    'provisioner/controlplane/api/portal/app.js',
+    'provisioner/controlplane/api/portal/style.css',
     'profiles/security/catalog.json', 'policy/rules/standards.json',
     'sources/capabilities/platform_registry.json', 'terraform/catalog.json',
 ):
@@ -53,6 +74,16 @@ assert callable(validate_record)
 distribution = next(d for d in importlib.metadata.distributions(path=[str(site)])
                     if d.metadata['Name'] == 'hosting-provisioner')
 assert any(e.name == 'hosting' and e.value == 'provisioner.cli.main:main'
+           for e in distribution.entry_points)
+assert any(e.name == 'hosting-operator' and e.value == 'provisioner.cli.operator:main'
+           for e in distribution.entry_points)
+assert any(e.name == 'hosting-api' and e.value == 'provisioner.controlplane.api.server:main'
+           for e in distribution.entry_points)
+assert any(e.name == 'hosting-evidence' and
+           e.value == 'provisioner.controlplane.evidence.runtime:main'
+           for e in distribution.entry_points)
+assert any(e.name == 'hosting-site-worker' and
+           e.value == 'provisioner.controlplane.worker.runtime:main'
            for e in distribution.entry_points)
 
 result = main(['plan', str(request)])

@@ -14,13 +14,27 @@ dependencies = [
   "cryptography==46.0.4",
 ]
 
+[project.optional-dependencies]
+controlplane = [
+  "psycopg[binary]==3.3.4",
+  "temporalio==1.33.0",
+  "PyJWT[crypto]==2.15.0",
+  "fastapi==0.141.1",
+  "httpx==0.28.1",
+  "uvicorn==0.54.0",
+  "boto3==1.43.103",
+]
+
 [project.scripts]
 hosting = "provisioner.cli.main:main"
+hosting-operator = "provisioner.cli.operator:main"
+hosting-api = "provisioner.controlplane.api.server:main"
+hosting-evidence = "provisioner.controlplane.evidence.runtime:main"
+hosting-site-worker = "provisioner.controlplane.worker.runtime:main"
 
 [tool.setuptools.packages.find]
 include = ["provisioner*", "tools", "scripts"]
 namespaces = false
 
 [tool.setuptools.package-data]
-provisioner = ["inventory/fixtures/*.json", "schemas/v1/*.json", "retired_interfaces.json"]
-
+provisioner = ["inventory/fixtures/*.json", "schemas/v1/*.json", "controlplane/persistence/migrations/*.sql", "controlplane/api/portal/*.html", "controlplane/api/portal/*.js", "controlplane/api/portal/*.css", "retired_interfaces.json"]

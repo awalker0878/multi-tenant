@@ -1,0 +1,44 @@
+# Disposable self-hosted Temporal integration fixture only. No production TLS,
+# authentication, high availability or backup. Frontend binds loopback only.
+services:
+  postgres:
+    image: postgres:17.6
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: ${TEMPORAL_TEST_DB_PASSWORD:?set disposable test password}
+      POSTGRES_DB: temporal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal -d temporal"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    volumes:
+      - temporal_test_db:/var/lib/postgresql/data
+    networks: [temporal_test_private]
+
+  temporal:
+    image: temporalio/auto-setup:1.29.1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: ${TEMPORAL_TEST_DB_PASSWORD:?set disposable test password}
+      POSTGRES_SEEDS: postgres
+      DYNAMIC_CONFIG_FILE_PATH: config/dynamicconfig/development-sql.yaml
+    ports:
+      - "127.0.0.1:7233:7233"
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig:ro
+    networks: [temporal_test_private]
+
+volumes:
+  temporal_test_db:
+
+networks:
+  # An ordinary project bridge is required for Docker's host-published
+  # loopback port. Production egress restrictions use enclave network policy;
+  # this disposable fixture makes no restricted-egress qualification claim.
+  temporal_test_private: {}

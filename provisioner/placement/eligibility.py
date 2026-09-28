@@ -23,7 +23,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from provisioner.repository import repository_module
+from provisioner import repository
 
 PLATFORM_FAMILY = {'nutanix': 'nutanix', 'vmware': 'vmware-nsx', 'openstack': 'openstack'}
 PLATFORMS = ('nutanix', 'vmware', 'openstack')
@@ -38,18 +38,14 @@ DECLARATION = (Path(__file__).resolve().parents[1] / 'inventory' / 'fixtures'
 _DECLARATION_PLATFORM_KEYS = {'product_tuple'}
 
 
-def _capability_module():
-    return repository_module('scripts.check_platform_capabilities')
-
-
 @functools.lru_cache(maxsize=1)
 def registry() -> dict:
-    return _capability_module().load()
+    return repository.capability_registry()
 
 
 def capabilities() -> tuple[str, ...]:
     """The capability ids the repository registry actually recognises."""
-    return tuple(_capability_module().CAPABILITIES)
+    return tuple(repository.capability_ids())
 
 
 def unknown_capabilities(required: set[str]) -> tuple[str, ...]:
@@ -75,8 +71,8 @@ class RepositoryQualification:
              assurance_profile: str | None = None) -> tuple[bool, tuple[str, ...]]:
         if platform not in PLATFORM_FAMILY:
             raise ValueError(f'Unknown platform: {platform}')
-        ok, blockers = _capability_module().eligible(registry(), PLATFORM_FAMILY[platform],
-                                                     set(required), assurance_profile)
+        ok, blockers = repository.capability_eligible(registry(), PLATFORM_FAMILY[platform],
+                                                      set(required), assurance_profile)
         return ok, tuple(blockers)
 
     def product_tuple(self, platform: str) -> str:

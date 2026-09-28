@@ -127,9 +127,18 @@ class NetboxDNSWithdrawalTests(unittest.TestCase):
 
     def test_failed_prewrite_observation_never_allows_a_second_attempt(self):
         self.registered()
-        with patch.object(self.dns_client, 'exchange', side_effect=TimeoutError):
+        # Keep this journal-safety test independent of loopback scheduling: the
+        # first observation fails, and the read-only recovery sees the exact
+        # still-registered generation. Signed TCP readback is covered elsewhere.
+        before = {'marker': dns_writer.marker_rr(self.dns_job['previous_marker']),
+                  'name_owners': {name: dns_writer.marker_rr(self.dns_job['previous_marker'])
+                                  for name in dns_writer.name_markers(self.dns_job)},
+                  'records': dns_writer.payload(self.dns_job, 'before')}
+        self.assertTrue(dns_writer.matches(before, self.dns_job, 'before'))
+        with patch.object(dns_writer, 'snapshot', side_effect=(TimeoutError, before)) as snapshot:
             self.assertEqual(self.run_dns('withdraw')['status'], 'DNS_WITHDRAWAL_HELD')
-        self.assertEqual(self.run_dns('reconcile-withdrawal')['status'], 'DNS_WITHDRAWAL_HELD')
+            self.assertEqual(self.run_dns('reconcile-withdrawal')['status'], 'DNS_WITHDRAWAL_HELD')
+        self.assertEqual(snapshot.call_count, 2)
         with self.assertRaises(FileExistsError): self.run_dns('withdraw')
         self.assertIn(('app.fixture.invalid.', 'A'), self.dns_server.store)
         self.assertEqual(self.dns_server.update_requests, 1)
