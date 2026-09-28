@@ -14,7 +14,7 @@ KINDS = {
     'openstack_quota': (set(), {'request','authority','token','ca'}, set()),
     'edge_containment': ({'nft','nft_sha256'}, {'spec','authority'}, set()),
     'remote_owner': ({'ssh','ssh_sha256'}, {'job','target','ssh_key','ssh_certificate'}, set()),
-    'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
+    'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority','transfer_manifest'}),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
@@ -83,12 +83,13 @@ def validate_packet(step, packet, plan, base):
         remote_owner.validate(load_private(files['target']),job)
     if kind=='restic':
         from tools.restic_run import validate
-        config=load_private(files['config']); validate(config); match_scope(config['scope'],plan)
+        config=load_private(files['config']); validate(config)
+        restic_transfer(packet,files,plan)
         require(config['restic_sha256']==values['restic_sha256'],'Backup executable binding changed')
         require(values['action'] in {'backup','restore'},'Unknown backup transition')
         restore_files={'receipt','manifest','restore_authority'}
         if values['action']=='backup':
-            require(values['target'] is None and not restore_files.intersection(files),'Backup cannot carry restore inputs')
+            require(values['target'] is None and not (restore_files|{'transfer_manifest'}).intersection(files),'Backup cannot carry restore inputs')
         else:
             require(restore_files.issubset(files) and isinstance(values['target'],str)
                     and Path(values['target']).is_absolute(),'Exact restore input set required')
@@ -258,7 +259,7 @@ def child(root, module, arguments, directory, *, timeout):
     require(result.returncode==0,'Delivery owner did not complete; inspect its private journal')
 
 
-def dispatch(step, packet, directory, base, plan, root):
+def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
     if kind=='openstack_quota':
@@ -279,8 +280,13 @@ def dispatch(step, packet, directory, base, plan, root):
             values['restic'],directory/'execution',ca_file=files.get('ca_bundle'),
             receipt=load_private(files['receipt']) if 'receipt' in files else None,
             expected=load_private(files['manifest']) if 'manifest' in files else None,target=values['target'],
-            authority=load_private(files['restore_authority']) if 'restore_authority' in files else None)
-        for name in ('receipt.json','context.json') + (('manifest.json',) if values['action']=='backup' else ()):
+            authority=load_private(files['restore_authority']) if 'restore_authority' in files else None,
+            transfer=load_private(files['transfer_manifest']) if 'transfer_manifest' in files else None,
+            transfer_guard=transfer_guard)
+        if 'transfer_manifest' in files:
+            result=load_private(directory/'execution/transfer-receipt.json')
+        for name in (('receipt.json','context.json') + (('manifest.json',) if values['action']=='backup' else ())
+                     + (('transfer-manifest.json','transfer-receipt.json') if 'transfer_manifest' in files else ())):
             write_new(directory/name,read_private(directory/'execution'/name)); names.append(name)
     elif kind=='platform_transition':
         from tools.lifecycle_transition import prepare
@@ -427,6 +433,26 @@ def complete(step,packet,directory,plan,result,names):
                 'packet_sha256':c.digest(packet),'status':result['status'],'artifacts':artifact_receipt(directory,names)}
     write_new(directory/'owner-completion.json',encoded(completion))
     return result,names+['owner-completion.json']
+
+
+def restic_transfer(packet,files,plan):
+    """Separate source ownership from the destination transfer evidence.
+
+    The envelope is evidence, not authority. The owner still requires a trusted
+    runtime TransferGuard before any cross-scope restore can contact restic.
+    """
+    config=load_private(files['config'])
+    if 'transfer_manifest' not in files:
+        match_scope(config['scope'],plan)
+        return None
+    from tools.restic_transfer import validate
+    require(packet['parameters']['action']=='restore', 'Backup cannot carry a transfer manifest')
+    require({'receipt','manifest','restore_authority'}<=set(files),'Exact transfer restore inputs required')
+    transfer=load_private(files['transfer_manifest'])
+    validate(transfer,config,load_private(files['receipt']),load_private(files['manifest']),
+             packet['parameters']['target'])
+    match_scope(transfer['destination_execution_scope'],plan)
+    return transfer
 
 
 def campaign_postcondition(result, campaign, raw):
@@ -745,7 +771,7 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
             return complete(step,packet,directory,plan,result,['containment.json'])
         if kind=='restic':
             files=file_paths(packet); values=packet['parameters']; config=load_private(files['config'])
-            match_scope(config['scope'],plan)
+            transfer=restic_transfer(packet,files,plan)
             context=load_private(directory/'execution/context.json')
             original=load_private(files['receipt']) if 'receipt' in files else None
             expected=load_private(files['manifest']) if 'manifest' in files else None
@@ -755,7 +781,9 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                 'manifest_sha256':digest(encoded(expected)) if expected is not None else None,
                 'authority_sha256':digest(encoded(authority)) if authority is not None else None,
                 'machine_id':config['machine_id'] if values['action']=='backup' else authority['machine_id'],
-                'target':values['target']},'Interrupted backup execution context differs')
+                'target':values['target']} | ({'transfer_manifest_sha256':digest(encoded(transfer))}
+                                            if transfer is not None else {}),
+                    'Interrupted backup execution context differs')
             result=load_private(directory/'execution/receipt.json')
             require(result['scope']==config['scope'] and result['member']==config['member'],
                     'Interrupted backup receipt scope differs')
@@ -772,6 +800,15 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                 require(result['status']=='RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
                         and result['snapshot_id']==original['snapshot_id'] and result['file_count']==len(expected['files'])
                         and result['production_activation'] is False,'Interrupted restore completion differs')
+            if transfer is not None:
+                from tools.restic_transfer import destination_receipt
+                require(load_private(directory/'execution/transfer-manifest.json')==transfer,
+                        'Interrupted transfer manifest changed')
+                destination=load_private(directory/'execution/transfer-receipt.json')
+                require(destination==destination_receipt(transfer,original,result),
+                        'Interrupted destination receipt changed')
+                result=destination
+                names.extend(['transfer-manifest.json','transfer-receipt.json'])
             for name in names: retain(directory/name,read_private(directory/'execution'/name))
             return complete(step,packet,directory,plan,result,names)
         if kind in {'terraform_apply','guest_apply'}:
