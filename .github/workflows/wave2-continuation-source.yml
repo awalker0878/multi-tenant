@@ -1,0 +1,30 @@
+name: Wave 2 continuation source
+on:
+  push:
+    branches: ['implementation/all-waves']
+    paths: ['.github/workflows/wave2-continuation-source.yml']
+permissions:
+  contents: read
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Export tracked source only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/wave2-source"
+          git bundle create "$RUNNER_TEMP/wave2-source/source.bundle" HEAD
+          git rev-parse HEAD > "$RUNNER_TEMP/wave2-source/revision.txt"
+          (cd "$RUNNER_TEMP/wave2-source" && sha256sum source.bundle > source.sha256)
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: wave2-source-${{ github.sha }}
+          path: ${{ runner.temp }}/wave2-source/
+          retention-days: 1
+          if-no-files-found: error
