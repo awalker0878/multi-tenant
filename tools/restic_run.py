@@ -152,8 +152,17 @@ def backup(config, client, operation, *, fixture=False):
     return result, payload
 
 
-def restore(config, receipt, expected, client, operation, target, *, fixture=False):
+def restore(config, receipt, expected, client, operation, target, *, fixture=False,
+            transfer=None, transfer_guard=None):
     tag = validate(config, fixture=fixture)
+    if transfer is not None or transfer_guard is not None:
+        from tools.restic_transfer import GuardedRestic, TransferGuard, validate as validate_transfer
+        require(transfer is not None and isinstance(transfer_guard, TransferGuard),
+                'Cross-scope restore requires live trusted worker authority')
+        validate_transfer(transfer, config, receipt, expected, target)
+        transfer_guard.check(transfer)
+        client = GuardedRestic(client, transfer_guard, transfer)
+
     require(receipt['format'] == 'hosting-restic-receipt/1' and receipt['status'] == 'CAPTURED_REQUIRES_RESTORE_TEST'
             and receipt['repository_id'] == config['repository_id'] and receipt['scope'] == config['scope']
             and receipt['member'] == config['member'] and receipt['source'] == config['source']
@@ -187,18 +196,24 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
               'data_age_seconds': round((utcnow() - timestamp(receipt['captured_at'])).total_seconds(), 3),
               'completed_at': utcnow().isoformat(), 'production_activation': False}
     write_new(Path(operation) / 'receipt.json', encoded(result))
+    if transfer is not None:
+        from tools.restic_transfer import destination_receipt
+        transfer_guard.check(transfer)
+        write_new(Path(operation) / 'transfer-receipt.json',
+                  encoded(destination_receipt(transfer, receipt, result)))
     return result
 
 
 def execute(action, config, credentials, binary, operation, *, ca_file=None,
-            receipt=None, expected=None, target=None, authority=None):
+            receipt=None, expected=None, target=None, authority=None,
+            transfer=None, transfer_guard=None):
     """Execute one fixed owner operation, preserving a deterministic private path."""
     validate(config)
     require(action in {'backup', 'restore'}, 'Unknown backup operation')
     machine = Path('/etc/machine-id').read_text().strip()
     if action == 'backup':
         require(machine == config['machine_id'], 'Backup source machine identity changed')
-        require(all(value is None for value in (receipt, expected, target, authority)),
+        require(all(value is None for value in (receipt, expected, target, authority, transfer, transfer_guard)),
                 'Backup cannot carry restore inputs')
     else:
         from tools.run_files import current_window
@@ -212,19 +227,30 @@ def execute(action, config, credentials, binary, operation, *, ca_file=None,
                 and authority['target'] == str(Path(target).absolute())
                 and all(re.fullmatch(r'[A-Za-z0-9:._/-]{3,200}', authority[k]) for k in ('isolation_ref', 'change_ref')),
                 'Restore requires current authority for an independent isolated target')
+        if transfer is not None or transfer_guard is not None:
+            from tools.restic_transfer import TransferGuard, validate as validate_transfer
+            require(transfer is not None and isinstance(transfer_guard, TransferGuard),
+                    'Cross-scope restore requires live trusted worker authority')
+            validate_transfer(transfer, config, receipt, expected, target)
+            transfer_guard.check(transfer)
     operation = new_directory(operation, ROOT)
-    write_new(operation / 'context.json', encoded({'action': action, 'config_sha256': digest(encoded(config)),
+    context = {'action': action, 'config_sha256': digest(encoded(config)),
         'receipt_sha256': digest(encoded(receipt)) if receipt is not None else None,
         'manifest_sha256': digest(encoded(expected)) if expected is not None else None,
         'authority_sha256': digest(encoded(authority)) if authority is not None else None,
-        'machine_id': machine, 'target': str(Path(target).absolute()) if target is not None else None}))
+        'machine_id': machine, 'target': str(Path(target).absolute()) if target is not None else None}
+    if transfer is not None:
+        context['transfer_manifest_sha256'] = digest(encoded(transfer))
+        write_new(operation / 'transfer-manifest.json', encoded(transfer))
+    write_new(operation / 'context.json', encoded(context))
     client = Restic(binary, config, credentials, operation, ca_file)
     if action == 'backup':
         result, _ = backup(config, client, operation)
     else:
         client.deadline = min(client.deadline, time.monotonic() +
             (timestamp(authority['valid_until']) - utcnow()).total_seconds())
-        result = restore(config, receipt, expected, client, operation, target)
+        result = restore(config, receipt, expected, client, operation, target,
+                         transfer=transfer, transfer_guard=transfer_guard)
     return result
 
 
@@ -233,7 +259,7 @@ def main():
     parser.add_argument('action', choices=['backup', 'restore'])
     for name in ('config', 'credentials', 'restic', 'output_root'):
         parser.add_argument('--' + name.replace('_', '-'), type=Path, required=True)
-    for name in ('ca_bundle', 'receipt', 'manifest', 'target', 'restore_authority'):
+    for name in ('ca_bundle', 'receipt', 'manifest', 'target', 'restore_authority', 'transfer_manifest'):
         parser.add_argument('--' + name.replace('_', '-'), type=Path)
     parser.add_argument('--execute', action='store_true')
     args = parser.parse_args()
@@ -247,7 +273,8 @@ def main():
         result = execute(args.action, config, load_private(args.credentials), args.restic, operation,
             ca_file=args.ca_bundle, receipt=load_private(args.receipt) if args.receipt else None,
             expected=load_private(args.manifest) if args.manifest else None, target=args.target,
-            authority=load_private(args.restore_authority) if args.restore_authority else None)
+            authority=load_private(args.restore_authority) if args.restore_authority else None,
+            transfer=load_private(args.transfer_manifest) if args.transfer_manifest else None)
         print(json.dumps({'status': result['status'], 'operation': str(operation), 'production_activation': False}))
         return 0
     except OperatorError as exc:
