@@ -15,6 +15,7 @@ to the exact project and catalog route by the trusted site integration.
 from __future__ import annotations
 
 import re
+import ipaddress
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Mapping, Protocol
@@ -135,6 +136,65 @@ def _fact(row: Mapping[str, object], key: str, name: str, expected: type,
     return DiscoveryFact.known(name, value)
 
 
+def _native_list(row: Mapping[str, object], name: str) -> DiscoveryFact:
+    """Observe a bounded native relationship set; never manufacture an empty set."""
+    if name not in row:
+        return DiscoveryFact.unknown(name, 'NOT_RETURNED')
+    items = row[name]
+    if not isinstance(items, list) or len(items) > 64:
+        raise OpenStackDiscoveryHeld('Native relationship list exceeds its bounded shape')
+    values = [_id(item, name) for item in items]
+    if len(values) != len(set(values)):
+        raise OpenStackDiscoveryHeld('Duplicate native relationship identity')
+    return DiscoveryFact.known(name, sorted(values))
+
+
+def _nullable_id(row: Mapping[str, object], name: str) -> DiscoveryFact:
+    fact = _fact(row, name, name, str, nullable=True)
+    if fact.state == 'KNOWN' and fact.value() is not None:
+        _id(fact.value(), name)
+    return fact
+
+
+def _address(value: object, *, cidr: bool = False) -> str:
+    if not isinstance(value, str) or len(value) > 64 or '%' in value:
+        raise OpenStackDiscoveryHeld('Invalid native IP address')
+    try:
+        # Keep hosts as hosts, and explicit CIDR policies as networks. Reject
+        # masked host bits rather than silently broadening an anti-spoof rule.
+        parsed = (ipaddress.ip_network(value, strict=True) if cidr and '/' in value
+                  else ipaddress.ip_address(value))
+    except ValueError as exc:
+        raise OpenStackDiscoveryHeld('Invalid native IP address') from exc
+    return str(parsed)
+
+
+def _mac(value: object) -> str:
+    if not isinstance(value, str) or not re.fullmatch(r'(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}', value):
+        raise OpenStackDiscoveryHeld('Invalid native MAC address')
+    return value.lower()
+
+
+def _pairs(row: Mapping[str, object]) -> DiscoveryFact:
+    name = 'allowed_address_pairs'
+    if name not in row:
+        return DiscoveryFact.unknown(name, 'NOT_RETURNED')
+    items = row[name]
+    if not isinstance(items, list) or len(items) > 32:
+        raise OpenStackDiscoveryHeld('Allowed address pairs exceed their bounded shape')
+    pairs = []
+    for item in items:
+        if not isinstance(item, Mapping):
+            raise OpenStackDiscoveryHeld('Invalid allowed address pair')
+        # Native response requires both values; arbitrary extension data is not retained.
+        pair = {'ip_address': _address(item.get('ip_address'), cidr=True),
+                'mac_address': _mac(item.get('mac_address'))}
+        if pair in pairs:
+            raise OpenStackDiscoveryHeld('Duplicate allowed address pair')
+        pairs.append(pair)
+    return DiscoveryFact.known(name, sorted(pairs, key=lambda p: (p['ip_address'], p['mac_address'])))
+
+
 def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> DiscoveryObject:
     native_id = _id(row.get('id'), kind)
     if kind == 'vm':
@@ -146,16 +206,29 @@ def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> Discovery
                  ('os-vol-tenant-attr:tenant_id', 'project_id'))
         facts = (_fact(row, 'name', 'name', str, nullable=True),
                  _fact(row, 'status', 'status', str),
-                 _fact(row, 'size', 'size_gib', int))
-        if 'size' in row and row['size'] < 0:
-            raise OpenStackDiscoveryHeld('Volume size cannot be negative')
+                 _fact(row, 'size', 'size_gib', int),
+                 _fact(row, 'encrypted', 'encrypted', bool),
+                 _fact(row, 'multiattach', 'multiattach', bool),
+                 _fact(row, 'volume_type', 'volume_type', str, nullable=True))
+        if 'size' in row and not 0 <= row['size'] <= (2**63 - 1) // 1024**3:
+            raise OpenStackDiscoveryHeld('Volume size exceeds the supported byte range')
     else:
         _project(row, scope.native_scope_id, ('project_id', 'tenant_id'))
         facts = (_fact(row, 'network_id', 'network_id', str),
                  _fact(row, 'device_id', 'device_id', str),
-                 _fact(row, 'status', 'status', str))
+                 _fact(row, 'status', 'status', str),
+                 _fact(row, 'port_security_enabled', 'port_security_enabled', bool),
+                 _fact(row, 'binding:vnic_type', 'binding_vnic_type', str),
+                 _fact(row, 'binding:vif_type', 'binding_vif_type', str),
+                 _native_list(row, 'security_groups'),
+                 _nullable_id(row, 'qos_policy_id'),
+                 _pairs(row))
+        if 'mac_address' in row:
+            facts += (DiscoveryFact.known('mac_address', _mac(row['mac_address'])),)
+        else:
+            facts += (DiscoveryFact.unknown('mac_address', 'NOT_RETURNED'),)
         if 'fixed_ips' in row:
-            if not isinstance(row['fixed_ips'], list):
+            if not isinstance(row['fixed_ips'], list) or len(row['fixed_ips']) > 32:
                 raise OpenStackDiscoveryHeld('Port fixed IPs have invalid shape')
             # The API's address objects may carry extension fields. Retain only
             # the subnet and address, with no arbitrary metadata/user data.
@@ -165,8 +238,11 @@ def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> Discovery
                         item.get('ip_address'), str) or not isinstance(
                         item.get('subnet_id'), str):
                     raise OpenStackDiscoveryHeld('Port fixed IPs have invalid shape')
-                fixed_ips.append({'ip_address': item['ip_address'],
-                                  'subnet_id': item['subnet_id']})
+                address = {'ip_address': _address(item['ip_address']),
+                           'subnet_id': _id(item['subnet_id'], 'subnet')}
+                if address in fixed_ips:
+                    raise OpenStackDiscoveryHeld('Duplicate native fixed address')
+                fixed_ips.append(address)
             facts += (DiscoveryFact.known('fixed_ips', fixed_ips),)
         else:
             facts += (DiscoveryFact.unknown('fixed_ips', 'NOT_RETURNED'),)

@@ -44,10 +44,15 @@ def responses():
                          'status': 'ACTIVE'}]},
         (ENDPOINTS.volume, 'volumes/detail', None): {
             'volumes': [{'id': VOLUME, 'os-vol-tenant-attr:tenant_id': PROJECT,
-                         'name': 'data', 'status': 'in-use', 'size': 50}]},
+                         'name': 'data', 'status': 'in-use', 'size': 50,
+                         'encrypted': True, 'multiattach': False, 'volume_type': 'encrypted'}]},
         (ENDPOINTS.network, 'ports', None): {
             'ports': [{'id': PORT, 'project_id': PROJECT,
                        'network_id': VM2, 'device_id': VM1, 'status': 'ACTIVE',
+                       'port_security_enabled': True, 'binding:vnic_type': 'normal',
+                       'binding:vif_type': 'ovs', 'security_groups': [VM3],
+                       'mac_address': '02:00:00:00:00:01', 'qos_policy_id': None,
+                       'allowed_address_pairs': [],
                        'fixed_ips': [{'subnet_id': VM3, 'ip_address': '10.1.0.4'}]}]},
         (ENDPOINTS.compute, f'os-quota-sets/{PROJECT}', None): {
             'quota_set': {'id': PROJECT, 'instances': 12, 'cores': 40,
@@ -77,6 +82,94 @@ class FakeTransport:
 
 
 class OpenStackDiscoveryTests(unittest.TestCase):
+    def _collected(self, values):
+        authority = campaign()
+        pages = collect_openstack_project(authority, ENDPOINTS, FakeTransport(values))
+        return assemble_discovery_result(authority, pages, checked_at=datetime.now(timezone.utc))
+
+    def test_native_port_security_and_volume_properties_are_observed_not_qualified(self):
+        result = self._collected(responses())
+        facts = {obj.identity.resource_kind: {f.name: f.value() for f in obj.facts}
+                 for obj in result.objects if obj.identity.resource_kind != 'quota'}
+        self.assertIs(facts['volume']['encrypted'], True)
+        self.assertIs(facts['volume']['multiattach'], False)
+        self.assertEqual(facts['nic']['security_groups'], [VM3])
+        self.assertEqual(facts['nic']['binding_vnic_type'], 'normal')
+        self.assertIsNone(facts['nic']['qos_policy_id'])
+        self.assertNotIn('capabilityProperties', facts['nic'])
+        self.assertNotIn('nativeQualified', facts['volume'])
+
+    def test_omitted_fields_remain_unknown_but_explicit_false_is_known(self):
+        values = responses()
+        port = values[(ENDPOINTS.network, 'ports', None)]['ports'][0]
+        volume = values[(ENDPOINTS.volume, 'volumes/detail', None)]['volumes'][0]
+        del port['binding:vif_type']
+        del port['security_groups']
+        del volume['multiattach']
+        port['port_security_enabled'] = False
+        result = self._collected(values)
+        self.assertEqual(result.completeness, 'PARTIAL')
+        facts = {obj.identity.resource_kind: {f.name: f for f in obj.facts} for obj in result.objects}
+        self.assertEqual(facts['nic']['security_groups'].state, 'UNKNOWN')
+        self.assertEqual(facts['nic']['binding_vif_type'].state, 'UNKNOWN')
+        self.assertEqual(facts['volume']['multiattach'].state, 'UNKNOWN')
+        self.assertIs(facts['nic']['port_security_enabled'].value(), False)
+        self.assertEqual(facts['nic']['port_security_enabled'].state, 'KNOWN')
+
+    def test_malformed_extension_types_and_relationships_abort_collection(self):
+        for service, path, collection, field, value in (
+            ('network', 'ports', 'ports', 'port_security_enabled', 1),
+            ('network', 'ports', 'ports', 'binding:vnic_type', True),
+            ('network', 'ports', 'ports', 'security_groups', [VM3, VM3]),
+            ('network', 'ports', 'ports', 'security_groups', ['foreign-unresolved-id']),
+            ('network', 'ports', 'ports', 'security_groups', [VM3] * 65),
+            ('network', 'ports', 'ports', 'qos_policy_id', ''),
+            ('volume', 'volumes/detail', 'volumes', 'encrypted', 'false'),
+            ('volume', 'volumes/detail', 'volumes', 'multiattach', 0),
+            ('volume', 'volumes/detail', 'volumes', 'size', 2**63),
+        ):
+            with self.subTest(field=field, value=value):
+                values = responses()
+                values[(ENDPOINTS.for_service(service), path, None)][collection][0][field] = value
+                with self.assertRaises(OpenStackDiscoveryHeld):
+                    self._collected(values)
+
+    def test_address_sets_are_bounded_canonical_and_not_silently_broadened(self):
+        values = responses()
+        port = values[(ENDPOINTS.network, 'ports', None)]['ports'][0]
+        port['allowed_address_pairs'] = [{'ip_address': '2001:0db8::/64',
+                                         'mac_address': '02:AA:00:00:00:01', 'metadata': 'not copied'}]
+        result = self._collected(values)
+        nic = next(obj for obj in result.objects if obj.identity.resource_kind == 'nic')
+        self.assertEqual(next(f.value() for f in nic.facts if f.name == 'allowed_address_pairs'),
+                         [{'ip_address': '2001:db8::/64', 'mac_address': '02:aa:00:00:00:01'}])
+        for field, invalid in (
+            ('allowed_address_pairs', [{'ip_address': '10.1.0.9/24', 'mac_address': '02:00:00:00:00:01'}]),
+            ('allowed_address_pairs', [{'ip_address': '10.0.0.0/24'}]),
+            ('allowed_address_pairs', port['allowed_address_pairs'] * 2),
+            ('allowed_address_pairs', port['allowed_address_pairs'] * 33),
+            ('fixed_ips', [{'subnet_id': VM3, 'ip_address': 'fe80::1%eth0'}]),
+            ('fixed_ips', [{'subnet_id': VM3, 'ip_address': '10.1.0.4'}] * 2),
+            ('fixed_ips', [{}] * 33),
+            ('mac_address', 'not-a-mac'),
+        ):
+            with self.subTest(field=field, invalid=invalid):
+                changed = responses()
+                changed[(ENDPOINTS.network, 'ports', None)]['ports'][0][field] = invalid
+                with self.assertRaises(OpenStackDiscoveryHeld):
+                    self._collected(changed)
+
+    def test_sensitive_response_fields_are_not_imported_as_policy_evidence(self):
+        values = responses()
+        for service, path, collection in (('network', 'ports', 'ports'),
+                                          ('volume', 'volumes/detail', 'volumes')):
+            values[(ENDPOINTS.for_service(service), path, None)][collection][0].update(
+                metadata={'capabilityProperties': {'distributed_firewall.enforcement': 'enforce'}},
+                user_data='private', connection_info={'auth_password': 'private'})
+        result = self._collected(values)
+        names = {f.name for obj in result.objects for f in obj.facts}
+        self.assertFalse(names & {'metadata', 'user_data', 'connection_info', 'capabilityProperties'})
+
     def test_read_only_complete_exact_project_and_stable_identities(self):
         authority = campaign()
         transport = FakeTransport()
