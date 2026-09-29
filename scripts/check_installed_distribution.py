@@ -45,6 +45,8 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
+    from provisioner.controlplane.discovery import collector_runtime, collector_settings
+    from provisioner.controlplane.discovery.adapters import collector_config
     from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
@@ -63,6 +65,9 @@ try:
     assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
     assert callable(publication.PrivateDiscoveryOutbox.for_campaign)
     assert publication_https.DiscoveryHttpsPublisher.__module__ == publication_https.__name__
+    assert collector_runtime.main.__module__ == collector_runtime.__name__
+    assert collector_settings.DiscoveryCollectorSettings.__module__ == collector_settings.__name__
+    assert collector_config.create_native_collector.__module__ == collector_config.__name__
     for platform in components.COMPONENTS:
         for phase in ('domains', 'workloads'):
             assert wsd.native_variables(platform, phase)
@@ -89,7 +94,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -150,6 +155,19 @@ assert any(e.name == 'hosting-site-worker' and
 assert any(e.name == 'hosting-discovery-ingest' and
            e.value == 'provisioner.controlplane.discovery.runtime:main'
            for e in distribution.entry_points)
+
+entry = next(e for e in distribution.entry_points if e.name == 'hosting-discovery-collect')
+assert entry.value == 'provisioner.controlplane.discovery.collector_runtime:main'
+assert entry.load() is collector_runtime.main
+import io
+from contextlib import redirect_stdout
+outcome = io.StringIO()
+missing_config = Path.cwd() / 'not-configured-collector.json'
+assert not missing_config.exists()
+with redirect_stdout(outcome):
+    assert entry.load()(['publish', '--config', str(missing_config)]) == 2
+assert json.loads(outcome.getvalue()) == {
+    'format': 'hosting-discovery-collector-outcome/1', 'status': 'HELD', 'executionAuthorized': False}
 
 result = main(['plan', str(request)])
 for name, module in sys.modules.items():

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.8 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.9 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -142,11 +142,32 @@ is explicitly unknown. Retry is deliberate, uses original bytes and still depend
 on server-side campaign/result idempotency; it never grants native execution.
 
 See [the publication and recovery contract](../engineering/discovery-publication-recovery.md).
-Library signing, custody and authenticated delivery are implemented; deployed site
-configuration/runtime, fleet scheduling, independent retention and persistent
-restart/DR authority floors remain open. Pre-reference outboxes require reviewed
+Library signing, custody, authenticated delivery and the installed command below
+are implemented. Fleet scheduling, deployed custody, independent retention and
+persistent restart/DR authority floors remain open. Pre-reference outboxes require reviewed
 original-digest reconciliation, not automatic rescanning. Local atomic references
 do not prove global uniqueness, complete inventory or native qualification.
+
+### Installed one-shot collector composition
+
+`discovery/collector_runtime.py` now owns `hosting-discovery-collect`. A protected
+versioned configuration selects the existing signed campaign, trust/witness stores,
+private outbox and exact native/publisher settings. `adapters/collector_config.py`
+constructs only the three registered native owners; no dynamic import or shim exists.
+
+`stage` collects/signs/retains only when no original campaign reference exists;
+resumed staging verifies original bytes without native credentials or signing keys.
+`publish` requires an existing original and never falls back to collection. Distinct
+held, unknown-delivery and interrupted exits avoid claiming that an uncertain POST
+never committed. All outcomes retain `executionAuthorized: false`.
+
+See [the installed collector contract](../engineering/discovery-collector-runtime.md).
+The shared native GET mechanism also stops inherited TLS session-key logging while
+retaining pinned certificate/hostname verification and bounded requests. Command and
+real-TLS tests exercise fresh-process recovery; database and installed-wheel checks
+cover publication identity and package ownership. Deployed credential/signer custody,
+independent retention, durable revision floors, visibility, B17 and B22 remain open.
+The command is not a scheduler, credential issuer, migration workflow or native qualification.
 
 ## Engineering and implementation handoff
 

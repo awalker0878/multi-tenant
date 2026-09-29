@@ -1,7 +1,7 @@
 # Wave 2 read-only discovery and comparison
 
-Status: B14–B22 are partially implemented. The current signed-publication/recovery
-checkpoint below distinguishes working library composition from deployed runtime gaps. Authenticated publication and scoped
+Status: B14–B22 are partially implemented. The installed-collector checkpoint
+below distinguishes working command/library composition from deployed custody gaps. Authenticated publication and scoped
 comparison are available in the repository; native collector integration, full
 fact coverage, scheduling and estate acceptance remain open. No native route is
 qualified by this document or by fixture-backed tests.
@@ -38,10 +38,11 @@ Campaigns, generations, observations and absence candidates are durable and
 append-only. The page assembler checks sequence, cursor chain, identity and
 collection budgets, preserving errors and missing privileges as partial/unknown
 coverage. The HTTP publication is a bounded signed aggregate, not proof that
-every claimed native page was actually read. Native collector transport,
-constrained credential retrieval, installed API/field-profile binding and full
-coverage reconciliation still need integration. The 1 MiB request limit must be
-accounted for when designing campaigns and resumable publication.
+every claimed native page was actually read. The installed command now connects
+bounded native transports, independently attested credential material and original
+signed publication. Deployed credential issuance, complete installed field profiles
+and independent coverage reconciliation remain open. The 1 MiB request limit must
+be accounted for when designing campaigns and resumable publication.
 
 Partial generations cannot establish absence or retire a native object. Even
 complete same-scope inventory produces an absence candidate, not deletion or
@@ -84,8 +85,8 @@ new observation metadata and hold reason remain visible.
 
 ## Remaining delivery and acceptance sequence
 
-1. Connect the existing bounded VMware, AHV and OpenStack GET adapters to
-   independently admitted campaigns and site credential custody. Bind the actual
+1. Deploy the installed VMware, AHV and OpenStack collector composition with
+   independently admitted campaigns and actual site credential custody. Bind the
    installed profile, required field coverage and retained native page evidence.
    Complete VM/device/network/storage/capacity normalization one platform at a time.
 2. Qualify pagination, stable IDs, project/tenant isolation, missing privileges,
@@ -261,8 +262,24 @@ conflicts. Restart recovery cannot renew an expired campaign or change captured-
 Missing references from older outboxes require reviewed original-digest reconciliation;
 no automatic rescan/import is provided. Local files are not independent DR custody.
 
-Actual signing and publication library composition is now implemented. Deployed
-site runtime/configuration, signer/native credential lifecycle, persistent authority
+Actual signing/publication and the installed command below are implemented. Deployed
+signer/native credential lifecycle, persistent authority
 floors, independent retention, visibility reconciliation, full facts, B17 persistence
 and B22 scheduling/freshness/estate measurements remain open. Collector/normalizer/
 policy contracts and partial/unknown inventory semantics are unchanged.
+
+## Installed collector command — 29 September 2026
+
+[The protected-configuration runtime](../engineering/discovery-collector-runtime.md)
+connects the three existing native adapters, original signer/outbox and mTLS publisher
+through `hosting-discovery-collect`. Staging and publication are separate explicit
+actions. Restarted staging reuses original bytes; publication without an original
+holds and cannot start native collection. Fresh authority and exact profile/scope
+checks remain in the active owners. Partial inventory is not promoted to complete.
+
+The command reports bounded JSON and distinct success, held, delivery-unknown and
+interrupted exits without credentials or raw observation dumps. It is package-owned,
+not a forwarding shim or new SQL writer. Deployed site custody, persistent revision
+floors, independent visibility, full facts, B17 persistence and B22 fleet scheduling
+still require implementation/qualification. The existing one-MiB aggregate and
+pre-reference recovery limitations remain explicit.

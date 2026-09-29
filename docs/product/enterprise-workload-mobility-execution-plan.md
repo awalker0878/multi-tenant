@@ -6,8 +6,8 @@
 
 This is the current execution addendum to the [historical audit and implementation plan](enterprise-workload-mobility-audit-and-implementation-plan.md).
 Preserve that audit's revision, findings and evidence. Its September 26 baseline must not be presented as the current code.
-The latest signed-publication/recovery checkpoint is recorded at the end of section 8.
-Earlier dated checkpoints retain their historical limits; the latest checkpoint distinguishes implemented library paths from remaining deployment work.
+The latest installed-collector checkpoint is recorded at the end of section 8.
+Earlier dated checkpoints retain their historical limits; the latest checkpoint distinguishes installed command/library paths from remaining deployment work.
 The B01–B50 identifiers remain stable. This addendum refines their sequence and completion evidence rather than replacing them with a second backlog.
 The older W01–W29 automation ledger and C01–C13 interface-refactor gates describe earlier scopes; neither closes this product programme.
 
@@ -491,3 +491,33 @@ visibility/privilege-loss reconciliation and full native facts. B17 owner/depend
 persistence and B05/later provisioning, transfer, fencing, cutover and release gates
 remain open. Local references do not provide global exactly-once collection, WORM
 custody or DR protection. No installed vendor or production workload was contacted.
+
+### B10/B13/B14–B16/B22 continuation — installed collector command, 29 September 2026
+
+[The installed collector](../engineering/discovery-collector-runtime.md) now provides
+`hosting-discovery-collect stage --config <absolute-protected-file>` and a separate
+`publish` action. It composes the existing signed campaign/witness authorities,
+three exact native adapters, signer, private outbox and mTLS publication owner.
+Configuration is bounded, strict and private; it cannot select dynamic imports,
+arbitrary commands or inline native secrets. This supersedes the earlier missing
+command/configuration composition, not site deployment or credential issuance.
+
+Staging resumes existing original bytes without native reads or signing material.
+Publication requires existing custody and cannot trigger collection as a fallback.
+Held, unknown-delivery and interrupted outcomes have distinct exit codes; all keep
+execution authority false. Original capture time, partial/unknown inventory and
+server idempotency remain intact. The shared native HTTPS helper no longer honors
+inherited TLS key logging; certificate/hostname and bounded-request checks remain.
+
+Regression evidence covers actual native TLS, fresh command processes, protected
+configuration rejection, original signatures, lost-acknowledgement restart and
+mTLS publication. PostgreSQL tests verify one generation after command replay.
+Final-revision CI and isolated installed-command checks must pass before recording
+automated verification; local protocol fixtures do not qualify installed platforms.
+
+B10/B13/B14–B16/B22 remain partial for deployed credential/key lifecycle and Vault,
+protected durable authority floors, independent retention/recovery, visibility/full
+facts, scheduling/concurrency, larger publication and estate benchmarks. Pre-reference
+outboxes need reviewed reconciliation, not automatic rescanning. B17 owner/dependency
+persistence and all later admitted provisioning/migration/qualification gates remain
+open; no native site, guest or production dataset was contacted in this increment.

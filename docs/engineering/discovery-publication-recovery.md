@@ -17,9 +17,10 @@ artifact implementation. Neither selects a platform or wraps another vendor clie
 A trusted site composes an already-admitted campaign, its original issuer signature,
 matching collector key, live verifier, actual native adapter collect method, private
 tenant outbox and pinned ingest target. No endpoint, private path, verifier or native
-credential is selected by an unauthenticated request. This library composition is
-implemented; a deployed collector runtime/configuration command and fleet scheduler
-are not supplied by these functions. Existing native adapters remain read-only.
+credential is selected by an unauthenticated request. The separate
+[installed collector command](discovery-collector-runtime.md) now supplies protected
+configuration and explicit stage/publish actions over these owners. A deployed fleet
+scheduler and credential/key custody are separate; native adapters remain read-only.
 
 The supported sequence is `stage_submission(...)`, then one explicit
 `DiscoveryHttpsPublisher(...).publish(submission)` attempt. Staging verifies current
@@ -128,7 +129,7 @@ capsule/realization 2 are unchanged. The new local reference is not a compatibil
 wrapper, a native capability claim or an approval conversion. Newly collected facts
 still require new digest-bound assessment reviews; partial inventory stays partial.
 
-B10/B13/B14–B16/B22 remain partial. Deployed runtime/configuration and signer custody,
+B10/B13/B14–B16/B22 remain partial. Installed command composition is implemented; signer custody,
 credential issuance/renewal/revocation, Vault publication, durable anti-rollback and
 independent retention, visibility/privilege-loss reconciliation, missing image/hardware
 facts, B17 owner/dependency persistence, scheduling and estate qualification remain
