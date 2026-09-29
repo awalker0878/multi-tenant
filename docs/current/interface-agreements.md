@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.6 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.7 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -104,6 +104,25 @@ responses, including errors. A late response or regressing clock cannot publish
 fresh evidence. See [native read custody and tests](../engineering/vmware-discovery-https.md)
 for exact fields, deployment obligations and rejection cases. Independent visibility
 reconciliation, remaining site integration and native qualification remain open.
+
+### OpenStack native discovery integration
+
+`adapters/openstack_https.py` now connects the project collector to the actual
+shared HTTPS mechanism. Its independently signed token binding names the exact
+project/user, region/interface, all three service endpoints, API versions and
+native token validity. Only consecutive project collection and quota GETs are
+admitted. Compute/volume version response headers must match; service failures,
+revocation, expiry and mid-read rotation discard the scan. Valid and empty scans
+remain partial/visible-only. URL normalization cannot change signed endpoint
+meaning. The [OpenStack read contract](../engineering/openstack-discovery-https.md)
+documents fields, tests and unresolved issuance, publication and native evidence.
+
+The native client requires `openstack-project-https-1` campaign enrollment and
+matching independent read-only witnesses. No old collector identity is aliased.
+This adds no mutation path or native qualification. Normalizer and policy formats
+are unchanged; fresh observations require fresh signed review. Glance/image reads,
+remaining hardware/key facts, deployed custody and original result publication
+are still unfinished B10/B16 integration, not supplied by this transport.
 
 ## Engineering and implementation handoff
 

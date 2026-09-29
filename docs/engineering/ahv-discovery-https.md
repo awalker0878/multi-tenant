@@ -90,8 +90,9 @@ generation pinning and signed review remain required before assessment use.
 Collector identities, normalizer 2, profile resolution 3 and policy capsule/
 realization 2 are unchanged. A changed observation has a new digest and needs a
 fresh review; old evidence is not relabelled. This client does not implement a site
-service runtime or native result-signing/publication path. OpenStack's HTTPS client,
-independent visibility reconciliation, B17 owner/dependency persistence and later
+service runtime or native result-signing/publication path. The separate
+[OpenStack HTTPS client](openstack-discovery-https.md) now implements bounded project
+reads; independent visibility reconciliation, B17 owner/dependency persistence and later
 provisioning/migration effects remain unfinished.
 
 Tests in `tests/provisioning/discovery/test_ahv_https.py` exercise actual loopback TLS

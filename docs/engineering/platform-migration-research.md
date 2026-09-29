@@ -152,3 +152,15 @@ no server release, RBAC coverage or native qualification is inferred from them.
 OpenStack campaign-clock regressions now block native reads before expiry violations
 rather than detecting them only when a page is appended. This advances existing
 B10/B14/B16, leaving native issuance/site deployment and independent coverage open.
+
+### OpenStack HTTPS integration — 29 September 2026
+
+The [project HTTPS contract](openstack-discovery-https.md) records the implemented
+B10/B16 token, service-catalog, API-version and route boundaries and their primary
+references. The native client uses the existing collector and common transport;
+it does not infer missing fields or issue native credentials. Exact project ownership,
+version echoes, signed endpoint custody, live authority and finite budgets precede
+publication. Complete-looking or empty visible lists remain partial. Three-service
+TLS fixtures demonstrate protocol behavior, not installed qualification. The existing
+wave plan retains deployed custody, signing/publication, independent visibility,
+Glance/full-fact and application/dependency obligations; no duplicate roadmap is added.

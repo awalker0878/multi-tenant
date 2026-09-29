@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.7 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.8 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -185,8 +185,27 @@ live campaign/credential/witness checks and no login, mutation or retry fallback
 Successful native-client collections remain visible-only/partial, including empty
 lists. Independent visibility and deployed custody are not inferred from totals.
 See [the AHV read contract](../engineering/ahv-discovery-https.md). Key issuance,
-Vault/persistent revision custody, site composition, signed result publication and
-OpenStack HTTPS remain separate implementation and native qualification work.
+Vault/persistent revision custody, site composition and signed result publication
+remain separate implementation and native qualification work.
+
+### OpenStack native discovery integration
+
+`adapters/openstack_https.py` now connects the project collector to the actual
+shared HTTPS mechanism. Its independently signed token binding names the exact
+project/user, region/interface, all three service endpoints, API versions and
+native token validity. Only consecutive project collection and quota GETs are
+admitted. Compute/volume version response headers must match; service failures,
+revocation, expiry and mid-read rotation discard the scan. Valid and empty scans
+remain partial/visible-only. URL normalization cannot change signed endpoint
+meaning. The [OpenStack read contract](../engineering/openstack-discovery-https.md)
+documents fields, tests and unresolved issuance, publication and native evidence.
+
+The native client requires `openstack-project-https-1` campaign enrollment and
+matching independent read-only witnesses. No old collector identity is aliased.
+This adds no mutation path or native qualification. Normalizer and policy formats
+are unchanged; fresh observations require fresh signed review. Glance/image reads,
+remaining hardware/key facts, deployed custody and original result publication
+are still unfinished B10/B16 integration, not supplied by this transport.
 
 ## Engineering and implementation handoff
 

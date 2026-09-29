@@ -194,7 +194,8 @@ is a protocol test, not a vCenter qualification. The output remains visible-only
 and partial; original collector signatures and mTLS ingestion are still required.
 OpenStack now verifies campaign validity before each native GET as well as after
 responses, so an expired campaign cannot perform even its first read. Actual site
-credential issuance and OpenStack HTTPS composition remain open.
+credential issuance remains open; the OpenStack client continuation below supplies
+the bounded HTTPS implementation, not deployed issuance or result publication.
 
 
 ## AHV signed native HTTPS continuation
@@ -210,6 +211,31 @@ visible-only and partial. API totals are not independent native coverage evidenc
 New owners are `adapters/ahv_credentials.py`, `adapters/ahv_https.py` and the common
 `native_https.py`. Existing collector IDs, normalizer and signed-result contracts
 remain unchanged. Site composition, key issuance/revocation, durable revision
-floors, original result signing/publication, OpenStack HTTPS and owner/dependency
-review remain open. Actual TLS fixtures test protocol enforcement, not native
+floors, original result signing/publication and owner/dependency review remain open.
+The subsequent OpenStack client uses this shared mechanism with distinct project
+and service-version contracts. Actual TLS fixtures test protocol enforcement, not native
 Prism support or production authority.
+
+## OpenStack signed native HTTPS continuation — 29 September 2026
+
+The [OpenStack HTTPS client](../engineering/openstack-discovery-https.md) implements
+actual project-scoped Nova/Cinder/Neutron collection and quota reads, not login or
+mutation. `openstack-project-https-1` pins compute 2.79, volume 3.60 and network v2.0
+contracts. Its independent signed binding selects project/user, catalog evidence,
+region/interface, all three endpoint/IP/CA records, token digest/validity and revision.
+The native read-only witness must cover each service; a GET-only client does not
+prove native RBAC. New campaigns need matching enrollment and credential material.
+
+The provider constructs only consecutive admitted routes/markers. Neutron ports
+carry the exact project filter. The shared HTTPS mechanism checks protocol version
+headers without permitting authentication/Host/framing overrides. Scope mismatch,
+ambiguous URL, wrong versions, stale material, exhausted budgets, native errors,
+revocation and late responses hold the collection. Successful and empty results
+remain partial/visible-only, not complete point-in-time inventory.
+
+All three native clients now have bounded HTTPS implementations. Deployed site
+composition, credential issuance/renewal/revocation, persistent revision floors,
+original result signing/authenticated publication, Glance and remaining native
+facts, independent visibility reconciliation and B17 persistence still require work.
+Normalizer 2 and policy formats remain unchanged; no native qualification or
+migration execution is implied by this continuation.

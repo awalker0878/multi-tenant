@@ -13,7 +13,8 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 | [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
 
-TAD-M01 is **version 0.7 (Proposed)**; ICD-M01 is **version 0.6 (Proposed)**;
+TAD-M01 is **version 0.8 (Proposed)**; ICD-M01 is **version 0.7 (Proposed)**;
+following the 29 September 2026 OpenStack transport increment;
 the other four records remain **version 0.3 (Proposed)** following the 28 September 2026
 mobility review. They describe the authenticated control application, durable discovery
 and comparison, 97 explicit capability dimensions, mandatory workload/service profile

@@ -426,5 +426,30 @@ Collector/normalizer/policy formats are unchanged; updated observations require 
 digest-bound review. This advances B10/B15 without closing them: deployed site
 composition, service-account issuance/revocation, Vault publication, persistent
 revision floors, original result signing/ingest and independent visibility remain
-open. OpenStack native HTTPS, B17 persistence and later migration effects also
-remain open. No native environment or production dataset was contacted.
+open. OpenStack native HTTPS was open at this checkpoint and is addressed by the
+next continuation. B17 persistence and later migration effects remain open. No native environment or production dataset was contacted.
+
+### B10/B16 continuation — signed OpenStack reads, 29 September 2026
+
+The [OpenStack native client](../engineering/openstack-discovery-https.md) now drives
+the existing project collector through actual bounded Nova/Cinder/Neutron HTTPS GETs.
+`openstack-project-https-1` requires newly admitted enrollment and independent native
+read-only witnesses. Signed project-token custody binds principal, token validity,
+catalog evidence, region/interface, all three exact endpoints/IPs/CA digests and
+selected API versions. It neither logs in nor refreshes credentials automatically.
+
+Only the consecutive collection page chains and project quota reads are allowed.
+Native identity/project checks precede marker admission; no server URL is followed.
+Exact compute/volume response versions, finite budgets/deadlines and live authority
+are enforced. Bad endpoints, scope/version mismatch, service failure, revocation
+or mid-request token rotation discard the scan rather than publishing a diagnostic
+as valid inventory. Successful and empty scans remain partial/visible-only.
+Endpoint/header hardening and real three-service TLS regressions accompany the code;
+the shared HTTPS owner remains provider-neutral. No compatibility shim was added.
+
+This advances B10/B16 repository implementation, not their native qualification or
+Wave 2 completion. Original result signing/authenticated publication, deployed site
+composition, independently verified token issuance/revocation, Vault/durable revision
+custody, Glance/image and remaining hardware facts, visibility reconciliation and
+B17 attributed application/dependency persistence remain open. Existing interpretation
+versions and later provisioning/migration/qualification gates remain unchanged.

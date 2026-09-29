@@ -101,7 +101,8 @@ collection page and quota read, after both successful and failed requests, and
 before emitting pages. Expired/not-yet-valid campaigns never issue the first GET;
 clock regression and responses arriving at expiry are rejected. `clock=` supports
 deterministic tests; it is supplied by the trusted site, not an HTTP parameter.
-Native OpenStack HTTPS/credential composition is still separate work.
+The separate [OpenStack HTTPS client](openstack-discovery-https.md) now supplies
+bounded project reads and signed token custody; deployed credential issuance remains open.
 
 ## Verification and evidence boundary
 
@@ -130,7 +131,9 @@ infrastructure, enterprise session issuance or a qualified migration route.
 Normalizers, collector identities and policy formats are unchanged; this increment
 adds transport/custody enforcement, not a new interpretation of inventory facts.
 B14 still needs deployed site composition, original result-signature custody,
-independent visibility reconciliation and native qualification. OpenStack native clients, B17 dependency persistence and later migration waves remain open.
+independent visibility reconciliation and native qualification. OpenStack's bounded
+client is documented separately; B17 dependency persistence, deployed custody and
+later migration waves remain open.
 
 ## Retained CI artifact reconciliation
 
