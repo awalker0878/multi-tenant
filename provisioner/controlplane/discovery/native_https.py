@@ -98,8 +98,13 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
         ca = read_protected(ca_bundle, 1024 * 1024, secret=False)
         if hashlib.sha256(ca).hexdigest() != ca_digest:
             raise NativeReadHeld('Native trust bundle differs from the signed binding')
-        context = ssl.create_default_context(cadata=ca.decode('ascii'))
+        # Do not let an inherited SSLKEYLOGFILE export native-session secrets.
+        # Retain explicit hostname/chain verification and the strict/partial-chain
+        # flags used by the supported Python client, without loading system roots.
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.verify_flags |= ssl.VERIFY_X509_STRICT | ssl.VERIFY_X509_PARTIAL_CHAIN
+        context.load_verify_locations(cadata=ca.decode('ascii'))
         raw = socket.create_connection((connect_ip, url.port or 443), timeout=remaining())
         active[0] = raw
         raw.settimeout(remaining())
