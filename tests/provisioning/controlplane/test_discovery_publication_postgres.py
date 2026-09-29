@@ -7,13 +7,15 @@ import socket
 import unittest
 from dataclasses import replace
 from datetime import datetime, timezone
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from cryptography.hazmat.primitives import serialization
 
 from provisioner.controlplane.discovery import ingest
 from provisioner.controlplane.discovery.model import DiscoveryFact
-from provisioner.controlplane.discovery.publication import PrivateDiscoveryOutbox, PrivateFileDiscoveryResultSigner
+from provisioner.controlplane.discovery.publication import (
+    DiscoveryPublicationHeld, PrivateDiscoveryOutbox, PrivateFileDiscoveryResultSigner,
+    stage_submission)
 from provisioner.controlplane.discovery.publication_https import (
     DiscoveryHttpsPublisher, DiscoveryPublicationUnknown, DiscoveryPublishTarget)
 from provisioner.controlplane.discovery.trust import DiscoverySignature
@@ -49,8 +51,9 @@ class DiscoveryPublicationPostgresTests(unittest.TestCase):
             certificate_digest=hashlib.sha256((root/'collector.pem').read_bytes()).hexdigest(),
             client_key=root/'collector.key')
 
-    def publisher(self):
-        return DiscoveryHttpsPublisher(self.target,verifier=self.verifier,outbox=self.outbox)
+    def publisher(self, outbox=None):
+        return DiscoveryHttpsPublisher(self.target,verifier=self.verifier,
+                                       outbox=outbox or self.outbox)
 
     def signed(self,result=None):
         return self.signer.sign(self.f.campaign,result or self.f.result,self.f.environment,
@@ -58,6 +61,10 @@ class DiscoveryPublicationPostgresTests(unittest.TestCase):
 
     def generations(self):
         return self.f.reader.list_generations(self.f.context,self.f.scope,self.f.environment)
+
+    def changed(self):
+        return self.signed(replace(self.f.result,objects=(replace(self.f.result.objects[0],
+            facts=(DiscoveryFact.known('name','different-observation'),)),)))
 
     def test_original_request_retry_has_one_generation_and_exact_retained_bytes(self):
         value=self.signed()
@@ -69,7 +76,7 @@ class DiscoveryPublicationPostgresTests(unittest.TestCase):
         self.assertEqual(next(self.f.evidence.rglob(value.digest)).read_bytes(),value.body)
         self.assertIs(again.execution_authorized,False)
 
-    def test_lost_ack_retry_reconciles_without_duplicate_generation(self):
+    def test_lost_ack_restart_reconciles_without_resigning_or_duplicate_generation(self):
         value=self.signed()
         reply=ingest._DiscoveryHandler._reply
         def lost(handler,status,document):
@@ -81,16 +88,40 @@ class DiscoveryPublicationPostgresTests(unittest.TestCase):
         with patch.object(ingest._DiscoveryHandler,'_reply',lost):
             with self.assertRaises(DiscoveryPublicationUnknown): self.publisher().publish(value)
         self.assertEqual(len(self.generations()),1)
-        receipt=self.publisher().publish(self.outbox.load(value.digest))
+        restarted=PrivateDiscoveryOutbox(self.outbox.root,self.f.context)
+        collect=Mock(side_effect=AssertionError('Native collection must not repeat'))
+        with patch.object(self.signer,'sign',side_effect=AssertionError('Original signature must survive')):
+            original=stage_submission(self.f.campaign,self.f.environment,self.signature,
+                collect=collect,signer=self.signer,verifier=self.verifier,outbox=restarted)
+        self.assertEqual(original.body,value.body)
+        receipt=self.publisher(restarted).publish(original)
+        collect.assert_not_called()
         self.assertEqual(receipt.generation,1)
         self.assertEqual(len(self.generations()),1)
+        self.assertEqual(next(self.f.evidence.rglob(value.digest)).read_bytes(),value.body)
 
-    def test_different_result_for_same_campaign_conflicts_without_overwrite(self):
+    def test_different_local_result_is_held_before_any_post_without_overwrite(self):
         original=self.signed()
         self.publisher().publish(original)
-        changed=replace(self.f.result,objects=(replace(self.f.result.objects[0],
-            facts=(DiscoveryFact.known('name','different-observation'),)),))
-        with self.assertRaises(DiscoveryPublicationUnknown): self.publisher().publish(self.signed(changed))
+        changed=self.changed()
+        publisher=self.publisher()
+        with patch.object(publisher,'_post') as post:
+            with self.assertRaises(DiscoveryPublicationHeld) as raised: publisher.publish(changed)
+        self.assertNotIsInstance(raised.exception,DiscoveryPublicationUnknown)
+        post.assert_not_called()
+        self.assertEqual(len(self.generations()),1)
+        self.assertEqual(self.generations()[0].result_digest,original.result.digest)
+
+    def test_server_rejects_competing_result_from_independent_outbox(self):
+        # Local custody cannot replace the server's global campaign-conflict gate.
+        original=self.signed()
+        self.publisher().publish(original)
+        other_root=self.f.root/'independent-outbox'
+        other_root.mkdir(mode=0o700)
+        other=PrivateDiscoveryOutbox(other_root,self.f.context)
+        with self.assertRaises(DiscoveryPublicationUnknown) as raised:
+            self.publisher(other).publish(self.changed())
+        self.assertEqual(raised.exception.phase,'RESULT')
         self.assertEqual(len(self.generations()),1)
         self.assertEqual(self.generations()[0].result_digest,original.result.digest)
 
