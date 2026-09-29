@@ -1,6 +1,7 @@
 # Wave 2 read-only discovery and comparison
 
-Status: B14–B22 are partially implemented. Authenticated publication and scoped
+Status: B14–B22 are partially implemented. The current signed-publication/recovery
+checkpoint below distinguishes working library composition from deployed runtime gaps. Authenticated publication and scoped
 comparison are available in the repository; native collector integration, full
 fact coverage, scheduling and estate acceptance remain open. No native route is
 qualified by this document or by fixture-backed tests.
@@ -235,7 +236,33 @@ remain partial/visible-only, not complete point-in-time inventory.
 
 All three native clients now have bounded HTTPS implementations. Deployed site
 composition, credential issuance/renewal/revocation, persistent revision floors,
-original result signing/authenticated publication, Glance and remaining native
-facts, independent visibility reconciliation and B17 persistence still require work.
+Glance and remaining native facts, independent visibility reconciliation and B17
+persistence still require work. Signed publication is implemented in the following checkpoint.
 Normalizer 2 and policy formats remain unchanged; no native qualification or
 migration execution is implied by this continuation.
+
+## Campaign-bound signed publication recovery — 29 September 2026
+
+The [publication/recovery owner](../engineering/discovery-publication-recovery.md)
+now connects admitted collection, original collector signatures, private retained
+wire bytes and explicit mTLS delivery through the existing ingest routes. It does
+not replace the listener, SQL writer, native read adapters or signature verifier.
+
+`stage_submission` locates an already-retained submission by tenant/campaign identity
+and verifies it again without recollecting or re-signing. Payload storage precedes
+a create-only reference that binds environment, authorization and request digest.
+Competing submissions, reused identities, corrupt references and missing originals
+hold before any publisher POST. A valid local record is still not a server receipt.
+
+After a lost campaign/result acknowledgement, delivery stays unknown until explicit
+current-authority retry of original bytes or independent reconciliation. PostgreSQL
+continues to enforce identical retry idempotency and reject independent-outbox
+conflicts. Restart recovery cannot renew an expired campaign or change captured-at.
+Missing references from older outboxes require reviewed original-digest reconciliation;
+no automatic rescan/import is provided. Local files are not independent DR custody.
+
+Actual signing and publication library composition is now implemented. Deployed
+site runtime/configuration, signer/native credential lifecycle, persistent authority
+floors, independent retention, visibility reconciliation, full facts, B17 persistence
+and B22 scheduling/freshness/estate measurements remain open. Collector/normalizer/
+policy contracts and partial/unknown inventory semantics are unchanged.

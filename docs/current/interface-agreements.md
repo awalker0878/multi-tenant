@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.7 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.8 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -121,8 +121,32 @@ The native client requires `openstack-project-https-1` campaign enrollment and
 matching independent read-only witnesses. No old collector identity is aliased.
 This adds no mutation path or native qualification. Normalizer and policy formats
 are unchanged; fresh observations require fresh signed review. Glance/image reads,
-remaining hardware/key facts, deployed custody and original result publication
-are still unfinished B10/B16 integration, not supplied by this transport.
+remaining hardware/key facts and deployed custody remain unfinished B10/B16
+integration. The publication owner described below now supplies signed delivery.
+
+### Signed discovery publication and campaign restart recovery
+
+`discovery/publication.py` now composes collection with the original issuer and
+collector signatures, immutable request bytes and a private tenant outbox.
+`stage_submission` resumes an existing campaign reference without recollecting,
+re-signing or changing capture time; all resumed evidence still needs current
+verification. Payload durability precedes the create-only campaign reference.
+Changed results, environment or authorization under one campaign ID conflict;
+corruption and missing referenced bytes hold rather than trigger a replacement.
+
+`discovery/publication_https.py` sends those retained bytes through the existing
+mTLS ingest routes. The server remains the sole inventory writer. Exact TLS identity,
+CA/CRL/certificate hashes, live authority, bounded acknowledgement fields and
+request deadlines are checked. An attempted request with a lost or invalid reply
+is explicitly unknown. Retry is deliberate, uses original bytes and still depends
+on server-side campaign/result idempotency; it never grants native execution.
+
+See [the publication and recovery contract](../engineering/discovery-publication-recovery.md).
+Library signing, custody and authenticated delivery are implemented; deployed site
+configuration/runtime, fleet scheduling, independent retention and persistent
+restart/DR authority floors remain open. Pre-reference outboxes require reviewed
+original-digest reconciliation, not automatic rescanning. Local atomic references
+do not prove global uniqueness, complete inventory or native qualification.
 
 ## Engineering and implementation handoff
 

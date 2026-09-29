@@ -6,6 +6,8 @@
 
 This is the current execution addendum to the [historical audit and implementation plan](enterprise-workload-mobility-audit-and-implementation-plan.md).
 Preserve that audit's revision, findings and evidence. Its September 26 baseline must not be presented as the current code.
+The latest signed-publication/recovery checkpoint is recorded at the end of section 8.
+Earlier dated checkpoints retain their historical limits; the latest checkpoint distinguishes implemented library paths from remaining deployment work.
 The B01–B50 identifiers remain stable. This addendum refines their sequence and completion evidence rather than replacing them with a second backlog.
 The older W01–W29 automation ledger and C01–C13 interface-refactor gates describe earlier scopes; neither closes this product programme.
 
@@ -453,3 +455,39 @@ composition, independently verified token issuance/revocation, Vault/durable rev
 custody, Glance/image and remaining hardware facts, visibility reconciliation and
 B17 attributed application/dependency persistence remain open. Existing interpretation
 versions and later provisioning/migration/qualification gates remain unchanged.
+
+### B10/B13/B14–B16/B22 continuation — original publication and recovery, 29 September 2026
+
+The [signed publication/recovery contract](../engineering/discovery-publication-recovery.md)
+now describes the implemented package-owned result signer, immutable submission,
+private outbox and mTLS sender. These consume existing admitted campaigns and
+actual native adapter collect methods; the existing ingest repository remains the
+only inventory writer. They do not issue native credentials or migration grants.
+This checkpoint supersedes earlier statements that the library result-signing and
+authenticated publication paths were missing, without claiming deployed site runtime.
+
+`stage_submission` now resumes the original by campaign identity, with fresh
+signature/enrollment/witness checks and no native recapture, replacement signature
+or changed capture time. The outbox fsyncs original bytes before an immutable
+campaign reference and rejects competing results, changed scope, corruption and
+missing referenced payloads. The existing publisher enforces this retention before
+any POST. Independent-outbox conflicts remain enforced by the server.
+
+Lost or malformed acknowledgements after an attempted request remain explicitly
+unknown. An explicit currently authorized retry sends the same bytes and relies on
+server idempotency, not presumed rollback. Expired or revoked evidence remains held.
+Pre-reference outboxes need reviewed replay by original digest before resuming old
+campaigns; no automatic migration, source rescan or approval relabelling is supplied.
+
+Regression evidence covers original signatures/capture times, create-only races,
+corruption/storage/authority failures, lost campaign/result replies over actual
+loopback mTLS, and PostgreSQL one-generation retries and central conflicts. Final
+revision CI and installed-package checks must pass; native qualification stays separate.
+
+Remaining B10/B13/B14–B16/B22 work includes deployed collector configuration/runtime,
+protected signer and native credential issuance/renewal, persistent anti-rollback
+floors and independent retention, fleet scheduling/resumable publication limits,
+visibility/privilege-loss reconciliation and full native facts. B17 owner/dependency
+persistence and B05/later provisioning, transfer, fencing, cutover and release gates
+remain open. Local references do not provide global exactly-once collection, WORM
+custody or DR protection. No installed vendor or production workload was contacted.

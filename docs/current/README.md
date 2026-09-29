@@ -13,8 +13,8 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 | [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
 
-TAD-M01 is **version 0.8 (Proposed)**; ICD-M01 is **version 0.7 (Proposed)**;
-following the 29 September 2026 OpenStack transport increment;
+TAD-M01 is **version 0.9 (Proposed)**; ICD-M01 is **version 0.8 (Proposed)**,
+following the 29 September 2026 signed-publication/recovery increment;
 the other four records remain **version 0.3 (Proposed)** following the 28 September 2026
 mobility review. They describe the authenticated control application, durable discovery
 and comparison, 97 explicit capability dimensions, mandatory workload/service profile
@@ -30,3 +30,8 @@ The
 [verified research record](../engineering/platform-migration-research.md) identifies
 accepted assumptions, rejected recommendations and remaining native evidence.
 The existing B01–B50 plan remains the only implementation backlog.
+
+[Signed publication and restart recovery](../engineering/discovery-publication-recovery.md)
+now documents implemented collector signatures, campaign-bound original-byte custody
+and explicit mTLS delivery. Deployed site orchestration, independent retention and
+restart/DR authority reconciliation remain open under the same wave plan.

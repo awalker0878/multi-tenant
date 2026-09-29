@@ -45,7 +45,7 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
-    from provisioner.controlplane.discovery import native_credentials, native_https
+    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
     assert not hasattr(native_credentials, 'SignedFileVmwareCredentialSource')
@@ -59,6 +59,10 @@ try:
     assert not hasattr(native_credentials, 'SignedFileOpenStackCredentialSource')
     assert openstack_https.read_json is native_https.read_json
     assert vmware_https.read_json is native_https.read_json
+    assert publication.stage_submission.__module__ == publication.__name__
+    assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
+    assert callable(publication.PrivateDiscoveryOutbox.for_campaign)
+    assert publication_https.DiscoveryHttpsPublisher.__module__ == publication_https.__name__
     for platform in components.COMPONENTS:
         for phase in ('domains', 'workloads'):
             assert wsd.native_variables(platform, phase)
@@ -85,7 +89,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__

@@ -35,7 +35,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.8",
+    "version": "0.9",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -88,6 +88,11 @@
         "version": "0.8",
         "date": "2026-09-29",
         "summary": "Added project-scoped OpenStack HTTPS/token custody, exact three-service/version and visibility boundaries, strict endpoint/header validation and explicit remaining deployment/qualification work."
+      },
+      {
+        "version": "0.9",
+        "date": "2026-09-29",
+        "summary": "Recorded original collector signatures, private campaign-bound outbox recovery and explicit mTLS publication uncertainty; preserved live authority, server idempotency and remaining deployment/DR custody gates."
       }
     ]
   },
@@ -161,7 +166,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.7",
+    "version": "0.8",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -208,6 +213,11 @@
         "version": "0.7",
         "date": "2026-09-29",
         "summary": "Added project-scoped OpenStack HTTPS/token custody, exact three-service/version and visibility boundaries, strict endpoint/header validation and explicit remaining deployment/qualification work."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-29",
+        "summary": "Recorded original collector signatures, private campaign-bound outbox recovery and explicit mTLS publication uncertainty; preserved live authority, server idempotency and remaining deployment/DR custody gates."
       }
     ]
   },
