@@ -22,7 +22,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from provisioner.controlplane.discovery.adapters import vmware_https
+from provisioner.controlplane.discovery import native_https
 from provisioner.controlplane.discovery.adapters.vmware_https import VmwareHttpsTransport
 from provisioner.controlplane.discovery.adapters.vmware_rest import PROFILE
 from provisioner.controlplane.discovery.model import _json, assemble_discovery_result
@@ -414,14 +414,14 @@ class VmwareHttpsTests(unittest.TestCase):
         expired = threading.Event()
         monotonic = time.monotonic
         clock = SimpleNamespace(monotonic=lambda: monotonic() + (60 if expired.is_set() else 0))
-        decode = vmware_https.decode_json
+        decode = native_https.decode_json
         def late_decode(body, limit):
             value = decode(body, limit)
             expired.set()
             return value
         client = self.client()
-        with patch.object(vmware_https, 'time', clock), \
-             patch.object(vmware_https, 'decode_json', late_decode):
+        with patch.object(native_https, 'time', clock), \
+             patch.object(native_https, 'decode_json', late_decode):
             with self.assertRaises(NativeReadHeld):
                 client.get(LIST)
         self.assertTrue(expired.is_set(), 'The fixture must reach successful JSON decoding')
@@ -461,7 +461,7 @@ class VmwareHttpsTests(unittest.TestCase):
     def test_binding_limits_and_unsafe_endpoint_values_are_rejected(self):
         initial = dict(self.binding)
         for field, bad in (('origin', 'http://localhost'), ('origin', 'https://u:p@localhost'),
-                           ('origin', 'https://localhost/path'), ('origin', 'https://localhost:0'),
+                           ('origin', 'https://localhost/path'), ('origin', 'https://local\nhost'), ('origin', 'https://localhost:0'),
                            ('connectIp', 'unresolved.example'), ('connectIp', '0.0.0.0'),
                            ('caDigest', 'wrong'), ('revision', True), ('revision', 2**63),
                            ('expiresAt', (self.now + timedelta(hours=2)).isoformat())):

@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unittest
 
-from provisioner.controlplane.discovery import native_credentials
+from provisioner.controlplane.discovery import native_credentials, native_https
 from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -29,7 +29,15 @@ class NativeCredentialBoundaryTests(unittest.TestCase):
                 self.assertEqual(getattr(native_credentials, name).__module__,
                                  native_credentials.__name__)
                 self.assertIs(getattr(vmware_credentials, name), getattr(native_credentials, name))
-                self.assertIs(getattr(vmware_https, name), getattr(native_credentials, name))
+                self.assertIs(getattr(native_https, name), getattr(native_credentials, name))
+
+    def test_https_has_one_provider_neutral_owner(self):
+        self.assertEqual(native_https.read_json.__module__, native_https.__name__)
+        self.assertIs(vmware_https.read_json, native_https.read_json)
+        tree = ast.parse(Path(native_https.__file__).read_text(encoding='utf-8'))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom):
+                self.assertNotIn('adapters', (node.module or '').split('.'))
 
     def test_shared_utility_has_no_vendor_import_or_dynamic_forwarding(self):
         tree = ast.parse(Path(native_credentials.__file__).read_text(encoding='utf-8'))
@@ -55,7 +63,7 @@ class NoAdapterImports(importlib.abc.MetaPathFinder):
                 'provisioner.controlplane.discovery.adapters.'):
             raise AssertionError('Shared credential utility imported a vendor: ' + fullname)
 sys.meta_path.insert(0, NoAdapterImports())
-from provisioner.controlplane.discovery import native_credentials as shared
+from provisioner.controlplane.discovery import native_credentials, native_https as shared
 assert shared.decode_json(b'{"observed":false}', 1024) == {'observed':False}
 try:
     shared.decode_json(b'{"observed":false,"observed":true}', 1024)

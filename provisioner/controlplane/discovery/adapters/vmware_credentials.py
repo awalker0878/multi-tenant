@@ -107,7 +107,7 @@ class SignedFileVmwareCredentialSource:
                 if (url.scheme != 'https' or not host or url.username is not None
                         or url.password is not None or url.path or url.query or url.fragment
                         or not re.fullmatch(r'[a-z0-9.:-]+', host)
-                        or '%' in origin or '\\' in origin or origin != origin.strip()
+                        or '%' in origin or '\\' in origin or any(not 33 <= ord(c) <= 126 for c in origin)
                         or url.port is not None and not 1 <= url.port <= 65535
                         or address.is_unspecified or address.is_multicast
                         or str(address) != binding['connectIp']):
