@@ -91,7 +91,9 @@ class OpenStackServiceEndpoints:
         }
         for service, suffix in expected.items():
             value = getattr(self, service)
-            if not isinstance(value, str):
+            if (not isinstance(value, str) or len(value) > 1024
+                    or any(not 33 <= ord(c) <= 126 for c in value)
+                    or any(char in value for char in '%\\?#')):
                 raise ValueError('Pinned HTTPS service endpoints are required')
             parsed = urlsplit(value)
             try:
@@ -99,7 +101,11 @@ class OpenStackServiceEndpoints:
             except ValueError as exc:
                 raise ValueError('Invalid pinned service port') from exc
             if (parsed.scheme != 'https' or not parsed.hostname or parsed.username
-                    or parsed.password or parsed.query or parsed.fragment
+                    or parsed.password is not None or parsed.query or parsed.fragment
+                    or parsed.netloc.endswith(':')
+                    or parsed.username is not None
+                    or not re.fullmatch(r'[a-z0-9.:-]+', parsed.hostname)
+                    or not re.fullmatch(r'(?:/[A-Za-z0-9._~-]+)+', parsed.path)
                     or not parsed.path.endswith(suffix)
                     or parsed.path != parsed.path.rstrip('/')
                     or any(segment in ('.', '..') for segment in parsed.path.split('/'))

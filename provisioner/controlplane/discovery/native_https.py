@@ -16,7 +16,7 @@ import ssl
 import time
 from pathlib import Path
 from threading import Timer
-from typing import Callable
+from typing import Callable, Mapping
 from urllib.parse import urlsplit
 
 from .native_credentials import NativeReadHeld, decode_json, read_protected
@@ -25,7 +25,9 @@ from .native_credentials import NativeReadHeld, decode_json, read_protected
 def read_json(*, origin: str, connect_ip: str, ca_digest: str,
               ca_bundle: Path, path: str, credential_header: str, credential: str,
               timeout: float, max_response_bytes: int,
-              authorize: Callable[[], None]) -> tuple[int, object]:
+              authorize: Callable[[], None],
+              request_headers: Mapping[str, str] | None = None,
+              response_headers: Mapping[str, str] | None = None) -> tuple[int, object]:
     """Perform one bounded GET on an already selected native endpoint.
 
     The absolute deadline includes trust-file loading, TLS, HTTP and decoding.
@@ -48,6 +50,27 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
             or type(max_response_bytes) is not int or not 1024 <= max_response_bytes <= 4*1024*1024
             or not callable(authorize)):
         raise NativeReadHeld('Invalid bounded native HTTPS configuration')
+    # Copy bounded public protocol headers; never allow overrides of custody or
+    # HTTP framing. Adapters own their version values, not this neutral mechanism.
+    reserved = {'host', 'connection', 'content-length', 'transfer-encoding',
+                'accept', 'accept-encoding', 'authorization', 'proxy-authorization',
+                'cookie', 'set-cookie', credential_header.lower()}
+    def headers(value):
+        if value is None:
+            return {}
+        if not isinstance(value, Mapping) or len(value) > 8:
+            raise NativeReadHeld('Invalid native protocol headers')
+        result, names = {}, set()
+        for name, item in value.items():
+            if (not isinstance(name, str) or not re.fullmatch(r'[A-Za-z][A-Za-z0-9-]{0,63}', name)
+                    or name.lower() in reserved or name.lower() in names
+                    or not isinstance(item, str) or not 1 <= len(item) <= 128
+                    or item != item.strip() or any(not 32 <= ord(c) <= 126 for c in item)):
+                raise NativeReadHeld('Invalid native protocol headers')
+            names.add(name.lower())
+            result[name] = item
+        return result
+    sent_headers, expected_headers = headers(request_headers), headers(response_headers)
     deadline = time.monotonic() + timeout
     active = [None]
 
@@ -91,7 +114,7 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
         connection.sock = tls
         connection.request('GET', path, headers={
             credential_header: credential, 'Accept': 'application/json',
-            'Accept-Encoding': 'identity', 'Connection': 'close'})
+            'Accept-Encoding': 'identity', 'Connection': 'close', **sent_headers})
         response = connection.getresponse()
         remaining()
         if response.status != 200:
@@ -100,6 +123,9 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
             authorize()
             remaining()
             return response.status, None  # Never expose native error bodies.
+        for name, expected in expected_headers.items():
+            if response.headers.get_all(name, []) != [expected]:
+                raise NativeReadHeld('Native response protocol version is not the selected value')
         lengths = response.headers.get_all('Content-Length', [])
         transfers = response.headers.get_all('Transfer-Encoding', [])
         types = response.headers.get_all('Content-Type', [])
