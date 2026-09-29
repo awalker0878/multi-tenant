@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.6 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -116,3 +116,16 @@ Unassigned endpoints, authority, recovery and version terms block the correspond
 Adopting authority and approval evidence: **not recorded**. Link the actual design review and its conditions when they exist; a code merge does not authorize a site or service. Keep sensitive site parameters and private credentials in their approved systems.
 
 [Maintained design register](README.md) · [Decision register](../adr/README.md)
+
+
+### AHV native read interface
+
+The AHV adapter accepts only an already-admitted VM campaign and independently
+signed `hosting-ahv-read-credential/1` material. It binds the service-account UUID,
+credential reference, API profile, exact endpoint trust and campaign digest; the
+current native read-only witness and campaign enrollment remain independent checks.
+Only the bounded VMM cluster VM-list GET is exposed. Failed/rotated/revoked reads
+cannot publish current observations. Successful lists stay partial/visible-only.
+The [AHV HTTPS contract](../engineering/ahv-discovery-https.md) specifies fields,
+consumer obligations, request/response limits, key custody and remaining deployed
+integration. This is not a source-signing interface, write grant or migration route.

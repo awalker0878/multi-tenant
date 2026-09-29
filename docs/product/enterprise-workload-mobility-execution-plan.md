@@ -396,8 +396,35 @@ UTC monotonicity and validity around every page/quota read, including error path
 The regression previously reproduced a native GET after campaign expiry.
 
 These are repository/automated-verification increments, not native acceptance of
-B10/B14/B16 or completion of Wave 2. AHV/OpenStack HTTPS credential clients, native
+B10/B14/B16 or completion of Wave 2. OpenStack HTTPS credential client, native
 visibility reconciliation and B17 persisted application/dependency review remain
 open. No collector identity, normalizer or qualification claim is silently upgraded;
 no compatibility shim, mutation endpoint, login fallback or production grant is
 introduced. Existing later-wave dependencies and completion columns still apply.
+
+
+### B10/B15 continuation — signed AHV reads and shared HTTPS
+
+The AHV VMM v4.0 collector now has `adapters/ahv_https.py` and an independently
+signed API-key source in `adapters/ahv_credentials.py`. Only the admitted cluster's
+consecutive bounded VM-list pages can be requested. Native service-account keys,
+TLS origin/IP/CA, scope, API profile, credential enrollment and current independent
+read-only witnesses are checked before connection, after TLS, after decoding and
+before returning pages. Mid-read revocation or rotation cannot become publishable
+observations. Errors consume the request budget and latch the client closed.
+
+The actual HTTPS mechanism is extracted into provider-neutral `native_https.py`;
+VMware callers and deadline tests use it directly. No adapter forwards to another
+vendor, no old-path alias or native login/mutation fallback was added. Both native
+credential readers now reject embedded origin controls/whitespace. Successful AHV
+collections remain `PARTIAL`/`VISIBLE_INVENTORY_ONLY`, including empty responses;
+API totals alone cannot establish independent native visibility.
+
+See [AHV HTTPS custody and qualification boundaries](../engineering/ahv-discovery-https.md).
+Local real-TLS/signature tests and installed-package guards cover these owners.
+Collector/normalizer/policy formats are unchanged; updated observations require new
+digest-bound review. This advances B10/B15 without closing them: deployed site
+composition, service-account issuance/revocation, Vault publication, persistent
+revision floors, original result signing/ingest and independent visibility remain
+open. OpenStack native HTTPS, B17 persistence and later migration effects also
+remain open. No native environment or production dataset was contacted.

@@ -35,6 +35,14 @@ properties, nonfinite/overflowing numbers, excess nesting, compressed responses,
 oversized bodies and truncated declared bodies are rejected. The client does not
 log tokens or native error payloads. It does not retry rejected sessions.
 
+The actual shared connection/framing/deadline implementation now lives in
+`provisioner/controlplane/discovery/native_https.py`. VMware retains path admission,
+credential interpretation and list-derived identities. The shared mechanism is
+also used by [the AHV client](ahv-discovery-https.md), with no vendor forwarding
+or platform branching. Deadline tests moved their instrumentation to this actual
+owner; no compatibility import aliases were retained. Both credential sources
+reject embedded controls/whitespace in signed origins before opening a connection.
+
 ## Native credential custody
 
 The VMware binding parser and session source belong to the discovery adapter.
@@ -122,8 +130,7 @@ infrastructure, enterprise session issuance or a qualified migration route.
 Normalizers, collector identities and policy formats are unchanged; this increment
 adds transport/custody enforcement, not a new interpretation of inventory facts.
 B14 still needs deployed site composition, original result-signature custody,
-independent visibility reconciliation and native qualification. AHV/OpenStack
-native clients, B17 dependency persistence and later migration waves remain open.
+independent visibility reconciliation and native qualification. OpenStack native clients, B17 dependency persistence and later migration waves remain open.
 
 ## Retained CI artifact reconciliation
 

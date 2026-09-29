@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.6 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.7 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -174,6 +174,19 @@ responses, including errors. A late response or regressing clock cannot publish
 fresh evidence. See [native read custody and tests](../engineering/vmware-discovery-https.md)
 for exact fields, deployment obligations and rejection cases. Independent visibility
 reconciliation, remaining site integration and native qualification remain open.
+
+### AHV native discovery integration
+
+`adapters/ahv_https.py` connects the existing AHV collector through the shared
+`discovery/native_https.py` mechanism. `adapters/ahv_credentials.py` interprets
+independent signed service-account material; VMware keeps its distinct binding and
+path owners. Only exact cluster-filtered consecutive VM pages are requested, with
+live campaign/credential/witness checks and no login, mutation or retry fallback.
+Successful native-client collections remain visible-only/partial, including empty
+lists. Independent visibility and deployed custody are not inferred from totals.
+See [the AHV read contract](../engineering/ahv-discovery-https.md). Key issuance,
+Vault/persistent revision custody, site composition, signed result publication and
+OpenStack HTTPS remain separate implementation and native qualification work.
 
 ## Engineering and implementation handoff
 

@@ -35,7 +35,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.6",
+    "version": "0.7",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -78,6 +78,11 @@
         "version": "0.6",
         "date": "2026-09-28",
         "summary": "Added exact-campaign signed VMware session custody and bounded HTTPS GET transport; corrected OpenStack pre-read expiry checks while retaining explicit site integration and native qualification gaps."
+      },
+      {
+        "version": "0.7",
+        "date": "2026-09-28",
+        "summary": "Added signed AHV service-account discovery, shared provider-neutral HTTPS ownership, exact page/scope and visible-only evidence boundaries; deployed custody and migration qualification remain open."
       }
     ]
   },
@@ -151,7 +156,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.5",
+    "version": "0.6",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -188,6 +193,11 @@
         "version": "0.5",
         "date": "2026-09-28",
         "summary": "Added exact-campaign signed VMware session custody and bounded HTTPS GET transport; corrected OpenStack pre-read expiry checks while retaining explicit site integration and native qualification gaps."
+      },
+      {
+        "version": "0.6",
+        "date": "2026-09-28",
+        "summary": "Added signed AHV service-account discovery, shared provider-neutral HTTPS ownership, exact page/scope and visible-only evidence boundaries; deployed custody and migration qualification remain open."
       }
     ]
   },

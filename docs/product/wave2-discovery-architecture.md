@@ -194,4 +194,22 @@ is a protocol test, not a vCenter qualification. The output remains visible-only
 and partial; original collector signatures and mTLS ingestion are still required.
 OpenStack now verifies campaign validity before each native GET as well as after
 responses, so an expired campaign cannot perform even its first read. Actual site
-credential issuance and AHV/OpenStack HTTPS composition remain open.
+credential issuance and OpenStack HTTPS composition remain open.
+
+
+## AHV signed native HTTPS continuation
+
+[AHV HTTPS discovery](../engineering/ahv-discovery-https.md) now connects the existing
+collector to actual GETs with a signed service-account API key, exact cluster/page
+allowlist and independently witnessed read-only authority. It shares the real
+provider-neutral HTTPS mechanism with VMware, not the VMware adapter. Scope,
+authority, credential rotation, TLS identity, deadlines and response bounds are
+rechecked; failed clients do not automatically retry. Successful/empty lists stay
+visible-only and partial. API totals are not independent native coverage evidence.
+
+New owners are `adapters/ahv_credentials.py`, `adapters/ahv_https.py` and the common
+`native_https.py`. Existing collector IDs, normalizer and signed-result contracts
+remain unchanged. Site composition, key issuance/revocation, durable revision
+floors, original result signing/publication, OpenStack HTTPS and owner/dependency
+review remain open. Actual TLS fixtures test protocol enforcement, not native
+Prism support or production authority.
