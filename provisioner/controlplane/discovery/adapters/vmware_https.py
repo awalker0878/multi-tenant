@@ -22,8 +22,8 @@ from urllib.parse import urlencode, urlsplit
 from .vmware_rest import (API_RELEASE, PROFILE, FolderSelection, RestResponse,
                           collect_vmware_vms)
 from ..model import DiscoveryCampaignAuthorization, _id, _utc
-from ..native_credentials import (NativeReadHeld, SignedFileVmwareCredentialSource,
-                                  decode_json, read_protected)
+from .vmware_credentials import SignedFileVmwareCredentialSource
+from ..native_credentials import NativeReadHeld, decode_json, read_protected
 from ..trust import BoundDiscoveryIngestVerifier
 
 

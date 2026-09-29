@@ -26,8 +26,9 @@ from provisioner.controlplane.discovery.adapters import vmware_https
 from provisioner.controlplane.discovery.adapters.vmware_https import VmwareHttpsTransport
 from provisioner.controlplane.discovery.adapters.vmware_rest import PROFILE
 from provisioner.controlplane.discovery.model import _json, assemble_discovery_result
-from provisioner.controlplane.discovery.native_credentials import (
-    NativeReadHeld, SignedFileVmwareCredentialSource, selection_digest)
+from provisioner.controlplane.discovery.native_credentials import NativeReadHeld
+from provisioner.controlplane.discovery.adapters.vmware_credentials import (
+    SignedFileVmwareCredentialSource, selection_digest)
 from provisioner.controlplane.discovery.trust import (
     DiscoveryKeyEnrollment, DiscoverySignature, DiscoveryTrustPolicy,
     SignedDiscoveryIngestVerifier, SignedFileDiscoveryTrustStore,

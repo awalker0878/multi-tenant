@@ -37,7 +37,14 @@ log tokens or native error payloads. It does not retry rejected sessions.
 
 ## Native credential custody
 
-`provisioner/controlplane/discovery/native_credentials.py` loads a private regular
+The VMware binding parser and session source belong to the discovery adapter.
+`provisioner/controlplane/discovery/native_credentials.py` retains only the shared
+protected-file/JSON readers and hold exception. It has no platform-specific
+imports, branches or forwarding aliases. The unchanged architecture guard rejects
+provider decisions in generic modules, and the installed-wheel gate checks the
+same ownership boundary outside the checkout.
+
+`provisioner/controlplane/discovery/adapters/vmware_credentials.py` loads a private regular
 file, refuses symlinks/FIFOs/public permissions, verifies an independent Ed25519
 signature, and matches the session token's SHA-256 digest. It reloads on every
 check and enforces a configured minimum revision plus an in-process high-water
@@ -100,10 +107,8 @@ in separate request-local fixtures, assert the response phase was reached and
 join cancelled handlers. A deterministic post-decoding clock advance separately
 proves that valid JSON arriving after the total deadline cannot authorize later
 VM-detail reads. Tests do not disable TLS, extend production deadlines or retry
-rejected requests. The earlier combined timing test failed once in full CI and
-was not reproduced in the focused local run; these tests remove its shared
-response configuration and make the final deadline assertion independent of
-thread scheduling. The strengthened drip-body test also reproduced an unclosed
+rejected requests. The isolated tests remove shared response configuration and make the final
+deadline assertion independent of thread scheduling. The strengthened drip-body test also reproduced an unclosed
 buffered HTTP response after cancellation. The transport now explicitly closes
 that reader on success and every response-processing hold, rather than relying
 on socket closure or garbage collection.
@@ -119,6 +124,18 @@ adds transport/custody enforcement, not a new interpretation of inventory facts.
 B14 still needs deployed site composition, original result-signature custody,
 independent visibility reconciliation and native qualification. AHV/OpenStack
 native clients, B17 dependency persistence and later migration waves remain open.
+
+## Retained CI artifact reconciliation
+
+The retained repository report for `092bfa36c7ca4770f9890d3ad1359432ac610273`
+(run `36501531267`) records the deadline tests as passing. Its one failure was the
+architecture guard finding VMware-specific branching in the generic credential
+module. Earlier decoded job-log summaries did not match that retained report;
+those summaries are not used as final test evidence. The source manifest hashes
+for the deadline tests and architecture guard match the reviewed source. The
+architecture failure was reproduced locally before relocating the actual binding
+implementation into `adapters/vmware_credentials.py`, without relaxing the guard.
+The strengthened buffered-reader cleanup regression remains independently valid.
 
 ## Primary references
 
