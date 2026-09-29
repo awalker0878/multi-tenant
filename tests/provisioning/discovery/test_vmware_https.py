@@ -7,18 +7,22 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import http.client
 import json
 import os
 import ssl
 import threading
 import time
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+from provisioner.controlplane.discovery.adapters import vmware_https
 from provisioner.controlplane.discovery.adapters.vmware_https import VmwareHttpsTransport
 from provisioner.controlplane.discovery.adapters.vmware_rest import PROFILE
 from provisioner.controlplane.discovery.model import _json, assemble_discovery_result
@@ -77,34 +81,47 @@ class VmwareHttpsTests(unittest.TestCase):
                         campaign_signing_bytes(self.campaign, self.environment)))))
         self.calls, self.on_get, self.delay = [], None, 0
         self.response_status = 200
+        self.request_started = threading.Event()
+        self.headers_sent = threading.Event()
+        self.handler_finished = threading.Event()
+        self.stop_response = threading.Event()
         self.raw_body, self.extra_headers, self.drip = None, [], False
         case = self
         class Handler(BaseHTTPRequestHandler):
             def log_message(self, *args):
                 pass
             def do_GET(self):
+                # A request owns its behavior. A late handler must not read the
+                # next request's mutable delay/drip configuration.
+                delay, drip = case.delay, case.drip
                 case.calls.append((self.command, self.path, dict(self.headers)))
-                if case.on_get:
-                    case.on_get()
-                time.sleep(case.delay)
-                value = [dict(VM1)] if self.path == LIST else detail()
-                body = case.raw_body if case.raw_body is not None else json.dumps(value).encode()
+                case.request_started.set()
                 try:
+                    if case.on_get:
+                        case.on_get()
+                    if case.stop_response.wait(delay):
+                        return
+                    value = [dict(VM1)] if self.path == LIST else detail()
+                    body = case.raw_body if case.raw_body is not None else json.dumps(value).encode()
                     self.send_response(case.response_status)
                     self.send_header('Content-Type', 'application/json')
                     self.send_header('Content-Length', str(len(body)))
                     for name, value in case.extra_headers:
                         self.send_header(name, value)
                     self.end_headers()
-                    if case.drip:
+                    case.headers_sent.set()
+                    if drip:
                         for byte in body:
                             self.wfile.write(bytes([byte]))
                             self.wfile.flush()
-                            time.sleep(0.02)
+                            if case.stop_response.wait(0.02):
+                                return
                     else:
                         self.wfile.write(body)
                 except (OSError, ssl.SSLError):
                     pass
+                finally:
+                    case.handler_finished.set()
         self.server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         self.server.daemon_threads = True
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -131,6 +148,7 @@ class VmwareHttpsTests(unittest.TestCase):
         self.transport = self.client()
 
     def stop(self):
+        self.stop_response.set()
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(timeout=2)
@@ -353,14 +371,61 @@ class VmwareHttpsTests(unittest.TestCase):
         with self.assertRaises(NativeReadHeld):
             self.client(max_response_bytes=1024).get(LIST)
 
-    def test_slow_headers_and_drip_body_are_bounded_by_total_deadline(self):
-        for drip in (False, True):
-            with self.subTest(drip=drip):
-                self.drip, self.delay = drip, 0 if drip else 0.3
-                start = time.monotonic()
+    def _assert_response_deadline(self, *, headers_expected):
+        client = self.client(timeout=0.15)
+        responses = []
+        class ObservedResponse(http.client.HTTPResponse):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                responses.append(self)
+        start = time.monotonic()
+        try:
+            with patch.object(http.client.HTTPConnection, 'response_class', ObservedResponse):
                 with self.assertRaises(NativeReadHeld):
-                    self.client(timeout=0.05).get(LIST)
-                self.assertLess(time.monotonic() - start, 1.0)
+                    client.get(LIST)
+            self.assertTrue(responses, 'The response parser must have been reached')
+            self.assertTrue(all(response.isclosed() for response in responses),
+                            'Held responses must release their buffered socket readers')
+            # Prove that the intended response phase, not TLS setup, was tested.
+            self.assertTrue(self.request_started.is_set())
+            self.assertEqual(self.headers_sent.is_set(), headers_expected)
+            self.assertEqual(len(self.calls), 1)
+            self.assertEqual(client._seen_vms, set())
+            self.assertLess(time.monotonic() - start, 2.0)
+        finally:
+            self.stop_response.set()
+            self.assertTrue(self.handler_finished.wait(2), 'The fixture handler did not stop')
+
+    def test_slow_headers_are_bounded_by_total_deadline(self):
+        self.delay = 3
+        self._assert_response_deadline(headers_expected=False)
+
+    def test_drip_body_is_bounded_despite_continuous_socket_progress(self):
+        self.drip = True
+        # Valid JSON takes much longer than the deadline even though each byte
+        # arrives before the inactivity timeout. A fresh fixture owns this case.
+        self.raw_body = b'[' + b' ' * 200 + b']'
+        self._assert_response_deadline(headers_expected=True)
+
+    def test_completed_valid_json_is_not_admitted_after_total_deadline(self):
+        # Exercise the final time check deterministically, independently of
+        # server/thread scheduling. Do not patch the process-global time module.
+        expired = threading.Event()
+        monotonic = time.monotonic
+        clock = SimpleNamespace(monotonic=lambda: monotonic() + (60 if expired.is_set() else 0))
+        decode = vmware_https.decode_json
+        def late_decode(body, limit):
+            value = decode(body, limit)
+            expired.set()
+            return value
+        client = self.client()
+        with patch.object(vmware_https, 'time', clock), \
+             patch.object(vmware_https, 'decode_json', late_decode):
+            with self.assertRaises(NativeReadHeld):
+                client.get(LIST)
+        self.assertTrue(expired.is_set(), 'The fixture must reach successful JSON decoding')
+        self.assertEqual(client._seen_vms, set())
+        self.assertEqual(len(self.calls), 1)
 
     def test_request_budget_and_concurrent_reads_are_bounded(self):
         self.transport._requests = self.transport._request_limit

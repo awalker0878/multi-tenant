@@ -95,6 +95,19 @@ ephemeral CA/endpoint certificates, independently signed campaign/material/witne
 files and a synthetic REST server. It tests hardware collection, scope/path
 refusal, key separation, credential revocation during a response, token rotation,
 rollback, private-file rules, framing/JSON limits, deadlines and request budgets.
+Deadline regressions isolate slow headers and continuously arriving body bytes
+in separate request-local fixtures, assert the response phase was reached and
+join cancelled handlers. A deterministic post-decoding clock advance separately
+proves that valid JSON arriving after the total deadline cannot authorize later
+VM-detail reads. Tests do not disable TLS, extend production deadlines or retry
+rejected requests. The earlier combined timing test failed once in full CI and
+was not reproduced in the focused local run; these tests remove its shared
+response configuration and make the final deadline assertion independent of
+thread scheduling. The strengthened drip-body test also reproduced an unclosed
+buffered HTTP response after cancellation. The transport now explicitly closes
+that reader on success and every response-processing hold, rather than relying
+on socket closure or garbage collection.
+
 OpenStack negative clock tests reproduce the former first-read-after-expiry bug.
 Installed-package tests import the new owners with `tools`/`scripts` blocked.
 

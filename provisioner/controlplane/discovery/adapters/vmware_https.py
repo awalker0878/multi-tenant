@@ -146,6 +146,7 @@ class VmwareHttpsTransport:
         timer = Timer(seconds, stop)
         timer.daemon = True
         connection = None
+        response = None
         timer.start()
         try:
             raw = socket.create_connection((material.connect_ip, url.port or 443), timeout=remaining())
@@ -206,6 +207,11 @@ class VmwareHttpsTransport:
             return RestResponse(200, value)
         finally:
             timer.cancel()
+            # A partial HTTPResponse owns a buffered socket reader independently
+            # of HTTPConnection.sock. Close it on framing/parser/deadline holds
+            # as well as success; closing only the socket leaves that reader live.
+            if response is not None:
+                response.close()
             if connection is not None:
                 connection.close()
             if active[0] is not None:
