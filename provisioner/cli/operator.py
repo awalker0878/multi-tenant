@@ -20,11 +20,9 @@ from urllib.parse import quote, urlsplit
 import httpx
 import certifi
 
-from . import application_drafts, assessments
+from . import application_drafts, assessments, discovery
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
-_DISCOVERY_CURSOR = re.compile(r'^[A-Za-z0-9_-]{1,4096}$')
-_MAX_GENERATION = 2**63 - 1
 _MAX_DOCUMENT = 1024 * 1024
 _MAX_RESPONSE = 8 * 1024 * 1024
 
@@ -34,13 +32,6 @@ def _identity(value: str) -> str:
     if not _ID.fullmatch(value):
         raise ValueError('Identity must be a 1–128 character platform ID')
     return quote(value, safe='')
-
-
-def _discovery_after(value: str) -> str:
-    # Treat the server cursor as an opaque query value, never as a URL/path.
-    if not isinstance(value, str) or _DISCOVERY_CURSOR.fullmatch(value) is None:
-        raise ValueError('Invalid bounded discovery cursor')
-    return value
 
 
 def _base_url(value: str) -> str:
@@ -109,18 +100,7 @@ def build_parser() -> argparse.ArgumentParser:
     environment_register.add_argument('--file', required=True,
                                       help='Unverified selector JSON without status')
 
-    discovery = groups.add_parser('discovery',
-                                  help='Browse read-only inventory generations and objects')
-    discovery_actions = discovery.add_subparsers(dest='action', required=True)
-    generations = discovery_actions.add_parser('generations')
-    generations.add_argument('--environment', required=True)
-    generations.add_argument('--after', type=int, default=0)
-    generations.add_argument('--limit', type=int, default=50)
-    objects = discovery_actions.add_parser('objects')
-    objects.add_argument('--environment', required=True)
-    objects.add_argument('--generation', type=int, required=True)
-    objects.add_argument('--after', help='Opaque nextAfter value from the API')
-    objects.add_argument('--limit', type=int, default=50)
+    discovery.install_parser(groups)
 
     assessments.install_parser(groups)
 
@@ -194,21 +174,7 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
             params['after'] = _identity(args.after)
         return 'GET', '/v1/environments', params, None
     if args.resource == 'discovery':
-        prefix = '/v1/environments/' + _identity(args.environment)
-        if not 1 <= args.limit <= 100:
-            raise ValueError('Discovery limit must be between 1 and 100')
-        if args.action == 'generations':
-            if not 0 <= args.after <= _MAX_GENERATION:
-                raise ValueError('Invalid discovery generation cursor')
-            return ('GET', prefix + '/discovery/generations',
-                    {'after': args.after, 'limit': args.limit}, None)
-        if not 1 <= args.generation <= _MAX_GENERATION:
-            raise ValueError('Invalid discovery generation')
-        params = {'limit': args.limit}
-        if args.after is not None:
-            params['after'] = _discovery_after(args.after)
-        return ('GET', prefix + '/discovery/generations/'
-                + str(args.generation) + '/objects', params, None)
+        return discovery.request(args, _identity)
     if args.resource == 'plans':
         return 'GET', '/v1/plans/' + _identity(args.id) + '/review', None, None
     if args.resource == 'workloads':
@@ -250,7 +216,7 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
 
 
 def _read_response(response: httpx.Response, *, strict: bool = False,
-                   maximum: int | None = None) -> dict:
+                   maximum: int | None = None, expected_length: int | None = None) -> dict:
     maximum = min(_MAX_RESPONSE, maximum) if maximum is not None else _MAX_RESPONSE
     size = 0
     chunks = []
@@ -259,6 +225,8 @@ def _read_response(response: httpx.Response, *, strict: bool = False,
         if size > maximum:
             raise ValueError('API response exceeds the CLI size limit')
         chunks.append(chunk)
+    if expected_length is not None and size != expected_length:
+        raise ValueError('API response length differs from its declaration')
     if strict:
         return application_drafts.decode_document(b''.join(chunks), maximum)
     try:
@@ -277,6 +245,8 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
     draft_save_attempted = False
     draft_request_started = False
     comparison_started = False
+    freshness_started = False
+    freshness = args.resource == 'discovery' and args.action == 'freshness'
     application_compare = args.resource == 'assessments' and args.action == 'compare-application'
     document = None
     try:
@@ -290,20 +260,42 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
         verify.verify_flags |= ssl.VERIFY_X509_STRICT | ssl.VERIFY_X509_PARTIAL_CHAIN
         verify.load_verify_locations(cafile=args.ca_bundle or certifi.where())
         headers = {'Authorization': 'Bearer ' + credential, 'Accept': 'application/json'}
-        if application_compare or args.resource == 'application-drafts' and args.action == 'review':
+        if freshness or application_compare or args.resource == 'application-drafts' and args.action == 'review':
             headers['Cache-Control'] = 'no-store'
+        if freshness:
+            headers['Accept-Encoding'] = 'identity'
         if args.resource == 'jobs' and args.action == 'submit':
             headers['Idempotency-Key'] = args.idempotency_key
         with httpx.Client(timeout=httpx.Timeout(10.0, connect=5.0),
                           follow_redirects=False, trust_env=False, verify=verify,
                           transport=transport) as client:
+            freshness_started = freshness
             comparison_started = application_compare
             draft_request_started = args.resource == 'application-drafts'
             draft_save_attempted = draft_request_started and args.action == 'save'
             with client.stream(method, base + path, params=params,
                                headers=headers, json=document) as response:
-                payload = _read_response(response, strict=application_compare or args.resource == 'application-drafts',
-                    maximum=assessments.MAX_RESPONSE_BYTES if application_compare else None)
+                expected_length = None
+                if freshness:
+                    encodings = response.headers.get_list('content-encoding')
+                    lengths = response.headers.get_list('content-length')
+                    if (len(encodings) > 1 or encodings and encodings[0].lower() != 'identity'
+                            or len(lengths) > 1):
+                        raise ValueError('Ambiguous freshness encoding or length')
+                    if lengths:
+                        if (not re.fullmatch(r'[0-9]{1,5}', lengths[0])
+                                or int(lengths[0]) > discovery.MAX_FRESHNESS_BYTES):
+                            raise ValueError('Freshness response exceeds its bound')
+                        expected_length = int(lengths[0])
+                    media_types = response.headers.get_list('content-type')
+                    if (len(media_types) != 1 or
+                            media_types[0].split(';', 1)[0].strip().lower() != 'application/json'):
+                        raise ValueError('Freshness response must be JSON')
+                payload = _read_response(response,
+                    strict=freshness or application_compare or args.resource == 'application-drafts',
+                    maximum=(discovery.MAX_FRESHNESS_BYTES if freshness else
+                             assessments.MAX_RESPONSE_BYTES if application_compare else None),
+                    expected_length=expected_length)
                 status = response.status_code
         conflict = (status == 409 and isinstance(payload.get('error'), dict)
                     and payload['error'].get('code') == 'APPLICATION_DRAFT_CONFLICT')
@@ -331,9 +323,14 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
                 environment=args.source_environment, id=args.application_group, revision=args.draft_revision,
                 record_digest=args.draft_record_digest), payload.get('applicationReview'))
             assessments.validate_application_response(document, payload)
+        healthy = True
+        if freshness:
+            if status != 200:
+                raise ValueError('Freshness requires an exact response')
+            healthy = discovery.validate_freshness(args.environment, payload)
         print(json.dumps(payload, sort_keys=True, separators=(',', ':')),
               file=stdout)
-        return 0
+        return 4 if freshness and args.check and not healthy else 0
     except KeyboardInterrupt:
         outcome = (application_drafts.save_unknown(args, document) if draft_save_attempted
                    else {'error': 'INTERRUPTED'})
@@ -345,7 +342,9 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
         if draft_save_attempted:
             print(json.dumps(application_drafts.save_unknown(args, document)), file=stderr)
             return 3
-        if comparison_started and isinstance(exc, ValueError):
+        if freshness_started and isinstance(exc, ValueError):
+            code = 'DISCOVERY_FRESHNESS_RESPONSE_INVALID'
+        elif comparison_started and isinstance(exc, ValueError):
             code = 'APPLICATION_COMPARISON_RESPONSE_INVALID'
         elif draft_request_started and isinstance(exc, ValueError):
             code = 'APPLICATION_DRAFT_RESPONSE_INVALID'
