@@ -19,6 +19,7 @@ from .adapters.collector_config import create_native_collector
 from .collector_settings import DiscoveryCollectorSettings, MAX_CONFIG_BYTES
 from .ingest import _campaign, _signature
 from .model import _id, _utc
+from .read_budget import NativeReadGate
 from .native_credentials import decode_json, read_protected
 from .publication import DiscoveryPublicationHeld, PrivateDiscoveryOutbox, PrivateFileDiscoveryResultSigner, stage_submission
 from .publication_https import DiscoveryHttpsPublisher, DiscoveryPublicationUnknown
@@ -29,21 +30,33 @@ from .witness import SignedFileDiscoveryCredentialAuthority
 FORMAT = 'hosting-discovery-collector-outcome/1'
 
 
-def execute(config_path, action: str, *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict:
+def execute(config_path, action: str, *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+            config_digest: str | None = None, campaign_digest: str | None = None,
+            environment_id: str | None = None, read_gate: NativeReadGate | None = None) -> dict:
     """Perform one requested action; return only bounded non-secret outcome metadata."""
     if action not in ('stage', 'publish') or not callable(clock):
         raise ValueError('An explicit stage or publish action is required')
-    settings = DiscoveryCollectorSettings.from_file(config_path)
+    settings = DiscoveryCollectorSettings.from_file(config_path, expected_digest=config_digest)
     document = _keys(decode_json(read_protected(settings.campaign_file, MAX_CONFIG_BYTES), MAX_CONFIG_BYTES),
                      {'environmentId', 'campaign', 'campaignSignature'})
     campaign, signature = _campaign(document['campaign']), _signature(document['campaignSignature'])
     environment = document['environmentId']
     if not _id(environment):
         raise ValueError('An exact environment identity is required')
+    if campaign_digest is not None and campaign.digest() != campaign_digest:
+        raise DiscoveryPublicationHeld('Campaign differs from its scheduled authorization')
+    if environment_id is not None and environment != environment_id:
+        raise DiscoveryPublicationHeld('Environment differs from its scheduled selection')
+    if read_gate is not None:
+        if not isinstance(read_gate, NativeReadGate):
+            raise TypeError('An endpoint read gate is required')
+        read_gate.require_scope(campaign.scope)
     previous = campaign.issued_at
 
     def now():
         nonlocal previous
+        if read_gate is not None:
+            read_gate.check()
         at = clock()
         if not _utc(at) or not previous <= at < campaign.expires_at:
             raise DiscoveryPublicationHeld('Collector campaign expired or clock regressed')
@@ -74,7 +87,7 @@ def execute(config_path, action: str, *, clock: Callable[[], datetime] = lambda:
             def collect():
                 nonlocal collected
                 native = create_native_collector(settings.native_json, campaign, environment,
-                                                  verifier.bind(signature), now)
+                                                  verifier.bind(signature), now, read_gate=read_gate)
                 collected = True
                 return native.collect()
 
@@ -106,12 +119,17 @@ class _Parser(argparse.ArgumentParser):
 
 def main(argv=None) -> int:
     parser = _Parser(description=__doc__, allow_abbrev=False)
-    parser.add_argument('action', choices=('stage', 'publish'))
+    parser.add_argument('action', choices=('stage', 'publish', 'batch-stage'))
     parser.add_argument('--config', required=True, help='Absolute protected collector JSON file')
     try:
         args = parser.parse_args(argv)
-        result = execute(args.config, args.action)
-        code = 0
+        if args.action == 'batch-stage':
+            from .batch_runtime import run_batch
+            result = run_batch(args.config)
+            code = 0 if result['status'] == 'BATCH_EVALUATED' else 2
+        else:
+            result = execute(args.config, args.action)
+            code = 0
     except DiscoveryPublicationUnknown as exc:
         result = {'format': FORMAT, 'status': 'DELIVERY_UNKNOWN', 'requestDigest': exc.request_digest,
                   'phase': exc.phase, 'reconciliationRequired': True, 'executionAuthorized': False}

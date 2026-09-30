@@ -1,6 +1,8 @@
 """Protected one-shot collector configuration; no credentials or authority are issued."""
 from __future__ import annotations
 
+import hashlib
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -69,8 +71,12 @@ class DiscoveryCollectorSettings:
     publish_timeout: float = 5.0
 
     @classmethod
-    def from_file(cls, path: str | Path) -> DiscoveryCollectorSettings:
+    def from_file(cls, path: str | Path, *, expected_digest: str | None = None) -> DiscoveryCollectorSettings:
         raw = read_protected(protected_path(str(path)), MAX_CONFIG_BYTES)
+        if expected_digest is not None and (not isinstance(expected_digest, str)
+                or re.fullmatch(r'[0-9a-f]{64}', expected_digest) is None
+                or hashlib.sha256(raw).hexdigest() != expected_digest):
+            raise ValueError('Collector configuration differs from its scheduled bytes')
         doc = decode_json(raw, MAX_CONFIG_BYTES)
         required = {'format', 'campaignFile', 'outboxRoot', 'trust', 'witness'}
         optional = {'native', 'signer', 'publisher'}
