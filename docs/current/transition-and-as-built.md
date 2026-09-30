@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -59,8 +59,9 @@ writer. Conversion failure preserves the hold and original evidence.
 The repository's engineering profiles have no selected installed tuples or native-
 qualified claims. The admitted Temporal job is an authority gate, not a completed
 provisioning/migration run. Discovery has signed publication/comparison components;
-collector/profile wiring, persistent owner/dependency review and scheduling remain
-open. Lower-level provisioning and transfer contracts do not close the missing
+the installed collector now composes native reads, signing and publication. Draft
+membership/dependency assertions are persisted; formal owner review, deployed
+credential custody and scheduling remain open. Lower-level provisioning and transfer contracts do not close the missing
 orchestration, fencing, cutover and post-write recovery paths.
 
 Record B01–B50 implementation, automated verification, native qualification and
@@ -84,6 +85,23 @@ source restart, key disposal, old-writer activation or target deletion.
 
 See [verified research decisions](../engineering/platform-migration-research.md) and
 [existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
+
+### Persisted application drafts and attributed assertions
+
+The control API now stores immutable, revisioned application proposals pinned to
+an exact observed discovery generation. Selected members must be observed VMs;
+partial inventory may support a draft but never an accepted or complete application.
+The authenticated author and database time are separate from asserted owner IDs,
+dependency sources and consistency groups. Unresolved dependencies remain visible.
+Saving a draft creates no owner review, adoption, capability claim or execution grant.
+
+The [application-draft contract](../engineering/application-drafts.md) defines the
+actual package owners, scoped PUT/GET routes, expected-revision conflict checks,
+original retry semantics, SQL migration and deployment grants. Source-generation
+publication and draft creation share their cooperative lock; authority is rechecked
+after waits and before commit. Exact retries retain original author/time; later
+source generations are reported without relabelling history. Formal owner review,
+independent enrichment verification, portal/CLI editing and B17 closure remain open.
 
 ## Engineering and implementation handoff
 

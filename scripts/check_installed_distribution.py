@@ -47,7 +47,7 @@ try:
     from provisioner.compiler import components, wsd
     from provisioner.controlplane.discovery import collector_runtime, collector_settings
     from provisioner.controlplane.discovery.adapters import collector_config
-    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https
+    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
     assert not hasattr(native_credentials, 'SignedFileVmwareCredentialSource')
@@ -61,6 +61,8 @@ try:
     assert not hasattr(native_credentials, 'SignedFileOpenStackCredentialSource')
     assert openstack_https.read_json is native_https.read_json
     assert vmware_https.read_json is native_https.read_json
+    assert application_drafts.ApplicationDraftRepository.__module__ == application_drafts.__name__
+    assert grouping.validate_draft.__module__ == grouping.__name__
     assert publication.stage_submission.__module__ == publication.__name__
     assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
     assert callable(publication.PrivateDiscoveryOutbox.for_campaign)
@@ -94,7 +96,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -119,6 +121,7 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0017_site_lock_guards.sql',
     'provisioner/controlplane/persistence/migrations/0018_site_role_superuser_classification.sql',
     'provisioner/controlplane/persistence/migrations/0019_discovery_inventory.sql',
+    'provisioner/controlplane/persistence/migrations/0021_application_drafts.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/style.css',

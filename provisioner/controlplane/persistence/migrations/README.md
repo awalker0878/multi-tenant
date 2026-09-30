@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0019`
+for the migration role. The runner applies packaged migrations `0001`–`0021`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -27,6 +27,8 @@ GRANT SELECT ON hosting_controlplane.discovery_campaigns,
     hosting_controlplane.discovery_generations,
     hosting_controlplane.discovery_observations,
     hosting_controlplane.discovery_absence_candidates TO hosting_runtime;
+GRANT SELECT, INSERT ON hosting_controlplane.application_draft_revisions
+    TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.enterprise_record_history
     TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.audit_events TO hosting_runtime;
@@ -188,3 +190,22 @@ storage writer, or external administrator. An expired lease remains held and
 cannot be automatically reacquired. Recovery requires an independently reviewed
 reconciliation operation in B11. A lease expiry alone cannot authorize another
 production writer. The route must separately prove native exclusion.
+
+## Application drafts and immutable history
+
+Migration `0020` retains independently signed assessment inputs separately from
+runtime-issued assertions. Migration `0021` adds `application_draft_revisions` for
+unreviewed human proposals, with exact environment/generation/result foreign keys,
+consecutive revisions, append-only history, tenant FORCE RLS and explicit site-worker
+exclusion. Grant only the API runtime SELECT/INSERT on the new table plus its existing
+discovery SELECT and audit INSERT/sequence privileges. The runtime must not have
+UPDATE/DELETE/TRUNCATE, trigger ownership or a generic SQL endpoint. Discovery ingest
+and site-worker roles need no proposal-writing privileges.
+
+Apply 0021 through the existing checksum-bound runner. Its added uniqueness constraint
+on discovery generations may lock/index existing data; plan the reviewed deployment
+window accordingly. It performs no ownership or approval conversion. Original
+inventory, drafts, audit checkpoints and migration history must survive restore
+together; the disposable restore gate explicitly checks the new table. See
+[the application-draft contract](../../../../docs/engineering/application-drafts.md)
+for exact scope, retry, source-lock and operational limitations.

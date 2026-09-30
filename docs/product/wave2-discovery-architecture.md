@@ -1,6 +1,7 @@
 # Wave 2 read-only discovery and comparison
 
-Status: B14–B22 are partially implemented. The installed-collector checkpoint
+Status: B14–B22 are partially implemented. The latest application-draft checkpoint
+below records durable unreviewed proposals separately from formal owner review. The installed-collector checkpoint
 below distinguishes working command/library composition from deployed custody gaps. Authenticated publication and scoped
 comparison are available in the repository; native collector integration, full
 fact coverage, scheduling and estate acceptance remain open. No native route is
@@ -283,3 +284,24 @@ not a forwarding shim or new SQL writer. Deployed site custody, persistent revis
 floors, independent visibility, full facts, B17 persistence and B22 fleet scheduling
 still require implementation/qualification. The existing one-MiB aggregate and
 pre-reference recovery limitations remain explicit.
+
+## Generation-bound application drafts — 29 September 2026
+
+The [application-draft API and store](../engineering/application-drafts.md) persist
+membership, proposed consistency and dependency assertions without modifying native
+inventory. Drafts can select actually observed members from partial generations;
+reviewed candidates retain their prior COMPLETE requirement and exact owner review.
+Authenticated authors/database timestamps are separate from logical owner and source
+claims. Both known and unresolved dependencies remain in the immutable proposal.
+
+Each new revision pins the latest fresh source, uses expected-revision comparison,
+and atomically appends its audit event. Source publication and saving share a scoped
+advisory lock; current authorization is rechecked after waiting and before commit.
+Exact retries retain the original record, while historical GETs identify superseded
+source pins. No accepted ownership, review result or execution permission is created.
+Migration 0021 and existing API role checks protect tenant/native scope and history.
+
+Formal reviewed-decision persistence, independent enrichment, owner acceptance and
+revocation, review-consuming comparison and portal/CLI editing remain open. This
+checkpoint supersedes earlier statements that all application drafts were purely
+in-memory; it does not close B17/B20 or any native migration acceptance gate.

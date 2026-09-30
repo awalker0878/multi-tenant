@@ -6,7 +6,7 @@
 
 This is the current execution addendum to the [historical audit and implementation plan](enterprise-workload-mobility-audit-and-implementation-plan.md).
 Preserve that audit's revision, findings and evidence. Its September 26 baseline must not be presented as the current code.
-The latest installed-collector checkpoint is recorded at the end of section 8.
+The latest application-draft checkpoint is recorded at the end of section 8.
 Earlier dated checkpoints retain their historical limits; the latest checkpoint distinguishes installed command/library paths from remaining deployment work.
 The B01–B50 identifiers remain stable. This addendum refines their sequence and completion evidence rather than replacing them with a second backlog.
 The older W01–W29 automation ledger and C01–C13 interface-refactor gates describe earlier scopes; neither closes this product programme.
@@ -521,3 +521,32 @@ facts, scheduling/concurrency, larger publication and estate benchmarks. Pre-ref
 outboxes need reviewed reconciliation, not automatic rescanning. B17 owner/dependency
 persistence and all later admitted provisioning/migration/qualification gates remain
 open; no native site, guest or production dataset was contacted in this increment.
+
+### B17/B20 continuation — durable application drafts, 29 September 2026
+
+The [application-draft owner](../engineering/application-drafts.md) now persists
+unreviewed application membership, dataset/consistency proposals, startup order and
+explicit dependency assertions through the existing authenticated control API.
+The selected latest source generation is rebuilt and digest-verified; all proposed
+members must be observed VMs. Partial inventory can support drafting, not acceptance.
+The logical owner and asserted external sources are never treated as verified actors.
+
+Immutable revisions bind exact tenant/environment/native scope, source generation,
+proposal content, authenticated author and database time. Expected-revision conflicts
+prevent competing edits; exact same-actor retries return the original record. New
+source generations invalidate a new save against older inventory, while history and
+retries report supersession. Current session/scope/evidence is rechecked after lock
+waits and before the draft and audit transaction commits. Migration 0021 adds exact
+foreign keys, append-only/consecutive revisions and tenant/worker SQL protections.
+
+Implemented routes are scoped PUT/GET with exact historical revision selection.
+Responses always remain UNREVIEWED with ownershipAccepted and executionAuthorized
+false. No fake owner review, compatibility alias, native mutation or new worker
+permission is added. Automated tests cover contract, HTTP, SQL, concurrency, retry,
+revocation, restore and installed ownership; final-revision results belong in the PR.
+
+This advances B17/B20, not their full closure: independent enrichment verification,
+formal owner acceptance/revocation, persisted reviewed decisions, review-consuming
+assessment, portal/CLI editing and draft listing remain open. B22 scheduling/scale,
+independent visibility, remaining native facts, B05 and later provision/migrate/
+qualification waves keep their existing gates. No vendor installation was contacted.

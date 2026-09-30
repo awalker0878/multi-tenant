@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.9 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.10 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -168,6 +168,23 @@ real-TLS tests exercise fresh-process recovery; database and installed-wheel che
 cover publication identity and package ownership. Deployed credential/signer custody,
 independent retention, durable revision floors, visibility, B17 and B22 remain open.
 The command is not a scheduler, credential issuer, migration workflow or native qualification.
+
+### Persisted application drafts and attributed assertions
+
+The control API now stores immutable, revisioned application proposals pinned to
+an exact observed discovery generation. Selected members must be observed VMs;
+partial inventory may support a draft but never an accepted or complete application.
+The authenticated author and database time are separate from asserted owner IDs,
+dependency sources and consistency groups. Unresolved dependencies remain visible.
+Saving a draft creates no owner review, adoption, capability claim or execution grant.
+
+The [application-draft contract](../engineering/application-drafts.md) defines the
+actual package owners, scoped PUT/GET routes, expected-revision conflict checks,
+original retry semantics, SQL migration and deployment grants. Source-generation
+publication and draft creation share their cooperative lock; authority is rechecked
+after waits and before commit. Exact retries retain original author/time; later
+source generations are reported without relabelling history. Formal owner review,
+independent enrichment verification, portal/CLI editing and B17 closure remain open.
 
 ## Engineering and implementation handoff
 

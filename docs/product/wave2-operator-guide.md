@@ -1,8 +1,8 @@
 # Wave 2 operator guide: observed inventory and destination comparison
 
 Status: authenticated ingestion and read-only destination comparison are
-implemented in the repository. Native collector integration, production
-deployment and site qualification remain open. See the
+implemented in the repository, alongside the installed collector and revisioned
+application-draft API. Production deployment and site qualification remain open. See the
 [architecture and acceptance sequence](wave2-discovery-architecture.md).
 
 ## Read an authorized generation
@@ -125,10 +125,30 @@ equivalence and recovery reviews tied to both generation digests. Estimated
 copy time, when measured size and throughput exist, has **low** confidence and
 describes only the arithmetic copy phase. It is not an outage estimate.
 
-An application grouping is an owner-reviewed proposal with attributed and
-unresolved dependencies, not accepted membership. A brownfield adoption
-proposal is a no-change review artifact; ownership collision or unknown
-facts hold it. Neither proposal writes a native object or adopts a VM.
+Application drafts are now stored as UNREVIEWED proposals with an authenticated
+author and explicit known/unknown dependencies. The asserted owner is not the
+verified author and saving does not accept membership. The separate reviewed-
+candidate model still requires exact external owner review. Brownfield adoption
+remains a no-change review artifact; none of these drafts adopts or mutates a VM.
+
+## Save and read an application draft
+
+Use `PUT /v1/environments/{id}/application-drafts/{applicationGroupId}` with an
+exact-scope EXECUTION_OPERATOR grant, current inventory generation/result digest,
+`expectedRevision` (zero for a new draft), `draft` and `dependencies`. See the
+[complete request contract](../engineering/application-drafts.md) for the bounded
+member, dataset, consistency, startup and dependency fields. Duplicate/extra fields
+and caller-supplied approval or actor claims are rejected. No draft-editing portal
+or CLI command is supplied yet.
+
+Read latest draft state with GET on the same route, or select immutable history
+with `?revision=N`. JOB_READER and EXECUTION_OPERATOR may read within their exact
+native scopes. Editing appends a revision; it never overwrites history. A 409 means
+the expected revision or new-save source selection changed: review the new state
+rather than automatically retrying modified content. An exact lost-response retry
+can return the original, now-superseded source pin with `sourceSuperseded: true`.
+That flag does not assess source freshness or completeness. Every response remains
+UNREVIEWED, without accepted ownership or execution authorization.
 
 ## Site qualification still required
 
@@ -137,8 +157,9 @@ selected folders, with a 4,000-visible-VM list limit and no native cursor.
 Inherited privilege gaps can hide objects. The AHV adapter assumes a pinned
 Prism Central VMM v4.0 installed profile and exact cluster; the OpenStack
 adapter assumes pinned HTTPS Nova/Cinder/Neutron catalog roots and a
-project-scoped read role. These are bounded, injected GET transports and local
-conformance tests, not deployed native collectors or proof of coverage.
+project-scoped read role. All three now have actual bounded HTTPS clients and an
+[installed stage/publish command](../engineering/discovery-collector-runtime.md).
+Protocol/integration tests are not proof of deployed custody or complete coverage.
 
 Before publishing production observations, the site owner must select and
 qualify the actual installed API/product tuple, constrained read credential,

@@ -274,3 +274,18 @@ Site-capacity tests also pin the exact qualification dossier SHA-256, approval d
 ## Qualification campaign evidence assurance
 
 `python -m provisioner.qualification.campaign --as-of 2026-09-19T16:30:00Z` validates exported campaign scope against a reviewed target selection, exact restricted campaign authorization, explicit assertion applicability, retained attempt chronology, evidence references/hashes/freshness, positive-control dependencies for negative observations and residual-gap state. Tests also prove that attempts after the authorized contact expiry are rejected while evidence collected inside a prior valid window may remain current after contact authority later becomes due; no new target contact is granted. `python scripts/check_qualification_campaign_readiness.py examples/qualification_campaign_readiness_intent.json.example --as-of 2026-09-19T16:30:00Z --expected-status HOLD_NO_CURRENT_QUALIFICATION_CAMPAIGN_EVIDENCE` verifies the active empty campaign index remains fail-closed. Tests preserve failed/blocked historical attempts, require the latest mandatory evidence to be current and passing (or explicitly reviewed not-applicable), reject target/scope drift and embedded qualification/production authority, and keep target-contact/native-test/qualification/registry/apply/activation authority flags false.
+
+## Revisioned application drafts
+
+Run:
+
+```sh
+python -m unittest tests.provisioning.discovery.test_application_draft_contract tests.provisioning.discovery.test_grouping tests.provisioning.api.test_application_drafts_http
+```
+ The dedicated disposable PostgreSQL job additionally runs
+`tests.provisioning.controlplane.test_application_drafts_postgres`, covering actual
+API/storage composition, concurrent revisions, exact retries, stale sources,
+authorization after waits, rollback and database constraints. Missing database roles
+must be reported as skips, not a persistence pass. Existing dump/restore and installed-
+package checks include migration 0021 and its actual repository owner. These tests
+never qualify an installed vendor platform or approve application ownership.
