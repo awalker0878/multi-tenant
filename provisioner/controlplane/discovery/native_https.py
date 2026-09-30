@@ -8,6 +8,7 @@ sent, and before any response is returned. No fallback transport exists.
 from __future__ import annotations
 
 import hashlib
+from contextlib import nullcontext
 import http.client
 import ipaddress
 import re
@@ -20,6 +21,7 @@ from typing import Callable, Mapping
 from urllib.parse import urlsplit
 
 from .native_credentials import NativeReadHeld, decode_json, read_protected
+from .read_budget import NativeReadGate
 
 
 def read_json(*, origin: str, connect_ip: str, ca_digest: str,
@@ -27,7 +29,8 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
               timeout: float, max_response_bytes: int,
               authorize: Callable[[], None],
               request_headers: Mapping[str, str] | None = None,
-              response_headers: Mapping[str, str] | None = None) -> tuple[int, object]:
+              response_headers: Mapping[str, str] | None = None,
+              read_gate: NativeReadGate | None = None) -> tuple[int, object]:
     """Perform one bounded GET on an already selected native endpoint.
 
     The absolute deadline includes trust-file loading, TLS, HTTP and decoding.
@@ -48,7 +51,8 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
             or any(not 33 <= ord(c) <= 126 for c in credential)
             or type(timeout) not in (int, float) or not 0 < timeout <= 15
             or type(max_response_bytes) is not int or not 1024 <= max_response_bytes <= 4*1024*1024
-            or not callable(authorize)):
+            or not callable(authorize)
+            or read_gate is not None and not isinstance(read_gate, NativeReadGate)):
         raise NativeReadHeld('Invalid bounded native HTTPS configuration')
     # Copy bounded public protocol headers; never allow overrides of custody or
     # HTTP framing. Adapters own their version values, not this neutral mechanism.
@@ -93,7 +97,21 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
     connection = None
     response = None
     timer.start()
+    permit = read_gate.permit(deadline, authorize) if read_gate is not None else nullcontext()
+    entered = False
+    original_authorize = authorize
+
+    def current_authorize():
+        if read_gate is not None:
+            read_gate.check()
+        original_authorize()
+        if read_gate is not None:
+            read_gate.check()
+
+    authorize = current_authorize
     try:
+        permit.__enter__()
+        entered = True
         authorize()
         ca = read_protected(ca_bundle, 1024 * 1024, secret=False)
         if hashlib.sha256(ca).hexdigest() != ca_digest:
@@ -152,11 +170,20 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
         return 200, value
     finally:
         timer.cancel()
-        # HTTPResponse owns a buffered reader independently of connection.sock.
-        if response is not None:
-            response.close()
-        if connection is not None:
-            connection.close()
-        if active[0] is not None:
-            active[0].close()
-        timer.join()
+        try:
+            # Buffered readers are independently owned; release all local resources
+            # before making the endpoint concurrency slot available to another GET.
+            try:
+                if response is not None:
+                    response.close()
+            finally:
+                try:
+                    if connection is not None:
+                        connection.close()
+                finally:
+                    if active[0] is not None:
+                        active[0].close()
+        finally:
+            timer.join()
+            if entered:
+                permit.__exit__(None, None, None)

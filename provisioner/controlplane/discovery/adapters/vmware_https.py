@@ -20,6 +20,7 @@ from ..model import DiscoveryCampaignAuthorization, _id, _utc
 from .vmware_credentials import SignedFileVmwareCredentialSource
 from ..native_credentials import NativeReadHeld
 from ..native_https import read_json
+from ..read_budget import NativeReadGate, NativeReadAdmissionHeld
 from ..trust import BoundDiscoveryIngestVerifier
 
 
@@ -36,7 +37,8 @@ class VmwareHttpsTransport:
                  environment_id: str, *, verifier: BoundDiscoveryIngestVerifier,
                  credentials: SignedFileVmwareCredentialSource, ca_bundle: str | Path,
                  timeout: float = 5.0, max_response_bytes: int = 4 * 1024 * 1024,
-                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)):
+                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+                 read_gate: NativeReadGate | None = None):
         if (not isinstance(campaign, DiscoveryCampaignAuthorization)
                 or not isinstance(selection, FolderSelection) or campaign.scope != selection.scope
                 or campaign.scope.platform_family != 'vmware' or campaign.collector_id != PROFILE
@@ -56,6 +58,12 @@ class VmwareHttpsTransport:
             raise ValueError('Exact VMware campaign and bounded native read configuration required')
         self._campaign, self._selection, self._environment = campaign, selection, environment_id
         self._verifier, self._credentials, self._ca = verifier, credentials, Path(ca_bundle)
+        if read_gate is not None:
+            if not isinstance(read_gate, NativeReadGate):
+                raise TypeError('A native endpoint read gate is required')
+            read_gate.require_scope(campaign.scope)
+        self._read_gate = read_gate
+        self._admission_failed = False
         self._timeout, self._max_bytes, self._clock = timeout, max_response_bytes, clock
         self._last_time = campaign.issued_at
         self._lock = Lock()
@@ -78,6 +86,10 @@ class VmwareHttpsTransport:
         return True  # The GET allowlist is enforced here; native RBAC is witnessed below.
 
     def _now(self):
+        if self._read_gate is not None:
+            self._read_gate.check()
+        if self._admission_failed:
+            raise NativeReadAdmissionHeld('Native read admission did not complete')
         now = self._clock()
         if not _utc(now) or not self._last_time <= now < self._campaign.expires_at:
             raise NativeReadHeld('Native read campaign expired or clock regressed')
@@ -110,7 +122,8 @@ class VmwareHttpsTransport:
                 raise NativeReadHeld('Native read path or request budget is not admitted')
             self._requests += 1
             return self._get(path)
-        except Exception:
+        except Exception as exc:
+            self._admission_failed |= isinstance(exc, NativeReadAdmissionHeld)
             # Neither provider exceptions nor native error bodies enter evidence.
             raise NativeReadHeld('Verified VMware HTTPS read unavailable') from None
         finally:
@@ -127,7 +140,7 @@ class VmwareHttpsTransport:
             ca_digest=material.ca_digest, ca_bundle=self._ca, path=path,
             credential_header='vmware-api-session-id', credential=material.token,
             timeout=min(self._timeout, (self._campaign.expires_at - self._now()).total_seconds()),
-            max_response_bytes=self._max_bytes, authorize=current)
+            max_response_bytes=self._max_bytes, authorize=current, read_gate=self._read_gate)
         if status == 200 and path in self._list_paths:
             if not isinstance(value, list) or len(value) >= 4000:
                 raise NativeReadHeld('Native list is malformed or potentially truncated')

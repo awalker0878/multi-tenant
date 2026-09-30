@@ -12,7 +12,7 @@ from ..native_credentials import decode_json
 from ..trust import _decode, _keys
 
 
-def _ahv(row, campaign, environment, verifier, clock, key):
+def _ahv(row, campaign, environment, verifier, clock, key, read_gate):
     from .ahv_https import AhvHttpsTransport
     from .ahv_credentials import SignedFileAhvCredentialSource
     _keys(row['selection'], set())
@@ -21,10 +21,10 @@ def _ahv(row, campaign, environment, verifier, clock, key):
         credentials=SignedFileAhvCredentialSource(protected_path(row['credentialFile']),
             authority_public_key=key, minimum_revision=row['minimumRevision']),
         ca_bundle=protected_path(ca['native']), timeout=row['timeoutSeconds'],
-        max_response_bytes=row['maxResponseBytes'], clock=clock)
+        max_response_bytes=row['maxResponseBytes'], clock=clock, read_gate=read_gate)
 
 
-def _vmware(row, campaign, environment, verifier, clock, key):
+def _vmware(row, campaign, environment, verifier, clock, key, read_gate):
     from .vmware_https import VmwareHttpsTransport
     from .vmware_credentials import SignedFileVmwareCredentialSource
     from .vmware_rest import FolderSelection
@@ -39,10 +39,10 @@ def _vmware(row, campaign, environment, verifier, clock, key):
         credentials=SignedFileVmwareCredentialSource(protected_path(row['credentialFile']),
             authority_public_key=key, minimum_revision=row['minimumRevision']),
         ca_bundle=protected_path(ca['native']), timeout=row['timeoutSeconds'],
-        max_response_bytes=row['maxResponseBytes'], clock=clock)
+        max_response_bytes=row['maxResponseBytes'], clock=clock, read_gate=read_gate)
 
 
-def _openstack(row, campaign, environment, verifier, clock, key):
+def _openstack(row, campaign, environment, verifier, clock, key, read_gate):
     from .openstack import OpenStackServiceEndpoints
     from .openstack_credentials import SignedFileOpenStackCredentialSource
     from .openstack_https import OpenStackHttpsTransport
@@ -54,7 +54,7 @@ def _openstack(row, campaign, environment, verifier, clock, key):
         credentials=SignedFileOpenStackCredentialSource(protected_path(row['credentialFile']),
             authority_public_key=key, minimum_revision=row['minimumRevision']),
         ca_bundles={name: protected_path(value) for name, value in ca.items()},
-        timeout=row['timeoutSeconds'], max_response_bytes=row['maxResponseBytes'], clock=clock)
+        timeout=row['timeoutSeconds'], max_response_bytes=row['maxResponseBytes'], clock=clock, read_gate=read_gate)
 
 
 # Exact existing collector IDs are admission selectors, not new capability claims.
@@ -65,9 +65,9 @@ _FACTORIES = {
 }
 
 
-def create_native_collector(native_json, campaign, environment, verifier, clock):
+def create_native_collector(native_json, campaign, environment, verifier, clock, *, read_gate=None):
     row = decode_json(native_json.encode('ascii'), MAX_CONFIG_BYTES)
     if row['profile'] != campaign.collector_id or row['profile'] not in _FACTORIES:
         raise ValueError('The native profile is not the exact admitted collector')
     key = Ed25519PublicKey.from_public_bytes(_decode(row['authorityKey'], 32))
-    return _FACTORIES[row['profile']](row, campaign, environment, verifier, clock, key)
+    return _FACTORIES[row['profile']](row, campaign, environment, verifier, clock, key, read_gate)

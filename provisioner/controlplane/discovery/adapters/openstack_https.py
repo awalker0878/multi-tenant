@@ -20,6 +20,7 @@ from .openstack_credentials import API_VERSIONS, COLLECTOR_ID, SignedFileOpenSta
 from ..model import DiscoveryCampaignAuthorization, _id, _utc
 from ..native_credentials import NativeReadHeld
 from ..native_https import read_json
+from ..read_budget import NativeReadGate, NativeReadAdmissionHeld
 from ..trust import BoundDiscoveryIngestVerifier
 
 
@@ -36,7 +37,8 @@ class OpenStackHttpsTransport:
                  credentials: SignedFileOpenStackCredentialSource,
                  ca_bundles: Mapping[str, str | Path], timeout: float = 5.0,
                  max_response_bytes: int = 4 * 1024 * 1024,
-                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)):
+                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+                 read_gate: NativeReadGate | None = None):
         if (not isinstance(campaign, DiscoveryCampaignAuthorization)
                 or campaign.scope.platform_family != 'openstack'
                 or campaign.collector_id != COLLECTOR_ID or set(campaign.allowed_kinds) != _REQUIRED_KINDS
@@ -53,6 +55,12 @@ class OpenStackHttpsTransport:
         self._campaign, self._endpoints, self._environment = campaign, endpoints, environment_id
         self._verifier, self._credentials = verifier, credentials
         self._ca = {service: Path(ca_bundles[service]) for service in _SERVICES}
+        if read_gate is not None:
+            if not isinstance(read_gate, NativeReadGate):
+                raise TypeError('A native endpoint read gate is required')
+            read_gate.require_scope(campaign.scope)
+        self._read_gate = read_gate
+        self._admission_failed = False
         self._timeout, self._max_bytes, self._clock = timeout, max_response_bytes, clock
         self._last_time, self._lock = campaign.issued_at, RLock()
         self._requests = self._stage = self._objects = 0
@@ -71,6 +79,10 @@ class OpenStackHttpsTransport:
         return self._endpoints.project_id
 
     def _now(self):
+        if self._read_gate is not None:
+            self._read_gate.check()
+        if self._admission_failed:
+            raise NativeReadAdmissionHeld('Native read admission did not complete')
         now = self._clock()
         if not _utc(now) or not self._last_time <= now < self._campaign.expires_at:
             raise NativeReadHeld('Native read campaign expired or clock regressed')
@@ -101,7 +113,8 @@ class OpenStackHttpsTransport:
             last = pages[-1]
             return (*pages[:-1], replace(last, terminal_completeness='PARTIAL',
                 collection_errors=(*last.collection_errors, 'VISIBLE_INVENTORY_ONLY')))
-        except Exception:
+        except Exception as exc:
+            self._admission_failed |= isinstance(exc, NativeReadAdmissionHeld)
             self._failed = True
             raise NativeReadHeld('Verified OpenStack campaign collection unavailable') from None
         finally:
@@ -148,7 +161,7 @@ class OpenStackHttpsTransport:
                 path=url.path + '/' + expected_path + ('?' + urlencode(query) if query else ''),
                 credential_header='X-Auth-Token', credential=material.token,
                 timeout=min(self._timeout, (self._campaign.expires_at - self._now()).total_seconds()),
-                max_response_bytes=self._max_bytes, authorize=current,
+                max_response_bytes=self._max_bytes, authorize=current, read_gate=self._read_gate,
                 request_headers=headers, response_headers=headers)
             if status != 200:
                 if 400 <= status <= 599:
@@ -192,7 +205,8 @@ class OpenStackHttpsTransport:
         except OpenStackHTTPError:
             self._failed = True
             raise
-        except Exception:
+        except Exception as exc:
+            self._admission_failed |= isinstance(exc, NativeReadAdmissionHeld)
             self._failed = True
             raise NativeReadHeld('Verified OpenStack HTTPS read unavailable') from None
         finally:
