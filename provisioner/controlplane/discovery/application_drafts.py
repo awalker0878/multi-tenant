@@ -107,6 +107,17 @@ class StoredApplicationDraft:
                 'ownershipAccepted': False, 'executionAuthorized': False}
 
 
+    def summary(self, *, latest_generation: int) -> dict:
+        """A verified revision summary, not another stored proposal or approval."""
+        value = self.document(latest_generation=latest_generation)
+        proposal = value.pop('proposal')
+        draft, edges = proposal['draft'], proposal['dependencies']
+        return {**value, 'name': draft['name'], 'ownerId': draft['ownerId'],
+                'memberCount': len(draft['members']), 'datasetCount': len(draft['datasetIds']),
+                'dependencyCount': len(edges),
+                'unknownDependencyCount': sum(edge['state'] == 'UNKNOWN' for edge in edges)}
+
+
 class ApplicationDraftRepository:
     """Trusted service storage; runtime SQL role needs explicit SELECT/INSERT only."""
     def __init__(self, connection_factory: Callable):
@@ -259,3 +270,57 @@ class ApplicationDraftRepository:
                 raise ValueError('Pinned source generation is missing')
             authorize(scope,connection.execute('SELECT clock_timestamp()').fetchone()[0])
             return stored.document(latest_generation=latest)
+
+
+    def list_current(self, ctx: TenantContext, scope: PlanScope, environment_id: str, *,
+                     after: str | None = None, limit: int = 50, authorize: Callable) -> dict:
+        """Bounded live listing: one latest revision per application, never history.
+
+        One SQL statement observes drafts and inventory currency in one snapshot.
+        Pages are independent live reads, not a frozen cross-page export. Re-load
+        the chosen draft and retain its optimistic revision before saving edits.
+        The ASCII group ID is a position only; it grants no tenant or scope access.
+        """
+        if (type(limit) is not int or not 1 <= limit <= 100
+                or after is not None and not _id(after)):
+            raise ValueError('A bounded page and exact application cursor are required')
+        DiscoveryRepository._require_scope(ctx, scope, environment_id)
+        args = DiscoveryRepository._scope_args(ctx, scope, environment_id)
+        with self._session(ctx, scope, environment_id, authorize) as connection:
+            rows = connection.execute(
+                'WITH source AS (SELECT max(generation) AS latest_generation FROM '
+                'hosting_controlplane.discovery_generations WHERE '+_SCOPE_SQL+'), '
+                'drafts AS (SELECT DISTINCT ON (application_group_id COLLATE "C") '+_COLUMNS+
+                ' FROM hosting_controlplane.application_draft_revisions WHERE '+_SCOPE_SQL+
+                ' AND application_group_id COLLATE "C" > %s '
+                'ORDER BY application_group_id COLLATE "C", revision DESC LIMIT %s) '
+                'SELECT source.latest_generation, drafts.* FROM source LEFT JOIN drafts ON true '
+                'ORDER BY drafts.application_group_id COLLATE "C"',
+                (*args, *args, after or '', limit+1)).fetchall()
+            if not rows or len(rows) > limit+1:
+                raise ValueError('Invalid bounded application listing')
+            latest = rows[0][0]
+            if latest is not None and (type(latest) is not int or not 1 <= latest <= _MAX):
+                raise ValueError('Invalid source generation')
+            stored = []
+            for row in rows:
+                if row[0] != latest:
+                    raise ValueError('Inconsistent listing source generation')
+                if row[1] is None:  # Empty LEFT JOIN, not a missing draft payload.
+                    if len(rows) != 1 or any(value is not None for value in row[1:]):
+                        raise ValueError('Invalid empty application listing')
+                    continue
+                item = self._row(environment_id, scope, row[1:])
+                if latest is None or latest < item.generation:
+                    raise ValueError('Pinned application source generation is missing')
+                if item.application_group_id <= (stored[-1].application_group_id if stored else after or ''):
+                    raise ValueError('Application listing did not advance')
+                stored.append(item)
+            items = [item.summary(latest_generation=latest) for item in stored[:limit]]
+            authorize(scope, connection.execute('SELECT clock_timestamp()').fetchone()[0])
+            return {'format': 'hosting-application-draft-list/1',
+                    'environmentId': environment_id, 'scope': vars(scope),
+                    'latestGeneration': latest, 'consistency': 'LIVE_PAGE',
+                    'items': items,
+                    'nextAfter': items[-1]['applicationGroupId'] if len(stored) > limit else None,
+                    'executionAuthorized': False}

@@ -5,6 +5,7 @@ sources in the proposal remain assertions, not independently accepted identities
 """
 from __future__ import annotations
 
+import re
 from typing import Annotated
 from uuid import uuid4
 
@@ -88,6 +89,43 @@ def install_routes(app, *, repository: ApplicationDraftRepository | None, author
                 or revision is not None and value['revision'] != revision):
             raise RuntimeError('Stored proposal response does not match the selected scope')
         return value
+
+    @app.get('/v1/environments/{environment_id}/application-drafts',
+             tags=['application-drafts'], summary='List current unreviewed application draft summaries')
+    def list_drafts(environment_id: Annotated[str, Path(pattern=_ID)],
+            after: Annotated[str | None, Query(pattern=_ID)] = None,
+            limit: Annotated[int, Query(ge=1, le=100)] = 50, active=Depends(session)):
+        try:
+            scope, authorize = selected(active, environment_id)
+            value = repository.list_current(context(active), scope, environment_id,
+                                            after=after, limit=limit, authorize=authorize)
+            if (not isinstance(value, dict) or value.get('format') != 'hosting-application-draft-list/1'
+                    or value.get('scope') != vars(scope) or value.get('environmentId') != environment_id
+                    or value.get('executionAuthorized') is not False or value.get('consistency') != 'LIVE_PAGE'
+                    or not isinstance(value.get('items'), list) or len(value['items']) > limit):
+                raise RuntimeError('Stored draft listing does not match the selected scope')
+            latest = value.get('latestGeneration')
+            if latest is not None and (type(latest) is not int or not 1 <= latest <= 2**63-1):
+                raise RuntimeError('Stored draft listing has invalid source metadata')
+            previous = after or ''
+            for item in value['items']:
+                identity = item.get('applicationGroupId') if isinstance(item, dict) else None
+                if (not isinstance(identity, str) or not re.fullmatch(_ID, identity)
+                        or identity <= previous or 'proposal' in item):
+                    raise RuntimeError('Stored draft listing is not an advancing summary page')
+                checked_view(item, scope, environment_id, identity, None)
+                if (latest is None or type(item.get('generation')) is not int
+                        or not 1 <= item['generation'] <= latest or item.get('latestGeneration') != latest
+                        or type(item.get('sourceSuperseded')) is not bool
+                        or item['sourceSuperseded'] != (item['generation'] != latest)):
+                    raise RuntimeError('Stored draft summary has inconsistent source metadata')
+                previous = identity
+            if value.get('nextAfter') is not None and (len(value['items']) != limit
+                    or value['nextAfter'] != previous):
+                raise RuntimeError('Stored draft cursor is not the last selected application')
+            return value
+        except Exception as exc:
+            failure(exc)
 
     @app.put('/v1/environments/{environment_id}/application-drafts/{application_id}',
              tags=['application-drafts'],
