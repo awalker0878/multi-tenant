@@ -7,6 +7,8 @@ import could have reversed an edge without failing a single test.
 from __future__ import annotations
 
 import ast
+from importlib.util import resolve_name
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -20,7 +22,7 @@ BACKREACH_MODULE = PACKAGE / 'repository.py'
 TRANSPORT_MODULES = frozenset({'__init__.py', '__main__.py', 'main.py', 'support.py'})
 # The enterprise operator talks to the control API; it is not a local owner
 # command and must not import the planning or delivery execution modules.
-API_ONLY_COMMANDS = frozenset({'operator.py'})
+API_ONLY_COMMANDS = frozenset({'operator.py', 'application_drafts.py'})
 #: The one module that holds the operations every command delegates to.
 SERVICE_MODULE = 'provisioner.execution.service'
 
@@ -79,6 +81,33 @@ def _command_couplings(module: str, path: Path) -> list[str]:
         return []
     return sorted(name for name in _command_imports(path)
                   if f'{name.rsplit(".", 1)[-1]}.py' not in TRANSPORT_MODULES)
+
+
+def _api_client_import_violations(path: Path, module: str) -> list[str]:
+    """Resolve all static import forms, including relative controller backreach.
+
+    Only the exact API-client modules may bypass the local execution service.
+    The operator may compose its draft contract; that contract has only standard
+    library imports. New CLI modules are not implicitly classified as clients.
+    """
+    tree = ast.parse(path.read_text(encoding='utf-8'))
+    targets = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            targets.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            base = node.module or ''
+            if node.level:
+                base = resolve_name('.' * node.level + base, module.rpartition('.')[0])
+            targets.update(base + '.' + alias.name for alias in node.names)
+    allowed = set(sys.stdlib_module_names)
+    if module == 'provisioner.cli.operator':
+        allowed.update({'httpx', 'certifi'})
+    internal = 'provisioner.cli.application_drafts'
+    return sorted(target for target in targets
+                  if target.split('.')[0] not in allowed
+                  and not (module == 'provisioner.cli.operator'
+                           and (target == internal or target.startswith(internal + '.'))))
 
 
 class DependencyDirectionTest(unittest.TestCase):
@@ -144,18 +173,48 @@ class DependencyDirectionTest(unittest.TestCase):
                               f'{_module_name(path)} does not use {SERVICE_MODULE}')
 
     def test_operator_cli_has_only_the_remote_api_boundary(self):
-        path = PACKAGE / 'cli' / 'operator.py'
-        self.assertTrue(path.is_file(), 'enterprise operator CLI is missing')
-        imports = _absolute_imports(path)
-        self.assertIn('httpx', imports)
-        for name in imports:
-            with self.subTest(imports=name):
-                self.assertFalse(name.startswith(('provisioner.execution',
-                                                  'provisioner.repository',
-                                                  'provisioner.adapters',
-                                                  'provisioner.controlplane',
-                                                  'tools', 'scripts', 'psycopg')),
-                                 f'operator CLI bypasses the authenticated control API via {name}')
+        for name in sorted(API_ONLY_COMMANDS):
+            path = PACKAGE / 'cli' / name
+            self.assertTrue(path.is_file(), 'declared API-client module is missing')
+            with self.subTest(module=name):
+                self.assertEqual(_api_client_import_violations(path, _module_name(path)), [])
+        self.assertIn('httpx', _absolute_imports(PACKAGE / 'cli' / 'operator.py'))
+
+    def test_api_client_exemptions_are_exact_and_not_local_owner_commands(self):
+        self.assertEqual(API_ONLY_COMMANDS, {'operator.py', 'application_drafts.py'})
+        for name in sorted(API_ONLY_COMMANDS):
+            path = PACKAGE / 'cli' / name
+            self.assertNotIn(SERVICE_MODULE, _absolute_imports(path))
+        self.assertNotIn('plan.py', API_ONLY_COMMANDS)
+        self.assertNotIn('apply.py', API_ONLY_COMMANDS)
+
+    def test_api_client_guard_rejects_direct_relative_and_peer_bypasses(self):
+        forbidden = (
+            'import provisioner.execution.service',
+            'from provisioner.execution import service',
+            'from ..execution import service',
+            'from .. import controlplane',
+            'from ..controlplane.discovery import application_drafts',
+            'from . import plan',
+            'from .plan import plan_for',
+            'import psycopg',
+            'from tools import delivery_runner',
+            'from scripts import native_lifecycle',
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'fixture.py'
+            for name in sorted(API_ONLY_COMMANDS):
+                module = 'provisioner.cli.' + Path(name).stem
+                for text in forbidden:
+                    with self.subTest(module=module, statement=text):
+                        path.write_text(text + '\n', encoding='utf-8')
+                        self.assertTrue(_api_client_import_violations(path, module))
+            path.write_text('from . import application_drafts\nimport httpx\nimport certifi\n',
+                            encoding='utf-8')
+            self.assertEqual(_api_client_import_violations(path, 'provisioner.cli.operator'), [])
+            self.assertTrue(_api_client_import_violations(path, 'provisioner.cli.application_drafts'))
+            path.write_text('import json\nfrom pathlib import Path\n', encoding='utf-8')
+            self.assertEqual(_api_client_import_violations(path, 'provisioner.cli.application_drafts'), [])
 
     def test_the_package_owned_compiler_has_only_low_level_dependencies(self):
         for filename in ('wsd.py', 'components.py'):

@@ -44,6 +44,14 @@ and is called by the existing `provisioner/cli/operator.py`. It imports no contr
 plane, database or platform adapter. No new executable, local SQL writer, credential
 issuer, migration action or compatibility entry point is created.
 
+Architecture guards explicitly classify `operator.py` and its draft helper as
+remote API clients, not local execution owners. Both guards share that exact
+classification; all other command modules still require the shared local service.
+The draft helper is restricted to standard-library imports. The operator may
+compose that helper and HTTP/TLS dependencies, never controller, database, native
+adapter or peer-command modules. Negative fixtures resolve direct and relative
+imports so moving a forbidden dependency behind `from ..` cannot bypass the guard.
+
 ## One live listing page
 
 The new endpoint is:
