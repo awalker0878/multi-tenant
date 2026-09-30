@@ -26,6 +26,7 @@ from provisioner.controlplane.authority.postgres import PostgresAuthority
 from provisioner.controlplane.authority.service import AuthorityService
 from provisioner.controlplane.jobs.repository import JobRepository
 from provisioner.controlplane.discovery.persistence import DiscoveryRepository
+from provisioner.controlplane.discovery.application_drafts import ApplicationDraftRepository
 from provisioner.controlplane.evidence.runtime import (EvidenceHold,
     EvidenceRuntimeConfig, build_gate)
 from provisioner.controlplane.persistence.store import EnterpriseRecordStore
@@ -228,6 +229,7 @@ def create_postgres_app(settings: ServiceSettings, *,
             gate.require(tenant)
     return create_app(records, authority, jobs, environments,
                       discovery=discovery,
+                      application_drafts=ApplicationDraftRepository(runtime_connect),
                       assessment_inputs=assessment_inputs,
                       portal_config=settings.portal,
                       evidence_gate=gate)
