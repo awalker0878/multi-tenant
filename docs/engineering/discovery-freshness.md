@@ -92,6 +92,22 @@ backend failures return 503 DISCOVERY_FRESHNESS_UNAVAILABLE rather than MISSING,
 without raw exception details. Non-GET methods do not request a collection. A valid
 200 response may be missing, stale or incomplete; HTTP success is not a health pass.
 
+## Stable snapshots and current identity during callbacks
+
+Each returned metadata record and the initial environment registration are copied
+before live authorization or clock callbacks run. A reused repository model cannot
+mutate both sides of the equality check or alter already validated output. Changes
+between the two captured values still conflict. Changes after the final captured
+value do not rewrite that as-of snapshot; a later authorized read remains necessary.
+This protects value consistency, not an atomic transaction across systems.
+
+Environment rechecks use the newly authenticated principal, not the initial grant
+snapshot. A legitimate grant renewal for the same verified human can remain readable;
+a changed subject, revoked access or changed registration remains denied. The API
+also rejects UTC-invalid or regressing reauthorization time relative to the service's
+check, even when a later callback would otherwise hide a transient regression.
+No role is added, credential refreshed or server monitoring threshold changed.
+
 ## Verification and remaining implementation
 
 Service and API tests cover exact age boundaries, future/invalid clocks, missing
@@ -103,6 +119,15 @@ full-scope/tenant filtering, unchanged audit/inventory state and post-read denia
 Their ingest fixture uses the existing explicit test verifier; these are not new
 native-signature or deployed-platform qualification campaigns. Local skips and
 final-revision CI execution must be reported separately.
+
+Eight additional callback regression tests cover shared-model mutation, immutable
+read snapshots, final-clock substitution, revocation before conflict disclosure,
+renewed grants, changed subjects, changed registrations and transient clock
+regression. Six reproduced the earlier behavior as failed assertions or an unexpected
+exception before the correction. These are deliberately controlled callback fixtures,
+not evidence that a production database or identity provider was compromised.
+The existing freshness response format, policy defaults and architecture records
+remain unchanged; no second freshness service or compatibility representation exists.
 
 B22 still needs periodic monitoring, retained health history, alert delivery,
 durable multi-process scheduling, globally coordinated endpoint budgets, larger
