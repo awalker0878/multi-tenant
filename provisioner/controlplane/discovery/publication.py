@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
+from uuid import uuid4
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -184,6 +185,8 @@ class PrivateDiscoveryOutbox:
     """Create-only, fsynced exact requests for explicit, currently authorized retry.
 
     A create-only campaign reference binds one exact submission before publication.
+    A durable pre-collection claim excludes competing first captures sharing this
+    outbox. An incomplete claim is never expired or automatically taken over.
     There is no automatic dispatcher or deletion. Local custody is not independent
     backup/WORM storage, a global campaign ledger, or a durable authority floor.
     """
@@ -238,6 +241,46 @@ class PrivateDiscoveryOutbox:
         key = hashlib.sha256(_json(['discovery-campaign-outbox/1', campaign_id]).encode('ascii')).hexdigest()
         store = self._store(key)
         return store.root / key[:2] / (key + '.campaign')
+
+    def _claim_collection(self, campaign: DiscoveryCampaignAuthorization,
+                          environment_id: str, signature: DiscoverySignature,
+                          checked_at: datetime) -> tuple[Path, bytes]:
+        """Persist one local capture intent before a native collector is invoked.
+
+        Only the verified staging path calls this method. This is not a lease,
+        worker grant, fleet-wide scheduler or native fence. The record is never
+        deleted on failure or success: original signed custody permits a later
+        resume; an intent without that custody requires reconciliation.
+        """
+        if (not isinstance(campaign, DiscoveryCampaignAuthorization)
+                or not _id(environment_id) or not isinstance(signature, DiscoverySignature)
+                or not _utc(checked_at) or not campaign.issued_at <= checked_at < campaign.expires_at
+                or campaign.scope.organization_id != self.context.organization_id
+                or campaign.scope.tenant_id != self.context.tenant_id):
+            raise ValueError('Exact campaign, signature, time and outbox tenant required')
+        path = self._campaign_path(campaign.campaign_id).with_suffix('.collection')
+        raw = _json({'format': 'hosting-discovery-collection-intent/1',
+            'environmentId': environment_id, 'campaignId': campaign.campaign_id,
+            'authorizationDigest': campaign.digest(),
+            'campaignSignatureDigest': hashlib.sha256(_json(
+                DiscoverySubmission.signature_document(signature)).encode('ascii')).hexdigest(),
+            'attemptId': uuid4().hex, 'claimedAt': checked_at.isoformat(),
+            'executionAuthorized': False}).encode('ascii')
+        # Atomic no-replace publication fsyncs the complete record and directory.
+        # A competing claim, including a corrupt/inaccessible file, never admits
+        # another collection. No PID, timeout or process exit can steal this claim.
+        if not _atomic_new(path, raw):
+            raise DiscoveryPublicationHeld('Collection intent already exists; reconcile original custody')
+        claim = (path, raw)
+        self._check_collection_claim(claim)
+        return claim
+
+    def _check_collection_claim(self, claim: tuple[Path, bytes]) -> None:
+        path, expected = claim
+        self._check_directory(self.root)
+        self._check_directory(path.parent)
+        if read_protected(path, 1024) != expected:
+            raise DiscoveryPublicationHeld('Collection intent changed; original custody requires reconciliation')
 
     @staticmethod
     def _binding_bytes(submission: DiscoverySubmission) -> bytes:
@@ -323,8 +366,9 @@ def stage_submission(campaign: DiscoveryCampaignAuthorization, environment_id: s
 
     A restart or lost ACK does not recollect, re-sign or change captured-at time.
     This stages bytes only; the existing mTLS publisher and ingest repository still
-    own delivery and commit. Concurrent first-time native reads are not scheduled
-    here: their competing results must resolve through the create-only reference.
+    own delivery and commit. A persistent local claim precedes collection, so
+    concurrent processes sharing this outbox cannot both start the first capture.
+    An incomplete claim is held, never retried by expiry or automatic takeover.
     """
     if (not isinstance(campaign, DiscoveryCampaignAuthorization) or not _id(environment_id)
             or not isinstance(campaign_signature, DiscoverySignature)
@@ -349,8 +393,15 @@ def stage_submission(campaign: DiscoveryCampaignAuthorization, environment_id: s
                 raise ValueError('Retained issuer signature cannot be replaced')
             original.verify(verifier, now())
             return original
+        claim = outbox._claim_collection(campaign, environment_id, campaign_signature, now())
+
+        def collect_claimed():
+            outbox._check_collection_claim(claim)
+            return collect()
+
         submission = collect_submission(campaign, environment_id, campaign_signature,
-            collect=collect, signer=signer, verifier=verifier, clock=now)
+            collect=collect_claimed, signer=signer, verifier=verifier, clock=now)
+        outbox._check_collection_claim(claim)
         outbox.retain(submission)
         submission.verify(verifier, now())
         return submission
