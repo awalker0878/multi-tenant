@@ -152,7 +152,7 @@ Wave 0 closes when B05 passes installed-runtime acceptance and active documentat
 | B10 | Delivered foundation | Extend enrolled workers and credential broker with separate discovery campaigns and explicit platform-action allowlists. | Qualify PKI/CRL, Vault roles, native privileges and credential lifetime. |
 | B11 | Delivered foundation | Extend resource/operation leases, uncertainty registry and containment to planned resources and each new native side effect. | Independently demonstrate writer exclusion and operation visibility on selected tuples. |
 | B12 | Delivered foundation | Extend the same portal and thin CLI with comparison, provisioning, migration and explicit recovery actions. | Sysadmin pilot verifies scope, usability and actual job visibility. |
-| B13 | Delivered foundation | Preserve signed audit checkpoints, Object Lock/Vault adapters, redaction and startup/write holds; add transfer/image artifacts and evidence retention. | Actual signing custody, retention enforcement and independent recovery verified. |
+| B13 | Delivered foundation | Extend signed audit checkpoints, Object Lock/Vault adapters, redaction and startup/write holds; add transfer/image artifacts and evidence retention. | Actual signing custody, retention enforcement and independent recovery verified. |
 
 Wave 1's existing repository boundary is verified in PR #52. Later native workflows extend it; they must not reinterpret its initial gate-only workflow as completed provisioning.
 
@@ -724,3 +724,28 @@ freshness, resumable-publication and estate-measurement obligations remain open.
 Wave 3 B23/B24 cannot consume this report as a reservation or native authorization;
 commissioned capacity/IPAM/staging admission and immediate effect checks are still
 required. No native qualification, production migration or wave completion is claimed.
+
+### B19/B20 continuation — saved-application browser, 30 September 2026
+
+The [portal comparison component](../engineering/application-comparison-browser.md)
+now consumes the existing format-2 application API from an unchanged current saved
+draft. The existing destination picker and route settings are reused; every retained
+member requires an explicit guest profile. Exact selection/review/source/pool checks
+retain combined demand, every member's findings and all mandatory holds/conditions.
+One bounded read-only POST creates no job, owner decision or reservation.
+
+Draft edits, historical or superseded selections, unknown saves, destination/route
+changes and session changes cannot leave earlier advice current. Cancellation and
+late-response tests verify clearing; malformed/oversized/unsafe-integer responses
+are refused without partial findings. Actual API fixtures and all three portal
+scripts are exercised in client-contract tests. Chromium navigation was blocked in
+the development environment; no passed rendering smoke test is claimed.
+
+This closes the browser-consumption slice left open at the preceding CLI checkpoint,
+not full guided draft/membership/evidence authoring or Wave 2. Verified external
+dependencies, remaining native facts and independent visibility reconciliation,
+B22 scheduling/concurrency/freshness/resumable publication and estate measurements
+remain open. Wave 3 B23/B24 still require commissioned envelopes, transactional
+capacity/IPAM/staging reservations and actual admitted native effects. Keep these
+implementation gates separate from native qualification and operational acceptance.
+No CI workflow, database migration, native privilege or capability claim changes.

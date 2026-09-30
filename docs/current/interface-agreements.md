@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.16 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.17 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -283,5 +283,12 @@ modes. The client rejects old/mismatched reports, missing members and contradict
 capacity/status claims; it neither supplies owner authority nor calls native owners.
 Single-VM comparison and signed review formats remain unchanged. This is B19/B20
 operator access, not B23 reservations, B24 provisioning or closure of Wave 2.
-The guided browser comparison, visibility/dependency evidence and B22 obligations
-remain in the existing backlog; no production acceptance is recorded here.
+The [saved-application browser](../engineering/application-comparison-browser.md)
+now consumes the same format-2 service. Only an unchanged current draft supplies
+membership; all guest profiles and destination selections remain explicit. Reports
+retain every member, exact source/review/pool bindings, capacity gaps and held owner
+decisions. Changes to drafts, destinations, route settings or tab identity invalidate
+earlier advice and suppress late responses. The component shares the existing portal
+identity and destination picker; it neither creates approval nor reserves resources.
+Guided draft creation/evidence editing, visibility/dependency evidence and B22
+obligations remain open; no production acceptance is recorded here.
