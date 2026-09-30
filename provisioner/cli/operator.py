@@ -18,6 +18,9 @@ from typing import IO
 from urllib.parse import quote, urlsplit
 
 import httpx
+import certifi
+
+from . import application_drafts
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _DISCOVERY_CURSOR = re.compile(r'^[A-Za-z0-9_-]{1,4096}$')
@@ -92,6 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
                         help='Read one SSO access token line from stdin; never pass it in argv')
     parser.add_argument('--ca-bundle', help='Trusted enterprise PEM CA bundle')
     groups = parser.add_subparsers(dest='resource', required=True)
+    application_drafts.install_parser(groups)
     groups.add_parser('scopes', help='Show active authorized WSD and native scopes')
 
     environments = groups.add_parser('environments',
@@ -192,6 +196,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _request(args) -> tuple[str, str, dict | None, dict | None]:
     """Map CLI verbs to the same API operations used by the portal."""
+    if args.resource == 'application-drafts':
+        return application_drafts.request(args, _identity)
     if args.resource == 'scopes':
         return 'GET', '/v1/access/scopes', None, None
     if args.resource == 'assessments':
@@ -297,7 +303,7 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
     return 'GET', prefix + '/events', {'after': args.after, 'limit': args.limit}, None
 
 
-def _read_response(response: httpx.Response) -> dict:
+def _read_response(response: httpx.Response, *, strict: bool = False) -> dict:
     size = 0
     chunks = []
     for chunk in response.iter_bytes():
@@ -305,6 +311,8 @@ def _read_response(response: httpx.Response) -> dict:
         if size > _MAX_RESPONSE:
             raise ValueError('API response exceeds the CLI size limit')
         chunks.append(chunk)
+    if strict:
+        return application_drafts.decode_document(b''.join(chunks), _MAX_RESPONSE)
     try:
         payload = json.loads(b''.join(chunks))
     except (ValueError, UnicodeDecodeError):
@@ -318,34 +326,68 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
         stdout: IO[str] = sys.stdout, stderr: IO[str] = sys.stderr,
         transport: httpx.BaseTransport | None = None) -> int:
     args = build_parser().parse_args(argv)
+    draft_save_attempted = False
+    draft_request_started = False
+    document = None
     try:
         base = _base_url(args.api_url)
         method, path, params, document = _request(args)
         credential = _token(stdin)
-        verify = ssl.create_default_context(cafile=args.ca_bundle) if args.ca_bundle else True
+        # An explicit context avoids inherited SSLKEYLOGFILE even when HTTPX
+        # would otherwise build its own environment-sensitive default context.
+        verify = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        verify.minimum_version = ssl.TLSVersion.TLSv1_2
+        verify.verify_flags |= ssl.VERIFY_X509_STRICT | ssl.VERIFY_X509_PARTIAL_CHAIN
+        verify.load_verify_locations(cafile=args.ca_bundle or certifi.where())
         headers = {'Authorization': 'Bearer ' + credential, 'Accept': 'application/json'}
         if args.resource == 'jobs' and args.action == 'submit':
             headers['Idempotency-Key'] = args.idempotency_key
         with httpx.Client(timeout=httpx.Timeout(10.0, connect=5.0),
                           follow_redirects=False, trust_env=False, verify=verify,
                           transport=transport) as client:
+            draft_request_started = args.resource == 'application-drafts'
+            draft_save_attempted = draft_request_started and args.action == 'save'
             with client.stream(method, base + path, params=params,
                                headers=headers, json=document) as response:
-                payload = _read_response(response)
+                payload = _read_response(response, strict=args.resource == 'application-drafts')
                 status = response.status_code
+        conflict = (status == 409 and isinstance(payload.get('error'), dict)
+                    and payload['error'].get('code') == 'APPLICATION_DRAFT_CONFLICT')
+        # Even 404 may follow a committed PUT if authority is revoked before
+        # the API's response readback. Only an exact ACK proves this save.
+        if draft_save_attempted and status != 200 and not conflict:
+            print(json.dumps(application_drafts.save_unknown(args, document)), file=stderr)
+            return 3
         if not 200 <= status < 300:
             error = payload.get('error')
             code = error.get('code') if isinstance(error, dict) else None
-            print(json.dumps({'status': status, 'error': code or 'API_REFUSED'}),
+            if not isinstance(code, str) or not re.fullmatch(r'[A-Z][A-Z0-9_]{0,63}', code):
+                code = 'API_REFUSED'
+            print(json.dumps({'status': status, 'error': code}),
                   file=stderr)
             return 2
+        if args.resource == 'application-drafts':
+            if status != 200:
+                raise ValueError('Draft response is not an exact acknowledgement')
+            application_drafts.validate_response(args, payload, submitted=document)
         print(json.dumps(payload, sort_keys=True, separators=(',', ':')),
               file=stdout)
         return 0
+    except KeyboardInterrupt:
+        outcome = (application_drafts.save_unknown(args, document) if draft_save_attempted
+                   else {'error': 'INTERRUPTED'})
+        print(json.dumps(outcome), file=stderr)
+        return 130
     except (ValueError, OSError, httpx.HTTPError) as exc:
         # Do not print transport URLs, request bodies or the token: exception
         # strings may include those, particularly from a proxy/TLS stack.
-        code = 'INVALID_INPUT' if isinstance(exc, (ValueError, OSError)) else 'API_UNAVAILABLE'
+        if draft_save_attempted:
+            print(json.dumps(application_drafts.save_unknown(args, document)), file=stderr)
+            return 3
+        if draft_request_started and isinstance(exc, ValueError):
+            code = 'APPLICATION_DRAFT_RESPONSE_INVALID'
+        else:
+            code = 'INVALID_INPUT' if isinstance(exc, (ValueError, OSError)) else 'API_UNAVAILABLE'
         print(json.dumps({'error': code}), file=stderr)
         return 3
 

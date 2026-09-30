@@ -102,6 +102,58 @@ class ApplicationDraftListingPostgresTests(unittest.TestCase):
             with self.subTest(after=value), self.assertRaises(ValueError): self.listing(after=value)
 
 
+    def test_thin_cli_save_list_and_history_use_the_real_authenticated_api_and_database(self):
+        from datetime import datetime, timedelta, timezone
+        import httpx
+        from fastapi.testclient import TestClient
+        from provisioner.cli.operator import run
+        from provisioner.controlplane.api import create_app
+        from provisioner.controlplane.authority.model import VerifiedPrincipal, RoleGrant
+        from provisioner.controlplane.authority.service import AuthorityService, EXECUTION_OPERATOR
+        from tests.provisioning.api import test_http as http_support
+        now = datetime.now(timezone.utc)
+        principal = VerifiedPrincipal('verified-draft-author', self.ctx.organization_id, self.ctx.tenant_id,
+            'HUMAN', now-timedelta(minutes=1), now+timedelta(minutes=5), None,
+            (RoleGrant(EXECUTION_OPERATOR, self.scope, now+timedelta(minutes=5)),))
+        class Identity:
+            def authenticate(self, token):
+                if token != 'synthetic-bearer': raise PermissionError('invalid credential')
+                return principal
+        class Evidence:
+            def require(self, ctx):
+                if ctx.organization_id != principal.organization_id: raise PermissionError('wrong tenant')
+        app = create_app(http_support._Records(),
+            AuthorityService(Identity(), http_support._Plans(), http_support._Ledger()),
+            http_support._Jobs(), self.environments, evidence_gate=Evidence(), application_drafts=self.repo)
+        with TestClient(app) as api, tempfile.TemporaryDirectory() as directory:
+            file = Path(directory)/'draft.json'
+            file.write_text(json.dumps(self.content))
+            requests = []
+            def transport(request):
+                requests.append(request.method)
+                response = api.request(request.method, request.url.raw_path.decode('ascii'),
+                                       content=request.content, headers=dict(request.headers))
+                return httpx.Response(response.status_code, json=response.json())
+            def invoke(action, *options):
+                out, err = io.StringIO(), io.StringIO()
+                code = run(['--api-url', 'https://api.example', '--token-stdin', 'application-drafts',
+                            action, '--environment', self.environment_id, *options],
+                           stdin=io.StringIO('synthetic-bearer\n'), stdout=out, stderr=err,
+                           transport=httpx.MockTransport(transport))
+                self.assertEqual(code, 0, err.getvalue())
+                self.assertEqual(err.getvalue(), '')
+                return json.loads(out.getvalue())
+            saved = invoke('save', '--id', 'app-1', '--generation', '1', '--result-digest',
+                           self.source.result_digest, '--expected-revision', '0', '--file', str(file))
+            listing = invoke('list', '--limit', '1')
+            original = invoke('get', '--id', 'app-1', '--revision', '1')
+            self.assertEqual(listing['items'][0]['recordDigest'], saved['recordDigest'])
+            self.assertEqual(original['recordDigest'], saved['recordDigest'])
+            self.assertEqual(original['recordedBy'], principal.subject)
+            self.assertEqual(original['proposal']['dependencies'], self.content['dependencies'])
+            self.assertFalse(original['ownershipAccepted'])
+            self.assertFalse(original['executionAuthorized'])
+            self.assertEqual(requests, ['PUT', 'GET', 'GET'])
 
 
 if __name__ == '__main__': unittest.main()
