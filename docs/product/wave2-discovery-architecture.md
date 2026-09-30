@@ -1,7 +1,8 @@
 # Wave 2 read-only discovery and comparison
 
-Status: B14–B22 are partially implemented. The latest application-draft checkpoint
-below records durable unreviewed proposals separately from formal owner review. The installed-collector checkpoint
+Status: B14–B22 are partially implemented. Durable unreviewed proposals and
+independently signed assessment-only owner decisions are separate records. The
+owner-review continuation below describes their current composition. The installed-collector checkpoint
 below distinguishes working command/library composition from deployed custody gaps. Authenticated publication and scoped
 comparison are available in the repository; native collector integration, full
 fact coverage, scheduling and estate acceptance remain open. No native route is
@@ -301,9 +302,29 @@ Exact retries retain the original record, while historical GETs identify superse
 source pins. No accepted ownership, review result or execution permission is created.
 Migration 0021 and existing API role checks protect tenant/native scope and history.
 
-Formal reviewed-decision persistence, independent enrichment, owner acceptance and
-revocation, review-consuming comparison and the portal editor remain open. The
-[operator CLI continuation](../engineering/application-draft-operator.md) now adds
-scoped listing and explicit draft save/load without changing those authority gates. This
-checkpoint supersedes earlier statements that all application drafts were purely
-in-memory; it does not close B17/B20 or any native migration acceptance gate.
+The [operator CLI continuation](../engineering/application-draft-operator.md) adds
+scoped listing and explicit draft save/load; the
+[browser workspace](../engineering/application-draft-browser.md) edits existing
+metadata/startup order. Signed exact-draft review persistence and GET-only candidate
+evaluation are implemented in the continuation below. Independent enrichment,
+owner-facing signing and application-wide comparison remain open. These checkpoints
+supersede the earlier in-memory-only grouping scope without closing B17/B20 or
+native migration acceptance.
+
+
+## Signed application-owner review continuation — 30 September 2026
+
+[Owner-review evidence](../engineering/application-owner-review.md) now persists
+through the existing separate assessment-ingest role and immutable signed store.
+Exact owner enrollment, signature, draft revision/content and source pins precede
+acceptance. A read-only endpoint consumes the latest valid decision through the
+existing grouping validator, without fallback after revocation or expiry. Old
+draft/inventory references remain held and external dependency claims are not
+promoted to independently verified evidence. This is a separately evaluated review;
+the original draft remains UNREVIEWED and no native ownership or write grant exists.
+
+The source-publication lock now also orders owner-review ingest and shared review
+reads. Live trust is checked after lock waits and before evidence/audit commit.
+Application-wide destination planning, reviewer onboarding/signing UX, trusted
+third-party enrichment and full browser editing remain open. Existing collectors,
+normalizer and per-VM comparison contracts are unchanged.

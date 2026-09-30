@@ -611,3 +611,34 @@ This narrows B20 but does not close B17/B20 or Wave 2. Owner acceptance/revocati
 verified dependency enrichment, reviewed assessment consumption, full browser
 creation and B22 remain open. No new database migration, privilege, interpretation
 version, native execution path or platform qualification is introduced.
+
+
+### B17/B20 continuation — signed owner decisions, 30 September 2026
+
+The [owner-review contract](../engineering/application-owner-review.md) extends the
+existing signed assessment evidence store, not the draft writer or native approval
+ledger. `APPLICATION_OWNER` enrollment and signatures bind an exact saved draft,
+its editor/owner, inventory generation and all proposal assertions. Acceptance and
+revocation share one monotonic evidence stream per immutable draft; changed drafts
+need new review. Existing original-policy custody, RLS and current revocation
+checks remain authoritative. The proposed owner cannot self-review an edited draft.
+
+`ApplicationReviewService` composes current signed decisions with retained source
+observations and the existing application-candidate validator. Its exact-revision
+GET endpoint is read-only. Complete current observations can produce an assessment-
+only candidate; partial/stale/superseded sources hold, and unknown dependencies
+remain visible. Every response denies native ownership/execution authority and
+keeps third-party dependency evidence explicitly unverified. Browser draft state
+is not rewritten or used as an approval. Existing per-VM comparison is unchanged.
+
+Migration 0022 extends the assessment kind constraint; the independent ingest role
+needs only additional SELECT on retained draft/discovery inputs. No earlier migration
+or native authority is replaced. Source locks serialize review with draft/inventory
+writers, and signatures are checked after lock waits and before commit. Tests cover
+real signatures, PostgreSQL/RLS, atomic audit rollback, revocation and API consumption;
+installed-package checks require the new owners and migration outside the checkout.
+
+This narrows B17/B20, not the entire wave. Enterprise owner/key onboarding, verified
+external dependencies, application-wide comparison/planning and an owner-facing
+browser/CLI review workflow remain open, together with B22 and later native effects.
+Native qualification and production acceptance are neither enabled nor inferred.

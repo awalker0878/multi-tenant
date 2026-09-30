@@ -105,7 +105,20 @@ session. Browser usability/accessibility acceptance and deployed SSO still requi
 an authorized browser environment. No browser restriction was disabled.
 
 No database migration, grant expansion, collector/normalizer/profile version change,
-compatibility shim or native support claim is introduced. B17 owner acceptance and
-revocation, independently verified dependency evidence, reviewed assessment input,
-full browser creation/membership editing and B22 scheduling remain open. Later native
+compatibility shim or native support claim was introduced by this browser increment.
+The subsequent signed owner-review path below is a separate service. Owner-facing
+signing/review presentation, independently verified dependency evidence,
+application-wide assessment, full browser creation/membership editing and B22
+scheduling remain open. Later native
 provisioning, transfer, fencing, cutover, recovery and qualification gates are unchanged.
+
+
+## Signed owner-review continuation
+
+The [owner-review evidence contract](application-owner-review.md) now provides
+independent exact-draft acceptance/revocation and GET-only candidate evaluation.
+This is separate from draft saves, listing and editing; drafts remain UNREVIEWED.
+The CLI/browser in this document do not issue signatures or show a native approval.
+Owner-facing review integration, verified external dependencies and application-wide
+migration planning remain open. The separate review does not change draft status,
+create a native owner or authorize a migration.

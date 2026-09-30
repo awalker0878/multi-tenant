@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.6 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.7 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -60,7 +60,8 @@ The repository's engineering profiles have no selected installed tuples or nativ
 qualified claims. The admitted Temporal job is an authority gate, not a completed
 provisioning/migration run. Discovery has signed publication/comparison components;
 the installed collector now composes native reads, signing and publication. Draft
-membership/dependency assertions are persisted; formal owner review, deployed
+membership/dependency assertions and signed assessment-only owner decisions are
+persisted separately; owner-facing signing and application-wide planning, deployed
 credential custody and scheduling remain open. Lower-level provisioning and transfer contracts do not close the missing
 orchestration, fencing, cutover and post-write recovery paths.
 
@@ -100,8 +101,9 @@ actual package owners, scoped PUT/GET routes, expected-revision conflict checks,
 original retry semantics, SQL migration and deployment grants. Source-generation
 publication and draft creation share their cooperative lock; authority is rechecked
 after waits and before commit. Exact retries retain original author/time; later
-source generations are reported without relabelling history. Formal owner review,
-independent enrichment verification, full guided review and B17 closure remain open.
+source generations are reported without relabelling history. The separate signed
+owner-review path below evaluates exact-draft assessment decisions. Independent
+enrichment verification, owner-facing workflow integration and B17 closure remain open.
 The [operator continuation](../engineering/application-draft-operator.md) now supplies
 bounded latest-draft listing and CLI save/load/history through the existing API.
 Explicit source/revision pins and matching content acknowledgements prevent silent
@@ -117,7 +119,25 @@ dependency assertion. Historical/superseded records cannot be edited. Explicit s
 confirmation, exact content acknowledgements and GET-only uncertain-save
 reconciliation use the existing API; no browser action accepts ownership or launches
 migration. Tab identity changes clear state and suppress late replies. Full browser
-creation/evidence editing and independently authorized owner review remain open.
+creation/evidence editing and owner-facing signing/review presentation remain open.
+Independently signed review evaluation is provided by the separate service below.
+
+### Independently signed application-owner decisions
+
+The existing signed assessment store now accepts exact-draft `APPLICATION_REVIEW`
+decisions from independently enrolled `APPLICATION_OWNER` subjects. Owner identity
+must match the proposal and differ from its editor. Acceptance/revocation is bound
+to the complete saved draft, inventory generation and proposal digest. Live trust,
+revocation and scope are rechecked; newer drafts or inventory cannot inherit an old
+review. No draft status, native ownership or execution approval is rewritten.
+
+The scoped read-only review endpoint composes retained proof with the existing
+application-candidate validator. Incomplete/stale inventory remains held and unknown
+dependencies stay explicit; external dependency evidence remains unverified.
+Migration 0022 and narrowly scoped ingest-role SELECT rights are required. See the
+[signed owner-review contract](../engineering/application-owner-review.md) for
+fields, locking, API states, deployment, tests and remaining application-wide
+planning and owner-facing workflow integration.
 
 ## Engineering and implementation handoff
 

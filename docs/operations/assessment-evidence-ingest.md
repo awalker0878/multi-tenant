@@ -1,15 +1,19 @@
 # Signed assessment evidence ingestion
 
 This internal workflow supplies installed product observations, directed route
-claims and independently reviewed control findings. It does not run a migration,
-approve execution, discover a platform, or establish native qualification by
-itself. Reviewers sign only conclusions supported by independently collected
-native evidence. A declared environment supplies a selector, never a conclusion.
+claims, independently reviewed control findings and exact-draft application-owner
+decisions. It does not run a migration, approve execution, discover a platform or
+establish native qualification by itself. Platform/control reviewers need native
+evidence; application owners review the exact retained definition and its source
+pin without promoting dependency assertions to native facts. A declared
+environment supplies a selector, never a conclusion.
 
 ## Runtime composition
 
-Apply migration `0020_assessment_inputs.sql` using the migration role. Grant the
-ordinary runtime role `SELECT` on `hosting_controlplane.assessment_inputs` only.
+Apply the immutable migrations through `0022_application_review_evidence.sql`
+using the migration role. Migration 0020 originally created the store; 0022 extends
+its closed kind set. Grant the ordinary runtime role `SELECT` on
+`hosting_controlplane.assessment_inputs` only, retaining its existing draft reads.
 Configure all three assessment settings together:
 
 | Setting | Required value |
@@ -56,7 +60,7 @@ Every enrollment has `keyId`, `subjectId`, `role`, `publicKey`, `environments`,
 `locationId`, `securityDomainId`, `endpointId`, `nativeScopeId`, `platformFamily`).
 There are no wildcards. Enrollment roles are `INSTALLATION`, `SOURCE_EXIT`,
 `TARGET_OPERATE`, `POLICY_TRANSLATION`, `SECURITY_EQUIVALENCE` and
-`RECOVERY_READINESS`. Distinct roles require distinct subjects and public keys.
+`RECOVERY_READINESS`, and `APPLICATION_OWNER`. Distinct roles require distinct subjects and public keys.
 A control reviewer must be enrolled for both source and destination environments.
 
 Policies live at most 24 hours. Replace the file atomically with a root-signed
@@ -91,6 +95,7 @@ increase for the exact binding, and evidence IDs are never reused.
 | INSTALLATION | `environmentId`, `installation`, `nativeEvidenceDigest` | INSTALLATION |
 | ROUTE | `sourceEnvironmentId`, `destinationEnvironmentId`, `route`, `maturity`, `evidence` | SOURCE_EXIT and TARGET_OPERATE |
 | CONTROL | `sourceEnvironmentId`, `destinationEnvironmentId`, `route`, `control`, `outcome`, `evidenceDigest`, `observedAt`, `sourceRawSnapshotDigest`, `destinationRawSnapshotDigest`, `sourceSnapshotDigest`, `destinationSnapshotDigest`, `normalizerVersion` | Role matching `control` |
+| APPLICATION_REVIEW | `environmentId`, `scope`, `applicationGroupId`, `draftRevision`, `draftRecordDigest`, `generation`, `resultDigest`, `proposalDigest`, `ownerId`, `decision`, `reviewReference`, `reviewedAt` | APPLICATION_OWNER, exact owner subject, independent of the draft editor |
 
 `installation` contains `scope`, `productTupleId`, `productTupleDigest`; `route`
 contains `source` and `destination` installations plus `method`, `guestProfile`,
@@ -112,3 +117,22 @@ It appends an audit event in the same transaction. Readback verifies both origin
 custody proof and current authority policy. External signed audit checkpoints and
 the deployment policy floor still govern whole-database restore or rollback;
 database append-only rules alone cannot detect an administrator restoring history.
+
+
+## Exact-draft application-owner evidence
+
+Migration 0022 adds `APPLICATION_REVIEW` to this same signed evidence store. Its
+`APPLICATION_OWNER` enrollment and exact payload, acceptance/revocation semantics
+and GET-only consumption are defined in the
+[owner-review contract](../engineering/application-owner-review.md). Deploy compatible
+readers and migration 0022 before publishing the new role. Give only the separate
+assessment-ingest login additional SELECT on `application_draft_revisions`,
+`discovery_generations` and `discovery_observations`; no draft/native writes or
+runtime evidence-ingest grant are required. The owner's signed subject must match
+the proposed owner and differ from the draft editor. A source-exit reviewer or a
+client-supplied owner label cannot substitute for that independent enrollment.
+
+For all evidence kinds, ingestion now revalidates current trust after lock waits
+and before commit. Review failure rolls back its audit transaction. Latest invalid
+or revoked proof never falls back to an earlier acceptance. A draft review remains
+assessment-only and cannot issue native ownership or execution permission.

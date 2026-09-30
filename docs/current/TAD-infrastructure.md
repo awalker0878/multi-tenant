@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.13 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.14 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -56,8 +56,9 @@ Normalization and comparison pin those inputs and the relevant inventory generat
 conflicting/missing VM, disk, NIC, quota and dependency facts do not become confirmed
 absence. Duplicate scope declarations cannot create artificial destination diversity.
 A comparison is advice, not ownership adoption or an execution grant. Full collector,
-profile and credential wiring, persisted owner/dependency review, scheduling and
-large-estate qualification remain open.
+profile and deployed credential wiring, independently verified dependency evidence,
+application-wide assessment, scheduling and large-estate qualification remain open.
+Exact-draft owner decisions now have the separate signed path described below.
 
 ### Profiles and qualification runtime
 
@@ -266,8 +267,9 @@ actual package owners, scoped PUT/GET routes, expected-revision conflict checks,
 original retry semantics, SQL migration and deployment grants. Source-generation
 publication and draft creation share their cooperative lock; authority is rechecked
 after waits and before commit. Exact retries retain original author/time; later
-source generations are reported without relabelling history. Formal owner review,
-independent enrichment verification, full guided review and B17 closure remain open.
+source generations are reported without relabelling history. The separate signed
+owner-review path below evaluates exact-draft assessment decisions. Independent
+enrichment verification, owner-facing workflow integration and B17 closure remain open.
 The [operator continuation](../engineering/application-draft-operator.md) now supplies
 bounded latest-draft listing and CLI save/load/history through the existing API.
 Explicit source/revision pins and matching content acknowledgements prevent silent
@@ -283,7 +285,25 @@ dependency assertion. Historical/superseded records cannot be edited. Explicit s
 confirmation, exact content acknowledgements and GET-only uncertain-save
 reconciliation use the existing API; no browser action accepts ownership or launches
 migration. Tab identity changes clear state and suppress late replies. Full browser
-creation/evidence editing and independently authorized owner review remain open.
+creation/evidence editing and owner-facing signing/review presentation remain open.
+Independently signed review evaluation is provided by the separate service below.
+
+### Independently signed application-owner decisions
+
+The existing signed assessment store now accepts exact-draft `APPLICATION_REVIEW`
+decisions from independently enrolled `APPLICATION_OWNER` subjects. Owner identity
+must match the proposal and differ from its editor. Acceptance/revocation is bound
+to the complete saved draft, inventory generation and proposal digest. Live trust,
+revocation and scope are rechecked; newer drafts or inventory cannot inherit an old
+review. No draft status, native ownership or execution approval is rewritten.
+
+The scoped read-only review endpoint composes retained proof with the existing
+application-candidate validator. Incomplete/stale inventory remains held and unknown
+dependencies stay explicit; external dependency evidence remains unverified.
+Migration 0022 and narrowly scoped ingest-role SELECT rights are required. See the
+[signed owner-review contract](../engineering/application-owner-review.md) for
+fields, locking, API states, deployment, tests and remaining application-wide
+planning and owner-facing workflow integration.
 
 ## Engineering and implementation handoff
 

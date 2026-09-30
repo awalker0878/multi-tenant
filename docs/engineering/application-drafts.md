@@ -40,8 +40,9 @@ Unauthorized and absent resources return 404; missing authentication returns 401
 An inconsistent request returns 422, a changed revision/source returns 409, and an
 unavailable store or evidence gate holds the operation. Responses are not cacheable.
 The [operator continuation](application-draft-operator.md) now supplies bounded
-listing and CLI save/load. Delete, ownership-acceptance and a portal editor remain
-unimplemented. The API deliberately cannot accept caller-supplied review records,
+listing and CLI save/load; the [browser workspace](application-draft-browser.md)
+edits existing metadata and startup order. Delete and native ownership-acceptance
+remain unimplemented. Draft-write endpoints cannot accept caller-supplied review records,
 actor identities, native credentials or execution/ownership success flags.
 
 The PUT body contains exactly `generation`, `resultDigest`, `expectedRevision`,
@@ -143,9 +144,21 @@ HTTP-to-database composition. The existing restore and installed-package gates
 cover the new records and actual package owners. Report final-revision CI separately
 from local runs; these are not native platform qualification campaigns.
 
-B17 remains partial: formal owner acceptance/revocation, independently verified
-source enrichments, persisted reviewed application decisions and consuming those
-reviews in assessments are not implemented here. Scoped listing and thin CLI
-save/load now exist; the guided portal editor and accepted review workflow remain
-B20 work. No proposal can bypass those steps or the later native
-provisioning, conversion, fencing, transfer, cutover and recovery gates.
+The separate signed owner-review path below now persists and evaluates exact-draft
+assessment decisions. B17 remains partial: independently verified external source
+enrichments, owner enrollment/signing integration and application-wide destination
+assessment remain open. Scoped listing, CLI save/load and bounded existing-draft
+browser editing are implemented; full browser creation/member/evidence editing is
+still B20 work. No proposal bypasses later native provisioning, conversion,
+fencing, transfer, cutover or recovery gates.
+
+
+## Signed owner-review continuation
+
+The [owner-review evidence contract](application-owner-review.md) now provides
+independent exact-draft acceptance/revocation and GET-only candidate evaluation.
+This is separate from draft saves, listing and editing; drafts remain UNREVIEWED.
+The CLI/browser in this document do not issue signatures or show a native approval.
+Owner-facing review integration, verified external dependencies and application-wide
+migration planning remain open. The separate review does not change draft status,
+create a native owner or authorize a migration.
