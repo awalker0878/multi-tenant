@@ -26,7 +26,7 @@ const ApplicationDraftWorkspace = (() => {
   const text = (v, max = 256) => typeof v === 'string' && v.length > 0 &&
     v.length <= max && v === v.trim() && !/[\u0000-\u001f\u007f]/.test(v);
 
-  function strictJson(source) {
+  function strictJson(source, maximum = MAX_RESPONSE) {
     // JSON.parse alone loses duplicate keys and rounds large integer identities.
     let position = 0;
     const fail = () => { throw new Error('Invalid bounded API JSON.'); };
@@ -76,7 +76,8 @@ const ApplicationDraftWorkspace = (() => {
           Number.isInteger(parsed) && !Number.isSafeInteger(parsed) || /[.eE]/.test(token[0]))) fail();
       return parsed;
     }
-    if (typeof source !== 'string' || source.length > MAX_RESPONSE) fail();
+    if (!integer(maximum) || maximum > 1048576 || typeof source !== 'string' ||
+        source.length > maximum || new TextEncoder().encode(source).length > maximum) fail();
     const result = value(); space();
     if (position !== source.length) fail();
     return result;
@@ -165,10 +166,13 @@ const ApplicationDraftWorkspace = (() => {
     return body;
   }
 
-  function mount({document, session, fetch, window, rejectSession = () => {}, timeoutMs = 15000}) {
+  function mount({document, session, fetch, window, rejectSession = () => {}, timeoutMs = 15000, onSelection = () => {}}) {
     const $ = (id) => document.getElementById('draft-' + id);
     let epoch = 0, busy = false, loaded = null, historical = false, dirty = false;
     let unknown = null, cursor = null, selectedEnvironment = null, pageScope = null, controller = null;
+    let lastSelection = null;
+    const selection = () => loaded && !busy && !historical && !dirty && !unknown &&
+      !loaded.sourceSuperseded ? copy(loaded) : null;
     const status = (message) => { $('status').textContent = message; };
     const identity = () => {
       const value = session();
@@ -186,6 +190,8 @@ const ApplicationDraftWorkspace = (() => {
       $('confirm').disabled = !canSave;
       $('reconcile').hidden = !unknown;
       $('reconcile').disabled = busy;
+      const selected = selection(), fingerprint = selected ? canonical(selected) : null;
+      if (fingerprint !== lastSelection) { lastSelection = fingerprint; onSelection(selected); }
     }
     function clear() {
       epoch++; controller?.abort(); controller = null;
@@ -380,7 +386,7 @@ const ApplicationDraftWorkspace = (() => {
     window?.addEventListener('pagehide', clear);
     window?.addEventListener('beforeunload', (event) => { if (busy || dirty || unknown) { event.preventDefault(); event.returnValue = ''; } });
     clear();
-    return {clear, list, load, save, reconcile};
+    return {clear, list, load, save, reconcile, selection};
   }
   return {mount, strictJson, validateRecord, editedRequest, canonical};
 })();

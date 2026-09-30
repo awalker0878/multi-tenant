@@ -7,6 +7,7 @@
   <title>Enterprise workload mobility</title>
   <link rel="stylesheet" href="style.css">
   <script src="application_drafts.js" defer></script>
+  <script src="application_comparison.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -177,6 +178,31 @@
       </div>
       <label><input id="draft-confirm-discard" type="checkbox"> If delivery is unknown, discard only this tab’s reconciliation state; this does not undo a save.</label>
       <p class="muted">Edits stay in this tab only. Reauthentication or clearing the tab discards them. A timed-out or cancelled save may already have committed; inspect exact history before retrying. Create drafts or change membership and dependency evidence through the existing operator CLI.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="application-comparison-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">Application assessment</p><h2 id="application-comparison-heading">Compare a saved application</h2></div>
+        <span class="tag">Read-only advice</span>
+      </div>
+      <p>Load source observations and select at least two destination observations using the destination picker above. Load a current saved application draft, with no unsaved edits, in Application drafts. Enter one guest profile per member below; the shared migration method, network mode and data mode above apply to every member.</p>
+      <p>No capacity is reserved and no migration is started. The API checks the current independent owner review; a held review produces no destination calculations. Missing capacity remains unknown.</p>
+      <pre id="app-compare-source" class="review-card"></pre>
+      <p id="app-compare-settings" class="muted"></p>
+      <form id="app-compare-form">
+        <div class="table-wrap"><table>
+          <caption>All retained application members — enter explicit guest-profile IDs</caption>
+          <thead><tr><th scope="col">Workload</th><th scope="col">Retained native identity</th><th scope="col">Guest profile</th></tr></thead>
+          <tbody id="app-compare-members"></tbody>
+        </table></div>
+        <div class="actions">
+          <button id="app-compare-submit" type="submit" disabled>Compare application destinations</button>
+          <button id="app-compare-cancel" class="quiet" type="button" disabled>Cancel comparison</button>
+        </div>
+      </form>
+      <p id="app-compare-status" class="muted" role="status" aria-live="polite">Load an unchanged current draft and selected destinations.</p>
+      <div id="app-compare-results" class="comparison-results" hidden></div>
+      <p class="muted">Maximum 200 member–destination pairs, 100 members and 20 destinations. Results are checked advice at the displayed time, not a continuing approval. Editing, changing selections, signing out or leaving this page clears the report. Native facts, reservations and application-wide policy/data acceptance remain separate requirements.</p>
     </section>
 
     <section class="panel" aria-labelledby="portfolio-heading">

@@ -5,6 +5,7 @@ const idPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const digestPattern = /^[0-9a-f]{64}$/;
 const approvalRoles = new Set(['SOURCE_OWNER', 'DESTINATION_OWNER', 'SOURCE_SECURITY', 'DESTINATION_SECURITY']);
 let applicationDraftWorkspace = null;
+let applicationComparisonWorkspace = null;
 let config = null;
 let accessToken = null;
 let expiryTimer = null;
@@ -50,6 +51,7 @@ function announce(message, error = false) {
 }
 
 function clearSession(message = 'This tab has no active token.') {
+  applicationComparisonWorkspace?.clear();
   applicationDraftWorkspace?.clear();
   accessToken = null;
   tokenVersion++;
@@ -136,6 +138,7 @@ function updateComparisonControls() {
 }
 
 function invalidateComparison(message = 'Choose an observed VM and at least two destinations.') {
+  applicationComparisonWorkspace?.invalidate();
   comparisonRequest++;
   comparisonBusy = false;
   $('comparison-results').replaceChildren();
@@ -198,6 +201,7 @@ async function signIn(forApproval = false) {
   const state = randomBase64Url();
   const verifier = randomBase64Url();
   const nonce = randomBase64Url();
+  applicationComparisonWorkspace?.clear();
   applicationDraftWorkspace?.clear();
   // A new login supersedes any code exchange still in flight for this tab.
   tokenVersion++;
@@ -267,6 +271,7 @@ async function receiveAuthorization(event) {
     if (expiryTimer) clearTimeout(expiryTimer);
     clearAssessmentSource();
     clearDestinationDirectory();
+    applicationComparisonWorkspace?.clear();
     applicationDraftWorkspace?.clear();
     accessToken = result.access_token;
     tokenVersion++;
@@ -1190,10 +1195,27 @@ try {
   applicationDraftWorkspace = ApplicationDraftWorkspace.mount({
     document, window, session: () => ({token: accessToken, version: tokenVersion}),
     fetch: (...args) => fetch(...args),
+    onSelection: (record) => applicationComparisonWorkspace?.setSource(record),
     rejectSession: () => clearSession('Token rejected. An attempted draft save may still require history reconciliation.')
   });
 } catch (_) {
   $('draft-status').textContent = 'Application draft workspace unavailable. Use the supported operator CLI.';
+}
+
+// Reuse the same destination picker and route settings; application membership
+// comes only from the unchanged saved draft, never from the single-VM selector.
+try {
+  applicationComparisonWorkspace = ApplicationComparisonWorkspace.mount({
+    document, window, drafts: ApplicationDraftWorkspace,
+    session: () => ({token: accessToken, version: tokenVersion}),
+    destinations: () => comparisonDestinations.map((item) => ({...item})),
+    settings: () => ({method: $('comparison-method').value,
+      networkMode: $('comparison-network').value.trim(), dataMode: $('comparison-data').value.trim()}),
+    fetch: (...args) => fetch(...args),
+    rejectSession: () => clearSession('Token rejected. Sign in and reload current application inputs.')
+  });
+} catch (_) {
+  $('app-compare-status').textContent = 'Application comparison unavailable. Use the supported operator CLI.';
 }
 
 (async () => {
