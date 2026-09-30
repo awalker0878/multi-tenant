@@ -700,3 +700,27 @@ in Wave 3 still require commissioned capacity, transactional reservation/IPAM,
 actual native stage integration and per-effect authority. Combined demand is useful
 input to that work, not permission to skip it. Keep the four completion columns
 separate and bind verification to the final delivery revision.
+
+### B19/B20 continuation — application-comparison operator, 30 September 2026
+
+`hosting-operator assessments compare-application` now calls the existing reviewed
+application service with explicit source generation, draft revision/digest, all
+member guest profiles and selected destination pools. The existing single-VM
+parser/request implementation moved into the same standard-library-only comparison
+helper without an old-path wrapper or local controller. The operator owns HTTP;
+the API still owns membership, live authorization, signed review and assessment.
+
+Application report format 2 binds the canonical full selection with `selectionDigest`,
+including method/network/data modes on both calculated and held reports. Old report
+interpretations are rejected, not aliased. Strict bounded response tests prevent
+dropped members/destinations, changed pools, false execution/reservation claims and
+capacity/status contradictions from becoming usable advice. The command makes one
+request and never retries, rebases, recollects inventory or launches a native job.
+See [operator contract and tests](../engineering/application-comparison-operator.md).
+
+This closes the CLI-access slice, not B20's guided browser application-comparison
+workflow or Wave 2. Remaining native fact/visibility, dependency and B22 scheduling,
+freshness, resumable-publication and estate-measurement obligations remain open.
+Wave 3 B23/B24 cannot consume this report as a reservation or native authorization;
+commissioned capacity/IPAM/staging admission and immediate effect checks are still
+required. No native qualification, production migration or wave completion is claimed.

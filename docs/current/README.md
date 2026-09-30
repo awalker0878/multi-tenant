@@ -13,8 +13,8 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 | [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
 
-TAD-M01 is **version 0.16 (Proposed)**; ICD-M01 is **version 0.15 (Proposed)**.
-RAD-M01 and TRANS-M01 are **version 0.9 (Proposed)** following the 30 September 2026
+TAD-M01 is **version 0.17 (Proposed)**; ICD-M01 is **version 0.16 (Proposed)**.
+RAD-M01 and TRANS-M01 are **version 0.10 (Proposed)** following the 30 September 2026
 signed owner-review, operator status and application-comparison increments. Both solution records remain **version 0.3 (Proposed)** following the 28 September 2026
 mobility review. They describe the authenticated control application, durable discovery
 and comparison, 97 explicit capability dimensions, mandatory workload/service profile
@@ -53,3 +53,7 @@ now provide separately verified assessment-only decisions and exact-revision CLI
 status inspection. Owner-facing signing,
 full browser creation/evidence editing and application-wide migration planning
 remain open; immutable drafts and native execution authority stay separate.
+
+[Application-comparison operator](../engineering/application-comparison-operator.md)
+now exposes exact reviewed-draft multi-member comparison through the existing API,
+with canonical selection binding and no native execution or reservation authority.

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.15 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.16 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -272,3 +272,16 @@ cannot publish current observations. Successful lists stay partial/visible-only.
 The [AHV HTTPS contract](../engineering/ahv-discovery-https.md) specifies fields,
 consumer obligations, request/response limits, key custody and remaining deployed
 integration. This is not a source-signing interface, write grant or migration route.
+
+### Application-comparison operator and response identity
+
+The [installed application-comparison command](../engineering/application-comparison-operator.md)
+now consumes the reviewed application service through the existing remote API
+transport. Report format 2 binds the exact canonical selection, including all
+member profiles, source/draft references, destination pools and method/network/data
+modes. The client rejects old/mismatched reports, missing members and contradictory
+capacity/status claims; it neither supplies owner authority nor calls native owners.
+Single-VM comparison and signed review formats remain unchanged. This is B19/B20
+operator access, not B23 reservations, B24 provisioning or closure of Wave 2.
+The guided browser comparison, visibility/dependency evidence and B22 obligations
+remain in the existing backlog; no production acceptance is recorded here.

@@ -100,7 +100,7 @@ The result explicitly sets `reservationHeld: false` and
 
 ## Response and remaining application obligations
 
-`hosting-application-comparison/1` retains the exact signed review, raw/normalized
+`hosting-application-comparison/2` retains the exact signed review, raw/normalized
 source and destination bindings, and per-destination member status and issue codes.
 The complete report is bounded to **1 MiB**; an oversized result is refused rather
 than dropping members or problems. Member rows identify workload, native VM, guest
@@ -117,9 +117,10 @@ Explicit blockers outrank unknowns, which outrank conditions. The top-level
 was approved. Every response denies ownership, execution and reservation authority.
 
 No new migration, database table, SQL privilege, permanent workflow, native driver,
-compatibility alias, CLI command or browser workflow is added. Existing operator
+compatibility alias or browser workflow is added by the service. The operator
+continuation below supplies a thin CLI. Existing operator
 clients continue their supported per-VM and draft operations. An application-wide
-browser/CLI selection experience and full migration planning remain future work.
+guided browser selection experience and full migration planning remain future work.
 The installed distribution includes the real calculation owner. Contract/HTTP tests
 use synthetic inventories and real owner signatures; separate PostgreSQL tests use
 the actual draft, signed-review and inventory repositories. Native route inputs in
@@ -139,3 +140,18 @@ increment supplies combined baseline demand for that handoff, not those owners.
 Do not promote comparison output into an approved provisioning job or remove
 remaining wave criteria to advance the status. No installed native platform or
 production dataset was contacted during this repository work.
+
+## Operator continuation and selection binding
+
+The [installed comparison command](application-comparison-operator.md) now exposes
+application-wide comparison without hand-authoring request JSON. The application
+report is format 2 and adds a canonical `selectionDigest` on both calculated and
+held reports, binding the exact source, draft, member profiles, destination pools
+and method/network/data selections. The client rejects old reports, mismatched
+selections, missing members and contradictory capacity/status claims. This digest
+is response identity, not a signature or execution grant. Single-VM comparison
+and independently signed owner-review interpretations remain unchanged.
+
+Guided browser application comparison remains open. The CLI neither fetches
+newer references automatically nor creates reservations or native jobs; the Wave 2
+exit and Wave 3 dependency boundaries above remain unchanged.

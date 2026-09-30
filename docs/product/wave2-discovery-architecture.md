@@ -353,3 +353,13 @@ cannot become eligibility. It does not reserve resources or authorize provisioni
 The API is implemented; a guided application-wide browser/CLI comparison is not yet
 provided. Wave 2 remains open for the documented visibility, fact, review and
 scheduling work before the Wave 3 execution handoff can be considered complete.
+
+## Application-comparison operator continuation
+
+The [thin application-comparison command](../engineering/application-comparison-operator.md)
+uses the existing authenticated service. Application report format 2 binds every
+canonical request selector with a digest, including method/network/data modes;
+the client checks retained source/review references and complete member/destination
+coverage without duplicating native policy evaluation. Old reports are rejected,
+not translated by a shim. Single-VM and signed-review formats remain unchanged.
+No reservations, jobs, new SQL rights or native support claims are introduced.

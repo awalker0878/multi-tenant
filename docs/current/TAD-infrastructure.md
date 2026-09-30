@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.16 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.17 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -343,3 +343,16 @@ Missing native edge construction, platform commissioning, actual IAM/backup/key 
 Adopting authority and approval evidence: **not recorded**. Link the actual design review and its conditions when they exist; a code merge does not authorize a site or service. Keep sensitive site parameters and private credentials in their approved systems.
 
 [Maintained design register](README.md) · [Decision register](../adr/README.md)
+
+### Application-comparison operator and response identity
+
+The [installed application-comparison command](../engineering/application-comparison-operator.md)
+now consumes the reviewed application service through the existing remote API
+transport. Report format 2 binds the exact canonical selection, including all
+member profiles, source/draft references, destination pools and method/network/data
+modes. The client rejects old/mismatched reports, missing members and contradictory
+capacity/status claims; it neither supplies owner authority nor calls native owners.
+Single-VM comparison and signed review formats remain unchanged. This is B19/B20
+operator access, not B23 reservations, B24 provisioning or closure of Wave 2.
+The guided browser comparison, visibility/dependency evidence and B22 obligations
+remain in the existing backlog; no production acceptance is recorded here.

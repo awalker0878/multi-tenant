@@ -210,3 +210,14 @@ cannot become eligibility. It does not reserve resources or authorize provisioni
 The API is implemented; a guided application-wide browser/CLI comparison is not yet
 provided. Wave 2 remains open for the documented visibility, fact, review and
 scheduling work before the Wave 3 execution handoff can be considered complete.
+
+## Compare a reviewed application through the CLI
+
+The installed `hosting-operator assessments compare-application` command now
+accepts exact draft/source references, repeated member-profile selections and
+2–20 distinct destinations within the 200-combination bound. It consumes the
+existing application API, not a local assessment or mutation owner. Use the
+[full command and response contract](../engineering/application-comparison-operator.md)
+for selectors, interpretation version 2, unknowns, limits and exit codes.
+A valid report may still be held or blocked; exit zero never approves a migration.
+The browser application-comparison workflow and the remaining Wave 2 gates stay open.
