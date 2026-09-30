@@ -138,8 +138,10 @@ exact-scope EXECUTION_OPERATOR grant, current inventory generation/result digest
 `expectedRevision` (zero for a new draft), `draft` and `dependencies`. See the
 [complete request contract](../engineering/application-drafts.md) for the bounded
 member, dataset, consistency, startup and dependency fields. Duplicate/extra fields
-and caller-supplied approval or actor claims are rejected. No draft-editing portal
-or CLI command is supplied yet.
+and caller-supplied approval or actor claims are rejected. The
+[operator CLI and bounded listing](../engineering/application-draft-operator.md)
+now provide save/load/history with explicit revision/source pins. A draft-editing
+portal is not supplied yet.
 
 Read latest draft state with GET on the same route, or select immutable history
 with `?revision=N`. JOB_READER and EXECUTION_OPERATOR may read within their exact

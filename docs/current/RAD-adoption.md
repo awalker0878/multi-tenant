@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -119,7 +119,12 @@ original retry semantics, SQL migration and deployment grants. Source-generation
 publication and draft creation share their cooperative lock; authority is rechecked
 after waits and before commit. Exact retries retain original author/time; later
 source generations are reported without relabelling history. Formal owner review,
-independent enrichment verification, portal/CLI editing and B17 closure remain open.
+independent enrichment verification, the portal editor and B17 closure remain open.
+The [operator continuation](../engineering/application-draft-operator.md) now supplies
+bounded latest-draft listing and CLI save/load/history through the existing API.
+Explicit source/revision pins and matching content acknowledgements prevent silent
+rebase or success claims after an ambiguous PUT. Listing is a live page, not an
+immutable export. Neither commands nor summaries accept ownership or migration.
 
 ## Engineering and implementation handoff
 

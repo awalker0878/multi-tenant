@@ -547,6 +547,37 @@ revocation, restore and installed ownership; final-revision results belong in th
 
 This advances B17/B20, not their full closure: independent enrichment verification,
 formal owner acceptance/revocation, persisted reviewed decisions, review-consuming
-assessment, portal/CLI editing and draft listing remain open. B22 scheduling/scale,
+assessment, portal/CLI editing and draft listing remained open at this checkpoint;
+the following continuation supplies listing and thin CLI save/load, not owner review. B22 scheduling/scale,
 independent visibility, remaining native facts, B05 and later provision/migrate/
 qualification waves keep their existing gates. No vendor installation was contacted.
+
+
+### B17/B20 continuation — draft listing and operator commands, 29 September 2026
+
+The [draft operator contract](../engineering/application-draft-operator.md) now
+connects the existing hosting-operator CLI to draft list/get/save operations.
+The new exact-scope GET listing returns latest-revision summaries with explicit
+ASCII keyset pagination and one database snapshot per live page. It does not
+pretend multiple requests form a frozen export or that listed owners are accepted.
+Stored checksums, source supersession and current reader authority are verified;
+no new migration or runtime write privilege is required beyond migration 0021.
+
+Saving requires explicit source generation/digest and expected revision. The CLI
+rejects malformed/oversized files, wrong selections, approval claims and content-
+substituted acknowledgements. It preserves unknown dependencies and canonical UTC
+spelling without a second controller or native adapter. Lost, interrupted or
+inconsistent save responses stay uncertain with original request identity. No
+automatic retry, rebase, rescan, actor override or token refresh is introduced.
+
+The operator TLS context now refuses inherited session-key logging for both CA
+selections while retaining certificate/hostname checks. API/CLI regressions,
+PostgreSQL round trips, source/tenant isolation and installed thin-client checks
+cover the increment. Final-revision CI evidence belongs in the delivery record;
+local test doubles and skipped database tests are not native qualification.
+
+This closes the missing listing and structured-JSON CLI save/load path, not B17,
+B20 or Wave 2. Formal owner acceptance/revocation, verified dependency enrichment,
+review-consuming assessment and a guided browser editor remain open. Existing
+B22, B05 and later provisioning/migration/recovery gates are unchanged; no source
+owner, execution grant or platform-qualified claim is created by these commands.

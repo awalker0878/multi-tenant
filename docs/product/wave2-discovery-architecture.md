@@ -302,6 +302,8 @@ source pins. No accepted ownership, review result or execution permission is cre
 Migration 0021 and existing API role checks protect tenant/native scope and history.
 
 Formal reviewed-decision persistence, independent enrichment, owner acceptance and
-revocation, review-consuming comparison and portal/CLI editing remain open. This
+revocation, review-consuming comparison and the portal editor remain open. The
+[operator CLI continuation](../engineering/application-draft-operator.md) now adds
+scoped listing and explicit draft save/load without changing those authority gates. This
 checkpoint supersedes earlier statements that all application drafts were purely
 in-memory; it does not close B17/B20 or any native migration acceptance gate.

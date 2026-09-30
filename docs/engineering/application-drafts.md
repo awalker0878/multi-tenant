@@ -34,12 +34,14 @@ store and is never overwritten with human assertions. Every saved/read draft has
 | `PUT /v1/environments/{environmentId}/application-drafts/{applicationGroupId}` | Append a revision. Requires exact native-scope `EXECUTION_OPERATOR`, live session and available evidence gate. The path and body application IDs must agree. |
 | `GET /v1/environments/{environmentId}/application-drafts/{applicationGroupId}` | Read the latest draft revision; `?revision=N` selects exact history. Requires exact native-scope `JOB_READER` or `EXECUTION_OPERATOR`. |
 
-Both routes use the existing bearer/SSO authentication and environment selector.
+The existing PUT/GET and new listing route use the same bearer/SSO authentication
+and environment selector.
 Unauthorized and absent resources return 404; missing authentication returns 401.
 An inconsistent request returns 422, a changed revision/source returns 409, and an
 unavailable store or evidence gate holds the operation. Responses are not cacheable.
-No list, delete, ownership-acceptance, portal editor or CLI editing command is added
-in this increment. The API deliberately cannot accept caller-supplied review records,
+The [operator continuation](application-draft-operator.md) now supplies bounded
+listing and CLI save/load. Delete, ownership-acceptance and a portal editor remain
+unimplemented. The API deliberately cannot accept caller-supplied review records,
 actor identities, native credentials or execution/ownership success flags.
 
 The PUT body contains exactly `generation`, `resultDigest`, `expectedRevision`,
@@ -143,6 +145,7 @@ from local runs; these are not native platform qualification campaigns.
 
 B17 remains partial: formal owner acceptance/revocation, independently verified
 source enrichments, persisted reviewed application decisions and consuming those
-reviews in assessments are not implemented here. Portal/CLI draft editing and
-listing remain B20 work. No proposal can bypass those steps or the later native
+reviews in assessments are not implemented here. Scoped listing and thin CLI
+save/load now exist; the guided portal editor and accepted review workflow remain
+B20 work. No proposal can bypass those steps or the later native
 provisioning, conversion, fencing, transfer, cutover and recovery gates.

@@ -45,6 +45,14 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
+    from provisioner.cli import application_drafts as draft_client
+    import argparse
+    client_parser = argparse.ArgumentParser()
+    draft_client.install_parser(client_parser.add_subparsers(dest='resource', required=True))
+    client_args = client_parser.parse_args(['application-drafts', 'list', '--environment', 'env-1'])
+    assert draft_client.request.__module__ == draft_client.__name__
+    assert draft_client.request(client_args, lambda value: value) == (
+        'GET', '/v1/environments/env-1/application-drafts', {'limit': 50}, None)
     from provisioner.controlplane.discovery import collector_runtime, collector_settings
     from provisioner.controlplane.discovery.adapters import collector_config
     from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping
@@ -96,7 +104,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, draft_client, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
