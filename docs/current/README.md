@@ -73,3 +73,9 @@ capture age, missing inventory and reported collection-health gaps through the
 existing API. TAD/ICD versions above include this inspection interface. Periodic
 monitoring/alerts, global scheduling and other Wave 2 gates remain open. RAD/TRANS
 stay at 0.12 and both solution records at 0.3; no authority boundary is changed.
+
+[Freshness operator inspection and checks](../engineering/discovery-freshness-operator.md)
+now expose that same metadata API through the existing installed CLI. Optional
+check mode distinguishes valid-but-unhealthy metadata from a failed read while
+retaining unverified native visibility and no collection/execution authority.
+This B22 client increment does not add periodic monitoring or close Wave 2.
