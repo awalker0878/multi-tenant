@@ -1,6 +1,6 @@
 # Signed discovery publication and restart recovery
 
-Reviewed 29 September 2026. This implements portions of B10/B13/B14–B16/B22 in
+Reviewed 30 September 2026. This implements portions of B10/B13/B14–B16/B22 in
 the [existing B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md).
 It describes actual package-owned collection/signing, local custody and mTLS sender
 code, not another inventory writer, a new roadmap or an installed-site acceptance.
@@ -25,7 +25,8 @@ scheduler and credential/key custody are separate; native adapters remain read-o
 The supported sequence is `stage_submission(...)`, then one explicit
 `DiscoveryHttpsPublisher(...).publish(submission)` attempt. Staging verifies current
 campaign authority and either resumes the original campaign-bound submission or
-collects, signs, retains and re-verifies a new one. Staging alone is not publication.
+claims its first collection before collecting, signing, retaining and re-verifying
+a new one. Staging alone is not publication.
 No automatic retry, deletion, campaign issuance or native write is performed.
 
 ## Original signature and wire custody
@@ -63,6 +64,65 @@ submissions race to one create-only reference; the losing submission is held and
 cannot replace the winner. The publisher's existing pre-POST retention call enforces
 this boundary even when a caller bypasses the staging helper. This is local custody,
 not fleet-wide exactly-once execution or a replacement for server campaign conflicts.
+
+## Shared-outbox first-capture exclusion — B22 continuation
+
+Before invoking a new collector, `stage_submission` now creates a private durable
+`hosting-discovery-collection-intent/1` record beside the campaign reference. The
+same hashed organization/tenant/campaign identity selects it, regardless of changed
+environment or authorization. The record binds the environment, campaign digest,
+issuer-signature digest, unique attempt and UTC claim time. It contains neither
+native credentials nor an execution grant. The unchanged `_atomic_new` primitive
+writes and fsyncs the record, links without replacing an existing destination, and
+fsyncs its directory before collection may begin.
+
+This closes a reproduced race: two callers could previously both enter native
+collection before their signed results competed at reference creation. Now only
+one caller sharing that outbox can acquire the first-capture intent. The loser
+holds without invoking the collector; it does not wait or automatically retry.
+Live signed campaign and credential-witness checks still run after acquisition.
+The claim is checked before the collector callback and before retaining its signed
+result. A changed or unreadable claim prevents new local result publication.
+
+| Local state | Staging behavior |
+|---|---|
+| Original signed submission and exact campaign reference exist | Reverify and return the original, without another claim, native read or signature. Existing pre-intent originals retain this same behavior. |
+| No original and no collection intent | Verify current authority, acquire the durable intent, then collect/sign/retain through the existing owners. |
+| Intent exists but no complete original reference exists | Hold for reconciliation; it may describe in-flight work, an interrupted read, or failed signing/storage. |
+| Corrupt intent, conflicting identity, unsafe file or storage failure | Hold without replacement or native collection. |
+
+The intent is never deleted after success or failure and has no expiry or PID-based
+takeover. A terminated process, cancelled command or elapsed schedule window does
+not prove the previous native operation stopped. Even a failure before any read
+can conservatively leave a held intent. The installed `stage` command returns its
+existing HELD result; `batch-stage` records the held task and reconciliation flag.
+No new public command or authority flag is added.
+
+An incomplete intent must be reviewed with original outbox content, existing
+campaign/result records and native observations. There is no new automated intent
+reset, orphan promotion or adjudication service. Do not delete an intent or change
+outbox roots to make a retry run. An independently verified original can use the
+existing retained-byte recovery path, subject to current authority; a timestamp
+or file name alone cannot establish such an original.
+
+This protection applies to cooperating updated processes sharing one protected
+local outbox. It does not coordinate separate roots, separate filesystems or arbitrary
+callers of lower-level `collect_submission`. It is not a distributed endpoint rate
+limit, a fleet dispatch database, a native fence or exactly-once processing. Batch
+read-rate/concurrency reporting remains `THIS_PROCESS_ONLY`. Qualify filesystem
+semantics before deployment; network-filesystem and multi-host behavior are not
+established by these local tests. Deleting or rolling back custody can erase the
+protection, so independent retention and recovery remain necessary.
+
+During upgrade, drain or hold older collectors before permitting new first captures:
+older code does not participate in intent acquisition. Preserve completed signed
+originals and all unresolved artifacts; do not silently reinterpret an absent claim
+as proof that old software never collected. The existing pre-reference recovery
+requirements below remain in force.
+
+The [Python 3.13 operating-system interface](https://docs.python.org/3.13/library/os.html)
+documents `os.link` and flushing with `os.fsync`; that API reference is not evidence
+that any particular storage deployment honors the required persistence guarantees.
 
 ## mTLS delivery and acknowledgements
 
@@ -110,8 +170,9 @@ Drain or hold pre-upgrade attempts and retain original bytes for reviewed replay
 Deleting a local reference or rolling back its entire filesystem is not independently
 detectable here. Deployments still need protected persistent authority revision floors,
 independent evidence retention/backup, restart/DR reconciliation and disk-capacity
-controls. Concurrent first-time reads are not serialized by the reference; B22 must
-supply campaign scheduling and endpoint budgets. Never present atomic local file
+controls. Updated staging serializes first capture through the separate local intent,
+not the completed reference. B22 still must supply durable fleet scheduling and
+globally coordinated endpoint budgets. Never present atomic local file
 creation as WORM storage, an HA ledger or enterprise exactly-once processing.
 
 ## Verification and remaining wave work
@@ -124,6 +185,15 @@ retry without native reads or signing. Dedicated PostgreSQL tests retain one inv
 generation after retry and exercise both local and independent-outbox server conflicts.
 Installed-package checks require both actual owners without legacy import fallback.
 
+The new `test_collection_claim.py` adds 23 methods, including separate-interpreter
+capture races, abrupt exit, completed-original resume, signing/storage failures,
+revocation after claiming and corrupt/unsafe claims. Two command-level cases use
+the actual AHV HTTPS transport against a synthetic loopback service: a second
+process sends no duplicate page chain, and termination of the first client does
+not permit automatic recapture. The failed pre-fix race regression is retained
+in the delivery evidence. These are local protocol/custody tests, not installed
+vendor, filesystem power-loss, PostgreSQL or fleet-scheduler qualification.
+
 Collector IDs, discovery wire formats, normalizer 2, profile resolution 3 and policy
 capsule/realization 2 are unchanged. The new local reference is not a compatibility
 wrapper, a native capability claim or an approval conversion. Newly collected facts
@@ -132,6 +202,9 @@ still require new digest-bound assessment reviews; partial inventory stays parti
 B10/B13/B14–B16/B22 remain partial. Installed command composition is implemented; signer custody,
 credential issuance/renewal/revocation, Vault publication, durable anti-rollback and
 independent retention, visibility/privilege-loss reconciliation, missing image/hardware
-facts, B17 owner/dependency persistence, scheduling and estate qualification remain
-open. Later provisioning, transfer, fencing, cutover and recovery are separate work.
-No installed vendor, production guest or production dataset was contacted by these tests.
+facts, verified external dependency evidence, owner-facing workflow integration,
+durable fleet scheduling and estate qualification remain open. Existing application
+draft persistence and signed assessment-only owner decisions are implemented; this
+custody change neither replaces them nor accepts their unresolved dependencies. Later provisioning, transfer, fencing, cutover and recovery are separate work.
+Wave 2 remains open; no Wave 3 work is started by this B22 correction. No installed
+vendor, production guest or production dataset was contacted by these tests.
