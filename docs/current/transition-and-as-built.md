@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.8 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.9 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -149,6 +149,22 @@ revocation does not make it acceptance. The
 [review command contract](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
 records exact request/response, tests and remaining signing/browser/application-wide
 planning work. No new database migration, privileges or execution authority are added.
+
+### Reviewed application comparison
+
+The [application comparison contract](../engineering/application-comparison.md)
+connects exact retained application drafts and independent owner decisions to the
+existing per-member destination engine. Every member and guest profile is checked;
+combined VM-slot, CPU, memory and logical-disk demand is checked against one selected
+capacity identity. Missing facts, source changes, evidence revocation and unresolved
+dependencies cannot disappear behind eligible member rows. No capacity is reserved,
+no application-wide data/policy outcome is qualified, and no native work is admitted.
+
+Inputs are immutable and current authority/evidence is rechecked, not represented
+as an atomic estate snapshot. Results retain all members and exact source/review
+bindings. B17/B19/B20 progress does not close Wave 2: independent visibility,
+remaining native facts, verified external dependencies and B22 scheduling/scale
+still precede wave closure. Wave 3 reserve/apply owners remain separate work.
 
 ## Engineering and implementation handoff
 

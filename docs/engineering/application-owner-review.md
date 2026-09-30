@@ -103,8 +103,10 @@ monitoring evidence, or a migration approval. Stored drafts stay `UNREVIEWED`;
 review validity is separately evaluated, never copied into immutable drafts.
 
 This increment consumes owner decisions through the existing application-candidate
-validator. It does not yet extend the per-VM destination comparison endpoint into
-an application-wide migration planner. The operator CLI now inspects this endpoint as described below. Browser review
+validator. The separate [application comparison service](application-comparison.md) now
+uses this review for bounded all-member comparison and combined baseline demand.
+Neither endpoint is an application-wide migration planner. The operator CLI inspects
+owner-review status as described below. Browser review
 presentation and an enterprise signing/approval experience remain future integrations.
 
 ## Inspect the review from the operator CLI
@@ -185,7 +187,7 @@ Installed distributions include the actual owners and migration. Local database
 skips and final-revision CI results must be reported separately.
 
 B17/B20 remain partial: verified external dependency evidence, actual owner/key
-onboarding, application-wide comparison/planning, browser review presentation and owner-facing
+onboarding, full application migration planning, browser review presentation and owner-facing
 signing workflows remain open. CLI status inspection is implemented, not decision issuance. The existing B22 scheduling, visibility reconciliation, native
 fact, provisioning, transfer, fencing, cutover, recovery and qualification work
 is unchanged. No native environment, workload or production dataset was contacted.

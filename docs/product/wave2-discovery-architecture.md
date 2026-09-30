@@ -341,3 +341,15 @@ Missing/mismatched replies never refresh an approval or change a draft. A retrie
 assessment-only candidate still denies native ownership/execution and third-party
 dependency verification. Browser review presentation, owner signing/enrollment and
 application-wide assessment/planning remain separate unfinished integrations.
+
+## Reviewed application-wide comparison
+
+The [application comparison endpoint](../engineering/application-comparison.md)
+now evaluates all members of an exact independently reviewed draft against multiple
+authorized destinations. It retains per-member route/profile issues and compares
+combined instance/CPU/memory/logical-disk demand with one selected capacity identity.
+Unreviewed/partial/superseded application input holds; missing or changed evidence
+cannot become eligibility. It does not reserve resources or authorize provisioning.
+The API is implemented; a guided application-wide browser/CLI comparison is not yet
+provided. Wave 2 remains open for the documented visibility, fact, review and
+scheduling work before the Wave 3 execution handoff can be considered complete.

@@ -59,7 +59,7 @@ try:
         'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
     from provisioner.controlplane.discovery import collector_runtime, collector_settings
     from provisioner.controlplane.discovery.adapters import collector_config
-    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews
+    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
     assert not hasattr(native_credentials, 'SignedFileVmwareCredentialSource')
@@ -76,6 +76,7 @@ try:
     assert application_drafts.ApplicationDraftRepository.__module__ == application_drafts.__name__
     assert application_review.parse_review.__module__ == application_review.__name__
     assert application_reviews.ApplicationReviewService.__module__ == application_reviews.__name__
+    assert application_assessment.ApplicationAssessmentService.__module__ == application_assessment.__name__
     assert grouping.validate_draft.__module__ == grouping.__name__
     assert publication.stage_submission.__module__ == publication.__name__
     assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
@@ -110,7 +111,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, draft_client, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, draft_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__

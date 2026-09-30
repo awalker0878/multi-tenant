@@ -668,3 +668,35 @@ dependency enrichment, application-wide destination comparison or full browser r
 No new database migration, privilege, native operation, capability claim or policy/
 normalizer interpretation is added. B17/B20, B22 and the later waves retain their
 unclosed implementation, native qualification and operating-acceptance gates.
+
+### B17/B19/B20 continuation — application-wide comparison, 30 September 2026
+
+The [application comparison service](../engineering/application-comparison.md)
+now consumes exact immutable drafts and independent current owner reviews through
+`POST /v1/assessments/applications/compare`. Every retained member needs an explicit
+guest profile; membership/evidence/capacity cannot be supplied as client claims.
+Two to twenty distinct destinations are supported under a 200 member/destination
+cell bound, with one selected capacity identity per destination for all members.
+
+The existing per-VM engine remains the owner of directed route and compatibility
+checks. Request-local caching avoids repeated immutable inventory hydration; it
+never caches authority, current generations or signed route/control decisions.
+Final checks detect changed reviews, installed tuples, revoked readers and source
+supersession. Combined VM slots/vCPU/memory/logical-disk checks catch applications
+whose individual VMs each fit but together exceed the selected pool. Missing or
+overflowing quantities stay unknown; no transient/HA/retention footprint is guessed.
+
+Unresolved dependencies stay unknown. Independent external dependency evidence,
+application-wide data/policy review and actual reservations are not manufactured
+from single-VM success. Even otherwise compatible applications stay conditional.
+The bounded report explicitly denies execution, ownership and reservation authority;
+no native job, schema migration, database grant or compatibility path is added.
+
+**Wave exit decision: remain in Wave 2.** Repository/HTTP/database tests verify this
+increment, not the whole wave. B14–B16 visibility and remaining image/hardware facts,
+B17 verified enrichment and deployed owner/key onboarding, B20 complete application
+operator flow and B22 scheduling/concurrency/freshness/scale remain open. B23/B24
+in Wave 3 still require commissioned capacity, transactional reservation/IPAM,
+actual native stage integration and per-effect authority. Combined demand is useful
+input to that work, not permission to skip it. Keep the four completion columns
+separate and bind verification to the final delivery revision.

@@ -198,3 +198,15 @@ passed validation, not that it is eligible for migration. The timestamped respon
 is not cached approval. Missing or invalid live evidence does not fall back to an
 older acceptance. Signing decisions, native ownership and mutation grants remain
 outside this command, and the draft itself remains UNREVIEWED.
+
+## Reviewed application-wide comparison
+
+The [application comparison endpoint](../engineering/application-comparison.md)
+now evaluates all members of an exact independently reviewed draft against multiple
+authorized destinations. It retains per-member route/profile issues and compares
+combined instance/CPU/memory/logical-disk demand with one selected capacity identity.
+Unreviewed/partial/superseded application input holds; missing or changed evidence
+cannot become eligibility. It does not reserve resources or authorize provisioning.
+The API is implemented; a guided application-wide browser/CLI comparison is not yet
+provided. Wave 2 remains open for the documented visibility, fact, review and
+scheduling work before the Wave 3 execution handoff can be considered complete.
