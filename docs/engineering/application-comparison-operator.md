@@ -114,10 +114,12 @@ qualification. Report final-revision CI and local skips separately.
 
 ## Wave transition
 
-This completes the CLI access slice of B20, not all of Wave 2. Guided browser
-application comparison, independently verified external dependencies, remaining
-image/hardware/security facts, inventory-visibility reconciliation and B22
-scheduling/freshness/resumable publication/estate qualification remain open.
+This completes the CLI access slice of B20, not all of Wave 2. The
+[saved-application browser](application-comparison-browser.md) now uses the same
+format-2 API with unchanged-draft selection and stale-result clearing. Guided draft
+creation/membership/evidence editing, independently verified external dependencies,
+remaining image/hardware/security facts, inventory-visibility reconciliation and
+B22 scheduling/freshness/resumable publication/estate qualification remain open.
 Wave 3 B23/B24 still require commissioned envelopes, capacity/IPAM/staging
 reservations and immediate per-effect authority. No comparison outcome is promoted
 into a provisioning job or used to claim that those dependencies are complete.
