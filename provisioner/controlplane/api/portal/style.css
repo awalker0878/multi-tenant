@@ -76,3 +76,9 @@ footer { padding: 0 1.5rem 2rem; margin: 0 auto; max-width: 1120px; color: #5367
 [hidden] { display: none !important; }
 @media (max-width: 650px) { .identity { text-align: left; } .actions { justify-content: flex-start; } .panel { padding: 1rem; } .section-heading { flex-wrap: wrap; } .lookup, .approval-form { display: grid; grid-template-columns: 1fr; } input, select { min-width: 0; width: 100%; } .review-grid { grid-template-columns: 1fr; } }
 @media (max-width: 650px) { .comparison-form { grid-template-columns: 1fr; } }
+
+#draft-binding { white-space: pre-wrap; overflow-wrap: anywhere; }
+#draft-order { box-sizing: border-box; width: 100%; font: inherit; padding: .65rem; }
+#draft-form label:has(input[type="checkbox"]), #draft-form button { grid-column: 1 / -1; }
+#draft-confirm, #draft-confirm-discard { flex: none; width: auto; min-width: 0; margin-right: .5rem; }
+#draft-order:focus-visible { outline: 3px solid #158d96; outline-offset: 2px; }

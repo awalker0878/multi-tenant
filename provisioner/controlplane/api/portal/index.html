@@ -6,6 +6,7 @@
   <meta name="referrer" content="no-referrer">
   <title>Enterprise workload mobility</title>
   <link rel="stylesheet" href="style.css">
+  <script src="application_drafts.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -132,6 +133,50 @@
       </form>
       <p id="comparison-status" class="muted" role="status" aria-live="polite">Choose an observed VM and at least two destinations.</p>
       <div id="comparison-results" class="comparison-results" hidden></div>
+    </section>
+
+    <section class="panel" aria-labelledby="draft-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">Application preparation</p><h2 id="draft-heading">Application drafts</h2></div>
+        <span class="tag">Unreviewed</span>
+      </div>
+      <p>Inspect saved application drafts and edit their name, proposed owner and startup order. Membership, datasets and dependency evidence remain read-only. This workspace does not approve ownership, qualify a platform or start a migration.</p>
+      <div class="lookup">
+        <label for="draft-environment">Authorized environment ID</label>
+        <input id="draft-environment" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+        <button id="draft-list" type="button" disabled>List drafts</button>
+        <button id="draft-next" type="button" class="quiet" disabled hidden>Next live page</button>
+      </div>
+      <div class="table-wrap"><table>
+        <caption>Latest unreviewed drafts on one live page; not a frozen export</caption>
+        <thead><tr><th scope="col">Application ID</th><th scope="col">Name</th><th scope="col">Proposed owner</th><th scope="col">Revision</th><th scope="col">Generation</th><th scope="col">State</th></tr></thead>
+        <tbody id="draft-rows"></tbody>
+      </table></div>
+      <div class="lookup">
+        <label for="draft-group">Application ID</label><input id="draft-group" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+        <label for="draft-revision">Historical revision (blank for current)</label><input id="draft-revision" inputmode="numeric" maxlength="16" autocomplete="off" disabled>
+        <button id="draft-load" type="button" disabled>Load draft</button>
+      </div>
+      <p id="draft-status" class="muted" role="status" aria-live="polite">Application draft workspace is loading.</p>
+      <div id="draft-editor" hidden>
+        <pre id="draft-binding" class="review-card"></pre>
+        <form id="draft-form" class="comparison-form">
+          <label for="draft-name">Application name</label><input id="draft-name" required maxlength="256" autocomplete="off" disabled>
+          <label for="draft-owner">Proposed owner ID (not acceptance)</label><input id="draft-owner" required maxlength="128" autocomplete="off" spellcheck="false" disabled>
+          <label for="draft-order">Startup order (one existing workload ID per line)</label><textarea id="draft-order" rows="5" maxlength="12900" spellcheck="false" disabled></textarea>
+          <label><input id="draft-confirm" type="checkbox" disabled> I checked the source and revision. Save an unreviewed edit only.</label>
+          <button id="draft-save" type="submit" disabled>Save unreviewed revision</button>
+        </form>
+        <div class="table-wrap"><table><caption>Retained native membership — read only</caption><thead><tr><th scope="col">Workload ID</th><th scope="col">Native identity</th></tr></thead><tbody id="draft-members"></tbody></table></div>
+        <div class="table-wrap"><table><caption>Retained dataset consistency groups — read only</caption><thead><tr><th scope="col">Group</th><th scope="col">Datasets</th></tr></thead><tbody id="draft-datasets"></tbody></table></div>
+        <div class="table-wrap"><table><caption>Retained dependency assertions — not independently verified by this editor</caption><thead><tr><th scope="col">Assertion</th><th scope="col">Source workload</th><th scope="col">Relation</th><th scope="col">Target workload</th><th scope="col">State</th><th scope="col">Unknown reason</th><th scope="col">Evidence source</th><th scope="col">Reference</th><th scope="col">Observed at</th></tr></thead><tbody id="draft-dependencies"></tbody></table></div>
+      </div>
+      <div class="actions">
+        <button id="draft-reconcile" type="button" hidden>Check exact saved revision</button>
+        <button id="draft-discard" type="button" class="quiet" disabled>Discard this tab’s draft view</button>
+      </div>
+      <label><input id="draft-confirm-discard" type="checkbox"> If delivery is unknown, discard only this tab’s reconciliation state; this does not undo a save.</label>
+      <p class="muted">Edits stay in this tab only. Reauthentication or clearing the tab discards them. A timed-out or cancelled save may already have committed; inspect exact history before retrying. Create drafts or change membership and dependency evidence through the existing operator CLI.</p>
     </section>
 
     <section class="panel" aria-labelledby="portfolio-heading">

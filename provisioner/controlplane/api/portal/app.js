@@ -4,6 +4,7 @@ const $ = (id) => document.getElementById(id);
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const digestPattern = /^[0-9a-f]{64}$/;
 const approvalRoles = new Set(['SOURCE_OWNER', 'DESTINATION_OWNER', 'SOURCE_SECURITY', 'DESTINATION_SECURITY']);
+let applicationDraftWorkspace = null;
 let config = null;
 let accessToken = null;
 let expiryTimer = null;
@@ -49,6 +50,7 @@ function announce(message, error = false) {
 }
 
 function clearSession(message = 'This tab has no active token.') {
+  applicationDraftWorkspace?.clear();
   accessToken = null;
   tokenVersion++;
   stepUpRequested = false;
@@ -196,6 +198,7 @@ async function signIn(forApproval = false) {
   const state = randomBase64Url();
   const verifier = randomBase64Url();
   const nonce = randomBase64Url();
+  applicationDraftWorkspace?.clear();
   // A new login supersedes any code exchange still in flight for this tab.
   tokenVersion++;
   pending = { popup, state, verifier, started: Date.now(), forApproval };
@@ -264,6 +267,7 @@ async function receiveAuthorization(event) {
     if (expiryTimer) clearTimeout(expiryTimer);
     clearAssessmentSource();
     clearDestinationDirectory();
+    applicationDraftWorkspace?.clear();
     accessToken = result.access_token;
     tokenVersion++;
     stepUpRequested = forApproval;
@@ -1180,6 +1184,17 @@ $('approval-form').addEventListener('submit', (event) => {
   event.preventDefault();
   recordApproval();
 });
+
+// The draft component uses the same tab identity, not a separate login or store.
+try {
+  applicationDraftWorkspace = ApplicationDraftWorkspace.mount({
+    document, window, session: () => ({token: accessToken, version: tokenVersion}),
+    fetch: (...args) => fetch(...args),
+    rejectSession: () => clearSession('Token rejected. An attempted draft save may still require history reconciliation.')
+  });
+} catch (_) {
+  $('draft-status').textContent = 'Application draft workspace unavailable. Use the supported operator CLI.';
+}
 
 (async () => {
   try {
