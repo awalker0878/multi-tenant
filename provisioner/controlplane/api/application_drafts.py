@@ -13,6 +13,7 @@ from fastapi import Depends, Path, Query, Request
 from starlette.concurrency import run_in_threadpool
 
 from provisioner.controlplane.authority.service import EXECUTION_OPERATOR, JOB_READER, require_scoped_role
+from provisioner.controlplane.discovery.application_reviews import ApplicationReviewService, REVIEW_STATUSES
 from provisioner.controlplane.discovery.application_drafts import (
     ApplicationDraftConflict, ApplicationDraftRepository, MAX_DRAFT_BYTES)
 from provisioner.controlplane.discovery.native_credentials import decode_json
@@ -34,10 +35,13 @@ _REQUEST_SCHEMA = {
 
 
 def install_routes(app, *, repository: ApplicationDraftRepository | None, authority,
-                   session, environment, context, require_evidence, clock, error):
+                   session, environment, context, require_evidence, clock, error, reviews=None):
     """Reuse the enclosing API's authenticated session and exact-scope selectors."""
     if repository is not None and not isinstance(repository, ApplicationDraftRepository):
         raise TypeError('An actual application-draft repository is required')
+
+    if reviews is not None and not isinstance(reviews, ApplicationReviewService):
+        raise TypeError('An actual signed application review service is required')
 
     def authorizer(active, write=False):
         def check(scope, checked_at):
@@ -172,5 +176,32 @@ def install_routes(app, *, repository: ApplicationDraftRepository | None, author
             if value is None:
                 raise error(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
             return checked_view(value, scope, environment_id, application_id, revision)
+        except Exception as exc:
+            failure(exc)
+
+    @app.get('/v1/environments/{environment_id}/application-drafts/{application_id}/review',
+             tags=['application-drafts'], summary='Check independently signed owner review for an exact draft')
+    def get_review(environment_id: Annotated[str, Path(pattern=_ID)],
+            application_id: Annotated[str, Path(pattern=_ID)],
+            revision: Annotated[int, Query(ge=1, le=2**63-1)], active=Depends(session)):
+        try:
+            scope, authorize = selected(active, environment_id)
+            if reviews is None:
+                raise error(503, 'APPLICATION_REVIEW_UNAVAILABLE', 'Signed application review service is unavailable')
+            value = reviews.get(context(active), scope, environment_id, application_id,
+                                revision=revision, authorize=authorize)
+            if value is None:
+                raise error(404, 'RESOURCE_NOT_FOUND', 'Resource not found')
+            if (value.get('format') != 'hosting-application-review-status/1'
+                    or value.get('scope') != vars(scope) or value.get('environmentId') != environment_id
+                    or value.get('applicationGroupId') != application_id
+                    or type(value.get('draftRevision')) is not int or value['draftRevision'] != revision
+                    or not isinstance(value.get('status'), str) or value['status'] not in REVIEW_STATUSES
+                    or value.get('dependencyEvidenceVerified') is not False
+                    or value.get('ownershipAccepted') is not False
+                    or value.get('executionAuthorized') is not False):
+                raise RuntimeError('Signed review response differs from the selected draft')
+            authorize(scope, clock())
+            return value
         except Exception as exc:
             failure(exc)

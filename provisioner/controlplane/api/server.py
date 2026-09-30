@@ -206,6 +206,8 @@ def create_postgres_app(settings: ServiceSettings, *,
     environments = EnvironmentRepository(runtime_connect)
     discovery = DiscoveryRepository(runtime_connect)
     assessment_inputs = None
+    application_reviews = None
+    application_drafts = ApplicationDraftRepository(runtime_connect)
     if settings.assessment_trust_path is not None:
         from provisioner.controlplane.discovery.assessment_inputs import (
             AssessmentInputRepository, DurableAssessmentInputs,
@@ -217,8 +219,10 @@ def create_postgres_app(settings: ServiceSettings, *,
                 settings.assessment_authority_public_key, validate=True)),
             minimum_revision=settings.assessment_minimum_revision)
         trust.current_policy(datetime.now(timezone.utc))
-        assessment_inputs = DurableAssessmentInputs(
-            AssessmentInputRepository(runtime_connect, trust), authority, environments)
+        from provisioner.controlplane.discovery.application_reviews import ApplicationReviewService
+        signed_inputs = AssessmentInputRepository(runtime_connect, trust)
+        assessment_inputs = DurableAssessmentInputs(signed_inputs, authority, environments)
+        application_reviews = ApplicationReviewService(application_drafts, signed_inputs)
     jobs = JobRepository(runtime_connect, ledger)
     if evidence_gate is None and settings.evidence_config is None:
         raise ValueError('Independent evidence configuration is required')
@@ -229,7 +233,7 @@ def create_postgres_app(settings: ServiceSettings, *,
             gate.require(tenant)
     return create_app(records, authority, jobs, environments,
                       discovery=discovery,
-                      application_drafts=ApplicationDraftRepository(runtime_connect),
+                      application_drafts=application_drafts, application_reviews=application_reviews,
                       assessment_inputs=assessment_inputs,
                       portal_config=settings.portal,
                       evidence_gate=gate)

@@ -193,6 +193,8 @@ def main() -> int:
             for statement in (
                 'GRANT SELECT ON hosting_controlplane.environment_registrations TO {}',
                 'GRANT SELECT, INSERT ON hosting_controlplane.assessment_inputs TO {}',
+                'GRANT SELECT ON hosting_controlplane.application_draft_revisions, '
+                'hosting_controlplane.discovery_generations, hosting_controlplane.discovery_observations TO {}',
                 'GRANT INSERT ON hosting_controlplane.audit_events TO {}',
                 'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
             ):

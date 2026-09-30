@@ -212,6 +212,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                discovery: DiscoveryRepository | None = None,
                assessment_inputs=None,
                application_drafts=None,
+               application_reviews=None,
                max_body_bytes: int = 1024 * 1024,
                clock: Callable[[], datetime] | None = None,
                portal_config: PortalConfig | None = None) -> FastAPI:
@@ -759,7 +760,7 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                                             'nextAfter': next_after})
 
     from .application_drafts import install_routes
-    install_routes(app, repository=application_drafts, authority=authority,
+    install_routes(app, repository=application_drafts, authority=authority, reviews=application_reviews,
                    session=session, environment=visible_environment, context=context,
                    require_evidence=require_evidence, clock=now, error=_ApiError)
     mount_portal(app, portal_config)
