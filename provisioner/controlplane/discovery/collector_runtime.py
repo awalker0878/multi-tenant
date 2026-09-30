@@ -1,4 +1,4 @@
-"""One-shot installed collector: stage signed observations or publish original bytes.
+"""One-shot collector: inspect custody, stage observations or publish original bytes.
 
 Only a protected local configuration file selects dependencies. This command does
 not admit campaigns, mint credentials, create database roles or perform migrations.
@@ -34,8 +34,8 @@ def execute(config_path, action: str, *, clock: Callable[[], datetime] = lambda:
             config_digest: str | None = None, campaign_digest: str | None = None,
             environment_id: str | None = None, read_gate: NativeReadGate | None = None) -> dict:
     """Perform one requested action; return only bounded non-secret outcome metadata."""
-    if action not in ('stage', 'publish') or not callable(clock):
-        raise ValueError('An explicit stage or publish action is required')
+    if action not in ('stage', 'publish', 'inspect') or not callable(clock):
+        raise ValueError('An explicit inspect, stage or publish action is required')
     settings = DiscoveryCollectorSettings.from_file(config_path, expected_digest=config_digest)
     document = _keys(decode_json(read_protected(settings.campaign_file, MAX_CONFIG_BYTES), MAX_CONFIG_BYTES),
                      {'environmentId', 'campaign', 'campaignSignature'})
@@ -73,6 +73,8 @@ def execute(config_path, action: str, *, clock: Callable[[], datetime] = lambda:
     verifier.bind(signature).verify_campaign(campaign, environment, now())
     outbox = PrivateDiscoveryOutbox(settings.outbox_root,
         TenantContext(campaign.scope.organization_id, campaign.scope.tenant_id))
+    if action == 'inspect':
+        return outbox.inspect(campaign, environment, signature, verifier=verifier, clock=now)
     original = outbox.for_campaign(campaign, environment)
     if original is not None:
         if original.campaign_signature != signature:
@@ -119,7 +121,7 @@ class _Parser(argparse.ArgumentParser):
 
 def main(argv=None) -> int:
     parser = _Parser(description=__doc__, allow_abbrev=False)
-    parser.add_argument('action', choices=('stage', 'publish', 'batch-stage'))
+    parser.add_argument('action', choices=('stage', 'publish', 'batch-stage', 'inspect'))
     parser.add_argument('--config', required=True, help='Absolute protected collector JSON file')
     try:
         args = parser.parse_args(argv)

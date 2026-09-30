@@ -205,14 +205,17 @@ class PrivateDiscoveryOutbox:
         if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.geteuid() or info.st_mode & 0o077:
             raise ValueError('Discovery outbox must be private and service-owned')
 
+    def _tenant_directory(self) -> Path:
+        scope = hashlib.sha256(_json([self.context.organization_id,
+                                     self.context.tenant_id]).encode('ascii')).hexdigest()
+        return self.root / scope
+
     def _store(self, digest: str) -> FileArtifactStore:
         if (not isinstance(digest, str) or len(digest) != 64
                 or any(char not in '0123456789abcdef' for char in digest)):
             raise ValueError('An exact submission digest is required')
         self._check_directory(self.root)
-        scope = hashlib.sha256(_json([self.context.organization_id,
-                                     self.context.tenant_id]).encode('ascii')).hexdigest()
-        directory = self.root / scope
+        directory = self._tenant_directory()
         for path in (directory, directory / digest[:2]):
             try:
                 path.mkdir(mode=0o700)
@@ -232,15 +235,138 @@ class PrivateDiscoveryOutbox:
                 or submission.campaign.scope.tenant_id != self.context.tenant_id):
             raise ValueError('Submission belongs to a different outbox tenant')
 
-    def _campaign_path(self, campaign_id: str) -> Path:
+    def _campaign_path(self, campaign_id: str, *, create: bool = True) -> Path:
         if not _id(campaign_id):
             raise ValueError('An exact campaign identity is required')
         # Match the ingest repository's org/tenant/campaign identity. Changing
         # environment, endpoint, authority or scope must conflict, not select a
         # different reference path. User identifiers never become path segments.
         key = hashlib.sha256(_json(['discovery-campaign-outbox/1', campaign_id]).encode('ascii')).hexdigest()
-        store = self._store(key)
-        return store.root / key[:2] / (key + '.campaign')
+        directory = self._store(key).root if create else self._tenant_directory()
+        return directory / key[:2] / (key + '.campaign')
+
+    def _read_inspection_file(self, path: Path, maximum: int) -> bytes | None:
+        """Read one known record without creating its namespace or digest shard."""
+        self._check_directory(self.root)
+        for parent in (self._tenant_directory(), path.parent):
+            try:
+                self._check_directory(parent)
+            except FileNotFoundError:
+                return None
+        try:
+            return read_protected(path, maximum)
+        except FileNotFoundError:
+            self._check_directory(path.parent)
+            return None
+
+    def inspect(self, campaign: DiscoveryCampaignAuthorization, environment_id: str,
+                signature: DiscoverySignature, *, verifier: SignedDiscoveryIngestVerifier,
+                clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict:
+        """Inspect current local custody, never collect, repair or query the server.
+
+        Two bounded reads bracket live signature checks. Changed observations hold
+        rather than being merged into a misleading recovery verdict. No directory,
+        intent, payload or campaign reference is created, promoted or deleted.
+        Local absence is not evidence of global absence or permission to recapture.
+        """
+        if (not isinstance(campaign, DiscoveryCampaignAuthorization) or not _id(environment_id)
+                or not isinstance(signature, DiscoverySignature)
+                or not isinstance(verifier, SignedDiscoveryIngestVerifier) or not callable(clock)
+                or (campaign.scope.organization_id, campaign.scope.tenant_id) !=
+                   (self.context.organization_id, self.context.tenant_id)):
+            raise ValueError('Exact campaign, verifier and local outbox tenant required')
+        previous = campaign.issued_at
+
+        def now():
+            nonlocal previous
+            at = clock()
+            if not _utc(at) or not previous <= at < campaign.expires_at:
+                raise DiscoveryPublicationHeld('Inspection campaign expired or clock regressed')
+            previous = at
+            return at
+
+        def snapshot():
+            path = self._campaign_path(campaign.campaign_id, create=False)
+            claim = self._read_inspection_file(path.with_suffix('.collection'), 1024)
+            reference = self._read_inspection_file(path, 1024)
+            payload = None
+            if reference is not None:
+                ref = _keys(decode_json(reference, 1024),
+                    {'format', 'environmentId', 'authorizationDigest', 'requestDigest'})
+                digest = ref['requestDigest']
+                if (ref['format'] != 'hosting-discovery-outbox-campaign/1'
+                        or ref['environmentId'] != environment_id
+                        or ref['authorizationDigest'] != campaign.digest()
+                        or not isinstance(digest, str) or len(digest) != 64
+                        or any(c not in '0123456789abcdef' for c in digest)
+                        or _json(ref).encode('ascii') != reference):
+                    raise ValueError('Local reference differs from the selected campaign')
+                payload = self._read_inspection_file(
+                    self._tenant_directory() / digest[:2] / digest, MAX_BODY)
+                if payload is None or hashlib.sha256(payload).hexdigest() != digest:
+                    raise ValueError('Referenced original is missing or changed')
+            return claim, reference, payload
+
+        try:
+            verifier.bind(signature).verify_campaign(campaign, environment_id, now())
+            first = snapshot()
+            claim, reference, payload = first
+            original = None
+            if payload is not None:
+                original = DiscoverySubmission.from_bytes(payload)
+                if (original.campaign != campaign or original.environment_id != environment_id
+                        or original.campaign_signature != signature
+                        or self._binding_bytes(original) != reference):
+                    raise ValueError('Original custody differs from the selected campaign')
+                original.verify(verifier, now())
+            intent = None
+            if claim is not None:
+                row = _keys(decode_json(claim, 1024), {'format', 'environmentId', 'campaignId',
+                    'authorizationDigest', 'campaignSignatureDigest', 'attemptId', 'claimedAt',
+                    'executionAuthorized'})
+                at, attempt = row['claimedAt'], row['attemptId']
+                if (row['format'] != 'hosting-discovery-collection-intent/1'
+                        or row['environmentId'] != environment_id
+                        or row['campaignId'] != campaign.campaign_id
+                        or row['authorizationDigest'] != campaign.digest()
+                        or row['campaignSignatureDigest'] != hashlib.sha256(_json(
+                            DiscoverySubmission.signature_document(signature)).encode('ascii')).hexdigest()
+                        or row['executionAuthorized'] is not False
+                        or not isinstance(attempt, str) or len(attempt) != 32
+                        or any(c not in '0123456789abcdef' for c in attempt)
+                        or not isinstance(at, str) or not 1 <= len(at) <= 40
+                        or _json(row).encode('ascii') != claim):
+                    raise ValueError('Local capture intent has inconsistent identity')
+                claimed_at = datetime.fromisoformat(at)
+                if (not _utc(claimed_at)
+                        or not campaign.issued_at <= claimed_at < campaign.expires_at
+                        or claimed_at > now()):
+                    raise ValueError('Local capture intent has inconsistent time')
+                intent = {'recordDigest': hashlib.sha256(claim).hexdigest(),
+                          'attemptId': attempt, 'claimedAt': at}
+            checked_at = now()
+            if original is not None:
+                original.verify(verifier, checked_at)
+            else:
+                verifier.bind(signature).verify_campaign(campaign, environment_id, checked_at)
+            if snapshot() != first:
+                raise ValueError('Local custody changed during inspection')
+            now()  # Detect expiry or clock regression during the final filesystem read.
+            status = ('STAGED_ORIGINAL' if original is not None else
+                      'COLLECTION_UNRESOLVED' if intent is not None else 'LOCAL_REFERENCE_ABSENT')
+            return {'format': 'hosting-discovery-outbox-inspection/1', 'status': status,
+                'campaignId': campaign.campaign_id, 'environmentId': environment_id,
+                'authorizationDigest': campaign.digest(), 'checkedAt': checked_at.isoformat(),
+                'collectionIntent': intent,
+                'original': None if original is None else {
+                    'requestDigest': original.digest, 'resultDigest': original.result.digest,
+                    'capturedAt': original.result.captured_at.isoformat(),
+                    'completeness': original.result.completeness, 'objectCount': len(original.result.objects)},
+                'consistency': 'LOCAL_RECORDS_RECHECKED', 'publicationStatus': 'NOT_CHECKED',
+                'reconciliationRequired': original is None, 'localCustodyOnly': True,
+                'collectionRequested': False, 'publicationAttempted': False, 'executionAuthorized': False}
+        except Exception:
+            raise DiscoveryPublicationHeld('Local capture inspection is held; reconcile original custody') from None
 
     def _claim_collection(self, campaign: DiscoveryCampaignAuthorization,
                           environment_id: str, signature: DiscoverySignature,
