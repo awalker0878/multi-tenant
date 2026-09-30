@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.11 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.12 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -214,3 +214,13 @@ earlier advice and suppress late responses. The component shares the existing po
 identity and destination picker; it neither creates approval nor reserves resources.
 Guided draft creation/evidence editing, visibility/dependency evidence and B22
 obligations remain open; no production acceptance is recorded here.
+
+### B22 discovery scheduling boundary
+
+The [bounded batch staging contract](../engineering/discovery-batch-scheduling.md)
+adds one-shot selection of due, already-authorized campaigns. It shares endpoint
+read limits across tenant/native-scope selections within the same process and
+retains original signed results on replay. Scheduling is not campaign issuance,
+credential authority, inventory completeness or native mutation permission. This
+increment does not establish fleet-wide admission, durable scheduling or B22
+acceptance. Wave 2 remains open; no Wave 3 work is advanced on this evidence.

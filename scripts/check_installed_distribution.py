@@ -57,7 +57,7 @@ try:
         '--id', 'app-1', '--revision', '1', '--record-digest', 'a'*64])
     assert draft_client.request(review_args, lambda value: value) == (
         'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
-    from provisioner.controlplane.discovery import collector_runtime, collector_settings
+    from provisioner.controlplane.discovery import collector_runtime, collector_settings, batch_runtime, read_budget
     from provisioner.controlplane.discovery.adapters import collector_config
     comparison_parser = argparse.ArgumentParser()
     assessment_client.install_parser(comparison_parser.add_subparsers(dest='resource', required=True))
@@ -94,6 +94,8 @@ try:
     assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
     assert callable(publication.PrivateDiscoveryOutbox.for_campaign)
     assert publication_https.DiscoveryHttpsPublisher.__module__ == publication_https.__name__
+    assert batch_runtime.run_batch.__module__ == batch_runtime.__name__
+    assert read_budget.NativeReadGate.__module__ == read_budget.__name__
     assert collector_runtime.main.__module__ == collector_runtime.__name__
     assert collector_settings.DiscoveryCollectorSettings.__module__ == collector_settings.__name__
     assert collector_config.create_native_collector.__module__ == collector_config.__name__
@@ -123,7 +125,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -200,6 +202,30 @@ with redirect_stdout(outcome):
     assert entry.load()(['publish', '--config', str(missing_config)]) == 2
 assert json.loads(outcome.getvalue()) == {
     'format': 'hosting-discovery-collector-outcome/1', 'status': 'HELD', 'executionAuthorized': False}
+
+# Exercise due-selection from the installed command, with no native authority or I/O.
+from datetime import datetime, timedelta, timezone
+now = datetime.now(timezone.utc)
+batch_file = Path.cwd() / 'future-batch.json'
+batch_file.write_text(json.dumps({
+    'format': 'hosting-discovery-batch/1', 'batchId': 'installed-check',
+    'maxParallelCollections': 1, 'maxDurationSeconds': 1,
+    'endpoints': [{'policyId': 'p', 'organizationId': 'org', 'siteId': 'site',
+        'platformFamily': 'nutanix', 'endpointId': 'endpoint',
+        'maxConcurrentReads': 1, 'minReadIntervalMilliseconds': 1}],
+    'tasks': [{'taskId': 'future', 'environmentId': 'env', 'campaignDigest': 'a'*64,
+        'collectorConfigFile': str(missing_config), 'collectorConfigDigest': 'b'*64,
+        'policyId': 'p', 'notBefore': (now+timedelta(minutes=10)).isoformat(),
+        'notAfter': (now+timedelta(minutes=11)).isoformat()}]}), encoding='utf-8')
+batch_file.chmod(0o600)
+batch_output = io.StringIO()
+with redirect_stdout(batch_output):
+    assert entry.load()(['batch-stage', '--config', str(batch_file)]) == 0
+batch_result = json.loads(batch_output.getvalue())
+assert batch_result['items'] == [{'taskId': 'future', 'status': 'NOT_DUE'}]
+assert batch_result['stagedCount'] == 0 and not batch_result['durableSchedule']
+assert batch_result['limitScope'] == 'THIS_PROCESS_ONLY'
+assert not batch_result['publicationAttempted'] and not batch_result['executionAuthorized']
 
 result = main(['plan', str(request)])
 for name, module in sys.modules.items():

@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.18 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.19 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -363,3 +363,21 @@ earlier advice and suppress late responses. The component shares the existing po
 identity and destination picker; it neither creates approval nor reserves resources.
 Guided draft creation/evidence editing, visibility/dependency evidence and B22
 obligations remain open; no production acceptance is recorded here.
+
+### B22 bounded batch staging and native read admission
+
+`discovery/batch_runtime.py` composes the installed collector's stage operation
+using protected manifest/configuration digests and exact campaign/environment
+references. It dispatches due tasks once in endpoint round-robin order under a
+finite collection-concurrency and duration budget. `discovery/read_budget.py`
+owns process-local FIFO read admission shared by all three native HTTPS adapters.
+Queue time consumes the existing native request deadline; current authority is
+rechecked while waiting and concurrency is released only after socket cleanup.
+Local scheduling failures cannot masquerade as native inventory evidence.
+
+The [batch contract](../engineering/discovery-batch-scheduling.md) distinguishes
+admission spacing from server-arrival timing and process limits from fleet-wide
+coordination. Stopping drains started work without assuming remote rollback.
+There is no automatic publication, retry, credential issuance or migration job.
+Durable scheduling, global budgets, freshness and resumable publication remain
+open under B22; neither native qualification nor Wave 2 completion is inferred.

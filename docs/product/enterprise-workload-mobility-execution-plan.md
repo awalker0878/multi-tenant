@@ -749,3 +749,33 @@ remain open. Wave 3 B23/B24 still require commissioned envelopes, transactional
 capacity/IPAM/staging reservations and actual admitted native effects. Keep these
 implementation gates separate from native qualification and operational acceptance.
 No CI workflow, database migration, native privilege or capability claim changes.
+
+### B22 continuation — bounded batch staging, 30 September 2026
+
+The [batch staging contract](../engineering/discovery-batch-scheduling.md) now
+composes due, independently authorized campaigns through the existing installed
+collector. Exact configuration bytes, campaign digest, environment, endpoint scope
+and UTC task windows are checked before native reads. One bounded dispatch uses
+endpoint round-robin queues and finite collection concurrency; each task runs once.
+Future work is reported, not waited for, and publication remains separately explicit.
+
+All three native HTTPS adapters now share FIFO endpoint read gates within a batch.
+Admission spacing and concurrency use monotonic budgets; queue time consumes the
+existing request timeout. Current authorization is checked while queued and before
+sending credentials. Local scheduling refusals hold rather than becoming native
+UNKNOWN observations. Started reads retain their rate charge through failure, and
+concurrency is released after socket cleanup. Interruptions stop new admission and
+drain started workers; any retained original still needs explicit reconciliation.
+
+Threaded, real local TLS, signed-campaign, fresh-process and installed-package
+checks cover this increment. They do not qualify real platform load or an estate.
+Output explicitly declares process-only limits and no durable schedule, publication
+or execution authority. BATCH_EVALUATED can contain only future tasks and no staged
+results; it does not mean the scheduled programme is complete.
+
+**Wave exit decision: remain in Wave 2.** Durable multi-process scheduling and
+globally coordinated endpoint budgets, freshness monitoring, larger resumable
+publication and estate measurements remain open under B22. Other Wave 2
+implementation and native/owner acceptance gates also remain open. No Wave 3 code
+is started, no qualification is invented, and no existing baseline row is promoted
+to VERIFIED by this checkpoint. No compatibility wrapper or SQL migration is added.

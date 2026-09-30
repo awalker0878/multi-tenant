@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.11 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.12 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -197,3 +197,19 @@ earlier advice and suppress late responses. The component shares the existing po
 identity and destination picker; it neither creates approval nor reserves resources.
 Guided draft creation/evidence editing, visibility/dependency evidence and B22
 obligations remain open; no production acceptance is recorded here.
+
+### B22 batch interruption and replay
+
+The [batch staging path](../engineering/discovery-batch-scheduling.md) selects only
+currently due tasks and preserves exact campaign/configuration references. A
+repeated authorized stage resumes original outbox bytes rather than collecting
+replacement evidence. Expired windows, revoked authority and local admission
+failures hold the task. Duration expiry stops new admission; running bounded
+requests are drained. A hold or interruption may leave an original staged result
+and must not be treated as rollback or proof that no native read occurred.
+
+Batch queues and rate counters are process-local, not a durable schedule or
+restart/DR high-water mark. No inventory generation is published automatically.
+Native visibility, fleet coordination, freshness, larger resumable publication
+and the other Wave 2 acceptance gates remain open. This is not Wave 3 admission
+or production operational acceptance.

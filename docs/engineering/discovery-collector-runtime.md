@@ -92,8 +92,10 @@ attempt. Do not use a new collection to repair uncertain historical delivery.
 Configured revision floors are inputs, not a durable high-water-mark service.
 Native issuance/renewal/revocation, Vault publication, protected persistent floors,
 signing-key lifecycle, independent retention, outbox capacity and DR remain site work.
-The command has no fleet scheduler, automatic retry, process-wide capture lock or
-resumable multi-part ingest. Concurrent initial captures remain a B22 obligation.
+The [batch-stage action](discovery-batch-scheduling.md) now dispatches due campaigns
+with process-local read limits. It is not a durable fleet scheduler, automatic retry,
+process-wide capture lock or resumable multi-part ingest. Cross-process initial
+captures and global coordination remain B22 obligations.
 The existing 1 MiB signed aggregate limit is unchanged.
 
 ## Verification and TLS correction
@@ -117,3 +119,11 @@ This closes the missing installed command composition, not B10/B14–B16 or Wave
 Independent inventory visibility, Glance/full hardware facts, B17 owner/dependency
 persistence, B22 scheduling/scale, installed custody and later provisioning/migration
 work remain open. No production site or vendor installation was contacted by these tests.
+
+## B22 batch composition
+
+`hosting-discovery-collect batch-stage --config <absolute-protected-batch-file>`
+uses the same stage implementation with exact configuration/campaign/environment
+pins. Future or expired tasks do not cause native contact. Cancellation stops new
+admission and drains started work. The [batch contract](discovery-batch-scheduling.md)
+defines process-only limits and outcomes; no implicit publish or migration follows.

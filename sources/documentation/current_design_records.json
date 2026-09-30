@@ -2,7 +2,7 @@
   {
     "id": "RAD-M01",
     "path": "docs/current/RAD-adoption.md",
-    "version": "0.11",
+    "version": "0.12",
     "status": "Proposed",
     "owner_role": "Architecture authority",
     "scope": "Reference adoption for enterprise workload mobility and secure hosting across qualified on-premises environments; no site-specific control assessment or production acceptance is implied.",
@@ -69,13 +69,18 @@
         "version": "0.11",
         "date": "2026-09-30",
         "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.12",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
       }
     ]
   },
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.18",
+    "version": "0.19",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -178,6 +183,11 @@
         "version": "0.18",
         "date": "2026-09-30",
         "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.19",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
       }
     ]
   },
@@ -251,7 +261,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.17",
+    "version": "0.18",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -348,13 +358,18 @@
         "version": "0.17",
         "date": "2026-09-30",
         "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.18",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.11",
+    "version": "0.12",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -421,6 +436,11 @@
         "version": "0.11",
         "date": "2026-09-30",
         "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.12",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
       }
     ]
   }

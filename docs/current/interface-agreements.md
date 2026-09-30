@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.17 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.18 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -292,3 +292,19 @@ earlier advice and suppress late responses. The component shares the existing po
 identity and destination picker; it neither creates approval nor reserves resources.
 Guided draft creation/evidence editing, visibility/dependency evidence and B22
 obligations remain open; no production acceptance is recorded here.
+
+### B22 batch and native admission interfaces
+
+`hosting-discovery-batch/1` selects bounded due tasks using exact protected
+collector-configuration bytes, campaign digest, environment, endpoint policy
+and UTC windows. `hosting-discovery-batch-outcome/1` preserves ordered per-task
+staged/held/not-due/expired/not-started outcomes. It always declares
+`limitScope: THIS_PROCESS_ONLY`, `durableSchedule: false`, no publication attempt
+and no execution authority. An evaluation with only future tasks stages nothing.
+
+See [the batch interface contract](../engineering/discovery-batch-scheduling.md)
+for field sets, bounds and caller obligations. An endpoint gate reduces read
+concurrency/admission rate but cannot supply missing campaign or credential
+authority. Separate processes and endpoint aliases require external coordination;
+this is not an enterprise scheduler or a shared native lease. Original signed
+publication remains a separate explicit interface with unchanged reconciliation.
