@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.19 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.20 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -157,7 +157,7 @@ Collector profile revisions require new admitted campaigns and credential witnes
 The normalizer's existing raw/normalized bindings remain in force. ISA, guest/key
 state, application policy, complete controller/boot mappings and deployed transport
 remain separate work. A native live-migration hint is not route qualification.
-See the [Wave 2 collector follow-up](../product/wave2-discovery-architecture.md#native-hardware-collection-follow-up--28-september-2026).
+See the [Wave 2 collector follow-up](../product/enterprise-workload-mobility-execution-plan.md#native-hardware-collection-follow-up--28-september-2026).
 
 
 ### Signed native discovery transport
@@ -379,5 +379,20 @@ The [batch contract](../engineering/discovery-batch-scheduling.md) distinguishes
 admission spacing from server-arrival timing and process limits from fleet-wide
 coordination. Stopping drains started work without assuming remote rollback.
 There is no automatic publication, retry, credential issuance or migration job.
-Durable scheduling, global budgets, freshness and resumable publication remain
+Durable scheduling, global budgets, periodic freshness monitoring and resumable publication remain
 open under B22; neither native qualification nor Wave 2 completion is inferred.
+
+### B22 scoped freshness projection
+
+`discovery/freshness.py` now projects age and collection-health metadata from the
+latest persisted generation. `api/discovery_freshness.py` composes that owner through
+the existing authenticated API. Two exact-scope metadata reads and live reader checks
+reject concurrent replacement, scope changes and revocation; no original observation
+or audit record is rewritten. Missing, future-dated, stale and recent captures remain
+distinct, independently of COMPLETE/PARTIAL/UNKNOWN reported collection quality.
+
+The [freshness contract](../engineering/discovery-freshness.md) defines server-owned
+refresh/max-age intervals, microsecond boundaries, metadata-only integrity and no
+native visibility/qualification grant. This adds inspection, not scheduled monitoring,
+alert dispatch, native recapture or migration. B22 and Wave 2 remain open; the RAD
+and transition authority boundaries remain unchanged.

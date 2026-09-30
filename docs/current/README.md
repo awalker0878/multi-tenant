@@ -13,7 +13,7 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 | [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
 
-TAD-M01 is **version 0.19 (Proposed)**; ICD-M01 is **version 0.18 (Proposed)**.
+TAD-M01 is **version 0.20 (Proposed)**; ICD-M01 is **version 0.19 (Proposed)**.
 RAD-M01 and TRANS-M01 are **version 0.12 (Proposed)** following the 30 September 2026
 signed owner-review, application-comparison and bounded batch-staging increments. Both solution records remain **version 0.3 (Proposed)** following the 28 September 2026
 mobility review. They describe the authenticated control application, durable discovery
@@ -65,5 +65,11 @@ preserve assessment-only scope. Guided authoring, native evidence and B22 remain
 
 [Bounded discovery batch staging](../engineering/discovery-batch-scheduling.md)
 adds due-task selection and process-local endpoint backpressure to the installed
-collector. Durable fleet scheduling, global budgets, freshness and resumable
+collector. Durable fleet scheduling, global budgets, periodic monitoring and resumable
 publication remain B22 work. Wave 2 stays open; no later wave is advanced.
+
+[Scoped freshness inspection](../engineering/discovery-freshness.md) now separates
+capture age, missing inventory and reported collection-health gaps through the
+existing API. TAD/ICD versions above include this inspection interface. Periodic
+monitoring/alerts, global scheduling and other Wave 2 gates remain open. RAD/TRANS
+stay at 0.12 and both solution records at 0.3; no authority boundary is changed.

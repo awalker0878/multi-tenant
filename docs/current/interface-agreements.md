@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.18 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.19 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -308,3 +308,19 @@ concurrency/admission rate but cannot supply missing campaign or credential
 authority. Separate processes and endpoint aliases require external coordination;
 this is not an enterprise scheduler or a shared native lease. Original signed
 publication remains a separate explicit interface with unchanged reconciliation.
+
+### B22 freshness inspection interface
+
+`GET /v1/environments/{environment_id}/discovery/freshness` returns
+`hosting-discovery-freshness/1` for the current exact-scope reader. It rejects all
+query parameters, including caller-supplied generations or freshness thresholds.
+Missing authorized inventory is an explicit MISSING result, not a fabricated empty
+complete scan; unavailable storage and denied access remain errors. Changed metadata
+between the two reads returns DISCOVERY_FRESHNESS_CHANGED without automatic rebase.
+
+The [interface contract](../engineering/discovery-freshness.md) records the complete
+response, status/error meanings and server defaults. A FRESH result establishes only
+age at checkedAt, not native visibility, signature currency, collection completeness
+or execution eligibility. Counts and issue codes replace raw native error/privilege
+strings. The API is no-store, read-only and invokes no scheduler or collector. No
+new database schema, privilege, client shim or native effect is introduced.

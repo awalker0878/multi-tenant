@@ -6,7 +6,7 @@
 
 This is the current execution addendum to the [historical audit and implementation plan](enterprise-workload-mobility-audit-and-implementation-plan.md).
 Preserve that audit's revision, findings and evidence. Its September 26 baseline must not be presented as the current code.
-The latest application-draft checkpoint is recorded at the end of section 8.
+The latest implementation checkpoint is recorded at the end of section 8.
 Earlier dated checkpoints retain their historical limits; the latest checkpoint distinguishes installed command/library paths from remaining deployment work.
 The B01–B50 identifiers remain stable. This addendum refines their sequence and completion evidence rather than replacing them with a second backlog.
 The older W01–W29 automation ledger and C01–C13 interface-refactor gates describe earlier scopes; neither closes this product programme.
@@ -504,7 +504,7 @@ command/configuration composition, not site deployment or credential issuance.
 
 Staging resumes existing original bytes without native reads or signing material.
 Publication requires existing custody and cannot trigger collection as a fallback.
-Held, unknown-delivery and interrupted outcomes have distinct exit codes; all keep
+Held, unknown-delivery and interrupted exits have distinct exit codes; all keep
 execution authority false. Original capture time, partial/unknown inventory and
 server idempotency remain intact. The shared native HTTPS helper no longer honors
 inherited TLS key logging; certificate/hostname and bounded-request checks remain.
@@ -779,3 +779,30 @@ publication and estate measurements remain open under B22. Other Wave 2
 implementation and native/owner acceptance gates also remain open. No Wave 3 code
 is started, no qualification is invented, and no existing baseline row is promoted
 to VERIFIED by this checkpoint. No compatibility wrapper or SQL migration is added.
+
+### B22 continuation — scoped freshness inspection, 30 September 2026
+
+The [freshness inspection contract](../engineering/discovery-freshness.md) adds a
+read-only API projection of the latest stored generation's age and reported
+collection health. Exact-scope metadata is read twice with current identity and
+role checks before and after reads. Missing inventory, future capture, stale age
+and incomplete collection stay distinct. Concurrent generation changes return an
+explicit conflict without silently retrying or selecting an older complete scan.
+
+`FRESH` describes capture age only; it never proves native visibility, signature
+currency, usable capacity or migration eligibility. The response retains original
+capture/digests and reports metadata-only verification, no requested collection and
+no execution authority. Server-owned monitoring intervals cannot be overridden in
+a request and do not change assessment policy. No native collector is invoked.
+
+This implements the freshness inspection service/API, not a recurring fleet monitor,
+alert dispatcher or auto-refresh scheduler. Service/HTTP and PostgreSQL tests cover
+age boundaries, missing/partial data, isolation, access changes, concurrent publication
+and no audit/inventory writes. Final-revision CI and skipped tests must be recorded
+separately; no installed vendor or production observation was collected here.
+
+**Wave exit decision: remain in Wave 2.** B22 durable multi-process scheduling,
+globally shared endpoint budgets, periodic freshness monitoring/alerts, larger
+resumable publication and estate measurements remain open. Other Wave 2 fact,
+visibility, dependency, authoring and adoption gates are unchanged. No Wave 3 work
+is started and no complete B item is marked VERIFIED from this partial increment.

@@ -80,7 +80,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.19",
+    "version": "0.20",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -188,6 +188,11 @@
         "version": "0.19",
         "date": "2026-09-30",
         "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.20",
+        "date": "2026-09-30",
+        "summary": "Added exact-scope freshness inspection with capture-age/coverage separation, live metadata and authorization rechecks, and explicit remaining monitoring and Wave 2 gates."
       }
     ]
   },
@@ -261,7 +266,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.18",
+    "version": "0.19",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -363,6 +368,11 @@
         "version": "0.18",
         "date": "2026-09-30",
         "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.19",
+        "date": "2026-09-30",
+        "summary": "Added exact-scope freshness inspection with capture-age/coverage separation, live metadata and authorization rechecks, and explicit remaining monitoring and Wave 2 gates."
       }
     ]
   },
