@@ -42,6 +42,24 @@ class AssessmentRequest(_StrictModel):
     data_mode: str = Field(alias='dataMode', pattern=_ID)
 
 
+class ApplicationMemberProfileInput(_StrictModel):
+    workload_id: str = Field(alias='workloadId', pattern=_ID)
+    guest_profile: str = Field(alias='guestProfile', pattern=_ID)
+
+
+class ApplicationAssessmentRequest(_StrictModel):
+    source: AssessmentSelectionInput
+    application_group_id: str = Field(alias='applicationGroupId', pattern=_ID)
+    draft_revision: int = Field(alias='draftRevision', ge=1, le=2**63-1)
+    draft_record_digest: str = Field(alias='draftRecordDigest', pattern=r'^[0-9a-f]{64}$')
+    member_profiles: list[ApplicationMemberProfileInput] = Field(alias='memberProfiles', min_length=2, max_length=100)
+    destinations: list[AssessmentDestinationInput] = Field(min_length=2, max_length=20)
+    method: Literal['REBUILD_RESTORE', 'COLD_VM_CONVERSION',
+                    'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE', 'WARM_VM_TRANSFER']
+    network_mode: str = Field(alias='networkMode', pattern=_ID)
+    data_mode: str = Field(alias='dataMode', pattern=_ID)
+
+
 class KnownInteger(_StrictModel):
     state: Literal['KNOWN']
     value: int = Field(ge=0)

@@ -54,7 +54,7 @@ from provisioner.domain.enterprise_records import validate_record
 
 from .body_limit import BodyLimitMiddleware
 from .portal import PortalConfig, mount_portal
-from .models import (AccessPage, ApprovalReceipt, ApprovalRequest, AssessmentRequest,
+from .models import (ApplicationAssessmentRequest, AccessPage, ApprovalReceipt, ApprovalRequest, AssessmentRequest,
                      DiscoveryGenerationPage, DiscoveryGenerationView,
                      EnvironmentCreate, EnvironmentPage, EnvironmentView,
                      ErrorResponse, JobEventPage, JobEventView, JobView,
@@ -530,6 +530,49 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
                             'Verified assessment inputs are temporarily unavailable') from None
         return comparison.to_document()
+
+    @app.post('/v1/assessments/applications/compare', responses=_ERRORS, tags=['discovery'])
+    def compare_application(document: ApplicationAssessmentRequest,
+                            active: _Session = Depends(session)) -> dict:
+        from provisioner.controlplane.discovery.application_assessment import (
+            ApplicationAssessmentService, ApplicationMemberProfile)
+        from provisioner.controlplane.discovery.application_reviews import ApplicationReviewUnavailable
+        selections = (document.source, *document.destinations)
+        for selection in selections:
+            visible_environment(active, selection.environment_id)
+        if assessment_inputs is None or application_drafts is None or application_reviews is None:
+            raise _ApiError(503, 'APPLICATION_ASSESSMENT_UNAVAILABLE',
+                            'Signed application assessment is unavailable')
+        try:
+            assessments = AssessmentService(discovery_repository(),
+                assessment_inputs.bind(active.credential), clock=now)
+            service = ApplicationAssessmentService(application_drafts, application_reviews, assessments)
+            result = service.compare(context(active), active.principal.subject,
+                AssessmentSelection(document.source.environment_id, document.source.generation),
+                document.application_group_id, revision=document.draft_revision,
+                record_digest=document.draft_record_digest,
+                profiles=tuple(ApplicationMemberProfile(item.workload_id, item.guest_profile)
+                               for item in document.member_profiles),
+                destinations=tuple(AssessmentDestination(
+                    AssessmentSelection(item.environment_id, item.generation),
+                    item.capacity_kind, item.capacity_native_id) for item in document.destinations),
+                method=document.method, network_mode=document.network_mode, data_mode=document.data_mode)
+            principal = authority.authenticate(active.credential)
+            if (principal.kind != 'HUMAN' or principal.subject != active.principal.subject
+                    or principal.organization_id != active.principal.organization_id
+                    or principal.tenant_id != active.principal.tenant_id):
+                raise PermissionError('Application assessment identity changed')
+            for selection in selections:
+                visible_environment(_Session(principal, active.credential), selection.environment_id)
+            return result
+        except (PermissionError, LookupError, AuthenticationFailed, AuthorityDenied):
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found') from None
+        except (ApplicationReviewUnavailable, NormalizationHeld, RuntimeError, OSError):
+            raise _ApiError(503, 'APPLICATION_ASSESSMENT_UNAVAILABLE',
+                            'Pinned application or signed evidence requires review') from None
+        except ValueError:
+            raise _ApiError(422, 'APPLICATION_ASSESSMENT_SELECTION_INVALID',
+                            'Exact application, complete profiles and bounded destinations are required') from None
 
     @app.post('/v1/environments', status_code=201,
               response_model=EnvironmentView, responses=_ERRORS,
