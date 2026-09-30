@@ -39,6 +39,12 @@ def _matches(pattern, value) -> bool:
     return isinstance(value, str) and pattern.fullmatch(value) is not None
 
 
+def _native_scope(value) -> bool:
+    # Environment registrations preserve native scope text, not logical-ID syntax.
+    return (isinstance(value, str) and 1 <= len(value) <= 512 and bool(value.strip())
+            and not any(ord(char) < 32 or ord(char) == 127 for char in value))
+
+
 def _time(value) -> datetime:
     _require(_matches(_UTC, value))
     try:
@@ -107,7 +113,8 @@ def validate_freshness(environment_id: str, payload: dict) -> bool:
              and type(payload['refreshDue']) is bool)
     scope, policy = payload['scope'], payload['policy']
     _require(type(scope) is dict and set(scope) == _SCOPE
-             and all(_matches(_ID, value) for value in scope.values())
+             and all(_matches(_ID, scope[key]) for key in _SCOPE - {'native_scope_id', 'platform_family'})
+             and _native_scope(scope['native_scope_id'])
              and scope['platform_family'] in ('vmware', 'nutanix', 'openstack'))
     _require(type(policy) is dict and set(policy) == {
         'format', 'refreshAfterSeconds', 'maxAgeSeconds'}
