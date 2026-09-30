@@ -24,7 +24,7 @@ _DRAFT_FIELDS = {'applicationGroupId', 'name', 'ownerId', 'members', 'datasetIds
 
 
 def install_parser(groups):
-    drafts = groups.add_parser('application-drafts', help='List, load or save unreviewed application drafts')
+    drafts = groups.add_parser('application-drafts', help='List, load, save drafts or inspect independently signed owner reviews')
     actions = drafts.add_subparsers(dest='action', required=True)
     listing = actions.add_parser('list', help='One live page of latest-revision summaries')
     listing.add_argument('--environment', required=True)
@@ -34,6 +34,11 @@ def install_parser(groups):
     get.add_argument('--environment', required=True)
     get.add_argument('--id', required=True)
     get.add_argument('--revision', type=int)
+    review = actions.add_parser('review', help='Read exact-draft owner-review status; never accept or revoke')
+    review.add_argument('--environment', required=True)
+    review.add_argument('--id', required=True)
+    review.add_argument('--revision', type=int, required=True)
+    review.add_argument('--record-digest', help='Optional exact recordDigest from the previously loaded draft')
     save = actions.add_parser('save', help='Append a draft; never approve ownership or migration')
     save.add_argument('--environment', required=True)
     save.add_argument('--id', required=True)
@@ -117,10 +122,18 @@ def request(args, identity):
             params['after'] = args.after  # Query values are encoded exactly once by HTTPX.
         return 'GET', prefix, params, None
     path = prefix + '/' + identity(args.id)
+    if args.action == 'review':
+        if (type(args.revision) is not int or not 1 <= args.revision <= _MAX
+                or args.record_digest is not None and (not isinstance(args.record_digest, str)
+                    or not _SHA.fullmatch(args.record_digest))):
+            raise ValueError('An exact draft revision and valid optional digest are required')
+        return 'GET', path + '/review', {'revision': args.revision}, None
     if args.action == 'get':
         if args.revision is not None and not 1 <= args.revision <= _MAX:
             raise ValueError('Draft revision is outside its bound')
         return 'GET', path, {'revision': args.revision} if args.revision is not None else None, None
+    if args.action != 'save':
+        raise ValueError('Unknown application draft operation')
     if (not 1 <= args.generation <= _MAX or not 0 <= args.expected_revision < _MAX
             or not _SHA.fullmatch(args.result_digest)):
         raise ValueError('Exact inventory digest/generation and expected revision are required')
@@ -136,6 +149,9 @@ def request(args, identity):
 
 def validate_response(args, value, *, submitted=None):
     """Refuse a successful-looking response for another selection or approval."""
+    if args.action == 'review':
+        _validate_review_response(args, value)
+        return
     def revision(item, identity):
         if (not isinstance(item, dict) or item.get('format') != 'hosting-application-draft-revision/1'
                 or item.get('environmentId') != args.environment or item.get('applicationGroupId') != identity
@@ -212,3 +228,103 @@ def save_unknown(args, document):
             'generation': args.generation, 'resultDigest': args.result_digest,
             'requestDigest': hashlib.sha256(raw).hexdigest(), 'executionAuthorized': False,
             'reconciliationRequired': True}
+
+
+def _validate_review_response(args, value):
+    """Check the read contract, not signatures or native/application eligibility.
+
+    Only the API can load current trust and retained observation evidence. A
+    consistent response is a status at checkedAt, never a cached approval, an
+    ownership transfer or a decision the thin client may issue itself.
+    """
+    fields = {'format', 'environmentId', 'scope', 'applicationGroupId', 'draftRevision',
+        'draftRecordDigest', 'proposalDigest', 'generation', 'resultDigest', 'latestGeneration',
+        'latestDraftRevision', 'checkedAt', 'status', 'ownerDecision', 'ownerId',
+        'reviewReference', 'evidenceId', 'evidenceRevision', 'evidenceDigest', 'reviewedAt',
+        'expiresAt', 'candidateDigest', 'unknownDependencyCount', 'dependencyEvidenceVerified',
+        'ownershipAccepted', 'executionAuthorized'}
+    statuses = {'UNREVIEWED', 'REVOKED', 'HELD_SUPERSEDED_DRAFT', 'HELD_SUPERSEDED_INVENTORY',
+        'HELD_INCOMPLETE_INVENTORY', 'HELD_STALE_INVENTORY',
+        'REVIEWED_ASSESSMENT_ONLY', 'REVIEWED_WITH_UNKNOWNS'}
+
+    def integer(item):
+        return type(item) is int and 1 <= item <= _MAX
+
+    def sha(item):
+        return isinstance(item, str) and _SHA.fullmatch(item) is not None
+
+    def stamp(item):
+        if (not isinstance(item, str) or len(item) > 40
+                or not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}'
+                                    r'(?:\.[0-9]{1,6})?(?:Z|\+00:00)', item)):
+            raise ValueError('Invalid review time')
+        parsed = datetime.fromisoformat(item)
+        if parsed.utcoffset() != timedelta(0):
+            raise ValueError('Review time must be UTC')
+        return parsed
+
+    if (not isinstance(value, dict) or set(value) != fields
+            or value['format'] != 'hosting-application-review-status/1'
+            or value['environmentId'] != args.environment or value['applicationGroupId'] != args.id
+            or not isinstance(value['status'], str) or value['status'] not in statuses
+            or not all(integer(value[key]) for key in ('draftRevision', 'generation',
+                                                        'latestGeneration', 'latestDraftRevision'))
+            or value['draftRevision'] != args.revision
+            or value['latestGeneration'] < value['generation']
+            or value['latestDraftRevision'] < value['draftRevision']
+            or not all(sha(value[key]) for key in ('draftRecordDigest', 'proposalDigest', 'resultDigest'))
+            or args.record_digest is not None and value['draftRecordDigest'] != args.record_digest
+            or any(value[key] is not False for key in ('dependencyEvidenceVerified',
+                                                       'ownershipAccepted', 'executionAuthorized'))):
+        raise ValueError('Invalid exact-draft review response')
+    scope = value['scope']
+    identity_fields = {'organization_id', 'tenant_id', 'site_id', 'security_domain_id', 'endpoint_id'}
+    if (not isinstance(scope, dict) or set(scope) != identity_fields | {'native_scope_id', 'platform_family'}
+            or any(not isinstance(scope[key], str) or not _ID.fullmatch(scope[key]) for key in identity_fields)
+            or not isinstance(scope['platform_family'], str)
+            or scope['platform_family'] not in {'vmware', 'nutanix', 'openstack'}
+            or not isinstance(scope['native_scope_id'], str) or not 1 <= len(scope['native_scope_id']) <= 512
+            or not scope['native_scope_id'].strip()
+            or any(ord(c) < 32 or ord(c) == 127 for c in scope['native_scope_id'])):
+        raise ValueError('Invalid review scope')
+    checked = stamp(value['checkedAt'])
+    decision = value['ownerDecision']
+    evidence_fields = ('ownerId', 'reviewReference', 'evidenceId', 'evidenceRevision',
+                       'evidenceDigest', 'reviewedAt', 'expiresAt')
+    if decision is None:
+        if any(value[key] is not None for key in evidence_fields):
+            raise ValueError('Unreviewed input cannot carry signed-decision claims')
+    elif isinstance(decision, str) and decision in {'ACCEPT_FOR_ASSESSMENT', 'REVOKE'}:
+        if (any(not isinstance(value[key], str) or not _ID.fullmatch(value[key])
+                for key in ('ownerId', 'reviewReference', 'evidenceId'))
+                or not integer(value['evidenceRevision']) or not sha(value['evidenceDigest'])):
+            raise ValueError('Invalid review evidence identity')
+        reviewed, expires = stamp(value['reviewedAt']), stamp(value['expiresAt'])
+        if not reviewed <= checked < expires or expires - reviewed > timedelta(hours=1):
+            raise ValueError('Review validity does not cover its evaluation')
+    else:
+        raise ValueError('Invalid owner decision')
+    status = value['status']
+    candidate = status in {'REVIEWED_ASSESSMENT_ONLY', 'REVIEWED_WITH_UNKNOWNS'}
+    if candidate:
+        count = value['unknownDependencyCount']
+        if (decision != 'ACCEPT_FOR_ASSESSMENT' or not sha(value['candidateDigest'])
+                or type(count) is not int or not 0 <= count <= 500
+                or (status == 'REVIEWED_WITH_UNKNOWNS') != (count > 0)):
+            raise ValueError('Review candidate or unknown count is inconsistent')
+    elif value['candidateDigest'] is not None or value['unknownDependencyCount'] is not None:
+        raise ValueError('Held or unreviewed input cannot carry a candidate')
+    # Enforce wire-state consistency only; do not reconstruct a candidate or
+    # reinterpret native completeness, freshness or dependency evidence here.
+    if decision == 'REVOKE':
+        valid = status == 'REVOKED'
+    elif value['latestDraftRevision'] != value['draftRevision']:
+        valid = status == 'HELD_SUPERSEDED_DRAFT'
+    elif value['latestGeneration'] != value['generation']:
+        valid = status == 'HELD_SUPERSEDED_INVENTORY'
+    elif decision is None:
+        valid = status == 'UNREVIEWED'
+    else:
+        valid = candidate or status in {'HELD_INCOMPLETE_INVENTORY', 'HELD_STALE_INVENTORY'}
+    if not valid:
+        raise ValueError('Review status contradicts its source or decision')

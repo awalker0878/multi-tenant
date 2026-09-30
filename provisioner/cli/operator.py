@@ -340,6 +340,8 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
         verify.verify_flags |= ssl.VERIFY_X509_STRICT | ssl.VERIFY_X509_PARTIAL_CHAIN
         verify.load_verify_locations(cafile=args.ca_bundle or certifi.where())
         headers = {'Authorization': 'Bearer ' + credential, 'Accept': 'application/json'}
+        if args.resource == 'application-drafts' and args.action == 'review':
+            headers['Cache-Control'] = 'no-store'
         if args.resource == 'jobs' and args.action == 'submit':
             headers['Idempotency-Key'] = args.idempotency_key
         with httpx.Client(timeout=httpx.Timeout(10.0, connect=5.0),
