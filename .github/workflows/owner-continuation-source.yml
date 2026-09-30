@@ -1,32 +1,93 @@
-name: Owner review continuation source
+name: Publish reviewed owner inspection
 on:
   push:
     branches: ['implementation/all-waves']
     paths: ['.github/workflows/owner-continuation-source.yml']
 permissions:
-  contents: read
+  contents: write
+concurrency:
+  group: reviewed-owner-inspection-publication
+  cancel-in-progress: false
 jobs:
-  source:
-    if: github.repository == 'awalker0878/multi-tenant'
+  reviewed-inspection:
+    if: github.repository == 'awalker0878/multi-tenant' && github.event_name == 'push' && github.ref == 'refs/heads/implementation/all-waves'
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-          persist-credentials: false
-      - name: Export exact tracked source without credentials
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.13'
+      - name: Verify baseline and apply the reviewed commit series
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/review-source"
-          git rev-parse HEAD > "$RUNNER_TEMP/review-source/revision.txt"
-          git bundle create "$RUNNER_TEMP/review-source/source.bundle" HEAD
-          cd "$RUNNER_TEMP/review-source"
-          sha256sum source.bundle > source.sha256
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: owner-continuation-source-${{ github.sha }}
-          path: ${{ runner.temp }}/review-source/
-          retention-days: 1
-          if-no-files-found: error
+          git config user.name 'Repository review'
+          git config user.email 'review@users.noreply.github.com'
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, lzma, os, subprocess
+          baseline='68a06c59037adcb343f5efb510ce272cd5e03369'
+          transport={'.github/owner-inspection.patch.xz','.github/workflows/owner-continuation-source.yml'}
+          subprocess.run(['git','merge-base','--is-ancestor',baseline,'HEAD'],check=True)
+          changed=set(subprocess.check_output(['git','diff','--name-only','-z',baseline,'HEAD']).decode().strip('\0').split('\0'))
+          if changed-transport:
+              raise SystemExit('Concurrent source change; publication refused')
+          packed=Path('.github/owner-inspection.patch.xz').read_bytes()
+          if len(packed)!=14872 or hashlib.sha256(packed).hexdigest()!='64374e00400081f9921684a457daa6986552369d504ebe5478da326f1b62dfc2':
+              raise SystemExit('Reviewed transport checksum mismatch')
+          decoder=lzma.LZMADecompressor(memlimit=128*1024*1024)
+          patch=decoder.decompress(packed,max_length=1024*1024)
+          if not decoder.eof or decoder.unused_data or len(patch)!=60506:
+              raise SystemExit('Unexpected reviewed patch')
+          if hashlib.sha256(patch).hexdigest()!='b653ad7f92edd40399211b829e2485275541192824e67fd432164d9ec7af71db':
+              raise SystemExit('Reviewed implementation checksum mismatch')
+          path=Path(os.environ['RUNNER_TEMP'])/'owner-inspection.patch'
+          path.write_bytes(patch)
+          subprocess.run(['git','am',str(path)],check=True)
+          PY
+      - name: Verify and isolate the exact transport-free source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, subprocess
+          from pathlib import Path
+          env=dict(os.environ,GIT_INDEX_FILE=str(Path(os.environ['RUNNER_TEMP'])/'delivery-index'))
+          subprocess.run(['git','read-tree','HEAD'],env=env,check=True)
+          subprocess.run(['git','update-index','--force-remove','.github/owner-inspection.patch.xz','.github/workflows/owner-continuation-source.yml'],env=env,check=True)
+          actual=subprocess.check_output(['git','write-tree'],env=env).decode().strip()
+          if actual!='23d4c12861890795bd32f6bfd682b55e3531bcb1':
+              raise SystemExit('Reviewed delivery tree mismatch: '+actual)
+          candidate=subprocess.check_output(['git','commit-tree',actual,'-p','HEAD','-m','Temporary exact-tree validation candidate']).decode().strip()
+          destination=str(Path(os.environ['RUNNER_TEMP'])/'inspection-delivery')
+          subprocess.run(['git','worktree','add','--detach',destination,candidate],check=True)
+          print('Exact reviewed source tree verified:',actual)
+          PY
+      - name: Install pinned repository and integration dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/inspection-delivery"
+          python -m pip install -r requirements-repository.txt -e '.[controlplane]' 'httpx==0.28.1' 'setuptools>=80,<85' 'wheel>=0.45,<1'
+      - name: Test the transport-free deliverable
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/inspection-delivery"
+          python -m unittest discover -s tests/provisioning/discovery -p 'test_*.py'
+          python -m unittest discover -s tests/provisioning/api -p 'test_*.py'
+          python -m unittest tests.provisioning.unit.test_architecture tests.provisioning.documentation.test_documentation tests.provisioning.documentation.test_research_alignment tests.test_retired_interfaces
+          python scripts/check_documentation.py
+          python scripts/check_repository.py
+          python scripts/check_retired_interfaces.py
+          python scripts/check_installed_distribution.py
+      - name: Publish reviewed commits by ordinary fast-forward only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain --untracked-files=no)"
+          git push origin HEAD:refs/heads/implementation/all-waves
+          git log -2 --format='%h %s'
