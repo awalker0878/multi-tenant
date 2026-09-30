@@ -125,5 +125,19 @@ class ApplicationAssessmentHttpTests(unittest.TestCase):
         self.assertEqual(self.request(value).status_code, 422)
         self.assertEqual(self.repository.reads, [])
 
+    def test_response_version_and_digest_bind_every_original_request_field(self):
+        import hashlib
+        import json
+        for changes in ({}, {'method': 'REBUILD_RESTORE'}, {'networkMode': 'renumber'}, {'dataMode': 'online'}):
+            body = {**self.body, **changes}
+            with self.subTest(changes=changes):
+                response = self.request(body)
+                self.assertEqual(response.status_code, 200, response.text)
+                value = response.json()
+                self.assertEqual(value['format'], 'hosting-application-comparison/2')
+                expected = hashlib.sha256(json.dumps(body, sort_keys=True, ensure_ascii=True,
+                    separators=(',', ':'), allow_nan=False).encode('ascii')).hexdigest()
+                self.assertEqual(value['selectionDigest'], expected)
+
 
 if __name__ == '__main__': unittest.main()

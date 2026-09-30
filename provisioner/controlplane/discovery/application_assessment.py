@@ -143,7 +143,18 @@ class ApplicationAssessmentService:
             return view
 
         review = read_review()
-        report = {'format': 'hosting-application-comparison/1', 'applicationReview': review,
+        selection = {'source': {'environmentId': source.environment_id, 'generation': source.generation},
+            'applicationGroupId': application_group_id, 'draftRevision': revision,
+            'draftRecordDigest': record_digest,
+            'memberProfiles': [{'workloadId': item.workload_id, 'guestProfile': item.guest_profile}
+                               for item in profiles],
+            'destinations': [dict(environmentId=item.selection.environment_id,
+                generation=item.selection.generation, **({'capacityKind': item.capacity_kind,
+                'capacityNativeId': item.capacity_native_id} if item.capacity_kind is not None else {}))
+                for item in destinations],
+            'method': method, 'networkMode': network_mode, 'dataMode': data_mode}
+        report = {'format': 'hosting-application-comparison/2', 'selectionDigest': _digest(selection),
+            'applicationReview': review,
             'sourceInput': None, 'destinationInputs': [], 'assessments': [],
             'status': 'HELD_APPLICATION_REVIEW', 'consistency': 'PINNED_INPUTS_LIVE_RECHECKS',
             'ownershipAccepted': False, 'executionAuthorized': False,
