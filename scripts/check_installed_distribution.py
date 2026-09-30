@@ -132,6 +132,7 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0021_application_drafts.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
+    'provisioner/controlplane/api/portal/application_drafts.js',
     'provisioner/controlplane/api/portal/style.css',
 ):
     assert (site / relative).is_file(), relative

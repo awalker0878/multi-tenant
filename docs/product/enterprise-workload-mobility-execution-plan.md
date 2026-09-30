@@ -578,6 +578,36 @@ local test doubles and skipped database tests are not native qualification.
 
 This closes the missing listing and structured-JSON CLI save/load path, not B17,
 B20 or Wave 2. Formal owner acceptance/revocation, verified dependency enrichment,
-review-consuming assessment and a guided browser editor remain open. Existing
+review-consuming assessment and the full guided browser workflow remain open. Existing
 B22, B05 and later provisioning/migration/recovery gates are unchanged; no source
 owner, execution grant or platform-qualified claim is created by these commands.
+
+
+### B20 continuation — existing-draft browser workspace, 29 September 2026
+
+The [browser workspace](../engineering/application-draft-browser.md) now composes
+live-page draft listing, exact current/history reads and limited existing-draft
+editing into the authenticated portal. Name, proposed owner and startup order are
+editable; original source/revision, membership, datasets, consistency groups and
+all dependency assertions are retained. Historical or superseded sources stay
+read-only. Full browser draft creation and membership/evidence editing remain open.
+
+Saves require explicit confirmation and an exact-content/source/revision HTTP 200
+acknowledgement. Conflicts require reload; ambiguous outcomes hold further saves.
+Reconciliation is one GET for the expected next revision, not a retry or an owner
+approval. Matching history is read-only and does not prove which tab authored it.
+Identity changes clear state and discard late responses. Same-origin requests,
+strict bounded JSON, literal DOM rendering and response cancellation are tested.
+No token or draft is persisted in browser storage; tab closure is not a durable
+operation log and cannot imply that a submitted write rolled back.
+
+Node component/shell tests and Python asset/CSP/origin tests cover this increment;
+the existing Python suites invoke the Node cases without a new workflow. Final
+CI belongs in the delivery record. The local real-browser smoke was blocked by
+administrator navigation policy, not recorded as passed. Deployed browser/SSO and
+usability acceptance still need an authorized test environment.
+
+This narrows B20 but does not close B17/B20 or Wave 2. Owner acceptance/revocation,
+verified dependency enrichment, reviewed assessment consumption, full browser
+creation and B22 remain open. No new database migration, privilege, interpretation
+version, native execution path or platform qualification is introduced.

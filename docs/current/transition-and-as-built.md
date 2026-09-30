@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.6 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -101,12 +101,23 @@ original retry semantics, SQL migration and deployment grants. Source-generation
 publication and draft creation share their cooperative lock; authority is rechecked
 after waits and before commit. Exact retries retain original author/time; later
 source generations are reported without relabelling history. Formal owner review,
-independent enrichment verification, the portal editor and B17 closure remain open.
+independent enrichment verification, full guided review and B17 closure remain open.
 The [operator continuation](../engineering/application-draft-operator.md) now supplies
 bounded latest-draft listing and CLI save/load/history through the existing API.
 Explicit source/revision pins and matching content acknowledgements prevent silent
 rebase or success claims after an ambiguous PUT. Listing is a live page, not an
 immutable export. Neither commands nor summaries accept ownership or migration.
+
+### Bounded browser draft workspace
+
+The [browser workspace](../engineering/application-draft-browser.md) now lists and
+loads existing unreviewed drafts and edits name, proposed owner and startup order.
+It retains the exact source/revision and every read-only membership, dataset and
+dependency assertion. Historical/superseded records cannot be edited. Explicit save
+confirmation, exact content acknowledgements and GET-only uncertain-save
+reconciliation use the existing API; no browser action accepts ownership or launches
+migration. Tab identity changes clear state and suppress late replies. Full browser
+creation/evidence editing and independently authorized owner review remain open.
 
 ## Engineering and implementation handoff
 
