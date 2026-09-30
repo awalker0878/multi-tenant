@@ -181,6 +181,9 @@ class ApplicationDraftRepository:
             raise ValueError('Application proposal exceeds its aggregate bound')
         content = decode_json(raw, MAX_DRAFT_BYTES)
         draft, dependencies = parse_content(content)
+        # Normalize accepted UTC spellings before comparing an exact retry.
+        for item, edge in zip(content['dependencies'], dependencies):
+            item['observedAt'] = edge.observed_at.isoformat()
         if not _id(draft.application_group_id):
             raise ValueError('An exact application proposal identity is required')
         DiscoveryRepository._require_scope(ctx, scope, environment_id)
@@ -208,6 +211,7 @@ class ApplicationDraftRepository:
             if (previous[1] if previous else 0) != expected_revision:
                 raise ApplicationDraftConflict('Application proposal revision has advanced')
             result = self._snapshot(connection, args, generation, result_digest)
+            at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
             validate_draft(result, draft, dependencies, checked_at=at)
             proposal = proposal_document(result, draft, dependencies)
             payload = _json(proposal)

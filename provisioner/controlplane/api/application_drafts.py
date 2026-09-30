@@ -98,7 +98,7 @@ def install_routes(app, *, repository: ApplicationDraftRepository | None, author
             environment_id: Annotated[str, Path(pattern=_ID)],
             application_id: Annotated[str, Path(pattern=_ID)], active=Depends(session)):
         try:
-            scope, authorize = selected(active, environment_id, write=True)
+            scope, authorize = await run_in_threadpool(selected, active, environment_id, write=True)
             if request.headers.get('content-type', '').split(';', 1)[0].strip().lower() != 'application/json':
                 raise ValueError('JSON is required')
             document = _keys(decode_json(await request.body(), MAX_DRAFT_BYTES),

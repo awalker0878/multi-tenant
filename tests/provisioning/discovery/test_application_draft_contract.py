@@ -1,5 +1,4 @@
 """Draft validation does not manufacture an owner review from incomplete inventory."""
-import copy
 import unittest
 from dataclasses import replace
 from datetime import timedelta

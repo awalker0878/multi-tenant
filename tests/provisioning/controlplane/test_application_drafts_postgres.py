@@ -70,6 +70,13 @@ class ApplicationDraftPostgresTests(unittest.TestCase):
                 "record_kind='ApplicationDraft' AND record_id='app-1'").fetchone()[0]
             self.assertEqual(count,1)
 
+    def test_utc_z_spelling_does_not_break_idempotent_retry(self):
+        content=copy.deepcopy(self.content)
+        content['dependencies'][0]['observedAt']=content['dependencies'][0]['observedAt'].replace('+00:00','Z')
+        first=self.save(content=content)
+        self.assertEqual(self.save(content=content),first)
+        self.assertEqual(self.save(),first)
+
     def test_changed_actor_or_payload_cannot_replay_original_append(self):
         self.save()
         with self.assertRaises(ApplicationDraftConflict):
@@ -158,6 +165,52 @@ class ApplicationDraftPostgresTests(unittest.TestCase):
                     'DELETE FROM hosting_controlplane.application_draft_revisions'):
             with self.assertRaises(self.psycopg.errors.InsufficientPrivilege):
                 with self.repo._session(self.ctx,self.scope,self.environment_id,self.authorize) as con: con.execute(sql)
+        self.assertEqual(self.get()['revision'],1)
+
+    def test_real_api_persists_and_reads_the_same_generation_bound_draft(self):
+        from datetime import datetime, timedelta, timezone
+        from fastapi.testclient import TestClient
+        from provisioner.controlplane.api import create_app
+        from provisioner.controlplane.authority.model import VerifiedPrincipal, RoleGrant
+        from provisioner.controlplane.authority.service import AuthorityService, EXECUTION_OPERATOR
+        from tests.provisioning.api import test_http as http_support
+        now=datetime.now(timezone.utc)
+        principal=VerifiedPrincipal('verified-draft-author',self.ctx.organization_id,self.ctx.tenant_id,
+            'HUMAN',now-timedelta(minutes=1),now+timedelta(minutes=5),None,
+            (RoleGrant(EXECUTION_OPERATOR,self.scope,now+timedelta(minutes=5)),))
+        class Identity:
+            def authenticate(self,token):
+                if token!='synthetic-bearer': raise PermissionError('invalid test credential')
+                return principal
+        class Evidence:
+            def require(self,ctx):
+                if ctx.organization_id!=principal.organization_id: raise PermissionError('wrong tenant')
+        app=create_app(http_support._Records(),AuthorityService(Identity(),http_support._Plans(),http_support._Ledger()),
+            http_support._Jobs(),self.environments,evidence_gate=Evidence(),application_drafts=self.repo)
+        path=f'/v1/environments/{self.environment_id}/application-drafts/app-1'
+        with TestClient(app) as client:
+            headers={'Authorization':'Bearer synthetic-bearer'}
+            response=client.put(path,headers=headers,json={**self.content,'generation':1,
+                'resultDigest':self.source.result_digest,'expectedRevision':0})
+            self.assertEqual(response.status_code,200,response.text)
+            self.assertEqual(response.json()['recordedBy'],principal.subject)
+            self.assertEqual(client.get(path,headers=headers).json()['recordDigest'],response.json()['recordDigest'])
+            self.assertFalse(response.json()['executionAuthorized'])
+
+    def test_database_rejects_revision_gaps_wrong_generation_and_approval_state(self):
+        from psycopg import sql
+        self.save()
+        with self.repo._session(self.ctx,self.scope,self.environment_id,self.authorize) as con:
+            original=con.execute('SELECT to_jsonb(d) FROM hosting_controlplane.application_draft_revisions d').fetchone()[0]
+        for changes in ({'revision':3}, {'revision':2,'generation':999},
+                        {'revision':2,'status':'APPROVED'}):
+            with self.subTest(changes=changes), self.assertRaises(self.psycopg.IntegrityError):
+                with self.repo._session(self.ctx,self.scope,self.environment_id,self.authorize) as con:
+                    row={**original,**changes}
+                    statement=sql.SQL('INSERT INTO hosting_controlplane.application_draft_revisions ({}) VALUES ({})').format(
+                        sql.SQL(',').join(map(sql.Identifier,row)),
+                        sql.SQL(',').join(sql.Placeholder() for _ in row))
+                    con.execute(statement,tuple(row.values()))
         self.assertEqual(self.get()['revision'],1)
 
     def test_site_worker_is_rejected_before_access(self):
