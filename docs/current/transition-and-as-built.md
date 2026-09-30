@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.7 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.8 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -138,6 +138,17 @@ Migration 0022 and narrowly scoped ingest-role SELECT rights are required. See t
 [signed owner-review contract](../engineering/application-owner-review.md) for
 fields, locking, API states, deployment, tests and remaining application-wide
 planning and owner-facing workflow integration.
+
+### Operator inspection of signed owner review
+
+The existing thin CLI now reads an exact draft's current signed owner-review status,
+optionally checking its retained record digest. It preserves source/evidence/time
+references and rejects contradictory status or authority claims without issuing
+signatures, changing drafts or launching migration. A successful read of a hold or
+revocation does not make it acceptance. The
+[review command contract](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
+records exact request/response, tests and remaining signing/browser/application-wide
+planning work. No new database migration, privileges or execution authority are added.
 
 ## Engineering and implementation handoff
 

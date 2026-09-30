@@ -128,7 +128,8 @@ describes only the arithmetic copy phase. It is not an outage estimate.
 Application drafts are now stored as UNREVIEWED proposals with an authenticated
 author and explicit known/unknown dependencies. The asserted owner is not the
 verified author and saving does not accept membership. The separate reviewed-
-candidate model still requires exact external owner review. Brownfield adoption
+candidate path now consumes independently signed exact-draft owner decisions;
+operator status reads do not issue those decisions. Brownfield adoption
 remains a no-change review artifact; none of these drafts adopts or mutates a VM.
 
 ## Save and read an application draft
@@ -140,8 +141,9 @@ exact-scope EXECUTION_OPERATOR grant, current inventory generation/result digest
 member, dataset, consistency, startup and dependency fields. Duplicate/extra fields
 and caller-supplied approval or actor claims are rejected. The
 [operator CLI and bounded listing](../engineering/application-draft-operator.md)
-now provide save/load/history with explicit revision/source pins. A draft-editing
-portal is not supplied yet.
+now provide save/load/history with explicit revision/source pins. The
+[browser workspace](../engineering/application-draft-browser.md) edits existing draft
+metadata/startup order; full browser creation and dependency editing remain open.
 
 Read latest draft state with GET on the same route, or select immutable history
 with `?revision=N`. JOB_READER and EXECUTION_OPERATOR may read within their exact
@@ -179,3 +181,20 @@ benchmark and p95 under two seconds remain unmeasured acceptance targets.
 Discovery is a way to investigate movement. Provisioning, transfer, source
 fencing, cutover and useful-service verification remain later implementation
 and release gates.
+
+
+## Read independently signed owner-review status
+
+Use `hosting-operator ... application-drafts review --environment ENV --id APP
+--revision N` with an explicit immutable revision. Optionally supply `--record-digest`
+from a previous draft GET. The placeholders and ellipsis are explanatory; see the
+[complete command](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
+for a runnable command structure and SSO/CA requirements.
+
+The command retrieves the current server evaluation for that exact draft: no
+review, explicit revocation, held historical/incomplete/stale source, or an assessment-
+only candidate with any unknown dependencies retained. Exit 0 means the response
+passed validation, not that it is eligible for migration. The timestamped response
+is not cached approval. Missing or invalid live evidence does not fall back to an
+older acceptance. Signing decisions, native ownership and mutation grants remain
+outside this command, and the draft itself remains UNREVIEWED.

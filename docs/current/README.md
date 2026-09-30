@@ -13,9 +13,9 @@ The records below are newly authored under distinct IDs and remain Proposed. The
 | [ICD-M01](interface-agreements.md) | API, workflow, worker, transfer, shared-service and evidence interface obligations |
 | [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
 
-TAD-M01 is **version 0.14 (Proposed)**; ICD-M01 is **version 0.13 (Proposed)**.
-RAD-M01 and TRANS-M01 are **version 0.7 (Proposed)** following the 30 September 2026
-signed owner-review increment. Both solution records remain **version 0.3 (Proposed)** following the 28 September 2026
+TAD-M01 is **version 0.15 (Proposed)**; ICD-M01 is **version 0.14 (Proposed)**.
+RAD-M01 and TRANS-M01 are **version 0.8 (Proposed)** following the 30 September 2026
+signed owner-review and operator status increments. Both solution records remain **version 0.3 (Proposed)** following the 28 September 2026
 mobility review. They describe the authenticated control application, durable discovery
 and comparison, 97 explicit capability dimensions, mandatory workload/service profile
 requirements, migrated qualification owners, and the remaining admitted native workflow
@@ -49,6 +49,7 @@ retain unreviewed state, live-page semantics and explicit uncertain-save handlin
 The [browser workspace](../engineering/application-draft-browser.md) now lists and
 edits existing draft metadata/startup order while retaining read-only evidence.
 [Signed owner-review evidence and status](../engineering/application-owner-review.md)
-now provide separately verified assessment-only decisions. Owner-facing signing,
+now provide separately verified assessment-only decisions and exact-revision CLI
+status inspection. Owner-facing signing,
 full browser creation/evidence editing and application-wide migration planning
 remain open; immutable drafts and native execution authority stay separate.

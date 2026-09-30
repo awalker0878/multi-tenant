@@ -642,3 +642,29 @@ This narrows B17/B20, not the entire wave. Enterprise owner/key onboarding, veri
 external dependencies, application-wide comparison/planning and an owner-facing
 browser/CLI review workflow remain open, together with B22 and later native effects.
 Native qualification and production acceptance are neither enabled nor inferred.
+
+
+### B17/B20 continuation — operator owner-review status, 30 September 2026
+
+The existing draft CLI helper now composes one exact-revision GET to the signed
+owner-review endpoint. It supports an optional retained draft-record digest check,
+validates complete source/evidence/status/validity fields and rejects mismatched
+candidate or authority claims. A valid read of a hold/revocation remains a hold/
+revocation; exit success denotes retrieval only. No client signing, local review
+service, approval writer, automatic retry, rebase or fallback to old evidence is
+introduced. Source observations, immutable drafts and current signed decisions
+retain their separate owners and existing contracts.
+
+Tests cover all eight actual service states and malformed/contradictory responses;
+separate PostgreSQL cases consume real signed acceptance/revocation and source/draft
+supersession through the authenticated API and CLI. Installed-package checks compose
+the new GET outside the checkout. Final source/CI evidence belongs in the PR; local
+skips and unavailable dependency downloads are not presented as native qualification.
+The [owner-review operator contract](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
+documents exact commands, optional pins, outcomes and limits.
+
+This completes CLI status presentation, not owner-facing signing, verified external
+dependency enrichment, application-wide destination comparison or full browser review.
+No new database migration, privilege, native operation, capability claim or policy/
+normalizer interpretation is added. B17/B20, B22 and the later waves retain their
+unclosed implementation, native qualification and operating-acceptance gates.

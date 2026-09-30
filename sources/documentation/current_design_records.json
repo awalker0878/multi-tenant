@@ -2,7 +2,7 @@
   {
     "id": "RAD-M01",
     "path": "docs/current/RAD-adoption.md",
-    "version": "0.7",
+    "version": "0.8",
     "status": "Proposed",
     "owner_role": "Architecture authority",
     "scope": "Reference adoption for enterprise workload mobility and secure hosting across qualified on-premises environments; no site-specific control assessment or production acceptance is implied.",
@@ -49,13 +49,18 @@
         "version": "0.7",
         "date": "2026-09-30",
         "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
       }
     ]
   },
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.14",
+    "version": "0.15",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -138,6 +143,11 @@
         "version": "0.14",
         "date": "2026-09-30",
         "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.15",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
       }
     ]
   },
@@ -211,7 +221,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.13",
+    "version": "0.14",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -288,13 +298,18 @@
         "version": "0.13",
         "date": "2026-09-30",
         "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.7",
+    "version": "0.8",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -341,6 +356,11 @@
         "version": "0.7",
         "date": "2026-09-30",
         "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
       }
     ]
   }

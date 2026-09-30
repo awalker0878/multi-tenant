@@ -328,3 +328,16 @@ reads. Live trust is checked after lock waits and before evidence/audit commit.
 Application-wide destination planning, reviewer onboarding/signing UX, trusted
 third-party enrichment and full browser editing remain open. Existing collectors,
 normalizer and per-VM comparison contracts are unchanged.
+
+
+## Read-only operator review consumption — 30 September 2026
+
+The [owner-review command](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
+now exposes exact-draft review status in the existing thin operator CLI. Its
+standard-library-only helper validates response identity, source, evidence, UTC
+validity and status consistency, without importing the review service or issuing
+signatures. It performs one GET and can check a previously retained record digest.
+Missing/mismatched replies never refresh an approval or change a draft. A retrieved
+assessment-only candidate still denies native ownership/execution and third-party
+dependency verification. Browser review presentation, owner signing/enrollment and
+application-wide assessment/planning remain separate unfinished integrations.

@@ -164,6 +164,22 @@ The [owner-review evidence contract](application-owner-review.md) now provides
 independent exact-draft acceptance/revocation and GET-only candidate evaluation.
 This is separate from draft saves, listing and editing; drafts remain UNREVIEWED.
 The CLI/browser in this document do not issue signatures or show a native approval.
-Owner-facing review integration, verified external dependencies and application-wide
-migration planning remain open. The separate review does not change draft status,
+Read-only CLI status inspection is now available through the existing draft helper;
+owner-facing signing, verified external dependencies and application-wide migration
+planning remain open. The separate review does not change draft status,
 create a native owner or authorize a migration.
+
+### Read an exact draft's owner-review status
+
+```sh
+hosting-operator --api-url https://control.example --token-stdin application-drafts review --environment env-1 --id app-1 --revision 1
+```
+
+This is one GET, not an owner decision. `--record-digest` can additionally pin the
+immutable recordDigest previously obtained from a draft read. Valid statuses,
+including revocations and holds, are returned unchanged with exit 0; this means
+retrieval succeeded, not that migration is approved. Exact source/evidence/validity,
+unknown counts and candidate/status consistency are checked before output. No
+signature is issued and no draft is modified. Read the
+[complete review command and evidence boundary](application-owner-review.md#inspect-the-review-from-the-operator-cli)
+for errors, current-authority limits and deployment prerequisites.

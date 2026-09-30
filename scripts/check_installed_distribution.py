@@ -53,6 +53,10 @@ try:
     assert draft_client.request.__module__ == draft_client.__name__
     assert draft_client.request(client_args, lambda value: value) == (
         'GET', '/v1/environments/env-1/application-drafts', {'limit': 50}, None)
+    review_args = client_parser.parse_args(['application-drafts', 'review', '--environment', 'env-1',
+        '--id', 'app-1', '--revision', '1', '--record-digest', 'a'*64])
+    assert draft_client.request(review_args, lambda value: value) == (
+        'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
     from provisioner.controlplane.discovery import collector_runtime, collector_settings
     from provisioner.controlplane.discovery.adapters import collector_config
     from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews

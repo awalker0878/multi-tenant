@@ -104,8 +104,59 @@ review validity is separately evaluated, never copied into immutable drafts.
 
 This increment consumes owner decisions through the existing application-candidate
 validator. It does not yet extend the per-VM destination comparison endpoint into
-an application-wide migration planner. Browser/CLI owner-review presentation and
-an enterprise signing/approval experience remain future integrations.
+an application-wide migration planner. The operator CLI now inspects this endpoint as described below. Browser review
+presentation and an enterprise signing/approval experience remain future integrations.
+
+## Inspect the review from the operator CLI
+
+The existing installed `hosting-operator` now exposes a read-only exact-revision
+action. The origin and identifiers below are illustrative; supply the scoped SSO
+token as one stdin line through the enterprise authentication process.
+
+```sh
+hosting-operator --api-url https://control.example --token-stdin application-drafts review --environment env-1 --id app-1 --revision 2
+```
+
+`--revision` is mandatory; the command never silently selects the newest draft.
+Optionally add `--record-digest` with the exact `recordDigest` from an earlier draft
+GET. A mismatch rejects the response without substituting another revision or hash.
+The expected digest is checked locally, not sent as authority or used as an evidence
+signature. The seven-field returned native scope is validated; the authenticated API
+continues to resolve the environment and authorize the actual reader's scope.
+
+The command performs exactly one GET on the existing `/review?revision=N` route,
+with no-store requested and no redirects, retries or fallback to draft metadata.
+Its client contract checks the complete closed response shape, exact selections,
+digest/revision types, UTC evaluation/validity fields, owner-decision and evidence
+identities, candidate/status consistency and the three false authority flags.
+For example, a revoked or held state cannot carry a candidate digest; reviewed
+states require an acceptance and current source pins, with the declared unknown
+count consistent with the status. Missing evidence is not displayed as acceptance.
+These checks validate the response contract, not the original signatures or actual
+native/dependency evidence; those remain the server's responsibility.
+
+Exit 0 means a validated status was retrieved, including UNREVIEWED, REVOKED or a
+HELD state. It does not mean the application is ready to move. The output preserves
+`checkedAt`, `expiresAt` and all source/evidence references without changing them.
+It is a status evaluated at the server's `checkedAt`, not durable approval or an
+assurance against later revocation. Request a new status when needed; the client
+does not cache or refresh it. Execution still requires independent current authority.
+
+A refused or unavailable API read exits 2; invalid response/input or transport
+failure exits 3; interruption exits 130. Errors contain bounded codes, not tokens,
+owner key paths, server exception details or invented review decisions. An expired
+or revoked signing key may make the API unavailable; it is not reinterpreted as
+an unsigned UNREVIEWED response and there is no older-review fallback. The command
+accepts no `approve`, `accept`, `revoke` or signing-key option and makes no PUT/POST.
+
+The implementation remains in the existing standard-library-only draft client
+helper, not a second review service. Tests exercise all eight actual server states,
+missing/extra fields, conflicting pins, evidence/expiry/candidate contradictions,
+strict JSON, one-request failures and no-mutation parser boundaries. Separate
+PostgreSQL tests run the CLI through the authenticated API and real signed evidence
+for acceptance, explicit revocation, reader revocation and superseded source/draft
+history. Installed-package validation composes the exact GET outside the checkout.
+No new migration, privilege, profile/normalizer version or runtime dependency is added.
 
 ## Deployment and verification
 
@@ -134,7 +185,7 @@ Installed distributions include the actual owners and migration. Local database
 skips and final-revision CI results must be reported separately.
 
 B17/B20 remain partial: verified external dependency evidence, actual owner/key
-onboarding, application-wide comparison/planning and guided browser/CLI owner
-review remain open. The existing B22 scheduling, visibility reconciliation, native
+onboarding, application-wide comparison/planning, browser review presentation and owner-facing
+signing workflows remain open. CLI status inspection is implemented, not decision issuance. The existing B22 scheduling, visibility reconciliation, native
 fact, provisioning, transfer, fencing, cutover, recovery and qualification work
 is unchanged. No native environment, workload or production dataset was contacted.
