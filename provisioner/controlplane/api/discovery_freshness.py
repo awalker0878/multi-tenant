@@ -1,13 +1,15 @@
 """Inventory freshness reads using the existing API identity and scope boundary."""
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Annotated
 from fastapi import Depends, Path, Request
 
 from provisioner.controlplane.authority.service import (
     EXECUTION_OPERATOR, JOB_READER, require_scoped_role)
 from provisioner.controlplane.discovery.freshness import (
-    DiscoveryFreshnessService, FreshnessChanged)
+    DiscoveryFreshnessService, FreshnessChanged, FreshnessUnavailable)
+from provisioner.controlplane.discovery.model import _utc
 
 _ID = r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'
 
@@ -27,7 +29,7 @@ def install_routes(app, *, repository, authority, session, environment, context,
         if request.query_params:
             raise error(422, 'REQUEST_INVALID', 'Freshness policy is server-owned; no query parameters are accepted')
         try:
-            selected = environment(active, environment_id)
+            selected = deepcopy(environment(active, environment_id))
         except error:
             raise
         except Exception:
@@ -41,15 +43,19 @@ def install_routes(app, *, repository, authority, session, environment, context,
                     (active.principal.subject, active.principal.organization_id,
                      active.principal.tenant_id, 'HUMAN')):
                 raise PermissionError('Freshness reader changed')
+            at = clock()
+            if not _utc(at) or at < checked_at:
+                raise FreshnessUnavailable('Freshness reauthorization clock regressed')
             for role in (JOB_READER, EXECUTION_OPERATOR):
                 try:
-                    require_scoped_role(principal, role, scope, clock())
+                    require_scoped_role(principal, role, scope, at)
                     break
                 except PermissionError:
                     continue
             else:
                 raise PermissionError('Current exact-scope read role is required')
-            if environment(active, environment_id) != selected:
+            current = type(active)(principal, active.credential)
+            if environment(current, environment_id) != selected:
                 raise PermissionError('Environment selection changed')
 
         try:

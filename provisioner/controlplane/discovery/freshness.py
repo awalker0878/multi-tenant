@@ -7,6 +7,7 @@ remain separate; none authorizes scheduling, collection or execution.
 from __future__ import annotations
 
 import re
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Callable
@@ -101,10 +102,12 @@ class DiscoveryFreshnessService:
             return at
 
         authorize(scope, now())
-        first = self._repository.latest_generation(ctx, scope, environment_id)
+        # Freeze values before callbacks: a reused repository object must not
+        # change either side of the comparison or the validated response later.
+        first = deepcopy(self._repository.latest_generation(ctx, scope, environment_id))
         authorize(scope, now())
         _metadata(first, ctx, scope, environment_id)
-        latest = self._repository.latest_generation(ctx, scope, environment_id)
+        latest = deepcopy(self._repository.latest_generation(ctx, scope, environment_id))
         authorize(scope, now())  # Includes missing inventories and unchanged rows.
         _metadata(latest, ctx, scope, environment_id)
         checked = now()
