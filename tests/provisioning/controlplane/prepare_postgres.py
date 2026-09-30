@@ -105,6 +105,7 @@ def main() -> int:
             'hosting_controlplane.discovery_observations, '
             'hosting_controlplane.discovery_absence_candidates TO {}',
             'GRANT SELECT ON hosting_controlplane.assessment_inputs TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.application_draft_revisions TO {}',
             'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
