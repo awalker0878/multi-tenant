@@ -28,6 +28,8 @@ from provisioner.controlplane.authority.service import (
 from provisioner.controlplane.persistence.environments import EnvironmentRepository
 from provisioner.controlplane.persistence.store import TenantContext
 
+from .application_review import (APPLICATION_OWNER, REVIEW_KIND, ApplicationReviewDecision,
+                                 parse_review, require_draft_binding)
 from .assessment import AssessmentScopeAccess, ReviewedFinding
 from .model import _digest, _id, _json, _scope, _scope_json, _unique_pairs, _utc
 from .normalization import NORMALIZER_VERSION, NormalizedDiscovery
@@ -39,7 +41,7 @@ from .trust import _decode
 _DIGEST = re.compile(r'^[0-9a-f]{64}$')
 _ROLE = re.compile(r'^[a-z][a-z0-9_]{0,62}$')
 _ROLES = {'INSTALLATION', 'SOURCE_EXIT', 'TARGET_OPERATE', 'POLICY_TRANSLATION',
-          'SECURITY_EQUIVALENCE', 'RECOVERY_READINESS'}
+          'SECURITY_EQUIVALENCE', 'RECOVERY_READINESS', APPLICATION_OWNER}
 
 
 class AssessmentInputDenied(PermissionError):
@@ -118,7 +120,7 @@ class AssessmentEvidence:
     issued_at: datetime
     expires_at: datetime
     environments: tuple[tuple[str, PlanScope], ...]
-    value: InstalledTuple | RouteClaim | ReviewedFinding
+    value: InstalledTuple | RouteClaim | ReviewedFinding | ApplicationReviewDecision
     required_roles: tuple[tuple[str, tuple[str, ...]], ...]
 
     @property
@@ -188,12 +190,19 @@ def parse_evidence(document: dict) -> AssessmentEvidence:
                     destinationSnapshotDigest=value.destination_snapshot_digest,
                     normalizerVersion=NORMALIZER_VERSION)
                 roles = ((value.control, (source, destination)),)
+        elif kind == REVIEW_KIND:
+            value = parse_review(payload, issued_at=issued, expires_at=expires)
+            environments = ((value.environment_id, value.scope),)
+            roles = ((APPLICATION_OWNER, (value.environment_id,)),)
+            # Exact draft identity, not decision/owner text, owns supersession.
+            binding = None
         else:
             raise AssessmentInputDenied('Unknown assessment evidence kind')
         if any(not _id(environment) for environment, _ in environments):
             raise AssessmentInputDenied('Evidence needs exact registered environments')
         return AssessmentEvidence(encoded, body['evidenceId'], kind, body['revision'],
-            _digest(binding), issued, expires, environments, value, roles)
+            (value.binding_digest() if kind == REVIEW_KIND else _digest(binding)),
+            issued, expires, environments, value, roles)
     except (TypeError, ValueError, KeyError, OverflowError) as exc:
         raise AssessmentInputDenied('Invalid assessment evidence document') from exc
 
@@ -242,6 +251,9 @@ class SignedFileAssessmentTrustStore:
                     or not 1 <= len(entry['environments']) <= 100
                     or _time(entry['notBefore']) >= _time(entry['expiresAt'])):
                 raise AssessmentInputDenied('Invalid assessment reviewer enrollment')
+            if (entry['role'] == APPLICATION_OWNER and _decode(entry['publicKey'], 32)
+                    == self._key.public_bytes_raw()):
+                raise AssessmentInputDenied('Application owner cannot sign as the trust root')
             _decode(entry['publicKey'], 32)
             if entry['revokedAt'] is not None:
                 _time(entry['revokedAt'])
@@ -323,6 +335,9 @@ class SignedFileAssessmentTrustStore:
             if len(candidates) != 1:
                 raise AssessmentInputDenied('An exact current reviewer role is unavailable')
             entry, signature = candidates[0]
+            if (evidence.kind == REVIEW_KIND
+                    and entry['subjectId'] != evidence.value.owner_id):
+                raise AssessmentInputDenied('Application review signer is not the exact proposed owner')
             if entry['keyId'] in used_keys or entry['subjectId'] in subjects:
                 raise AssessmentInputDenied('Assessment signatures are not independent')
             try:
@@ -370,7 +385,8 @@ class AssessmentInputRepository:
                     'SELECT hosting_controlplane.is_site_worker_role()').fetchone()[0]:
                 raise AssessmentInputDenied('Site workers cannot ingest assessment evidence')
             connection.execute("SELECT set_config('app.organization_id', %s, true), "
-                               "set_config('app.tenant_id', %s, true)",
+                               "set_config('app.tenant_id', %s, true), set_config('TimeZone','UTC',true), "
+                               "set_config('lock_timeout','5s',true), set_config('statement_timeout','10s',true)",
                                (ctx.organization_id, ctx.tenant_id))
             yield connection
 
@@ -403,6 +419,8 @@ class AssessmentInputRepository:
                      scope.platform_family)).fetchone()
                 if found is None:
                     raise AssessmentInputDenied('Evidence does not match a registered exact environment')
+            if evidence.kind == REVIEW_KIND:
+                self._check_application_draft(connection, ctx, evidence)
             connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
                 (int.from_bytes(hashlib.sha256((ctx.organization_id + ':' + ctx.tenant_id + ':' +
                      evidence.binding_digest).encode()).digest()[:8], 'big', signed=True),))
@@ -410,6 +428,10 @@ class AssessmentInputRepository:
                 'FROM hosting_controlplane.assessment_inputs WHERE organization_id = %s AND tenant_id = %s '
                 'AND kind = %s AND binding_digest = %s ORDER BY revision DESC LIMIT 1',
                 (ctx.organization_id, ctx.tenant_id, evidence.kind, evidence.binding_digest)).fetchone()
+            # Recheck after all lock waits, including exact retries. A former
+            # successful signature check cannot authorize a later append.
+            now = connection.execute('SELECT clock_timestamp()').fetchone()[0]
+            policy, subjects = self._trust.verify(evidence, signatures, now)
             if prior == (evidence.revision, evidence.digest, evidence.evidence_id, _json(signatures)):
                 return evidence.digest  # Exact retry after lost response; signatures reverified above.
             if prior is not None and evidence.revision <= prior[0]:
@@ -431,11 +453,47 @@ class AssessmentInputRepository:
                  evidence.evidence_id, evidence.evidence_id, evidence.revision, evidence.digest,
                  _json({'policyDigest': policy.digest, 'policyRevision': policy.revision,
                         'reviewerSubjects': subjects, 'bindingDigest': evidence.binding_digest})))
+            self._trust.verify(evidence, signatures,
+                connection.execute('SELECT clock_timestamp()').fetchone()[0])
         return evidence.digest
+
+    @staticmethod
+    def _check_application_draft(connection, ctx, evidence):
+        from .application_drafts import ApplicationDraftRepository, _COLUMNS, _SCOPE_SQL
+        from .persistence import DiscoveryRepository
+        from .grouping import validate_draft
+        from .application_drafts import parse_content
+        decision = evidence.value
+        args = DiscoveryRepository._scope_args(ctx, decision.scope, decision.environment_id)
+        key = int.from_bytes(hashlib.sha256(_json(args).encode('utf-8')).digest()[:8], 'big', signed=True)
+        # Match publication and draft-save lock order. No new writer is created.
+        connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)', (key,))
+        row = connection.execute('SELECT '+_COLUMNS+
+            ' FROM hosting_controlplane.application_draft_revisions WHERE '+_SCOPE_SQL+
+            ' AND application_group_id=%s AND revision=%s',
+            (*args, decision.application_group_id, decision.draft_revision)).fetchone()
+        if row is None:
+            raise AssessmentInputDenied('Application review has no retained draft')
+        stored = ApplicationDraftRepository._row(decision.environment_id, decision.scope, row)
+        require_draft_binding(decision, stored)
+        if decision.decision == 'ACCEPT_FOR_ASSESSMENT':
+            latest = connection.execute('SELECT max(revision) FROM '
+                'hosting_controlplane.application_draft_revisions WHERE '+_SCOPE_SQL+
+                ' AND application_group_id=%s', (*args, decision.application_group_id)).fetchone()[0]
+            if latest != stored.revision:
+                raise AssessmentInputDenied('Application draft was superseded before review')
+            result = ApplicationDraftRepository._snapshot(connection, args,
+                stored.generation, stored.result_digest)
+            proposal = json.loads(stored.proposal_json)
+            draft, edges = parse_content({'draft': proposal['draft'], 'dependencies': proposal['dependencies']})
+            validate_draft(result, draft, edges,
+                checked_at=connection.execute('SELECT clock_timestamp()').fetchone()[0])
+        # Revocation can refer to a retained historical/stale draft. It cannot
+        # authorize that draft, rewrite it, or revoke an unrelated revision.
 
     def latest(self, ctx: TenantContext, kind: str, binding_digest: str,
                checked_at: datetime) -> AssessmentEvidence | None:
-        if kind not in ('INSTALLATION', 'ROUTE', 'CONTROL') or not _utc(checked_at):
+        if kind not in ('INSTALLATION', 'ROUTE', 'CONTROL', REVIEW_KIND) or not _utc(checked_at):
             raise AssessmentInputDenied('Exact assessment lookup and UTC time required')
         _hash(binding_digest)
         with self._session(ctx) as connection:
