@@ -79,3 +79,9 @@ now expose that same metadata API through the existing installed CLI. Optional
 check mode distinguishes valid-but-unhealthy metadata from a failed read while
 retaining unverified native visibility and no collection/execution authority.
 This B22 client increment does not add periodic monitoring or close Wave 2.
+
+[Shared-outbox capture claims](../engineering/discovery-publication-recovery.md#shared-outbox-first-capture-exclusion--b22-continuation)
+now prevent concurrent first capture by cooperating updated processes using the
+same local custody. Incomplete intents survive process exit and remain held;
+completed originals resume unchanged. This is not fleet scheduling or global
+endpoint budgeting, and Wave 2 stays open. Architecture versions above are unchanged.
