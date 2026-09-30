@@ -1,6 +1,6 @@
-# Installed discovery collector: stage and publish
+# Installed discovery collector: inspect, stage and publish
 
-Reviewed 29 September 2026. This B10/B13/B14–B16/B22 increment follows the
+Reviewed 30 September 2026. This B10/B13/B14–B16/B22 increment follows the
 [existing B01–B50 plan](../product/enterprise-workload-mobility-execution-plan.md).
 It provides an installed command over the actual native adapters, signer, private
 outbox and mTLS publisher. It does not issue campaigns, credentials or write grants.
@@ -10,24 +10,27 @@ outbox and mTLS publisher. It does not issue campaigns, credentials or write gra
 With the reviewed package installed and a site-provisioned protected configuration:
 
 ```sh
+hosting-discovery-collect inspect --config /etc/hosting/discovery/collector.json
 hosting-discovery-collect stage --config /etc/hosting/discovery/collector.json
 hosting-discovery-collect publish --config /etc/hosting/discovery/collector.json
 ```
 
 The path is illustrative, not a supplied site configuration. There is no combined
-run action: publication must be requested explicitly. Both actions verify the
+run action: publication must be requested explicitly. These actions verify the
 original signed campaign and live enrollment/native-read witness before proceeding.
 
 | Action/outcome | Meaning and boundary |
 |---|---|
+| `inspect`, exit 0 | A validated local-custody report, including absent or unresolved states. No native read, signing, publication or record change occurs. See the [inspection contract](discovery-outbox-inspection.md). |
 | `stage`, exit 0, `STAGED` | Resume the original campaign-bound submission or collect/sign/retain a new one. This invocation does not publish. Existing custody does not establish that an earlier invocation never published. |
 | `publish`, exit 0, `PUBLISHED` | Send the existing original through the current mTLS publisher and validate its exact acknowledgement. No native reads or result signing are performed. |
 | Exit 2, `HELD` | The requested operation was not admitted or failed a precondition. Do not infer historical server noncommitment. No raw exception, credential or private path is printed. |
 | Exit 3, `DELIVERY_UNKNOWN` | A publication request may have committed. The outcome includes the original request digest and CAMPAIGN/RESULT phase. Reconcile or explicitly retry original bytes under current authority. |
 | Exit 130, `INTERRUPTED` | Interruption does not establish noncommitment; reconciliation is required. |
 
-Every JSON outcome uses `hosting-discovery-collector-outcome/1` and
-`executionAuthorized: false`. Success reports only bounded campaign/environment,
+Stage/publish and generic error outcomes use `hosting-discovery-collector-outcome/1`;
+valid inspections use `hosting-discovery-outbox-inspection/1`. Batch results use
+the separate format documented below. All retain `executionAuthorized: false`. Success reports only bounded campaign/environment,
 digest, completeness/count or generation metadata, not raw inventory or secrets.
 `collectionRequested` and `publicationAttempted` describe this successful invocation,
 not a durable history. Unknown/interrupted outcomes do not claim those effects were absent.
@@ -93,9 +96,10 @@ Configured revision floors are inputs, not a durable high-water-mark service.
 Native issuance/renewal/revocation, Vault publication, protected persistent floors,
 signing-key lifecycle, independent retention, outbox capacity and DR remain site work.
 The [batch-stage action](discovery-batch-scheduling.md) now dispatches due campaigns
-with process-local read limits. It is not a durable fleet scheduler, automatic retry,
-process-wide capture lock or resumable multi-part ingest. Cross-process initial
-captures and global coordination remain B22 obligations.
+with process-local read limits. Shared-outbox first-capture intents now exclude
+competing updated collectors using the same local custody and retain unresolved
+attempts. This is not a native fence, durable fleet scheduler, global endpoint
+budget or resumable multi-part ingest. Independent outboxes remain uncoordinated.
 The existing 1 MiB signed aggregate limit is unchanged.
 
 ## Verification and TLS correction
@@ -116,8 +120,8 @@ The [Python SSL reference](https://docs.python.org/3/library/ssl.html), consulte
 context alternative. Existing negative hostname/trust and deadline tests remain.
 
 This closes the missing installed command composition, not B10/B14–B16 or Wave 2.
-Independent inventory visibility, Glance/full hardware facts, B17 owner/dependency
-persistence, B22 scheduling/scale, installed custody and later provisioning/migration
+Independent inventory visibility, Glance/full hardware facts, verified external
+dependencies, B22 scheduling/scale, installed custody and later provisioning/migration
 work remain open. No production site or vendor installation was contacted by these tests.
 
 ## B22 batch composition
@@ -127,3 +131,13 @@ uses the same stage implementation with exact configuration/campaign/environment
 pins. Future or expired tasks do not cause native contact. Cancellation stops new
 admission and drains started work. The [batch contract](discovery-batch-scheduling.md)
 defines process-only limits and outcomes; no implicit publish or migration follows.
+
+## B22 local recovery inspection
+
+[Read-only outbox inspection](discovery-outbox-inspection.md) reports absent local
+references, unresolved capture intents, or verified staged originals. It reads only
+known bounded records without creating directories, claiming work, scanning loose
+payloads or clearing holds. The selected campaign and current trust/witness policies
+remain required; native, signer and publisher sections may be omitted. Local record
+changes during verification hold. Publication status stays NOT_CHECKED, and exit 0
+means inspection succeeded rather than capture or delivery completed.
