@@ -806,5 +806,9 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
     install_routes(app, repository=application_drafts, authority=authority, reviews=application_reviews,
                    session=session, environment=visible_environment, context=context,
                    require_evidence=require_evidence, clock=now, error=_ApiError)
+    from .discovery_freshness import install_routes as install_freshness_routes
+    install_freshness_routes(app, repository=discovery, authority=authority,
+                             session=session, environment=visible_environment,
+                             context=context, clock=now, error=_ApiError)
     mount_portal(app, portal_config)
     return app

@@ -3,7 +3,6 @@ import os
 import unittest
 from dataclasses import replace
 from datetime import timedelta
-from unittest.mock import patch
 
 from provisioner.controlplane.discovery.freshness import DiscoveryFreshnessService, FreshnessChanged
 from provisioner.controlplane.persistence.store import TenantContext
