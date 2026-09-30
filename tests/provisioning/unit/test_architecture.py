@@ -22,7 +22,7 @@ BACKREACH_MODULE = PACKAGE / 'repository.py'
 TRANSPORT_MODULES = frozenset({'__init__.py', '__main__.py', 'main.py', 'support.py'})
 # The enterprise operator talks to the control API; it is not a local owner
 # command and must not import the planning or delivery execution modules.
-API_ONLY_COMMANDS = frozenset({'operator.py', 'application_drafts.py'})
+API_ONLY_COMMANDS = frozenset({'operator.py', 'application_drafts.py', 'assessments.py'})
 #: The one module that holds the operations every command delegates to.
 SERVICE_MODULE = 'provisioner.execution.service'
 
@@ -87,7 +87,7 @@ def _api_client_import_violations(path: Path, module: str) -> list[str]:
     """Resolve all static import forms, including relative controller backreach.
 
     Only the exact API-client modules may bypass the local execution service.
-    The operator may compose its draft contract; that contract has only standard
+    The operator may compose its draft/comparison contracts, which have only standard
     library imports. New CLI modules are not implicitly classified as clients.
     """
     tree = ast.parse(path.read_text(encoding='utf-8'))
@@ -103,11 +103,11 @@ def _api_client_import_violations(path: Path, module: str) -> list[str]:
     allowed = set(sys.stdlib_module_names)
     if module == 'provisioner.cli.operator':
         allowed.update({'httpx', 'certifi'})
-    internal = 'provisioner.cli.application_drafts'
+    internal = ('provisioner.cli.application_drafts', 'provisioner.cli.assessments')
     return sorted(target for target in targets
                   if target.split('.')[0] not in allowed
                   and not (module == 'provisioner.cli.operator'
-                           and (target == internal or target.startswith(internal + '.'))))
+                           and any(target == name or target.startswith(name + '.') for name in internal)))
 
 
 class DependencyDirectionTest(unittest.TestCase):
@@ -181,7 +181,7 @@ class DependencyDirectionTest(unittest.TestCase):
         self.assertIn('httpx', _absolute_imports(PACKAGE / 'cli' / 'operator.py'))
 
     def test_api_client_exemptions_are_exact_and_not_local_owner_commands(self):
-        self.assertEqual(API_ONLY_COMMANDS, {'operator.py', 'application_drafts.py'})
+        self.assertEqual(API_ONLY_COMMANDS, {'operator.py', 'application_drafts.py', 'assessments.py'})
         for name in sorted(API_ONLY_COMMANDS):
             path = PACKAGE / 'cli' / name
             self.assertNotIn(SERVICE_MODULE, _absolute_imports(path))
@@ -213,6 +213,10 @@ class DependencyDirectionTest(unittest.TestCase):
                             encoding='utf-8')
             self.assertEqual(_api_client_import_violations(path, 'provisioner.cli.operator'), [])
             self.assertTrue(_api_client_import_violations(path, 'provisioner.cli.application_drafts'))
+            path.write_text('from . import assessments\n', encoding='utf-8')
+            self.assertEqual(_api_client_import_violations(path, 'provisioner.cli.operator'), [])
+            for helper in ('application_drafts', 'assessments'):
+                self.assertTrue(_api_client_import_violations(path, 'provisioner.cli.' + helper))
             path.write_text('import json\nfrom pathlib import Path\n', encoding='utf-8')
             self.assertEqual(_api_client_import_violations(path, 'provisioner.cli.application_drafts'), [])
 

@@ -20,16 +20,14 @@ from urllib.parse import quote, urlsplit
 import httpx
 import certifi
 
-from . import application_drafts
+from . import application_drafts, assessments
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _DISCOVERY_CURSOR = re.compile(r'^[A-Za-z0-9_-]{1,4096}$')
 _MAX_GENERATION = 2**63 - 1
 _MAX_DOCUMENT = 1024 * 1024
 _MAX_RESPONSE = 8 * 1024 * 1024
-_ASSESSMENT_METHODS = ('REBUILD_RESTORE', 'COLD_VM_CONVERSION',
-                       'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE',
-                       'WARM_VM_TRANSFER')
+
 
 
 def _identity(value: str) -> str:
@@ -124,25 +122,7 @@ def build_parser() -> argparse.ArgumentParser:
     objects.add_argument('--after', help='Opaque nextAfter value from the API')
     objects.add_argument('--limit', type=int, default=50)
 
-    assessments = groups.add_parser('assessments',
-                                    help='Compare observed workloads and pinned destinations')
-    assessment_actions = assessments.add_subparsers(dest='action', required=True)
-    compare = assessment_actions.add_parser('compare',
-                                            help='Read-only assessment; does not approve execution')
-    compare.add_argument('--source-environment', required=True)
-    compare.add_argument('--source-generation', type=int, required=True)
-    compare.add_argument('--workload-native-id', required=True,
-                         help='VM native identity from the selected source generation')
-    compare.add_argument('--destination', nargs=2, action='append', required=True,
-                         metavar=('ENVIRONMENT', 'GENERATION'),
-                         help='Repeat for 2–20 distinct destination environments')
-    compare.add_argument('--capacity', nargs=3, action='append', default=[],
-                         metavar=('ENVIRONMENT', 'KIND', 'NATIVE_ID'),
-                         help='Optional observed pool, cluster, quota or datastore for a destination')
-    compare.add_argument('--method', choices=_ASSESSMENT_METHODS, required=True)
-    compare.add_argument('--guest-profile', required=True)
-    compare.add_argument('--network-mode', required=True)
-    compare.add_argument('--data-mode', required=True)
+    assessments.install_parser(groups)
 
     workloads = groups.add_parser('workloads', help='Browse or submit planned workload records')
     workload_actions = workloads.add_subparsers(dest='action', required=True)
@@ -201,41 +181,7 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
     if args.resource == 'scopes':
         return 'GET', '/v1/access/scopes', None, None
     if args.resource == 'assessments':
-        _identity(args.source_environment)
-        if not 1 <= args.source_generation <= _MAX_GENERATION:
-            raise ValueError('A positive source observation generation is required')
-        def native(value):
-            if (not isinstance(value, str) or not 1 <= len(value) <= 512
-                    or not value.strip()
-                    or any(ord(char) < 32 or ord(char) == 127 for char in value)):
-                raise ValueError('A bounded native identity without control characters is required')
-            return value
-        if not 2 <= len(args.destination) <= 20:
-            raise ValueError('Compare between 2 and 20 distinct destinations')
-        destinations = {}
-        for environment, raw_generation in args.destination:
-            _identity(environment)
-            if (not re.fullmatch(r'[1-9][0-9]{0,18}', raw_generation)
-                    or int(raw_generation) > _MAX_GENERATION):
-                raise ValueError('A positive destination observation generation is required')
-            if environment == args.source_environment or environment in destinations:
-                raise ValueError('Source and destination environments must all be distinct')
-            destinations[environment] = {'environmentId': environment,
-                                         'generation': int(raw_generation)}
-        for environment, kind, identity in args.capacity:
-            if (environment not in destinations or 'capacityKind' in destinations[environment]
-                    or kind not in {'pool', 'cluster', 'quota', 'datastore'}):
-                raise ValueError('Each capacity selection must name one destination and supported kind')
-            destinations[environment].update(capacityKind=kind, capacityNativeId=native(identity))
-        for value in (args.guest_profile, args.network_mode, args.data_mode):
-            _identity(value)
-        return 'POST', '/v1/assessments/compare', None, {
-            'source': {'environmentId': args.source_environment,
-                       'generation': args.source_generation},
-            'workloadNativeId': native(args.workload_native_id),
-            'destinations': list(destinations.values()), 'method': args.method,
-            'guestProfile': args.guest_profile, 'networkMode': args.network_mode,
-            'dataMode': args.data_mode}
+        return assessments.request(args, _identity)
     if args.resource == 'environments':
         if args.action == 'get':
             return 'GET', '/v1/environments/' + _identity(args.id), None, None
@@ -303,16 +249,18 @@ def _request(args) -> tuple[str, str, dict | None, dict | None]:
     return 'GET', prefix + '/events', {'after': args.after, 'limit': args.limit}, None
 
 
-def _read_response(response: httpx.Response, *, strict: bool = False) -> dict:
+def _read_response(response: httpx.Response, *, strict: bool = False,
+                   maximum: int | None = None) -> dict:
+    maximum = min(_MAX_RESPONSE, maximum) if maximum is not None else _MAX_RESPONSE
     size = 0
     chunks = []
     for chunk in response.iter_bytes():
         size += len(chunk)
-        if size > _MAX_RESPONSE:
+        if size > maximum:
             raise ValueError('API response exceeds the CLI size limit')
         chunks.append(chunk)
     if strict:
-        return application_drafts.decode_document(b''.join(chunks), _MAX_RESPONSE)
+        return application_drafts.decode_document(b''.join(chunks), maximum)
     try:
         payload = json.loads(b''.join(chunks))
     except (ValueError, UnicodeDecodeError):
@@ -328,6 +276,8 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
     args = build_parser().parse_args(argv)
     draft_save_attempted = False
     draft_request_started = False
+    comparison_started = False
+    application_compare = args.resource == 'assessments' and args.action == 'compare-application'
     document = None
     try:
         base = _base_url(args.api_url)
@@ -340,18 +290,20 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
         verify.verify_flags |= ssl.VERIFY_X509_STRICT | ssl.VERIFY_X509_PARTIAL_CHAIN
         verify.load_verify_locations(cafile=args.ca_bundle or certifi.where())
         headers = {'Authorization': 'Bearer ' + credential, 'Accept': 'application/json'}
-        if args.resource == 'application-drafts' and args.action == 'review':
+        if application_compare or args.resource == 'application-drafts' and args.action == 'review':
             headers['Cache-Control'] = 'no-store'
         if args.resource == 'jobs' and args.action == 'submit':
             headers['Idempotency-Key'] = args.idempotency_key
         with httpx.Client(timeout=httpx.Timeout(10.0, connect=5.0),
                           follow_redirects=False, trust_env=False, verify=verify,
                           transport=transport) as client:
+            comparison_started = application_compare
             draft_request_started = args.resource == 'application-drafts'
             draft_save_attempted = draft_request_started and args.action == 'save'
             with client.stream(method, base + path, params=params,
                                headers=headers, json=document) as response:
-                payload = _read_response(response, strict=args.resource == 'application-drafts')
+                payload = _read_response(response, strict=application_compare or args.resource == 'application-drafts',
+                    maximum=assessments.MAX_RESPONSE_BYTES if application_compare else None)
                 status = response.status_code
         conflict = (status == 409 and isinstance(payload.get('error'), dict)
                     and payload['error'].get('code') == 'APPLICATION_DRAFT_CONFLICT')
@@ -372,6 +324,13 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
             if status != 200:
                 raise ValueError('Draft response is not an exact acknowledgement')
             application_drafts.validate_response(args, payload, submitted=document)
+        if application_compare:
+            if status != 200:
+                raise ValueError('Application comparison requires an exact response')
+            application_drafts.validate_response(argparse.Namespace(action='review',
+                environment=args.source_environment, id=args.application_group, revision=args.draft_revision,
+                record_digest=args.draft_record_digest), payload.get('applicationReview'))
+            assessments.validate_application_response(document, payload)
         print(json.dumps(payload, sort_keys=True, separators=(',', ':')),
               file=stdout)
         return 0
@@ -386,7 +345,9 @@ def run(argv: list[str] | None = None, *, stdin: IO[str] = sys.stdin,
         if draft_save_attempted:
             print(json.dumps(application_drafts.save_unknown(args, document)), file=stderr)
             return 3
-        if draft_request_started and isinstance(exc, ValueError):
+        if comparison_started and isinstance(exc, ValueError):
+            code = 'APPLICATION_COMPARISON_RESPONSE_INVALID'
+        elif draft_request_started and isinstance(exc, ValueError):
             code = 'APPLICATION_DRAFT_RESPONSE_INVALID'
         else:
             code = 'INVALID_INPUT' if isinstance(exc, (ValueError, OSError)) else 'API_UNAVAILABLE'

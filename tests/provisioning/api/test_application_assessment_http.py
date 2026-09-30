@@ -139,5 +139,31 @@ class ApplicationAssessmentHttpTests(unittest.TestCase):
                     separators=(',', ':'), allow_nan=False).encode('ascii')).hexdigest()
                 self.assertEqual(value['selectionDigest'], expected)
 
+    def test_operator_command_consumes_actual_review_and_application_comparison(self):
+        import io
+        import json
+        import httpx
+        from provisioner.cli.operator import run
+        from tests.provisioning.api.test_application_comparison_cli import command
+        argv = command()
+        argv[argv.index('--draft-record-digest')+1] = self.fixture.stored.record_digest
+        calls = []
+        def request(sent):
+            calls.append(sent)
+            reply = self.client.post(sent.url.path, content=sent.content, headers=dict(sent.headers))
+            return httpx.Response(reply.status_code, content=reply.content, headers=reply.headers)
+        for unreviewed in (False, True):
+            self.fixture.reviews.none = unreviewed
+            out, err = io.StringIO(), io.StringIO()
+            code = run(['--api-url', 'https://control.example', '--token-stdin', *argv],
+                stdin=io.StringIO('operator\n'), stdout=out, stderr=err,
+                transport=httpx.MockTransport(request))
+            with self.subTest(unreviewed=unreviewed):
+                self.assertEqual((code, err.getvalue()), (0, ''))
+                value = json.loads(out.getvalue())
+                self.assertEqual(value['status'], 'HELD_APPLICATION_REVIEW' if unreviewed else 'ASSESSED_NOT_AUTHORIZED')
+                self.assertIs(value['executionAuthorized'], False)
+        self.assertEqual(len(calls), 2)
+
 
 if __name__ == '__main__': unittest.main()

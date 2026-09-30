@@ -45,7 +45,7 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
-    from provisioner.cli import application_drafts as draft_client
+    from provisioner.cli import application_drafts as draft_client, assessments as assessment_client
     import argparse
     client_parser = argparse.ArgumentParser()
     draft_client.install_parser(client_parser.add_subparsers(dest='resource', required=True))
@@ -59,6 +59,18 @@ try:
         'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
     from provisioner.controlplane.discovery import collector_runtime, collector_settings
     from provisioner.controlplane.discovery.adapters import collector_config
+    comparison_parser = argparse.ArgumentParser()
+    assessment_client.install_parser(comparison_parser.add_subparsers(dest='resource', required=True))
+    comparison_args = comparison_parser.parse_args(['assessments', 'compare-application',
+        '--source-environment', 'source', '--source-generation', '1', '--application-group', 'app',
+        '--draft-revision', '1', '--draft-record-digest', 'a'*64,
+        '--member-profile', 'db', 'linux', '--member-profile', 'web', 'linux',
+        '--destination', 'target-a', '1', '--destination', 'target-b', '1',
+        '--method', 'REBUILD_RESTORE', '--network-mode', 'routed', '--data-mode', 'offline'])
+    method, path, params, body = assessment_client.request(comparison_args, lambda value: value)
+    assert (method, path, params) == ('POST', '/v1/assessments/applications/compare', None)
+    assert body['applicationGroupId'] == 'app' and len(body['memberProfiles']) == 2
+    assert len(assessment_client.selection_digest(body)) == 64
     from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
@@ -111,7 +123,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, draft_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
