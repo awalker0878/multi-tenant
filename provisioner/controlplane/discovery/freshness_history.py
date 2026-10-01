@@ -254,14 +254,30 @@ class FreshnessHistoryRepository:
             raise ValueError('Bounded history cursor and page size are required')
         with self._session(ctx, scope, environment_id, authorize) as (con, _):
             args = DiscoveryRepository._scope_args(ctx, scope, environment_id)
+            # Include the cursor predecessor and lookahead in the same bounded
+            # statement. A separate anchor read could observe a different state.
+            anchor = int(after > 0)
+            lower = after - anchor
             rows = con.execute('SELECT '+_COLUMNS+' FROM '+_TABLE+' WHERE '+_SCOPE_SQL+
-                ' AND sequence>%s ORDER BY sequence LIMIT %s', (*args,after,limit+1)).fetchall()
+                ' AND sequence>%s ORDER BY sequence LIMIT %s',
+                (*args, lower, limit + 1 + anchor)).fetchall()
             values = [self._row(environment_id,scope,row) for row in rows]
             for index, value in enumerate(values):
-                if value.sequence != after + index + 1:
+                if value.sequence != lower + index + 1:
                     raise FreshnessUnavailable('History sequence is incomplete')
-                if index and value.previous_record_digest != values[index-1].record_digest:
-                    raise FreshnessUnavailable('History predecessor differs')
+                if index:
+                    previous = values[index - 1]
+                    if value.previous_record_digest != previous.record_digest:
+                        raise FreshnessUnavailable('History predecessor differs')
+                    prior_report = json.loads(previous.report_json)
+                    current_report = json.loads(value.report_json)
+                    if (value.recorded_at < previous.recorded_at
+                            or _time(current_report['checkedAt']) < _time(prior_report['checkedAt'])):
+                        raise FreshnessUnavailable('History time order differs')
+                    if json.loads(value.changes_json) != changes_between(prior_report, current_report):
+                        raise FreshnessUnavailable('History change kinds differ from retained reports')
+            # The anchor validates continuity but is not a newly returned item.
+            values = values[anchor:]
             items = values[:limit]
             result = {'format':'hosting-discovery-freshness-history/1','environmentId':environment_id,
                 'scope':dict(vars(scope)),'items':[v.document() for v in items],
