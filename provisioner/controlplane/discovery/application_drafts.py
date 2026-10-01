@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import unicodedata
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
@@ -116,6 +117,41 @@ class StoredApplicationDraft:
                 'memberCount': len(draft['members']), 'datasetCount': len(draft['datasetIds']),
                 'dependencyCount': len(edges),
                 'unknownDependencyCount': sum(edge['state'] == 'UNKNOWN' for edge in edges)}
+
+
+def parse_draft_export(document: dict, *, expected_record_digest: str) -> StoredApplicationDraft:
+    """Validate an untrusted full API export against an explicitly reviewed digest.
+
+    Reuse the retained-record parser and digests; do not manufacture inventory,
+    currency, server provenance, an owner signature or native membership evidence.
+    The ingest repository must bind the result to its actual immutable SQL record.
+    """
+    value = _keys(document, {'format', 'environmentId', 'scope', 'applicationGroupId',
+        'revision', 'generation', 'resultDigest', 'proposalDigest', 'recordedBy',
+        'recordedAt', 'recordDigest', 'proposal', 'status', 'latestGeneration',
+        'sourceSuperseded', 'ownershipAccepted', 'executionAuthorized'})
+    raw_scope = _keys(value['scope'], {'organization_id', 'tenant_id', 'site_id',
+        'security_domain_id', 'endpoint_id', 'native_scope_id', 'platform_family'})
+    scope = PlanScope(**raw_scope)
+    from .model import _scope
+    if (not _scope(scope) or value['format'] != 'hosting-application-draft-revision/1'
+            or value['status'] != 'UNREVIEWED' or value['ownershipAccepted'] is not False
+            or value['executionAuthorized'] is not False
+            or not all(_id(value[key]) for key in ('environmentId', 'applicationGroupId'))
+            or not isinstance(value['recordedBy'], str) or not 1 <= len(value['recordedBy']) <= 512
+            or any(unicodedata.category(c) in {'Cc', 'Cf'} for c in value['recordedBy'])
+            or any(type(value[key]) is not int or not 1 <= value[key] <= _MAX
+                   for key in ('revision', 'generation', 'latestGeneration'))
+            or value['latestGeneration'] < value['generation']
+            or type(value['sourceSuperseded']) is not bool
+            or value['sourceSuperseded'] != (value['generation'] != value['latestGeneration'])
+            or not all(_sha(value[key]) for key in ('recordDigest', 'proposalDigest', 'resultDigest'))
+            or not _sha(expected_record_digest) or value['recordDigest'] != expected_record_digest):
+        raise ValueError('Export does not bind the exact reviewed unapproved record')
+    return ApplicationDraftRepository._row(value['environmentId'], scope, (
+        value['applicationGroupId'], value['revision'], value['generation'], value['resultDigest'],
+        _json(value['proposal']), value['proposalDigest'], value['recordedBy'],
+        _time(value['recordedAt']), value['recordDigest']))
 
 
 class ApplicationDraftRepository:

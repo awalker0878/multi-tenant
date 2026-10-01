@@ -72,7 +72,7 @@ try:
     assert (method, path, params) == ('POST', '/v1/assessments/applications/compare', None)
     assert body['applicationGroupId'] == 'app' and len(body['memberProfiles']) == 2
     assert len(assessment_client.selection_digest(body)) == 64
-    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment
+    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment, owner_signing
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
     assert not hasattr(native_credentials, 'SignedFileVmwareCredentialSource')
@@ -87,6 +87,8 @@ try:
     assert openstack_https.read_json is native_https.read_json
     assert vmware_https.read_json is native_https.read_json
     assert application_drafts.ApplicationDraftRepository.__module__ == application_drafts.__name__
+    assert owner_signing.main.__module__ == owner_signing.__name__
+    assert application_drafts.parse_draft_export.__module__ == application_drafts.__name__
     assert application_review.parse_review.__module__ == application_review.__name__
     assert application_reviews.ApplicationReviewService.__module__ == application_reviews.__name__
     assert application_assessment.ApplicationAssessmentService.__module__ == application_assessment.__name__
@@ -129,7 +131,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -194,6 +196,15 @@ assert any(e.name == 'hosting-site-worker' and
 assert any(e.name == 'hosting-discovery-ingest' and
            e.value == 'provisioner.controlplane.discovery.runtime:main'
            for e in distribution.entry_points)
+
+review_entry = next(e for e in distribution.entry_points if e.name == 'hosting-application-review')
+assert review_entry.value == 'provisioner.controlplane.discovery.owner_signing:main'
+assert review_entry.load() is owner_signing.main
+import io
+review_out, review_err = io.StringIO(), io.StringIO()
+assert review_entry.load()(['sign'], stdout=review_out, stderr=review_err) == 2
+assert review_out.getvalue() == ''
+assert json.loads(review_err.getvalue()) == {'error': 'OWNER_REVIEW_HELD', 'outputMayExist': True}
 
 entry = next(e for e in distribution.entry_points if e.name == 'hosting-discovery-collect')
 assert entry.value == 'provisioner.controlplane.discovery.collector_runtime:main'

@@ -148,6 +148,38 @@ print(json.dumps({'status': plan['status'], 'native_contact': plan['native_conta
         self.assertFalse(result['capability_eligible'])
         self.assertTrue(result['blockers'])
 
+    def test_offline_owner_signing_runs_from_the_installed_distribution(self):
+        from datetime import datetime, timezone
+        from tests.provisioning.discovery.test_application_review import stored_fixture, OwnerFixture
+        from tests.provisioning.discovery.test_owner_signing import fixture_files, prepare_args, sign_args
+        from provisioner.controlplane.discovery.assessment_inputs import parse_evidence
+        # Only the parent builds synthetic inputs. The installed child cannot
+        # import tests or the checkout and does not connect to a native system.
+        stored, _ = stored_fixture()
+        with tempfile.TemporaryDirectory(dir=self.work) as directory:
+            root = Path(directory)
+            fixture = OwnerFixture(root/'policy.json', stored, at=datetime.now(timezone.utc))
+            fixture_files(root, stored, fixture)
+            command = [str(self.python), '-I', '-m',
+                       'provisioner.controlplane.discovery.owner_signing']
+            prepared = json.loads(self.run_checked(command + prepare_args(root, stored)))
+            signed = json.loads(self.run_checked(command + sign_args(root, stored)))
+            self.assertEqual(prepared['evidenceDigest'], signed['evidenceDigest'])
+            self.assertEqual(signed['status'], 'SIGNED_NOT_INGESTED')
+            submission = json.loads((root/'signed.json').read_bytes())
+            fixture.trust.verify(parse_evidence(submission['evidence']),
+                                 tuple(submission['signatures']), datetime.now(timezone.utc))
+            self.assertFalse(signed['executionAuthorized'])
+        result = self.probe("""
+import json, importlib.metadata
+from provisioner.controlplane.discovery import owner_signing
+entry = next(e for e in importlib.metadata.distribution('hosting-provisioner').entry_points
+             if e.name == 'hosting-application-review')
+assert entry.load() is owner_signing.main
+print(json.dumps({'owner': entry.value}))
+""")
+        self.assertEqual(result['owner'], 'provisioner.controlplane.discovery.owner_signing:main')
+
     def test_missing_packaged_asset_cannot_resolve_a_shared_directory(self):
         result = self.probe('''
 import json

@@ -309,45 +309,78 @@ class SignedFileAssessmentTrustStore:
         policy = self.current_policy(checked_at)
         return policy, self._verify_with_policy(evidence, signatures, checked_at, policy)
 
-    def _verify_with_policy(self, evidence, signatures, checked_at, policy) -> tuple[str, ...]:
+    def _reviewers(self, evidence, key_ids, checked_at, policy) -> tuple[dict, ...]:
+        """One enrollment selector shared by verification and signing preflight.
+
+        Selecting an enrolled key does not verify a signature or ingest evidence.
+        """
         body = json.loads(policy.canonical_json)
-        if (not evidence.issued_at <= checked_at < evidence.expires_at
+        if (not _utc(checked_at) or not evidence.issued_at <= checked_at < evidence.expires_at
                 or evidence.evidence_id in body['revokedEvidenceIds']
-                or not isinstance(signatures, tuple)
-                or len(signatures) != len(evidence.required_roles)):
+                or not isinstance(key_ids, tuple) or len(key_ids) != len(evidence.required_roles)
+                or any(not _id(key_id) for key_id in key_ids)):
             raise AssessmentInputDenied('Assessment evidence is expired, revoked or unsigned')
-        subjects, used_keys = [], set()
+        subjects, used_keys, selected = [], set(), []
         for role, environment_ids in evidence.required_roles:
             candidates = []
-            for signature in signatures:
-                _keys(signature, {'keyId', 'signature'})
+            for key_id in key_ids:
                 for entry in body['enrollments']:
                     authorized = {(item['environmentId'], _parse_scope(item['scope']))
                                   for item in entry['environments']}
                     needed = {(name, scope) for name, scope in evidence.environments
                               if name in environment_ids}
-                    if (entry['keyId'] == signature['keyId'] and entry['role'] == role
+                    if (entry['keyId'] == key_id and entry['role'] == role
                             and needed <= authorized
                             and _time(entry['notBefore']) <= evidence.issued_at
                             and evidence.expires_at <= _time(entry['expiresAt'])
                             and (entry['revokedAt'] is None or checked_at < _time(entry['revokedAt']))):
-                        candidates.append((entry, signature))
+                        candidates.append(entry)
             if len(candidates) != 1:
                 raise AssessmentInputDenied('An exact current reviewer role is unavailable')
-            entry, signature = candidates[0]
-            if (evidence.kind == REVIEW_KIND
-                    and entry['subjectId'] != evidence.value.owner_id):
+            entry = candidates[0]
+            if evidence.kind == REVIEW_KIND and entry['subjectId'] != evidence.value.owner_id:
                 raise AssessmentInputDenied('Application review signer is not the exact proposed owner')
             if entry['keyId'] in used_keys or entry['subjectId'] in subjects:
                 raise AssessmentInputDenied('Assessment signatures are not independent')
+            used_keys.add(entry['keyId'])
+            subjects.append(entry['subjectId'])
+            selected.append(entry)
+        return tuple(selected)
+
+    def authorize_application_signer(self, evidence: AssessmentEvidence, key_id: str,
+                                     public_key: bytes, checked_at: datetime) -> VerifiedAssessmentPolicy:
+        """Preflight only the existing application-owner role before signing.
+
+        The caller must still verify the produced signature under current trust
+        before publishing. This cannot enroll a key, allocate a revision or accept
+        a draft on behalf of the independent assessment-ingest repository.
+        """
+        if (not isinstance(evidence, AssessmentEvidence) or evidence.kind != REVIEW_KIND
+                or parse_evidence(json.loads(evidence.canonical_json,
+                                              object_pairs_hook=_unique_pairs)) != evidence
+                or not isinstance(public_key, bytes) or len(public_key) != 32):
+            raise AssessmentInputDenied('An exact application review signing request is required')
+        policy = self.current_policy(checked_at)
+        entry, = self._reviewers(evidence, (key_id,), checked_at, policy)
+        if _decode(entry['publicKey'], 32) != public_key:
+            raise AssessmentInputDenied('Local signing key is not the enrolled owner key')
+        return policy
+
+    def _verify_with_policy(self, evidence, signatures, checked_at, policy) -> tuple[str, ...]:
+        if not isinstance(signatures, tuple):
+            raise AssessmentInputDenied('Assessment signatures must be an immutable tuple')
+        for signature in signatures:
+            _keys(signature, {'keyId', 'signature'})
+        entries = self._reviewers(evidence, tuple(item['keyId'] for item in signatures),
+                                 checked_at, policy)
+        for entry in entries:
+            signature = next(item for item in signatures if item['keyId'] == entry['keyId'])
             try:
                 Ed25519PublicKey.from_public_bytes(_decode(entry['publicKey'], 32)).verify(
                     _decode(signature['signature'], 64), evidence.canonical_json.encode('ascii'))
             except (InvalidSignature, ValueError) as exc:
                 raise AssessmentInputDenied('Assessment artifact signature is invalid') from exc
-            used_keys.add(entry['keyId'])
-            subjects.append(entry['subjectId'])
-        return tuple(subjects)
+        return tuple(entry['subjectId'] for entry in entries)
 
     def verify_retained_policy(self, policy_json: str, signature: str,
                                checked_at: datetime) -> VerifiedAssessmentPolicy:

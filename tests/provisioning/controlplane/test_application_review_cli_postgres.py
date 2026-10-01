@@ -76,6 +76,54 @@ class ApplicationReviewCliPostgresTests(unittest.TestCase):
         self.assertEqual(out.getvalue(), '')
         return code, json.loads(err.getvalue())
 
+    def signed_artifact(self, *, decision='ACCEPT_FOR_ASSESSMENT', revision=1, exported=None):
+        from pathlib import Path
+        from tests.provisioning.discovery.test_owner_signing import (
+            fixture_files, prepare_args, sign_args, invoke, private_file)
+        root = Path(self.temp.name) / ('decision-' + str(revision))
+        root.mkdir(mode=0o700)
+        fixture_files(root, self.original, self.fixture)
+        if exported is not None:
+            private_file(root/'draft.json', exported)
+        clock = lambda: datetime.now(timezone.utc)
+        code, prepared = invoke(prepare_args(root, self.original, decision=decision, revision=revision), clock=clock)
+        self.assertEqual(code, 0, prepared)
+        code, signed = invoke(sign_args(root, self.original), clock=clock)
+        self.assertEqual(code, 0, signed)
+        self.assertEqual(signed['status'], 'SIGNED_NOT_INGESTED')
+        return json.loads((root/'signed.json').read_bytes())
+
+    def test_owner_command_signs_api_export_and_existing_ingest_drives_review(self):
+        with self.api() as api:
+            path = f'/v1/environments/{self.environment_id}/application-drafts/app-1?revision=1'
+            response = api.get(path, headers={'Authorization': 'Bearer synthetic-review-bearer'})
+            self.assertEqual(response.status_code, 200, response.text)
+            submission = self.signed_artifact(exported=response.json())
+            self.assertEqual(self.invoke(api)[1]['status'], 'UNREVIEWED')
+            digest = self.evidence_writer.ingest(self.ctx, submission['evidence'], tuple(submission['signatures']))
+            code, view = self.invoke(api, digest=self.original.record_digest)
+            self.assertEqual(code, 0, view)
+            self.assertEqual(view['status'], 'REVIEWED_WITH_UNKNOWNS')
+            self.assertEqual(view['evidenceDigest'], digest)
+            self.assertIs(view['dependencyEvidenceVerified'], False)
+
+    def test_offline_signature_cannot_accept_a_draft_superseded_before_ingestion(self):
+        from provisioner.controlplane.discovery.assessment_inputs import AssessmentInputDenied
+        submission = self.signed_artifact()
+        content = copy.deepcopy(self.content); content['draft']['name'] = 'New revision'
+        self.save(expected_revision=1, content=content)
+        with self.assertRaises(AssessmentInputDenied):
+            self.evidence_writer.ingest(self.ctx, submission['evidence'], tuple(submission['signatures']))
+
+    def test_owner_command_can_revoke_its_exact_retained_historical_draft(self):
+        content = copy.deepcopy(self.content); content['draft']['name'] = 'New revision'
+        self.save(expected_revision=1, content=content)
+        submission = self.signed_artifact(decision='REVOKE', revision=2)
+        self.evidence_writer.ingest(self.ctx, submission['evidence'], tuple(submission['signatures']))
+        with self.api() as api:
+            self.assertEqual(self.invoke(api, revision=1)[1]['status'], 'REVOKED')
+            self.assertEqual(self.invoke(api, revision=2)[1]['status'], 'UNREVIEWED')
+
     def test_cli_observes_signed_acceptance_revocation_and_live_reader_access(self):
         with self.api() as api:
             self.assertEqual(self.invoke(api)[1]['status'], 'UNREVIEWED')
