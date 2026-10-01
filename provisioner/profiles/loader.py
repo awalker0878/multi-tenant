@@ -23,6 +23,7 @@ from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.capabilities import CAPABILITIES
 from provisioner.domain.capability_properties import parse_requirements
 from provisioner.domain.request import digest
+from provisioner.profiles.requirements import validate_requirements
 from hosting_resources import RESOURCE_ROOT as ROOT
 
 PROFILE_ROOT = ROOT / 'profiles'
@@ -43,20 +44,6 @@ CATALOG_KEYS = {'family', 'version', 'description', 'default', 'services', 'defa
                 'requestDefaults', 'profiles'}
 ENTRY_KEYS = {'profile', 'version', 'rank', 'status', 'description', 'requires',
               'platform_inputs', 'limits'}
-
-
-REQUIREMENT_KEYS = {
-    'assurance': frozenset(['capabilities', 'constraints', 'recovery_required']),
-    'availability': frozenset(['capabilities', 'constraints', 'min_workloads_per_zone', 'zones']),
-    'compute': frozenset(['boot_disk_gib', 'capabilities', 'constraints', 'flavor_class', 'memory_gib', 'vcpu', 'workloads_per_zone']),
-    'environment': frozenset(['assurance_min_rank', 'availability_min_rank', 'capabilities', 'constraints', 'lifecycle', 'recovery', 'security_min_rank']),
-    'network': frozenset(['address_family', 'capabilities', 'constraints', 'gateway_host_number', 'prefix_length']),
-    'placement': frozenset(['capabilities', 'constraints', 'selection']),
-    'recovery': frozenset(['capabilities', 'constraints', 'independent_site', 'recovery_zone', 'services']),
-    'security': frozenset(['capabilities', 'constraints', 'internet_egress', 'public_ingress', 'service_class', 'trust', 'zones']),
-    'service': frozenset(['binding_class', 'capabilities', 'constraints', 'service']),
-    'storage': frozenset(['capabilities', 'constraints', 'data_disk_gib', 'storage_class']),
-}
 
 
 def _relative(path: Path) -> str:
@@ -202,6 +189,8 @@ class Catalog:
 def _load_one(path: Path) -> tuple[str, dict]:
     family = path.parent.name
     relative = _relative(path)
+    if family not in FAMILIES:
+        raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unknown profile family: {family}', path=relative)
     try:
         with path.open('rb') as stream:
             raw = stream.read(1024 * 1024 + 1)
@@ -262,9 +251,7 @@ def _load_one(path: Path) -> tuple[str, dict]:
         if not isinstance(requirements, dict) or not isinstance(inputs, dict):
             raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile requirements and inputs must be mappings',
                                     path=relative)
-        if set(requirements) - REQUIREMENT_KEYS[family]:
-            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Unknown profile requirement field',
-                                    path=relative)
+        validate_requirements(family, requirements, path=relative)
         capabilities = requirements.get('capabilities', [])
         if (not isinstance(capabilities, list)
                 or any(not isinstance(cap, str) for cap in capabilities)
@@ -360,10 +347,6 @@ def load_catalogs(root: Path = PROFILE_ROOT) -> Catalog:
     service_defaults: dict[str, str] = {}
     for path in sorted(root.glob('*/catalog.json')):
         family, loaded = _load_one(path)
-        if family not in FAMILIES:
-            raise ProvisioningError('UNSUPPORTED_PROFILE',
-                                    f'Unknown profile family directory: {family}',
-                                    path=_relative(path))
         families[family] = loaded['profiles']
         versions[family] = loaded['version']
         if loaded['default'] is not None:
