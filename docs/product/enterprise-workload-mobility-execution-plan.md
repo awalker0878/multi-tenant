@@ -3,7 +3,8 @@
 **Current review:** 1 October 2026, `implementation/all-waves`, starting at
 `9d4c6685b6fd0fcb6df211aebd47857562265456`, with discovery/profile corrections
 `b993470` and `249d75f`, catalog/design alignment and the subsequent guided
-initial application-draft creation continuation from `d663821ae9b594bd6b035755a0113218169ff40b`.
+initial application-draft creation continuation from `d663821ae9b594bd6b035755a0113218169ff40b`
+and saved-revision authoring continuation from `a83c4aa5f328a598012fbc822dad48201a0a446b`.
 **Historical baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`.
 **Status:** substantial Wave 0/1 foundations; B05 remains open, Wave 2 is partial,
 and Waves 3–6 are not complete. No native qualification or operating acceptance added.
@@ -28,7 +29,7 @@ Lack of native access does not prevent repository implementation and local testi
 | Packaging (B05) | Package-owned resources, WSD compiler and qualification registry/native/provenance owners; retired entry points deleted without aliases. | Other real runtime imports, installed execution ownership and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 2 retains allocation and attachment facts. | Full hardware/driver/key/Glance/service facts, deployed custody, independent visibility and native profile qualification. |
-| B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial browser creation and saved-draft metadata editing. | Guided changes to saved membership/evidence, independent dependencies, owner-facing signing and complete administrator acceptance. |
+| B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing. | Independent dependencies, owner-facing signing and complete administrator acceptance. |
 | B21/B22 | Adoption proposal model; one-shot process-local batch limits, shared-outbox first-capture claims, scoped freshness CLI/API and retained on-demand history. | Actual ownership transfer, durable fleet/global budgets, periodic monitoring/alerts, resumability and measured estate qualification. |
 | B23–B43 | Portable planning, native lifecycle/readback/fenced-power primitives, guest/service handoffs, transfer/integrity/consistency contracts and compatibility checks. | Native reserve/prepare/plan/approval/apply/observe/power/guest/service/activate chain; trusted transfer-worker/target-root bindings; source fencing, final sync/cutover, post-write recovery and route execution. |
 | B44–B50 | Existing recovery/security/evidence foundations and defined release obligations. | Deployed HA/DR, alert delivery, final qualification, retained-state conversion, pilot and operating release. |
@@ -46,7 +47,7 @@ one writer, immutable approval, uncertainty holds and independent postconditions
 Delete competing/obsolete entry points only after verified consumer/state migration;
 these safety controls are not shims.
 
-### Guided initial draft creation — B17/B20 continuation
+### Guided draft creation and saved-revision editing — B17/B20 continuation
 
 The existing portal now pins an authorized stored generation, pages VM identities
 explicitly, collects proposed members/dataset groups/known or unknown dependencies,
@@ -54,10 +55,15 @@ and submits the existing first-revision contract without hand-authored JSON. Sha
 proposal validation and the existing uncertain-save owner replace duplicated checks;
 no alternate API, SQL migration, authority flag or compatibility shim is added.
 First-save acknowledgement loss reconciles through exact revision-one history, never
-an automatic retry. Saved membership/evidence still requires the operator/API path.
+an automatic retry. The same component now explicitly revises saved membership,
+dataset groups and dependency assertions. It rechecks the saved generation/digest,
+retains original ordering and precision in a working copy, and submits expected revision
+N with exact N+1 acknowledgement or history reconciliation. No source rebase, old-review
+reuse or overwrite of an earlier record occurs. Failed source/page reads hold both
+structural and metadata editing; historical/superseded/unresolved records remain read only.
 
 The [current browser contract](../engineering/application-draft-browser.md) records
-bounds, remaining guided editing/review obligations and synthetic verification.
+bounds, remaining independent-evidence/review obligations and synthetic verification.
 Initial authoring is not independently verified dependency evidence, owner signing,
 installed-platform qualification or operational acceptance. B05 and Wave 2 remain
 open; this continuation does not start or close the native provisioning/migration waves.
@@ -122,7 +128,7 @@ Wave 1's existing repository boundary is verified in PR #52. Later native workfl
 | B17 | Persisted drafts and signed assessment decisions | Finish independent enrichment/dependency verification and owner-facing signing/review workflows; exact observed membership and consistency decisions remain revision-bound. | Application owner confirms dependencies and useful-service acceptance criteria. |
 | B18 | Durable signed tuple/route/control inputs | Complete deployed qualification import, expiry/supersession/revocation and release-ledger integration without converting operator assertions into evidence. | Source-exit and destination-operation campaigns independently qualify advertised scope. |
 | B19 | Persisted generation-pinned comparison | Complete coverage and acceptance for single-VM and reviewed multi-member comparisons, exact pool/profile bindings and explicit reasons/remediation. | Reviewed policy, security, recovery and target-capacity evidence for positive candidates. |
-| B20 | Initial browser creation, saved-draft metadata editing and application comparison | Finish guided changes to saved membership/dependency evidence, owner-facing signing and complete administrator workflows; preserve stale-response and uncertain-save defenses. | Sysadmins complete comparison without hand-authoring JSON. |
+| B20 | Initial and saved-revision browser authoring and application comparison | Finish owner-facing signing, independent dependency verification and complete administrator acceptance; preserve stale-response and uncertain-save defenses. | Sysadmins complete comparison without hand-authoring JSON. |
 | B21 | Partial proposal model | Persist no-change import proposals, ownership collisions, review state and links to exact observations; execution stays separately approved. | Native no-change/state reconciliation before ownership transfer. |
 | B22 | Bounded batch, custody claims and freshness/history | Complete durable fleet/global endpoint budgets, resumable estate work, periodic monitoring/alerts and measured benchmark beyond existing one-shot/process-local/on-demand paths. | Independent omission/privilege-loss reconciliation and agreed estate-scale measurements. |
 

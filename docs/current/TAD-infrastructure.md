@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.22 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.23 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -92,9 +92,13 @@ The existing browser component now creates initial proposals using exact-generat
 VM choices, explicit dataset groups and known/unknown dependency forms. It reuses the
 same API, shared proposal validator and uncertain-save reconciliation owner; first
 writes use expected revision zero and reconcile exact revision-one history. Source
-summaries, names and proposed evidence are not independent acceptance. Saved membership
-and evidence remain read-only in the browser; guided subsequent editing and reviewer
-signing remain open. CLI and browser operations do not approve ownership or migration.
+summaries, names and proposed evidence are not independent acceptance. The same editor
+now explicitly revises saved membership, dataset groups and dependency assertions.
+Entry rechecks the exact saved source; an isolated working copy preserves original
+order/precision, and saves require loaded revision N with exact N+1 acknowledgement.
+No rebase or owner-review reuse is permitted. Failed source reads disable editing and
+comparison; uncertain writes reconcile exact history. Reviewer signing, independent
+external evidence and administrator acceptance remain open. CLI and browser operations do not approve ownership or migration.
 Application comparison report 2 binds canonical selection, every member profile,
 source/review references, destination pools and method/network/data modes. Mismatched,
 stale, partial or contradictory responses cannot become positive advice.

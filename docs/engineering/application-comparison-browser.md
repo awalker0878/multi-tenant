@@ -20,8 +20,9 @@ save. Historical or superseded drafts are read-only and cannot become new compar
 selections. Editing, saving, loading another draft or clearing its view invalidates
 the application selection. The single-VM selector cannot substitute membership.
 The separate [draft workspace](application-draft-browser.md) now creates initial
-applications from stored VMs. Changing saved membership/dependency evidence still
-uses the operator/API path. This comparison panel is not an authoring or review authority.
+applications from stored VMs and explicitly revises saved membership/dependency
+assertions. Entering that working copy invalidates comparison; only its exact current
+saved revision can be selected again, with a separate matching owner review. This comparison panel is not an authoring or review authority.
 
 Results show the checked owner review, selection digest, all destinations, original
 and latest inventory generations, exact capacity identity, combined logical demand
@@ -86,9 +87,9 @@ A Chromium navigation smoke test was blocked by the development environment and
 is not reported as passed. Final CI and its skips must be reported independently.
 
 **Wave 2 remains open.** This completes browser consumption of saved-application
-comparison. Initial creation is separately implemented in the draft workspace; guided
-changes to saved membership/evidence remain open, along with independently
-verified external dependencies, remaining image/hardware/security facts or inventory
+comparison. Initial and saved-revision authoring are separately implemented in the
+draft workspace. Owner-facing signing and independently verified external dependencies
+remain open, along with remaining image/hardware/security facts or inventory
 visibility reconciliation. B22 scheduling, concurrency, freshness, larger resumable
 publication and estate measurements remain open. Wave 3 B23/B24 still need actual
 commissioned capacity/IPAM/staging reservations and admitted provisioning effects;
