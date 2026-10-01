@@ -307,8 +307,7 @@ if(process.env.HOSTING_AUTHORING_FIXTURE){
     const list=UI.validateList(f.listing,f.source.environmentId,null,null,1);
     const src={...UI.validateGeneration(f.source,list.environmentId,list.latestGeneration),scope:list.scope};
     UI.validateObjectPage(f.page,src,new Set(),null,0);
-    const body=UI.creationRequest(src,f.content.draft.applicationGroupId,f.content.draft.name,f.content.draft.ownerId,
-      f.content.draft.members,f.content.draft.consistencyGroups,f.content.dependencies,f.content.draft.startupOrder.join('\n'));
+    const body=UI.proposalRequest(src,f.content.draft,f.content.dependencies,0);
     assert.deepEqual(UI.validateRecord(f.saved,src.environmentId,body.draft.applicationGroupId,1,src.scope).proposal.draft,body.draft);
     fs.writeFileSync(process.env.HOSTING_AUTHORING_REQUEST,JSON.stringify(body));
   });
@@ -327,7 +326,8 @@ test('initial proposal enforces member, dataset, group, dependency and byte budg
   const h=harness();await h.prepare();h.confirm();await h.client.save();
   const body=JSON.parse(h.calls.at(-1)[1].body), draft=body.draft, src={...source(),scope};
   const make=(members=draft.members,groups=draft.consistencyGroups,edges=[],order=members.map(m=>m.workloadId).join(' '))=>
-    UI.creationRequest(src,'application-a','Application A','owner-a',members,groups,edges,order);
+    UI.proposalRequest(src,{applicationGroupId:'application-a',name:'Application A',ownerId:'owner-a',members,
+      datasetIds:groups.flatMap(g=>g.datasetIds),consistencyGroups:groups,startupOrder:order.split(' ')},edges,0);
   assert.throws(()=>make(Array.from({length:101},(_,i)=>({workloadId:'member-'+i,nativeVm:[...draft.members[0].nativeVm.slice(0,4),'vm-'+i]}))));
   assert.throws(()=>make(draft.members,[{groupId:'g',datasetIds:Array.from({length:1001},(_,i)=>'dataset-'+i)}]));
   assert.throws(()=>make(draft.members,Array.from({length:101},(_,i)=>({groupId:'g-'+i,datasetIds:['dataset-'+i]}))));
@@ -377,3 +377,295 @@ test('digest fields never accept array-to-string coercion',async()=>{
     assert.equal(h.client.selection(),null);
   }
 });
+
+// Saved revisions use the same authoring, paging and reconciliation owners.
+function currentRecord(revision=4) {
+  const members=['db','web'].map((workloadId,i)=>({workloadId,nativeVm:[scope.endpoint_id,scope.native_scope_id,'vmware','vm','vm-'+(101+i)]}));
+  const row=saved({generation:3,resultDigest:digest,expectedRevision:revision-1,
+    draft:{applicationGroupId:'application-a',name:'Saved application',ownerId:'owner-a',members,
+      // Deliberately different from flattened group order; unchanged bytes must survive.
+      datasetIds:['web-data','database-data'],consistencyGroups:[{groupId:'db-group',datasetIds:['database-data']},
+        {groupId:'web-group',datasetIds:['web-data']}],startupOrder:['db','web']},
+    dependencies:[{assertionId:'edge-a',sourceWorkloadId:'web',targetWorkloadId:'db',relation:'STARTS_AFTER',state:'KNOWN',
+      source:'CMDB',sourceReference:'cmdb-ticket-a',observedAt:'2026-10-01T12:00:00.123456+00:00',unknownReason:null},
+    {assertionId:'edge-b',sourceWorkloadId:'web',targetWorkloadId:null,relation:'SERVICE_CALL',state:'UNKNOWN',
+      source:'MONITORING',sourceReference:'trace-a',observedAt:'2026-10-01T12:00:00.000001+00:00',unknownReason:'EXTERNAL_DEPENDENCY'}]});
+  return row;
+}
+function revisionHarness(handler=null, row=currentRecord()) {
+  const h=harness((url,init,base)=>{
+    const fallback=(url,init)=> {
+      if(init.method==='GET' && url.endsWith('/application-drafts/application-a'))return response(row);
+      if(url.endsWith('/latest'))return response({...source(),objectCount:4});
+      if(url.includes('/objects?'))return response({...page(),items:[...page().items,item('vm-103')]});
+      return base(url,init);
+    };
+    return handler?handler(url,init,fallback):fallback(url,init);
+  });
+  h.original=copy(row);
+  h.open=async()=>{await h.client.load();await h.$('edit-evidence').fire('click');};
+  h.remove=async(table,id)=>{
+    const row=h.$(table).children.find(row=>row.children[0].textContent===id);
+    assert.ok(row,'existing proposal row');await row.children.at(-1).children[0].fire('click');
+  };
+  h.dependency=(fields={})=>{
+    const values={'edge-id':'corrected','edge-from':'web','edge-to':'db','edge-relation':'SERVICE_CALL',
+      'edge-state':'KNOWN','edge-reason':'','edge-source':'APPLICATION_OWNER',
+      'edge-reference':'review-reference','edge-time':'2026-10-01T12:01:00.654321Z',...fields};
+    for(const [id,value] of Object.entries(values))h.$(id).value=value;
+    h.client.addEdge();
+  };
+  return h;
+}
+
+test('saved evidence entry is explicit, read-only on the server, and pins the original revision and source',async()=>{
+  const h=revisionHarness();await h.client.load();assert.equal(h.$('authoring').hidden,true);
+  assert.equal(h.$('edit-evidence').disabled,false);assert.equal(h.client.selection().revision,4);
+  await h.$('edit-evidence').fire('click');
+  assert.equal(h.calls.length,2);assert.ok(h.calls.every(([,init])=>init.method==='GET'));
+  assert.match(h.calls[1][0],/environments\/env-a\/discovery\/generations\/latest$/);
+  assert.equal(h.$('authoring').hidden,false);assert.equal(h.$('members').children.length,2);
+  assert.equal(h.$('datasets').children.length,2);assert.equal(h.$('dependencies').children.length,2);
+  assert.match(h.$('binding').textContent,/based on revision 4/);assert.equal(h.client.selection(),null);
+  assert.equal(h.$('edit-evidence').disabled,true);assert.equal(h.$('environment').disabled,true);
+});
+test('opening and saving an unchanged working copy preserves original dataset order and timestamp precision',async()=>{
+  const h=revisionHarness();await h.open();h.confirm();await h.client.save();
+  const body=JSON.parse(h.calls.at(-1)[1].body);
+  assert.equal(body.expectedRevision,4);assert.equal(body.resultDigest,digest);assert.equal(body.generation,3);
+  assert.deepEqual(body.draft,h.original.proposal.draft);assert.deepEqual(body.dependencies,h.original.proposal.dependencies);
+  assert.equal(h.client.selection().revision,5);assert.equal(h.$('authoring').hidden,true);
+  assert.equal(h.client.selection().executionAuthorized,false);assert.equal(h.client.selection().ownershipAccepted,false);
+  assert.deepEqual(currentRecord(),h.original);
+});
+test('saved member replacement selects only observed identities and does not mutate historical membership',async()=>{
+  const h=revisionHarness();await h.open();await h.client.objects();
+  await h.remove('dependencies','edge-a');await h.remove('dependencies','edge-b');await h.remove('members','web');
+  await h.select('vm-103','api');h.confirm();await h.client.save();
+  const body=JSON.parse(h.calls.at(-1)[1].body);
+  assert.equal(body.expectedRevision,4);assert.deepEqual(body.draft.members.map(m=>m.workloadId),['db','api']);
+  assert.deepEqual(body.draft.members.map(m=>m.nativeVm[4]),['vm-101','vm-103']);
+  assert.deepEqual(body.draft.startupOrder,['db','api']);assert.deepEqual(body.dependencies,[]);
+  assert.deepEqual(h.original.proposal.draft.members.map(m=>m.workloadId),['db','web']);
+  assert.deepEqual(body.draft.datasetIds,h.original.proposal.draft.datasetIds);
+});
+test('referenced saved members cannot be removed implicitly and dataset changes preserve unrelated groups',async()=>{
+  const h=revisionHarness();await h.open();await h.remove('members','db');
+  assert.equal(h.$('members').children.length,2);assert.match(h.$('status').textContent,/assertions explicitly/);
+  await h.remove('datasets','db-group');h.group('new-db','database-v2 audit-data');h.confirm();await h.client.save();
+  const body=JSON.parse(h.calls.at(-1)[1].body);
+  assert.deepEqual(body.draft.datasetIds,['web-data','database-v2','audit-data']);
+  assert.deepEqual(body.draft.consistencyGroups[0],h.original.proposal.draft.consistencyGroups[1]);
+  assert.deepEqual(body.dependencies,h.original.proposal.dependencies);
+  assert.equal(h.original.proposal.draft.consistencyGroups[0].groupId,'db-group');
+});
+test('replacing saved unknown evidence requires an explicit selected target and new source assertion',async()=>{
+  const h=revisionHarness();await h.open();await h.remove('dependencies','edge-b');
+  h.dependency({'edge-id':'edge-b'});h.confirm();await h.client.save();
+  const edges=JSON.parse(h.calls.at(-1)[1].body).dependencies;
+  assert.deepEqual(edges[0],h.original.proposal.dependencies[0]);assert.equal(edges[1].state,'KNOWN');
+  assert.equal(edges[1].targetWorkloadId,'db');assert.equal(edges[1].sourceReference,'review-reference');
+  assert.equal(edges[1].observedAt,'2026-10-01T12:01:00.654321+00:00');
+  assert.equal(h.original.proposal.dependencies[1].state,'UNKNOWN');
+  assert.equal(h.client.selection().status,'UNREVIEWED');
+});
+test('replacing a saved known assertion with unknown does not invent a target or verification',async()=>{
+  const h=revisionHarness();await h.open();await h.remove('dependencies','edge-a');
+  h.dependency({'edge-id':'edge-a','edge-to':'','edge-state':'UNKNOWN','edge-reason':'CONFLICTING_SOURCES'});
+  h.confirm();await h.client.save();const edge=JSON.parse(h.calls.at(-1)[1].body).dependencies.at(-1);
+  assert.equal(edge.targetWorkloadId,null);assert.equal(edge.unknownReason,'CONFLICTING_SOURCES');
+  assert.equal(h.client.selection().ownershipAccepted,false);
+});
+test('dirty metadata, absent records, and signed-out sessions cannot enter saved evidence editing',async()=>{
+  const h=revisionHarness();await h.client.editEvidence();assert.equal(h.calls.length,0);
+  await h.client.load();h.$('name').value='pending';await h.$('name').fire('input');
+  await h.client.editEvidence();assert.equal(h.calls.length,1);assert.equal(h.$('authoring').hidden,true);
+  assert.equal(h.$('name').value,'pending');
+  h.client.clear();h.setAuth({token:null,version:2});await h.client.editEvidence();assert.equal(h.calls.length,1);
+});
+test('historical and superseded saved revisions never request an editing source',async()=>{
+  for(const mode of ['historical','superseded']){
+    const row=currentRecord();if(mode==='superseded'){row.latestGeneration=4;row.sourceSuperseded=true;}
+    const h=revisionHarness((url,init,fallback)=>url.endsWith('?revision=4')?response(row):fallback(url,init),row);
+    if(mode==='historical')h.$('revision').value='4';await h.client.load();await h.client.editEvidence();
+    assert.equal(h.calls.length,1);assert.equal(h.$('edit-evidence').disabled,true);
+    assert.equal(h.$('authoring').hidden,true);assert.equal(h.client.selection(),null);
+  }
+});
+test('changed saved-source generation or digest holds all editing and comparison rather than rebasing',async()=>{
+  for(const mutate of [s=>s.generation=4,s=>s.resultDigest='f'.repeat(64),s=>s.environmentId='other',
+    s=>s.objectCount=-1,s=>s.capturedAt='bad',s=>s.executionAuthorized=true]){
+    const h=revisionHarness((url,init,fallback)=>{if(!url.endsWith('/latest'))return fallback(url,init);
+      const value={...source(),objectCount:4};mutate(value);return response(value);});
+    await h.open();assert.equal(h.$('authoring').hidden,true);assert.equal(h.$('name').disabled,true);
+    assert.equal(h.$('edit-evidence').disabled,true);assert.equal(h.client.selection(),null);
+    h.confirm();await h.client.save();await h.client.objects();assert.equal(h.calls.length,2);
+    assert.match(h.$('status').textContent,/read only/);
+  }
+});
+test('unavailable saved source holds metadata saves until an explicit current reload',async()=>{
+  const h=revisionHarness((url,init,fallback)=>url.endsWith('/latest')?response({error:'absent'},404):fallback(url,init));
+  await h.open();h.$('name').value='not authorized to edit';await h.$('name').fire('input');h.confirm();await h.client.save();
+  assert.equal(h.calls.length,2);assert.equal(h.client.selection(),null);
+  await h.client.load();assert.equal(h.calls.length,3);assert.equal(h.$('name').disabled,false);
+  assert.equal(h.client.selection().revision,4);assert.equal(h.$('name').value,'Saved application');
+});
+test('late saved-source responses cannot repopulate cleared or signed-out editing state',async()=>{
+  for(const action of ['clear','signout']){
+    const wait=deferred();const h=revisionHarness((url,init,fallback)=>url.endsWith('/latest')?wait.promise:fallback(url,init));
+    await h.client.load();const pending=h.client.editEvidence();await new Promise(setImmediate);
+    if(action==='signout')h.setAuth({token:null,version:2});h.client.clear();
+    wait.resolve(response({...source(),objectCount:4}));await pending;
+    assert.equal(h.$('authoring').hidden,true);assert.equal(h.$('members').children.length,0);assert.equal(h.client.selection(),null);
+  }
+});
+test('source-read authentication rejection clears loaded and working evidence',async()=>{
+  const h=revisionHarness((url,init,fallback)=>url.endsWith('/latest')?response({error:'unauthorized'},401):fallback(url,init));
+  await h.open();assert.equal(h.$('environment').value,'');assert.equal(h.$('members').children.length,0);
+  assert.equal(h.$('authoring').hidden,true);assert.equal(h.client.selection(),null);
+});
+test('saved-edit identity paging is pinned despite changed lookup inputs and excludes selected native IDs',async()=>{
+  const h=revisionHarness();await h.open();h.$('environment').value='foreign';h.$('group').value='foreign';
+  await h.client.objects();assert.match(h.calls.at(-1)[0],/environments\/env-a\/discovery\/generations\/3\/objects/);
+  assert.equal(h.$('observations').children[0].children[3].textContent,'Selected');
+  await h.select('vm-103','worker');h.confirm();await h.client.save();
+  assert.match(h.calls.at(-1)[0],/environments\/env-a\/application-drafts\/application-a$/);
+  assert.equal(JSON.parse(h.calls.at(-1)[1].body).expectedRevision,4);
+});
+test('malformed saved-edit identity pages block even metadata-only saves on the loaded baseline',async()=>{
+  const h=revisionHarness((url,init,fallback)=>url.includes('/objects?')?response({...page(),generation:4}):fallback(url,init));
+  await h.open();await h.client.objects();h.$('name').value='changed';await h.$('name').fire('input');h.confirm();await h.client.save();
+  assert.equal(h.calls.length,3);assert.equal(h.$('name').disabled,true);assert.equal(h.client.selection(),null);
+  assert.equal(h.$('save').disabled,true);assert.equal(h.$('edit-evidence').disabled,true);
+});
+test('saved-edit unfinished assertion input and pending VM aliases survive redraws and block saves',async()=>{
+  const h=revisionHarness();await h.open();await h.client.objects();
+  const input=h.$('observations').children[2].children[3].children[0].children[0];input.value='pending';await input.fire('input');
+  h.$('edge-reference').value='pending-ref';h.group('extra','extra-data');
+  assert.equal(h.$('observations').children[2].children[3].children[0].children[0].value,'pending');
+  assert.equal(h.$('edge-reference').value,'pending-ref');h.confirm();await h.client.save();
+  assert.equal(h.calls.length,3);assert.match(h.$('status').textContent,/unfinished/);
+});
+test('saved-edit removal cannot bypass minimum membership, dataset coverage or startup checks',async()=>{
+  for(const invalid of ['members','datasets','order']){
+    const h=revisionHarness();await h.open();
+    if(invalid==='members'){await h.remove('dependencies','edge-a');await h.remove('dependencies','edge-b');await h.remove('members','web');}
+    if(invalid==='datasets'){await h.remove('datasets','db-group');await h.remove('datasets','web-group');}
+    if(invalid==='order')h.$('order').value='web db';
+    h.confirm();await h.client.save();assert.equal(h.calls.length,2);assert.equal(h.client.selection(),null);
+  }
+});
+test('saved-edit conflicts never retry or overwrite a concurrent revision',async()=>{
+  const h=revisionHarness((url,init,fallback)=>init.method==='PUT'?response({error:{code:'APPLICATION_DRAFT_CONFLICT'}},409):fallback(url,init));
+  await h.open();h.group('extra','extra-data');h.confirm();await h.client.save();
+  assert.equal(h.calls.length,3);assert.equal(h.$('authoring').hidden,true);assert.equal(h.client.selection(),null);
+  await h.client.save();await h.client.editEvidence();assert.equal(h.calls.length,3);
+  assert.match(h.$('status').textContent,/conflict/);
+});
+test('lost saved-edit acknowledgement reconciles exact next revision with the full changed proposal',async()=>{
+  let stored;const h=revisionHarness((url,init,fallback)=>{
+    if(init.method==='PUT'){stored=saved(JSON.parse(init.body));throw Error('lost');}
+    return url.endsWith('?revision=5')?response(stored):fallback(url,init);
+  });
+  await h.open();await h.remove('datasets','db-group');h.group('new-data','replacement');h.confirm();await h.client.save();
+  assert.match(h.$('status').textContent,/SAVE UNKNOWN.*revision 5/);assert.equal(h.$('add-group').disabled,true);
+  await h.client.editEvidence();await h.client.save();await h.client.objects();assert.equal(h.calls.length,3);
+  await h.client.reconcile();assert.match(h.calls.at(-1)[0],/\?revision=5$/);
+  assert.equal(h.$('authoring').hidden,true);assert.equal(h.$('edit-evidence').disabled,true);assert.equal(h.client.selection(),null);
+  assert.equal(h.calls.filter(([,i])=>i.method==='PUT').length,1);assert.match(h.$('status').textContent,/not proof this tab/);
+});
+test('changed saved-edit acknowledgements cannot authorize or silently replace submitted evidence',async()=>{
+  for(const mutate of [r=>r.revision=6,r=>r.scope.tenant_id='foreign',r=>r.proposal.draft.datasetIds.reverse(),
+    r=>r.proposal.dependencies.pop(),r=>r.proposal.dependencies[0].observedAt='2026-10-01T12:01:00+00:00',
+    r=>r.ownershipAccepted=true,r=>r.executionAuthorized=true]){
+    const h=revisionHarness((url,init,fallback)=>{if(init.method!=='PUT')return fallback(url,init);
+      const row=saved(JSON.parse(init.body));mutate(row);return response(row);});
+    await h.open();h.confirm();await h.client.save();assert.match(h.$('status').textContent,/SAVE UNKNOWN/);
+    assert.equal(h.client.selection(),null);assert.equal(h.$('edit-evidence').disabled,true);
+  }
+});
+test('missing or mismatched saved-edit history does not unlock writes',async()=>{
+  for(const absent of [true,false]){
+    let stored;const h=revisionHarness((url,init,fallback)=>{
+      if(init.method==='PUT'){stored=saved(JSON.parse(init.body));throw Error('lost');}
+      if(url.endsWith('?revision=5')){stored.proposal.draft.name='competing';return absent?response({error:'absent'},404):response(stored);}
+      return fallback(url,init);
+    });
+    await h.open();h.confirm();await h.client.save();await h.client.reconcile();
+    assert.match(h.$('status').textContent,/remains UNKNOWN/);await h.client.save();
+    assert.equal(h.calls.filter(([,i])=>i.method==='PUT').length,1);assert.equal(h.client.selection(),null);
+  }
+});
+test('in-flight saved-edit body is frozen and cannot be changed by local input or a second edit entry',async()=>{
+  const wait=deferred();const h=revisionHarness((url,init,fallback)=>init.method==='PUT'?wait.promise:fallback(url,init));
+  await h.open();h.group('extra','extra-data');h.confirm();const pending=h.client.save();await new Promise(setImmediate);
+  const body=JSON.parse(h.calls.at(-1)[1].body);h.group('late','late-data');h.$('name').value='late';
+  await h.client.editEvidence();await h.client.objects();await h.client.save();assert.equal(h.calls.length,3);
+  wait.resolve(response(saved(body)));await pending;assert.equal(h.client.selection().proposal.draft.name,'Saved application');
+  assert.ok(!h.client.selection().proposal.draft.datasetIds.includes('late-data'));
+});
+test('source supersession reported by a successful saved-edit acknowledgement remains read-only',async()=>{
+  const h=revisionHarness((url,init,fallback)=>{if(init.method!=='PUT')return fallback(url,init);
+    return response({...saved(JSON.parse(init.body)),latestGeneration:4,sourceSuperseded:true});});
+  await h.open();h.confirm();await h.client.save();assert.equal(h.$('authoring').hidden,true);
+  assert.equal(h.$('name').disabled,true);assert.equal(h.$('edit-evidence').disabled,true);assert.equal(h.client.selection(),null);
+});
+test('discard of unsaved evidence changes makes no write and original loaded history remains intact',async()=>{
+  const h=revisionHarness();await h.open();await h.remove('dependencies','edge-b');h.group('extra','extra-data');
+  await h.$('discard').fire('click');assert.equal(h.calls.length,2);assert.equal(h.$('authoring').hidden,true);
+  h.$('environment').value='env-a';h.$('group').value='application-a';await h.client.load();
+  assert.deepEqual(h.client.selection().proposal,h.original.proposal);
+});
+test('unknown saved-edit discard requires confirmation and late replies cannot reopen another session',async()=>{
+  const h=revisionHarness((url,init,fallback)=>{if(init.method==='PUT')throw Error('lost');return fallback(url,init);});
+  await h.open();h.confirm();await h.client.save();await h.$('discard').fire('click');assert.equal(h.$('authoring').hidden,false);
+  h.$('confirm-discard').checked=true;await h.$('discard').fire('click');assert.equal(h.$('authoring').hidden,true);
+  assert.equal(h.$('dependencies').children.length,0);assert.equal(h.client.selection(),null);
+});
+test('page exit warns about working revisions and clears all loaded and proposed assertions',async()=>{
+  const h=revisionHarness();await h.open();h.group('extra','extra-data');let warned=false;
+  h.events.beforeunload({preventDefault(){warned=true;}});assert.equal(warned,true);h.events.pagehide();
+  for(const id of ['members','datasets','dependencies','observations'])assert.equal(h.$(id).children.length,0);
+  assert.equal(h.$('authoring').hidden,true);assert.equal(h.$('binding').textContent,'');assert.equal(h.client.selection(),null);
+});
+test('proposal request revision is explicit and cannot overflow the next stored revision',()=>{
+  const row=currentRecord();
+  for(const revision of [undefined,null,-1,true,'4',4.1,Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER+1]){
+    assert.throws(()=>UI.proposalRequest(row,row.proposal.draft,row.proposal.dependencies,revision));
+  }
+  assert.equal(UI.proposalRequest(row,row.proposal.draft,row.proposal.dependencies,0).expectedRevision,0);
+  assert.equal(UI.proposalRequest(row,row.proposal.draft,row.proposal.dependencies,4).expectedRevision,4);
+  assert.equal(UI.creationRequest,undefined); // Retired helper is not a compatibility alias.
+});
+test('unwritable maximum saved revision cannot open evidence or bypass the common request guard',async()=>{
+  const row=currentRecord(Number.MAX_SAFE_INTEGER),h=revisionHarness(null,row);await h.open();
+  assert.equal(h.$('authoring').hidden,true);assert.equal(h.client.selection(),null);h.confirm();await h.client.save();
+  assert.equal(h.calls.length,2);assert.throws(()=>UI.editedRequest(row,'Name','owner-a','db web'));
+});
+
+if(process.env.HOSTING_REVISION_REQUEST){
+  test('actual saved Python revision crosses the browser edit workspace and returns a new pinned request',async()=>{
+    const f=JSON.parse(fs.readFileSync(process.env.HOSTING_AUTHORING_FIXTURE,'utf8'));
+    const h=harness((url,init)=>{
+      if(init.method==='PUT'){
+        fs.writeFileSync(process.env.HOSTING_REVISION_REQUEST,init.body);
+        throw Error('Captured request only; no stored acknowledgement is fabricated.');
+      }
+      if(url.endsWith('/latest'))return response(f.source);
+      if(url.includes('/objects?'))return response(f.page);
+      return response(f.saved);
+    });
+    h.$('environment').value=f.source.environmentId;h.$('group').value=f.saved.applicationGroupId;
+    await h.client.load();await h.client.editEvidence();await h.client.objects();
+    // Explicitly remove the two asserted relationships, then replace the second member from observations.
+    while(h.$('dependencies').children.length)await h.$('dependencies').children[0].children[9].children[0].fire('click');
+    const old=f.content.draft.members[1];await h.$('members').children[1].children[2].children[0].fire('click');
+    await h.select(old.nativeVm[4],'replacement-member');h.group('additional-group','additional-data');
+    h.$('name').value='Revised application';await h.$('name').fire('input');h.confirm();await h.client.save();
+    assert.match(h.$('status').textContent,/SAVE UNKNOWN/);
+    const body=JSON.parse(h.calls.at(-1)[1].body);
+    assert.equal(body.expectedRevision,f.saved.revision);assert.equal(body.resultDigest,f.source.resultDigest);
+    assert.equal(body.draft.members[1].workloadId,'replacement-member');assert.deepEqual(body.dependencies,[]);
+    assert.deepEqual(f.saved.proposal.draft,f.content.draft);
+  });
+}

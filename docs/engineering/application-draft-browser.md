@@ -2,8 +2,9 @@
 
 Reviewed 1 October 2026. This B17/B20 continuation follows the
 [existing B01–B50 plan](../product/enterprise-workload-mobility-execution-plan.md).
-The existing authenticated portal now creates an initial application proposal from
-stored VM observations without hand-authoring request JSON. Drafts are still
+The existing authenticated portal creates initial application proposals and explicitly
+revises saved membership, dataset groups and dependency assertions without hand-authoring
+request JSON. Each save appends a revision; the original record is never overwritten. Drafts are still
 UNREVIEWED; no ownership acceptance, reservation, native adoption or migration is issued.
 
 ## Create an initial application
@@ -50,7 +51,7 @@ Successful readback retains the recorded author and false ownership/execution fl
 Only an unchanged current saved record can become the separate application-comparison
 selection; local proposals and unresolved saves cannot.
 
-## Existing drafts and deliberately limited subsequent editing
+## Revise a saved application
 
 **List drafts** fetches one live page of at most 50 summaries; **Next live page** is
 explicit, not an automatic estate export. Load a current record by application ID,
@@ -58,12 +59,38 @@ or supply an exact positive historical revision. The source generation/result di
 author/time, members, datasets, consistency groups and all dependency assertions
 remain visible. Unknown dependencies are not hidden.
 
-After saving, this form edits only the current draft's name, proposed owner and startup
-order. Saved membership, datasets and dependency evidence remain read-only and are
-retained exactly in subsequent submissions, including original timestamp precision.
-Changing those saved assertions still uses the [operator CLI](application-draft-operator.md).
-Guided editing of existing membership/evidence and owner-facing signing remain B17/B20
-work; initial browser creation does not close those obligations.
+Name, proposed owner and startup order can be edited directly. For structural changes,
+load a current saved draft with no pending edits, then select **Edit membership and
+evidence**. One existing latest-generation GET must match the saved generation and
+result digest exactly. The client never changes the source pin or automatically rebases.
+An unavailable, mismatched or unwritable source holds both metadata/structural editing
+and comparison until an explicit current reload. Opening a proposal makes no PUT and
+issues no owner review or native collection request.
+
+The same authoring tables start from deep copies of the saved members, dataset IDs,
+groups and dependency assertions. Original array order and timestamp strings, including
+microseconds, remain intact unless explicitly changed. Add observed VMs from the pinned
+identity pages. Remove and re-add a member to change its logical mapping; first remove
+any assertions referring to that member. Remove and add replacements explicitly to
+correct groups or evidence, including changing KNOWN/UNKNOWN state. Removing one group
+removes only its dataset IDs from this proposal and preserves the ordering of unrelated
+IDs. It does not delete data or alter an earlier revision. Empty assertions mean none
+were recorded, not independently verified absence of dependencies.
+
+Pending aliases and unfinished evidence fields are retained across redraws and block
+saving. Existing membership, dataset, dependency, order, byte and page limits apply to
+both initial and revised proposals. The new save uses the loaded `expectedRevision: N`
+and requires acknowledgement of exactly `N+1`; it never resets a saved edit to revision
+zero. The server independently validates membership, freshness, current source and
+concurrent revisions. Even an unchanged proposal requires confirmation and appends a
+new unreviewed revision when accepted. Browser revision values must permit a safe next
+integer; they do not change the server's signed-64-bit API contract.
+
+Entering editing invalidates the comparison selection immediately. Only a valid current
+acknowledged record can be selected again, with its new revision and digests. It still
+needs a separately accepted exact-draft owner review. Guided owner signing, independent
+external evidence verification and administrator acceptance remain open. The
+[operator CLI](application-draft-operator.md) continues to use the same API contract.
 
 Historical and superseded-source records are read-only. Every edit pins the original
 inventory and expected revision; there is no implicit rebase, rescan or selection of a
@@ -75,8 +102,10 @@ person's authority or transfers native workload ownership.
 
 `provisioner/controlplane/api/portal/application_drafts.js` owns creation, saved-record
 editing and uncertainty handling. Shared proposal, dependency and list validators
-replace the previous embedded copies; no second representation, controller or route
-is introduced. The existing `app.js` supplies the in-memory token and identity version.
+replace the previous embedded copies; one `proposalRequest` owner checks initial,
+metadata and structural requests, including the explicit writable expected revision.
+The initial-only `creationRequest` helper is removed, with callers migrated and no
+forwarding alias. No second representation, controller or route is introduced. The existing `app.js` supplies the in-memory token and identity version.
 Sign-out, a new identity and page exit clear content and abort outstanding reads.
 Earlier identity/selection replies cannot repopulate the workspace. No browser
 persistent storage, cookies, token refresh, external asset or native access is added.
@@ -86,6 +115,7 @@ missing scripts leave markup controls disabled.
 | Operation | Existing path / bound |
 |---|---|
 | Initial scope and source | Two serial GETs: `application-drafts?limit=1`, then `discovery/generations/latest`. No automatic collection or draft creation. |
+| Saved edit entry | One latest-generation GET checked against the loaded exact source pin; no draft write, automatic rebase or owner review. |
 | Source VM choices | One GET per explicit page: `discovery/generations/<pinned>/objects?limit=50`, using the exact identity cursor. Maximum 200 pages. |
 | Proposal | 2–100 observed VMs; 1–1,000 dataset IDs; 1–100 disjoint consistency groups; 0–500 attributed dependencies; complete startup order. |
 | Save | One PUT to `application-drafts/<id>`; at most 128 KiB including source pins and expected revision. |
@@ -99,7 +129,7 @@ refused rather than rounded. Native selectors retain their bounded native text r
 than being reduced to logical IDs. All labels and assertions are literal text, not HTML.
 Object pages must retain exact native kinds/IDs, unique identities across pages, the
 last-identity continuation and count consistency. Any missing or inconsistent page
-holds creation until explicit discard/reload. A terminal stored chain, a zero unknown
+holds both initial and saved-revision authoring until explicit discard/reload. A terminal stored chain, a zero unknown
 count or a COMPLETE summary does not independently prove native completeness.
 
 New dependency timestamps require an explicit UTC suffix, real calendar date and
@@ -141,36 +171,38 @@ collector's discovery outbox is separate and is not used for human draft edits.
 
 ## Verification and remaining work
 
-The Node tests execute the actual component; existing suites also compose it with the
-portal shell and saved-application comparison. New cases cover first creation, source
-races, explicit paging and limits, pending-input preservation, selected identities,
-dataset/dependency bounds, UTC precision, literal rendering, frozen first saves,
-conflicts, missing/mismatched acknowledgements, GET-only reconciliation and identity
-cleanup. Python tests serialize actual API generation/object summaries and a stored
-revision, run the browser request builder, then parse and validate that request with
-the real Python proposal owner. Another check verifies labelled disabled controls in
-the actual markup. The existing Python runner invokes Node; no CI workflow is added.
+The existing Node suites exercise the real component and compose it with the portal
+shell and application comparison. This saved-edit continuation adds 27 standalone
+cases: exact source/revision entry, unchanged-byte retention, member/group/assertion
+replacement, historical/superseded holds, failed-source/page holds, stale replies,
+identity cleanup, frozen writes, conflicting revisions, uncertain acknowledgement,
+exact `N+1` reconciliation, discard and safe-integer bounds. All 124 standalone cases
+passed locally. Python serialization supplies two additional conditional Node cases;
+one drives saved-record editing through the actual workspace and passes its changed
+request back to the actual Python proposal parser and validator. The focused 25-test
+Python run passed; these overlapping suite counts are not additive.
 
-Local focused results: 97 Node tests passed with no failures/skips across authoring,
-existing-draft and application-comparison suites; the Python serialization fixture
-adds one conditional Node case. The focused 25-test Python run passed. Counts overlap
-and are not additive unique-test totals. The broader API discovery run had 222 executed
-passes and two module-import errors because local psycopg is unavailable; that run is
-not a full API pass. Final-revision CI supplies separate database and installed-package
-results; earlier successful CI is not evidence for the new commit.
+A broad local API run discovered 224 tests, with two `psycopg` module-import errors;
+the 222 runnable tests passed. That attempt is not a complete API pass. Local FastAPI
+is 0.128.2 rather than the declared deployment pin; final-revision CI must independently
+run the pinned installed-package, database/API and integration gates. Successful prior
+revision checks are historical evidence, not qualification of this change.
 
-A local Chromium real-DOM smoke completed the guided form and exact save with synthetic
-responses and no script errors. It used the actual markup/styles/component but not
-enterprise login, HTTP-to-database integration or vendor systems. This does not turn
-older blocked navigation attempts into passes. Deployed SSO, accessibility, usability
-and administrator acceptance remain separate; no browser policy was disabled.
+An offline Chromium DOM smoke used the repository markup, styles and component,
+synthetic in-memory identity and injected transport. It revised membership/data/evidence
+and acknowledged revision two after actual Python parsing/validation/serialization,
+with no script errors. It did not test SSO, network transport, persistence, an actual
+owner signature or a vendor environment. The earlier navigation attempt was blocked by
+the browser's administrator policy and remains a blocked result; no browser policy
+was disabled. Accessibility, deployed usability and administrator acceptance remain
+separate from this component smoke.
 
 No database migration, grant expansion, API/collector/normalizer/profile format change,
-compatibility shim or native support claim is introduced. Initial creation is now
-implemented. Guided changes to saved membership/evidence, independent dependencies,
-owner-facing signing and administrator acceptance remain open. B22 fleet scheduling,
-monitoring, resumability and measurements and later provisioning, transfer, fencing,
-cutover, post-write recovery and qualification obligations remain in the existing plan.
+compatibility shim or native support claim is introduced. Initial and saved-revision
+browser authoring are implemented; independent dependencies, owner-facing signing and
+administrator acceptance remain open. B22 fleet scheduling, monitoring, resumability
+and measurements and later provisioning, transfer, fencing, cutover, post-write recovery
+and qualification obligations remain in the existing plan.
 
 ## Signed review and application comparison are separate
 

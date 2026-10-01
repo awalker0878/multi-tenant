@@ -194,15 +194,10 @@ const ApplicationDraftWorkspace = (() => {
   }
 
   function editedRequest(record, name, owner, orderText) {
-    if (record.sourceSuperseded) throw new Error('The source generation is superseded.');
-    if (!text(name) || !validId(owner)) throw new Error('Enter a valid name and proposed owner ID.');
-    const body = {generation: record.generation, resultDigest: record.resultDigest,
-      expectedRevision: record.revision, ...copy({draft: record.proposal.draft, dependencies: record.proposal.dependencies})};
-    const order = orderText.trim().split(/\s+/);
-    validateOrder(order, body.draft.members, body.dependencies);
-    body.draft.name = name; body.draft.ownerId = owner; body.draft.startupOrder = order;
-    if (new TextEncoder().encode(JSON.stringify(body)).length > MAX_REQUEST) throw new Error('Proposal exceeds the request limit.');
-    return body;
+    if (typeof orderText !== 'string' || orderText.length > 12900) throw new Error('Invalid startup order input.');
+    const draft = {...copy(record.proposal.draft), name, ownerId: owner,
+      startupOrder: orderText.trim().split(/\s+/)};
+    return proposalRequest(record, draft, record.proposal.dependencies, record.revision);
   }
 
   const KINDS = ['vm', 'disk', 'nic', 'volume', 'image', 'network', 'pool', 'cluster', 'host', 'datastore', 'quota'];
@@ -261,16 +256,13 @@ const ApplicationDraftWorkspace = (() => {
     return copy(page);
   }
 
-  function creationRequest(source, groupId, name, owner, members, groups, dependencies, orderText) {
+  function proposalRequest(source, draft, dependencies, expectedRevision) {
+    // Initial and subsequent authoring use one request contract, with no inferred revision.
     if (!source || !validId(source.environmentId) || !scopeValid(source.scope) || !integer(source.generation) ||
-        !validSha(source.resultDigest) || !validId(groupId) || typeof orderText !== 'string' || orderText.length > 12900 ||
-        !Array.isArray(members) || members.length > 100 || !Array.isArray(groups) || groups.length > 100 ||
-        groups.some((group) => !keys(group, ['groupId', 'datasetIds']) || !Array.isArray(group.datasetIds) || group.datasetIds.length > 1000)) throw new Error('A pinned source and application ID are required.');
-    const draft = {applicationGroupId: groupId, name, ownerId: owner, members: copy(members),
-      datasetIds: groups.flatMap((group) => group.datasetIds), consistencyGroups: copy(groups),
-      startupOrder: orderText.trim().split(/\s+/)};
-    const content = validateProposal(draft, dependencies, source.scope, groupId);
-    const body = {generation: source.generation, resultDigest: source.resultDigest, expectedRevision: 0, ...content};
+        !validSha(source.resultDigest) || source.sourceSuperseded || !integer(expectedRevision, 0) ||
+        expectedRevision >= Number.MAX_SAFE_INTEGER) throw new Error('An exact source and writable revision are required.');
+    const content = validateProposal(draft, dependencies, source.scope, draft?.applicationGroupId);
+    const body = {generation: source.generation, resultDigest: source.resultDigest, expectedRevision, ...content};
     if (new TextEncoder().encode(JSON.stringify(body)).length > MAX_REQUEST) throw new Error('Proposal exceeds the request limit.');
     return body;
   }
@@ -280,12 +272,12 @@ const ApplicationDraftWorkspace = (() => {
     let epoch = 0, busy = false, loaded = null, historical = false, dirty = false;
     let unknown = null, cursor = null, selectedEnvironment = null, pageScope = null, controller = null;
     let lastSelection = null;
-    let creation = null, members = [], groups = [], dependencies = [];
+    let authoring = null, members = [], datasets = [], groups = [], dependencies = [];
     let objectAfter = null, objectDone = false, objectCount = 0, objectPages = 0, objectHeld = false;
     let seenObjects = new Set(), visibleObjects = [], memberInputs = [], rowControls = [];
     const authoringFields = ['data-group', 'data-ids', 'edge-id', 'edge-from', 'edge-to', 'edge-relation',
       'edge-state', 'edge-reason', 'edge-source', 'edge-reference', 'edge-time'];
-    const selection = () => loaded && !busy && !historical && !dirty && !unknown &&
+    const selection = () => loaded && !authoring && !objectHeld && !busy && !historical && !dirty && !unknown &&
       !loaded.sourceSuperseded ? copy(loaded) : null;
     const status = (message) => { $('status').textContent = message; };
     const identity = () => {
@@ -297,13 +289,14 @@ const ApplicationDraftWorkspace = (() => {
     function controls() {
       for (const id of ['environment', 'group', 'revision', 'list', 'load', 'next']) $(id).disabled = busy || dirty || !!unknown;
       $('next').hidden = cursor === null;
-      for (const id of ['name', 'owner', 'order']) $(id).disabled = busy || !(loaded || creation) || historical || !!loaded?.sourceSuperseded || !!unknown;
-      const canSave = !busy && (loaded || creation && !objectHeld) && !historical && !loaded?.sourceSuperseded && dirty && !unknown;
+      for (const id of ['name', 'owner', 'order']) $(id).disabled = busy || !(loaded || authoring) || historical || !!loaded?.sourceSuperseded || objectHeld || !!unknown;
+      const canSave = !busy && !objectHeld && (loaded || authoring) && !historical && !loaded?.sourceSuperseded && dirty && !unknown;
       $('save').disabled = !canSave || !$('confirm').checked;
-      $('discard').disabled = busy || !(loaded || creation || unknown);
+      $('discard').disabled = busy || !(loaded || authoring || unknown);
       $('start').disabled = busy || dirty || !!unknown || !session()?.token;
-      $('authoring').hidden = !creation;
-      const locked = busy || !creation || !!unknown || objectHeld;
+      $('edit-evidence').disabled = busy || !loaded || historical || !!loaded?.sourceSuperseded || dirty || !!unknown || objectHeld;
+      $('authoring').hidden = !authoring;
+      const locked = busy || !authoring || !!unknown || objectHeld;
       for (const id of [...authoringFields, 'add-group', 'add-edge']) $(id).disabled = locked;
       for (const item of rowControls) item.disabled = locked;
       $('objects').disabled = locked || objectDone || objectPages >= MAX_PAGES;
@@ -314,8 +307,8 @@ const ApplicationDraftWorkspace = (() => {
       const selected = selection(), fingerprint = selected ? canonical(selected) : null;
       if (fingerprint !== lastSelection) { lastSelection = fingerprint; onSelection(selected); }
     }
-    function resetCreation() {
-      creation = null; members = []; groups = []; dependencies = [];
+    function resetAuthoring() {
+      authoring = null; members = []; datasets = []; groups = []; dependencies = [];
       objectAfter = null; objectDone = objectHeld = false; objectCount = objectPages = 0;
       seenObjects = new Set(); visibleObjects = []; memberInputs = []; rowControls = [];
       $('observations').replaceChildren(); $('observation-status').textContent = '';
@@ -323,7 +316,7 @@ const ApplicationDraftWorkspace = (() => {
     }
     function clear() {
       epoch++; controller?.abort(); controller = null;
-      resetCreation();
+      resetAuthoring();
       busy = dirty = historical = false; loaded = unknown = cursor = selectedEnvironment = pageScope = null;
       for (const id of ['rows', 'members', 'datasets', 'dependencies', 'binding']) $(id).replaceChildren();
       for (const id of ['environment', 'group', 'revision', 'name', 'owner', 'order']) $(id).value = '';
@@ -378,9 +371,9 @@ const ApplicationDraftWorkspace = (() => {
     const pathFor = (env, group = null) => `/v1/environments/${encodeURIComponent(env)}/application-drafts` +
       (group === null ? '' : '/' + encodeURIComponent(group));
     function changed() {
-      if (!creation || busy || unknown || objectHeld) return;
+      if (!authoring || busy || unknown || objectHeld) return;
       dirty = true; $('confirm').checked = false;
-      status('Unsaved initial proposal. Review the selected tables; assertions are not independently verified.');
+      status('Unsaved proposal. Review the selected tables; original saved revisions are unchanged and assertions are not independently verified.');
       controls();
     }
     function options(id, values) {
@@ -395,12 +388,12 @@ const ApplicationDraftWorkspace = (() => {
       const td = document.createElement('td'), button = document.createElement('button');
       button.type = 'button'; button.textContent = label; rowControls.push(button);
       button.addEventListener('click', () => {
-        if (!creation || busy || unknown || objectHeld) return;
-        try { remove(); renderCreation(); changed(); } catch (error) { status(error.message); }
+        if (!authoring || busy || unknown || objectHeld) return;
+        try { remove(); renderAuthoring(); changed(); } catch (error) { status(error.message); }
       });
       td.append(button); row.append(td);
     }
-    function renderCreation() {
+    function renderAuthoring() {
       const unfinished = new Map(memberInputs.map((input) => [input.nativeId, input.value]));
       rowControls = []; memberInputs = [];
       for (const id of ['members', 'datasets', 'dependencies', 'observations']) $(id).replaceChildren();
@@ -416,7 +409,10 @@ const ApplicationDraftWorkspace = (() => {
       }
       for (const group of groups) {
         const row = document.createElement('tr'); cell(row, group.groupId); cell(row, group.datasetIds.join(', '));
-        removeButton(row, 'Remove group', () => { groups = groups.filter((item) => item !== group); }); $('datasets').append(row);
+        removeButton(row, 'Remove group', () => {
+          groups = groups.filter((item) => item !== group);
+          datasets = datasets.filter((id) => !group.datasetIds.includes(id));
+        }); $('datasets').append(row);
       }
       for (const edge of dependencies) {
         const row = document.createElement('tr');
@@ -441,8 +437,8 @@ const ApplicationDraftWorkspace = (() => {
             if (!validId(input.value) || members.length >= 100 || members.some((member) => member.workloadId === input.value)) {
               throw new Error('Enter a unique logical workload ID; maximum 100 observed members.');
             }
-            members.push({workloadId: input.value, nativeVm: [creation.scope.endpoint_id,
-              creation.scope.native_scope_id, creation.scope.platform_family, 'vm', item.nativeId]});
+            members.push({workloadId: input.value, nativeVm: [authoring.scope.endpoint_id,
+              authoring.scope.native_scope_id, authoring.scope.platform_family, 'vm', item.nativeId]});
             $('order').value = [$('order').value.trim(), input.value].filter(Boolean).join('\n');
           });
         }
@@ -457,7 +453,7 @@ const ApplicationDraftWorkspace = (() => {
       let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
       const env = $('environment').value.trim(), id = $('group').value.trim();
       if (!validId(env) || !validId(id) || $('revision').value.trim()) { status('Enter an environment and new application ID; leave historical revision empty.'); return; }
-      const version = ++epoch; busy = true; loaded = null; historical = false; resetCreation(); $('editor').hidden = true; controls();
+      const version = ++epoch; busy = true; loaded = null; historical = false; resetAuthoring(); $('editor').hidden = true; controls();
       status('Reading the authorized draft scope and current stored observation. No draft has been saved.');
       try {
         const listing = await request(pathFor(env) + '?limit=1', 'GET', null, who, version);
@@ -469,21 +465,48 @@ const ApplicationDraftWorkspace = (() => {
         if (!same(who, version)) return;
         if (response.status !== 200) throw new Error('Observation unavailable');
         const observation = validateGeneration(response.value, env, page.latestGeneration);
-        creation = {...observation, applicationGroupId: id, scope: copy(page.scope)};
+        authoring = {...observation, applicationGroupId: id, scope: copy(page.scope)};
         dirty = true; $('editor').hidden = false;
         for (const field of ['name', 'owner', 'order']) $(field).value = '';
         $('confirm').checked = false;
-        $('binding').textContent = `${env} · ${id} · NEW UNSAVED proposal · generation ${creation.generation}\nResult: ${creation.resultDigest}\nCaptured: ${creation.capturedAt} · ${creation.completeness}\nNo owner review or native authority. Source currency is rechecked by the server at save.`;
-        renderCreation();
+        $('binding').textContent = `${env} · ${id} · NEW UNSAVED proposal · generation ${authoring.generation}\nResult: ${authoring.resultDigest}\nCaptured: ${authoring.capturedAt} · ${authoring.completeness}\nNo owner review or native authority. Source currency is rechecked by the server at save.`;
+        renderAuthoring();
         status('Source pinned. Load identity pages explicitly, select at least two VMs, and propose dataset groups and dependencies.');
       } catch (_) { if (same(who, version)) status('Source unavailable or changed. No new draft was opened; reload explicitly.'); }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
+    async function editEvidence() {
+      if (busy || !loaded || dirty || unknown || historical || loaded.sourceSuperseded || objectHeld) return;
+      let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
+      const original = copy(loaded), version = ++epoch;
+      busy = true; $('confirm').checked = false; controls();
+      status('Checking the saved source pin before opening a new revision proposal. No write is requested.');
+      try {
+        const response = await request(`/v1/environments/${encodeURIComponent(original.environmentId)}/discovery/generations/latest`, 'GET', null, who, version);
+        if (!same(who, version)) return;
+        if (response.status !== 200) throw new Error('Source unavailable');
+        const observation = validateGeneration(response.value, original.environmentId, original.generation);
+        if (observation.resultDigest !== original.resultDigest || original.revision >= Number.MAX_SAFE_INTEGER) throw new Error('Saved source or revision is not writable');
+        resetAuthoring();
+        authoring = {...observation, applicationGroupId: original.applicationGroupId, scope: copy(original.scope)};
+        members = copy(original.proposal.draft.members); datasets = copy(original.proposal.draft.datasetIds);
+        groups = copy(original.proposal.draft.consistencyGroups); dependencies = copy(original.proposal.dependencies);
+        // Dataset order and original assertion timestamps are copied, not reconstructed.
+        dirty = true; renderAuthoring();
+        $('binding').textContent += `\nUNSAVED REVISION PROPOSAL — based on revision ${original.revision}; save expects that exact revision.\nCaptured: ${authoring.capturedAt} · ${authoring.completeness}. No rebase or owner-review reuse.`;
+        status('Propose membership, dataset and dependency changes. Remove and add replacements explicitly; saving appends a new revision and never overwrites history.');
+      } catch (_) {
+        if (same(who, version)) {
+          objectHeld = true;
+          status('Saved source unavailable, changed or not writable. The draft is read only; reload explicitly. No source rebase or write occurred.');
+        }
+      } finally { if (same(who, version)) { busy = false; controls(); } }
+    }
     async function objects() {
-      if (busy || !creation || unknown || objectHeld || objectDone || objectPages >= MAX_PAGES) return;
+      if (busy || !authoring || unknown || objectHeld || objectDone || objectPages >= MAX_PAGES) return;
       if (memberInputs.some((input) => input.value !== '')) { status('Add or clear the unfinished member row before changing pages.'); return; }
       let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
-      const source = copy(creation), after = objectAfter, version = ++epoch;
+      const source = copy(authoring), after = objectAfter, version = ++epoch;
       busy = true; $('confirm').checked = false; controls();
       try {
         const response = await request(`/v1/environments/${encodeURIComponent(source.environmentId)}/discovery/generations/${source.generation}/objects?limit=50` +
@@ -494,15 +517,15 @@ const ApplicationDraftWorkspace = (() => {
         for (const item of page.items) seenObjects.add(canonical([item.resourceKind, item.nativeId]));
         visibleObjects = page.items; objectCount += page.items.length; objectPages++;
         objectAfter = page.nextAfter; objectDone = objectAfter === null;
-        renderCreation();
+        renderAuthoring();
         $('observation-status').textContent = `${objectCount} stored identity summaries inspected; only VMs on this page are selectable. ` +
           (objectDone ? 'Stored page chain ended; native completeness is not established.' : objectPages >= MAX_PAGES ?
             'Browser page budget reached. Selected VMs may still be proposed; remaining estate coverage is not claimed.' : 'Continue only by selecting Next observed identity page.');
-      } catch (_) { if (same(who, version)) { objectHeld = true; $('observations').replaceChildren(); status('Observation page unavailable or inconsistent. Discard and reload the source; no creation save is permitted.'); } }
+      } catch (_) { if (same(who, version)) { objectHeld = true; $('observations').replaceChildren(); status('Observation page unavailable or inconsistent. Discard and reload the source; no authoring save is permitted.'); } }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
     function addGroup() {
-      if (!creation || busy || unknown || objectHeld) return;
+      if (!authoring || busy || unknown || objectHeld) return;
       if ($('data-ids').value.length > 129000) { status('Dataset input exceeds its bounded size.'); return; }
       const groupId = $('data-group').value, datasetIds = $('data-ids').value.trim().split(/\s+/);
       const existing = new Set(groups.flatMap((group) => group.datasetIds));
@@ -511,11 +534,11 @@ const ApplicationDraftWorkspace = (() => {
           existing.size + datasetIds.length > 1000 || datasetIds.some((id) => existing.has(id))) {
         status('Enter a unique consistency-group ID and distinct dataset IDs; each dataset must occur in exactly one group.'); return;
       }
-      groups.push({groupId, datasetIds}); $('data-group').value = ''; $('data-ids').value = '';
-      renderCreation(); changed();
+      groups.push({groupId, datasetIds}); datasets.push(...datasetIds); $('data-group').value = ''; $('data-ids').value = '';
+      renderAuthoring(); changed();
     }
     function addEdge() {
-      if (!creation || busy || unknown || objectHeld) return;
+      if (!authoring || busy || unknown || objectHeld) return;
       try {
         const state = $('edge-state').value;
         if (!['KNOWN', 'UNKNOWN'].includes(state) || state === 'UNKNOWN' && $('edge-to').value || state === 'KNOWN' && $('edge-reason').value) {
@@ -529,7 +552,7 @@ const ApplicationDraftWorkspace = (() => {
         validateOrder($('order').value.trim().split(/\s+/), members, [...dependencies, edge]);
         dependencies.push(edge);
         for (const id of authoringFields.filter((id) => id.startsWith('edge-'))) $(id).value = '';
-        renderCreation(); changed();
+        renderAuthoring(); changed();
       } catch (error) { status(error.message); }
     }
     async function list(next = false) {
@@ -558,7 +581,7 @@ const ApplicationDraftWorkspace = (() => {
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
     function render(record) {
-      resetCreation();
+      resetAuthoring();
       loaded = record; dirty = false; $('confirm').checked = false; $('editor').hidden = false;
       $('name').value = record.proposal.draft.name; $('owner').value = record.proposal.draft.ownerId;
       $('order').value = record.proposal.draft.startupOrder.join('\n');
@@ -589,22 +612,25 @@ const ApplicationDraftWorkspace = (() => {
         if (!same(who, version)) return;
         if (result.status !== 200) throw new Error('Unavailable');
         render(validateRecord(result.value, env, id, revision, selectedEnvironment === env ? pageScope : null));
-        status('Draft loaded. Membership, datasets and dependency evidence are retained read-only; no approval is issued.');
+        status('Draft loaded. Select Edit membership and evidence to propose a new revision; historical and superseded sources remain read only. No approval is issued.');
       } catch (_) { if (same(who, version)) status('Draft unavailable or inconsistent. No editable draft was loaded.'); }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
     async function save() {
-      if (busy || !dirty || !(loaded || creation) || historical || loaded?.sourceSuperseded || unknown || objectHeld || !$('confirm').checked) return;
+      if (busy || !dirty || !(loaded || authoring) || historical || loaded?.sourceSuperseded || unknown || objectHeld || !$('confirm').checked) return;
       let who, body;
       try {
         who = identity();
-        if (creation && unfinishedRows()) throw new Error('Add or clear unfinished member, dataset and dependency rows before saving.');
-        body = creation ? creationRequest(creation, creation.applicationGroupId, $('name').value, $('owner').value, members, groups, dependencies, $('order').value) :
+        if (authoring && unfinishedRows()) throw new Error('Add or clear unfinished member, dataset and dependency rows before saving.');
+        body = authoring ? proposalRequest(authoring, {
+          applicationGroupId: authoring.applicationGroupId, name: $('name').value, ownerId: $('owner').value,
+          members, datasetIds: datasets, consistencyGroups: groups, startupOrder: $('order').value.trim().split(/\s+/)
+        }, dependencies, loaded ? loaded.revision : 0) :
           editedRequest(loaded, $('name').value, $('owner').value, $('order').value);
       }
       catch (error) { status(error.message); return; }
-      const original = creation ? {environmentId: creation.environmentId, applicationGroupId: creation.applicationGroupId,
-        scope: copy(creation.scope), revision: 0} : copy(loaded), version = ++epoch;
+      const original = loaded ? copy(loaded) : {environmentId: authoring.environmentId,
+        applicationGroupId: authoring.applicationGroupId, scope: copy(authoring.scope), revision: 0}, version = ++epoch;
       busy = true;
       unknown = {environmentId: original.environmentId, applicationGroupId: original.applicationGroupId,
         revision: original.revision + 1, body: copy(body), scope: copy(original.scope)};
@@ -615,7 +641,7 @@ const ApplicationDraftWorkspace = (() => {
         if (!same(who, version)) return;
         if (result.status === 409 && result.value?.error?.code === 'APPLICATION_DRAFT_CONFLICT') {
           unknown = null; historical = true; dirty = false;
-          if (creation) { resetCreation(); $('editor').hidden = true; }
+          if (authoring) { resetAuthoring(); $('editor').hidden = true; }
           status('Revision/source conflict. Reload current history before editing; this does not settle an earlier unknown save.'); return;
         }
         if (result.status !== 200) throw new Error('Save acknowledgement unavailable');
@@ -645,6 +671,7 @@ const ApplicationDraftWorkspace = (() => {
       } catch (_) { if (same(who, version)) status('Save remains UNKNOWN. Missing, conflicting or inaccessible history does not prove rollback.'); }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
+    $('edit-evidence').addEventListener('click', editEvidence);
     $('start').addEventListener('click', start); $('objects').addEventListener('click', objects);
     $('add-group').addEventListener('click', addGroup); $('add-edge').addEventListener('click', addEdge);
     for (const id of authoringFields) { $(id).addEventListener('input', changed); $(id).addEventListener('change', changed); }
@@ -652,7 +679,7 @@ const ApplicationDraftWorkspace = (() => {
     $('confirm').addEventListener('change', controls);
     $('load').addEventListener('click', load); $('reconcile').addEventListener('click', reconcile);
     $('form').addEventListener('submit', (event) => { event.preventDefault(); return save(); });
-    for (const id of ['name', 'owner', 'order']) $(id).addEventListener('input', () => { if (!busy && (loaded || creation) && !historical && !unknown) { dirty = true; $('confirm').checked = false; status('Unsaved local changes; the original source pin remains unchanged.'); controls(); } });
+    for (const id of ['name', 'owner', 'order']) $(id).addEventListener('input', () => { if (!busy && !objectHeld && (loaded || authoring) && !historical && !loaded?.sourceSuperseded && !unknown) { dirty = true; $('confirm').checked = false; status('Unsaved local changes; the original source pin remains unchanged.'); controls(); } });
     $('discard').addEventListener('click', () => {
       if (busy) return;
       if (unknown && !$('confirm-discard').checked) { status('A save is unresolved. Confirm discarding this tab’s reconciliation state first; it does not undo a committed write.'); return; }
@@ -667,9 +694,9 @@ const ApplicationDraftWorkspace = (() => {
     window?.addEventListener('pagehide', clear);
     window?.addEventListener('beforeunload', (event) => { if (busy || dirty || unknown) { event.preventDefault(); event.returnValue = ''; } });
     clear();
-    return {clear, list, load, start, objects, addGroup, addEdge, save, reconcile, selection};
+    return {clear, list, load, start, editEvidence, objects, addGroup, addEdge, save, reconcile, selection};
   }
   return {mount, strictJson, validateRecord, validateProposal, validateList, validateGeneration, validateObjectPage,
-    creationRequest, utcInput, objectCursor, editedRequest, canonical};
+    proposalRequest, utcInput, objectCursor, editedRequest, canonical};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = ApplicationDraftWorkspace;

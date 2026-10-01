@@ -1,4 +1,4 @@
-"""Initial browser authoring uses real serialized summaries and the existing parser.
+"""Initial and saved-revision browser authoring uses real serialized summaries and the existing parser.
 
 These are in-process API serialization/domain and Node DOM-contract tests, not a
 browser deployment, database-role test, owner acceptance or native qualification.
@@ -81,20 +81,22 @@ class ApplicationAuthoringAssetTests(unittest.TestCase):
                 identity = 'draft-' + field
                 self.assertIn(identity, markup.labels)
                 self.assertIn('disabled', markup.controls[identity][1])
-        for identity in ('draft-start', 'draft-objects', 'draft-add-group', 'draft-add-edge'):
+        for identity in ('draft-start', 'draft-edit-evidence', 'draft-objects', 'draft-add-group', 'draft-add-edge'):
             with self.subTest(identity=identity):
                 self.assertEqual(markup.controls[identity][0], 'button')
                 self.assertEqual(markup.controls[identity][1]['type'], 'button')
                 self.assertIn('disabled', markup.controls[identity][1])
 
     @unittest.skipUnless(shutil.which('node'), 'Node is required for browser-client contract tests')
-    def test_initial_authoring_contracts_and_real_python_serialization_roundtrip(self):
+    def test_initial_and_saved_authoring_contracts_and_real_python_serialization_roundtrip(self):
         fixture, result = serialized_fixture()
         with tempfile.TemporaryDirectory() as directory:
             source, output = Path(directory) / 'fixture.json', Path(directory) / 'request.json'
+            revision_output = Path(directory) / 'revision-request.json'
             source.write_text(json.dumps(fixture))
             env = {**os.environ, 'HOSTING_AUTHORING_FIXTURE': str(source),
-                   'HOSTING_AUTHORING_REQUEST': str(output)}
+                   'HOSTING_AUTHORING_REQUEST': str(output),
+                   'HOSTING_REVISION_REQUEST': str(revision_output)}
             run = subprocess.run([shutil.which('node'), '--test',
                 str(ROOT / 'tests/provisioning/api/test_application_authoring_ui.js')],
                 cwd=ROOT, env=env, text=True, capture_output=True, timeout=45)
@@ -102,6 +104,7 @@ class ApplicationAuthoringAssetTests(unittest.TestCase):
             self.assertIn('# fail 0', run.stdout)
             self.assertIn('# skipped 0', run.stdout)
             body = json.loads(output.read_text())
+            revision_body = json.loads(revision_output.read_text())
         self.assertEqual(set(body), {'generation', 'resultDigest', 'expectedRevision', 'draft', 'dependencies'})
         self.assertEqual((body['generation'], body['resultDigest'], body['expectedRevision']), (3, result.digest, 0))
         draft, edges = parse_content({'draft': body['draft'], 'dependencies': body['dependencies']})
@@ -109,6 +112,18 @@ class ApplicationAuthoringAssetTests(unittest.TestCase):
         self.assertEqual(edges, (KNOWN, UNKNOWN))
         self.assertEqual(validate_draft(result, draft, edges, checked_at=NOW), (UNKNOWN,))
         self.assertEqual(proposal_digest(result, draft, edges), fixture['saved']['proposalDigest'])
+        self.assertEqual(set(revision_body), set(body))
+        self.assertEqual((revision_body['generation'], revision_body['resultDigest'],
+                          revision_body['expectedRevision']), (3, result.digest, 1))
+        revised, revised_edges = parse_content({key: revision_body[key] for key in ('draft', 'dependencies')})
+        self.assertEqual(revised.members[0], DRAFT.members[0])
+        self.assertEqual(revised.members[1].native_vm, DRAFT.members[1].native_vm)
+        self.assertEqual(revised.members[1].workload_id, 'replacement-member')
+        self.assertEqual(revised.dataset_ids, DRAFT.dataset_ids + ('additional-data',))
+        self.assertEqual(revised.startup_order, ('db', 'replacement-member'))
+        self.assertEqual(revised_edges, ())
+        self.assertEqual(validate_draft(result, revised, revised_edges, checked_at=NOW), ())
+        self.assertNotEqual(proposal_digest(result, revised, revised_edges), fixture['saved']['proposalDigest'])
 
 
 if __name__ == '__main__':
