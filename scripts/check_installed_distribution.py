@@ -58,6 +58,7 @@ try:
     assert draft_client.request(review_args, lambda value: value) == (
         'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
     from provisioner.controlplane.discovery import collector_runtime, collector_settings, batch_runtime, read_budget
+    from provisioner.controlplane.discovery import freshness, freshness_history
     from provisioner.controlplane.discovery.adapters import collector_config
     comparison_parser = argparse.ArgumentParser()
     assessment_client.install_parser(comparison_parser.add_subparsers(dest='resource', required=True))
@@ -94,6 +95,9 @@ try:
     assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
     assert callable(publication.PrivateDiscoveryOutbox.for_campaign)
     assert publication_https.DiscoveryHttpsPublisher.__module__ == publication_https.__name__
+    assert freshness.DiscoveryFreshnessService.__module__ == freshness.__name__
+    assert freshness_history.FreshnessHistoryRepository.__module__ == freshness_history.__name__
+    assert callable(freshness_history.FreshnessHistoryRepository.list_checks)
     assert batch_runtime.run_batch.__module__ == batch_runtime.__name__
     assert read_budget.NativeReadGate.__module__ == read_budget.__name__
     assert collector_runtime.main.__module__ == collector_runtime.__name__
@@ -125,7 +129,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -152,6 +156,7 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0019_discovery_inventory.sql',
     'provisioner/controlplane/persistence/migrations/0021_application_drafts.sql',
     'provisioner/controlplane/persistence/migrations/0022_application_review_evidence.sql',
+    'provisioner/controlplane/persistence/migrations/0023_discovery_freshness_history.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/application_drafts.js',

@@ -85,3 +85,12 @@ now prevent concurrent first capture by cooperating updated processes using the
 same local custody. Incomplete intents survive process exit and remain held;
 completed originals resume unchanged. This is not fleet scheduling or global
 endpoint budgeting, and Wave 2 stays open. Architecture versions above are unchanged.
+
+
+[Retained freshness history](../engineering/discovery-freshness-history.md) records
+the implemented on-demand check writer, exact-ID retry, paginated history and
+cursor/predecessor integrity. Its deployment addendum names migration 0023, narrow
+API runtime grants, atomic audit and restore obligations. This closes the retained
+history/API gap, not periodic monitoring or alert delivery. The maintained architecture
+versions above are unchanged; this engineering addendum supplies the implemented
+interface and recovery detail without recording design or operational acceptance.

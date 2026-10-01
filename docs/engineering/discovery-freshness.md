@@ -129,10 +129,15 @@ not evidence that a production database or identity provider was compromised.
 The existing freshness response format, policy defaults and architecture records
 remain unchanged; no second freshness service or compatibility representation exists.
 
-B22 still needs periodic monitoring, retained health history, alert delivery,
+The [retained-history continuation](discovery-freshness-history.md) now adds explicit
+server-computed check capture and immutable, paginated reads. That separate PUT
+writes monitoring/audit records; this live GET and its response remain unchanged.
+B22 still needs periodic monitoring, alert delivery,
 durable multi-process scheduling, globally coordinated endpoint budgets, larger
 resumable publication and measured estate-scale acceptance. The
 [batch staging path](discovery-batch-scheduling.md) remains process-local and is not
 triggered by refreshDue. Other Wave 2 native-fact, visibility, dependency, authoring
-and adoption obligations remain open. No Wave 3 work, SQL migration, additional
-privilege, shim, native collection or production qualification is introduced here.
+and adoption obligations remain open. This live-read increment introduced no SQL
+migration or additional privilege; the linked history continuation separately requires
+migration 0023 and narrow runtime SELECT/INSERT. Neither path authorizes native
+collection, production qualification or Wave 3 advancement.
