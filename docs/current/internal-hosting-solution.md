@@ -1,6 +1,6 @@
 # SOL-M01 — Internal two-tenant protected workload solution
 
-**Version:** 0.3 · **Status:** Proposed · **Accountable role:** Hosting solution architect.
+**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Hosting solution architect.
 
 ## Scope and authority
 
@@ -73,6 +73,18 @@ application rebuilding is distinct from preserving an opaque whole VM.
 
 See [verified research decisions](../engineering/platform-migration-research.md) and
 [existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
+
+### Catalog and discovery correction — 1 October 2026
+
+Availability catalog 18 distinguishes security zones from physical failure domains;
+no zone name establishes HA, restart reserves or recovery. Typed requirements now
+reject malformed flags/quantities and insufficient workload counts; independent-site
+recovery remains unsupported. New catalog digests require regenerated examples and
+fresh plan review. All five-request/three-platform examples stay disabled.
+OpenStack collector selector 2 preserves bounded native allocation/image/attachment
+facts without converting them into qualification. The [current research review](../engineering/platform-capability-review-2026-10-01.md)
+records these changes and remaining coverage. No deferred public, encryption, GPU,
+whole-VM, provisioning or migration capability is enabled by this correction.
 
 ## Engineering and implementation handoff
 

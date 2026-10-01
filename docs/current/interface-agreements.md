@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.19 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.20 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -10,247 +10,131 @@ This is a newly authored maintained Markdown record, not a reconstruction of an 
 
 ## Design content
 
-For each interface identify producer, actual client, native endpoint, permitted operation, address family, trust material, resource entitlement, initiation/reply path, MTU/packet budget, capacity and security boundary. Record data-path and management-path ownership separately. A shared endpoint does not authorize a tenant to administer its backing service.
-
-The agreement identifies version/feature compatibility, failure detection, retry/backpressure, log attribution, identity/key expiry and recovery order. Define who can change a next hop, firewall scope, service credential or data object, and which observer can independently verify it.
-
-Use a bounded allocation and lifecycle reference across owners rather than credentials or large state dumps. Include expected generation, operation identity and safe stopping conditions for partial success. Name release/retention conditions before reusing an address, attachment, service identity or data copy.
+Every agreement identifies producer, actual client, native endpoint, permitted
+operation, address family, trust material, entitlement, initiation/reply path, MTU,
+capacity and security boundary. Separate data and management ownership. Define
+feature/version compatibility, backpressure, finite retries, attribution, key expiry,
+recovery order, observer independence and release/retention terms. Shared service
+consumption never grants administration of the provider.
 
 ### Control-application interfaces
 
-| Boundary | Required binding and refusal condition |
+| Boundary | Required binding and hold condition |
 |---|---|
-| Operator to API | Verified organization/tenant identity, entitlement, immutable plan revision/digest, applicable approval and revocation state. A browser/CLI parameter is not authority. |
-| API to workflow | Committed job and transactional outbox, exact workflow/run binding and idempotency identity. Dispatch success is not native completion; admission does not approve arbitrary later effects. |
-| Collector to discovery ingest | Separate read-only mTLS identity, signed campaign/result, independent native credential witness, exact scope, completeness and freshness. Retain original signed bytes; a discovery credential cannot mint a write grant. |
-| Site worker to native owner | Approved operation/resource identity, bounded grant, resource claim and durable intent. Expiry, scope change or uncertain completion prevents a blind retry. |
-| Native owner to observer | Exact native IDs and task/attempt identity, independently observed postconditions and complete observation scope. An echoed request or task acknowledgement is insufficient. |
-| Source to data-transfer worker | Original repository/snapshot/dataset identity and signed source receipt, separate target binding, integrity/metadata policy and consistency-group membership. Never reconstruct source evidence from target claims. |
-| Workload to shared-service owner | Scoped endpoint, operation, entitlement and accepted service outcome. Consuming a resolver, identity service or backup repository does not grant provider administration. |
-| Evidence producer to custodian | Original signed content, digest, scope, issuer, validity and controlled retention. Local test artifacts cannot populate native qualification as if they were site observations. |
+| Operator -> API | Verified tenant entitlement, immutable request/plan revision, applicable approval and live revocation. Client parameters are not authority. |
+| API -> workflow | Committed job, transactional outbox, exact workflow/run and idempotency identity. Dispatch/gate success is not native completion. |
+| Collector -> ingest | Separate enrolled read identity, signed campaign/result, independent credential witness, exact scope and original-byte custody before publication. |
+| Worker -> native owner | Approved action/resource, bounded grant, claim and durable intent; uncertain completion prevents blind retry. |
+| Native owner -> observer | Exact resource/task/attempt identity and independently observed complete postconditions; echoed requests do not qualify. |
+| Source -> transfer worker | Original repository/snapshot/dataset receipt, separate target/root binding, integrity/metadata policy and consistency-group membership. |
+| Workload -> service owner | Scoped endpoint/operation, entitlement, reply path and accepted service outcome, not provider privileges. |
+| Evidence -> custodian | Original signature/digest/scope/issuer/validity/retention; synthetic tests cannot become site observations. |
 
-These are contract obligations, not a statement that every interface is fully wired.
-In particular, the admitted workflow still stops at its authority gate and the data
-transfer path still needs independent native target/root and worker-authority
-composition. Record those gaps instead of presenting a handoff document as execution.
+These are obligations, not a claim of a fully wired mutation graph. The admitted
+workflow stops at its authority gate; target/root and transfer-worker authority
+composition remain open. A bounded allocation/lifecycle reference replaces credential
+or state dumps. Record expected generation, operation identity and partial-success
+stopping conditions before reusing any address, attachment, identity or data copy.
 
-### Versioning, qualification and ownership
+### Versioned profile and capability interfaces
 
-The registry now uses a digest-bound 97-dimension vocabulary shared by installed
-registry and native-dossier validators. Every platform explicitly declares each
-capability. A caller supplies requirements, not support assertions; native support
-requires a current exact-tuple dossier and directed routes remain separately qualified.
-Portable catalogue/profile revision changes require reassessment and new plan identity.
+The registry explicitly covers 97 IDs with one digest. Typed property requirements
+have exactly `property`, `operator`, `value`, and a required capability owner; integers
+exclude booleans. Resolution 3 and policy capsule/realization 2 bind interpretation.
+Normalizer 2 and signed findings bind both raw and normalized snapshots; old or changed
+interpretations require new review. Comparisons never set execution authorization.
+Ten catalog families now use a single typed requirement owner. Required fields,
+booleans, integer bounds, relationships and selectors are checked before resolution.
+Assurance recovery, workload-count and recovery-zone obligations are enforced once;
+independent-site recovery is refused without an implemented composition.
 
-Commands and import owners for qualification now reside in `provisioner.qualification`;
-the former scripts are removed. Consumers must migrate rather than use an alias.
-Other retained execution interfaces require the documented freeze/drain/reconcile
-and historical-state conversion before their competing writers can be removed.
+Availability catalog 18 and revised profile entries remove a false equivalence between
+security zones and failure domains. Changing catalog identity requires regenerated
+examples and fresh plan approval; no HA, public ingress or native support is implied.
+A caller provides requirements, not installed support assertions. Support needs an
+exact current tuple and independently qualified directed method.
 
-An agreement must also define failure/retry limits, credential renewal/revocation,
-lease expiry, unknown outcomes and independent recovery. Include write cutover and
-post-write recovery ownership explicitly: neither producer may assume the other has
-excluded the old writer or admitted target writes.
+### Native collection contracts
 
-### Versioned capability and discovery property interfaces
+VMware requires `vcenter-rest-vm-info-8.0.3.0-visible-only-2`; AHV requires
+`nutanix-ahv-v4.0-hardware-2`; OpenStack requires `openstack-project-https-2`.
+Old selectors are not aliases. Native material, campaign root/issuer/collector keys
+and independent read-only witnesses have distinct custody. Pinned endpoints/IP/CA,
+service identity, validity, API profile, route/response budgets and live rechecks are
+mandatory. Returned links and metadata cannot provide new authority or destinations.
+Visible and empty native scans remain partial; failed/rotated/revoked reads cannot
+publish current observations. Credential issuance and complete visibility remain
+site obligations, not consequences of having GET-only code.
 
-Profile `requires.constraints` entries have exactly `property`, `operator` and
-`value`; the property owner must occur in required capabilities. The property
-vocabulary/digest is closed and integers exclude booleans. Resolution format 3
-and policy capsule/realization format 2 carry this digest. Old inputs require
-new review, not a compatibility translation.
-Discovery normalizer 2 requires source `requiredCapabilities`,
-`capabilityRequirements`, `capabilityPropertySchemaDigest` and destination
-`observedCapabilities`, `capabilityProperties`, `capabilityPropertySchemaDigest`.
-These are observed/reviewed inputs, not client-issued authorization. Signed
-control findings must retain raw and normalized snapshot digests and the current
-normalizer. Missing, malformed and stale fields stay unknown; exact typed
-mismatches remain blockers. Comparison never sets `executionAuthorized` true.
+OpenStack allocation fields have explicit MiB/GiB-to-byte conversion and signed-64-bit
+bounds. Nova relationships are bounded to 64; Cinder attachments to 32 and the existing
+8,192-byte fact limit. Unique UUIDs, exact enclosing volume identity and optional bounded
+guest device labels are validated. Missing and explicit false/null/empty are distinct.
+Flavor root capacity, attachment sorting and deletion flags are not total storage,
+boot order, fencing proof or disposal permission. No secrets or arbitrary properties
+are imported. Selector changes require matching enrollment/campaign/witness/material,
+a new signed generation and reassessment; retained results are not relabelled.
 
-See [verified research decisions](../engineering/platform-migration-research.md) and
-[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
+### Original publication, application review and comparison
 
-### Revised native collector contracts
+Stage/publish commands preserve original bytes and explicit delivery. Cooperating
+processes share first-capture exclusion; incomplete intents stay held after exit.
+Publication retains separate native read and ingest authority. Revisioned draft
+save/load/history and bounded browser editing retain source/revision/content pins;
+ambiguous saves reconcile by GET. Attributed assertions are not accepted dependencies.
+Independent signed owner decisions remain assessment-only and exact-draft bound.
+Application report 2 binds every member/profile, canonical selection, source/review,
+destination and method/network/data settings. CLI/browser reject mismatched or stale
+reports and clear advice after changed selections or identity. No comparison reserves
+capacity, transfers ownership or launches mutation.
 
-AHV uses `nutanix-ahv-v4.0-hardware-2`; VMware VM-info uses
-`vcenter-rest-vm-info-8.0.3.0-visible-only-2`. Old profile IDs are not compatibility
-aliases. The site worker must verify campaign admission, current read credentials,
-exact native endpoint/scope, API release, TLS origin and response/timeout budgets.
-It signs the new raw observation with a matching independent credential witness;
-collector output alone is never admitted inventory or mutation authority.
+### Batch, freshness and history interfaces
 
-VMware now emits common `DiscoveryPage` records. Its cursors partition one captured
-visible set; they do not assert a native pagination mechanism or complete privileges.
-Empty visible results remain partial; a failed scan is unknown. Recheck the campaign
-before and after every read and before publication. Folder-review and hardware facts
-are part of the immutable snapshot, so changes require fresh signed reviews.
-AHV keeps tagged disk backing and explicit boot/security/device observations rather
-than applying SDK request defaults. Consumer normalization and compatibility remain
-separate from native qualification and execution approval.
+`hosting-discovery-batch/1` and `hosting-discovery-batch-outcome/1` bind due windows,
+protected inputs and ordered outcomes. They declare process-only limits, no durable
+schedule, no implicit publication and no execution authority. Queue/deadline limits
+cannot replace campaign or credential authority; endpoint aliases/processes require
+external coordination. Stop drains accepted bounded work, not remote rollback.
+The existing scoped freshness API/CLI distinguish age, MISSING inventory and reported
+collection health without inventing visibility. Caller thresholds/generation overrides
+are refused. Retained on-demand history adds exact-ID retry, predecessor/cursor checks,
+atomic audit and migration 0023/runtime grants. It is not periodic monitoring or alert
+delivery. Historical freshness never authorizes collection or mutation.
 
+### Retirement and recovery ownership
 
-### Signed native discovery transport
-
-The VMware collector now has a package-owned HTTPS transport with signed native
-session custody, pinned IP/hostname/CA, exact folder/list-derived detail paths,
-finite I/O and total deadlines, strict response parsing and per-use live authority.
-The native attestor is independent of campaign/collector signing identities. Its
-credential reference must match the signed campaign enrollment and current native
-read-only witness. Token bytes never enter observations or logs. This is an actual
-GET implementation, not a claim of deployed Vault/session issuance or completeness.
-
-OpenStack checks campaign validity before every page/quota GET and after native
-responses, including errors. A late response or regressing clock cannot publish
-fresh evidence. See [native read custody and tests](../engineering/vmware-discovery-https.md)
-for exact fields, deployment obligations and rejection cases. Independent visibility
-reconciliation, remaining site integration and native qualification remain open.
-
-### OpenStack native discovery integration
-
-`adapters/openstack_https.py` now connects the project collector to the actual
-shared HTTPS mechanism. Its independently signed token binding names the exact
-project/user, region/interface, all three service endpoints, API versions and
-native token validity. Only consecutive project collection and quota GETs are
-admitted. Compute/volume version response headers must match; service failures,
-revocation, expiry and mid-read rotation discard the scan. Valid and empty scans
-remain partial/visible-only. URL normalization cannot change signed endpoint
-meaning. The [OpenStack read contract](../engineering/openstack-discovery-https.md)
-documents fields, tests and unresolved issuance, publication and native evidence.
-
-The native client requires `openstack-project-https-1` campaign enrollment and
-matching independent read-only witnesses. No old collector identity is aliased.
-This adds no mutation path or native qualification. Normalizer and policy formats
-are unchanged; fresh observations require fresh signed review. Glance/image reads,
-remaining hardware/key facts and deployed custody remain unfinished B10/B16
-integration. The publication owner described below now supplies signed delivery.
-
-### Signed discovery publication and campaign restart recovery
-
-`discovery/publication.py` now composes collection with the original issuer and
-collector signatures, immutable request bytes and a private tenant outbox.
-`stage_submission` resumes an existing campaign reference without recollecting,
-re-signing or changing capture time; all resumed evidence still needs current
-verification. Payload durability precedes the create-only campaign reference.
-Changed results, environment or authorization under one campaign ID conflict;
-corruption and missing referenced bytes hold rather than trigger a replacement.
-
-`discovery/publication_https.py` sends those retained bytes through the existing
-mTLS ingest routes. The server remains the sole inventory writer. Exact TLS identity,
-CA/CRL/certificate hashes, live authority, bounded acknowledgement fields and
-request deadlines are checked. An attempted request with a lost or invalid reply
-is explicitly unknown. Retry is deliberate, uses original bytes and still depends
-on server-side campaign/result idempotency; it never grants native execution.
-
-See [the publication and recovery contract](../engineering/discovery-publication-recovery.md).
-Library signing, custody, authenticated delivery and the installed command below
-are implemented. Fleet scheduling, deployed custody, independent retention and
-persistent restart/DR authority floors remain open. Pre-reference outboxes require reviewed
-original-digest reconciliation, not automatic rescanning. Local atomic references
-do not prove global uniqueness, complete inventory or native qualification.
-
-### Installed one-shot collector composition
-
-`discovery/collector_runtime.py` now owns `hosting-discovery-collect`. A protected
-versioned configuration selects the existing signed campaign, trust/witness stores,
-private outbox and exact native/publisher settings. `adapters/collector_config.py`
-constructs only the three registered native owners; no dynamic import or shim exists.
-
-`stage` collects/signs/retains only when no original campaign reference exists;
-resumed staging verifies original bytes without native credentials or signing keys.
-`publish` requires an existing original and never falls back to collection. Distinct
-held, unknown-delivery and interrupted exits avoid claiming that an uncertain POST
-never committed. All outcomes retain `executionAuthorized: false`.
-
-See [the installed collector contract](../engineering/discovery-collector-runtime.md).
-The shared native GET mechanism also stops inherited TLS session-key logging while
-retaining pinned certificate/hostname verification and bounded requests. Command and
-real-TLS tests exercise fresh-process recovery; database and installed-wheel checks
-cover publication identity and package ownership. Deployed credential/signer custody,
-independent retention, durable revision floors, visibility, B17 and B22 remain open.
-The command is not a scheduler, credential issuer, migration workflow or native qualification.
-
-### Persisted application drafts and attributed assertions
-
-The control API now stores immutable, revisioned application proposals pinned to
-an exact observed discovery generation. Selected members must be observed VMs;
-partial inventory may support a draft but never an accepted or complete application.
-The authenticated author and database time are separate from asserted owner IDs,
-dependency sources and consistency groups. Unresolved dependencies remain visible.
-Saving a draft creates no owner review, adoption, capability claim or execution grant.
-
-The [application-draft contract](../engineering/application-drafts.md) defines the
-actual package owners, scoped PUT/GET routes, expected-revision conflict checks,
-original retry semantics, SQL migration and deployment grants. Source-generation
-publication and draft creation share their cooperative lock; authority is rechecked
-after waits and before commit. Exact retries retain original author/time; later
-source generations are reported without relabelling history. The separate signed
-owner-review path below evaluates exact-draft assessment decisions. Independent
-enrichment verification, owner-facing workflow integration and B17 closure remain open.
-The [operator continuation](../engineering/application-draft-operator.md) now supplies
-bounded latest-draft listing and CLI save/load/history through the existing API.
-Explicit source/revision pins and matching content acknowledgements prevent silent
-rebase or success claims after an ambiguous PUT. Listing is a live page, not an
-immutable export. Neither commands nor summaries accept ownership or migration.
-
-### Bounded browser draft workspace
-
-The [browser workspace](../engineering/application-draft-browser.md) now lists and
-loads existing unreviewed drafts and edits name, proposed owner and startup order.
-It retains the exact source/revision and every read-only membership, dataset and
-dependency assertion. Historical/superseded records cannot be edited. Explicit save
-confirmation, exact content acknowledgements and GET-only uncertain-save
-reconciliation use the existing API; no browser action accepts ownership or launches
-migration. Tab identity changes clear state and suppress late replies. Full browser
-creation/evidence editing and owner-facing signing/review presentation remain open.
-Independently signed review evaluation is provided by the separate service below.
-
-### Independently signed application-owner decisions
-
-The existing signed assessment store now accepts exact-draft `APPLICATION_REVIEW`
-decisions from independently enrolled `APPLICATION_OWNER` subjects. Owner identity
-must match the proposal and differ from its editor. Acceptance/revocation is bound
-to the complete saved draft, inventory generation and proposal digest. Live trust,
-revocation and scope are rechecked; newer drafts or inventory cannot inherit an old
-review. No draft status, native ownership or execution approval is rewritten.
-
-The scoped read-only review endpoint composes retained proof with the existing
-application-candidate validator. Incomplete/stale inventory remains held and unknown
-dependencies stay explicit; external dependency evidence remains unverified.
-Migration 0022 and narrowly scoped ingest-role SELECT rights are required. See the
-[signed owner-review contract](../engineering/application-owner-review.md) for
-fields, locking, API states, deployment, tests and remaining application-wide
-planning and owner-facing workflow integration.
-
-### Operator inspection of signed owner review
-
-The existing thin CLI now reads an exact draft's current signed owner-review status,
-optionally checking its retained record digest. It preserves source/evidence/time
-references and rejects contradictory status or authority claims without issuing
-signatures, changing drafts or launching migration. A successful read of a hold or
-revocation does not make it acceptance. The
-[review command contract](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
-records exact request/response, tests and remaining signing/browser/application-wide
-planning work. No new database migration, privileges or execution authority are added.
-
-### Reviewed application comparison
-
-The [application comparison contract](../engineering/application-comparison.md)
-connects exact retained application drafts and independent owner decisions to the
-existing per-member destination engine. Every member and guest profile is checked;
-combined VM-slot, CPU, memory and logical-disk demand is checked against one selected
-capacity identity. Missing facts, source changes, evidence revocation and unresolved
-dependencies cannot disappear behind eligible member rows. No capacity is reserved,
-no application-wide data/policy outcome is qualified, and no native work is admitted.
-
-Inputs are immutable and current authority/evidence is rechecked, not represented
-as an atomic estate snapshot. Results retain all members and exact source/review
-bindings. B17/B19/B20 progress does not close Wave 2: independent visibility,
-remaining native facts, verified external dependencies and B22 scheduling/scale
-still precede wave closure. Wave 3 reserve/apply owners remain separate work.
+Current qualification owners remain in `provisioner.qualification`. Deleted script
+owners have no compatibility wrapper. Other writers require freeze/drain/reconcile
+and one-time retained-state conversion before removal. Define credential renewal,
+lease expiry, unknown outcomes and independent recovery explicitly. Neither producer
+may assume another has excluded source writers or admitted target writes; activation
+is separate from source disposal, retention release and address reuse.
 
 ## Engineering and implementation handoff
 
 Populate the controlled engineering schedule with exact native values and support evidence. Both owners review it. Link each field to the applicable assertion and actual procedure, and retain separately protected evidence. The repository’s examples do not supply those native values.
+
+Detailed producer/consumer, response, retry and deployment contracts remain at:
+
+- [NBD §6](../engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md)
+- [verified research decisions](../engineering/platform-migration-research.md)
+- [native read custody and tests](../engineering/vmware-discovery-https.md)
+- [OpenStack read contract](../engineering/openstack-discovery-https.md)
+- [the publication and recovery contract](../engineering/discovery-publication-recovery.md)
+- [the installed collector contract](../engineering/discovery-collector-runtime.md)
+- [application-draft contract](../engineering/application-drafts.md)
+- [operator continuation](../engineering/application-draft-operator.md)
+- [browser workspace](../engineering/application-draft-browser.md)
+- [signed owner-review contract](../engineering/application-owner-review.md)
+- [application comparison contract](../engineering/application-comparison.md)
+- [AHV HTTPS contract](../engineering/ahv-discovery-https.md)
+- [installed application-comparison command](../engineering/application-comparison-operator.md)
+- [saved-application browser](../engineering/application-comparison-browser.md)
+- [the batch interface contract](../engineering/discovery-batch-scheduling.md)
+- [interface contract](../engineering/discovery-freshness.md)
+
+See [the current research review](../engineering/platform-capability-review-2026-10-01.md) and
+[the B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md).
 
 ## Acceptance and open work
 
@@ -259,68 +143,3 @@ Unassigned endpoints, authority, recovery and version terms block the correspond
 Adopting authority and approval evidence: **not recorded**. Link the actual design review and its conditions when they exist; a code merge does not authorize a site or service. Keep sensitive site parameters and private credentials in their approved systems.
 
 [Maintained design register](README.md) · [Decision register](../adr/README.md)
-
-
-### AHV native read interface
-
-The AHV adapter accepts only an already-admitted VM campaign and independently
-signed `hosting-ahv-read-credential/1` material. It binds the service-account UUID,
-credential reference, API profile, exact endpoint trust and campaign digest; the
-current native read-only witness and campaign enrollment remain independent checks.
-Only the bounded VMM cluster VM-list GET is exposed. Failed/rotated/revoked reads
-cannot publish current observations. Successful lists stay partial/visible-only.
-The [AHV HTTPS contract](../engineering/ahv-discovery-https.md) specifies fields,
-consumer obligations, request/response limits, key custody and remaining deployed
-integration. This is not a source-signing interface, write grant or migration route.
-
-### Application-comparison operator and response identity
-
-The [installed application-comparison command](../engineering/application-comparison-operator.md)
-now consumes the reviewed application service through the existing remote API
-transport. Report format 2 binds the exact canonical selection, including all
-member profiles, source/draft references, destination pools and method/network/data
-modes. The client rejects old/mismatched reports, missing members and contradictory
-capacity/status claims; it neither supplies owner authority nor calls native owners.
-Single-VM comparison and signed review formats remain unchanged. This is B19/B20
-operator access, not B23 reservations, B24 provisioning or closure of Wave 2.
-The [saved-application browser](../engineering/application-comparison-browser.md)
-now consumes the same format-2 service. Only an unchanged current draft supplies
-membership; all guest profiles and destination selections remain explicit. Reports
-retain every member, exact source/review/pool bindings, capacity gaps and held owner
-decisions. Changes to drafts, destinations, route settings or tab identity invalidate
-earlier advice and suppress late responses. The component shares the existing portal
-identity and destination picker; it neither creates approval nor reserves resources.
-Guided draft creation/evidence editing, visibility/dependency evidence and B22
-obligations remain open; no production acceptance is recorded here.
-
-### B22 batch and native admission interfaces
-
-`hosting-discovery-batch/1` selects bounded due tasks using exact protected
-collector-configuration bytes, campaign digest, environment, endpoint policy
-and UTC windows. `hosting-discovery-batch-outcome/1` preserves ordered per-task
-staged/held/not-due/expired/not-started outcomes. It always declares
-`limitScope: THIS_PROCESS_ONLY`, `durableSchedule: false`, no publication attempt
-and no execution authority. An evaluation with only future tasks stages nothing.
-
-See [the batch interface contract](../engineering/discovery-batch-scheduling.md)
-for field sets, bounds and caller obligations. An endpoint gate reduces read
-concurrency/admission rate but cannot supply missing campaign or credential
-authority. Separate processes and endpoint aliases require external coordination;
-this is not an enterprise scheduler or a shared native lease. Original signed
-publication remains a separate explicit interface with unchanged reconciliation.
-
-### B22 freshness inspection interface
-
-`GET /v1/environments/{environment_id}/discovery/freshness` returns
-`hosting-discovery-freshness/1` for the current exact-scope reader. It rejects all
-query parameters, including caller-supplied generations or freshness thresholds.
-Missing authorized inventory is an explicit MISSING result, not a fabricated empty
-complete scan; unavailable storage and denied access remain errors. Changed metadata
-between the two reads returns DISCOVERY_FRESHNESS_CHANGED without automatic rebase.
-
-The [interface contract](../engineering/discovery-freshness.md) records the complete
-response, status/error meanings and server defaults. A FRESH result establishes only
-age at checkedAt, not native visibility, signature currency, collection completeness
-or execution eligibility. Counts and issue codes replace raw native error/privilege
-strings. The API is no-store, read-only and invokes no scheduler or collector. No
-new database schema, privilege, client shim or native effect is introduced.

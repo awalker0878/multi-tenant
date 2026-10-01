@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.12 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.13 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -10,182 +10,98 @@ This is a newly authored maintained Markdown record, not a reconstruction of an 
 
 ## Design content
 
-The available proposed baseline is the v1.4 infrastructure reference and linked delivery-kit v1.1 engineering. Adopt its physical/logical views as a versioned set, then identify service demand, independent information impacts, eligible locations, assurance sharing and required native platform profiles. Do not equate Tenant Namespace, WSD, security-domain intent and native domain instance.
-
-Every variation names the original requirement/decision, requested scope, competing options, route/data/management consequences and accountable authority. Existing proposed ADRs explain why the base design uses commissioned cells, local overlays, explicit ZIP mediation, scoped services and separated administration. Acceptance must record actual applicability and exceptions, not rewrite source history.
-
-The source-scope inventory records previously described but unavailable originals. This newly identified record covers adoption guidance without asserting that the missing RAD file was recovered. Unresolved file recovery and organizational adoption are different conditions.
+The proposed v1.4 infrastructure reference and delivery-kit v1.1 remain the adoption
+basis. Adopt physical/logical views as a versioned set, with independent information
+impacts, eligible locations, assurance sharing and explicit exceptions. Tenant
+Namespace, WSD, application identity and native domain instance are not synonyms.
+An exception records the original requirement, options, route/data/management
+consequences, accountable authority and conditions; it does not rewrite source history.
 
 ### Workload mobility product boundary
 
-The product is one authenticated operator control application for administrators
-assessing, provisioning and moving workloads between qualified on-premises VMware,
-Nutanix and OpenStack environments. Browser and CLI clients use the same durable
-records and authority. A workload/application identity, its datasets and dependency
-group are not the WSD: the WSD remains the tenant security and placement boundary.
-A vendor-native domain is a realization of that boundary, not its portable identity.
+One authenticated control application serves browser and thin CLI operators. The
+durable database owns business state and approvals; Temporal coordinates admitted
+work, not a second authority ledger. Tenant VPC/domain isolation, commissioned fabric
+cells, local overlays, ZIP mediation, shared-service ownership and separated
+administration remain architectural boundaries. Native APIs, Terraform and Ansible
+realize approved intent behind typed owners; there is one writer per owned resource.
 
-The reference architecture still supplies commissioned fabric cells, locally owned
-overlays, tenant VPC/domain isolation, ZIP mediation and independently governed
-shared services. The control application coordinates accepted changes to those
-resources; it does not replace their accountable owners or flatten their trust
-boundaries. Provider-specific APIs remain behind typed native adapters. Removing
-obsolete entry points must not remove independent observation or one-writer safety.
+An application comprises observed workloads, datasets, dependencies and reviewed
+consistency requirements. A WSD remains its tenant security/placement boundary.
+Discovery, a saved application draft, owner assessment and destination comparison
+never adopt native resources or authorize their mutation.
 
-### Capability and placement architecture
+### Profiles, security and failure domains
 
-A selected platform family is insufficient evidence for placement. Match the exact
-installed product/API/provider/hardware/licence tuple and current qualification
-against every required compute, storage, network, security, guest, discovery,
-migration, service and operational capability. The programme now represents 97
-such dimensions in one package-owned vocabulary. Every platform must declare every
-row explicitly; omitted and unknown requirements are rejected, not downgraded.
+Every selected profile contributes requirements and limitations. The registry has
+97 explicit capability dimensions; 28 typed properties distinguish their semantics.
+The exact installed product/API/provider/hardware/licence tuple, current evidence,
+source preservation requirements and directed route must match. Missing evidence
+stays unknown; incompatible observations block. A product name or feature row is not
+qualification. Every platform has explicit rows; no tuple is currently native-qualified.
 
-The grouped vocabulary digest is bound into the engineering registry. Portable
-profile versions and the complete catalogue digest are bound into derived plans.
-Compute, storage, recovery and service requirements participate in eligibility;
-network support alone cannot qualify a useful workload. Preserve every selected
-profile's limitations through resolution. A resolvable profile is a policy
-expansion, not an assertion of installed feature support or successful execution.
+The typed catalog owner rejects missing fields, coercions and unsupported selectors.
+Profile validation enforces assurance recovery, workload counts and recovery-zone
+composition. Independent-site recovery is refused while its implementation is absent.
+Availability catalog 18 corrects the meaning of OZ/RZ/PAZ: security-zone composition
+is not proof of separate physical failure domains, reserved restart capacity, automatic
+failover or application recovery. No new HA or public capability is enabled.
 
-Keep source implementation state, native capability qualification, directed
-migration-route qualification and live mutation authority separate. The current
-registry has unselected installed tuples and no native-qualified claims. Newly
-enumerated dimensions remain explicitly unassessed. The deferred GPU, encryption,
-public-exposure and address-family profiles are not enabled by enumeration.
+### Discovery, review and comparison
 
-### Authority, discovery and migration invariants
+Signed native reads, original-byte custody, mTLS publication, persisted generations
+and scoped normalization are implemented. VMware, AHV and OpenStack have exact enrolled
+collector selectors; visible native inventory remains partial. OpenStack selector 2
+adds bounded allocation/image/attachment facts without extra endpoint privileges.
+Nominal flavor disk sizes do not prove complete transferable storage.
 
-Scope requests, inventory generations, immutable plans, approvals, jobs and evidence
-to the organization, tenant and relevant native environments. The durable database
-is the business authority; Temporal is the workflow engine, not a second approval
-ledger. Use transactional admission/outbox dispatch, fresh per-effect checks,
-resource intents, bounded worker grants and independently reconciled native IDs.
-An ambiguous native result retains the hold; a process exit is not a fence.
+Revisioned application drafts preserve observed membership and attributed assertions.
+Independent signed owner decisions are assessment-only and bind an exact draft.
+Existing-draft browser editing, CLI save/load/history, review inspection and exact
+multi-member comparison are implemented. Report format 2 preserves all members,
+selected profiles, source/review/destination pins and explicit unknown/blocker reasons.
+Changed drafts, identities or selections invalidate advice and suppress late responses.
+Guided creation/evidence editing, external dependency validation and owner-facing
+signing workflows remain open.
 
-Discovery is read-only authority. Preserve original signed campaign/result bytes,
-collector identity, exact native scope, freshness and completeness before publishing
-a generation. A result, inventory comparison or owner grouping proposal cannot
-implicitly adopt resources or grant mutation rights. Scope incomplete disk, NIC,
-firmware, policy and dependency facts as unknown and expose their impact to operators.
+Batch staging selects due, already-authorized campaigns under process-local limits.
+Shared-outbox capture exclusion and on-demand freshness/history are implemented;
+these do not establish fleet-wide admission, durable scheduling or periodic alerts.
 
-Migration is preservation of an application outcome: datasets and metadata, guest
-identity, policy, routes, shared services, consistency and recovery. Rebuild/restore
-and whole-VM movement are distinct strategies. Each directed route requires its own
-source capture, target reconstruction, isolated rehearsal, source-writer exclusion,
-final synchronization and independent activation postconditions. After target
-writes, recovery requires a reviewed reverse-sync/restore/repair decision; simply
-restarting the old source is not a general rollback.
+### Migration and acceptance invariants
 
-### Implementation and acceptance boundary
+Migration preserves application outcomes, policy, data/metadata, guest identity,
+service dependencies and recovery. Rebuild/restore is distinct from opaque whole-VM
+movement. Each directed method needs isolated rehearsal, source-writer exclusion,
+final synchronization, controlled exposure and independently observed postconditions.
+After target writes, use a reviewed reverse-sync/restore/forward-repair decision;
+restarting the old source is not a general rollback. Activation does not authorize
+source disposal or address release.
 
-The current repository contains control-plane foundations, signed discovery and
-comparison paths, disabled portable planning, native execution primitives and
-transfer/evidence contracts. It does **not** contain a complete admitted provisioning
-or migration workflow. The admitted Temporal workflow currently verifies authority
-and returns a gate result; it must not be described as executing the native chain.
-
-Use the [all-waves execution plan](../product/enterprise-workload-mobility-execution-plan.md)
-for B01–B50 closure. Repository code, automated checks, installed native qualification
-and operational acceptance are four separate evidence columns. Prior W/C ledger
-completion and current CI success do not close this product programme.
-
-### Semantic portability and research boundaries
-
-The migration contract now includes typed capability properties beneath the existing
-97 IDs. A feature name does not establish equivalence: routing context, policy
-rule model, enforcement coverage, performance guarantees, encryption/key custody
-and hardware preservation remain distinct requirements. Every selected profile
-contributes constraints; incompatible intersections are rejected, never overridden.
-The destination must enforce the source requirement or a demonstrably stronger
-compatible requirement. Vendor documentation supports design assumptions, not
-installed qualification or mutation authority.
-
-See [verified research decisions](../engineering/platform-migration-research.md) and
-[existing wave-plan delta](../product/enterprise-workload-mobility-execution-plan.md#8-research-driven-acceptance-and-implementation-delta).
-
-### Persisted application drafts and attributed assertions
-
-The control API now stores immutable, revisioned application proposals pinned to
-an exact observed discovery generation. Selected members must be observed VMs;
-partial inventory may support a draft but never an accepted or complete application.
-The authenticated author and database time are separate from asserted owner IDs,
-dependency sources and consistency groups. Unresolved dependencies remain visible.
-Saving a draft creates no owner review, adoption, capability claim or execution grant.
-
-The [application-draft contract](../engineering/application-drafts.md) defines the
-actual package owners, scoped PUT/GET routes, expected-revision conflict checks,
-original retry semantics, SQL migration and deployment grants. Source-generation
-publication and draft creation share their cooperative lock; authority is rechecked
-after waits and before commit. Exact retries retain original author/time; later
-source generations are reported without relabelling history. The separate signed
-owner-review path below evaluates exact-draft assessment decisions. Independent
-enrichment verification, owner-facing workflow integration and B17 closure remain open.
-The [operator continuation](../engineering/application-draft-operator.md) now supplies
-bounded latest-draft listing and CLI save/load/history through the existing API.
-Explicit source/revision pins and matching content acknowledgements prevent silent
-rebase or success claims after an ambiguous PUT. Listing is a live page, not an
-immutable export. Neither commands nor summaries accept ownership or migration.
-
-### Bounded browser draft workspace
-
-The [browser workspace](../engineering/application-draft-browser.md) now lists and
-loads existing unreviewed drafts and edits name, proposed owner and startup order.
-It retains the exact source/revision and every read-only membership, dataset and
-dependency assertion. Historical/superseded records cannot be edited. Explicit save
-confirmation, exact content acknowledgements and GET-only uncertain-save
-reconciliation use the existing API; no browser action accepts ownership or launches
-migration. Tab identity changes clear state and suppress late replies. Full browser
-creation/evidence editing and owner-facing signing/review presentation remain open.
-Independently signed review evaluation is provided by the separate service below.
-
-### Independently signed application-owner decisions
-
-The existing signed assessment store now accepts exact-draft `APPLICATION_REVIEW`
-decisions from independently enrolled `APPLICATION_OWNER` subjects. Owner identity
-must match the proposal and differ from its editor. Acceptance/revocation is bound
-to the complete saved draft, inventory generation and proposal digest. Live trust,
-revocation and scope are rechecked; newer drafts or inventory cannot inherit an old
-review. No draft status, native ownership or execution approval is rewritten.
-
-The scoped read-only review endpoint composes retained proof with the existing
-application-candidate validator. Incomplete/stale inventory remains held and unknown
-dependencies stay explicit; external dependency evidence remains unverified.
-Migration 0022 and narrowly scoped ingest-role SELECT rights are required. See the
-[signed owner-review contract](../engineering/application-owner-review.md) for
-fields, locking, API states, deployment, tests and remaining application-wide
-planning and owner-facing workflow integration.
-
-### Operator inspection of signed owner review
-
-The existing thin CLI now reads an exact draft's current signed owner-review status,
-optionally checking its retained record digest. It preserves source/evidence/time
-references and rejects contradictory status or authority claims without issuing
-signatures, changing drafts or launching migration. A successful read of a hold or
-revocation does not make it acceptance. The
-[review command contract](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
-records exact request/response, tests and remaining signing/browser/application-wide
-planning work. No new database migration, privileges or execution authority are added.
-
-### Reviewed application comparison
-
-The [application comparison contract](../engineering/application-comparison.md)
-connects exact retained application drafts and independent owner decisions to the
-existing per-member destination engine. Every member and guest profile is checked;
-combined VM-slot, CPU, memory and logical-disk demand is checked against one selected
-capacity identity. Missing facts, source changes, evidence revocation and unresolved
-dependencies cannot disappear behind eligible member rows. No capacity is reserved,
-no application-wide data/policy outcome is qualified, and no native work is admitted.
-
-Inputs are immutable and current authority/evidence is rechecked, not represented
-as an atomic estate snapshot. Results retain all members and exact source/review
-bindings. B17/B19/B20 progress does not close Wave 2: independent visibility,
-remaining native facts, verified external dependencies and B22 scheduling/scale
-still precede wave closure. Wave 3 reserve/apply owners remain separate work.
+The admitted workflow still returns an authority gate result rather than executing
+the complete native provisioning/migration chain. B05 and Wave 2 remain open;
+Waves 3–6 are not completed by comparison features or passing local tests. Track
+implementation, automated verification, native qualification and operational
+acceptance separately under the existing B01–B50 plan.
 
 ## Engineering and implementation handoff
 
 The TAD and selected solution inherit the approved baseline version, topology boundaries, sharing choices and service constraints. They identify which fields need actual supported values and which require architecture/security decisions. Independent controls such as physical OOB and key recovery need real owners and design artifacts, not references to an API reader.
+
+Detailed producer/consumer, response, retry and deployment contracts remain at:
+
+- [verified research decisions](../engineering/platform-migration-research.md)
+- [application-draft contract](../engineering/application-drafts.md)
+- [operator continuation](../engineering/application-draft-operator.md)
+- [browser workspace](../engineering/application-draft-browser.md)
+- [signed owner-review contract](../engineering/application-owner-review.md)
+- [application comparison contract](../engineering/application-comparison.md)
+- [installed application-comparison command](../engineering/application-comparison-operator.md)
+- [saved-application browser](../engineering/application-comparison-browser.md)
+- [bounded batch staging contract](../engineering/discovery-batch-scheduling.md)
+
+See [the current research review](../engineering/platform-capability-review-2026-10-01.md) and
+[the B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md).
 
 ## Acceptance and open work
 
@@ -194,33 +110,3 @@ Review the explicit scope inventory, current risks and unresolved values. Choose
 Adopting authority and approval evidence: **not recorded**. Link the actual design review and its conditions when they exist; a code merge does not authorize a site or service. Keep sensitive site parameters and private credentials in their approved systems.
 
 [Maintained design register](README.md) · [Decision register](../adr/README.md)
-
-### Application-comparison operator and response identity
-
-The [installed application-comparison command](../engineering/application-comparison-operator.md)
-now consumes the reviewed application service through the existing remote API
-transport. Report format 2 binds the exact canonical selection, including all
-member profiles, source/draft references, destination pools and method/network/data
-modes. The client rejects old/mismatched reports, missing members and contradictory
-capacity/status claims; it neither supplies owner authority nor calls native owners.
-Single-VM comparison and signed review formats remain unchanged. This is B19/B20
-operator access, not B23 reservations, B24 provisioning or closure of Wave 2.
-The [saved-application browser](../engineering/application-comparison-browser.md)
-now consumes the same format-2 service. Only an unchanged current draft supplies
-membership; all guest profiles and destination selections remain explicit. Reports
-retain every member, exact source/review/pool bindings, capacity gaps and held owner
-decisions. Changes to drafts, destinations, route settings or tab identity invalidate
-earlier advice and suppress late responses. The component shares the existing portal
-identity and destination picker; it neither creates approval nor reserves resources.
-Guided draft creation/evidence editing, visibility/dependency evidence and B22
-obligations remain open; no production acceptance is recorded here.
-
-### B22 discovery scheduling boundary
-
-The [bounded batch staging contract](../engineering/discovery-batch-scheduling.md)
-adds one-shot selection of due, already-authorized campaigns. It shares endpoint
-read limits across tenant/native-scope selections within the same process and
-retains original signed results on replay. Scheduling is not campaign issuance,
-credential authority, inventory completeness or native mutation permission. This
-increment does not establish fleet-wide admission, durable scheduling or B22
-acceptance. Wave 2 remains open; no Wave 3 work is advanced on this evidence.

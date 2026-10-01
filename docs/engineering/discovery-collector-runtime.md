@@ -72,7 +72,7 @@ signed campaign's collector identity before a native request can be attempted.
 |---|---|---|
 | `nutanix-ahv-v4.0-hardware-2` | Empty object; cluster scope comes from the admitted campaign. | Exactly `native`: CA file path. |
 | `vcenter-rest-vm-info-8.0.3.0-visible-only-2` | Exactly `folderIds` (bounded list) and `coverageDigest`; the existing folder-selection validator remains authoritative. | Exactly `native`: CA file path. |
-| `openstack-project-https-1` | Exactly `compute`, `volume`, `network`: the pinned project service roots. | Exactly `compute`, `volume`, `network`: CA file paths. |
+| `openstack-project-https-2` | Exactly `compute`, `volume`, `network`: the pinned project service roots. | Exactly `compute`, `volume`, `network`: CA file paths. |
 
 Native endpoint, API, token/key, project/cluster/folder, response and deadline
 restrictions remain in the [VMware](vmware-discovery-https.md),

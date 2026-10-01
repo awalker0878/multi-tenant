@@ -5,6 +5,13 @@ Reviewed 28 September 2026 against `implementation/all-waves` at
 not a second roadmap. The [existing B01–B50 plan](../product/enterprise-workload-mobility-execution-plan.md)
 remains the delivery authority. No installed vendor environment was contacted.
 
+Current implementation status and newly checked API semantics are recorded in the
+[1 October review](platform-capability-review-2026-10-01.md). The dated open-work
+statements below describe their original checkpoints; the active B01–B50 plan owns
+remaining work. Signed native transport, installed collector composition, original
+publication, revisioned drafts, owner assessment and on-demand freshness/history
+are now implemented repository components, not all still missing integrations.
+
 ## Research corrections
 
 The supplied research used approximate/nonexistent repository paths, proposed

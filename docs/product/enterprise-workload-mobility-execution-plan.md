@@ -1,110 +1,49 @@
 # Enterprise workload mobility: execution plan for all waves
 
-**Baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`, reviewed 28 September 2026.
-**Purpose:** complete the repository implementation, then qualify and release the declared platform and migration matrix.
-**Status:** Waves 0 and 1 delivered substantial foundations; B05 remains open, Wave 2 is partial, and Waves 3–6 require implementation.
+**Current review:** 1 October 2026, `implementation/all-waves`, starting at
+`9d4c6685b6fd0fcb6df211aebd47857562265456`, with discovery/profile corrections
+`b993470` and `249d75f` and the accompanying catalog/design alignment.
+**Historical baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`.
+**Status:** substantial Wave 0/1 foundations; B05 remains open, Wave 2 is partial,
+and Waves 3–6 are not complete. No native qualification or operating acceptance added.
 
-This is the current execution addendum to the [historical audit and implementation plan](enterprise-workload-mobility-audit-and-implementation-plan.md).
-Preserve that audit's revision, findings and evidence. Its September 26 baseline must not be presented as the current code.
-The latest implementation checkpoint is recorded at the end of section 8.
-Earlier dated checkpoints retain their historical limits; the latest checkpoint distinguishes installed command/library paths from remaining deployment work.
-The B01–B50 identifiers remain stable. This addendum refines their sequence and completion evidence rather than replacing them with a second backlog.
-The older W01–W29 automation ledger and C01–C13 interface-refactor gates describe earlier scopes; neither closes this product programme.
+This is the active addendum to the [historical audit](enterprise-workload-mobility-audit-and-implementation-plan.md).
+B01–B50 remain stable; earlier W01–W29 and C01–C13 ledgers have narrower scopes.
+Chronological checkpoints have been consolidated into current status here. Their
+original wording and evidence remain in Git history, not as competing active guidance.
 
 ## 1. Completion rules and current position
 
-Track each B item through four distinct columns in the delivery ledger: repository implementation, automated verification, native qualification and operational acceptance.
-For every completed column retain the source/artifact revision, test or campaign reference, scope, result and unresolved limitations.
-Use `NOT_STARTED`, `IN_PROGRESS`, `VERIFIED` or `NOT_APPLICABLE_REVIEWED` for each column; never infer one column from another.
-An unchanged historical acceptance result is not evidence for a later implementation revision or installed product tuple.
+Track each B item through repository implementation, automated verification, native
+qualification and operational acceptance. Each column uses `NOT_STARTED`, `IN_PROGRESS`,
+`VERIFIED` or `NOT_APPLICABLE_REVIEWED`, with exact revision, test/campaign, scope,
+result and limitations. Never infer one column from another. Prior CI or signed
+acceptance at an old revision is not evidence for a changed artifact or installed tuple.
+An API hold, fixture, native-operation name or authority gate is not its implementation.
+Lack of native access does not prevent repository implementation and local testing.
 
-At this baseline, merged PR #51 records the product/schema/package foundation, #52 the control application and worker foundation, and #53 partial discovery/comparison.
-Their recorded CI results support their stated implementation boundaries. Required CI must run again for changed delivery revisions.
-No route has been qualified by this review, and no native platform, credential, workload or production data has been contacted.
-An API returning a hold, a model accepting a fixture, or a handoff naming a native operation does not implement that operation.
-Conversely, absent native access does not prevent writing, integrating and testing the missing repository components.
+| Area | Implemented repository boundary | Still open |
+|---|---|---|
+| Packaging (B05) | Package-owned resources, WSD compiler and qualification registry/native/provenance owners; retired entry points deleted without aliases. | Other real runtime imports, installed execution ownership and retained-state conversion. |
+| B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
+| B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 2 retains allocation and attachment facts. | Full hardware/driver/key/Glance/service facts, deployed custody, independent visibility and native profile qualification. |
+| B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI and existing-draft browser. | Guided creation/evidence editing, independent dependencies, owner-facing signing and complete administrator acceptance. |
+| B21/B22 | Adoption proposal model; one-shot process-local batch limits, shared-outbox first-capture claims, scoped freshness CLI/API and retained on-demand history. | Actual ownership transfer, durable fleet/global budgets, periodic monitoring/alerts, resumability and measured estate qualification. |
+| B23–B43 | Portable planning, native lifecycle/readback/fenced-power primitives, guest/service handoffs, transfer/integrity/consistency contracts and compatibility checks. | Native reserve/prepare/plan/approval/apply/observe/power/guest/service/activate chain; trusted transfer-worker/target-root bindings; source fencing, final sync/cutover, post-write recovery and route execution. |
+| B44–B50 | Existing recovery/security/evidence foundations and defined release obligations. | Deployed HA/DR, alert delivery, final qualification, retained-state conversion, pilot and operating release. |
 
-The supported product remains one authenticated control application with tenant-scoped state, durable workflows and narrowly scoped site workers.
-Terraform, native APIs, Ansible and service owners are execution mechanisms behind that authority.
-Keep exact native identity, approved immutable plans, one writer per owned resource, uncertainty holds and independently verified postconditions.
-Do not remove these controls as “shims.” Remove obsolete representations and competing mutation entry points after verified consumer and state migration.
+Profiles explicitly represent 97 capabilities and 28 semantic properties. All ten
+families have typed requirement checks; selected capabilities/constraints/limitations
+flow into resolution. Availability catalog 18 corrects security-zone/failure-domain
+wording; it grants no HA. All installed tuples remain unselected/unqualified and
+examples stay disabled. Immutable plans and observations require new digest-bound
+review after change, not compatibility aliases or relabelled history.
 
-### Implementation checkpoint after the baseline
-
-The B01–B50 table below remains a historical snapshot of `3cbc0c1e`; these
-subsequent changes refine the remaining work without changing that baseline.
-Required checks and native qualification must still bind the final delivery revision.
-
-- B05 now packages reviewed planning/compiler/catalogue assets privately through
-  `hosting_resources`, with one selected resource root and installed wheel/sdist
-  checks against checkout fallback and stale build layouts. Generic `tools` and
-  `scripts` runtime owners and source-bound execution still keep B05 open.
-  The actual WSD compiler and component declarations are now package-owned; its
-  old executable was deleted, callers migrated, and isolated compiler imports
-  reject legacy owner dependencies. Generated native inputs and resources retain
-  their existing identities. This relocation does not close retained-state work.
-- Wave 2 now has a separate signed campaign/result mTLS listener, independent
-  native credential witnesses, original signature custody before publication,
-  and isolated ingest SQL roles. Durable signed installed-tuple, directed-route
-  and control inputs feed generation-pinned normalization and the scoped compare
-  API, portal and CLI. Tests cover signature/revocation negatives, actual local
-  TLS, real PostgreSQL role/RLS and publication, API access and stale UI state.
-  Conflicting VM/NIC/quota facts remain unknown; duplicate native scopes cannot
-  pad destination counts, and superseded generation pins cannot retain current
-  eligibility. Native collector/profile and
-  credential wiring, complete fact coverage, persisted owner/dependency review,
-  scheduling and estate qualification still keep Wave 2 partial.
-- B24's lower-level delivery path now includes bootstrap prepare/plan/apply and
-  native readback, with typed native lifecycle dispatch and per-VM fenced power
-  handling. The admitted Temporal workflow does not yet drive the complete
-  native provisioning, guest, service and activation chain.
-- B30/B31 now guard cross-scope source/destination authority, retain original
-  source receipts, and enforce exact canonical dataset coverage and complete
-  consistency-group joins. Mutation-worker composition remains missing: an
-  independently observed target dataset/root binding, a trusted adapter from
-  mTLS worker identity to transfer authority, qualified dynamic repository
-  credentials, and independent filesystem observation/old-writer exclusion for
-  native intent reconciliation. A `targetRef` is neither a native ID nor a path.
-  Persisted transfer identity must remain separate from expiring attempt grants.
-- Source fencing, final sync/cutover, post-write recovery, route expansion and
-  most Waves 4–6 implementation and release acceptance remain open. No local
-  fixture, synthetic benchmark or passing CI result establishes native support.
-
-### Capability/profile and architecture alignment — 28 September 2026
-
-This review used `implementation/all-waves` at
-`e40489cf9177d1689a8c49dec5d427ff4ab36431` as the implementation source, against the
-unchanged B01–B50 baseline above. It does not promote the baseline table into a
-claim that all work is now complete.
-
-The platform registry now explicitly covers 97 dimensions across compute, storage,
-network, security, guest, discovery, migration, services and operations. A single
-package-owned vocabulary and digest replace duplicated network-only lists. Registry
-format 2 rejects omitted rows and the older incomplete format. Newly enumerated
-features remain unassessed; all installed tuples remain unselected and all native
-claims remain unqualified until independently demonstrated.
-
-Compute/storage/recovery/service profile requirements now participate in placement.
-Every selected profile's limitations survive resolution. Strict catalogue parsing
-rejects duplicate properties, malformed identities/requirements and unknown
-capabilities. Updated catalogue/profile versions and regenerated five-request,
-three-platform examples remain disabled, non-authoritative fixtures. Existing
-approved plans require reassessment, not reinterpretation under the new digest.
-
-Registry and native-dossier validators now live in `provisioner.qualification`.
-Their former script files were deleted, their consumers migrated and their absence
-covered by retirement/installed-distribution checks; no compatibility wrappers were
-left. Other runtime owners and retained execution-state conversion keep B05 open.
-
-The maintained RAD, TAD, internal/public solution, interface and transition records
-are revised together, with explicit control-application, discovery, authority,
-profile, transfer and recovery boundaries. Obsolete increment-only current-scope
-and next-work narratives are replaced by the B01–B50 scope. Frozen source
-transcriptions and signed historical evidence are preserved as history.
-
-This slice does not complete admitted provisioning, transfer-worker composition,
-source fencing, final sync/cutover, post-write recovery or the native route/release
-campaigns. Their implementation and qualification requirements remain open below.
+One authenticated control application remains the product. Terraform, native APIs,
+Ansible and service owners are mechanisms behind tenant-scoped authority. Preserve
+one writer, immutable approval, uncertainty holds and independent postconditions.
+Delete competing/obsolete entry points only after verified consumer/state migration;
+these safety controls are not shims.
 
 ## 2. Corrected dependencies and delivery order
 
@@ -124,7 +63,7 @@ campaigns. Their implementation and qualification requirements remain open below
 | Route expansion is directional | B38–B42 require independent method, guest, source-exit, target-operate, policy, data and recovery evidence. Never infer reverse or same-family support. |
 | Final qualification must cover final code | Design/import conversion early. Rehearse B48 before final B47 release campaigns; rerun affected qualification after deleting old paths. B49 follows that final state, and B50 follows pilot acceptance. |
 
-## 3. B01–B50 baseline and remaining deliverables
+## 3. B01–B50 completion obligations
 
 “Delivered” below identifies repository evidence at the baseline, not production acceptance. “Partial” includes useful earlier tools that are not integrated into the new product path.
 Each row names the remaining repository work separately from external or native acceptance. None of the latter may be fabricated to make a wave appear complete.
@@ -160,15 +99,15 @@ Wave 1's existing repository boundary is verified in PR #52. Later native workfl
 
 | ID | Baseline | Repository completion deliverable | Native/external gate |
 |---|---|---|---|
-| B14 | Partial | Wire authorized VMware collector transport to campaign ingestion; normalize VM/device/network/storage facts; preserve scope, pagination and identity history. | Reconcile with independent enumeration; qualify folder/privilege coverage and visible-list limits. |
-| B15 | Partial | Wire pinned AHV/Prism read profile, complete VM/disk/NIC/network and selected capacity facts, and authenticated publication. | Qualify installed API/profile, paging/count semantics and least-privilege coverage. |
-| B16 | Partial | Wire project-scoped Nova/Cinder/Neutron/image/quota reads; correlate IDs, reject cross-project results and publish verified generations. | Qualify actual catalog endpoints, versions, read roles and service visibility. |
-| B17 | Partial grouping model | Persist attributed enrichments, reviewed application membership, owner/dependency and consistency-group decisions with unknowns visible. | Application owner confirms dependencies and useful-service acceptance criteria. |
-| B18 | Partial pure catalogue | Persist independently verified installed tuples, directed route/action claims, evidence digests, expiry, supersession and revocation. | Source-exit and destination-operation campaigns independently qualify advertised scope. |
-| B19 | Partial pure engine | Build trusted generation-pinned inputs from storage, perform scoped reads, retain assessments and expose reasons/remediation/confidence through service APIs. | Reviewed policy, security, recovery and target-capacity evidence for positive candidates. |
-| B20 | Partial inventory UI | Add workload details, application grouping and comparison of at least two authorized destinations to portal and CLI; handle stale selections/results. | Sysadmins complete comparison without hand-authoring JSON. |
+| B14 | Partial signed native path | Complete remaining VMware hardware/policy/visibility coverage over the implemented signed HTTPS collector and publication; preserve exact folder/native identities and original generations. | Reconcile with independent enumeration; qualify folder/privilege coverage and visible-list limits. |
+| B15 | Partial signed native path | Complete AHV hardware/network/capacity facts over the implemented pinned VMM read and authenticated publication; retain typed boot/device evidence. | Qualify installed API/profile, paging/count semantics and least-privilege coverage. |
+| B16 | Partial signed native path | Complete Glance/guest/boot/key/driver and independent coverage over implemented exact-project Nova/Cinder/Neutron/quota reads, allocation and attachment facts. | Qualify actual catalog endpoints, versions, read roles and service visibility. |
+| B17 | Persisted drafts and signed assessment decisions | Finish independent enrichment/dependency verification and owner-facing signing/review workflows; exact observed membership and consistency decisions remain revision-bound. | Application owner confirms dependencies and useful-service acceptance criteria. |
+| B18 | Durable signed tuple/route/control inputs | Complete deployed qualification import, expiry/supersession/revocation and release-ledger integration without converting operator assertions into evidence. | Source-exit and destination-operation campaigns independently qualify advertised scope. |
+| B19 | Persisted generation-pinned comparison | Complete coverage and acceptance for single-VM and reviewed multi-member comparisons, exact pool/profile bindings and explicit reasons/remediation. | Reviewed policy, security, recovery and target-capacity evidence for positive candidates. |
+| B20 | Existing-draft CLI/browser and saved-application comparison | Finish guided creation, dependency/evidence editing, owner-facing signing and complete administrator workflows; preserve stale-response and uncertain-save defenses. | Sysadmins complete comparison without hand-authoring JSON. |
 | B21 | Partial proposal model | Persist no-change import proposals, ownership collisions, review state and links to exact observations; execution stays separately approved. | Native no-change/state reconciliation before ownership transfer. |
-| B22 | Partial budgets/paging | Implement bounded scheduling, per-endpoint rate/concurrency limits, resumable generations, freshness monitoring and a reproducible estate benchmark. | Independent omission/privilege-loss reconciliation and agreed estate-scale measurements. |
+| B22 | Bounded batch, custody claims and freshness/history | Complete durable fleet/global endpoint budgets, resumable estate work, periodic monitoring/alerts and measured benchmark beyond existing one-shot/process-local/on-demand paths. | Independent omission/privilege-loss reconciliation and agreed estate-scale measurements. |
 
 Wave 2 exits with a deployed-capable read-only slice from campaign admission to scoped comparisons. Unknown evidence produces a usable `UNKNOWN` result, never invented eligibility.
 Native B14–B16 acceptance and positive qualified destination claims remain separate from local service integration tests.
@@ -231,7 +170,7 @@ The wider estate's additional whole-VM, appliance, GPU/passthrough, shared-disk,
 ## 4. Small-commit execution sequence
 
 Each numbered row is a bounded implementation series. Split it into behavior-sized commits with tests and the relevant documentation; do not combine unrelated platform drivers or migrations in one commit.
-Use a current-main branch. The old `implementation/mobility-integrity-closure` branch is 127 commits behind this baseline and is not the product starting point.
+Continue the latest verified `implementation/all-waves` revision in small non-force commits. Recheck the branch before each update; do not reset it to an older baseline or silently overwrite concurrent work.
 
 | Order | Commit series | Completion evidence |
 |---|---|---|
@@ -263,13 +202,14 @@ revocation and TLS negatives are also covered. See the
 [ingest contract](../discovery-ingest.md) and
 [comparison architecture](wave2-discovery-architecture.md).
 
-Complete the native side next: admitted collector transport and credential
-retrieval, installed API/profile and field-set binding, full per-platform facts,
-page evidence and independently reconciled coverage. Campaign signatures and an
-aggregate result digest do not themselves prove native completeness. Preserve
-separate issuer/collector/witness authority, exact scope, bounded budgets and
-live revocation checks as these pieces are integrated. Scheduling may select
-work; it cannot issue campaign or credential authority.
+Native HTTPS transport, signed material readers, installed collector composition,
+original publication, persisted application/owner review and API/CLI/browser comparison
+now exist. Remaining native-side work is complete field coverage, exact deployed
+custody and least-privilege qualification, independent enumeration reconciliation,
+guided owner workflows, durable fleet scheduling and estate measurement. Campaign
+signatures and aggregate digests do not prove completeness. Scheduling cannot issue
+campaigns, credentials or mutation rights. On-demand freshness/history does not close
+periodic monitoring or alert delivery.
 
 The implementation sequence above remains the complete ordered programme;
 several series have begun but none of these changes grants provisioning or
@@ -293,36 +233,27 @@ Final completion means the declared support matrix works through the supported p
 - [Control-plane operator guide](control-plane-operator.md) describes the authenticated foundation and explicitly excludes later native provisioning and workload migration activities.
 
 
+
 ## 8. Research-driven acceptance and implementation delta
 
-The 28 September 2026 [verified research decisions](../engineering/platform-migration-research.md)
-are integrated here, not adopted as a new four-wave or B01–B15 roadmap. Preserve
-B01–B50 identifiers, baseline rows, authority boundaries and dependencies. The
-research's approximate paths, active-owner deletion advice, unsupported blanket
-feature claims and illustrative completion dates are rejected.
+The [current primary-source review](../engineering/platform-capability-review-2026-10-01.md)
+and [earlier semantic research](../engineering/platform-migration-research.md) refine
+this programme, not a replacement numbering scheme. Approximate paths, unsupported
+blanket vendor claims, arbitrary completion dates and deletion of active owners are
+not accepted requirements. Vendor documentation is not installed qualification.
 
-### Implemented repository increment
+OpenStack selector 2 retains strict allocation/image/volume/attachment facts from
+already selected APIs; nominal disk sizes, deletion booleans and device labels never
+become total storage, fencing or mutation authority. The retired selector has no alias.
+The typed profile field owner removes a parallel table; standalone assurance recovery
+now shares the existing full-pipeline rule. Minimum workload counts and recovery-zone
+composition are enforced; independent-site recovery stays unsupported. Catalog 18
+and regenerated examples correct security-zone semantics without changing support.
 
-Typed semantic properties beneath the existing 97 capability IDs now flow from
-strict profile catalogues through resolution, scoped cluster placement and portable
-policy translation. Profile resolution format 3 and policy capsule/realization
-format 2 bind the property interpretation digest and reject weaker/old inputs.
-The existing security/compute profiles impose explicit routing, enforcement,
-NIC-coverage and architecture requirements; deferred encryption stays deferred.
-
-Discovery normalizer 2 and comparison check exact source requirements against the
-selected target's observed capabilities/properties. Whole-VM hardware/driver/key/
-writer requirements and warm-transfer convergence are checked before eligibility;
-positive route/control evidence cannot fill missing native facts. Old-normalizer
-signed control evidence is rejected. Mixed same-platform-relocation comparisons
-retain all authorized destination rows and block cross-hypervisor ones.
-OpenStack collection now observes bounded port-security/binding/group/QoS/address
-and volume-encryption/multiattach/type fields without inventing qualification.
-All updated examples remain non-authoritative and disabled.
-
-This increment has local regression tests, not native acceptance. Do not mark an
-entire B item VERIFIED from this subsection. Store exact final-revision CI results
-in the PR/delivery record; qualification and operations remain separate columns.
+Resolution 3, normalizer 2 and policy capsule/realization 2 retain exact interpretation
+digests. Unknown/contradictory hardware, driver, key, policy and convergence evidence
+cannot become eligibility through a positive route/control flag. These remain tested
+comparison prerequisites, not native provisioning, conversion or transfer execution.
 
 ### Existing wave owners and expanded closure tests
 
@@ -330,9 +261,9 @@ in the PR/delivery record; qualification and operations remain separate columns.
 |---|---|---|
 | Wave 0 — B03/B04/B05 | Keep canonical property types and bounded parsers; reject old interpretation rather than shim it. Migrate every real consumer before deleting a legacy path. | Property contract and version rejection implemented. Package qualification owners are active, not deletion targets. B05 retained runtime/state migration remains open; installed-wheel and retirement tests are required. |
 | Wave 1 — B06–B13 | Bind requirements, observations, approvals, immutable revisions, reviewer authority and worker credentials; per-effect rechecks cannot use an earlier comparison as permission. | Existing signature/RLS/outbox/lease controls retained. Old-normalizer review rejection added. Native claim import must retain original sources, timestamps, tuple, publisher and independent evidence custody. |
-| Wave 2 — B14/B15/B16 | Collect per-VM firmware/architecture, controllers/disks/NIC order, boot/security/key state, shared/passthrough devices and optional service/driver/extension facts. Bind exact API/driver/tool versions, project/scope and completeness. | OpenStack attribute capture and malformed/missing-field tests implemented. VMware REST campaign/VM-info and AHV typed boot/device mapping are implemented in the follow-up below. Full fact coverage, installed profiles, credential transports and independent reconciliation remain open. Never infer safe boot or encryption absence from a friendly profile name. |
+| Wave 2 — B14/B15/B16 | Collect per-VM firmware/architecture, controllers/disks/NIC order, boot/security/key state, shared/passthrough devices and optional service/driver/extension facts. Bind exact API/driver/tool versions, project/scope and completeness. | OpenStack attribute capture and malformed/missing-field tests implemented. VMware REST campaign/VM-info and AHV typed boot/device mapping are implemented in the native read contracts. Full fact coverage, deployed credential custody and independent reconciliation remain open; signed native transports and installed collector composition exist. Never infer safe boot or encryption absence from a friendly profile name. |
 | Wave 2 — B17/B18 | Attribute source policy and dependency/consistency decisions; version the complete source/destination/guest/tool/backend tuple. Keep six directed inter-family routes distinct and distinguish each method. | Current tuple/route authority retained. Property schema and explicit observed/source capability sets enforced. Exact released support matrices, entitlement, expiration and native claims still need qualified owner evidence. |
-| Wave 2 — B19/B20/B22 | Compare scoped property values, all source requirements and measured transfer assumptions; expose stable blocker/unknown reasons and remediation without hiding other destinations. | Typed comparison and relocation error isolation implemented; old signed reviews invalidated. Persisted owner enrichment, complete UI review flow, scheduling, freshness and estate benchmark still required. |
+| Wave 2 — B19/B20/B22 | Compare scoped property values, all source requirements and measured transfer assumptions; expose stable blocker/unknown reasons and remediation without hiding other destinations. | Typed comparison and relocation error isolation implemented; old signed reviews invalidated. Revisioned drafts, signed owner decisions, operator comparisons and on-demand freshness/history exist; verified dependencies, guided owner workflows, durable scheduling, periodic monitoring and estate benchmark remain open. |
 | Wave 3 — B23/B25/B26 | Reserve real VM/storage/transfer/retention capacity; map firmware, disks, NICs, keys, drivers, shared devices and huge pages. Distinguish QoS minimum guarantees from ceilings and encryption layers from each other. | Planning/placement and comparison prerequisites implemented. Actual native realization, resource reservations, driver preparation, encryption transition and observation-bound postconditions remain open. Test unknown versus false and malformed integers as well as happy paths. |
 | Wave 3 — B24/B27/B28/B29 | Realize policy outcomes with exact ordered/additive semantics, all-NIC enforcement, routing/VRF and datapath constraints. Qualify LB/VPN/service insertion as separately installed services; do not assume Neutron core or Flow networking supplies them. | Property conflicts, NSX VRF HA, DPDK prerequisites and SR-IOV bypass checks implemented. Native rule compilation/readback, positive app flows, negative isolation/bypass, MTU/reply paths, HA and service-owner acceptance still required. |
 | Wave 4 — B30–B37 | Retain per-dataset consistency and metadata, isolate rehearsal, independently exclude old writers, final-sync, switch traffic and admit target writes. Split pre-write return from post-write reverse-sync/restore/forward repair. | Existing safe cutover contract retained; the research's unconditional source restart is rejected. Transfer-worker composition, native effect graph and actual first application campaign remain open. Inject failure before/after every effect and first-write boundary. |
@@ -345,464 +276,3 @@ then native realization/workflow increments with their actual tests. This change
 adds no competing sequence or fictitious lab access. A missing capability fact
 remains UNKNOWN; an explicit incompatible observation is BLOCKED. Neither can be
 turned into an execution grant by an operator-supplied success flag.
-
-
-### Native hardware collection follow-up — 28 September 2026
-
-B14/B15 now retain more native facts without manufacturing capability claims.
-AHV's VMM v4.0 collector records the explicit boot union, returned Secure Boot and
-vTPM booleans, native live-migration hint, disk bus/index and NIC model/MAC/link
-state. A tagged volume-group attachment cannot masquerade as a VmDisk or supply
-its disk-image capacity. Duplicate addresses, malformed types and oversized facts
-remain unknown; missing SDK response fields never acquire request defaults.
-
-The VMware REST collector now retains VM-info CPU, memory, firmware, disk layout,
-NIC model/MAC/link and native network bindings, with instance UUID and reviewed
-folder identity/digest. Summary/detail disagreements hold the scan. Its new
-`collect_vmware_vms` path emits the common campaign pages and rechecks campaign
-lifetime around each native GET. Those pages are always `PARTIAL` for visible-only
-REST inventory, even when the result is empty. Native read failures emit `UNKNOWN`
-without publishing a truncated scan as complete; expiry cannot produce late evidence.
-The emitted cursors partition the captured observations, not a native paging API.
-
-Collector identities are `nutanix-ahv-v4.0-hardware-2` and
-`vcenter-rest-vm-info-8.0.3.0-visible-only-2`. Re-admit campaigns and reissue the
-matching worker/credential witnesses; old collector identities are rejected rather
-than aliased. Raw hardware and folder-evidence changes affect snapshot digests.
-The normalizer remains version 2: its interpretation is unchanged, and the changed
-raw snapshots require new signed review bindings. No existing approval is restamped.
-
-This is bounded read-only mapping and campaign integration, not completion of
-B14/B15 or Wave 2. Site transport/credential wiring and independent visibility
-reconciliation remain open, as do full controller/boot-order/opaque-network,
-ISA, encryption/key, shared-disk and passthrough mapping and attributed application
-requirements. REST VM-info does not supply SOAP ConfigInfo security fields.
-The native live-migration hint is not directed route or entitlement qualification.
-No native system or guest was contacted; no execution or qualification gate changed.
-
-### B10/B14/B16 continuation — signed native reads
-
-The [VMware HTTPS transport](../engineering/vmware-discovery-https.md) now invokes
-the current collector using independently signed exact-campaign session material.
-Scope/folder selection, API release, URL, pinned IP, CA and token bytes are bound;
-the live enrolled credential and independent read-only witness are rechecked
-before connection, before sending credentials, after response and at collection
-return. Native issuance, original result-signature publication, deployed PKI/Vault
-composition and independent visibility reconciliation still require integration.
-
-The transport restricts requests to reviewed folder lists and VM IDs actually
-returned by those lists. Real loopback TLS tests cover wrong identities, revoked
-credentials, rotation/replay, response tampering/framing, deadlines and bounds.
-OpenStack now rejects expired/future campaigns before their first read and checks
-UTC monotonicity and validity around every page/quota read, including error paths.
-The regression previously reproduced a native GET after campaign expiry.
-
-These are repository/automated-verification increments, not native acceptance of
-B10/B14/B16 or completion of Wave 2. OpenStack HTTPS credential client, native
-visibility reconciliation and B17 persisted application/dependency review remain
-open. No collector identity, normalizer or qualification claim is silently upgraded;
-no compatibility shim, mutation endpoint, login fallback or production grant is
-introduced. Existing later-wave dependencies and completion columns still apply.
-
-
-### B10/B15 continuation — signed AHV reads and shared HTTPS
-
-The AHV VMM v4.0 collector now has `adapters/ahv_https.py` and an independently
-signed API-key source in `adapters/ahv_credentials.py`. Only the admitted cluster's
-consecutive bounded VM-list pages can be requested. Native service-account keys,
-TLS origin/IP/CA, scope, API profile, credential enrollment and current independent
-read-only witnesses are checked before connection, after TLS, after decoding and
-before returning pages. Mid-read revocation or rotation cannot become publishable
-observations. Errors consume the request budget and latch the client closed.
-
-The actual HTTPS mechanism is extracted into provider-neutral `native_https.py`;
-VMware callers and deadline tests use it directly. No adapter forwards to another
-vendor, no old-path alias or native login/mutation fallback was added. Both native
-credential readers now reject embedded origin controls/whitespace. Successful AHV
-collections remain `PARTIAL`/`VISIBLE_INVENTORY_ONLY`, including empty responses;
-API totals alone cannot establish independent native visibility.
-
-See [AHV HTTPS custody and qualification boundaries](../engineering/ahv-discovery-https.md).
-Local real-TLS/signature tests and installed-package guards cover these owners.
-Collector/normalizer/policy formats are unchanged; updated observations require new
-digest-bound review. This advances B10/B15 without closing them: deployed site
-composition, service-account issuance/revocation, Vault publication, persistent
-revision floors, original result signing/ingest and independent visibility remain
-open. OpenStack native HTTPS was open at this checkpoint and is addressed by the
-next continuation. B17 persistence and later migration effects remain open. No native environment or production dataset was contacted.
-
-### B10/B16 continuation — signed OpenStack reads, 29 September 2026
-
-The [OpenStack native client](../engineering/openstack-discovery-https.md) now drives
-the existing project collector through actual bounded Nova/Cinder/Neutron HTTPS GETs.
-`openstack-project-https-1` requires newly admitted enrollment and independent native
-read-only witnesses. Signed project-token custody binds principal, token validity,
-catalog evidence, region/interface, all three exact endpoints/IPs/CA digests and
-selected API versions. It neither logs in nor refreshes credentials automatically.
-
-Only the consecutive collection page chains and project quota reads are allowed.
-Native identity/project checks precede marker admission; no server URL is followed.
-Exact compute/volume response versions, finite budgets/deadlines and live authority
-are enforced. Bad endpoints, scope/version mismatch, service failure, revocation
-or mid-request token rotation discard the scan rather than publishing a diagnostic
-as valid inventory. Successful and empty scans remain partial/visible-only.
-Endpoint/header hardening and real three-service TLS regressions accompany the code;
-the shared HTTPS owner remains provider-neutral. No compatibility shim was added.
-
-This advances B10/B16 repository implementation, not their native qualification or
-Wave 2 completion. Original result signing/authenticated publication, deployed site
-composition, independently verified token issuance/revocation, Vault/durable revision
-custody, Glance/image and remaining hardware facts, visibility reconciliation and
-B17 attributed application/dependency persistence remain open. Existing interpretation
-versions and later provisioning/migration/qualification gates remain unchanged.
-
-### B10/B13/B14–B16/B22 continuation — original publication and recovery, 29 September 2026
-
-The [signed publication/recovery contract](../engineering/discovery-publication-recovery.md)
-now describes the implemented package-owned result signer, immutable submission,
-private outbox and mTLS sender. These consume existing admitted campaigns and
-actual native adapter collect methods; the existing ingest repository remains the
-only inventory writer. They do not issue native credentials or migration grants.
-This checkpoint supersedes earlier statements that the library result-signing and
-authenticated publication paths were missing, without claiming deployed site runtime.
-
-`stage_submission` now resumes the original by campaign identity, with fresh
-signature/enrollment/witness checks and no native recapture, replacement signature
-or changed capture time. The outbox fsyncs original bytes before an immutable
-campaign reference and rejects competing results, changed scope, corruption and
-missing referenced payloads. The existing publisher enforces this retention before
-any POST. Independent-outbox conflicts remain enforced by the server.
-
-Lost or malformed acknowledgements after an attempted request remain explicitly
-unknown. An explicit currently authorized retry sends the same bytes and relies on
-server idempotency, not presumed rollback. Expired or revoked evidence remains held.
-Pre-reference outboxes need reviewed replay by original digest before resuming old
-campaigns; no automatic migration, source rescan or approval relabelling is supplied.
-
-Regression evidence covers original signatures/capture times, create-only races,
-corruption/storage/authority failures, lost campaign/result replies over actual
-loopback mTLS, and PostgreSQL one-generation retries and central conflicts. Final
-revision CI and installed-package checks must pass; native qualification stays separate.
-
-Remaining B10/B13/B14–B16/B22 work includes deployed collector configuration/runtime,
-protected signer and native credential issuance/renewal, persistent anti-rollback
-floors and independent retention, fleet scheduling/resumable publication limits,
-visibility/privilege-loss reconciliation and full native facts. B17 owner/dependency
-persistence and B05/later provisioning, transfer, fencing, cutover and release gates
-remain open. Local references do not provide global exactly-once collection, WORM
-custody or DR protection. No installed vendor or production workload was contacted.
-
-### B10/B13/B14–B16/B22 continuation — installed collector command, 29 September 2026
-
-[The installed collector](../engineering/discovery-collector-runtime.md) now provides
-`hosting-discovery-collect stage --config <absolute-protected-file>` and a separate
-`publish` action. It composes the existing signed campaign/witness authorities,
-three exact native adapters, signer, private outbox and mTLS publication owner.
-Configuration is bounded, strict and private; it cannot select dynamic imports,
-arbitrary commands or inline native secrets. This supersedes the earlier missing
-command/configuration composition, not site deployment or credential issuance.
-
-Staging resumes existing original bytes without native reads or signing material.
-Publication requires existing custody and cannot trigger collection as a fallback.
-Held, unknown-delivery and interrupted exits have distinct exit codes; all keep
-execution authority false. Original capture time, partial/unknown inventory and
-server idempotency remain intact. The shared native HTTPS helper no longer honors
-inherited TLS key logging; certificate/hostname and bounded-request checks remain.
-
-Regression evidence covers actual native TLS, fresh command processes, protected
-configuration rejection, original signatures, lost-acknowledgement restart and
-mTLS publication. PostgreSQL tests verify one generation after command replay.
-Final-revision CI and isolated installed-command checks must pass before recording
-automated verification; local protocol fixtures do not qualify installed platforms.
-
-B10/B13/B14–B16/B22 remain partial for deployed credential/key lifecycle and Vault,
-protected durable authority floors, independent retention/recovery, visibility/full
-facts, scheduling/concurrency, larger publication and estate benchmarks. Pre-reference
-outboxes need reviewed reconciliation, not automatic rescanning. B17 owner/dependency
-persistence and all later admitted provisioning/migration/qualification gates remain
-open; no native site, guest or production dataset was contacted in this increment.
-
-### B17/B20 continuation — durable application drafts, 29 September 2026
-
-The [application-draft owner](../engineering/application-drafts.md) now persists
-unreviewed application membership, dataset/consistency proposals, startup order and
-explicit dependency assertions through the existing authenticated control API.
-The selected latest source generation is rebuilt and digest-verified; all proposed
-members must be observed VMs. Partial inventory can support drafting, not acceptance.
-The logical owner and asserted external sources are never treated as verified actors.
-
-Immutable revisions bind exact tenant/environment/native scope, source generation,
-proposal content, authenticated author and database time. Expected-revision conflicts
-prevent competing edits; exact same-actor retries return the original record. New
-source generations invalidate a new save against older inventory, while history and
-retries report supersession. Current session/scope/evidence is rechecked after lock
-waits and before the draft and audit transaction commits. Migration 0021 adds exact
-foreign keys, append-only/consecutive revisions and tenant/worker SQL protections.
-
-Implemented routes are scoped PUT/GET with exact historical revision selection.
-Responses always remain UNREVIEWED with ownershipAccepted and executionAuthorized
-false. No fake owner review, compatibility alias, native mutation or new worker
-permission is added. Automated tests cover contract, HTTP, SQL, concurrency, retry,
-revocation, restore and installed ownership; final-revision results belong in the PR.
-
-This advances B17/B20, not their full closure: independent enrichment verification,
-formal owner acceptance/revocation, persisted reviewed decisions, review-consuming
-assessment, portal/CLI editing and draft listing remained open at this checkpoint;
-the following continuation supplies listing and thin CLI save/load, not owner review. B22 scheduling/scale,
-independent visibility, remaining native facts, B05 and later provision/migrate/
-qualification waves keep their existing gates. No vendor installation was contacted.
-
-
-### B17/B20 continuation — draft listing and operator commands, 29 September 2026
-
-The [draft operator contract](../engineering/application-draft-operator.md) now
-connects the existing hosting-operator CLI to draft list/get/save operations.
-The new exact-scope GET listing returns latest-revision summaries with explicit
-ASCII keyset pagination and one database snapshot per live page. It does not
-pretend multiple requests form a frozen export or that listed owners are accepted.
-Stored checksums, source supersession and current reader authority are verified;
-no new migration or runtime write privilege is required beyond migration 0021.
-
-Saving requires explicit source generation/digest and expected revision. The CLI
-rejects malformed/oversized files, wrong selections, approval claims and content-
-substituted acknowledgements. It preserves unknown dependencies and canonical UTC
-spelling without a second controller or native adapter. Lost, interrupted or
-inconsistent save responses stay uncertain with original request identity. No
-automatic retry, rebase, rescan, actor override or token refresh is introduced.
-
-The operator TLS context now refuses inherited session-key logging for both CA
-selections while retaining certificate/hostname checks. API/CLI regressions,
-PostgreSQL round trips, source/tenant isolation and installed thin-client checks
-cover the increment. Final-revision CI evidence belongs in the delivery record;
-local test doubles and skipped database tests are not native qualification.
-
-This closes the missing listing and structured-JSON CLI save/load path, not B17,
-B20 or Wave 2. Formal owner acceptance/revocation, verified dependency enrichment,
-review-consuming assessment and the full guided browser workflow remain open. Existing
-B22, B05 and later provisioning/migration/recovery gates are unchanged; no source
-owner, execution grant or platform-qualified claim is created by these commands.
-
-
-### B20 continuation — existing-draft browser workspace, 29 September 2026
-
-The [browser workspace](../engineering/application-draft-browser.md) now composes
-live-page draft listing, exact current/history reads and limited existing-draft
-editing into the authenticated portal. Name, proposed owner and startup order are
-editable; original source/revision, membership, datasets, consistency groups and
-all dependency assertions are retained. Historical or superseded sources stay
-read-only. Full browser draft creation and membership/evidence editing remain open.
-
-Saves require explicit confirmation and an exact-content/source/revision HTTP 200
-acknowledgement. Conflicts require reload; ambiguous outcomes hold further saves.
-Reconciliation is one GET for the expected next revision, not a retry or an owner
-approval. Matching history is read-only and does not prove which tab authored it.
-Identity changes clear state and discard late responses. Same-origin requests,
-strict bounded JSON, literal DOM rendering and response cancellation are tested.
-No token or draft is persisted in browser storage; tab closure is not a durable
-operation log and cannot imply that a submitted write rolled back.
-
-Node component/shell tests and Python asset/CSP/origin tests cover this increment;
-the existing Python suites invoke the Node cases without a new workflow. Final
-CI belongs in the delivery record. The local real-browser smoke was blocked by
-administrator navigation policy, not recorded as passed. Deployed browser/SSO and
-usability acceptance still need an authorized test environment.
-
-This narrows B20 but does not close B17/B20 or Wave 2. Owner acceptance/revocation,
-verified dependency enrichment, reviewed assessment consumption, full browser
-creation and B22 remain open. No new database migration, privilege, interpretation
-version, native execution path or platform qualification is introduced.
-
-
-### B17/B20 continuation — signed owner decisions, 30 September 2026
-
-The [owner-review contract](../engineering/application-owner-review.md) extends the
-existing signed assessment evidence store, not the draft writer or native approval
-ledger. `APPLICATION_OWNER` enrollment and signatures bind an exact saved draft,
-its editor/owner, inventory generation and all proposal assertions. Acceptance and
-revocation share one monotonic evidence stream per immutable draft; changed drafts
-need new review. Existing original-policy custody, RLS and current revocation
-checks remain authoritative. The proposed owner cannot self-review an edited draft.
-
-`ApplicationReviewService` composes current signed decisions with retained source
-observations and the existing application-candidate validator. Its exact-revision
-GET endpoint is read-only. Complete current observations can produce an assessment-
-only candidate; partial/stale/superseded sources hold, and unknown dependencies
-remain visible. Every response denies native ownership/execution authority and
-keeps third-party dependency evidence explicitly unverified. Browser draft state
-is not rewritten or used as an approval. Existing per-VM comparison is unchanged.
-
-Migration 0022 extends the assessment kind constraint; the independent ingest role
-needs only additional SELECT on retained draft/discovery inputs. No earlier migration
-or native authority is replaced. Source locks serialize review with draft/inventory
-writers, and signatures are checked after lock waits and before commit. Tests cover
-real signatures, PostgreSQL/RLS, atomic audit rollback, revocation and API consumption;
-installed-package checks require the new owners and migration outside the checkout.
-
-This narrows B17/B20, not the entire wave. Enterprise owner/key onboarding, verified
-external dependencies, application-wide comparison/planning and an owner-facing
-browser/CLI review workflow remain open, together with B22 and later native effects.
-Native qualification and production acceptance are neither enabled nor inferred.
-
-
-### B17/B20 continuation — operator owner-review status, 30 September 2026
-
-The existing draft CLI helper now composes one exact-revision GET to the signed
-owner-review endpoint. It supports an optional retained draft-record digest check,
-validates complete source/evidence/status/validity fields and rejects mismatched
-candidate or authority claims. A valid read of a hold/revocation remains a hold/
-revocation; exit success denotes retrieval only. No client signing, local review
-service, approval writer, automatic retry, rebase or fallback to old evidence is
-introduced. Source observations, immutable drafts and current signed decisions
-retain their separate owners and existing contracts.
-
-Tests cover all eight actual service states and malformed/contradictory responses;
-separate PostgreSQL cases consume real signed acceptance/revocation and source/draft
-supersession through the authenticated API and CLI. Installed-package checks compose
-the new GET outside the checkout. Final source/CI evidence belongs in the PR; local
-skips and unavailable dependency downloads are not presented as native qualification.
-The [owner-review operator contract](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
-documents exact commands, optional pins, outcomes and limits.
-
-This completes CLI status presentation, not owner-facing signing, verified external
-dependency enrichment, application-wide destination comparison or full browser review.
-No new database migration, privilege, native operation, capability claim or policy/
-normalizer interpretation is added. B17/B20, B22 and the later waves retain their
-unclosed implementation, native qualification and operating-acceptance gates.
-
-### B17/B19/B20 continuation — application-wide comparison, 30 September 2026
-
-The [application comparison service](../engineering/application-comparison.md)
-now consumes exact immutable drafts and independent current owner reviews through
-`POST /v1/assessments/applications/compare`. Every retained member needs an explicit
-guest profile; membership/evidence/capacity cannot be supplied as client claims.
-Two to twenty distinct destinations are supported under a 200 member/destination
-cell bound, with one selected capacity identity per destination for all members.
-
-The existing per-VM engine remains the owner of directed route and compatibility
-checks. Request-local caching avoids repeated immutable inventory hydration; it
-never caches authority, current generations or signed route/control decisions.
-Final checks detect changed reviews, installed tuples, revoked readers and source
-supersession. Combined VM slots/vCPU/memory/logical-disk checks catch applications
-whose individual VMs each fit but together exceed the selected pool. Missing or
-overflowing quantities stay unknown; no transient/HA/retention footprint is guessed.
-
-Unresolved dependencies stay unknown. Independent external dependency evidence,
-application-wide data/policy review and actual reservations are not manufactured
-from single-VM success. Even otherwise compatible applications stay conditional.
-The bounded report explicitly denies execution, ownership and reservation authority;
-no native job, schema migration, database grant or compatibility path is added.
-
-**Wave exit decision: remain in Wave 2.** Repository/HTTP/database tests verify this
-increment, not the whole wave. B14–B16 visibility and remaining image/hardware facts,
-B17 verified enrichment and deployed owner/key onboarding, B20 complete application
-operator flow and B22 scheduling/concurrency/freshness/scale remain open. B23/B24
-in Wave 3 still require commissioned capacity, transactional reservation/IPAM,
-actual native stage integration and per-effect authority. Combined demand is useful
-input to that work, not permission to skip it. Keep the four completion columns
-separate and bind verification to the final delivery revision.
-
-### B19/B20 continuation — application-comparison operator, 30 September 2026
-
-`hosting-operator assessments compare-application` now calls the existing reviewed
-application service with explicit source generation, draft revision/digest, all
-member guest profiles and selected destination pools. The existing single-VM
-parser/request implementation moved into the same standard-library-only comparison
-helper without an old-path wrapper or local controller. The operator owns HTTP;
-the API still owns membership, live authorization, signed review and assessment.
-
-Application report format 2 binds the canonical full selection with `selectionDigest`,
-including method/network/data modes on both calculated and held reports. Old report
-interpretations are rejected, not aliased. Strict bounded response tests prevent
-dropped members/destinations, changed pools, false execution/reservation claims and
-capacity/status contradictions from becoming usable advice. The command makes one
-request and never retries, rebases, recollects inventory or launches a native job.
-See [operator contract and tests](../engineering/application-comparison-operator.md).
-
-This closes the CLI-access slice, not B20's guided browser application-comparison
-workflow or Wave 2. Remaining native fact/visibility, dependency and B22 scheduling,
-freshness, resumable-publication and estate-measurement obligations remain open.
-Wave 3 B23/B24 cannot consume this report as a reservation or native authorization;
-commissioned capacity/IPAM/staging admission and immediate effect checks are still
-required. No native qualification, production migration or wave completion is claimed.
-
-### B19/B20 continuation — saved-application browser, 30 September 2026
-
-The [portal comparison component](../engineering/application-comparison-browser.md)
-now consumes the existing format-2 application API from an unchanged current saved
-draft. The existing destination picker and route settings are reused; every retained
-member requires an explicit guest profile. Exact selection/review/source/pool checks
-retain combined demand, every member's findings and all mandatory holds/conditions.
-One bounded read-only POST creates no job, owner decision or reservation.
-
-Draft edits, historical or superseded selections, unknown saves, destination/route
-changes and session changes cannot leave earlier advice current. Cancellation and
-late-response tests verify clearing; malformed/oversized/unsafe-integer responses
-are refused without partial findings. Actual API fixtures and all three portal
-scripts are exercised in client-contract tests. Chromium navigation was blocked in
-the development environment; no passed rendering smoke test is claimed.
-
-This closes the browser-consumption slice left open at the preceding CLI checkpoint,
-not full guided draft/membership/evidence authoring or Wave 2. Verified external
-dependencies, remaining native facts and independent visibility reconciliation,
-B22 scheduling/concurrency/freshness/resumable publication and estate measurements
-remain open. Wave 3 B23/B24 still require commissioned envelopes, transactional
-capacity/IPAM/staging reservations and actual admitted native effects. Keep these
-implementation gates separate from native qualification and operational acceptance.
-No CI workflow, database migration, native privilege or capability claim changes.
-
-### B22 continuation — bounded batch staging, 30 September 2026
-
-The [batch staging contract](../engineering/discovery-batch-scheduling.md) now
-composes due, independently authorized campaigns through the existing installed
-collector. Exact configuration bytes, campaign digest, environment, endpoint scope
-and UTC task windows are checked before native reads. One bounded dispatch uses
-endpoint round-robin queues and finite collection concurrency; each task runs once.
-Future work is reported, not waited for, and publication remains separately explicit.
-
-All three native HTTPS adapters now share FIFO endpoint read gates within a batch.
-Admission spacing and concurrency use monotonic budgets; queue time consumes the
-existing request timeout. Current authorization is checked while queued and before
-sending credentials. Local scheduling refusals hold rather than becoming native
-UNKNOWN observations. Started reads retain their rate charge through failure, and
-concurrency is released after socket cleanup. Interruptions stop new admission and
-drain started workers; any retained original still needs explicit reconciliation.
-
-Threaded, real local TLS, signed-campaign, fresh-process and installed-package
-checks cover this increment. They do not qualify real platform load or an estate.
-Output explicitly declares process-only limits and no durable schedule, publication
-or execution authority. BATCH_EVALUATED can contain only future tasks and no staged
-results; it does not mean the scheduled programme is complete.
-
-**Wave exit decision: remain in Wave 2.** Durable multi-process scheduling and
-globally coordinated endpoint budgets, freshness monitoring, larger resumable
-publication and estate measurements remain open under B22. Other Wave 2
-implementation and native/owner acceptance gates also remain open. No Wave 3 code
-is started, no qualification is invented, and no existing baseline row is promoted
-to VERIFIED by this checkpoint. No compatibility wrapper or SQL migration is added.
-
-### B22 continuation — scoped freshness inspection, 30 September 2026
-
-The [freshness inspection contract](../engineering/discovery-freshness.md) adds a
-read-only API projection of the latest stored generation's age and reported
-collection health. Exact-scope metadata is read twice with current identity and
-role checks before and after reads. Missing inventory, future capture, stale age
-and incomplete collection stay distinct. Concurrent generation changes return an
-explicit conflict without silently retrying or selecting an older complete scan.
-
-`FRESH` describes capture age only; it never proves native visibility, signature
-currency, usable capacity or migration eligibility. The response retains original
-capture/digests and reports metadata-only verification, no requested collection and
-no execution authority. Server-owned monitoring intervals cannot be overridden in
-a request and do not change assessment policy. No native collector is invoked.
-
-This implements the freshness inspection service/API, not a recurring fleet monitor,
-alert dispatcher or auto-refresh scheduler. Service/HTTP and PostgreSQL tests cover
-age boundaries, missing/partial data, isolation, access changes, concurrent publication
-and no audit/inventory writes. Final-revision CI and skipped tests must be recorded
-separately; no installed vendor or production observation was collected here.
-
-**Wave exit decision: remain in Wave 2.** B22 durable multi-process scheduling,
-globally shared endpoint budgets, periodic freshness monitoring/alerts, larger
-resumable publication and estate measurements remain open. Other Wave 2 fact,
-visibility, dependency, authoring and adoption gates are unchanged. No Wave 3 work
-is started and no complete B item is marked VERIFIED from this partial increment.

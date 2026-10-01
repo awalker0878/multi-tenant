@@ -2,7 +2,7 @@
   {
     "id": "RAD-M01",
     "path": "docs/current/RAD-adoption.md",
-    "version": "0.12",
+    "version": "0.13",
     "status": "Proposed",
     "owner_role": "Architecture authority",
     "scope": "Reference adoption for enterprise workload mobility and secure hosting across qualified on-premises environments; no site-specific control assessment or production acceptance is implied.",
@@ -74,13 +74,18 @@
         "version": "0.12",
         "date": "2026-09-30",
         "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.13",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
       }
     ]
   },
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.20",
+    "version": "0.21",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -193,13 +198,18 @@
         "version": "0.20",
         "date": "2026-09-30",
         "summary": "Added exact-scope freshness inspection with capture-age/coverage separation, live metadata and authorization rechecks, and explicit remaining monitoring and Wave 2 gates."
+      },
+      {
+        "version": "0.21",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
       }
     ]
   },
   {
     "id": "SOL-M01",
     "path": "docs/current/internal-hosting-solution.md",
-    "version": "0.3",
+    "version": "0.4",
     "status": "Proposed",
     "owner_role": "Hosting solution architect",
     "scope": "A maintained internal two-tenant reference solution for isolated provisioning and application migration; fixture values are not current allocations or service promises.",
@@ -227,13 +237,18 @@
         "version": "0.3",
         "date": "2026-09-28",
         "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
       }
     ]
   },
   {
     "id": "SOL-M02",
     "path": "docs/current/public-hosting-design-profile.md",
-    "version": "0.3",
+    "version": "0.4",
     "status": "Proposed",
     "owner_role": "Security and hosting solution architects",
     "scope": "A proposed public-extension design profile under the same workload mobility authority model; public exposure remains deferred and is not enabled by the internal fixture.",
@@ -260,13 +275,18 @@
         "version": "0.3",
         "date": "2026-09-28",
         "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
       }
     ]
   },
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.19",
+    "version": "0.20",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -373,13 +393,18 @@
         "version": "0.19",
         "date": "2026-09-30",
         "summary": "Added exact-scope freshness inspection with capture-age/coverage separation, live metadata and authorization rechecks, and explicit remaining monitoring and Wave 2 gates."
+      },
+      {
+        "version": "0.20",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.12",
+    "version": "0.13",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -451,6 +476,11 @@
         "version": "0.12",
         "date": "2026-09-30",
         "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.13",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
       }
     ]
   }

@@ -11,6 +11,7 @@ would otherwise have to live in Python.
 Loader: `provisioner/profiles/loader.py`
 Resolver: `provisioner/profiles/resolver.py`
 Validation: `provisioner/profiles/validation.py`
+Typed requirement fields: `provisioner/profiles/requirements.py`
 
 ## Families
 
@@ -70,6 +71,23 @@ declared by anything but the service catalog.
 request. `provisioner/profiles/resolver.py` reads the same catalog fields for the
 one case where the choice is only meaningful at resolution time (a recovery profile
 when `recovery.enabled` is true), so both readers share one source of truth.
+
+## Typed fields and cross-profile obligations
+
+One closed requirement-field owner covers all ten catalog families. Required fields
+must exist; booleans are not numbers and strings/floats are not coerced into quantities.
+Relationship sets are bounded, nonempty and unique. Quantities use representation
+bounds, not assumed native platform maxima; address parameters must fit the selected
+family and placement selectors must have an implemented resolver. Capability property
+constraints retain their separate typed semantic owner.
+
+Standalone and full request validation share assurance-required recovery. Availability
+minimum workload counts must fit the compute profile, and recovery must name a selected
+zone. Independent-site recovery remains explicitly unsupported rather than becoming
+implemented through a renamed catalog entry. Availability catalog 18 corrects security
+zone/failure-domain wording; separate domains, HA admission reserves, restart behavior
+and application recovery still need observed qualification. Catalog changes regenerate
+all dependent example fingerprints and require new review of proposed execution plans.
 
 ## Status vocabulary
 

@@ -1,51 +1,61 @@
-# Current implementation scope and evidence boundary
+# Current implementation scope
 
-The [all-waves execution plan](product/enterprise-workload-mobility-execution-plan.md)
-is the current B01–B50 delivery baseline. Earlier numbered implementation increments,
-W01–W29 and C01–C13 records describe narrower historical scopes; they are not current
-product-completion claims. This record replaces the obsolete Increment 04-only scope.
+Reviewed 1 October 2026 on `implementation/all-waves`, from `9d4c668` through the
+OpenStack/profile corrections. The [B01–B50 execution plan](product/enterprise-workload-mobility-execution-plan.md)
+is the current product backlog. Earlier W/C increment ledgers and dated checkpoints
+are historical scopes, not full-program completion claims.
 
 ## Implemented repository components
 
-The repository includes the authenticated control application/portal/CLI foundation,
-PostgreSQL business state and isolation, approval/admission/outbox primitives,
-Temporal authority gating, scoped workers and native-intent/evidence controls.
-Read-only VMware/AHV/OpenStack discovery components, signed mTLS result publication,
-generation-pinned normalization and destination comparison have repository tests.
+One authenticated control application, portal and CLI use tenant-scoped durable
+records, admission/outbox/approval primitives, bounded workers and native-intent/
+evidence controls. Signed VMware/AHV/OpenStack HTTPS discovery, independently bound
+read credentials, original-result custody, explicit authenticated publication and
+generation-pinned normalization/comparison are implemented repository paths.
 
-Portable planning, reviewed Terraform roots, native lifecycle/readback primitives,
-guest/service handoffs and cross-scope transfer/integrity contracts are present.
-They are not yet a fully composed admitted provisioning or migration workflow.
-`AdmittedMigrationJob` verifies authority and stops at its gate result.
+Installed stage/publish commands and shared-outbox first-capture exclusion exist.
+Revisioned application drafts, attributed assertions, signed assessment-only owner
+decisions, existing-draft browser editing and saved-application comparisons are
+implemented. One-shot process-local batch staging, API/CLI freshness inspection and
+retained on-demand history are implemented. These do not supply complete native
+visibility, fleet scheduling, ownership adoption or execution authorization.
 
-The registry explicitly covers 97 workload capability dimensions for every platform.
-One package-owned vocabulary feeds registry and native qualification validators;
-registry version 2 binds its digest. Compute/storage/recovery/service profiles now
-supply mandatory workload capabilities, preserve every selected limitation and
-reject ambiguous/malformed catalogue input. All platform tuples remain unselected
-and no capability is native-qualified. Unsupported/deferred profiles stay refused.
+Profiles use 97 capability IDs, 28 typed properties, strict requirements for all ten
+families and cross-profile recovery/workload checks. Availability catalog 18 corrects
+security-zone/failure-domain confusion. OpenStack selector 2 retains bounded native
+allocation and storage relationships without extra privileges. All installed tuples
+remain unselected and no native-qualified claim is created. Deferred profiles remain
+refused; changed catalog/snapshot digests require new review.
 
-## Removed obsolete runtime paths
+Portable planning, reviewed native roots, lifecycle/readback/fenced-power primitives,
+guest/service handoffs and cross-scope transfer/integrity contracts exist. They are
+not a complete admitted provisioning/migration workflow. `AdmittedMigrationJob`
+currently verifies authority and stops at its gate result.
 
-The capability-registry and native-qualification script owners were moved into
-`provisioner/qualification/registry.py` and `provisioner/qualification/native.py`.
-All known consumers were migrated and the old files deleted, with retirement and
-installed-package checks. No compatibility wrapper was retained. This is a partial
-B05 closure, not a claim that every top-level owner has been relocated.
+## Removed obsolete paths
 
-## Still unimplemented or unqualified
+Qualification registry/native/provenance and WSD compiler ownership moved into their
+actual packages; retired entry points have no wrappers. The profile correction removes
+a redundant semantic recovery branch, unused constant and parallel field table.
+OpenStack selector 1 is retired rather than forwarded. Other actively imported runtime
+owners remain until their consumers and retained state are migrated and verified.
 
-Complete native collector/profile/credential wiring, persisted dependency review,
-scheduling/estate-scale discovery, admitted native provisioning, all guest/service
-postconditions, independently bound data-transfer workers, source fencing, final
-sync, cutover, post-write recovery and directed whole-VM route breadth remain open.
-HA/DR, native security/failure/recovery campaigns, pilot and operating acceptance
-must be demonstrated for the exact installed scope before release.
+## Open implementation and qualification
+
+B05 packaging/execution-state conversion and Wave 2 remain open. Full native fact/
+visibility coverage, deployed credential custody, owner-facing workflows, verified
+external dependencies, no-change ownership adoption, durable fleet/global budgets,
+periodic monitoring/alerts and estate-scale qualification are not complete.
+Admitted native provisioning, full guest/service postconditions, independently bound
+transfer workers, source fencing, final sync/cutover, post-write recovery, whole-VM
+conversion and directed route breadth remain open. Deployed HA/DR, security, native
+failure/recovery campaigns, retained-state handover, pilot and operating acceptance
+must be demonstrated for the exact final revision and installed scope before release.
 
 ## Verification meaning
 
-Use the current [RAD](current/RAD-adoption.md), [TAD](current/TAD-infrastructure.md),
-[testing guide](TESTING.md) and execution plan together. Repository/unit/protocol
-fixtures, real CI database tests, native qualification and production authorization
-are distinct evidence. No native site, workload, credential or production data was
-contacted or changed by this review. Historical signed evidence remains immutable.
+Use the [RAD](current/RAD-adoption.md), [TAD](current/TAD-infrastructure.md),
+[research review](engineering/platform-capability-review-2026-10-01.md) and
+[testing guide](TESTING.md). Repository tests, protocol fixtures, database integration,
+installed engines, native qualification and production authorization are distinct.
+No native site, workload, credential or production data was contacted by this review.

@@ -79,13 +79,17 @@ Reviewed as catalog revision `1`.
 
 ## Availability
 
-Reviewed as catalog revision `2`.
+Reviewed as catalog revision `18`.
 
 | Profile | Rank | Status | Zones | Version |
 | --- | --- | --- | --- | --- |
 | `single-zone` | 1 | implemented | `OZ` | 1 |
-| `high` | 2 | implemented | `OZ`, `RZ` | 1 |
-| `maximum` | 3 | **deferred** | `OZ`, `RZ`, `PAZ` — only OZ/RZ compositions exist | 1 |
+| `high` | 2 | implemented | `OZ`, `RZ` | 2 |
+| `maximum` | 3 | **deferred** | `OZ`, `RZ`, `PAZ` — only OZ/RZ compositions exist | 2 |
+
+These are security-zone compositions, not independent physical failure domains or
+HA guarantees. Workload counts are enforced against the selected compute profile.
+Native placement, restart capacity and recovery require separate qualification.
 
 ## Recovery
 

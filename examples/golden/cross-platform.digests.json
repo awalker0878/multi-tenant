@@ -1,9 +1,9 @@
 {
   "catalogs": {
-    "digest": "b697e73370ff0d2950a4d3a0c8e2049fe2f219eb492b0d9de37c3176fccaa535",
+    "digest": "2b3fd373334284267951cdde4b3b2b490ee1ba37fda67953e0f14417e276736e",
     "versions": {
       "assurance": "1",
-      "availability": "2",
+      "availability": "18",
       "compute": "16",
       "environment": "4",
       "network": "5",
@@ -29,17 +29,17 @@
           "compiled_files": [
             "tenant-01/wsd-dev-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "16a1ef63e16db3c46e999326f5f2eb2dd8726fae84588ef7dad2079a5d8891b6",
+          "desired_state_digest": "59477c14fe1cc61121b1ceca39fab96017aa4a02612cd3607b17ea1554d735c7",
           "environment_digest": "6495aaca8fc620a5fe3f7f6cd7e8119204288b2c8a3013391ec49a3ee76b7efa",
-          "manifest_digest": "ecf51b3fbcdbf5ee600fb51c272bf4545bfc59d515ace46c7da70058b3f34604",
+          "manifest_digest": "72822b4a3e62a87f97e5559776d1a80261a08e99c15723ea5aeba321967dd6dd",
           "native_contact": false,
           "placement_digest": "f1b79ed66810992179efdcd50cfe916c46fb749fd9ddeceed1768a18c28913af",
-          "plan_digest": "ecf51b3fbcdbf5ee600fb51c272bf4545bfc59d515ace46c7da70058b3f34604",
+          "plan_digest": "72822b4a3e62a87f97e5559776d1a80261a08e99c15723ea5aeba321967dd6dd",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "fd44ad74685975dad8cb9ba9cd5b284a8ee0c4e685ccd25c3b77df4b6e7fe215",
-          "resolution_digest": "9c1d9d6190cb422c187553b5b878c463ac210849e84da91f0e275ef7dfb42865",
+          "resolution_digest": "3727aba3cfc3ac6fc5c456b7c87f2d25e5d3100f6f8bfc9fc3c7cb9b346fa15a",
           "stack_roots": [
             "terraform/stacks/wsd/nutanix/domains"
           ],
@@ -49,17 +49,17 @@
           "compiled_files": [
             "tenant-01/wsd-dev-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "9620fb35f4c98bb0624c556058398e5706fd55bdaf7f4c79091ad81b8d52edc1",
+          "desired_state_digest": "9cc26f530ebb53d06adb3954e91c51964750c43dacfa38cdfd43cc745a95c5c2",
           "environment_digest": "3dc0fbae7674b2ecb242d9e64789bece72813a4fadb4f9fe05e68368eb8c4515",
-          "manifest_digest": "f17e9e2f28bd0f7b19196924451feda657c95c88771ca3acefbc28977d11e1da",
+          "manifest_digest": "e168d355d20689982084fd8b555d407713f95600f668a57673a6a116d2f4239e",
           "native_contact": false,
           "placement_digest": "9198ce86775b615f7c8c0f1f9968f334ca869c3004c9158dea22cf90f004ae07",
-          "plan_digest": "f17e9e2f28bd0f7b19196924451feda657c95c88771ca3acefbc28977d11e1da",
+          "plan_digest": "e168d355d20689982084fd8b555d407713f95600f668a57673a6a116d2f4239e",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "1f044374431f46f0e37df72300be311fb2b54092f8af4110140e29abffedaeb9",
-          "resolution_digest": "9c1d9d6190cb422c187553b5b878c463ac210849e84da91f0e275ef7dfb42865",
+          "resolution_digest": "3727aba3cfc3ac6fc5c456b7c87f2d25e5d3100f6f8bfc9fc3c7cb9b346fa15a",
           "stack_roots": [
             "terraform/stacks/wsd/openstack/domains"
           ],
@@ -69,18 +69,18 @@
           "compiled_files": [
             "tenant-01/wsd-dev-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "50ac2b2346791d7c3a435cf500428bbfc194fcc43b3ba0ee323d88bc619ca40e",
+          "desired_state_digest": "5f819d7f7d7c46bcb26a0052d3172b9e197f3f0c3565a3062d71356b01346b57",
           "environment_digest": "5a9b6b5f167b064156287f71fc87722cc97471d28fb6492ba6ca036f954eabf0",
-          "manifest_digest": "d0609d7ca6cad710643dc4f067631eb4e7a5bc9e16fe96ec684ab4753377f43f",
+          "manifest_digest": "b410dce719eca5d642b29c6e2494c4a30923e6989a6f50e65ec4dcf0e5e5b60c",
           "native_contact": false,
           "placement_digest": "c10c6235ada0af9b61b6ad3db2e4b86aa766bfcd1dd5af637cdbf311c92dca58",
-          "plan_digest": "d0609d7ca6cad710643dc4f067631eb4e7a5bc9e16fe96ec684ab4753377f43f",
+          "plan_digest": "b410dce719eca5d642b29c6e2494c4a30923e6989a6f50e65ec4dcf0e5e5b60c",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE",
             "REALIZATION_INPUT_UNAVAILABLE"
           ],
           "request_digest": "7d77c0b5118b0eb74c44ab09e7a325d93d19f674addd61123d99b2fc923a5c45",
-          "resolution_digest": "9c1d9d6190cb422c187553b5b878c463ac210849e84da91f0e275ef7dfb42865",
+          "resolution_digest": "3727aba3cfc3ac6fc5c456b7c87f2d25e5d3100f6f8bfc9fc3c7cb9b346fa15a",
           "stack_roots": [
             "terraform/stacks/wsd/vmware/domains"
           ],
@@ -146,17 +146,17 @@
           "compiled_files": [
             "tenant-01/wsd-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "048b1c5842b9f97c87aa11f041fa77b227f387f7401de21e455c7c91d9e70d24",
+          "desired_state_digest": "bc481b6c14d38ba02c437380171ebade30ef8f8ad622e83e6911b62b77fc64c4",
           "environment_digest": "b14b13853e6e5c51020c2f82a64f141b3330e036fa19be4d9ac3a4292b610fec",
-          "manifest_digest": "21c6bbe0846e363535775bda5c51931b49705e6a92f98a714b85457887a2d4c8",
+          "manifest_digest": "8684017a2d5aeded38c8b3dfe39406519b62f51a4cb8453d7b1778fb73698f8a",
           "native_contact": false,
           "placement_digest": "1e11aca5f0df92a50963a9d66c1a543f5a9c82797df74704f7bc4c8328ded176",
-          "plan_digest": "21c6bbe0846e363535775bda5c51931b49705e6a92f98a714b85457887a2d4c8",
+          "plan_digest": "8684017a2d5aeded38c8b3dfe39406519b62f51a4cb8453d7b1778fb73698f8a",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "12bd1c3429b9498d8594d558eec059bc76fbea594780b649d07d15b469391e39",
-          "resolution_digest": "6eb4cbf5550ddb63b45d4de15be292865e3190cf5c74fa067ebb234f82f226b6",
+          "resolution_digest": "ff3763bca3958e8c9ef6448d2921429cddc92346b181b03d39105992c9c9218c",
           "stack_roots": [
             "terraform/stacks/wsd/nutanix/domains"
           ],
@@ -166,17 +166,17 @@
           "compiled_files": [
             "tenant-01/wsd-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "cab09888bd80d6cb9f7aebb70ae7b2ba2112b45a3251932f0d73324c334bd192",
+          "desired_state_digest": "335749730b00a11d159a8169e44930b7aed0610a919fdd7c0d66f0fcabc97a5f",
           "environment_digest": "6b0d89a4a5cacbbe0d7d806b1b276cf6f137c811ec235cedea9e25147d240250",
-          "manifest_digest": "cec9785690925fae190dfb01fa8a98045aff76d661f7310ccd0c0c70436c873f",
+          "manifest_digest": "1573633b3a2e56311005186d12e6ea4e2d859cca9688eecf051610f634b7d7de",
           "native_contact": false,
           "placement_digest": "2952a00e894ab87e9bf0d9202ae65d03b7e809b30035f6e1a68542dcfddd75f5",
-          "plan_digest": "cec9785690925fae190dfb01fa8a98045aff76d661f7310ccd0c0c70436c873f",
+          "plan_digest": "1573633b3a2e56311005186d12e6ea4e2d859cca9688eecf051610f634b7d7de",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "f7040d6c414b71c46afb9bc2f53249f2e222be32468649bd7471bb758cfd7a0f",
-          "resolution_digest": "6eb4cbf5550ddb63b45d4de15be292865e3190cf5c74fa067ebb234f82f226b6",
+          "resolution_digest": "ff3763bca3958e8c9ef6448d2921429cddc92346b181b03d39105992c9c9218c",
           "stack_roots": [
             "terraform/stacks/wsd/openstack/domains"
           ],
@@ -186,18 +186,18 @@
           "compiled_files": [
             "tenant-01/wsd-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "c849c6bc9281c85773853ea9e78b76b6eda48e3ee4c79673dfb01ac80f123f2b",
+          "desired_state_digest": "8b8e2b396a898e630244798c08db183deab1527b4636ddc55a88446fad278f9b",
           "environment_digest": "27c8f535ea008ff7a9dfc89b7e6e594a0b93d425379d2f0b3a866daba78e6525",
-          "manifest_digest": "a9550f4b2b163438527a125673858404fd420c8af3196e86932312ff94972a77",
+          "manifest_digest": "9ee51a05c56ba9f4049305652cc79d111e6394b13f47c1449176d33a92604a29",
           "native_contact": false,
           "placement_digest": "c36c94dfbf18a6951749037eb1b0a25dcd3d065f347f402dbbf64184550fb679",
-          "plan_digest": "a9550f4b2b163438527a125673858404fd420c8af3196e86932312ff94972a77",
+          "plan_digest": "9ee51a05c56ba9f4049305652cc79d111e6394b13f47c1449176d33a92604a29",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE",
             "REALIZATION_INPUT_UNAVAILABLE"
           ],
           "request_digest": "492853ab3914573578d3bb7b241233f73dcaad56d4b8c8474a52339b21480ab4",
-          "resolution_digest": "6eb4cbf5550ddb63b45d4de15be292865e3190cf5c74fa067ebb234f82f226b6",
+          "resolution_digest": "ff3763bca3958e8c9ef6448d2921429cddc92346b181b03d39105992c9c9218c",
           "stack_roots": [
             "terraform/stacks/wsd/vmware/domains"
           ],
@@ -263,17 +263,17 @@
           "compiled_files": [
             "tenant-01/wsd-multitier-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "1008aa9cff5b504c7d6119cdf3fa98d4b1aedebced9cd563813ec1efbd08e45d",
+          "desired_state_digest": "9c0d9e580731b4903afb44983866b78bec3d662c9299d4c47c7ef711aefe3542",
           "environment_digest": "7b43c1ff9ba33823d60f036cc68948aaf77e700a6681695b1319111fd2a1064f",
-          "manifest_digest": "dc5882e7cdf8b72dc03229a753c19236ad9b519420fb8d843818684ab8c9ff39",
+          "manifest_digest": "9b60ac750cf3c313a777b8cf7782f6b14b0513b14764588e10a5c6198a27be05",
           "native_contact": false,
           "placement_digest": "a713e1eca0df3fa0311297ebb6a75f70aa182c9c5318adef08e8c7be9bab32e4",
-          "plan_digest": "dc5882e7cdf8b72dc03229a753c19236ad9b519420fb8d843818684ab8c9ff39",
+          "plan_digest": "9b60ac750cf3c313a777b8cf7782f6b14b0513b14764588e10a5c6198a27be05",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "956cfc578f3721ccea2b5e3e16f25610f7c75095ed5b16d971e3ac7e7a7f55ab",
-          "resolution_digest": "aba822b4f789df925e038e3e3bbbdf4fbeeba9c4579a2393ba34bdba704a7f0e",
+          "resolution_digest": "b68475c107691134f93c76e8b4209e75c2ec902fbe14d030ae549effa424dcea",
           "stack_roots": [
             "terraform/stacks/wsd/nutanix/domains"
           ],
@@ -283,17 +283,17 @@
           "compiled_files": [
             "tenant-01/wsd-multitier-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "0877003cdc88e622ab6ea9c779819eaa047290b4e1f8dc51ab894df4a7d829c9",
+          "desired_state_digest": "ed81331b043315223ea74b8acc01f614f38a92ab7b2eb566a23ffb450c65f799",
           "environment_digest": "f6a552d283156ce41fc5fe28f34a8c820b64da0aad2c057164650f628a714840",
-          "manifest_digest": "71bf44174d25c03ce250c630bfb52d4002d52db9cc34ad7547dd4006fd3aa0d1",
+          "manifest_digest": "b1974409ba1b68e9de1c76740f38b321a04bae81e554810d745dead343761669",
           "native_contact": false,
           "placement_digest": "b69b7968a2301645406aa24f62e935b246197713df4fdc4784c473b224140a67",
-          "plan_digest": "71bf44174d25c03ce250c630bfb52d4002d52db9cc34ad7547dd4006fd3aa0d1",
+          "plan_digest": "b1974409ba1b68e9de1c76740f38b321a04bae81e554810d745dead343761669",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "4c15e96cf85011c298dd4b29d0dddf1fade7094d3d4c4a054ee931e9543f4f5e",
-          "resolution_digest": "aba822b4f789df925e038e3e3bbbdf4fbeeba9c4579a2393ba34bdba704a7f0e",
+          "resolution_digest": "b68475c107691134f93c76e8b4209e75c2ec902fbe14d030ae549effa424dcea",
           "stack_roots": [
             "terraform/stacks/wsd/openstack/domains"
           ],
@@ -303,18 +303,18 @@
           "compiled_files": [
             "tenant-01/wsd-multitier-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "36c6393cc0c50253864b455f10ba6bcab8b00671d7c41af872df29a5dc0931a8",
+          "desired_state_digest": "4170ea2d0e7a6cd7326fcd5d5b736fadc0ac2a2f5cc95c3956c2dba1a1125849",
           "environment_digest": "2f8bc0efd7b0c0bd12cbcbbedcf03dd64f56b702e2eb1194bbe8dffc9d131917",
-          "manifest_digest": "b5148ffeefc712aff4b7cea3847122e9ec9e6fcadb1a88cff0811982df29eefb",
+          "manifest_digest": "616c1ddb591453797b7c14ec06b32292d630d7ce921d46f61d1d2b1b5dec2ac6",
           "native_contact": false,
           "placement_digest": "b9fc8e86139dd0efa3d16651ce723e3336bfd7609f838e56d92dec93326b0798",
-          "plan_digest": "b5148ffeefc712aff4b7cea3847122e9ec9e6fcadb1a88cff0811982df29eefb",
+          "plan_digest": "616c1ddb591453797b7c14ec06b32292d630d7ce921d46f61d1d2b1b5dec2ac6",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE",
             "REALIZATION_INPUT_UNAVAILABLE"
           ],
           "request_digest": "4099a39d07affb3998712e6fddd24c84a92dc8db08c4c3bf21755e0c610a7a4b",
-          "resolution_digest": "aba822b4f789df925e038e3e3bbbdf4fbeeba9c4579a2393ba34bdba704a7f0e",
+          "resolution_digest": "b68475c107691134f93c76e8b4209e75c2ec902fbe14d030ae549effa424dcea",
           "stack_roots": [
             "terraform/stacks/wsd/vmware/domains"
           ],
@@ -380,17 +380,17 @@
           "compiled_files": [
             "tenant-01/wsd-recovery-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "71261853065fa137a91b8370d5eacdd3d588bb64328b64c01dce6b2cbd298fad",
+          "desired_state_digest": "92ffa4b49eda6ccc70a5d0316269bef8ba477d82cbfac3414c819d4d4d3259bf",
           "environment_digest": "14166d07692a957c4f41aff5a2041182a985649332455adac0268144b84bd68a",
-          "manifest_digest": "8ed9863e5e4406dff35e2be766952668b818f817162c53ad2d49ebd1b3df1a5a",
+          "manifest_digest": "0379440599cd1998743523ec61e9466628226d10a988a0e3e5a2b02bb29aab0f",
           "native_contact": false,
           "placement_digest": "7911db9b3842a9abbf7dd72a451923c5a9fdef84d75ca067f55f665df3edd63f",
-          "plan_digest": "8ed9863e5e4406dff35e2be766952668b818f817162c53ad2d49ebd1b3df1a5a",
+          "plan_digest": "0379440599cd1998743523ec61e9466628226d10a988a0e3e5a2b02bb29aab0f",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "b0340ebea29ac1f2524300dd5942cd75b953282687065c92e2d0b483855424ea",
-          "resolution_digest": "ed6219fae8103b475f2a40a2da44f540c65e02c3d18364849dc034cbe86f67d8",
+          "resolution_digest": "acbdfb397fd94dbacdfedd262bcfda14de655bd68f780ecb823befbd42152a04",
           "stack_roots": [
             "terraform/stacks/wsd/nutanix/domains"
           ],
@@ -400,17 +400,17 @@
           "compiled_files": [
             "tenant-01/wsd-recovery-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "ea8cf9ecbeb02520c8d72d663056e95bd59ac8320e545e693447fec59ee8ac90",
+          "desired_state_digest": "e6e177e8b5392dce91140aa0cbc474bf4dc81d76ceac7a2b2f30fe46769fd6c7",
           "environment_digest": "1e6e4cee6b5670c5afaddc97e7f7dc9288b67dc696b93232ca823cc03bdf9e39",
-          "manifest_digest": "e47c18a5a96b447edef6e046a3b1be447d025b38d54ec06bea9c0e7538c2b031",
+          "manifest_digest": "071e3a3a3ba8628c9b2c2ac5e4a2059120f4861f793d0a1d7b83913b14c392b8",
           "native_contact": false,
           "placement_digest": "9880df79dcde56ed303498ae4db233f5c566a78cae79d1e4a1e39b4c6ac75cb3",
-          "plan_digest": "e47c18a5a96b447edef6e046a3b1be447d025b38d54ec06bea9c0e7538c2b031",
+          "plan_digest": "071e3a3a3ba8628c9b2c2ac5e4a2059120f4861f793d0a1d7b83913b14c392b8",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "927032b766a46b9fabc4098621a23282699f2e85f1e6e67913bf847da00d876c",
-          "resolution_digest": "ed6219fae8103b475f2a40a2da44f540c65e02c3d18364849dc034cbe86f67d8",
+          "resolution_digest": "acbdfb397fd94dbacdfedd262bcfda14de655bd68f780ecb823befbd42152a04",
           "stack_roots": [
             "terraform/stacks/wsd/openstack/domains"
           ],
@@ -420,18 +420,18 @@
           "compiled_files": [
             "tenant-01/wsd-recovery-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "682aa7e33e072a8227219527747dcd14e3995acb2221b4a6c2e58cf5a63749fd",
+          "desired_state_digest": "337b2ae0e815a61caab97ad7a946e0ac1b397a8d63fad5422ebe611fd87532b9",
           "environment_digest": "c9ad1c751f90ec7d83337b9e7502635c96b0ddb8e4aab4c7cb525ca56e1ab69b",
-          "manifest_digest": "43e393449c1ac51ceaa81c9f01a9d5a94c3936ee710a650ff673c5397e3713f7",
+          "manifest_digest": "913655c81906bc5cd7b46428aff2d8eaa15ec5ae640e5c3689d8e849be4673e6",
           "native_contact": false,
           "placement_digest": "97b967f60849fd90e32d339ea1d7c13674453c0736d4bc81780234093fb1ecea",
-          "plan_digest": "43e393449c1ac51ceaa81c9f01a9d5a94c3936ee710a650ff673c5397e3713f7",
+          "plan_digest": "913655c81906bc5cd7b46428aff2d8eaa15ec5ae640e5c3689d8e849be4673e6",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE",
             "REALIZATION_INPUT_UNAVAILABLE"
           ],
           "request_digest": "052c183bf949166bdafa2513c1ecf408724c6662d77e67151e5f44eff48a2561",
-          "resolution_digest": "ed6219fae8103b475f2a40a2da44f540c65e02c3d18364849dc034cbe86f67d8",
+          "resolution_digest": "acbdfb397fd94dbacdfedd262bcfda14de655bd68f780ecb823befbd42152a04",
           "stack_roots": [
             "terraform/stacks/wsd/vmware/domains"
           ],
@@ -497,17 +497,17 @@
           "compiled_files": [
             "tenant-01/wsd-archive-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "4943113ef5f8bf7545fc0f3a8693b753064887116a33a3becab2cfe67a6e0013",
+          "desired_state_digest": "82a4355dd2bbd76bec8ec2adef582b4561f50b97b6778b62f8287ddc58f34bd7",
           "environment_digest": "738e52b014de52721c745d9f62a06ce3a188e6eefc8409e05e7e56e950c5bac8",
-          "manifest_digest": "be795191b622ded81a8f0814346daca55a648b47697c42bad258fd5b6fcd8d76",
+          "manifest_digest": "4ca6954add8f1cc3bded002595fe4d0190c2f18dd3ac33ea3a7277affe3a9abf",
           "native_contact": false,
           "placement_digest": "a5ee136f7d27cd955deaab2670ffa0a4f70133f5de72e047bdcb9bdc7fa50598",
-          "plan_digest": "be795191b622ded81a8f0814346daca55a648b47697c42bad258fd5b6fcd8d76",
+          "plan_digest": "4ca6954add8f1cc3bded002595fe4d0190c2f18dd3ac33ea3a7277affe3a9abf",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "79beb828c0f724067093d3082f5646e1b2d7801e85cff24caa14afaefa45170f",
-          "resolution_digest": "e915d324f0325959f0f6942e2c2716fbc8a277258a4d88e797bf62c55d2643a2",
+          "resolution_digest": "b42fb285f850fb3b2888616f84786dec35bf3d7a935adfb7549a7389c12dcc8c",
           "stack_roots": [
             "terraform/stacks/wsd/nutanix/domains"
           ],
@@ -517,17 +517,17 @@
           "compiled_files": [
             "tenant-01/wsd-archive-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "f6dd5fdaf80e69eb3849348084ebd07aa9996a009d41f7221a0a879549ac2c9b",
+          "desired_state_digest": "65ae301ef7cb330e8851a1c9f3aee17660976a91884b73663184fbcf13f5f02b",
           "environment_digest": "5761ff79321de87186713cb52b6b108acb7429050593d82526919fe4f23098a2",
-          "manifest_digest": "35256bc626f51ee0d77f696c14695bfc4c99ebbafd12783dfdf4a1968aaa92de",
+          "manifest_digest": "f04c444789cab3f7b910dfce0039e8371e1c5a697e4dfe0ed82fb857f197fb6e",
           "native_contact": false,
           "placement_digest": "b52e0a74802a0495deac81e5c5d2f845bd50189ef50dad64a89ef74944a7aad3",
-          "plan_digest": "35256bc626f51ee0d77f696c14695bfc4c99ebbafd12783dfdf4a1968aaa92de",
+          "plan_digest": "f04c444789cab3f7b910dfce0039e8371e1c5a697e4dfe0ed82fb857f197fb6e",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE"
           ],
           "request_digest": "bad58d4700532887f7f3a51f33f1c06c0842b0fde8cb4307e751485e8dc6729b",
-          "resolution_digest": "e915d324f0325959f0f6942e2c2716fbc8a277258a4d88e797bf62c55d2643a2",
+          "resolution_digest": "b42fb285f850fb3b2888616f84786dec35bf3d7a935adfb7549a7389c12dcc8c",
           "stack_roots": [
             "terraform/stacks/wsd/openstack/domains"
           ],
@@ -537,18 +537,18 @@
           "compiled_files": [
             "tenant-01/wsd-archive-01/domains.tfvars.json"
           ],
-          "desired_state_digest": "1d34391654675abf297eac199e8d8d7d3c2a743c673344e144e1581dc9722aa5",
+          "desired_state_digest": "8a2fe8fc1f03414f485aff2fe51943cb1d2767e1cc6840f7865eaa05887e8828",
           "environment_digest": "a5d888c66e33a3cc72be8e5b1fa1941b35c7473030425d9083dd4f288462508a",
-          "manifest_digest": "8afd2d788b32145a3605a447bdd09b9c0952b230357815415331db9c77b56104",
+          "manifest_digest": "59fa53d95ed68acde64e252e93c1bedf98838c68f31eb4ca326055867443c2f5",
           "native_contact": false,
           "placement_digest": "dd0a897ca210e11ea0a7708b0020fbc6b8a742ecfd7c0c76db1785f643022648",
-          "plan_digest": "8afd2d788b32145a3605a447bdd09b9c0952b230357815415331db9c77b56104",
+          "plan_digest": "59fa53d95ed68acde64e252e93c1bedf98838c68f31eb4ca326055867443c2f5",
           "realization_gaps": [
             "INVENTORY_NOT_AUTHORITATIVE",
             "REALIZATION_INPUT_UNAVAILABLE"
           ],
           "request_digest": "74ad9694cb0cb3749d8d9df690cfc934db5b342f8cfbe6cb1e776311b9783240",
-          "resolution_digest": "e915d324f0325959f0f6942e2c2716fbc8a277258a4d88e797bf62c55d2643a2",
+          "resolution_digest": "b42fb285f850fb3b2888616f84786dec35bf3d7a935adfb7549a7389c12dcc8c",
           "stack_roots": [
             "terraform/stacks/wsd/vmware/domains"
           ],

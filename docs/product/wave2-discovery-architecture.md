@@ -224,7 +224,7 @@ Prism support or production authority.
 
 The [OpenStack HTTPS client](../engineering/openstack-discovery-https.md) implements
 actual project-scoped Nova/Cinder/Neutron collection and quota reads, not login or
-mutation. `openstack-project-https-1` pins compute 2.79, volume 3.60 and network v2.0
+mutation. `openstack-project-https-2` pins compute 2.79, volume 3.60 and network v2.0
 contracts. Its independent signed binding selects project/user, catalog evidence,
 region/interface, all three endpoint/IP/CA records, token digest/validity and revision.
 The native read-only witness must cover each service; a GET-only client does not
