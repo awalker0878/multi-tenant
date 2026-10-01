@@ -85,7 +85,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.21",
+    "version": "0.22",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -203,6 +203,11 @@
         "version": "0.21",
         "date": "2026-10-01",
         "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
+      },
+      {
+        "version": "0.22",
+        "date": "2026-10-01",
+        "summary": "Guided initial browser proposals from pinned stored VM identities, explicit dataset/dependency assertions and first-save uncertainty reconciliation. Existing APIs and authority boundaries retained; saved-membership editing, owner signing and native acceptance remain open."
       }
     ]
   },
@@ -286,7 +291,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.20",
+    "version": "0.21",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -398,6 +403,11 @@
         "version": "0.20",
         "date": "2026-10-01",
         "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
+      },
+      {
+        "version": "0.21",
+        "date": "2026-10-01",
+        "summary": "Guided initial browser proposals from pinned stored VM identities, explicit dataset/dependency assertions and first-save uncertainty reconciliation. Existing APIs and authority boundaries retained; saved-membership editing, owner signing and native acceptance remain open."
       }
     ]
   },

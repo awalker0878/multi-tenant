@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.21 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.22 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -88,7 +88,13 @@ Immutable drafts retain observed VM membership, datasets, assertions and expecte
 revision. Saves use cooperative generation locking and exact retry/content semantics;
 uncertain saves reconcile through reads, not unguarded replay. Separate signed owner
 assessment decisions preserve exact draft/source pins and current reviewer authority.
-CLI and existing-draft browser operations do not approve ownership or migration.
+The existing browser component now creates initial proposals using exact-generation
+VM choices, explicit dataset groups and known/unknown dependency forms. It reuses the
+same API, shared proposal validator and uncertain-save reconciliation owner; first
+writes use expected revision zero and reconcile exact revision-one history. Source
+summaries, names and proposed evidence are not independent acceptance. Saved membership
+and evidence remain read-only in the browser; guided subsequent editing and reviewer
+signing remain open. CLI and browser operations do not approve ownership or migration.
 Application comparison report 2 binds canonical selection, every member profile,
 source/review references, destination pools and method/network/data modes. Mismatched,
 stale, partial or contradictory responses cannot become positive advice.

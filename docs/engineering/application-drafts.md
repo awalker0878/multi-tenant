@@ -41,7 +41,8 @@ An inconsistent request returns 422, a changed revision/source returns 409, and 
 unavailable store or evidence gate holds the operation. Responses are not cacheable.
 The [operator continuation](application-draft-operator.md) now supplies bounded
 listing and CLI save/load; the [browser workspace](application-draft-browser.md)
-edits existing metadata and startup order. Delete and native ownership-acceptance
+creates initial proposals from pinned observed VMs and edits saved metadata/startup
+order. Saved membership/evidence editing still uses the operator/API path. Delete and native ownership-acceptance
 remain unimplemented. Draft-write endpoints cannot accept caller-supplied review records,
 actor identities, native credentials or execution/ownership success flags.
 
@@ -146,10 +147,10 @@ from local runs; these are not native platform qualification campaigns.
 
 The separate signed owner-review path below now persists and evaluates exact-draft
 assessment decisions. B17 remains partial: independently verified external source
-enrichments, owner enrollment/signing integration and application-wide destination
-assessment remain open. Scoped listing, CLI save/load and bounded existing-draft
-browser editing are implemented; full browser creation/member/evidence editing is
-still B20 work. No proposal bypasses later native provisioning, conversion,
+enrichments and owner enrollment/signing integration remain open. Scoped listing,
+CLI save/load, guided initial browser creation and bounded existing-draft metadata
+editing are implemented. Saved-application comparison is a separate assessment path.
+Guided changes to saved membership/evidence and administrator acceptance remain B20 work. No proposal bypasses later native provisioning, conversion,
 fencing, transfer, cutover or recovery gates.
 
 

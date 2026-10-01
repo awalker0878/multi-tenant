@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.13 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.21 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.22 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.4 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.4 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.20 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [ICD-M01](interface-agreements.md) | 0.21 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
 | [TRANS-M01](transition-and-as-built.md) | 0.13 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.21 (Proposed)**; ICD-M01 is **version 0.20 (Proposed)**.
+TAD-M01 is **version 0.22 (Proposed)**; ICD-M01 is **version 0.21 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -41,8 +41,10 @@ qualified by these changes. B05 and Wave 2 remain open.
 [signed owner review](../engineering/application-owner-review.md) and
 [multi-member comparison](../engineering/application-comparison.md) have implemented
 [CLI](../engineering/application-comparison-operator.md) and
-[browser](../engineering/application-comparison-browser.md) paths. These are assessment
-interfaces, not adoption, reservations or migration permission.
+[browser](../engineering/application-comparison-browser.md) paths. The [draft workspace](../engineering/application-draft-browser.md) also creates
+initial proposals from exact stored VM identities with explicit datasets/dependencies
+and revision-one save reconciliation; saved membership/evidence editing remains open.
+These are assessment interfaces, not adoption, reservations or migration permission.
 
 [Batch staging](../engineering/discovery-batch-scheduling.md),
 [freshness inspection](../engineering/discovery-freshness.md),

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.20 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.21 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -80,7 +80,12 @@ a new signed generation and reassessment; retained results are not relabelled.
 Stage/publish commands preserve original bytes and explicit delivery. Cooperating
 processes share first-capture exclusion; incomplete intents stay held after exit.
 Publication retains separate native read and ingest authority. Revisioned draft
-save/load/history and bounded browser editing retain source/revision/content pins;
+save/load/history and browser initial creation/metadata editing retain source/revision/content pins;
+initial creation obtains scope and matching generation from two serial existing GETs,
+then requests identity pages explicitly. Native IDs come only from that pinned source.
+First-save PUTs use expected revision zero; lost acknowledgements use exact revision-one
+GET reconciliation. Proposals remain unreviewed; no signed owner evidence is manufactured.
+Guided updates to saved membership/dependency evidence remain open;
 ambiguous saves reconcile by GET. Attributed assertions are not accepted dependencies.
 Independent signed owner decisions remain assessment-only and exact-draft bound.
 Application report 2 binds every member/profile, canonical selection, source/review,
