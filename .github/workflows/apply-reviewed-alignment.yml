@@ -1,0 +1,163 @@
+name: Apply exact reviewed catalog and documentation tree
+# One-use, fixed-base/fixed-result application; removed by the result commit.
+# The full plaintext diff is identified by PATCH_HASH in the application step.
+on:
+  push:
+    branches: [implementation/all-waves]
+    paths: [.github/workflows/apply-reviewed-alignment.yml]
+permissions: {}
+concurrency:
+  group: exact-reviewed-alignment-all-waves
+  cancel-in-progress: false
+jobs:
+  apply:
+    if: github.repository == 'awalker0878/multi-tenant' && github.ref == 'refs/heads/implementation/all-waves'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: true
+      - name: Verify exact byte identities, commit without hooks, push without force, and remove this workflow
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import base64, hashlib, json, lzma, os, subprocess, urllib.request
+          from pathlib import Path, PurePosixPath
+
+          BASE = "249d75ff760d11d57fc02dd9f6aecef31d217eb6"
+          TREE = "34e5c2e964c28ad3fef4daa89b8f4d6a914b899a"
+          DELTA_HASH = "e8f10d66b9a442d036b4e89cfc3b59e46cec01a157369d78899db7b5b4145e4d"
+          PATCH_HASH = "fcdc9f79c04d795c090d9308910290825ade1052e19282a9f16434abb2a19909"
+          WORKFLOW = ".github/workflows/apply-reviewed-alignment.yml"
+          REF = "refs/heads/implementation/all-waves"
+          ROOT = Path.cwd().resolve()
+
+          def held(message):
+              raise SystemExit("HELD: " + message)
+
+          def git(*args):
+              return subprocess.check_output(["git", *args], text=True).strip()
+
+          head = os.environ["GITHUB_SHA"]
+          if git("rev-parse", "HEAD") != head or git("rev-parse", "HEAD^") != BASE:
+              held("checkout is not the one permitted base successor")
+          if git("diff", "--name-only", "HEAD^", "HEAD").splitlines() != [WORKFLOW]:
+              held("bootstrap commit changed another path")
+          if git("ls-remote", "--heads", "origin", REF).split()[0] != head:
+              held("branch moved; no rebase or force update permitted")
+
+          # Fetch only the exact reviewed compressed Git blob from this repository.
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, request, response, code, message, headers, new_url):
+                  return None
+
+          chunks = [
+              ("9304efeaee37babe7ee6bc835a70ecac2d4ccfbd", 7000),
+              ("373d2569ee214ad5dd34e072f3ad100c7047ca12", 7000),
+              ("efaa5a2f1d06c979afc97f3f92e05797a39edda1", 7000),
+              ("60ba0da713522ae3930f548d4ccd58935e93be67", 4880)]
+          verified = []
+          for blob_sha, size in chunks:
+              url = "https://api.github.com/repos/awalker0878/multi-tenant/git/blobs/" + blob_sha
+              request = urllib.request.Request(url, headers={
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"],
+                  "Accept": "application/vnd.github+json", "Accept-Encoding": "identity",
+                  "X-GitHub-Api-Version": "2022-11-28"})
+              try:
+                  with urllib.request.build_opener(NoRedirect()).open(request, timeout=15) as response:
+                      body = response.read(16385)
+                      if response.status != 200 or len(body) > 16384 or response.headers.get("Content-Encoding", "identity") != "identity":
+                          held("bounded Git blob response failed")
+                  blob = json.loads(body)
+                  if blob.get("sha") != blob_sha or blob.get("encoding") != "base64" or blob.get("size") != size:
+                      held("Git blob identity failed")
+                  chunk = base64.b64decode(blob["content"].replace(chr(10), ""), validate=True)
+              except (OSError, ValueError, KeyError, TypeError):
+                  held("reviewed Git blob unavailable")
+              if len(chunk) != size or hashlib.sha1(b"blob " + str(len(chunk)).encode() + bytes([0]) + chunk).hexdigest() != blob_sha:
+                  held("compressed Git blob content identity failed")
+              verified.append(chunk)
+          compressed = b"".join(verified)
+
+          decoder = lzma.LZMADecompressor(memlimit=134217728)
+          raw = decoder.decompress(compressed, max_length=84192)
+          if (not decoder.eof or decoder.unused_data or len(raw) != 84191
+                  or hashlib.sha256(raw).hexdigest() != DELTA_HASH):
+              held("reviewed byte delta identity failed")
+          document = json.loads(raw)
+          if set(document) != {"format", "files"} or document["format"] != "reviewed-repository-byte-delta/1":
+              held("unexpected reviewed delta format")
+          if not isinstance(document["files"], list) or len(document["files"]) != 34:
+              held("unexpected reviewed file count")
+
+          updates, names = [], set()
+          for row in document["files"]:
+              if not isinstance(row, dict) or set(row) != {"path", "before", "after", "ops"}:
+                  held("unexpected file delta shape")
+              name = row["path"]
+              if not isinstance(name, str):
+                  held("invalid file path")
+              relative = PurePosixPath(name)
+              path = ROOT / relative
+              if (name in names or relative.is_absolute() or str(relative) != name
+                      or ".." in relative.parts or ".git" in relative.parts
+                      or not name.startswith(("docs/", "examples/", "profiles/", "sources/documentation/"))
+                      or path.is_symlink() or not path.resolve().is_relative_to(ROOT)):
+                  held("file outside the reviewed non-executable data scope")
+              names.add(name)
+              if row["before"] is None:
+                  if path.exists():
+                      held("new reviewed file already exists")
+                  before = b""
+              else:
+                  before = path.read_bytes()
+                  if len(before) > 1048576 or hashlib.sha256(before).hexdigest() != row["before"]:
+                      held("original file identity changed")
+              if not isinstance(row["ops"], list) or len(row["ops"]) > 10000:
+                  held("file delta exceeds its operation bound")
+              parts = []
+              for operation in row["ops"]:
+                  if isinstance(operation, str):
+                      parts.append(operation.encode("latin1"))
+                  elif (isinstance(operation, list) and len(operation) == 2
+                        and all(type(value) is int for value in operation)
+                        and 0 <= operation[0] <= operation[1] <= len(before)):
+                      parts.append(before[operation[0]:operation[1]])
+                  else:
+                      held("invalid byte-copy operation")
+              after = b"".join(parts)
+              if len(after) > 1048576 or hashlib.sha256(after).hexdigest() != row["after"]:
+                  held("result file identity failed")
+              updates.append((path, after))
+
+          # All source and result identities are checked before any working-file write.
+          for path, contents in updates:
+              path.write_bytes(contents)
+          subprocess.check_call(["git", "add", "--", *sorted(names)])
+          subprocess.check_call(["git", "rm", "--", WORKFLOW])
+          subprocess.check_call(["git", "diff", "--cached", "--check"])
+          if git("write-tree") != TREE:
+              held("result is not the exact locally reviewed tree")
+          subprocess.check_call([
+              "git", "-c", "core.hooksPath=/dev/null", "-c", "commit.gpgsign=false",
+              "-c", "user.name=github-actions[bot]",
+              "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+              "commit", "-m", "docs(profiles): align catalog semantics and current mobility design",
+              "-m", "Apply the exact reviewed catalog/documentation tree; regenerate disabled golden examples, synchronize maintained design versions, consolidate B01-B50 status and retain original history. Remove this one-use application workflow. No native qualification or production authority is added."])
+          if git("rev-parse", "HEAD^{tree}") != TREE:
+              held("committed tree identity changed")
+          if git("ls-remote", "--heads", "origin", REF).split()[0] != head:
+              held("branch changed before push; no force update permitted")
+          subprocess.check_call(["git", "push", "origin", "HEAD:" + REF])
+          print(json.dumps({"commit": git("rev-parse", "HEAD"), "tree": TREE,
+                            "reviewedPatchSha256": PATCH_HASH,
+                            "temporaryWorkflowRemoved": True, "nativeContact": False}))
+          PYTHON
