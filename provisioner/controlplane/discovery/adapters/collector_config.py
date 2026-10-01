@@ -61,7 +61,7 @@ def _openstack(row, campaign, environment, verifier, clock, key, read_gate):
 _FACTORIES = {
     'nutanix-ahv-v4.0-hardware-2': _ahv,
     'vcenter-rest-vm-info-8.0.3.0-visible-only-2': _vmware,
-    'openstack-project-https-1': _openstack,
+    'openstack-project-https-2': _openstack,
 }
 
 

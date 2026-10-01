@@ -1,6 +1,6 @@
 # Project-scoped OpenStack discovery over bounded HTTPS
 
-Reviewed 29 September 2026. This B10/B16 implementation continues the
+Reviewed 1 October 2026. This B10/B16 implementation continues the
 [existing B01–B50 wave plan](../product/enterprise-workload-mobility-execution-plan.md).
 It connects the existing project collector to actual Nova, Cinder and Neutron
 HTTPS GETs. No installed vendor environment was contacted in development.
@@ -9,7 +9,7 @@ HTTPS GETs. No installed vendor environment was contacted in development.
 
 `provisioner/controlplane/discovery/adapters/openstack_https.py` owns
 `OpenStackHttpsTransport`; `adapters/openstack_credentials.py` owns the signed
-project-token reader. The exact collector identity is `openstack-project-https-1`.
+project-token reader. The exact collector identity is `openstack-project-https-2`.
 A newly admitted matching campaign, independent credential witness and protected
 credential material are required. An arbitrary collector ID is not an alias.
 
@@ -32,6 +32,37 @@ backslashes, dot segments or empty path components. Root validation rejects inpu
 that URL parsing would otherwise silently normalize. The three service URLs,
 endpoint identities, literal IP addresses and exact CA digests are signed; the
 client neither discovers endpoints from Keystone nor follows catalog/response URLs.
+
+## Hardware and storage observation contract
+
+The second collector profile retains Nova's embedded server allocation: `vcpus`
+becomes `vcpuCount`, RAM and swap MiB become bytes, and flavor root/ephemeral GiB
+become explicitly named nominal allocation facts. Numeric coercions, booleans,
+negative values and signed-64-bit byte overflow are rejected. Missing or partial
+flavor fields stay unknown; a legacy flavor ID does not trigger another lookup.
+The existing normalizer consumes canonical CPU/memory facts. A flavor's root size
+is not `diskCapacityBytes`: volume-backed roots, image minimums, ephemeral disks,
+shared volumes and complete attachment coverage must be reconciled separately.
+
+Nova image UUIDs, explicitly volume-backed empty image references, volume UUIDs
+and per-volume `delete_on_termination` booleans are retained. A missing deletion
+flag preserves the relationship but leaves disposition unknown. Cinder detail
+responses retain attachment/server/volume UUIDs and an optional guest device label.
+Missing and explicitly empty sets are distinct; duplicate identities, mismatched
+volume IDs and oversized relationships hold collection. The limits are 64 Nova
+relationships, 32 Cinder relationships and the existing 8,192-byte fact bound.
+Sorted relationship order does not establish boot order or guest disk order.
+
+Only these named fields are retained. Image properties, flavor extra-specs, host
+names, connector credentials, metadata and user data cannot enter qualification
+through this path. No new service, endpoint, privilege or native mutation is added.
+A complete relationship is not proof of writer exclusion, permission to delete,
+a consistency group or a complete migratable disk image.
+
+The first collector selector is retired, not forwarded. Deployments must enroll
+`openstack-project-https-2`, issue a fresh matching campaign/witness/credential
+binding, collect a new signed generation, and reassess its exact digest. Old signed
+results remain immutable history; they are not relabelled or silently enriched.
 
 ## Signed project-token custody
 
@@ -111,14 +142,16 @@ These tests do not qualify a deployed OpenStack environment.
 
 Discovery-page, normalizer 2, profile resolution 3 and policy capsule/realization 2
 formats are unchanged. Changed observations require fresh digest-bound reviews.
-Site composition, original result signing/authenticated publication, persistent
-custody, independent visibility reconciliation, Glance/image discovery, full VM
-hardware/driver/key facts and B17 application/dependency persistence remain open.
+The installed collector command and original signed/authenticated publication are
+implemented; revisioned application drafts and signed owner decisions also exist.
+Unattended site commissioning, durable cross-process custody/scheduling, independent
+visibility reconciliation, Glance metadata, complete hardware/driver/key coverage,
+external dependency verification and full owner workflows remain open.
 No migration, native mutation, execution grant or production qualification is added.
 
 ## Primary references
 
-Consulted 29 September 2026. These sources establish API semantics, not installed
+Consulted 29 September and rechecked 1 October 2026. These sources establish API semantics, not installed
 qualification or enterprise approval:
 
 - [Keystone Identity v3](https://docs.openstack.org/api-ref/identity/v3/) describes
@@ -127,7 +160,9 @@ qualification or enterprise approval:
   describes explicit version selection, response version headers and rejection
   of unavailable versions; the client does not use `latest`.
 - [Nova Compute API](https://docs.openstack.org/api-ref/compute/) defines the
-  server-detail, marker/limit and project quota read operations used here.
+  server-detail, embedded allocation units, image and attachment fields, marker/limit
+  and project quota reads. [Nova microversion history](https://docs.openstack.org/nova/latest/reference/api-microversion-history.html)
+  records embedded allocation details from 2.47; this collector still pins 2.79.
 - [Cinder API v3](https://docs.openstack.org/api-ref/block-storage/v3/) and its
   [microversion history](https://docs.openstack.org/cinder/latest/contributor/api_microversion_history.html)
   distinguish the caller's token project from URL syntax and document the volume

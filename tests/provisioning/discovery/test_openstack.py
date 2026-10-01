@@ -41,11 +41,18 @@ def responses():
     return {
         (ENDPOINTS.compute, 'servers/detail', None): {
             'servers': [{'id': VM1, 'tenant_id': PROJECT, 'name': 'app',
-                         'status': 'ACTIVE'}]},
+                         'status': 'ACTIVE',
+                         'flavor': {'vcpus': 4, 'ram': 8192, 'disk': 20,
+                                    'ephemeral': 0, 'swap': 0},
+                         'image': {'id': VM3},
+                         'os-extended-volumes:volumes_attached': [
+                             {'id': VOLUME, 'delete_on_termination': False}]}]},
         (ENDPOINTS.volume, 'volumes/detail', None): {
             'volumes': [{'id': VOLUME, 'os-vol-tenant-attr:tenant_id': PROJECT,
                          'name': 'data', 'status': 'in-use', 'size': 50,
-                         'encrypted': True, 'multiattach': False, 'volume_type': 'encrypted'}]},
+                         'encrypted': True, 'multiattach': False, 'volume_type': 'encrypted',
+                         'attachments': [{'attachment_id': VM2, 'volume_id': VOLUME,
+                                          'server_id': VM1, 'device': '/dev/vdb'}]}]},
         (ENDPOINTS.network, 'ports', None): {
             'ports': [{'id': PORT, 'project_id': PROJECT,
                        'network_id': VM2, 'device_id': VM1, 'status': 'ACTIVE',
@@ -194,14 +201,15 @@ class OpenStackDiscoveryTests(unittest.TestCase):
 
     def test_native_marker_page_chain_and_link_are_not_followed(self):
         values = responses()
+        complete = values[(ENDPOINTS.compute, 'servers/detail', None)]['servers'][0]
         values[(ENDPOINTS.compute, 'servers/detail', None)] = {
-            'servers': [{'id': VM1, 'tenant_id': PROJECT, 'name': 'a', 'status': 'ACTIVE'},
-                        {'id': VM2, 'tenant_id': PROJECT, 'name': 'b', 'status': 'ACTIVE'}],
+            'servers': [dict(complete, id=VM1, name='a'),
+                        dict(complete, id=VM2, name='b')],
             'servers_links': [{'rel': 'next', 'href':
                 f'{ENDPOINTS.compute}/servers/detail?limit=2&marker={VM2}'}],
         }
         values[(ENDPOINTS.compute, 'servers/detail', VM2)] = {
-            'servers': [{'id': VM3, 'tenant_id': PROJECT, 'name': 'c', 'status': 'ACTIVE'}]}
+            'servers': [dict(complete, id=VM3, name='c')]}
         authority = campaign()
         transport = FakeTransport(values)
         pages = collect_openstack_project(authority, ENDPOINTS, transport)

@@ -201,12 +201,121 @@ def _pairs(row: Mapping[str, object]) -> DiscoveryFact:
     return DiscoveryFact.known(name, sorted(pairs, key=lambda p: (p['ip_address'], p['mac_address'])))
 
 
+
+def _flavor_facts(row: Mapping[str, object]) -> tuple[DiscoveryFact, ...]:
+    """Read Nova >=2.47's embedded allocation, never a mutable flavor lookup.
+
+    Flavor disk sizes are nominal allocations, not observed root/total storage.
+    Missing fields (including partial down-cell responses) stay UNKNOWN.
+    """
+    flavor = row.get('flavor', {})
+    if not isinstance(flavor, Mapping):
+        raise OpenStackDiscoveryHeld('Embedded server flavor has an invalid shape')
+    result = []
+    for key, name, scale, minimum in (
+            ('vcpus', 'vcpuCount', 1, 1),
+            ('ram', 'memorySizeBytes', 1024**2, 1),
+            ('disk', 'flavorRootDiskBytes', 1024**3, 0),
+            ('ephemeral', 'flavorEphemeralDiskBytes', 1024**3, 0),
+            ('swap', 'flavorSwapBytes', 1024**2, 0)):
+        if key not in flavor:
+            result.append(DiscoveryFact.unknown(name, 'NOT_RETURNED'))
+            continue
+        value = flavor[key]
+        if type(value) is not int or not minimum <= value <= (2**63 - 1) // scale:
+            raise OpenStackDiscoveryHeld('Embedded server allocation exceeds its typed bounds')
+        result.append(DiscoveryFact.known(name, value * scale))
+    return tuple(result)
+
+
+def _server_storage_facts(row: Mapping[str, object]) -> tuple[DiscoveryFact, ...]:
+    """Retain observed references, not guessed boot volume or deletion authority."""
+    if 'image' not in row:
+        image = DiscoveryFact.unknown('imageId', 'NOT_RETURNED')
+    elif row['image'] == '':
+        # Nova explicitly returns an empty string for volume-backed boot.
+        image = DiscoveryFact.known('imageId', None)
+    elif isinstance(row['image'], Mapping):
+        image = (DiscoveryFact.known('imageId', _id(row['image']['id'], 'image'))
+                 if 'id' in row['image'] else
+                 DiscoveryFact.unknown('imageId', 'NOT_RETURNED'))
+    else:
+        raise OpenStackDiscoveryHeld('Server image reference has an invalid shape')
+    key = 'os-extended-volumes:volumes_attached'
+    if key not in row:
+        return (image, DiscoveryFact.unknown('attachedVolumeIds', 'NOT_RETURNED'),
+                DiscoveryFact.unknown('volumeDeleteOnTermination', 'NOT_RETURNED'))
+    items = row[key]
+    if not isinstance(items, list) or len(items) > 64:
+        raise OpenStackDiscoveryHeld('Server volume relationships exceed their bounded shape')
+    identities, disposition, missing = set(), [], False
+    for item in items:
+        if not isinstance(item, Mapping):
+            raise OpenStackDiscoveryHeld('Invalid server volume relationship')
+        volume_id = _id(item.get('id'), 'attached volume')
+        if volume_id in identities:
+            raise OpenStackDiscoveryHeld('Duplicate server volume relationship')
+        identities.add(volume_id)
+        if 'delete_on_termination' not in item:
+            missing = True
+        elif type(item['delete_on_termination']) is not bool:
+            raise OpenStackDiscoveryHeld('Volume deletion disposition must be a native boolean')
+        else:
+            disposition.append({'volumeId': volume_id,
+                                'deleteOnTermination': item['delete_on_termination']})
+    return (image, DiscoveryFact.known('attachedVolumeIds', sorted(identities)),
+            DiscoveryFact.unknown('volumeDeleteOnTermination', 'NOT_RETURNED') if missing else
+            DiscoveryFact.known('volumeDeleteOnTermination',
+                                sorted(disposition, key=lambda item: item['volumeId'])))
+
+
+def _volume_attachment_fact(row: Mapping[str, object], volume_id: str) -> DiscoveryFact:
+    """Cinder /volumes/detail relationships; never copy connector secrets.
+
+    IDs are observations in this project, not proof of a complete consistency
+    group, device order, native path authority or exclusion of another writer.
+    """
+    if 'attachments' not in row:
+        return DiscoveryFact.unknown('volumeAttachments', 'NOT_RETURNED')
+    items = row['attachments']
+    if not isinstance(items, list) or len(items) > 32:
+        raise OpenStackDiscoveryHeld('Volume attachments exceed their bounded shape')
+    identities, bindings = set(), []
+    for item in items:
+        if not isinstance(item, Mapping):
+            raise OpenStackDiscoveryHeld('Invalid volume attachment')
+        attachment_id = _id(item.get('attachment_id'), 'attachment')
+        if attachment_id in identities:
+            raise OpenStackDiscoveryHeld('Duplicate volume attachment identity')
+        identities.add(attachment_id)
+        if _id(item.get('volume_id'), 'attachment volume') != volume_id:
+            raise OpenStackDiscoveryHeld('Attachment refers to a different volume')
+        binding = {'attachmentId': attachment_id, 'volumeId': volume_id,
+                   'serverId': _id(item.get('server_id'), 'attachment server')}
+        # The guest device label is neither a host path nor an ordering contract.
+        # Null/missing during attachment transitions is not an invented device.
+        if 'device' in item:
+            device = item['device']
+            if device is not None and (not isinstance(device, str)
+                    or not 1 <= len(device) <= 128
+                    or any(not 32 <= ord(c) <= 126 for c in device)):
+                raise OpenStackDiscoveryHeld('Invalid native guest device label')
+            binding['device'] = device
+        bindings.append(binding)
+    try:
+        return DiscoveryFact.known('volumeAttachments',
+                                   sorted(bindings, key=lambda item: item['attachmentId']))
+    except ValueError as exc:
+        raise OpenStackDiscoveryHeld('Volume attachment fact exceeds the evidence bound') from exc
+
+
+
 def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> DiscoveryObject:
     native_id = _id(row.get('id'), kind)
     if kind == 'vm':
         _project(row, scope.native_scope_id, ('tenant_id', 'project_id'))
         facts = (_fact(row, 'name', 'name', str),
-                 _fact(row, 'status', 'status', str))
+                 _fact(row, 'status', 'status', str)) + _flavor_facts(row) + _server_storage_facts(row)
     elif kind == 'volume':
         _project(row, scope.native_scope_id,
                  ('os-vol-tenant-attr:tenant_id', 'project_id'))
@@ -215,7 +324,8 @@ def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> Discovery
                  _fact(row, 'size', 'size_gib', int),
                  _fact(row, 'encrypted', 'encrypted', bool),
                  _fact(row, 'multiattach', 'multiattach', bool),
-                 _fact(row, 'volume_type', 'volume_type', str, nullable=True))
+                 _fact(row, 'volume_type', 'volume_type', str, nullable=True),
+                 _volume_attachment_fact(row, native_id))
         if 'size' in row and not 0 <= row['size'] <= (2**63 - 1) // 1024**3:
             raise OpenStackDiscoveryHeld('Volume size exceeds the supported byte range')
     else:
