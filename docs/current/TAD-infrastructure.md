@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.23 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.24 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -97,8 +97,16 @@ now explicitly revises saved membership, dataset groups and dependency assertion
 Entry rechecks the exact saved source; an isolated working copy preserves original
 order/precision, and saves require loaded revision N with exact N+1 acknowledgement.
 No rebase or owner-review reuse is permitted. Failed source reads disable editing and
-comparison; uncertain writes reconcile exact history. Reviewer signing, independent
-external evidence and administrator acceptance remain open. CLI and browser operations do not approve ownership or migration.
+comparison; uncertain writes reconcile exact history. An installed offline owner command
+now prepares the existing assessment envelope from a full digest-pinned draft export,
+then signs explicitly confirmed canonical bytes. The existing trust owner checks exact
+root-enrolled owner/scope/key eligibility before signing and verifies the signature
+again before create-only private-file publication. No private key enters the portal or
+operator client. Export checksums do not establish server currency: the existing ingest
+repository independently checks the retained draft, current source and live trust.
+Owner/key provisioning, authenticated delivery, browser review, independent external
+evidence and administrator acceptance remain open. Signing is assessment-only, never
+native ownership or migration approval.
 Application comparison report 2 binds canonical selection, every member profile,
 source/review references, destination pools and method/network/data modes. Mismatched,
 stale, partial or contradictory responses cannot become positive advice.
@@ -156,6 +164,7 @@ Detailed producer/consumer, response, retry and deployment contracts remain at:
 - [operator continuation](../engineering/application-draft-operator.md)
 - [browser workspace](../engineering/application-draft-browser.md)
 - [signed owner-review contract](../engineering/application-owner-review.md)
+- [offline owner preparation/signing contract](../engineering/application-owner-signing.md)
 - [application comparison contract](../engineering/application-comparison.md)
 - [installed application-comparison command](../engineering/application-comparison-operator.md)
 - [saved-application browser](../engineering/application-comparison-browser.md)

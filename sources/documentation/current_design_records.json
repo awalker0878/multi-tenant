@@ -85,7 +85,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.23",
+    "version": "0.24",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -213,6 +213,11 @@
         "version": "0.23",
         "date": "2026-10-01",
         "summary": "Added explicit saved-revision browser membership/data/evidence editing, exact source rechecks, preserved original ordering/precision, N+1 acknowledgement/reconciliation and stale-review invalidation. No rebase, schema change or native authority; independent dependencies, owner signing and acceptance remain open."
+      },
+      {
+        "version": "0.24",
+        "date": "2026-10-01",
+        "summary": "Document installed offline application-owner prepare/sign commands with exact immutable export/digest binding, shared current enrollment verification and create-only private artifact custody. Preserve server ingestion/currency checks and open owner onboarding, authenticated delivery, independent dependency and operating acceptance obligations."
       }
     ]
   },
@@ -296,7 +301,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.22",
+    "version": "0.23",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -418,6 +423,11 @@
         "version": "0.22",
         "date": "2026-10-01",
         "summary": "Added explicit saved-revision browser membership/data/evidence editing, exact source rechecks, preserved original ordering/precision, N+1 acknowledgement/reconciliation and stale-review invalidation. No rebase, schema change or native authority; independent dependencies, owner signing and acceptance remain open."
+      },
+      {
+        "version": "0.23",
+        "date": "2026-10-01",
+        "summary": "Document installed offline application-owner prepare/sign commands with exact immutable export/digest binding, shared current enrollment verification and create-only private artifact custody. Preserve server ingestion/currency checks and open owner onboarding, authenticated delivery, independent dependency and operating acceptance obligations."
       }
     ]
   },

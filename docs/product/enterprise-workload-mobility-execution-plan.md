@@ -5,6 +5,7 @@
 `b993470` and `249d75f`, catalog/design alignment and the subsequent guided
 initial application-draft creation continuation from `d663821ae9b594bd6b035755a0113218169ff40b`
 and saved-revision authoring continuation from `a83c4aa5f328a598012fbc822dad48201a0a446b`.
+The owner preparation/signing continuation starts at `1db0e51fa7a0ed8a974268c9d5202dd13fea7b40`.
 **Historical baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`.
 **Status:** substantial Wave 0/1 foundations; B05 remains open, Wave 2 is partial,
 and Waves 3–6 are not complete. No native qualification or operating acceptance added.
@@ -29,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 | Packaging (B05) | Package-owned resources, WSD compiler and qualification registry/native/provenance owners; retired entry points deleted without aliases. | Other real runtime imports, installed execution ownership and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 2 retains allocation and attachment facts. | Full hardware/driver/key/Glance/service facts, deployed custody, independent visibility and native profile qualification. |
-| B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing. | Independent dependencies, owner-facing signing and complete administrator acceptance. |
+| B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, and installed offline owner preparation/signing. | Independent dependencies, deployed owner/key onboarding, authenticated signed-artifact delivery, browser review and complete administrator acceptance. |
 | B21/B22 | Adoption proposal model; one-shot process-local batch limits, shared-outbox first-capture claims, scoped freshness CLI/API and retained on-demand history. | Actual ownership transfer, durable fleet/global budgets, periodic monitoring/alerts, resumability and measured estate qualification. |
 | B23–B43 | Portable planning, native lifecycle/readback/fenced-power primitives, guest/service handoffs, transfer/integrity/consistency contracts and compatibility checks. | Native reserve/prepare/plan/approval/apply/observe/power/guest/service/activate chain; trusted transfer-worker/target-root bindings; source fencing, final sync/cutover, post-write recovery and route execution. |
 | B44–B50 | Existing recovery/security/evidence foundations and defined release obligations. | Deployed HA/DR, alert delivery, final qualification, retained-state conversion, pilot and operating release. |
@@ -47,7 +48,7 @@ one writer, immutable approval, uncertainty holds and independent postconditions
 Delete competing/obsolete entry points only after verified consumer/state migration;
 these safety controls are not shims.
 
-### Guided draft creation and saved-revision editing — B17/B20 continuation
+### Guided drafts and owner preparation/signing — B17/B20 continuation
 
 The existing portal now pins an authorized stored generation, pages VM identities
 explicitly, collects proposed members/dataset groups/known or unknown dependencies,
@@ -64,8 +65,17 @@ structural and metadata editing; historical/superseded/unresolved records remain
 
 The [current browser contract](../engineering/application-draft-browser.md) records
 bounds, remaining independent-evidence/review obligations and synthetic verification.
-Initial authoring is not independently verified dependency evidence, owner signing,
-installed-platform qualification or operational acceptance. B05 and Wave 2 remain
+The [installed owner command](../engineering/application-owner-signing.md) now prepares
+an exact-record-bound decision, requires explicit confirmation of its digest and signs
+under the existing root-enrolled owner role. Canonical input/output, private create-only
+files and pre/post-sign live trust checks are implemented. The shared retained-record
+parser and enrollment selector avoid a second representation or approval authority.
+Signing performs no database/network action: a valid signature is not ingested evidence,
+current inventory, accepted dependencies or native permission. Existing ingest rechecks
+actual retained content, currency, roles, evidence revision and original signatures.
+
+Independent dependency verification, actual owner/key onboarding, authenticated artifact
+delivery, browser review and administrator acceptance remain open. B05 and Wave 2 remain
 open; this continuation does not start or close the native provisioning/migration waves.
 
 ## 2. Corrected dependencies and delivery order
@@ -125,10 +135,10 @@ Wave 1's existing repository boundary is verified in PR #52. Later native workfl
 | B14 | Partial signed native path | Complete remaining VMware hardware/policy/visibility coverage over the implemented signed HTTPS collector and publication; preserve exact folder/native identities and original generations. | Reconcile with independent enumeration; qualify folder/privilege coverage and visible-list limits. |
 | B15 | Partial signed native path | Complete AHV hardware/network/capacity facts over the implemented pinned VMM read and authenticated publication; retain typed boot/device evidence. | Qualify installed API/profile, paging/count semantics and least-privilege coverage. |
 | B16 | Partial signed native path | Complete Glance/guest/boot/key/driver and independent coverage over implemented exact-project Nova/Cinder/Neutron/quota reads, allocation and attachment facts. | Qualify actual catalog endpoints, versions, read roles and service visibility. |
-| B17 | Persisted drafts and signed assessment decisions | Finish independent enrichment/dependency verification and owner-facing signing/review workflows; exact observed membership and consistency decisions remain revision-bound. | Application owner confirms dependencies and useful-service acceptance criteria. |
+| B17 | Persisted drafts, signed assessment decisions and offline owner signer | Finish independent enrichment/dependency verification, deployed owner/key onboarding, authenticated artifact delivery and review workflows; exact observed membership and consistency decisions remain revision-bound. | Application owner confirms dependencies and useful-service acceptance criteria. |
 | B18 | Durable signed tuple/route/control inputs | Complete deployed qualification import, expiry/supersession/revocation and release-ledger integration without converting operator assertions into evidence. | Source-exit and destination-operation campaigns independently qualify advertised scope. |
 | B19 | Persisted generation-pinned comparison | Complete coverage and acceptance for single-VM and reviewed multi-member comparisons, exact pool/profile bindings and explicit reasons/remediation. | Reviewed policy, security, recovery and target-capacity evidence for positive candidates. |
-| B20 | Initial and saved-revision browser authoring and application comparison | Finish owner-facing signing, independent dependency verification and complete administrator acceptance; preserve stale-response and uncertain-save defenses. | Sysadmins complete comparison without hand-authoring JSON. |
+| B20 | Initial and saved-revision browser authoring and application comparison | Finish enterprise owner/review integration, authenticated signed-artifact delivery, independent dependency verification and complete administrator acceptance; preserve stale-response and uncertain-save defenses. | Sysadmins complete comparison without hand-authoring JSON. |
 | B21 | Partial proposal model | Persist no-change import proposals, ownership collisions, review state and links to exact observations; execution stays separately approved. | Native no-change/state reconciliation before ownership transfer. |
 | B22 | Bounded batch, custody claims and freshness/history | Complete durable fleet/global endpoint budgets, resumable estate work, periodic monitoring/alerts and measured benchmark beyond existing one-shot/process-local/on-demand paths. | Independent omission/privilege-loss reconciliation and agreed estate-scale measurements. |
 

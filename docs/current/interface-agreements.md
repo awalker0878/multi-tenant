@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.22 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.23 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -93,6 +93,16 @@ rebase. Source-read/page failure holds metadata editing and comparison too; dirt
 historical, superseded and unknown-save records cannot reopen editing. No earlier
 owner review is copied into the changed record. Ambiguous saves reconcile by GET. Attributed assertions are not accepted dependencies.
 Independent signed owner decisions remain assessment-only and exact-draft bound.
+`hosting-application-review` is a separate installed owner-workstation command, not
+an operator/API signing privilege. It consumes a full immutable draft export, explicit
+record digest and prepared-evidence confirmation. One shared enrollment selector serves
+both pre-sign authorization and original signature verification. The unchanged signed
+assessment envelope and its signature travel as `evidence`/`signatures` to the existing
+custodian; the command performs no ingestion, enrollment or network call. Source/draft
+currency and evidence-stream concurrency remain server checks, not export claims.
+Private create-only POSIX output is never overwritten; an error may leave output and
+requires byte reconciliation, not another signature or automatic submission. Deployed
+owner onboarding, artifact delivery and policy revision-floor custody remain open.
 Application report 2 binds every member/profile, canonical selection, source/review,
 destination and method/network/data settings. CLI/browser reject mismatched or stale
 reports and clear advice after changed selections or identity. No comparison reserves
@@ -136,6 +146,7 @@ Detailed producer/consumer, response, retry and deployment contracts remain at:
 - [operator continuation](../engineering/application-draft-operator.md)
 - [browser workspace](../engineering/application-draft-browser.md)
 - [signed owner-review contract](../engineering/application-owner-review.md)
+- [offline owner preparation/signing contract](../engineering/application-owner-signing.md)
 - [application comparison contract](../engineering/application-comparison.md)
 - [AHV HTTPS contract](../engineering/ahv-discovery-https.md)
 - [installed application-comparison command](../engineering/application-comparison-operator.md)

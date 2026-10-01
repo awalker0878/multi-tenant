@@ -1,6 +1,6 @@
 # Signed application-owner decisions for assessment
 
-Reviewed 30 September 2026. This B17/B20 increment follows the
+Reviewed 1 October 2026. This B17/B20 increment follows the
 [existing wave plan](../product/enterprise-workload-mobility-execution-plan.md).
 It connects independently signed owner decisions to retained application drafts
 and a scoped read endpoint. It does not transfer native ownership, authorize
@@ -106,8 +106,10 @@ This increment consumes owner decisions through the existing application-candida
 validator. The separate [application comparison service](application-comparison.md) now
 uses this review for bounded all-member comparison and combined baseline demand.
 Neither endpoint is an application-wide migration planner. The operator CLI inspects
-owner-review status as described below. Browser review
-presentation and an enterprise signing/approval experience remain future integrations.
+owner-review status as described below. The separate
+[installed offline owner command](application-owner-signing.md) now prepares and signs
+decisions outside the API/operator identity. Browser review presentation, actual
+owner/key onboarding and authenticated signed-artifact delivery remain integrations.
 
 ## Inspect the review from the operator CLI
 
@@ -187,7 +189,9 @@ Installed distributions include the actual owners and migration. Local database
 skips and final-revision CI results must be reported separately.
 
 B17/B20 remain partial: verified external dependency evidence, actual owner/key
-onboarding, full application migration planning, browser review presentation and owner-facing
-signing workflows remain open. CLI status inspection is implemented, not decision issuance. The existing B22 scheduling, visibility reconciliation, native
+onboarding, authenticated signed-artifact delivery, full application migration planning,
+browser review presentation and administrator acceptance remain open. The operator CLI
+only inspects status; the separate offline owner command signs existing envelopes but
+does not ingest them or issue native authority. The existing B22 scheduling, visibility reconciliation, native
 fact, provisioning, transfer, fencing, cutover, recovery and qualification work
 is unchanged. No native environment, workload or production dataset was contacted.
