@@ -116,7 +116,8 @@ test('one live list page uses same-origin redirect-rejecting bounded read settin
 });
 test('list pagination is explicit and encodes cursor once',async()=>{
   let n=0;const item=summary();item.applicationGroupId='app:a';
-  const h=harness(()=>response(n++?page([]):page([item],'app:a')));
+  const rows=Array.from({length:49},(_,i)=>({...summary(),applicationGroupId:'app:'+String(i).padStart(3,'0')}));
+  const h=harness(()=>response(n++?page([]):page([...rows,item],'app:a')));
   await h.client.list();assert.equal(h.calls.length,1);await h.client.list(true);
   assert.match(h.calls[1][0],/&after=app%3Aa$/);assert.equal(h.calls.length,2);assert.equal(h.$('next').hidden,true);
 });

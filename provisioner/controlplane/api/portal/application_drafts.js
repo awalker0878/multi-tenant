@@ -1,6 +1,6 @@
 'use strict';
 
-// An API client for existing UNREVIEWED drafts, never an owner-review authority.
+// An API client for creating and editing UNREVIEWED drafts, never an owner-review authority.
 const ApplicationDraftWorkspace = (() => {
   const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
   const SHA = /^[0-9a-f]{64}$/;
@@ -12,6 +12,7 @@ const ApplicationDraftWorkspace = (() => {
     'proposal', 'status', 'latestGeneration', 'sourceSuperseded', 'ownershipAccepted', 'executionAuthorized'];
   const SUMMARY = RECORD.filter((key) => key !== 'proposal').concat(
     ['name', 'ownerId', 'memberCount', 'datasetCount', 'dependencyCount', 'unknownDependencyCount']);
+  const validSha = (v) => typeof v === 'string' && SHA.test(v);
   const validId = (v) => typeof v === 'string' && ID.test(v);
   const integer = (v, min = 1) => Number.isSafeInteger(v) && v >= min;
   const plain = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -21,8 +22,10 @@ const ApplicationDraftWorkspace = (() => {
   const canonical = (v) => JSON.stringify(v, function (_, item) {
     return plain(item) ? Object.fromEntries(Object.keys(item).sort().map((key) => [key, item[key]])) : item;
   });
-  const scopeValid = (v) => keys(v, SCOPE) && SCOPE.every((key) => validId(v[key])) &&
-    ['vmware', 'nutanix', 'openstack'].includes(v.platform_family);
+  const nativeText = (v) => typeof v === 'string' && v.length <= 512 && v.trim().length > 0 &&
+    !/[\u0000-\u001f\u007f]/.test(v);
+  const scopeValid = (v) => keys(v, SCOPE) && SCOPE.filter((key) => key !== 'native_scope_id').every((key) => validId(v[key])) &&
+    nativeText(v.native_scope_id) && ['vmware', 'nutanix', 'openstack'].includes(v.platform_family);
   const text = (v, max = 256) => typeof v === 'string' && v.length > 0 &&
     v.length <= max && v === v.trim() && !/[\u0000-\u001f\u007f]/.test(v);
 
@@ -90,29 +93,34 @@ const ApplicationDraftWorkspace = (() => {
         !scopeValid(record.scope) || scope && canonical(record.scope) !== canonical(scope) ||
         !integer(record.revision) || revision !== null && record.revision !== revision ||
         !integer(record.generation) || !integer(record.latestGeneration) ||
-        record.latestGeneration < record.generation || !SHA.test(record.resultDigest) ||
-        !SHA.test(record.proposalDigest) || !SHA.test(record.recordDigest) ||
+        record.latestGeneration < record.generation || !validSha(record.resultDigest) ||
+        !validSha(record.proposalDigest) || !validSha(record.recordDigest) ||
         !text(record.recordedBy, 512) || !text(record.recordedAt, 64) ||
         !Number.isFinite(Date.parse(record.recordedAt)) || record.status !== 'UNREVIEWED' ||
         record.ownershipAccepted !== false || record.executionAuthorized !== false ||
         record.sourceSuperseded !== (record.generation !== record.latestGeneration) ||
         !keys(proposal, ['format', 'discoveryDigest', 'scope', 'draft', 'dependencies']) ||
         proposal.format !== 'hosting-application-group-candidate/1' ||
-        proposal.discoveryDigest !== record.resultDigest || canonical(proposal.scope) !== canonical(record.scope) ||
-        !keys(draft, ['applicationGroupId', 'name', 'ownerId', 'members', 'datasetIds', 'consistencyGroups', 'startupOrder']) ||
+        proposal.discoveryDigest !== record.resultDigest || canonical(proposal.scope) !== canonical(record.scope)) throw new Error('Invalid draft response.');
+    validateProposal(draft, proposal.dependencies, record.scope, groupId);
+    return copy(record);
+  }
+
+  function validateProposal(draft, dependencies, scope, groupId) {
+    if (!scopeValid(scope) || !validId(groupId) || !keys(draft, ['applicationGroupId', 'name', 'ownerId', 'members', 'datasetIds', 'consistencyGroups', 'startupOrder']) ||
         draft.applicationGroupId !== groupId || !text(draft.name) || !validId(draft.ownerId) ||
         !Array.isArray(draft.members) || draft.members.length < 2 || draft.members.length > 100 ||
         !Array.isArray(draft.datasetIds) || !draft.datasetIds.length || draft.datasetIds.length > 1000 ||
         !draft.datasetIds.every(validId) || new Set(draft.datasetIds).size !== draft.datasetIds.length ||
         !Array.isArray(draft.consistencyGroups) || !draft.consistencyGroups.length || draft.consistencyGroups.length > 100 ||
-        !Array.isArray(proposal.dependencies) || proposal.dependencies.length > 500) throw new Error('Invalid draft response.');
+        !Array.isArray(dependencies) || dependencies.length > 500) throw new Error('Invalid application proposal.');
     const memberIds = new Set(), nativeIds = new Set(), groups = new Set(), datasets = [];
     for (const member of draft.members) {
       if (!keys(member, ['workloadId', 'nativeVm']) || !validId(member.workloadId) ||
           memberIds.has(member.workloadId) || !Array.isArray(member.nativeVm) || member.nativeVm.length !== 5 ||
-          canonical(member.nativeVm.slice(0, 4)) !== canonical([record.scope.endpoint_id,
-            record.scope.native_scope_id, record.scope.platform_family, 'vm']) ||
-          !text(member.nativeVm[4], 512) || nativeIds.has(member.nativeVm[4])) throw new Error('Invalid member binding.');
+          canonical(member.nativeVm.slice(0, 4)) !== canonical([scope.endpoint_id,
+            scope.native_scope_id, scope.platform_family, 'vm']) ||
+          !nativeText(member.nativeVm[4]) || nativeIds.has(member.nativeVm[4])) throw new Error('Invalid member binding.');
       memberIds.add(member.workloadId); nativeIds.add(member.nativeVm[4]);
     }
     for (const group of draft.consistencyGroups) {
@@ -123,8 +131,15 @@ const ApplicationDraftWorkspace = (() => {
     }
     if (new Set(datasets).size !== datasets.length || canonical([...datasets].sort()) !==
         canonical([...draft.datasetIds].sort())) throw new Error('Invalid dataset coverage.');
+    validateDependencies(dependencies, memberIds);
+    validateOrder(draft.startupOrder, draft.members, dependencies);
+    return copy({draft, dependencies});
+  }
+
+  function validateDependencies(dependencies, memberIds) {
+    if (!Array.isArray(dependencies) || dependencies.length > 500) throw new Error('Dependency assertion limit exceeded.');
     const assertionIds = new Set();
-    for (const edge of proposal.dependencies) {
+    for (const edge of dependencies) {
       if (!keys(edge, ['assertionId', 'sourceWorkloadId', 'targetWorkloadId', 'relation', 'state',
           'source', 'sourceReference', 'observedAt', 'unknownReason']) || !validId(edge.assertionId) ||
           assertionIds.has(edge.assertionId) || !memberIds.has(edge.sourceWorkloadId) ||
@@ -140,8 +155,6 @@ const ApplicationDraftWorkspace = (() => {
       }
       assertionIds.add(edge.assertionId);
     }
-    validateOrder(draft.startupOrder, draft.members, proposal.dependencies);
-    return copy(record);
   }
 
   function validateOrder(order, members, dependencies) {
@@ -152,6 +165,32 @@ const ApplicationDraftWorkspace = (() => {
           order.indexOf(edge.targetWorkloadId) >= order.indexOf(edge.sourceWorkloadId))) {
       throw new Error('Startup order must include every member once and respect known dependencies.');
     }
+  }
+
+  function validateList(page, env, after = null, scope = null, limit = 50) {
+    if (!keys(page, ['format', 'environmentId', 'scope', 'latestGeneration', 'consistency', 'items', 'nextAfter', 'executionAuthorized']) || page.format !== 'hosting-application-draft-list/1' ||
+        page.environmentId !== env || !scopeValid(page.scope) || scope && canonical(page.scope) !== canonical(scope) ||
+        page.consistency !== 'LIVE_PAGE' || page.executionAuthorized !== false ||
+        !(page.latestGeneration === null || integer(page.latestGeneration)) ||
+        !Array.isArray(page.items) || page.items.length > limit ||
+        !(page.nextAfter === null || validId(page.nextAfter))) throw new Error('Invalid draft listing.');
+    let previous = after;
+    for (const item of page.items) {
+      if (!keys(item, SUMMARY) || item.format !== 'hosting-application-draft-revision/1' ||
+          item.environmentId !== env || canonical(item.scope) !== canonical(page.scope) || item.latestGeneration !== page.latestGeneration ||
+          !text(item.recordedBy, 512) || !text(item.recordedAt, 64) || !Number.isFinite(Date.parse(item.recordedAt)) ||
+          !integer(item.memberCount, 2) || item.memberCount > 100 || !integer(item.datasetCount) || item.datasetCount > 1000 ||
+          !integer(item.dependencyCount, 0) || item.dependencyCount > 500 || !integer(item.unknownDependencyCount, 0) ||
+          item.unknownDependencyCount > item.dependencyCount || !validId(item.applicationGroupId) || previous !== null && item.applicationGroupId <= previous ||
+          item.status !== 'UNREVIEWED' || item.ownershipAccepted !== false || item.executionAuthorized !== false ||
+          !integer(item.revision) || !integer(item.generation) || !text(item.name) || !validId(item.ownerId) ||
+          !validSha(item.resultDigest) || !validSha(item.proposalDigest) || !validSha(item.recordDigest) ||
+          Object.hasOwn(item, 'proposal') || !integer(page.latestGeneration) || item.generation > page.latestGeneration ||
+          item.sourceSuperseded !== (item.generation !== page.latestGeneration)) throw new Error('Invalid draft summary.');
+      previous = item.applicationGroupId;
+    }
+    if (page.nextAfter !== null && (page.items.length !== limit || page.nextAfter !== previous || page.nextAfter === after)) throw new Error('Invalid continuation.');
+    return copy(page);
   }
 
   function editedRequest(record, name, owner, orderText) {
@@ -166,11 +205,86 @@ const ApplicationDraftWorkspace = (() => {
     return body;
   }
 
+  const KINDS = ['vm', 'disk', 'nic', 'volume', 'image', 'network', 'pool', 'cluster', 'host', 'datastore', 'quota'];
+  const MAX_PAGES = 200;
+
+  function utcInput(value) {
+    const match = typeof value === 'string' && /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d{1,6}))?(?:Z|\+00:00)$/.exec(value);
+    if (!match || Number(value.slice(0, 4)) < 1) throw new Error('Enter a UTC timestamp including seconds and Z or +00:00.');
+    const date = new Date(match[1] + 'Z');
+    if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 19) !== match[1]) throw new Error('Invalid UTC calendar time.');
+    const fraction = (match[2] || '').padEnd(6, '0');
+    return match[1] + (fraction === '000000' ? '' : '.' + fraction) + '+00:00';
+  }
+
+  function validateGeneration(page, env, generation) {
+    if (!keys(page, ['environmentId', 'generation', 'campaignId', 'resultDigest', 'capturedAt',
+        'completeness', 'objectCount', 'collectionErrorCount', 'missingPrivilegeCount']) ||
+        page.environmentId !== env || page.generation !== generation || !integer(page.generation) ||
+        !validId(page.campaignId) || !validSha(page.resultDigest) ||
+        !['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(page.completeness) ||
+        !['objectCount', 'collectionErrorCount', 'missingPrivilegeCount'].every((key) => integer(page[key], 0)) ||
+        page.completeness === 'COMPLETE' && (page.collectionErrorCount || page.missingPrivilegeCount)) {
+      throw new Error('Source observation changed or is invalid.');
+    }
+    utcInput(page.capturedAt);
+    return copy(page);
+  }
+
+  function objectCursor(item) {
+    // This is the control API's identity cursor, not a native API URL or cursor.
+    const bytes = new TextEncoder().encode(JSON.stringify([item.resourceKind, item.nativeId]));
+    return btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+  }
+
+  function validateObjectPage(page, source, seen, after, count) {
+    if (!keys(page, ['environmentId', 'generation', 'items', 'nextAfter']) ||
+        page.environmentId !== source.environmentId || page.generation !== source.generation ||
+        !Array.isArray(page.items) || page.items.length > 50 ||
+        count + page.items.length > source.objectCount) throw new Error('Observation page changed.');
+    const pageKeys = new Set();
+    for (const item of page.items) {
+      const key = canonical([item?.resourceKind, item?.nativeId]);
+      if (!keys(item, ['resourceKind', 'nativeId', 'displayName', 'unknownCount', 'objectDigest']) ||
+          !KINDS.includes(item.resourceKind) || !nativeText(item.nativeId) ||
+          !(item.displayName === null || typeof item.displayName === 'string' && item.displayName.length <= 256 &&
+            !/[\u0000-\u001f\u007f]/.test(item.displayName)) ||
+          !integer(item.unknownCount, 0) || !validSha(item.objectDigest) || seen.has(key) || pageKeys.has(key)) {
+        throw new Error('Invalid or repeated observation identity.');
+      }
+      pageKeys.add(key);
+    }
+    if (page.nextAfter !== null && (page.items.length !== 50 ||
+        page.nextAfter !== objectCursor(page.items.at(-1)) || page.nextAfter === after ||
+        count + page.items.length >= source.objectCount)) throw new Error('Invalid identity continuation.');
+    if (page.nextAfter === null && count + page.items.length !== source.objectCount) throw new Error('Stored object count differs.');
+    return copy(page);
+  }
+
+  function creationRequest(source, groupId, name, owner, members, groups, dependencies, orderText) {
+    if (!source || !validId(source.environmentId) || !scopeValid(source.scope) || !integer(source.generation) ||
+        !validSha(source.resultDigest) || !validId(groupId) || typeof orderText !== 'string' || orderText.length > 12900 ||
+        !Array.isArray(members) || members.length > 100 || !Array.isArray(groups) || groups.length > 100 ||
+        groups.some((group) => !keys(group, ['groupId', 'datasetIds']) || !Array.isArray(group.datasetIds) || group.datasetIds.length > 1000)) throw new Error('A pinned source and application ID are required.');
+    const draft = {applicationGroupId: groupId, name, ownerId: owner, members: copy(members),
+      datasetIds: groups.flatMap((group) => group.datasetIds), consistencyGroups: copy(groups),
+      startupOrder: orderText.trim().split(/\s+/)};
+    const content = validateProposal(draft, dependencies, source.scope, groupId);
+    const body = {generation: source.generation, resultDigest: source.resultDigest, expectedRevision: 0, ...content};
+    if (new TextEncoder().encode(JSON.stringify(body)).length > MAX_REQUEST) throw new Error('Proposal exceeds the request limit.');
+    return body;
+  }
+
   function mount({document, session, fetch, window, rejectSession = () => {}, timeoutMs = 15000, onSelection = () => {}}) {
     const $ = (id) => document.getElementById('draft-' + id);
     let epoch = 0, busy = false, loaded = null, historical = false, dirty = false;
     let unknown = null, cursor = null, selectedEnvironment = null, pageScope = null, controller = null;
     let lastSelection = null;
+    let creation = null, members = [], groups = [], dependencies = [];
+    let objectAfter = null, objectDone = false, objectCount = 0, objectPages = 0, objectHeld = false;
+    let seenObjects = new Set(), visibleObjects = [], memberInputs = [], rowControls = [];
+    const authoringFields = ['data-group', 'data-ids', 'edge-id', 'edge-from', 'edge-to', 'edge-relation',
+      'edge-state', 'edge-reason', 'edge-source', 'edge-reference', 'edge-time'];
     const selection = () => loaded && !busy && !historical && !dirty && !unknown &&
       !loaded.sourceSuperseded ? copy(loaded) : null;
     const status = (message) => { $('status').textContent = message; };
@@ -183,18 +297,33 @@ const ApplicationDraftWorkspace = (() => {
     function controls() {
       for (const id of ['environment', 'group', 'revision', 'list', 'load', 'next']) $(id).disabled = busy || dirty || !!unknown;
       $('next').hidden = cursor === null;
-      for (const id of ['name', 'owner', 'order']) $(id).disabled = busy || !loaded || historical || loaded.sourceSuperseded || !!unknown;
-      const canSave = !busy && loaded && !historical && !loaded.sourceSuperseded && dirty && !unknown;
+      for (const id of ['name', 'owner', 'order']) $(id).disabled = busy || !(loaded || creation) || historical || !!loaded?.sourceSuperseded || !!unknown;
+      const canSave = !busy && (loaded || creation && !objectHeld) && !historical && !loaded?.sourceSuperseded && dirty && !unknown;
       $('save').disabled = !canSave || !$('confirm').checked;
-      $('discard').disabled = busy || !loaded && !unknown;
+      $('discard').disabled = busy || !(loaded || creation || unknown);
+      $('start').disabled = busy || dirty || !!unknown || !session()?.token;
+      $('authoring').hidden = !creation;
+      const locked = busy || !creation || !!unknown || objectHeld;
+      for (const id of [...authoringFields, 'add-group', 'add-edge']) $(id).disabled = locked;
+      for (const item of rowControls) item.disabled = locked;
+      $('objects').disabled = locked || objectDone || objectPages >= MAX_PAGES;
+      $('objects').textContent = objectPages ? 'Next observed identity page' : 'Load observed identities';
       $('confirm').disabled = !canSave;
       $('reconcile').hidden = !unknown;
       $('reconcile').disabled = busy;
       const selected = selection(), fingerprint = selected ? canonical(selected) : null;
       if (fingerprint !== lastSelection) { lastSelection = fingerprint; onSelection(selected); }
     }
+    function resetCreation() {
+      creation = null; members = []; groups = []; dependencies = [];
+      objectAfter = null; objectDone = objectHeld = false; objectCount = objectPages = 0;
+      seenObjects = new Set(); visibleObjects = []; memberInputs = []; rowControls = [];
+      $('observations').replaceChildren(); $('observation-status').textContent = '';
+      for (const id of authoringFields) $(id).value = '';
+    }
     function clear() {
       epoch++; controller?.abort(); controller = null;
+      resetCreation();
       busy = dirty = historical = false; loaded = unknown = cursor = selectedEnvironment = pageScope = null;
       for (const id of ['rows', 'members', 'datasets', 'dependencies', 'binding']) $(id).replaceChildren();
       for (const id of ['environment', 'group', 'revision', 'name', 'owner', 'order']) $(id).value = '';
@@ -232,6 +361,11 @@ const ApplicationDraftWorkspace = (() => {
           source += decoder.decode(value, {stream: true});
         }
         source += decoder.decode();
+        // Fetch decodes content codings; Content-Length then measures encoded, not exposed bytes.
+        // Both declared and decoded lengths retain their independent finite upper bound.
+        const coding = response.headers.get('content-encoding');
+        if (declared !== null && (coding === null || coding.trim().toLowerCase() === 'identity') &&
+            length !== Number(declared)) throw new Error('Response length differs.');
         if (!same(who, version) || abort.signal.aborted) throw new Error('Read superseded or timed out.');
         return {status: response.status, value: strictJson(source)};
       } finally {
@@ -243,6 +377,161 @@ const ApplicationDraftWorkspace = (() => {
     }
     const pathFor = (env, group = null) => `/v1/environments/${encodeURIComponent(env)}/application-drafts` +
       (group === null ? '' : '/' + encodeURIComponent(group));
+    function changed() {
+      if (!creation || busy || unknown || objectHeld) return;
+      dirty = true; $('confirm').checked = false;
+      status('Unsaved initial proposal. Review the selected tables; assertions are not independently verified.');
+      controls();
+    }
+    function options(id, values) {
+      const select = $(id); select.replaceChildren();
+      for (const value of ['', ...values]) {
+        const option = document.createElement('option'); option.value = value;
+        option.textContent = value || 'Choose explicitly'; select.append(option);
+      }
+      select.value = '';
+    }
+    function removeButton(row, label, remove) {
+      const td = document.createElement('td'), button = document.createElement('button');
+      button.type = 'button'; button.textContent = label; rowControls.push(button);
+      button.addEventListener('click', () => {
+        if (!creation || busy || unknown || objectHeld) return;
+        try { remove(); renderCreation(); changed(); } catch (error) { status(error.message); }
+      });
+      td.append(button); row.append(td);
+    }
+    function renderCreation() {
+      const unfinished = new Map(memberInputs.map((input) => [input.nativeId, input.value]));
+      rowControls = []; memberInputs = [];
+      for (const id of ['members', 'datasets', 'dependencies', 'observations']) $(id).replaceChildren();
+      for (const member of members) {
+        const row = document.createElement('tr'); cell(row, member.workloadId); cell(row, member.nativeVm.join(' / '));
+        removeButton(row, 'Remove member', () => {
+          if (dependencies.some((edge) => edge.sourceWorkloadId === member.workloadId || edge.targetWorkloadId === member.workloadId)) {
+            throw new Error('Remove dependent assertions explicitly before removing this member.');
+          }
+          members = members.filter((item) => item !== member);
+          $('order').value = $('order').value.trim().split(/\s+/).filter((id) => id !== member.workloadId).join('\n');
+        }); $('members').append(row);
+      }
+      for (const group of groups) {
+        const row = document.createElement('tr'); cell(row, group.groupId); cell(row, group.datasetIds.join(', '));
+        removeButton(row, 'Remove group', () => { groups = groups.filter((item) => item !== group); }); $('datasets').append(row);
+      }
+      for (const edge of dependencies) {
+        const row = document.createElement('tr');
+        for (const field of ['assertionId', 'sourceWorkloadId', 'relation', 'targetWorkloadId', 'state', 'unknownReason', 'source', 'sourceReference', 'observedAt']) cell(row, edge[field]);
+        removeButton(row, 'Remove assertion', () => { dependencies = dependencies.filter((item) => item !== edge); }); $('dependencies').append(row);
+      }
+      const from = $('edge-from').value, to = $('edge-to').value;
+      for (const id of ['edge-from', 'edge-to']) options(id, members.map((member) => member.workloadId));
+      if (members.some((member) => member.workloadId === from)) $('edge-from').value = from;
+      if (members.some((member) => member.workloadId === to)) $('edge-to').value = to;
+      for (const item of visibleObjects.filter((row) => row.resourceKind === 'vm')) {
+        const row = document.createElement('tr'); cell(row, item.nativeId); cell(row, item.displayName); cell(row, item.unknownCount);
+        if (members.some((member) => member.nativeVm[4] === item.nativeId)) { cell(row, 'Selected'); cell(row, ''); }
+        else {
+          const td = document.createElement('td'), label = document.createElement('label'), input = document.createElement('input');
+          label.textContent = `Proposed workload ID for ${item.nativeId}`;
+          input.nativeId = item.nativeId; input.value = unfinished.get(item.nativeId) || '';
+          input.maxLength = 128; input.autocomplete = 'off'; input.spellcheck = false;
+          input.addEventListener('input', changed); label.append(input); td.append(label); row.append(td);
+          rowControls.push(input); memberInputs.push(input);
+          removeButton(row, 'Add member', () => {
+            if (!validId(input.value) || members.length >= 100 || members.some((member) => member.workloadId === input.value)) {
+              throw new Error('Enter a unique logical workload ID; maximum 100 observed members.');
+            }
+            members.push({workloadId: input.value, nativeVm: [creation.scope.endpoint_id,
+              creation.scope.native_scope_id, creation.scope.platform_family, 'vm', item.nativeId]});
+            $('order').value = [$('order').value.trim(), input.value].filter(Boolean).join('\n');
+          });
+        }
+        $('observations').append(row);
+      }
+    }
+    function unfinishedRows() {
+      return authoringFields.some((id) => $(id).value !== '') || memberInputs.some((input) => input.value !== '');
+    }
+    async function start() {
+      if (busy || dirty || unknown) return;
+      let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
+      const env = $('environment').value.trim(), id = $('group').value.trim();
+      if (!validId(env) || !validId(id) || $('revision').value.trim()) { status('Enter an environment and new application ID; leave historical revision empty.'); return; }
+      const version = ++epoch; busy = true; loaded = null; historical = false; resetCreation(); $('editor').hidden = true; controls();
+      status('Reading the authorized draft scope and current stored observation. No draft has been saved.');
+      try {
+        const listing = await request(pathFor(env) + '?limit=1', 'GET', null, who, version);
+        if (!same(who, version)) return;
+        if (listing.status !== 200) throw new Error('Scope unavailable');
+        const page = validateList(listing.value, env, null, null, 1);
+        if (!integer(page.latestGeneration)) throw new Error('No stored observation');
+        const response = await request(`/v1/environments/${encodeURIComponent(env)}/discovery/generations/latest`, 'GET', null, who, version);
+        if (!same(who, version)) return;
+        if (response.status !== 200) throw new Error('Observation unavailable');
+        const observation = validateGeneration(response.value, env, page.latestGeneration);
+        creation = {...observation, applicationGroupId: id, scope: copy(page.scope)};
+        dirty = true; $('editor').hidden = false;
+        for (const field of ['name', 'owner', 'order']) $(field).value = '';
+        $('confirm').checked = false;
+        $('binding').textContent = `${env} · ${id} · NEW UNSAVED proposal · generation ${creation.generation}\nResult: ${creation.resultDigest}\nCaptured: ${creation.capturedAt} · ${creation.completeness}\nNo owner review or native authority. Source currency is rechecked by the server at save.`;
+        renderCreation();
+        status('Source pinned. Load identity pages explicitly, select at least two VMs, and propose dataset groups and dependencies.');
+      } catch (_) { if (same(who, version)) status('Source unavailable or changed. No new draft was opened; reload explicitly.'); }
+      finally { if (same(who, version)) { busy = false; controls(); } }
+    }
+    async function objects() {
+      if (busy || !creation || unknown || objectHeld || objectDone || objectPages >= MAX_PAGES) return;
+      if (memberInputs.some((input) => input.value !== '')) { status('Add or clear the unfinished member row before changing pages.'); return; }
+      let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
+      const source = copy(creation), after = objectAfter, version = ++epoch;
+      busy = true; $('confirm').checked = false; controls();
+      try {
+        const response = await request(`/v1/environments/${encodeURIComponent(source.environmentId)}/discovery/generations/${source.generation}/objects?limit=50` +
+          (after === null ? '' : '&after=' + encodeURIComponent(after)), 'GET', null, who, version);
+        if (!same(who, version)) return;
+        if (response.status !== 200) throw new Error('Observation unavailable');
+        const page = validateObjectPage(response.value, source, seenObjects, after, objectCount);
+        for (const item of page.items) seenObjects.add(canonical([item.resourceKind, item.nativeId]));
+        visibleObjects = page.items; objectCount += page.items.length; objectPages++;
+        objectAfter = page.nextAfter; objectDone = objectAfter === null;
+        renderCreation();
+        $('observation-status').textContent = `${objectCount} stored identity summaries inspected; only VMs on this page are selectable. ` +
+          (objectDone ? 'Stored page chain ended; native completeness is not established.' : objectPages >= MAX_PAGES ?
+            'Browser page budget reached. Selected VMs may still be proposed; remaining estate coverage is not claimed.' : 'Continue only by selecting Next observed identity page.');
+      } catch (_) { if (same(who, version)) { objectHeld = true; $('observations').replaceChildren(); status('Observation page unavailable or inconsistent. Discard and reload the source; no creation save is permitted.'); } }
+      finally { if (same(who, version)) { busy = false; controls(); } }
+    }
+    function addGroup() {
+      if (!creation || busy || unknown || objectHeld) return;
+      if ($('data-ids').value.length > 129000) { status('Dataset input exceeds its bounded size.'); return; }
+      const groupId = $('data-group').value, datasetIds = $('data-ids').value.trim().split(/\s+/);
+      const existing = new Set(groups.flatMap((group) => group.datasetIds));
+      if (!validId(groupId) || groups.length >= 100 || groups.some((group) => group.groupId === groupId) ||
+          !datasetIds.every(validId) || new Set(datasetIds).size !== datasetIds.length ||
+          existing.size + datasetIds.length > 1000 || datasetIds.some((id) => existing.has(id))) {
+        status('Enter a unique consistency-group ID and distinct dataset IDs; each dataset must occur in exactly one group.'); return;
+      }
+      groups.push({groupId, datasetIds}); $('data-group').value = ''; $('data-ids').value = '';
+      renderCreation(); changed();
+    }
+    function addEdge() {
+      if (!creation || busy || unknown || objectHeld) return;
+      try {
+        const state = $('edge-state').value;
+        if (!['KNOWN', 'UNKNOWN'].includes(state) || state === 'UNKNOWN' && $('edge-to').value || state === 'KNOWN' && $('edge-reason').value) {
+          throw new Error('Choose known with a target and no unknown reason, or unknown with a reason and no target.');
+        }
+        const edge = {assertionId: $('edge-id').value, sourceWorkloadId: $('edge-from').value,
+          targetWorkloadId: state === 'KNOWN' ? $('edge-to').value : null, relation: $('edge-relation').value,
+          state, source: $('edge-source').value, sourceReference: $('edge-reference').value,
+          observedAt: utcInput($('edge-time').value), unknownReason: state === 'UNKNOWN' ? $('edge-reason').value : null};
+        validateDependencies([...dependencies, edge], new Set(members.map((member) => member.workloadId)));
+        validateOrder($('order').value.trim().split(/\s+/), members, [...dependencies, edge]);
+        dependencies.push(edge);
+        for (const id of authoringFields.filter((id) => id.startsWith('edge-'))) $(id).value = '';
+        renderCreation(); changed();
+      } catch (error) { status(error.message); }
+    }
     async function list(next = false) {
       if (busy || dirty || unknown) return;
       let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
@@ -256,28 +545,8 @@ const ApplicationDraftWorkspace = (() => {
         const result = await request(pathFor(env) + '?limit=50' + (after ? '&after=' + encodeURIComponent(after) : ''), 'GET', null, who, version);
         if (!same(who, version)) return;
         const page = result.value;
-        if (result.status !== 200 || !keys(page, ['format', 'environmentId', 'scope', 'latestGeneration', 'consistency', 'items', 'nextAfter', 'executionAuthorized']) || page.format !== 'hosting-application-draft-list/1' ||
-            page.environmentId !== env || !scopeValid(page.scope) || pageScope && canonical(page.scope) !== canonical(pageScope) ||
-            page.consistency !== 'LIVE_PAGE' || page.executionAuthorized !== false ||
-            !(page.latestGeneration === null || integer(page.latestGeneration)) ||
-            !Array.isArray(page.items) || page.items.length > 50 ||
-            !(page.nextAfter === null || validId(page.nextAfter))) throw new Error('Invalid draft listing.');
-        let previous = after;
-        for (const item of page.items) {
-          if (!keys(item, SUMMARY) || item.format !== 'hosting-application-draft-revision/1' ||
-              item.environmentId !== env || canonical(item.scope) !== canonical(page.scope) || item.latestGeneration !== page.latestGeneration ||
-              !text(item.recordedBy, 512) || !text(item.recordedAt, 64) || !Number.isFinite(Date.parse(item.recordedAt)) ||
-              !integer(item.memberCount, 2) || item.memberCount > 100 || !integer(item.datasetCount) || item.datasetCount > 1000 ||
-              !integer(item.dependencyCount, 0) || item.dependencyCount > 500 || !integer(item.unknownDependencyCount, 0) ||
-              item.unknownDependencyCount > item.dependencyCount || !validId(item.applicationGroupId) || previous !== null && item.applicationGroupId <= previous ||
-              item.status !== 'UNREVIEWED' || item.ownershipAccepted !== false || item.executionAuthorized !== false ||
-              !integer(item.revision) || !integer(item.generation) || !text(item.name) || !validId(item.ownerId) ||
-              !SHA.test(item.resultDigest) || !SHA.test(item.proposalDigest) || !SHA.test(item.recordDigest) ||
-              Object.hasOwn(item, 'proposal') || !integer(page.latestGeneration) || item.generation > page.latestGeneration ||
-              item.sourceSuperseded !== (item.generation !== page.latestGeneration)) throw new Error('Invalid draft summary.');
-          previous = item.applicationGroupId;
-        }
-        if (page.nextAfter !== null && (!page.items.length || page.nextAfter !== previous || page.nextAfter === after)) throw new Error('Invalid continuation.');
+        if (result.status !== 200) throw new Error('Unavailable');
+        validateList(page, env, after, pageScope);
         pageScope = copy(page.scope); cursor = page.nextAfter;
         for (const item of page.items) {
           const row = document.createElement('tr');
@@ -289,21 +558,22 @@ const ApplicationDraftWorkspace = (() => {
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
     function render(record) {
+      resetCreation();
       loaded = record; dirty = false; $('confirm').checked = false; $('editor').hidden = false;
       $('name').value = record.proposal.draft.name; $('owner').value = record.proposal.draft.ownerId;
       $('order').value = record.proposal.draft.startupOrder.join('\n');
       $('binding').textContent = `${record.environmentId} · ${record.applicationGroupId} · revision ${record.revision} · generation ${record.generation}\nResult: ${record.resultDigest}\nRecorded by ${record.recordedBy} at ${record.recordedAt}\n${record.sourceSuperseded ? 'SUPERSEDED SOURCE — read only.' : historical ? 'HISTORICAL REVISION — read only.' : 'UNREVIEWED — editing preserves this source pin.'}`;
       for (const id of ['members', 'datasets', 'dependencies']) $(id).replaceChildren();
       for (const member of record.proposal.draft.members) {
-        const row = document.createElement('tr'); cell(row, member.workloadId); cell(row, member.nativeVm.join(' / ')); $('members').append(row);
+        const row = document.createElement('tr'); cell(row, member.workloadId); cell(row, member.nativeVm.join(' / ')); cell(row, 'Read only'); $('members').append(row);
       }
       for (const group of record.proposal.draft.consistencyGroups) {
-        const row = document.createElement('tr'); cell(row, group.groupId); cell(row, group.datasetIds.join(', ')); $('datasets').append(row);
+        const row = document.createElement('tr'); cell(row, group.groupId); cell(row, group.datasetIds.join(', ')); cell(row, 'Read only'); $('datasets').append(row);
       }
       for (const edge of record.proposal.dependencies) {
         const row = document.createElement('tr');
         for (const field of ['assertionId', 'sourceWorkloadId', 'relation', 'targetWorkloadId', 'state', 'unknownReason', 'source', 'sourceReference', 'observedAt']) cell(row, edge[field]);
-        $('dependencies').append(row);
+        cell(row, 'Read only'); $('dependencies').append(row);
       }
     }
     async function load() {
@@ -324,20 +594,28 @@ const ApplicationDraftWorkspace = (() => {
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
     async function save() {
-      if (busy || !dirty || !loaded || historical || loaded.sourceSuperseded || unknown || !$('confirm').checked) return;
+      if (busy || !dirty || !(loaded || creation) || historical || loaded?.sourceSuperseded || unknown || objectHeld || !$('confirm').checked) return;
       let who, body;
-      try { who = identity(); body = editedRequest(loaded, $('name').value, $('owner').value, $('order').value); }
+      try {
+        who = identity();
+        if (creation && unfinishedRows()) throw new Error('Add or clear unfinished member, dataset and dependency rows before saving.');
+        body = creation ? creationRequest(creation, creation.applicationGroupId, $('name').value, $('owner').value, members, groups, dependencies, $('order').value) :
+          editedRequest(loaded, $('name').value, $('owner').value, $('order').value);
+      }
       catch (error) { status(error.message); return; }
-      const original = copy(loaded), version = ++epoch;
-      busy = true; controls();
+      const original = creation ? {environmentId: creation.environmentId, applicationGroupId: creation.applicationGroupId,
+        scope: copy(creation.scope), revision: 0} : copy(loaded), version = ++epoch;
+      busy = true;
       unknown = {environmentId: original.environmentId, applicationGroupId: original.applicationGroupId,
         revision: original.revision + 1, body: copy(body), scope: copy(original.scope)};
+      controls();
       status('Saving an unreviewed revision. A lost acknowledgement requires reconciliation, not an automatic retry.');
       try {
         const result = await request(pathFor(original.environmentId, original.applicationGroupId), 'PUT', body, who, version);
         if (!same(who, version)) return;
         if (result.status === 409 && result.value?.error?.code === 'APPLICATION_DRAFT_CONFLICT') {
           unknown = null; historical = true; dirty = false;
+          if (creation) { resetCreation(); $('editor').hidden = true; }
           status('Revision/source conflict. Reload current history before editing; this does not settle an earlier unknown save.'); return;
         }
         if (result.status !== 200) throw new Error('Save acknowledgement unavailable');
@@ -367,11 +645,14 @@ const ApplicationDraftWorkspace = (() => {
       } catch (_) { if (same(who, version)) status('Save remains UNKNOWN. Missing, conflicting or inaccessible history does not prove rollback.'); }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
+    $('start').addEventListener('click', start); $('objects').addEventListener('click', objects);
+    $('add-group').addEventListener('click', addGroup); $('add-edge').addEventListener('click', addEdge);
+    for (const id of authoringFields) { $(id).addEventListener('input', changed); $(id).addEventListener('change', changed); }
     $('list').addEventListener('click', () => list()); $('next').addEventListener('click', () => list(true));
     $('confirm').addEventListener('change', controls);
     $('load').addEventListener('click', load); $('reconcile').addEventListener('click', reconcile);
     $('form').addEventListener('submit', (event) => { event.preventDefault(); return save(); });
-    for (const id of ['name', 'owner', 'order']) $(id).addEventListener('input', () => { if (!busy && loaded && !historical && !unknown) { dirty = true; $('confirm').checked = false; status('Unsaved local changes; source, membership and dependency evidence remain pinned.'); controls(); } });
+    for (const id of ['name', 'owner', 'order']) $(id).addEventListener('input', () => { if (!busy && (loaded || creation) && !historical && !unknown) { dirty = true; $('confirm').checked = false; status('Unsaved local changes; the original source pin remains unchanged.'); controls(); } });
     $('discard').addEventListener('click', () => {
       if (busy) return;
       if (unknown && !$('confirm-discard').checked) { status('A save is unresolved. Confirm discarding this tab’s reconciliation state first; it does not undo a committed write.'); return; }
@@ -386,8 +667,9 @@ const ApplicationDraftWorkspace = (() => {
     window?.addEventListener('pagehide', clear);
     window?.addEventListener('beforeunload', (event) => { if (busy || dirty || unknown) { event.preventDefault(); event.returnValue = ''; } });
     clear();
-    return {clear, list, load, save, reconcile, selection};
+    return {clear, list, load, start, objects, addGroup, addEdge, save, reconcile, selection};
   }
-  return {mount, strictJson, validateRecord, editedRequest, canonical};
+  return {mount, strictJson, validateRecord, validateProposal, validateList, validateGeneration, validateObjectPage,
+    creationRequest, utcInput, objectCursor, editedRequest, canonical};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = ApplicationDraftWorkspace;

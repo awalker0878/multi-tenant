@@ -39,8 +39,8 @@ class ApplicationDraftAssetTests(unittest.TestCase):
                      'draft-members', 'draft-datasets', 'draft-dependencies', 'draft-status'):
             self.assertIn('id="'+name+'"', page)
         self.assertIn('role="status"', page)
-        self.assertIn('Membership, datasets and dependency evidence remain read-only', page)
-        self.assertIn('Create drafts or change membership and dependency evidence through the existing operator CLI', page)
+        self.assertIn('Saved drafts retain read-only membership and evidence', page)
+        self.assertIn('Changing saved membership and dependency evidence still uses the existing operator CLI', page)
         script = (ROOT / 'provisioner/controlplane/api/portal/application_drafts.js').read_text()
         for forbidden in ('localStorage', 'sessionStorage', 'innerHTML', 'document.cookie'):
             self.assertNotIn(forbidden, script)
