@@ -162,6 +162,14 @@
       <p id="draft-status" class="muted" role="status" aria-live="polite">Application draft workspace is loading.</p>
       <div id="draft-editor" hidden>
         <pre id="draft-binding" class="review-card"></pre>
+        <section aria-labelledby="draft-review-heading">
+          <h3 id="draft-review-heading">Independent owner-review status</h3>
+          <p>Check the signed review for this exact saved revision, including history. This reads status only: it cannot sign, accept, revoke or submit an owner decision. A proposed owner ID is not acceptance.</p>
+          <button id="draft-review-check" type="button" disabled>Check exact owner review</button>
+          <p id="draft-review-status" class="muted" role="status" aria-live="polite">Load a saved draft before checking its review.</p>
+          <pre id="draft-review-result" class="review-card" hidden></pre>
+          <p class="muted">Results are evaluated at the displayed time, not a continuing approval. They clear on edits, selection/identity changes and hidden tabs; clearance is also scheduled within 60 seconds or sooner at evidence expiry. Browser timers are best-effort, not a revocation monitor. Check again explicitly. Comparison rechecks its own current evidence; this display never enables migration.</p>
+        </section>
         <button id="draft-edit-evidence" type="button" disabled>Edit membership and evidence</button>
         <p>Start an explicit new-revision proposal from a current saved draft. The exact source and expected revision stay pinned. Historical, superseded and unresolved-save records cannot be edited. Changing assertions does not carry forward an owner review.</p>
         <form id="draft-form" class="comparison-form">

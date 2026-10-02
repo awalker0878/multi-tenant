@@ -106,6 +106,63 @@ const ApplicationDraftWorkspace = (() => {
     return copy(record);
   }
 
+  const REVIEWED = ['REVIEWED_ASSESSMENT_ONLY', 'REVIEWED_WITH_UNKNOWNS'];
+  // Shared wire contract for the draft review display and application comparison.
+  // This does not verify signatures or recreate a native assessment candidate.
+  function validateReview(v, record) {
+    const check = (ok) => { if (!ok) throw new Error('Review differs from the exact saved draft.'); };
+    validateRecord(record, record?.environmentId, record?.applicationGroupId);
+    const stamp = utcMicros;
+    check(keys(v, ['format', 'environmentId', 'scope', 'applicationGroupId', 'draftRevision', 'draftRecordDigest',
+      'proposalDigest', 'generation', 'resultDigest', 'latestGeneration', 'latestDraftRevision', 'checkedAt', 'status',
+      'ownerDecision', 'ownerId', 'reviewReference', 'evidenceId', 'evidenceRevision', 'evidenceDigest', 'reviewedAt',
+      'expiresAt', 'candidateDigest', 'unknownDependencyCount', 'dependencyEvidenceVerified', 'ownershipAccepted', 'executionAuthorized']));
+    check(v.format === 'hosting-application-review-status/1' && canonical(v.scope) === canonical(record.scope) &&
+      v.environmentId === record.environmentId && v.applicationGroupId === record.applicationGroupId &&
+      v.draftRevision === record.revision && v.draftRecordDigest === record.recordDigest &&
+      v.proposalDigest === record.proposalDigest && v.generation === record.generation && v.resultDigest === record.resultDigest &&
+      integer(v.latestGeneration, record.latestGeneration) && integer(v.latestDraftRevision, v.draftRevision) &&
+      ['ownershipAccepted', 'executionAuthorized', 'dependencyEvidenceVerified'].every((k) => v[k] === false));
+    const checked = stamp(v.checkedAt), ready = REVIEWED.includes(v.status);
+    check(stamp(record.recordedAt) <= checked);
+    const evidence = ['ownerId', 'reviewReference', 'evidenceId', 'evidenceRevision', 'evidenceDigest', 'reviewedAt', 'expiresAt'];
+    if (v.ownerDecision === null) check(evidence.every((k) => v[k] === null));
+    else {
+      check(['ACCEPT_FOR_ASSESSMENT', 'REVOKE'].includes(v.ownerDecision) &&
+        ['ownerId', 'reviewReference', 'evidenceId'].every((k) => validId(v[k])) && integer(v.evidenceRevision) && validSha(v.evidenceDigest));
+      check(stamp(v.reviewedAt) <= checked && checked < stamp(v.expiresAt) &&
+        stamp(v.expiresAt) - stamp(v.reviewedAt) <= 3600000000n);
+      check(v.ownerId === record.proposal.draft.ownerId && v.ownerId !== record.recordedBy &&
+        stamp(record.recordedAt) <= stamp(v.reviewedAt));
+    }
+    if (ready) {
+      const count = record.proposal.dependencies.filter((e) => e.state === 'UNKNOWN').length;
+      check(v.ownerDecision === 'ACCEPT_FOR_ASSESSMENT' && validSha(v.candidateDigest) && v.unknownDependencyCount === count &&
+        (v.status === 'REVIEWED_WITH_UNKNOWNS') === (count > 0));
+    } else check(v.candidateDigest === null && v.unknownDependencyCount === null);
+    const expected = v.ownerDecision === 'REVOKE' ? ['REVOKED'] : v.latestDraftRevision !== v.draftRevision ?
+      ['HELD_SUPERSEDED_DRAFT'] : v.latestGeneration !== v.generation ? ['HELD_SUPERSEDED_INVENTORY'] :
+        v.ownerDecision === null ? ['UNREVIEWED'] : [...REVIEWED, 'HELD_INCOMPLETE_INVENTORY', 'HELD_STALE_INVENTORY'];
+    check(expected.includes(v.status));
+    return ready;
+  }
+  function utcMicros(value) {
+    // JavaScript Date loses sub-millisecond precision; signed bindings do not.
+    const normalized = utcInput(value);
+    const seconds = normalized.slice(0, 19), fraction = normalized[19] === '.' ? normalized.slice(20, 26) : '000000';
+    return BigInt(Date.parse(seconds + 'Z')) * 1000n + BigInt(fraction);
+  }
+
+  function reviewDisplayMilliseconds(value, elapsed) {
+    if (!Number.isFinite(elapsed) || elapsed < 0) throw new Error('Review read clock regressed.');
+    // This is a conservative display limit, never a freshness or authority lease.
+    const validity = value.expiresAt === null ? 60000 :
+      Number(utcMicros(value.expiresAt) - utcMicros(value.checkedAt)) / 1000;
+    const remaining = Math.floor(Math.min(60000, validity) - elapsed);
+    if (remaining < 1) throw new Error('Review display interval has elapsed.');
+    return remaining;
+  }
+
   function validateProposal(draft, dependencies, scope, groupId) {
     if (!scopeValid(scope) || !validId(groupId) || !keys(draft, ['applicationGroupId', 'name', 'ownerId', 'members', 'datasetIds', 'consistencyGroups', 'startupOrder']) ||
         draft.applicationGroupId !== groupId || !text(draft.name) || !validId(draft.ownerId) ||
@@ -267,11 +324,12 @@ const ApplicationDraftWorkspace = (() => {
     return body;
   }
 
-  function mount({document, session, fetch, window, rejectSession = () => {}, timeoutMs = 15000, onSelection = () => {}}) {
+  function mount({document, session, fetch, window, rejectSession = () => {}, timeoutMs = 15000, onSelection = () => {},
+    clock = () => globalThis.performance.now(), schedule = setTimeout, cancel = clearTimeout}) {
     const $ = (id) => document.getElementById('draft-' + id);
     let epoch = 0, busy = false, loaded = null, historical = false, dirty = false;
     let unknown = null, cursor = null, selectedEnvironment = null, pageScope = null, controller = null;
-    let lastSelection = null;
+    let lastSelection = null, reviewTimer = null, reviewLoading = false;
     let authoring = null, members = [], datasets = [], groups = [], dependencies = [];
     let objectAfter = null, objectDone = false, objectCount = 0, objectPages = 0, objectHeld = false;
     let seenObjects = new Set(), visibleObjects = [], memberInputs = [], rowControls = [];
@@ -286,7 +344,15 @@ const ApplicationDraftWorkspace = (() => {
       return value;
     };
     const same = (who, version) => version === epoch && session()?.version === who.version && session()?.token === who.token;
+    function clearReview(message = 'Check the exact saved revision. No review is inferred from the proposed owner.') {
+      if (reviewTimer !== null) cancel(reviewTimer);
+      reviewTimer = null;
+      $('review-result').textContent = ''; $('review-result').hidden = true;
+      $('review-status').textContent = message;
+    }
     function controls() {
+      if (busy || !loaded || authoring || dirty || unknown) clearReview();
+      $('review-check').disabled = busy || !loaded || !!authoring || dirty || !!unknown || !session()?.token;
       for (const id of ['environment', 'group', 'revision', 'list', 'load', 'next']) $(id).disabled = busy || dirty || !!unknown;
       $('next').hidden = cursor === null;
       for (const id of ['name', 'owner', 'order']) $(id).disabled = busy || !(loaded || authoring) || historical || !!loaded?.sourceSuperseded || objectHeld || !!unknown;
@@ -316,6 +382,7 @@ const ApplicationDraftWorkspace = (() => {
     }
     function clear() {
       epoch++; controller?.abort(); controller = null;
+      reviewLoading = false; clearReview();
       resetAuthoring();
       busy = dirty = historical = false; loaded = unknown = cursor = selectedEnvironment = pageScope = null;
       for (const id of ['rows', 'members', 'datasets', 'dependencies', 'binding']) $(id).replaceChildren();
@@ -653,6 +720,68 @@ const ApplicationDraftWorkspace = (() => {
       } catch (_) { if (same(who, version)) status(`SAVE UNKNOWN — reconcile ${original.applicationGroupId} revision ${original.revision + 1} before another save. Cancellation or an error does not prove rollback.`); }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
+    async function checkReview() {
+      if (busy || !loaded || authoring || dirty || unknown || document.hidden === true) return;
+      let who;
+      try { who = identity(); } catch (_) { clearReview('Sign in before checking a saved review.'); return; }
+      const original = copy(loaded), version = ++epoch;
+      busy = reviewLoading = true; controls();
+      $('review-status').textContent = 'Checking the independently signed review of this exact saved revision…';
+      try {
+        const started = clock();
+        const response = await request(pathFor(original.environmentId, original.applicationGroupId) +
+          '/review?revision=' + original.revision, 'GET', null, who, version);
+        if (!same(who, version)) return;
+        if (response.status !== 200 || document.hidden === true) throw new Error('Review unavailable.');
+        const value = response.value;
+        validateReview(value, original);
+        const duration = reviewDisplayMilliseconds(value, clock() - started);
+        if (value.latestDraftRevision > original.revision || value.latestGeneration > original.generation) {
+          historical = true;  // Keep the saved record unchanged; require an explicit current reload.
+          status('The review reports a superseded draft or source. Reload current before editing or comparing.');
+        }
+        const explanation = {
+          UNREVIEWED: 'No signed owner decision exists for this exact draft.',
+          REVOKED: 'The owner decision for this exact draft is revoked.',
+          HELD_SUPERSEDED_DRAFT: 'A newer application draft exists. Load it explicitly for a new review.',
+          HELD_SUPERSEDED_INVENTORY: 'The source inventory has advanced. Reconcile the draft explicitly.',
+          HELD_INCOMPLETE_INVENTORY: 'Owner acceptance cannot establish complete source visibility.',
+          HELD_STALE_INVENTORY: 'Owner acceptance cannot refresh stale source observations.',
+          REVIEWED_ASSESSMENT_ONLY: 'Accepted for assessment at the displayed time, not for migration.',
+          REVIEWED_WITH_UNKNOWNS: 'Accepted for assessment with unresolved dependencies, not for migration.'
+        }[value.status];
+        $('review-result').textContent = [
+          `${value.status} — ${explanation}`,
+          `Evaluated at ${value.checkedAt}. This display is not a continuing approval.`,
+          `Environment: ${value.environmentId} · application: ${value.applicationGroupId}`,
+          `Native scope: ${canonical(value.scope)}`,
+          `Draft revision: ${value.draftRevision} · latest: ${value.latestDraftRevision}`,
+          `Draft record digest: ${value.draftRecordDigest}`,
+          `Proposal digest: ${value.proposalDigest}`,
+          `Source generation: ${value.generation} · latest: ${value.latestGeneration}`,
+          `Source result digest: ${value.resultDigest}`,
+          `Owner: ${value.ownerId ?? 'No signed decision'} · decision: ${value.ownerDecision ?? 'None'}`,
+          `Review reference: ${value.reviewReference ?? 'None'}`,
+          `Evidence: ${value.evidenceId ?? 'None'} · revision: ${value.evidenceRevision ?? 'None'}`,
+          `Evidence digest: ${value.evidenceDigest ?? 'None'}`,
+          `Reviewed at: ${value.reviewedAt ?? 'None'} · expires at: ${value.expiresAt ?? 'None'}`,
+          `Candidate digest: ${value.candidateDigest ?? 'None'}`,
+          `Unknown dependencies: ${value.unknownDependencyCount ?? 'Not evaluated'}`,
+          'Dependency evidence independently verified: false. Ownership accepted: false. Execution authorized: false.'
+        ].join('\n');
+        $('review-result').hidden = false;
+        $('review-status').textContent = 'Exact-draft review retrieved. Display clearance is scheduled within 60 seconds or sooner at expiry; check again explicitly. No signing or submission was performed.';
+        reviewTimer = schedule(() => {
+          if (version === epoch) clearReview('Review display expired. Check again for newly evaluated status. No request was retried.');
+        }, duration);
+        reviewTimer?.unref?.(); // Node contract tests need not keep the process alive for a display timer.
+      } catch (_) {
+        if (same(who, version)) clearReview('Review unavailable, expired or inconsistent. No earlier review is shown; check again explicitly.');
+      } finally {
+        if (same(who, version)) { busy = reviewLoading = false; controls(); }
+      }
+    }
+
     async function reconcile() {
       if (busy || !unknown) return;
       let who; try { who = identity(); } catch (_) { status('Sign in first.'); return; }
@@ -671,6 +800,7 @@ const ApplicationDraftWorkspace = (() => {
       } catch (_) { if (same(who, version)) status('Save remains UNKNOWN. Missing, conflicting or inaccessible history does not prove rollback.'); }
       finally { if (same(who, version)) { busy = false; controls(); } }
     }
+    $('review-check').addEventListener('click', checkReview);
     $('edit-evidence').addEventListener('click', editEvidence);
     $('start').addEventListener('click', start); $('objects').addEventListener('click', objects);
     $('add-group').addEventListener('click', addGroup); $('add-edge').addEventListener('click', addEdge);
@@ -691,12 +821,21 @@ const ApplicationDraftWorkspace = (() => {
       if (id === 'environment') { cursor = pageScope = selectedEnvironment = null; $('rows').replaceChildren(); }
       controls();
     });
+    document.addEventListener?.('visibilitychange', () => {
+      if (document.hidden !== true) return;
+      clearReview('Review cleared when the tab became hidden. Check again explicitly.');
+      // Do not abort a draft save or discard its uncertainty when hiding a tab.
+      if (reviewLoading) {
+        epoch++; controller?.abort(); controller = null;
+        busy = reviewLoading = false; controls();
+      }
+    });
     window?.addEventListener('pagehide', clear);
     window?.addEventListener('beforeunload', (event) => { if (busy || dirty || unknown) { event.preventDefault(); event.returnValue = ''; } });
     clear();
-    return {clear, list, load, start, editEvidence, objects, addGroup, addEdge, save, reconcile, selection};
+    return {clear, list, load, start, editEvidence, objects, addGroup, addEdge, save, reconcile, checkReview, selection};
   }
-  return {mount, strictJson, validateRecord, validateProposal, validateList, validateGeneration, validateObjectPage,
+  return {mount, strictJson, validateRecord, validateReview, reviewDisplayMilliseconds, validateProposal, validateList, validateGeneration, validateObjectPage,
     proposalRequest, utcInput, objectCursor, editedRequest, canonical};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = ApplicationDraftWorkspace;

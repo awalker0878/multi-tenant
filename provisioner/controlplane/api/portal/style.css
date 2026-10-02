@@ -86,3 +86,5 @@ footer { padding: 0 1.5rem 2rem; margin: 0 auto; max-width: 1120px; color: #5367
 .panel[aria-labelledby="draft-heading"] { min-width: 0; }
 table:has(#draft-dependencies) { min-width: 70rem; }
 #draft-dependencies button { white-space: nowrap; }
+
+#draft-review-result { white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -3,9 +3,10 @@
 // Read-only composition of a retained draft and the existing comparison service.
 // Wire consistency is checked here; native evidence and authority stay at the API.
 const ApplicationComparisonWorkspace = (() => {
+  const draftContract = typeof module !== 'undefined' && module.exports ?
+    module.require('./application_drafts.js') : ApplicationDraftWorkspace;
   const ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
   const SHA = /^[0-9a-f]{64}$/;
-  const READY = ['REVIEWED_ASSESSMENT_ONLY', 'REVIEWED_WITH_UNKNOWNS'];
   const METHODS = ['REBUILD_RESTORE', 'COLD_VM_CONVERSION', 'SAME_PLATFORM_RELOCATION',
     'APPLICATION_NATIVE', 'WARM_VM_TRANSFER'];
   const FLAGS = ['ownershipAccepted', 'executionAuthorized', 'dependencyEvidenceVerified', 'reservationHeld'];
@@ -68,38 +69,6 @@ const ApplicationComparisonWorkspace = (() => {
     require(new TextEncoder().encode(canonical(body)).length <= 131072);
     return body;
   }
-  function validateReview(v, record) {
-    require(keys(v, ['format', 'environmentId', 'scope', 'applicationGroupId', 'draftRevision', 'draftRecordDigest',
-      'proposalDigest', 'generation', 'resultDigest', 'latestGeneration', 'latestDraftRevision', 'checkedAt', 'status',
-      'ownerDecision', 'ownerId', 'reviewReference', 'evidenceId', 'evidenceRevision', 'evidenceDigest', 'reviewedAt',
-      'expiresAt', 'candidateDigest', 'unknownDependencyCount', 'dependencyEvidenceVerified', 'ownershipAccepted', 'executionAuthorized']));
-    require(v.format === 'hosting-application-review-status/1' && equal(v.scope, record.scope) &&
-      v.environmentId === record.environmentId && v.applicationGroupId === record.applicationGroupId &&
-      v.draftRevision === record.revision && v.draftRecordDigest === record.recordDigest &&
-      v.proposalDigest === record.proposalDigest && v.generation === record.generation && v.resultDigest === record.resultDigest &&
-      integer(v.latestGeneration, v.generation) && integer(v.latestDraftRevision, v.draftRevision) &&
-      ['ownershipAccepted', 'executionAuthorized', 'dependencyEvidenceVerified'].every((k) => v[k] === false));
-    const checked = stamp(v.checkedAt), ready = READY.includes(v.status);
-    const evidence = ['ownerId', 'reviewReference', 'evidenceId', 'evidenceRevision', 'evidenceDigest', 'reviewedAt', 'expiresAt'];
-    if (v.ownerDecision === null) require(evidence.every((k) => v[k] === null));
-    else {
-      require(['ACCEPT_FOR_ASSESSMENT', 'REVOKE'].includes(v.ownerDecision) &&
-        ['ownerId', 'reviewReference', 'evidenceId'].every((k) => id(v[k])) && integer(v.evidenceRevision) && sha(v.evidenceDigest));
-      require(stamp(v.reviewedAt) <= checked && checked < stamp(v.expiresAt) &&
-        Date.parse(v.expiresAt) - Date.parse(v.reviewedAt) <= 3600000);
-      require(v.ownerId === record.proposal.draft.ownerId);
-    }
-    if (ready) {
-      const count = record.proposal.dependencies.filter((e) => e.state === 'UNKNOWN').length;
-      require(v.ownerDecision === 'ACCEPT_FOR_ASSESSMENT' && sha(v.candidateDigest) && v.unknownDependencyCount === count &&
-        (v.status === 'REVIEWED_WITH_UNKNOWNS') === (count > 0));
-    } else require(v.candidateDigest === null && v.unknownDependencyCount === null);
-    const expected = v.ownerDecision === 'REVOKE' ? ['REVOKED'] : v.latestDraftRevision !== v.draftRevision ?
-      ['HELD_SUPERSEDED_DRAFT'] : v.latestGeneration !== v.generation ? ['HELD_SUPERSEDED_INVENTORY'] :
-        v.ownerDecision === null ? ['UNREVIEWED'] : [...READY, 'HELD_INCOMPLETE_INVENTORY', 'HELD_STALE_INVENTORY'];
-    require(expected.includes(v.status));
-    return ready;
-  }
   function binding(v, selected) {
     require(keys(v, ['environmentId', 'generation', 'endpointId', 'nativeScopeId', 'platformFamily', 'productTupleId',
       'productTupleDigest', 'observation', 'superseded', 'latestObservation']) &&
@@ -137,7 +106,7 @@ const ApplicationComparisonWorkspace = (() => {
     require(keys(v, held ? common : [...common, 'startupOrder', 'datasetCount', 'consistencyGroupCount']) &&
       v.format === 'hosting-application-comparison/2' && sha(digest) && v.selectionDigest === digest &&
       v.consistency === 'PINNED_INPUTS_LIVE_RECHECKS' && FLAGS.every((k) => v[k] === false));
-    const ready = validateReview(v.applicationReview, record);
+    const ready = draftContract.validateReview(v.applicationReview, record);
     if (held) { require(!ready && v.sourceInput === null && equal(v.destinationInputs, []) && equal(v.assessments, [])); return v; }
     require(ready);
     const scope = binding(v.sourceInput, body.source), draft = record.proposal.draft;
