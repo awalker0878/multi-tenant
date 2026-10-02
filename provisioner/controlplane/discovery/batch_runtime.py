@@ -2,7 +2,8 @@
 
 Batch policy selects work and reduces native read rates. It does not issue a
 campaign, refresh credentials, publish inventory, retry work, or persist a fleet
-schedule. Original-byte staging/recovery stays with the existing collector.
+schedule by default. Opt-in checkpointed scheduling retains starts and outcomes;
+original-byte staging/recovery stays with the existing collector.
 """
 from __future__ import annotations
 
@@ -105,57 +106,88 @@ class DiscoveryBatch:
                    doc['maxDurationSeconds'], tuple(policies), tuple(tasks))
 
 
-def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict:
-    """Dispatch only tasks due at the initial cut; never wait for future work.
+def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+              state_directory=None, wait_for_due=False) -> dict:
+    if type(wait_for_due) is not bool or wait_for_due and state_directory is None:
+        raise ValueError('Waiting requires an explicit durable batch journal')
+    spec = DiscoveryBatch.from_file(path)
+    if state_directory is None:
+        return _run_batch(spec, clock=clock)
+    from .batch_journal import BatchJournal
+    with BatchJournal(state_directory, spec, manifest_path=path, clock=clock, enroll=True) as journal:
+        return _run_batch(spec, clock=clock, journal=journal, wait_for_due=wait_for_due)
+
+
+def _run_batch(spec, *, clock, journal=None, wait_for_due=False) -> dict:
+    """Use one dispatcher; optionally wait for pre-enrolled future tasks.
 
     Due tasks are round-robin across selected endpoints, oldest first within each
     endpoint. The process bounds both active collections and actual native GETs.
     A shared stop event stops new reads and results after the duration limit.
     Running threads are drained, never left collecting after this function returns.
     """
-    spec = DiscoveryBatch.from_file(path)
-    initial = clock()
+    initial = journal.now() if journal is not None else clock()
     if not _utc(initial):
         raise ValueError('A trusted UTC batch clock is required')
     stopped = Event()
     deadline = time.monotonic() + spec.max_seconds
     gates = {name: NativeReadGate(policy, stopped=stopped) for name, policy in spec.policies}
-    results, groups = {}, defaultdict(deque)
+    results, groups, future_tasks = {}, defaultdict(deque), []
     for task in sorted(spec.tasks, key=lambda t: (t.not_before, t.task_id)):
-        if initial < task.not_before:
+        recorded = journal.summary(task.task_id) if journal is not None else None
+        if recorded is not None:
+            results[task.task_id] = recorded
+        elif initial < task.not_before:
             results[task.task_id] = {'taskId': task.task_id, 'status': 'NOT_DUE'}
+            if wait_for_due:
+                future_tasks.append(task)
         elif initial >= task.not_after:
+            if journal is not None:
+                journal.expire(task.task_id)
             results[task.task_id] = {'taskId': task.task_id, 'status': 'WINDOW_EXPIRED'}
         else:
             groups[task.policy_id].append(task)
     ready = deque()
-    while groups:
-        for name in tuple(groups):
-            ready.append(groups[name].popleft())
-            if not groups[name]:
-                del groups[name]
+    def enqueue_due():
+        while groups:
+            for name in tuple(groups):
+                ready.append(groups[name].popleft())
+                if not groups[name]:
+                    del groups[name]
+    enqueue_due()
 
     def run(task):
         previous = initial
 
         def current():
             nonlocal previous
-            at = clock()
+            at = journal.now() if journal is not None else clock()
             if (stopped.is_set() or time.monotonic() >= deadline or not _utc(at)
                     or not previous <= at or not task.not_before <= at < task.not_after):
                 raise NativeReadHeld('Scheduled collection expired, stopped or clock regressed')
             previous = at
             return at
 
+        started = False
         try:
             current()
+            if journal is not None:
+                journal.start(task.task_id)
+                started = True
             outcome = execute(task.config_file, 'stage', clock=current,
                 config_digest=task.config_digest, campaign_digest=task.campaign_digest,
                 environment_id=task.environment_id, read_gate=gates[task.policy_id])
+            if journal is not None:
+                journal.finish(task.task_id, outcome)
             return {'taskId': task.task_id, 'status': 'STAGED', 'collector': outcome}
         except Exception:
             # No private file paths, token material or native error bodies escape.
             # A hold can still have retained original bytes; it does not mean rollback.
+            if journal is not None and started:
+                try:
+                    journal.finish(task.task_id)
+                except Exception:
+                    stopped.set()  # Publication may have succeeded; never overwrite/retry it.
             return {'taskId': task.task_id, 'status': 'HELD', 'reconciliationRequired': True}
 
     timer = Timer(spec.max_seconds, stopped.set)
@@ -164,7 +196,21 @@ def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(time
     active = {}
     timer.start()
     try:
-        while ready or active:
+        while ready or active or future_tasks:
+            if future_tasks and not stopped.is_set():
+                at = journal.now()
+                # The same gate/timer/lock survives waits. No interval is reset
+                # when another endpoint's task becomes due later in this run.
+                for task in tuple(future_tasks):
+                    if at >= task.not_after:
+                        journal.expire(task.task_id)
+                        results[task.task_id] = {'taskId': task.task_id, 'status': 'WINDOW_EXPIRED'}
+                        future_tasks.remove(task)
+                    elif at >= task.not_before:
+                        groups[task.policy_id].append(task)
+                        results.pop(task.task_id, None)
+                        future_tasks.remove(task)
+                enqueue_due()
             while ready and len(active) < spec.parallel and not stopped.is_set():
                 if time.monotonic() >= deadline:
                     stopped.set()
@@ -172,6 +218,9 @@ def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(time
                 task = ready.popleft()
                 active[executor.submit(run, task)] = task
             if not active:
+                if future_tasks and not stopped.is_set() and time.monotonic() < deadline:
+                    stopped.wait(min(0.05, max(0, deadline - time.monotonic())))
+                    continue
                 break
             done, _ = wait(active, timeout=0.05, return_when=FIRST_COMPLETED)
             for future in done:
@@ -187,9 +236,93 @@ def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(time
     for task in ready:
         results[task.task_id] = {'taskId': task.task_id, 'status': 'NOT_STARTED'}
     items = [results[t.task_id] for t in spec.tasks]
-    held = any(item['status'] not in ('STAGED', 'NOT_DUE') for item in items)
-    return {'format': FORMAT, 'batchId': spec.batch_id, 'batchDigest': spec.digest,
+    held = any(item['status'] not in ('STAGED', 'NOT_DUE') and not (
+        item['status'] == 'ALREADY_RECORDED' and item['recordedEvent'] in ('TASK_STAGED', 'TASK_RECONCILED')) for item in items)
+    result = {'format': FORMAT, 'batchId': spec.batch_id, 'batchDigest': spec.digest,
         'checkedAt': initial.isoformat(), 'status': 'BATCH_HELD' if held else 'BATCH_EVALUATED',
         'stagedCount': sum(item['status'] == 'STAGED' for item in items),
         'items': items, 'limitScope': 'THIS_PROCESS_ONLY', 'durableSchedule': False,
         'publicationAttempted': False, 'executionAuthorized': False}
+    if journal is not None:
+        result.update(format='hosting-discovery-checkpointed-batch-outcome/1',
+                      durableSchedule=True, scheduleScope='ONE_LOCAL_BATCH_JOURNAL',
+                      journalRecordDigest=journal._previous, journalSequence=journal._sequence,
+                      unresolvedTaskCount=sum(item['status'] in ('OUTCOME_UNKNOWN', 'HELD') for item in items),
+                      historicalOnly=False, waitedForDue=wait_for_due,
+                      pendingTaskCount=sum(item['status'] in ('NOT_DUE', 'NOT_STARTED') for item in items))
+    return result
+
+
+def inspect_batch(path, state_directory, *, reconcile=False,
+                  clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict:
+    """Read retained scheduling state, optionally reconcile original signed custody.
+
+    A reconciliation invokes only collector `inspect`, never `stage` or `publish`.
+    Absence, incomplete original custody, revoked/expired authority or changed inputs
+    stay unresolved. This method cannot reset a started task or issue another capture.
+    """
+    from .batch_journal import BatchJournal, validate_staged
+    if type(reconcile) is not bool:
+        raise ValueError('Reconciliation must be selected explicitly')
+    spec = DiscoveryBatch.from_file(path)
+    with BatchJournal(state_directory, spec, manifest_path=path, clock=clock) as journal:
+        initial = journal.now()
+        deadline = time.monotonic() + spec.max_seconds
+        items = []
+        for task in spec.tasks:
+            row = journal.summary(task.task_id)
+            if row is None:
+                row = {'taskId': task.task_id, 'status': 'NOT_STARTED', 'historicalOnly': True,
+                       'reconciliationRequired': False}
+            if reconcile and row['status'] == 'OUTCOME_UNKNOWN':
+                def current():
+                    if time.monotonic() >= deadline:
+                        raise NativeReadHeld('Batch reconciliation deadline expired')
+                    return journal.now()
+                try:
+                    current()
+                    value = execute(task.config_file, 'inspect', clock=current,
+                        config_digest=task.config_digest, campaign_digest=task.campaign_digest,
+                        environment_id=task.environment_id)
+                    # The installed collector rechecks original campaign/result signatures.
+                    # Here we only guard the exact returned binding before checkpointing it.
+                    _keys(value, {'format', 'status', 'campaignId', 'environmentId', 'authorizationDigest',
+                        'checkedAt', 'collectionIntent', 'original', 'consistency', 'publicationStatus',
+                        'reconciliationRequired', 'localCustodyOnly', 'collectionRequested',
+                        'publicationAttempted', 'executionAuthorized'})
+                    if (value['format'] != 'hosting-discovery-outbox-inspection/1'
+                            or value['status'] != 'STAGED_ORIGINAL' or not _id(value['campaignId'])
+                            or value['environmentId'] != task.environment_id
+                            or value['authorizationDigest'] != task.campaign_digest
+                            or value['consistency'] != 'LOCAL_RECORDS_RECHECKED'
+                            or value['publicationStatus'] != 'NOT_CHECKED' or value['localCustodyOnly'] is not True
+                            or any(value[k] is not False for k in ('reconciliationRequired',
+                                'collectionRequested', 'publicationAttempted', 'executionAuthorized'))
+                            or not initial <= _timestamp(value['checkedAt']) <= current()):
+                        raise NativeReadHeld('Original inspection differs from the scheduled task')
+                    original = _keys(value['original'], {'requestDigest', 'resultDigest', 'capturedAt',
+                                                       'completeness', 'objectCount'})
+                    captured = _timestamp(original['capturedAt'])
+                    if captured > _timestamp(value['checkedAt']):
+                        raise NativeReadHeld('Original capture time is inconsistent')
+                    outcome = {'format': 'hosting-discovery-collector-outcome/1', 'status': 'STAGED',
+                        'campaignId': value['campaignId'], 'environmentId': task.environment_id,
+                        'requestDigest': original['requestDigest'], 'resultDigest': original['resultDigest'],
+                        'completeness': original['completeness'], 'objectCount': original['objectCount'],
+                        'collectionRequested': False, 'publicationAttempted': False, 'executionAuthorized': False}
+                    validate_staged(outcome, task.environment_id)
+                    journal.finish(task.task_id, outcome, recovered=True)
+                    row = journal.summary(task.task_id)
+                except Exception:
+                    # Do not append repeated failure records or change the original start.
+                    row = {**row, 'reconciliationStatus': 'HELD'}
+            items.append(row)
+        unresolved = sum(item['status'] == 'OUTCOME_UNKNOWN' for item in items)
+        return {'format': 'hosting-discovery-batch-journal-inspection/1',
+            'batchId': spec.batch_id, 'batchDigest': spec.digest, 'checkedAt': initial.isoformat(),
+            'status': 'JOURNAL_HELD' if unresolved else 'JOURNAL_INSPECTED',
+            'items': items, 'unresolvedTaskCount': unresolved,
+            'journalRecordDigest': journal._previous, 'journalSequence': journal._sequence,
+            'reconciliationRequested': reconcile, 'historicalOnly': True,
+            'scheduleScope': 'ONE_LOCAL_BATCH_JOURNAL', 'durableSchedule': True,
+            'collectionRequested': False, 'publicationAttempted': False, 'executionAuthorized': False}

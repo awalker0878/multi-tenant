@@ -1,12 +1,12 @@
 # B22 — bounded discovery batch staging
 
-Reviewed 30 September 2026. This is an implementation increment within
+Reviewed 2 October 2026. The default no-journal operation is described below. This is an implementation increment within
 [Wave 2 of the existing B01–B50 plan](../product/enterprise-workload-mobility-execution-plan.md),
 not a new programme or completion of B22. It composes the
 [installed collector](discovery-collector-runtime.md) and the existing native HTTPS
 adapters. Native qualification and operating acceptance remain separate.
 
-## Installed operation
+## Default installed operation
 
 ```sh
 hosting-discovery-collect batch-stage --config /etc/hosting/discovery/batch.json
@@ -94,14 +94,16 @@ Every result explicitly includes `limitScope: THIS_PROCESS_ONLY`,
 `durableSchedule: false`, `publicationAttempted: false` and
 `executionAuthorized: false`.
 
-The schedule and its rate counters are not persisted. A second process does not
-share these limits, endpoint queues, start times or cancellation. Direct one-shot
+Without `--state-directory`, scheduling progress and rate counters are not persisted.
+Separate invocations do not share these read limits, endpoint queues or cancellation.
+The checkpointed mode described below retains task starts/outcomes, but not fleet-wide
+read budgets; it serializes cooperating processes sharing the same private journal. Direct one-shot
 collection is not retroactively governed by another batch. Consequently this
 increment is **not fleet-wide admission or B22 closure**. Do not run overlapping
 batches and infer a combined platform rate limit. Site orchestration must supply
 independent non-overlap controls until durable fleet coordination is implemented.
 Original-byte outbox recovery and central inventory idempotency remain unchanged;
-they do not provide exactly-once native collection or durable scheduling.
+they alone do not provide exactly-once native collection or durable scheduling.
 
 ## Verification and remaining work
 
@@ -114,9 +116,20 @@ fixtures separately test global concurrency, endpoint order, per-task failure
 isolation and thread draining. These tests do not qualify an installed platform,
 production load, an estate benchmark or a distributed scheduler.
 
-B22 still needs durable multi-process scheduling/dispatch, globally coordinated
-endpoint budgets, freshness monitoring, larger resumable publication and measured
+Checkpointed local multi-process exclusion and finite future-task dispatch are now
+implemented separately below. B22 still needs fleet-wide scheduling/dispatch, globally
+coordinated endpoint budgets, freshness monitoring, larger resumable publication and measured
 estate-scale acceptance. Wave 2 also retains its other B14–B21 implementation and
 native/owner acceptance gates. No Wave 3 work is started or marked complete by this
 increment. No compatibility wrapper, SQL migration, new privilege or native mutation
 path is introduced.
+
+
+## Checkpointed scheduling continuation — 2 October 2026
+
+The optional `--state-directory` on batch-stage now persists a finite schedule's
+starts/outcomes. `batch-run` additionally waits for enrolled future tasks within the
+existing duration bound. `batch-inspect` and `batch-reconcile` expose history and
+original-only recovery. The ordinary no-journal path is unchanged. Read the
+[checkpointed scheduling contract](discovery-checkpointed-scheduling.md) for exact
+commands, formats, locks, uncertainty, historical results and remaining fleet gates.

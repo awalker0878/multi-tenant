@@ -34,7 +34,7 @@ Lack of native access does not prevent repository implementation and local testi
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 2 retains allocation and attachment facts. | Full hardware/driver/key/Glance/service facts, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
-| B21/B22 | Adoption proposal model; one-shot process-local batch limits, shared-outbox first-capture claims, scoped freshness CLI/API and retained on-demand history. | Actual ownership transfer, durable fleet/global budgets, periodic monitoring/alerts, resumability and measured estate qualification. |
+| B21/B22 | Adoption proposal model; bounded batch limits, checkpointed local scheduling/waiting, original-result reconciliation, shared-outbox first-capture claims, scoped freshness CLI/API and retained on-demand history. | Actual ownership transfer, durable fleet/global budgets, periodic monitoring/alerts, resumability and measured estate qualification. |
 | B23–B43 | Portable planning, native lifecycle/readback/fenced-power primitives, guest/service handoffs, transfer/integrity/consistency contracts and compatibility checks. | Native reserve/prepare/plan/approval/apply/observe/power/guest/service/activate chain; trusted transfer-worker/target-root bindings; source fencing, final sync/cutover, post-write recovery and route execution. |
 | B44–B50 | Existing recovery/security/evidence foundations and defined release obligations. | Deployed HA/DR, alert delivery, final qualification, retained-state conversion, pilot and operating release. |
 
@@ -136,6 +136,31 @@ capacity/reservation/IPAM/DNS and execution owners, actual retained-state conver
 installed site custody and the later wave obligations remain open. No native API or
 production dataset is contacted by this continuation.
 
+### Checkpointed collection scheduling — B22 continuation (2 October 2026)
+
+The existing batch dispatcher now has opt-in local durable progress and a bounded
+waiting mode. `batch-stage --state-directory` selects due unstarted work;
+`batch-run` additionally waits for already-enrolled future tasks without resetting
+its endpoint gates. A create-only start precedes stage, and restarted unresolved
+work is never automatically retried. `batch-inspect` reads history and explicit
+`batch-reconcile` invokes only the original signed-outbox inspector. Changed inputs,
+invalid history, revoked original custody and uncertain completion remain held.
+The journal issues no campaign, token, publication or migration authority; any new
+observation still comes only from the existing independently authorized collector.
+
+This is one private local journal, not a distributed scheduler or global endpoint
+budget. Pending and unknown counts remain visible; saved outcomes are historical,
+not current reviews. The unchanged human-only freshness API is not repurposed for
+unattended service identities. See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
+Periodic monitoring/alerts, fleet-wide admission, estate measurements and the rest of
+B22 remain open. The earlier blocked reservation/source-integrity refactors are not
+included in this continuation; their original live callers remain unchanged.
+The related process tests now use a bounded readiness/activation handshake so slow
+interpreter startup does not consume the active exclusion window. Existing operation
+deadlines, exit-code/signature/request-count assertions and production checks are
+preserved. This is a B01 test-fixture correction, not a runtime authorization change;
+failed baseline/development runs remain evidence alongside later exact-tree results.
+
 ## 2. Corrected dependencies and delivery order
 
 | Correction | Required sequence and reason |
@@ -198,7 +223,7 @@ Wave 1's existing repository boundary is verified in PR #52. Later native workfl
 | B19 | Persisted generation-pinned comparison | Complete coverage and acceptance for single-VM and reviewed multi-member comparisons, exact pool/profile bindings and explicit reasons/remediation. | Reviewed policy, security, recovery and target-capacity evidence for positive candidates. |
 | B20 | Initial/saved-revision authoring, exact-draft browser review and application comparison | Finish enterprise owner/review integration, owner-to-custodian artifact transfer, independent dependency verification and complete administrator acceptance; preserve stale-response and uncertain-save defenses. | Sysadmins complete comparison without hand-authoring JSON. |
 | B21 | Partial proposal model | Persist no-change import proposals, ownership collisions, review state and links to exact observations; execution stays separately approved. | Native no-change/state reconciliation before ownership transfer. |
-| B22 | Bounded batch, custody claims and freshness/history | Complete durable fleet/global endpoint budgets, resumable estate work, periodic monitoring/alerts and measured benchmark beyond existing one-shot/process-local/on-demand paths. | Independent omission/privilege-loss reconciliation and agreed estate-scale measurements. |
+| B22 | Bounded batch, checkpointed local scheduling, custody claims and freshness/history | Complete durable fleet/global endpoint budgets, resumable estate work, periodic monitoring/alerts and measured benchmark beyond existing checkpointed local/process-local/on-demand paths. | Independent omission/privilege-loss reconciliation and agreed estate-scale measurements. |
 
 Wave 2 exits with a deployed-capable read-only slice from campaign admission to scoped comparisons. Unknown evidence produces a usable `UNKNOWN` result, never invented eligibility.
 Native B14–B16 acceptance and positive qualified destination claims remain separate from local service integration tests.

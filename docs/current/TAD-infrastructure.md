@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.27 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.28 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -178,6 +178,19 @@ removes deleted Python owners and bytecode; source-overlapping output is refused
 Installed tests load the reader from bundled resources with legacy imports blocked.
 This does not convert state, renew old source-bound approvals or close other B05
 runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
+
+### Checkpointed discovery scheduling
+
+The existing batch dispatcher now optionally uses a private digest-linked journal
+owned by `batch_journal.BatchJournal`. Starts are retained before stage, and one local
+process lock plus thread serialization protects cooperating writers. Bounded waiting
+reuses the same endpoint gates. Restarted started/held tasks are never recaptured;
+explicit reconciliation consumes only the current signed-original inspector.
+Completed checkpoints are historical, not current inventory or publication receipts.
+No new API/SQL role is introduced. Global fleet budgets, periodic monitoring/alerts,
+external restore high-water marks and operating acceptance remain open.
+
+See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
 
 ## Engineering and implementation handoff
 

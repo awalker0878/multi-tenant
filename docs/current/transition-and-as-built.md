@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.16 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.17 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -108,6 +108,20 @@ removes deleted Python owners and bytecode; source-overlapping output is refused
 Installed tests load the reader from bundled resources with legacy imports blocked.
 This does not convert state, renew old source-bound approvals or close other B05
 runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
+
+### Checkpointed collection restart
+
+An opted-in batch saves a start before calling the existing collector. Process loss
+or unconfirmed completion leaves an unknown task; another schedule invocation cannot
+reset or replay it. Explicit reconciliation may append a completion only after current
+verification of the original signed outbox. Absence, expired/revoked authority or
+partial custody stays held. Successful historical tasks are not reported as fresh
+collection; future unstarted tasks keep their original time windows.
+No journal, original outbox or retained failed record is deleted during recovery.
+A restored consistent prefix still needs independent high-water-mark reconciliation;
+this implementation is not a fleet-wide disaster-recovery authority.
+
+See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
 
 ## Engineering and implementation handoff
 

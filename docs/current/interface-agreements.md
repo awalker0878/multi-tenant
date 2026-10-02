@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.26 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.27 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -159,6 +159,19 @@ removes deleted Python owners and bytecode; source-overlapping output is refused
 Installed tests load the reader from bundled resources with legacy imports blocked.
 This does not convert state, renew old source-bound approvals or close other B05
 runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
+
+### Checkpointed batch interface
+
+The existing manifest remains `hosting-discovery-batch/1`. Journal-selected results
+use `hosting-discovery-checkpointed-batch-outcome/1` with exact manifest/journal pins,
+pending/unknown counts and explicit `ONE_LOCAL_BATCH_JOURNAL` scope. Ordinary batches
+retain their existing result. Starts cannot be reset, historical records are not
+fresh authorization, and reconciliation calls only signed-original inspection.
+The optional waiting mode never mints new campaigns or resets live endpoint gates.
+Journal/manifest/original-outbox custody must be restored together and reconciled;
+local hashes/locks do not supply global authority or independent rollback detection.
+
+See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
 
 ## Engineering and implementation handoff
 

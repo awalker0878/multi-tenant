@@ -7,8 +7,6 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
-import sys
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
@@ -21,6 +19,8 @@ from provisioner.controlplane.discovery.publication import (
     DiscoveryPublicationHeld, PrivateDiscoveryOutbox)
 from tests.provisioning.discovery.test_publication import PublicationFixture
 from tests.provisioning.discovery.test_collector_runtime import RuntimeFixture
+
+from tests.provisioning.discovery.process_fixture import start_prepared, activate
 
 
 class CollectionClaimTests(PublicationFixture, unittest.TestCase):
@@ -264,7 +264,7 @@ class CollectionClaimTests(PublicationFixture, unittest.TestCase):
         self.assertNotEqual(first[0], second[0])
         self.assertNotEqual(first[1], second[1])
 
-    def worker(self, mode):
+    def worker(self, mode, *, start=True):
         from provisioner.controlplane.discovery.ingest import campaign_document, result_document
         document = {'campaign': campaign_document(self.f.campaign),
             'result': result_document(self.f.result),
@@ -276,9 +276,10 @@ class CollectionClaimTests(PublicationFixture, unittest.TestCase):
         inputs = self.f.root / 'child-input.json'
         inputs.write_text(json.dumps(document))
         inputs.chmod(0o600)
-        process = subprocess.Popen([sys.executable, '-c', _CHILD, str(inputs), mode],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = start_prepared(_CHILD, [str(inputs), mode])
         self.addCleanup(self.close_worker, process)
+        if start:
+            activate(process)
         return process
 
     @staticmethod
@@ -289,10 +290,12 @@ class CollectionClaimTests(PublicationFixture, unittest.TestCase):
 
     def test_separate_processes_share_first_capture_exclusion_and_original_resume(self):
         import select
-        first = self.worker('wait')
-        self.assertTrue(select.select([first.stdout], [], [], 5)[0], 'worker startup timeout')
+        first = self.worker('wait', start=False)
+        second = self.worker('quick', start=False)
+        activate(first)
+        self.assertTrue(select.select([first.stdout], [], [], 5)[0], 'active collection timeout')
         self.assertEqual(first.stdout.readline().strip(), 'COLLECTING')
-        second = self.worker('quick')
+        activate(second)
         second_out, second_err = second.communicate(timeout=5)
         self.assertEqual(second.returncode, 2, second_err)
         self.assertEqual(second_out.strip(), 'HELD')
@@ -349,6 +352,7 @@ def collect():
     return (DiscoveryPage(campaign.campaign_id, campaign.scope, 1, None, None,
         result.captured_at, result.objects, terminal_completeness='PARTIAL',
         collection_errors=('VISIBLE_INVENTORY_ONLY',)),)
+fixture_ready()
 try:
     stage_submission(campaign, v['environmentId'], _signature(v['signature']), collect=collect,
         signer=PrivateFileDiscoveryResultSigner(root/'result-signing.pem', key_id='collector-key'),
@@ -367,21 +371,30 @@ class InstalledCollectionClaimTests(RuntimeFixture, unittest.TestCase):
         self.addCleanup(self.release.set)
         self.native.on_get = lambda: self.release.wait(5)
 
-    def start_command(self):
-        process = subprocess.Popen([sys.executable, '-m',
-            'provisioner.controlplane.discovery.collector_runtime',
-            'stage', '--config', str(self.config_path)],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    def start_command(self, *, start=True):
+        # Import/setup is outside the five-second active native exclusion check.
+        # Invoke the same installed command entry point with unchanged arguments.
+        program = '''
+from provisioner.controlplane.discovery.collector_runtime import main
+fixture_ready()
+raise SystemExit(main())
+'''
+        process = start_prepared(program, ['stage', '--config', str(self.config_path)])
         self.addCleanup(CollectionClaimTests.close_worker, process)
+        if start:
+            activate(process)
         return process
 
     def test_two_command_processes_send_only_one_native_page_chain(self):
-        first = self.start_command()
+        first = self.start_command(start=False)
+        second = self.start_command(start=False)
+        activate(first)
         try:
             self.assertTrue(self.native.request_started.wait(5))
-            second = self.command('stage')
-            self.assertEqual(second.returncode, 2, second.stderr)
-            self.assertEqual(json.loads(second.stdout)['status'], 'HELD')
+            activate(second)
+            second_output, second_errors = second.communicate(timeout=5)
+            self.assertEqual(second.returncode, 2, second_errors)
+            self.assertEqual(json.loads(second_output)['status'], 'HELD')
             self.assertEqual(len(self.native.calls), 1)
         finally:
             self.release.set()

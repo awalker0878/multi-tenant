@@ -121,7 +121,7 @@ context alternative. Existing negative hostname/trust and deadline tests remain.
 
 This closes the missing installed command composition, not B10/B14–B16 or Wave 2.
 Independent inventory visibility, Glance/full hardware facts, verified external
-dependencies, B22 scheduling/scale, installed custody and later provisioning/migration
+dependencies, B22 fleet scheduling/scale, installed custody and later provisioning/migration
 work remain open. No production site or vendor installation was contacted by these tests.
 
 ## B22 batch composition
@@ -141,3 +141,13 @@ payloads or clearing holds. The selected campaign and current trust/witness poli
 remain required; native, signer and publisher sections may be omitted. Local record
 changes during verification hold. Publication status stays NOT_CHECKED, and exit 0
 means inspection succeeded rather than capture or delivery completed.
+
+
+## Checkpointed scheduling continuation — 2 October 2026
+
+The optional `--state-directory` on batch-stage now persists a finite schedule's
+starts/outcomes. `batch-run` additionally waits for enrolled future tasks within the
+existing duration bound. `batch-inspect` and `batch-reconcile` expose history and
+original-only recovery. The ordinary no-journal path is unchanged. Read the
+[checkpointed scheduling contract](discovery-checkpointed-scheduling.md) for exact
+commands, formats, locks, uncertainty, historical results and remaining fleet gates.

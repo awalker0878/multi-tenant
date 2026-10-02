@@ -307,3 +307,28 @@ the expected set is not derived from the register being tested. The preceding
 `c5a579f` repository CI failure remains a historical failure. See the
 [2 October verification repair](engineering/ci-retirement-repair-2026-10-02.md) for
 its reproduced cause, this increment's scope, and separate final-revision checks.
+
+
+## Process readiness and active discovery exclusion checks
+
+The fixed test helper `tests/provisioning/discovery/process_fixture.py` separates
+bounded interpreter/import setup from the operation under test. Its readiness marker
+is consumed by the fixture, not an API or native client. Children wait for explicit
+activation, allowing two competing processes to be prepared before the first acquires
+its collection claim. Setup/activation waits are at most 30 seconds; the existing
+five-second active collection/exclusion checks and ten-second journal operation
+checks still fail on timeout. No timeout is accepted as successful exclusion.
+
+This corrects a test-startup assumption reproduced on the unchanged `73731f7` source
+in the local environment, where a bare child interpreter took more than five seconds
+to start. Retain the original failed runs; the readiness fix is a new test revision,
+not a retroactive pass. Real signatures, filesystem locks, process termination,
+request counts, exact original-byte recovery and command exit codes are still checked.
+The contending CLI fixture calls the real installed command entry point after setup;
+other fresh-process `-m` command tests remain unchanged. Three helper tests verify
+that readiness does not execute work, accept unexpected startup output or hide a
+failed child operation. The helper is not packaged as an application dependency and
+creates no alternate execution/approval path.
+
+See [checkpointed discovery scheduling](engineering/discovery-checkpointed-scheduling.md)
+for the new B22 tests and the still-open fleet/native acceptance gates.

@@ -2,7 +2,7 @@
   {
     "id": "RAD-M01",
     "path": "docs/current/RAD-adoption.md",
-    "version": "0.13",
+    "version": "0.14",
     "status": "Proposed",
     "owner_role": "Architecture authority",
     "scope": "Reference adoption for enterprise workload mobility and secure hosting across qualified on-premises environments; no site-specific control assessment or production acceptance is implied.",
@@ -79,13 +79,18 @@
         "version": "0.13",
         "date": "2026-10-01",
         "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
       }
     ]
   },
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.27",
+    "version": "0.28",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -233,6 +238,11 @@
         "version": "0.27",
         "date": "2026-10-01",
         "summary": "Move the actual Terraform catalog reader into package ownership without an alias; bound JSON/local-source validation, migrate all consumers and remove stale Python/bytecode from clean build staging. Preserve catalog/native/plan bytes and remaining B05 runtime/state and native acceptance obligations."
+      },
+      {
+        "version": "0.28",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
       }
     ]
   },
@@ -316,7 +326,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.26",
+    "version": "0.27",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -458,13 +468,18 @@
         "version": "0.26",
         "date": "2026-10-01",
         "summary": "Move the actual Terraform catalog reader into package ownership without an alias; bound JSON/local-source validation, migrate all consumers and remove stale Python/bytecode from clean build staging. Preserve catalog/native/plan bytes and remaining B05 runtime/state and native acceptance obligations."
+      },
+      {
+        "version": "0.27",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.16",
+    "version": "0.17",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -556,6 +571,11 @@
         "version": "0.16",
         "date": "2026-10-01",
         "summary": "Move the actual Terraform catalog reader into package ownership without an alias; bound JSON/local-source validation, migrate all consumers and remove stale Python/bytecode from clean build staging. Preserve catalog/native/plan bytes and remaining B05 runtime/state and native acceptance obligations."
+      },
+      {
+        "version": "0.17",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
       }
     ]
   }

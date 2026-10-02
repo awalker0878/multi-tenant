@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.13 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.14 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -61,12 +61,16 @@ Existing-draft browser editing, CLI save/load/history, review inspection and exa
 multi-member comparison are implemented. Report format 2 preserves all members,
 selected profiles, source/review/destination pins and explicit unknown/blocker reasons.
 Changed drafts, identities or selections invalidate advice and suppress late responses.
-Guided creation/evidence editing, external dependency validation and owner-facing
-signing workflows remain open.
+Guided initial and saved-revision membership/data/evidence editing, offline owner
+signing, exact-draft browser review and custodian intake are also implemented.
+Independent dependency verification, deployed owner/key onboarding, owner-to-custodian
+transport and administrator acceptance remain open.
 
 Batch staging selects due, already-authorized campaigns under process-local limits.
 Shared-outbox capture exclusion and on-demand freshness/history are implemented;
-these do not establish fleet-wide admission, durable scheduling or periodic alerts.
+the new checkpointed local schedule adds persisted starts/outcomes, bounded waiting
+and original-result reconciliation. It does not establish fleet-wide admission or
+periodic alerts. Historical checkpoints are not current authority.
 
 ### Migration and acceptance invariants
 

@@ -60,7 +60,7 @@ try:
     assert draft_client.request(review_args, lambda value: value) == (
         'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
     from provisioner.controlplane.discovery import collector_runtime, collector_settings, batch_runtime, read_budget
-    from provisioner.controlplane.discovery import freshness, freshness_history
+    from provisioner.controlplane.discovery import freshness, freshness_history, batch_journal
     from provisioner.controlplane.discovery.adapters import collector_config
     comparison_parser = argparse.ArgumentParser()
     assessment_client.install_parser(comparison_parser.add_subparsers(dest='resource', required=True))
@@ -255,6 +255,39 @@ assert batch_result['items'] == [{'taskId': 'future', 'status': 'NOT_DUE'}]
 assert batch_result['stagedCount'] == 0 and not batch_result['durableSchedule']
 assert batch_result['limitScope'] == 'THIS_PROCESS_ONLY'
 assert not batch_result['publicationAttempted'] and not batch_result['executionAuthorized']
+
+# Checkpoint and inspect the future task using the installed implementation only.
+# No native configuration is read and no campaign, credential or task is invented.
+state_directory = Path.cwd() / 'batch-state'
+state_directory.mkdir(mode=0o700)
+checkpoint_output = io.StringIO()
+with redirect_stdout(checkpoint_output):
+    assert entry.load()(['batch-stage', '--config', str(batch_file),
+                         '--state-directory', str(state_directory)]) == 0
+checkpoint = json.loads(checkpoint_output.getvalue())
+assert checkpoint['format'] == 'hosting-discovery-checkpointed-batch-outcome/1'
+assert checkpoint['durableSchedule'] is True and checkpoint['stagedCount'] == 0
+assert checkpoint['items'] == [{'taskId': 'future', 'status': 'NOT_DUE'}]
+assert checkpoint['scheduleScope'] == 'ONE_LOCAL_BATCH_JOURNAL'
+inspect_output = io.StringIO()
+with redirect_stdout(inspect_output):
+    assert entry.load()(['batch-inspect', '--config', str(batch_file),
+                         '--state-directory', str(state_directory)]) == 0
+inspected = json.loads(inspect_output.getvalue())
+assert inspected['journalRecordDigest'] == checkpoint['journalRecordDigest']
+assert inspected['items'][0]['status'] == 'NOT_STARTED'
+assert inspected['collectionRequested'] is False and inspected['executionAuthorized'] is False
+assert Path(batch_journal.__file__).resolve().is_relative_to(site)
+waiting_output = io.StringIO()
+with redirect_stdout(waiting_output):
+    assert entry.load()(['batch-run', '--config', str(batch_file),
+                         '--state-directory', str(state_directory)]) == 0
+waiting = json.loads(waiting_output.getvalue())
+assert waiting['waitedForDue'] is True and waiting['pendingTaskCount'] == 1
+assert waiting['stagedCount'] == 0 and waiting['journalSequence'] == 1
+assert waiting['journalRecordDigest'] == checkpoint['journalRecordDigest']
+assert not waiting['publicationAttempted'] and not waiting['executionAuthorized']
+
 
 result = main(['plan', str(request)])
 for name, module in sys.modules.items():
