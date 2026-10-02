@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.26 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.27 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -167,6 +167,17 @@ receipt publication; they are not current owner reviews or migration grants.
 Owner-to-custodian transport and deployed TLS/SCRAM/custody qualification remain open.
 
 See the [custodian intake contract](../engineering/application-review-intake.md).
+
+
+The Terraform catalog implementation is now package-owned at
+`provisioner.execution.terraform_catalog`; every in-tree consumer migrated and the
+old tools module is removed without an alias. The reader validates finite JSON,
+canonical source paths, local root/module ownership and the registered source set.
+Existing catalog/configuration/plan bytes remain unchanged. Clean build staging
+removes deleted Python owners and bytecode; source-overlapping output is refused.
+Installed tests load the reader from bundled resources with legacy imports blocked.
+This does not convert state, renew old source-bound approvals or close other B05
+runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
 
 ## Engineering and implementation handoff
 

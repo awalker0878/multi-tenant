@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.15 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.16 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -97,6 +97,17 @@ An expired decision may remain unretryable despite historical ingestion. The rec
 never refreshes owner validity or replaces a newly evaluated server review.
 
 See the [custodian intake contract](../engineering/application-review-intake.md).
+
+
+The Terraform catalog implementation is now package-owned at
+`provisioner.execution.terraform_catalog`; every in-tree consumer migrated and the
+old tools module is removed without an alias. The reader validates finite JSON,
+canonical source paths, local root/module ownership and the registered source set.
+Existing catalog/configuration/plan bytes remain unchanged. Clean build staging
+removes deleted Python owners and bytecode; source-overlapping output is refused.
+Installed tests load the reader from bundled resources with legacy imports blocked.
+This does not convert state, renew old source-bound approvals or close other B05
+runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
 
 ## Engineering and implementation handoff
 

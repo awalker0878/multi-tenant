@@ -8,6 +8,7 @@ and saved-revision authoring continuation from `a83c4aa5f328a598012fbc822dad4820
 The owner preparation/signing continuation starts at `1db0e51fa7a0ed8a974268c9d5202dd13fea7b40`;
 read-only browser review inspection continues from `b0704b559d70a8f5b6af875ab933ef2fbf898fd4`.
 Custodian signed-artifact intake continues from `4123efd543832bb9cff3087227f87165d90305d5`.
+The parallel B05 Terraform catalog continuation starts at `7438fb375d95188d1258141f06c2940d9e5d9a31`.
 **Historical baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`.
 **Status:** substantial Wave 0/1 foundations; B05 remains open, Wave 2 is partial,
 and Waves 3–6 are not complete. No native qualification or operating acceptance added.
@@ -29,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler and qualification registry/native/provenance owners; retired entry points deleted without aliases. | Other real runtime imports, installed execution ownership and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. | Other real runtime imports, installed execution ownership and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 2 retains allocation and attachment facts. | Full hardware/driver/key/Glance/service facts, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -98,6 +99,22 @@ retry. Shared private-file code replaces the signer's local helpers without alia
 Independent dependency verification, actual owner/key onboarding, owner-to-custodian
 artifact transfer and enterprise/administrator acceptance remain open. B05 and Wave 2 remain
 open; this continuation does not start or close the native provisioning/migration waves.
+
+### Package-owned Terraform catalog — parallel B05 continuation
+
+The actual reader now lives in `provisioner.execution.terraform_catalog`; all preparation,
+verification and test consumers migrated and the old tools module is deleted without
+an alias. Bounded catalog/configuration reads, exact local owned-source checks and
+complete registered-directory checks refuse ambiguous input. The existing catalog,
+Terraform source, provider locks, profiles and golden plans remain unchanged. Installed
+checks block legacy imports and require the retired module to be absent. Reused build
+staging cannot retain deleted Python owners or bytecode; source-overlapping build
+outputs are refused before cleanup. See the [runtime contract](../engineering/terraform-catalog-runtime.md).
+
+This closes one runtime owner, not B05 or the native workflow. Source integrity, other
+capacity/reservation/IPAM/DNS and execution owners, actual retained-state conversion,
+installed site custody and the later wave obligations remain open. No native API or
+production dataset is contacted by this continuation.
 
 ## 2. Corrected dependencies and delivery order
 

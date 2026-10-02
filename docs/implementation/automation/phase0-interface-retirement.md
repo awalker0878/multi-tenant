@@ -113,3 +113,22 @@ bytes are unchanged by relocation. Installed-wheel checks block all `tools` and
 for all three platforms and both phases. Existing compiled plans remain disabled;
 this code ownership change does not migrate retained execution state, reauthorize
 old plans or close the rest of B05.
+
+
+### Package-owned Terraform catalog — 1 October 2026
+
+The implementation formerly at `tools/terraform_catalog.py` now lives at
+`provisioner/execution/terraform_catalog.py`. Preparation, engine verification,
+repository validation and all in-tree imports use that owner directly. The old
+module is deleted and registered as retired, not replaced by a forwarding alias.
+The installed reader resolves only package-owned assets and runs with legacy
+`tools`/`scripts` imports blocked. Catalog/configuration bytes, ordering, provider
+locks, profiles and golden plans are unchanged. Invalid or ambiguous source inputs
+now fail before selection; see the [catalog runtime contract](../../engineering/terraform-catalog-runtime.md).
+
+Incremental builds reconstruct the existing Python package trees, removing deleted
+owners and orphaned bytecode from reused staging. Source-overlapping destinations
+are refused before cleanup. This is not an in-place deployment, state conversion,
+source-approval renewal or completion of the rest of B05/B48. Other real runtime
+owners remain in the top-level packages; their active consumers and retained state
+must be migrated before deletion.

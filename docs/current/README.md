@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.13 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.26 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.27 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.4 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.4 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.25 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
-| [TRANS-M01](transition-and-as-built.md) | 0.15 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
+| [ICD-M01](interface-agreements.md) | 0.26 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.16 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.26 (Proposed)**; ICD-M01 is **version 0.25 (Proposed)**.
+TAD-M01 is **version 0.27 (Proposed)**; ICD-M01 is **version 0.26 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -28,6 +28,11 @@ profile owner validates all ten families and cross-profile obligations. Availabi
 catalog 18 describes security-zone composition, not physical HA. Regenerated examples
 stay disabled. No installed tuple, directed route, native capability or operation is
 qualified by these changes. B05 and Wave 2 remain open.
+
+The [package-owned Terraform catalog](../engineering/terraform-catalog-runtime.md)
+now replaces its old tools module without an alias. Strict input and source-path checks
+preserve the current catalog/plan bytes, and clean build staging excludes deleted owners.
+Other B05 runtime imports and retained-state conversion remain open.
 
 ## Detailed current contracts
 

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.25 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.26 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -148,6 +148,17 @@ commits and postcommit receipt failures preserve uncertainty without automatic r
 Owner-to-custodian transfer and deployed custody remain independent obligations.
 
 See the [custodian intake contract](../engineering/application-review-intake.md).
+
+
+The Terraform catalog implementation is now package-owned at
+`provisioner.execution.terraform_catalog`; every in-tree consumer migrated and the
+old tools module is removed without an alias. The reader validates finite JSON,
+canonical source paths, local root/module ownership and the registered source set.
+Existing catalog/configuration/plan bytes remain unchanged. Clean build staging
+removes deleted Python owners and bytecode; source-overlapping output is refused.
+Installed tests load the reader from bundled resources with legacy imports blocked.
+This does not convert state, renew old source-bound approvals or close other B05
+runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
 
 ## Engineering and implementation handoff
 

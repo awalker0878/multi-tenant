@@ -4,8 +4,11 @@
 WSD domain or workload root. This is an operator tool for an already selected,
 authorized native target. Hosted PR checks never invoke it against a platform.
 
-`tools/terraform_catalog.py` discovers the explicitly registered writer scopes
-from `terraform/catalog.json` without assuming a fixed count.
+`provisioner.execution.terraform_catalog` reads the explicitly registered writer scopes
+from `terraform/catalog.json` without assuming a fixed count. The former tools module
+is deleted; all consumers use the package owner. Its bounded JSON/path checks and
+clean incremental build behavior are documented in the
+[package catalog contract](../../engineering/terraform-catalog-runtime.md).
 
 ## Plan preparation
 
