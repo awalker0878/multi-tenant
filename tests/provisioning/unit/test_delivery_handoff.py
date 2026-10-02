@@ -647,12 +647,18 @@ class NoBypassTest(unittest.TestCase):
                 self.assertNotIn('import tools', text)
                 self.assertNotIn('import scripts', text)
 
-    def test_no_module_under_provisioner_owns_a_journal(self):
+    def test_no_module_under_provisioner_owns_a_delivery_execution_journal(self):
+        allowed = self.PACKAGE / 'controlplane' / 'discovery' / 'batch_journal.py'
         for path in sorted(self.PACKAGE.rglob('*.py')):
             text = path.read_text(encoding='utf-8')
             with self.subTest(module=str(path.relative_to(self.PACKAGE))):
                 self.assertNotIn('execution_journal', text)
-                self.assertNotIn('flock', text)
+                if path == allowed:
+                    self.assertIn('grants no collection authority', text)
+                    self.assertIn('not an enterprise scheduler', text)
+                    self.assertNotIn('execution_authorized = True', text.lower())
+                else:
+                    self.assertNotIn('flock', text)
 
     def test_the_repository_declares_no_execution_authority(self):
         self.assertEqual(authority_module.EXECUTION_AUTHORITY, 'EXTERNAL_ONLY')
