@@ -289,3 +289,21 @@ authorization after waits, rollback and database constraints. Missing database r
 must be reported as skips, not a persistence pass. Existing dump/restore and installed-
 package checks include migration 0021 and its actual repository owner. These tests
 never qualify an installed vendor platform or approve application ownership.
+
+
+## Package-owned source attribution and retirement regression repair
+
+The `tools/check_local.py` report uses one `source_snapshot(root)` helper for its
+source digest map. It includes the installed `provisioner` and `hosting_resources`
+packages, plus `pyproject.toml`, `setup.py` and `MANIFEST.in`, as well as the existing
+source families. Tests check real package/build files, preserve attribution of
+still-active tools, and prove a changed package file changes its recorded digest.
+Provider caches and Python bytecode are not captured. This is an unsigned source
+map, not complete artifact provenance or a claim that each file was exercised.
+
+The explicit retirement expectation now includes the package-owned Terraform catalog.
+Its absence and no-legacy-import checks run alongside the existing negative tests;
+the expected set is not derived from the register being tested. The preceding
+`c5a579f` repository CI failure remains a historical failure. See the
+[2 October verification repair](engineering/ci-retirement-repair-2026-10-02.md) for
+its reproduced cause, this increment's scope, and separate final-revision checks.

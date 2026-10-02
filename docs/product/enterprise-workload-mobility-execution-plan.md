@@ -1,6 +1,6 @@
 # Enterprise workload mobility: execution plan for all waves
 
-**Current review:** 1 October 2026, `implementation/all-waves`, starting at
+**Current review:** 2 October 2026, `implementation/all-waves`, starting at
 `9d4c6685b6fd0fcb6df211aebd47857562265456`, with discovery/profile corrections
 `b993470` and `249d75f`, catalog/design alignment and the subsequent guided
 initial application-draft creation continuation from `d663821ae9b594bd6b035755a0113218169ff40b`
@@ -50,6 +50,26 @@ Ansible and service owners are mechanisms behind tenant-scoped authority. Preser
 one writer, immutable approval, uncertainty holds and independent postconditions.
 Delete competing/obsolete entry points only after verified consumer/state migration;
 these safety controls are not shims.
+
+### Verification repair — B01/B05 continuation (2 October 2026)
+
+The architecture run for `c5a579fa3a33a4c1bf0bceb33a18bee500872aba`
+finished **FAILED**, not pending or passed: its repository regression report recorded
+4,274 tests, two retirement assertions and 123 skips. The independent expected
+retirement map omitted the already-deleted Terraform catalog module. This increment
+adds that explicit eighteenth entry and extends package-owner import tests to the
+execution package; rejection tests and the retirement register are not weakened.
+
+The local regression evidence manifest now includes `provisioner/`,
+`hosting_resources/`, `pyproject.toml`, `setup.py` and `MANIFEST.in` alongside its
+existing source families. Moving code into an installed package must not remove it
+from test-source attribution. Original reports are retained; the expanded manifest
+is not a signed release or proof that every reported file was exercised.
+
+See the [revision-specific verification repair](../engineering/ci-retirement-repair-2026-10-02.md).
+The separately prepared source-integrity relocation is **not published** in this
+increment: the existing verifier and all its callers remain intact. Only coherent
+verification/evidence changes are delivered; B05 and the remaining waves stay open.
 
 ### Guided drafts and owner preparation/signing — B17/B20 continuation
 
