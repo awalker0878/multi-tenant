@@ -41,7 +41,7 @@ each owner produces. Nothing here restates them.
 | reservation intent | `scripts/check_reservation_preflight.py` | `provisioner/repository.py` |
 | allocation intent | `scripts/check_ipam_allocation_preflight.py` | `provisioner/repository.py` |
 | registration intent | `scripts/check_dns_registration_preflight.py` | `provisioner/repository.py` |
-| exported reservation records | `scripts/check_reservation_records.py` | `provisioner/repository.py` |
+| exported reservation records | `provisioner/allocations/reservation_evidence.py` | `provisioner/repository.py` |
 | exported allocation records | `scripts/check_ipam_allocation_records.py` | `provisioner/repository.py` |
 | exported registration records | `scripts/check_dns_registration_records.py` | `provisioner/repository.py` |
 

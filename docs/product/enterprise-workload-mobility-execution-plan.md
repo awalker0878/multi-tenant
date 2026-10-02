@@ -30,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. | Other real runtime imports, installed execution ownership and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, reservation-evidence reader and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. | Other real runtime imports, installed execution ownership and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 2 retains allocation and attachment facts. | Full hardware/driver/key/Glance/service facts, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -70,6 +70,22 @@ See the [revision-specific verification repair](../engineering/ci-retirement-rep
 The separately prepared source-integrity relocation is **not published** in this
 increment: the existing verifier and all its callers remain intact. Only coherent
 verification/evidence changes are delivered; B05 and the remaining waves stay open.
+
+### Exported reservation evidence — parallel B05 continuation (2 October 2026)
+
+From `73731f7e6432e5adc44e11a89c0b5ddd5f3578e9`, the actual reservation-record
+reader now lives in `provisioner.allocations.reservation_evidence`. Every in-tree
+consumer, current command and generated source link is migrated; the old script is
+deleted with no alias. Bounded regular-file reads and exact contained source references
+reject ambiguous inputs while preserving the existing record format, canonical digests,
+expiry and uncertainty rules. Installed tests block legacy imports and working-directory
+fallbacks; reused builds remove the retired script and bytecode. The independent
+retirement expectation is updated together with the register.
+
+See the [reservation-evidence runtime contract](../engineering/reservation-evidence-runtime.md).
+The reader authenticates neither an external issuer nor live capacity. No record is
+created, renewed, consumed or released; the authoritative reservation service, B23
+transactional composition and remaining B05 owners/state conversion stay open.
 
 ### Guided drafts and owner preparation/signing — B17/B20 continuation
 

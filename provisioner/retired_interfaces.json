@@ -151,6 +151,13 @@
       "reason": "The complete catalog reader is package-owned; all runtime, validation and test consumers migrated without a forwarding module.",
       "replacement": "provisioner/execution/terraform_catalog.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_reservation_records.py",
+      "kind": "path",
+      "reason": "The exported reservation-evidence implementation is package-owned; all in-tree callers and commands migrated with no forwarding module.",
+      "replacement": "provisioner/allocations/reservation_evidence.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }

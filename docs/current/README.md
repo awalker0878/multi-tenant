@@ -34,6 +34,10 @@ now replaces its old tools module without an alias. Strict input and source-path
 preserve the current catalog/plan bytes, and clean build staging excludes deleted owners.
 Other B05 runtime imports and retained-state conversion remain open.
 
+The [reservation-evidence reader](../engineering/reservation-evidence-runtime.md) is
+also package-owned, with its old script and bytecode removed. The unchanged export
+contract remains read only; no current capacity or reservation authority is inferred.
+
 ## Detailed current contracts
 
 [Native OpenStack reads](../engineering/openstack-discovery-https.md),

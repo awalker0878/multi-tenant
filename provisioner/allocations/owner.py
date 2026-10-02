@@ -80,7 +80,7 @@ UNITS = ('vcpu', 'memory_mb', 'storage_gb')
 #: Mirrors the owner's own accounting bound, so the mirror never accepts a request
 #: the authoritative validator would refuse.
 MAX_UNITS = 10 ** 15
-#: Mirrors `tools.check_reservation_records.STATES` for the states this module reads.
+#: Mirrors `provisioner.allocations.reservation_evidence.STATES` for the states this module reads.
 RECORD_STATES = ('HELD', 'CONSUMED', 'RELEASED', 'EXPIRED', 'UNCERTAIN')
 
 #: The reconciled states. None of them is "this repository holds capacity".

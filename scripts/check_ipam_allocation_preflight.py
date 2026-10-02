@@ -20,7 +20,7 @@ from hosting_resources import RESOURCE_ROOT as ROOT
 
 from scripts import check_ipam_allocation_records as ipam
 from scripts import check_reservation_preflight as reservation_preflight
-from scripts import check_reservation_records as reservation_records
+from provisioner.allocations import reservation_evidence as reservation_records
 from scripts import check_site_service_eligibility as sitecheck
 
 FORMAT='portable-hosting-ipam-allocation-intent/1'

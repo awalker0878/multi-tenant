@@ -56,7 +56,7 @@ refusal is never lost to a rounding artifact.
 
 `reconcile(identity, index, as_of=...)` validates the repository's exported
 reservation evidence with the repository's existing checker
-(`scripts/check_reservation_records.py`, reached only through
+(`provisioner/allocations/reservation_evidence.py`, reached only through
 `provisioner/repository.py`) and classifies the proposal. A missing record is a
 proposal, **never** a confirmation.
 

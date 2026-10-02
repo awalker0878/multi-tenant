@@ -132,3 +132,16 @@ are refused before cleanup. This is not an in-place deployment, state conversion
 source-approval renewal or completion of the rest of B05/B48. Other real runtime
 owners remain in the top-level packages; their active consumers and retained state
 must be migrated before deletion.
+
+### Package-owned reservation evidence — 2 October 2026
+
+The implementation formerly at `scripts/check_reservation_records.py` is now
+`provisioner/allocations/reservation_evidence.py`. All in-tree imports, CI commands,
+metadata, generator links and tests use the new owner; the old path is prohibited
+without a wrapper. The independent retirement test now expects nineteen entries.
+Installed tests reject legacy imports and stale bytecode while preserving the existing
+export schema, canonical digests and reconciliation requirements. See the
+[read-only evidence boundary](../../engineering/reservation-evidence-runtime.md).
+
+This move does not import private reservation state, grant ownership, reauthorize
+old plans or complete the remaining capacity/IPAM/DNS preflight and execution owners.

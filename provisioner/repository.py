@@ -105,13 +105,13 @@ def reservation_records(path: Path | str | None = None) -> dict:
     that system recorded and already owns the contract for reading it, so the
     provisioner asks for the export instead of defining a second record model.
     """
-    from scripts import check_reservation_records as module
+    from provisioner.allocations import reservation_evidence as module
     return module.load(Path(path) if path is not None else module.INDEX)
 
 
 def validate_reservation_records(index: dict, *, as_of, root: Path | str | None = None) -> dict:
     """Validate an exported reservation record index with the repository's checker."""
-    from scripts import check_reservation_records as module
+    from provisioner.allocations import reservation_evidence as module
     return module.validate(index, as_of=as_of,
                            root=Path(root) if root is not None else ROOT)
 
@@ -203,7 +203,7 @@ def declared_contracts() -> dict:
     from scripts import check_ipam_allocation_records as allocation_records
     from scripts import check_dns_registration_preflight as registration
     from scripts import check_dns_registration_records as registration_records
-    from scripts import check_reservation_records as records
+    from provisioner.allocations import reservation_evidence as records
     return {
         'identifier': site.ID.pattern,
         'capacity_request': {
@@ -304,13 +304,13 @@ def opaque_dns_ref(value, label) -> str:
 
 def instant(value, label):
     """Read a timezone-aware instant with the repository record contract."""
-    from scripts import check_reservation_records as module
+    from provisioner.allocations import reservation_evidence as module
     return module.instant(value, label)
 
 
 def canonical_record_digest(document: dict) -> str:
     """The repository's canonical digest of a reservation-shaped document."""
-    from scripts import check_reservation_records as module
+    from provisioner.allocations import reservation_evidence as module
     return module.canonical_digest(document)
 
 

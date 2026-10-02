@@ -21,6 +21,7 @@ class BuildRuntime(build_py):
         required = {
             'tools/__init__.py', 'provisioner/compiler/wsd.py', 'tools/check_release.py',
             'scripts/__init__.py', 'provisioner/compiler/components.py',
+            'provisioner/allocations/reservation_evidence.py',
             'provisioner/qualification/registry.py', 'provisioner/execution/terraform_catalog.py',
             'sources/capabilities/platform_registry.json',
             'policy/rules/standards.json', 'profiles/security/catalog.json',

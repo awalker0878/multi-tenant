@@ -164,14 +164,25 @@ runtime owners. See the [catalog runtime contract](../engineering/terraform-cata
 
 The existing manifest remains `hosting-discovery-batch/1`. Journal-selected results
 use `hosting-discovery-checkpointed-batch-outcome/1` with exact manifest/journal pins,
-pending/unknown counts and explicit `ONE_LOCAL_BATCH_JOURNAL` scope. Ordinary batches
-retain their existing result. Starts cannot be reset, historical records are not
-fresh authorization, and reconciliation calls only signed-original inspection.
-The optional waiting mode never mints new campaigns or resets live endpoint gates.
+pre-stage start records and append-only result/unknown/reconciled transitions.
+`batch-run` may wait only inside the manifest's finite authority window. `batch-inspect`
+reads retained history without collecting; `batch-reconcile` checks original signed
+outbox bytes and cannot recollect, publish or reset a task for retry.
 Journal/manifest/original-outbox custody must be restored together and reconciled;
 local hashes/locks do not supply global authority or independent rollback detection.
 
 See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
+
+### Exported reservation evidence interface
+
+The same record format and canonical digest are consumed by the package-owned
+`provisioner.allocations.reservation_evidence` reader; the retired script has no alias.
+Bounded regular-file reads, duplicate/nonfinite JSON rejection and contained source
+references preserve the existing external-authority boundary and uncertainty rules.
+Malformed exports and ambiguous references hold instead of resolving another file.
+Export provenance and live commitments remain the external owner's obligations.
+No reservation lifecycle or IPAM authority is granted by successful parsing. See the
+[read-only runtime contract](../engineering/reservation-evidence-runtime.md).
 
 ## Engineering and implementation handoff
 

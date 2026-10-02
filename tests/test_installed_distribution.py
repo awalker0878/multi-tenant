@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import site
 import shutil
 import subprocess
 import sys
@@ -55,7 +56,9 @@ class InstalledDistributionTest(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
         cls.retired_python = ('tools/terraform_catalog.py', 'tools/terraform_catalog.pyc',
-                              'tools/__pycache__/terraform_catalog.cpython-313.pyc')
+                              'tools/__pycache__/terraform_catalog.cpython-313.pyc',
+                              'scripts/check_reservation_records.py', 'scripts/check_reservation_records.pyc',
+                              'scripts/__pycache__/check_reservation_records.cpython-313.pyc')
         for relative in cls.retired_python:
             path = cls.staging / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -72,9 +75,27 @@ class InstalledDistributionTest(unittest.TestCase):
         cls.environment = cls.base / 'environment'
         # Runtime dependencies come from the test runner's environment; the
         # project itself must be installed solely from the freshly built wheel.
+        # A nested venv's --system-site-packages points at the base interpreter,
+        # not an outer venv such as CI/test tooling.  Add only dependency roots
+        # that do not already contain this project, so isolated child imports can
+        # see PyYAML/httpx/etc. without resolving provisioner from the checkout.
         venv.EnvBuilder(with_pip=True, system_site_packages=True).create(cls.environment)
         cls.python = (cls.environment / ('Scripts/python.exe' if os.name == 'nt'
                                          else 'bin/python'))
+        dependency_roots = []
+        for candidate in [*site.getsitepackages(), site.getusersitepackages()]:
+            root = Path(candidate).resolve()
+            if (root.is_dir() and root not in dependency_roots
+                    and not (root / 'provisioner').exists()
+                    and not (root / 'hosting_resources').exists()):
+                dependency_roots.append(root)
+        nested_sites = json.loads(subprocess.check_output(
+            [str(cls.python), '-I', '-c',
+             'import json,site; print(json.dumps(site.getsitepackages()))'],
+            text=True, env=cls.env, timeout=30))
+        dependency_link = Path(nested_sites[0]) / 'hosting-test-runner-dependencies.pth'
+        dependency_link.write_text(''.join(str(root) + '\n' for root in dependency_roots),
+                                   encoding='utf-8')
         cls.run_checked([str(cls.python), '-I', '-m', 'pip', '--disable-pip-version-check',
                          'install', '--no-deps', '--ignore-installed', str(cls.wheel)])
         shutil.copyfile(ROOT / 'examples/requests/internal-production.yaml',
@@ -98,6 +119,8 @@ class InstalledDistributionTest(unittest.TestCase):
         with zipfile.ZipFile(self.wheel) as wheel:
             members = wheel.namelist()
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
+        self.assertIn('provisioner/allocations/reservation_evidence.py', members)
+        self.assertFalse(any(name.startswith('scripts/check_reservation_records.') for name in members))
         self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
         for name in members:
             self.assertNotIn(name.split('/')[0],
@@ -233,6 +256,58 @@ print(json.dumps({'entries': len(rows), 'legacyImports': False, 'nativeContact':
         self.assertGreater(result['entries'], 0)
         self.assertFalse(result['legacyImports'])
         self.assertFalse(result['nativeContact'])
+
+    def test_reservation_evidence_runs_without_legacy_imports_or_checkout(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, os, sys, tempfile
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('Reservation evidence reached a legacy owner: ' + fullname)
+blocker = NoLegacy()
+sys.meta_path.insert(0, blocker)
+try:
+    from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+    from provisioner import repository
+    from provisioner.allocations import reservation_evidence as records
+    assert SOURCE_ROOT is None
+    assert Path(records.__file__).is_relative_to(Path(sys.prefix))
+    assert records.INDEX.is_relative_to(RESOURCE_ROOT)
+    original = records.INDEX.read_bytes()
+    with tempfile.TemporaryDirectory() as directory:
+        previous = Path.cwd()
+        os.chdir(directory)
+        try:
+            forged = Path('sources/capabilities/reservation_record_index.json')
+            forged.parent.mkdir(parents=True)
+            forged.write_text('{"forged": true}')
+            assert repository.reservation_records() == records.load()
+            assert records.validate(records.load())['record_count'] == 0
+            records.INDEX.unlink()
+            try:
+                records.load()
+            except FileNotFoundError:
+                pass
+            else:
+                raise AssertionError('Missing installed index resolved a cwd fallback')
+        finally:
+            records.INDEX.write_bytes(original)
+            os.chdir(previous)
+    assert sys.path == before
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('scripts.check_reservation_records') is None
+print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.allocations.reservation_evidence')
+        self.assertFalse(result['legacyImports'])
+        report = json.loads(self.run_checked([str(self.python), '-I', '-m',
+            'provisioner.allocations.reservation_evidence', '--as-of', '2026-10-02T00:00:00Z']))
+        self.assertEqual(report['status'], 'PASSED_EXPORTED_RESERVATION_RECORDS')
+        self.assertEqual(report['record_count'], 0)
+        self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
 
     def test_missing_packaged_asset_cannot_resolve_a_shared_directory(self):
         result = self.probe('''

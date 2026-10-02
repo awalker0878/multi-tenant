@@ -61,16 +61,25 @@ Existing-draft browser editing, CLI save/load/history, review inspection and exa
 multi-member comparison are implemented. Report format 2 preserves all members,
 selected profiles, source/review/destination pins and explicit unknown/blocker reasons.
 Changed drafts, identities or selections invalidate advice and suppress late responses.
-Guided initial and saved-revision membership/data/evidence editing, offline owner
-signing, exact-draft browser review and custodian intake are also implemented.
+Guided initial and saved-revision membership/data/evidence editing, the separate
+offline owner signer, exact-draft browser review and custodian intake are implemented.
 Independent dependency verification, deployed owner/key onboarding, owner-to-custodian
-transport and administrator acceptance remain open.
+artifact transfer and enterprise/administrator acceptance remain open.
 
 Batch staging selects due, already-authorized campaigns under process-local limits.
 Shared-outbox capture exclusion and on-demand freshness/history are implemented;
 the new checkpointed local schedule adds persisted starts/outcomes, bounded waiting
 and original-result reconciliation. It does not establish fleet-wide admission or
 periodic alerts. Historical checkpoints are not current authority.
+
+### Exported evidence and installed ownership
+
+The reservation-evidence reader is package-owned; its former script and alternate
+import path are retired. It validates the existing exported contract without becoming
+the reservation authority. A valid file, reference or canonical digest is not a current
+capacity commitment or an authenticated owner response. Reserve/renew/confirm/release
+composition remains B23 work, separately from this B05 packaging correction. See the
+[read-only reservation-evidence contract](../engineering/reservation-evidence-runtime.md).
 
 ### Migration and acceptance invariants
 

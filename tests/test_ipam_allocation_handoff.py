@@ -12,7 +12,7 @@ import unittest
 from scripts import check_ipam_allocation_preflight as preflight
 from scripts import check_ipam_allocation_records as ipam
 from scripts import check_reservation_preflight as reservation_preflight
-from scripts import check_reservation_records as reservation_records
+from provisioner.allocations import reservation_evidence as reservation_records
 from scripts import check_site_service_eligibility as sitecheck
 
 ROOT=Path(__file__).resolve().parents[1]

@@ -135,7 +135,7 @@ class NavigationIntegrationTests(unittest.TestCase):
         self.assertTrue(any('scripts/check_platform_family_eligibility.py' in s for s in commands))
         self.assertTrue(any('scripts/check_site_service_capacity.py' in s for s in commands))
         self.assertTrue(any('scripts/check_site_service_eligibility.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_reservation_records.py' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.reservation_evidence' in s for s in commands))
         self.assertTrue(any('scripts/check_reservation_preflight.py' in s for s in commands))
         self.assertTrue(any('scripts/check_ipam_allocation_records.py' in s for s in commands))
         self.assertTrue(any('scripts/check_ipam_allocation_preflight.py' in s for s in commands))

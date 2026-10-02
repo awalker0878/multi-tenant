@@ -13,7 +13,7 @@ import unittest
 from provisioner.qualification import native as qualification
 from provisioner.qualification import campaign as campaign
 from scripts import check_reservation_preflight as preflight
-from scripts import check_reservation_records as records
+from provisioner.allocations import reservation_evidence as records
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as sitecheck
 from provisioner.qualification import provenance as provenance
@@ -219,7 +219,7 @@ class ReservationRecordTests(unittest.TestCase):
 
     def test_current_cli_keeps_all_mutation_authority_false(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_reservation_records.py'),
+            sys.executable,'-m','provisioner.allocations.reservation_evidence',
             '--as-of','2026-09-18T18:00:00Z'],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)

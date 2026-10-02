@@ -18,7 +18,7 @@ if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
-from scripts import check_reservation_records as records
+from provisioner.allocations import reservation_evidence as records
 from scripts import check_site_service_capacity as capacity
 from scripts import check_site_service_eligibility as sitecheck
 from provisioner.qualification import native as qualification

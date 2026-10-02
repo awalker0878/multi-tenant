@@ -183,14 +183,24 @@ runtime owners. See the [catalog runtime contract](../engineering/terraform-cata
 
 The existing batch dispatcher now optionally uses a private digest-linked journal
 owned by `batch_journal.BatchJournal`. Starts are retained before stage, and one local
-process lock plus thread serialization protects cooperating writers. Bounded waiting
-reuses the same endpoint gates. Restarted started/held tasks are never recaptured;
-explicit reconciliation consumes only the current signed-original inspector.
+schedule invocation can wait for already-enrolled due work within a bounded horizon.
+Crash recovery never recollects an uncertain task; reconciliation accepts only the
+original signed outbox object under the same immutable campaign/configuration binding.
 Completed checkpoints are historical, not current inventory or publication receipts.
 No new API/SQL role is introduced. Global fleet budgets, periodic monitoring/alerts,
 external restore high-water marks and operating acceptance remain open.
 
 See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
+
+### Package-owned reservation evidence
+
+`provisioner.allocations.reservation_evidence` now owns the exported reservation
+record reader used by repository access, reservation preflight and IPAM parent checks.
+It validates bounded regular input, duplicate/nonfinite JSON and contained source
+references while retaining record/schema/digest and expiry/uncertainty semantics.
+Installed checks prohibit legacy imports and working-directory fallback. This is not
+a new writer or reservation service; B23 transactions and remaining B05 owners stay
+open. See the [runtime contract](../engineering/reservation-evidence-runtime.md).
 
 ## Engineering and implementation handoff
 

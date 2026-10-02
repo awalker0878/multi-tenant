@@ -134,7 +134,7 @@ The current inventory is intentionally empty. A commissioned envelope now pins t
 
 Design: [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md) · [Reservation recovery](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [Concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
 
-Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../scripts/check_reservation_records.py) · [immutable intent preflight](../../scripts/check_reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
+Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../provisioner/allocations/reservation_evidence.py) · [immutable intent preflight](../../scripts/check_reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
 
 The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding and the current commissioned-envelope SHA-256 are validated together; drift under the same envelope ID is a reconciliation conflict and the digest is propagated into the parent binding consumed by IPAM. CI never creates or releases a reservation or allocates an address.
 

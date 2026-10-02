@@ -51,7 +51,7 @@ DNS_PREFLIGHT = support.ROOT / 'scripts' / 'check_dns_registration_preflight.py'
 IPAM_RECORDS = support.ROOT / 'scripts' / 'check_ipam_allocation_records.py'
 DNS_RECORDS = support.ROOT / 'scripts' / 'check_dns_registration_records.py'
 RESERVATION_PREFLIGHT = support.ROOT / 'scripts' / 'check_reservation_preflight.py'
-RESERVATION_RECORDS = support.ROOT / 'scripts' / 'check_reservation_records.py'
+RESERVATION_RECORDS = support.ROOT / 'provisioner' / 'allocations' / 'reservation_evidence.py'
 
 #: The exported record key sets the two owners declare, filtered from the compiled
 #: documents. A compiled intent carries more than an exported record does.

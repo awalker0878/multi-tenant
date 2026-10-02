@@ -83,7 +83,7 @@
       {
         "version": "0.14",
         "date": "2026-10-02",
-        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
       }
     ]
   },
@@ -242,7 +242,7 @@
       {
         "version": "0.28",
         "date": "2026-10-02",
-        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
       }
     ]
   },
@@ -472,7 +472,7 @@
       {
         "version": "0.27",
         "date": "2026-10-02",
-        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
       }
     ]
   },
@@ -575,7 +575,7 @@
       {
         "version": "0.17",
         "date": "2026-10-02",
-        "summary": "Add checkpointed local discovery scheduling, bounded waiting and signed-original reconciliation under the existing dispatcher. Preserve uncertain starts, historical result semantics and open fleet/monitoring/native acceptance gates; correct active RAD owner-workflow descriptions."
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
       }
     ]
   }

@@ -113,15 +113,25 @@ runtime owners. See the [catalog runtime contract](../engineering/terraform-cata
 
 An opted-in batch saves a start before calling the existing collector. Process loss
 or unconfirmed completion leaves an unknown task; another schedule invocation cannot
-reset or replay it. Explicit reconciliation may append a completion only after current
-verification of the original signed outbox. Absence, expired/revoked authority or
-partial custody stays held. Successful historical tasks are not reported as fresh
-collection; future unstarted tasks keep their original time windows.
-No journal, original outbox or retained failed record is deleted during recovery.
-A restored consistent prefix still needs independent high-water-mark reconciliation;
-this implementation is not a fleet-wide disaster-recovery authority.
+silently recollect it. Reconciliation consumes only the original signed outbox object
+and appends a transition instead of rewriting history. Completed tasks are historical
+records and do not refresh inventory. The private journal must be restored together
+with its manifest/configuration and original outbox custody; missing or divergent
+history holds further local scheduling. A restored consistent prefix still needs
+independent high-water-mark reconciliation; this implementation is not a fleet-wide
+disaster-recovery authority.
 
 See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
+
+### Reservation-evidence reader transition
+
+The exported reservation reader moved into package ownership with all consumers and
+commands migrated. The old script and cached bytecode are excluded from fresh builds.
+Existing record/index formats, canonical digests, uncertainty handling and owner scope
+are unchanged. This is not a retained-state importer or an in-place installation
+upgrade. Invalid aliased/linked references require owner-controlled correction, never
+silent relabelling of retained evidence. See the
+[runtime contract](../engineering/reservation-evidence-runtime.md).
 
 ## Engineering and implementation handoff
 

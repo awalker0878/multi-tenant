@@ -40,7 +40,7 @@ from tools import capacity as owner_module
 from tests.provisioning import support
 
 OWNER = support.ROOT / 'tools' / 'capacity.py'
-RECORD_CHECKER = support.ROOT / 'scripts' / 'check_reservation_records.py'
+RECORD_CHECKER = support.ROOT / 'provisioner' / 'allocations' / 'reservation_evidence.py'
 PREFLIGHT = support.ROOT / 'scripts' / 'check_reservation_preflight.py'
 
 #: A relative path the repository really owns, for exported-evidence references.
