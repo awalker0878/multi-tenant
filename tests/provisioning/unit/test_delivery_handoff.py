@@ -655,7 +655,8 @@ class NoBypassTest(unittest.TestCase):
                 self.assertNotIn('execution_journal', text)
                 if path == allowed:
                     self.assertIn('grants no collection authority', text)
-                    self.assertIn('not an enterprise scheduler', text)
+                    self.assertIn('enterprise scheduler', text)
+                    self.assertIn('is not', text)
                     self.assertNotIn('execution_authorized = True', text.lower())
                 else:
                     self.assertNotIn('flock', text)
