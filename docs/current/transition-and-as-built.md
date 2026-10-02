@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.13 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.14 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -44,8 +44,14 @@ durable fleet budgets or DR high-water marks.
 Draft retries retain original author/time/content and exact source revision. Signed
 owner decisions do not convert proposals into mutation rights. CLI/browser comparison
 report 2 retains all member/profile/source/review/destination pins. Draft, route,
-destination or identity changes invalidate advice; late replies are ignored. Full
-owner-facing signing and application-wide migration planning remain open.
+destination or identity changes invalidate advice; late replies are ignored. The
+installed offline owner signer prepares and signs exact-draft assessment decisions;
+authenticated artifact delivery and actual owner/key onboarding remain open. The
+[exact-draft browser review](../engineering/application-review-browser.md) now displays
+all existing review states without signing or changing immutable draft status. It
+clears stale advice and preserves uncertain draft saves when the tab becomes hidden.
+Reported supersession requires explicit reload, never source rebasing or review reuse.
+Application-wide migration planning and operating acceptance remain open.
 
 Freshness inspection/history are implemented, including on-demand exact-ID checks,
 predecessor/cursor integrity, migration 0023, narrow grants and atomic audit. Restore

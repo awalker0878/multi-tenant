@@ -150,10 +150,11 @@ outside the checkout with legacy imports blocked. Report final-revision CI and
 actual skips separately; these tests are not native platform qualification.
 
 The separate signed owner-review path below now persists and evaluates exact-draft
-assessment decisions. Owner-facing signing, trusted dependency enrichment and
-application-wide destination planning remain unfinished B17/B20 work. The
-[browser workspace](application-draft-browser.md) edits existing metadata/startup
-order; this CLI still uses structured JSON for full proposals. B22 scheduling and scale, native provisioning, transfer, fencing,
+assessment decisions. The separate [offline owner signer](application-owner-signing.md)
+now prepares and signs those decisions. Trusted dependency enrichment, owner/key
+onboarding and authenticated artifact delivery remain unfinished B17/B20 work. The
+[browser workspace](application-draft-browser.md) creates and revises complete
+membership/data/evidence proposals; this CLI still uses structured JSON for proposals. B22 scheduling and scale, native provisioning, transfer, fencing,
 cutover and post-write recovery remain in the existing waves. No native support
 claim, reviewed candidate, ownership acceptance or production grant is added.
 
@@ -165,8 +166,9 @@ independent exact-draft acceptance/revocation and GET-only candidate evaluation.
 This is separate from draft saves, listing and editing; drafts remain UNREVIEWED.
 The CLI/browser in this document do not issue signatures or show a native approval.
 Read-only CLI status inspection is now available through the existing draft helper;
-owner-facing signing, verified external dependencies and application-wide migration
-planning remain open. The separate review does not change draft status,
+the separate offline signer and [browser status inspector](application-review-browser.md)
+are implemented. Authenticated artifact delivery, verified external dependencies and
+application-wide migration planning remain open. The separate review does not change draft status,
 create a native owner or authorize a migration.
 
 ### Read an exact draft's owner-review status

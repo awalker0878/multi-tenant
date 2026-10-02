@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.23 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.24 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -103,6 +103,13 @@ currency and evidence-stream concurrency remain server checks, not export claims
 Private create-only POSIX output is never overwritten; an error may leave output and
 requires byte reconciliation, not another signature or automatic submission. Deployed
 owner onboarding, artifact delivery and policy revision-floor custody remain open.
+The browser now issues one exact-revision review GET from the loaded immutable draft.
+The standalone display and application comparison share a single wire validator; no
+new response format or issuer is added. All eight statuses retain their meaning and
+false dependency-verification, ownership and execution flags. Read errors remove prior
+advice, never fall back to unsigned metadata or another revision. Hidden-tab review
+reads are cancelled without cancelling a separate draft save or erasing its uncertainty.
+Scheduled clearance is a display bound, not a hard timer guarantee or revocation feed.
 Application report 2 binds every member/profile, canonical selection, source/review,
 destination and method/network/data settings. CLI/browser reject mismatched or stale
 reports and clear advice after changed selections or identity. No comparison reserves
@@ -147,6 +154,7 @@ Detailed producer/consumer, response, retry and deployment contracts remain at:
 - [browser workspace](../engineering/application-draft-browser.md)
 - [signed owner-review contract](../engineering/application-owner-review.md)
 - [offline owner preparation/signing contract](../engineering/application-owner-signing.md)
+- [exact-draft browser review contract](../engineering/application-review-browser.md)
 - [application comparison contract](../engineering/application-comparison.md)
 - [AHV HTTPS contract](../engineering/ahv-discovery-https.md)
 - [installed application-comparison command](../engineering/application-comparison-operator.md)

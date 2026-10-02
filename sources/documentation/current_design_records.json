@@ -85,7 +85,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.24",
+    "version": "0.25",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -218,6 +218,11 @@
         "version": "0.24",
         "date": "2026-10-01",
         "summary": "Document installed offline application-owner prepare/sign commands with exact immutable export/digest binding, shared current enrollment verification and create-only private artifact custody. Preserve server ingestion/currency checks and open owner onboarding, authenticated delivery, independent dependency and operating acceptance obligations."
+      },
+      {
+        "version": "0.25",
+        "date": "2026-10-01",
+        "summary": "Add exact-saved-revision browser review inspection with one shared wire validator, microsecond validity checks, stale-response/visibility/expiry cleanup and explicit no-signing/no-ingest authority. Correct stale owner-signing descriptions; retain deployed custody, artifact delivery, independent dependency and operating acceptance gaps."
       }
     ]
   },
@@ -301,7 +306,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.23",
+    "version": "0.24",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -428,13 +433,18 @@
         "version": "0.23",
         "date": "2026-10-01",
         "summary": "Document installed offline application-owner prepare/sign commands with exact immutable export/digest binding, shared current enrollment verification and create-only private artifact custody. Preserve server ingestion/currency checks and open owner onboarding, authenticated delivery, independent dependency and operating acceptance obligations."
+      },
+      {
+        "version": "0.24",
+        "date": "2026-10-01",
+        "summary": "Add exact-saved-revision browser review inspection with one shared wire validator, microsecond validity checks, stale-response/visibility/expiry cleanup and explicit no-signing/no-ingest authority. Correct stale owner-signing descriptions; retain deployed custody, artifact delivery, independent dependency and operating acceptance gaps."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.13",
+    "version": "0.14",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -511,6 +521,11 @@
         "version": "0.13",
         "date": "2026-10-01",
         "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01–B50/native acceptance gates."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-10-01",
+        "summary": "Add exact-saved-revision browser review inspection with one shared wire validator, microsecond validity checks, stale-response/visibility/expiry cleanup and explicit no-signing/no-ingest authority. Correct stale owner-signing descriptions; retain deployed custody, artifact delivery, independent dependency and operating acceptance gaps."
       }
     ]
   }

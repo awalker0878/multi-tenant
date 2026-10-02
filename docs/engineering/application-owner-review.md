@@ -108,8 +108,9 @@ uses this review for bounded all-member comparison and combined baseline demand.
 Neither endpoint is an application-wide migration planner. The operator CLI inspects
 owner-review status as described below. The separate
 [installed offline owner command](application-owner-signing.md) now prepares and signs
-decisions outside the API/operator identity. Browser review presentation, actual
-owner/key onboarding and authenticated signed-artifact delivery remain integrations.
+decisions outside the API/operator identity. The [browser review inspector](application-review-browser.md)
+now presents the same eight statuses for an exact loaded draft. Actual owner/key
+onboarding and authenticated signed-artifact delivery remain integrations.
 
 ## Inspect the review from the operator CLI
 
@@ -190,7 +191,8 @@ skips and final-revision CI results must be reported separately.
 
 B17/B20 remain partial: verified external dependency evidence, actual owner/key
 onboarding, authenticated signed-artifact delivery, full application migration planning,
-browser review presentation and administrator acceptance remain open. The operator CLI
+enterprise/administrator acceptance remain open. Read-only browser review inspection
+is implemented separately and adds no signing or ingestion authority. The operator CLI
 only inspects status; the separate offline owner command signs existing envelopes but
 does not ingest them or issue native authority. The existing B22 scheduling, visibility reconciliation, native
 fact, provisioning, transfer, fencing, cutover, recovery and qualification work

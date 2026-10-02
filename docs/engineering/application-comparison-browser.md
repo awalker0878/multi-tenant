@@ -88,8 +88,11 @@ is not reported as passed. Final CI and its skips must be reported independently
 
 **Wave 2 remains open.** This completes browser consumption of saved-application
 comparison. Initial and saved-revision authoring are separately implemented in the
-draft workspace. Owner-facing signing and independently verified external dependencies
-remain open, along with remaining image/hardware/security facts or inventory
+draft workspace. The separate offline owner signer and [browser review inspector](application-review-browser.md)
+are implemented. Comparison now consumes the same browser review validator as that
+inspector; its duplicate local validator is removed without a forwarding alias.
+Authenticated artifact delivery, owner/key onboarding and independently verified external
+dependencies remain open, along with remaining image/hardware/security facts or inventory
 visibility reconciliation. B22 scheduling, concurrency, freshness, larger resumable
 publication and estate measurements remain open. Wave 3 B23/B24 still need actual
 commissioned capacity/IPAM/staging reservations and admitted provisioning effects;

@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.24 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.25 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -104,8 +104,16 @@ root-enrolled owner/scope/key eligibility before signing and verifies the signat
 again before create-only private-file publication. No private key enters the portal or
 operator client. Export checksums do not establish server currency: the existing ingest
 repository independently checks the retained draft, current source and live trust.
-Owner/key provisioning, authenticated delivery, browser review, independent external
-evidence and administrator acceptance remain open. Signing is assessment-only, never
+The draft workspace now presents exact-revision signed-review status through the
+existing read API. It shares one browser wire validator with application comparison;
+that component no longer maintains a duplicate review interpretation. Returned scope,
+record/proposal/source digests, owner/editor separation, UTC microseconds and status
+precedence are checked. The view is evaluated-at-time advice, clears on edits, changed
+identity/selection and hidden tabs, and schedules bounded display clearance. Timers
+are not a current-authority guarantee. A reported superseded source/draft prevents
+editing or comparison until current reload, without rewriting the retained record.
+Owner/key provisioning, authenticated delivery, independent external evidence and
+enterprise/administrator acceptance remain open. Signing is assessment-only, never
 native ownership or migration approval.
 Application comparison report 2 binds canonical selection, every member profile,
 source/review references, destination pools and method/network/data modes. Mismatched,
@@ -165,6 +173,7 @@ Detailed producer/consumer, response, retry and deployment contracts remain at:
 - [browser workspace](../engineering/application-draft-browser.md)
 - [signed owner-review contract](../engineering/application-owner-review.md)
 - [offline owner preparation/signing contract](../engineering/application-owner-signing.md)
+- [exact-draft browser review contract](../engineering/application-review-browser.md)
 - [application comparison contract](../engineering/application-comparison.md)
 - [installed application-comparison command](../engineering/application-comparison-operator.md)
 - [saved-application browser](../engineering/application-comparison-browser.md)

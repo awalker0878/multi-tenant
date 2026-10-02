@@ -88,8 +88,9 @@ integer; they do not change the server's signed-64-bit API contract.
 
 Entering editing invalidates the comparison selection immediately. Only a valid current
 acknowledged record can be selected again, with its new revision and digests. It still
-needs a separately accepted exact-draft owner review. Guided owner signing, independent
-external evidence verification and administrator acceptance remain open. The
+needs a separately accepted exact-draft owner review. The offline signer exists; deployed
+owner/key onboarding, authenticated artifact delivery, independent evidence verification
+and administrator acceptance remain open. The
 [operator CLI](application-draft-operator.md) continues to use the same API contract.
 
 Historical and superseded-source records are read-only. Every edit pins the original
@@ -171,6 +172,11 @@ collector's discovery outbox is separate and is not used for human draft edits.
 
 ## Verification and remaining work
 
+The following results belong to the saved-edit checkpoint
+`1db0e51fa7a0ed8a974268c9d5202dd13fea7b40`, not the later review-browser revision.
+The [review inspector contract](application-review-browser.md) describes that subsequent
+scope; its final-revision results must be recorded separately.
+
 The existing Node suites exercise the real component and compose it with the portal
 shell and application comparison. This saved-edit continuation adds 27 standalone
 cases: exact source/revision entry, unchanged-byte retention, member/group/assertion
@@ -199,8 +205,9 @@ separate from this component smoke.
 
 No database migration, grant expansion, API/collector/normalizer/profile format change,
 compatibility shim or native support claim is introduced. Initial and saved-revision
-browser authoring are implemented; independent dependencies, owner-facing signing and
-administrator acceptance remain open. B22 fleet scheduling, monitoring, resumability
+browser authoring are implemented. The separate installed offline signer now prepares
+and signs owner decisions; independent dependencies, deployed owner/key onboarding,
+authenticated artifact delivery and administrator acceptance remain open. B22 fleet scheduling, monitoring, resumability
 and measurements and later provisioning, transfer, fencing, cutover, post-write recovery
 and qualification obligations remain in the existing plan.
 
@@ -211,3 +218,6 @@ assessment/revocation. The [saved-application comparison](application-comparison
 uses a current saved draft plus separately accepted review. Creating or saving a draft
 does not sign that review, change status from UNREVIEWED, grant ownership or authorize a
 migration. Application-wide native execution is not supplied by either browser view.
+The [exact-draft review inspector](application-review-browser.md) now adds a read-only
+status action in this workspace. It clears on edits/source selection/identity changes,
+uses bounded display lifetime, and cannot sign, submit, accept or revoke a decision.

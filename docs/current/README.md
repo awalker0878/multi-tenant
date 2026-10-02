@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.13 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.24 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.25 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.4 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.4 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.23 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
-| [TRANS-M01](transition-and-as-built.md) | 0.13 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
+| [ICD-M01](interface-agreements.md) | 0.24 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.14 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.24 (Proposed)**; ICD-M01 is **version 0.23 (Proposed)**.
+TAD-M01 is **version 0.25 (Proposed)**; ICD-M01 is **version 0.24 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -49,6 +49,9 @@ independent dependency verification and enterprise owner onboarding/review remai
 The [installed offline owner signer](../engineering/application-owner-signing.md) now
 prepares and signs exact-draft decisions with explicit digest confirmation. It neither
 enrolls owners nor submits artifacts; authenticated delivery and deployed custody remain open.
+[Exact-draft browser review inspection](../engineering/application-review-browser.md)
+now uses the existing read API and a shared wire validator with application comparison.
+It reports evaluated-at-time status, not a reusable approval or signature issuance.
 These are assessment interfaces, not adoption, reservations or migration permission.
 
 [Batch staging](../engineering/discovery-batch-scheduling.md),
