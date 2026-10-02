@@ -13,6 +13,7 @@ from scripts import check_retired_interfaces as retirement
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
+    'tools/terraform_catalog.py': ('path', 'provisioner/execution/terraform_catalog.py'),
     'tools/compile_wsd.py': ('path', 'provisioner/compiler/wsd.py'),
     'tools/old_compile.py': ('path', 'provisioner/compiler/wsd.py'),
     'tools/compile_wsd_v2.py': ('path', 'provisioner/compiler/wsd.py'),
@@ -56,9 +57,9 @@ class RetiredInterfaceTests(unittest.TestCase):
         self.assertEqual(report['interfaces_checked'], len(EXPECTED))
         self.assertEqual(report['native_infrastructure'], 'NOT_CONTACTED')
 
-    def test_qualification_owners_are_real_modules_without_legacy_backreach(self):
+    def test_package_owners_are_real_modules_without_legacy_backreach(self):
         for old, (kind, replacement) in EXPECTED.items():
-            if not replacement.startswith('provisioner/qualification/'):
+            if not replacement.startswith(('provisioner/qualification/', 'provisioner/execution/')):
                 continue
             with self.subTest(owner=replacement):
                 self.assertEqual(kind, 'path')
