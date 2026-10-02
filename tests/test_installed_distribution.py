@@ -35,6 +35,18 @@ class InstalledDistributionTest(unittest.TestCase):
         cls.work.mkdir()
         cls.env = {key: value for key, value in os.environ.items()
                    if not key.startswith(('PYTHON', 'PIP_'))}
+        # Destructive-output regressions use only this disposable source copy.
+        cls.unsafe_build_results = []
+        protected = {name: (cls.source / name).read_bytes() for name in
+                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'terraform/catalog.json')}
+        for output in (cls.source, cls.base, cls.source / 'provisioner'):
+            result = subprocess.run([sys.executable, 'setup.py', 'build_py', '--build-lib', str(output)],
+                cwd=cls.source, env=cls.env, text=True, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, timeout=120)
+            if (result.returncode == 0 or any((cls.source / name).read_bytes() != raw
+                                            for name, raw in protected.items())):
+                raise AssertionError('Unsafe build destination was not refused before source mutation')
+            cls.unsafe_build_results.append(result.stdout)
         cls.staging = cls.base / 'incremental-build'
         cls.retired = ('profiles', 'policy', 'sources', 'terraform', 'ansible',
                        'config', 'docs', 'provisioner/_assets')
@@ -42,6 +54,12 @@ class InstalledDistributionTest(unittest.TestCase):
             path = cls.staging / relative / 'stale.json'
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
+        cls.retired_python = ('tools/terraform_catalog.py', 'tools/terraform_catalog.pyc',
+                              'tools/__pycache__/terraform_catalog.cpython-313.pyc')
+        for relative in cls.retired_python:
+            path = cls.staging / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'retired owner must not be packaged')
         cls.run_checked([sys.executable, 'setup.py', 'build_py', '--build-lib',
                          str(cls.staging)], cwd=cls.source)
         cls.run_checked([sys.executable, 'setup.py', 'sdist', '--dist-dir',
@@ -79,6 +97,8 @@ class InstalledDistributionTest(unittest.TestCase):
     def test_wheel_owns_all_data_without_shared_top_level_directories(self):
         with zipfile.ZipFile(self.wheel) as wheel:
             members = wheel.namelist()
+        self.assertIn('provisioner/execution/terraform_catalog.py', members)
+        self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
         for name in members:
             self.assertNotIn(name.split('/')[0],
                              {'profiles', 'policy', 'sources', 'terraform',
@@ -90,10 +110,15 @@ class InstalledDistributionTest(unittest.TestCase):
             self.assertIn('hosting_resources/_assets/' + name, members)
 
     def test_incremental_build_removes_retired_and_deleted_resources(self):
-        for relative in self.retired:
+        for relative in (*self.retired, *self.retired_python):
             self.assertFalse((self.staging / relative).exists(), relative)
         self.assertFalse((self.staging / 'hosting_resources/_assets/obsolete').exists())
         self.assertTrue((self.staging / 'hosting_resources/_assets/terraform/catalog.json').is_file())
+
+    def test_build_refuses_source_ancestor_and_package_destinations(self):
+        self.assertEqual(len(self.unsafe_build_results), 3)
+        for result in self.unsafe_build_results:
+            self.assertIn('Runtime build output overlaps source inputs', result)
 
     def test_installed_planning_loads_owner_modules_and_all_resources(self):
         result = self.probe('''
@@ -110,7 +135,7 @@ from provisioner.schemas.registry import load_schema
 from provisioner.portability.artifacts import load as artifact_registry
 from provisioner.compiler.artifacts import assert_output_path
 from provisioner.domain.errors import ProvisioningError
-from tools.terraform_catalog import entries
+from provisioner.execution.terraform_catalog import entries
 code, plan = dispatch(['plan', 'request.yaml'])
 registry = repository.capability_registry()
 eligible, blockers = repository.capability_eligible(registry, 'openstack', {'ipv4'})
@@ -179,6 +204,35 @@ assert entry.load() is owner_signing.main
 print(json.dumps({'owner': entry.value}))
 """)
         self.assertEqual(result['owner'], 'provisioner.controlplane.discovery.owner_signing:main')
+
+    def test_catalog_is_independent_of_checkout_tools_and_working_directory(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, sys
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('Catalog reached retired dependency: ' + fullname)
+blocker = NoLegacy()
+sys.meta_path.insert(0, blocker)
+try:
+    from provisioner.execution import terraform_catalog
+    from hosting_resources import SOURCE_ROOT, RESOURCE_ROOT
+    rows = terraform_catalog.entries()
+    assert SOURCE_ROOT is None
+    assert Path(terraform_catalog.__file__).is_relative_to(Path(sys.prefix))
+    assert RESOURCE_ROOT.is_relative_to(Path(sys.prefix))
+    assert rows == json.loads((RESOURCE_ROOT / 'terraform/catalog.json').read_text())['entries']
+    assert sys.path == before
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('tools.terraform_catalog') is None
+print(json.dumps({'entries': len(rows), 'legacyImports': False, 'nativeContact': False}))
+''')
+        self.assertGreater(result['entries'], 0)
+        self.assertFalse(result['legacyImports'])
+        self.assertFalse(result['nativeContact'])
 
     def test_missing_packaged_asset_cannot_resolve_a_shared_directory(self):
         result = self.probe('''

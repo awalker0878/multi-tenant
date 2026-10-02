@@ -27,7 +27,7 @@ from tools.plan_review import review
 from tools.run_files import (current_window, digest, encoded, file_map, load_private,
                              new_directory, private_path, read_private, require,
                              utcnow, write_new, OperatorError)
-from tools.terraform_catalog import entries
+from provisioner.execution.terraform_catalog import entries
 
 SCOPE_KEYS = ('environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key', 'phase')
 ENV_KEYS = {'TF_VAR_platform_password', 'TF_HTTP_USERNAME', 'TF_HTTP_PASSWORD'}

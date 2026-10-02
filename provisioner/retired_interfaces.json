@@ -144,6 +144,13 @@
       "reason": "The actual compiler is package-owned; all callers migrated, with no forwarding file, path mutation or build-script/native-observer dependency.",
       "replacement": "provisioner/compiler/wsd.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_catalog.py",
+      "kind": "path",
+      "reason": "The complete catalog reader is package-owned; all runtime, validation and test consumers migrated without a forwarding module.",
+      "replacement": "provisioner/execution/terraform_catalog.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }
