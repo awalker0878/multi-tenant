@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.14 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.15 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -86,6 +86,17 @@ prefilled from examples. Bind code/artifact revision, installed tuple, campaign,
 result and limitations separately for implementation, tests, native qualification and
 operational acceptance. The gate-only admitted workflow and uncomposed native/transfer/
 cutover/recovery paths remain explicit B01–B50 work, not accepted service operation.
+
+### Signed owner artifact intake
+
+Custodian intake now uses the existing signed-evidence writer and create-only local
+receipts. A commit acknowledgement loss stays unknown; receipt failure after a confirmed
+commit retains recorded=true. Preserve artifacts and reconcile the exact evidence;
+neither case authorizes deletion, a replacement signature or an automatic retry.
+An expired decision may remain unretryable despite historical ingestion. The receipt
+never refreshes owner validity or replaces a newly evaluated server review.
+
+See the [custodian intake contract](../engineering/application-review-intake.md).
 
 ## Engineering and implementation handoff
 

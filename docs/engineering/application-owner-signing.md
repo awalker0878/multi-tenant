@@ -134,8 +134,11 @@ message, not the digest confirmation string or arbitrary user-selected content.
 A trusted custodian can supply these existing arguments to
 `AssessmentInputRepository.ingest(ctx, evidence, tuple(signatures))` under its already
 separate authenticated tenant context and ingest role. This is the existing repository
-interface, not a new public API, installed importer, database credential recommendation
-or completed artifact-delivery service. Deployment of that delivery path remains open.
+interface, not a new public API or a completed artifact-delivery service. The separate
+[installed custodian intake](application-review-intake.md) now composes this writer
+with exact-scope configuration, authenticated SQL and a local commit receipt. The
+owner signer remains offline and performs no ingestion; upstream transfer and deployed
+custody qualification remain open.
 
 Actual ingestion independently validates the retained immutable SQL draft, original
 source, owner/editor separation, current enrollment, signature and revision stream.

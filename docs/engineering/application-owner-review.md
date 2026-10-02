@@ -110,7 +110,10 @@ owner-review status as described below. The separate
 [installed offline owner command](application-owner-signing.md) now prepares and signs
 decisions outside the API/operator identity. The [browser review inspector](application-review-browser.md)
 now presents the same eight statuses for an exact loaded draft. Actual owner/key
-onboarding and authenticated signed-artifact delivery remain integrations.
+onboarding and owner-to-custodian artifact transfer remain integrations. The separate
+[installed custodian intake](application-review-intake.md) now records original signed
+artifacts through the same repository and provides local postcommit receipts; it adds
+no public upload route or signing privilege to this read service.
 
 ## Inspect the review from the operator CLI
 

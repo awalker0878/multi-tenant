@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.24 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.25 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -136,6 +136,18 @@ and one-time retained-state conversion before removal. Define credential renewal
 lease expiry, unknown outcomes and independent recovery explicitly. Neither producer
 may assume another has excluded source writers or admitted target writes; activation
 is separate from source disposal, retention release and address reuse.
+
+### Signed owner artifact intake
+
+The installed custodian intake consumes the unchanged owner artifact and explicit
+submission digest, never a browser acceptance flag. One protected environment/scope,
+TLS/SCRAM database identity and append-only session guard precede the existing writer.
+The local unsigned receipt binds exact submitted/recorded identities after commit;
+it is neither remote delivery proof nor a current assessment approval. Unconfirmed
+commits and postcommit receipt failures preserve uncertainty without automatic retry.
+Owner-to-custodian transfer and deployed custody remain independent obligations.
+
+See the [custodian intake contract](../engineering/application-review-intake.md).
 
 ## Engineering and implementation handoff
 

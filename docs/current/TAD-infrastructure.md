@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.25 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.26 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -155,6 +155,18 @@ state before deletion; do not remove functional safety adapters as shims. Instal
 wheel/sdist checks must run outside the checkout. Unit/loopback tests, real database
 integration, installed execution, native campaigns and operational acceptance remain
 separate evidence classes on the final artifact revision.
+
+### Signed owner artifact intake
+
+The installed custodian intake now submits a canonical owner-signed artifact to the
+existing assessment repository under one configured environment/scope. It shares
+private-file handling with the offline signer, uses a dedicated authenticated SQL
+login with forced-RLS/privilege checks, and rechecks inputs/trust before commit.
+Create-only local receipts distinguish confirmed ingestion from uncertain commit or
+receipt publication; they are not current owner reviews or migration grants.
+Owner-to-custodian transport and deployed TLS/SCRAM/custody qualification remain open.
+
+See the [custodian intake contract](../engineering/application-review-intake.md).
 
 ## Engineering and implementation handoff
 
