@@ -230,21 +230,21 @@ class OwnerSigningTests(unittest.TestCase):
 
     def test_final_authority_recheck_discards_a_mid_operation_revocation(self):
         self.prepare()
-        original = signing._publish
+        original = signing.review_files.publish_once
         def publish(path, raw, recheck):
             self.fixture.policy['revision'] += 1
             self.fixture.policy['revokedEvidenceIds'] = ['owner-review-1']; self.fixture.write()
             return original(path, raw, recheck)
-        with patch.object(signing, '_publish', publish): self.held()
+        with patch.object(signing.review_files, 'publish_once', publish): self.held()
 
     def test_inputs_rotated_before_publication_are_not_spliced(self):
-        self.prepare(); original = signing._publish
+        self.prepare(); original = signing.review_files.publish_once
         for file in ('draft.json', 'decision.json', 'config.json', 'owner.key'):
             target = self.root/file; before = target.read_bytes()
             def publish(path, raw, recheck):
                 private_file(target, before+b' ')
                 return original(path, raw, recheck)
-            with self.subTest(file=file), patch.object(signing, '_publish', publish): self.held()
+            with self.subTest(file=file), patch.object(signing.review_files, 'publish_once', publish): self.held()
             private_file(target, before)
 
     def test_publishing_never_overwrites_existing_files_or_follows_symlinks(self):

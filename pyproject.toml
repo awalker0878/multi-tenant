@@ -28,6 +28,7 @@ controlplane = [
 [project.scripts]
 hosting = "provisioner.cli.main:main"
 hosting-operator = "provisioner.cli.operator:main"
+hosting-application-review-ingest = "provisioner.controlplane.discovery.review_intake:main"
 hosting-application-review = "provisioner.controlplane.discovery.owner_signing:main"
 hosting-api = "provisioner.controlplane.api.server:main"
 hosting-evidence = "provisioner.controlplane.evidence.runtime:main"

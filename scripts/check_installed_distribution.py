@@ -72,7 +72,7 @@ try:
     assert (method, path, params) == ('POST', '/v1/assessments/applications/compare', None)
     assert body['applicationGroupId'] == 'app' and len(body['memberProfiles']) == 2
     assert len(assessment_client.selection_digest(body)) == 64
-    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment, owner_signing
+    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment, owner_signing, review_intake, review_files
     from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
     assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
     assert not hasattr(native_credentials, 'SignedFileVmwareCredentialSource')
@@ -131,7 +131,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (review_intake, review_files, owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -205,6 +205,16 @@ review_out, review_err = io.StringIO(), io.StringIO()
 assert review_entry.load()(['sign'], stdout=review_out, stderr=review_err) == 2
 assert review_out.getvalue() == ''
 assert json.loads(review_err.getvalue()) == {'error': 'OWNER_REVIEW_HELD', 'outputMayExist': True}
+
+intake_entry = next(e for e in distribution.entry_points if e.name == 'hosting-application-review-ingest')
+assert intake_entry.value == 'provisioner.controlplane.discovery.review_intake:main'
+assert intake_entry.load() is review_intake.main
+assert not hasattr(owner_signing, '_read') and not hasattr(owner_signing, '_publish')
+intake_out, intake_err = io.StringIO(), io.StringIO()
+assert intake_entry.load()([], stdout=intake_out, stderr=intake_err) == 2
+assert intake_out.getvalue() == ''
+assert json.loads(intake_err.getvalue()) == {
+    'error': 'REVIEW_INTAKE_HELD', 'ingestAttempted': False, 'recorded': False, 'outputMayExist': True}
 
 entry = next(e for e in distribution.entry_points if e.name == 'hosting-discovery-collect')
 assert entry.value == 'provisioner.controlplane.discovery.collector_runtime:main'
