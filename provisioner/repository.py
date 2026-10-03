@@ -124,21 +124,21 @@ def ipam_allocation_records(path: Path | str | None = None) -> dict:
     provisioner asks for the export instead of defining a second record model.
     The exported record deliberately carries no allocated address or prefix value.
     """
-    from scripts import check_ipam_allocation_records as module
+    from provisioner.allocations import ipam_evidence as module
     return module.load(Path(path) if path is not None else module.INDEX)
 
 
 def validate_ipam_allocation_records(index: dict, *, as_of,
                                      root: Path | str | None = None) -> dict:
     """Validate an exported IPAM allocation index with the repository's checker."""
-    from scripts import check_ipam_allocation_records as module
+    from provisioner.allocations import ipam_evidence as module
     return module.validate(index, as_of=as_of,
                            root=Path(root) if root is not None else ROOT)
 
 
 def dns_registration_records(path: Path | str | None = None) -> dict:
     """The repository's exported authoritative DNS registration evidence."""
-    from scripts import check_dns_registration_records as module
+    from provisioner.allocations import dns_evidence as module
     return module.load(Path(path) if path is not None else module.INDEX)
 
 
@@ -150,7 +150,7 @@ def validate_dns_registration_records(index: dict, *, ipam_index=None, as_of,
     allocation it was derived from, so a registration whose bound allocation is
     absent, unconformed or of another family is refused here rather than used.
     """
-    from scripts import check_dns_registration_records as module
+    from provisioner.allocations import dns_evidence as module
     return module.validate(index, ipam_index=ipam_index, as_of=as_of,
                            root=Path(root) if root is not None else ROOT)
 
@@ -163,7 +163,7 @@ def ipam_allocation_preflight(intent: dict, *, reservation_index=None,
     validates the shape, resolves the declared parent reservation and reports what
     the authoritative IPAM system has recorded. It never returns an address.
     """
-    from scripts import check_ipam_allocation_preflight as module
+    from provisioner.allocations import ipam_preflight as module
     return module.evaluate(intent, reservation_index=reservation_index,
                            allocation_index=allocation_index, as_of=as_of)
 
@@ -175,7 +175,7 @@ def ipam_allocation_spec(intent: dict, *, as_of, parent_envelope_record_sha256=N
     asks for the normalization instead of restating the contract. The declared parent
     reservation intent and its capacity request must resolve inside the checkout.
     """
-    from scripts import check_ipam_allocation_preflight as module
+    from provisioner.allocations import ipam_preflight as module
     return module.normalized_spec(intent, as_of=as_of,
                                   parent_envelope_record_sha256=parent_envelope_record_sha256)
 
@@ -183,7 +183,7 @@ def ipam_allocation_spec(intent: dict, *, as_of, parent_envelope_record_sha256=N
 def dns_registration_preflight(intent: dict, *, ipam_index=None, dns_index=None,
                                as_of=None) -> dict:
     """Run the repository's authoritative DNS registration preflight on an intent."""
-    from scripts import check_dns_registration_preflight as module
+    from provisioner.allocations import dns_preflight as module
     return module.evaluate(intent, ipam_index=ipam_index, dns_index=dns_index,
                            as_of=as_of)
 
@@ -196,13 +196,13 @@ def declared_contracts() -> dict:
     the declared vocabulary, so a compiled document and the checker that will judge
     it can never disagree about a key set, a status or an identifier grammar.
     """
-    from scripts import check_site_service_eligibility as site
-    from scripts import check_site_service_capacity as capacity
-    from scripts import check_reservation_preflight as reservation
-    from scripts import check_ipam_allocation_preflight as allocation
-    from scripts import check_ipam_allocation_records as allocation_records
-    from scripts import check_dns_registration_preflight as registration
-    from scripts import check_dns_registration_records as registration_records
+    from provisioner.allocations import site_eligibility as site
+    from provisioner.allocations import capacity_evidence as capacity
+    from provisioner.allocations import reservation_preflight as reservation
+    from provisioner.allocations import ipam_preflight as allocation
+    from provisioner.allocations import ipam_evidence as allocation_records
+    from provisioner.allocations import dns_preflight as registration
+    from provisioner.allocations import dns_evidence as registration_records
     from provisioner.allocations import reservation_evidence as records
     return {
         'identifier': site.ID.pattern,
@@ -258,7 +258,7 @@ def declared_contracts() -> dict:
 
 def capacity_request_shape(document: dict) -> dict:
     """Validate a portable site-service capacity request with the repository checker."""
-    from scripts import check_site_service_eligibility as module
+    from provisioner.allocations import site_eligibility as module
     module.validate_request(document, None)
     return document
 
@@ -272,33 +272,33 @@ def reservation_intent_spec(intent: dict, capacity_request: dict, *, as_of,
     `capacity_request_ref` must still resolve inside the checkout, which is why a
     compiled chain is staged before it is handed to the owner.
     """
-    from scripts import check_reservation_preflight as module
+    from provisioner.allocations import reservation_preflight as module
     return module.normalized_spec(intent, capacity_request, as_of=as_of,
                                   envelope_record_sha256=envelope_record_sha256)
 
 
 def dns_registration_spec(intent: dict, *, as_of, ipam_confirmation_sha256=None) -> dict:
     """Normalize a portable DNS registration intent in memory with the owner's preflight."""
-    from scripts import check_dns_registration_preflight as module
+    from provisioner.allocations import dns_preflight as module
     return module.normalized_spec(intent, as_of=as_of,
                                   ipam_confirmation_sha256=ipam_confirmation_sha256)
 
 
 def allocation_prefix_shape(family, kind, prefix_length) -> None:
     """Refuse an IPAM prefix shape the authoritative record contract would refuse."""
-    from scripts import check_ipam_allocation_records as module
+    from provisioner.allocations import ipam_evidence as module
     module.validate_prefix_shape(family, kind, prefix_length)
 
 
 def opaque_external_ref(value, label) -> str:
     """Refuse an opaque external reference the IPAM contract would refuse."""
-    from scripts import check_ipam_allocation_records as module
+    from provisioner.allocations import ipam_evidence as module
     return module.opaque_external_ref(value, label)
 
 
 def opaque_dns_ref(value, label) -> str:
     """Refuse an opaque DNS reference the registration contract would refuse."""
-    from scripts import check_dns_registration_records as module
+    from provisioner.allocations import dns_evidence as module
     return module.opaque_ref(value, label)
 
 
@@ -316,7 +316,7 @@ def canonical_record_digest(document: dict) -> str:
 
 def canonical_dns_intent_digest(document: dict) -> str:
     """The repository's canonical digest of a normalized DNS registration intent."""
-    from scripts import check_dns_registration_preflight as module
+    from provisioner.allocations import dns_preflight as module
     return module.canonical_digest(document)
 
 

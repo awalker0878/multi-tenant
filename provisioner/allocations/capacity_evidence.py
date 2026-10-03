@@ -14,10 +14,7 @@ from decimal import Decimal, InvalidOperation
 import json
 from pathlib import Path
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
 from provisioner.qualification import native as qualification
@@ -327,7 +324,7 @@ def validate(index, *, qindex=None, provenance_index=None, campaign_evidence_ind
     }
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--index', type=Path, default=INDEX)
     parser.add_argument('--as-of', help='ISO-8601 review instant; defaults to current UTC')

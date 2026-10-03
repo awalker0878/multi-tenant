@@ -40,7 +40,7 @@ External reservations such as IPAM remain under their own owners. The repository
 The active site/service envelope inventory and reservation evidence index are empty, so the repository example remains:
 
 ```sh
-python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE
+python -m provisioner.allocations.reservation_preflight examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE
 ```
 
 All mutation and activation flags remain false. A future ready result means only that the exact immutable spec may be submitted to the authoritative reservation owner under its accepted interface.

@@ -60,7 +60,16 @@ class InstalledDistributionTest(unittest.TestCase):
                               'tools/check_release.py', 'tools/check_release.pyc',
                               'tools/__pycache__/check_release.cpython-313.pyc',
                               'scripts/check_reservation_records.py', 'scripts/check_reservation_records.pyc',
-                              'scripts/__pycache__/check_reservation_records.cpython-313.pyc')
+                              'scripts/__pycache__/check_reservation_records.cpython-313.pyc',
+                              'scripts/check_ipam_allocation_records.py', 'scripts/check_ipam_allocation_records.pyc',
+                              'scripts/__pycache__/check_ipam_allocation_records.cpython-313.pyc',
+                              'scripts/check_dns_registration_records.py', 'scripts/check_dns_registration_records.pyc',
+                              'scripts/__pycache__/check_dns_registration_records.cpython-313.pyc',
+                              'scripts/check_site_service_capacity.py', 'scripts/check_site_service_capacity.pyc', 'scripts/__pycache__/check_site_service_capacity.cpython-313.pyc',
+                              'scripts/check_site_service_eligibility.py', 'scripts/check_site_service_eligibility.pyc', 'scripts/__pycache__/check_site_service_eligibility.cpython-313.pyc',
+                              'scripts/check_reservation_preflight.py', 'scripts/check_reservation_preflight.pyc', 'scripts/__pycache__/check_reservation_preflight.cpython-313.pyc',
+                              'scripts/check_ipam_allocation_preflight.py', 'scripts/check_ipam_allocation_preflight.pyc', 'scripts/__pycache__/check_ipam_allocation_preflight.cpython-313.pyc',
+                              'scripts/check_dns_registration_preflight.py', 'scripts/check_dns_registration_preflight.pyc', 'scripts/__pycache__/check_dns_registration_preflight.cpython-313.pyc')
         for relative in cls.retired_python:
             path = cls.staging / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -123,6 +132,15 @@ class InstalledDistributionTest(unittest.TestCase):
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
         self.assertIn('provisioner/execution/source_integrity.py', members)
         self.assertIn('provisioner/allocations/reservation_evidence.py', members)
+        self.assertIn('provisioner/allocations/ipam_evidence.py', members)
+        self.assertIn('provisioner/allocations/dns_evidence.py', members)
+        self.assertIn('provisioner/allocations/capacity_evidence.py', members)
+        self.assertIn('provisioner/allocations/site_eligibility.py', members)
+        self.assertIn('provisioner/allocations/reservation_preflight.py', members)
+        self.assertIn('provisioner/allocations/ipam_preflight.py', members)
+        self.assertIn('provisioner/allocations/dns_preflight.py', members)
+        self.assertFalse(any(name.startswith('scripts/check_ipam_allocation_records.') for name in members))
+        self.assertFalse(any(name.startswith('scripts/check_dns_registration_records.') for name in members))
         self.assertFalse(any(name.startswith('scripts/check_reservation_records.') for name in members))
         self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
         self.assertFalse(any(name.startswith('tools/check_release.') for name in members))
@@ -327,6 +345,99 @@ print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
         report = json.loads(self.run_checked([str(self.python), '-I', '-m',
             'provisioner.allocations.reservation_evidence', '--as-of', '2026-10-02T00:00:00Z']))
         self.assertEqual(report['status'], 'PASSED_EXPORTED_RESERVATION_RECORDS')
+        self.assertEqual(report['record_count'], 0)
+        self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
+
+    def test_ipam_evidence_runs_without_legacy_imports_or_checkout(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, os, sys, tempfile
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('IPAM evidence reached a legacy owner: ' + fullname)
+blocker = NoLegacy()
+sys.meta_path.insert(0, blocker)
+try:
+    from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+    from provisioner import repository
+    from provisioner.allocations import ipam_evidence as records
+    assert SOURCE_ROOT is None
+    assert Path(records.__file__).is_relative_to(Path(sys.prefix))
+    assert records.INDEX.is_relative_to(RESOURCE_ROOT)
+    original = records.INDEX.read_bytes()
+    with tempfile.TemporaryDirectory() as directory:
+        previous = Path.cwd()
+        os.chdir(directory)
+        try:
+            forged = Path('sources/capabilities/ipam_allocation_index.json')
+            forged.parent.mkdir(parents=True)
+            forged.write_text('{"forged": true}')
+            assert repository.ipam_allocation_records() == records.load()
+            assert records.validate(records.load())['record_count'] == 0
+            records.INDEX.unlink()
+            try:
+                records.load()
+            except FileNotFoundError:
+                pass
+            else:
+                raise AssertionError('Missing installed IPAM index resolved a cwd fallback')
+        finally:
+            records.INDEX.write_bytes(original)
+            os.chdir(previous)
+    assert sys.path == before
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('scripts.check_ipam_allocation_records') is None
+print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.allocations.ipam_evidence')
+        self.assertFalse(result['legacyImports'])
+        report = json.loads(self.run_checked([str(self.python), '-I', '-m',
+            'provisioner.allocations.ipam_evidence', '--as-of', '2026-10-02T00:00:00Z']))
+        self.assertEqual(report['status'], 'PASSED_EXPORTED_AUTHORITATIVE_IPAM_RECORDS')
+        self.assertEqual(report['record_count'], 0)
+        self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
+
+    def test_dns_evidence_runs_without_legacy_imports_or_checkout(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, os, sys, tempfile
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('DNS evidence reached a legacy owner: ' + fullname)
+blocker = NoLegacy(); sys.meta_path.insert(0, blocker)
+try:
+    from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+    from provisioner import repository
+    from provisioner.allocations import dns_evidence as records, ipam_evidence
+    assert SOURCE_ROOT is None and records.INDEX.is_relative_to(RESOURCE_ROOT)
+    original = records.INDEX.read_bytes()
+    with tempfile.TemporaryDirectory() as directory:
+        previous = Path.cwd(); os.chdir(directory)
+        try:
+            forged=Path('sources/capabilities/dns_registration_index.json'); forged.parent.mkdir(parents=True); forged.write_text('{"forged": true}')
+            assert repository.dns_registration_records() == records.load()
+            assert records.validate(records.load(),ipam_index=ipam_evidence.load())['record_count'] == 0
+            records.INDEX.unlink()
+            try: records.load()
+            except FileNotFoundError: pass
+            else: raise AssertionError('Missing installed DNS index resolved a cwd fallback')
+        finally:
+            records.INDEX.write_bytes(original); os.chdir(previous)
+    assert sys.path == before
+finally: sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('scripts.check_dns_registration_records') is None
+print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.allocations.dns_evidence')
+        self.assertFalse(result['legacyImports'])
+        report = json.loads(self.run_checked([str(self.python), '-I', '-m',
+            'provisioner.allocations.dns_evidence', '--as-of', '2026-10-02T00:00:00Z']))
+        self.assertEqual(report['status'], 'PASSED_EXPORTED_AUTHORITATIVE_DNS_RECORDS')
         self.assertEqual(report['record_count'], 0)
         self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
 

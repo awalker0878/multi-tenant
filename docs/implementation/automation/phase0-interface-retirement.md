@@ -138,14 +138,27 @@ must be migrated before deletion.
 The implementation formerly at `scripts/check_reservation_records.py` is now
 `provisioner/allocations/reservation_evidence.py`. All in-tree imports, CI commands,
 metadata, generator links and tests use the new owner; the old path is prohibited
-without a wrapper. The independent retirement test now expects nineteen entries.
+without a wrapper. The independent retirement test includes this path explicitly alongside the other retired owners.
 Installed tests reject legacy imports and stale bytecode while preserving the existing
 export schema, canonical digests and reconciliation requirements. See the
 [read-only evidence boundary](../../engineering/reservation-evidence-runtime.md).
 
 This move does not import private reservation state, grant ownership, reauthorize
-old plans or complete the remaining capacity/IPAM/DNS preflight and execution owners.
+old plans or complete the remaining direct execution owners and retained-state conversion.
 
+
+### Package-owned IPAM allocation evidence — 2 October 2026
+
+The implementation formerly at `scripts/check_ipam_allocation_records.py` is now
+`provisioner/allocations/ipam_evidence.py`. Reservation/IPAM preflight, DNS evidence,
+repository adapters, CI commands and tests use the package owner directly. The old path
+is deleted and prohibited without a wrapper. Installed checks require the package module,
+refuse working-directory fallback and remove stale script/bytecode from reused builds.
+The allocation-index format, confirmation digest and release/quarantine semantics remain
+unchanged. See the [IPAM evidence contract](../../engineering/ipam-evidence-runtime.md).
+
+This is read-only exported evidence. It does not import private IPAM state, reveal or
+assign address values, write DNS, release capacity or close B23/B48.
 
 ### Package-owned source-integrity verification — 2 October 2026
 

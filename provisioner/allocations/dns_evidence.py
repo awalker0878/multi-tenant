@@ -12,16 +12,17 @@ import argparse
 from datetime import datetime, timezone
 import ipaddress
 import json
-from pathlib import Path
+import math
+import os
+import stat
+from pathlib import Path, PurePosixPath
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
-from scripts import check_ipam_allocation_records as ipam
+from provisioner.allocations import ipam_evidence as ipam
 
 INDEX=ROOT/'sources/capabilities/dns_registration_index.json'
+MAX_INDEX_BYTES=1024*1024
 FORMAT='portable-hosting-dns-registration-index/2'
 STATUS='EXPORTED_AUTHORITATIVE_DNS_EVIDENCE_NOT_DNS_AUTHORITY'
 STATES={'REGISTERED','RELEASE_PENDING','TOMBSTONED','RELEASED','UNCERTAIN'}
@@ -76,10 +77,17 @@ def nullable_instant(value,label):
 
 def repository_ref(value,root=ROOT):
     bounded(value,'repository reference')
-    p=Path(value)
-    if p.is_absolute() or '..' in p.parts or '\\' in value or ':' in value:
+    relative=PurePosixPath(value)
+    if (relative.is_absolute() or relative.as_posix()!=value or '..' in relative.parts
+            or '\\' in value or ':' in value):
         raise ValueError('Repository reference must be normalized and relative')
-    if not (root/p).exists():raise ValueError(f'Repository reference does not exist: {value}')
+    selected=Path(root).resolve(strict=True); target=selected
+    for part in relative.parts:
+        target/=part
+        if target.is_symlink() or target.is_junction():
+            raise ValueError('Linked repository references are not supported')
+    if not target.is_file() or not target.resolve().is_relative_to(selected):
+        raise ValueError(f'Repository reference does not exist: {value}')
     return value
 
 
@@ -112,9 +120,29 @@ def unique_strings(value,label,*,allow_empty=False,maximum=64):
     return value
 
 
+def _fingerprint(info):
+    return (info.st_dev,info.st_ino,info.st_size,info.st_mtime_ns,info.st_ctime_ns)
+
+
 def load(path:Path=INDEX):
-    with path.open('rb') as stream:raw=stream.read(1024*1024+1)
-    if len(raw)>1024*1024:raise ValueError('DNS registration index exceeds bounded size')
+    path=Path(path).absolute()
+    for member in (path,*path.parents):
+        if member.is_symlink() or member.is_junction():
+            raise ValueError('Linked DNS registration-index paths are not supported')
+    flags=(os.O_RDONLY|getattr(os,'O_NOFOLLOW',0)|getattr(os,'O_NONBLOCK',0)
+           |getattr(os,'O_BINARY',0)|getattr(os,'O_CLOEXEC',0))
+    descriptor=os.open(path,flags)
+    try:
+        before=os.fstat(descriptor)
+        if not stat.S_ISREG(before.st_mode) or not 1<=before.st_size<=MAX_INDEX_BYTES:
+            raise ValueError('DNS registration index must be a bounded nonempty regular file')
+        with os.fdopen(descriptor,'rb',closefd=False) as stream: raw=stream.read(MAX_INDEX_BYTES+1)
+        if (len(raw)!=before.st_size or len(raw)>MAX_INDEX_BYTES
+                or _fingerprint(before)!=_fingerprint(os.fstat(descriptor))
+                or _fingerprint(before)!=_fingerprint(path.stat(follow_symlinks=False))):
+            raise ValueError('DNS registration index changed during reading')
+    finally:
+        os.close(descriptor)
     def pairs(items):
         out={}
         for k,v in items:
@@ -122,7 +150,14 @@ def load(path:Path=INDEX):
             out[k]=v
         return out
     def reject(_):raise ValueError('Non-finite JSON number')
-    value=json.loads(raw,object_pairs_hook=pairs,parse_constant=reject)
+    def finite(text):
+        value=float(text)
+        if not math.isfinite(value):reject(text)
+        return value
+    try:
+        value=json.loads(raw,object_pairs_hook=pairs,parse_constant=reject,parse_float=finite)
+    except RecursionError as exc:
+        raise ValueError('DNS registration-index nesting exceeds parser limits') from exc
     if not isinstance(value,dict):raise ValueError('DNS registration index must be an object')
     return value
 
@@ -280,11 +315,11 @@ def validate(index,*,ipam_index=None,as_of=None,root=ROOT):
     }
 
 
-def main():
+def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--index',type=Path,default=INDEX)
     p.add_argument('--as-of',help='ISO-8601 review instant; defaults to current UTC')
-    a=p.parse_args()
+    a=p.parse_args(argv)
     try:
         as_of=instant(a.as_of,'as_of') if a.as_of else datetime.now(timezone.utc)
         summary=validate(load(a.index),as_of=as_of)

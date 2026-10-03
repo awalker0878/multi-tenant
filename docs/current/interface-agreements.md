@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.30 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.32 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -130,6 +130,12 @@ notification, refreshes no credential, requests no collection and grants no exec
 Deployed service scheduling, delivery/acknowledgement and fleet-global coordination remain
 external interface obligations.
 
+
+Exported IPAM allocation evidence is consumed through the package-owned reader, never by
+importing a script owner. The stable confirmed-allocation digest remains the DNS handoff
+binding; actual allocation values and mutation authority stay in the external IPAM service.
+See the [IPAM evidence runtime contract](../engineering/ipam-evidence-runtime.md).
+
 ### Retirement and recovery ownership
 
 Current qualification owners remain in `provisioner.qualification`, and source-byte
@@ -186,6 +192,10 @@ Malformed exports and ambiguous references hold instead of resolving another fil
 Export provenance and live commitments remain the external owner's obligations.
 No reservation lifecycle or IPAM authority is granted by successful parsing. See the
 [read-only runtime contract](../engineering/reservation-evidence-runtime.md).
+
+### Package-owned allocation planning chain
+
+Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
 
 ## Engineering and implementation handoff
 

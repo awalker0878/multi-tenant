@@ -48,11 +48,23 @@ try:
     from provisioner.execution import terraform_catalog, source_integrity
     assert terraform_catalog.entries()
     assert source_integrity.verify()['status'] == 'BLOCKED_NO_CURRENT_CHECKOUT'
-    from provisioner.allocations import reservation_evidence
+    from provisioner.allocations import (reservation_evidence, ipam_evidence, dns_evidence,
+        capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight)
     assert reservation_evidence.load.__module__ == reservation_evidence.__name__
     assert reservation_evidence.validate(reservation_evidence.load())['record_count'] == 0
     from provisioner import repository as installed_repository
     assert installed_repository.reservation_records() == reservation_evidence.load()
+    assert ipam_evidence.load.__module__ == ipam_evidence.__name__
+    assert ipam_evidence.validate(ipam_evidence.load())['record_count'] == 0
+    assert installed_repository.ipam_allocation_records() == ipam_evidence.load()
+    assert dns_evidence.load.__module__ == dns_evidence.__name__
+    assert dns_evidence.validate(dns_evidence.load(), ipam_index=ipam_evidence.load())['record_count'] == 0
+    assert installed_repository.dns_registration_records() == dns_evidence.load()
+    assert capacity_evidence.load.__module__ == capacity_evidence.__name__
+    assert site_eligibility.evaluate.__module__ == site_eligibility.__name__
+    assert reservation_preflight.evaluate.__module__ == reservation_preflight.__name__
+    assert ipam_preflight.evaluate.__module__ == ipam_preflight.__name__
+    assert dns_preflight.evaluate.__module__ == dns_preflight.__name__
     from provisioner.cli import application_drafts as draft_client, assessments as assessment_client
     import argparse
     client_parser = argparse.ArgumentParser()
@@ -142,7 +154,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (reservation_evidence, source_integrity, terraform_catalog,review_intake, review_files, owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (reservation_evidence, ipam_evidence, dns_evidence, capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight, source_integrity, terraform_catalog,review_intake, review_files, owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
@@ -187,6 +199,13 @@ assert importlib.util.find_spec('scripts.check_platform_qualification') is None
 assert importlib.util.find_spec('scripts.check_version_source_provenance') is None
 assert importlib.util.find_spec('scripts.check_qualification_campaign_assurance') is None
 assert importlib.util.find_spec('scripts.check_target_selection_assurance') is None
+assert importlib.util.find_spec('scripts.check_ipam_allocation_records') is None
+assert importlib.util.find_spec('scripts.check_dns_registration_records') is None
+assert importlib.util.find_spec('scripts.check_site_service_capacity') is None
+assert importlib.util.find_spec('scripts.check_site_service_eligibility') is None
+assert importlib.util.find_spec('scripts.check_reservation_preflight') is None
+assert importlib.util.find_spec('scripts.check_ipam_allocation_preflight') is None
+assert importlib.util.find_spec('scripts.check_dns_registration_preflight') is None
 assert registry.validate(registry.load())['capabilities_per_platform'] == len(registry.CAPABILITIES)
 assert callable(validate_record)
 

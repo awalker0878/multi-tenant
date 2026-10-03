@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.15 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.31 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.33 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.5 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.5 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.30 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
-| [TRANS-M01](transition-and-as-built.md) | 0.20 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
+| [ICD-M01](interface-agreements.md) | 0.32 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.22 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.31 (Proposed)**; ICD-M01 is **version 0.30 (Proposed)**.
+TAD-M01 is **version 0.33 (Proposed)**; ICD-M01 is **version 0.32 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -35,10 +35,20 @@ commit or an explicit export manifest and fails closed when an installed runtime
 no selected checkout. This is source-byte consistency, not release signing or native
 acceptance.
 
+The [package-owned IPAM evidence reader](../engineering/ipam-evidence-runtime.md)
+replaces its old script owner without an alias while preserving external-authority and
+no-address-value semantics. Live IPAM mutation and B23 transaction composition remain open.
+
+
+The [allocation runtime owners](../engineering/allocation-runtime-owners.md) now keep
+capacity evidence, eligibility, reservation/IPAM/DNS preflight and exported allocation
+evidence inside the installed package. `provisioner` has no top-level `scripts`/`tools`
+imports; live owner services, direct execution tools and retained-state conversion remain open.
+
 The [package-owned Terraform catalog](../engineering/terraform-catalog-runtime.md)
 now replaces its old tools module without an alias. Strict input and source-path checks
 preserve the current catalog/plan bytes, and clean build staging excludes deleted owners.
-Other B05 runtime imports and retained-state conversion remain open.
+Direct operator/execution-tool ownership, installed service composition and retained-state conversion remain open.
 
 The [reservation-evidence reader](../engineering/reservation-evidence-runtime.md) is
 also package-owned, with its old script and bytecode removed. The unchanged export

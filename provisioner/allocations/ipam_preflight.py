@@ -12,16 +12,13 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
-from scripts import check_ipam_allocation_records as ipam
-from scripts import check_reservation_preflight as reservation_preflight
+from provisioner.allocations import ipam_evidence as ipam
+from provisioner.allocations import reservation_preflight
 from provisioner.allocations import reservation_evidence as reservation_records
-from scripts import check_site_service_eligibility as sitecheck
+from provisioner.allocations import site_eligibility as sitecheck
 
 FORMAT='portable-hosting-ipam-allocation-intent/1'
 STATUS='PLANNING_ONLY_NOT_AUTHORIZED'
@@ -248,12 +245,12 @@ def evaluate(intent,*,reservation_index=None,allocation_index=None,as_of=None):
     }
 
 
-def main():
+def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('intent',type=Path)
     p.add_argument('--as-of',help='ISO-8601 review instant; defaults to current UTC')
     p.add_argument('--expected-status',choices=(READY,HOLD_PARENT,HOLD_CONFLICT,HOLD_UNCERTAIN,HOLD_RELEASE,HOLD_TERMINAL,EXISTING_RESERVED,EXISTING_CONFIRMED))
-    a=p.parse_args()
+    a=p.parse_args(argv)
     try:
         as_of=ipam.instant(a.as_of,'as_of') if a.as_of else datetime.now(timezone.utc)
         result=evaluate(load(a.intent),as_of=as_of)

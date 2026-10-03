@@ -50,6 +50,5 @@ Disposable Git tests cover dirty/staged/untracked/missing files, HEAD movement, 
 Git overrides/replacements/fsmonitor, symlinks, bounded export manifests and explicit
 CLI root selection.
 
-This closes one B05 runtime owner only. Reservation/IPAM/DNS preflight and additional
-execution/evidence owners, retained-state conversion, signed artifact custody and native
+This closes one B05 runtime owner only. Direct operator/execution and additional evidence owners, retained-state conversion, signed artifact custody and native
 operating acceptance remain separate plan obligations.

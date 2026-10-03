@@ -30,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, reservation-evidence reader and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. | Other real runtime imports, installed execution ownership and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 3 retains allocation/attachment facts plus bounded Glance metadata for VM-referenced images. | Full guest-driver/key/service facts, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -150,6 +150,19 @@ Installed execution without an explicit checkout is held. See the
 This is byte consistency, not signer trust, approval, native qualification or a B48
 state conversion. Other B05 owner migrations remain open.
 
+### Package-owned IPAM allocation evidence — parallel B05 continuation (2 October 2026)
+
+The exported allocation reader now lives in `provisioner.allocations.ipam_evidence`;
+reservation/IPAM preflight and DNS consumers use that owner directly and the former
+script is retired without an alias. The index format, lifecycle rules, stable confirmed-
+allocation digest and deliberate absence of allocation values are unchanged. Bounded
+regular-file reads, no-link source references and duplicate/non-finite JSON refusal make
+installed evidence selection explicit. See the
+[IPAM evidence contract](../engineering/ipam-evidence-runtime.md).
+
+This does not implement IPAM mutation, address assignment, DNS writing, B23 live
+reservation/IPAM transactions, retained-state conversion or native qualification.
+
 ### Package-owned Terraform catalog — parallel B05 continuation
 
 The actual reader now lives in `provisioner.execution.terraform_catalog`; all preparation,
@@ -161,10 +174,25 @@ checks block legacy imports and require the retired module to be absent. Reused 
 staging cannot retain deleted Python owners or bytecode; source-overlapping build
 outputs are refused before cleanup. See the [runtime contract](../engineering/terraform-catalog-runtime.md).
 
-This closes one runtime owner, not B05 or the native workflow. Source integrity, other
-capacity/reservation/IPAM/DNS and execution owners, actual retained-state conversion,
-installed site custody and the later wave obligations remain open. No native API or
-production dataset is contacted by this continuation.
+This closes the IPAM evidence owner but not B05 or the native workflow. The dependent
+capacity/eligibility/reservation/IPAM/DNS planning owners are now package-owned as
+described below; direct execution owners, actual retained-state conversion, installed
+site custody and later wave obligations remain open. No native API or production dataset
+is contacted by these ownership changes.
+
+### Package-owned capacity and allocation planning chain — B05 continuation (2 October 2026)
+
+The remaining capacity evidence, site eligibility, reservation preflight, IPAM preflight
+and DNS preflight implementations now live under `provisioner.allocations`. All runtime,
+CI, test and documentation consumers migrated and their old script paths are retired
+without aliases. `provisioner.repository` no longer imports any top-level `scripts` or
+`tools`; package code is self-contained at that import boundary. See the
+[allocation runtime owner contract](../engineering/allocation-runtime-owners.md).
+
+Existing formats, status/digest/operation identities and external-owner boundaries are
+unchanged. These evaluators do not reserve capacity, allocate addresses, write DNS or
+contact a native platform. B23 live transactional composition, direct operator/execution
+owners and B48 retained-state conversion remain open.
 
 ### Checkpointed collection scheduling — B22 continuation (2 October 2026)
 

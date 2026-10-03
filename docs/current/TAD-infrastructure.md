@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.31 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.33 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -149,6 +149,13 @@ remain missing composition. `targetRef` is neither native ID nor filesystem path
 Durable transfer identity is separate from expiring attempt grants. Final sync, source
 fencing, traffic switch and post-write recovery are not closed by integrity contracts.
 
+
+The exported IPAM lifecycle-evidence reader is package-owned at
+`provisioner.allocations.ipam_evidence`. It retains opaque external allocation references,
+cleanup/quarantine and confirmation-digest semantics while refusing linked/ambiguous local
+evidence inputs. It does not allocate or contact IPAM; live B23 owner composition remains open.
+See the [IPAM evidence runtime contract](../engineering/ipam-evidence-runtime.md).
+
 ### Runtime and verification ownership
 
 The WSD compiler, source-integrity verifier and qualification registry/native/provenance owners are package-owned;
@@ -204,6 +211,10 @@ references while retaining record/schema/digest and expiry/uncertainty semantics
 Installed checks prohibit legacy imports and working-directory fallback. This is not
 a new writer or reservation service; B23 transactions and remaining B05 owners stay
 open. See the [runtime contract](../engineering/reservation-evidence-runtime.md).
+
+### Package-owned allocation planning chain
+
+Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
 
 ## Engineering and implementation handoff
 

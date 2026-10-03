@@ -95,7 +95,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.31",
+    "version": "0.33",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -263,6 +263,16 @@
         "version": "0.31",
         "date": "2026-10-02",
         "summary": "Move active source-integrity verification into the execution package, pin one current Git tree or explicit export manifest, and retire the former tools owner without changing native or approval authority."
+      },
+      {
+        "version": "0.32",
+        "date": "2026-10-02",
+        "summary": "Move exported IPAM allocation-evidence validation into package ownership without an alias; retain external-authority, no-address-value, confirmation-digest and release/quarantine semantics while keeping live IPAM/B23 and retained-state work open."
+      },
+      {
+        "version": "0.33",
+        "date": "2026-10-02",
+        "summary": "Package capacity/eligibility and reservation/IPAM/DNS preflight owners with their evidence readers; eliminate provisioner imports from top-level scripts/tools while retaining live owner-service, execution and state-conversion gates."
       }
     ]
   },
@@ -356,7 +366,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.30",
+    "version": "0.32",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -518,13 +528,23 @@
         "version": "0.30",
         "date": "2026-10-02",
         "summary": "Define package-owned checkout/export source-integrity boundaries and fail-closed installed-runtime behavior while retaining signer/custody and state-conversion obligations."
+      },
+      {
+        "version": "0.31",
+        "date": "2026-10-02",
+        "summary": "Bind reservation/IPAM/DNS consumers to the package-owned IPAM evidence reader while preserving the stable confirmed-allocation digest and external IPAM mutation authority."
+      },
+      {
+        "version": "0.32",
+        "date": "2026-10-02",
+        "summary": "Align package-owned capacity/reservation/IPAM/DNS planning and evidence interfaces; preserve exact digests, external service authority and no-mutation boundary."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.20",
+    "version": "0.22",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -636,6 +656,16 @@
         "version": "0.20",
         "date": "2026-10-02",
         "summary": "Record source-integrity owner transition without relabelling historical manifests or converting retained/native state."
+      },
+      {
+        "version": "0.21",
+        "date": "2026-10-02",
+        "summary": "Record the IPAM evidence owner transition without importing private allocation state, relabelling external records or making released capacity reusable."
+      },
+      {
+        "version": "0.22",
+        "date": "2026-10-02",
+        "summary": "Record allocation planning/evidence code-owner migration without importing private owner state or authorizing live reservation, IPAM or DNS operations."
       }
     ]
   }

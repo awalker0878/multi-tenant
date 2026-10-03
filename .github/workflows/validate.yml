@@ -171,21 +171,21 @@ jobs:
       - name: Platform-family pre-placement must remain held without native qualification
         run: python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM > build/reports/platform_family_eligibility.json
       - name: Current site cell and service-class capacity envelopes
-        run: python scripts/check_site_service_capacity.py > build/reports/site_service_capacity_index.json
+        run: python -m provisioner.allocations.capacity_evidence > build/reports/site_service_capacity_index.json
       - name: Site service-capacity precheck must remain held without commissioned envelopes
-        run: python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
+        run: python -m provisioner.allocations.site_eligibility examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
       - name: Exported reservation records remain external-authority evidence
         run: python -m provisioner.allocations.reservation_evidence --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
       - name: Reservation preflight must remain held without eligible envelope
-        run: python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
+        run: python -m provisioner.allocations.reservation_preflight examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
       - name: Exported IPAM allocations remain authoritative-service evidence
-        run: python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
+        run: python -m provisioner.allocations.ipam_evidence --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
       - name: IPAM allocation preflight must remain held without parent reservation
-        run: python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
+        run: python -m provisioner.allocations.ipam_preflight examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
       - name: Exported DNS registrations remain authoritative-service evidence
-        run: python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
+        run: python -m provisioner.allocations.dns_evidence --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
       - name: DNS registration preflight must remain held without confirmed IPAM
-        run: python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
+        run: python -m provisioner.allocations.dns_preflight examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
       - name: Exported backup/restore assurance remains external-service evidence
         run: python scripts/check_backup_restore_assurance.py --as-of 2026-09-18T19:00:00Z > build/reports/backup_restore_assurance.json
       - name: Backup/restore readiness must remain held without current assurance

@@ -12,15 +12,12 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
 from provisioner.allocations import reservation_evidence as records
-from scripts import check_site_service_capacity as capacity
-from scripts import check_site_service_eligibility as sitecheck
+from provisioner.allocations import capacity_evidence as capacity
+from provisioner.allocations import site_eligibility as sitecheck
 from provisioner.qualification import native as qualification
 
 FORMAT='portable-hosting-reservation-intent/1'
@@ -253,12 +250,12 @@ def evaluate(intent,*,capacity_index=None,reservation_index=None,qindex=None,pro
     }
 
 
-def main():
+def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('intent',type=Path)
     p.add_argument('--expected-status',choices=(READY,HOLD_ENVELOPE,HOLD_CONFLICT,HOLD_UNCERTAIN,HOLD_TERMINAL,EXISTING_HELD,EXISTING_CONSUMED))
     p.add_argument('--as-of',help='ISO-8601 review instant; defaults to current UTC')
-    a=p.parse_args()
+    a=p.parse_args(argv)
     try:
         as_of=records.instant(a.as_of,'as_of') if a.as_of else datetime.now(timezone.utc)
         result=evaluate(load(a.intent),as_of=as_of)

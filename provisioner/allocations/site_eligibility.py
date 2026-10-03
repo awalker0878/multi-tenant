@@ -13,13 +13,10 @@ from decimal import Decimal, InvalidOperation
 import json
 from pathlib import Path
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
-from scripts import check_site_service_capacity as capacity
+from provisioner.allocations import capacity_evidence as capacity
 from provisioner.qualification import native as qualification
 
 FORMAT='portable-hosting-site-service-demand/1'
@@ -230,7 +227,7 @@ def evaluate(request,index,*,qindex=None,provenance_index=None,campaign_evidence
     }
 
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('request',type=Path)
     parser.add_argument('--index',type=Path,default=capacity.INDEX)

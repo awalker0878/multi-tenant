@@ -15,6 +15,13 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
     'tools/check_release.py': ('path', 'provisioner/execution/source_integrity.py'),
     'scripts/check_reservation_records.py': ('path', 'provisioner/allocations/reservation_evidence.py'),
+    'scripts/check_ipam_allocation_records.py': ('path', 'provisioner/allocations/ipam_evidence.py'),
+    'scripts/check_dns_registration_records.py': ('path', 'provisioner/allocations/dns_evidence.py'),
+    'scripts/check_site_service_capacity.py': ('path', 'provisioner/allocations/capacity_evidence.py'),
+    'scripts/check_site_service_eligibility.py': ('path', 'provisioner/allocations/site_eligibility.py'),
+    'scripts/check_reservation_preflight.py': ('path', 'provisioner/allocations/reservation_preflight.py'),
+    'scripts/check_ipam_allocation_preflight.py': ('path', 'provisioner/allocations/ipam_preflight.py'),
+    'scripts/check_dns_registration_preflight.py': ('path', 'provisioner/allocations/dns_preflight.py'),
     'tools/terraform_catalog.py': ('path', 'provisioner/execution/terraform_catalog.py'),
     'tools/compile_wsd.py': ('path', 'provisioner/compiler/wsd.py'),
     'tools/old_compile.py': ('path', 'provisioner/compiler/wsd.py'),

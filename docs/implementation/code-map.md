@@ -126,7 +126,7 @@ This precheck evaluates only platform-family capability evidence. It cannot sele
 
 Design: [Hosting cells and failure boundaries](../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md) · [Capacity and service envelopes](../assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md) · [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md)
 
-Implementation: [active capacity inventory](../../sources/capabilities/site_service_capacity_index.json) · [capacity-envelope validator](../../scripts/check_site_service_capacity.py) · [read-only site/service precheck](../../scripts/check_site_service_eligibility.py) · [engineering boundary](../engineering/site-service-capacity-eligibility.md)
+Implementation: [active capacity inventory](../../sources/capabilities/site_service_capacity_index.json) · [capacity-envelope validator](../../provisioner/allocations/capacity_evidence.py) · [read-only site/service precheck](../../provisioner/allocations/site_eligibility.py) · [engineering boundary](../engineering/site-service-capacity-eligibility.md)
 
 The current inventory is intentionally empty. A commissioned envelope now pins the exact qualification dossier SHA-256, approval decision and one supporting target-bound campaign/site/cell scope, preventing silent drift when a dossier changes under the same ID. Matching envelopes still never create a reservation, select a site, allocate an address or authorize activation; one failed capacity/profile/quota dimension rejects the envelope.
 
@@ -134,7 +134,7 @@ The current inventory is intentionally empty. A commissioned envelope now pins t
 
 Design: [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md) · [Reservation recovery](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [Concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
 
-Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../provisioner/allocations/reservation_evidence.py) · [immutable intent preflight](../../scripts/check_reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
+Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../provisioner/allocations/reservation_evidence.py) · [immutable intent preflight](../../provisioner/allocations/reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
 
 The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding and the current commissioned-envelope SHA-256 are validated together; drift under the same envelope ID is a reconciliation conflict and the digest is propagated into the parent binding consumed by IPAM. CI never creates or releases a reservation or allocates an address.
 
@@ -142,7 +142,7 @@ The authoritative reservation system remains external. Stable reservation/operat
 
 Design: [Addressing and authoritative IPAM](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [Reserve/confirm/release lifecycle](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
 
-Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../scripts/check_ipam_allocation_records.py) · [no-guess allocation preflight](../../scripts/check_ipam_allocation_preflight.py) · [live NetBox lifecycle operator](../../tools/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
+Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../provisioner/allocations/ipam_evidence.py) · [no-guess allocation preflight](../../provisioner/allocations/ipam_preflight.py) · [live NetBox lifecycle operator](../../tools/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
 
 Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated from exported evidence without reserving/releasing an address or writing DNS. The live operator tool performs the same reserve/confirm/retire/quarantine/release lifecycle against NetBox under one authoritative writer lock, and refuses reuse except through a new explicit allocation decision.
 
@@ -150,7 +150,7 @@ Actual allocation values remain in authoritative IPAM. Stable operation identity
 
 Design: [Name/time/initialization service profiles](../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md) · [Address/name lifecycle](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [Scoped DNS lifecycle](../DNS_LIFECYCLE.md)
 
-Implementation: [exported DNS evidence index](../../sources/capabilities/dns_registration_index.json) · [registration evidence validator](../../scripts/check_dns_registration_records.py) · [no-guess DNS preflight](../../scripts/check_dns_registration_preflight.py) · [engineering boundary](../engineering/authoritative-dns-registration-handoff.md)
+Implementation: [exported DNS evidence index](../../sources/capabilities/dns_registration_index.json) · [registration evidence validator](../../provisioner/allocations/dns_evidence.py) · [no-guess DNS preflight](../../provisioner/allocations/dns_preflight.py) · [engineering boundary](../engineering/authoritative-dns-registration-handoff.md)
 
 Actual DNS names and A/AAAA/PTR values remain outside Git. DNS evidence pins the stable SHA-256 of the confirmed IPAM allocation/realization plus the full normalized DNS-intent SHA-256; reused parent or DNS IDs cannot hide confirmation, TTL, zone, owner or scope drift. REGISTERED still requires CONFIRMED IPAM evidence and every declared required observation, and CI never invokes the RFC2136 writer.
 

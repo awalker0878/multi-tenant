@@ -183,7 +183,7 @@ class ReservationEvidenceBoundaryTests(unittest.TestCase):
                 records.repository_ref(value, self.root)
 
     def test_retired_import_is_absent_and_all_record_consumers_share_the_owner(self):
-        from scripts import check_reservation_preflight, check_ipam_allocation_preflight
+        from provisioner.allocations import reservation_preflight as check_reservation_preflight, ipam_preflight as check_ipam_allocation_preflight
         self.assertIsNone(importlib.util.find_spec('scripts.check_reservation_records'))
         self.assertIs(check_reservation_preflight.records, records)
         self.assertIs(check_ipam_allocation_preflight.reservation_records, records)

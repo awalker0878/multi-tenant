@@ -12,8 +12,8 @@ import unittest
 
 from provisioner.qualification import native as qualification
 from provisioner.qualification import campaign as campaign
-from scripts import check_site_service_capacity as capacity
-from scripts import check_site_service_eligibility as eligibility
+from provisioner.allocations import capacity_evidence as capacity
+from provisioner.allocations import site_eligibility as eligibility
 from provisioner.qualification import provenance as provenance
 from tests.qualification_fixture_support import campaign_index, target_index
 
@@ -356,14 +356,14 @@ class SiteEligibilityTests(unittest.TestCase):
 
     def test_cli_current_example_asserts_expected_hold(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_site_service_eligibility.py'),str(EXAMPLE),
+            sys.executable,'-m','provisioner.allocations.site_eligibility',str(EXAMPLE),
             '--expected-status',eligibility.HOLD],capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)
         self.assertEqual(json.loads(run.stdout)['status'],eligibility.HOLD)
 
     def test_cli_hold_is_nonzero_without_expected_status(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_site_service_eligibility.py'),str(EXAMPLE)],
+            sys.executable,'-m','provisioner.allocations.site_eligibility',str(EXAMPLE)],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,2)
         self.assertEqual(json.loads(run.stdout)['status'],eligibility.HOLD)

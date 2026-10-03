@@ -71,7 +71,7 @@ proposal, **never** a confirmation.
 | `EXISTING_CONSUMED_RESERVATION` | the owner's record is `CONSUMED` |
 
 The four refusal states deliberately borrow the refusal vocabulary of the preserved
-preflight (`scripts/check_reservation_preflight.py`) so an operator reads one
+preflight (`provisioner/allocations/reservation_preflight.py`) so an operator reads one
 vocabulary. `require_settled`, `require_confirmed` and `require_current` refuse with
 `CAPACITY_RESERVATION_CONFLICT` (a definite no), `CAPACITY_RESERVATION_UNRESOLVED` (the
 owner has not answered yet) or `CAPACITY_RESERVATION_UNCONFIRMED` (the answer is not a

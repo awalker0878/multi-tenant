@@ -38,12 +38,12 @@ each owner produces. Nothing here restates them.
 | Compiled | Validated by | Reached through |
 | --- | --- | --- |
 | capacity request | `tools/capacity.py` | `provisioner/repository.py` |
-| reservation intent | `scripts/check_reservation_preflight.py` | `provisioner/repository.py` |
-| allocation intent | `scripts/check_ipam_allocation_preflight.py` | `provisioner/repository.py` |
-| registration intent | `scripts/check_dns_registration_preflight.py` | `provisioner/repository.py` |
+| reservation intent | `provisioner/allocations/reservation_preflight.py` | `provisioner/repository.py` |
+| allocation intent | `provisioner/allocations/ipam_preflight.py` | `provisioner/repository.py` |
+| registration intent | `provisioner/allocations/dns_preflight.py` | `provisioner/repository.py` |
 | exported reservation records | `provisioner/allocations/reservation_evidence.py` | `provisioner/repository.py` |
-| exported allocation records | `scripts/check_ipam_allocation_records.py` | `provisioner/repository.py` |
-| exported registration records | `scripts/check_dns_registration_records.py` | `provisioner/repository.py` |
+| exported allocation records | `provisioner/allocations/ipam_evidence.py` | `provisioner/repository.py` |
+| exported registration records | `provisioner/allocations/dns_evidence.py` | `provisioner/repository.py` |
 
 The owner normalizes a submitted intent before it hashes it, so the provisioner asks
 the owner's own preflight for the normalization (`repository.ipam_allocation_spec`,
@@ -90,8 +90,8 @@ than an untyped failure.
 | `EXISTING_REGISTERED_DNS_IDEMPOTENT` | the owner holds a `REGISTERED` record for this exact identity |
 
 Both vocabularies deliberately borrow the refusal vocabulary of the preserved
-preflights (`scripts/check_ipam_allocation_preflight.py` and
-`scripts/check_dns_registration_preflight.py`) so an operator reads one vocabulary.
+preflights (`provisioner/allocations/ipam_preflight.py` and
+`provisioner/allocations/dns_preflight.py`) so an operator reads one vocabulary.
 The reconciliation itself is the repository's own: `CONFIRMED`, `REFUSED` or
 `PENDING_OWNER`.
 

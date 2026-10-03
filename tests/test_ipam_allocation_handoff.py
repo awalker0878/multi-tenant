@@ -9,11 +9,11 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_ipam_allocation_preflight as preflight
-from scripts import check_ipam_allocation_records as ipam
-from scripts import check_reservation_preflight as reservation_preflight
+from provisioner.allocations import ipam_preflight as preflight
+from provisioner.allocations import ipam_evidence as ipam
+from provisioner.allocations import reservation_preflight as reservation_preflight
 from provisioner.allocations import reservation_evidence as reservation_records
-from scripts import check_site_service_eligibility as sitecheck
+from provisioner.allocations import site_eligibility as sitecheck
 
 ROOT=Path(__file__).resolve().parents[1]
 AS_OF=datetime(2026,9,18,18,0,tzinfo=timezone.utc)
@@ -140,7 +140,7 @@ class IPAMRecordTests(unittest.TestCase):
         result=ipam.validate(ipam.load(),as_of=AS_OF)
         self.assertEqual(result['record_count'],0)
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_ipam_allocation_records.py'),
+            sys.executable,'-m', 'provisioner.allocations.ipam_evidence',
             '--as-of','2026-09-18T18:00:00Z'],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)
@@ -318,7 +318,7 @@ class IPAMPreflightTests(unittest.TestCase):
 
     def test_cli_can_assert_current_parent_hold(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_ipam_allocation_preflight.py'),str(INTENT),
+            sys.executable,'-m','provisioner.allocations.ipam_preflight',str(INTENT),
             '--as-of','2026-09-18T18:00:00Z',
             '--expected-status',preflight.HOLD_PARENT],
             capture_output=True,text=True,timeout=10)

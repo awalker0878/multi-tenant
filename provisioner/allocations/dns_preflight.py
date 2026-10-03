@@ -12,14 +12,11 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-import sys
 
-if __package__ in (None, ''):
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hosting_resources import RESOURCE_ROOT as ROOT
 
-from scripts import check_dns_registration_records as dnsrecords
-from scripts import check_ipam_allocation_records as ipam
+from provisioner.allocations import dns_evidence as dnsrecords
+from provisioner.allocations import ipam_evidence as ipam
 
 FORMAT='portable-hosting-dns-registration-intent/1'
 STATUS='PLANNING_ONLY_NOT_AUTHORIZED'
@@ -224,12 +221,12 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
     }
 
 
-def main():
+def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('intent',type=Path)
     p.add_argument('--as-of',help='ISO-8601 review instant; defaults to current UTC')
     p.add_argument('--expected-status',choices=(READY,HOLD_IPAM,HOLD_CONFLICT,HOLD_UNCERTAIN,HOLD_RELEASE,HOLD_TERMINAL,EXISTING_REGISTERED))
-    a=p.parse_args()
+    a=p.parse_args(argv)
     try:
         as_of=dnsrecords.instant(a.as_of,'as_of') if a.as_of else datetime.now(timezone.utc)
         result=evaluate(load(a.intent),as_of=as_of)

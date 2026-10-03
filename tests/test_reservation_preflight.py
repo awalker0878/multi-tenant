@@ -12,10 +12,10 @@ import unittest
 
 from provisioner.qualification import native as qualification
 from provisioner.qualification import campaign as campaign
-from scripts import check_reservation_preflight as preflight
+from provisioner.allocations import reservation_preflight as preflight
 from provisioner.allocations import reservation_evidence as records
-from scripts import check_site_service_capacity as capacity
-from scripts import check_site_service_eligibility as sitecheck
+from provisioner.allocations import capacity_evidence as capacity
+from provisioner.allocations import site_eligibility as sitecheck
 from provisioner.qualification import provenance as provenance
 from tests.qualification_fixture_support import campaign_index, target_index
 
@@ -337,7 +337,7 @@ class ReservationPreflightTests(unittest.TestCase):
 
     def test_cli_can_assert_current_expected_hold(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_reservation_preflight.py'),str(INTENT),
+            sys.executable,'-m','provisioner.allocations.reservation_preflight',str(INTENT),
             '--as-of','2026-09-18T18:00:00Z',
             '--expected-status',preflight.HOLD_ENVELOPE],
             capture_output=True,text=True,timeout=10)

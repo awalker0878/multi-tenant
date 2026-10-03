@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.20 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.22 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -84,6 +84,12 @@ tracked bytes; a Git-less export must carry its own explicit snapshot manifest. 
 release manifests remain historical evidence and are never reinterpreted as current
 authority. This code-owner transition changes no native state or retained operation.
 
+
+The IPAM evidence owner transition changes only code/import custody. Existing reservation,
+allocation, DNS and cleanup records remain immutable external-service evidence; no private
+IPAM state or allocation value is imported, relabelled or made reusable by the move.
+See the [IPAM evidence runtime contract](../engineering/ipam-evidence-runtime.md).
+
 ### Retained-state conversion and as-built evidence
 
 B05/B48 require actual retained-record inventory, immutable originals, exact native-ID,
@@ -143,6 +149,10 @@ are unchanged. This is not a retained-state importer or an in-place installation
 upgrade. Invalid aliased/linked references require owner-controlled correction, never
 silent relabelling of retained evidence. See the
 [runtime contract](../engineering/reservation-evidence-runtime.md).
+
+### Package-owned allocation planning chain
+
+Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
 
 ## Engineering and implementation handoff
 

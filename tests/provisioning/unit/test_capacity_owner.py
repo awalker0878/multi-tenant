@@ -41,7 +41,7 @@ from tests.provisioning import support
 
 OWNER = support.ROOT / 'tools' / 'capacity.py'
 RECORD_CHECKER = support.ROOT / 'provisioner' / 'allocations' / 'reservation_evidence.py'
-PREFLIGHT = support.ROOT / 'scripts' / 'check_reservation_preflight.py'
+PREFLIGHT = support.ROOT / 'provisioner' / 'allocations' / 'reservation_preflight.py'
 
 #: A relative path the repository really owns, for exported-evidence references.
 SOURCE_REF = 'examples/requests/internal-production.yaml'
