@@ -5,6 +5,7 @@ import json
 import os
 import unittest
 from copy import deepcopy
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -121,8 +122,9 @@ class NativeRegistryPostgresTest(unittest.TestCase):
                 (self.ctx.organization_id, self.ctx.tenant_id,
                  self.job_id, 'key-' + suffix, self.plan['metadata']['planId'],
                  self.plan['metadata']['planDigest'],
-                 json.dumps(self.plan['spec']['source']),
-                 json.dumps(self.plan['spec']['destination']), 'operator-1'))
+                 json.dumps(asdict(PlanScope.from_record(self.plan['spec']['source']))),
+                 json.dumps(asdict(PlanScope.from_record(self.plan['spec']['destination']))),
+                 'operator-1'))
         self.owner = self.store.acquire_owner_lease(
             self.ctx, self.plan['spec']['source'], self.binding,
             self.workload['metadata']['workloadId'], 'worker-1', 60, self.audit)

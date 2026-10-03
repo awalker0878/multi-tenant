@@ -20,7 +20,7 @@ from provisioner.controlplane.authority.model import PlanScope, VerifiedPrincipa
 from provisioner.controlplane.authority.service import (DESTINATION_SECURITY,
     EXECUTION_OPERATOR, MAX_STEP_UP_AGE, SOURCE_SECURITY, AuthorityDenied,
     require_scoped_role)
-from provisioner.controlplane.jobs.repository import _tenant
+from provisioner.controlplane.jobs.repository import _json, _tenant
 from provisioner.controlplane.persistence.store import (NativeBinding,
     OwnerLease, TenantContext)
 from provisioner.controlplane.worker.grants import VerifiedWorkerIdentity
@@ -198,6 +198,14 @@ def _row(row) -> NativeOperation:
                            row[13], row[14], row[15], row[16], row[17], row[18])
 
 
+def _stored_job_scope(value) -> PlanScope:
+    """Decode B09's persisted dataclass scope, not a canonical plan record."""
+    try:
+        return PlanScope(**_json(value))
+    except (TypeError, ValueError) as exc:
+        raise OperationConflict('The persisted job scope is invalid') from exc
+
+
 _SELECT = ('operation_id, job_id, grant_id, step_id, lease_key, '
            'platform_family, endpoint_id, '
            'native_scope_id, resource_kind, native_id, workload_id, '
@@ -243,9 +251,8 @@ class NativeLeaseAuthority:
             job = cursor.fetchone()
             if job is None or job[0] not in ('STARTED', 'RUNNING'):
                 raise OperationConflict('A started job is required')
-            from provisioner.controlplane.jobs.repository import _json
-            if scope not in (PlanScope.from_record(_json(job[1])),
-                             PlanScope.from_record(_json(job[2]))):
+            if scope not in (_stored_job_scope(job[1]),
+                             _stored_job_scope(job[2])):
                 raise OperationConflict('Scope is not selected by the job')
             NativeOperationRegistry._owner(cursor, ctx, lease, live=True)
             NativeOperationRegistry._containment(cursor, lease.binding)
@@ -388,9 +395,8 @@ class NativeOperationRegistry:
             job = cursor.fetchone()
             if job is None or job[2] not in ('STARTED', 'RUNNING'):
                 raise OperationConflict('Only a started and current job may prepare native work')
-            from provisioner.controlplane.jobs.repository import _json
-            if scope not in (PlanScope.from_record(_json(job[0])),
-                             PlanScope.from_record(_json(job[1]))):
+            if scope not in (_stored_job_scope(job[0]),
+                             _stored_job_scope(job[1])):
                 raise OperationConflict('Native scope is not selected by this job')
             # B10 takes job -> enrollment -> authority -> operation lease ->
             # owner locks. Preserve that order before touching intent rows.
