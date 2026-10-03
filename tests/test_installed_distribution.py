@@ -73,7 +73,9 @@ class InstalledDistributionTest(unittest.TestCase):
                               'tools/guest_probe.py', 'tools/guest_probe.pyc',
                               'tools/__pycache__/guest_probe.cpython-313.pyc',
                               'tools/route_audit.py', 'tools/route_audit.pyc',
-                              'tools/__pycache__/route_audit.cpython-313.pyc')
+                              'tools/__pycache__/route_audit.cpython-313.pyc',
+                              'tools/check_package.py', 'tools/check_package.pyc',
+                              'tools/__pycache__/check_package.cpython-313.pyc')
         for relative in cls.retired_python:
             path = cls.staging / relative
             path.parent.mkdir(parents=True, exist_ok=True)

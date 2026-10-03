@@ -247,6 +247,12 @@ The offline IPv4/IPv6 routed-topology model now lives at `provisioner.execution.
 
 This model still simulates only the documented reference routing semantics. It does not contact infrastructure, configure routes/firewalls, prove vendor datapath behavior or issue production approval. Direct execution/observer owners, installed service composition and retained-state conversion remain open.
 
+### Retired redundant repository-gate wrapper — B05 continuation (3 October 2026)
+
+`tools/check_package.py` was only a subprocess forwarding wrapper to `scripts/check_repository.py` and had no live Python consumer. It is deleted rather than moved or retained as a compatibility shim; the retirement register prevents reintroduction. Historical source-transcription documentation that records the old command remains provenance, while current testing guidance already names the actual repository gate.
+
+This deletion changes no repository-check logic, native interface, source format, authority or retained execution state. The remaining direct operator/execution owners and B48 conversion work keep B05 open.
+
 ## 2. Corrected dependencies and delivery order
 
 | Correction | Required sequence and reason |

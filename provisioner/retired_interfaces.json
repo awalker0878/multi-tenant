@@ -228,6 +228,13 @@
       "reason": "The offline routed-topology model is package-owned; all active callers migrated without a forwarding module.",
       "replacement": "provisioner/execution/route_audit.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/check_package.py",
+      "kind": "path",
+      "reason": "Redundant repository-gate wrapper; the actual current gate is scripts/check_repository.py and no live caller requires a forwarding command.",
+      "replacement": "scripts/check_repository.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }
