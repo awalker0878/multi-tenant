@@ -148,8 +148,8 @@ def require_ingest_role(connect: Callable, role: str) -> None:
             "OR (has_table_privilege(current_user, c.oid, 'INSERT') AND "
             "NOT (n.nspname = 'hosting_controlplane' AND c.relname = ANY(%s)))), false) "
             'FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace '
-            "WHERE c.relkind IN ('r', 'p') AND n.nspname NOT LIKE 'pg_%' "
-            "AND n.nspname <> 'information_schema'", (list(_WRITE_TABLES),)).fetchone()
+            "WHERE c.relkind IN ('r', 'p') AND n.nspname NOT LIKE %s "
+            "AND n.nspname <> 'information_schema'", (list(_WRITE_TABLES),'pg_%')).fetchone()
         if forbidden != (False,):
             raise RuntimeError('Discovery SQL login has unrelated or mutable table privileges')
         required = connection.execute(

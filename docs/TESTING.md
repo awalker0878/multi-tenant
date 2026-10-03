@@ -1,5 +1,21 @@
 # Test strategy and actual evidence levels
 
+## Installed execution package
+
+Run `python scripts/check_installed_distribution.py` with the declared
+`.[controlplane]` extra and the repository/build dependencies installed. The gate
+imports the actual transaction, migration, workflow, monitoring and recovery owners
+from the built wheel in an isolated interpreter outside the checkout. CI installs
+this extra explicitly because these owners require its pinned Temporal and PostgreSQL
+clients. Passing in a development environment with those clients already present
+does not verify the CI installation command.
+
+The protected-source test copies the actual verifier/bootstrap bytes into its own
+readable package capsule before launching an actual other-UID worker. Its mutable
+custody negative still rejects ambient wildcard Git trust. Local capability skips
+remain explicit; the privileged hosted check must exercise the positive and negative
+cases.
+
 ## Capability/profile reconciliation checks
 
 Run `python -m provisioner.qualification.registry` and

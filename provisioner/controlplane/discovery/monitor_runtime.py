@@ -106,8 +106,8 @@ def require_monitor_role(connect,role_name):
             "(has_table_privilege(current_user,c.oid,'SELECT') AND NOT "
             "(n.nspname='hosting_controlplane' AND c.relname=ANY(%s)))),false) "
             "FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace "
-            "WHERE c.relkind IN ('r','p') AND n.nspname NOT LIKE 'pg_%' AND n.nspname<>'information_schema'",
-            (list(_INSERT_TABLES),list(_SELECT_TABLES))).fetchone()
+            "WHERE c.relkind IN ('r','p') AND n.nspname NOT LIKE %s AND n.nspname<>'information_schema'",
+            (list(_INSERT_TABLES),list(_SELECT_TABLES),'pg_%')).fetchone()
         if forbidden!=(False,):raise RuntimeError('Monitor SQL login has unrelated mutation privileges')
         required=con.execute("SELECT bool_and(coalesce(has_table_privilege(current_user,to_regclass('hosting_controlplane.'||t.name),'SELECT'),false)) "
                              'FROM unnest(%s::text[]) AS t(name)',(list(_SELECT_TABLES),)).fetchone()

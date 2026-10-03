@@ -15,6 +15,40 @@ from contextlib import redirect_stdout
 from unittest.mock import patch
 
 from provisioner.execution import source_integrity as owner
+import hosting_resources
+
+
+def verifier_package_capsule(destination):
+    """Actual verifier/bootstrap bytes, independent of checkout ancestor modes."""
+    destination.mkdir(mode=0o755)
+    package=Path(owner.__file__).resolve().parents[2]
+    resources=Path(hosting_resources.__file__).resolve().parent
+    inputs={name:package/name for name in (
+        'provisioner/__init__.py', 'provisioner/domain/__init__.py',
+        'provisioner/domain/errors.py', 'provisioner/execution/__init__.py',
+        'provisioner/execution/source_integrity.py')}
+    inputs.update({'hosting_resources/__init__.py':resources/'__init__.py',
+                   'hosting_resources/runtime-documents.json':resources/'runtime-documents.json'})
+    for name,source in inputs.items():
+        path=destination/name
+        path.parent.mkdir(parents=True,exist_ok=True,mode=0o755)
+        path.write_bytes(source.read_bytes()); path.chmod(0o644)
+    # This is an explicit disposable source package, not an installed runtime or
+    # an application qualification. Its only operation is read-only Git verify.
+    (destination/'.hosting-root').write_bytes(b'')
+    (destination/'pyproject.toml').write_text('[project]\nname="source-verifier-fixture"\nversion="0"\n')
+    for path in destination.rglob('*'):
+        path.chmod(0o755 if path.is_dir() else 0o644)
+    return destination
+
+
+VERIFIER_CODE=('import json,sys; from pathlib import Path; '
+    'package=Path(sys.argv[1]).resolve(); sys.path.insert(0,str(package)); '
+    'from provisioner.execution import source_integrity; import hosting_resources; '
+    'assert Path(source_integrity.__file__).resolve().is_relative_to(package); '
+    'assert Path(hosting_resources.__file__).resolve().is_relative_to(package); '
+    'assert hosting_resources.SOURCE_ROOT == package; '
+    'print(json.dumps(source_integrity.verify(Path(sys.argv[2]))))')
 
 
 def git(root, *args):
@@ -67,6 +101,16 @@ class SourceIntegrityTests(unittest.TestCase):
             result=owner.verify(self.root)
         self.assertIn({'kind':'WORKTREE_DIFFERS_FROM_HEAD','file':'one.txt'},result['issues'])
 
+    def test_actual_verifier_package_capsule_runs_isolated_without_original_package_paths(self):
+        package=verifier_package_capsule(self.root.parent/'package')
+        result=subprocess.run([sys.executable,'-I','-B','-c',VERIFIER_CODE,str(package),str(self.root)],
+            cwd=package,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+            text=True,timeout=30)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(json.loads(result.stdout)['status'],'HASHES_MATCH')
+        self.assertTrue(all(not path.is_symlink() and not path.stat().st_mode&0o022
+                            for path in (package,*package.rglob('*'))))
+
     @unittest.skipUnless(os.geteuid() == 0 and shutil.which('runuser'),
                          'Actual cross-UID fixture requires a local root test runner and runuser')
     def test_protected_root_owned_checkout_is_readable_by_worker_without_ambient_git_trust(self):
@@ -84,20 +128,17 @@ class SourceIntegrityTests(unittest.TestCase):
         self.assertEqual(probe.returncode,0,probe.stderr)
         self.assertEqual(int(probe.stdout),account.pw_uid)
         with tempfile.TemporaryDirectory(prefix='hosting-source-custody-',dir='/var/lib') as directory:
-            root=Path(directory); root.chmod(0o755); git(root,'init','-q')
+            base=Path(directory); base.chmod(0o755)
+            root=base/'checkout'; root.mkdir(mode=0o755); git(root,'init','-q')
             git(root,'config','user.name','Synthetic custody fixture')
             git(root,'config','user.email','fixture@example.invalid')
             (root/'owned.txt').write_bytes(b'accepted fixture bytes\n')
             git(root,'add','.'); git(root,'commit','-qm','fixture')
-            package=Path(owner.__file__).resolve().parents[2]
-            code=('import json,sys; from pathlib import Path; '
-                  'sys.path.insert(0,sys.argv[1]); '
-                  'from provisioner.execution.source_integrity import verify; '
-                  'print(json.dumps(verify(Path(sys.argv[2]))))')
+            package=verifier_package_capsule(base/'package')
             environment={key:value for key,value in os.environ.items() if not key.startswith('GIT_')}
             environment.update(GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='safe.directory',GIT_CONFIG_VALUE_0='*')
             command=[shutil.which('runuser'),'-u',account.pw_name,'--',sys.executable,'-I','-B','-c',
-                     code,str(package),str(root)]
+                     VERIFIER_CODE,str(package),str(root)]
             def observe():
                 result=subprocess.run(command,env=environment,cwd=root,stdin=subprocess.DEVNULL,
                     stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=30)
@@ -164,11 +205,13 @@ class SourceIntegrityTests(unittest.TestCase):
     def test_old_module_is_absent_and_runtime_consumers_use_owner(self):
         import importlib.util
         from provisioner import repository
-        from provisioner.execution import terraform_run, terraform_apply
-        from tools import state_export
-        from provisioner.execution import vsphere_power
+        from provisioner.execution import terraform_run, terraform_apply, state_export, vsphere_power
         self.assertIsNone(importlib.util.find_spec('tools.check_release'))
-        for module in (terraform_run,terraform_apply,state_export,vsphere_power):self.assertIs(module.verify,owner.verify)
+        package=Path(owner.__file__).resolve().parents[2]
+        self.assertFalse((package/'tools/state_export.py').exists())
+        for module in (terraform_run,terraform_apply,state_export,vsphere_power):
+            self.assertIs(module.verify,owner.verify)
+            self.assertTrue(Path(module.__file__).resolve().is_relative_to(package/'provisioner/execution'))
         self.assertEqual(repository.source_commit(self.root)['commit'],self.commit)
 
 
