@@ -47,7 +47,7 @@ class ApplicationDraftAssetTests(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which('node'), 'Node is required for browser-client contract tests')
     def test_draft_javascript_contracts_and_real_shell_composition(self):
-        result = subprocess.run([shutil.which('node'), '--test',
+        result = subprocess.run([shutil.which('node'), '--test', '--test-reporter=tap',
             str(ROOT / 'tests/provisioning/api/test_application_draft_ui.js')],
             cwd=ROOT, text=True, capture_output=True, timeout=45)
         self.assertEqual(result.returncode, 0, result.stdout[-15000:]+result.stderr[-3000:])

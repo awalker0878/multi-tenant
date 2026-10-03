@@ -44,7 +44,7 @@ class ApplicationComparisonAssetTests(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which('node'), 'Node is required for browser contracts')
     def test_browser_request_response_race_and_composition_contracts(self):
-        result = subprocess.run([shutil.which('node'), '--test',
+        result = subprocess.run([shutil.which('node'), '--test', '--test-reporter=tap',
             str(ROOT / 'tests/provisioning/api/test_application_comparison_ui.js')],
             cwd=ROOT, text=True, capture_output=True, timeout=45)
         self.assertEqual(result.returncode, 0, result.stdout[-18000:] + result.stderr[-3000:])

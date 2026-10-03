@@ -97,7 +97,7 @@ class ApplicationReviewBrowserAssetsTests(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which('node'), 'Node is required for browser review integration')
     def test_actual_review_client_and_python_api_service_contracts(self):
-        run = subprocess.run([shutil.which('node'), '--test',
+        run = subprocess.run([shutil.which('node'), '--test', '--test-reporter=tap',
             str(ROOT/'tests/provisioning/api/test_application_review_ui.js')], cwd=ROOT,
             text=True, capture_output=True, timeout=45)
         self.assertEqual(run.returncode, 0, run.stdout[-18000:]+run.stderr[-4000:])

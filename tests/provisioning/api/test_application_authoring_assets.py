@@ -97,7 +97,7 @@ class ApplicationAuthoringAssetTests(unittest.TestCase):
             env = {**os.environ, 'HOSTING_AUTHORING_FIXTURE': str(source),
                    'HOSTING_AUTHORING_REQUEST': str(output),
                    'HOSTING_REVISION_REQUEST': str(revision_output)}
-            run = subprocess.run([shutil.which('node'), '--test',
+            run = subprocess.run([shutil.which('node'), '--test', '--test-reporter=tap',
                 str(ROOT / 'tests/provisioning/api/test_application_authoring_ui.js')],
                 cwd=ROOT, env=env, text=True, capture_output=True, timeout=45)
             self.assertEqual(run.returncode, 0, run.stdout[-16000:] + run.stderr[-3000:])
