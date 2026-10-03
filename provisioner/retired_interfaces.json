@@ -235,6 +235,13 @@
       "reason": "Redundant repository-gate wrapper; the actual current gate is scripts/check_repository.py and no live caller requires a forwarding command.",
       "replacement": "scripts/check_repository.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/input_review.py",
+      "kind": "path",
+      "reason": "Read-only implementation-input review moved into the installed execution package; all callers migrated without a forwarding module.",
+      "replacement": "provisioner/execution/input_review.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }

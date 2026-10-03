@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 try:
  from tools.neutron_observe import strict_loads,digest
- from tools.input_review import PLACEHOLDER
+ from provisioner.execution.input_review import PLACEHOLDER
 except ModuleNotFoundError:
  from neutron_observe import strict_loads,digest
  from input_review import PLACEHOLDER

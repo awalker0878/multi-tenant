@@ -136,6 +136,7 @@ class InstalledDistributionTest(unittest.TestCase):
         with zipfile.ZipFile(self.wheel) as wheel:
             members = wheel.namelist()
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
+        self.assertIn('provisioner/execution/input_review.py', members)
         self.assertIn('provisioner/execution/source_integrity.py', members)
         self.assertIn('provisioner/execution/guest_probe.py', members)
         self.assertIn('provisioner/execution/route_audit.py', members)
@@ -151,6 +152,7 @@ class InstalledDistributionTest(unittest.TestCase):
         self.assertFalse(any(name.startswith('scripts/check_dns_registration_records.') for name in members))
         self.assertFalse(any(name.startswith('scripts/check_reservation_records.') for name in members))
         self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
+        self.assertFalse(any(name.startswith('tools/input_review.') for name in members))
         self.assertFalse(any(name.startswith('tools/check_release.') for name in members))
         self.assertFalse(any(name.startswith('tools/guest_probe.') for name in members))
         self.assertFalse(any(name.startswith('tools/route_audit.') for name in members))
@@ -191,6 +193,7 @@ from provisioner.portability.artifacts import load as artifact_registry
 from provisioner.compiler.artifacts import assert_output_path
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution.terraform_catalog import entries
+from provisioner.execution import input_review
 code, plan = dispatch(['plan', 'request.yaml'])
 registry = repository.capability_registry()
 eligible, blockers = repository.capability_eligible(registry, 'openstack', {'ipv4'})
@@ -207,6 +210,7 @@ assert load_rules() and len(load_catalogs().families) == 10
 assert fixture().status == 'FIXTURE_NOT_AUTHORITATIVE'
 assert declarations['reservation_intent']['format']
 assert entries()
+assert callable(input_review.review_inputs)
 assert code == 0, plan
 assert SOURCE_ROOT is None
 assert RESOURCE_ROOT.is_relative_to(Path(sys.prefix))

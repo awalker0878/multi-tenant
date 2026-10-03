@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.36 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.37 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -225,6 +225,12 @@ The fixed guest connectivity/health probe is package-owned at `provisioner.execu
 
 
 The offline route-audit model is package-owned at `provisioner.execution.route_audit`; planning/test callers migrated and the former tools path is retired. Its IPv4/IPv6 topology model remains model-only and does not assert native routing, firewall state or service acceptance.
+
+
+Implementation input review is now package-owned at
+`provisioner.execution.input_review`; its former tool path is retired without an alias.
+Offline schema/type/placeholder/address checks are unchanged and remain non-authoritative.
+See the [input-review runtime contract](../engineering/input-review-runtime.md).
 
 ## Engineering and implementation handoff
 

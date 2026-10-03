@@ -12,10 +12,7 @@ import ipaddress
 import json
 import re
 from pathlib import Path
-try:
- from provisioner.execution.route_audit import DOC_NETS, load_json
-except ModuleNotFoundError:
- from route_audit import DOC_NETS, load_json
+from provisioner.execution.route_audit import DOC_NETS, load_json
 
 PLACEHOLDER=re.compile(r'(REQUIRED|MOCK|EXAMPLE|NOT-ASSIGNED|REPLACE|<|>)',re.I)
 REPEATED_UUID=re.compile(r'^([a-fA-F0-9])\1{7}-')

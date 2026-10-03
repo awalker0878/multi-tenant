@@ -30,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, fixed guest probe, offline route-audit model, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, package-owned implementation-input review, fixed guest probe, offline route-audit model, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 4 retains allocation/attachment facts plus bounded VM-referenced Glance driver/security metadata. | Guest-installed driver/key/service evidence, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -135,6 +135,19 @@ retry. Shared private-file code replaces the signer's local helpers without alia
 Independent dependency verification, actual owner/key onboarding, owner-to-custodian
 artifact transfer and enterprise/administrator acceptance remain open. B05 and Wave 2 remain
 open; this continuation does not start or close the native provisioning/migration waves.
+
+### Package-owned implementation input review — parallel B05 continuation (3 October 2026)
+
+The read-only Terraform-root input validator now lives in
+`provisioner.execution.input_review`. Its former tool path is retired without an alias;
+route-record review, tests and active documentation use the package owner directly.
+Required/extra field, primitive type, placeholder, documentation-address, restricted-
+build and gateway checks are unchanged. See the
+[input-review runtime contract](../engineering/input-review-runtime.md).
+
+This is offline validation only: no credential, IPAM, target, Terraform or production
+authority is introduced. Remaining mutation/orchestration owners, installed service
+composition and retained-state conversion keep B05 open.
 
 ### Package-owned source integrity — parallel B05 continuation (2 October 2026)
 

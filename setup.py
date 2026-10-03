@@ -27,6 +27,7 @@ class BuildRuntime(build_py):
             'provisioner/allocations/reservation_preflight.py', 'provisioner/allocations/ipam_preflight.py',
             'provisioner/allocations/dns_preflight.py',
             'provisioner/qualification/registry.py', 'provisioner/execution/terraform_catalog.py',
+            'provisioner/execution/input_review.py',
             'sources/capabilities/platform_registry.json',
             'policy/rules/standards.json', 'profiles/security/catalog.json',
             'terraform/catalog.json', 'ansible/catalog.json', 'config/toolchain.json',

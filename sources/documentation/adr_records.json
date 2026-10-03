@@ -861,7 +861,7 @@
     ],
     "implementation_paths": [
       "terraform/modules",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "open_work": "The actual tenant identities, approved shared-domain ownership and lifecycle integration remain unassigned.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -956,7 +956,7 @@
       "IPAM-004"
     ],
     "implementation_paths": [
-      "tools/input_review.py",
+      "provisioner/execution/input_review.py",
       "tools/dns_change.py"
     ],
     "open_work": "Authoritative IPAM allocation and native DNS propagation remain external integration work; DNS change code does not allocate addresses.",

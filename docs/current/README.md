@@ -5,18 +5,18 @@ separately here. Original Word files remain provenance. These maintained records
 new syntheses, not recovered missing Word originals. Source refresh must not overwrite
 them. A Git merge and a structural documentation pass are not adoption or site approval.
 
-## Current records — 2 October 2026
+## Current records — 3 October 2026
 
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.15 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.36 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.37 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.5 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.5 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.35 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [ICD-M01](interface-agreements.md) | 0.36 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
 | [TRANS-M01](transition-and-as-built.md) | 0.25 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.36 (Proposed)**; ICD-M01 is **version 0.35 (Proposed)**.
+TAD-M01 is **version 0.37 (Proposed)**; ICD-M01 is **version 0.36 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -44,6 +44,8 @@ The [allocation runtime owners](../engineering/allocation-runtime-owners.md) now
 capacity evidence, eligibility, reservation/IPAM/DNS preflight and exported allocation
 evidence inside the installed package. `provisioner` has no top-level `scripts`/`tools`
 imports; live owner services, direct execution tools and retained-state conversion remain open.
+
+The [package-owned implementation-input review](../engineering/input-review-runtime.md) now validates non-secret Terraform-root input shape from the installed execution package; it grants no native or allocation authority.
 
 The [package-owned Terraform catalog](../engineering/terraform-catalog-runtime.md)
 now replaces its old tools module without an alias. Strict input and source-path checks

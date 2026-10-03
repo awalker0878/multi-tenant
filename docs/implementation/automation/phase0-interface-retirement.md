@@ -171,3 +171,12 @@ source trees use only an explicitly supplied SHA-256 manifest; there is no histo
 manifest or working-directory fallback. Installed execution without an explicit checkout
 fails closed. This establishes source-byte consistency only, not signer trust, approval,
 native qualification or retained-state conversion. Other B05 runtime owners remain.
+
+### Package-owned implementation input review — 3 October 2026
+
+The implementation formerly in `tools/input_review.py` now lives at
+`provisioner/execution/input_review.py`. Route-record review, tests, installed-package
+checks and active documentation migrated to the package owner. The old path is deleted
+and prohibited without a forwarding module. This is read-only input validation; it
+converts no retained state and grants no target, address-allocation or execution
+authority.
