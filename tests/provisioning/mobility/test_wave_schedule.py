@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from provisioner.controlplane.authority.model import PlanScope
-from provisioner.controlplane.jobs import AdmissionRefused, JobRepository
+from provisioner.controlplane.jobs import AdmissionRefused, Job, JobRepository
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
 from provisioner.controlplane.workflow.execution_selection import FileExecutionSelectionStore
 from provisioner.domain.enterprise_records import plan_digest, validate_record
@@ -213,8 +213,9 @@ class WaveSchedulingTests(unittest.TestCase):
             _resource_keys(self.a, missing)
 
     def test_delayed_start_and_every_native_effect_recheck_current_wave_window(self):
-        job = SimpleNamespace(organization_id='org-01', tenant_id='tenant-01', job_id='job-1',
-            plan_id=self.a.plan_id, plan_revision=self.a.plan_revision, plan_digest=self.a.plan_digest)
+        job = Job('org-01','tenant-01','job-1','wave-member-1',self.a.plan_id,
+            self.a.plan_revision,self.a.plan_digest,self.a.source,self.a.destination,
+            'operator-1',('approval-1',),0,'QUEUED',1,NOW,NOW)
         valid = ('ADMITTED', self.domain.digest, self.domain.digest,
             self.domain.observed_at, self.domain.expires_at, self.a.window_start,
             self.a.window_end, self.a.runtime_seconds, job.plan_id, job.plan_revision, job.plan_digest)
@@ -225,6 +226,8 @@ class WaveSchedulingTests(unittest.TestCase):
             def fetchone(self): return self.row
         require_wave_window(Cursor(valid), job, NOW, starting=True)
         require_wave_window(Cursor(None), job, NOW)  # Existing non-wave policy unchanged.
+        with self.assertRaisesRegex(WaveHeld, 'persisted B09 job'):
+            require_wave_window(Cursor(None), SimpleNamespace(**vars(job)), NOW)
         delayed = NOW+timedelta(hours=2)-timedelta(seconds=1)
         require_wave_window(Cursor(valid), job, delayed)
         with self.assertRaises(WaveHeld):

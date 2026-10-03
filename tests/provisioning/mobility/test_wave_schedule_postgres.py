@@ -19,7 +19,7 @@ from uuid import uuid4
 from provisioner.controlplane.authority import postgres as authority_postgres
 from provisioner.controlplane.authority.model import (
     AuthorizedPlan, PlanScope, PortfolioScope, RoleGrant, VerifiedPrincipal)
-from provisioner.controlplane.jobs import JobRepository, StartReceipt
+from provisioner.controlplane.jobs import AdmissionRefused, JobRepository, StartReceipt
 from provisioner.controlplane.jobs.repository import _digest, _tenant
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
 from provisioner.controlplane.persistence.migrate import apply_migrations
@@ -292,6 +292,53 @@ class WavePostgresTests(unittest.TestCase):
                     '(organization_id,tenant_id,domain_id,document_digest,document_json,enrolled_by) VALUES(%s,%s,%s,%s,%s,%s)',
                     (self.ctx.organization_id,self.ctx.tenant_id,another.domain_id,another.digest,
                      json.dumps(another.to_record()),'independent-native-budget-owner'))
+
+    def test_original_outbox_start_uses_typed_job_window_and_retains_approval_revocation(self):
+        self.add_member('a',end=self.now+timedelta(minutes=30))
+        self.enroll(); self.register()
+        admitted = self.admit()
+        message = self.jobs.claim_start(self.ctx,dispatcher_id='wave-boundary-dispatcher')
+        job = self.jobs.revalidate_start(self.ctx,message)
+        self.assertEqual(job.job_id,admitted.job_id)
+        with self.runtime() as connection, connection.cursor() as cursor:
+            _tenant(cursor,self.ctx)
+            # An AuthorizedPlan retains the pre-admission authority-only check.
+            # It never replaces the persisted Job used by the B09 outbox.
+            authority_postgres.revalidate_start(cursor,self.decisions['a'],self.now)
+            delayed = self.members[0].window_end-timedelta(seconds=1)
+            authority_postgres.revalidate_start(cursor,job,delayed)
+            with self.assertRaises(WaveHeld):
+                require_wave_window(cursor,job,delayed,starting=True)
+            with self.assertRaises(WaveHeld):
+                authority_postgres.revalidate_start(cursor,job,self.members[0].window_end)
+        with self.psycopg.connect(self.dsn) as connection:
+            connection.execute('UPDATE hosting_controlplane.plan_authority_state '
+                'SET revocation_epoch=revocation_epoch+1 WHERE organization_id=%s AND tenant_id=%s AND plan_id=%s',
+                (self.ctx.organization_id,self.ctx.tenant_id,job.plan_id))
+        with self.assertRaises(PermissionError):
+            self.jobs.revalidate_start(self.ctx,message)
+        self.assertEqual(self.jobs.get(self.ctx,job.job_id).status,'QUEUED')
+        self.assertEqual(self.counts()[:2],(1,1))
+
+    def test_superseded_wave_plan_cannot_start_its_original_queued_outbox(self):
+        member = self.add_member('a')
+        self.enroll(); self.register(); admitted = self.admit()
+        message = self.jobs.claim_start(self.ctx,dispatcher_id='wave-revision-dispatcher')
+        self.jobs.revalidate_start(self.ctx,message)
+        revised = deepcopy(member.plan)
+        revised['metadata']['revision'] += 1
+        revised['spec']['maxDowntimeSeconds'] += 1
+        revised['metadata']['planDigest'] = plan_digest(revised)
+        with self.psycopg.connect(self.dsn) as connection, connection.cursor() as cursor:
+            _tenant(cursor,self.ctx)
+            cursor.execute('UPDATE hosting_controlplane.enterprise_records SET revision=%s,record_json=%s::jsonb,'
+                'record_digest=%s WHERE organization_id=%s AND tenant_id=%s AND record_kind=%s AND record_id=%s',
+                (revised['metadata']['revision'],json.dumps(revised),canonical_record_digest(revised),
+                 self.ctx.organization_id,self.ctx.tenant_id,'MigrationPlan',member.plan_id))
+        with self.assertRaises(AdmissionRefused):
+            self.jobs.revalidate_start(self.ctx,message)
+        self.assertEqual(self.jobs.get(self.ctx,admitted.job_id).status,'QUEUED')
+        self.assertEqual(self.counts()[:2],(1,1))
 
     def test_independent_reviewer_cannot_accept_empty_native_inventory_or_a_fake_success_projection(self):
         self.add_member('a'); self.add_member('b',dependencies=('a',))

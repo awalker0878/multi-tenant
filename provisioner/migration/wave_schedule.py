@@ -20,7 +20,7 @@ from provisioner.controlplane.authority.service import (
     AuthorityDenied, EXECUTION_OPERATOR, WORKLOAD_EDITOR, require_scoped_role,
     require_workload_role)
 from provisioner.controlplane.jobs.repository import (
-    AdmissionRefused, JobRepository, _digest, _ensure_plan, _ensure_workload,
+    AdmissionRefused, Job, JobRepository, _digest, _ensure_plan, _ensure_workload,
     _json, _tenant)
 from provisioner.controlplane.persistence import TenantContext
 from provisioner.controlplane.workflow.execution_selection import FileExecutionSelectionStore
@@ -851,6 +851,7 @@ def require_wave_window(cursor, job, at: datetime, *, starting=False):
     and requires containment/reconciliation; it never invents a completed job.
     A read-only observation may still inspect an expired/held original operation.
     """
+    _require(isinstance(job, Job), 'Current wave checks require the exact persisted B09 job')
     _instant(at)
     cursor.execute('SELECT * FROM hosting_controlplane.migration_wave_job_window(%s,%s,%s)',
         (job.organization_id, job.tenant_id, job.job_id))

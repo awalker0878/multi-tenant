@@ -123,6 +123,8 @@ class PostgresAuthorityTests(unittest.TestCase):
         self.service.revoke_approvals('reviewer-0', 'plan-01', 'change withdrawn')
         with self.assertRaises(AuthorityDenied):
             self._revalidate(decision)
+        with self.assertRaises(AuthorityDenied):
+            self._revalidate(decision, revalidate_start)
         self._approve()
         second = self.service.authorize_submission('operator', 'plan-01')
         self.assertEqual(decision.revocation_epoch + 1, second.revocation_epoch)
