@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.29 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.30 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -132,7 +132,8 @@ external interface obligations.
 
 ### Retirement and recovery ownership
 
-Current qualification owners remain in `provisioner.qualification`. Deleted script
+Current qualification owners remain in `provisioner.qualification`, and source-byte
+integrity is owned by `provisioner.execution.source_integrity`. Deleted script/tool
 owners have no compatibility wrapper. Other writers require freeze/drain/reconcile
 and one-time retained-state conversion before removal. Define credential renewal,
 lease expiry, unknown outcomes and independent recovery explicitly. Neither producer

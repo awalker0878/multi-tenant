@@ -12,12 +12,11 @@ ROOT = Path(__file__).resolve().parents[1]
 class RuntimeSourceCoverageTests(unittest.TestCase):
     def test_actual_runtime_and_build_owners_are_in_the_recorded_source_map(self):
         files = source_snapshot(ROOT)
-        for name in ('provisioner/repository.py', 'provisioner/execution/terraform_catalog.py',
+        for name in ('provisioner/repository.py', 'provisioner/execution/source_integrity.py', 'provisioner/execution/terraform_catalog.py',
                      'provisioner/controlplane/discovery/review_intake.py', 'hosting_resources/__init__.py',
                      'pyproject.toml', 'setup.py', 'MANIFEST.in'):
             self.assertEqual(files[name], hashlib.sha256((ROOT/name).read_bytes()).hexdigest())
-        self.assertEqual(files['tools/check_release.py'],
-                         hashlib.sha256((ROOT/'tools/check_release.py').read_bytes()).hexdigest())
+        self.assertNotIn('tools/check_release.py', files)
         self.assertNotIn('tools/terraform_catalog.py', files)
         self.assertFalse(any('__pycache__' in name or '/.terraform/' in name for name in files))
 

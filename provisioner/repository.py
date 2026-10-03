@@ -88,7 +88,7 @@ def source_commit(root: Path | str | None = None) -> dict:
     already owns that answer, so the provisioner asks for it instead of
     computing a second opinion.
     """
-    from tools import check_release as verifier
+    from provisioner.execution import source_integrity as verifier
     if root is None and SOURCE_ROOT is None:
         return {'status': 'BLOCKED_NO_CURRENT_CHECKOUT', 'commit': '',
                 'issues': [{'kind': 'CURRENT_GIT_CHECKOUT_REQUIRED',

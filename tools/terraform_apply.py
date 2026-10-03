@@ -20,7 +20,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from provisioner.compiler.wsd import STATE
 from tools.plan_review import review
 from tools import readback_core as c

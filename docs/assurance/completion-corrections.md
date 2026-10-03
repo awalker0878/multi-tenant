@@ -20,7 +20,7 @@ The later integrated main snapshot `b184bc629b996e1cd658c389ba707a99f89f7c07` pa
 
 ## Current checks
 
-`python scripts/check_documentation.py` independently compares code and ordered table cells, ADR source/rendered content and lifecycle, maintained-design structure, assertion allocation and every verification family. `python tools/check_local.py` runs the existing and corrective regressions plus the offline routing checks. `python tools/check_release.py` validates a clean current Git checkout. Run engine checks on the accepted connected toolchain; no credentials are supplied for native targets.
+`python scripts/check_documentation.py` independently compares code and ordered table cells, ADR source/rendered content and lifecycle, maintained-design structure, assertion allocation and every verification family. `python tools/check_local.py` runs the existing and corrective regressions plus the offline routing checks. `python -m provisioner.execution.source_integrity` validates a clean current Git checkout. Run engine checks on the accepted connected toolchain; no credentials are supplied for native targets.
 
 [Maintained design workspace](../current/README.md) · [Historical findings](historical-dispositions.md) · [Verification families](verification-families.md) · [Assertion allocation](../implementation/assertion-allocation.md) · [Initial engine evidence](../../evidence/completion-corrections/README.md) · [Post-merge verification record](../../evidence/completion-publication/verification.json)
 

@@ -145,3 +145,16 @@ export schema, canonical digests and reconciliation requirements. See the
 
 This move does not import private reservation state, grant ownership, reauthorize
 old plans or complete the remaining capacity/IPAM/DNS preflight and execution owners.
+
+
+### Package-owned source-integrity verification — 2 October 2026
+
+The active clean-source verifier now lives at `provisioner/execution/source_integrity.py`.
+All executable callers use that owner directly; `tools/check_release.py` is deleted and
+registered as retired without a forwarding module. Checkout verification pins one Git
+HEAD, rejects changed tracked/untracked/staged bytes, disables ambient Git replacement,
+fsmonitor and configuration overrides, and rechecks HEAD after bounded reads. Exported
+source trees use only an explicitly supplied SHA-256 manifest; there is no historical-
+manifest or working-directory fallback. Installed execution without an explicit checkout
+fails closed. This establishes source-byte consistency only, not signer trust, approval,
+native qualification or retained-state conversion. Other B05 runtime owners remain.

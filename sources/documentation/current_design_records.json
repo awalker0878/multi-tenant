@@ -95,7 +95,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.30",
+    "version": "0.31",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -258,6 +258,11 @@
         "version": "0.30",
         "date": "2026-10-02",
         "summary": "Extend exact OpenStack discovery to a signed Glance v2 endpoint and bounded VM-referenced image metadata while retaining campaign budgets and explicit compatibility/qualification gaps."
+      },
+      {
+        "version": "0.31",
+        "date": "2026-10-02",
+        "summary": "Move active source-integrity verification into the execution package, pin one current Git tree or explicit export manifest, and retire the former tools owner without changing native or approval authority."
       }
     ]
   },
@@ -351,7 +356,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.29",
+    "version": "0.30",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -508,13 +513,18 @@
         "version": "0.29",
         "date": "2026-10-02",
         "summary": "Add the signed Glance endpoint and exact VM-referenced image-read contract; image metadata remains observation, not guest/target compatibility."
+      },
+      {
+        "version": "0.30",
+        "date": "2026-10-02",
+        "summary": "Define package-owned checkout/export source-integrity boundaries and fail-closed installed-runtime behavior while retaining signer/custody and state-conversion obligations."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.19",
+    "version": "0.20",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -621,6 +631,11 @@
         "version": "0.19",
         "date": "2026-10-02",
         "summary": "Require fresh selector-3 enrollment/campaign evidence for Glance-enriched observations; earlier signed selector results remain immutable history."
+      },
+      {
+        "version": "0.20",
+        "date": "2026-10-02",
+        "summary": "Record source-integrity owner transition without relabelling historical manifests or converting retained/native state."
       }
     ]
   }

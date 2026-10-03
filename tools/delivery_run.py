@@ -9,7 +9,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
 from tools import execution_journal as journal, readback_core as c
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from tools.run_files import (current_window, digest, encoded, load_private, private_path,
                              read_private, require, sync_directory, write_new)
 

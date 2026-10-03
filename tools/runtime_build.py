@@ -20,7 +20,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
 from tools import readback_core as c
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from tools.owner_install import installed_path
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
     private_path, read_private, require, sync_directory, utcnow, write_new)

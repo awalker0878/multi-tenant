@@ -11,7 +11,7 @@ if __package__ in (None, ''):
     sys.path.insert(0, str(ROOT))
 
 from tools import readback_core as c
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from tools.run_files import encoded, load_private, require, write_new
 
 ACTION_ORDER = {

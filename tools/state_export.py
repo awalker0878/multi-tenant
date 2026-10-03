@@ -19,7 +19,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if __package__ in (None,''): sys.path.insert(0,str(ROOT))
 from provisioner.repository import asset_path
 from tools import readback_core as c,state_project as projects
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from tools.run_files import (current_window,digest,encoded,file_map,load_private,new_directory,private_path,
     read_private,require,sync_directory,utcnow,write_new)
 from tools.service_http import JsonService

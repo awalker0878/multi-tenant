@@ -158,6 +158,13 @@
       "reason": "The exported reservation-evidence implementation is package-owned; all in-tree callers and commands migrated with no forwarding module.",
       "replacement": "provisioner/allocations/reservation_evidence.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/check_release.py",
+      "kind": "path",
+      "reason": "The complete source-integrity verifier is package-owned; all executable consumers migrated without a forwarding module. Historical manifests remain immutable.",
+      "replacement": "provisioner/execution/source_integrity.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }

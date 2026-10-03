@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.30 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.31 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -151,7 +151,7 @@ fencing, traffic switch and post-write recovery are not closed by integrity cont
 
 ### Runtime and verification ownership
 
-The WSD compiler and qualification registry/native/provenance owners are package-owned;
+The WSD compiler, source-integrity verifier and qualification registry/native/provenance owners are package-owned;
 retired entry points stay deleted without aliases. Other actively imported top-level
 owners and retained-state conversion keep B05 open. Move each real consumer and its
 state before deletion; do not remove functional safety adapters as shims. Installed

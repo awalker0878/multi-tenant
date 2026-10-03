@@ -19,7 +19,7 @@ class BuildRuntime(build_py):
     def run(self):
         source = Path(__file__).resolve().parent
         required = {
-            'tools/__init__.py', 'provisioner/compiler/wsd.py', 'tools/check_release.py',
+            'tools/__init__.py', 'provisioner/compiler/wsd.py', 'provisioner/execution/source_integrity.py',
             'scripts/__init__.py', 'provisioner/compiler/components.py',
             'provisioner/allocations/reservation_evidence.py',
             'provisioner/qualification/registry.py', 'provisioner/execution/terraform_catalog.py',

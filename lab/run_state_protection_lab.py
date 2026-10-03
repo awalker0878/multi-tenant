@@ -15,7 +15,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from lab.native_readback_fixture import Fixture
 from tools import state_export as exports,state_project as projects,readback_core as c
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from tools.restic_run import Restic,backup,restore,sha_file
 from tools.run_files import digest,encoded,require,utcnow
 from tools.state_backend import compile_backend

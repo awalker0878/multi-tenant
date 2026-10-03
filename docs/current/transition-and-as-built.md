@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.19 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.20 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -75,6 +75,14 @@ malformed values, insufficient workload counts and unsupported independent-site
 recovery before placement. Previously approved plans must be regenerated and reviewed;
 do not reinterpret them under new code. OZ/RZ/PAZ names do not prove physical HA.
 No active source or native state was migrated by this documentation/code change.
+
+### Source-byte verification transition
+
+The active source-integrity owner is package-local and the old tools entry point is
+retired without an alias. A current checkout is bound to one Git HEAD and explicit
+tracked bytes; a Git-less export must carry its own explicit snapshot manifest. Old
+release manifests remain historical evidence and are never reinterpreted as current
+authority. This code-owner transition changes no native state or retained operation.
 
 ### Retained-state conversion and as-built evidence
 

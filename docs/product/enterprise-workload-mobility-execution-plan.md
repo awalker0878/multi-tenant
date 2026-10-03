@@ -30,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, reservation-evidence reader and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. | Other real runtime imports, installed execution ownership and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, reservation-evidence reader and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. | Other real runtime imports, installed execution ownership and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 3 retains allocation/attachment facts plus bounded Glance metadata for VM-referenced images. | Full guest-driver/key/service facts, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -135,6 +135,20 @@ retry. Shared private-file code replaces the signer's local helpers without alia
 Independent dependency verification, actual owner/key onboarding, owner-to-custodian
 artifact transfer and enterprise/administrator acceptance remain open. B05 and Wave 2 remain
 open; this continuation does not start or close the native provisioning/migration waves.
+
+### Package-owned source integrity — parallel B05 continuation (2 October 2026)
+
+The active clean-source verifier now lives in `provisioner.execution.source_integrity`;
+every live caller and CI command migrated and the old tools module is retired without an
+alias. Checkout verification pins one HEAD/tree, removes ambient Git overrides/replacement
+objects/fsmonitor, performs bounded no-follow tracked-byte reads and rejects untracked,
+staged, missing or changed sources. Explicit exports require their own bounded SHA-256
+manifest and never fall back to historical release manifests or an adjacent checkout.
+Installed execution without an explicit checkout is held. See the
+[source-integrity contract](../engineering/source-integrity-runtime.md).
+
+This is byte consistency, not signer trust, approval, native qualification or a B48
+state conversion. Other B05 owner migrations remain open.
 
 ### Package-owned Terraform catalog — parallel B05 continuation
 

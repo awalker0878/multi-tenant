@@ -19,7 +19,7 @@ from provisioner.compiler.wsd import STATE
 from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe
 from tools import nsx_segment_observe, nsx_domain_switch_observe, nsx_domain_binding, vmware_network_binding
 from tools import recovery_review, vsphere_port_observe
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from tools.guest_inventory import build
 from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
     read_private, replace_private, require, utcnow, write_new)

@@ -13,6 +13,7 @@ from scripts import check_retired_interfaces as retirement
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
+    'tools/check_release.py': ('path', 'provisioner/execution/source_integrity.py'),
     'scripts/check_reservation_records.py': ('path', 'provisioner/allocations/reservation_evidence.py'),
     'tools/terraform_catalog.py': ('path', 'provisioner/execution/terraform_catalog.py'),
     'tools/compile_wsd.py': ('path', 'provisioner/compiler/wsd.py'),

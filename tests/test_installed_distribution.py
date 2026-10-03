@@ -39,7 +39,7 @@ class InstalledDistributionTest(unittest.TestCase):
         # Destructive-output regressions use only this disposable source copy.
         cls.unsafe_build_results = []
         protected = {name: (cls.source / name).read_bytes() for name in
-                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'terraform/catalog.json')}
+                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'provisioner/execution/source_integrity.py', 'terraform/catalog.json')}
         for output in (cls.source, cls.base, cls.source / 'provisioner'):
             result = subprocess.run([sys.executable, 'setup.py', 'build_py', '--build-lib', str(output)],
                 cwd=cls.source, env=cls.env, text=True, stdout=subprocess.PIPE,
@@ -57,6 +57,8 @@ class InstalledDistributionTest(unittest.TestCase):
             path.write_text('{}', encoding='utf-8')
         cls.retired_python = ('tools/terraform_catalog.py', 'tools/terraform_catalog.pyc',
                               'tools/__pycache__/terraform_catalog.cpython-313.pyc',
+                              'tools/check_release.py', 'tools/check_release.pyc',
+                              'tools/__pycache__/check_release.cpython-313.pyc',
                               'scripts/check_reservation_records.py', 'scripts/check_reservation_records.pyc',
                               'scripts/__pycache__/check_reservation_records.cpython-313.pyc')
         for relative in cls.retired_python:
@@ -119,9 +121,11 @@ class InstalledDistributionTest(unittest.TestCase):
         with zipfile.ZipFile(self.wheel) as wheel:
             members = wheel.namelist()
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
+        self.assertIn('provisioner/execution/source_integrity.py', members)
         self.assertIn('provisioner/allocations/reservation_evidence.py', members)
         self.assertFalse(any(name.startswith('scripts/check_reservation_records.') for name in members))
         self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
+        self.assertFalse(any(name.startswith('tools/check_release.') for name in members))
         for name in members:
             self.assertNotIn(name.split('/')[0],
                              {'profiles', 'policy', 'sources', 'terraform',
@@ -228,6 +232,22 @@ print(json.dumps({'owner': entry.value}))
 """)
         self.assertEqual(result['owner'], 'provisioner.controlplane.discovery.owner_signing:main')
 
+    def test_source_integrity_is_package_owned_and_has_no_checkout_fallback(self):
+        result = self.probe('''
+import importlib.util, json
+from pathlib import Path
+from provisioner.execution import source_integrity
+from hosting_resources import SOURCE_ROOT
+assert SOURCE_ROOT is None
+assert Path(source_integrity.__file__).is_relative_to(Path(__import__("sys").prefix))
+assert importlib.util.find_spec("tools.check_release") is None
+value = source_integrity.verify()
+assert value["status"] == "BLOCKED_NO_CURRENT_CHECKOUT"
+print(json.dumps({"owner": source_integrity.__name__, "status": value["status"]}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.execution.source_integrity')
+        self.assertEqual(result['status'], 'BLOCKED_NO_CURRENT_CHECKOUT')
+
     def test_catalog_is_independent_of_checkout_tools_and_working_directory(self):
         result = self.probe('''
 import importlib.abc, importlib.util, json, sys
@@ -251,6 +271,7 @@ try:
 finally:
     sys.meta_path.remove(blocker)
 assert importlib.util.find_spec('tools.terraform_catalog') is None
+assert importlib.util.find_spec('tools.check_release') is None
 print(json.dumps({'entries': len(rows), 'legacyImports': False, 'nativeContact': False}))
 ''')
         self.assertGreater(result['entries'], 0)

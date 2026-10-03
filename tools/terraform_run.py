@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from provisioner.repository import asset_path
 
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 from provisioner.compiler.wsd import identity
 from tools.neutron_observe import strict_loads
 from tools.plan_review import review
