@@ -26,7 +26,7 @@ from provisioner.controlplane.authority.model import AuthorizedPlan, FrozenPlan,
 from provisioner.controlplane.authority.postgres import PostgresAuthority
 from provisioner.controlplane.authority.service import AuthorityDenied
 from provisioner.controlplane.jobs import JobRepository, StartReceipt
-from provisioner.controlplane.jobs.repository import _digest
+from provisioner.controlplane.jobs.repository import _digest, _tenant
 from provisioner.controlplane.operations.action_gate import (
     MINIMUM_PREREQUISITES, OperationsActionGate, _canonical,
     acceptance_digest, acceptance_event_key, scope_digest,
@@ -285,7 +285,7 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
             self.boundary(**kwargs)
         self.assertEqual(tuple(self.callbacks), before)
 
-    def claim_original(self, *, ttl=timedelta(minutes=3)):
+    def claim_original(self, *, ttl=timedelta(minutes=3), lease_ttl_seconds=300):
         self.identity = VerifiedWorkerIdentity(self.context.organization_id, self.context.tenant_id,
             'worker-' + uuid4().hex[:12], self.frozen.source.site_id,
             uuid4().hex + uuid4().hex, self.now + timedelta(hours=1))
@@ -303,7 +303,7 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
         self.operation_id, self.lease_key = 'operation-' + uuid4().hex, 'lease-' + uuid4().hex
         self.leases.register(self.context, self.lease, self.frozen.source,
             lease_key=self.lease_key, job_id=self.admitted.job_id, operation_id=self.operation_id,
-            worker_identity=self.identity)
+            worker_identity=self.identity, ttl_seconds=lease_ttl_seconds)
         request = GrantRequest(self.admitted.job_id, 'source-fence', self.operation_id,
             'SOURCE_FENCE', self.frozen.source, self.lease_key, self.lease.epoch, ttl)
         self.grant = self.grants.issue_grant(self.context, self.identity, request)
@@ -440,15 +440,51 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
         self.refused(**continuation)
 
     def test_expired_database_lease_and_wrong_original_operation_never_continue(self):
-        continuation = self.claim_original()
+        continuation = self.claim_original(lease_ttl_seconds=5)
+        self.boundary(**continuation)
+        self.assertEqual(len(self.callbacks), 1)
         self.refused(continuation_grant=replace(self.grant, operation_id='foreign-operation'),
                      continuation_identity=self.identity)
-        with self.scoped_owner() as connection:
-            connection.execute('UPDATE hosting_controlplane.native_operation_leases SET '
-                "expires_at=clock_timestamp()-interval '1 second' WHERE organization_id=%s "
-                'AND tenant_id=%s AND lease_key=%s',
-                (self.context.organization_id, self.context.tenant_id, self.lease_key))
+        # The mapping is immutable. Read its actual expiry as the non-bypass
+        # runtime role, then let the PostgreSQL clock expire this short mapping
+        # while the original grant and B06 owner remain independently live.
+        state_sql = (
+            'SELECT l.expires_at, g.expires_at, o.lease_expires_at, clock_timestamp() '
+            'FROM hosting_controlplane.native_operation_leases l '
+            'JOIN hosting_controlplane.worker_grants g ON '
+            'g.organization_id=l.organization_id AND g.tenant_id=l.tenant_id '
+            'AND g.job_id=l.job_id AND g.operation_id=l.operation_id '
+            'AND g.lease_key=l.lease_key AND g.lease_epoch=l.owner_epoch '
+            'AND g.grant_id=%s '
+            'JOIN hosting_controlplane.native_ownership o ON '
+            'o.platform_family=l.platform_family AND o.endpoint_id=l.endpoint_id '
+            'AND o.native_scope_id=l.native_scope_id AND o.resource_kind=l.resource_kind '
+            'AND o.native_id=l.native_id AND o.organization_id=l.organization_id '
+            'AND o.tenant_id=l.tenant_id AND o.worker_id=l.worker_id '
+            'AND o.lease_epoch=l.owner_epoch '
+            'WHERE l.organization_id=%s AND l.tenant_id=%s AND l.lease_key=%s')
+        state_params = (self.grant.grant_id, self.context.organization_id,
+                        self.context.tenant_id, self.lease_key)
+        with self.runtime() as connection, connection.cursor() as cursor:
+            _tenant(cursor, self.context)
+            cursor.execute(state_sql, state_params)
+            lease_expiry, grant_expiry, owner_expiry, current = cursor.fetchone()
+            self.assertGreater(lease_expiry, current)
+            self.assertLessEqual(lease_expiry-current, timedelta(seconds=5))
+            self.assertLess(lease_expiry, grant_expiry)
+            self.assertLess(lease_expiry, owner_expiry)
+            cursor.execute('SELECT pg_sleep(GREATEST(0, '
+                'EXTRACT(EPOCH FROM (%s::timestamptz-clock_timestamp()))+0.05))',
+                (lease_expiry,))
+            cursor.execute(state_sql, state_params)
+            expired, live_grant, live_owner, current = cursor.fetchone()
+            self.assertEqual((expired, live_grant, live_owner),
+                             (lease_expiry, grant_expiry, owner_expiry))
+            self.assertLessEqual(expired, current)
+            self.assertGreater(live_grant, current)
+            self.assertGreater(live_owner, current)
         self.refused(**continuation)
+        self.assertEqual(len(self.callbacks), 1)
 
     def test_uncertain_original_intent_allows_local_observation_but_no_native_callback(self):
         continuation = self.claim_original()
