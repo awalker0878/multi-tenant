@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.24 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.25 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -157,6 +157,9 @@ Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share
 
 
 The fixed guest probe moved into the installed package without changing campaign records or guest/native state. Historical evidence keeps the prior source path as provenance; current campaigns use the package owner and still require independently accepted target evidence.
+
+
+The offline route-audit implementation moved into the installed package without changing any topology fixture or observed/native state. Historical imported evidence retains the former path, while current checks use the package owner.
 
 ## Engineering and implementation handoff
 

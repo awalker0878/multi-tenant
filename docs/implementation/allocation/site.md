@@ -19,7 +19,7 @@ Security Domain Instances SHOULD be site-local by default.
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Security Domain Instances SHOULD be site-local by default.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-054, CT-055
 
@@ -42,7 +42,7 @@ Layer-2 stretch across sites SHALL require a documented application/availability
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Layer-2 stretch across sites SHALL require a documented application/availability requirement and failure-domain analysis.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-054
 
@@ -65,7 +65,7 @@ Recovery-site connectivity SHALL be pre-authorized and tested; emergency recover
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Recovery-site connectivity SHALL be pre-authorized and tested; emergency recovery SHALL NOT depend on ad hoc route leaking.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-052, CT-054
 
@@ -83,7 +83,7 @@ Recovery-site connectivity SHALL be pre-authorized and tested; emergency recover
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Recovery-site connectivity SHALL be pre-authorized and tested
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-052, CT-054
 
@@ -101,7 +101,7 @@ Recovery-site connectivity SHALL be pre-authorized and tested; emergency recover
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: emergency recovery SHALL NOT depend on ad hoc route leaking.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-052, CT-054
 
@@ -124,7 +124,7 @@ Recovery placement SHALL preserve domain, co-residency, cryptographic, identity 
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Recovery placement SHALL preserve domain, co-residency, cryptographic, identity and location constraints; writer fencing and failback ownership SHALL be proven before production recovery is offered.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-035, CT-038, CT-054, CT-061
 
@@ -142,7 +142,7 @@ Recovery placement SHALL preserve domain, co-residency, cryptographic, identity 
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Recovery placement SHALL preserve domain, co-residency, cryptographic, identity and location constraints
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-035, CT-038, CT-054, CT-061
 
@@ -160,7 +160,7 @@ Recovery placement SHALL preserve domain, co-residency, cryptographic, identity 
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: writer fencing and failback ownership SHALL be proven before production recovery is offered.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-035, CT-038, CT-054, CT-061
 

@@ -1002,7 +1002,7 @@
       "IPV6-003"
     ],
     "implementation_paths": [
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "lab/run_namespace_lab.py"
     ],
     "open_work": "The native source and routed fixture remain IPv4-focused; offline IPv6 or loopback evidence does not satisfy native routed qualification.",
@@ -1744,7 +1744,7 @@
     ],
     "implementation_paths": [
       "lab/run_namespace_lab.py",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "open_work": "Native service/gateway configuration and real endpoint no-transit/source-validation controls still require the chosen implementation.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",

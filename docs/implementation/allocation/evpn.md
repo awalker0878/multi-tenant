@@ -19,7 +19,7 @@ When EVPN is used, RD/RT/VNI, gateway and multihoming policies SHALL be provider
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: When EVPN is used, RD/RT/VNI, gateway and multihoming policies SHALL be provider-owned, collision-checked and domain-scoped; unapproved route imports SHALL be denied.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-009, CT-033, CT-072
 
@@ -37,7 +37,7 @@ When EVPN is used, RD/RT/VNI, gateway and multihoming policies SHALL be provider
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: When EVPN is used, RD/RT/VNI, gateway and multihoming policies SHALL be provider-owned, collision-checked and domain-scoped
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-009, CT-033, CT-072
 
@@ -55,7 +55,7 @@ When EVPN is used, RD/RT/VNI, gateway and multihoming policies SHALL be provider
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: unapproved route imports SHALL be denied.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-009, CT-033, CT-072
 
@@ -78,7 +78,7 @@ Every multihoming and border interoperability profile SHALL be tested for split-
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Every multihoming and border interoperability profile SHALL be tested for split-brain, link/peer failure, MTU, route withdrawal and stateful-path behavior; vendor-specific MLAG interoperability SHALL NOT be assumed.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-024, CT-032, CT-034
 
@@ -96,7 +96,7 @@ Every multihoming and border interoperability profile SHALL be tested for split-
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Every multihoming and border interoperability profile SHALL be tested for split-brain, link/peer failure, MTU, route withdrawal and stateful-path behavior
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-024, CT-032, CT-034
 
@@ -114,7 +114,7 @@ Every multihoming and border interoperability profile SHALL be tested for split-
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: vendor-specific MLAG interoperability SHALL NOT be assumed.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-024, CT-032, CT-034
 

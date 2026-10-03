@@ -13,6 +13,7 @@ from scripts import check_retired_interfaces as retirement
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
+    'tools/route_audit.py': ('path', 'provisioner/execution/route_audit.py'),
     'tools/guest_probe.py': ('path', 'provisioner/execution/guest_probe.py'),
     'tools/check_release.py': ('path', 'provisioner/execution/source_integrity.py'),
     'scripts/check_reservation_records.py': ('path', 'provisioner/allocations/reservation_evidence.py'),

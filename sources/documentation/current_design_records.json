@@ -95,7 +95,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.35",
+    "version": "0.36",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -283,6 +283,11 @@
         "version": "0.35",
         "date": "2026-10-03",
         "summary": "Move the fixed guest probe into the installed execution package without an alias while retaining its bounded read-only network/TLS semantics and separate campaign/native acceptance gates."
+      },
+      {
+        "version": "0.36",
+        "date": "2026-10-03",
+        "summary": "Move the offline routed-topology audit model into the installed execution package without an alias; preserve model-only scope and separate native routing/security acceptance."
       }
     ]
   },
@@ -376,7 +381,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.34",
+    "version": "0.35",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -558,13 +563,18 @@
         "version": "0.34",
         "date": "2026-10-03",
         "summary": "Bind target qualification to the package-owned fixed guest probe without changing endpoint, SSH, network-policy or acceptance semantics."
+      },
+      {
+        "version": "0.35",
+        "date": "2026-10-03",
+        "summary": "Bind offline route/intent checking to the package-owned model without changing modeled address/route/flow semantics or native evidence obligations."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.24",
+    "version": "0.25",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -696,6 +706,11 @@
         "version": "0.24",
         "date": "2026-10-03",
         "summary": "Record package ownership of the fixed guest probe without changing campaign evidence or guest/native state; historical source provenance is preserved."
+      },
+      {
+        "version": "0.25",
+        "date": "2026-10-03",
+        "summary": "Record package ownership of the offline route-audit model without changing topology fixtures or observed/native state; preserve imported path provenance."
       }
     ]
   }

@@ -16,7 +16,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.route_audit import Topology, load_json
+from provisioner.execution.route_audit import Topology, load_json
 
 
 def source_snapshot(root: Path) -> dict[str, str]:

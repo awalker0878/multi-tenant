@@ -30,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, fixed guest probe, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, fixed guest probe, offline route-audit model, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 4 retains allocation/attachment facts plus bounded VM-referenced Glance driver/security metadata. | Guest-installed driver/key/service evidence, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -240,6 +240,12 @@ generation; selector 3 evidence is not relabelled. Native qualification remains 
 The fixed guest traffic/health probe now lives at `provisioner.execution.guest_probe`; the target-qualification campaign reads that exact installed file and the former tools module is retired without an alias. Existing machine-ID binding, source-address binding, socket/TLS deadlines, CA/name validation, body digest and bounded status behavior are unchanged. Installed-wheel tests require the package owner and absence of the retired path. See the [runtime contract](../engineering/guest-probe-runtime.md).
 
 This is code ownership only: it does not install guest software, change network policy, qualify a route or authorize native contact. Target campaign authority, direct observer/orchestrator ownership, execution journals, installed service composition and B48 retained-state conversion remain open.
+
+### Package-owned offline route audit — B05 continuation (3 October 2026)
+
+The offline IPv4/IPv6 routed-topology model now lives at `provisioner.execution.route_audit`; active planning/input-review/local-test callers migrated and the former tools path is retired without an alias. Existing strict fixture parsing, unique address/segment ownership, directly connected next-hop, tenant/path and stateful-flow checks are unchanged. See the [runtime contract](../engineering/route-audit-runtime.md).
+
+This model still simulates only the documented reference routing semantics. It does not contact infrastructure, configure routes/firewalls, prove vendor datapath behavior or issue production approval. Direct execution/observer owners, installed service composition and retained-state conversion remain open.
 
 ## 2. Corrected dependencies and delivery order
 

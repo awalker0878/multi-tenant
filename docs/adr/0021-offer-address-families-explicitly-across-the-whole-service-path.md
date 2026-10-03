@@ -34,7 +34,7 @@ Record enabled families, source validation, local control, effective MTU and pos
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [tools/route_audit.py](../../tools/route_audit.py)
+- [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py)
 - [lab/run_namespace_lab.py](../../lab/run_namespace_lab.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

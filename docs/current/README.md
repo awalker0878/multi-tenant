@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.15 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.35 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.36 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.5 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.5 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.34 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
-| [TRANS-M01](transition-and-as-built.md) | 0.24 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
+| [ICD-M01](interface-agreements.md) | 0.35 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.25 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.35 (Proposed)**; ICD-M01 is **version 0.34 (Proposed)**.
+TAD-M01 is **version 0.36 (Proposed)**; ICD-M01 is **version 0.35 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -51,6 +51,8 @@ preserve the current catalog/plan bytes, and clean build staging excludes delete
 Direct operator/execution-tool ownership, installed service composition and retained-state conversion remain open.
 
 The [fixed guest probe](../engineering/guest-probe-runtime.md) is now package-owned and the former tools path is retired without an alias. Target qualification still owns campaign orchestration and no native or guest authority is inferred from probe packaging.
+
+The [offline route-audit model](../engineering/route-audit-runtime.md) is also package-owned; planning and test callers no longer depend on a top-level tools implementation. Its model-only status and native-routing limitations are unchanged.
 
 The [reservation-evidence reader](../engineering/reservation-evidence-runtime.md) is
 also package-owned, with its old script and bytecode removed. The unchanged export

@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.35 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.36 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -222,6 +222,9 @@ Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share
 
 
 The fixed guest connectivity/health probe is package-owned at `provisioner.execution.guest_probe`; target qualification reads that exact installed source and the old tools path is retired. Probe network/TLS/body limits and statuses are unchanged. Campaign authority, native observation and guest acceptance remain separate.
+
+
+The offline route-audit model is package-owned at `provisioner.execution.route_audit`; planning/test callers migrated and the former tools path is retired. Its IPv4/IPv6 topology model remains model-only and does not assert native routing, firewall state or service acceptance.
 
 ## Engineering and implementation handoff
 

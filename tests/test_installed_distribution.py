@@ -39,7 +39,7 @@ class InstalledDistributionTest(unittest.TestCase):
         # Destructive-output regressions use only this disposable source copy.
         cls.unsafe_build_results = []
         protected = {name: (cls.source / name).read_bytes() for name in
-                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'provisioner/execution/source_integrity.py', 'provisioner/execution/guest_probe.py', 'terraform/catalog.json')}
+                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'provisioner/execution/source_integrity.py', 'provisioner/execution/guest_probe.py', 'provisioner/execution/route_audit.py', 'terraform/catalog.json')}
         for output in (cls.source, cls.base, cls.source / 'provisioner'):
             result = subprocess.run([sys.executable, 'setup.py', 'build_py', '--build-lib', str(output)],
                 cwd=cls.source, env=cls.env, text=True, stdout=subprocess.PIPE,
@@ -71,7 +71,9 @@ class InstalledDistributionTest(unittest.TestCase):
                               'scripts/check_ipam_allocation_preflight.py', 'scripts/check_ipam_allocation_preflight.pyc', 'scripts/__pycache__/check_ipam_allocation_preflight.cpython-313.pyc',
                               'scripts/check_dns_registration_preflight.py', 'scripts/check_dns_registration_preflight.pyc', 'scripts/__pycache__/check_dns_registration_preflight.cpython-313.pyc',
                               'tools/guest_probe.py', 'tools/guest_probe.pyc',
-                              'tools/__pycache__/guest_probe.cpython-313.pyc')
+                              'tools/__pycache__/guest_probe.cpython-313.pyc',
+                              'tools/route_audit.py', 'tools/route_audit.pyc',
+                              'tools/__pycache__/route_audit.cpython-313.pyc')
         for relative in cls.retired_python:
             path = cls.staging / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -134,6 +136,7 @@ class InstalledDistributionTest(unittest.TestCase):
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
         self.assertIn('provisioner/execution/source_integrity.py', members)
         self.assertIn('provisioner/execution/guest_probe.py', members)
+        self.assertIn('provisioner/execution/route_audit.py', members)
         self.assertIn('provisioner/allocations/reservation_evidence.py', members)
         self.assertIn('provisioner/allocations/ipam_evidence.py', members)
         self.assertIn('provisioner/allocations/dns_evidence.py', members)
@@ -148,6 +151,7 @@ class InstalledDistributionTest(unittest.TestCase):
         self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
         self.assertFalse(any(name.startswith('tools/check_release.') for name in members))
         self.assertFalse(any(name.startswith('tools/guest_probe.') for name in members))
+        self.assertFalse(any(name.startswith('tools/route_audit.') for name in members))
         for name in members:
             self.assertNotIn(name.split('/')[0],
                              {'profiles', 'policy', 'sources', 'terraform',
@@ -253,6 +257,28 @@ assert entry.load() is owner_signing.main
 print(json.dumps({'owner': entry.value}))
 """)
         self.assertEqual(result['owner'], 'provisioner.controlplane.discovery.owner_signing:main')
+
+    def test_route_audit_is_package_owned_without_legacy_imports(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, sys
+from pathlib import Path
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools','scripts'):
+            raise AssertionError('Route audit reached legacy owner: '+fullname)
+blocker=NoLegacy(); sys.meta_path.insert(0, blocker)
+try:
+    from provisioner.execution import route_audit
+    assert Path(route_audit.__file__).is_relative_to(Path(sys.prefix))
+    assert route_audit.DOC_NETS
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('tools.route_audit') is None
+print(json.dumps({'owner':route_audit.__name__,'legacyImports':False,'nativeContact':False}))
+''')
+        self.assertEqual(result['owner'],'provisioner.execution.route_audit')
+        self.assertFalse(result['legacyImports'])
+        self.assertFalse(result['nativeContact'])
 
     def test_guest_probe_is_package_owned_and_qualifier_uses_that_file(self):
         result = self.probe('''

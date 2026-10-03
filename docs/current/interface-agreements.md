@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.34 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.35 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -199,6 +199,9 @@ Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share
 
 
 Target qualification now sources the fixed guest probe from the installed execution package. The probe contract remains one bounded source-bound connection and TLS/body observation; moving the file changes no endpoint, SSH authority, network policy or acceptance semantics.
+
+
+Offline route/intent checking now consumes the package-owned route-audit model. The modeled address/route/flow contract is unchanged and remains distinct from native routing, security-edge or service-owner evidence.
 
 ## Engineering and implementation handoff
 
