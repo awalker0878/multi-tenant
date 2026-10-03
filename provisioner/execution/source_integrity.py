@@ -215,7 +215,7 @@ def main(argv=None):
     parser.add_argument('--root', type=Path, default=ROOT,
                         help='Explicit checkout/export root; required outside source development')
     parser.add_argument('--manifest', type=Path)
-    args = parser.parse_args(arvy)
+    args = parser.parse_args(argv)
     if args.root is None:
         result = _unavailable()
     else:
