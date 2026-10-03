@@ -12,7 +12,7 @@ import threading
 import unittest
 
 from lab.native_readback_fixture import Fixture, manifest, responses, credentials
-from tools.guest_probe import probe
+from provisioner.execution.guest_probe import probe
 from tools.qualify_target import (ASSETS, authority_matches, budget, native_readback,
                                   traffic_campaign, validate, bound_inputs, workload_binding, WORKLOAD_ASSETS)
 from tools.run_files import digest, encoded, utcnow, write_new
@@ -168,7 +168,7 @@ class GuestProbeTests(unittest.TestCase):
                 self.assertEqual(probe(request | {'server_name': 'wrong.invalid'})['status'], 'INCONCLUSIVE')
                 self.assertEqual(probe(request | {'machine_id': 'wrong'})['status'], 'WRONG_GUEST')
                 self.assertEqual(probe(request | {'expect': 'deny'})['status'], 'UNEXPECTED_CONNECTION')
-                completed = subprocess.run([sys.executable, 'tools/guest_probe.py'], input=encoded(request), capture_output=True, timeout=15)
+                completed = subprocess.run([sys.executable, 'provisioner/execution/guest_probe.py'], input=encoded(request), capture_output=True, timeout=15)
                 self.assertIn(b'HEALTHY', completed.stdout)
             finally:
                 server.shutdown(); server.server_close(); thread.join()

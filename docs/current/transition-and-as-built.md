@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.23 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.24 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -154,6 +154,9 @@ silent relabelling of retained evidence. See the
 ### Package-owned allocation planning chain
 
 Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
+
+
+The fixed guest probe moved into the installed package without changing campaign records or guest/native state. Historical evidence keeps the prior source path as provenance; current campaigns use the package owner and still require independently accepted target evidence.
 
 ## Engineering and implementation handoff
 

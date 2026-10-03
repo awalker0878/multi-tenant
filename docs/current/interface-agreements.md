@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.33 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.34 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -196,6 +196,9 @@ No reservation lifecycle or IPAM authority is granted by successful parsing. See
 ### Package-owned allocation planning chain
 
 Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
+
+
+Target qualification now sources the fixed guest probe from the installed execution package. The probe contract remains one bounded source-bound connection and TLS/body observation; moving the file changes no endpoint, SSH authority, network policy or acceptance semantics.
 
 ## Engineering and implementation handoff
 

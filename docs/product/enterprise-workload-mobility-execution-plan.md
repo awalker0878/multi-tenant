@@ -1,6 +1,6 @@
 # Enterprise workload mobility: execution plan for all waves
 
-**Current review:** 2 October 2026, `implementation/all-waves`, starting at
+**Current review:** 3 October 2026, `implementation/all-waves`, starting at
 `9d4c6685b6fd0fcb6df211aebd47857562265456`, with discovery/profile corrections
 `b993470` and `249d75f`, catalog/design alignment and the subsequent guided
 initial application-draft creation continuation from `d663821ae9b594bd6b035755a0113218169ff40b`
@@ -30,7 +30,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, fixed guest probe, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 4 retains allocation/attachment facts plus bounded VM-referenced Glance driver/security metadata. | Guest-installed driver/key/service evidence, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -234,6 +234,12 @@ This narrows B16's driver/security evidence gap but does not prove installed gue
 drivers, compute-host support, key custody, firmware state or service readiness. New
 selector identity requires fresh signed campaign/credential/witness material and a new
 generation; selector 3 evidence is not relabelled. Native qualification remains open.
+
+### Package-owned fixed guest probe — B05 continuation (3 October 2026)
+
+The fixed guest traffic/health probe now lives at `provisioner.execution.guest_probe`; the target-qualification campaign reads that exact installed file and the former tools module is retired without an alias. Existing machine-ID binding, source-address binding, socket/TLS deadlines, CA/name validation, body digest and bounded status behavior are unchanged. Installed-wheel tests require the package owner and absence of the retired path. See the [runtime contract](../engineering/guest-probe-runtime.md).
+
+This is code ownership only: it does not install guest software, change network policy, qualify a route or authorize native contact. Target campaign authority, direct observer/orchestrator ownership, execution journals, installed service composition and B48 retained-state conversion remain open.
 
 ## 2. Corrected dependencies and delivery order
 

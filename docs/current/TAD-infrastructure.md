@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.34 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.35 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -219,6 +219,9 @@ open. See the [runtime contract](../engineering/reservation-evidence-runtime.md)
 ### Package-owned allocation planning chain
 
 Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
+
+
+The fixed guest connectivity/health probe is package-owned at `provisioner.execution.guest_probe`; target qualification reads that exact installed source and the old tools path is retired. Probe network/TLS/body limits and statuses are unchanged. Campaign authority, native observation and guest acceptance remain separate.
 
 ## Engineering and implementation handoff
 

@@ -39,7 +39,7 @@ class InstalledDistributionTest(unittest.TestCase):
         # Destructive-output regressions use only this disposable source copy.
         cls.unsafe_build_results = []
         protected = {name: (cls.source / name).read_bytes() for name in
-                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'provisioner/execution/source_integrity.py', 'terraform/catalog.json')}
+                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'provisioner/execution/source_integrity.py', 'provisioner/execution/guest_probe.py', 'terraform/catalog.json')}
         for output in (cls.source, cls.base, cls.source / 'provisioner'):
             result = subprocess.run([sys.executable, 'setup.py', 'build_py', '--build-lib', str(output)],
                 cwd=cls.source, env=cls.env, text=True, stdout=subprocess.PIPE,
@@ -69,7 +69,9 @@ class InstalledDistributionTest(unittest.TestCase):
                               'scripts/check_site_service_eligibility.py', 'scripts/check_site_service_eligibility.pyc', 'scripts/__pycache__/check_site_service_eligibility.cpython-313.pyc',
                               'scripts/check_reservation_preflight.py', 'scripts/check_reservation_preflight.pyc', 'scripts/__pycache__/check_reservation_preflight.cpython-313.pyc',
                               'scripts/check_ipam_allocation_preflight.py', 'scripts/check_ipam_allocation_preflight.pyc', 'scripts/__pycache__/check_ipam_allocation_preflight.cpython-313.pyc',
-                              'scripts/check_dns_registration_preflight.py', 'scripts/check_dns_registration_preflight.pyc', 'scripts/__pycache__/check_dns_registration_preflight.cpython-313.pyc')
+                              'scripts/check_dns_registration_preflight.py', 'scripts/check_dns_registration_preflight.pyc', 'scripts/__pycache__/check_dns_registration_preflight.cpython-313.pyc',
+                              'tools/guest_probe.py', 'tools/guest_probe.pyc',
+                              'tools/__pycache__/guest_probe.cpython-313.pyc')
         for relative in cls.retired_python:
             path = cls.staging / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -131,6 +133,7 @@ class InstalledDistributionTest(unittest.TestCase):
             members = wheel.namelist()
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
         self.assertIn('provisioner/execution/source_integrity.py', members)
+        self.assertIn('provisioner/execution/guest_probe.py', members)
         self.assertIn('provisioner/allocations/reservation_evidence.py', members)
         self.assertIn('provisioner/allocations/ipam_evidence.py', members)
         self.assertIn('provisioner/allocations/dns_evidence.py', members)
@@ -144,6 +147,7 @@ class InstalledDistributionTest(unittest.TestCase):
         self.assertFalse(any(name.startswith('scripts/check_reservation_records.') for name in members))
         self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
         self.assertFalse(any(name.startswith('tools/check_release.') for name in members))
+        self.assertFalse(any(name.startswith('tools/guest_probe.') for name in members))
         for name in members:
             self.assertNotIn(name.split('/')[0],
                              {'profiles', 'policy', 'sources', 'terraform',
@@ -249,6 +253,21 @@ assert entry.load() is owner_signing.main
 print(json.dumps({'owner': entry.value}))
 """)
         self.assertEqual(result['owner'], 'provisioner.controlplane.discovery.owner_signing:main')
+
+    def test_guest_probe_is_package_owned_and_qualifier_uses_that_file(self):
+        result = self.probe('''
+import importlib.util, json, sys
+from pathlib import Path
+from provisioner.execution import guest_probe
+from tools import qualify_target
+probe = Path(guest_probe.__file__).resolve()
+assert probe.is_relative_to(Path(sys.prefix))
+assert qualify_target.ROOT / 'provisioner/execution/guest_probe.py' == probe
+assert importlib.util.find_spec('tools.guest_probe') is None
+print(json.dumps({'owner': guest_probe.__name__, 'probe': str(probe), 'nativeContact': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.execution.guest_probe')
+        self.assertFalse(result['nativeContact'])
 
     def test_source_integrity_is_package_owned_and_has_no_checkout_fallback(self):
         result = self.probe('''
