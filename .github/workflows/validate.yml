@@ -67,18 +67,13 @@ jobs:
         run: python -m tests.provisioning.controlplane.prepare_postgres
       - name: Run control-plane database and HTTP integration tests
         run: |
-          python -m unittest discover -s tests/provisioning/controlplane -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/discovery -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/authority -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/jobs -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/api -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/worker -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/reconciliation -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/mobility -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/operations -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/conversion -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/evidence -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/workflow -p 'test_*.py' -v
+          # Keep separate interpreters and report every tenant-isolated suite.
+          # Any failed suite still fails this step and blocks subsequent gates.
+          integration_status=0
+          for suite in controlplane discovery authority jobs api worker reconciliation mobility operations conversion evidence workflow; do
+            python -m unittest discover -s "tests/provisioning/$suite" -p 'test_*.py' -v || integration_status=1
+          done
+          exit "$integration_status"
       - name: Validate the packaged portal browser flow
         run: |
           node --check provisioner/controlplane/api/portal/app.js

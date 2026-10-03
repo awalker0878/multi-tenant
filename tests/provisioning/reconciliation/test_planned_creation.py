@@ -32,12 +32,32 @@ from provisioner.controlplane.reconciliation.registry import (
 from provisioner.controlplane.worker.grants import (
     PostgresWorkerGrants, GrantRequest, VerifiedWorkerIdentity, ALLOWED_OPERATIONS)
 from provisioner.controlplane.workflow.admitted_job import AdmittedInput
-from provisioner.domain.enterprise_records import plan_digest
+from provisioner.domain.enterprise_records import plan_digest, validate_record
 from provisioner.execution import readback_core as c
+from tests.provisioning.schema.test_enterprise_records import plan as canonical_plan
 from tests.provisioning.worker import test_postgres_worker as worker_fixture
 
 
+def selected_openstack_plan():
+    selected=canonical_plan()
+    selected['spec']['destination'].update(platformFamily='openstack',endpointId='openstack-01',
+        nativeScopeId='project-01',securityDomainId='wsd-01')
+    selected['spec']['route']['method']='REBUILD_RESTORE'
+    selected['spec']['execution']={'format':'hosting-execution-selection/1',
+        'driver':'openstack-linux-rebuild/1','artifactDigest':'d'*64}
+    selected['metadata']['planDigest']=plan_digest(selected)
+    return selected
+
+
 class PlannedCreationValidationTests(unittest.TestCase):
+    def test_selected_fixture_is_a_valid_canonical_plan_for_the_existing_workload(self):
+        selected=selected_openstack_plan()
+        self.assertEqual(validate_record(selected,workload=worker_fixture.workload()),[])
+        changed=deepcopy(selected)
+        changed['spec']['route']['method']='APPLICATION_REBUILD_RESTORE'
+        changed['metadata']['planDigest']=plan_digest(changed)
+        self.assertTrue(validate_record(changed,workload=worker_fixture.workload()))
+
     def test_creation_observation_never_accepts_logical_ids_as_native_bindings(self):
         at=datetime.now(timezone.utc)
         native=NativeObservation('readback-01','a'*64,'independent-reader',None,
@@ -83,6 +103,7 @@ class _Evidence:
 
 
 @unittest.skipUnless(os.environ.get('HOSTING_TEST_POSTGRES_RUNTIME_DSN') and
+                     os.environ.get('HOSTING_TEST_POSTGRES_MIGRATION_DSN') and
                      os.environ.get('HOSTING_TEST_POSTGRES_ENROLLMENT_DSN') and
                      os.environ.get('HOSTING_TEST_POSTGRES_ISOLATED')=='1',
                      'Requires isolated real PostgreSQL runtime/enrollment/migration roles')
@@ -93,21 +114,16 @@ class PlannedCreationPostgresTests(unittest.TestCase):
         cls.psycopg=worker_fixture.WorkerPostgresTests.psycopg
 
     def setUp(self):
-        original=worker_fixture.plan
-        def selected_plan():
-            plan=original()
-            plan['spec']['destination'].update(platformFamily='openstack',endpointId='openstack-01',
-                nativeScopeId='project-01',securityDomainId='wsd-01')
-            plan['spec']['route']['method']='APPLICATION_REBUILD_RESTORE'
-            plan['spec']['execution']={'format':'hosting-execution-selection/1',
-                'driver':'openstack-linux-rebuild/1','artifactDigest':'d'*64}
-            plan['metadata']['planDigest']=plan_digest(plan)
-            return plan
         self.fixture=worker_fixture.WorkerPostgresTests()
-        with patch.object(worker_fixture,'plan',selected_plan): self.fixture.setUp()
+        with patch.object(worker_fixture,'plan',selected_openstack_plan): self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
         self.context=self.fixture.context
-        self.runtime=self.fixture.runtime
+        # Reuse the real non-bypass B10 runtime DSN; fixture records are seeded
+        # separately by the migration owner, never used for runtime effects.
+        self.runtime=lambda: self.psycopg.connect(self.fixture.runtime_dsn)
+        with self.runtime() as connection:
+            self.assertEqual(connection.execute('SELECT rolsuper,rolbypassrls FROM pg_catalog.pg_roles '
+                'WHERE rolname=current_user').fetchone(),(False,False))
         self.scope=self.fixture.target
         job=JobRepository(self.runtime,authority_postgres).get(self.context,self.fixture.job_id)
         admitted=AdmittedInput(job.job_id,job.organization_id,job.tenant_id,job.plan_id,
