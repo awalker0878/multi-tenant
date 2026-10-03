@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.33 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.34 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -34,7 +34,7 @@ The installed collector composes three exact read-only profiles:
 |---|---|---|
 | VMware | `vcenter-rest-vm-info-8.0.3.0-visible-only-2` | Reviewed folders and list-derived VM detail; captured visible set, not invented native paging. |
 | AHV | `nutanix-ahv-v4.0-hardware-2` | Pinned VMM v4.0 VM reads and typed boot/device facts. |
-| OpenStack | `openstack-project-https-2` | Exact project Nova 2.79, Cinder 3.60 and Neutron v2.0 roots; no automatic version fallback. |
+| OpenStack | `openstack-project-https-4` | Exact project Nova 2.79, Cinder 3.60, Neutron v2.0 and Glance v2 roots; image reads are limited to UUIDs referenced by captured Nova servers. |
 
 Native material is independently signed and bound to campaign, environment, credential
 reference, service identity, TLS origin/IP/CA and validity. Current campaign enrollment
@@ -44,15 +44,19 @@ rechecked around waits, transport and publication. No redirects, arbitrary URL
 following, credential issuance or privileged fallback are supplied by the collector.
 Successful native lists remain partial/visible-only, including empty lists.
 
-OpenStack selector 3 retains strict embedded vCPU/RAM allocation, nominal root,
+OpenStack selector 4 retains strict embedded vCPU/RAM allocation, nominal root,
 ephemeral and swap quantities, image references, attached-volume IDs and native
 delete-on-termination booleans. Cinder attachment/server/volume identities and optional
-guest device labels are bounded and canonical. Missing fields stay unknown; explicit
-false/null/empty observations remain distinct. Nominal flavor disk capacity is not
-total disk capacity; sorted identities do not establish boot order or writer exclusion.
-Only whitelisted fields survive. No extra read route or native privilege was added.
-The first selector is retired with no forwarding alias; new enrollment, evidence and
-review are required rather than relabelling existing signed results.
+guest device labels are bounded and canonical. VM-referenced Glance evidence now also
+retains bounded driver/security properties (`hw_vif_model`, `hw_scsi_model`,
+`hw_qemu_guest_agent`, `hw_vif_multiqueue_enabled`, `os_secure_boot`) exactly as
+custom-property strings, with documented closed vocabularies checked where applicable.
+Missing fields stay unknown; explicit false/null/empty observations remain distinct.
+Nominal flavor disk capacity is not total disk capacity, and image metadata does not
+prove host support, installed guest drivers, Secure Boot readiness, boot order or writer
+exclusion. Only whitelisted fields survive. No extra read route or native privilege was
+added. Earlier selectors are retired with no forwarding alias; new enrollment, evidence
+and review are required rather than relabelling existing signed results.
 
 Original campaign/result signatures are retained before authenticated publication.
 The installed stage/publish commands, restart custody and shared-outbox first-capture

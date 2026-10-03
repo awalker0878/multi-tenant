@@ -51,9 +51,10 @@ failover or application recovery. No new HA or public capability is enabled.
 
 Signed native reads, original-byte custody, mTLS publication, persisted generations
 and scoped normalization are implemented. VMware, AHV and OpenStack have exact enrolled
-collector selectors; visible native inventory remains partial. OpenStack selector 3
-adds bounded allocation/image/attachment facts without extra endpoint privileges.
-Nominal flavor disk sizes do not prove complete transferable storage.
+collector selectors; visible native inventory remains partial. OpenStack selector 4
+adds bounded allocation/image/attachment plus VM-referenced driver/security image facts
+without extra endpoint privileges. Nominal flavor disk sizes and image properties do not
+prove complete transferable storage, host support or installed guest drivers.
 
 Revisioned application drafts preserve observed membership and attributed assertions.
 Independent signed owner decisions are assessment-only and bind an exact draft.

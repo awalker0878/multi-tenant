@@ -23,7 +23,7 @@ from ..model import DiscoveryCampaignAuthorization, _id, _json, _utc
 from ..native_credentials import NativeReadHeld, decode_json, read_protected
 from ..trust import _decode, _keys, _time
 
-COLLECTOR_ID = 'openstack-project-https-3'
+COLLECTOR_ID = 'openstack-project-https-4'
 # Deliberately selected API contracts, not the latest supported deployment tuple.
 API_VERSIONS = MappingProxyType({'compute': '2.79', 'volume': '3.60', 'network': '2.0', 'image': '2.7'})
 

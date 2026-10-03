@@ -5,11 +5,30 @@ Reviewed 1 October 2026. This B10/B16 implementation continues the
 It connects the existing project collector to actual Nova, Cinder, Neutron and
 Glance HTTPS GETs. No installed vendor environment was contacted in development.
 
+
+## Referenced image driver and secure-boot observations
+
+Selector 4 extends the existing VM-referenced Glance read with bounded custom
+properties that Nova can use when constructing a guest: `hw_vif_model`,
+`hw_scsi_model`, `hw_qemu_guest_agent`, `hw_vif_multiqueue_enabled` and
+`os_secure_boot`. Glance v2 returns additional image properties as strings, so
+those bytes are retained as strings rather than coerced into local booleans. Closed
+Nova vocabularies are validated where documented; a malformed value holds the
+collection rather than becoming compatibility evidence. Missing properties remain
+UNKNOWN.
+
+These observations do not prove that a destination hypervisor, machine type, QEMU
+version, guest driver or firmware supports the requested model. In particular,
+virtio multiqueue still requires compatible guest configuration, and Secure Boot
+requires UEFI plus compute-host support. Qualification and profile comparison remain
+separate gates. Selector 3 evidence is not relabelled as selector 4; new campaign,
+credential/witness material and a new signed generation are required.
+
 ## Selected native contract
 
 `provisioner/controlplane/discovery/adapters/openstack_https.py` owns
 `OpenStackHttpsTransport`; `adapters/openstack_credentials.py` owns the signed
-project-token reader. The exact collector identity is `openstack-project-https-3`.
+project-token reader. The exact collector identity is `openstack-project-https-4`.
 A newly admitted matching campaign, independent credential witness and protected
 credential material are required. An arbitrary collector ID is not an alias.
 
@@ -73,7 +92,7 @@ proof of writer exclusion, permission to delete, a consistency group or a comple
 migratable disk image.
 
 The previous OpenStack selectors are retired, not forwarded. Deployments must enroll
-`openstack-project-https-3`, issue a fresh matching campaign/witness/credential
+`openstack-project-https-4`, issue a fresh matching campaign/witness/credential
 binding, collect a new signed generation, and reassess its exact digest. Old signed
 results remain immutable history; they are not relabelled or silently enriched.
 

@@ -3,8 +3,8 @@
 The caller supplies a site-verified campaign, pinned service catalog endpoints,
 and a transport already bound to a project-scoped read credential. This module
 never follows returned links, authenticates, opens a socket, or issues a mutating
-request. Its COMPLETE marker means the three API collection page chains and
-quota reads terminated without observed gaps; it is not a point-in-time native
+request. Its COMPLETE marker means the three project collection page chains, quota reads,
+and referenced-image reads terminated without observed gaps; it is not a point-in-time native
 snapshot, ownership acceptance, or permission to provision/migrate.
 
 API routes: Nova ``GET /servers/detail`` and ``/os-quota-sets/{project}``,
@@ -341,6 +341,25 @@ def _image_hash_facts(row: Mapping[str, object]) -> tuple[DiscoveryFact, Discove
     return DiscoveryFact.known('hashAlgorithm', algorithm), DiscoveryFact.known('hashValue', value)
 
 
+
+def _image_property(row: Mapping[str, object], key: str, name: str,
+                    *, allowed: frozenset[str] | None = None) -> DiscoveryFact:
+    """Retain one Glance custom property exactly as the v2 API returns it.
+
+    Glance additional image properties are strings.  We validate bounded printable
+    text and, where Nova documents a closed vocabulary, reject an unexpected value
+    rather than coercing it into a compatibility claim.
+    """
+    if key not in row:
+        return DiscoveryFact.unknown(name, 'NOT_RETURNED')
+    value = row[key]
+    if (not isinstance(value, str) or not 1 <= len(value) <= 128
+            or any(not 32 <= ord(char) <= 126 for char in value)):
+        raise OpenStackDiscoveryHeld(f'Image {name} has an invalid custom-property value')
+    if allowed is not None and value not in allowed:
+        raise OpenStackDiscoveryHeld(f'Image {name} is outside the documented vocabulary')
+    return DiscoveryFact.known(name, value)
+
 def _image(scope: PlanScope, row: Mapping[str, object]) -> DiscoveryObject:
     """Retain bounded Glance metadata for a VM-referenced image only.
 
@@ -368,6 +387,15 @@ def _image(scope: PlanScope, row: Mapping[str, object]) -> DiscoveryObject:
         _fact(row, 'hw_machine_type', 'hwMachineType', str, nullable=True),
         _fact(row, 'hw_firmware_type', 'hwFirmwareType', str, nullable=True),
         _fact(row, 'hw_disk_bus', 'hwDiskBus', str, nullable=True),
+        _image_property(row, 'hw_vif_model', 'hwVifModel'),
+        _image_property(row, 'hw_scsi_model', 'hwScsiModel',
+                        allowed=frozenset({'virtio-scsi'})),
+        _image_property(row, 'hw_qemu_guest_agent', 'hwQemuGuestAgent',
+                        allowed=frozenset({'yes', 'no'})),
+        _image_property(row, 'hw_vif_multiqueue_enabled', 'hwVifMultiqueueEnabled',
+                        allowed=frozenset({'true', 'false'})),
+        _image_property(row, 'os_secure_boot', 'osSecureBoot',
+                        allowed=frozenset({'required', 'disabled', 'optional'})),
     )
     if 'owner' in row and row['owner'] is not None:
         _id(row['owner'], 'image owner')

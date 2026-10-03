@@ -32,7 +32,7 @@ Lack of native access does not prevent repository implementation and local testi
 |---|---|---|
 | Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
-| B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 3 retains allocation/attachment facts plus bounded Glance metadata for VM-referenced images. | Full guest-driver/key/service facts, deployed custody, independent visibility and native profile qualification. |
+| B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 4 retains allocation/attachment facts plus bounded VM-referenced Glance driver/security metadata. | Guest-installed driver/key/service evidence, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
 | B21/B22 | Adoption proposal model; bounded batch limits, checkpointed local scheduling/waiting, original-result reconciliation, shared-outbox first-capture claims, scoped freshness CLI/API/history and deterministic periodic freshness/alert-intent projection. | Actual ownership transfer, deployed service scheduling, durable fleet/global budgets, alert delivery/acknowledgement, resumable estate publication and measured qualification. |
 | B23–B43 | Portable planning, native lifecycle/readback/fenced-power primitives, guest/service handoffs, transfer/integrity/consistency contracts and compatibility checks. | Native reserve/prepare/plan/approval/apply/observe/power/guest/service/activate chain; trusted transfer-worker/target-root bindings; source fencing, final sync/cutover, post-write recovery and route execution. |
@@ -221,6 +221,20 @@ deadlines, exit-code/signature/request-count assertions and production checks ar
 preserved. This is a B01 test-fixture correction, not a runtime authorization change;
 failed baseline/development runs remain evidence alongside later exact-tree results.
 
+### OpenStack referenced-image driver/security evidence — B16 continuation (2 October 2026)
+
+Selector 4 extends the already bounded Glance read for VM-referenced images with five
+Nova-consumed custom properties: VIF model, SCSI model, QEMU guest-agent declaration,
+virtio-net multiqueue declaration and Secure Boot policy. Glance v2 additional image
+properties are strings, so the collector preserves those values as strings rather than
+coercing local booleans. Documented closed vocabularies fail closed; absent properties
+remain UNKNOWN. No additional endpoint, route or privilege is introduced.
+
+This narrows B16's driver/security evidence gap but does not prove installed guest
+drivers, compute-host support, key custody, firmware state or service readiness. New
+selector identity requires fresh signed campaign/credential/witness material and a new
+generation; selector 3 evidence is not relabelled. Native qualification remains open.
+
 ## 2. Corrected dependencies and delivery order
 
 | Correction | Required sequence and reason |
@@ -277,7 +291,7 @@ Wave 1's existing repository boundary is verified in PR #52. Later native workfl
 |---|---|---|---|
 | B14 | Partial signed native path | Complete remaining VMware hardware/policy/visibility coverage over the implemented signed HTTPS collector and publication; preserve exact folder/native identities and original generations. | Reconcile with independent enumeration; qualify folder/privilege coverage and visible-list limits. |
 | B15 | Partial signed native path | Complete AHV hardware/network/capacity facts over the implemented pinned VMM read and authenticated publication; retain typed boot/device evidence. | Qualify installed API/profile, paging/count semantics and least-privilege coverage. |
-| B16 | Partial signed native path with referenced-image evidence | Complete guest boot/driver/key/service and independent coverage over exact-project Nova/Cinder/Neutron/quota reads plus VM-referenced Glance metadata; do not infer compatibility from image properties. | Qualify actual catalog endpoints, versions, read roles, image visibility and service coverage. |
+| B16 | Partial signed native path with referenced-image driver/security evidence | Complete guest-installed driver/key/service and independent coverage over exact-project Nova/Cinder/Neutron/quota reads plus VM-referenced Glance metadata; do not infer compatibility from image properties. | Qualify actual catalog endpoints, versions, read roles, image visibility and service coverage. |
 | B17 | Persisted drafts, signed assessment decisions, offline owner signer and custodian intake | Finish independent enrichment/dependency verification, deployed owner/key onboarding, owner-to-custodian artifact transfer and review workflows; exact observed membership and consistency decisions remain revision-bound. | Application owner confirms dependencies and useful-service acceptance criteria. |
 | B18 | Durable signed tuple/route/control inputs | Complete deployed qualification import, expiry/supersession/revocation and release-ledger integration without converting operator assertions into evidence. | Source-exit and destination-operation campaigns independently qualify advertised scope. |
 | B19 | Persisted generation-pinned comparison | Complete coverage and acceptance for single-VM and reviewed multi-member comparisons, exact pool/profile bindings and explicit reasons/remediation. | Reviewed policy, security, recovery and target-capacity evidence for positive candidates. |
@@ -418,7 +432,7 @@ this programme, not a replacement numbering scheme. Approximate paths, unsupport
 blanket vendor claims, arbitrary completion dates and deletion of active owners are
 not accepted requirements. Vendor documentation is not installed qualification.
 
-OpenStack selector 3 retains strict allocation/image/volume/attachment facts from
+OpenStack selector 4 retains strict allocation/image/volume/attachment and bounded driver/security facts from
 already selected APIs; nominal disk sizes, deletion booleans and device labels never
 become total storage, fencing or mutation authority. The retired selector has no alias.
 The typed profile field owner removes a parallel table; standalone assurance recovery

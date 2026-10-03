@@ -22,8 +22,8 @@ visibility, fleet scheduling, ownership adoption or execution authorization.
 
 Profiles use 97 capability IDs, 28 typed properties, strict requirements for all ten
 families and cross-profile recovery/workload checks. Availability catalog 18 corrects
-security-zone/failure-domain confusion. OpenStack selector 3 retains bounded native
-allocation and storage relationships without extra privileges. All installed tuples
+security-zone/failure-domain confusion. OpenStack selector 4 retains bounded native allocation/storage relationships and
+VM-referenced driver/security image metadata without extra privileges. All installed tuples
 remain unselected and no native-qualified claim is created. Deferred profiles remain
 refused; changed catalog/snapshot digests require new review.
 

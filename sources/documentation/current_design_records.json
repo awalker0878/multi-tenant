@@ -95,7 +95,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.33",
+    "version": "0.34",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -273,6 +273,11 @@
         "version": "0.33",
         "date": "2026-10-02",
         "summary": "Package capacity/eligibility and reservation/IPAM/DNS preflight owners with their evidence readers; eliminate provisioner imports from top-level scripts/tools while retaining live owner-service, execution and state-conversion gates."
+      },
+      {
+        "version": "0.34",
+        "date": "2026-10-02",
+        "summary": "Document OpenStack selector 4 VM-referenced driver/security metadata as bounded observation-only evidence; preserve unknowns and require fresh enrollment/evidence while guest-installed drivers, keys, service facts and native qualification remain open."
       }
     ]
   },
@@ -366,7 +371,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.32",
+    "version": "0.33",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -538,13 +543,18 @@
         "version": "0.32",
         "date": "2026-10-02",
         "summary": "Align package-owned capacity/reservation/IPAM/DNS planning and evidence interfaces; preserve exact digests, external service authority and no-mutation boundary."
+      },
+      {
+        "version": "0.33",
+        "date": "2026-10-02",
+        "summary": "Bind OpenStack selector 4 and its Glance custom-property string semantics at the producer/consumer boundary; retain compute-tuple/guest reconciliation and native qualification as separate obligations."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.22",
+    "version": "0.23",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -666,6 +676,11 @@
         "version": "0.22",
         "date": "2026-10-02",
         "summary": "Record allocation planning/evidence code-owner migration without importing private owner state or authorizing live reservation, IPAM or DNS operations."
+      },
+      {
+        "version": "0.23",
+        "date": "2026-10-02",
+        "summary": "Require fresh selector-4 campaign/evidence after the OpenStack image-property contract change; preserve earlier signed generations without relabelling and retain guest/host/key/service acceptance as open transition gates."
       }
     ]
   }

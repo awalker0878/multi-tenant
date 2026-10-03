@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.22 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.23 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -63,11 +63,12 @@ fleet-wide recovery remain open.
 
 ### Collector and catalog transition
 
-Earlier OpenStack selectors are retired, not redirected. Enroll selector 3 with new matching
+Earlier OpenStack selectors are retired, not redirected. Enroll selector 4 with new matching
 campaign/witness/credential material, capture a fresh signed generation and reassess
 raw/normalized identities. Preserve old signed evidence without relabelling. CPU/memory
-and image/volume/attachment facts now survive collection, but nominal flavor storage
-and a guest device label do not establish complete disks, boot order or path authority.
+and image/volume/attachment facts now survive collection. Driver/security image properties
+also survive as bounded strings, but they do not establish installed guest drivers, host
+feature support, Secure Boot readiness, complete disks, boot order or path authority.
 
 Availability catalog 18 corrects security-zone wording and changes digest-bound
 resolution/plan/example identities. Typed requirements and cross-profile checks reject

@@ -76,7 +76,10 @@ def responses():
             'visibility': 'shared', 'owner': OTHER, 'protected': True, 'os_hidden': False,
             'os_hash_algo': 'sha512', 'os_hash_value': 'a'*128,
             'architecture': 'x86_64', 'os_distro': 'ubuntu',
-            'hw_machine_type': 'q35', 'hw_firmware_type': 'uefi', 'hw_disk_bus': 'scsi'},
+            'hw_machine_type': 'q35', 'hw_firmware_type': 'uefi', 'hw_disk_bus': 'scsi',
+            'hw_vif_model': 'virtio', 'hw_scsi_model': 'virtio-scsi',
+            'hw_qemu_guest_agent': 'yes', 'hw_vif_multiqueue_enabled': 'true',
+            'os_secure_boot': 'required'},
     }
 
 
@@ -132,9 +135,40 @@ class OpenStackDiscoveryTests(unittest.TestCase):
         self.assertEqual(facts['virtualSizeBytes'].value(), image['virtual_size'])
         self.assertEqual(facts['architecture'].value(), 'x86_64')
         self.assertEqual(facts['hwFirmwareType'].value(), 'uefi')
+        self.assertEqual(facts['hwVifModel'].value(), 'virtio')
+        self.assertEqual(facts['hwScsiModel'].value(), 'virtio-scsi')
+        self.assertEqual(facts['hwQemuGuestAgent'].value(), 'yes')
+        self.assertEqual(facts['hwVifMultiqueueEnabled'].value(), 'true')
+        self.assertEqual(facts['osSecureBoot'].value(), 'required')
         self.assertNotIn('checksum', facts)
         self.assertNotIn('compatible', facts)
         self.assertNotIn('nativeQualified', facts)
+
+    def test_image_guest_driver_and_secure_boot_metadata_remain_typed_observations(self):
+        for field, invalid in (
+                ('hw_scsi_model', 'lsi'),
+                ('hw_qemu_guest_agent', 'enabled'),
+                ('hw_vif_multiqueue_enabled', True),
+                ('hw_vif_multiqueue_enabled', 'TRUE'),
+                ('os_secure_boot', 'yes'),
+                ('hw_vif_model', ''),
+                ('hw_vif_model', 'x' * 129)):
+            values = responses()
+            values[(ENDPOINTS.image, f'images/{VM3}', None)][field] = invalid
+            with self.subTest(field=field, invalid=invalid), self.assertRaises(OpenStackDiscoveryHeld):
+                self._collected(values)
+
+        values = responses()
+        image = values[(ENDPOINTS.image, f'images/{VM3}', None)]
+        for field in ('hw_vif_model', 'hw_scsi_model', 'hw_qemu_guest_agent',
+                      'hw_vif_multiqueue_enabled', 'os_secure_boot'):
+            del image[field]
+        result = self._collected(values)
+        facts = {fact.name: fact for obj in result.objects
+                 if obj.identity.resource_kind == 'image' for fact in obj.facts}
+        for name in ('hwVifModel', 'hwScsiModel', 'hwQemuGuestAgent',
+                     'hwVifMultiqueueEnabled', 'osSecureBoot'):
+            self.assertEqual(facts[name].state, 'UNKNOWN')
 
     def test_image_hash_pair_and_referenced_identity_fail_closed(self):
         for change in (
