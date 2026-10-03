@@ -9,14 +9,14 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 
 | Record | Version / status | Scope |
 |---|---|---|
-| [RAD-M01](RAD-adoption.md) | 0.15 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.39 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [RAD-M01](RAD-adoption.md) | 0.16 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
+| [TAD-M01](TAD-infrastructure.md) | 0.40 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.5 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.5 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.38 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
-| [TRANS-M01](transition-and-as-built.md) | 0.25 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
+| [ICD-M01](interface-agreements.md) | 0.39 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.26 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.39 (Proposed)**; ICD-M01 is **version 0.38 (Proposed)**.
+TAD-M01 is **version 0.40 (Proposed)**; ICD-M01 is **version 0.39 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -37,22 +37,28 @@ acceptance.
 
 The [package-owned IPAM evidence reader](../engineering/ipam-evidence-runtime.md)
 replaces its old script owner without an alias while preserving external-authority and
-no-address-value semantics. Live IPAM mutation and B23 transaction composition remain open.
+no-address-value semantics. The separate [job-bound resource transactions](../engineering/job-bound-resource-transactions.md)
+now compose capacity and scoped NetBox ownership; enrolled workflow dispatch and native
+acceptance remain open.
 
 
 The [allocation runtime owners](../engineering/allocation-runtime-owners.md) now keep
 capacity evidence, eligibility, reservation/IPAM/DNS preflight and exported allocation
 evidence inside the installed package. `provisioner` has no top-level `scripts`/`tools`
-imports; live owner services, direct execution tools and retained-state conversion remain open.
+imports. Actual execution owners and service composition are package-owned; commissioned
+services and authenticated retained-state conversion remain open.
 
 The [package-owned implementation-input review](../engineering/input-review-runtime.md) now validates non-secret Terraform-root input shape from the installed execution package; it grants no native or allocation authority.
 
 The [package-owned Terraform catalog](../engineering/terraform-catalog-runtime.md)
 now replaces its old tools module without an alias. Strict input and source-path checks
 preserve the current catalog/plan bytes, and clean build staging excludes deleted owners.
-Direct operator/execution-tool ownership, installed service composition and retained-state conversion remain open.
+Installed source and service composition are implemented; native planning credentials,
+commissioned workers and authenticated retained-state conversion remain open.
 
-The [saved-plan/lifecycle runtime chain](../engineering/saved-plan-runtime.md) now has package-owned implementations and explicit installed source selection/binding; other owners and retained-state conversion remain open.
+The [saved-plan/lifecycle runtime chain](../engineering/saved-plan-runtime.md) now has
+package-owned implementations and explicit installed source selection/binding.
+Retained-state import and independent native reconciliation remain open.
 
 The [fixed guest probe](../engineering/guest-probe-runtime.md) is now package-owned and the former tools path is retired without an alias. Target qualification still owns campaign orchestration and no native or guest authority is inferred from probe packaging.
 

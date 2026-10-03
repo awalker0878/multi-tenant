@@ -92,7 +92,7 @@ class DomainCampaignTests(unittest.TestCase):
                 events.append(name); return original(assets, name, report, started, current)
             original = q.check_campaign_report
             with patch.object(q, 'check_campaign_report', side_effect=record), \
-                 patch.object(q, 'ssh_probe', side_effect=lambda *args: events.append('traffic') or {'status': 'HEALTHY'}):
+                 patch.object(q, 'ssh_probe', side_effect=lambda *args, command_guard=None: events.append('traffic') or {'status': 'HEALTHY'}):
                 self.assertEqual(execute(folder, data), 0)
             order = ['native_manifest', 'portgroup_manifest', 'workload_manifest', 'portgroup_manifest', 'native_manifest']
             self.assertEqual(events, order + ['traffic'] + order)
@@ -123,7 +123,7 @@ class DomainCampaignTests(unittest.TestCase):
         with Fixture() as nf, Fixture() as vf, tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp); data, domain_inputs = inputs(nf.origin, vf.origin)
             routes(nf, vf, data); assets_at(folder, data, domain_inputs, nf, vf)
-            def probe(*args):
+            def probe(*args, command_guard=None):
                 nf.routes['/policy/api/v1'+data[2]['resources'][3]['path']]['body']['rules'][0]['disabled'] = True
                 return {'status': 'HEALTHY'}
             with patch.object(q, 'ssh_probe', side_effect=probe): self.assertEqual(execute(folder, data), 2)

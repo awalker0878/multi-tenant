@@ -39,8 +39,8 @@ from tests.provisioning import support
 
 REQUEST = str(support.REQUEST)
 MODULE = 'provisioner.cli'
-DELIVERY_RUNNER = support.ROOT / 'tools' / 'delivery_run.py'
-DELIVERY_STEPS = support.ROOT / 'tools' / 'delivery_steps.py'
+DELIVERY_RUNNER = support.ROOT / 'provisioner' / 'execution' / 'delivery_run.py'
+DELIVERY_STEPS = support.ROOT / 'provisioner' / 'execution' / 'delivery_steps.py'
 COMMIT = 'a' * 40
 
 
@@ -647,36 +647,54 @@ class NoBypassTest(unittest.TestCase):
                 self.assertNotIn('import tools', text)
                 self.assertNotIn('import scripts', text)
 
-    def test_no_module_under_provisioner_owns_a_delivery_execution_journal(self):
-        allowed = self.PACKAGE / 'controlplane' / 'discovery' / 'batch_journal.py'
+    def test_delivery_journal_has_one_package_owner_and_no_portable_writer(self):
+        # B05 moves the existing owner, rather than banning its new package path.
+        # Discovery, allocation and conversion locks serve different contracts;
+        # a flock anywhere in the package is not a competing delivery journal.
+        owner = self.PACKAGE / 'execution' / 'execution_journal.py'
+        self.assertTrue(owner.is_file())
+        self.assertFalse((support.ROOT / 'tools' / 'execution_journal.py').exists())
+        journal_owners = []
+        format_owners = []
         for path in sorted(self.PACKAGE.rglob('*.py')):
+            tree = ast.parse(path.read_text(encoding='utf-8'))
+            if any(isinstance(node, ast.ClassDef) and node.name == 'Journal'
+                   for node in ast.walk(tree)):
+                journal_owners.append(path)
+            if any(isinstance(node, ast.Constant)
+                   and node.value == 'hosting-execution-event/1'
+                   for node in ast.walk(tree)):
+                format_owners.append(path)
+        self.assertEqual(journal_owners, [owner])
+        self.assertEqual(format_owners, [owner])
+        portable = [self.PACKAGE / 'execution' / name for name in ('handoff.py', 'service.py')]
+        portable.extend(path for directory in ('domain', 'compiler', 'placement', 'adapters')
+                        for path in (self.PACKAGE / directory).rglob('*.py'))
+        for path in sorted(portable):
             text = path.read_text(encoding='utf-8')
             with self.subTest(module=str(path.relative_to(self.PACKAGE))):
                 self.assertNotIn('execution_journal', text)
-                if path == allowed:
-                    self.assertIn('grants no collection authority', text)
-                    self.assertIn('enterprise scheduler', text)
-                    self.assertIn('is not', text)
-                    self.assertNotIn('execution_authorized = True', text.lower())
-                elif path == self.PACKAGE / 'execution' / 'terraform_apply.py':
-                    # This is the same pre-existing native saved-plan owner,
-                    # relocated without a second delivery journal or authority.
-                    self.assertIn('def scope_ledger(', text)
-                    self.assertIn("'STARTED_OUTCOME_UNKNOWN'", text)
-                    self.assertIn("'APPLIED_REQUIRES_NATIVE_ACCEPTANCE'", text)
-                    self.assertIn('Explicit native mutation opt-in required', text)
-                    module = ast.parse(text)
-                    calls = [node for node in ast.walk(module)
-                             if isinstance(node, ast.Call)
-                             and isinstance(node.func, ast.Attribute)
-                             and isinstance(node.func.value, ast.Name)
-                             and node.func.value.id == 'fcntl' and node.func.attr == 'flock']
-                    owned = next(node for node in module.body
-                                 if isinstance(node, ast.FunctionDef) and node.name == 'scope_ledger')
-                    self.assertEqual(len(calls), 1)
-                    self.assertTrue(all(owned.lineno <= node.lineno <= owned.end_lineno for node in calls))
-                else:
-                    self.assertNotIn('flock', text)
+                self.assertNotIn('flock', text)
+
+        batch = (self.PACKAGE / 'controlplane' / 'discovery' / 'batch_journal.py').read_text()
+        self.assertIn('grants no collection authority', batch)
+        self.assertIn('enterprise scheduler', batch)
+        self.assertIn('is not', batch)
+        self.assertNotIn('execution_authorized = True', batch.lower())
+        # The saved-plan owner retains its separate original uncertainty ledger.
+        text = (self.PACKAGE / 'execution' / 'terraform_apply.py').read_text()
+        self.assertIn("'STARTED_OUTCOME_UNKNOWN'", text)
+        self.assertIn("'APPLIED_REQUIRES_NATIVE_ACCEPTANCE'", text)
+        self.assertIn('Explicit native mutation opt-in required', text)
+        module = ast.parse(text)
+        calls = [node for node in ast.walk(module)
+                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                 and isinstance(node.func.value, ast.Name)
+                 and node.func.value.id == 'fcntl' and node.func.attr == 'flock']
+        owned = next(node for node in module.body
+                     if isinstance(node, ast.FunctionDef) and node.name == 'scope_ledger')
+        self.assertEqual(len(calls), 1)
+        self.assertTrue(all(owned.lineno <= node.lineno <= owned.end_lineno for node in calls))
 
     def test_the_repository_declares_no_execution_authority(self):
         self.assertEqual(authority_module.EXECUTION_AUTHORITY, 'EXTERNAL_ONLY')

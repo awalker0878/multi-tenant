@@ -192,7 +192,11 @@ class HeldFlowTests(unittest.TestCase):
         self.assertEqual((self.folder/'head.json').read_bytes(), before)
 
     def test_cli_reviews_offline_without_ledger_release(self):
-        contacts = len(self.f.requests); args = [sys.executable, str(Path(review.__file__))]
+        contacts = len(self.f.requests)
+        args = [sys.executable, '-I', '-B', '-c',
+                'import runpy,sys; sys.path.insert(0,sys.argv.pop(1)); '
+                'runpy.run_module("provisioner.execution.terraform_recovery_review",run_name="__main__",alter_sys=True)',
+                str(Path(review.__file__).resolve().parents[2]), '--source-root', str(review.ROOT)]
         for key, value in dict(bundle=self.operation, ledger=self.ledger, manifest=self.base/'manifest',
                                readback=self.base/'readback', context=self.base/'context', output=self.base/'cli-review').items():
             args += ['--'+key, str(value)]

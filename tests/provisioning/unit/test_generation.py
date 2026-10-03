@@ -24,11 +24,11 @@ from provisioner.observation import native
 from tests.provisioning import support
 
 SOURCE = support.ROOT / 'provisioner' / 'domain' / 'generation.py'
-DELIVERY_RUNNER = support.ROOT / 'tools' / 'delivery_run.py'
+DELIVERY_RUNNER = support.ROOT / 'provisioner' / 'execution' / 'delivery_run.py'
 
 
 def _declared_delivery_scope_keys() -> set:
-    """The scope keys `tools/delivery_run.validate` requires, read from its source.
+    """The scope keys `provisioner.execution.delivery_run.validate` requires, read from its source.
 
     The runner is the owner of the scope contract, so this reads the contract
     instead of restating it. `provisioner.execution.delivery_run` imports `fcntl` at module scope

@@ -17,6 +17,7 @@ from provisioner.execution import recovery_review as rr
 from provisioner.execution import vsphere_task_observe as task
 from provisioner.execution import vsphere_task_tree_observe as tree
 from provisioner.execution import qualify_target as q
+from provisioner.execution.readback_cli import module_command
 
 
 def manifest(origin='https://vcenter.example.invalid'):
@@ -84,9 +85,9 @@ class TaskTreeTests(unittest.TestCase):
             f.post_routes[create] = collector; f.post_routes[read] = lambda _: {'body': pages.pop(0)}
             folder = Path(tmp); path = folder / 'manifest.json'; path.write_text(json.dumps(m))
             output = folder / 'report.json'
-            result = subprocess.run([sys.executable, str(q.ROOT / 'provisioner/execution/vsphere_task_tree_observe.py'), str(path),
+            result = subprocess.run(module_command(tree, [str(path),
                 '--read-authorized-target', '--expected-origin', f.origin, '--ca-file', str(f.directory / 'ca.pem'),
-                '--output', str(output), '--interval', '0'], capture_output=True, text=True,
+                '--output', str(output), '--interval', '0']), capture_output=True, text=True,
                 env=dict(os.environ, VCENTER_SESSION='fixture-session'), timeout=20)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             report = json.loads(output.read_text()); self.assertEqual(report['outcome'], 'READBACK_MATCH_NOT_QUALIFIED')
