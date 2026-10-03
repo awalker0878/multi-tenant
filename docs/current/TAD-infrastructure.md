@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.28 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.29 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -121,15 +121,18 @@ stale, partial or contradictory responses cannot become positive advice.
 
 ### Scheduling, freshness and retained history
 
-Bounded one-shot batch staging uses protected manifest/config digests and due windows.
-Endpoint FIFO admission is shared only within a process; queue time consumes the native
-deadline and active work drains on stop. The batch cannot mint campaigns, publish
-implicitly or claim global endpoint limits. Durable fleet scheduling remains open.
-Freshness inspection separates capture age from collection health and visibility.
-The scoped API/CLI, on-demand check writer and retained history are implemented.
-Migration 0023, narrow runtime grants, atomic audit, exact-ID retry and predecessor/
-cursor integrity govern retained history. Freshness is not qualification. Periodic
-monitoring, alert dispatch and native coverage reconciliation remain open.
+Bounded batch staging uses protected manifest/config digests and due windows. Optional
+private checkpointing persists starts before collection, waits for already-enrolled future
+tasks and reconciles only original signed-outbox results after uncertainty; it cannot mint
+campaigns, publish implicitly or claim global endpoint limits. Endpoint admission remains
+local to cooperating processes and durable fleet scheduling remains open. Freshness
+inspection separates capture age from collection health and visibility. The scoped API/CLI,
+on-demand writer, retained history and deterministic periodic evaluator are implemented.
+Stable target/time-slot IDs make restarts idempotent against retained checks. Digest-bound
+warning/critical alert intents are projections only: notification delivery, acknowledgement,
+deployed service scheduling, global admission and independent visibility reconciliation remain
+open. Migration 0023, narrow grants, atomic audit and predecessor/cursor integrity remain the
+history owner. Freshness is not qualification.
 
 ### Provisioning, transfer and recovery boundaries
 

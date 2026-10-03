@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.27 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.28 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -117,16 +117,18 @@ capacity, transfers ownership or launches mutation.
 
 ### Batch, freshness and history interfaces
 
-`hosting-discovery-batch/1` and `hosting-discovery-batch-outcome/1` bind due windows,
-protected inputs and ordered outcomes. They declare process-only limits, no durable
-schedule, no implicit publication and no execution authority. Queue/deadline limits
-cannot replace campaign or credential authority; endpoint aliases/processes require
-external coordination. Stop drains accepted bounded work, not remote rollback.
-The existing scoped freshness API/CLI distinguish age, MISSING inventory and reported
-collection health without inventing visibility. Caller thresholds/generation overrides
-are refused. Retained on-demand history adds exact-ID retry, predecessor/cursor checks,
-atomic audit and migration 0023/runtime grants. It is not periodic monitoring or alert
-delivery. Historical freshness never authorizes collection or mutation.
+`hosting-discovery-batch/1` binds due windows and protected inputs. Optional local
+checkpointing adds immutable start/outcome history, explicit wait/inspect/reconcile modes and
+no automatic retry after an uncertain start. It still supplies no campaign, implicit
+publication or global endpoint budget; aliases/processes beyond one local journal require
+external coordination. The scoped freshness API/CLI distinguish age, missing inventory and
+reported collection health without inventing visibility. Retained history adds exact-ID retry,
+predecessor/cursor checks, atomic audit and migration 0023/runtime grants. A finite periodic
+projection now maps exact target/time slots onto those retained checks and emits deterministic
+warning/critical alert intents only after report/record digest verification. It sends no
+notification, refreshes no credential, requests no collection and grants no execution.
+Deployed service scheduling, delivery/acknowledgement and fleet-global coordination remain
+external interface obligations.
 
 ### Retirement and recovery ownership
 

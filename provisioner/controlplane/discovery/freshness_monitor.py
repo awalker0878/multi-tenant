@@ -109,9 +109,18 @@ def alert_projection(check: dict) -> dict | None:
     if not isinstance(issues, list) or any(not isinstance(value, str) for value in issues):
         raise ValueError('Freshness issues are invalid')
     record_digest = check.get('recordDigest')
+    report_digest = check.get('reportDigest')
     if (not isinstance(record_digest, str) or len(record_digest) != 64
-            or any(char not in '0123456789abcdef' for char in record_digest)):
-        raise ValueError('Freshness record digest is required')
+            or any(char not in '0123456789abcdef' for char in record_digest)
+            or not isinstance(report_digest, str) or len(report_digest) != 64
+            or any(char not in '0123456789abcdef' for char in report_digest)):
+        raise ValueError('Freshness report and record digests are required')
+    if hashlib.sha256(_json(report).encode('ascii')).hexdigest() != report_digest:
+        raise ValueError('Freshness report differs from its retained digest')
+    binding = {key: check.get(key) for key in ('format', 'environmentId', 'scope', 'checkId',
+        'sequence', 'reportDigest', 'recordedBy', 'recordedAt', 'previousRecordDigest', 'changeKinds')}
+    if hashlib.sha256(_json(binding).encode('ascii')).hexdigest() != record_digest:
+        raise ValueError('Freshness record differs from its retained digest')
     selected = sorted({value for value in issues if value in _ACTIONABLE})
     if not selected:
         return None

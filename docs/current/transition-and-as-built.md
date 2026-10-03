@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.17 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.18 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -54,9 +54,12 @@ Reported supersession requires explicit reload, never source rebasing or review 
 Application-wide migration planning and operating acceptance remain open.
 
 Freshness inspection/history are implemented, including on-demand exact-ID checks,
-predecessor/cursor integrity, migration 0023, narrow grants and atomic audit. Restore
+predecessor/cursor integrity, migration 0023, narrow grants and atomic audit. A finite
+periodic evaluator reuses deterministic target/time-slot IDs after restart and projects
+digest-bound alert intents without sending notifications or collecting inventory. Restore
 must reconcile generation history, audit and authority before accepting new writes.
-Periodic collection/monitoring/alerting and fleet-wide recovery remain open.
+Deployed service scheduling, alert delivery/acknowledgement, periodic collection and
+fleet-wide recovery remain open.
 
 ### Collector and catalog transition
 

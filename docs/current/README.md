@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.14 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.28 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.29 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.4 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.4 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.27 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
-| [TRANS-M01](transition-and-as-built.md) | 0.17 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
+| [ICD-M01](interface-agreements.md) | 0.28 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.18 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.28 (Proposed)**; ICD-M01 is **version 0.27 (Proposed)**.
+TAD-M01 is **version 0.29 (Proposed)**; ICD-M01 is **version 0.28 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment
@@ -71,9 +71,11 @@ These are assessment interfaces, not adoption, reservations or migration permiss
 [freshness CLI checks](../engineering/discovery-freshness-operator.md) and
 [retained history](../engineering/discovery-freshness-history.md) are bounded implemented
 paths. [Checkpointed scheduling](../engineering/discovery-checkpointed-scheduling.md)
-now retains a finite local batch across restarts, waits for pre-enrolled due work within
-a bounded run and reconciles only original signed custody. Durable fleet coordination,
-periodic monitoring/alerts and qualification remain open.
+retains a finite local batch across restarts, while the
+[periodic freshness projection](../engineering/discovery-freshness-monitor.md) reuses
+exact target/time-slot IDs and creates digest-bound alert intents from retained checks.
+No notification is sent. Deployed service scheduling, alert delivery/acknowledgement,
+fleet-global coordination and qualification remain open.
 
 The [B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md)
 remains the sole product backlog; the [current research review](../engineering/platform-capability-review-2026-10-01.md)

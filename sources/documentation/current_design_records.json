@@ -90,7 +90,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.28",
+    "version": "0.29",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -243,6 +243,11 @@
         "version": "0.28",
         "date": "2026-10-02",
         "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.29",
+        "date": "2026-10-02",
+        "summary": "Periodic freshness monitoring now reuses immutable history through deterministic target/time slots and digest-bound alert intents without collection or notification authority; deployed scheduling, alert delivery and fleet-global admission remain open."
       }
     ]
   },
@@ -326,7 +331,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.27",
+    "version": "0.28",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -473,13 +478,18 @@
         "version": "0.27",
         "date": "2026-10-02",
         "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.28",
+        "date": "2026-10-02",
+        "summary": "Define checkpointed local collection and periodic freshness/alert-intent interfaces with exact replay, digest verification and explicit external delivery/coordination boundaries."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.17",
+    "version": "0.18",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -576,6 +586,11 @@
         "version": "0.17",
         "date": "2026-10-02",
         "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.18",
+        "date": "2026-10-02",
+        "summary": "Document restart-idempotent freshness slots and historical alert-intent projection while preserving restore reconciliation and open deployed alert/fleet recovery obligations."
       }
     ]
   }
