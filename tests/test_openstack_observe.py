@@ -4,7 +4,7 @@ import json
 import unittest
 
 from lab.native_readback_fixture import Fixture
-from tools import openstack_observe as o
+from provisioner.execution import openstack_observe as o
 from provisioner.execution.run_files import utcnow
 
 PROJECT = '1bdef490bc60447c9877632b03933b33'

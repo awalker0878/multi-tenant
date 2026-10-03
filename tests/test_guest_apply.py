@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from tests.test_guest_run import inputs, prepare, SOURCE
-from tools import guest_apply as a, guest_run as g
+from provisioner.execution import guest_apply as a, guest_run as g
 from provisioner.execution.run_files import digest, encoded, file_map, load_private, utcnow, write_new
 
 
@@ -32,6 +32,13 @@ def successful_child(argv, directory, env, timeout):
 
 
 class GuestExecutionTests(unittest.TestCase):
+    def test_installed_runtime_mismatch_stops_before_bundle_read_or_dispatch(self):
+        with patch.object(g, 'verify_runtime', return_value={'status': 'FAILED_RUNTIME_SOURCE_CHECK'}), \
+             patch.object(a, 'run_process') as controller, \
+             self.assertRaisesRegex(ValueError, 'Installed guest execution source differs'):
+            a.validate_bundle(Path('/not-read'), {})
+        controller.assert_not_called()
+
     def test_ledger_replays_complete_receipts_and_rejects_damaged_history_without_writes(self):
         with tempfile.TemporaryDirectory() as tmp:
             args = configured(Path(tmp))

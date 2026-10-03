@@ -74,7 +74,7 @@ class VerifiedPrincipal:
     subject: str
     organization_id: str
     tenant_id: str
-    kind: str  # HUMAN or WORKER
+    kind: str  # HUMAN, WORKER or a narrowly enrolled SERVICE
     issued_at: datetime
     expires_at: datetime
     step_up_at: datetime | None
@@ -82,7 +82,7 @@ class VerifiedPrincipal:
 
     def __post_init__(self) -> None:
         if (not self.subject or not self.organization_id or not self.tenant_id
-                or self.kind not in ('HUMAN', 'WORKER')
+                or self.kind not in ('HUMAN', 'WORKER', 'SERVICE')
                 or not _aware(self.issued_at) or not _aware(self.expires_at)
                 or self.expires_at <= self.issued_at
                 or (self.step_up_at is not None and

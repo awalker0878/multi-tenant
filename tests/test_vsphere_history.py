@@ -2,7 +2,8 @@
 import unittest
 from lab.native_readback_fixture import Fixture
 from provisioner.execution import readback_core as c
-from tools import vsphere_history as h, vsphere_observe as vm
+from provisioner.execution import vsphere_history as h
+from provisioner.execution import vsphere_observe as vm
 
 
 def routes(f, pages):

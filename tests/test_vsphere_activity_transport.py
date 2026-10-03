@@ -5,7 +5,7 @@ from unittest.mock import patch
 from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_history import routes
 from provisioner.execution import readback_core as c
-from tools import vsphere_history as h
+from provisioner.execution import vsphere_history as h
 from provisioner.execution.run_files import utcnow
 
 

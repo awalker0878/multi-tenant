@@ -13,10 +13,10 @@ import unittest
 
 from lab.native_readback_fixture import Fixture, manifest, responses, credentials
 from provisioner.execution.guest_probe import probe
-from tools.qualify_target import (ASSETS, authority_matches, budget, native_readback,
+from provisioner.execution.qualify_target import (ASSETS, authority_matches, budget, native_readback,
                                   traffic_campaign, validate, bound_inputs, workload_binding, WORKLOAD_ASSETS)
 from provisioner.execution.run_files import digest, encoded, utcnow, write_new
-from tools.guest_inventory import build
+from provisioner.execution.guest_inventory import build
 from tests.test_guest_inventory import fixture
 
 

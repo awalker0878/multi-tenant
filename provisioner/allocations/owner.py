@@ -17,7 +17,7 @@ exported evidence says about it:
   that moved invalidates a stale reservation preflight instead of silently reserving
   against capacity that is already gone.
 - `request()` compiles the reviewed demand into `hosting-capacity-request/1` — the
-  exact request the repository's existing `tools/capacity.py` owner validates and the
+  exact request the repository's existing `provisioner/allocations/capacity_owner.py` owner validates and the
   `capacity` step kind of the existing delivery runner stages. Units are converted
   into the owner's decimal accounting units and every workload is rounded upward, so
   a reservation may exceed the reviewed demand but can never undercharge it.
@@ -57,7 +57,7 @@ HANDOFF_FORMAT = 'hosting-capacity-owner-handoff/1'
 BINDING_FORMAT = 'hosting-capacity-binding/1'
 #: What the exported reservation records say about a proposal.
 RECONCILIATION_FORMAT = 'hosting-capacity-reconciliation/1'
-#: Mirrors `tools.capacity.REQUEST_FORMAT`, the declared owner contract.
+#: Mirrors `provisioner.allocations.capacity_owner.REQUEST_FORMAT`, the declared owner contract.
 REQUEST_FORMAT = 'hosting-capacity-request/1'
 #: The recorded owner facts an operator supplies so a request can be compiled.
 FACTS_FORMAT = 'hosting-capacity-owner-facts/1'
@@ -75,7 +75,7 @@ REQUEST_KEYS = frozenset({'format', 'owner_id', 'reservation_id', 'operation_id'
 IDENTIFIER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')
 SHA256 = re.compile(r'^[0-9a-f]{64}$')
 
-#: The accounting units the capacity owner holds. Mirrors `tools.capacity.UNITS`.
+#: The accounting units the capacity owner holds. Mirrors `provisioner.allocations.capacity_owner.UNITS`.
 UNITS = ('vcpu', 'memory_mb', 'storage_gb')
 #: Mirrors the owner's own accounting bound, so the mirror never accepts a request
 #: the authoritative validator would refuse.
@@ -373,7 +373,7 @@ def request(plan, *, owner_id: str, pool_id: str, capabilities, reservation_id: 
 def validate_request(document: dict) -> dict:
     """Refuse any request the declared owner contract would refuse.
 
-    This mirrors the pure shape contract `tools.capacity.validate_request` enforces,
+    This mirrors the pure shape contract `provisioner.allocations.capacity_owner.validate_request` enforces,
     so the transport can refuse an unusable request without importing the owner.
     `tests/provisioning/unit/test_capacity_owner.py` compares the two on the same
     documents, so the mirror cannot drift from the owner.

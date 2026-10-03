@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 from provisioner.execution import readback_core as c
-from tools import owner_install as d
+from provisioner.execution import owner_install as d
 from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 
 
@@ -65,8 +65,8 @@ class InstallTests(unittest.TestCase):
         self.assertEqual(self.count('restart')+self.count('stop'),0)
         daemon=self.host.path(d.CONFIG/'sshd_config').read_text()
         self.assertIn('AuthorizedKeysFile none\n',daemon); self.assertIn('DisableForwarding yes\n',daemon)
-        self.assertIn('ForceCommand /usr/bin/python3 -I /opt/hosting-source/tools/owner_worker.py',daemon)
-        self.assertIn('SetEnv GIT_CONFIG_COUNT=1',daemon)
+        self.assertIn('ForceCommand /usr/bin/python3 -I -B -m provisioner.execution.owner_worker --source-root /opt/hosting-source',daemon)
+        self.assertNotIn('GIT_CONFIG',daemon)
         self.assertIn('RevokedKeys /etc/hosting-owner/revoked-keys',daemon)
         self.assertEqual(self.host.path(d.CONFIG/'host-key').stat().st_mode & 0o777,0o600)
         self.assertEqual(self.host.path(d.CONFIG/'principals').read_text(),'hosting-owner\n')

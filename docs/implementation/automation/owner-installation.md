@@ -1,6 +1,6 @@
 # Install the dedicated owner endpoint
 
-`tools/owner_install.py` installs the [remote worker](remote-owner-worker.md) as a
+`provisioner/execution/owner_install.py` installs the [remote worker](remote-owner-worker.md) as a
 separate systemd-managed SSH endpoint on an accepted Ubuntu 24.04 host. It writes
 only its dedicated configuration/unit, a standard OpenSSH runtime-directory
 declaration and selected private worker directories. It never edits management
@@ -79,11 +79,11 @@ independent recovery path; the installer does not authenticate or issue that
 external authority.
 
 ```sh
-python /opt/hosting-source/tools/owner_install.py \
+python -m provisioner.execution.owner_install --source-root /opt/hosting-source \
   --config /private/operator/owner-install.json
 
-sudo /opt/hosting-python/bin/python -I \
-  /opt/hosting-source/tools/owner_install.py \
+sudo /opt/hosting-python/bin/python -I -B -m provisioner.execution.owner_install \
+  --source-root /opt/hosting-source \
   --config /private/operator/owner-install.json \
   --authority /private/operator/owner-install-authority.json --execute
 ```
@@ -125,10 +125,10 @@ jobs already dispatched through child sessions. Before deliberately stopping or
 changing it, reconcile active jobs through their native owners. Do not assume
 that stopping SSH removes native effects.
 
-The forced SSH environment trusts only the selected root-controlled checkout
-through an exact Git `safe.directory` setting, allowing a restricted non-root
-worker to verify that source. It does not trust arbitrary directories. No
-client-supplied Git/environment overlay is accepted.
+The package verifier checks protected filesystem custody before supplying an
+exact Git `safe.directory` setting for the selected checkout, allowing a
+restricted non-root worker to verify that source. Client-supplied and global
+Git/environment overlays are ignored.
 
 After an interruption, preserve the installation directory, source, keys and
 owner state. Invoke the same configuration with current authority. The installer
@@ -160,3 +160,10 @@ the daemon. Revocation does not end an existing SSH session or fence a native jo
 Use the [revocation owner](owner-revocations.md) for accepted live subject-key
 denial and interrupted publication recovery. The initial installer never erases
 unknown policy or silently removes a journaled revocation during repeat installation.
+
+The selected worker interpreter must have the application wheel installed. Before
+installation writes host files or starts its SSH service, the installer invokes
+that interpreter in isolated mode, verifies its verification bootstrap bytes,
+then compares its complete owned package and assets with the accepted checkout.
+The forced command uses the installed `provisioner.execution.owner_worker` module
+with explicit `--source-root`; the checkout supplies reviewed source identity.

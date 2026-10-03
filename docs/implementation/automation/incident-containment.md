@@ -1,12 +1,12 @@
 # Delegated edge incident containment
 
-`tools/edge_contain.py` withdraws an adopted Linux/nftables edge boundary using
+`provisioner/execution/edge_contain.py` withdraws an adopted Linux/nftables edge boundary using
 separate incident authority and the existing edge owner's shared ledger. It can
 remove scoped exposure, install the owned deny boundary if absent, and observe
 containment after a lost reply. It cannot introduce an allow, change routes or
 interfaces, clear another owner's hold, or authorize reactivation.
 
-`tools/delivery_containment.py` carries the optional predelegated containment
+`provisioner/execution/delivery_containment.py` carries the optional predelegated containment
 that runs independently of forward-stage success when a delivery stage fails.
 
 ## Authority and execution
@@ -19,7 +19,7 @@ This separate delegation permits withdrawal of the owned boundary regardless of
 its current allows; it does not approve a new boundary or production readiness.
 
 ```sh
-python tools/edge_contain.py --spec /private/edge.json \
+python -m provisioner.execution.edge_contain --spec /private/edge.json \
   --authority /private/incident-authority.json --nft /usr/sbin/nft \
   --ledger /private/edge-ledger --output /private/incident-run --execute
 ```

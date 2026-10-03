@@ -1,6 +1,6 @@
 # Edge denial at startup
 
-`tools/edge_boot.py` establishes the complete accepted set of owned edge deny
+`provisioner/execution/edge_boot.py` establishes the complete accepted set of owned edge deny
 tables before the selected network manager starts. It restores no allows or
 activation leases. All selected tables are checked and replaced in one nftables
 transaction, then inspected for permanent interface drops. Native owner journals
@@ -33,7 +33,7 @@ lock before changing any table. Busy writers, foreign tables, changed policy,
 source drift and failed native checks prevent success.
 
 ```sh
-python tools/edge_boot.py apply --config /etc/hosting-edge/boot.json \
+python -m provisioner.execution.edge_boot apply --source-root /opt/hosting-source --config /etc/hosting-edge/boot.json \
   --output-root /var/lib/hosting-edge/boot --execute
 ```
 
@@ -47,7 +47,7 @@ requires owner reconciliation and configuration review; IDs are not rebound.
 Render the unit and manager drop-in using actual installed paths:
 
 ```sh
-python tools/edge_boot.py render-service \
+python -m provisioner.execution.edge_boot render-service \
   --python /opt/hosting-python/bin/python --source /opt/hosting-source \
   --config /etc/hosting-edge/boot.json --output-root /var/lib/hosting-edge/boot \
   --ledger /var/lib/hosting-owner/ledger/owners/edge_policy \
@@ -65,8 +65,9 @@ the complete installed unit set with `systemd-analyze verify`, run
 accepted installation/maintenance procedure. Do not casually restart live
 network management to install a boot policy.
 
-Use a root-controlled standalone checkout and interpreter outside home
-directories. The service makes the filesystem read-only except its output
+Use a root-controlled standalone checkout and an interpreter with the matching
+application wheel installed outside home directories. The generated service uses
+`-I -B -m provisioner.execution.edge_boot` and selects that checkout explicitly. The service makes the filesystem read-only except its output
 parent and explicit native ledger. Those paths must match its configuration and
 remain independently recoverable. Source, configuration, binary and ledger
 must be locally available before attachment; network mounts cannot supply them.
@@ -94,7 +95,7 @@ actual commissioning and acceptance exercises.
 
 ## Resumable installer
 
-`tools/edge_install.py` installs this profile on an accepted Ubuntu 24.04
+`provisioner/execution/edge_install.py` installs this profile on an accepted Ubuntu 24.04
 systemd host during console/OOB maintenance. The selected network manager must
 already be inactive and dead. The installer never starts, stops or restarts that
 manager. It checks the actual host/system namespace, exact clean root-controlled
@@ -126,8 +127,8 @@ The private `hosting-edge-install-authority/1` record contains `format`,
 and current window, at most one hour, bind the offline installation procedure.
 
 ```sh
-python tools/edge_install.py --config /private/edge-install.json
-python tools/edge_install.py --config /private/edge-install.json \
+python -m provisioner.execution.edge_install --source-root /opt/hosting-source --config /private/edge-install.json
+python -m provisioner.execution.edge_install --source-root /opt/hosting-source --config /private/edge-install.json \
   --authority /private/edge-install-authority.json --execute
 ```
 

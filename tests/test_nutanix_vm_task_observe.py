@@ -10,9 +10,11 @@ import tempfile
 import unittest
 from lab.native_readback_fixture import Fixture
 from tests.test_nutanix_vm_observe import manifest as vm_manifest, uid
-from tools import nutanix_vm_task_observe as ahv, nutanix_vm_observe as vm
+from provisioner.execution import readback_cli
+from provisioner.execution import nutanix_vm_task_observe as ahv
+from provisioner.execution import nutanix_vm_observe as vm
 from provisioner.execution import readback_core as c
-from tools import nutanix_task_tree as tree
+from provisioner.execution import nutanix_task_tree as tree
 
 ROOT = Path(__file__).resolve().parents[1]
 TASK = 'ZXJnb24=:88888888-8888-4888-8888-888888888888'
@@ -173,7 +175,7 @@ class TLSVMTaskTests(unittest.TestCase):
     def test_cli_defaults_offline_and_writes_private_evidence_only_when_enabled(self):
         with tempfile.TemporaryDirectory() as directory:
             manifest_path = Path(directory) / 'manifest.json'; output = Path(directory) / 'readback.json'
-            args = [sys.executable, str(ROOT / 'tools/nutanix_vm_task_observe.py'), str(manifest_path)]
+            args = [*readback_cli.module_command(ahv, []), str(manifest_path)]
             manifest_path.write_text(json.dumps(self.m))
             result = subprocess.run(args, capture_output=True, text=True, cwd=ROOT)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

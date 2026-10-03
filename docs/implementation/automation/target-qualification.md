@@ -1,6 +1,6 @@
 # Collecting target-bound qualification evidence
 
-`tools/qualify_target.py` runs the existing exact-ID native observers before and
+`provisioner/execution/qualify_target.py` runs the existing exact-ID native observers before and
 after a bounded guest traffic campaign. It uses real HTTPS and certificate SSH.
 It ships `provisioner/execution/guest_probe.py` unchanged as a fixed read-only script over that
 SSH session; the probe needs no remote installation and returns only the bounded
@@ -268,8 +268,8 @@ binding must independently establish that native manifest resources and guest
 IDs belong to the exact site/tenant/WSD. Do not infer ownership from a label.
 
 ```sh
-python tools/qualify_target.py /private/operator/campaign.json
-python tools/qualify_target.py /private/operator/campaign.json --execute \
+python -m provisioner.execution.qualify_target --source-root /opt/hosting/source /private/operator/campaign.json
+python -m provisioner.execution.qualify_target --source-root /opt/hosting/source /private/operator/campaign.json --execute \
   --authority /private/operator/campaign-authority.json \
   --ssh /usr/bin/ssh --output /private/operator/new-campaign
 ```
@@ -293,3 +293,10 @@ This read-only collector cannot issue its own mutation authority or silently
 renew an expiring policy. For recovery campaigns, pair these health checks with
 the [restic file restore](restic-recovery.md) and application-owner acceptance.
 Neither file hashes nor a health endpoint alone establish database consistency.
+
+The installed campaign requires an explicit `--source-root` matching its actual
+package and reviewed assets before target execution. Native reader children run
+in isolated Python from the imported package owner; the guest probe is read from
+that same installation. A working directory or retained tool file cannot supply
+an alternate observer. The existing per-platform profiles and authorization
+contracts continue to apply.

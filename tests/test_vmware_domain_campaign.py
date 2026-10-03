@@ -15,7 +15,8 @@ from tests.nsx_domain_fixture import scenario
 from tests.test_target_campaign import window
 from tests.test_nutanix_task_tree import reseal
 from provisioner.execution import readback_core as c
-from tools import qualify_target as q, nsx_domain_switch_observe as combined
+from provisioner.execution import qualify_target as q
+from provisioner.execution import nsx_domain_switch_observe as combined
 from provisioner.execution.run_files import digest, encoded, write_new, load_private, utcnow
 
 

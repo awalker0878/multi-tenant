@@ -7,7 +7,7 @@ import unittest
 
 from provisioner.execution import handoff
 from provisioner.execution import readback_core as c
-from tools import delivery_steps as steps
+from provisioner.execution import delivery_steps as steps
 from provisioner.execution.run_files import digest, encoded, read_private, utcnow, write_new
 
 
@@ -15,7 +15,7 @@ SCOPE=dict(environment_key='test',site_key='site',platform='nutanix',tenant_key=
 
 
 def campaign():
-    from tools.qualify_target import ASSETS
+    from provisioner.execution.qualify_target import ASSETS
     return dict(format='hosting-target-campaign/1',scope=SCOPE,source_commit='a'*40,
         origin='https://example.test',assets={key:{'path':'/private/'+key,'sha256':'a'*64} for key in ASSETS},
         cases=[dict(id='health',guest='vm',destination='192.0.2.2',port=443,server_name='example.test',

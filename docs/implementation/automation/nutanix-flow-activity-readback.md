@@ -1,12 +1,12 @@
 # Flow policy task activity and held-attempt review
 
-`tools/nutanix_flow_activity_observe.py` composes the exact
+`provisioner/execution/nutanix_flow_activity_observe.py` composes the exact
 [Flow policy snapshot](nutanix-flow-readback.md) with a recorded Prism task graph
 and bounded visible task queries. Its explicit profile is
 `nutanix-microseg-v4.2-prism-v4.3-policy-task-activity`. The installed target must
 support both microseg v4.2 and Prism v4.3. Failure never selects a weaker profile.
 The bounded Prism v4.3 entity-activity queries come from the shared
-`tools/nutanix_entity_activity.py`.
+`provisioner/execution/nutanix_entity_activity.py`.
 
 ## Accepted scope and read sequence
 
@@ -51,14 +51,14 @@ Pending, failed and uncertain work retain their distinct hold outcomes.
 Validate without contacting any endpoint:
 
 ```sh
-python3 tools/nutanix_flow_activity_observe.py /private/site/flow-activity.json
+python3 -m provisioner.execution.nutanix_flow_activity_observe /private/site/flow-activity.json
 ```
 
 After scoped read authorization, inject `NUTANIX_USERNAME` and `NUTANIX_PASSWORD`
 and collect with the independently accepted origin and trust root:
 
 ```sh
-python3 tools/nutanix_flow_activity_observe.py /private/site/flow-activity.json \
+python3 -m provisioner.execution.nutanix_flow_activity_observe /private/site/flow-activity.json \
   --read-authorized-target --expected-origin https://accepted-prism.example.invalid \
   --ca-file /private/site/native-ca.pem --output /private/operator/new-flow-report.json
 ```

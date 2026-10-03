@@ -7,6 +7,8 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
+import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -65,6 +67,48 @@ class SourceIntegrityTests(unittest.TestCase):
             result=owner.verify(self.root)
         self.assertIn({'kind':'WORKTREE_DIFFERS_FROM_HEAD','file':'one.txt'},result['issues'])
 
+    @unittest.skipUnless(os.geteuid() == 0 and shutil.which('runuser'),
+                         'Actual cross-UID fixture requires a local root test runner and runuser')
+    def test_protected_root_owned_checkout_is_readable_by_worker_without_ambient_git_trust(self):
+        import pwd
+        try:
+            account=pwd.getpwnam('nobody')
+        except KeyError:
+            self.skipTest('Local read-only fixture account is unavailable')
+        probe=subprocess.run([shutil.which('runuser'),'-u',account.pw_name,'--','id','-u'],
+            stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+            text=True,timeout=10)
+        if (probe.returncode != 0 and 'cannot set groups' in probe.stderr
+                and 'Operation not permitted' in probe.stderr):
+            self.skipTest('Container lacks privilege to start an actual other-UID worker')
+        self.assertEqual(probe.returncode,0,probe.stderr)
+        self.assertEqual(int(probe.stdout),account.pw_uid)
+        with tempfile.TemporaryDirectory(prefix='hosting-source-custody-',dir='/var/lib') as directory:
+            root=Path(directory); root.chmod(0o755); git(root,'init','-q')
+            git(root,'config','user.name','Synthetic custody fixture')
+            git(root,'config','user.email','fixture@example.invalid')
+            (root/'owned.txt').write_bytes(b'accepted fixture bytes\n')
+            git(root,'add','.'); git(root,'commit','-qm','fixture')
+            package=Path(owner.__file__).resolve().parents[2]
+            code=('import json,sys; from pathlib import Path; '
+                  'sys.path.insert(0,sys.argv[1]); '
+                  'from provisioner.execution.source_integrity import verify; '
+                  'print(json.dumps(verify(Path(sys.argv[2]))))')
+            environment={key:value for key,value in os.environ.items() if not key.startswith('GIT_')}
+            environment.update(GIT_CONFIG_COUNT='1',GIT_CONFIG_KEY_0='safe.directory',GIT_CONFIG_VALUE_0='*')
+            command=[shutil.which('runuser'),'-u',account.pw_name,'--',sys.executable,'-I','-B','-c',
+                     code,str(package),str(root)]
+            def observe():
+                result=subprocess.run(command,env=environment,cwd=root,stdin=subprocess.DEVNULL,
+                    stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=30)
+                self.assertEqual(result.returncode,0,result.stderr)
+                return json.loads(result.stdout)
+            self.assertEqual(observe()['status'],'HASHES_MATCH')
+            # Mutable custody cannot use the directory exception, even when an
+            # ambient caller attempts to trust every Git checkout.
+            (root/'.git/config').chmod(0o666)
+            self.assertEqual(observe()['status'],'BLOCKED_NO_CURRENT_CHECKOUT')
+
     def test_external_fsmonitor_is_not_invoked(self):
         marker=self.root.parent/'unexpected';script=self.root.parent/'monitor.sh'
         script.write_text('#!/bin/sh\ntouch "'+str(marker)+'"\n');script.chmod(0o700);git(self.root,'config','core.fsmonitor',str(script))
@@ -121,7 +165,8 @@ class SourceIntegrityTests(unittest.TestCase):
         import importlib.util
         from provisioner import repository
         from provisioner.execution import terraform_run, terraform_apply
-        from tools import state_export, vsphere_power
+        from tools import state_export
+        from provisioner.execution import vsphere_power
         self.assertIsNone(importlib.util.find_spec('tools.check_release'))
         for module in (terraform_run,terraform_apply,state_export,vsphere_power):self.assertIs(module.verify,owner.verify)
         self.assertEqual(repository.source_commit(self.root)['commit'],self.commit)

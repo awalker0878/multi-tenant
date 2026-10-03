@@ -9,7 +9,7 @@ from tests.test_lifecycle_transition import fixture as platform_fixture
 from tests.test_openstack_transition import fixture as openstack_fixture
 from provisioner.execution import readback_core as c
 from provisioner.execution import lifecycle_transition as lifecycle
-from tools import delivery_steps as d
+from provisioner.execution import delivery_steps as d
 from provisioner.compiler.wsd import compile_environment
 from provisioner.execution.run_files import digest,encoded,load_private,read_private,utcnow,write_new
 

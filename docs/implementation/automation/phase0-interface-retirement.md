@@ -97,7 +97,7 @@ Other execution owners and retained-state conversion remain separate B05 work.
 
 ### Package-owned WSD compilation
 
-The implementation formerly at `tools/compile_wsd.py` now lives at
+The implementation formerly at `provisioner/compiler/wsd.py` now lives at
 `provisioner/compiler/wsd.py`; its native component map lives at
 `provisioner/compiler/components.py`. All in-tree imports, current commands,
 architecture links, packaging requirements and tests were migrated. The old file
@@ -117,7 +117,7 @@ old plans or close the rest of B05.
 
 ### Package-owned Terraform catalog — 1 October 2026
 
-The implementation formerly at `tools/terraform_catalog.py` now lives at
+The implementation formerly at `provisioner/execution/terraform_catalog.py` now lives at
 `provisioner/execution/terraform_catalog.py`. Preparation, engine verification,
 repository validation and all in-tree imports use that owner directly. The old
 module is deleted and registered as retired, not replaced by a forwarding alias.
@@ -135,7 +135,7 @@ must be migrated before deletion.
 
 ### Package-owned reservation evidence — 2 October 2026
 
-The implementation formerly at `scripts/check_reservation_records.py` is now
+The implementation formerly at `provisioner/allocations/reservation_evidence.py` is now
 `provisioner/allocations/reservation_evidence.py`. All in-tree imports, CI commands,
 metadata, generator links and tests use the new owner; the old path is prohibited
 without a wrapper. The independent retirement test includes this path explicitly alongside the other retired owners.
@@ -149,7 +149,7 @@ old plans or complete the remaining direct execution owners and retained-state c
 
 ### Package-owned IPAM allocation evidence — 2 October 2026
 
-The implementation formerly at `scripts/check_ipam_allocation_records.py` is now
+The implementation formerly at `provisioner/allocations/ipam_evidence.py` is now
 `provisioner/allocations/ipam_evidence.py`. Reservation/IPAM preflight, DNS evidence,
 repository adapters, CI commands and tests use the package owner directly. The old path
 is deleted and prohibited without a wrapper. Installed checks require the package module,
@@ -163,7 +163,7 @@ assign address values, write DNS, release capacity or close B23/B48.
 ### Package-owned source-integrity verification — 2 October 2026
 
 The active clean-source verifier now lives at `provisioner/execution/source_integrity.py`.
-All executable callers use that owner directly; `tools/check_release.py` is deleted and
+All executable callers use that owner directly; `provisioner/execution/source_integrity.py` is deleted and
 registered as retired without a forwarding module. Checkout verification pins one Git
 HEAD, rejects changed tracked/untracked/staged bytes, disables ambient Git replacement,
 fsmonitor and configuration overrides, and rechecks HEAD after bounded reads. Exported
@@ -174,7 +174,7 @@ native qualification or retained-state conversion. Other B05 runtime owners rema
 
 ### Package-owned implementation input review — 3 October 2026
 
-The implementation formerly in `tools/input_review.py` now lives at
+The implementation formerly in `provisioner/execution/input_review.py` now lives at
 `provisioner/execution/input_review.py`. Route-record review, tests, installed-package
 checks and active documentation migrated to the package owner. The old path is deleted
 and prohibited without a forwarding module. This is read-only input validation; it

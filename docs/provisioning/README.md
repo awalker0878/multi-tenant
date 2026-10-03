@@ -19,7 +19,7 @@ portable WSD request (YAML)
   -> package-owned compiler     provisioner/compiler/wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
   -> hosting-delivery/2         provisioner/execution/handoff.py
-  -> existing delivery runner   tools/delivery_run.py (the only engine)
+  -> existing delivery runner   provisioner/execution/delivery_run.py (the only engine)
   -> delivery and observation   provisioner/execution/delivery.py, provisioner/observation
 ```
 

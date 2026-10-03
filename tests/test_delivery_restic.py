@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from tools import delivery_steps as steps, restic_run as restic
+from provisioner.execution import delivery_steps as steps
+from provisioner.execution import restic_run as restic
 from provisioner.execution.run_files import digest, encoded, load_private, read_private, replace_private, utcnow, write_new
 import test_delivery_run as harness
 from test_restic_run import fixture

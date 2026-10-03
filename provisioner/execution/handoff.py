@@ -50,7 +50,7 @@ TOPOLOGY_FORMAT = 'hosting-delivery-topology-intent/1'
 TOPOLOGY_KEYS = ('format', 'steps', 'operationBindings', 'reviewedParameters',
                  'compiledCatalogIds')
 
-#: Mirrors `tools.delivery_steps.KINDS`, the declared typed-step contract, and
+#: Mirrors `provisioner.execution.delivery_steps.KINDS`, the declared typed-step contract, and
 #: `provisioner.execution.readback_core.ID`, the declared identifier grammar. The tools are the
 #: owners; `tests/provisioning/unit/test_delivery_handoff.py` compares every mirror
 #: against them, so a kind or a grammar the runner adds cannot drift unnoticed.
@@ -97,7 +97,7 @@ class Step:
 #: campaign again after it.
 #:
 #: Two orderings are load-bearing rather than cosmetic. The workload phase descends
-#: from the capacity reservation, so `tools.capacity_demand.check_ancestors` still
+#: from the capacity reservation, so `provisioner.allocations.capacity_demand.check_ancestors` still
 #: proves the workload shape against its reservation instead of silently skipping
 #: the check. The narrow bootstrap and the workload build descend from the edge
 #: attachment, so no workload is created outside the isolated route.
@@ -293,7 +293,7 @@ def operation_names(plan) -> list[str]:
 def validate(graph: dict) -> dict:
     """Refuse any graph the declared `hosting-delivery/2` contract would refuse.
 
-    This mirrors the pure shape contract `tools.delivery_run.validate` enforces, so
+    This mirrors the pure shape contract `provisioner.execution.delivery_run.validate` enforces, so
     the transport can refuse a malformed handoff without importing the runner.
     `tests/provisioning/unit/test_delivery_handoff.py` compares the two on the same
     graphs, so the mirror cannot drift from the owner.
@@ -477,7 +477,7 @@ def _declared_parameters(kind: str) -> frozenset:
 
     Held here rather than imported so the transport never reaches into the runner's
     module graph; `test_delivery_handoff` compares every entry with
-    `tools.delivery_steps.KINDS`.
+    `provisioner.execution.delivery_steps.KINDS`.
     """
     return _DECLARED_PARAMETERS[kind]
 

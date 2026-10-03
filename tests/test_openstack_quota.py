@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 from lab.native_readback_fixture import credentials
 from provisioner.execution import readback_core as c
-from tools import openstack_quota as d
+from provisioner.execution import openstack_quota as d
 from provisioner.execution.run_files import digest,encoded,load_private,utcnow
 
 PROJECT='1'*32

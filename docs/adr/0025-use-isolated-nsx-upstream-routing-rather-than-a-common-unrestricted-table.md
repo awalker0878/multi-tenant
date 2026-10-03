@@ -38,7 +38,7 @@ Related implementation areas are traceability targets, not proof of complete imp
 - [terraform/modules/nsx-route](../../terraform/modules/nsx-route)
 - [terraform/modules/nsx-gateway-quarantine](../../terraform/modules/nsx-gateway-quarantine)
 - [terraform/modules/vsphere-workload](../../terraform/modules/vsphere-workload)
-- [tools/nsx_observe.py](../../tools/nsx_observe.py)
+- [provisioner/execution/nsx_observe.py](../../provisioner/execution/nsx_observe.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

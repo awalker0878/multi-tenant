@@ -19,11 +19,14 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from lab.native_readback_fixture import Fixture, TASK
 from lab.nutanix_task_tree_fixture import reset, CHILD_A, CHILD_B, GRANDCHILD
 from lab.run_readback_lab import operator_context
+from provisioner.execution import readback_cli
 from provisioner.execution import readback_core as c
-from tools import nutanix_observe as native, nutanix_task_tree as tree, recovery_review as rr
+from provisioner.execution import nutanix_observe as native
+from provisioner.execution import nutanix_task_tree as tree
+from provisioner.execution import recovery_review as rr
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE_FILES=('tools/nutanix_task_tree.py','tools/nutanix_observe.py','provisioner/execution/readback_core.py',
- 'tools/readback_cli.py','tools/recovery_review.py','lab/native_readback_fixture.py',
+SOURCE_FILES=('provisioner/execution/nutanix_task_tree.py','provisioner/execution/nutanix_observe.py','provisioner/execution/readback_core.py',
+ 'provisioner/execution/readback_cli.py','provisioner/execution/recovery_review.py','lab/native_readback_fixture.py',
  'lab/nutanix_task_tree_fixture.py','lab/run_readback_lab.py','lab/run_task_tree_lab.py')
 CLI_ENVIRONMENT=('PATH','LANG','LC_ALL','LD_LIBRARY_PATH','SYSTEMROOT','WINDIR')
 
@@ -101,7 +104,7 @@ def campaign() -> list[dict]:
             input_path=directory/'manifest.json';input_path.write_text(json.dumps(m))
             output=directory/'readback.json'
             env=cli_environment()
-            proc=subprocess.run([sys.executable,str(ROOT/'tools/nutanix_observe.py'),str(input_path),
+            proc=subprocess.run([*readback_cli.module_command(native, []),str(input_path),
                 '--read-authorized-target','--expected-origin',f.origin,'--ca-file',str(f.directory/'ca.pem'),
                 '--output',str(output),'--interval','0.1'],env=env,capture_output=True,text=True,timeout=25)
             r=c.load(output) if output.exists() else {};decision=rr.review(m,r,operator_context(m,r)) if r else {}

@@ -6,6 +6,11 @@ not a new programme or completion of B22. It composes the
 [installed collector](discovery-collector-runtime.md) and the existing native HTTPS
 adapters. Native qualification and operating acceptance remain separate.
 
+The opt-in 3 October [service scheduling continuation](discovery-service-scheduling.md)
+adds a shared-host persistent endpoint gate and explicit retained-original batch
+publication. The process-only defaults described here remain available when no shared
+budget/journal is selected; their limits must not be claimed as fleet-wide admission.
+
 ## Default installed operation
 
 ```sh

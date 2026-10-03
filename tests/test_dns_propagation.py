@@ -19,7 +19,7 @@ import dns.rrset
 from lab.dns_authority import Authority
 from tests.test_dns_transactions import example
 from provisioner.execution import readback_core as c
-from tools import dns_change as writer, dns_propagation as d, delivery_steps as steps
+from provisioner.execution import dns_change as writer, dns_propagation as d, delivery_steps as steps
 from provisioner.execution.run_files import digest, encoded, load_private, replace_private, utcnow, write_new
 
 

@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 
 from provisioner.execution import readback_core as c
-from tools import retirement as r
+from provisioner.execution import retirement as r
 
 
 NOW = '2026-09-21T12:00:00+00:00'

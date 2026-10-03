@@ -48,7 +48,7 @@ Design: [SVC §2](../architecture/shared-services/2-name-time-initialization-and
 
 Decisions: [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [ADR-0010](../adr/0010-expose-shared-services-through-scoped-consumption-endpoints.md)
 
-Implementation: [tools/dns_change.py](../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../DNS_LIFECYCLE.md) · [lab/run_dns_lab.py](../../lab/run_dns_lab.py) · [lab/dns_authority.py](../../lab/dns_authority.py)
+Implementation: [provisioner/execution/dns_change.py](../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../DNS_LIFECYCLE.md) · [lab/run_dns_lab.py](../../lab/run_dns_lab.py) · [lab/dns_authority.py](../../lab/dns_authority.py)
 
 [lab/dns_authority.py](../../lab/dns_authority.py) is the bounded test-only TCP authority implementing this integration's RFC2136 subset. It parses and authenticates real TSIG wire messages, serializes transactions and evaluates prerequisites before any store swap; its fault switches exist for tests. It is driven by `lab/run_dns_lab.py` and the DNS transaction, propagation, NetBox and withdrawal test modules.
 
@@ -60,7 +60,7 @@ Design: [PROV §5](provisioning-strategy/5-concurrency-ownership-and-failed-exec
 
 Decisions: [ADR-0031](../adr/0031-discover-uncertain-native-outcomes-instead-of-blind-replay-or-rollback.md) · [ADR-0032](../adr/0032-keep-incident-containment-above-routine-reconciliation.md)
 
-Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [provisioner/execution/neutron_observe.py](../../provisioner/execution/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
+Implementation: [provisioner/execution/nsx_observe.py](../../provisioner/execution/nsx_observe.py) · [provisioner/execution/nutanix_observe.py](../../provisioner/execution/nutanix_observe.py) · [provisioner/execution/neutron_observe.py](../../provisioner/execution/neutron_observe.py) · [provisioner/execution/recovery_review.py](../../provisioner/execution/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
 
 [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) is the disposable localhost HTTPS fixture behind the native readback observers, not a vendor emulator or a production service. [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py) scripts a small synthetic task tree over that same real loopback HTTPS fixture; its operation names, IDs and API bodies are synthetic.
 
@@ -142,7 +142,7 @@ The authoritative reservation system remains external. Stable reservation/operat
 
 Design: [Addressing and authoritative IPAM](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [Reserve/confirm/release lifecycle](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
 
-Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../provisioner/allocations/ipam_evidence.py) · [no-guess allocation preflight](../../provisioner/allocations/ipam_preflight.py) · [live NetBox lifecycle operator](../../tools/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
+Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../provisioner/allocations/ipam_evidence.py) · [no-guess allocation preflight](../../provisioner/allocations/ipam_preflight.py) · [live NetBox lifecycle operator](../../provisioner/allocations/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
 
 Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated from exported evidence without reserving/releasing an address or writing DNS. The live operator tool performs the same reserve/confirm/retire/quarantine/release lifecycle against NetBox under one authoritative writer lock, and refuses reuse except through a new explicit allocation decision.
 
@@ -214,7 +214,7 @@ Current qualification requires exact pairwise scope, mandatory security-function
 
 Design: [Native readback](../NATIVE_READBACK.md) · [Interrupted-change recovery](../INTERRUPTED_CHANGE_RECOVERY.md) · [PROV §5 concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
 
-Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../provisioner/execution/readback_core.py) · [offline recovery reviewer](../../tools/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
+Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../provisioner/execution/readback_core.py) · [offline recovery reviewer](../../provisioner/execution/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
 
 A matching GET-only readback remains observation evidence only. Current reconciliation additionally requires exact installed-interface applicability, complete task/entity scope, verified native writer fencing, current containment state, operation-generation binding and an attributable data-safe reconciliation decision; CI performs no task mutation, state import, repair, deletion, apply or activation.
 

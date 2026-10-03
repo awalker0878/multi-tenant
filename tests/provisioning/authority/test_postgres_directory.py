@@ -108,6 +108,26 @@ class DirectoryPostgresTests(unittest.TestCase):
         with self.assertRaises(DirectorySyncRefused):
             self.sync.apply(raw + b' ', signature)
 
+    def test_signed_monitor_service_enrollment_and_live_revocation_preserve_role_separation(self):
+        payload=self.payload()
+        payload['identityKind']='SERVICE';payload['grants'][0]['role']='DISCOVERY_MONITOR'
+        raw,signature=self.signed(payload)
+        with self.assertRaises(DirectorySyncRefused):self.sync.apply(raw,b'0'*64)
+        self.assertTrue(self.sync.apply(raw,signature))
+        identity=self.directory.resolve(self.issuer,self.subject,self.session)
+        self.assertEqual(identity.kind,'SERVICE')
+        self.assertEqual([grant.role for grant in identity.grants],['DISCOVERY_MONITOR'])
+        for kind,role in [('SERVICE','EXECUTION_OPERATOR'),('SERVICE','SOURCE_OWNER'),
+                          ('SERVICE','WORKER'),('HUMAN','DISCOVERY_MONITOR'),('WORKER','DISCOVERY_MONITOR')]:
+            changed=deepcopy(payload);changed.update(generation=2,identityKind=kind)
+            changed['grants'][0]['role']=role
+            with self.subTest(kind=kind,role=role),self.assertRaises(DirectorySyncRefused):
+                self.sync.apply(*self.signed(changed))
+        revoked=deepcopy(payload);revoked.update(generation=2,active=False,grants=[],sessions=[])
+        self.assertTrue(self.sync.apply(*self.signed(revoked)))
+        with self.assertRaises(PermissionError):self.directory.resolve(self.issuer,self.subject,self.session)
+        with self.assertRaises(DirectorySyncRefused):self.sync.apply(raw,signature)
+
     def test_historical_backfill_requires_fresh_signed_generation(self):
         historical = self.payload()
         raw, signature = self.signed(historical)

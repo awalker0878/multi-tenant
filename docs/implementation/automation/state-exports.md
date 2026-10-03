@@ -1,6 +1,6 @@
 # Export accepted Terraform state for independent protection
 
-`tools/state_export.py` reads the exact state slots from an accepted
+`provisioner/execution/state_export.py` reads the exact state slots from an accepted
 [GitLab project handoff](state-projects.md), verifies their lineage and serial,
 and creates a private export usable by the existing
 [restic capture and isolated restore](restic-recovery.md) owner. It performs only
@@ -50,10 +50,10 @@ whose accepted native user matches `reader_id`; the original project-bootstrap
 owner token is not required.
 
 ```sh
-python tools/state_export.py --request /private/state/export.json \
+python -m provisioner.execution.state_export --source-root /opt/hosting-source --request /private/state/export.json \
   --project-request /private/state/project.json \
   --project-receipt /private/state/accepted-project.receipt
-python tools/state_export.py --request /private/state/export.json \
+python -m provisioner.execution.state_export --source-root /opt/hosting-source --request /private/state/export.json \
   --project-request /private/state/project.json \
   --project-receipt /private/state/accepted-project.receipt \
   --authority /private/state/export-authority.json \
@@ -74,7 +74,7 @@ repository-pinned Terraform version, validates lineage/minimum serial, and reads
 that same serial through GitLab's retained-version endpoint. Both JSON objects
 must match. State files may contain credentials and private data; every stored
 file is owner-only and console output contains only status and request digest.
-The existing HTTPS transport (`tools/service_http.py`, shared with the
+The existing HTTPS transport (`provisioner/execution/service_http.py`, shared with the
 [allocation](netbox-ipam.md) and [DNS](netbox-dns.md) writers) refuses redirects,
 proxies, automatic retries and responses larger than 4 MiB. Larger states require
 a separately accepted profile.

@@ -7,7 +7,8 @@ from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_clone_activity import manifest, Client
 from tests.test_vsphere_history import routes as history_routes
 from provisioner.execution import readback_core as c
-from tools import vsphere_task_tree_observe as tree, vsphere_task_activity as activity
+from provisioner.execution import vsphere_task_tree_observe as tree
+from provisioner.execution import vsphere_task_activity as activity
 
 
 def routes(f, m):

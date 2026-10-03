@@ -9,7 +9,7 @@ import threading
 import unittest
 from unittest.mock import patch
 from provisioner.execution import readback_core as c
-from tools import capacity as a
+from provisioner.allocations import capacity_owner as a
 from provisioner.execution.run_files import encoded, utcnow
 
 

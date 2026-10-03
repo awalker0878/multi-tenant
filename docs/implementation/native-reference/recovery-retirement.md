@@ -69,7 +69,7 @@ other tenants, retained copies, required keys and investigation evidence.
 
 Confirm absence of obsolete routing/policy/identity and authoritative name registration
 before releasing reservations or reusing addresses/attachments. Apply the actual name and
-address quarantine policy; the [DNS client](../../../tools/dns_change.py) does not replace
+address quarantine policy; the [DNS client](../../../provisioner/execution/dns_change.py) does not replace
 IPAM or prove all downstream caches/log/copy obligations are clear. A missing resource in
 one API is not sufficient release evidence.
 

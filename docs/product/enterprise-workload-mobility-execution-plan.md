@@ -5,8 +5,9 @@
 `d2dfdc8d967543d8412ebd21a95db3cc96e3a124` and the saved-plan/lifecycle/source-binding
 continuation documented below. Earlier continuation boundaries remain in Git history.
 **Historical baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`.
-**Status:** substantial Wave 0/1 foundations; B05 remains open, Wave 2 is partial,
-and Waves 3–6 are not complete. No native qualification or operating acceptance added.
+**Status:** installed execution-owner closure, deployable Wave 2 services and the
+selected application workflow are implemented increments. Waves 3–6 remain incomplete.
+No native qualification, pilot acceptance or operating release is added.
 
 This is the active addendum to the [historical audit](enterprise-workload-mobility-audit-and-implementation-plan.md).
 B01–B50 remain stable; earlier W01–W29 and C01–C13 ledgers have narrower scopes.
@@ -25,13 +26,15 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, package-owned implementation-input review, operator/readback primitives, saved-plan/lifecycle chain, fixed guest probe, offline route-audit model, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Remaining guest/transfer/native-operation and other execution owners, installed service composition and retained-state conversion. |
+| Packaging (B05) | Actual guest/restic, native readback, delivery, state/runtime/SSH and recovery owners are installed package modules. Active callers and fixed isolated subprocesses use those modules; retired files have no aliases. Application-wheel bytes/assets and the selected service interpreter are checked against the explicit source. | Commission installed services; complete actual retained-state import, independent reconciliation and owner handover before retiring live writers. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 4 retains allocation/attachment facts plus bounded VM-referenced Glance driver/security metadata. | Guest-installed driver/key/service evidence, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
-| B21/B22 | Adoption proposal model; bounded batch limits, checkpointed local scheduling/waiting, original-result reconciliation, shared-outbox first-capture claims, scoped freshness CLI/API/history and deterministic periodic freshness/alert-intent projection. | Actual ownership transfer, deployed service scheduling, durable fleet/global budgets, alert delivery/acknowledgement, resumable estate publication and measured qualification. |
-| B23–B43 | Portable planning, native lifecycle/readback/fenced-power primitives, guest/service handoffs, transfer/integrity/consistency contracts and compatibility checks. | Native reserve/prepare/plan/approval/apply/observe/power/guest/service/activate chain; trusted transfer-worker/target-root bindings; source fencing, final sync/cutover, post-write recovery and route execution. |
-| B44–B50 | Existing recovery/security/evidence foundations and defined release obligations. | Deployed HA/DR, alert delivery, final qualification, retained-state conversion, pilot and operating release. |
+| B21/B22 | Original-only bounded batch publication/reconciliation; process-shared POSIX collector budget; installed periodic freshness monitor with narrow SERVICE IAM and retained signed HTTPS alert receipts, explicit unknown delivery and retry. | Commission native fleet, custody, receiving alert owner and on-call acknowledgement; qualify measured estate scale. Shared coordinator is one host, not multi-host fleet-global admission. Actual ownership adoption remains open. |
+| B23–B29 | Same-owner atomic capacity transactions and scoped NetBox composition; approved execution artifact; separately versioned OpenStack application workflow; planned creation in the existing B10/B11 intent journal. Exact live Vault/Keystone creation credentials and local observed Ubuntu policy commands reuse the existing engines. | Implement scoped planning-credential and per-remote-command guest owners, enrolled IPAM/service dispatch and approved revoked-job cleanup. Commission native credentials, independent readback and selected service acceptance. No alternate native writer or synthetic native identity is admitted. |
+| B30–B37 | Trusted per-dataset restic runtime with real resource ceilings, native intent claim, original-only reconcile and complete dataset join; source power/task observation; observation-only recovery projection and mandatory operating gate before native writes. | Actual isolated application rehearsal, independently verified source restart/late-writer exclusion, final consistency, traffic/target activation, post-write recovery and first directed application qualification. Source power-off is insufficient fencing. |
+| B38–B43 | Exact direction/method/profile implementation and campaign gates; bounded retained-disk inspection contract; single-tenant wave DAG/window/budget admission binds original B09 jobs, uses WSD round-robin and rechecks windows before effects. Accepted independent release is mandatory before charge removal. | Native whole-VM capture/import/driver remediation, Windows, warm/database methods and additional directed routes; cross-tenant scheduling/fairness and measured native concurrency acceptance. Each tuple/direction/method needs its own evidence. |
+| B44–B50 | Consistent observation-only backup/restore tooling, health/ITSM receipts, separately signed minimum operating prerequisites, final-code campaign/pilot/release checks and exact-byte retained-state conversion rehearsal. | Actual HA/DR restore/failover and operating acceptance, authenticated conversion/import/epoch advance, final native campaign, owner-signed pilot acceptance and supported release. |
 
 Profiles explicitly represent 97 capabilities and 28 semantic properties. All ten
 families have typed requirement checks; selected capabilities/constraints/limitations
@@ -45,6 +48,38 @@ Ansible and service owners are mechanisms behind tenant-scoped authority. Preser
 one writer, immutable approval, uncertainty holds and independent postconditions.
 Delete competing/obsolete entry points only after verified consumer/state migration;
 these safety controls are not shims.
+
+### Selected application continuation — implementation boundary
+
+The implemented driver is **VMware → OpenStack, REBUILD_RESTORE,
+linux-ubuntu-2404**. The immutable canonical plan optionally selects
+`hosting-execution-selection/1`; older plans retain their original gate-only
+workflow. The review shows the driver and artifact digest. Resource, dataset,
+cutover, delivery, native qualification and minimum operating acceptance digests
+are acyclic pre-plan descriptors under protected custody. Credentials and
+runtime filenames never enter Temporal history.
+
+`OpenStackApplicationMigration` is a distinct, pinned workflow. It rechecks the
+original admitted payload, proceeds through resource and declared target stages,
+joins bounded dataset children and requires isolated rehearsal before source
+fencing/final-sync/cutover. Every effect activity has one attempt. Missing native
+bindings, a lost result or an unimplemented native owner produces a visible hold;
+an old approval gate or successful subprocess cannot become migration success.
+Local original-receipt inspection remains possible under its separately named
+observation gate. A typed continuation can exclude only its independently
+revalidated original grant/intent from the new-write uncertainty check.
+
+See [operating controls](../operations/control-application/1-operating-the-selected-slice.md),
+[qualification, pilot and release](../operations/control-application/2-campaign-pilot-and-release.md),
+[conversion rehearsal](../operations/retained-state-conversion-rehearsal.md),
+[discovery scheduling](../engineering/discovery-service-scheduling.md) and
+[monitor service](../engineering/discovery-monitor-service.md),
+[application composition](../engineering/application-worker-composition.md) and
+[migration owners](../engineering/application-migration-runtime.md).
+Recorded local protocol/engine results are automated verification. Deployed
+PostgreSQL/Temporal checks and native acceptance retain their own evidence columns.
+Run affected engine/protocol campaigns again on final code after the old paths
+are deleted. The earlier dated sections below preserve narrower increment context.
 
 ### Verification repair — B01/B05 continuation (2 October 2026)
 
@@ -257,7 +292,7 @@ This model still simulates only the documented reference routing semantics. It d
 
 ### Retired redundant repository-gate wrapper — B05 continuation (3 October 2026)
 
-`tools/check_package.py` was only a subprocess forwarding wrapper to `scripts/check_repository.py` and had no live Python consumer. It is deleted rather than moved or retained as a compatibility shim; the retirement register prevents reintroduction. Historical source-transcription documentation that records the old command remains provenance, while current testing guidance already names the actual repository gate.
+`scripts/check_repository.py` was only a subprocess forwarding wrapper to `scripts/check_repository.py` and had no live Python consumer. It is deleted rather than moved or retained as a compatibility shim; the retirement register prevents reintroduction. Historical source-transcription documentation that records the old command remains provenance, while current testing guidance already names the actual repository gate.
 
 This deletion changes no repository-check logic, native interface, source format, authority or retained execution state. The remaining direct operator/execution owners and B48 conversion work keep B05 open.
 

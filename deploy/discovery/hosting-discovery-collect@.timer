@@ -1,0 +1,12 @@
+[Unit]
+Description=Evaluate retained discovery batch %i
+
+[Timer]
+OnCalendar=*-*-* *:*:00 UTC
+Persistent=true
+AccuracySec=1s
+Unit=hosting-discovery-collect@%i.service
+
+[Install]
+WantedBy=timers.target
+

@@ -4,7 +4,7 @@ import json
 import unittest
 from lab.native_readback_fixture import Fixture
 from provisioner.execution import readback_core as c
-from tools import nutanix_flow_observe as flow
+from provisioner.execution import nutanix_flow_observe as flow
 from tests.test_nutanix_vm_observe import uid, Client
 
 

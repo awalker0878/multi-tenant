@@ -2,7 +2,7 @@
   {
     "id": "RAD-M01",
     "path": "docs/current/RAD-adoption.md",
-    "version": "0.15",
+    "version": "0.16",
     "status": "Proposed",
     "owner_role": "Architecture authority",
     "scope": "Reference adoption for enterprise workload mobility and secure hosting across qualified on-premises environments; no site-specific control assessment or production acceptance is implied.",
@@ -89,13 +89,18 @@
         "version": "0.15",
         "date": "2026-10-02",
         "summary": "Record OpenStack selector 3 referenced-image evidence as an observed portability input without treating image metadata as compatibility or native qualification."
+      },
+      {
+        "version": "0.16",
+        "date": "2026-10-03",
+        "summary": "Recorded installed runtime/Wave2 service closure, selected application/resource/operating composition and exact directed/conversion/release holds."
       }
     ]
   },
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.39",
+    "version": "0.40",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -303,6 +308,11 @@
         "version": "0.39",
         "date": "2026-10-03",
         "summary": "Package saved-plan review/execution, lifecycle binding, Flow rules and execution handoff; require explicit source selection and package/source byte agreement before installed effects; preserve retained-state and authority contracts."
+      },
+      {
+        "version": "0.40",
+        "date": "2026-10-03",
+        "summary": "Recorded installed runtime/Wave2 service closure, selected application/resource/operating composition and exact directed/conversion/release holds."
       }
     ]
   },
@@ -396,7 +406,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.38",
+    "version": "0.39",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -598,13 +608,18 @@
         "version": "0.38",
         "date": "2026-10-03",
         "summary": "Package saved-plan review/execution, lifecycle binding, Flow rules and execution handoff; require explicit source selection and package/source byte agreement before installed effects; preserve retained-state and authority contracts."
+      },
+      {
+        "version": "0.39",
+        "date": "2026-10-03",
+        "summary": "Recorded installed runtime/Wave2 service closure, selected application/resource/operating composition and exact directed/conversion/release holds."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.25",
+    "version": "0.26",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
     "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
@@ -741,6 +756,11 @@
         "version": "0.25",
         "date": "2026-10-03",
         "summary": "Record package ownership of the offline route-audit model without changing topology fixtures or observed/native state; preserve imported path provenance."
+      },
+      {
+        "version": "0.26",
+        "date": "2026-10-03",
+        "summary": "Recorded installed runtime/Wave2 service closure, selected application/resource/operating composition and exact directed/conversion/release holds."
       }
     ]
   }

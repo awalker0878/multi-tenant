@@ -18,7 +18,7 @@ portable WSD request (YAML)
   -> provisioner/compiler/wsd.py (the existing compiler)
   -> reviewed immutable plan (Plan.manifest_digest)
   -> hosting-delivery/2 (provisioner/execution/handoff.py)
-  -> tools/delivery_run.py (the existing runner)
+  -> provisioner/execution/delivery_run.py (the existing runner)
   -> owner operations (the typed stage packets)
   -> observation and reconciliation (provisioner/observation)
   -> conformance (provisioner/conformance)
@@ -82,7 +82,7 @@ Three properties are load-bearing rather than cosmetic, and each is a recorded
 assumption in the completion audit:
 
 1. **The workload phase descends from the capacity reservation.** The existing
-   `tools.capacity_demand.check_ancestors` walks transitive dependencies and demands
+   `provisioner.allocations.capacity_demand.check_ancestors` walks transitive dependencies and demands
    a live reservation for every `capacity` ancestor of a workloads `terraform_apply`.
    Because `workload-apply` descends from `capacity-reservation`, the check still
    fires; a graph that placed the reservation elsewhere would silently skip it.
@@ -144,7 +144,7 @@ carries the whole reviewed chain in the payload as `address_owner_handoff`
 reservation intent, one allocation intent and one registration intent per reviewed
 zone, the staged sibling references and the per-document digests — together with the
 reconciled `addresses` reading and `address_review`. Both step kinds are declared
-kinds of `tools.delivery_steps.KINDS`, and the two steps still prepare their own
+kinds of `provisioner.execution.delivery_steps.KINDS`, and the two steps still prepare their own
 stage packets. See [Address allocation](address-allocation-model.md).
 
 ## Operation coverage
@@ -154,12 +154,12 @@ to the step that discharges it, and `uncovered(operations)` reports any operatio
 the table does not map. `build()` refuses with `COMPILATION_FAILED` when the mapping
 is incomplete, so a new owner operation cannot appear in a handoff without a typed
 step that owns it. Every step kind is a declared kind of
-`tools.delivery_steps.KINDS`: the repository adds no new owner type and no parallel
+`provisioner.execution.delivery_steps.KINDS`: the repository adds no new owner type and no parallel
 generic runner.
 
 ## Source commit binding
 
-A handoff binds exactly one clean 40-hex commit, and `tools.delivery_run.run`
+A handoff binds exactly one clean 40-hex commit, and `provisioner.execution.delivery_run.run`
 re-verifies it against the checkout it is running from. `hosting apply` therefore
 refuses before compiling rather than emitting a graph the runner must reject:
 

@@ -8,9 +8,9 @@ import unittest
 from unittest.mock import patch
 from tests.test_edge_contain import Kernel
 from tests.test_nft_edge import fixture
-from tools import delivery_containment as incident,delivery_run as delivery,delivery_steps as steps
+from provisioner.execution import delivery_containment as incident,delivery_run as delivery,delivery_steps as steps
 from provisioner.execution import readback_core as c
-from tools import owner_worker as worker, edge_contain
+from provisioner.execution import owner_worker as worker, edge_contain
 from provisioner.execution.run_files import digest,encoded,load_private,read_private,replace_private,utcnow,write_new
 
 
@@ -62,7 +62,7 @@ class RemoteContainmentTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'input bytes changed'): self.serve()
         self.assertEqual(self.kernel.writes,0)
     def test_remote_failure_hook_transports_only_containment_and_retains_receipt(self):
-        from tools import remote_owner
+        from provisioner.execution import remote_owner
         import base64,struct
         plan={'format':'hosting-delivery/2','source_commit':'a'*40,'scope':self.spec['scope'],'operation_id':'central',
               'generation':1,'reviewed_plan_digest':'0'*64,'steps':[{'id':'verify','kind':'acceptance','needs':[]}], 'operation_bindings':{},'reviewed_parameters':{},'compiled_catalog_ids':{}}

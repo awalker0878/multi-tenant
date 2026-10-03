@@ -362,8 +362,8 @@
       "IAM-002"
     ],
     "implementation_paths": [
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "provisioner/execution/neutron_observe.py"
     ],
     "open_work": "Management/OOB independence, accepted principals, real access paths and break-glass exercises require the actual site.",
@@ -412,7 +412,7 @@
       "MODEL-002"
     ],
     "implementation_paths": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "lab/mtls_fixture.py"
     ],
     "open_work": "Actual service endpoints, native authorization and backing-service resilience remain to be accepted; protocol fixtures are not production services.",
@@ -568,7 +568,7 @@
     "implementation_paths": [
       "terraform/stacks/components",
       "terraform/modules",
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "ansible"
     ],
     "open_work": "The actual execution platform, state backends and shared-service acceptance records remain engineering inputs.",
@@ -744,7 +744,7 @@
       "LIFE-002"
     ],
     "implementation_paths": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "provisioner/execution/route_record_review.py",
       "terraform/stacks/components"
     ],
@@ -957,7 +957,7 @@
     ],
     "implementation_paths": [
       "provisioner/execution/input_review.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "open_work": "Authoritative IPAM allocation and native DNS propagation remain external integration work; DNS change code does not allocate addresses.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1161,7 +1161,7 @@
       "terraform/modules/nutanix-domain",
       "terraform/modules/nutanix-route",
       "terraform/modules/nutanix-workload",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "open_work": "Actual VPC attachments, full Flow/VM observation and target failover/restore evidence remain outside the current candidate integration.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1214,7 +1214,7 @@
       "terraform/modules/nsx-route",
       "terraform/modules/nsx-gateway-quarantine",
       "terraform/modules/vsphere-workload",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "open_work": "Tier-0/VRF/Edge/interface construction and effective per-node enforcement are not provided or qualified by the current static-route and readback scopes.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1413,8 +1413,8 @@
     ],
     "implementation_paths": [
       "lab/mtls_fixture.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "open_work": "Local certificate and service-identity fixtures do not establish enterprise federation, revocation infrastructure, HSM/KMS or actual bootstrap custody.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1533,10 +1533,10 @@
       "STATE-003"
     ],
     "implementation_paths": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/dns_change.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/dns_change.py"
     ],
     "open_work": "True native fencing, automatic repair and actual approval authentication remain unimplemented; the reviewer never authorizes apply, delete or activation.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1587,7 +1587,7 @@
       "IR-002"
     ],
     "implementation_paths": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "lab/run_namespace_lab.py"
     ],
     "open_work": "The local containment fixture and offline context review do not establish the actual incident process or production policy precedence.",
@@ -1638,8 +1638,8 @@
       "STO-003"
     ],
     "implementation_paths": [
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "open_work": "Actual retention decisions, media methods and verified native cleanup remain data-owner and service-owner work.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1797,7 +1797,7 @@
     ],
     "implementation_paths": [
       "docs/COMMISSIONING.md",
-      "tools/recovery_review.py"
+      "provisioner/execution/recovery_review.py"
     ],
     "open_work": "No production activation or authorization is issued by an ADR extraction; actual initial readiness remains a target-specific acceptance gate.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",

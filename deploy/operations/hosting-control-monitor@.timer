@@ -1,0 +1,11 @@
+[Unit]
+Description=Scheduled scoped control-application operating signals
+
+[Timer]
+OnBootSec=90s
+OnUnitActiveSec=60s
+RandomizedDelaySec=10s
+Persistent=yes
+
+[Install]
+WantedBy=timers.target

@@ -5,9 +5,10 @@ from pathlib import Path
 import sys
 import unittest
 from unittest.mock import patch
-import test_capacity as harness
+from tests import test_capacity as harness
 from provisioner.execution import readback_core as c
-from tools import capacity, capacity_demand as demand, delivery_run as delivery, delivery_steps as steps
+from provisioner.allocations import capacity_owner as capacity, capacity_demand as demand
+from provisioner.execution import delivery_run as delivery, delivery_steps as steps
 from provisioner.execution.run_files import digest,encoded,load_private,read_private,replace_private,write_new
 
 ROOT=Path(__file__).resolve().parents[1]

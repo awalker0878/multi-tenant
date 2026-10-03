@@ -15,6 +15,17 @@ from datetime import timedelta
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from provisioner.execution.run_files import digest, encoded, utcnow
+from provisioner.execution.source_integrity import _protected_checkout, verify
+
+OWNER_LAUNCH = ('import runpy,sys; sys.path.insert(0,sys.argv.pop(1)); '
+                'runpy.run_module(sys.argv.pop(1),run_name="__main__",alter_sys=True)')
+
+
+def owner_command(name, *arguments):
+    if name not in {'nft_edge', 'edge_contain', 'edge_boot'}:
+        raise ValueError('Fixed local edge fixture owner required')
+    return [sys.executable, '-I', '-B', '-c', OWNER_LAUNCH, str(ROOT),
+            'provisioner.execution.' + name, *arguments]
 
 SERVER = '''import socket,threading
 def connection(c):
@@ -52,6 +63,9 @@ def run():
     ip, nft = shutil.which('ip'), shutil.which('nft')
     if os.geteuid() != 0 or not ip or not nft:
         raise RuntimeError('Disposable namespace campaign requires root, iproute2 and nftables')
+    accepted=verify(ROOT)
+    if not _protected_checkout(ROOT) or accepted['status']!='HASHES_MATCH':
+        raise RuntimeError('Protected clean exact source fixture required')
     prefix = 'hfe' + uuid.uuid4().hex[:7]
     names = {k: prefix + '-' + k for k in ('client', 'edge', 'server')}
     created, processes = [], []
@@ -107,16 +121,16 @@ def run():
                 counter += 1; spec['generation'] = counter
                 spec_path = base / f'spec-{counter}.json'; spec_path.write_bytes(encoded(spec)); spec_path.chmod(0o600)
                 common = ['--spec', str(spec_path), '--nft', nft, '--execute']
-                inspected = json.loads(command(ns('edge', sys.executable, str(ROOT / 'tools/nft_edge.py'), 'inspect',
-                                      *common, '--output', str(base / f'inspect-{counter}'))))
+                inspected = json.loads(command(ns('edge', *owner_command('nft_edge', 'inspect',
+                                      *common, '--output', str(base / f'inspect-{counter}')))))
                 authority = dict(spec_sha256=digest(encoded(spec)), mode=mode, expected_state_sha256=inspected['state_sha256'],
                     valid_from=(utcnow() - timedelta(seconds=1)).isoformat(), valid_until=(utcnow() + timedelta(minutes=5)).isoformat(),
                     change_ref='LOCAL-FIXTURE', boundary_acceptance_ref='LOCAL-FIXTURE', readiness_ref='LOCAL-FIXTURE')
                 authority_path = base / f'authority-{counter}.json'
                 authority_path.write_bytes(encoded(authority)); authority_path.chmod(0o600)
                 try:
-                    command(ns('edge', sys.executable, str(ROOT / 'tools/nft_edge.py'), 'apply', *common, '--mode', mode,
-                               '--authority', str(authority_path), '--ledger', str(ledger), '--output', str(base / f'apply-{counter}')))
+                    command(ns('edge', *owner_command('nft_edge', 'apply', *common, '--mode', mode,
+                               '--authority', str(authority_path), '--ledger', str(ledger), '--output', str(base / f'apply-{counter}'))))
                 except subprocess.CalledProcessError as exc:
                     # This campaign owns every synthetic input and has no native
                     # credentials. Retain its engine diagnostic before cleanup.
@@ -146,28 +160,28 @@ def run():
                 change_ref='LOCAL-INCIDENT',boundary_acceptance_ref='LOCAL-BOUNDARY')
             incident_path=base/'incident.json'; incident_path.write_bytes(encoded(incident)); incident_path.chmod(0o600)
             for attempt in ('first','repeat'):
-                result=json.loads(command(ns('edge',sys.executable,str(ROOT/'tools/edge_contain.py'),
+                result=json.loads(command(ns('edge',*owner_command('edge_contain',
                     '--spec',str(base/f'spec-{counter}.json'),'--authority',str(incident_path),'--nft',nft,
-                    '--ledger',str(ledger),'--output',str(base/('contain-'+attempt)),'--execute')))
+                    '--ledger',str(ledger),'--output',str(base/('contain-'+attempt)),'--execute'))))
                 if result['status']!='CONTAINED_OBSERVED_NOT_QUALIFIED' or result['write_attempted']!=(attempt=='first'):
                     raise RuntimeError('Delegated containment did not retain its one native attempt')
                 probe(19651,False); probe(19652,False); probe(19652,True,'server')
             # Simulate loss of volatile policy at startup, then invoke the real
             # boot executor before making any new forwarding/activation claim.
-            from tools.nft_edge import validate as edge_identity
+            from provisioner.execution.nft_edge import validate as edge_identity
             table,_=edge_identity(spec)
             command(ns('edge',nft,'delete','table','inet',table))
             denied=dict(spec,flows=[])
             denied_path=base/'boot-boundary.json'; denied_path.write_bytes(encoded(denied)); denied_path.chmod(0o600)
-            commit=command(['git','-c','safe.directory='+str(ROOT),'-C',str(ROOT),'rev-parse','HEAD']).strip()
+            commit=accepted['commit']
             boot_config=dict(format='hosting-edge-boot/1',source_commit=commit,machine_id=spec['machine_id'],
                 network_namespace_inode=spec['network_namespace_inode'],nft=nft,nft_sha256=spec['nft_sha256'],
                 ledger=str(ledger),specs=[{'path':str(denied_path),'sha256':digest(encoded(denied))}],
                 boundary_acceptance_ref='LOCAL-BOOT-FIXTURE',boot_ordering_ref='LOCAL-ENGINE-ONLY-NO-REBOOT')
             boot_path=base/'boot.json'; boot_path.write_bytes(encoded(boot_config)); boot_path.chmod(0o600)
             history={p.relative_to(ledger):p.read_bytes() for p in ledger.rglob('*.json')}
-            command(ns('edge','env','GIT_CONFIG_COUNT=1','GIT_CONFIG_KEY_0=safe.directory','GIT_CONFIG_VALUE_0='+str(ROOT),
-                sys.executable,str(ROOT/'tools/edge_boot.py'),'apply','--config',str(boot_path),'--output-root',str(base),'--execute'))
+            command(ns('edge',*owner_command('edge_boot','apply','--source-root',str(ROOT),
+                '--config',str(boot_path),'--output-root',str(base),'--execute')))
             if history!={p.relative_to(ledger):p.read_bytes() for p in ledger.rglob('*.json')}:
                 raise RuntimeError('Boot denial altered native owner history')
             probe(19651,False); probe(19652,False); probe(19652,True,'server')

@@ -22,6 +22,7 @@ from provisioner.controlplane.jobs.repository import AdmissionConflict, StartRec
 
 from .admitted_job import AdmittedInput, AdmittedMigrationJob
 from .approval_gate import GateResult, _valid_id
+from .application_job import ApplicationJobInput, ApplicationJobResult, OpenStackApplicationMigration
 
 _PAYLOAD_KEYS = frozenset({'format', 'job_id', 'organization_id', 'tenant_id',
                            'plan_id', 'plan_revision', 'plan_digest', 'revocation_epoch'})
@@ -88,20 +89,28 @@ class TemporalWorkflowStarter:
     action. The approval-wait workflow is a separate B08 durability scenario.
     """
 
-    def __init__(self, connection: TemporalConnection):
+    def __init__(self, connection: TemporalConnection, *, application_selector=None):
+        if application_selector is not None and not callable(application_selector):
+            raise TypeError('A trusted current-plan selector is required')
         self.connection = connection
+        self.application_selector = application_selector
 
     def start(self, *, namespace: str, workflow_id: str, payload: dict) -> StartReceipt:
         if namespace != self.connection.namespace:
             raise AdmissionConflict('Outbox and Temporal namespaces differ')
         gate = _admitted_input(workflow_id, payload)
+        selected = self.application_selector(gate) if self.application_selector is not None else None
+        if selected is not None and (not isinstance(selected, ApplicationJobInput)
+                                     or selected.admitted != gate):
+            raise AdmissionConflict('Application graph belongs to another admitted job')
         try:
             asyncio.get_running_loop()
         except RuntimeError:
-            return asyncio.run(self._start(gate, namespace))
+            return asyncio.run(self._start(gate, namespace, selected))
         raise RuntimeError('Run the synchronous dispatcher outside an asyncio event loop')
 
-    async def _start(self, gate: AdmittedInput, namespace: str) -> StartReceipt:
+    async def _start(self, gate: AdmittedInput, namespace: str,
+                     selected: ApplicationJobInput | None = None) -> StartReceipt:
         client = await Client.connect(self.connection.target_host, namespace=namespace,
                                       tls=self.connection.tls())
         deadline = timedelta(seconds=self.connection.rpc_timeout_seconds)
@@ -110,9 +119,19 @@ class TemporalWorkflowStarter:
                    'plan_revision': gate.plan_revision, 'plan_digest': gate.plan_digest,
                    'revocation_epoch': gate.revocation_epoch,
                    'payload_digest': gate.payload_digest}
+        workflow_run = AdmittedMigrationJob.run
+        workflow_type = 'AdmittedMigrationJob'
+        argument = gate
+        if selected is not None:
+            from dataclasses import asdict
+            binding['application_input_digest'] = _digest(asdict(selected))
+            binding['selection_digest'] = selected.selection_digest
+            workflow_run = OpenStackApplicationMigration.run
+            workflow_type = 'OpenStackApplicationMigration'
+            argument = selected
         try:
             handle = await client.start_workflow(
-                AdmittedMigrationJob.run, gate, id=gate.job_id,
+                workflow_run, argument, id=gate.job_id,
                 task_queue=self.connection.task_queue,
                 id_reuse_policy=WorkflowIDReusePolicy.REJECT_DUPLICATE,
                 id_conflict_policy=WorkflowIDConflictPolicy.FAIL,
@@ -127,7 +146,7 @@ class TemporalWorkflowStarter:
         stored_binding = await description.memo_value(_MEMO_KEY, None)
         if (not description.run_id or (run_id and description.run_id != run_id)
                 or description.id != gate.job_id
-                or description.workflow_type != 'AdmittedMigrationJob'
+                or description.workflow_type != workflow_type
                 or stored_binding != binding):
             raise AdmissionConflict('Temporal workflow ID belongs to a different job binding')
         return StartReceipt(namespace, gate.job_id, description.run_id, gate.job_id,
@@ -173,4 +192,48 @@ class TemporalWorkflowStarter:
                                             receipt.plan_revision, receipt.plan_digest)
                 or result.status not in ('GATE_PASSED', 'HELD')):
             raise AdmissionConflict('Temporal result does not bind the admitted job')
+        return result
+
+    def completed_job(self, receipt: StartReceipt) -> GateResult | ApplicationJobResult | None:
+        """Read the exact run and retain its original declared workflow type."""
+        if receipt.namespace != self.connection.namespace:
+            raise AdmissionConflict('Stored run belongs to another namespace')
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(self._completed_job(receipt))
+        raise RuntimeError('Call result readback outside an asyncio event loop')
+
+    async def _completed_job(self, receipt):
+        client = await Client.connect(self.connection.target_host,
+            namespace=receipt.namespace, tls=self.connection.tls())
+        deadline = timedelta(seconds=self.connection.rpc_timeout_seconds)
+        handle = client.get_workflow_handle(receipt.workflow_id, run_id=receipt.run_id)
+        description = await handle.describe(rpc_timeout=deadline)
+        if description.workflow_type == 'AdmittedMigrationJob':
+            return await self._completed_gate(receipt)
+        memo = await description.memo_value(_MEMO_KEY, None)
+        if (description.workflow_type != 'OpenStackApplicationMigration'
+                or description.run_id != receipt.run_id or description.id != receipt.workflow_id
+                or not isinstance(memo, dict) or not _DIGEST.fullmatch(memo.get('selection_digest', ''))
+                or not _DIGEST.fullmatch(memo.get('application_input_digest', ''))
+                or (memo.get('job_id'), memo.get('plan_id'), memo.get('plan_revision'),
+                    memo.get('plan_digest'), memo.get('payload_digest')) !=
+                    (receipt.job_id, receipt.plan_id, receipt.plan_revision,
+                     receipt.plan_digest, receipt.payload_digest)):
+            raise AdmissionConflict('Completed application run has a foreign original binding')
+        if description.status == WorkflowExecutionStatus.RUNNING:
+            return None
+        if description.status != WorkflowExecutionStatus.COMPLETED:
+            return ApplicationJobResult(receipt.job_id, receipt.plan_id, receipt.plan_revision,
+                receipt.plan_digest, memo['selection_digest'], 'HELD', 'VERIFY',
+                'NATIVE_UNCERTAIN', None, 0, 0)
+        typed = client.get_workflow_handle(receipt.workflow_id, run_id=receipt.run_id,
+                                           result_type=ApplicationJobResult)
+        result = await typed.result(follow_runs=False, rpc_timeout=deadline)
+        if (not isinstance(result, ApplicationJobResult)
+                or (result.job_id, result.plan_id, result.plan_revision, result.plan_digest,
+                    result.selection_digest) != (receipt.job_id, receipt.plan_id,
+                    receipt.plan_revision, receipt.plan_digest, memo['selection_digest'])):
+            raise AdmissionConflict('Application result differs from the original admitted job')
         return result

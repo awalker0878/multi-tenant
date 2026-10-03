@@ -16,8 +16,9 @@ from tests.test_vsphere_task_activity import context
 from tests.test_target_campaign import window
 from tests.test_vsphere_observe import ref
 from provisioner.execution import readback_core as c
-from tools import qualify_target as q, recovery_review as recovery
-from tools import vsphere_task_activity as activity
+from provisioner.execution import qualify_target as q
+from provisioner.execution import recovery_review as recovery
+from provisioner.execution import vsphere_task_activity as activity
 from provisioner.execution.run_files import digest, encoded, write_new
 
 

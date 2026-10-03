@@ -9,7 +9,7 @@ implement a live reservation service, allocate capacity or complete B23.
 ## One implementation, all callers migrated
 
 `provisioner.allocations.reservation_evidence` owns the implementation formerly at
-`scripts/check_reservation_records.py`. The old module is deleted and prohibited by
+`provisioner/allocations/reservation_evidence.py`. The old module is deleted and prohibited by
 the retirement register. Repository access, reservation preflight, IPAM parent-binding
 checks, test consumers, generated documentation, implementation metadata and the
 existing CI command now use the package owner. There is no forwarding module or

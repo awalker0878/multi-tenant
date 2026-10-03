@@ -59,7 +59,7 @@ Do not test against an unrelated tenant to avoid provisioning a controlled probe
 
 ## Use readback without inflating its meaning
 
-The existing [NSX](../../../tools/nsx_observe.py), [Nutanix](../../../tools/nutanix_observe.py)
+The existing [NSX](../../../provisioner/execution/nsx_observe.py), [Nutanix](../../../provisioner/execution/nutanix_observe.py)
 and [Neutron](../../../provisioner/execution/neutron_observe.py) tools only observe their documented
 selected resources. Native IDs and expected version/task scope must come from the
 accepted writer record. These readers neither discover all applicable policy nor
@@ -67,7 +67,7 @@ prove every packet path. Do not replace missing fields with assumed false/empty 
 a 404 with retirement proof, a completion percentage with task success, or a succeeded
 task with a correct resource graph.
 
-The [offline recovery reviewer](../../../tools/recovery_review.py) has no authority to
+The [offline recovery reviewer](../../../provisioner/execution/recovery_review.py) has no authority to
 fence a real writer, release containment, replay, delete or activate. Obtain those facts
 from the responsible native owner and preserve uncertainty when they cannot be shown.
 

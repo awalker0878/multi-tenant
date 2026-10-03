@@ -14,8 +14,8 @@ import uuid
 from lab.dns_authority import Authority
 from tests import test_netbox_ipam as ipam_fixture
 from tests.test_dns_transactions import example
-from tools import dns_change as dns_writer, netbox_dns as handoff
-from tools.netbox_ipam import allocation_lock
+from provisioner.execution import dns_change as dns_writer, netbox_dns as handoff
+from provisioner.allocations.netbox_ipam import allocation_lock
 from provisioner.execution.run_files import digest, encoded, load_private, replace_private, utcnow, write_new
 
 

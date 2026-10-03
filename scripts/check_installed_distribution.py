@@ -46,6 +46,49 @@ try:
     import provisioner
     from provisioner.compiler import components, wsd
     from provisioner.execution import terraform_catalog, source_integrity, guest_probe, route_audit, input_review, readback_core, neutron_observe, run_files, route_record_review, flow_policy, lifecycle_transition, openstack_transition, plan_review, terraform_apply, terraform_run, wsd_handoff
+    from provisioner.execution import guest_inventory, guest_run, guest_apply, guest_services, restic_run, restic_transfer
+    observer_names = (
+        'vsphere_observe', 'vsphere_task_observe', 'vsphere_history', 'vsphere_task_tree_observe',
+        'vsphere_port_observe', 'vsphere_network_observe', 'vsphere_clone_source', 'vsphere_task_activity',
+        'nutanix_vm_observe', 'nutanix_observe', 'nutanix_vm_task_observe', 'nutanix_vm_activity_observe',
+        'nutanix_flow_observe', 'nutanix_flow_activity_observe', 'nutanix_entity_activity', 'nutanix_task_tree',
+        'readback_cli', 'nsx_observe', 'nsx_segment_observe', 'nsx_domain_observe', 'nsx_domain_switch_observe',
+        'nsx_domain_binding', 'vmware_network_binding', 'recovery_review', 'openstack_observe', 'qualify_target')
+    runtime_names = ('execution_journal', 'dataset_acceptance', 'vsphere_power', 'dns_change', 'dns_propagation', 'openstack_quota', 'operations_review', 'operations_alerts', 'delivery_run', 'delivery_steps', 'delivery_containment', 'edge_contain', 'nft_edge', 'netbox_dns', 'owner_worker', 'remote_owner', 'retirement', 'runtime_build', 'owner_install', 'owner_revocations', 'edge_install', 'edge_boot', 'state_backend', 'state_export', 'state_project', 'ssh_issuer', 'terraform_recovery_review', 'nutanix_terraform_recovery', 'nutanix_flow_terraform_recovery', 'nsx_terraform_recovery', 'vsphere_recovery_devices', 'service_http')
+    runtime_owners = tuple(__import__('importlib').import_module('provisioner.execution.' + name) for name in runtime_names)
+    assert all(Path(module.__file__).resolve().is_relative_to(site) for module in runtime_owners)
+    from provisioner.execution import delivery_steps, runtime_build, owner_worker, vsphere_power, openstack_quota, delivery_run
+    assert all(module.ROOT is None for module in (runtime_build, owner_worker, vsphere_power, openstack_quota, delivery_run))
+    owner_commands = [delivery_steps.child_command(name, ['--help']) for name in sorted(delivery_steps.CHILD_OWNERS)]
+    observer_owners = tuple(__import__('importlib').import_module('provisioner.execution.' + name)
+                            for name in observer_names)
+    assert all(Path(module.__file__).resolve().is_relative_to(site) for module in observer_owners)
+    from provisioner.execution import qualify_target, readback_cli, nsx_observe
+    assert qualify_target.ROOT is None
+    assert all(Path(owner.__file__).resolve().is_relative_to(site)
+               for owner in qualify_target.READERS.values())
+    assert Path(qualify_target.guest_probe.__file__).resolve().is_relative_to(site)
+    child_command = readback_cli.module_command(nsx_observe, [str(request.parent / 'missing-manifest')])
+    assert child_command[1:4] == ['-I', '-B', '-c']
+    assert str(site) in child_command
+    assert guest_run.ROOT is None and guest_apply.ROOT is None
+    assert callable(guest_inventory.build) and callable(guest_services.validate_services)
+    assert callable(restic_run.restore) and callable(restic_transfer.execute_authorized_transfer)
+    assert guest_inventory.ROOT == site and restic_run.ROOT == site
+    assert all(Path(module.__file__).resolve().is_relative_to(site) for module in
+               (guest_inventory, guest_run, guest_apply, guest_services, restic_run, restic_transfer))
+    try:
+        guest_run.prepare(None)
+    except ValueError as error:
+        assert 'explicit current source checkout' in str(error)
+    else:
+        raise AssertionError('Installed guest preparation accepted no source root')
+    try:
+        guest_apply.validate_bundle(Path('/not-read'), {})
+    except ValueError as error:
+        assert 'explicit current source checkout' in str(error)
+    else:
+        raise AssertionError('Installed guest execution accepted no source root')
     assert terraform_catalog.entries()
     assert callable(input_review.review_inputs)
     assert neutron_observe.strict_loads('{"value": true}') == {"value": True}
@@ -54,6 +97,9 @@ try:
     assert terraform_run.ROOT is None and terraform_apply.ROOT is None
     assert callable(lifecycle_transition.plan_bindings) and callable(wsd_handoff.execution_outputs)
     assert source_integrity.verify()['status'] == 'BLOCKED_NO_CURRENT_CHECKOUT'
+    allocation_names = ('capacity_owner', 'capacity_demand', 'netbox_ipam', 'transactions', 'ipam_transactions')
+    allocation_owners = tuple(__import__('importlib').import_module('provisioner.allocations.' + name) for name in allocation_names)
+    assert all(Path(module.__file__).resolve().is_relative_to(site) for module in allocation_owners)
     from provisioner.allocations import (reservation_evidence, ipam_evidence, dns_evidence,
         capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight)
     assert reservation_evidence.load.__module__ == reservation_evidence.__name__
@@ -140,11 +186,32 @@ try:
         assert inputs and summary['native_contact'] is False
         assert summary['status'] == 'DRAFT_DISABLED_NOT_AUTHORIZED'
         assert all(value['allow_restricted_build'] is False for value in inputs.values())
+    live_names = ('provisioner.controlplane.operations.action_gate', 'provisioner.controlplane.operations.health', 'provisioner.controlplane.operations.recovery', 'provisioner.controlplane.operations.runtime', 'provisioner.qualification.action_gate', 'provisioner.qualification.mobility', 'provisioner.qualification.release', 'provisioner.qualification.directed_mobility', 'provisioner.execution.image_sandbox', 'provisioner.controlplane.conversion.contracts', 'provisioner.controlplane.conversion.rehearsal', 'provisioner.migration.application', 'provisioner.migration.activities', 'provisioner.migration.cutover', 'provisioner.migration.cold_descriptor', 'provisioner.migration.resources', 'provisioner.migration.authority', 'provisioner.migration.wave_schedule', 'provisioner.controlplane.workflow.application_selection', 'provisioner.controlplane.workflow.execution_selection', 'provisioner.controlplane.workflow.application_job', 'provisioner.controlplane.reconciliation.planned', 'provisioner.controlplane.reconciliation.planned_terraform', 'provisioner.controlplane.discovery.alert_delivery', 'provisioner.controlplane.discovery.alert_transport', 'provisioner.controlplane.discovery.monitor_runtime', 'provisioner.controlplane.discovery.shared_read_budget')
+    live_names += ('provisioner.controlplane.workflow.application_runtime',
+                   'provisioner.migration.provisioning',
+                   'provisioner.controlplane.jobs.progress')
+    live_owners = tuple(__import__('importlib').import_module(name) for name in live_names)
+    assert all(Path(module.__file__).resolve().is_relative_to(site) for module in live_owners)
+    import hosting_resources
+    assert all(hosting_resources.resource_path(name).is_file() for name in hosting_resources.EXTRA_EVIDENCE_DOCS)
     assert sys.path == compiler_path
 finally:
     sys.meta_path.remove(blocker)
 assert importlib.util.find_spec('tools.compile_wsd') is None
 assert importlib.util.find_spec('tools.terraform_catalog') is None
+assert all(importlib.util.find_spec('tools.' + name) is None for name in
+           ('guest_inventory', 'guest_run', 'guest_apply', 'guest_services', 'restic_run', 'restic_transfer'))
+assert all(importlib.util.find_spec('tools.' + name) is None for name in observer_names + runtime_names)
+assert all(importlib.util.find_spec('tools.' + name) is None for name in ('capacity', 'capacity_demand', 'netbox_ipam'))
+import subprocess
+observed_child = subprocess.run(child_command, stdin=subprocess.DEVNULL, capture_output=True,
+                                text=True, cwd=request.parent, timeout=15)
+assert observed_child.returncode == 2, observed_child.stdout + observed_child.stderr
+assert json.loads(observed_child.stdout) == {'status': 'INPUT_OR_OUTPUT_REJECTED', 'may_activate': False}
+for command in owner_commands:
+    owner_child = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True, text=True, cwd=request.parent, timeout=15)
+    assert owner_child.returncode == 0, owner_child.stdout + owner_child.stderr
+    assert 'usage:' in owner_child.stdout
 assert importlib.util.find_spec('tools.guest_probe') is None
 assert importlib.util.find_spec('tools.route_audit') is None
 assert importlib.util.find_spec('tools.input_review') is None
@@ -202,6 +269,10 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0021_application_drafts.sql',
     'provisioner/controlplane/persistence/migrations/0022_application_review_evidence.sql',
     'provisioner/controlplane/persistence/migrations/0023_discovery_freshness_history.sql',
+    'provisioner/controlplane/persistence/migrations/0024_planned_native_creation.sql',
+    'provisioner/controlplane/persistence/migrations/0025_selected_provisioning_operations.sql',
+    'provisioner/controlplane/persistence/migrations/0026_discovery_monitor_delivery.sql',
+    'provisioner/controlplane/persistence/migrations/0027_migration_wave_schedule.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
     'provisioner/controlplane/api/portal/application_drafts.js',
@@ -246,6 +317,13 @@ assert any(e.name == 'hosting-site-worker' and
 assert any(e.name == 'hosting-discovery-ingest' and
            e.value == 'provisioner.controlplane.discovery.runtime:main'
            for e in distribution.entry_points)
+for command_name, module_name in (
+    ('hosting-discovery-monitor', 'provisioner.controlplane.discovery.monitor_runtime'),
+    ('hosting-application-runtime', 'provisioner.controlplane.workflow.application_runtime')):
+    installed_entry = next(e for e in distribution.entry_points if e.name == command_name)
+    assert installed_entry.value == module_name + ':main'
+    assert installed_entry.load() is next(module for module in live_owners
+                                         if module.__name__ == module_name).main
 
 review_entry = next(e for e in distribution.entry_points if e.name == 'hosting-application-review')
 assert review_entry.value == 'provisioner.controlplane.discovery.owner_signing:main'

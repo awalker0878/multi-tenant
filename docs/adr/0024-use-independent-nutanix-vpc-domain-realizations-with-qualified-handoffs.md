@@ -37,7 +37,7 @@ Related implementation areas are traceability targets, not proof of complete imp
 - [terraform/modules/nutanix-domain](../../terraform/modules/nutanix-domain)
 - [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
 - [terraform/modules/nutanix-workload](../../terraform/modules/nutanix-workload)
-- [tools/nutanix_observe.py](../../tools/nutanix_observe.py)
+- [provisioner/execution/nutanix_observe.py](../../provisioner/execution/nutanix_observe.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

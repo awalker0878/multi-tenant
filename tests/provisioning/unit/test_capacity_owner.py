@@ -14,7 +14,7 @@ unknown, spent or conflicting authoritative outcome is refused rather than retri
 into a second reservation, and that two operations cannot each be admitted against
 the same stale view of the same free capacity.
 
-`tools/capacity.py` is the owner of the request contract. Its declarations are read
+`provisioner/allocations/capacity_owner.py` is the owner of the request contract. Its declarations are read
 from its source and compared against the mirror in `provisioner.allocations.owner` on
 the same documents, so a key, a unit, a grammar or a bound the owner adds cannot
 drift unnoticed.
@@ -35,11 +35,11 @@ from provisioner.domain import request as request_module
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import manifest as manifest_module
 from provisioner.execution import service
-from tools import capacity as owner_module
+from provisioner.allocations import capacity_owner as owner_module
 
 from tests.provisioning import support
 
-OWNER = support.ROOT / 'tools' / 'capacity.py'
+OWNER = support.ROOT / 'provisioner' / 'allocations' / 'capacity_owner.py'
 RECORD_CHECKER = support.ROOT / 'provisioner' / 'allocations' / 'reservation_evidence.py'
 PREFLIGHT = support.ROOT / 'provisioner' / 'allocations' / 'reservation_preflight.py'
 
@@ -158,7 +158,7 @@ def _owner_request_keys() -> set:
                 and node.func.attr == 'exact_keys' and node.args
                 and isinstance(node.args[0], ast.Name) and node.args[0].id == 'request'):
             return _literal_set(node.args[1])
-    raise AssertionError('tools/capacity.py does not enforce a request key set')
+    raise AssertionError('provisioner/allocations/capacity_owner.py does not enforce a request key set')
 
 
 def _owner_scope_keys() -> set:
@@ -171,12 +171,17 @@ def _owner_scope_keys() -> set:
                 and node.args[0].value.id == 'request'
                 and _subscript_key(node.args[0]) == 'scope'):
             return _literal_set(node.args[1])
-    raise AssertionError('tools/capacity.py does not enforce a request scope key set')
+    raise AssertionError('provisioner/allocations/capacity_owner.py does not enforce a request scope key set')
 
 
 def _owner_request_format() -> str:
     """The request format string the authoritative owner itself requires."""
-    for node in ast.walk(_owner_source()):
+    # This planning mirror is the stable V1 external-owner contract. V2 product
+    # requests additionally bind admitted jobs and have their own integration
+    # suite; scanning the whole module would conflate those distinct formats.
+    validator=next(node for node in _owner_source().body
+                   if isinstance(node,ast.FunctionDef) and node.name=='validate_request')
+    for node in ast.walk(validator):
         if not isinstance(node, ast.Compare) or not node.comparators:
             continue
         left, right = node.left, node.comparators[0]
@@ -184,7 +189,7 @@ def _owner_request_format() -> str:
                 and left.value.id == 'request' and _subscript_key(left) == 'format'
                 and isinstance(right, ast.Constant) and isinstance(right.value, str)):
             return right.value
-    raise AssertionError('tools/capacity.py does not enforce a request format')
+    raise AssertionError('provisioner/allocations/capacity_owner.py does not enforce a request format')
 
 
 def _declared(path: Path, name: str) -> set:

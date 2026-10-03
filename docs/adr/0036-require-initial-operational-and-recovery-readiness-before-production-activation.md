@@ -35,7 +35,7 @@ Identify initial versus continuing obligations, the exact offered service promis
 Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [docs/COMMISSIONING.md](../COMMISSIONING.md)
-- [tools/recovery_review.py](../../tools/recovery_review.py)
+- [provisioner/execution/recovery_review.py](../../provisioner/execution/recovery_review.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

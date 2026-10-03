@@ -9,7 +9,8 @@ from tests import test_terraform_recovery_review as attempts, test_vsphere_port_
 from tests.test_vsphere_network_replay import reseal
 from tests.test_nutanix_vm_observe import uid
 from provisioner.execution import readback_core as c
-from tools import terraform_recovery_review as review, vsphere_recovery_devices as devices
+from provisioner.execution import terraform_recovery_review as review
+from provisioner.execution import vsphere_recovery_devices as devices
 from provisioner.execution.run_files import encoded, load_private
 
 
@@ -128,7 +129,7 @@ class AttachmentRecoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.bind(m, network, inputs)
 
     def test_offline_cli_binds_new_private_packet(self):
-        args = [sys.executable, str(review.ROOT/'tools/terraform_recovery_review.py'), '--bundle', str(self.operation),
+        args = [sys.executable, '-m', 'provisioner.execution.terraform_recovery_review', '--source-root', str(review.ROOT), '--bundle', str(self.operation),
             '--ledger', str(self.ledger), '--manifest', str(self.base/'manifest'), '--readback', str(self.base/'readback'),
             '--context', str(self.base/'context'), '--network-manifest', str(self.base/'network'),
             '--network-readback', str(self.base/'network-report'), '--output', str(self.base/'cli-review')]

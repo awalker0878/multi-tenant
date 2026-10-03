@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from provisioner.execution import readback_core as c
-from tools import ssh_issuer as d
+from provisioner.execution import ssh_issuer as d
 from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 
 
@@ -165,8 +165,9 @@ class IssuerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'custody or policy changed'): self.execute()
 
     def test_actual_host_checks_ca_bytes_and_public_identity_before_any_signing(self):
-        # Source hash is fixture-only; production host/key/binary checks are real.
+        # Source/runtime identity is fixture-only; host/key/binary checks are real.
         with tempfile.TemporaryDirectory(dir=Path.home()) as tmp, \
+             patch.object(d, 'verify_runtime', return_value={'status':'RUNTIME_SOURCES_MATCH'}), \
              patch.object(d, 'verify', return_value={'status':'HASHES_MATCH', 'commit':'a'*40}):
             root = Path(tmp); self.config['source'] = str(root)
             d.Host().identity(self.config, root)

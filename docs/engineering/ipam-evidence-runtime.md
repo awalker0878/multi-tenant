@@ -40,7 +40,7 @@ call; returned objects are not a shared cache. The package owner imports no `scr
 ## Ownership and deployment
 
 All runtime/preflight/DNS consumers and current CI invocation use the package owner.
-`scripts/check_ipam_allocation_records.py` is retired and prohibited; there is no
+`provisioner/allocations/ipam_evidence.py` is retired and prohibited; there is no
 forwarding module. Installed-wheel tests require the package module, the absence of the
 old import, packaged-resource resolution outside the checkout and refusal of a forged
 working-directory fallback. Reused build staging cannot preserve the retired script or

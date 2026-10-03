@@ -2,7 +2,7 @@
 from copy import deepcopy
 import unittest
 from tests import test_terraform_recovery_review as attempts
-from tools import terraform_recovery_review as r
+from provisioner.execution import terraform_recovery_review as r
 from provisioner.execution.run_files import load_private
 
 

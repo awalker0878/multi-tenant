@@ -1,7 +1,7 @@
 # Dependency-safe retirement orchestration
 
 The repository now provides a non-mutating retirement coordination contract in
-`tools/retirement.py`. It exists to stop otherwise-correct owner tools from being
+`provisioner/execution/retirement.py`. It exists to stop otherwise-correct owner tools from being
 combined in an unsafe order. It does **not** delete native resources, release data
 holds, prove sanitization, or declare a site retired.
 
@@ -83,7 +83,7 @@ different resource set, changed plan digest or skipped predecessor is rejected.
 Running:
 
 ```sh
-python tools/retirement.py \
+python -m provisioner.execution.retirement --source-root /opt/hosting-source \
   --plan /private/retirement-plan.json \
   --evidence /private/retirement-evidence.json \
   --output /private/retirement-review.json

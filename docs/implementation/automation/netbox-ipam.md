@@ -1,7 +1,7 @@
 # NetBox address lifecycle
 
 The [reference decision](reference-realization.md) selects the NetBox 4.7 REST
-interface for exact IPv4 allocations. `tools/netbox_ipam.py` performs reserve,
+interface for exact IPv4 allocations. `provisioner/allocations/netbox_ipam.py` performs reserve,
 confirm, read-only reconcile, retire, quarantine and release operations. Retire
 changes the native status to `deprecated`; it never deletes the record. Quarantine
 declares the accepted reuse boundary over completed dependent cleanup, and release
@@ -57,8 +57,8 @@ Duplicate JSON keys, unknown categories, missing categories and unknown states s
 before NetBox contact.
 
 ```sh
-python tools/netbox_ipam.py /private/operator/allocation.json --action reserve
-python tools/netbox_ipam.py /private/operator/allocation.json --action reserve \
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action reserve
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action reserve \
   --authority /private/operator/ipam-authority.json \
   --token-file /private/operator/netbox-token --ca-bundle /private/operator/ca.pem \
   --ledger /private/operator/ipam-ledger --output /private/operator/reserved.json \
@@ -129,9 +129,9 @@ outcome of this tool. The release receipt carries `request_sha256`,
 complete cleanup block for the change record.
 
 ```sh
-python tools/netbox_ipam.py /private/operator/allocation.json --action quarantine \
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action quarantine \
   --release-evidence /private/operator/reuse-quarantine.json
-python tools/netbox_ipam.py /private/operator/allocation.json --action quarantine \
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action quarantine \
   --release-evidence /private/operator/reuse-quarantine.json \
   --authority /private/operator/ipam-authority.json \
   --token-file /private/operator/netbox-token --ca-bundle /private/operator/ca.pem \

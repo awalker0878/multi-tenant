@@ -251,6 +251,14 @@ def _plan(record: dict, problems: list[dict], workload: dict | None) -> None:
             _problem(problems, f'$.spec.{name}', 'Scope lies outside plan organization or tenant')
     if spec['route']['method'] == 'SAME_PLATFORM_RELOCATION' and spec['source']['platformFamily'] != spec['destination']['platformFamily']:
         _problem(problems, '$.spec.route.method', 'Native relocation requires the same platform family')
+    if 'execution' in spec:
+        selected = spec['execution']
+        expected = ('vmware', 'openstack', 'REBUILD_RESTORE')
+        actual = (spec['source']['platformFamily'], spec['destination']['platformFamily'],
+                  spec['route']['method'])
+        if selected['driver'] == 'openstack-linux-rebuild/1' and actual != expected:
+            _problem(problems, '$.spec.execution',
+                     'The selected executor requires the directed VMware to OpenStack rebuild route')
     mappings = spec['machineMappings']
     _duplicates([m['machineId'] for m in mappings], '$.spec.machineMappings', problems)
     _duplicates([m['targetMachineId'] for m in mappings], '$.spec.machineMappings', problems)

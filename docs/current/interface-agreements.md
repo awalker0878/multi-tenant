@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.38 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.39 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -9,6 +9,11 @@ Producer/consumer obligations across operator, discovery, workflow, native execu
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [NBD §6](../engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md) · [SVC §1](../architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md).
 
 ## Design content
+
+### Current selected application increment
+
+The canonical plan optionally selects hosting-execution-selection/1 with exact driver and artifactDigest. Approval review exposes these decision facts; older plans retain their original gate-only histories. Resources, dataset/cutover selections, delivery graph, qualification and operating acceptance are separately retained by digest. Native worker bindings remain process-local typed objects; secrets, filenames and callback/module choices never enter Temporal history. Observation and original-grant continuation have separately named gates and cannot authorize a replacement effect. Discovery monitor SERVICE identity is restricted to scoped monitoring; HUMAN-only public operations remain unchanged.
+
 
 Every agreement identifies producer, actual client, native endpoint, permitted
 operation, address family, trust material, entitlement, initiation/reply path, MTU,

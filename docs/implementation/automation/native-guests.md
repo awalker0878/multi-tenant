@@ -40,7 +40,7 @@ the manual output-copy step without supplying native quarantine acceptance.
 Each target contains `native_id` matching the VM/server output; observed SSH `address`, `port`, non-root `user`, exact `host_key` (`ssh-ed25519` plus its base64 public key); independently observed 32-character lowercase `machine_id`; approved short `hostname`; `profile: ubuntu-24.04-chrony`; and one to four entitled `time_servers` as IP addresses. Machine IDs must be unique per guest. Obtain keys, address bindings and machine IDs through trusted image/native provisioning observation; a scan of an unauthenticated endpoint does not establish that binding. Do not store private keys or passwords in this file.
 
 ```sh
-python tools/guest_inventory.py /private/operator/workload-outputs.json \
+python -m provisioner.execution.guest_inventory /private/operator/workload-outputs.json \
   /private/operator/guest-access.json --output /private/operator/new-guest-run
 cd ansible
 ansible-playbook -i /private/operator/new-guest-run/inventory.json \

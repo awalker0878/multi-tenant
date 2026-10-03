@@ -110,3 +110,12 @@ for material revisions. Record actual accepting authority only when supplied.
 [Frozen source reading paths](../README.md) · [ADR lifecycle](../adr/README.md).
 Run `python scripts/check_documentation.py`; source integrity and current-design
 structure are checked separately, not promoted into architectural acceptance.
+
+## Selected application implementation boundary
+
+The current execution plan now records installed owner closure, deployable discovery
+publication/monitoring, live resource transactions, the explicitly selected application
+workflow and operating/conversion tooling. Ubuntu24.04 VMware-to-OpenStack rebuild/restore
+is the only composed direction/profile. Native command exclusion, application rehearsal,
+source fencing, activation and final qualification remain required; no pilot or release
+acceptance is recorded.

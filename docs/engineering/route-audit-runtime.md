@@ -2,7 +2,7 @@
 
 Reviewed 3 October 2026. This B05 continuation follows the
 [enterprise workload mobility execution plan](../product/enterprise-workload-mobility-execution-plan.md).
-It moves the offline routed-topology model from `tools/route_audit.py` to
+It moves the offline routed-topology model from `provisioner/execution/route_audit.py` to
 `provisioner.execution.route_audit`. The old tools path is retired without an alias.
 
 The model remains offline and deterministic. It validates the explicit version-1

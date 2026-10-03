@@ -1,13 +1,13 @@
 # Persistent delivery execution
 
-`tools/delivery_run.py` executes an ordered dependency graph through existing
+`provisioner/execution/delivery_run.py` executes an ordered dependency graph through existing
 resource owners. It supplies coordination, exact handoffs, durable completion
 and process restart recovery. It does not issue approvals or establish native
 fencing. Each Terraform, guest, power, IPAM, DNS, campaign and edge adapter retains
 its own validation, credentials, scope, private evidence and uncertainty ledger.
 
-`tools/delivery_steps.py` holds the typed per-kind adapters and the registered
-kind table. `tools/execution_journal.py` records durable ordered events for one
+`provisioner/execution/delivery_steps.py` holds the typed per-kind adapters and the registered
+kind table. `provisioner/execution/execution_journal.py` records durable ordered events for one
 owned resource; it is not a native writer fence.
 
 ## Workflow contract
@@ -194,7 +194,7 @@ evidence as required by the owning gate.
 ## Execution and recovery
 
 ```sh
-python tools/delivery_run.py --plan /private/delivery.json \
+python -m provisioner.execution.delivery_run --source-root /opt/hosting-source --plan /private/delivery.json \
   --inbox /private/inbox --ledger /private/delivery-ledger --execute
 ```
 

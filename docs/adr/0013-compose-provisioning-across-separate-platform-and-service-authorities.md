@@ -36,7 +36,7 @@ Related implementation areas are traceability targets, not proof of complete imp
 
 - [terraform/stacks/components](../../terraform/stacks/components)
 - [terraform/modules](../../terraform/modules)
-- [tools/dns_change.py](../../tools/dns_change.py)
+- [provisioner/execution/dns_change.py](../../provisioner/execution/dns_change.py)
 - [ansible](../../ansible)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

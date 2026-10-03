@@ -1,0 +1,24 @@
+[Unit]
+Description=Scoped control-application retained health and incident dispatch
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=hosting-ops
+Group=hosting-ops
+EnvironmentFile=/etc/hosting/operations/%i.env
+ExecStart=/opt/hosting/bin/python -m provisioner.controlplane.operations.health --organization-id ${HOSTING_OPS_ORGANIZATION_ID} --tenant-id ${HOSTING_OPS_TENANT_ID} --dispatch
+SuccessExitStatus=2
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+CapabilityBoundingSet=
+UMask=0077
+TimeoutStartSec=120

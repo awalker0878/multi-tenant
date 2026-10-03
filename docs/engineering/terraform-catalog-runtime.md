@@ -9,7 +9,7 @@ It does not implement the remaining admitted provisioning workflow or contact a 
 ## One catalog owner
 
 `provisioner.execution.terraform_catalog.entries` owns the implementation previously
-at `tools/terraform_catalog.py`. The old file is deleted and its path is prohibited
+at `provisioner/execution/terraform_catalog.py`. The old file is deleted and its path is prohibited
 by the retirement register; no import alias, wrapper or alternate index remains.
 The existing Terraform preparation tool, engine verifier, repository checker and all
 in-tree test consumers use the package implementation directly. This is an internal

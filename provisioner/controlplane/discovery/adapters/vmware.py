@@ -3,7 +3,7 @@
 The reader must be bound by the site worker to the exact endpoint and native
 scope, use a read-only credential and turn native permission, transport and
 pagination failures into errors. Its wire API is deliberately not assumed here:
-the existing vSphere reader (`tools/vsphere_observe.py`) reads exact VM IDs,
+the existing vSphere reader (`provisioner/execution/vsphere_observe.py`) reads exact VM IDs,
 not collection pages. This collector never opens a connection or obtains a
 credential. A terminal cursor establishes only that the reader finished its
 page chain; it is not independent inventory completeness or site qualification.

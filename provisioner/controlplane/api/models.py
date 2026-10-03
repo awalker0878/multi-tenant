@@ -320,6 +320,11 @@ class ReviewScope(_StrictModel):
     platform_family: str = Field(alias='platformFamily')
 
 
+class ExecutionReview(_StrictModel):
+    driver: Literal['openstack-linux-rebuild/1']
+    artifact_digest: str = Field(alias='artifactDigest', pattern='^[0-9a-f]{64}$')
+
+
 class PlanReview(_StrictModel):
     """Allowlisted decision facts from a current, authority-bound plan."""
     plan_id: str = Field(alias='planId')
@@ -333,6 +338,7 @@ class PlanReview(_StrictModel):
     source: ReviewScope
     destination: ReviewScope
     route_method: str = Field(alias='routeMethod')
+    execution: ExecutionReview | None = None
     selected_machine_count: int = Field(alias='selectedMachineCount', ge=1)
     selected_dataset_count: int = Field(alias='selectedDatasetCount', ge=0)
     max_downtime_seconds: int = Field(alias='maxDowntimeSeconds', ge=0)

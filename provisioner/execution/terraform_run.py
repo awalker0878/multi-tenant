@@ -164,15 +164,24 @@ def command(binary, directory, argv, environment, output, *, timeout=900, ok=(0,
     return result.returncode
 
 
-def authorized_command(authority, *args, **kwargs):
+def authorized_command(authority, *args, command_guard=None, **kwargs):
     current_window(authority)
     remaining = (datetime.fromisoformat(authority['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
     require(remaining > 0, 'Native contact window expired')
     kwargs['timeout'] = min(kwargs.get('timeout', 900), remaining)
-    return command(*args, **kwargs)
+    if command_guard is not None:
+        from provisioner.migration.provisioning import ObservedProvisioningGuard
+        require(isinstance(command_guard, ObservedProvisioningGuard)
+                and command_guard.operation_kind == 'DISCOVER_READ',
+                'Exact current observed Terraform read authority is required')
+        kwargs['timeout'] = command_guard.timeout(kwargs['timeout'])
+    result = command(*args, **kwargs)
+    if command_guard is not None:
+        command_guard.require_current()
+    return result
 
 
-def prepare(args, root=ROOT):
+def prepare(args, root=ROOT, *, command_guard=None):
     require(isinstance(root, Path), 'An explicit current source checkout is required')
     require(args.read_authorized_target is True, 'Explicit native read/contact opt-in required')
     source = verify(root)
@@ -225,18 +234,21 @@ def prepare(args, root=ROOT):
     if transition is not None:
         write_new(operation / 'transition.json', encoded(transition))
     write_new(operation / 'backend.hcl', ''.join(f'{k} = {json.dumps(v)}\n' for k, v in sorted(settings.items())).encode())
-    authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json')
+    authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json',
+                       command_guard=command_guard)
     version = strict_loads(read_private(operation / 'version.json'))['terraform_version']
     toolchain = root / 'config/toolchain.json'
     require(version == json.loads(toolchain.read_text(encoding='utf-8'))['terraform'], 'Terraform version differs from the pinned toolchain')
     current_window(authority)
     authorized_command(authority, binary, directory, ['init', '-input=false', '-no-color', '-lockfile=readonly',
-            '-reconfigure', f'-backend-config={operation / "backend.hcl"}'], env, operation / 'init.log')
+            '-reconfigure', f'-backend-config={operation / "backend.hcl"}'], env, operation / 'init.log',
+            command_guard=command_guard)
     current_window(authority)
     authorized_command(authority, binary, directory, ['plan', '-input=false', '-no-color', '-lock=true', '-lock-timeout=60s',
             '-detailed-exitcode', f'-var-file={operation / "inputs.json"}', f'-out={operation / "saved.tfplan"}'],
-            env, operation / 'plan.log', ok=(0, 2))
-    authorized_command(authority, binary, directory, ['show', '-json', str(operation / 'saved.tfplan')], env, operation / 'plan.json')
+            env, operation / 'plan.log', ok=(0, 2), command_guard=command_guard)
+    authorized_command(authority, binary, directory, ['show', '-json', str(operation / 'saved.tfplan')],
+                       env, operation / 'plan.json', command_guard=command_guard)
     result = review(strict_loads(read_private(operation / 'plan.json')), references, transition)
     write_new(operation / 'review.json', encoded(result))
     require(result['status'] != 'BLOCKED', 'Restricted plan has blocked changes; no execution bundle issued')

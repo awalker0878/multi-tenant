@@ -7,8 +7,9 @@ from lab.native_readback_fixture import Fixture, manifest, responses
 from tests.test_nutanix_vm_observe import manifest as vm_manifest, uid
 from tests.test_target_campaign import plan_fixture, window
 from tests.test_guest_inventory import fixture as guests
-from tools import nutanix_vm_observe as ahv, qualify_target as q
-from tools.guest_inventory import build
+from provisioner.execution import nutanix_vm_observe as ahv
+from provisioner.execution import qualify_target as q
+from provisioner.execution.guest_inventory import build
 from provisioner.execution.run_files import digest, encoded, write_new
 
 

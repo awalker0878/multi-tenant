@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from provisioner.compiler import wsd as compile_wsd
-from tools import guest_inventory
+from provisioner.execution import guest_inventory
 
 
 class PrivateHandoffJsonTests(unittest.TestCase):

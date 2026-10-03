@@ -19,10 +19,10 @@ The existing readers already bind exact resource/task identities, selected expec
 
 The repository already contains:
 
-- `tools/nsx_observe.py` — exact selected NSX Policy/realization readback;
-- `tools/nutanix_observe.py` — exact Nutanix networking/task readback;
+- `provisioner/execution/nsx_observe.py` — exact selected NSX Policy/realization readback;
+- `provisioner/execution/nutanix_observe.py` — exact Nutanix networking/task readback;
 - `provisioner/execution/neutron_observe.py` — bounded Neutron exact-resource comparison;
-- `tools/recovery_review.py` — offline consistency review of operation, report, fencing/quarantine and generation records;
+- `provisioner/execution/recovery_review.py` — offline consistency review of operation, report, fencing/quarantine and generation records;
 - the bounded Nutanix task-tree extension for an explicitly enumerated small task graph.
 
 Those tools remain read-only. They do not discover arbitrary inventory, cancel tasks, fence a writer, import Terraform state or perform repair.

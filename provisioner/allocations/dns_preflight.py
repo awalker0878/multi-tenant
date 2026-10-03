@@ -214,7 +214,7 @@ def evaluate(intent,*,ipam_index=None,dns_index=None,as_of=None):
         }[result],
         'limits':[
             'No literal DNS name or A/AAAA/PTR value is accepted or returned by this repository preflight.',
-            'The existing tools/dns_change.py remains the separately scoped mutation mechanism and is never invoked by this check.',
+            'The existing provisioner/execution/dns_change.py remains the separately scoped mutation mechanism and is never invoked by this check.',
             'Authoritative readback does not prove recursive/secondary propagation unless those observations are explicitly required and evidenced.',
             'DNS intent identity includes the exact confirmed-IPAM digest and full normalized registration scope; parent or TTL/zone/owner drift under the same IDs is not idempotent.'
         ]

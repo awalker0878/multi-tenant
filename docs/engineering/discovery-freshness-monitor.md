@@ -5,6 +5,11 @@ Reviewed 2 October 2026. This B22 continuation composes the existing retained
 It does not collect inventory, refresh credentials, contact native platforms, deliver
 notifications or authorize execution.
 
+The 3 October [installed monitoring service](discovery-monitor-service.md) composes
+this projection with current SERVICE IAM, retained delivery attempts and explicit
+authenticated alert-owner transport. This module remains the pure projection owner;
+deployment/delivery evidence must use the service's own outcomes.
+
 ## Deterministic monitoring slots
 
 `FreshnessMonitor` accepts a bounded set of exact environment/native-scope targets and
@@ -62,7 +67,9 @@ per-target revocation holds, finite periodic execution and monitor-clock regress
 They run with the existing freshness-history transaction fixture and make no native
 calls. Existing freshness-history/page tests remain in force.
 
-B22 still requires deployed service scheduling, fleet/global endpoint budgets, actual
-alert delivery and acknowledgement, independent omission/privilege-loss reconciliation,
-resumable estate-scale publication and measured estate qualification. This monitoring
-projection neither closes B22 nor supplies native/operational acceptance.
+B22 now has [service scheduling and original-only batch publication](discovery-service-scheduling.md),
+a shared-host persistent endpoint budget and installed alert-delivery composition.
+Commissioned deployment/receiver/identity/custody, multi-host global budgets,
+independent omission/privilege-loss reconciliation, large-result publication and
+measured estate qualification remain open. This projection neither closes B22 nor
+supplies native/operational acceptance.

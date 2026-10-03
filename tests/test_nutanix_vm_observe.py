@@ -4,7 +4,7 @@ import json
 import unittest
 from lab.native_readback_fixture import Fixture
 from provisioner.execution import readback_core as c
-from tools import nutanix_vm_observe as ahv
+from provisioner.execution import nutanix_vm_observe as ahv
 
 
 def uid(number):

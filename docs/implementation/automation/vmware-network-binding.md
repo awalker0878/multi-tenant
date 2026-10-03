@@ -5,13 +5,13 @@ requires evidence connecting vSphere NIC backings to the intended NSX domain.
 Names, independently matching VM/policy snapshots and an accepted mapping record
 alone do not observe that association on the installed systems.
 
-`tools/vmware_network_binding.py` performs that join: it binds campaign VM NICs
+`provisioner/execution/vmware_network_binding.py` performs that join: it binds campaign VM NICs
 through observed portgroups to owned NSX segments and refuses foreign or
 mismatched association scope.
 
 ## Exact NSX-backed portgroups
 
-`tools/vsphere_network_observe.py` uses profile
+`provisioner/execution/vsphere_network_observe.py` uses profile
 `vsphere-vi-json-8.0.3.0-nsx-portgroups` and the common
 [readback envelope](../../NATIVE_READBACK.md), with platform `vmware` and no task.
 Each resource has `kind: nsx-portgroup`, an exact `dvportgroup-*` MoID,
@@ -32,7 +32,7 @@ duplicate backing keys are refused. Unrelated switch inventory and descriptions
 are excluded from reports. Normal CLI session/TLS/contact/output controls apply:
 
 ```sh
-python3 tools/vsphere_network_observe.py /private/operator/portgroups.json
+python3 -m provisioner.execution.vsphere_network_observe /private/operator/portgroups.json
 ```
 
 This profile covers NSX-backed distributed portgroups only. Standard portgroups,
@@ -48,7 +48,7 @@ Published interfaces and local HTTPS fixtures do not qualify an installed tuple.
 
 ## NSX segment realization identity
 
-`tools/nsx_segment_observe.py` uses profile
+`provisioner/execution/nsx_segment_observe.py` uses profile
 `nsx-local-policy-v1-segment-switches`. Keep the existing NSX envelope, full
 selected policies and exact revision/intent-version/enforcement-point expectations.
 Every segment additionally has `logical_switch`, an independently accepted
@@ -77,7 +77,7 @@ the query or infers an association from a display name. Missing/changed identity
 failed realization and pending publication retain their corresponding holds.
 
 ```sh
-python3 tools/nsx_segment_observe.py /private/operator/nsx-segments.json
+python3 -m provisioner.execution.nsx_segment_observe /private/operator/nsx-segments.json
 ```
 
 Interfaces: [segment-scoped realized entities](https://developer.broadcom.com/xapis/nsx-t-data-center-rest-api/latest/method_ListRealizedEntities.html)
@@ -129,7 +129,7 @@ Do not downgrade to v5 to bypass an association failure.
 
 ## Exact native port attachments
 
-`tools/vsphere_port_observe.py` uses profile
+`provisioner/execution/vsphere_port_observe.py` uses profile
 `vsphere-vi-json-8.0.3.0-nsx-port-attachments`. Keep the portgroup envelope and
 expectations above and add `ports` to each resource: 1–64 independently accepted
 selected `DistributedVirtualPort` objects, at most 100 across the manifest.
@@ -166,7 +166,7 @@ controls apply. Without the contact flag this command validates inputs only;
 the preview's `planned_get_targets` counts property GETs, excluding method POSTs:
 
 ```sh
-python3 tools/vsphere_port_observe.py /private/operator/port-attachments.json
+python3 -m provisioner.execution.vsphere_port_observe /private/operator/port-attachments.json
 ```
 
 Interfaces: [FetchDVPorts](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VmwareDistributedVirtualSwitch/moId/FetchDVPorts/post/),

@@ -1,6 +1,6 @@
 # File-export backup and isolated recovery
 
-`tools/restic_run.py` captures a data-owner-produced file export into an existing
+`provisioner/execution/restic_run.py` captures a data-owner-produced file export into an existing
 restic repository and verifies restored file bytes in a new destination. Native
 execution accepts only `rest:https://` repositories with explicit identity and
 credentials. No initialization, deletion, pruning, forced unlocking, automatic
@@ -43,7 +43,7 @@ credentials). They enter the child environment, not the command line or receipt.
 Ambient proxy, SSH backend and restic override variables are not inherited.
 
 ```sh
-python tools/restic_run.py backup --config /private/backup/config.json \
+python -m provisioner.execution.restic_run backup --config /private/backup/config.json \
   --credentials /private/backup/credentials.json --restic /usr/bin/restic \
   --ca-bundle /private/backup/ca.pem --output-root /private/backup/runs --execute
 ```
@@ -55,6 +55,12 @@ encrypted snapshot alongside the export. Snapshot tags bind the manifest digest
 and tenant/WSD/member. Preserve `receipt.json` and `manifest.json` in the independent
 evidence store. The attempt record precedes capture; an interrupted capture may
 leave a retained snapshot, and absence of a receipt never authorizes deletion.
+
+The guest backup role installs the actual `provisioner` package import closure
+from the reviewed bundle. Its service runs `python -E -s -B -m
+provisioner.execution.restic_run` from the root-owned package directory, discarding
+Python environment overrides and user-site imports. A missing package dependency
+fails locally; there is no retired tool wrapper or checkout fallback.
 
 ## Restore
 

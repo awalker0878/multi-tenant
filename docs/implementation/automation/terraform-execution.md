@@ -176,7 +176,7 @@ authority. The handoff retains the source and execution provenance for each WSD.
 After a separately reviewed workload apply and accepted bootstrap/access handoff:
 
 ```sh
-python tools/guest_inventory.py /private/operator/guest-access.json \
+python -m provisioner.execution.guest_inventory /private/operator/guest-access.json \
   --workload-run /private/operator/tenant-01-workloads \
   --output /private/operator/guest-inventory
 ```

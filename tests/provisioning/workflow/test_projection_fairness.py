@@ -27,10 +27,10 @@ class ProjectionFairnessTests(unittest.TestCase):
             def append_progress(self,context,job_id,**event):
                 outer.events.append((job_id,event)); outer.active.pop(job_id,None)
         self.jobs=Jobs()
-        def completed_gate(receipt):
+        def completed_job(receipt):
             if receipt.job_id not in self.completed: return None
             return GateResult('GATE_PASSED',receipt.job_id,'plan',1,'a'*64,'approval','c'*64)
-        self.workflow=SimpleNamespace(completed_gate=completed_gate)
+        self.workflow=SimpleNamespace(completed_job=completed_job)
         def pending(context,*,limit=32,after=None):
             self.assertEqual(context,self.context); self.queries.append(after)
             key=lambda row:(row.created_at,row.job_id)

@@ -265,6 +265,15 @@
     "plan": {
       "type": "object", "required": ["workloadId", "workloadRevision", "applicationGroupId", "sourceSnapshotId", "destinationSnapshotId", "source", "destination", "route", "selectedMachineIds", "selectedDatasetIds", "machineMappings", "datasetMappings", "policyDigest", "acceptanceTestIds", "maxDowntimeSeconds", "maxDataLossSeconds", "rollbackWindowSeconds"], "additionalProperties": false,
       "properties": {
+        "execution": {
+          "type": "object", "additionalProperties": false,
+          "required": ["format", "driver", "artifactDigest"],
+          "properties": {
+            "format": {"const": "hosting-execution-selection/1"},
+            "driver": {"const": "openstack-linux-rebuild/1"},
+            "artifactDigest": {"$ref": "#/definitions/digest"}
+          }
+        },
         "workloadId": {"$ref": "#/definitions/id"}, "workloadRevision": {"type": "integer", "minimum": 1},
         "applicationGroupId": {"oneOf": [{"type": "null"}, {"$ref": "#/definitions/id"}]},
         "sourceSnapshotId": {"$ref": "#/definitions/id"}, "destinationSnapshotId": {"$ref": "#/definitions/id"},

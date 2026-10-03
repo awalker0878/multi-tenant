@@ -121,17 +121,23 @@ class _Parser(argparse.ArgumentParser):
 
 def main(argv=None) -> int:
     parser = _Parser(description=__doc__, allow_abbrev=False)
-    parser.add_argument('action', choices=('stage', 'publish', 'batch-stage', 'inspect', 'batch-inspect', 'batch-reconcile', 'batch-run'))
+    parser.add_argument('action', choices=('stage', 'publish', 'batch-stage', 'inspect', 'batch-inspect',
+                        'batch-reconcile', 'batch-run', 'batch-publish', 'batch-retry-publication'))
     parser.add_argument('--config', required=True, help='Absolute protected collector JSON file')
     parser.add_argument('--state-directory', help='Existing private directory for one checkpointed batch')
+    parser.add_argument('--fleet-state-directory', help='Existing private shared POSIX endpoint budget directory')
     try:
         args = parser.parse_args(argv)
-        if args.state_directory is not None and args.action not in ('batch-stage', 'batch-inspect', 'batch-reconcile', 'batch-run'):
+        if args.fleet_state_directory is not None and args.action not in ('batch-stage', 'batch-run'):
+            raise ValueError('Shared endpoint budgets are only supported for collection batch actions')
+        if args.state_directory is not None and args.action not in ('batch-stage', 'batch-inspect',
+                'batch-reconcile', 'batch-run', 'batch-publish', 'batch-retry-publication'):
             raise ValueError('State directory is only supported for batch actions')
         if args.action in ('batch-stage', 'batch-run'):
             from .batch_runtime import run_batch
             result = run_batch(args.config, state_directory=args.state_directory,
-                               wait_for_due=args.action == 'batch-run')
+                               wait_for_due=args.action == 'batch-run',
+                               fleet_state_directory=args.fleet_state_directory)
             code = 0 if result['status'] == 'BATCH_EVALUATED' else 2
         elif args.action in ('batch-inspect', 'batch-reconcile'):
             if args.state_directory is None:
@@ -139,6 +145,14 @@ def main(argv=None) -> int:
             from .batch_runtime import inspect_batch
             result = inspect_batch(args.config, args.state_directory, reconcile=args.action == 'batch-reconcile')
             code = 0 if result['status'] == 'JOURNAL_INSPECTED' else 2
+        elif args.action in ('batch-publish', 'batch-retry-publication'):
+            if args.state_directory is None:
+                raise ValueError('An enrolled private journal is required')
+            from .batch_runtime import publish_batch
+            result = publish_batch(args.config, args.state_directory,
+                                   retry_unknown=args.action == 'batch-retry-publication')
+            code = (0 if result['status'] == 'PUBLICATION_ACKNOWLEDGED' else
+                    3 if result['unknownDeliveryCount'] else 2)
         else:
             result = execute(args.config, args.action)
             code = 0

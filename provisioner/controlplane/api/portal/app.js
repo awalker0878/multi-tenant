@@ -961,6 +961,18 @@ async function loadEvents() {
     const time = document.createElement('small');
     time.textContent = displayTime(event.recordedAt);
     item.append(label, time);
+    if (event.detail && typeof event.detail === 'object') {
+      const detail = document.createElement('span');
+      const facts = [];
+      if (event.detail.phase) facts.push(event.detail.phase);
+      if (event.detail.reasonCode) facts.push(event.detail.reasonCode);
+      if (event.detail.holdCode) facts.push(event.detail.holdCode);
+      if (Number.isSafeInteger(event.detail.completed) && Number.isSafeInteger(event.detail.total)) {
+        facts.push(`${event.detail.completed}/${event.detail.total} stages verified`);
+      }
+      detail.textContent = facts.join(' · ');
+      if (facts.length) item.append(detail);
+    }
     $('job-events').append(item);
   }
   eventCursor = page.items.length ? page.items[page.items.length - 1].sequence : cursor;
@@ -987,6 +999,8 @@ function validReview(plan, requestedId) {
     plan.planRevision > 0 && digestPattern.test(plan.planDigest) &&
     typeof plan.workloadId === 'string' && Number.isInteger(plan.workloadRevision) &&
     typeof plan.routeMethod === 'string' && plan.routeMethod.length > 0 &&
+    (plan.execution == null || (plan.execution.driver === 'openstack-linux-rebuild/1' &&
+      digestPattern.test(plan.execution.artifactDigest))) &&
     typeof plan.frozenAt === 'string' && scopeValid(plan.source) && scopeValid(plan.destination) &&
     ['selectedMachineCount', 'selectedDatasetCount', 'maxDowntimeSeconds',
       'maxDataLossSeconds', 'rollbackWindowSeconds'].every((key) =>
@@ -1002,6 +1016,10 @@ function displayReview(plan) {
   addFact($('review-identity'), 'Workload ID', plan.workloadId);
   addFact($('review-identity'), 'Workload revision', plan.workloadRevision);
   addFact($('review-identity'), 'Route method', plan.routeMethod);
+  if (plan.execution) {
+    addFact($('review-identity'), 'Execution driver', plan.execution.driver);
+    addFact($('review-identity'), 'Execution inputs digest', plan.execution.artifactDigest);
+  }
   if (plan.sourceSnapshotId) addFact($('review-identity'), 'Source snapshot', plan.sourceSnapshotId);
   if (plan.destinationSnapshotId) addFact($('review-identity'), 'Destination snapshot', plan.destinationSnapshotId);
   addFact($('review-limits'), 'Selected machines', plan.selectedMachineCount);

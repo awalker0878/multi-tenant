@@ -1,6 +1,6 @@
 # Observe DNS propagation through selected views
 
-`tools/dns_propagation.py` extends the [owned DNS handoff](netbox-dns.md) with
+`provisioner/execution/dns_propagation.py` extends the [owned DNS handoff](netbox-dns.md) with
 read-only observations of the exact primary, required secondaries and recursive
 views. Registration and [withdrawal](netbox-dns-retirement.md) use the same path.
 The completed primary receipt, original job and original scope are immutable.
@@ -60,7 +60,7 @@ owner-only files outside the repository; real credentials are never committed.
 Native execution refuses documentation/loopback addresses and test zones.
 
 ```sh
-python tools/dns_propagation.py \
+python -m provisioner.execution.dns_propagation \
   --config /private/operator/propagation.json \
   --job /private/operator/dns-job.json \
   --scope /private/operator/dns-scope.json \

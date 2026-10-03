@@ -2,8 +2,8 @@
 from copy import deepcopy
 import unittest
 
-from tools import operations_alerts as a
-from tools import operations_review as o
+from provisioner.execution import operations_alerts as a
+from provisioner.execution import operations_review as o
 
 NOW='2026-09-21T12:00:00+00:00'
 LATE='2026-09-21T13:00:00+00:00'

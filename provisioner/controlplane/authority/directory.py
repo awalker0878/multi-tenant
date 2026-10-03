@@ -22,7 +22,7 @@ from .service import AuthenticationFailed
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _PLAN_ROLES = frozenset({'SOURCE_OWNER', 'DESTINATION_OWNER',
                          'SOURCE_SECURITY', 'DESTINATION_SECURITY',
-                         'EXECUTION_OPERATOR', 'JOB_READER', 'WORKER'})
+                         'EXECUTION_OPERATOR', 'JOB_READER', 'WORKER', 'DISCOVERY_MONITOR'})
 _PORTFOLIO_ROLES = frozenset({'WORKLOAD_READER', 'WORKLOAD_EDITOR',
                               'INVENTORY_READER'})
 _PLAN_SCOPE = frozenset({'organizationId', 'tenantId', 'locationId',
@@ -92,7 +92,7 @@ def _snapshot(payload: dict, *, issuer: str, audience: str,
             or any(not isinstance(payload[name], str) or
                    _ID.fullmatch(payload[name]) is None
                    for name in ('organizationId', 'tenantId'))
-            or payload['identityKind'] not in ('HUMAN', 'WORKER')
+            or payload['identityKind'] not in ('HUMAN', 'WORKER', 'SERVICE')
             or type(payload['active']) is not bool
             or type(payload['generation']) is not int or payload['generation'] < 1
             or type(payload['issuedAt']) is not int
@@ -113,7 +113,10 @@ def _snapshot(payload: dict, *, issuer: str, audience: str,
             raise DirectorySyncRefused('IAM role is invalid')
         scope = _scope(item['scope'], role, organization, tenant)
         expires = _timestamp(item['expiresAt'], now=now, max_lifetime=timedelta(days=1))
-        if (role, scope) in distinct or (payload['identityKind'] == 'WORKER') != (role == 'WORKER'):
+        identity_kind = payload['identityKind']
+        matched_kind = ('WORKER' if role == 'WORKER' else
+                        'SERVICE' if role == 'DISCOVERY_MONITOR' else 'HUMAN')
+        if (role, scope) in distinct or identity_kind != matched_kind:
             raise DirectorySyncRefused('IAM grant is duplicated or mismatched to identity kind')
         distinct.add((role, scope))
         grants.append(RoleGrant(role, scope, expires))

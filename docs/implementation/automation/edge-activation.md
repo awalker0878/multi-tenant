@@ -4,7 +4,7 @@ Use the [startup denial guard](edge-startup.md) to establish owned drops before
 the accepted network manager starts. It restores no active leases and preserves
 unresolved owner history; actual reboot and HA qualification remain site tests.
 
-The reference adapter `tools/nft_edge.py` targets a provider-owned Linux/nftables
+The reference adapter `provisioner/execution/nft_edge.py` targets a provider-owned Linux/nftables
 IPv4 security edge with already commissioned interfaces and routing. This is an
 adoption path for an explicitly selected edge, not a replacement for Nutanix Flow,
 NSX distributed enforcement or OpenStack provider-owned mandatory policy. The
@@ -52,9 +52,9 @@ drop rules. Host input/output and other interface boundaries remain separately
 owned; this forward-chain adapter does not secure the edge's management plane.
 
 ```sh
-python tools/nft_edge.py inspect --spec /private/edge/spec.json \
+python -m provisioner.execution.nft_edge inspect --spec /private/edge/spec.json \
   --nft /usr/sbin/nft --output /private/edge/inspection --execute
-python tools/nft_edge.py apply --spec /private/edge/spec.json --mode bootstrap \
+python -m provisioner.execution.nft_edge apply --spec /private/edge/spec.json --mode bootstrap \
   --authority /private/edge/authority.json --ledger /private/edge/ledger \
   --nft /usr/sbin/nft --output /private/edge/change --execute
 ```

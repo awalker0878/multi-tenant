@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 
 from provisioner.domain.enterprise_records import plan_digest
-from tools.dataset_acceptance import validate_coverage, validate_group
+from provisioner.execution.dataset_acceptance import validate_coverage, validate_group
 from provisioner.execution.run_files import digest, encoded, load_private
 import test_restic_transfer as harness
 

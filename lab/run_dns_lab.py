@@ -36,7 +36,7 @@ def main():
             'passed':len([x for x in observations if x['result']=='PASS']),'failed':len(result.failures)+len(result.errors),
             'elapsed_seconds':round(time.monotonic()-start,3),'observations':observations,
             'source_sha256':{n:hashlib.sha256((ROOT/n).read_bytes()).hexdigest() for n in
-                             ('tools/dns_change.py','lab/dns_authority.py','lab/run_dns_lab.py','tests/test_dns_transactions.py')},
+                             ('provisioner/execution/dns_change.py','lab/dns_authority.py','lab/run_dns_lab.py','tests/test_dns_transactions.py')},
             'native_dns_product_qualification':'NOT_RUN','infrastructure_contact':'NONE',
             'limits':['The local authority is an implementation of this test subset, not BIND or a production DNS service',
                       'AAAA is a DNS data record, not proof of IPv6 transport or reachability',

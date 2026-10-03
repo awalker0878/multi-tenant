@@ -157,7 +157,7 @@ def verify_outputs(outputs, bundle, inputs):
                     'Native output lifecycle differs from the exact plan inputs')
 
 
-def apply(args, root=ROOT):
+def apply(args, root=ROOT, *, openstack_apply_context=None):
     require(isinstance(root, Path), 'An explicit current source checkout is required')
     require(args.execute_approved_change is True, 'Explicit native mutation opt-in required')
     operation = private_path(args.bundle, directory=True)
@@ -167,6 +167,12 @@ def apply(args, root=ROOT):
     credentials = load_private(operation / 'environment.json')
     directory = operation / 'source' / bundle['root']
     env = runtime_environment(operation, credentials, bundle['scope']['platform'], directory)
+    if openstack_apply_context is not None:
+        from provisioner.controlplane.reconciliation.planned_terraform import EphemeralOpenStackApplyContext
+        require(isinstance(openstack_apply_context, EphemeralOpenStackApplyContext),
+                'Only the current enrolled OpenStack effect owner may refresh provider credentials')
+        openstack_apply_context.require_current(operation, bundle)
+        env = openstack_apply_context.environment(operation, directory)
     backend = load_private(operation / 'backend.json')
     identity = digest(encoded({'operation': bundle['operation_id'], 'generation': bundle['generation']}))
     with scope_ledger(args.ledger, backend['address'],bundle['scope']) as ledger:
@@ -189,12 +195,24 @@ def apply(args, root=ROOT):
                 deadline = load_private(operation / 'transition.json')['valid_until']
                 remaining = min(remaining, (datetime.fromisoformat(deadline.replace('Z', '+00:00')) - utcnow()).total_seconds())
             require(remaining > 0, 'Approval expired before mutation')
+            if openstack_apply_context is not None:
+                openstack_apply_context.require_current(operation, bundle)
+                remaining = min(remaining, openstack_apply_context.remaining_seconds())
+                require(remaining > 0, 'Current native/backend credential expired before mutation')
             command(binary, directory, ['apply', '-input=false', '-no-color', '-lock=true', '-lock-timeout=60s',
                     str(operation / 'saved.tfplan')], env, operation / 'apply.log', timeout=min(remaining, 3600))
+            if openstack_apply_context is not None:
+                openstack_apply_context.require_current(operation, bundle)
             # Query outputs only; never invoke a second apply to recover missing output.
             current_window(approval)
             remaining = (datetime.fromisoformat(approval['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
+            if openstack_apply_context is not None:
+                openstack_apply_context.require_current(operation, bundle)
+                remaining = min(remaining, openstack_apply_context.remaining_seconds())
+                require(remaining > 0, 'Current native/backend credential expired before output observation')
             command(binary, directory, ['output', '-json'], env, operation / 'outputs.json', timeout=remaining)
+            if openstack_apply_context is not None:
+                openstack_apply_context.require_current(operation, bundle)
             verify_outputs(load_private(operation / 'outputs.json'), bundle, load_private(operation / 'inputs.json'))
             receipt.update(status='APPLIED_REQUIRES_NATIVE_ACCEPTANCE', completed_at=utcnow().isoformat(),
                            outputs_sha256=digest(read_private(operation / 'outputs.json')))

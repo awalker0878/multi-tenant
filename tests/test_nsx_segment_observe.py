@@ -5,8 +5,8 @@ import unittest
 from lab.native_readback_fixture import Fixture, manifest as base_manifest, responses
 from tests.test_nutanix_vm_observe import uid
 from provisioner.execution import readback_core as c
-from tools import nsx_segment_observe as n
-from tools import recovery_review as review
+from provisioner.execution import nsx_segment_observe as n
+from provisioner.execution import recovery_review as review
 from lab.run_readback_lab import operator_context
 from tests.test_nutanix_task_tree import reseal
 

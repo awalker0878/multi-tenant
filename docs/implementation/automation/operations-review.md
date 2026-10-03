@@ -1,6 +1,6 @@
 # Operations drift, health and capacity review
 
-`tools/operations_review.py` classifies scheduled operations evidence and routes
+`provisioner/execution/operations_review.py` classifies scheduled operations evidence and routes
 it to accountable owners. It compares exact configuration digests, reads declared
 health, capacity and telemetry states, and preserves an active emergency override
 instead of silently accepting the drifted value. It cannot repair drift, approve a
@@ -8,7 +8,7 @@ boundary, contain an edge or authorize production activation: a healthy review
 still returns `ordinary_reconciliation_authorized: false`, `native_acceptance:
 false` and `production_activation: false`.
 
-`tools/operations_alerts.py` then binds the resulting alerts to accountable
+`provisioner/execution/operations_alerts.py` then binds the resulting alerts to accountable
 acknowledgement, escalation and containment release, so a routed alert cannot be
 closed by silence, by another owner or by a release that precedes the response.
 
@@ -131,7 +131,7 @@ binds the review's alerts to accountable acknowledgement. It takes the private
 
 ## Alert acknowledgement and escalation
 
-`tools/operations_alerts.py` turns each alert in a review result into an
+`provisioner/execution/operations_alerts.py` turns each alert in a review result into an
 accountability record. It never mutates a native resource and never asserts
 acceptance; it decides only whether the alerts have been answered by the owner
 that the review names.
@@ -200,7 +200,7 @@ interrupted alert stage is therefore never completed by a retry.
 ## Command line
 
 ```sh
-python tools/operations_review.py --review /private/operations-review.json \
+python -m provisioner.execution.operations_review --source-root /opt/hosting-source --review /private/operations-review.json \
   --output /private/operations-result.json
 ```
 
@@ -210,7 +210,7 @@ including a rejected input, exits 2 with `HOLD_OPERATIONS_RECONCILIATION` and
 `native_acceptance: false`.
 
 ```sh
-python tools/operations_alerts.py --review /private/operations-review.json \
+python -m provisioner.execution.operations_alerts --review /private/operations-review.json \
   --result /private/operations-result.json \
   --acknowledgements /private/acknowledgements.json \
   --release /private/containment-release.json \

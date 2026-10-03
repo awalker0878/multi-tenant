@@ -23,6 +23,7 @@ def main() -> int:
     site_worker_dsn = os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN')
     discovery_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DISCOVERY_DSN')
     assessment_dsn = os.environ.get('HOSTING_TEST_POSTGRES_ASSESSMENT_DSN')
+    monitor_dsn = os.environ.get('HOSTING_TEST_POSTGRES_MONITOR_DSN')
     from provisioner.controlplane.persistence.migrate import apply_migrations
 
     with psycopg.connect(admin_dsn, autocommit=True) as connection:
@@ -36,7 +37,7 @@ def main() -> int:
         identities = [dsn for dsn in (
             migration_dsn, runtime_dsn, authority_dsn, enrollment_dsn,
             directory_resolver_dsn, directory_writer_dsn, site_worker_dsn,
-            discovery_dsn, assessment_dsn) if dsn]
+            discovery_dsn, assessment_dsn, monitor_dsn) if dsn]
         roles = []
         for dsn in identities:
             settings = conninfo_to_dict(dsn)
@@ -86,8 +87,24 @@ def main() -> int:
             'text, text, text, text, text, text, text, text, text, text) TO {}',
             'GRANT EXECUTE ON FUNCTION '
             'hosting_controlplane.lock_native_worker_scope(text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION '
+            'hosting_controlplane.lock_planned_worker_scope(text, text, text) TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.planned_resource_ownership, '
+            'hosting_controlplane.planned_creation_children TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_job_scope('
             'text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.migration_wave_job_window('
+            'text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_migration_wave_domain('
+            'text, text, text), hosting_controlplane.migration_wave_release_is_current('
+            'text, text, text, text, timestamptz) TO {}',
+            'GRANT SELECT ON hosting_controlplane.migration_wave_domains, '
+            'hosting_controlplane.migration_wave_domain_scopes, '
+            'hosting_controlplane.migration_wave_release_acceptances TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.migration_waves, '
+            'hosting_controlplane.migration_wave_events TO {}',
+            'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.migration_wave_members, '
+            'hosting_controlplane.migration_wave_resource_claims TO {}',
             'GRANT SELECT, INSERT, UPDATE ON '
             'hosting_controlplane.native_operation_leases, '
             'hosting_controlplane.native_operation_intents TO {}',
@@ -107,6 +124,7 @@ def main() -> int:
             'GRANT SELECT ON hosting_controlplane.assessment_inputs TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.application_draft_revisions TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.discovery_freshness_checks TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.discovery_alert_deliveries TO {}',
             'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
@@ -170,6 +188,8 @@ def main() -> int:
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_job_scope(text, text, text) TO {}',
                 'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.migration_wave_job_window(text, text, text) TO {}',
+                'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_worker_scope('
@@ -200,6 +220,17 @@ def main() -> int:
                 'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
             ):
                 connection.execute(sql.SQL(statement).format(reviewer))
+        if monitor_dsn:
+            monitor = sql.Identifier(conninfo_to_dict(monitor_dsn)['user'])
+            for statement in (
+                'GRANT SELECT ON hosting_controlplane.environment_registrations, '
+                'hosting_controlplane.discovery_generations, hosting_controlplane.evidence_entries, '
+                'hosting_controlplane.evidence_streams, hosting_controlplane.audit_streams TO {}',
+                'GRANT SELECT, INSERT ON hosting_controlplane.discovery_freshness_checks, '
+                'hosting_controlplane.discovery_alert_deliveries, hosting_controlplane.audit_events TO {}',
+                'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(monitor))
     print('PostgreSQL control-plane test roles and grants are ready')
     return 0
 

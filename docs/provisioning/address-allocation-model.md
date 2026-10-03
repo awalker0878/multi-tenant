@@ -37,7 +37,7 @@ each owner produces. Nothing here restates them.
 
 | Compiled | Validated by | Reached through |
 | --- | --- | --- |
-| capacity request | `tools/capacity.py` | `provisioner/repository.py` |
+| capacity request | `provisioner/allocations/capacity_owner.py` | `provisioner/repository.py` |
 | reservation intent | `provisioner/allocations/reservation_preflight.py` | `provisioner/repository.py` |
 | allocation intent | `provisioner/allocations/ipam_preflight.py` | `provisioner/repository.py` |
 | registration intent | `provisioner/allocations/dns_preflight.py` | `provisioner/repository.py` |

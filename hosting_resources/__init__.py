@@ -8,9 +8,23 @@ checkout or to another distribution's similarly named file.
 from __future__ import annotations
 
 import atexit
+import json
 from contextlib import ExitStack
 from importlib.resources import as_file, files
 from pathlib import Path, PurePosixPath
+
+
+# Runbooks shipped with application/control-plane runtime owners even when no
+# capability index yet cites the new implementation. Build and integrity owners
+# share this exact declaration; missing files cannot be repaired from a checkout.
+_runtime_docs = json.loads(files(__name__).joinpath('runtime-documents.json').read_text(encoding='utf-8'))
+if (not isinstance(_runtime_docs, list) or not _runtime_docs
+        or any(not isinstance(name, str) or not name.startswith('docs/')
+               or '..' in PurePosixPath(name).parts or '\\' in name or ':' in name
+               or name != PurePosixPath(name).as_posix() for name in _runtime_docs)
+        or len(_runtime_docs) != len(set(_runtime_docs))):
+    raise ValueError('Invalid hosted runtime documentation manifest')
+EXTRA_EVIDENCE_DOCS = tuple(_runtime_docs)
 
 
 _resources = ExitStack()

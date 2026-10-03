@@ -13,7 +13,7 @@ import dns.message
 import dns.query
 import dns.rdatatype
 import dns.exception
-from tools import dns_change as d
+from provisioner.execution import dns_change as d
 from lab.dns_authority import Authority
 
 

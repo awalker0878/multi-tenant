@@ -1,6 +1,6 @@
 # Retained-VM power execution
 
-`tools/vsphere_power.py` owns power for an existing VMware VM. Terraform retains
+`provisioner/execution/vsphere_power.py` owns power for an existing VMware VM. Terraform retains
 VM configuration, disk and NIC ownership. NSX retains policy/segment ownership;
 the edge owner retains exposure. This command never creates, replaces, migrates,
 reconfigures or deletes a VM. Its completion is execution evidence, not activation.
@@ -50,7 +50,7 @@ Inject the accepted session through `VCENTER_SESSION_TOKEN`; it is never stored
 in the journal. TLS verification is mandatory, with an optional private CA.
 
 ```sh
-python tools/vsphere_power.py --request /private/power.json \
+python -m provisioner.execution.vsphere_power --source-root /opt/hosting-source --request /private/power.json \
   --authority /private/power-authority.json --ledger /private/native-ledger \
   --ca-file /private/vcenter-ca.pem --execute-approved-change
 ```
@@ -77,7 +77,7 @@ results are excluded from the journal.
 Pending tasks and interrupted reads resume without a second power POST:
 
 ```sh
-python tools/vsphere_power.py --request /private/power.json \
+python -m provisioner.execution.vsphere_power --source-root /opt/hosting-source --request /private/power.json \
   --authority /private/current-power-authority.json --ledger /private/native-ledger \
   --ca-file /private/vcenter-ca.pem --resume
 ```

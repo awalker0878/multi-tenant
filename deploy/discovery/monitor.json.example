@@ -1,0 +1,33 @@
+{
+  "format": "hosting-discovery-monitor/1",
+  "subject": "commissioned-freshness-service",
+  "organizationId": "organization-1",
+  "tenantId": "tenant-1",
+  "tokenFile": "/etc/hosting/discovery/monitors/service-access-token",
+  "targets": [
+    {
+      "environmentId": "environment-1",
+      "scope": {
+        "organizationId": "organization-1",
+        "tenantId": "tenant-1",
+        "locationId": "site-1",
+        "securityDomainId": "security-domain-1",
+        "endpointId": "endpoint-1",
+        "nativeScopeId": "native-scope-1",
+        "platformFamily": "openstack"
+      }
+    }
+  ],
+  "policy": {"intervalSeconds": 300, "maxTargets": 256, "maxCycles": 288},
+  "freshnessPolicy": {"refreshAfterSeconds": 3600, "maxAgeSeconds": 86400},
+  "alertOwner": {
+    "ownerId": "commissioned-alert-owner",
+    "origin": "https://alerts.example.invalid",
+    "connectIp": "192.0.2.40",
+    "caBundle": "/etc/hosting/discovery/monitors/alert-owner-ca.pem",
+    "caDigest": "REPLACE_WITH_CA_SHA256",
+    "credentialFile": "/etc/hosting/discovery/monitors/alert-owner-access-token",
+    "receiptPublicKey": "REPLACE_WITH_BASE64_ED25519_OWNER_PUBLIC_KEY",
+    "timeoutSeconds": 5
+  }
+}

@@ -34,7 +34,7 @@ Record the incident authority, scope, precedence, required service dependencies,
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [tools/recovery_review.py](../../tools/recovery_review.py)
+- [provisioner/execution/recovery_review.py](../../provisioner/execution/recovery_review.py)
 - [lab/run_namespace_lab.py](../../lab/run_namespace_lab.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

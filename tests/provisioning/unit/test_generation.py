@@ -31,7 +31,7 @@ def _declared_delivery_scope_keys() -> set:
     """The scope keys `tools/delivery_run.validate` requires, read from its source.
 
     The runner is the owner of the scope contract, so this reads the contract
-    instead of restating it. `tools.delivery_run` imports `fcntl` at module scope
+    instead of restating it. `provisioner.execution.delivery_run` imports `fcntl` at module scope
     through the delivery journal, so the source is the portable way to see it.
     """
     tree = ast.parse(DELIVERY_RUNNER.read_text(encoding='utf-8'))
@@ -45,7 +45,7 @@ def _declared_delivery_scope_keys() -> set:
 
 
 def _delivery_runner():
-    """`tools.delivery_run`, importable on a platform without POSIX file locking.
+    """`provisioner.execution.delivery_run`, importable on a platform without POSIX file locking.
 
     The delivery *journal* genuinely needs `fcntl`; the pure `validate()` contract
     does not. Only that contract is exercised here, so a no-op stub is installed for
@@ -60,11 +60,11 @@ def _delivery_runner():
         stub.flock = lambda *arguments, **options: None
         sys.modules['fcntl'] = stub
         try:
-            from tools import delivery_run
+            from provisioner.execution import delivery_run
             return delivery_run
         finally:
             del sys.modules['fcntl']
-    from tools import delivery_run
+    from provisioner.execution import delivery_run
     return delivery_run
 
 

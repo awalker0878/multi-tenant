@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 from provisioner.compiler.wsd import STATE
-from tools.guest_inventory import build, gate
+from provisioner.execution.guest_inventory import build, gate
 
 
 def fixture():
@@ -70,7 +70,7 @@ class GuestInventoryTests(unittest.TestCase):
             for name, data in [('inputs.json', inputs), ('bundle.json', bundle), ('outputs.json', outputs),
                                ('result.json', result), ('access.json', access)]:
                 write_new(directory / name, encoded(data))
-            invocation = subprocess.run([sys.executable, str(ROOT / 'tools/guest_inventory.py'),
+            invocation = subprocess.run([sys.executable, '-m', 'provisioner.execution.guest_inventory',
                 str(directory / 'access.json'), '--workload-run', str(directory), '--output', str(directory / 'inventory')],
                 capture_output=True, text=True, timeout=30)
             self.assertEqual(invocation.returncode, 0, invocation.stdout + invocation.stderr)

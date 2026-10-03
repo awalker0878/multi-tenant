@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from provisioner.execution import readback_core as c
-from tools import delivery_run as d, delivery_steps as s, execution_journal as j, delivery_containment as incident
+from provisioner.execution import delivery_run as d, delivery_steps as s, execution_journal as j, delivery_containment as incident
 from provisioner.execution.run_files import digest, encoded, load_private, read_private, replace_private, utcnow, write_new
 
 
@@ -21,6 +21,20 @@ class DeliveryTests(unittest.TestCase):
         self.source=patch.object(d,'verify',return_value={'status':'HASHES_MATCH','commit':'a'*40})
         self.source.start(); self.addCleanup(self.source.stop)
     def run_delivery(self): return d.run(self.plan,self.inbox,self.ledger,execute=True)
+
+    def test_child_dispatch_is_fixed_to_actual_package_owners(self):
+        command=s.child_command('provisioner.execution.nft_edge',['--help'])
+        self.assertEqual(command[1:4],['-I','-B','-c'])
+        self.assertEqual(command[-3:], [str(Path(s.__file__).resolve().parents[2]),
+                                      'provisioner.execution.nft_edge','--help'])
+        with self.assertRaisesRegex(ValueError,'Unsupported delivery child owner'):
+            s.child_command('tools.nft_edge',[])
+        from types import SimpleNamespace
+        foreign=SimpleNamespace(__file__=str(self.base/'nft_edge.py'))
+        with patch.object(s.importlib,'import_module',return_value=foreign), \
+             self.assertRaisesRegex(ValueError,'outside the executing package'):
+            s.child_command('provisioner.execution.nft_edge',[])
+
     def offer(self, identity, dependencies, purpose='admission'):
         record=dict(format='hosting-delivery-acceptance/1',plan_sha256=c.digest(self.plan),step_id=identity,
             scope=self.plan['scope'],dependencies=dependencies,purpose=purpose,
@@ -62,6 +76,60 @@ class DeliveryTests(unittest.TestCase):
         with patch.object(s,'dispatch',side_effect=AssertionError('owner replayed')),self.assertRaises(OSError): self.run_delivery()
         self.plan['operation_id']='renamed'; self.plan['generation']=2
         with self.assertRaisesRegex(ValueError,'held scope'): self.run_delivery()
+
+    def test_selected_interrupted_owner_uses_only_its_original_recovery_and_keeps_uncertainty(self):
+        self.offer('admit',{})
+        handoffs=[]; recoveries=[]
+        def selected_owner(step,packet,directory,*args,**keywords):
+            handoffs.append((deepcopy(step),deepcopy(packet),directory))
+            raise InterruptedError('selected owner lost its native response')
+        def selected_recovery(step,packet,directory,*args,**keywords):
+            recoveries.append((deepcopy(step),deepcopy(packet),directory))
+            self.assertEqual(keywords,{'recovery_authority':None})
+            raise ValueError('original selected operation remains uncertain')
+        with patch.object(s,'dispatch',side_effect=AssertionError('legacy dispatch reached')), \
+             patch.object(s,'recover',side_effect=AssertionError('legacy native recovery reached')):
+            with self.assertRaisesRegex(InterruptedError,'lost its native response'):
+                d.run(self.plan,self.inbox,self.ledger,execute=True,
+                      stop_after_step='admit',dispatch_owner=selected_owner,recover_owner=selected_recovery)
+            # Retrying may inspect the retained original operation. It cannot
+            # hand off again or fall back to an operator-token recovery path.
+            for _ in range(2):
+                with self.assertRaisesRegex(ValueError,'remains uncertain'):
+                    d.run(self.plan,self.inbox,self.ledger,execute=True,
+                          stop_after_step='admit',dispatch_owner=selected_owner,recover_owner=selected_recovery)
+        self.assertEqual(len(handoffs),1)
+        self.assertEqual(recoveries,[handoffs[0],handoffs[0]])
+        events=[load_private(path) for path in self.ledger.glob('*/*.json')]
+        self.assertEqual(len([event for event in events if event['kind']=='STEP_STARTED']),1)
+        self.assertEqual([event for event in events if event['kind']=='STEP_COMPLETED'],[])
+
+    def test_selected_completion_recovery_never_reissues_or_uses_legacy_fallback(self):
+        self.offer('admit',{})
+        original_dispatch,original_recover=s.dispatch,s.recover
+        handoffs=[]; recoveries=[]; append=j.Journal.append
+        def selected_owner(step,*args,**keywords):
+            handoffs.append(step['id'])
+            return original_dispatch(step,*args,**keywords)
+        def selected_recovery(step,*args,**keywords):
+            recoveries.append(step['id'])
+            return original_recover(step,*args,**keywords)
+        def lose_completion(log,kind,data):
+            if kind=='STEP_COMPLETED': raise InterruptedError('lost completion projection')
+            return append(log,kind,data)
+        with patch.object(s,'dispatch',side_effect=AssertionError('legacy dispatch reached')), \
+             patch.object(s,'recover',side_effect=AssertionError('legacy recovery reached')):
+            with patch.object(j.Journal,'append',new=lose_completion),self.assertRaises(InterruptedError):
+                d.run(self.plan,self.inbox,self.ledger,execute=True,stop_after_step='admit',
+                      dispatch_owner=selected_owner,recover_owner=selected_recovery)
+            result=d.run(self.plan,self.inbox,self.ledger,execute=True,stop_after_step='admit',
+                         dispatch_owner=selected_owner,recover_owner=selected_recovery)
+            self.assertEqual(result['status'],'STEP_EVIDENCE_RETAINED')
+            repeated=d.run(self.plan,self.inbox,self.ledger,execute=True,stop_after_step='admit',
+                           dispatch_owner=selected_owner,recover_owner=selected_recovery)
+        self.assertEqual(repeated,result)
+        self.assertEqual(handoffs,['admit']); self.assertEqual(recoveries,['admit'])
+        self.assertFalse(result['native_acceptance']); self.assertFalse(result['production_activation'])
     def test_complete_generation_allows_new_plan_with_shared_owner_ledgers(self):
         self.plan['steps']=self.plan['steps'][:1]; self.offer('admit',{}); self.run_delivery()
         firstbase=next(self.ledger.glob('*/runs/*')); owner=s.owner_ledger(firstbase,'terraform')

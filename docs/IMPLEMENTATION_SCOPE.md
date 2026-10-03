@@ -1,9 +1,9 @@
 # Current implementation scope
 
-Reviewed 1 October 2026 on `implementation/all-waves`, from `9d4c668` through the
-OpenStack/profile corrections. The [B01–B50 execution plan](product/enterprise-workload-mobility-execution-plan.md)
-is the current product backlog. Earlier W/C increment ledgers and dated checkpoints
-are historical scopes, not full-program completion claims.
+Reviewed 3 October 2026 on `implementation/all-waves`. The [B01–B50 execution plan](product/enterprise-workload-mobility-execution-plan.md)
+is the current product backlog. Implementation, automated verification, native
+qualification and operating acceptance remain separate. No native qualification,
+pilot acceptance or production release is claimed.
 
 ## Implemented repository components
 
@@ -16,9 +16,10 @@ generation-pinned normalization/comparison are implemented repository paths.
 Installed stage/publish commands and shared-outbox first-capture exclusion exist.
 Revisioned application drafts, attributed assertions, signed assessment-only owner
 decisions, existing-draft browser editing and saved-application comparisons are
-implemented. One-shot process-local batch staging, API/CLI freshness inspection and
-retained on-demand history are implemented. These do not supply complete native
-visibility, fleet scheduling, ownership adoption or execution authorization.
+implemented. Original-only batch publication, process-shared POSIX read budgets, narrow SERVICE
+IAM, periodic monitor service and retained signed HTTPS alert delivery are implemented.
+Shared collector coordination is one host; fleet-wide scale, commissioned custody,
+receiving alert/on-call owners and ownership adoption remain unaccepted.
 
 Profiles use 97 capability IDs, 28 typed properties, strict requirements for all ten
 families and cross-profile recovery/workload checks. Availability catalog 18 corrects
@@ -29,28 +30,34 @@ refused; changed catalog/snapshot digests require new review.
 
 Portable planning, reviewed native roots, lifecycle/readback/fenced-power primitives,
 guest/service handoffs and cross-scope transfer/integrity contracts exist. They are
-not a complete admitted provisioning/migration workflow. `AdmittedMigrationJob`
-currently verifies authority and stops at its gate result.
+joined by an explicit artifact-bound `OpenStackApplicationMigration` workflow and
+live capacity/IPAM, planned native creation and per-dataset transfer owners. Older
+`AdmittedMigrationJob` histories retain their original approval-only behavior.
+Only the selected Ubuntu24.04 VMware-to-OpenStack rebuild route has execution
+composition; its native command, rehearsal/fencing/activation prerequisites hold
+until independently supplied. No native effect is retried after an uncertain result.
 
 ## Removed obsolete paths
 
 Qualification registry/native/provenance and WSD compiler ownership moved into their
 actual packages; retired entry points have no wrappers. The profile correction removes
 a redundant semantic recovery branch, unused constant and parallel field table.
-OpenStack selector 1 is retired rather than forwarded. Other actively imported runtime
-owners remain until their consumers and retained state are migrated and verified.
+OpenStack selector 1 is retired rather than forwarded. Guest/transfer, native observer, delivery, state/runtime/SSH and recovery owners
+are installed package modules. Isolated callers and stale-build rejection cover
+the deleted entry points. Actual retained-state conversion and owner transfer
+remain separately required before deleting live deployed writers.
 
 ## Open implementation and qualification
 
-B05 packaging/execution-state conversion and Wave 2 remain open. Full native fact/
-visibility coverage, deployed credential custody, owner-facing workflows, verified
-external dependencies, no-change ownership adoption, durable fleet/global budgets,
-periodic monitoring/alerts and estate-scale qualification are not complete.
-Admitted native provisioning, full guest/service postconditions, independently bound
-transfer workers, source fencing, final sync/cutover, post-write recovery, whole-VM
-conversion and directed route breadth remain open. Deployed HA/DR, security, native
-failure/recovery campaigns, retained-state handover, pilot and operating acceptance
-must be demonstrated for the exact final revision and installed scope before release.
+Installed runtime commissioning, actual retained-state import and independent owner
+handover remain open. Wave2 services require deployed identity/key/receiver custody,
+full native visibility, dependency verification, fleet-global budgets and measured
+estate scale. Guest per-remote-command authority, isolated application rehearsal,
+source restart/late-writer exclusion, final-sync/activation and post-write recovery
+remain open. Whole-VM, Windows, database/warm methods and other directed routes are
+explicitly unsupported by runtime admission despite descriptive campaign coverage.
+Operating/DR tooling, directed campaign gates, conversion rehearsal and pilot/release
+validators exist; actual final-code native and operating evidence must satisfy them.
 
 ## Verification meaning
 

@@ -2,7 +2,7 @@
 
 Reviewed 3 October 2026. This B05 continuation follows the
 [enterprise workload mobility execution plan](../product/enterprise-workload-mobility-execution-plan.md).
-It moves the fixed read-only guest probe from `tools/guest_probe.py` to
+It moves the fixed read-only guest probe from `provisioner/execution/guest_probe.py` to
 `provisioner.execution.guest_probe`. The former path is deleted and retired; no
 forwarding module or alternate probe is retained.
 
@@ -13,7 +13,7 @@ checks a fixed response-body SHA-256, and returns only the existing bounded stat
 The ten-second process alarm and three-second socket timeout remain unchanged. It does
 not install software, change guest state, discover destinations or grant execution.
 
-`tools/qualify_target.py` still owns campaign orchestration but now reads the fixed
+`provisioner/execution/qualify_target.py` still owns campaign orchestration but now reads the fixed
 probe source from the installed package path. Installed-distribution tests require the
 new module in the wheel, absence of the old tools module and stale bytecode, and exact
 resolution from an unrelated working directory. Target-campaign loopback TLS tests

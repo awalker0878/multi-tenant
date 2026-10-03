@@ -14,8 +14,10 @@ from tests.test_vsphere_network_observe import manifest as pg_manifest, Client a
 from tests.test_nsx_segment_observe import manifest as nsx_manifest, Client as NsxClient
 from tests.test_target_campaign import window
 from tests.test_nutanix_vm_observe import uid
-from tools import qualify_target as q, vmware_network_binding as binding, nsx_segment_observe as nsx
-from tools.guest_inventory import build
+from provisioner.execution import qualify_target as q
+from provisioner.execution import vmware_network_binding as binding
+from provisioner.execution import nsx_segment_observe as nsx
+from provisioner.execution.guest_inventory import build
 from provisioner.execution.run_files import digest, encoded, write_new
 
 

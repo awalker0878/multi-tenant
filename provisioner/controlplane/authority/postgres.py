@@ -200,6 +200,8 @@ def revalidate_admission(cursor, decision: AuthorizedPlan, at: datetime) -> None
 def revalidate_start(cursor, job, at: datetime) -> None:
     """Called before outbox dispatch; a worker rechecks before every mutation."""
     _revalidate(cursor, job, at)
+    from provisioner.migration.wave_schedule import require_wave_window
+    require_wave_window(cursor, job, at)
 
 
 class PostgresAuthority:

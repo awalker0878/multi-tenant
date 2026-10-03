@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.39 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.40 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -9,6 +9,11 @@ Technical decomposition of the control application, durable authority, discovery
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §3](../architecture/reference/3-system-context-and-physical-hosting-topology.md) · [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [RA §15](../architecture/reference/15-cross-vendor-realization-model.md) · [PROV §3](../implementation/provisioning-strategy/3-terraform-native-tools-and-operation-level-support.md).
 
 ## Design content
+
+### Current selected application increment
+
+The actual guest, transfer, observer, delivery, state/runtime/SSH and recovery owners are installed package modules. The selected service interpreter and complete installed wheel/assets are checked against the explicit source. A canonical plan binds one acyclic protected execution artifact. OpenStackApplicationMigration is a separately pinned Temporal type; one-attempt effects retain uncertainty. Live B10/B11 planned creation shares the existing intent owner; no native IDs are invented. Per-dataset transfer enforces actual cgroup/staging ceilings. Guest per-remote-command authority, isolated application rehearsal, source restart/late-writer exclusion, final sync and activation remain unfinished native execution prerequisites.
+
 
 Compose commissioned fabric capacity, native platform domains, scoped security edge
 and service attachments behind the control application. Physical OOB, administration,
@@ -24,7 +29,7 @@ revision and exact workflow/run. Temporal provides durable execution/replay and 
 routing. Enrolled workers receive bounded grants; resource claims, durable native
 intents and fresh per-effect authority checks prevent competing writers. Reconcile
 accepted work after revocation; an unknown outcome is held, never blindly retried.
-`AdmittedMigrationJob` currently completes its authority gate only.
+`AdmittedMigrationJob` retains its original authority-gate behavior. An explicitly artifact-bound plan selects the distinct `OpenStackApplicationMigration` graph; unresolved native prerequisites remain held.
 
 ### Native discovery and original evidence
 

@@ -20,6 +20,23 @@ import zipfile
 
 
 ROOT = Path(__file__).resolve().parents[1]
+B05_EXECUTION_OWNERS = (
+    'guest_inventory', 'guest_run', 'guest_apply', 'guest_services', 'restic_run', 'restic_transfer',
+    'vsphere_observe', 'vsphere_task_observe', 'vsphere_history', 'vsphere_task_tree_observe',
+    'vsphere_port_observe', 'vsphere_network_observe', 'vsphere_clone_source', 'vsphere_task_activity',
+    'nutanix_vm_observe', 'nutanix_observe', 'nutanix_vm_task_observe', 'nutanix_vm_activity_observe',
+    'nutanix_flow_observe', 'nutanix_flow_activity_observe', 'nutanix_entity_activity', 'nutanix_task_tree',
+    'readback_cli', 'nsx_observe', 'nsx_segment_observe', 'nsx_domain_observe', 'nsx_domain_switch_observe',
+    'nsx_domain_binding', 'vmware_network_binding', 'recovery_review', 'openstack_observe', 'qualify_target',
+    'execution_journal', 'dataset_acceptance', 'vsphere_power', 'dns_change',
+    'dns_propagation', 'openstack_quota', 'operations_review', 'operations_alerts',
+    'delivery_run', 'delivery_steps', 'delivery_containment', 'edge_contain',
+    'nft_edge', 'netbox_dns', 'owner_worker', 'remote_owner',
+    'retirement', 'runtime_build', 'owner_install', 'owner_revocations',
+    'edge_install', 'edge_boot', 'state_backend', 'state_export',
+    'state_project', 'ssh_issuer', 'terraform_recovery_review', 'nutanix_terraform_recovery',
+    'nutanix_flow_terraform_recovery', 'nsx_terraform_recovery', 'vsphere_recovery_devices', 'service_http',
+)
 
 
 class InstalledDistributionTest(unittest.TestCase):
@@ -98,6 +115,9 @@ class InstalledDistributionTest(unittest.TestCase):
                               'tools/__pycache__/route_audit.cpython-313.pyc',
                               'tools/check_package.py', 'tools/check_package.pyc',
                               'tools/__pycache__/check_package.cpython-313.pyc')
+        cls.retired_python += tuple(relative for name in (*B05_EXECUTION_OWNERS, 'capacity', 'capacity_demand', 'netbox_ipam') for relative in (
+            'tools/' + name + '.py', 'tools/' + name + '.pyc',
+            'tools/__pycache__/' + name + '.cpython-313.pyc'))
         for relative in cls.retired_python:
             path = cls.staging / relative
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -228,6 +248,33 @@ from provisioner.execution.source_integrity import verify_runtime
 reviewed = Path(FIXTURE_SOURCE_ROOT)
 runtime_binding = verify_runtime(reviewed)
 assert runtime_binding['status'] == 'RUNTIME_SOURCES_MATCH', runtime_binding
+from provisioner.execution.runtime_build import verify_application
+import subprocess
+from functools import partial
+selected_runtime = verify_application(sys.executable, reviewed,
+    partial(subprocess.check_output, text=True, timeout=30))
+assert selected_runtime['status'] == 'RUNTIME_SOURCES_MATCH'
+# Identical bytes with writable installed custody cannot activate a daemon.
+from provisioner.execution import source_integrity
+installed_verifier=Path(source_integrity.__file__)
+mode=installed_verifier.stat().st_mode & 0o777
+try:
+    installed_verifier.chmod(mode | 0o022)
+    try: verify_application(sys.executable, reviewed, partial(subprocess.check_output, text=True, stderr=subprocess.PIPE, timeout=30))
+    except subprocess.CalledProcessError: pass
+    else: raise AssertionError('Writable installed application custody accepted')
+finally:
+    installed_verifier.chmod(mode)
+# A different verifier cannot supply its own claim of source consistency.
+bootstrap=reviewed/'provisioner/execution/source_integrity.py'
+bootstrap_bytes=bootstrap.read_bytes()
+try:
+    bootstrap.write_bytes(bootstrap_bytes+b'\n# foreign verification bootstrap\n')
+    try: verify_application(sys.executable, reviewed, partial(subprocess.check_output, text=True, stderr=subprocess.PIPE, timeout=30))
+    except subprocess.CalledProcessError: pass
+    else: raise AssertionError('Different installed verifier accepted')
+finally:
+    bootstrap.write_bytes(bootstrap_bytes)
 changed = reviewed / 'provisioner/execution/flow_policy.py'
 original = changed.read_bytes()
 try:
@@ -469,14 +516,65 @@ print(json.dumps({'owner':route_audit.__name__,'legacyImports':False,'nativeCont
 import importlib.util, json, sys
 from pathlib import Path
 from provisioner.execution import guest_probe
-from tools import qualify_target
+from provisioner.execution import qualify_target
 probe = Path(guest_probe.__file__).resolve()
 assert probe.is_relative_to(Path(sys.prefix))
-assert qualify_target.ROOT / 'provisioner/execution/guest_probe.py' == probe
+assert qualify_target.ROOT is None
+assert Path(qualify_target.guest_probe.__file__).resolve() == probe
 assert importlib.util.find_spec('tools.guest_probe') is None
 print(json.dumps({'owner': guest_probe.__name__, 'probe': str(probe), 'nativeContact': False}))
 ''')
         self.assertEqual(result['owner'], 'provisioner.execution.guest_probe')
+        self.assertFalse(result['nativeContact'])
+
+    def test_guest_transfer_and_native_readers_have_one_installed_owner(self):
+        names = repr(B05_EXECUTION_OWNERS)
+        result = self.probe('''
+import importlib, importlib.abc, importlib.util, json, subprocess, sys
+from pathlib import Path
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('Package execution reached retired owner: ' + fullname)
+blocker = NoLegacy(); sys.meta_path.insert(0, blocker)
+try:
+    modules = tuple(importlib.import_module('provisioner.execution.' + name) for name in ''' + names + ''')
+    assert all(Path(module.__file__).is_relative_to(Path(sys.prefix)) for module in modules)
+    allocation_modules = tuple(importlib.import_module('provisioner.allocations.' + name) for name in ('capacity_owner', 'capacity_demand', 'netbox_ipam', 'transactions', 'ipam_transactions'))
+    assert all(Path(module.__file__).is_relative_to(Path(sys.prefix)) for module in allocation_modules)
+    live_modules = tuple(importlib.import_module(name) for name in ('provisioner.controlplane.operations.action_gate', 'provisioner.controlplane.operations.health', 'provisioner.controlplane.operations.recovery', 'provisioner.controlplane.operations.runtime', 'provisioner.qualification.action_gate', 'provisioner.qualification.mobility', 'provisioner.qualification.release', 'provisioner.qualification.directed_mobility', 'provisioner.execution.image_sandbox', 'provisioner.controlplane.conversion.contracts', 'provisioner.controlplane.conversion.rehearsal', 'provisioner.migration.application', 'provisioner.migration.activities', 'provisioner.migration.cutover', 'provisioner.migration.cold_descriptor', 'provisioner.migration.resources', 'provisioner.migration.authority', 'provisioner.migration.wave_schedule', 'provisioner.controlplane.workflow.application_selection', 'provisioner.controlplane.workflow.execution_selection', 'provisioner.controlplane.workflow.application_job', 'provisioner.controlplane.reconciliation.planned', 'provisioner.controlplane.reconciliation.planned_terraform', 'provisioner.controlplane.discovery.alert_delivery', 'provisioner.controlplane.discovery.alert_transport', 'provisioner.controlplane.discovery.monitor_runtime', 'provisioner.controlplane.discovery.shared_read_budget'))
+    assert all(Path(module.__file__).is_relative_to(Path(sys.prefix)) for module in live_modules)
+    import hosting_resources
+    assert all(hosting_resources.resource_path(name).is_file() for name in hosting_resources.EXTRA_EVIDENCE_DOCS)
+    from provisioner.execution import guest_run, guest_apply, qualify_target, readback_cli, nsx_observe, delivery_steps, runtime_build, owner_worker, vsphere_power, openstack_quota, delivery_run
+    assert guest_run.ROOT is None and guest_apply.ROOT is None and qualify_target.ROOT is None
+    for call in (lambda: guest_run.prepare(None), lambda: guest_apply.validate_bundle(Path('/not-read'), {})):
+        try: call()
+        except ValueError as error: assert 'explicit current source checkout' in str(error)
+        else: raise AssertionError('Installed guest execution accepted absent source selection')
+    assert all(module.ROOT is None for module in (runtime_build, owner_worker, vsphere_power, openstack_quota, delivery_run))
+    owner_commands = [delivery_steps.child_command(name, ['--help']) for name in sorted(delivery_steps.CHILD_OWNERS)]
+    try: delivery_steps.child_command('tools.nft_edge', [])
+    except ValueError: pass
+    else: raise AssertionError('Legacy delivery child admitted')
+    command = readback_cli.module_command(nsx_observe, [str(Path.cwd() / 'missing-reader-manifest')])
+    assert command[1:4] == ['-I', '-B', '-c']
+finally:
+    sys.meta_path.remove(blocker)
+assert all(importlib.util.find_spec('tools.' + name) is None for name in ''' + names + ''')
+assert all(importlib.util.find_spec('tools.' + name) is None for name in ('capacity', 'capacity_demand', 'netbox_ipam'))
+child = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True,
+                       text=True, cwd=Path.cwd(), timeout=15)
+assert child.returncode == 2, child.stdout + child.stderr
+assert json.loads(child.stdout) == {'status': 'INPUT_OR_OUTPUT_REJECTED', 'may_activate': False}
+for command in owner_commands:
+    result = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True, text=True, cwd=Path.cwd(), timeout=15)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'usage:' in result.stdout
+print(json.dumps({'owners': len(modules), 'legacyImports': False, 'nativeContact': False}))
+''')
+        self.assertEqual(result['owners'], len(B05_EXECUTION_OWNERS))
+        self.assertFalse(result['legacyImports'])
         self.assertFalse(result['nativeContact'])
 
     def test_source_integrity_is_package_owned_and_has_no_checkout_fallback(self):

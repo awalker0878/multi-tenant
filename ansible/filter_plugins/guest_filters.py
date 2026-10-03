@@ -5,8 +5,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from datetime import datetime, timezone
-from tools.guest_inventory import gate, timestamp
-from tools.guest_services import resolver_bound
+from provisioner.execution.guest_inventory import gate, timestamp
+from provisioner.execution.guest_services import resolver_bound
 
 
 def guest_gate(enabled, outputs, access, known_hosts, targets, hostvars):

@@ -15,13 +15,13 @@ from provisioner.controlplane.authority.service import (
     SOURCE_OWNER, DESTINATION_OWNER, SOURCE_SECURITY, DESTINATION_SECURITY,
     WORKER, LeaseState)
 from provisioner.domain.enterprise_records import plan_digest
-from provisioning.schema.test_enterprise_records import (
+from tests.provisioning.schema.test_enterprise_records import (
     plan as selected_plan, transfer as selected_transfer, TARGET)
-from tools import restic_run
-from tools.restic_transfer import (
+from provisioner.execution import restic_run
+from provisioner.execution.restic_transfer import (
     FORMAT, TransferGuard, execute_authorized_transfer, grant_digest, validate)
 from provisioner.execution.run_files import digest, encoded, load_private, utcnow
-from test_restic_run import fixture
+from tests.test_restic_run import fixture
 
 
 class TransferTests(unittest.TestCase):
@@ -259,7 +259,7 @@ class TransferTests(unittest.TestCase):
         self.assertEqual(self.calls, [])
 
     def test_running_command_deadline_cannot_outlive_current_owner_lease(self):
-        from tools.restic_transfer import GuardedRestic
+        from provisioner.execution.restic_transfer import GuardedRestic
         self.leases.lease = replace(self.leases.lease, expires_at=self.now + timedelta(seconds=1))
         _grant, deadline = self.guard.check_window(self.envelope)
         self.assertEqual(deadline, self.leases.lease.expires_at)

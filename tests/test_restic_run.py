@@ -2,7 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 import tempfile
 import unittest
-from tools.restic_run import validate, manifest, restore
+from provisioner.execution.restic_run import validate, manifest, restore
 from provisioner.execution.run_files import utcnow
 
 

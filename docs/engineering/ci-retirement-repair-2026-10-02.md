@@ -22,7 +22,7 @@ reproduction remain evidence. Rechecking the final revision is required.
 
 ## Independent expectations and rejection tests
 
-The test's explicit `EXPECTED` map now includes `tools/terraform_catalog.py` with
+The test's explicit `EXPECTED` map now includes `provisioner/execution/terraform_catalog.py` with
 replacement `provisioner/execution/terraform_catalog.py`. It remains independent
 of the actual register, retaining exact name/kind/replacement and duplicate checks.
 The existing register itself does not change and still contains eighteen entries.
@@ -32,7 +32,7 @@ package, ensuring the replacement contains implementation and does not import
 back into `tools` or `scripts`.
 
 This is not permission to delete an active runtime owner or retained state. The
-existing `tools/check_release.py` and every caller remain unchanged in this delivered
+existing `provisioner/execution/source_integrity.py` and every caller remain unchanged in this delivered
 increment. A separately prepared source-integrity relocation was not published;
 no partial migration, forwarding alias or extra retirement is included here.
 

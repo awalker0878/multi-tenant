@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 from provisioner.execution import readback_core as c
-from tools import delivery_steps as steps
+from provisioner.execution import delivery_steps as steps
 from provisioner.execution.run_files import digest, encoded, load_private, read_private, write_new
 
 

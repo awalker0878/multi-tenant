@@ -31,7 +31,7 @@ unknown, including fields the native product may omit when empty. A profile whos
 required fields/version tokens cannot be obtained needs an engineered, reviewed
 normalization or a different observer; the code does not fabricate success.
 
-`tools/readback_cli.py` supplies the shared command-line plumbing for these
+`provisioner/execution/readback_cli.py` supplies the shared command-line plumbing for these
 adapters. It validates the manifest without contacting anything unless
 `--read-authorized-target` is given, requires an enabled manifest, an expected
 origin and a new private output before any request, refuses `.invalid`

@@ -1,0 +1,12 @@
+[
+  "docs/operations/control-application/1-operating-the-selected-slice.md",
+  "docs/operations/control-application/2-campaign-pilot-and-release.md",
+  "docs/operations/retained-state-conversion-rehearsal.md",
+  "docs/engineering/discovery-service-scheduling.md",
+  "docs/engineering/discovery-monitor-service.md",
+  "docs/engineering/application-migration-runtime.md",
+  "docs/engineering/job-bound-resource-transactions.md",
+  "docs/engineering/planned-openstack-creation.md",
+  "docs/engineering/application-worker-composition.md",
+  "docs/operations/directed-mobility-expansion.md"
+]

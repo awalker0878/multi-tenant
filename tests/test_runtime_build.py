@@ -13,7 +13,7 @@ from unittest.mock import patch
 import zipfile
 
 from provisioner.execution import readback_core as c
-from tools import runtime_build as d
+from provisioner.execution import runtime_build as d
 from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 
 
@@ -30,7 +30,7 @@ def authority(config):
 
 
 class Host(d.Host):
-    def __init__(self, config): self.config=config; self.calls=[]; self.fail=None; self.extra={}; self.identity_calls=0
+    def __init__(self, config): self.config=config; self.calls=[]; self.fail=None; self.extra={}; self.identity_calls=0; self.runtime_status='RUNTIME_SOURCES_MATCH'
     def identity(self,config,root): self.identity_calls+=1
     def command(self,argv,cwd):
         args=list(map(str,argv)); self.calls.append(args)
@@ -46,6 +46,7 @@ class Host(d.Host):
         if d.PACKAGES_CODE in args:
             return json.dumps(dict(packages={x['name']:x['version'] for x in self.config['wheels']}|self.extra,
                 prefix=str(Path(self.config['output'])/'env'),base_prefix='/opt/python'))
+        if d.RUNTIME_CODE in args: return json.dumps(dict(status=self.runtime_status,files_checked=42))
         if 'version' in args: return json.dumps(dict(terraform_version='1.13.5',platform='linux_amd64'))
         return ''
 
@@ -56,7 +57,9 @@ class RuntimeTests(unittest.TestCase):
         wheels=[]
         for name,version in (d.pins(d.ROOT)|{'pip':'26.2.1'}).items():
             path=self.base/(name.replace('-','_')+'-'+version+'-py3-none-any.whl')
-            raw=zipped({name.replace('-','_')+'-'+version+'.dist-info/METADATA':f'Name: {name}\nVersion: {version}\n'})
+            files={name.replace('-','_')+'-'+version+'.dist-info/METADATA':f'Name: {name}\nVersion: {version}\n'}
+            if name=='hosting-provisioner': files.update({name:path.read_bytes() for name,path in d.application_files(d.ROOT).items()})
+            raw=zipped(files)
             write_new(path,raw); wheels.append(dict(name=name,version=version,path=str(path),sha256=digest(raw)))
         terraform=zipped({'terraform':b'TERRAFORM'}); path=self.base/'terraform.zip'; write_new(path,terraform)
         self.config=dict(format='hosting-runtime-build/1',enabled=True,source_commit='a'*40,python='/opt/python/bin/python',
@@ -104,11 +107,35 @@ class RuntimeTests(unittest.TestCase):
         wheel=self.config['wheels'][0]; Path(wheel['path']).write_bytes(b'WRONG')
         with self.assertRaisesRegex(ValueError,'artifact changed'): self.build()
         self.assertEqual(self.host.calls,[])
+
         self.config['output']=str(self.base/'other')
         raw=zipped({'foreign-1.dist-info/METADATA':'Name: foreign\nVersion: 1\n'})
         Path(wheel['path']).write_bytes(raw); wheel['sha256']=digest(raw)
         with self.assertRaisesRegex(ValueError,'identity differs'): self.build()
         self.assertEqual(self.host.calls,[])
+
+    def test_application_wheel_is_pinned_and_its_code_is_checked_before_execution(self):
+        wheel=next(item for item in self.config['wheels'] if item['name']=='hosting-provisioner')
+        missing=deepcopy(self.config)
+        missing['wheels']=[item for item in missing['wheels'] if item['name']!='hosting-provisioner']
+        with self.assertRaisesRegex(ValueError,'hosting-provisioner'): d.validate(missing)
+        with zipfile.ZipFile(wheel['path']) as archive:
+            files={name:archive.read(name) for name in archive.namelist()}
+        files['provisioner/execution/source_integrity.py']=b'raise RuntimeError("foreign application")\n'
+        raw=zipped(files); Path(wheel['path']).write_bytes(raw); wheel['sha256']=digest(raw)
+        with self.assertRaisesRegex(ValueError,'Application wheel source or asset bytes differ'): self.build()
+        self.assertEqual(self.host.calls,[])
+        self.assertFalse((Path(self.config['output'])/'receipt.json').exists())
+
+    def test_installed_application_mismatch_holds_completed_publication(self):
+        self.host.runtime_status='FAILED_RUNTIME_SOURCE_CHECK'
+        with self.assertRaisesRegex(ValueError,'Installed application differs'): self.build()
+        output=Path(self.config['output'])
+        self.assertTrue((output/'intent.json').exists())
+        self.assertFalse((output/'receipt.json').exists())
+        runtime=next(call for call in self.host.calls if d.RUNTIME_CODE in call)
+        self.assertEqual(runtime[1:4],['-B','-I','-c'])
+        self.assertEqual(runtime[-1],str(d.ROOT))
 
     def test_unsafe_archive_symlinks_duplicate_paths_and_unknown_terraform_files(self):
         for name in ('../escape','/absolute','a\\b','a//b','a/./b'):

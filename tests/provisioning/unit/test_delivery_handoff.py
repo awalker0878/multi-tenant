@@ -7,11 +7,11 @@ reviewed owner operation is discharged by a declared typed step, that one clean
 source commit and one generation are bound, and that nothing in this repository
 became a second runner, a second journal or a second recovery model.
 
-`tools/delivery_run.py` is the owner of the graph contract and imports `fcntl` at
+`provisioner/execution/delivery_run.py` is the owner of the graph contract and imports `fcntl` at
 module scope through the delivery journal, so it is imported here behind a no-op
 stub for the duration of the import — the pure `validate()` contract does not need
 file locking. The mirrored declarations are compared against the owner's source and
-against `tools.delivery_steps.KINDS`, so a kind, a parameter or a grammar the runner
+against `provisioner.execution.delivery_steps.KINDS`, so a kind, a parameter or a grammar the runner
 adds cannot drift unnoticed.
 """
 from __future__ import annotations
@@ -63,7 +63,7 @@ def _run(*arguments: str) -> tuple[int, dict]:
 
 
 def _delivery_runner():
-    """`tools.delivery_run`, importable on a platform without POSIX file locking."""
+    """`provisioner.execution.delivery_run`, importable on a platform without POSIX file locking."""
     try:
         import fcntl  # noqa: F401
     except ImportError:
@@ -72,21 +72,21 @@ def _delivery_runner():
         stub.flock = lambda *arguments, **options: None
         sys.modules['fcntl'] = stub
         try:
-            from tools import delivery_run
+            from provisioner.execution import delivery_run
             return delivery_run
         finally:
             del sys.modules['fcntl']
-    from tools import delivery_run
+    from provisioner.execution import delivery_run
     return delivery_run
 
 
 def _delivery_steps():
-    from tools import delivery_steps
+    from provisioner.execution import delivery_steps
     return delivery_steps
 
 
 def _literal_set(pattern: str) -> set:
-    """The set literal `tools/delivery_steps.py` accepts at one predicate.
+    """The set literal `provisioner/execution/delivery_steps.py` accepts at one predicate.
 
     The runner owns these sets. Reading them out of its source keeps the mirror
     honest without restating the contract a second time.
@@ -100,7 +100,7 @@ def _literal_set(pattern: str) -> set:
 def _module_literal(relative: str, name: str) -> set:
     """A module-level set constant, read from the module's source.
 
-    `tools.netbox_ipam` and `tools.netbox_dns` import `fcntl` at module scope, so
+    `provisioner.allocations.netbox_ipam` and `provisioner.execution.netbox_dns` import `fcntl` at module scope, so
     their declarations are read the same way the runner's are.
     """
     source = (support.ROOT / relative).read_text(encoding='utf-8')
@@ -151,9 +151,9 @@ class MirroredContractTest(unittest.TestCase):
 
     def test_every_mirrored_action_set_is_the_declared_action_set(self):
         self.assertEqual(handoff.IPAM_ACTIONS,
-                         _module_literal('tools/netbox_ipam.py', 'ACTIONS'))
+                         _module_literal('provisioner/allocations/netbox_ipam.py', 'ACTIONS'))
         self.assertEqual(handoff.DNS_ACTIONS,
-                         _module_literal('tools/netbox_dns.py', 'ACTIONS'))
+                         _module_literal('provisioner/execution/netbox_dns.py', 'ACTIONS'))
         self.assertEqual(handoff.CAPACITY_ACTIONS,
                          _literal_set(r"values\['action'\] in (\{[^}]*\}),"
                                       r"'Unknown capacity transition'"))

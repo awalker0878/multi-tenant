@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.15 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.16 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -9,6 +9,11 @@ Reference adoption for enterprise workload mobility and secure hosting across qu
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §1](../architecture/reference/1-purpose-scope-and-architectural-authority.md) · [RA §7](../architecture/reference/7-tenant-environments-and-security-domain-placement.md) · [RA §29](../architecture/reference/29-architecture-decisions-and-alternatives.md).
 
 ## Design content
+
+### Current selected application increment
+
+The selected execution contract is VMware to OpenStack rebuild/restore for Ubuntu24.04. Each direction, method, native tuple, guest profile and final source revision retains separate admission and qualification evidence. Package ownership, deployable discovery services, native resource transactions and operating/conversion tooling do not imply operating or release acceptance.
+
 
 The proposed v1.4 infrastructure reference and delivery-kit v1.1 remain the adoption
 basis. Adopt physical/logical views as a versioned set, with independent information

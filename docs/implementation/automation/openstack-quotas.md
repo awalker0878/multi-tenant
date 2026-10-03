@@ -2,7 +2,7 @@
 
 [Automation home](README.md) · [Capacity reservations](capacity-reservations.md) · [Reference decisions](reference-realization.md)
 
-`tools/openstack_quota.py` applies exact accepted limits to an existing tenant
+`provisioner/execution/openstack_quota.py` applies exact accepted limits to an existing tenant
 project through Nova, Cinder or Neutron. It verifies the administrative token,
 native target project, selected catalog endpoint, current limits and usage
 before one native PUT. Durable intent prevents an interrupted controller from
@@ -76,8 +76,8 @@ bind exact input bytes. The trusted CA is mandatory. Tokens are injected through
 a private file and never retained in receipts or printed diagnostics.
 
 ```sh
-python tools/openstack_quota.py --request /private/quota-request.json
-python tools/openstack_quota.py --request /private/quota-request.json \
+python -m provisioner.execution.openstack_quota --source-root /opt/hosting-source --request /private/quota-request.json
+python -m provisioner.execution.openstack_quota --source-root /opt/hosting-source --request /private/quota-request.json \
   --authority /private/quota-authority.json --token /private/quota-token \
   --ca /private/service-ca.pem --ledger /private/quota-ledger --execute
 ```

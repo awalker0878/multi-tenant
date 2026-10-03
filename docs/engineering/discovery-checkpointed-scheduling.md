@@ -6,6 +6,11 @@ Reviewed 2 October 2026. This continuation starts from
 It adds durable local progress and bounded waiting to the existing batch dispatcher.
 It does not complete fleet-wide scheduling, periodic monitoring or native acceptance.
 
+The 3 October continuation adds [service/timer wiring, shared-host endpoint budgets
+and original-only batch publication](discovery-service-scheduling.md). The separate
+[current-authority monitor service](discovery-monitor-service.md) handles actual
+alert-owner delivery and acknowledgements under its own retained record owner.
+
 ## Installed commands
 
 The existing `hosting-discovery-collect` command accepts an opt-in private journal.
@@ -31,7 +36,9 @@ contacting platforms or creating enrollment. `batch-reconcile` additionally invo
 only the installed collector's existing **inspect** operation for unresolved tasks.
 It never invokes stage, publish or a native adapter as a fallback. The existing
 [original-outbox inspection contract](discovery-outbox-inspection.md) remains authoritative.
-No public API, SQL migration, human/service role change or new executable is introduced.
+The capture journal introduces no public mutation API or collection authority.
+The separate monitor service's identity/delivery migration is documented in its own
+contract; the human freshness HTTP routes are unchanged.
 
 ## One manifest, one local progress owner
 
@@ -66,10 +73,13 @@ and no-overwrite publication; no second file-publication implementation was intr
 | TASK_HELD | A started task with unsuccessful or uncertain execution; no automatic retry follows. |
 | TASK_STAGED | A started task whose exact bounded stage outcome was returned and retained. |
 | TASK_RECONCILED | A started/held task with currently verified original signed outbox custody; no collection request. |
+| TASK_PUBLICATION_STARTED | A staged/reconciled original or explicitly retried unknown delivery, inside the original window; at most three attempts. |
+| TASK_PUBLICATION_UNKNOWN | A started delivery without a retained authenticated receipt; no automatic retry follows. |
+| TASK_PUBLISHED | A started delivery with a receipt bound to the exact retained original. |
 
 Partial or unexpected files, changed bytes, gaps, invalid transitions and clock
-regression hold. Maximum accepted history is 385 records (enrollment plus at most
-start/hold/reconcile per 128 tasks), at most 8 KiB per record. These are accepted data
+regression hold. Maximum accepted history is 1,153 records (enrollment plus at most
+three capture and six publication records per 128 tasks), at most 8 KiB per record. These are accepted data
 bounds, not a hard operating-system memory/disk deadline. A poisoned append instance
 cannot continue writing: failure after publication may already have left the final
 record, which must be read and reconciled on a new invocation.
@@ -106,7 +116,8 @@ Checkpointed stage/run results use `hosting-discovery-checkpointed-batch-outcome
 They retain the batch identity, task order and stage counts, adding journal sequence/
 digest, unresolved/pending task counts, `waitedForDue`, `durableSchedule: true` and
 `scheduleScope: ONE_LOCAL_BATCH_JOURNAL`. Native read `limitScope` remains
-**THIS_PROCESS_ONLY**. A local durable queue must not be advertised as globally
+**THIS_PROCESS_ONLY** by default; an explicit shared endpoint directory selects
+**ONE_SHARED_POSIX_COORDINATOR_HOST**. A local durable queue must not be advertised as globally
 coordinated fleet admission. Every result retains `executionAuthorized: false` and
 `publicationAttempted: false`.
 
@@ -153,8 +164,8 @@ The normal installed `-m` command tests remain, and the contending CLI fixture i
 the same command entry point only after setup. The helper is not installed runtime
 code and changes no campaign lifetime, native timeout, production lock or permission.
 
-B22 still requires durable fleet-wide policy/endpoint budgets, authenticated periodic
-freshness monitoring and alerts, scalable resumable publication, independent omission
+B22 still requires commissioned deployment/receiver/identity/custody, multi-host global
+policy/endpoint budgets, large-result publication, independent omission
 reconciliation and estate measurements. The freshness HTTP routes remain human-only;
 this change does not reuse human sessions as machine credentials. B05 and later native
 provisioning/migration/recovery waves remain open. No production system was contacted.

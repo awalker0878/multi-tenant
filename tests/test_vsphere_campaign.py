@@ -8,8 +8,9 @@ from tests.test_vsphere_observe import manifest, Client
 from tests.test_vsphere_task_observe import manifest as task_manifest, task_body
 from tests.test_target_campaign import plan_fixture, window
 from tests.test_guest_inventory import fixture as guests
-from tools import qualify_target as q, vsphere_task_observe as tasks
-from tools.guest_inventory import build
+from provisioner.execution import qualify_target as q
+from provisioner.execution import vsphere_task_observe as tasks
+from provisioner.execution.guest_inventory import build
 from provisioner.execution.run_files import digest, encoded, write_new
 
 

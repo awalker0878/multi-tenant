@@ -22,7 +22,8 @@ import zipfile
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from provisioner.execution import readback_core as c
-from tools import runtime_build as d
+from provisioner.execution import runtime_build as d
+from provisioner.execution.source_integrity import _protected_checkout
 from provisioner.execution.run_files import digest,encoded,require,utcnow,write_new
 
 
@@ -31,7 +32,8 @@ class EngineHost(d.Host):
     def __init__(self): self.commands=0
     def identity(self,config,root):
         source=d.verify(root)
-        require(source['status']=='HASHES_MATCH' and source['commit']==config['source_commit'],'Fixture checkout changed')
+        require(_protected_checkout(root) and source['status']=='HASHES_MATCH'
+                and source['commit']==config['source_commit'],'Protected fixture checkout changed')
         require(digest(Path(config['python']).read_bytes())==config['python_sha256'],'Fixture Python changed')
     def command(self,argv,cwd):
         self.commands+=1
@@ -55,7 +57,8 @@ def authority(config):
 def run(terraform):
     require(os.geteuid()==0 and Path('/usr/bin/unshare').is_file(),'Disposable network namespace lab requires root')
     require(platform.python_version().startswith('3.13.'),'Repository Python 3.13 engine required')
-    source=d.verify(ROOT); require(source['status']=='HASHES_MATCH','Clean exact source required')
+    source=d.verify(ROOT)
+    require(_protected_checkout(ROOT) and source['status']=='HASHES_MATCH','Protected clean exact source fixture required')
     binary=Path(terraform).read_bytes()
     with tempfile.TemporaryDirectory(prefix='hosting-runtime-lab-',dir='/var/lib') as temporary:
         base=Path(temporary); wheelhouse=base/'candidates'; wheelhouse.mkdir(mode=0o700)
@@ -64,6 +67,14 @@ def run(terraform):
         subprocess.run([sys.executable,'-I','-m','pip','download','--only-binary=:all:','--no-cache-dir',
             '--disable-pip-version-check','--dest',str(wheelhouse),'-r',str(ROOT/'requirements-repository.txt'),
             'pip=='+importlib.metadata.version('pip')],env=d.ENV.copy(),check=True,timeout=240)
+        # The application runtime is an actual wheel built from this exact local
+        # checkout; it is installed and byte-checked with the dependency wheels.
+        wheel_source=base/'wheel-source'
+        shutil.copytree(ROOT,wheel_source,ignore=shutil.ignore_patterns(
+            '.git','build','dist','__pycache__','*.egg-info'))
+        subprocess.run([sys.executable,'-I','-m','pip','wheel','--no-index','--no-deps',
+            '--no-build-isolation','--wheel-dir',str(wheelhouse),str(wheel_source)],
+            env=d.ENV.copy(),check=True,timeout=240)
         wheels=[]
         for path in sorted(wheelhouse.glob('*.whl')):
             path.chmod(0o600)
@@ -89,7 +100,7 @@ def run(terraform):
         require(d.build(config,None,host=host,observe=True)==receipt and host.commands==calls,'Read-only repeat executed an engine')
         # Real ordinary imports must preserve the already sealed hash bytecode.
         python=Path(config['output'])/'env/bin/python'
-        host.command([python,'-I','-c','import ansible, jinja2, yaml, dns.resolver, cryptography; print(ansible.__version__)'],base)
+        host.command([python,'-I','-c','import ansible, jinja2, yaml, dns.resolver, cryptography, provisioner.execution.owner_worker; print(ansible.__version__)'],base)
         d.build(config,None,host=host,observe=True)
         # A transitive omission is permitted by the request schema but must fail
         # the actual offline dependency check, without a completed receipt.

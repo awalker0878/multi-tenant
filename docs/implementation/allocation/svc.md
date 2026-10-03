@@ -19,7 +19,7 @@ Consumers SHALL NOT receive broad routing to a shared-services supernet solely b
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Consumers SHALL NOT receive broad routing to a shared-services supernet solely because they consume one shared service.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-008, CT-037
 
@@ -42,7 +42,7 @@ Where useful, shared services SHOULD expose zone-aligned endpoints so that consu
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Where useful, shared services SHOULD expose zone-aligned endpoints so that consumption does not force unnecessary cross-zone routing.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-008, CT-025
 
@@ -65,7 +65,7 @@ Each ServiceProfile SHALL define direction, endpoint identity, authentication, a
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Each ServiceProfile SHALL define direction, endpoint identity, authentication, allowed scope, availability, failure behavior and management separation; bindings SHALL be revoked when their entitlement or service version expires.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-008, CT-028, CT-077
 
@@ -83,7 +83,7 @@ Each ServiceProfile SHALL define direction, endpoint identity, authentication, a
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Each ServiceProfile SHALL define direction, endpoint identity, authentication, allowed scope, availability, failure behavior and management separation
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-008, CT-028, CT-077
 
@@ -101,7 +101,7 @@ Each ServiceProfile SHALL define direction, endpoint identity, authentication, a
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: bindings SHALL be revoked when their entitlement or service version expires.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-008, CT-028, CT-077
 

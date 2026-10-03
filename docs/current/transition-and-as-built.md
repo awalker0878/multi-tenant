@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.25 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.26 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -9,6 +9,11 @@ Migration, recovery, retained-state conversion and as-built acceptance across ex
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [OPS §3](../operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md) · [OPS §6](../operations/recovery-transition/6-migrate-and-fail-back-without-conflicting-writers.md) · [QUAL §7](../assurance/site-qualification/7-operating-accountability-handover-and-change.md).
 
 ## Design content
+
+### Current selected application increment
+
+Retained-state conversion rehearsal preserves original bytes and reconciles canonical records, actual Terraform/delivery journals, counts/native IDs/scope/epochs. Rehearsal is observation-only, with no import, lease or writer permission. Actual independent native inventory, frozen old writers, owner-epoch advance and accepted database import remain required. Operating backup/restore, health/ITSM, final-code campaign and pilot/release validators exist; deployed acceptance and final supported release remain unrecorded.
+
 
 Record observed ownership/topology before introducing an isolated target. Every
 intermediate state names routes, identities, protected dependencies, data consistency,

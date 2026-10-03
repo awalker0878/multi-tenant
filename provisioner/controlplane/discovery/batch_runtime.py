@@ -107,18 +107,19 @@ class DiscoveryBatch:
 
 
 def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
-              state_directory=None, wait_for_due=False) -> dict:
+              state_directory=None, wait_for_due=False, fleet_state_directory=None) -> dict:
     if type(wait_for_due) is not bool or wait_for_due and state_directory is None:
         raise ValueError('Waiting requires an explicit durable batch journal')
     spec = DiscoveryBatch.from_file(path)
     if state_directory is None:
-        return _run_batch(spec, clock=clock)
+        return _run_batch(spec, clock=clock, fleet_state_directory=fleet_state_directory)
     from .batch_journal import BatchJournal
     with BatchJournal(state_directory, spec, manifest_path=path, clock=clock, enroll=True) as journal:
-        return _run_batch(spec, clock=clock, journal=journal, wait_for_due=wait_for_due)
+        return _run_batch(spec, clock=clock, journal=journal, wait_for_due=wait_for_due,
+                          fleet_state_directory=fleet_state_directory)
 
 
-def _run_batch(spec, *, clock, journal=None, wait_for_due=False) -> dict:
+def _run_batch(spec, *, clock, journal=None, wait_for_due=False, fleet_state_directory=None) -> dict:
     """Use one dispatcher; optionally wait for pre-enrolled future tasks.
 
     Due tasks are round-robin across selected endpoints, oldest first within each
@@ -131,7 +132,12 @@ def _run_batch(spec, *, clock, journal=None, wait_for_due=False) -> dict:
         raise ValueError('A trusted UTC batch clock is required')
     stopped = Event()
     deadline = time.monotonic() + spec.max_seconds
-    gates = {name: NativeReadGate(policy, stopped=stopped) for name, policy in spec.policies}
+    if fleet_state_directory is None:
+        gates = {name: NativeReadGate(policy, stopped=stopped) for name, policy in spec.policies}
+    else:
+        from .shared_read_budget import SharedNativeReadGate
+        gates = {name: SharedNativeReadGate(policy, stopped=stopped, directory=fleet_state_directory)
+                 for name, policy in spec.policies}
     results, groups, future_tasks = {}, defaultdict(deque), []
     for task in sorted(spec.tasks, key=lambda t: (t.not_before, t.task_id)):
         recorded = journal.summary(task.task_id) if journal is not None else None
@@ -237,7 +243,8 @@ def _run_batch(spec, *, clock, journal=None, wait_for_due=False) -> dict:
         results[task.task_id] = {'taskId': task.task_id, 'status': 'NOT_STARTED'}
     items = [results[t.task_id] for t in spec.tasks]
     held = any(item['status'] not in ('STAGED', 'NOT_DUE') and not (
-        item['status'] == 'ALREADY_RECORDED' and item['recordedEvent'] in ('TASK_STAGED', 'TASK_RECONCILED')) for item in items)
+        item['status'] == 'ALREADY_RECORDED' and item['recordedEvent'] in
+        ('TASK_STAGED', 'TASK_RECONCILED', 'TASK_PUBLISHED')) for item in items)
     result = {'format': FORMAT, 'batchId': spec.batch_id, 'batchDigest': spec.digest,
         'checkedAt': initial.isoformat(), 'status': 'BATCH_HELD' if held else 'BATCH_EVALUATED',
         'stagedCount': sum(item['status'] == 'STAGED' for item in items),
@@ -247,9 +254,11 @@ def _run_batch(spec, *, clock, journal=None, wait_for_due=False) -> dict:
         result.update(format='hosting-discovery-checkpointed-batch-outcome/1',
                       durableSchedule=True, scheduleScope='ONE_LOCAL_BATCH_JOURNAL',
                       journalRecordDigest=journal._previous, journalSequence=journal._sequence,
-                      unresolvedTaskCount=sum(item['status'] in ('OUTCOME_UNKNOWN', 'HELD') for item in items),
+                      unresolvedTaskCount=sum(item['status'] in ('OUTCOME_UNKNOWN', 'DELIVERY_UNKNOWN', 'HELD') for item in items),
                       historicalOnly=False, waitedForDue=wait_for_due,
                       pendingTaskCount=sum(item['status'] in ('NOT_DUE', 'NOT_STARTED') for item in items))
+    if fleet_state_directory is not None:
+        result.update(limitScope='ONE_SHARED_POSIX_COORDINATOR_HOST', durableEndpointBudget=True)
     return result
 
 
@@ -317,7 +326,7 @@ def inspect_batch(path, state_directory, *, reconcile=False,
                     # Do not append repeated failure records or change the original start.
                     row = {**row, 'reconciliationStatus': 'HELD'}
             items.append(row)
-        unresolved = sum(item['status'] == 'OUTCOME_UNKNOWN' for item in items)
+        unresolved = sum(item['status'] in ('OUTCOME_UNKNOWN', 'DELIVERY_UNKNOWN') for item in items)
         return {'format': 'hosting-discovery-batch-journal-inspection/1',
             'batchId': spec.batch_id, 'batchDigest': spec.digest, 'checkedAt': initial.isoformat(),
             'status': 'JOURNAL_HELD' if unresolved else 'JOURNAL_INSPECTED',
@@ -326,3 +335,71 @@ def inspect_batch(path, state_directory, *, reconcile=False,
             'reconciliationRequested': reconcile, 'historicalOnly': True,
             'scheduleScope': 'ONE_LOCAL_BATCH_JOURNAL', 'durableSchedule': True,
             'collectionRequested': False, 'publicationAttempted': False, 'executionAuthorized': False}
+
+
+def publish_batch(path, state_directory, *, retry_unknown=False,
+                  clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)) -> dict:
+    """Deliver retained originals with current authority; never collect or re-sign.
+
+    Every attempt is durably recorded before the existing mTLS publisher is called.
+    Lost replies or process exits require an explicitly selected original-byte retry.
+    A publication receipt is retained only when its exact original digest matches.
+    """
+    from .batch_journal import BatchJournal, validate_published
+    if type(retry_unknown) is not bool:
+        raise ValueError('Original-only replay must be selected explicitly')
+    spec = DiscoveryBatch.from_file(path)
+    with BatchJournal(state_directory, spec, manifest_path=path, clock=clock) as journal:
+        initial = journal.now()
+        deadline = time.monotonic() + spec.max_seconds
+        items = []
+        for task in spec.tasks:
+            row = journal.summary(task.task_id)
+            original = journal.original(task.task_id)
+            if row is not None and row.get('recordedEvent') == 'TASK_PUBLISHED':
+                items.append(row)
+                continue
+            if (original is None or row is None or row['status'] == 'DELIVERY_UNKNOWN' and not retry_unknown):
+                items.append(row or {'taskId': task.task_id, 'status': 'ORIGINAL_NOT_RETAINED',
+                    'historicalOnly': True, 'reconciliationRequired': True})
+                continue
+            started = False
+            def current():
+                at = journal.now()
+                if time.monotonic() >= deadline or not task.not_before <= at < task.not_after:
+                    raise NativeReadHeld('Publication window or deadline expired')
+                return at
+            try:
+                current()
+                journal.publication_start(task.task_id)
+                started = True
+                outcome = execute(task.config_file, 'publish', clock=current,
+                    config_digest=task.config_digest, campaign_digest=task.campaign_digest,
+                    environment_id=task.environment_id)
+                validate_published(outcome, original)
+                journal.publication_finish(task.task_id, outcome)
+                items.append({'taskId': task.task_id, 'status': 'PUBLISHED', 'collector': outcome,
+                              'historicalOnly': False, 'reconciliationRequired': False})
+            except Exception:
+                if started:
+                    # Even an error before sending does not erase the retained start.
+                    # Never recollect or clear an uncertain native/publication effect.
+                    try:
+                        journal.publication_finish(task.task_id)
+                    except Exception:
+                        raise NativeReadHeld('Publication checkpoint requires reopening and reconciliation') from None
+                items.append({'taskId': task.task_id, 'status': 'DELIVERY_UNKNOWN' if started else 'PUBLICATION_HELD',
+                              'historicalOnly': False, 'reconciliationRequired': True})
+        unknown = sum(item['status'] == 'DELIVERY_UNKNOWN' for item in items)
+        held = any(item['status'] != 'PUBLISHED' and not (
+            item['status'] == 'ALREADY_RECORDED' and item['recordedEvent'] == 'TASK_PUBLISHED') for item in items)
+        return {'format': 'hosting-discovery-batch-publication-outcome/1',
+            'batchId': spec.batch_id, 'batchDigest': spec.digest, 'checkedAt': initial.isoformat(),
+            'status': 'PUBLICATION_HELD' if held else 'PUBLICATION_ACKNOWLEDGED',
+            'items': items, 'publishedCount': sum(item['status'] == 'PUBLISHED' for item in items),
+            'unknownDeliveryCount': unknown, 'journalRecordDigest': journal._previous,
+            'journalSequence': journal._sequence, 'retryUnknownRequested': retry_unknown,
+            'durableSchedule': True, 'scheduleScope': 'ONE_LOCAL_BATCH_JOURNAL',
+            'collectionRequested': False, 'publicationAttempted': any(
+                item['status'] in ('PUBLISHED', 'DELIVERY_UNKNOWN') and item.get('historicalOnly') is False
+                for item in items), 'executionAuthorized': False}

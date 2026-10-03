@@ -7,7 +7,7 @@ from uuid import uuid5, NAMESPACE_URL
 from tests.test_lifecycle_transition import fixture as lifecycle_fixture
 from lab.native_readback_fixture import manifest, responses
 from provisioner.execution import readback_core as c
-from tools import nsx_domain_observe as domain
+from provisioner.execution import nsx_domain_observe as domain
 from provisioner.execution.run_files import digest, encoded
 
 

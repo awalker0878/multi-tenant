@@ -67,6 +67,10 @@ class JobPostgresTest(unittest.TestCase):
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_authority_scope(text, text, text) '
                 'TO hosting_jobs_test_runtime')
+            connection.execute(
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.migration_wave_job_window(text, text, text) '
+                'TO hosting_jobs_test_runtime')
 
     @classmethod
     def runtime(cls):

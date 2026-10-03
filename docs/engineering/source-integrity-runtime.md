@@ -22,6 +22,13 @@ environment settings from relabelling another tree as the selected checkout. It 
 a lock against a privileged concurrent writer or a cryptographic signature over Git
 metadata. Trusted repository/artifact custody remains external.
 
+A restricted worker may read a root-owned checkout. The verifier supplies
+`safe.directory` for that exact resolved root only after checking the root, its
+ancestors and bounded complete contents for trusted UID ownership, unlinked
+regular files/directories and absence of group/other writable modes. Mutable
+or linked custody receives no exception. Ambient or global directory trust is
+never reused.
+
 Tracked file reads use no-follow regular-file descriptors with finite byte bounds and
 compare descriptor/path identity and timestamps around streaming. Git metadata, file
 count and each file size are bounded. Unsupported object modes/types and invalid UTF-8
@@ -43,7 +50,7 @@ adjacent working directory from silently becoming the package's source authority
 ## Ownership and verification
 
 All live Python callers, CI source-integrity invocation and repository handoff helpers
-use the package owner. `tools/check_release.py` is a retired path; preserved old release
+use the package owner. `tools/source_integrity.py` is a retired path; preserved old release
 manifests/audit transcripts may still name it as historical evidence and are not edited.
 Installed-package tests require the package owner and absence of the retired module.
 Disposable Git tests cover dirty/staged/untracked/missing files, HEAD movement, ambient

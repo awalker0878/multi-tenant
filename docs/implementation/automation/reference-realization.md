@@ -38,7 +38,7 @@ in an existing accepted namespace and supplies its observed native ID directly
 to the backend compiler. It checks actual project restrictions and inherited
 membership, preserves uncertain creation and never writes a state file.
 
-`tools/state_backend.py` compiles `backend.json` consumed by the
+`provisioner/execution/state_backend.py` compiles `backend.json` consumed by the
 [reviewed executor](terraform-execution.md). It takes `--origin`, `--project-id`,
 `--environment-key`, `--site-key`, `--platform`, `--tenant-key`, `--wsd-key`,
 `--phase` and `--output`. The output parent must already be private. It performs

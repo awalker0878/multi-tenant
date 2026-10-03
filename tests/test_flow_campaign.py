@@ -8,11 +8,13 @@ from tests.test_ahv_campaign import inputs as ahv_inputs
 from tests.test_nutanix_flow_observe import manifest as flow_manifest
 from tests.test_nutanix_vm_observe import uid
 from tests.test_target_campaign import window
-from tools import nutanix_vm_observe as ahv, nutanix_flow_observe as flow, qualify_target as q
+from provisioner.execution import nutanix_vm_observe as ahv
+from provisioner.execution import nutanix_flow_observe as flow
+from provisioner.execution import qualify_target as q
 from tests.test_nutanix_flow_activity import manifest as activity_manifest, responses as activity_responses
 from provisioner.execution import readback_core as c
-from tools import nutanix_flow_activity_observe as activity
-from tools.guest_inventory import build
+from provisioner.execution import nutanix_flow_activity_observe as activity
+from provisioner.execution.guest_inventory import build
 from provisioner.execution.run_files import digest, encoded, write_new
 
 
@@ -98,7 +100,7 @@ class FlowCampaignTests(unittest.TestCase):
                         for key, name in [('network', 'activity'), ('workloads', 'activity-workloads'), ('flow', 'activity-flow')]}
             self.assertEqual(result, digest(encoded(expected)))
             report = c.load(directory/'activity-flow.json'); self.assertEqual(report['profile'], activity.PROFILE)
-            from tools import nutanix_entity_activity as queries
+            from provisioner.execution import nutanix_entity_activity as queries
             service.routes[queries.target(policy, policy['resources'][0]['ext_id'], 0)]['body'].update(
                 data=[], metadata={'totalAvailableResults': 0})
             with self.assertRaises(ValueError): q.native_readback(plan, assets, window(), directory, 'held')

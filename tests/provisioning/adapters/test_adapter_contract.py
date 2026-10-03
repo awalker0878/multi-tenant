@@ -790,6 +790,20 @@ class GenericCodeNeverBranchesOnAPlatformNameTest(unittest.TestCase):
         # package owner. Pin their exact pre-existing branches; a new branch or
         # any generic module still fails this guard.
         self.assertEqual(offenders, {
+            'provisioner/allocations/capacity_demand.py': ["catalog['platform'] == 'openstack'", "platform == 'openstack'", "catalog['platform'] == 'openstack'", "catalog['platform'] == 'openstack'"],
+            'provisioner/execution/delivery_steps.py': ["plan['scope']['platform'] == 'vmware'", "plan['scope']['platform'] == 'openstack'", "plan['scope']['platform'] == 'vmware'"],
+            'provisioner/execution/guest_inventory.py': ["platform == 'openstack'"],
+            'provisioner/execution/nsx_domain_binding.py': ["scope['platform'] == 'vmware'"],
+            'provisioner/execution/nsx_terraform_recovery.py': ["transition['scope']['platform'] == 'vmware'"],
+            'provisioner/execution/nutanix_flow_terraform_recovery.py': ["transition['scope']['platform'] == 'nutanix'"],
+            'provisioner/execution/nutanix_terraform_recovery.py': ["transition['scope']['platform'] == 'nutanix'"],
+            'provisioner/execution/openstack_observe.py': ["manifest['scope']['platform'] == 'openstack'"],
+            'provisioner/execution/openstack_quota.py': ["request['scope']['platform'] == 'openstack'"],
+            'provisioner/execution/qualify_target.py': ["platform == 'vmware'", "platform == 'openstack'", "plan['scope']['platform'] == 'openstack'", "plan['scope']['platform'] == 'nutanix'", "plan['scope']['platform'] == 'vmware'", "scope['platform'] == 'nutanix'", "scope['platform'] == 'nutanix'", "scope['platform'] == 'vmware'", "platform == 'vmware'"],
+            'provisioner/execution/recovery_review.py': ["m.get('platform') == 'nsx'", "m.get('platform') == 'nsx'", "m.get('platform') == 'nsx'", "m.get('platform') == 'nutanix'", "m.get('platform') == 'nutanix'", "m.get('platform') == 'nutanix'", "m.get('platform') == 'vmware'", "m['platform'] == 'nsx'"],
+            'provisioner/execution/terraform_recovery_review.py': ["scope['platform'] == 'vmware'", "scope['platform'] == 'nutanix'"],
+            'provisioner/execution/vmware_network_binding.py': ["scope['platform'] == 'vmware'"],
+            'provisioner/execution/vsphere_network_observe.py': ["config['backingType'] == 'nsx'"],
             'provisioner/execution/terraform_run.py': [
                 "platform == 'openstack'", "entry['platform'] == 'openstack'"],
             'provisioner/execution/lifecycle_transition.py': [

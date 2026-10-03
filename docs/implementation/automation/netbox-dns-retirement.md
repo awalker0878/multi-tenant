@@ -24,7 +24,7 @@ Prepare a separately accepted withdrawal job/scope with:
 
 - the same tenant/resource, zone, server, port and TSIG key identity;
 - a new canonical operation UUID, current validity and the retirement engineering reference;
-- `previous_marker` equal to `tools.dns_change.marker_value(original_registration_job)`;
+- `previous_marker` equal to `provisioner.execution.dns_change.marker_value(original_registration_job)`;
 - exactly the original record name/type, `before` equal to its complete original
   `after` value including TTL, and `after: null`;
 - an allowed-record scope containing only the original value and an accepted TTL ceiling.
@@ -37,7 +37,7 @@ DNS withdrawal. Changed ownership or revision requires service-owner reconciliat
 ## Validate and execute
 
 ```sh
-python tools/netbox_dns.py --action withdraw \
+python -m provisioner.execution.netbox_dns --action withdraw \
   --allocation /private/operator/allocation.json \
   --confirmation /private/operator/confirmed.json \
   --registration-job /private/operator/dns-job.json \

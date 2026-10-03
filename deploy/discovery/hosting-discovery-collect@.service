@@ -1,0 +1,24 @@
+[Unit]
+Description=Preauthorized discovery batch %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=hosting-discovery
+Group=hosting-discovery
+UMask=0077
+StateDirectory=hosting-discovery/batches/%i hosting-discovery/endpoint-budgets
+StateDirectoryMode=0700
+ExecStart=/opt/hosting/bin/hosting-discovery-collect batch-run --config /etc/hosting/discovery/batches/%i.json --state-directory /var/lib/hosting-discovery/batches/%i --fleet-state-directory /var/lib/hosting-discovery/endpoint-budgets
+ExecStartPost=/opt/hosting/bin/hosting-discovery-collect batch-publish --config /etc/hosting/discovery/batches/%i.json --state-directory /var/lib/hosting-discovery/batches/%i
+TimeoutStartSec=70min
+KillMode=control-group
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+

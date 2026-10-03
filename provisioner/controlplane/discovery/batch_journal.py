@@ -23,7 +23,8 @@ from .review_files import private_parent, publish_once, read_private
 from .trust import _keys
 
 MAX_RECORD_BYTES = 8192
-MAX_RECORDS = 385  # enrollment plus start, hold and original reconciliation per task
+MAX_PUBLICATION_ATTEMPTS = 3
+MAX_RECORDS = 1153  # enrollment plus three capture and six publication records/task
 _FIELDS = {'format', 'sequence', 'batchId', 'batchDigest', 'previousRecordDigest',
            'recordedAt', 'event', 'taskId', 'outcome', 'recordDigest'}
 
@@ -61,6 +62,22 @@ def validate_staged(value, environment_id):
     return deepcopy(value)
 
 
+def validate_published(value, original):
+    """An authenticated receipt must identify the exact retained original."""
+    _keys(value, {'format', 'status', 'campaignId', 'environmentId', 'requestDigest',
+                  'resultDigest', 'generation', 'completeness', 'collectionRequested',
+                  'publicationAttempted', 'executionAuthorized'})
+    if (value['format'] != 'hosting-discovery-collector-outcome/1'
+            or value['status'] != 'PUBLISHED'
+            or any(value[key] != original[key] for key in
+                   ('campaignId', 'environmentId', 'requestDigest', 'resultDigest', 'completeness'))
+            or type(value['generation']) is not int or not 1 <= value['generation'] < 2**63
+            or value['collectionRequested'] is not False or value['publicationAttempted'] is not True
+            or value['executionAuthorized'] is not False):
+        raise ValueError('Publication receipt does not identify the retained original')
+    return deepcopy(value)
+
+
 class BatchJournal:
     """Append-only, digest-linked decisions under a process and thread lock.
 
@@ -77,6 +94,7 @@ class BatchJournal:
         self._mutex = RLock()
         self._tasks = {task.task_id: task for task in spec.tasks}
         self._states = {}
+        self._originals, self._publication_attempts = {}, {}
         self._sequence, self._previous, self._last = 0, None, None
         self._poisoned = False
         self._observed_at = None
@@ -202,6 +220,22 @@ class BatchJournal:
                 validate_staged(outcome, task.environment_id)
                 if event == 'TASK_RECONCILED' and outcome['collectionRequested'] is not False:
                     raise ValueError('Reconciliation cannot request collection')
+                self._originals[task_id] = deepcopy(outcome)
+            elif event == 'TASK_PUBLICATION_STARTED':
+                if (previous not in ('TASK_STAGED', 'TASK_RECONCILED',
+                                      'TASK_PUBLICATION_STARTED', 'TASK_PUBLICATION_UNKNOWN')
+                        or task_id not in self._originals or outcome is not None
+                        or not task.not_before <= at < task.not_after
+                        or self._publication_attempts.get(task_id, 0) >= MAX_PUBLICATION_ATTEMPTS):
+                    raise ValueError('Publication needs an original, current window and bounded attempt')
+                self._publication_attempts[task_id] = self._publication_attempts.get(task_id, 0) + 1
+            elif event == 'TASK_PUBLICATION_UNKNOWN':
+                if previous != 'TASK_PUBLICATION_STARTED' or outcome is not None:
+                    raise ValueError('Only a started publication can have an unknown outcome')
+            elif event == 'TASK_PUBLISHED':
+                if previous != 'TASK_PUBLICATION_STARTED':
+                    raise ValueError('An authenticated publication has no prior delivery start')
+                validate_published(outcome, self._originals[task_id])
             else:
                 raise ValueError('Unknown batch journal transition')
             self._states[task_id] = deepcopy(row)
@@ -215,11 +249,13 @@ class BatchJournal:
             'recordedAt': at.isoformat(), 'event': event, 'taskId': task_id, 'outcome': outcome}
         row['recordDigest'] = _digest(row)
         # Validate before any file creation while preserving the prior view.
-        old = self._sequence, self._previous, self._last, deepcopy(self._states)
+        old = (self._sequence, self._previous, self._last, deepcopy(self._states),
+               deepcopy(self._originals), dict(self._publication_attempts))
         try:
             self._accept(row)
         finally:
-            self._sequence, self._previous, self._last, self._states = old
+            (self._sequence, self._previous, self._last, self._states,
+             self._originals, self._publication_attempts) = old
         raw = _json(row).encode('ascii')
         if len(raw) > MAX_RECORD_BYTES:
             raise ValueError('Batch checkpoint exceeds its bound')
@@ -244,11 +280,27 @@ class BatchJournal:
             event = 'TASK_RECONCILED' if recovered else 'TASK_HELD' if outcome is None else 'TASK_STAGED'
             return self._append(event, task_id, outcome, self.now())
 
+    def original(self, task_id):
+        with self._mutex:
+            self.check()
+            return deepcopy(self._originals.get(task_id))
+
+    def publication_start(self, task_id):
+        with self._mutex:
+            return self._append('TASK_PUBLICATION_STARTED', task_id, None, self.now())
+
+    def publication_finish(self, task_id, outcome=None):
+        with self._mutex:
+            event = 'TASK_PUBLICATION_UNKNOWN' if outcome is None else 'TASK_PUBLISHED'
+            return self._append(event, task_id, outcome, self.now())
+
     def summary(self, task_id):
         row = self.state(task_id)
         if row is None:
             return None
         unresolved = row['event'] in ('TASK_STARTED', 'TASK_HELD')
-        return {'taskId': task_id, 'status': 'OUTCOME_UNKNOWN' if unresolved else 'ALREADY_RECORDED',
+        delivery_unknown = row['event'] in ('TASK_PUBLICATION_STARTED', 'TASK_PUBLICATION_UNKNOWN')
+        return {'taskId': task_id, 'status': 'DELIVERY_UNKNOWN' if delivery_unknown else
+                'OUTCOME_UNKNOWN' if unresolved else 'ALREADY_RECORDED',
                 'recordedEvent': row['event'], 'recordDigest': row['recordDigest'],
-                'historicalOnly': True, 'reconciliationRequired': unresolved}
+                'historicalOnly': True, 'reconciliationRequired': unresolved or delivery_unknown}

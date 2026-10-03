@@ -13,8 +13,10 @@ from tests.test_vsphere_observe import Client as VmClient, ref
 from tests.test_vsphere_task_observe import manifest as flat_manifest, task_body
 from tests.test_vsphere_recovery import reseal
 from provisioner.execution import readback_core as c
-from tools import recovery_review as rr, vsphere_task_observe as task, vsphere_task_tree_observe as tree
-from tools import qualify_target as q
+from provisioner.execution import recovery_review as rr
+from provisioner.execution import vsphere_task_observe as task
+from provisioner.execution import vsphere_task_tree_observe as tree
+from provisioner.execution import qualify_target as q
 
 
 def manifest(origin='https://vcenter.example.invalid'):
@@ -82,7 +84,7 @@ class TaskTreeTests(unittest.TestCase):
             f.post_routes[create] = collector; f.post_routes[read] = lambda _: {'body': pages.pop(0)}
             folder = Path(tmp); path = folder / 'manifest.json'; path.write_text(json.dumps(m))
             output = folder / 'report.json'
-            result = subprocess.run([sys.executable, str(q.ROOT / 'tools/vsphere_task_tree_observe.py'), str(path),
+            result = subprocess.run([sys.executable, str(q.ROOT / 'provisioner/execution/vsphere_task_tree_observe.py'), str(path),
                 '--read-authorized-target', '--expected-origin', f.origin, '--ca-file', str(f.directory / 'ca.pem'),
                 '--output', str(output), '--interval', '0'], capture_output=True, text=True,
                 env=dict(os.environ, VCENTER_SESSION='fixture-session'), timeout=20)

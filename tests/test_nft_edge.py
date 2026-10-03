@@ -3,7 +3,7 @@ from datetime import timedelta
 from pathlib import Path
 import tempfile
 import unittest
-from tools.nft_edge import validate, render, apply, normalized
+from provisioner.execution.nft_edge import validate, render, apply, normalized
 from provisioner.execution.run_files import digest, encoded, load_private, utcnow
 
 

@@ -2,7 +2,7 @@
 
 **Purpose:** bind DNS registration lifecycle evidence to a confirmed authoritative IPAM allocation without making this repository an IPAM or DNS authority.
 
-The existing `tools/dns_change.py` remains the separately scoped RFC 2136/TSIG mutation mechanism. This package does not invoke it. It only validates exported DNS lifecycle evidence and decides whether an immutable registration intent is ready to be handed to the DNS owner.
+The existing `provisioner/execution/dns_change.py` remains the separately scoped RFC 2136/TSIG mutation mechanism. This package does not invoke it. It only validates exported DNS lifecycle evidence and decides whether an immutable registration intent is ready to be handed to the DNS owner.
 
 The separate [NetBox execution adapter](../implementation/automation/netbox-dns.md)
 connects confirmed native IPv4 allocations to initial A/PTR registration. Its

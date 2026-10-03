@@ -9,6 +9,7 @@ import hashlib
 import json
 import unittest
 from copy import deepcopy
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 from fastapi.testclient import TestClient
@@ -254,6 +255,19 @@ class ControlApiTests(unittest.TestCase):
 
     def auth(self, token):
         return {'Authorization': f'Bearer {token}'}
+
+    def test_monitor_service_never_enters_human_operator_endpoints(self):
+        human=self.identity.tokens['operator']
+        self.identity.tokens['monitor-service']=replace(human,kind='SERVICE',subject='monitor-service',
+            grants=(RoleGrant('DISCOVERY_MONITOR',SOURCE_SCOPE,human.expires_at),))
+        for method,path,body in [('get','/v1/access/scopes',None),
+                                 ('get','/v1/environments?wsdId=wsd-01',None),
+                                 ('put','/v1/environments/env-01/discovery/freshness/checks/check-1',{})]:
+            options={'headers':self.auth('monitor-service')}
+            if body is not None:options['json']=body
+            result=getattr(self.client,method)(path,**options)
+            self.assertEqual(result.status_code,403,result.text)
+            self.assertEqual(result.json()['error']['code'],'HUMAN_ROLE_REQUIRED')
 
     def test_environment_declaration_is_unverified_and_exact_scope_visible(self):
         source = {

@@ -1,6 +1,6 @@
 # NSX domain lifecycle observation and held review
 
-`tools/nsx_domain_observe.py` provides the explicit
+`provisioner/execution/nsx_domain_observe.py` provides the explicit
 `nsx-local-policy-v1-domain-lifecycle` profile for existing VMware domains. It
 observes accepted Local Manager object paths with GET requests only. It adds no
 writer, native fence, task inventory, state adoption or activation authority.
@@ -9,7 +9,7 @@ contains synthetic identities and expectations; replace them only from accepted
 engineering and native-owner records. Never populate an expected baseline from
 the unreviewed response being tested.
 
-`tools/nsx_domain_binding.py` then binds the observed domain intent to exact
+`provisioner/execution/nsx_domain_binding.py` then binds the observed domain intent to exact
 owned outputs and provider inputs. Binding establishes record consistency only:
 it does not authenticate ownership, prove packet enforcement, renew apply
 authority or release a held operation.
@@ -61,7 +61,7 @@ authorization. Private custody and independent controls remain prerequisites.
 Validate without contacting an endpoint:
 
 ```sh
-python3 tools/nsx_domain_observe.py /private/operator/nsx-domain.json
+python3 -m provisioner.execution.nsx_domain_observe /private/operator/nsx-domain.json
 ```
 
 After the responsible owners establish real scoped fencing and quarantine,
@@ -69,7 +69,7 @@ collect current observations with independently injected `NSXT_USERNAME` and
 `NSXT_PASSWORD`, accepted TLS trust, explicit enabled contact and a new output:
 
 ```sh
-python3 tools/nsx_domain_observe.py /private/operator/nsx-domain.json \
+python3 -m provisioner.execution.nsx_domain_observe /private/operator/nsx-domain.json \
   --read-authorized-target --expected-origin https://accepted-nsx.example.invalid \
   --ca-file /private/operator/site-ca.pem \
   --output /private/operator/nsx-domain-report.json
@@ -106,7 +106,7 @@ realization attribution still need native qualification.
 
 ## Combined domain and logical-switch observation
 
-`tools/nsx_domain_switch_observe.py` uses the explicit
+`provisioner/execution/nsx_domain_switch_observe.py` uses the explicit
 `nsx-local-policy-v1-domain-switches` profile. Keep all four owned resources,
 strict full-response checks and realization expectations above. Add the accepted
 `logical_switch` object from the [segment profile](vmware-network-binding.md#nsx-segment-realization-identity)
@@ -114,7 +114,7 @@ to every segment and no other object. The [disabled combined example](../../../e
 can be validated without contact:
 
 ```sh
-python3 tools/nsx_domain_switch_observe.py /private/operator/nsx-domain-switches.json
+python3 -m provisioner.execution.nsx_domain_switch_observe /private/operator/nsx-domain-switches.json
 ```
 
 Collection uses the same explicit contact, origin, credentials, CA and private

@@ -4,7 +4,8 @@ from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
-from tools import delivery_steps as steps, restic_run
+from provisioner.execution import delivery_steps as steps
+from provisioner.execution import restic_run
 from provisioner.execution.run_files import digest, encoded, load_private, read_private, write_new, replace_private, utcnow
 
 
@@ -206,7 +207,7 @@ class DeliveryTransferTests(unittest.TestCase):
         self.assertIn('transfer-receipt.json',names)
 
     def test_interrupted_transfer_rejects_substituted_actual_machine_even_with_matching_receipt(self):
-        from tools.restic_transfer import destination_receipt
+        from provisioner.execution.restic_transfer import destination_receipt
         with patch.object(steps,'complete',side_effect=InterruptedError('coordinator lost')):
             with self.assertRaises(InterruptedError): self.dispatch(transfer_guard=self.fixture.guard)
         execution=self.directory/'execution'
@@ -236,8 +237,8 @@ class DeliveryTransferTests(unittest.TestCase):
         self.assertFalse((self.directory/'owner-completion.json').exists())
 
     def test_completed_transfer_returns_and_revalidates_actual_restore_identity(self):
-        from tools.delivery_run import artifact_receipt
-        from tools.restic_transfer import destination_receipt
+        from provisioner.execution.delivery_run import artifact_receipt
+        from provisioner.execution.restic_transfer import destination_receipt
         original,_=self.dispatch(transfer_guard=self.fixture.guard)
         calls=list(self.fixture.calls)
         result,_=self.recover()

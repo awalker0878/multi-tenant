@@ -1,6 +1,6 @@
 # Nutanix Flow policy readback
 
-`tools/nutanix_flow_observe.py` reads exact policy IDs through microseg v4.2. It
+`provisioner/execution/nutanix_flow_observe.py` reads exact policy IDs through microseg v4.2. It
 compares a reviewed native snapshot and strong ETag, then independently checks the
 restricted policy shape. A matching snapshot is not proof of enforcement,
 realization, task completion, or readiness to activate.
@@ -29,7 +29,7 @@ native shapes remain held for engineering review.
 Validate without contact:
 
 ```sh
-python3 tools/nutanix_flow_observe.py /private/site/flow-manifest.json
+python3 -m provisioner.execution.nutanix_flow_observe /private/site/flow-manifest.json
 ```
 
 After scoped read authorization, use `--read-authorized-target`,

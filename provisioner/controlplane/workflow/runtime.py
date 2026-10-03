@@ -1,7 +1,8 @@
 """Installed-package Temporal worker, outbox dispatcher and result projector.
 
 Each dispatcher/projector instance is bound to one verified tenant context.
-The worker handles a read-only approval gate and has no native platform API.
+Existing gate histories keep their original workflow type. The separately
+selected application graph requires explicit installed runtime composition.
 """
 from __future__ import annotations
 
@@ -29,6 +30,7 @@ from provisioner.controlplane.jobs.repository import _tenant
 from provisioner.controlplane.persistence import TenantContext
 
 from .admitted_job import AdmittedMigrationJob
+from .application_job import ApplicationJobResult, OpenStackApplicationMigration
 from .approval_activity import PostgresApprovalVerifier
 from .temporal_adapter import TemporalConnection, TemporalWorkflowStarter
 
@@ -72,15 +74,29 @@ def _worker_deployment_config() -> WorkerDeploymentConfig:
         default_versioning_behavior=VersioningBehavior.PINNED)
 
 
-async def _worker(settings: TemporalConnection) -> None:
+async def _worker(settings: TemporalConnection, *, application_components=None) -> None:
     deployment = _worker_deployment_config()
     verifier = PostgresApprovalVerifier(_connect, authority_postgres)
+    from .application_runtime import application_execution_enabled, build_application_worker_components
+    if application_components is None and application_execution_enabled():
+        evidence_config = EvidenceRuntimeConfig.from_environment()
+        if evidence_config.postgres_dsn != _required('HOSTING_WORKFLOW_POSTGRES_DSN'):
+            raise ValueError('Application workflow and evidence database roles must match')
+        application_components = build_application_worker_components(_connect, build_gate(evidence_config))
+    workflows, activities = [AdmittedMigrationJob], [verifier.verify_job]
+    if application_components is not None:
+        from .application_runtime import ApplicationWorkerComponents
+        if not isinstance(application_components, ApplicationWorkerComponents):
+            raise TypeError('Actual installed application worker components required')
+        application_components.settings.require_current()
+        workflows.append(OpenStackApplicationMigration)
+        activities.extend(application_components.activities)
     client = await Client.connect(settings.target_host, namespace=settings.namespace,
                                   tls=settings.tls())
     with ThreadPoolExecutor(max_workers=8) as executor:
         worker = Worker(client, task_queue=settings.task_queue,
-                        workflows=[AdmittedMigrationJob],
-                        activities=[verifier.verify_job], activity_executor=executor,
+                        workflows=workflows,
+                        activities=activities, activity_executor=executor,
                         deployment_config=deployment)
         await worker.run()
 
@@ -141,9 +157,21 @@ def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
     receipt = jobs.start_run(context, job_id)
     if receipt is None:
         return False
-    result = workflow.completed_gate(receipt)
+    result = workflow.completed_job(receipt)
     if result is None:
         return False
+    if isinstance(result, ApplicationJobResult):
+        detail = {'stepId': {'APPROVAL': 'approval-gate', 'PREPARE': 'prepare',
+            'PROVISION': 'provision', 'TRANSFER': 'transfer', 'CUTOVER': 'cutover',
+            'VERIFY': 'verify'}[result.phase], 'phase': result.phase,
+            'reasonCode': result.reason_code, 'completed': result.completed, 'total': result.total}
+        if result.evidence_digest is not None:
+            detail['evidenceDigest'] = result.evidence_digest
+        if result.hold_code is not None:
+            detail['holdCode'] = result.hold_code
+        jobs.append_progress(context, job_id, event_key=f'temporal-application:{receipt.run_id}',
+            event_type='APPLICATION_EXECUTION_HELD', status='HELD', detail=detail)
+        return True
     passed = result.status == 'GATE_PASSED'
     jobs.append_progress(
         context, job_id, event_key=f'temporal-gate:{receipt.run_id}',
@@ -192,7 +220,6 @@ def main(argv: list[str] | None = None) -> int:
         parser.error('dispatch and project require exact organization and tenant IDs')
     context = TenantContext(args.organization_id, args.tenant_id)
     jobs = JobRepository(_connect, authority_postgres)
-    workflow = TemporalWorkflowStarter(settings)
     try:
         evidence_config = EvidenceRuntimeConfig.from_environment()
         if evidence_config.postgres_dsn != _required('HOSTING_WORKFLOW_POSTGRES_DSN'):
@@ -201,6 +228,15 @@ def main(argv: list[str] | None = None) -> int:
         gate.require(context)
     except Exception:
         raise SystemExit('Workflow signed evidence configuration is unavailable') from None
+    selector = None
+    if args.mode == 'dispatch':
+        from .application_runtime import (application_execution_enabled, build_application_worker_components,
+                                          selected_application_runtime_required)
+        if application_execution_enabled():
+            selector = build_application_worker_components(_connect, gate).selector
+        else:
+            selector = lambda admitted: selected_application_runtime_required(_connect, admitted)
+    workflow = TemporalWorkflowStarter(settings, application_selector=selector)
     if args.mode == 'dispatch':
         if not args.dispatcher_id:
             parser.error('dispatch requires a stable dispatcher ID')

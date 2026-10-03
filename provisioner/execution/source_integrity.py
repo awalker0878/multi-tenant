@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+from itertools import chain
 import json
 import math
 import os
@@ -139,13 +140,33 @@ def verify_snapshot(root, manifest_path):
             'scope': 'Explicit export manifest; not signature or native qualification.'}
 
 
+def _protected_checkout(root):
+    """Prove custody before trusting one other-UID checkout for read-only Git."""
+    try:
+        if not (root / '.git').is_dir() or (root / '.git').is_symlink():
+            return False
+        count = 0
+        for path in chain((root,), root.parents, root.rglob('*')):
+            count += 1
+            if count > MAX_FILES or path.is_symlink() or path.is_junction():
+                return False
+            info = path.stat(follow_symlinks=False)
+            if (info.st_uid not in {0, os.getuid()} or stat.S_IMODE(info.st_mode) & 0o022
+                    or not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode))):
+                return False
+        return True
+    except (OSError, ValueError):
+        return False
+
+
 def _git(root, *args):
     # Ignore ambient repository/index/config/replace overrides. Do not refresh an
     # index, invoke a monitor hook, prompt, or lazily fetch missing objects.
     environment = {key: value for key, value in os.environ.items() if not key.startswith('GIT_')}
     environment.update(GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL=os.devnull,
         GIT_TERMINAL_PROMPT='0', GIT_OPTIONAL_LOCKS='0', GIT_NO_LAZY_FETCH='1')
-    result = subprocess.check_output(['git', '--no-replace-objects', '-c', 'core.fsmonitor=false',
+    custody = ['-c', 'safe.directory=' + str(root)] if _protected_checkout(root) else []
+    result = subprocess.check_output(['git', '--no-replace-objects', *custody, '-c', 'core.fsmonitor=false',
         '-c', 'core.untrackedCache=false', '-C', str(root), *args], env=environment,
         stdin=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=60)
     if len(result) > MAX_GIT_METADATA_BYTES:
@@ -241,21 +262,23 @@ def verify_runtime(root):
 
         runtime = inventory(package, 'provisioner', extensions)
         expected = inventory(_path(source, 'provisioner'), 'provisioner', extensions)
-        runtime.add('hosting_resources/__init__.py')
-        expected.add('hosting_resources/__init__.py')
+        runtime.update({'hosting_resources/__init__.py', 'hosting_resources/runtime-documents.json'})
+        expected.update({'hosting_resources/__init__.py', 'hosting_resources/runtime-documents.json'})
         for name in sorted(runtime | expected):
             if name not in runtime or name not in expected:
                 issues.append({'kind': 'RUNTIME_SOURCE_SET_MISMATCH', 'file': name})
                 continue
             live = (_path(package.parent, name) if name.startswith('provisioner/')
-                    else Path(hosting_resources.__file__))
+                    else _path(Path(hosting_resources.__file__).resolve().parent.parent, name))
             count += 1
             if _read(live, MAX_FILE_BYTES) != _read(_path(source, name), MAX_FILE_BYTES):
                 issues.append({'kind': 'RUNTIME_SOURCE_MISMATCH', 'file': name})
         assets = Path(hosting_resources.RESOURCE_ROOT).resolve(strict=True)
         if assets != source:
             def resource_names(base):
-                names = set()
+                names = set(hosting_resources.EXTRA_EVIDENCE_DOCS)
+                for name in names:
+                    _relative(name)
                 for directory in ('profiles', 'policy', 'sources', 'terraform', 'ansible', 'config'):
                     names.update(inventory(_path(base, directory), directory))
                 def documents(value):
