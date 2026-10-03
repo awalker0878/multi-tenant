@@ -40,7 +40,8 @@ class WavePostgresTests(unittest.TestCase):
         import psycopg
         cls.psycopg = psycopg
         cls.dsn = os.environ['HOSTING_TEST_POSTGRES_DSN']
-        apply_migrations(lambda: psycopg.connect(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']))
+        cls.migration_dsn = os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']
+        apply_migrations(lambda: psycopg.connect(cls.migration_dsn))
         with psycopg.connect(cls.dsn) as connection:
             for role in ('hosting_wave_test_runtime','hosting_wave_test_commissioner','hosting_wave_test_reviewer'):
                 connection.execute("DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='"+role+
@@ -87,6 +88,16 @@ class WavePostgresTests(unittest.TestCase):
     def runtime(cls):
         return cls.connection_as('hosting_wave_test_runtime')
 
+    @classmethod
+    def migration(cls):
+        """Seed synthetic facts as the explicit non-bypass schema owner.
+
+        Admin access above only provisions reviewed test roles; production
+        tenant helpers and seed mutations use this separate forced-RLS owner.
+        Runtime/commissioner/reviewer credentials never inherit this factory.
+        """
+        return cls.psycopg.connect(cls.migration_dsn)
+
     def setUp(self):
         self.ctx = TenantContext('wave-org-'+uuid4().hex[:12], 'tenant-a')
         self.foreign = TenantContext(self.ctx.organization_id, 'tenant-b')
@@ -120,9 +131,8 @@ class WavePostgresTests(unittest.TestCase):
         decision = AuthorizedPlan(self.ctx.organization_id,self.ctx.tenant_id,member.plan_id,
             member.plan_revision,member.plan_digest,member.source,member.destination,approvals,0,
             self.now+timedelta(hours=1),'operator-wave')
-        with self.psycopg.connect(self.dsn) as connection:
-            connection.execute("SELECT set_config('app.organization_id',%s,true),set_config('app.tenant_id',%s,true)",
-                               (self.ctx.organization_id,self.ctx.tenant_id))
+        with self.migration() as connection, connection.cursor() as cursor:
+            _tenant(cursor,self.ctx)
             for kind, identity, record in (('Workload',observed['metadata']['workloadId'],observed),
                                            ('MigrationPlan',member.plan_id,selected)):
                 connection.execute('INSERT INTO hosting_controlplane.enterprise_records '
@@ -238,7 +248,8 @@ class WavePostgresTests(unittest.TestCase):
         with self.assertRaises(WaveHeld): self.admit()
         self.assertEqual(self.counts(),(0,0,0))
         self.decisions['a'] = original
-        with self.psycopg.connect(self.dsn) as connection:
+        with self.migration() as connection, connection.cursor() as cursor:
+            _tenant(cursor,self.ctx)
             connection.execute('UPDATE hosting_controlplane.plan_authority_state SET revocation_epoch=revocation_epoch+1 '
                 'WHERE organization_id=%s AND tenant_id=%s AND plan_id=%s',
                 (self.ctx.organization_id,self.ctx.tenant_id,original.plan_id))
@@ -311,7 +322,8 @@ class WavePostgresTests(unittest.TestCase):
                 require_wave_window(cursor,job,delayed,starting=True)
             with self.assertRaises(WaveHeld):
                 authority_postgres.revalidate_start(cursor,job,self.members[0].window_end)
-        with self.psycopg.connect(self.dsn) as connection:
+        with self.migration() as connection, connection.cursor() as cursor:
+            _tenant(cursor,self.ctx)
             connection.execute('UPDATE hosting_controlplane.plan_authority_state '
                 'SET revocation_epoch=revocation_epoch+1 WHERE organization_id=%s AND tenant_id=%s AND plan_id=%s',
                 (self.ctx.organization_id,self.ctx.tenant_id,job.plan_id))
@@ -329,7 +341,7 @@ class WavePostgresTests(unittest.TestCase):
         revised['metadata']['revision'] += 1
         revised['spec']['maxDowntimeSeconds'] += 1
         revised['metadata']['planDigest'] = plan_digest(revised)
-        with self.psycopg.connect(self.dsn) as connection, connection.cursor() as cursor:
+        with self.migration() as connection, connection.cursor() as cursor:
             _tenant(cursor,self.ctx)
             cursor.execute('UPDATE hosting_controlplane.enterprise_records SET revision=%s,record_json=%s::jsonb,'
                 'record_digest=%s WHERE organization_id=%s AND tenant_id=%s AND record_kind=%s AND record_id=%s',
@@ -380,13 +392,13 @@ class WavePostgresTests(unittest.TestCase):
                  at+timedelta(minutes=5),'independent-native-release-owner'))
 
     def native_ledger_fixture(self, job):
-        """Administrative synthetic ledger seeding, never native execution."""
+        """Tenant-constrained synthetic ledger seeding, never native execution."""
         member = self.members[0]
         binding = member.plan['spec']['machineMappings'][0]['sourceBinding']
         native = (member.source.platform_family,member.source.endpoint_id,member.source.native_scope_id,
                   binding['resourceKind'],binding['nativeId'])
         tenant = (self.ctx.organization_id,self.ctx.tenant_id)
-        with self.psycopg.connect(self.dsn) as connection, connection.cursor() as cursor:
+        with self.migration() as connection, connection.cursor() as cursor:
             _tenant(cursor,self.ctx)
             cursor.execute('INSERT INTO hosting_controlplane.native_ownership '
                 '(platform_family,endpoint_id,native_scope_id,resource_kind,native_id,organization_id,tenant_id,'
@@ -438,13 +450,13 @@ class WavePostgresTests(unittest.TestCase):
                 "hosting_controlplane.migration_wave_release_acceptances,timestamp with time zone)','EXECUTE')")
             self.assertEqual(cursor.fetchone(),(False,False))
         self.accept_fixture(job,message,event)
-        with self.psycopg.connect(self.dsn) as connection, connection.cursor() as cursor:
+        with self.migration() as connection, connection.cursor() as cursor:
             _tenant(cursor,self.ctx)
             self.append_native_observation(cursor,'IN_PROGRESS',False)
         with self.assertRaises(self.psycopg.errors.CheckViolation):
             self.scheduler.reconcile_release('synthetic-verified-session',self.ctx,self.definition.digest,'a')
         self.assertEqual(self.admit().status,'HELD_OR_WAITING')
-        with self.psycopg.connect(self.dsn) as connection, connection.cursor() as cursor:
+        with self.migration() as connection, connection.cursor() as cursor:
             _tenant(cursor,self.ctx)
             self.append_native_observation(cursor,'EFFECT_PRESENT',True)
         # A fresh independent acceptance observation is needed after changed
@@ -472,7 +484,7 @@ class WavePostgresTests(unittest.TestCase):
         admitted = self.admit()
         job, message, event = self.finished_fixture(admitted)
         native = self.native_ledger_fixture(job)
-        with self.psycopg.connect(self.dsn) as connection, connection.cursor() as cursor:
+        with self.migration() as connection, connection.cursor() as cursor:
             _tenant(cursor,self.ctx)
             cursor.execute('INSERT INTO hosting_controlplane.native_containment_holds '
                 '(platform_family,endpoint_id,native_scope_id,resource_kind,native_id,organization_id,tenant_id,'

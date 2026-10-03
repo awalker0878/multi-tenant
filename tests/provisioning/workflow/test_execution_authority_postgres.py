@@ -22,7 +22,7 @@ import unittest
 from uuid import uuid4
 
 from provisioner.controlplane.authority import postgres as authority_postgres
-from provisioner.controlplane.authority.model import AuthorizedPlan, FrozenPlan, PlanApproval
+from provisioner.controlplane.authority.model import AuthorizedPlan, FrozenPlan, PlanApproval, PlanScope
 from provisioner.controlplane.authority.postgres import PostgresAuthority
 from provisioner.controlplane.authority.service import AuthorityDenied
 from provisioner.controlplane.jobs import JobRepository, StartReceipt
@@ -52,6 +52,19 @@ from tests.provisioning.schema.test_enterprise_records import plan, workload
 from tests.provisioning.worker.test_postgres_worker import (
     TestEnrollmentAuthorizer, TestWorkerVerifier,
 )
+
+
+SYNTHETIC_VAULT_ROLE_REF = 'vault:synthetic-pg-no-native-use'
+
+
+class ExecutionAuthorityFixtureTests(unittest.TestCase):
+    def test_source_fence_fixture_has_a_valid_opaque_role_reference(self):
+        scope = PlanScope.from_record(plan()['spec']['source'])
+        capability = WorkerCapability(scope, 'SOURCE_FENCE', SYNTHETIC_VAULT_ROLE_REF)
+        self.assertEqual(capability.credential_ref, SYNTHETIC_VAULT_ROLE_REF)
+        with self.assertRaises(ValueError):
+            WorkerCapability(scope, 'SOURCE_FENCE',
+                             'controlled-synthetic-credential:no-native-use')
 
 
 class SelectedQualificationProof:
@@ -281,7 +294,7 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
             TestWorkerVerifier(), TestEnrollmentAuthorizer())
         self.enrollment.enroll(self.identity, self.context, 'approved-enrollment',
             capabilities=(WorkerCapability(self.frozen.source, 'SOURCE_FENCE',
-                                           'controlled-synthetic-credential:no-native-use'),))
+                                           SYNTHETIC_VAULT_ROLE_REF),))
         self.binding = NativeBinding.from_record(
             self.observed['spec']['machines'][0]['bindings'][0]['binding'])
         self.lease = self.store.acquire_owner_lease(self.context, self.selected['spec']['source'],
