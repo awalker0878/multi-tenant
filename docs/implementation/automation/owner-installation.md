@@ -72,7 +72,7 @@ select writable backup restore destinations outside those protected locations.
 It retains the host network namespace for the existing edge ownership checks.
 
 The separate `hosting-owner-install-authority/1` object contains exactly
-`format`, `config_sha256` (`tools.readback_core.digest(config)`), `valid_from`,
+`format`, `config_sha256` (`provisioner.execution.readback_core.digest(config)`), `valid_from`,
 `valid_until`, `change_ref` and `recovery_access_ref`. Its current window lasts
 at most one hour. This private record binds the accepted installation and
 independent recovery path; the installer does not authenticate or issue that

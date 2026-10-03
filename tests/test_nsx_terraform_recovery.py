@@ -10,9 +10,10 @@ from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
 from tests.nsx_domain_fixture import scenario, responses, uid
 from tools import nsx_terraform_recovery as nsx, nsx_domain_observe as domain, terraform_recovery_review as review
-from tools import lifecycle_transition as lifecycle, readback_core as c
-from tools.run_files import digest, encoded, write_new, load_private
-from tools.terraform_run import select_scope
+from provisioner.execution import readback_core as c
+from provisioner.execution import lifecycle_transition as lifecycle
+from provisioner.execution.run_files import digest, encoded, write_new, load_private
+from provisioner.execution.terraform_run import select_scope
 
 
 class HeldNSXTests(unittest.TestCase):

@@ -42,7 +42,7 @@ The `hosting-dns-propagation/1` configuration contains exactly:
 | Field | Meaning |
 | --- | --- |
 | `format` | `hosting-dns-propagation/1` |
-| `job_sha256`, `scope_sha256`, `receipt_sha256` | `tools.readback_core.digest` of the original job, scope and completed primary receipt |
+| `job_sha256`, `scope_sha256`, `receipt_sha256` | `provisioner.execution.readback_core.digest` of the original job, scope and completed primary receipt |
 | `observer_machine_id` | Exact lowercase 32-digit `/etc/machine-id` |
 | `network_namespace_inode` | Positive integer inode of `/proc/self/ns/net` |
 | `valid_from`, `valid_until` | Current timezone-aware observation window, at most one hour |

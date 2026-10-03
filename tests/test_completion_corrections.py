@@ -12,7 +12,7 @@ from adr_lifecycle import validate,render
 from build_documentation import Builder
 from check_current_design import check as current_check
 from check_assurance_allocation import check as allocation_check
-from tools.check_release import verify,verify_snapshot
+from provisioner.execution.source_integrity import verify,verify_snapshot
 
 
 class CodeStructureTests(unittest.TestCase):

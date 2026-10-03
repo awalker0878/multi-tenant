@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts import check_platform_capabilities as capabilities
+from provisioner.qualification import registry as capabilities
 FORMAT = 'portable-hosting-platform-family-eligibility/1'
 STATUS = 'PLANNING_ONLY_NOT_AUTHORIZED'
 MODE = 'SINGLE_PLATFORM_WSD'

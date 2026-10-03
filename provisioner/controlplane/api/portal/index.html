@@ -6,6 +6,8 @@
   <meta name="referrer" content="no-referrer">
   <title>Enterprise workload mobility</title>
   <link rel="stylesheet" href="style.css">
+  <script src="application_drafts.js" defer></script>
+  <script src="application_comparison.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -84,6 +86,167 @@
         </table>
       </div>
       <button id="more-discovery" class="quiet" type="button" hidden>Load more observed identities</button>
+    </section>
+
+    <section class="panel" aria-labelledby="comparison-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">Destination assessment</p><h2 id="comparison-heading">Compare migration options</h2></div>
+        <span class="tag">Read only</span>
+      </div>
+      <p>Select an observed VM above, then add at least two destinations. Each selection pins the latest available observation generation. Assessment results describe blockers, missing facts and conditions; they do not approve execution.</p>
+      <p id="comparison-source" class="muted">Load source observations first.</p>
+      <div class="lookup">
+        <label for="comparison-workload">Observed VM</label>
+        <select id="comparison-workload" required disabled><option value="">Choose an observed VM</option></select>
+      </div>
+      <form id="destination-form" class="lookup">
+        <label for="destination-wsd">Destination WSD</label>
+        <select id="destination-wsd" required disabled><option value="">Choose an authorized WSD</option></select>
+        <button id="show-destinations" type="submit" disabled>Show destinations</button>
+      </form>
+      <div class="lookup">
+        <label for="destination-environment">Candidate environment</label>
+        <select id="destination-environment" disabled><option value="">Choose an environment</option></select>
+        <button id="add-destination" type="button" disabled>Add latest observation</button>
+        <button id="more-destinations" class="quiet" type="button" hidden>Load more candidates</button>
+      </div>
+      <p id="destination-status" class="muted" role="status" aria-live="polite">Sign in to choose authorized destinations.</p>
+      <div class="table-wrap">
+        <table>
+          <caption>Selected destinations and pinned observation generations</caption>
+          <thead><tr><th scope="col">Destination</th><th scope="col">Generation and coverage</th><th scope="col">Optional observed capacity</th><th scope="col">Selection</th></tr></thead>
+          <tbody id="destination-rows"></tbody>
+        </table>
+      </div>
+      <form id="comparison-form" class="comparison-form">
+        <label for="comparison-method">Migration method</label>
+        <select id="comparison-method" required>
+          <option value="REBUILD_RESTORE">Rebuild and restore</option>
+          <option value="COLD_VM_CONVERSION">Cold VM conversion</option>
+          <option value="SAME_PLATFORM_RELOCATION">Same-platform relocation</option>
+          <option value="APPLICATION_NATIVE">Application-native transfer</option>
+          <option value="WARM_VM_TRANSFER">Warm VM transfer</option>
+        </select>
+        <label for="comparison-guest">Guest profile</label><input id="comparison-guest" required maxlength="128" autocomplete="off" spellcheck="false">
+        <label for="comparison-network">Network mode</label><input id="comparison-network" required maxlength="128" autocomplete="off" spellcheck="false">
+        <label for="comparison-data">Data mode</label><input id="comparison-data" required maxlength="128" autocomplete="off" spellcheck="false">
+        <button id="compare-destinations" type="submit" disabled>Compare destinations</button>
+      </form>
+      <p id="comparison-status" class="muted" role="status" aria-live="polite">Choose an observed VM and at least two destinations.</p>
+      <div id="comparison-results" class="comparison-results" hidden></div>
+    </section>
+
+    <section class="panel" aria-labelledby="draft-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">Application preparation</p><h2 id="draft-heading">Application drafts</h2></div>
+        <span class="tag">Unreviewed</span>
+      </div>
+      <p>Create an unreviewed application from observed VMs, proposed dataset groups and attributed dependency assertions. A current saved draft can be revised explicitly, including its membership and evidence; original revisions remain immutable. This workspace does not approve ownership, qualify a platform or start a migration.</p>
+      <div class="lookup">
+        <label for="draft-environment">Authorized environment ID</label>
+        <input id="draft-environment" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+        <button id="draft-list" type="button" disabled>List drafts</button>
+        <button id="draft-next" type="button" class="quiet" disabled hidden>Next live page</button>
+      </div>
+      <div class="table-wrap"><table>
+        <caption>Latest unreviewed drafts on one live page; not a frozen export</caption>
+        <thead><tr><th scope="col">Application ID</th><th scope="col">Name</th><th scope="col">Proposed owner</th><th scope="col">Revision</th><th scope="col">Generation</th><th scope="col">State</th></tr></thead>
+        <tbody id="draft-rows"></tbody>
+      </table></div>
+      <div class="lookup">
+        <label for="draft-group">Application ID</label><input id="draft-group" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+        <label for="draft-revision">Historical revision (blank for current)</label><input id="draft-revision" inputmode="numeric" maxlength="16" autocomplete="off" disabled>
+        <button id="draft-load" type="button" disabled>Load draft</button>
+        <button id="draft-start" type="button" disabled>Start new application</button>
+      </div>
+      <p id="draft-status" class="muted" role="status" aria-live="polite">Application draft workspace is loading.</p>
+      <div id="draft-editor" hidden>
+        <pre id="draft-binding" class="review-card"></pre>
+        <section aria-labelledby="draft-review-heading">
+          <h3 id="draft-review-heading">Independent owner-review status</h3>
+          <p>Check the signed review for this exact saved revision, including history. This reads status only: it cannot sign, accept, revoke or submit an owner decision. A proposed owner ID is not acceptance.</p>
+          <button id="draft-review-check" type="button" disabled>Check exact owner review</button>
+          <p id="draft-review-status" class="muted" role="status" aria-live="polite">Load a saved draft before checking its review.</p>
+          <pre id="draft-review-result" class="review-card" hidden></pre>
+          <p class="muted">Results are evaluated at the displayed time, not a continuing approval. They clear on edits, selection/identity changes and hidden tabs; clearance is also scheduled within 60 seconds or sooner at evidence expiry. Browser timers are best-effort, not a revocation monitor. Check again explicitly. Comparison rechecks its own current evidence; this display never enables migration.</p>
+        </section>
+        <button id="draft-edit-evidence" type="button" disabled>Edit membership and evidence</button>
+        <p>Start an explicit new-revision proposal from a current saved draft. The exact source and expected revision stay pinned. Historical, superseded and unresolved-save records cannot be edited. Changing assertions does not carry forward an owner review.</p>
+        <form id="draft-form" class="comparison-form">
+          <label for="draft-name">Application name</label><input id="draft-name" required maxlength="256" autocomplete="off" disabled>
+          <label for="draft-owner">Proposed owner ID (not acceptance)</label><input id="draft-owner" required maxlength="128" autocomplete="off" spellcheck="false" disabled>
+          <label for="draft-order">Startup order (one selected workload ID per line)</label><textarea id="draft-order" rows="5" maxlength="12900" spellcheck="false" disabled></textarea>
+          <label><input id="draft-confirm" type="checkbox" disabled> I checked the pinned source, selected members, proposed data and assertions. Save an unreviewed proposal only.</label>
+          <button id="draft-save" type="submit" disabled>Save unreviewed revision</button>
+        </form>
+        <div id="draft-authoring" hidden>
+          <h3>1. Select observed VMs</h3>
+          <p>Each member must be a VM from the pinned stored generation. Assign a distinct proposed workload ID; it is not an accepted Workload record. Add members before changing pages. Selection order initially supplies the editable startup order.</p>
+          <button id="draft-objects" type="button" disabled>Load observed identities</button>
+          <p id="draft-observation-status" class="muted" role="status" aria-live="polite"></p>
+          <div class="table-wrap"><table>
+            <caption>VMs on one stored identity page — no native rescan</caption>
+            <thead><tr><th scope="col">Native VM ID</th><th scope="col">Display name</th><th scope="col">Unknown facts</th><th scope="col">Proposed workload ID</th><th scope="col">Action</th></tr></thead>
+            <tbody id="draft-observations"></tbody>
+          </table></div>
+          <h3>2. Propose dataset consistency groups</h3>
+          <p>Every dataset must occur in exactly one proposed group. These are author assertions, not discovered disks or proof of application-consistent writes. Remove and re-add a group explicitly to change this proposal. Earlier saved revisions retain their original groups.</p>
+          <div class="comparison-form">
+            <label for="draft-data-group">Proposed consistency-group ID</label><input id="draft-data-group" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+            <label for="draft-data-ids">Dataset IDs (one per line or separated by spaces)</label><textarea id="draft-data-ids" rows="3" maxlength="129000" spellcheck="false" disabled></textarea>
+            <button id="draft-add-group" type="button" disabled>Add proposed group</button>
+          </div>
+          <h3>3. Attribute dependency assertions</h3>
+          <p>Add known member-to-member dependencies, or explicitly unknown dependencies with an unresolved reason and no target. An empty assertion table means none were recorded, not that dependencies do not exist. Source references are asserted evidence IDs, not proof of verification. Known STARTS_AFTER edges must agree with the startup order above.</p>
+          <div class="comparison-form">
+            <label for="draft-edge-id">Assertion ID</label><input id="draft-edge-id" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+            <label for="draft-edge-from">Source workload</label><select id="draft-edge-from" disabled><option value="">Choose explicitly</option></select>
+            <label for="draft-edge-relation">Relation</label><select id="draft-edge-relation" disabled><option value="">Choose explicitly</option><option value="STARTS_AFTER">Starts after target</option><option value="SERVICE_CALL">Calls target service</option></select>
+            <label for="draft-edge-state">Assertion state</label><select id="draft-edge-state" disabled><option value="">Choose explicitly</option><option value="KNOWN">Known target member (asserted)</option><option value="UNKNOWN">Unknown or external target</option></select>
+            <label for="draft-edge-to">Target workload (known only)</label><select id="draft-edge-to" disabled><option value="">Choose explicitly</option></select>
+            <label for="draft-edge-reason">Unknown reason (unknown only)</label><select id="draft-edge-reason" disabled><option value="">Choose explicitly</option><option value="UNRESOLVED_TARGET">Unresolved target</option><option value="NOT_OBSERVED">Not observed</option><option value="CONFLICTING_SOURCES">Conflicting sources</option><option value="EXTERNAL_DEPENDENCY">External dependency</option></select>
+            <label for="draft-edge-source">Asserted evidence source</label><select id="draft-edge-source" disabled><option value="">Choose explicitly</option><option value="CMDB">CMDB</option><option value="GUEST">Guest</option><option value="MONITORING">Monitoring</option><option value="APPLICATION_OWNER">Application owner (asserted)</option></select>
+            <label for="draft-edge-reference">Evidence reference ID</label><input id="draft-edge-reference" maxlength="128" autocomplete="off" spellcheck="false" disabled>
+            <label for="draft-edge-time">Observed at (UTC, for example 2026-10-01T12:00:00Z)</label><input id="draft-edge-time" maxlength="32" autocomplete="off" spellcheck="false" disabled>
+            <button id="draft-add-edge" type="button" disabled>Add dependency assertion</button>
+          </div>
+          <p>Review the selected tables below, then confirm the unreviewed save above. Add or clear all unfinished input rows; they are never silently included in a save. Limits: 100 members, 1,000 datasets, 100 consistency groups, 500 assertions, 200 manually requested pages. The first save creates a draft; later saves append a revision, never overwrite history.</p>
+        </div>
+        <div class="table-wrap"><table><caption>Proposed native membership — changes require an explicit revision proposal</caption><thead><tr><th scope="col">Workload ID</th><th scope="col">Native identity</th><th scope="col">Proposal action</th></tr></thead><tbody id="draft-members"></tbody></table></div>
+        <div class="table-wrap"><table><caption>Proposed dataset consistency groups — original saved groups remain in history</caption><thead><tr><th scope="col">Group</th><th scope="col">Datasets</th><th scope="col">Proposal action</th></tr></thead><tbody id="draft-datasets"></tbody></table></div>
+        <div class="table-wrap"><table><caption>Retained dependency assertions — not independently verified by this editor</caption><thead><tr><th scope="col">Assertion</th><th scope="col">Source workload</th><th scope="col">Relation</th><th scope="col">Target workload</th><th scope="col">State</th><th scope="col">Unknown reason</th><th scope="col">Evidence source</th><th scope="col">Reference</th><th scope="col">Observed at</th><th scope="col">Proposal action</th></tr></thead><tbody id="draft-dependencies"></tbody></table></div>
+      </div>
+      <div class="actions">
+        <button id="draft-reconcile" type="button" hidden>Check exact saved revision</button>
+        <button id="draft-discard" type="button" class="quiet" disabled>Discard this tab’s draft view</button>
+      </div>
+      <label><input id="draft-confirm-discard" type="checkbox"> If delivery is unknown, discard only this tab’s reconciliation state; this does not undo a save.</label>
+      <p class="muted">Edits stay in this tab only. Reauthentication or clearing the tab discards them. A timed-out or cancelled save may already have committed; inspect exact history before retrying. Initial creation is available here. Use Edit membership and evidence for a new revision proposal; it requires a new unreviewed revision and independent reassessment.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="application-comparison-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">Application assessment</p><h2 id="application-comparison-heading">Compare a saved application</h2></div>
+        <span class="tag">Read-only advice</span>
+      </div>
+      <p>Load source observations and select at least two destination observations using the destination picker above. Load a current saved application draft, with no unsaved edits, in Application drafts. Enter one guest profile per member below; the shared migration method, network mode and data mode above apply to every member.</p>
+      <p>No capacity is reserved and no migration is started. The API checks the current independent owner review; a held review produces no destination calculations. Missing capacity remains unknown.</p>
+      <pre id="app-compare-source" class="review-card"></pre>
+      <p id="app-compare-settings" class="muted"></p>
+      <form id="app-compare-form">
+        <div class="table-wrap"><table>
+          <caption>All retained application members — enter explicit guest-profile IDs</caption>
+          <thead><tr><th scope="col">Workload</th><th scope="col">Retained native identity</th><th scope="col">Guest profile</th></tr></thead>
+          <tbody id="app-compare-members"></tbody>
+        </table></div>
+        <div class="actions">
+          <button id="app-compare-submit" type="submit" disabled>Compare application destinations</button>
+          <button id="app-compare-cancel" class="quiet" type="button" disabled>Cancel comparison</button>
+        </div>
+      </form>
+      <p id="app-compare-status" class="muted" role="status" aria-live="polite">Load an unchanged current draft and selected destinations.</p>
+      <div id="app-compare-results" class="comparison-results" hidden></div>
+      <p class="muted">Maximum 200 member–destination pairs, 100 members and 20 destinations. Results are checked advice at the displayed time, not a continuing approval. Editing, changing selections, signing out or leaving this page clears the report. Native facts, reservations and application-wide policy/data acceptance remain separate requirements.</p>
     </section>
 
     <section class="panel" aria-labelledby="portfolio-heading">

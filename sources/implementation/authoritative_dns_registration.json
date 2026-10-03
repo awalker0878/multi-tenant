@@ -8,8 +8,8 @@
     "INV-007"
   ],
   "dns_index": "sources/capabilities/dns_registration_index.json",
-  "record_checker": "scripts/check_dns_registration_records.py",
-  "preflight": "scripts/check_dns_registration_preflight.py",
+  "record_checker": "provisioner/allocations/dns_evidence.py",
+  "preflight": "provisioner/allocations/dns_preflight.py",
   "native_writer": "tools/dns_change.py",
   "engineering": "docs/engineering/authoritative-dns-registration-handoff.md",
   "current_records": 0,

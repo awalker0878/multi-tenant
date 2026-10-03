@@ -9,8 +9,9 @@ from unittest.mock import patch
 from tests.test_edge_contain import Kernel
 from tests.test_nft_edge import fixture
 from tools import delivery_containment as incident,delivery_run as delivery,delivery_steps as steps
-from tools import owner_worker as worker,edge_contain,readback_core as c
-from tools.run_files import digest,encoded,load_private,read_private,replace_private,utcnow,write_new
+from provisioner.execution import readback_core as c
+from tools import owner_worker as worker, edge_contain
+from provisioner.execution.run_files import digest,encoded,load_private,read_private,replace_private,utcnow,write_new
 
 
 class RemoteContainmentTests(unittest.TestCase):

@@ -8,7 +8,7 @@ from datetime import timedelta
 
 from lab.native_readback_fixture import credentials
 from tools.guest_services import validate_services, verify_assets, resolver_bound
-from tools.run_files import digest, utcnow
+from provisioner.execution.run_files import digest, utcnow
 
 
 def fixture(directory='/private/operator'):

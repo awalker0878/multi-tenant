@@ -10,7 +10,8 @@ from unittest.mock import patch
 from lab.native_readback_fixture import Fixture
 from lab.nutanix_task_tree_fixture import reset
 from scripts.check_documentation import Builder
-from tools import readback_core as c, nutanix_observe as native, recovery_review as rr
+from provisioner.execution import readback_core as c
+from tools import nutanix_observe as native, recovery_review as rr
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -130,24 +131,24 @@ class NavigationIntegrationTests(unittest.TestCase):
         workflow = yaml.safe_load((ROOT/'.github/workflows/validate.yml').read_text())
         commands = [s.get('run', '') for s in workflow['jobs']['repository']['steps']]
         self.assertTrue(any('scripts/commissioning_pack.py check' in s for s in commands))
-        self.assertTrue(any('scripts/check_platform_capabilities.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_platform_qualification.py' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.registry' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.native' in s for s in commands))
         self.assertTrue(any('scripts/check_platform_family_eligibility.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_site_service_capacity.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_site_service_eligibility.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_reservation_records.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_reservation_preflight.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_ipam_allocation_records.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_ipam_allocation_preflight.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_dns_registration_records.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_dns_registration_preflight.py' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.capacity_evidence' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.site_eligibility' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.reservation_evidence' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.reservation_preflight' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.ipam_evidence' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.ipam_preflight' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.dns_evidence' in s for s in commands))
+        self.assertTrue(any('provisioner.allocations.dns_preflight' in s for s in commands))
         self.assertTrue(any('scripts/check_backup_restore_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_backup_restore_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_control_inheritance_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_control_inheritance_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_operational_handover_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_operational_handover_readiness.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_version_source_provenance.py' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.provenance' in s for s in commands))
         self.assertTrue(any('scripts/check_version_source_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_extension_adoption_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_extension_adoption_readiness.py' in s for s in commands))
@@ -169,9 +170,9 @@ class NavigationIntegrationTests(unittest.TestCase):
         self.assertTrue(any('scripts/check_service_reply_readiness.py' in s for s in commands))
         self.assertTrue(any('scripts/check_bootstrap_service_assurance.py' in s for s in commands))
         self.assertTrue(any('scripts/check_bootstrap_service_readiness.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_target_selection_assurance.py' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.target_selection' in s for s in commands))
         self.assertTrue(any('scripts/check_target_selection_readiness.py' in s for s in commands))
-        self.assertTrue(any('scripts/check_qualification_campaign_assurance.py' in s for s in commands))
+        self.assertTrue(any('provisioner.qualification.campaign' in s for s in commands))
         self.assertTrue(any('scripts/check_qualification_campaign_readiness.py' in s for s in commands))
         self.assertTrue(any('lab/run_task_tree_lab.py --execute' in s for s in commands))
         self.assertTrue(any('tools/check_local.py' in s for s in commands))

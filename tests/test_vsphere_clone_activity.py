@@ -7,7 +7,8 @@ from tests.test_vsphere_task_activity import context
 from tests.test_vsphere_observe import ref
 from tests.test_vsphere_recovery import reseal
 from tests.test_nutanix_vm_observe import uid
-from tools import readback_core as c, recovery_review as rr, qualify_target as q
+from provisioner.execution import readback_core as c
+from tools import recovery_review as rr, qualify_target as q
 from tools import vsphere_task_tree_observe as tree, vsphere_task_activity as activity, vsphere_task_observe as task
 
 

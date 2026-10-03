@@ -20,9 +20,12 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from provisioner.domain.errors import ProvisioningError
+from provisioner.domain.capabilities import CAPABILITIES
+from provisioner.domain.capability_properties import parse_requirements
 from provisioner.domain.request import digest
+from provisioner.profiles.requirements import validate_requirements
+from hosting_resources import RESOURCE_ROOT as ROOT
 
-ROOT = Path(__file__).resolve().parents[2]
 PROFILE_ROOT = ROOT / 'profiles'
 
 FAMILIES = ('environment', 'security', 'assurance', 'availability', 'recovery',
@@ -55,7 +58,7 @@ def _version(value, owner: str, path: str) -> str:
     if value is None:
         raise ProvisioningError('UNSUPPORTED_PROFILE',
                                 f'{owner} declares no reviewed version', path=path)
-    if not isinstance(value, str) or not VERSION.match(value):
+    if not isinstance(value, str) or not VERSION.fullmatch(value):
         raise ProvisioningError('UNSUPPORTED_PROFILE',
                                 f'{owner} version {value!r} is not a positive integer revision',
                                 path=path)
@@ -76,7 +79,7 @@ class Profile:
 
     @property
     def implemented(self) -> bool:
-        return self.status != DEFERRED
+        return self.status == 'IMPLEMENTED_INTERNAL_IPV4_OZ_RZ'
 
     @property
     def trust(self) -> str | None:
@@ -186,8 +189,23 @@ class Catalog:
 def _load_one(path: Path) -> tuple[str, dict]:
     family = path.parent.name
     relative = _relative(path)
+    if family not in FAMILIES:
+        raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unknown profile family: {family}', path=relative)
     try:
-        document = json.loads(path.read_text(encoding='utf-8'))
+        with path.open('rb') as stream:
+            raw = stream.read(1024 * 1024 + 1)
+        if len(raw) > 1024 * 1024:
+            raise ValueError('Profile catalog exceeds bounded size')
+        def pairs(items):
+            result = {}
+            for key, value in items:
+                if key in result:
+                    raise ValueError('Duplicate profile property')
+                result[key] = value
+            return result
+        def reject(_):
+            raise ValueError('Non-finite profile value')
+        document = json.loads(raw, object_pairs_hook=pairs, parse_constant=reject)
     except (OSError, ValueError) as exc:
         raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unreadable profile catalog: {exc}',
                                 path=relative) from exc
@@ -221,6 +239,34 @@ def _load_one(path: Path) -> tuple[str, dict]:
         if row['status'] not in STATUSES:
             raise ProvisioningError('UNSUPPORTED_PROFILE', f'Unknown profile status: {row["status"]}',
                                     path=relative)
+        if (not isinstance(row['profile'], str) or not row['profile'].strip()
+                or len(row['profile']) > 128 or type(row['rank']) is not int
+                or row['rank'] <= 0 or not isinstance(row['description'], str)
+                or not row['description'].strip()):
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Invalid profile identity or rank',
+                                    path=relative)
+        requirements = row.get('requires', {})
+        inputs = row.get('platform_inputs', {})
+        limits = row.get('limits', [])
+        if not isinstance(requirements, dict) or not isinstance(inputs, dict):
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile requirements and inputs must be mappings',
+                                    path=relative)
+        validate_requirements(family, requirements, path=relative)
+        capabilities = requirements.get('capabilities', [])
+        if (not isinstance(capabilities, list)
+                or any(not isinstance(cap, str) for cap in capabilities)
+                or len(capabilities) != len(set(capabilities))
+                or not set(capabilities) <= CAPABILITIES):
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile capabilities must be unique reviewed IDs',
+                                    path=relative)
+        if (not isinstance(limits, list)
+                or any(not isinstance(limit, str) or not limit.strip() for limit in limits)):
+            raise ProvisioningError('UNSUPPORTED_PROFILE', 'Profile limits must be nonempty text entries',
+                                    path=relative)
+        try:
+            parse_requirements(requirements.get('constraints', []), capabilities)
+        except ValueError as exc:
+            raise ProvisioningError('UNSUPPORTED_PROFILE', str(exc), path=relative) from exc
         entry_version = _version(row.get('version'), f'Profile {row.get("profile")}', relative)
         rank_key = (row['profile'].split('/', 1)[0] if '/' in row['profile'] else family, row['rank'])
         if row['profile'] in profiles or rank_key in ranks:
@@ -301,10 +347,6 @@ def load_catalogs(root: Path = PROFILE_ROOT) -> Catalog:
     service_defaults: dict[str, str] = {}
     for path in sorted(root.glob('*/catalog.json')):
         family, loaded = _load_one(path)
-        if family not in FAMILIES:
-            raise ProvisioningError('UNSUPPORTED_PROFILE',
-                                    f'Unknown profile family directory: {family}',
-                                    path=_relative(path))
         families[family] = loaded['profiles']
         versions[family] = loaded['version']
         if loaded['default'] is not None:

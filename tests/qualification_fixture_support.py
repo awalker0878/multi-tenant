@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import hashlib
 
-from scripts import check_qualification_campaign_assurance as campaign
-from scripts import check_target_selection_assurance as target
+from provisioner.qualification import campaign as campaign
+from provisioner.qualification import target_selection as target
 
 PLATFORM_TO_CAMPAIGN = {
     'nutanix': 'NUTANIX',

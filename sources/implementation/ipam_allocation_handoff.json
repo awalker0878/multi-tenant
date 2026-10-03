@@ -13,8 +13,8 @@
     "EVID-002"
   ],
   "allocation_index": "sources/capabilities/ipam_allocation_index.json",
-  "record_checker": "scripts/check_ipam_allocation_records.py",
-  "preflight_checker": "scripts/check_ipam_allocation_preflight.py",
+  "record_checker": "provisioner/allocations/ipam_evidence.py",
+  "preflight_checker": "provisioner/allocations/ipam_preflight.py",
   "engineering": "docs/engineering/authoritative-ipam-allocation-handoff.md",
   "current_allocation_records": 0,
   "actual_allocation_values_stored_in_repository": false,

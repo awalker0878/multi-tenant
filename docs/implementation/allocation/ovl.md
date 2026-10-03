@@ -19,7 +19,7 @@ A platform SHALL provide an isolated routing/policy mechanism capable of realizi
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A platform SHALL provide an isolated routing/policy mechanism capable of realizing the Security Domain semantics required by the applicable conformance profile.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-016, CT-018, CT-080
 
@@ -42,7 +42,7 @@ Native routing MAY be used within one authorized Security Domain Instance; commu
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Native routing MAY be used within one authorized Security Domain Instance; communication between independent security domains SHALL follow the approved boundary/ZIP realization and its policy.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-021, CT-023
 
@@ -60,7 +60,7 @@ Native routing MAY be used within one authorized Security Domain Instance; commu
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Native routing MAY be used within one authorized Security Domain Instance
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-021, CT-023
 
@@ -78,7 +78,7 @@ Native routing MAY be used within one authorized Security Domain Instance; commu
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: communication between independent security domains SHALL follow the approved boundary/ZIP realization and its policy.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-021, CT-023
 
@@ -101,7 +101,7 @@ Before a workload is attached, the adapter SHALL normalize permissive native def
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Before a workload is attached, the adapter SHALL normalize permissive native defaults and enforce the mandatory baseline on all supported NIC, router, gateway and workload-attachment paths.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-022, CT-066, CT-069
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from provisioner.domain.request import digest
 
-POLICY_CAPSULE_FORMAT = 'hosting-portable-policy-capsule/1'
+POLICY_CAPSULE_FORMAT = 'hosting-portable-policy-capsule/2'
 
 
 def _profile(plan, family: str):
@@ -37,6 +37,8 @@ def build(plan) -> dict:
             'service_class': plan.resolution.service_class,
             'zones': list(plan.resolution.zones),
             'capabilities': list(plan.resolution.required_capabilities),
+            'capability_property_schema_digest': plan.resolution.capability_property_schema_digest,
+            'capability_constraints': [r.to_dict() for r in plan.resolution.capability_constraints],
             'network': {
                 'profile': plan.resolution.network['profile'],
                 'address_family': plan.resolution.network['address_family'],

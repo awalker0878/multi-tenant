@@ -9,8 +9,8 @@ import re
 import sys
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from provisioner.execution.run_files import require
 
 PROFILE = 'nutanix-ahv-v4.2-vm-snapshot'
 TYPE = 'vmm.v4.ahv.config.'

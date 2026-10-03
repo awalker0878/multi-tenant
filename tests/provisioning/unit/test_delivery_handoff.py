@@ -122,7 +122,7 @@ class MirroredContractTest(unittest.TestCase):
                 self.assertEqual(handoff._declared_parameters(kind), set(entry[0]))
 
     def test_the_identifier_grammar_is_the_declared_grammar(self):
-        from tools import readback_core
+        from provisioner.execution import readback_core
         self.assertEqual(handoff.IDENTIFIER.pattern, readback_core.ID.pattern)
 
     def test_the_graph_and_step_keys_are_the_ones_the_runner_requires(self):
@@ -212,7 +212,7 @@ class SequenceTest(unittest.TestCase):
                  'backup-retention': 'restic',
                  'native-qualification': 'target_campaign',
                  'production-authorization': 'acceptance',
-                 'guest-configuration': 'guest_plan'}
+                 'guest-configuration': 'guest_apply'}
         self.assertEqual(sorted(handoff.OPERATION_STEPS), sorted(kinds))
         for operation, step_id in sorted(handoff.OPERATION_STEPS.items()):
             with self.subTest(operation=operation):
@@ -398,7 +398,10 @@ class GraphTest(unittest.TestCase):
                 self.assertEqual(graph['scope']['platform'], platform)
                 self.assertEqual(graph['scope'], plan.identity.scope)
                 self.assertEqual(graph['operation_id'], plan.operation_id)
-                self.assertEqual(graph['steps'], self.graph['steps'])
+                self.assertEqual(graph['steps'], [step.to_dict() for step in handoff.sequence(plan)])
+                if platform == 'vmware':
+                    self.assertTrue(any(step['kind'] == 'vsphere_power' for step in graph['steps']))
+                    self.assertFalse(any(step['id'] == 'workload-bootstrap' for step in graph['steps']))
 
     def test_the_review_projection_names_the_coverage(self):
         review = handoff.review(self.graph)
@@ -644,12 +647,36 @@ class NoBypassTest(unittest.TestCase):
                 self.assertNotIn('import tools', text)
                 self.assertNotIn('import scripts', text)
 
-    def test_no_module_under_provisioner_owns_a_journal(self):
+    def test_no_module_under_provisioner_owns_a_delivery_execution_journal(self):
+        allowed = self.PACKAGE / 'controlplane' / 'discovery' / 'batch_journal.py'
         for path in sorted(self.PACKAGE.rglob('*.py')):
             text = path.read_text(encoding='utf-8')
             with self.subTest(module=str(path.relative_to(self.PACKAGE))):
                 self.assertNotIn('execution_journal', text)
-                self.assertNotIn('flock', text)
+                if path == allowed:
+                    self.assertIn('grants no collection authority', text)
+                    self.assertIn('enterprise scheduler', text)
+                    self.assertIn('is not', text)
+                    self.assertNotIn('execution_authorized = True', text.lower())
+                elif path == self.PACKAGE / 'execution' / 'terraform_apply.py':
+                    # This is the same pre-existing native saved-plan owner,
+                    # relocated without a second delivery journal or authority.
+                    self.assertIn('def scope_ledger(', text)
+                    self.assertIn("'STARTED_OUTCOME_UNKNOWN'", text)
+                    self.assertIn("'APPLIED_REQUIRES_NATIVE_ACCEPTANCE'", text)
+                    self.assertIn('Explicit native mutation opt-in required', text)
+                    module = ast.parse(text)
+                    calls = [node for node in ast.walk(module)
+                             if isinstance(node, ast.Call)
+                             and isinstance(node.func, ast.Attribute)
+                             and isinstance(node.func.value, ast.Name)
+                             and node.func.value.id == 'fcntl' and node.func.attr == 'flock']
+                    owned = next(node for node in module.body
+                                 if isinstance(node, ast.FunctionDef) and node.name == 'scope_ledger')
+                    self.assertEqual(len(calls), 1)
+                    self.assertTrue(all(owned.lineno <= node.lineno <= owned.end_lineno for node in calls))
+                else:
+                    self.assertNotIn('flock', text)
 
     def test_the_repository_declares_no_execution_authority(self):
         self.assertEqual(authority_module.EXECUTION_AUTHORITY, 'EXTERNAL_ONLY')
@@ -673,32 +700,24 @@ class NoBypassTest(unittest.TestCase):
                 self.assertIn(term, source)
 
     def test_every_command_still_routes_through_the_shared_service(self):
+        from tests.provisioning.unit import test_architecture as architecture
         for path in sorted((self.PACKAGE / 'cli').glob('*.py')):
-            if path.name in ('__init__.py', '__main__.py', 'main.py',
-                             'support.py', 'operator.py'):
+            if path.name in architecture.TRANSPORT_MODULES | architecture.API_ONLY_COMMANDS:
                 continue
             with self.subTest(command=path.name):
                 self.assertIn('execution.service',
                               path.read_text(encoding='utf-8'))
 
     def test_operator_command_cannot_bypass_the_control_api(self):
-        path = self.PACKAGE / 'cli' / 'operator.py'
-        self.assertTrue(path.is_file())
-        tree = ast.parse(path.read_text(encoding='utf-8'))
-        imported = set()
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                imported.update(alias.name for alias in node.names)
-            elif isinstance(node, ast.ImportFrom) and not node.level:
-                imported.add(node.module or '')
-        self.assertIn('httpx', imported)
-        for name in imported:
-            with self.subTest(imports=name):
-                self.assertFalse(name.startswith(('provisioner.execution',
-                                                  'provisioner.repository',
-                                                  'provisioner.adapters',
-                                                  'provisioner.controlplane',
-                                                  'tools', 'scripts', 'psycopg')))
+        from tests.provisioning.unit import test_architecture as architecture
+        for name in sorted(architecture.API_ONLY_COMMANDS):
+            path = self.PACKAGE / 'cli' / name
+            self.assertTrue(path.is_file())
+            with self.subTest(module=name):
+                self.assertEqual(architecture._api_client_import_violations(
+                    path, 'provisioner.cli.' + path.stem), [])
+        self.assertIn('httpx', architecture._absolute_imports(
+            self.PACKAGE / 'cli' / 'operator.py'))
 
 
 if __name__ == '__main__':

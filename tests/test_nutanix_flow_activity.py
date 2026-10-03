@@ -17,7 +17,8 @@ from tests.test_nutanix_vm_activity import activity_routes
 from tests.test_nutanix_flow_observe import manifest as snapshot_manifest
 from tests.test_nutanix_vm_observe import uid
 from tools import nutanix_flow_activity_observe as a, nutanix_flow_observe as flow
-from tools import nutanix_entity_activity as activity, nutanix_task_tree as tree, readback_core as c
+from provisioner.execution import readback_core as c
+from tools import nutanix_entity_activity as activity, nutanix_task_tree as tree
 
 
 def manifest(origin='https://pc.example.invalid'):

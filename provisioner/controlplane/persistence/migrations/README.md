@@ -4,7 +4,7 @@ Install the `controlplane` extra, provision a dedicated `NOSUPERUSER
 NOBYPASSRLS` migration role with `CREATE` on the database and a separate
 runtime role, then run `python -m
 provisioner.controlplane.persistence.migrate` with libpq connection settings
-for the migration role. The runner applies packaged migrations `0001`–`0019`
+for the migration role. The runner applies packaged migrations `0001`–`0023`
 in filename order, each in its own transaction under a
 session advisory lock. Applied SQL
 is checksummed; modified or missing history stops startup.
@@ -27,6 +27,10 @@ GRANT SELECT ON hosting_controlplane.discovery_campaigns,
     hosting_controlplane.discovery_generations,
     hosting_controlplane.discovery_observations,
     hosting_controlplane.discovery_absence_candidates TO hosting_runtime;
+GRANT SELECT, INSERT ON hosting_controlplane.application_draft_revisions
+    TO hosting_runtime;
+GRANT SELECT, INSERT ON hosting_controlplane.discovery_freshness_checks
+    TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.enterprise_record_history
     TO hosting_runtime;
 GRANT SELECT, INSERT ON hosting_controlplane.audit_events TO hosting_runtime;
@@ -188,3 +192,51 @@ storage writer, or external administrator. An expired lease remains held and
 cannot be automatically reacquired. Recovery requires an independently reviewed
 reconciliation operation in B11. A lease expiry alone cannot authorize another
 production writer. The route must separately prove native exclusion.
+
+## Application drafts and immutable history
+
+Migration `0020` retains independently signed assessment inputs separately from
+runtime-issued assertions. Migration `0021` adds `application_draft_revisions` for
+unreviewed human proposals, with exact environment/generation/result foreign keys,
+consecutive revisions, append-only history, tenant FORCE RLS and explicit site-worker
+exclusion. Grant only the API runtime SELECT/INSERT on the new table plus its existing
+discovery SELECT and audit INSERT/sequence privileges. The runtime must not have
+UPDATE/DELETE/TRUNCATE, trigger ownership or a generic SQL endpoint. Discovery ingest
+and site-worker roles need no proposal-writing privileges.
+
+Apply 0021 through the existing checksum-bound runner. Its added uniqueness constraint
+on discovery generations may lock/index existing data; plan the reviewed deployment
+window accordingly. It performs no ownership or approval conversion. Original
+inventory, drafts, audit checkpoints and migration history must survive restore
+together; the disposable restore gate explicitly checks the new table. See
+[the application-draft contract](../../../../docs/engineering/application-drafts.md)
+for exact scope, retry, source-lock and operational limitations.
+
+
+## Signed application review and retained freshness checks
+
+Migration `0022` extends the signed assessment input kind for independent
+APPLICATION_REVIEW decisions. The separate assessment-ingest role needs SELECT
+on retained application drafts, discovery generations and observations in addition
+to its existing assessment/audit rights. It does not receive draft-writing or
+native execution privileges. See the
+[owner-review contract](../../../../docs/engineering/application-owner-review.md)
+for original-byte custody, exact draft binding and deployment requirements.
+
+Migration `0023` creates `discovery_freshness_checks`. Apply it before exposing
+freshness-history PUT/GET routes, then grant the API runtime SELECT/INSERT as above.
+Existing discovery SELECT and audit INSERT rights remain necessary. No UPDATE,
+DELETE, TRUNCATE, table/trigger ownership or arbitrary SQL endpoint is allowed.
+Site workers and discovery-ingest roles receive no new history privilege. The table
+has full environment/native-scope foreign keys, tenant FORCE RLS, site-worker
+exclusion, append-only guards and consecutive predecessor validation. A record and
+its exact-digest audit event commit together through the trusted runtime owner.
+
+No existing sample is backfilled and no old freshness result is made current by
+this migration. Preserve the table, audit/checkpoints, original inventory,
+environment records and migration ledger together through restore. The disposable
+restore gate includes this table; restored production services still need independent
+reconciliation before write access. Do not reset check IDs, rewrite historical
+reports, edit applied SQL/checksums or treat a missing acknowledgement as rollback.
+See [retained freshness history](../../../../docs/engineering/discovery-freshness-history.md)
+for same-ID retry, current authority, pagination integrity and operational limits.

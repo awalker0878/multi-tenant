@@ -1,8 +1,9 @@
 """Scoped vSphere task-history queries; only session-local collector writes."""
 import re
 from urllib.parse import quote
-from tools import readback_core as c, vsphere_observe as vm
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import vsphere_observe as vm
+from provisioner.execution.run_files import require
 
 
 class CollectorClient(c.ReadClient):

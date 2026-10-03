@@ -85,8 +85,18 @@ class MainPublicationIntegration(unittest.TestCase):
         with self.mutate_read('docs/current/TAD-infrastructure.md',lambda s:s.replace('**Accountable role:** Platform, network and security engineering.','**Accountable role:** Unassigned.')):
             self.assertTrue(current.check(ROOT)['errors'])
     def test_current_header_version_change_rejected(self):
-        with self.mutate_read('docs/current/TAD-infrastructure.md',lambda s:s.replace('**Version:** 0.1','**Version:** 0.2')):
-            self.assertTrue(current.check(ROOT)['errors'])
+        records=json.loads((ROOT/'sources/documentation/current_design_records.json').read_text())
+        self.assertTrue(records, 'The maintained design register must not be empty')
+        for record in records:
+            with self.subTest(document=record['path']):
+                original='**Version:** '+record['version']+' ·'
+                replacement='**Version:** unregistered-test-version ·'
+                # Derive the mutation from the register so legitimate version
+                # bumps cannot turn this negative test into a silent no-op.
+                self.assertEqual((ROOT/record['path']).read_text().count(original),1)
+                with self.mutate_read(record['path'],lambda text:text.replace(original,replacement,1)):
+                    self.assertIn(record['id']+': rendered status/version/owner differs from maintained record',
+                                  current.check(ROOT)['errors'])
     def test_current_prose_can_evolve_without_source_amendments(self):
         with self.mutate_read('docs/current/TAD-infrastructure.md',lambda s:s.replace('## Design content','## Design content\n\nProposed engineering refinement for review.')):
             self.assertEqual(current.check(ROOT)['errors'],[])

@@ -2,10 +2,10 @@
   {
     "id": "RAD-M01",
     "path": "docs/current/RAD-adoption.md",
-    "version": "0.1",
+    "version": "0.15",
     "status": "Proposed",
     "owner_role": "Architecture authority",
-    "scope": "Reference adoption for a portable infrastructure service; no site-specific control assessment is implied.",
+    "scope": "Reference adoption for enterprise workload mobility and secure hosting across qualified on-premises environments; no site-specific control assessment or production acceptance is implied.",
     "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
     "parent_sections": [
       "docs/architecture/reference/1-purpose-scope-and-architectural-authority.md",
@@ -19,16 +19,86 @@
         "version": "0.1",
         "date": "2026-09-18",
         "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      },
+      {
+        "version": "0.2",
+        "date": "2026-09-28",
+        "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-09-29",
+        "summary": "Persisted generation-bound application drafts and authenticated author attribution; retained unreviewed status, immutable history, unknown dependencies and separate owner-acceptance/execution gates."
+      },
+      {
+        "version": "0.5",
+        "date": "2026-09-29",
+        "summary": "Added scoped live draft listing and thin operator save/load with explicit source/revision pins, exact content acknowledgements and uncertain-save recovery; owner approval and guided review remain open."
+      },
+      {
+        "version": "0.6",
+        "date": "2026-09-29",
+        "summary": "Added bounded browser listing and existing-draft metadata/startup editing with source/revision preservation, read-only evidence, explicit confirmation and uncertain-save reconciliation; formal owner review and full guided creation remain open."
+      },
+      {
+        "version": "0.7",
+        "date": "2026-09-30",
+        "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
+      },
+      {
+        "version": "0.9",
+        "date": "2026-09-30",
+        "summary": "Integrated signed application-wide comparison, all-member aggregate demand, live evidence/currency rechecks and explicit Wave 2 exit and Wave 3 reservation boundaries."
+      },
+      {
+        "version": "0.10",
+        "date": "2026-09-30",
+        "summary": "Added thin application-comparison command and format-2 canonical selection binding, strict response coherence and explicit remaining wave/reservation boundaries."
+      },
+      {
+        "version": "0.11",
+        "date": "2026-09-30",
+        "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.12",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.13",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01\u2013B50/native acceptance gates."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.15",
+        "date": "2026-10-02",
+        "summary": "Record OpenStack selector 3 referenced-image evidence as an observed portability input without treating image metadata as compatibility or native qualification."
       }
     ]
   },
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.1",
+    "version": "0.39",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
-    "scope": "Technical decomposition across the fabric, hosting stacks, security edge and shared services.",
+    "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
     "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
     "parent_sections": [
       "docs/architecture/reference/3-system-context-and-physical-hosting-topology.md",
@@ -43,16 +113,206 @@
         "version": "0.1",
         "date": "2026-09-18",
         "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      },
+      {
+        "version": "0.2",
+        "date": "2026-09-28",
+        "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Moved the actual WSD compiler and component declarations into package ownership without a shim; bounded file input, migrated callers and verified isolated compiler imports while preserving generated native inputs."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-09-28",
+        "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.5",
+        "date": "2026-09-28",
+        "summary": "Added bounded VMware VM-info campaign output and AHV boot/device observations; revised collector profiles without aliases, preserved unknown/visibility boundaries and native qualification gates."
+      },
+      {
+        "version": "0.6",
+        "date": "2026-09-28",
+        "summary": "Added exact-campaign signed VMware session custody and bounded HTTPS GET transport; corrected OpenStack pre-read expiry checks while retaining explicit site integration and native qualification gaps."
+      },
+      {
+        "version": "0.7",
+        "date": "2026-09-28",
+        "summary": "Added signed AHV service-account discovery, shared provider-neutral HTTPS ownership, exact page/scope and visible-only evidence boundaries; deployed custody and migration qualification remain open."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-29",
+        "summary": "Added project-scoped OpenStack HTTPS/token custody, exact three-service/version and visibility boundaries, strict endpoint/header validation and explicit remaining deployment/qualification work."
+      },
+      {
+        "version": "0.9",
+        "date": "2026-09-29",
+        "summary": "Recorded original collector signatures, private campaign-bound outbox recovery and explicit mTLS publication uncertainty; preserved live authority, server idempotency and remaining deployment/DR custody gates."
+      },
+      {
+        "version": "0.10",
+        "date": "2026-09-29",
+        "summary": "Added the installed protected-configuration collector command with separate stage/publish actions, original-byte restart and explicit uncertainty; removed inherited native TLS key logging without weakening trust checks."
+      },
+      {
+        "version": "0.11",
+        "date": "2026-09-29",
+        "summary": "Persisted generation-bound application drafts and authenticated author attribution; retained unreviewed status, immutable history, unknown dependencies and separate owner-acceptance/execution gates."
+      },
+      {
+        "version": "0.12",
+        "date": "2026-09-29",
+        "summary": "Added scoped live draft listing and thin operator save/load with explicit source/revision pins, exact content acknowledgements and uncertain-save recovery; owner approval and guided review remain open."
+      },
+      {
+        "version": "0.13",
+        "date": "2026-09-29",
+        "summary": "Added bounded browser listing and existing-draft metadata/startup editing with source/revision preservation, read-only evidence, explicit confirmation and uncertain-save reconciliation; formal owner review and full guided creation remain open."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-09-30",
+        "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.15",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
+      },
+      {
+        "version": "0.16",
+        "date": "2026-09-30",
+        "summary": "Integrated signed application-wide comparison, all-member aggregate demand, live evidence/currency rechecks and explicit Wave 2 exit and Wave 3 reservation boundaries."
+      },
+      {
+        "version": "0.17",
+        "date": "2026-09-30",
+        "summary": "Added thin application-comparison command and format-2 canonical selection binding, strict response coherence and explicit remaining wave/reservation boundaries."
+      },
+      {
+        "version": "0.18",
+        "date": "2026-09-30",
+        "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.19",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.20",
+        "date": "2026-09-30",
+        "summary": "Added exact-scope freshness inspection with capture-age/coverage separation, live metadata and authorization rechecks, and explicit remaining monitoring and Wave 2 gates."
+      },
+      {
+        "version": "0.21",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01\u2013B50/native acceptance gates."
+      },
+      {
+        "version": "0.22",
+        "date": "2026-10-01",
+        "summary": "Guided initial browser proposals from pinned stored VM identities, explicit dataset/dependency assertions and first-save uncertainty reconciliation. Existing APIs and authority boundaries retained; saved-membership editing, owner signing and native acceptance remain open."
+      },
+      {
+        "version": "0.23",
+        "date": "2026-10-01",
+        "summary": "Added explicit saved-revision browser membership/data/evidence editing, exact source rechecks, preserved original ordering/precision, N+1 acknowledgement/reconciliation and stale-review invalidation. No rebase, schema change or native authority; independent dependencies, owner signing and acceptance remain open."
+      },
+      {
+        "version": "0.24",
+        "date": "2026-10-01",
+        "summary": "Document installed offline application-owner prepare/sign commands with exact immutable export/digest binding, shared current enrollment verification and create-only private artifact custody. Preserve server ingestion/currency checks and open owner onboarding, authenticated delivery, independent dependency and operating acceptance obligations."
+      },
+      {
+        "version": "0.25",
+        "date": "2026-10-01",
+        "summary": "Add exact-saved-revision browser review inspection with one shared wire validator, microsecond validity checks, stale-response/visibility/expiry cleanup and explicit no-signing/no-ingest authority. Correct stale owner-signing descriptions; retain deployed custody, artifact delivery, independent dependency and operating acceptance gaps."
+      },
+      {
+        "version": "0.26",
+        "date": "2026-10-01",
+        "summary": "Add installed exact-scope custodian intake of original owner-signed artifacts through the existing assessment writer, shared private-file custody, authenticated SQL role checks and create-only receipts with explicit commit uncertainty. Retain upstream artifact transfer, deployed custody, independent dependencies and operating acceptance as open work."
+      },
+      {
+        "version": "0.27",
+        "date": "2026-10-01",
+        "summary": "Move the actual Terraform catalog reader into package ownership without an alias; bound JSON/local-source validation, migrate all consumers and remove stale Python/bytecode from clean build staging. Preserve catalog/native/plan bytes and remaining B05 runtime/state and native acceptance obligations."
+      },
+      {
+        "version": "0.28",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.29",
+        "date": "2026-10-02",
+        "summary": "Periodic freshness monitoring now reuses immutable history through deterministic target/time slots and digest-bound alert intents without collection or notification authority; deployed scheduling, alert delivery and fleet-global admission remain open."
+      },
+      {
+        "version": "0.30",
+        "date": "2026-10-02",
+        "summary": "Extend exact OpenStack discovery to a signed Glance v2 endpoint and bounded VM-referenced image metadata while retaining campaign budgets and explicit compatibility/qualification gaps."
+      },
+      {
+        "version": "0.31",
+        "date": "2026-10-02",
+        "summary": "Move active source-integrity verification into the execution package, pin one current Git tree or explicit export manifest, and retire the former tools owner without changing native or approval authority."
+      },
+      {
+        "version": "0.32",
+        "date": "2026-10-02",
+        "summary": "Move exported IPAM allocation-evidence validation into package ownership without an alias; retain external-authority, no-address-value, confirmation-digest and release/quarantine semantics while keeping live IPAM/B23 and retained-state work open."
+      },
+      {
+        "version": "0.33",
+        "date": "2026-10-02",
+        "summary": "Package capacity/eligibility and reservation/IPAM/DNS preflight owners with their evidence readers; eliminate provisioner imports from top-level scripts/tools while retaining live owner-service, execution and state-conversion gates."
+      },
+      {
+        "version": "0.34",
+        "date": "2026-10-02",
+        "summary": "Document OpenStack selector 4 VM-referenced driver/security metadata as bounded observation-only evidence; preserve unknowns and require fresh enrollment/evidence while guest-installed drivers, keys, service facts and native qualification remain open."
+      },
+      {
+        "version": "0.35",
+        "date": "2026-10-03",
+        "summary": "Move the fixed guest probe into the installed execution package without an alias while retaining its bounded read-only network/TLS semantics and separate campaign/native acceptance gates."
+      },
+      {
+        "version": "0.36",
+        "date": "2026-10-03",
+        "summary": "Move the offline routed-topology audit model into the installed execution package without an alias; preserve model-only scope and separate native routing/security acceptance."
+      },
+      {
+        "version": "0.37",
+        "date": "2026-10-03",
+        "summary": "Move read-only implementation-input validation into the installed execution package without an alias; preserve existing schema/type/address checks and non-authoritative boundaries."
+      },
+      {
+        "version": "0.38",
+        "date": "2026-10-03",
+        "summary": "Package operator files, shared readback transport, exact-ID Neutron observation and route-record review without aliases; preserve authority and retained-record contracts."
+      },
+      {
+        "version": "0.39",
+        "date": "2026-10-03",
+        "summary": "Package saved-plan review/execution, lifecycle binding, Flow rules and execution handoff; require explicit source selection and package/source byte agreement before installed effects; preserve retained-state and authority contracts."
       }
     ]
   },
   {
     "id": "SOL-M01",
     "path": "docs/current/internal-hosting-solution.md",
-    "version": "0.1",
+    "version": "0.5",
     "status": "Proposed",
     "owner_role": "Hosting solution architect",
-    "scope": "A newly maintained selection view of the existing two-tenant OZ/RZ reference fixture; no fresh addresses or service promises are invented.",
+    "scope": "A maintained internal two-tenant reference solution for isolated provisioning and application migration; fixture values are not current allocations or service promises.",
     "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
     "parent_sections": [
       "docs/solutions/internal-protected-workload/2-reference-decisions-and-infrastructure-boundaries.md",
@@ -67,16 +327,36 @@
         "version": "0.1",
         "date": "2026-09-18",
         "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      },
+      {
+        "version": "0.2",
+        "date": "2026-09-28",
+        "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01\u2013B50/native acceptance gates."
+      },
+      {
+        "version": "0.5",
+        "date": "2026-10-02",
+        "summary": "Align the internal reference solution to OpenStack selector 3 and referenced-image evidence without enabling or qualifying a native route."
       }
     ]
   },
   {
     "id": "SOL-M02",
     "path": "docs/current/public-hosting-design-profile.md",
-    "version": "0.1",
+    "version": "0.5",
     "status": "Proposed",
     "owner_role": "Security and hosting solution architects",
-    "scope": "New design profile for a proposed PAZ/OZ/RZ extension; not the missing worked public-service solution and not an amendment enabling the internal fixture.",
+    "scope": "A proposed public-extension design profile under the same workload mobility authority model; public exposure remains deferred and is not enabled by the internal fixture.",
     "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
     "parent_sections": [
       "docs/architecture/reference/9-shared-services-ingress-and-controlled-egress.md",
@@ -90,16 +370,36 @@
         "version": "0.1",
         "date": "2026-09-18",
         "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      },
+      {
+        "version": "0.2",
+        "date": "2026-09-28",
+        "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01\u2013B50/native acceptance gates."
+      },
+      {
+        "version": "0.5",
+        "date": "2026-10-02",
+        "summary": "Align the deferred public-extension profile to OpenStack selector 3 and referenced-image evidence without enabling public activation."
       }
     ]
   },
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.1",
+    "version": "0.38",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
-    "scope": "Per-interface working design obligations across independently governed infrastructure.",
+    "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
     "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
     "parent_sections": [
       "docs/architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md",
@@ -113,16 +413,201 @@
         "version": "0.1",
         "date": "2026-09-18",
         "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      },
+      {
+        "version": "0.2",
+        "date": "2026-09-28",
+        "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-09-28",
+        "summary": "Added bounded VMware VM-info campaign output and AHV boot/device observations; revised collector profiles without aliases, preserved unknown/visibility boundaries and native qualification gates."
+      },
+      {
+        "version": "0.5",
+        "date": "2026-09-28",
+        "summary": "Added exact-campaign signed VMware session custody and bounded HTTPS GET transport; corrected OpenStack pre-read expiry checks while retaining explicit site integration and native qualification gaps."
+      },
+      {
+        "version": "0.6",
+        "date": "2026-09-28",
+        "summary": "Added signed AHV service-account discovery, shared provider-neutral HTTPS ownership, exact page/scope and visible-only evidence boundaries; deployed custody and migration qualification remain open."
+      },
+      {
+        "version": "0.7",
+        "date": "2026-09-29",
+        "summary": "Added project-scoped OpenStack HTTPS/token custody, exact three-service/version and visibility boundaries, strict endpoint/header validation and explicit remaining deployment/qualification work."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-29",
+        "summary": "Recorded original collector signatures, private campaign-bound outbox recovery and explicit mTLS publication uncertainty; preserved live authority, server idempotency and remaining deployment/DR custody gates."
+      },
+      {
+        "version": "0.9",
+        "date": "2026-09-29",
+        "summary": "Added the installed protected-configuration collector command with separate stage/publish actions, original-byte restart and explicit uncertainty; removed inherited native TLS key logging without weakening trust checks."
+      },
+      {
+        "version": "0.10",
+        "date": "2026-09-29",
+        "summary": "Persisted generation-bound application drafts and authenticated author attribution; retained unreviewed status, immutable history, unknown dependencies and separate owner-acceptance/execution gates."
+      },
+      {
+        "version": "0.11",
+        "date": "2026-09-29",
+        "summary": "Added scoped live draft listing and thin operator save/load with explicit source/revision pins, exact content acknowledgements and uncertain-save recovery; owner approval and guided review remain open."
+      },
+      {
+        "version": "0.12",
+        "date": "2026-09-29",
+        "summary": "Added bounded browser listing and existing-draft metadata/startup editing with source/revision preservation, read-only evidence, explicit confirmation and uncertain-save reconciliation; formal owner review and full guided creation remain open."
+      },
+      {
+        "version": "0.13",
+        "date": "2026-09-30",
+        "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
+      },
+      {
+        "version": "0.15",
+        "date": "2026-09-30",
+        "summary": "Integrated signed application-wide comparison, all-member aggregate demand, live evidence/currency rechecks and explicit Wave 2 exit and Wave 3 reservation boundaries."
+      },
+      {
+        "version": "0.16",
+        "date": "2026-09-30",
+        "summary": "Added thin application-comparison command and format-2 canonical selection binding, strict response coherence and explicit remaining wave/reservation boundaries."
+      },
+      {
+        "version": "0.17",
+        "date": "2026-09-30",
+        "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.18",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.19",
+        "date": "2026-09-30",
+        "summary": "Added exact-scope freshness inspection with capture-age/coverage separation, live metadata and authorization rechecks, and explicit remaining monitoring and Wave 2 gates."
+      },
+      {
+        "version": "0.20",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01\u2013B50/native acceptance gates."
+      },
+      {
+        "version": "0.21",
+        "date": "2026-10-01",
+        "summary": "Guided initial browser proposals from pinned stored VM identities, explicit dataset/dependency assertions and first-save uncertainty reconciliation. Existing APIs and authority boundaries retained; saved-membership editing, owner signing and native acceptance remain open."
+      },
+      {
+        "version": "0.22",
+        "date": "2026-10-01",
+        "summary": "Added explicit saved-revision browser membership/data/evidence editing, exact source rechecks, preserved original ordering/precision, N+1 acknowledgement/reconciliation and stale-review invalidation. No rebase, schema change or native authority; independent dependencies, owner signing and acceptance remain open."
+      },
+      {
+        "version": "0.23",
+        "date": "2026-10-01",
+        "summary": "Document installed offline application-owner prepare/sign commands with exact immutable export/digest binding, shared current enrollment verification and create-only private artifact custody. Preserve server ingestion/currency checks and open owner onboarding, authenticated delivery, independent dependency and operating acceptance obligations."
+      },
+      {
+        "version": "0.24",
+        "date": "2026-10-01",
+        "summary": "Add exact-saved-revision browser review inspection with one shared wire validator, microsecond validity checks, stale-response/visibility/expiry cleanup and explicit no-signing/no-ingest authority. Correct stale owner-signing descriptions; retain deployed custody, artifact delivery, independent dependency and operating acceptance gaps."
+      },
+      {
+        "version": "0.25",
+        "date": "2026-10-01",
+        "summary": "Add installed exact-scope custodian intake of original owner-signed artifacts through the existing assessment writer, shared private-file custody, authenticated SQL role checks and create-only receipts with explicit commit uncertainty. Retain upstream artifact transfer, deployed custody, independent dependencies and operating acceptance as open work."
+      },
+      {
+        "version": "0.26",
+        "date": "2026-10-01",
+        "summary": "Move the actual Terraform catalog reader into package ownership without an alias; bound JSON/local-source validation, migrate all consumers and remove stale Python/bytecode from clean build staging. Preserve catalog/native/plan bytes and remaining B05 runtime/state and native acceptance obligations."
+      },
+      {
+        "version": "0.27",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.28",
+        "date": "2026-10-02",
+        "summary": "Define checkpointed local collection and periodic freshness/alert-intent interfaces with exact replay, digest verification and explicit external delivery/coordination boundaries."
+      },
+      {
+        "version": "0.29",
+        "date": "2026-10-02",
+        "summary": "Add the signed Glance endpoint and exact VM-referenced image-read contract; image metadata remains observation, not guest/target compatibility."
+      },
+      {
+        "version": "0.30",
+        "date": "2026-10-02",
+        "summary": "Define package-owned checkout/export source-integrity boundaries and fail-closed installed-runtime behavior while retaining signer/custody and state-conversion obligations."
+      },
+      {
+        "version": "0.31",
+        "date": "2026-10-02",
+        "summary": "Bind reservation/IPAM/DNS consumers to the package-owned IPAM evidence reader while preserving the stable confirmed-allocation digest and external IPAM mutation authority."
+      },
+      {
+        "version": "0.32",
+        "date": "2026-10-02",
+        "summary": "Align package-owned capacity/reservation/IPAM/DNS planning and evidence interfaces; preserve exact digests, external service authority and no-mutation boundary."
+      },
+      {
+        "version": "0.33",
+        "date": "2026-10-02",
+        "summary": "Bind OpenStack selector 4 and its Glance custom-property string semantics at the producer/consumer boundary; retain compute-tuple/guest reconciliation and native qualification as separate obligations."
+      },
+      {
+        "version": "0.34",
+        "date": "2026-10-03",
+        "summary": "Bind target qualification to the package-owned fixed guest probe without changing endpoint, SSH, network-policy or acceptance semantics."
+      },
+      {
+        "version": "0.35",
+        "date": "2026-10-03",
+        "summary": "Bind offline route/intent checking to the package-owned model without changing modeled address/route/flow semantics or native evidence obligations."
+      },
+      {
+        "version": "0.36",
+        "date": "2026-10-03",
+        "summary": "Bind implementation-input review consumers to the package owner without changing non-secret input, address, approval or native-authority interface semantics."
+      },
+      {
+        "version": "0.37",
+        "date": "2026-10-03",
+        "summary": "Package operator files, shared readback transport, exact-ID Neutron observation and route-record review without aliases; preserve authority and retained-record contracts."
+      },
+      {
+        "version": "0.38",
+        "date": "2026-10-03",
+        "summary": "Package saved-plan review/execution, lifecycle binding, Flow rules and execution handoff; require explicit source selection and package/source byte agreement before installed effects; preserve retained-state and authority contracts."
       }
     ]
   },
   {
     "id": "TRANS-M01",
     "path": "docs/current/transition-and-as-built.md",
-    "version": "0.1",
+    "version": "0.25",
     "status": "Proposed",
     "owner_role": "Implementation and operations owners",
-    "scope": "New maintained transition/as-built record replacing no historical original; current and intermediate states must be observed.",
+    "scope": "Migration, recovery, retained-state conversion and as-built acceptance across explicit intermediate states; observations and accepting authority remain external.",
     "source_relation": "New maintained synthesis of linked available material; not a recovered missing Word artifact",
     "parent_sections": [
       "docs/operations/recovery-transition/3-run-maintenance-and-recover-interrupted-changes.md",
@@ -136,6 +621,126 @@
         "version": "0.1",
         "date": "2026-09-18",
         "summary": "New named maintained record addressing CA-04/06; implementation and authority remain bounded."
+      },
+      {
+        "version": "0.2",
+        "date": "2026-09-28",
+        "summary": "Aligned workload mobility authority, discovery, expanded capability/profile contracts, package-owner retirement and explicit unclosed execution/native/operating gates."
+      },
+      {
+        "version": "0.3",
+        "date": "2026-09-28",
+        "summary": "Integrated verified platform semantics, strict profile/placement requirements, snapshot-bound migration comparison and explicit remaining native workflow/qualification gates."
+      },
+      {
+        "version": "0.4",
+        "date": "2026-09-29",
+        "summary": "Persisted generation-bound application drafts and authenticated author attribution; retained unreviewed status, immutable history, unknown dependencies and separate owner-acceptance/execution gates."
+      },
+      {
+        "version": "0.5",
+        "date": "2026-09-29",
+        "summary": "Added scoped live draft listing and thin operator save/load with explicit source/revision pins, exact content acknowledgements and uncertain-save recovery; owner approval and guided review remain open."
+      },
+      {
+        "version": "0.6",
+        "date": "2026-09-29",
+        "summary": "Added bounded browser listing and existing-draft metadata/startup editing with source/revision preservation, read-only evidence, explicit confirmation and uncertain-save reconciliation; formal owner review and full guided creation remain open."
+      },
+      {
+        "version": "0.7",
+        "date": "2026-09-30",
+        "summary": "Added independently signed exact-draft owner decisions, revocation and read-only candidate evaluation; native ownership, external dependency proof and execution remain separate."
+      },
+      {
+        "version": "0.8",
+        "date": "2026-09-30",
+        "summary": "Added exact-revision operator review reads, optional retained-record pins and strict status/evidence validation without changing owner signing or execution authority."
+      },
+      {
+        "version": "0.9",
+        "date": "2026-09-30",
+        "summary": "Integrated signed application-wide comparison, all-member aggregate demand, live evidence/currency rechecks and explicit Wave 2 exit and Wave 3 reservation boundaries."
+      },
+      {
+        "version": "0.10",
+        "date": "2026-09-30",
+        "summary": "Added thin application-comparison command and format-2 canonical selection binding, strict response coherence and explicit remaining wave/reservation boundaries."
+      },
+      {
+        "version": "0.11",
+        "date": "2026-09-30",
+        "summary": "Integrated saved-application browser comparison, exact format-2 source/review/member bindings, stale-result suppression and explicit remaining Wave 2 and reservation gates."
+      },
+      {
+        "version": "0.12",
+        "date": "2026-09-30",
+        "summary": "Added bounded due-campaign batch staging and process-local endpoint read admission with exact input pins, current authority, drained interruption and explicit remaining B22/Wave 2 gates."
+      },
+      {
+        "version": "0.13",
+        "date": "2026-10-01",
+        "summary": "Consolidated current implementation boundaries; documented OpenStack selector 2 hardware/attachment observations, typed profile requirements, security-zone versus failure-domain correction, retained freshness history and explicit remaining B01\u2013B50/native acceptance gates."
+      },
+      {
+        "version": "0.14",
+        "date": "2026-10-01",
+        "summary": "Add exact-saved-revision browser review inspection with one shared wire validator, microsecond validity checks, stale-response/visibility/expiry cleanup and explicit no-signing/no-ingest authority. Correct stale owner-signing descriptions; retain deployed custody, artifact delivery, independent dependency and operating acceptance gaps."
+      },
+      {
+        "version": "0.15",
+        "date": "2026-10-01",
+        "summary": "Add installed exact-scope custodian intake of original owner-signed artifacts through the existing assessment writer, shared private-file custody, authenticated SQL role checks and create-only receipts with explicit commit uncertainty. Retain upstream artifact transfer, deployed custody, independent dependencies and operating acceptance as open work."
+      },
+      {
+        "version": "0.16",
+        "date": "2026-10-01",
+        "summary": "Move the actual Terraform catalog reader into package ownership without an alias; bound JSON/local-source validation, migrate all consumers and remove stale Python/bytecode from clean build staging. Preserve catalog/native/plan bytes and remaining B05 runtime/state and native acceptance obligations."
+      },
+      {
+        "version": "0.17",
+        "date": "2026-10-02",
+        "summary": "Add checkpointed local discovery scheduling with restart-safe signed-original reconciliation and move exported reservation-evidence validation into package ownership without aliases. Preserve uncertainty/authority semantics, open fleet monitoring/native acceptance, and remaining B05/B23 state/execution work; correct active owner-workflow descriptions."
+      },
+      {
+        "version": "0.18",
+        "date": "2026-10-02",
+        "summary": "Document restart-idempotent freshness slots and historical alert-intent projection while preserving restore reconciliation and open deployed alert/fleet recovery obligations."
+      },
+      {
+        "version": "0.19",
+        "date": "2026-10-02",
+        "summary": "Require fresh selector-3 enrollment/campaign evidence for Glance-enriched observations; earlier signed selector results remain immutable history."
+      },
+      {
+        "version": "0.20",
+        "date": "2026-10-02",
+        "summary": "Record source-integrity owner transition without relabelling historical manifests or converting retained/native state."
+      },
+      {
+        "version": "0.21",
+        "date": "2026-10-02",
+        "summary": "Record the IPAM evidence owner transition without importing private allocation state, relabelling external records or making released capacity reusable."
+      },
+      {
+        "version": "0.22",
+        "date": "2026-10-02",
+        "summary": "Record allocation planning/evidence code-owner migration without importing private owner state or authorizing live reservation, IPAM or DNS operations."
+      },
+      {
+        "version": "0.23",
+        "date": "2026-10-02",
+        "summary": "Require fresh selector-4 campaign/evidence after the OpenStack image-property contract change; preserve earlier signed generations without relabelling and retain guest/host/key/service acceptance as open transition gates."
+      },
+      {
+        "version": "0.24",
+        "date": "2026-10-03",
+        "summary": "Record package ownership of the fixed guest probe without changing campaign evidence or guest/native state; historical source provenance is preserved."
+      },
+      {
+        "version": "0.25",
+        "date": "2026-10-03",
+        "summary": "Record package ownership of the offline route-audit model without changing topology fixtures or observed/native state; preserve imported path provenance."
       }
     ]
   }

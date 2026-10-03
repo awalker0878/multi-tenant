@@ -60,7 +60,7 @@ Do not test against an unrelated tenant to avoid provisioning a controlled probe
 ## Use readback without inflating its meaning
 
 The existing [NSX](../../../tools/nsx_observe.py), [Nutanix](../../../tools/nutanix_observe.py)
-and [Neutron](../../../tools/neutron_observe.py) tools only observe their documented
+and [Neutron](../../../provisioner/execution/neutron_observe.py) tools only observe their documented
 selected resources. Native IDs and expected version/task scope must come from the
 accepted writer record. These readers neither discover all applicable policy nor
 prove every packet path. Do not replace missing fields with assumed false/empty values,

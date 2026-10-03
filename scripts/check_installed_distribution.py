@@ -19,6 +19,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 CHILD = r'''
 import importlib.metadata
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -30,19 +31,152 @@ assert Path.cwd() != checkout and not Path.cwd().is_relative_to(checkout)
 assert not any(Path(item).resolve() == checkout for item in sys.path if item)
 sys.path.insert(0, str(site))
 
-import provisioner
+# Compiler execution must work without importing the legacy owner packages.
+import importlib.abc
+class NoLegacyCompilerImports(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('Compiler imported legacy owner: '+fullname)
+        return None
+
+blocker = NoLegacyCompilerImports()
+sys.meta_path.insert(0, blocker)
+compiler_path = list(sys.path)
+try:
+    import provisioner
+    from provisioner.compiler import components, wsd
+    from provisioner.execution import terraform_catalog, source_integrity, guest_probe, route_audit, input_review, readback_core, neutron_observe, run_files, route_record_review, flow_policy, lifecycle_transition, openstack_transition, plan_review, terraform_apply, terraform_run, wsd_handoff
+    assert terraform_catalog.entries()
+    assert callable(input_review.review_inputs)
+    assert neutron_observe.strict_loads('{"value": true}') == {"value": True}
+    assert callable(readback_core.identifier) and callable(run_files.write_new)
+    assert callable(route_record_review.review)
+    assert terraform_run.ROOT is None and terraform_apply.ROOT is None
+    assert callable(lifecycle_transition.plan_bindings) and callable(wsd_handoff.execution_outputs)
+    assert source_integrity.verify()['status'] == 'BLOCKED_NO_CURRENT_CHECKOUT'
+    from provisioner.allocations import (reservation_evidence, ipam_evidence, dns_evidence,
+        capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight)
+    assert reservation_evidence.load.__module__ == reservation_evidence.__name__
+    assert reservation_evidence.validate(reservation_evidence.load())['record_count'] == 0
+    from provisioner import repository as installed_repository
+    assert installed_repository.reservation_records() == reservation_evidence.load()
+    assert ipam_evidence.load.__module__ == ipam_evidence.__name__
+    assert ipam_evidence.validate(ipam_evidence.load())['record_count'] == 0
+    assert installed_repository.ipam_allocation_records() == ipam_evidence.load()
+    assert dns_evidence.load.__module__ == dns_evidence.__name__
+    assert dns_evidence.validate(dns_evidence.load(), ipam_index=ipam_evidence.load())['record_count'] == 0
+    assert installed_repository.dns_registration_records() == dns_evidence.load()
+    assert capacity_evidence.load.__module__ == capacity_evidence.__name__
+    assert site_eligibility.evaluate.__module__ == site_eligibility.__name__
+    assert reservation_preflight.evaluate.__module__ == reservation_preflight.__name__
+    assert ipam_preflight.evaluate.__module__ == ipam_preflight.__name__
+    assert dns_preflight.evaluate.__module__ == dns_preflight.__name__
+    from provisioner.cli import application_drafts as draft_client, assessments as assessment_client
+    import argparse
+    client_parser = argparse.ArgumentParser()
+    draft_client.install_parser(client_parser.add_subparsers(dest='resource', required=True))
+    client_args = client_parser.parse_args(['application-drafts', 'list', '--environment', 'env-1'])
+    assert draft_client.request.__module__ == draft_client.__name__
+    assert draft_client.request(client_args, lambda value: value) == (
+        'GET', '/v1/environments/env-1/application-drafts', {'limit': 50}, None)
+    review_args = client_parser.parse_args(['application-drafts', 'review', '--environment', 'env-1',
+        '--id', 'app-1', '--revision', '1', '--record-digest', 'a'*64])
+    assert draft_client.request(review_args, lambda value: value) == (
+        'GET', '/v1/environments/env-1/application-drafts/app-1/review', {'revision': 1}, None)
+    from provisioner.controlplane.discovery import collector_runtime, collector_settings, batch_runtime, read_budget
+    from provisioner.controlplane.discovery import freshness, freshness_history, batch_journal
+    from provisioner.controlplane.discovery.adapters import collector_config
+    comparison_parser = argparse.ArgumentParser()
+    assessment_client.install_parser(comparison_parser.add_subparsers(dest='resource', required=True))
+    comparison_args = comparison_parser.parse_args(['assessments', 'compare-application',
+        '--source-environment', 'source', '--source-generation', '1', '--application-group', 'app',
+        '--draft-revision', '1', '--draft-record-digest', 'a'*64,
+        '--member-profile', 'db', 'linux', '--member-profile', 'web', 'linux',
+        '--destination', 'target-a', '1', '--destination', 'target-b', '1',
+        '--method', 'REBUILD_RESTORE', '--network-mode', 'routed', '--data-mode', 'offline'])
+    method, path, params, body = assessment_client.request(comparison_args, lambda value: value)
+    assert (method, path, params) == ('POST', '/v1/assessments/applications/compare', None)
+    assert body['applicationGroupId'] == 'app' and len(body['memberProfiles']) == 2
+    assert len(assessment_client.selection_digest(body)) == 64
+    from provisioner.controlplane.discovery import native_credentials, native_https, publication, publication_https, application_drafts, grouping, application_review, application_reviews, application_assessment, owner_signing, review_intake, review_files
+    from provisioner.controlplane.discovery.adapters import vmware_credentials, vmware_https, ahv_credentials, ahv_https, openstack_credentials, openstack_https
+    assert vmware_credentials.SignedFileVmwareCredentialSource.__module__ == vmware_credentials.__name__
+    assert not hasattr(native_credentials, 'SignedFileVmwareCredentialSource')
+    assert not hasattr(native_credentials, 'VmwareSessionMaterial')
+    assert not hasattr(native_credentials, 'selection_digest')
+    assert ahv_credentials.SignedFileAhvCredentialSource.__module__ == ahv_credentials.__name__
+    assert not hasattr(native_credentials, 'SignedFileAhvCredentialSource')
+    assert ahv_https.read_json is native_https.read_json
+    assert openstack_credentials.SignedFileOpenStackCredentialSource.__module__ == openstack_credentials.__name__
+    assert openstack_https.OpenStackHttpsTransport.__module__ == openstack_https.__name__
+    assert not hasattr(native_credentials, 'SignedFileOpenStackCredentialSource')
+    assert openstack_https.read_json is native_https.read_json
+    assert vmware_https.read_json is native_https.read_json
+    assert application_drafts.ApplicationDraftRepository.__module__ == application_drafts.__name__
+    assert owner_signing.main.__module__ == owner_signing.__name__
+    assert application_drafts.parse_draft_export.__module__ == application_drafts.__name__
+    assert application_review.parse_review.__module__ == application_review.__name__
+    assert application_reviews.ApplicationReviewService.__module__ == application_reviews.__name__
+    assert application_assessment.ApplicationAssessmentService.__module__ == application_assessment.__name__
+    assert grouping.validate_draft.__module__ == grouping.__name__
+    assert publication.stage_submission.__module__ == publication.__name__
+    assert publication.PrivateDiscoveryOutbox.__module__ == publication.__name__
+    assert callable(publication.PrivateDiscoveryOutbox.for_campaign)
+    assert publication_https.DiscoveryHttpsPublisher.__module__ == publication_https.__name__
+    assert freshness.DiscoveryFreshnessService.__module__ == freshness.__name__
+    assert freshness_history.FreshnessHistoryRepository.__module__ == freshness_history.__name__
+    assert callable(freshness_history.FreshnessHistoryRepository.list_checks)
+    assert batch_runtime.run_batch.__module__ == batch_runtime.__name__
+    assert read_budget.NativeReadGate.__module__ == read_budget.__name__
+    assert collector_runtime.main.__module__ == collector_runtime.__name__
+    assert collector_settings.DiscoveryCollectorSettings.__module__ == collector_settings.__name__
+    assert collector_config.create_native_collector.__module__ == collector_config.__name__
+    for platform in components.COMPONENTS:
+        for phase in ('domains', 'workloads'):
+            assert wsd.native_variables(platform, phase)
+        environment = json.loads((request.parent / 'environments' /
+                                  (platform+'.json.example')).read_text())
+        inputs, summary = wsd.compile_environment(environment)
+        assert inputs and summary['native_contact'] is False
+        assert summary['status'] == 'DRAFT_DISABLED_NOT_AUTHORIZED'
+        assert all(value['allow_restricted_build'] is False for value in inputs.values())
+    assert sys.path == compiler_path
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('tools.compile_wsd') is None
+assert importlib.util.find_spec('tools.terraform_catalog') is None
+assert importlib.util.find_spec('tools.guest_probe') is None
+assert importlib.util.find_spec('tools.route_audit') is None
+assert importlib.util.find_spec('tools.input_review') is None
+assert importlib.util.find_spec('tools.flow_policy') is None
+assert importlib.util.find_spec('tools.lifecycle_transition') is None
+assert importlib.util.find_spec('tools.openstack_transition') is None
+assert importlib.util.find_spec('tools.plan_review') is None
+assert importlib.util.find_spec('tools.terraform_apply') is None
+assert importlib.util.find_spec('tools.terraform_run') is None
+assert importlib.util.find_spec('tools.wsd_handoff') is None
+assert importlib.util.find_spec('tools.readback_core') is None
+assert importlib.util.find_spec('tools.neutron_observe') is None
+assert importlib.util.find_spec('tools.run_files') is None
+assert importlib.util.find_spec('tools.route_record_review') is None
+assert importlib.util.find_spec('tools.check_release') is None
+assert importlib.util.find_spec('scripts.check_reservation_records') is None
 import scripts
 import tools
+import hosting_resources
 from provisioner import repository
+from provisioner.qualification import campaign, native, provenance, registry, target_selection
 from provisioner.cli.main import main
 from provisioner.domain.enterprise_records import validate_record
 from provisioner.controlplane.discovery import (adoption, assessment, grouping,
-                                                 model, persistence, routes)
+                                                 ingest, model, persistence, routes,
+                                                 runtime, trust, witness)
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (provisioner, scripts, tools, adoption, ahv, assessment, grouping,
-               model, openstack, persistence, routes, vmware, vmware_rest):
+for module in (readback_core, neutron_observe, run_files, route_record_review, guest_probe, route_audit, input_review, reservation_evidence, ipam_evidence, dns_evidence, capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight, source_integrity, terraform_catalog,review_intake, review_files, owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+               ingest, model, openstack, persistence, routes, runtime, trust,
+               vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__
 for relative in (
     'provisioner/schemas/v1/enterprise-record.schema.json',
@@ -65,16 +199,34 @@ for relative in (
     'provisioner/controlplane/persistence/migrations/0017_site_lock_guards.sql',
     'provisioner/controlplane/persistence/migrations/0018_site_role_superuser_classification.sql',
     'provisioner/controlplane/persistence/migrations/0019_discovery_inventory.sql',
+    'provisioner/controlplane/persistence/migrations/0021_application_drafts.sql',
+    'provisioner/controlplane/persistence/migrations/0022_application_review_evidence.sql',
+    'provisioner/controlplane/persistence/migrations/0023_discovery_freshness_history.sql',
     'provisioner/controlplane/api/portal/index.html',
     'provisioner/controlplane/api/portal/app.js',
+    'provisioner/controlplane/api/portal/application_drafts.js',
     'provisioner/controlplane/api/portal/style.css',
-    'profiles/security/catalog.json', 'policy/rules/standards.json',
-    'sources/capabilities/platform_registry.json', 'terraform/catalog.json',
 ):
     assert (site / relative).is_file(), relative
-for relative in ('ansible/catalog.json', 'config/toolchain.json'):
+for relative in ('profiles/security/catalog.json', 'policy/rules/standards.json',
+                 'sources/capabilities/platform_registry.json', 'terraform/catalog.json',
+                 'ansible/catalog.json', 'config/toolchain.json'):
     asset = repository.asset_path(relative).resolve()
-    assert asset.is_file() and asset.is_relative_to(site / 'provisioner' / '_assets'), asset
+    assert asset.is_file() and asset.is_relative_to(site / 'hosting_resources' / '_assets'), asset
+assert hosting_resources.SOURCE_ROOT is None
+assert importlib.util.find_spec('scripts.check_platform_capabilities') is None
+assert importlib.util.find_spec('scripts.check_platform_qualification') is None
+assert importlib.util.find_spec('scripts.check_version_source_provenance') is None
+assert importlib.util.find_spec('scripts.check_qualification_campaign_assurance') is None
+assert importlib.util.find_spec('scripts.check_target_selection_assurance') is None
+assert importlib.util.find_spec('scripts.check_ipam_allocation_records') is None
+assert importlib.util.find_spec('scripts.check_dns_registration_records') is None
+assert importlib.util.find_spec('scripts.check_site_service_capacity') is None
+assert importlib.util.find_spec('scripts.check_site_service_eligibility') is None
+assert importlib.util.find_spec('scripts.check_reservation_preflight') is None
+assert importlib.util.find_spec('scripts.check_ipam_allocation_preflight') is None
+assert importlib.util.find_spec('scripts.check_dns_registration_preflight') is None
+assert registry.validate(registry.load())['capabilities_per_platform'] == len(registry.CAPABILITIES)
 assert callable(validate_record)
 
 distribution = next(d for d in importlib.metadata.distributions(path=[str(site)])
@@ -91,10 +243,102 @@ assert any(e.name == 'hosting-evidence' and
 assert any(e.name == 'hosting-site-worker' and
            e.value == 'provisioner.controlplane.worker.runtime:main'
            for e in distribution.entry_points)
+assert any(e.name == 'hosting-discovery-ingest' and
+           e.value == 'provisioner.controlplane.discovery.runtime:main'
+           for e in distribution.entry_points)
+
+review_entry = next(e for e in distribution.entry_points if e.name == 'hosting-application-review')
+assert review_entry.value == 'provisioner.controlplane.discovery.owner_signing:main'
+assert review_entry.load() is owner_signing.main
+import io
+review_out, review_err = io.StringIO(), io.StringIO()
+assert review_entry.load()(['sign'], stdout=review_out, stderr=review_err) == 2
+assert review_out.getvalue() == ''
+assert json.loads(review_err.getvalue()) == {'error': 'OWNER_REVIEW_HELD', 'outputMayExist': True}
+
+intake_entry = next(e for e in distribution.entry_points if e.name == 'hosting-application-review-ingest')
+assert intake_entry.value == 'provisioner.controlplane.discovery.review_intake:main'
+assert intake_entry.load() is review_intake.main
+assert not hasattr(owner_signing, '_read') and not hasattr(owner_signing, '_publish')
+intake_out, intake_err = io.StringIO(), io.StringIO()
+assert intake_entry.load()([], stdout=intake_out, stderr=intake_err) == 2
+assert intake_out.getvalue() == ''
+assert json.loads(intake_err.getvalue()) == {
+    'error': 'REVIEW_INTAKE_HELD', 'ingestAttempted': False, 'recorded': False, 'outputMayExist': True}
+
+entry = next(e for e in distribution.entry_points if e.name == 'hosting-discovery-collect')
+assert entry.value == 'provisioner.controlplane.discovery.collector_runtime:main'
+assert entry.load() is collector_runtime.main
+import io
+from contextlib import redirect_stdout
+outcome = io.StringIO()
+missing_config = Path.cwd() / 'not-configured-collector.json'
+assert not missing_config.exists()
+with redirect_stdout(outcome):
+    assert entry.load()(['publish', '--config', str(missing_config)]) == 2
+assert json.loads(outcome.getvalue()) == {
+    'format': 'hosting-discovery-collector-outcome/1', 'status': 'HELD', 'executionAuthorized': False}
+
+# Exercise due-selection from the installed command, with no native authority or I/O.
+from datetime import datetime, timedelta, timezone
+now = datetime.now(timezone.utc)
+batch_file = Path.cwd() / 'future-batch.json'
+batch_file.write_text(json.dumps({
+    'format': 'hosting-discovery-batch/1', 'batchId': 'installed-check',
+    'maxParallelCollections': 1, 'maxDurationSeconds': 1,
+    'endpoints': [{'policyId': 'p', 'organizationId': 'org', 'siteId': 'site',
+        'platformFamily': 'nutanix', 'endpointId': 'endpoint',
+        'maxConcurrentReads': 1, 'minReadIntervalMilliseconds': 1}],
+    'tasks': [{'taskId': 'future', 'environmentId': 'env', 'campaignDigest': 'a'*64,
+        'collectorConfigFile': str(missing_config), 'collectorConfigDigest': 'b'*64,
+        'policyId': 'p', 'notBefore': (now+timedelta(minutes=10)).isoformat(),
+        'notAfter': (now+timedelta(minutes=11)).isoformat()}]}), encoding='utf-8')
+batch_file.chmod(0o600)
+batch_output = io.StringIO()
+with redirect_stdout(batch_output):
+    assert entry.load()(['batch-stage', '--config', str(batch_file)]) == 0
+batch_result = json.loads(batch_output.getvalue())
+assert batch_result['items'] == [{'taskId': 'future', 'status': 'NOT_DUE'}]
+assert batch_result['stagedCount'] == 0 and not batch_result['durableSchedule']
+assert batch_result['limitScope'] == 'THIS_PROCESS_ONLY'
+assert not batch_result['publicationAttempted'] and not batch_result['executionAuthorized']
+
+# Checkpoint and inspect the future task using the installed implementation only.
+# No native configuration is read and no campaign, credential or task is invented.
+state_directory = Path.cwd() / 'batch-state'
+state_directory.mkdir(mode=0o700)
+checkpoint_output = io.StringIO()
+with redirect_stdout(checkpoint_output):
+    assert entry.load()(['batch-stage', '--config', str(batch_file),
+                         '--state-directory', str(state_directory)]) == 0
+checkpoint = json.loads(checkpoint_output.getvalue())
+assert checkpoint['format'] == 'hosting-discovery-checkpointed-batch-outcome/1'
+assert checkpoint['durableSchedule'] is True and checkpoint['stagedCount'] == 0
+assert checkpoint['items'] == [{'taskId': 'future', 'status': 'NOT_DUE'}]
+assert checkpoint['scheduleScope'] == 'ONE_LOCAL_BATCH_JOURNAL'
+inspect_output = io.StringIO()
+with redirect_stdout(inspect_output):
+    assert entry.load()(['batch-inspect', '--config', str(batch_file),
+                         '--state-directory', str(state_directory)]) == 0
+inspected = json.loads(inspect_output.getvalue())
+assert inspected['journalRecordDigest'] == checkpoint['journalRecordDigest']
+assert inspected['items'][0]['status'] == 'NOT_STARTED'
+assert inspected['collectionRequested'] is False and inspected['executionAuthorized'] is False
+assert Path(batch_journal.__file__).resolve().is_relative_to(site)
+waiting_output = io.StringIO()
+with redirect_stdout(waiting_output):
+    assert entry.load()(['batch-run', '--config', str(batch_file),
+                         '--state-directory', str(state_directory)]) == 0
+waiting = json.loads(waiting_output.getvalue())
+assert waiting['waitedForDue'] is True and waiting['pendingTaskCount'] == 1
+assert waiting['stagedCount'] == 0 and waiting['journalSequence'] == 1
+assert waiting['journalRecordDigest'] == checkpoint['journalRecordDigest']
+assert not waiting['publicationAttempted'] and not waiting['executionAuthorized']
+
 
 result = main(['plan', str(request)])
 for name, module in sys.modules.items():
-    if name.split('.')[0] in ('provisioner', 'tools', 'scripts'):
+    if name.split('.')[0] in ('provisioner', 'tools', 'scripts', 'hosting_resources'):
         path = getattr(module, '__file__', None)
         if path is not None:
             assert Path(path).resolve().is_relative_to(site), (name, path)
@@ -106,7 +350,7 @@ def run(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.pop('PYTHONPATH', None)
     completed = subprocess.run(args, cwd=cwd, env=env, text=True,
-                               capture_output=True)
+                               capture_output=True, timeout=120)
     if completed.returncode:
         raise RuntimeError(f'Installed-wheel check failed (exit {completed.returncode}): '
                            f'{args[:4]}\nstdout:\n{completed.stdout[-8000:]}\n'
@@ -121,15 +365,20 @@ def main() -> None:
         wheels = scratch / 'wheels'
         installed = scratch / 'installed'
         foreign = scratch / 'foreign'
+        source = scratch / 'source'
         archives.mkdir()
         wheels.mkdir()
         foreign.mkdir()
         request = foreign / 'request.yaml'
         shutil.copyfile(ROOT / 'examples/requests/internal-production.yaml', request)
+        shutil.copytree(ROOT / 'examples/environments', foreign / 'environments')
+        shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns(
+            '.git', '.venv', '__pycache__', '.pytest_cache', 'build', 'dist',
+            '*.egg-info'))
 
         # Build through the source distribution to test MANIFEST.in as well as
         # the wheel: published source archives must not lose reviewed assets.
-        run(sys.executable, 'setup.py', 'sdist', '--dist-dir', str(archives), cwd=ROOT)
+        run(sys.executable, 'setup.py', 'sdist', '--dist-dir', str(archives), cwd=source)
         source_archives = list(archives.glob('hosting_provisioner-*.tar.gz'))
         if len(source_archives) != 1:
             raise AssertionError(f'Expected one source archive, found {source_archives}')
@@ -140,6 +389,7 @@ def main() -> None:
             raise AssertionError(f'Expected one built wheel, found {built}')
         run(sys.executable, '-m', 'pip', 'install', '--no-index', '--no-deps',
             '--target', str(installed), str(built[0]), cwd=foreign)
+        shutil.rmtree(source)
 
         completed = run(sys.executable, '-I', '-c', CHILD, str(installed),
                         str(ROOT), str(request), cwd=foreign)

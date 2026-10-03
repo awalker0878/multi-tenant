@@ -79,6 +79,28 @@ The user certificate is bound in the bundle; the native SSH client/server still
 validate the key, signature, principals, validity and image trust at connection.
 Preparation does not contact a guest or issue authority.
 
+### Sealed guest-gate dependencies
+
+The source manifest includes the actual package-owned WSD compiler, component
+map, package initializers and error model, plus `hosting_resources` and its
+reviewed source-root markers. The Ansible filter loads these copies from the
+private bundle, not from the preparing checkout or an installed editable package.
+The old composition build script is no longer a guest runtime dependency.
+Every added source byte participates in the existing bundle digest and is
+rechecked against the clean reviewed revision before controller dispatch.
+
+`tests/test_guest_source_closure.py` imports the pure guest gate in a fresh
+interpreter with site packages disabled. It verifies that every hosting owner
+comes from the bundle, that missing package owners fail rather than falling back,
+and that a modified compiler copy is rejected before the controller is launched.
+The separate real-Ansible/SSH-fixture test remains required; isolated imports
+alone do not prove controller dispatch or native guest configuration.
+
+Prepare and review a new bundle after this source change. Do not edit a previous
+bundle, reuse its approval or reinterpret historical execution receipts. This
+closes the guest filter's copied dependency set, not the remaining B05 installed
+execution/state migration or native service-acceptance work.
+
 ## Review and execute the exact bundle
 
 Review `bundle.json`, the selected mode, original/rebound access, source/runtime

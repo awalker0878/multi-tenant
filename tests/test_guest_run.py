@@ -10,7 +10,7 @@ from tests.test_guest_inventory import fixture
 from tests.test_guest_services import fixture as service_fixture
 from lab.native_readback_fixture import credentials
 from tools import guest_run as g
-from tools.run_files import digest, encoded, load_private, write_new
+from provisioner.execution.run_files import digest, encoded, load_private, write_new
 
 SOURCE = {'status': 'HASHES_MATCH', 'commit': 'a'*40}
 

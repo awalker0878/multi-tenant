@@ -148,6 +148,68 @@ class OperatorCliTests(unittest.TestCase):
                 self.assertEqual(json.loads(err), {'error': 'INVALID_INPUT'})
                 self.assertNotIn('opaque-access-token', err)
 
+    @staticmethod
+    def comparison_command():
+        return ['assessments', 'compare', '--source-environment', 'source:01',
+                '--source-generation', '7', '--workload-native-id', 'folder/vm:101',
+                '--destination', 'target:02', '9', '--destination', 'target-03', '12',
+                '--method', 'COLD_VM_CONVERSION', '--guest-profile', 'linux-uefi',
+                '--network-mode', 'renumber', '--data-mode', 'image-copy']
+
+    def test_comparison_maps_flags_without_native_tuple_claims_or_json_files(self):
+        def handler(request):
+            self.assertEqual(request.method, 'POST')
+            self.assertEqual(request.url.path, '/v1/assessments/compare')
+            self.assertEqual(request.headers['Authorization'], 'Bearer opaque-access-token')
+            self.assertNotIn('Idempotency-Key', request.headers)
+            self.assertEqual(json.loads(request.content), {
+                'source': {'environmentId': 'source:01', 'generation': 7},
+                'workloadNativeId': 'folder/vm:101',
+                'destinations': [
+                    {'environmentId': 'target:02', 'generation': 9,
+                     'capacityKind': 'cluster', 'capacityNativeId': 'cluster/path:02'},
+                    {'environmentId': 'target-03', 'generation': 12}],
+                'method': 'COLD_VM_CONVERSION', 'guestProfile': 'linux-uefi',
+                'networkMode': 'renumber', 'dataMode': 'image-copy'})
+            return httpx.Response(200, json={'executionAuthorized': False,
+                'assessments': [{'status': 'UNKNOWN', 'issues': [
+                    {'reason': 'Evidence missing', 'remediation': 'Collect current evidence'}]}]})
+        code, output, error = self.invoke(self.comparison_command() + [
+            '--capacity', 'target:02', 'cluster', 'cluster/path:02'], handler)
+        self.assertEqual(code, 0)
+        self.assertEqual(error, '')
+        self.assertFalse(json.loads(output)['executionAuthorized'])
+        self.assertEqual(json.loads(output)['assessments'][0]['status'], 'UNKNOWN')
+
+    def test_comparison_invalid_or_ambiguous_selection_never_reaches_api(self):
+        def unexpected(_request):
+            self.fail('Invalid comparison must not contact the API')
+        commands = []
+        for flag, value in [('--source-generation', '0'), ('--source-generation', str(2**63)),
+                            ('--workload-native-id', 'vm\n101'),
+                            ('--guest-profile', '../unreviewed')]:
+            command = self.comparison_command()
+            command[command.index(flag) + 1] = value
+            commands.append(command)
+        for environment, generation in [('target:02', '13'), ('source:01', '4'),
+                                        ('target-04', 'nan'), ('target-04', str(2**63))]:
+            commands.append(self.comparison_command() + ['--destination', environment, generation])
+        commands.extend(self.comparison_command() + tail for tail in [
+            ['--capacity', 'other', 'pool', 'p-01'],
+            ['--capacity', 'target:02', 'vm', 'vm-01'],
+            ['--capacity', 'target:02', 'pool', 'p-01', '--capacity', 'target:02', 'pool', 'p-02'],
+            ['--capacity', 'target:02', 'pool', ' ']])
+        one = self.comparison_command()
+        second = one.index('--destination', one.index('--destination') + 1)
+        del one[second:second + 3]
+        commands.append(one)
+        for command in commands:
+            with self.subTest(command=command):
+                code, out, err = self.invoke(command, unexpected)
+                self.assertEqual(code, 3)
+                self.assertEqual(out, '')
+                self.assertEqual(json.loads(err), {'error': 'INVALID_INPUT'})
+
     def test_job_submit_requires_stable_key_and_sends_no_approval_body(self):
         def handler(request):
             self.assertEqual(request.method, 'POST')

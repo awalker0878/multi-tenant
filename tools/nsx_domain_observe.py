@@ -4,8 +4,9 @@ from copy import deepcopy
 from pathlib import Path
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import nsx_observe as nsx, readback_core as c
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import nsx_observe as nsx
+from provisioner.execution.run_files import require
 
 PROFILE = 'nsx-local-policy-v1-domain-lifecycle'
 FIELDS = {

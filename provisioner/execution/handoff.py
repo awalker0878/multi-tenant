@@ -27,6 +27,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from provisioner.adapters import base as adapters
+from provisioner.adapters.base import WorkloadLifecycleMode
 from provisioner.domain.errors import ProvisioningError
 from provisioner.domain.generation import SCOPE_KEYS, claim, record_for
 from provisioner.domain.request import digest
@@ -49,14 +51,15 @@ TOPOLOGY_KEYS = ('format', 'steps', 'operationBindings', 'reviewedParameters',
                  'compiledCatalogIds')
 
 #: Mirrors `tools.delivery_steps.KINDS`, the declared typed-step contract, and
-#: `tools.readback_core.ID`, the declared identifier grammar. The tools are the
+#: `provisioner.execution.readback_core.ID`, the declared identifier grammar. The tools are the
 #: owners; `tests/provisioning/unit/test_delivery_handoff.py` compares every mirror
 #: against them, so a kind or a grammar the runner adds cannot drift unnoticed.
 KINDS = frozenset({
     'openstack_quota', 'edge_containment', 'remote_owner', 'restic',
+    'dataset_restore', 'dataset_acceptance',
     'platform_transition', 'workload_inputs', 'capacity', 'acceptance',
     'retirement_review', 'operations_review', 'operations_alerts', 'terraform_plan',
-    'terraform_apply', 'guest_plan', 'guest_apply', 'vsphere_power', 'target_campaign',
+    'terraform_apply', 'terraform_approval', 'guest_plan', 'guest_apply', 'vsphere_power', 'target_campaign',
     'edge_policy', 'ipam', 'dns', 'dns_propagation',
 })
 IDENTIFIER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')
@@ -112,8 +115,18 @@ STEPS = (
     Step('workload-plan', 'terraform_plan', ('workload-inputs',)),
     Step('workload-apply', 'terraform_apply', ('workload-plan',)),
     Step('bootstrap', 'platform_transition', ('domain-apply', 'edge-policy')),
-    Step('bootstrap-acceptance', 'acceptance', ('bootstrap',)),
-    Step('guest-plan', 'guest_plan', ('workload-apply',)),
+    Step('bootstrap-plan', 'terraform_plan', ('bootstrap',)),
+    Step('bootstrap-approval', 'terraform_approval', ('bootstrap-plan',)),
+    Step('bootstrap-apply', 'terraform_apply', ('bootstrap-plan', 'bootstrap-approval')),
+    Step('workload-bootstrap', 'platform_transition', ('workload-apply', 'bootstrap-apply')),
+    Step('workload-bootstrap-plan', 'terraform_plan', ('workload-bootstrap',)),
+    Step('workload-bootstrap-approval', 'terraform_approval', ('workload-bootstrap-plan',)),
+    Step('workload-bootstrap-apply', 'terraform_apply',
+         ('workload-bootstrap-plan', 'workload-bootstrap-approval')),
+    Step('bootstrap-observe', 'target_campaign', ('bootstrap-apply', 'workload-bootstrap-apply')),
+    Step('bootstrap-acceptance', 'acceptance',
+         ('bootstrap-apply', 'workload-bootstrap-apply', 'bootstrap-observe')),
+    Step('guest-plan', 'guest_plan', ('workload-bootstrap-apply', 'bootstrap-acceptance')),
     Step('guest-apply', 'guest_apply', ('guest-plan',)),
     Step('backup-retention', 'restic', ('guest-apply',)),
     Step('service-acceptance', 'acceptance',
@@ -139,7 +152,7 @@ OPERATION_STEPS = {
     'backup-retention': 'backup-retention',
     'native-qualification': 'pre-activation-campaign',
     'production-authorization': 'activation',
-    'guest-configuration': 'guest-plan',
+    'guest-configuration': 'guest-apply',
 }
 
 #: Parameters the reviewed decision already fixes, per step.
@@ -155,8 +168,13 @@ REVIEWED_PARAMETERS = {
     'workload-inputs': {'domain_steps': ['domain-apply']},
     'workload-apply': {'prepared_step': 'workload-plan'},
     'bootstrap': {'prior_step': 'domain-apply', 'stage': 'bootstrap'},
+    'bootstrap-approval': {'prepared_step': 'bootstrap-plan'},
+    'bootstrap-apply': {'prepared_step': 'bootstrap-plan'},
+    'workload-bootstrap': {'prior_step': 'workload-apply', 'stage': 'bootstrap'},
+    'workload-bootstrap-approval': {'prepared_step': 'workload-bootstrap-plan'},
+    'workload-bootstrap-apply': {'prepared_step': 'workload-bootstrap-plan'},
     'bootstrap-acceptance': {'purpose': 'bootstrap'},
-    'guest-plan': {'workload_step': 'workload-apply', 'mode': 'configure'},
+    'guest-plan': {'workload_step': 'workload-bootstrap-apply', 'mode': 'configure'},
     'guest-apply': {'prepared_step': 'guest-plan'},
     'backup-retention': {'action': 'backup'},
     'service-acceptance': {'purpose': 'services'},
@@ -168,6 +186,8 @@ REVIEWED_PARAMETERS = {
 #: parameter of every reviewed step.
 COMPILED_PARAMETERS = {
     'domain-plan': ('catalog_id',),
+    'bootstrap-plan': ('catalog_id',),
+    'workload-bootstrap-plan': ('catalog_id',),
     'workload-plan': ('catalog_id',),
     'workload-inputs': ('selected_input',),
 }
@@ -179,6 +199,9 @@ COMPILED_PARAMETERS = {
 OPERATOR_PARAMETERS = {
     'capacity-reservation': ('database',),
     'domain-plan': ('terraform', 'terraform_sha256'),
+    'bootstrap-plan': ('terraform', 'terraform_sha256'),
+    'workload-bootstrap-plan': ('terraform', 'terraform_sha256'),
+    'bootstrap-observe': ('ssh', 'ssh_sha256'),
     'workload-plan': ('terraform', 'terraform_sha256'),
     'edge-policy': ('nft', 'nft_sha256'),
     'guest-plan': ('python', 'python_sha256', 'ssh', 'ssh_sha256', 'max_seconds'),
@@ -186,6 +209,53 @@ OPERATOR_PARAMETERS = {
     'pre-activation-campaign': ('ssh', 'ssh_sha256'),
     'post-activation-campaign': ('ssh', 'ssh_sha256'),
 }
+
+
+def sequence(plan) -> tuple[Step, ...]:
+    """Use the existing fenced vSphere owner once for each reviewed VM.
+
+    VMware workload power is deliberately absent from Terraform's lifecycle
+    profile. Compile actual per-member power steps instead of emitting an
+    unsupported Terraform transition or a planning receipt as completed power.
+    """
+    lifecycle=adapters.get(plan.identity.scope['platform']).workload_lifecycle
+    if lifecycle.mode is WorkloadLifecycleMode.SAVED_PLAN:
+        return STEPS
+    scope = plan.identity.scope
+    wsds = [wsd for wsd in plan.environment['wsds']
+            if (wsd['tenant_key'], wsd['wsd_key']) ==
+               (scope['tenant_key'], scope['wsd_key'])]
+    if len(wsds) != 1:
+        raise ProvisioningError('COMPILATION_FAILED', 'Exact per-member lifecycle WSD required')
+    members = sorted(name for domain in wsds[0]['domains'] for name in domain['workloads'])
+    powers = tuple(Step('bootstrap-power-' + digest(name)[:16], lifecycle.owner_kind,
+                        ('workload-apply', 'bootstrap-apply')) for name in members)
+    if not powers:
+        raise ProvisioningError('COMPILATION_FAILED', 'Owned workloads required for per-member lifecycle')
+    result = []
+    for step in STEPS:
+        if step.id == 'workload-bootstrap':
+            result.extend(powers)
+        elif step.id.startswith('workload-bootstrap'):
+            continue
+        elif step.id in {'bootstrap-observe', 'bootstrap-acceptance'}:
+            needs = tuple(need for need in step.needs if need != 'workload-bootstrap-apply')
+            result.append(Step(step.id, step.kind, (*needs, *(power.id for power in powers))))
+        elif step.id == 'guest-plan':
+            result.append(Step(step.id, step.kind, ('workload-apply', 'bootstrap-acceptance')))
+        else:
+            result.append(step)
+    return tuple(result)
+
+
+def power_members(plan) -> dict[str, str]:
+    if adapters.get(plan.identity.scope['platform']).workload_lifecycle.mode is not WorkloadLifecycleMode.PER_MEMBER_OWNER:
+        return {}
+    return {'bootstrap-power-' + digest(name)[:16]: name
+            for wsd in plan.environment['wsds']
+            if (wsd['tenant_key'], wsd['wsd_key']) ==
+               (plan.identity.scope['tenant_key'], plan.identity.scope['wsd_key'])
+            for domain in wsd['domains'] for name in domain['workloads']}
 
 
 def step_of(step_id: str) -> Step:
@@ -321,17 +391,27 @@ def reviewed_parameters(plan) -> dict:
     and an unqualified value would stage a packet the runner must refuse.
     """
     catalogs = catalog_ids(plan)
-    values = {step_id: dict(parameters) for step_id, parameters in REVIEWED_PARAMETERS.items()}
+    selected_steps = sequence(plan)
+    step_ids = {step.id for step in selected_steps}
+    values = {step_id: dict(parameters) for step_id, parameters in REVIEWED_PARAMETERS.items()
+              if step_id in step_ids}
+    if adapters.get(plan.identity.scope['platform']).workload_lifecycle.mode is WorkloadLifecycleMode.PER_MEMBER_OWNER:
+        values['guest-plan']['workload_step'] = 'workload-apply'
+        values.update({step_id: {'workload_step': 'workload-apply', 'member': member}
+                       for step_id, member in power_members(plan).items()})
     inputs = {scope.get('scope', {}).get('phase'): scope.get('input', '')
               for scope in plan.terraform_scopes}
     if catalogs.get('domains'):
         values['domain-plan'] = {'catalog_id': catalogs['domains']}
+        values['bootstrap-plan'] = {'catalog_id': catalogs['domains']}
     if catalogs.get('workloads'):
         values['workload-plan'] = {'catalog_id': catalogs['workloads']}
+        if 'workload-bootstrap-plan' in step_ids:
+            values['workload-bootstrap-plan'] = {'catalog_id': catalogs['workloads']}
     if inputs.get('workloads'):
         values['workload-inputs'] = {**values['workload-inputs'],
                                      'selected_input': inputs['workloads']}
-    for step in STEPS:
+    for step in selected_steps:
         declared = _declared_parameters(step.kind)
         if step.id in values and not set(values[step.id]) <= declared:
             raise ProvisioningError(
@@ -359,7 +439,7 @@ def topology_intent(plan) -> dict:
     """
     return {
         'format': TOPOLOGY_FORMAT,
-        'steps': [step.to_dict() for step in STEPS],
+        'steps': [step.to_dict() for step in sequence(plan)],
         'operationBindings': dict(sorted(OPERATION_STEPS.items())),
         'reviewedParameters': {step_id: dict(parameters) for step_id, parameters
                                in sorted(reviewed_parameters(plan).items())},
@@ -407,6 +487,9 @@ _DECLARED_PARAMETERS = {
     'edge_containment': frozenset({'nft', 'nft_sha256'}),
     'remote_owner': frozenset({'ssh', 'ssh_sha256'}),
     'restic': frozenset({'action', 'restic', 'restic_sha256', 'target'}),
+    'dataset_restore': frozenset({'action','restic','restic_sha256','target','transfer_manifest_sha256',
+                                  'dataset_id','target_ref','consistency_group_id','source_scope'}),
+    'dataset_acceptance': frozenset({'group_id','datasets'}),
     'platform_transition': frozenset({'prior_step', 'stage'}),
     'workload_inputs': frozenset({'domain_steps', 'selected_input'}),
     'capacity': frozenset({'action', 'database'}),
@@ -416,10 +499,11 @@ _DECLARED_PARAMETERS = {
     'operations_alerts': frozenset(),
     'terraform_plan': frozenset({'catalog_id', 'terraform', 'terraform_sha256'}),
     'terraform_apply': frozenset({'prepared_step'}),
+    'terraform_approval': frozenset({'prepared_step'}),
     'guest_plan': frozenset({'workload_step', 'python', 'python_sha256', 'ssh',
                              'ssh_sha256', 'mode', 'max_seconds'}),
     'guest_apply': frozenset({'prepared_step'}),
-    'vsphere_power': frozenset(),
+    'vsphere_power': frozenset({'workload_step', 'member'}),
     'target_campaign': frozenset({'ssh', 'ssh_sha256'}),
     'edge_policy': frozenset({'nft', 'nft_sha256', 'mode'}),
     'ipam': frozenset({'action'}),
@@ -452,7 +536,7 @@ def build(plan, source_commit: str, ledger=None) -> dict:
     graph = {'format': HANDOFF_FORMAT, 'source_commit': source_commit,
              'operation_id': plan.operation_id, 'generation': plan.generation,
              'scope': plan.identity.scope, 'reviewed_plan_digest': plan.digest,
-             'steps': [step.to_dict() for step in STEPS],
+             'steps': [step.to_dict() for step in sequence(plan)],
              'operation_bindings': dict(sorted(OPERATION_STEPS.items())),
              'reviewed_parameters': reviewed_parameters(plan),
              'compiled_catalog_ids': dict(sorted(catalog_ids(plan).items()))}

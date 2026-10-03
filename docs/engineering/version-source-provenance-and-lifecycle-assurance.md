@@ -79,7 +79,7 @@ Only `CURRENT_SUPPORTED` can back a current native qualification dossier.
 
 ## Qualification integration
 
-`scripts/check_platform_qualification.py` now requires exactly one matching `CURRENT_SUPPORTED` provenance record for every `CURRENT_APPROVED` qualification record. Platform family, `product_tuple_id` and the entire product/API/provider/hardware/licence tuple must match exactly.
+`provisioner/qualification/native.py` now requires exactly one matching `CURRENT_SUPPORTED` provenance record for every `CURRENT_APPROVED` qualification record. Platform family, `product_tuple_id` and the entire product/API/provider/hardware/licence tuple must match exactly.
 
 Version/source provenance remains an independent prerequisite, not the native-observation record. The qualification dossier also requires current target-bound campaign evidence for every native evidence reference; satisfying this provenance gate alone cannot create a qualified PlatformProfile.
 

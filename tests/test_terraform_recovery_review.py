@@ -10,9 +10,10 @@ import unittest
 from tests.test_vsphere_task_activity import manifest, Client, context
 from tests.test_vsphere_observe import ref
 from tests import test_vsphere_port_observe as ports
-from tools import readback_core as c, terraform_recovery_review as r, vsphere_task_tree_observe as tree
-from tools.run_files import digest, encoded, write_new, load_private, utcnow
-from tools.terraform_run import select_scope
+from provisioner.execution import readback_core as c
+from tools import terraform_recovery_review as r, vsphere_task_tree_observe as tree
+from provisioner.execution.run_files import digest, encoded, write_new, load_private, utcnow
+from provisioner.execution.terraform_run import select_scope
 
 
 class AttemptRecoveryTests(unittest.TestCase):

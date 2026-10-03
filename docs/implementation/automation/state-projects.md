@@ -64,7 +64,7 @@ optional CA bundle and shared ledger in owner-only storage outside the checkout.
 A separate `hosting-state-project-authority/1` object has exactly `format`,
 `request_sha256`, `action`, `valid_from`, `valid_until`, `change_ref`,
 `token_sha256` and `ca_sha256`. The request digest is
-`tools.readback_core.digest(request)`. Credential/CA digests bind their complete
+`provisioner.execution.readback_core.digest(request)`. Credential/CA digests bind their complete
 file bytes; absent CA uses null and the system trust roots. Authority lasts at
 most one hour, is checked before each request, and selects either `create` or
 `observe`. Observation never authorizes another POST.

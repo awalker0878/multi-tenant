@@ -3,8 +3,8 @@ import ssl
 from urllib.parse import urlsplit
 from urllib.request import Request, ProxyHandler, HTTPSHandler, build_opener
 
-from tools.neutron_observe import NoRedirect, strict_loads
-from tools.run_files import encoded, require
+from provisioner.execution.neutron_observe import NoRedirect, strict_loads
+from provisioner.execution.run_files import encoded, require
 
 
 class JsonService:

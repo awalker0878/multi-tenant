@@ -4,8 +4,9 @@ from pathlib import Path
 import re
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, nutanix_vm_observe as projection
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import nutanix_vm_observe as projection
+from provisioner.execution.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-vm-snapshot'
 PREFIX = '/sdk/vim25/8.0.3.0/'

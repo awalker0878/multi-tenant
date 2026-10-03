@@ -71,7 +71,7 @@ ENVELOPE_KEYS = frozenset({'id', 'record_sha256'})
 REQUEST_KEYS = frozenset({'format', 'owner_id', 'reservation_id', 'operation_id',
                           'generation', 'scope', 'pool_id', 'units', 'capabilities'})
 
-#: Mirrors `tools.readback_core.ID`, the declared identifier grammar.
+#: Mirrors `provisioner.execution.readback_core.ID`, the declared identifier grammar.
 IDENTIFIER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')
 SHA256 = re.compile(r'^[0-9a-f]{64}$')
 
@@ -80,7 +80,7 @@ UNITS = ('vcpu', 'memory_mb', 'storage_gb')
 #: Mirrors the owner's own accounting bound, so the mirror never accepts a request
 #: the authoritative validator would refuse.
 MAX_UNITS = 10 ** 15
-#: Mirrors `tools.check_reservation_records.STATES` for the states this module reads.
+#: Mirrors `provisioner.allocations.reservation_evidence.STATES` for the states this module reads.
 RECORD_STATES = ('HELD', 'CONSUMED', 'RELEASED', 'EXPIRED', 'UNCERTAIN')
 
 #: The reconciled states. None of them is "this repository holds capacity".

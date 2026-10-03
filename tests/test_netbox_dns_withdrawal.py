@@ -11,7 +11,7 @@ from tests import test_netbox_dns as registration_fixture
 from tests.test_dns_transactions import example
 from tools import dns_change as dns_writer, netbox_dns as handoff
 from tools.netbox_ipam import CLEANUP_CATEGORIES, RELEASE_EVIDENCE, operate as ipam_operate, validate as validate_allocation
-from tools.run_files import digest, encoded, load_private, replace_private, utcnow
+from provisioner.execution.run_files import digest, encoded, load_private, replace_private, utcnow
 
 
 class NetboxDNSWithdrawalTests(unittest.TestCase):
@@ -181,7 +181,7 @@ class NetboxDNSWithdrawalTests(unittest.TestCase):
         later = utcnow() + timedelta(hours=2)
         self.authority = dict(valid_from=(later - timedelta(minutes=1)).isoformat(),
                               valid_until=(later + timedelta(minutes=5)).isoformat())
-        with patch.object(handoff, 'utcnow', return_value=later), patch('tools.run_files.utcnow', return_value=later):
+        with patch.object(handoff, 'utcnow', return_value=later), patch('provisioner.execution.run_files.utcnow', return_value=later):
             self.assertEqual(self.run_dns('reconcile-withdrawal')['status'], 'AUTHORITATIVE_TOMBSTONE_OBSERVED')
             with self.assertRaises(ValueError): self.run_dns('withdraw')
         self.assertEqual(self.dns_server.update_requests, 2)

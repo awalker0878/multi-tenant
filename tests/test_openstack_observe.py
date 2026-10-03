@@ -5,7 +5,7 @@ import unittest
 
 from lab.native_readback_fixture import Fixture
 from tools import openstack_observe as o
-from tools.run_files import utcnow
+from provisioner.execution.run_files import utcnow
 
 PROJECT = '1bdef490bc60447c9877632b03933b33'
 SERVER = 'bbfe612f-640a-408e-a0d4-a363a263f4bb'

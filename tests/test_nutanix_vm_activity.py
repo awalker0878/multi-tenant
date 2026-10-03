@@ -12,7 +12,8 @@ from urllib.parse import parse_qs, urlsplit
 from lab.native_readback_fixture import Fixture
 from tests import test_nutanix_vm_task_observe as fixtures
 from tests.test_nutanix_vm_observe import manifest as vm_manifest, uid
-from tools import nutanix_vm_activity_observe as a, nutanix_task_tree as tree, readback_core as c
+from provisioner.execution import readback_core as c
+from tools import nutanix_vm_activity_observe as a, nutanix_task_tree as tree
 from tools import recovery_review as rr
 from lab.run_readback_lab import operator_context
 from tests.test_nutanix_task_tree import reseal

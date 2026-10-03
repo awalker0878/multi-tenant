@@ -4,9 +4,11 @@ from pathlib import Path
 import re
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, flow_policy, nutanix_vm_observe as vm
-from tools.lifecycle_transition import service_rules
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from provisioner.execution import flow_policy
+from tools import nutanix_vm_observe as vm
+from provisioner.execution.lifecycle_transition import service_rules
+from provisioner.execution.run_files import require
 
 PROFILE = 'nutanix-microseg-v4.2-policy-snapshot'
 TYPE = 'microseg.v4.config.'

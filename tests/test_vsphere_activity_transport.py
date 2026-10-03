@@ -4,8 +4,9 @@ import unittest
 from unittest.mock import patch
 from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_history import routes
-from tools import readback_core as c, vsphere_history as h
-from tools.run_files import utcnow
+from provisioner.execution import readback_core as c
+from tools import vsphere_history as h
+from provisioner.execution.run_files import utcnow
 
 
 class ActivityTransportTests(unittest.TestCase):

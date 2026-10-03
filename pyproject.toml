@@ -28,12 +28,16 @@ controlplane = [
 [project.scripts]
 hosting = "provisioner.cli.main:main"
 hosting-operator = "provisioner.cli.operator:main"
+hosting-application-review-ingest = "provisioner.controlplane.discovery.review_intake:main"
+hosting-application-review = "provisioner.controlplane.discovery.owner_signing:main"
 hosting-api = "provisioner.controlplane.api.server:main"
 hosting-evidence = "provisioner.controlplane.evidence.runtime:main"
 hosting-site-worker = "provisioner.controlplane.worker.runtime:main"
+hosting-discovery-ingest = "provisioner.controlplane.discovery.runtime:main"
+hosting-discovery-collect = "provisioner.controlplane.discovery.collector_runtime:main"
 
 [tool.setuptools.packages.find]
-include = ["provisioner*", "tools", "scripts"]
+include = ["provisioner*", "hosting_resources", "tools", "scripts"]
 namespaces = false
 
 [tool.setuptools.package-data]

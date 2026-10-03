@@ -35,7 +35,7 @@ Carry stable ownership through network/resource attachment, shared dependencies,
 Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [terraform/modules](../../terraform/modules)
-- [tools/input_review.py](../../tools/input_review.py)
+- [provisioner/execution/input_review.py](../../provisioner/execution/input_review.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

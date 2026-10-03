@@ -11,7 +11,8 @@ import unittest
 from lab.native_readback_fixture import Fixture
 from tests.test_nutanix_vm_observe import manifest as vm_manifest, uid
 from tools import nutanix_vm_task_observe as ahv, nutanix_vm_observe as vm
-from tools import nutanix_task_tree as tree, readback_core as c
+from provisioner.execution import readback_core as c
+from tools import nutanix_task_tree as tree
 
 ROOT = Path(__file__).resolve().parents[1]
 TASK = 'ZXJnb24=:88888888-8888-4888-8888-888888888888'

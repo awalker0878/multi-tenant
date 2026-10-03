@@ -13,7 +13,7 @@ accepted native UUIDs. `services` uses the lifecycle bootstrap rule map: directi
 TCP/UDP protocol, one port, and one remote IPv4 address per named service. Empty
 services means the prepared policy with its two retained deny rules.
 
-The restricted policy shape is validated by `tools/flow_policy.py`, which checks
+The restricted policy shape is validated by `provisioner/execution/flow_policy.py`, which checks
 the exact Terraform Flow rule specifications for the owned policy.
 
 `expected` is the reviewed API policy object with native rule IDs and direct

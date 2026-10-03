@@ -1,6 +1,6 @@
 {
   "family": "security",
-  "version": "8",
+  "version": "15",
   "description": "Security profiles bind portable intent to a trust level, a service class and the portable capabilities the placement must prove.",
   "requestDefaults": {
     "exposure": {
@@ -11,52 +11,159 @@
   "profiles": [
     {
       "profile": "internal-baseline",
-      "version": "1",
+      "version": "2",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
-            "description": "Internal baseline separation without a dedicated protected service class.",
-            "requires": {
-              "trust": "internal-trust",
-              "service_class": "standard",
-        "capabilities": ["network_domain", "ipv4", "gateway_policy", "audit_logging"],
-        "zones": ["OZ", "RZ"],
+      "description": "Internal baseline separation without a dedicated protected service class.",
+      "requires": {
+        "trust": "internal-trust",
+        "service_class": "standard",
+        "capabilities": [
+          "network_domain",
+          "ipv4",
+          "gateway_policy",
+          "audit_logging"
+        ],
+        "zones": [
+          "OZ",
+          "RZ"
+        ],
         "public_ingress": false,
-        "internet_egress": false
+        "internet_egress": false,
+        "constraints": [
+          {
+            "property": "gateway_policy.default_action",
+            "operator": "eq",
+            "value": "deny"
+          },
+          {
+            "property": "gateway_policy.enforcement",
+            "operator": "eq",
+            "value": "enforce"
+          },
+          {
+            "property": "network_domain.routing_isolation",
+            "operator": "eq",
+            "value": "independent-context"
+          }
+        ]
       },
-      "limits": ["Baseline separation is not a protected service class claim"]
+      "limits": [
+        "Baseline separation is not a protected service class claim",
+        "Capability names alone do not prove enforcement scope, mode or routing isolation; scoped property observations and independent native qualification are required"
+      ]
     },
     {
       "profile": "protected-b-medium",
-      "version": "1",
+      "version": "2",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
-            "description": "Protected internal service class with distributed policy enforcement in both internal zones.",
-            "requires": {
-              "trust": "internal-trust",
-              "service_class": "protected-b",
-        "capabilities": ["network_domain", "ipv4", "distributed_firewall", "gateway_policy", "audit_logging"],
-        "zones": ["OZ", "RZ"],
+      "description": "Protected internal service class with distributed policy enforcement in both internal zones.",
+      "requires": {
+        "trust": "internal-trust",
+        "service_class": "protected-b",
+        "capabilities": [
+          "network_domain",
+          "ipv4",
+          "distributed_firewall",
+          "gateway_policy",
+          "audit_logging"
+        ],
+        "zones": [
+          "OZ",
+          "RZ"
+        ],
         "public_ingress": false,
-        "internet_egress": false
+        "internet_egress": false,
+        "constraints": [
+          {
+            "property": "distributed_firewall.enforcement",
+            "operator": "eq",
+            "value": "enforce"
+          },
+          {
+            "property": "distributed_firewall.scope",
+            "operator": "eq",
+            "value": "all-workload-nics"
+          },
+          {
+            "property": "gateway_policy.default_action",
+            "operator": "eq",
+            "value": "deny"
+          },
+          {
+            "property": "gateway_policy.enforcement",
+            "operator": "eq",
+            "value": "enforce"
+          },
+          {
+            "property": "network_domain.routing_isolation",
+            "operator": "eq",
+            "value": "independent-context"
+          }
+        ]
       },
-      "limits": ["Internal protected service class only; no public or partner exposure"]
+      "limits": [
+        "Internal protected service class only; no public or partner exposure",
+        "Capability names alone do not prove enforcement scope, mode or routing isolation; scoped property observations and independent native qualification are required"
+      ]
     },
     {
       "profile": "protected-b-high",
-      "version": "1",
+      "version": "2",
       "rank": 3,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
-            "description": "Protected internal service class with dedicated edge context, load balancing and logging evidence.",
-            "requires": {
-              "trust": "internal-trust",
-              "service_class": "protected-b",
-        "capabilities": ["network_domain", "ipv4", "distributed_firewall", "gateway_policy",
-                         "dedicated_edge_context", "native_load_balancer", "audit_logging"],
-        "zones": ["OZ", "RZ"],
+      "description": "Protected internal service class with dedicated edge context, load balancing and logging evidence.",
+      "requires": {
+        "trust": "internal-trust",
+        "service_class": "protected-b",
+        "capabilities": [
+          "network_domain",
+          "ipv4",
+          "distributed_firewall",
+          "gateway_policy",
+          "dedicated_edge_context",
+          "native_load_balancer",
+          "audit_logging"
+        ],
+        "zones": [
+          "OZ",
+          "RZ"
+        ],
         "public_ingress": false,
-        "internet_egress": false
+        "internet_egress": false,
+        "constraints": [
+          {
+            "property": "distributed_firewall.enforcement",
+            "operator": "eq",
+            "value": "enforce"
+          },
+          {
+            "property": "distributed_firewall.scope",
+            "operator": "eq",
+            "value": "all-workload-nics"
+          },
+          {
+            "property": "gateway_policy.default_action",
+            "operator": "eq",
+            "value": "deny"
+          },
+          {
+            "property": "gateway_policy.enforcement",
+            "operator": "eq",
+            "value": "enforce"
+          },
+          {
+            "property": "network_domain.routing_isolation",
+            "operator": "eq",
+            "value": "independent-context"
+          }
+        ]
       },
-      "limits": ["Dedicated edge context is still an internal boundary, not public exposure"]
+      "limits": [
+        "Dedicated edge context is still an internal boundary, not public exposure",
+        "Capability names alone do not prove enforcement scope, mode or routing isolation; scoped property observations and independent native qualification are required"
+      ]
     }
   ]
 }

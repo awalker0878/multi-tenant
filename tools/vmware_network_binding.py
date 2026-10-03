@@ -1,7 +1,8 @@
 """Bind campaign VM NICs through observed portgroups to owned NSX segments."""
-from tools import readback_core as c, nsx_segment_observe as nsx, vsphere_network_observe as pg, vsphere_port_observe as ports
-from tools.compile_wsd import STATE
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import nsx_segment_observe as nsx, vsphere_network_observe as pg, vsphere_port_observe as ports
+from provisioner.compiler.wsd import STATE
+from provisioner.execution.run_files import require
 
 
 def bind(scope, workloads, outputs, network, portgroups, domain_outputs, inputs):

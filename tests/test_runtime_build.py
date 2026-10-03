@@ -12,8 +12,9 @@ import unittest
 from unittest.mock import patch
 import zipfile
 
-from tools import runtime_build as d, readback_core as c
-from tools.run_files import digest, encoded, utcnow, write_new
+from provisioner.execution import readback_core as c
+from tools import runtime_build as d
+from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 
 
 def zipped(files):

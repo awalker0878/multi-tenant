@@ -58,7 +58,7 @@ Retirement preserves the DNS owner marker/tombstone boundary until name/address 
 
 ## Preflight
 
-`scripts/check_dns_registration_preflight.py` accepts only opaque registration scope. It rejects caller-supplied FQDN or address fields because those values must come from the authoritative name/IPAM owners after handoff.
+`provisioner/allocations/dns_preflight.py` accepts only opaque registration scope. It rejects caller-supplied FQDN or address fields because those values must come from the authoritative name/IPAM owners after handoff.
 
 Ready state is:
 
@@ -73,7 +73,7 @@ The preflight always keeps `may_write_dns`, `may_delete_dns`, `may_release_name`
 Because the active IPAM and DNS indexes contain no confirmed allocation/registration records, the repository example remains held:
 
 ```sh
-python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED
+python -m provisioner.allocations.dns_preflight examples/dns_registration_intent.json.example --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED
 ```
 
 Local wire tests continue to prove only the bounded RFC2136/TSIG implementation against the disposable loopback authority. They do not qualify BIND, Windows DNS, appliances, DNSSEC, recursion, secondary convergence or production ACLs.

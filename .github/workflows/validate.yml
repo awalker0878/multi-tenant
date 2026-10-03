@@ -50,6 +50,7 @@ jobs:
       HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN: postgresql://hosting_directory_writer:ci_directory_writer_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_SITE_WORKER_DSN: postgresql://hosting_site_worker:ci_site_worker_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DISCOVERY_DSN: postgresql://hosting_discovery_ingest:ci_discovery_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_ASSESSMENT_DSN: postgresql://hosting_assessment_ingest:ci_assessment_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DSN: postgresql://postgres:ci_migration_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_ISOLATED: '1'
     steps:
@@ -66,6 +67,7 @@ jobs:
       - name: Run control-plane database and HTTP integration tests
         run: |
           python -m unittest discover -s tests/provisioning/controlplane -p 'test_*.py' -v
+          python -m unittest discover -s tests/provisioning/discovery -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/authority -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/jobs -p 'test_*.py' -v
           python -m unittest discover -s tests/provisioning/api -p 'test_*.py' -v
@@ -147,7 +149,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Confirm current checkout integrity before generated reports
-        run: python tools/check_release.py
+        run: python -m provisioner.execution.source_integrity
       - name: Install repository and local protocol-test dependencies
         run: python -m pip install -r requirements-repository.txt -e '.[controlplane]' 'httpx==0.28.1'
       - name: Repository hygiene and frozen-artifact links
@@ -159,31 +161,31 @@ jobs:
       - name: Native reference planning inputs and original W14 associations
         run: python scripts/commissioning_pack.py check > build/reports/native_reference_planning.json
       - name: Current exact-tuple version, source provenance and lifecycle records
-        run: python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
+        run: python -m provisioner.qualification.provenance --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
       - name: Version/source readiness must remain held without a selected supported tuple
         run: python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE > build/reports/version_source_readiness.json
       - name: Current exact-tuple native qualification dossiers
-        run: python scripts/check_platform_qualification.py > build/reports/platform_native_qualification.json
+        run: python -m provisioner.qualification.native > build/reports/platform_native_qualification.json
       - name: Platform capability registry evidence boundary
-        run: python scripts/check_platform_capabilities.py > build/reports/platform_capability_registry.json
+        run: python -m provisioner.qualification.registry > build/reports/platform_capability_registry.json
       - name: Platform-family pre-placement must remain held without native qualification
         run: python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM > build/reports/platform_family_eligibility.json
       - name: Current site cell and service-class capacity envelopes
-        run: python scripts/check_site_service_capacity.py > build/reports/site_service_capacity_index.json
+        run: python -m provisioner.allocations.capacity_evidence > build/reports/site_service_capacity_index.json
       - name: Site service-capacity precheck must remain held without commissioned envelopes
-        run: python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
+        run: python -m provisioner.allocations.site_eligibility examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
       - name: Exported reservation records remain external-authority evidence
-        run: python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
+        run: python -m provisioner.allocations.reservation_evidence --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
       - name: Reservation preflight must remain held without eligible envelope
-        run: python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
+        run: python -m provisioner.allocations.reservation_preflight examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
       - name: Exported IPAM allocations remain authoritative-service evidence
-        run: python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
+        run: python -m provisioner.allocations.ipam_evidence --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
       - name: IPAM allocation preflight must remain held without parent reservation
-        run: python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
+        run: python -m provisioner.allocations.ipam_preflight examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
       - name: Exported DNS registrations remain authoritative-service evidence
-        run: python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
+        run: python -m provisioner.allocations.dns_evidence --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
       - name: DNS registration preflight must remain held without confirmed IPAM
-        run: python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
+        run: python -m provisioner.allocations.dns_preflight examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
       - name: Exported backup/restore assurance remains external-service evidence
         run: python scripts/check_backup_restore_assurance.py --as-of 2026-09-18T19:00:00Z > build/reports/backup_restore_assurance.json
       - name: Backup/restore readiness must remain held without current assurance
@@ -237,11 +239,11 @@ jobs:
       - name: Bootstrap service readiness must remain held without current target dependencies
         run: python scripts/check_bootstrap_service_readiness.py examples/bootstrap_service_readiness_intent.json.example --as-of 2026-09-19T14:30:00Z --expected-status HOLD_NO_CURRENT_BOOTSTRAP_SERVICE_ASSURANCE > build/reports/bootstrap_service_readiness.json
       - name: Exported actual-target selection assurance remains non-authoritative
-        run: python scripts/check_target_selection_assurance.py --as-of 2026-09-19T15:30:00Z > build/reports/target_selection_assurance.json
+        run: python -m provisioner.qualification.target_selection --as-of 2026-09-19T15:30:00Z > build/reports/target_selection_assurance.json
       - name: Target-selection readiness must remain held without an actual selected target
         run: python scripts/check_target_selection_readiness.py examples/target_selection_readiness_intent.json.example --as-of 2026-09-19T15:30:00Z --expected-status HOLD_NO_CURRENT_TARGET_SELECTION > build/reports/target_selection_readiness.json
       - name: Exported qualification-campaign evidence remains non-authoritative
-        run: python scripts/check_qualification_campaign_assurance.py --as-of 2026-09-19T16:30:00Z > build/reports/qualification_campaign_assurance.json
+        run: python -m provisioner.qualification.campaign --as-of 2026-09-19T16:30:00Z > build/reports/qualification_campaign_assurance.json
       - name: Qualification-campaign readiness must remain held without native campaign evidence
         run: python scripts/check_qualification_campaign_readiness.py examples/qualification_campaign_readiness_intent.json.example --as-of 2026-09-19T16:30:00Z --expected-status HOLD_NO_CURRENT_QUALIFICATION_CAMPAIGN_EVIDENCE > build/reports/qualification_campaign_readiness.json
       - name: Local regressions and route-model checks

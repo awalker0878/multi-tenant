@@ -64,7 +64,7 @@ paths, upstream routing, policy priority, group ownership and return traffic exp
 | Domain | Independent project/domain routing scope, provider-owned mandatory controls, port security and approved source identities | [Network-mutation ownership](../../engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md); additive tenant allow groups do not create a mandatory deny hierarchy |
 | Workload | Accepted image/flavour, boot/data volume ownership, explicit security-group association and eligible placement | [Workload module](../../../terraform/modules/openstack-workload/README.md); preserve retained data, and observe actual port/guest behaviour |
 | Approved paths | Provider-controlled external attachments and qualified security-edge handoffs, with symmetric owned replies | [Exact route module](../../../terraform/modules/openstack-route/README.md); no complete external gateway/firewall service is provided |
-| Observe | Exact owned Neutron network/router/subnet/port/group configuration and tenant binding | [Neutron observer](../../../tools/neutron_observe.py) is not full compute/storage inventory or enforcement/failover proof |
+| Observe | Exact owned Neutron network/router/subnet/port/group configuration and tenant binding | [Neutron observer](../../../provisioner/execution/neutron_observe.py) is not full compute/storage inventory or enforcement/failover proof |
 
 Test the real delegated role against attempts to replace mandatory groups, alter port
 security, source identities or external attachments. Do not write directly into a network

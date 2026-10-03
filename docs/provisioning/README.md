@@ -2,8 +2,9 @@
 
 The portable provisioning package (`provisioner/`) turns one reviewed YAML request
 into a deterministic, reviewable internal desired state. It is a **portable,
-provider-neutral front end to the existing compiler** — it does not replace the
-compiler, the Terraform roots, the Ansible roles or the delivery tooling.
+provider-neutral front end with a package-owned native compiler**. The original
+compiler implementation is preserved at `provisioner/compiler/wsd.py`; Terraform
+roots, Ansible roles and the remaining delivery tooling keep their owners.
 
 Pipeline (each stage is a separate owner, in dependency order):
 
@@ -15,7 +16,7 @@ portable WSD request (YAML)
   -> placement                  provisioner/placement
   -> desired state              provisioner/compiler/desired_state.py
   -> realization contract       provisioner/adapters
-  -> existing compile_wsd.py    tools/compile_wsd.py
+  -> package-owned compiler     provisioner/compiler/wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
   -> hosting-delivery/2         provisioner/execution/handoff.py
   -> existing delivery runner   tools/delivery_run.py (the only engine)
@@ -35,6 +36,7 @@ that cites it cites every reviewed decision. See
 
 | Document | Covers |
 | --- | --- |
+| [Current enterprise execution plan](../product/enterprise-workload-mobility-execution-plan.md) | B01–B50 delivery sequence, remaining implementation and separate qualification gates |
 | [Provisioning architecture](architecture.md) | Stages, ownership, dependency direction, what CI does not do |
 | [Portable WSD request contract](request-contract.md) | `apiVersion`, `kind`, `metadata`, `spec` field by field |
 | [Profile model](profile-model.md) | Catalogs, implemented vs deferred status, resolution rules |
@@ -50,8 +52,14 @@ that cites it cites every reviewed decision. See
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |
 | [Plan workflow](plan-workflow.md) | `validate resolve plan mobility-plan mobility-apply status verify evidence apply` |
 | [Supported service-profile matrix](service-profile-matrix.md) | What is implemented, what is deferred, why |
-| [Refactor completion audit](../deepseek-refactor-completion-audit.md) | Ordered completion gates, required regressions, repository-side vs external exit criteria |
-| [DeepSeek completion execution prompt](../deepseek-refactor-completion-execution-prompt.md) | Authoritative execution sequence for closing every repository-side audit gate with small commits |
+
+## Retained refactor history
+
+The [refactor completion audit](../deepseek-refactor-completion-audit.md) and
+[DeepSeek completion execution prompt](../deepseek-refactor-completion-execution-prompt.md)
+are retained specifications for an earlier refactor scope, not current execution
+authorities or evidence that the complete mobility programme is implemented.
+The B01–B50 execution plan above owns the current sequence and outstanding gates.
 
 ## Command line
 

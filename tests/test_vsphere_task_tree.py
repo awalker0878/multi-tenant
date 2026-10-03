@@ -12,7 +12,8 @@ from tests.test_native_readback import context
 from tests.test_vsphere_observe import Client as VmClient, ref
 from tests.test_vsphere_task_observe import manifest as flat_manifest, task_body
 from tests.test_vsphere_recovery import reseal
-from tools import readback_core as c, recovery_review as rr, vsphere_task_observe as task, vsphere_task_tree_observe as tree
+from provisioner.execution import readback_core as c
+from tools import recovery_review as rr, vsphere_task_observe as task, vsphere_task_tree_observe as tree
 from tools import qualify_target as q
 
 

@@ -2,7 +2,7 @@
 
 The provisioner owns the portable half of this boundary: it renders a resolved
 desired state into the reviewed `hosting-wsd-environment/1` document. The existing
-`tools/compile_wsd.py` owns the other half and remains the only thing that turns an
+`provisioner/compiler/wsd.py` owns the other half and remains the only thing that turns an
 environment document into Terraform inputs. It is reused, never reimplemented.
 """
 from __future__ import annotations

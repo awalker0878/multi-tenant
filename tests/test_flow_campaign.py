@@ -10,9 +10,10 @@ from tests.test_nutanix_vm_observe import uid
 from tests.test_target_campaign import window
 from tools import nutanix_vm_observe as ahv, nutanix_flow_observe as flow, qualify_target as q
 from tests.test_nutanix_flow_activity import manifest as activity_manifest, responses as activity_responses
-from tools import nutanix_flow_activity_observe as activity, readback_core as c
+from provisioner.execution import readback_core as c
+from tools import nutanix_flow_activity_observe as activity
 from tools.guest_inventory import build
-from tools.run_files import digest, encoded, write_new
+from provisioner.execution.run_files import digest, encoded, write_new
 
 
 def inputs(origin):

@@ -364,7 +364,7 @@
     "implementation_paths": [
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "open_work": "Management/OOB independence, accepted principals, real access paths and break-glass exercises require the actual site.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -745,7 +745,7 @@
     ],
     "implementation_paths": [
       "tools/recovery_review.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/stacks/components"
     ],
     "open_work": "Actual native writer exclusion and transfer acceptance remain external controls; an offline record checker does not implement fencing.",
@@ -861,7 +861,7 @@
     ],
     "implementation_paths": [
       "terraform/modules",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "open_work": "The actual tenant identities, approved shared-domain ownership and lifecycle integration remain unassigned.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -956,7 +956,7 @@
       "IPAM-004"
     ],
     "implementation_paths": [
-      "tools/input_review.py",
+      "provisioner/execution/input_review.py",
       "tools/dns_change.py"
     ],
     "open_work": "Authoritative IPAM allocation and native DNS propagation remain external integration work; DNS change code does not allocate addresses.",
@@ -1002,7 +1002,7 @@
       "IPV6-003"
     ],
     "implementation_paths": [
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "lab/run_namespace_lab.py"
     ],
     "open_work": "The native source and routed fixture remain IPv4-focused; offline IPv6 or loopback evidence does not satisfy native routed qualification.",
@@ -1266,7 +1266,7 @@
       "terraform/modules/openstack-domain",
       "terraform/modules/openstack-route",
       "terraform/modules/openstack-workload",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "open_work": "Actual distribution policy, gateway/OVN failure behaviour, storage/key integrations and supported native lifecycle remain target qualification work.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",
@@ -1686,7 +1686,7 @@
       "OPS-001"
     ],
     "implementation_paths": [
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       ".github/workflows/validate.yml"
     ],
     "open_work": "Actual change classification, approval authority, installed support status and operational ownership are not supplied by CI success.",
@@ -1744,7 +1744,7 @@
     ],
     "implementation_paths": [
       "lab/run_namespace_lab.py",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "open_work": "Native service/gateway configuration and real endpoint no-transit/source-validation controls still require the chosen implementation.",
     "derivation": "Source-derived synthesis; not a new source standard or a reconstructed approval meeting.",

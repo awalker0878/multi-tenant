@@ -14,7 +14,7 @@ from provisioner.domain.request import load as load_document
 from provisioner.execution.plan import create_plan
 from provisioner.inventory.model import fixture
 from provisioner.profiles.loader import load_catalogs
-from tools import compile_wsd
+from provisioner.compiler import wsd as compile_wsd
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUESTS = ROOT / 'examples' / 'requests'

@@ -21,7 +21,7 @@ The repository already contains:
 
 - `tools/nsx_observe.py` — exact selected NSX Policy/realization readback;
 - `tools/nutanix_observe.py` — exact Nutanix networking/task readback;
-- `tools/neutron_observe.py` — bounded Neutron exact-resource comparison;
+- `provisioner/execution/neutron_observe.py` — bounded Neutron exact-resource comparison;
 - `tools/recovery_review.py` — offline consistency review of operation, report, fencing/quarantine and generation records;
 - the bounded Nutanix task-tree extension for an explicitly enumerated small task graph.
 

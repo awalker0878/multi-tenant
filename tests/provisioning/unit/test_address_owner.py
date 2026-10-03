@@ -17,10 +17,10 @@ hold rather than a second allocation, that a name is never registered before the
 allocation it depends on is confirmed, and that reusable addressing is never handed
 back before the dependent DNS withdrawal has completed.
 
-`scripts/check_ipam_allocation_preflight.py` and
-`scripts/check_dns_registration_preflight.py` own the intent contracts, and
-`scripts/check_ipam_allocation_records.py` and
-`scripts/check_dns_registration_records.py` own the exported-evidence contracts.
+`provisioner/allocations/ipam_preflight.py` and
+`provisioner/allocations/dns_preflight.py` own the intent contracts, and
+`provisioner/allocations/ipam_evidence.py` and
+`provisioner/allocations/dns_evidence.py` own the exported-evidence contracts.
 Their declarations are read from source and compared against the mirror in
 `provisioner.allocations.addresses` on the same documents, so a key, a state, a
 grammar or a bound an owner adds cannot drift unnoticed.
@@ -46,12 +46,12 @@ from provisioner.execution import service
 
 from tests.provisioning import support
 
-IPAM_PREFLIGHT = support.ROOT / 'scripts' / 'check_ipam_allocation_preflight.py'
-DNS_PREFLIGHT = support.ROOT / 'scripts' / 'check_dns_registration_preflight.py'
-IPAM_RECORDS = support.ROOT / 'scripts' / 'check_ipam_allocation_records.py'
-DNS_RECORDS = support.ROOT / 'scripts' / 'check_dns_registration_records.py'
-RESERVATION_PREFLIGHT = support.ROOT / 'scripts' / 'check_reservation_preflight.py'
-RESERVATION_RECORDS = support.ROOT / 'scripts' / 'check_reservation_records.py'
+IPAM_PREFLIGHT = support.ROOT / 'provisioner' / 'allocations' / 'ipam_preflight.py'
+DNS_PREFLIGHT = support.ROOT / 'provisioner' / 'allocations' / 'dns_preflight.py'
+IPAM_RECORDS = support.ROOT / 'provisioner' / 'allocations' / 'ipam_evidence.py'
+DNS_RECORDS = support.ROOT / 'provisioner' / 'allocations' / 'dns_evidence.py'
+RESERVATION_PREFLIGHT = support.ROOT / 'provisioner' / 'allocations' / 'reservation_preflight.py'
+RESERVATION_RECORDS = support.ROOT / 'provisioner' / 'allocations' / 'reservation_evidence.py'
 
 #: The exported record key sets the two owners declare, filtered from the compiled
 #: documents. A compiled intent carries more than an exported record does.

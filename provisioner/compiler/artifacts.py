@@ -36,7 +36,10 @@ def assert_deterministic(name: str, value) -> str:
 
 def assert_output_path(path: Path) -> Path:
     path = Path(path)
-    if path.resolve().is_relative_to(ROOT):
+    # A wheel's resource root is separate from its Python modules. Neither is
+    # an operator output directory, including when both are writable to a user.
+    code_root = Path(__file__).resolve().parents[2]
+    if any(path.resolve().is_relative_to(root) for root in (ROOT, code_root)):
         raise ProvisioningError('OUTPUT_PATH_NOT_PRIVATE',
                                 'Generated inputs must be written outside the repository',
                                 path=str(path), details={'repository_root': str(ROOT)})

@@ -9,8 +9,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools import ssh_issuer as d, readback_core as c
-from tools.run_files import digest, encoded, utcnow, write_new
+from provisioner.execution import readback_core as c
+from tools import ssh_issuer as d
+from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 
 
 class EngineHost(d.Host):
@@ -131,7 +132,7 @@ class IssuerTests(unittest.TestCase):
         self.execute(); self.authority['action'] = 'observe'
         future = utcnow()+timedelta(minutes=10)
         self.authority.update(valid_from=(future-timedelta(seconds=10)).isoformat(), valid_until=(future+timedelta(minutes=1)).isoformat())
-        with patch('tools.run_files.utcnow', return_value=future): result = self.execute()
+        with patch('provisioner.execution.run_files.utcnow', return_value=future): result = self.execute()
         self.assertLess(result['valid_before'], future.timestamp()); self.assertEqual(self.host.signatures, 1)
 
     def test_policy_scope_lifetime_authority_and_operation_cannot_expand(self):

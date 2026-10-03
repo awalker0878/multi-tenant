@@ -1,7 +1,7 @@
 {
   "family": "availability",
-  "version": "2",
-  "description": "Availability profiles state the internal zones the workload security domain must span.",
+  "version": "18",
+  "description": "Availability profiles select security-zone composition and workload counts; native failure-domain and HA qualification are separate.",
   "requestDefaults": {
     "zones": {
       "operations": {
@@ -24,19 +24,19 @@
     },
     {
       "profile": "high",
-      "version": "1",
+      "version": "2",
       "rank": 2,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
-      "description": "Operations and restricted zones in separate failure domains.",
+      "description": "Operations and restricted security zones; this does not establish independent failure domains.",
       "requires": {"zones": ["OZ", "RZ"], "min_workloads_per_zone": 1},
       "limits": ["Zone separation is not an automatic failover guarantee"]
     },
     {
       "profile": "maximum",
-      "version": "1",
+      "version": "2",
       "rank": 3,
       "status": "DEFERRED_NOT_IMPLEMENTED",
-      "description": "Three-zone availability including a protected availability zone.",
+      "description": "Deferred three-security-zone composition (OZ/RZ/PAZ); no native HA or failure-domain guarantee.",
       "requires": {"zones": ["OZ", "RZ", "PAZ"], "min_workloads_per_zone": 1},
       "limits": ["Deferred: only internal OZ/RZ compositions are implemented in this repository"]
     }

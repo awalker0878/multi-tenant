@@ -15,8 +15,8 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from tools import neutron_observe as no
-from tools.route_record_review import review,COMMON,FIELDS
+from provisioner.execution import neutron_observe as no
+from provisioner.execution.route_record_review import review,COMMON,FIELDS
 from lab.run_namespace_lab import validate_fixture,rules_for,endpoint
 from lab.worker import dns_question,dns_answer,validate_dns_answer,fixture_ip
 from lab.link_config import attribute,set_forwarding
@@ -134,7 +134,7 @@ class ObservationTests(unittest.TestCase):
  def test_empty_collection_never_success(self):
   with self.assertRaises(ValueError):no.observe({'project_id':PROJECT,'engineering_record_ref':'ENG','resources':[]},None)
  def test_live_command_requires_opt_in(self):
-  result=subprocess.run([os.sys.executable,str(ROOT/'tools/neutron_observe.py'),'does-not-exist',
+  result=subprocess.run([os.sys.executable,str(ROOT/'provisioner/execution/neutron_observe.py'),'does-not-exist',
     '--endpoint','https://invalid.example/v2.0','--expected-origin','https://invalid.example','--output','unused'],capture_output=True,text=True,timeout=5)
   self.assertNotEqual(result.returncode,0);self.assertIn('No target contacted',result.stderr)
 
@@ -255,19 +255,19 @@ class ExtendedPlanTests(unittest.TestCase):
    'mode':'managed','type':'openstack_networking_router_route_v2','provider_name':'registry.terraform.io/terraform-provider-openstack/openstack',
    'change':{'actions':['create'],'after':{'router_id':RID,'destination_cidr':destination,'next_hop':next_hop},'after_unknown':{}}}]}
  def test_route_always_requires_independent_review(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   result=review(self.route_plan(),{'router_id':[RID]});self.assertEqual(result['status'],'REVIEW_REQUIRED')
  def test_route_default_blocked(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan('0.0.0.0/0'))['status'],'BLOCKED')
  def test_route_ipv6_not_silently_enabled(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan('2001:db8::/64'))['status'],'BLOCKED')
  def test_route_bad_hop_blocked(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan(next_hop='not-an-ip'))['status'],'BLOCKED')
  def test_route_foreign_target_blocked(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan(),{'router_id':['other']})['status'],'BLOCKED')
  def test_all_mock_sources_plan_only(self):
   from tools.verify_terraform import plan_only_mock_tests

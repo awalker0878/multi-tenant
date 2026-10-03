@@ -19,7 +19,7 @@ Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment r
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment record covering forwarding authority, isolation, MTU, HA, capacity and cleanup; consumers SHALL NOT choose its native topology identifiers.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-023, CT-024, CT-032, CT-071
 
@@ -37,7 +37,7 @@ Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment r
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment record covering forwarding authority, isolation, MTU, HA, capacity and cleanup
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-023, CT-024, CT-032, CT-071
 
@@ -55,7 +55,7 @@ Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment r
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: consumers SHALL NOT choose its native topology identifiers.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-023, CT-024, CT-032, CT-071
 
@@ -78,7 +78,7 @@ A shared attachment SHALL be prohibited unless direct connected, neighbor, gatew
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A shared attachment SHALL be prohibited unless direct connected, neighbor, gateway and NAT/PBR paths preserve the required domain isolation and ZIP enforcement in normal and failure states.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-023, CT-024, CT-080
 

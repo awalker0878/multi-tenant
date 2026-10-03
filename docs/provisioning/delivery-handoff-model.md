@@ -15,7 +15,7 @@ repository tooling, so the transport cannot reach into the runner's module graph
 ```
 portable WSD request (YAML)
   -> provisioner (schema, profiles, policy, placement, desired state)
-  -> tools/compile_wsd.py (the existing compiler)
+  -> provisioner/compiler/wsd.py (the existing compiler)
   -> reviewed immutable plan (Plan.manifest_digest)
   -> hosting-delivery/2 (provisioner/execution/handoff.py)
   -> tools/delivery_run.py (the existing runner)
@@ -164,7 +164,7 @@ re-verifies it against the checkout it is running from. `hosting apply` therefor
 refuses before compiling rather than emitting a graph the runner must reject:
 
 - with a clean checkout it takes the commit from the repository release verifier
-  (`tools/check_release.verify`, reached only through `provisioner/repository.py`);
+  (`provisioner.execution.source_integrity.verify`, reached through `provisioner/repository.py`);
 - with a dirty checkout it refuses with `ARTIFACT_INTEGRITY_FAILED`, naming the
   differing files, unless the caller names the commit under review with
   `--source-commit`, which must still be the commit the checkout reports;

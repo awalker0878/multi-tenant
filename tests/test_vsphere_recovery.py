@@ -5,7 +5,8 @@ import unittest
 from tests.test_native_readback import context
 from tests.test_vsphere_observe import Client
 from tests.test_vsphere_task_observe import manifest, task_body
-from tools import readback_core as c, recovery_review as rr, vsphere_task_observe as t
+from provisioner.execution import readback_core as c
+from tools import recovery_review as rr, vsphere_task_observe as t
 
 
 def fixture():

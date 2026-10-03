@@ -19,7 +19,7 @@ All inter-zone network paths SHALL traverse the applicable ZIP/security edge.
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: All inter-zone network paths SHALL traverse the applicable ZIP/security edge.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-080
 
@@ -42,7 +42,7 @@ A ZIP SHALL identify exactly two authorized adjacent endpoints, each an internal
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A ZIP SHALL identify exactly two authorized adjacent endpoints, each an internal domain instance or approved external/management domain, and SHALL NOT create a general-purpose third-zone transit path.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-023, CT-025
 
@@ -65,7 +65,7 @@ Default inter-zone policy SHALL be deny; allowed flows SHALL be generated from a
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Default inter-zone policy SHALL be deny; allowed flows SHALL be generated from approved Flow Intentions and Service Bindings.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-007, CT-025, CT-066
 
@@ -83,7 +83,7 @@ Default inter-zone policy SHALL be deny; allowed flows SHALL be generated from a
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Default inter-zone policy SHALL be deny
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-007, CT-025, CT-066
 
@@ -101,7 +101,7 @@ Default inter-zone policy SHALL be deny; allowed flows SHALL be generated from a
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: allowed flows SHALL be generated from approved Flow Intentions and Service Bindings.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-007, CT-025, CT-066
 
@@ -124,7 +124,7 @@ ZIP management traffic SHALL be segregated from operational traffic.
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: ZIP management traffic SHALL be segregated from operational traffic.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-004, CT-026
 
@@ -147,7 +147,7 @@ Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distin
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distinct security services; shared virtualization SHALL only be used where the applicable assurance analysis supports it.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-026, CT-035, CT-080
 
@@ -165,7 +165,7 @@ Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distin
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Separate data-path security service
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-026, CT-035, CT-080
 
@@ -183,7 +183,7 @@ Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distin
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Separate management-path security service
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-026, CT-035, CT-080
 
@@ -201,7 +201,7 @@ Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distin
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Shared virtualization is covered by actual assurance analysis
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-026, CT-035, CT-080
 
@@ -224,7 +224,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Each ZIP SHALL record its two zone authorities, joint approval, required security functions, management authority, heightened posture, session-revocation behavior and current evidence.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -242,7 +242,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Exactly the adjacent zone authorities
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -260,7 +260,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Joint approval
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -278,7 +278,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Required security functions
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -296,7 +296,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Management authority
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -314,7 +314,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Heightened posture
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -332,7 +332,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Existing-session withdrawal behaviour
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -350,7 +350,7 @@ Each ZIP SHALL record its two zone authorities, joint approval, required securit
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Current attributable evidence
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-067, CT-077, CT-080
 
@@ -373,7 +373,7 @@ A distributed or shared-infrastructure ZIP SHALL be qualified against the same r
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A distributed or shared-infrastructure ZIP SHALL be qualified against the same required security outcomes as a dedicated edge; any unsupported mandatory function SHALL make that realization ineligible.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-023, CT-080
 
@@ -391,7 +391,7 @@ A distributed or shared-infrastructure ZIP SHALL be qualified against the same r
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: A distributed or shared-infrastructure ZIP SHALL be qualified against the same required security outcomes as a dedicated edge
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-023, CT-080
 
@@ -409,7 +409,7 @@ A distributed or shared-infrastructure ZIP SHALL be qualified against the same r
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: any unsupported mandatory function SHALL make that realization ineligible.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-003, CT-023, CT-080
 

@@ -63,9 +63,9 @@ and authority are available. Each packet has exactly:
 | Field | Value |
 | --- | --- |
 | `format` | `hosting-delivery-step/1` |
-| `plan_sha256` | `tools.readback_core.digest(plan)` |
+| `plan_sha256` | `provisioner.execution.readback_core.digest(plan)` |
 | `step_id` | Exact selected step ID |
-| `dependencies` | Map from every `needs` ID to `tools.readback_core.digest(its completed receipt)` |
+| `dependencies` | Map from every `needs` ID to `provisioner.execution.readback_core.digest(its completed receipt)` |
 | `parameters` | Typed parameters from the adapter table below |
 | `files` | Map from adapter input names to `{ "path": "/absolute/private/file", "sha256": "<SHA256-of-file-bytes>" }` |
 

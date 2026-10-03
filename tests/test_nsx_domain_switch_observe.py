@@ -8,7 +8,8 @@ from lab.run_readback_lab import operator_context
 from tests.nsx_domain_fixture import scenario
 from tests.test_nsx_segment_observe import manifest as switch_fixture, Client
 from tests.test_nutanix_task_tree import reseal
-from tools import nsx_domain_switch_observe as n, readback_core as c, recovery_review as review
+from provisioner.execution import readback_core as c
+from tools import nsx_domain_switch_observe as n, recovery_review as review
 
 
 def manifest(origin='https://nsx.example.test'):

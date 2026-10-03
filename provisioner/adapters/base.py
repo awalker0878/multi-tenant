@@ -1,22 +1,23 @@
 """The platform adapter boundary.
 
 An adapter owns the provider-specific half of the portable-to-native mapping and
-nothing else. Six surfaces are contract:
+nothing else. Its reviewed contracts include:
 
 * `capability_contract`  — the qualification a platform must hold before selection
 * `placement_contract`   — the native identity reviewed inventory must supply
 * `phase_contract`       — what each reviewed native phase accepts and produces
 * `readback_contract`    — the native identity the readback must observe
-* `realization_contract` — the whole declaration, as one reviewable document
+* `realization_contract` — the portable-to-native declaration, as one reviewable document
+* `workload_lifecycle`   — the typed strategy and existing owner used for bootstrap
 * `validate`             — the refusal of a reviewed plan this platform cannot realize
 
 An adapter never provisions, never contacts a platform and never decides placement.
 Execution and platform contact stay with the owner tools that already own them, and
-`tools/compile_wsd.py` stays the authority for what a reviewed module accepts.
+`provisioner/compiler/wsd.py` stays the authority for what a reviewed module accepts.
 
 Nothing here restates the compiler. Every declaration is read from the module that
-already owns it — `tools.compile_wsd` for the native field sets, the declared native
-variables and the declared cross-phase binding rules; `scripts.build_wsd_compositions`
+already owns it — `provisioner.compiler.wsd` for the native field sets, the declared native
+variables and the declared cross-phase binding rules; `provisioner.compiler.components`
 for the module identities; `terraform/catalog.json` for the reviewed security-edge
 realization; the capability registry for qualification — so an adapter and the
 compiler cannot drift apart, and a generic stage asks the adapter instead of
@@ -25,6 +26,7 @@ branching on a platform name.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 
 from provisioner.domain.errors import ProvisioningError
 from provisioner.placement import eligibility
@@ -113,6 +115,32 @@ def binding_requirement(platform: str) -> tuple[tuple[str, str], ...]:
     return () if rule is None else tuple(sorted(rule.items()))
 
 
+
+class WorkloadLifecycleMode(Enum):
+    """How the native workload owner exposes reviewed bootstrap effects."""
+    SAVED_PLAN = 'saved-plan'
+    PER_MEMBER_OWNER = 'per-member-owner'
+
+
+@dataclass(frozen=True)
+class WorkloadLifecycle:
+    """Typed execution strategy declared by the concrete native adapter.
+
+    A saved-plan owner transitions all members through the reviewed Terraform
+    lifecycle profile. A per-member owner requires a separately fenced operation
+    for each applied VM. The adapter names the existing delivery executor kind;
+    selecting a strategy does not authorize or qualify that executor.
+    """
+    mode: WorkloadLifecycleMode
+    owner_kind: str
+
+    def __post_init__(self):
+        if not isinstance(self.mode, WorkloadLifecycleMode):
+            raise ValueError('A typed workload lifecycle mode is required')
+        if not isinstance(self.owner_kind, str) or not self.owner_kind:
+            raise ValueError('An existing native workload owner kind is required')
+
+
 @dataclass(frozen=True)
 class Adapter:
     """One platform realization boundary."""
@@ -124,6 +152,7 @@ class Adapter:
     placement_fields: frozenset
     network_fields: frozenset
     security_edge: str
+    workload_lifecycle: WorkloadLifecycle
     edge_components: tuple[str, ...] = ()
     binding_requirement: tuple[tuple[str, str], ...] = ()
     realization_note: str = ''
@@ -172,7 +201,7 @@ class Adapter:
         refused = tuple(fact for fact, native in COMPUTED_FACTS if native not in declared)
         return accepted, refused
 
-    # -- the six contract surfaces -------------------------------------------
+    # -- reviewed contract surfaces -------------------------------------------
 
     def capability_contract(self, required=(), assurance_profile=None) -> dict:
         """The qualification contract a platform must hold before it may be selected.
@@ -201,7 +230,7 @@ class Adapter:
                 'fields': sorted(self.placement_fields),
                 'supplied_by': 'reviewed inventory cluster native identity',
                 'provisioner_owned': False,
-                'authority': 'tools.compile_wsd.PLACEMENT',
+                'authority': 'provisioner.compiler.wsd.PLACEMENT',
                 'native_contact': False}
 
     def phase_contract(self, phase: str) -> dict:
@@ -215,7 +244,7 @@ class Adapter:
                 'unavailable_inputs': list(refused),
                 'readback_identity': sorted(self.network_fields) if phase == 'domains' else [],
                 'binding_requirement': self.binding if phase == 'workloads' else {},
-                'authority': 'tools.compile_wsd.native_variables',
+                'authority': 'provisioner.compiler.wsd.native_variables',
                 'native_contact': False}
 
     def readback_contract(self) -> dict:
@@ -236,7 +265,7 @@ class Adapter:
                                               if key == 'native_field'),
                 'observed_field': binding.get('observed_field', ''),
                 'binding': binding,
-                'authority': 'tools.compile_wsd.NETWORK',
+                'authority': 'provisioner.compiler.wsd.NETWORK',
                 'native_contact': False}
 
     def security_edge_contract(self) -> dict:
@@ -332,14 +361,15 @@ class Adapter:
         return tuple(problems)
 
 def _adapter(platform: str, security_edge: str, limits: tuple[str, ...],
-             realization_note: str = '') -> Adapter:
+             realization_note: str = '', *, workload_lifecycle: WorkloadLifecycle) -> Adapter:
     modules = repository.composition_components()[platform]
     compiler = repository.compiler_declarations()
     return Adapter(platform=platform, family=eligibility.PLATFORM_FAMILY[platform],
                    domains_module=modules['domains'], workloads_module=modules['workloads'],
                    placement_fields=frozenset(compiler['placement'][platform]),
                    network_fields=frozenset(compiler['network'][platform]),
-                   security_edge=security_edge, edge_components=edge_components(platform),
+                   security_edge=security_edge, workload_lifecycle=workload_lifecycle,
+                   edge_components=edge_components(platform),
                    binding_requirement=binding_requirement(platform),
                    realization_note=realization_note, limits=limits)
 

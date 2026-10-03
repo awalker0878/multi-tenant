@@ -7,8 +7,8 @@ from provisioner.adapters import base as adapter_base
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import ansible, delivery, terraform
 from provisioner.placement import eligibility
-from scripts import build_wsd_compositions
-from tools import compile_wsd
+from provisioner.compiler import components as native_components
+from provisioner.compiler import wsd as compile_wsd
 
 from tests.provisioning import support
 
@@ -36,7 +36,7 @@ class AdapterBoundaryTest(unittest.TestCase):
             self.assertEqual(sorted(adapter.network_fields), sorted(compile_wsd.NETWORK[platform]))
 
     def test_adapters_cannot_drift_from_the_composition_roots(self):
-        components = build_wsd_compositions.COMPONENTS
+        components = native_components.COMPONENTS
         for platform, adapter in adapter_base.adapters().items():
             self.assertEqual(adapter.domains_module, components[platform]['domains'])
             self.assertEqual(adapter.workloads_module, components[platform]['workloads'])

@@ -19,7 +19,7 @@ Internet egress SHALL be deny-by-default and enabled only through an approved eg
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Internet egress SHALL be deny-by-default and enabled only through an approved egress profile.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-005, CT-064
 
@@ -42,7 +42,7 @@ Egress telemetry SHALL permit attribution to the originating tenant/WSD and shou
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Egress telemetry SHALL permit attribution to the originating tenant/WSD and should preserve useful source identity where operationally feasible.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-010, CT-064
 

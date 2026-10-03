@@ -1,7 +1,8 @@
 """Bind owned workload shapes and placements to a current capacity reservation."""
-from tools import capacity,readback_core as c
+from provisioner.execution import readback_core as c
+from tools import capacity
 import re
-from tools.run_files import current_window,load_private,require
+from provisioner.execution.run_files import current_window,load_private,require
 
 PLACEMENT={'nutanix':{'cluster_id','project_id','storage_container_id'},
            'vmware':{'resource_pool_id','datastore_id','storage_policy_id'},

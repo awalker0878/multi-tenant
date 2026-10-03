@@ -33,8 +33,8 @@ from provisioner.conformance import checks as conformance_checks
 from provisioner.domain.errors import ProvisioningError
 from provisioner.execution import manifest as plan_manifest
 from provisioner.execution.plan import create_plan
-from scripts import build_wsd_compositions
-from tools import compile_wsd
+from provisioner.compiler import components as native_components
+from provisioner.compiler import wsd as compile_wsd
 
 from tests.provisioning import support
 
@@ -252,7 +252,7 @@ class RealizationContractSurfaceTest(unittest.TestCase):
         for platform, contract in self.contracts.items():
             placement = contract['placement']
             self.assertEqual(placement['fields'], sorted(PLACEMENT_FIELDS[platform]), platform)
-            self.assertEqual(placement['authority'], 'tools.compile_wsd.PLACEMENT', platform)
+            self.assertEqual(placement['authority'], 'provisioner.compiler.wsd.PLACEMENT', platform)
             self.assertFalse(placement['provisioner_owned'], platform)
 
     def test_the_phase_surface_covers_every_reviewed_phase(self):
@@ -271,7 +271,7 @@ class RealizationContractSurfaceTest(unittest.TestCase):
 
     def test_the_readback_surface_delegates_to_the_compiler(self):
         for platform, contract in self.contracts.items():
-            self.assertEqual(contract['readback']['authority'], 'tools.compile_wsd.NETWORK',
+            self.assertEqual(contract['readback']['authority'], 'provisioner.compiler.wsd.NETWORK',
                              platform)
 
     def test_the_contract_is_serialisable_and_holds_no_timestamp(self):
@@ -682,7 +682,7 @@ class AdapterCompilerAgreementTest(unittest.TestCase):
                              frozenset(compiler().NETWORK[platform]), platform)
 
     def test_the_module_identities_are_the_reviewed_composition_roots(self):
-        roots = build_wsd_compositions.COMPONENTS
+        roots = native_components.COMPONENTS
         for platform in PLATFORMS:
             adapter = adapter_base.get(platform)
             self.assertEqual((adapter.domains_module, adapter.workloads_module),
@@ -774,7 +774,7 @@ class GenericCodeNeverBranchesOnAPlatformNameTest(unittest.TestCase):
         return found
 
     def test_the_existing_compiler_never_branches_on_a_platform_name(self):
-        self.assertEqual(self.literal_platform_branches(support.ROOT / 'tools' / 'compile_wsd.py'),
+        self.assertEqual(self.literal_platform_branches(support.ROOT / 'provisioner' / 'compiler' / 'wsd.py'),
                          [])
 
     def test_no_generic_provisioning_module_branches_on_a_platform_name(self):
@@ -786,7 +786,18 @@ class GenericCodeNeverBranchesOnAPlatformNameTest(unittest.TestCase):
             found = self.literal_platform_branches(path)
             if found:
                 offenders[path.relative_to(support.ROOT).as_posix()] = found
-        self.assertEqual(offenders, {})
+        # Existing native operator implementations moved from tools into their
+        # package owner. Pin their exact pre-existing branches; a new branch or
+        # any generic module still fails this guard.
+        self.assertEqual(offenders, {
+            'provisioner/execution/terraform_run.py': [
+                "platform == 'openstack'", "entry['platform'] == 'openstack'"],
+            'provisioner/execution/lifecycle_transition.py': [
+                "bundle['scope']['platform'] == 'openstack'",
+                "scope['platform'] == 'nutanix'", "scope['platform'] == 'nutanix'"],
+            'provisioner/execution/openstack_transition.py': [
+                "scope['platform'] == 'openstack'", "record['scope']['platform'] == 'openstack'"],
+        })
 
     def test_the_compiler_declares_the_workload_network_binding_as_data(self):
         table = compiler().WORKLOAD_NETWORK_BINDING

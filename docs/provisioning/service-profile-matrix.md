@@ -1,5 +1,26 @@
 # Supported service-profile matrix
 
+## Capability requirements and limitations
+
+Selected compute, storage, recovery and service profiles now declare their own
+mandatory workload capabilities, in addition to the network/security requirements.
+For example, boot/data storage, VM creation, DNS registration, identity join, time
+synchronization, log forwarding and backup/restore cannot be satisfied by a
+network-only qualification. The [platform registry](../engineering/platform-capability-registry.md)
+uses one complete, digest-bound vocabulary for all three platform families.
+
+Profile resolution retains the limitations of **every** selected profile, including
+compute, storage, assurance, placement, recovery and each service. The loader rejects
+malformed or duplicate capability lists, unknown IDs, ambiguous JSON properties
+and invalid profile metadata rather than coercing them. Unsupported/deferred
+profiles remain refused. A profile being resolvable means its policy can be
+expanded; it is not proof of native execution, entitlement or qualification.
+
+This revision changes the reviewed security/compute/storage catalogue and
+profile versions. Existing plans need reassessment and new approval; do not reuse
+an approval made against the previous catalogue digest. The regenerated examples
+remain synthetic, disabled and unauthorized.
+
 Every profile below is reviewed in `profiles/<family>/catalog.json`. Status
 `IMPLEMENTED_INTERNAL_IPV4_OZ_RZ` means a request in this repository may select it;
 `DEFERRED_NOT_IMPLEMENTED` means selection is refused with `UNSUPPORTED_PROFILE`.
@@ -32,15 +53,19 @@ Reviewed as catalog revision `4`.
 
 ## Security
 
-Reviewed as catalog revision `8`.
+Reviewed as catalog revision `15`.
 
 | Profile | Rank | Status | Service class | Version |
 | --- | --- | --- | --- | --- |
-| `internal-baseline` | 1 | implemented | `standard` | 1 |
-| `protected-b-medium` | 2 | implemented | `protected-b`, distributed firewall | 1 |
-| `protected-b-high` | 3 | implemented | `protected-b`, dedicated edge context, native load balancer | 1 |
+| `internal-baseline` | 1 | implemented | `standard` | 2 |
+| `protected-b-medium` | 2 | implemented | `protected-b`, distributed firewall | 2 |
+| `protected-b-high` | 3 | implemented | `protected-b`, dedicated edge context, native load balancer | 2 |
 
 All three declare `public_ingress: false` and `internet_egress: false`.
+They require independent routing context and enforced deny-default gateway policy;
+profiles selecting distributed firewalling additionally require enforced policy
+across every selected workload NIC. Monitor mode or a gateway-only firewall does
+not fulfill that obligation.
 
 ## Assurance
 
@@ -54,43 +79,49 @@ Reviewed as catalog revision `1`.
 
 ## Availability
 
-Reviewed as catalog revision `2`.
+Reviewed as catalog revision `18`.
 
 | Profile | Rank | Status | Zones | Version |
 | --- | --- | --- | --- | --- |
 | `single-zone` | 1 | implemented | `OZ` | 1 |
-| `high` | 2 | implemented | `OZ`, `RZ` | 1 |
-| `maximum` | 3 | **deferred** | `OZ`, `RZ`, `PAZ` — only OZ/RZ compositions exist | 1 |
+| `high` | 2 | implemented | `OZ`, `RZ` | 2 |
+| `maximum` | 3 | **deferred** | `OZ`, `RZ`, `PAZ` — only OZ/RZ compositions exist | 2 |
+
+These are security-zone compositions, not independent physical failure domains or
+HA guarantees. Workload counts are enforced against the selected compute profile.
+Native placement, restart capacity and recovery require separate qualification.
 
 ## Recovery
 
-Reviewed as catalog revision `7`.
+Reviewed as catalog revision `13`.
 
 | Profile | Rank | Status | Requires | Version |
 | --- | --- | --- | --- | --- |
-| `standard` | 1 | implemented | `RZ`, `backup` service | 1 |
-| `enhanced` | 2 | **deferred** | independent recovery site — no such inventory exists | 1 |
+| `standard` | 1 | implemented | `RZ`, `backup` service | 2 |
+| `enhanced` | 2 | **deferred** | independent recovery site — no such inventory exists | 2 |
 
 ## Compute
 
-Reviewed as catalog revision `3`.
+Reviewed as catalog revision `16`.
 
 | Profile | Rank | Status | Guest | Version |
 | --- | --- | --- | --- | --- |
-| `small` | 1 | implemented | 2 vCPU / 4 GiB / 40 GiB boot | 1 |
-| `medium` | 2 | implemented | 4 vCPU / 8 GiB / 60 GiB boot | 1 |
-| `large` | 3 | implemented | 8 vCPU / 16 GiB / 80 GiB boot | 1 |
-| `gpu` | 4 | **deferred** | no reviewed accelerator capacity or scheduling model | 1 |
+| `small` | 1 | implemented | 2 vCPU / 4 GiB / 40 GiB boot | 3 |
+| `medium` | 2 | implemented | 4 vCPU / 8 GiB / 60 GiB boot | 3 |
+| `large` | 3 | implemented | 8 vCPU / 16 GiB / 80 GiB boot | 3 |
+| `gpu` | 4 | **deferred** | no reviewed accelerator capacity or scheduling model | 3 |
+
+All compute profiles now explicitly require x86_64; GPU remains deferred.
 
 ## Storage
 
-Reviewed as catalog revision `10`.
+Reviewed as catalog revision `17`.
 
 | Profile | Rank | Status | Requires | Version |
 | --- | --- | --- | --- | --- |
-| `standard` | 1 | implemented | boot disk only | 1 |
-| `high-capacity` | 2 | implemented | boot disk plus a 100 GiB protected data volume | 1 |
-| `encrypted-high-capacity` | 3 | **deferred** | key custody and encryption qualification are not implemented | 1 |
+| `standard` | 1 | implemented | boot disk only | 2 |
+| `high-capacity` | 2 | implemented | boot disk plus a 100 GiB protected data volume | 2 |
+| `encrypted-high-capacity` | 3 | **deferred** | key custody and encryption qualification are not implemented | 3 |
 
 ## Network
 
@@ -116,19 +147,19 @@ A region profile is a filter over reviewed inventory, not a capacity promise.
 
 ## Service
 
-Reviewed as catalog revision `9`.
+Reviewed as catalog revision `14`.
 
 | Profile | Rank | Status | Required binding class | Version |
 | --- | --- | --- | --- | --- |
-| `dns/default` | 1 | implemented | `dns-internal` | 1 |
-| `dns/external-view` | 2 | **deferred** | `dns-external` — public name publication is out of scope | 1 |
-| `ntp/default` | 1 | implemented | `ntp-internal` | 1 |
-| `identity/enterprise` | 1 | implemented | `identity-directory` | 1 |
-| `identity/standalone` | 2 | **deferred** | `identity-standalone` — contradicts the reviewed identity boundary | 1 |
-| `logging/standard` | 1 | implemented | `logging-standard` | 1 |
-| `logging/protected-b` | 2 | implemented | `logging-protected` | 1 |
-| `backup/standard` | 1 | implemented | `backup-isolated` | 1 |
-| `backup/enhanced` | 2 | **deferred** | `backup-cross-site` — no independent recovery site | 1 |
+| `dns/default` | 1 | implemented | `dns-internal` | 2 |
+| `dns/external-view` | 2 | **deferred** | `dns-external` — public name publication is out of scope | 2 |
+| `ntp/default` | 1 | implemented | `ntp-internal` | 2 |
+| `identity/enterprise` | 1 | implemented | `identity-directory` | 2 |
+| `identity/standalone` | 2 | **deferred** | `identity-standalone` — contradicts the reviewed identity boundary | 2 |
+| `logging/standard` | 1 | implemented | `logging-standard` | 2 |
+| `logging/protected-b` | 2 | implemented | `logging-protected` | 2 |
+| `backup/standard` | 1 | implemented | `backup-isolated` | 2 |
+| `backup/enhanced` | 2 | **deferred** | `backup-cross-site` — no independent recovery site | 2 |
 
 In a request, services are named inside their family:
 

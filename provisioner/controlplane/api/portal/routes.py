@@ -178,6 +178,20 @@ def mount_portal(app: FastAPI, config: PortalConfig | None) -> None:
         return Response(_asset('app.js'), media_type='text/javascript; charset=utf-8',
                         headers=_headers(_ASSET_CSP))
 
+    @app.get('/portal/application_drafts.js', include_in_schema=False)
+    def application_draft_javascript(request: Request) -> Response:
+        if rejected := wrong_origin(request):
+            return rejected
+        return Response(_asset('application_drafts.js'), media_type='text/javascript; charset=utf-8',
+                        headers=_headers(_ASSET_CSP))
+
+    @app.get('/portal/application_comparison.js', include_in_schema=False)
+    def application_comparison_javascript(request: Request) -> Response:
+        if rejected := wrong_origin(request):
+            return rejected
+        return Response(_asset('application_comparison.js'), media_type='text/javascript; charset=utf-8',
+                        headers=_headers(_ASSET_CSP))
+
     @app.get('/portal/style.css', include_in_schema=False)
     def stylesheet(request: Request) -> Response:
         if rejected := wrong_origin(request):

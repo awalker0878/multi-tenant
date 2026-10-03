@@ -10,13 +10,13 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_platform_qualification as qualification
-from scripts import check_qualification_campaign_assurance as campaign
-from scripts import check_reservation_preflight as preflight
-from scripts import check_reservation_records as records
-from scripts import check_site_service_capacity as capacity
-from scripts import check_site_service_eligibility as sitecheck
-from scripts import check_version_source_provenance as provenance
+from provisioner.qualification import native as qualification
+from provisioner.qualification import campaign as campaign
+from provisioner.allocations import reservation_preflight as preflight
+from provisioner.allocations import reservation_evidence as records
+from provisioner.allocations import capacity_evidence as capacity
+from provisioner.allocations import site_eligibility as sitecheck
+from provisioner.qualification import provenance as provenance
 from tests.qualification_fixture_support import campaign_index, target_index
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -219,7 +219,7 @@ class ReservationRecordTests(unittest.TestCase):
 
     def test_current_cli_keeps_all_mutation_authority_false(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_reservation_records.py'),
+            sys.executable,'-m','provisioner.allocations.reservation_evidence',
             '--as-of','2026-09-18T18:00:00Z'],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)
@@ -337,7 +337,7 @@ class ReservationPreflightTests(unittest.TestCase):
 
     def test_cli_can_assert_current_expected_hold(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_reservation_preflight.py'),str(INTENT),
+            sys.executable,'-m','provisioner.allocations.reservation_preflight',str(INTENT),
             '--as-of','2026-09-18T18:00:00Z',
             '--expected-status',preflight.HOLD_ENVELOPE],
             capture_output=True,text=True,timeout=10)

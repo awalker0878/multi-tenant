@@ -5,7 +5,8 @@ import unittest
 from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_network_observe import manifest as pg_manifest, Client as GroupClient
 from tests.test_vsphere_observe import ref
-from tools import vsphere_port_observe as p, vsphere_network_observe as pg, readback_core as c
+from provisioner.execution import readback_core as c
+from tools import vsphere_port_observe as p, vsphere_network_observe as pg
 
 
 def manifest(origin='https://vc.example.test'):

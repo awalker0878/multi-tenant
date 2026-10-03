@@ -7,17 +7,16 @@ import copy
 import json
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-COMPONENTS = {
-    'nutanix': {'domains': 'nutanix-domain', 'workloads': 'nutanix-workload'},
-    'vmware': {'domains': 'nsx-domain', 'workloads': 'vsphere-workload'},
-    'openstack': {'domains': 'openstack-domain', 'workloads': 'openstack-workload'},
-}
+if __package__ in (None, ''):
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from hosting_resources import RESOURCE_ROOT as ROOT
+from provisioner.compiler import components
 
 
 def rendered(root=ROOT):
     files, entries = {}, []
-    for platform, phases in COMPONENTS.items():
+    for platform, phases in components.COMPONENTS.items():
         for phase, component in phases.items():
             primitive = root / 'terraform/modules' / component
             old_root = root / 'terraform/stacks/components' / component

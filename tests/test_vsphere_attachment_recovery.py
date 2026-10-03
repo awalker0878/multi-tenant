@@ -8,8 +8,9 @@ import unittest
 from tests import test_terraform_recovery_review as attempts, test_vsphere_port_observe as ports
 from tests.test_vsphere_network_replay import reseal
 from tests.test_nutanix_vm_observe import uid
-from tools import readback_core as c, terraform_recovery_review as review, vsphere_recovery_devices as devices
-from tools.run_files import encoded, load_private
+from provisioner.execution import readback_core as c
+from tools import terraform_recovery_review as review, vsphere_recovery_devices as devices
+from provisioner.execution.run_files import encoded, load_private
 
 
 class AttachmentRecoveryTests(unittest.TestCase):

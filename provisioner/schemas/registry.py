@@ -7,10 +7,9 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
+from importlib.resources import files
 
-ROOT = Path(__file__).resolve().parents[2]
-SCHEMA_ROOT = ROOT / 'provisioner' / 'schemas'
+SCHEMA_ROOT = files('provisioner.schemas')
 
 SCHEMAS = {
     'workload-security-domain': 'v1/workload-security-domain.schema.json',

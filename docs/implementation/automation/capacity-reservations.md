@@ -62,7 +62,7 @@ reconcile that incomplete owner record before enabling callers.
 Every mutation requires a current `hosting-capacity-authority/1` record with
 `request_sha256`, `action`, `native_ids_sha256`, `envelope_sha256`,
 `previous_receipt_sha256`, `valid_from`, `valid_until`, `change_ref` and
-`evidence_ref`. Object digests use `tools.readback_core.digest`. Native ID digests
+`evidence_ref`. Object digests use `provisioner.execution.readback_core.digest`. Native ID digests
 cover the sorted ID list, or `[]` for reserve/release. The previous receipt digest
 is JSON null for the initial reserve and the exact current receipt for a new
 confirmation or release. This comparison occurs inside the transaction.

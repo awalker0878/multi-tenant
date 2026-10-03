@@ -62,7 +62,7 @@ Unique allocation is the default. An overlap allocation is accepted by the recor
 Because the exported reservation/IPAM indexes are empty, the repository example remains held:
 
 ```sh
-python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD
+python -m provisioner.allocations.ipam_preflight examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD
 ```
 
 Every IPAM/DNS/apply/activation mutation flag remains false.

@@ -19,7 +19,7 @@ A workload SHALL NOT obtain direct public ingress by attaching its internal Secu
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A workload SHALL NOT obtain direct public ingress by attaching its internal Security Domain directly to a public network.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-006, CT-025
 
@@ -42,7 +42,7 @@ Public exposure SHALL be represented by an Exposure object with owner, protocol,
 
 **Artifact or required operating record:** Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Public exposure SHALL be represented by an Exposure object with owner, protocol, endpoint, certificate/DNS dependencies, logging, security profile, and lifecycle state.
 
-**Available related source:** [terraform/modules](../../../terraform/modules) · [tools/route_audit.py](../../../tools/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
+**Available related source:** [terraform/modules](../../../terraform/modules) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py) · [docs/NATIVE_READBACK.md](../../NATIVE_READBACK.md)
 
 **Verification:** Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure. Baseline procedures: CT-006, CT-063
 

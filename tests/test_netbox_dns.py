@@ -16,7 +16,7 @@ from tests import test_netbox_ipam as ipam_fixture
 from tests.test_dns_transactions import example
 from tools import dns_change as dns_writer, netbox_dns as handoff
 from tools.netbox_ipam import allocation_lock
-from tools.run_files import digest, encoded, load_private, replace_private, utcnow, write_new
+from provisioner.execution.run_files import digest, encoded, load_private, replace_private, utcnow, write_new
 
 
 class NetboxDNSTests(unittest.TestCase):
@@ -212,7 +212,7 @@ class NetboxDNSTests(unittest.TestCase):
         self.authority = dict(valid_from=(later - timedelta(minutes=1)).isoformat(),
                               valid_until=(later + timedelta(minutes=5)).isoformat())
         with patch.object(handoff, 'utcnow', return_value=later), \
-                patch('tools.run_files.utcnow', return_value=later):
+                patch('provisioner.execution.run_files.utcnow', return_value=later):
             result = self.run_dns('reconcile')
             self.assertEqual(result['status'], 'AUTHORITATIVE_REGISTRATION_OBSERVED')
             self.assertEqual(result['dns']['update_attempts'], 0)

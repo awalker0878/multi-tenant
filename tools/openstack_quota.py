@@ -13,9 +13,10 @@ from urllib.parse import urlsplit
 
 ROOT=Path(__file__).resolve().parents[1]
 if __package__ in (None,''): sys.path.insert(0,str(ROOT))
-from tools import execution_journal as journal, readback_core as c
-from tools.check_release import verify
-from tools.run_files import current_window,digest,encoded,load_private,private_path,read_private,require,utcnow,write_new
+from provisioner.execution import readback_core as c
+from tools import execution_journal as journal
+from provisioner.execution.source_integrity import verify
+from provisioner.execution.run_files import current_window,digest,encoded,load_private,private_path,read_private,require,utcnow,write_new
 
 PROFILES={
     'compute':('compute 2.79','quota_set','in_use',{'cores','instances','ram','server_groups','server_group_members'}),

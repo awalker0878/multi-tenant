@@ -1,7 +1,8 @@
 # Wave 2 operator guide: observed inventory and destination comparison
 
-Status: read-only repository implementation in progress. The production site
-ingestion and native qualification path is not deployed. See the
+Status: authenticated ingestion and read-only destination comparison are
+implemented in the repository, alongside the installed collector and revisioned
+application-draft API. Production deployment and site qualification remain open. See the
 [architecture and acceptance sequence](wave2-discovery-architecture.md).
 
 ## Read an authorized generation
@@ -45,12 +46,64 @@ authorized environment, including coverage and collection gaps. It clears
 stale rows if the selection changes or a page fails. No operator write
 endpoint admits a discovery campaign or accepts native rows.
 
+## Compare authorized destinations
+
+The portal's **Compare migration options** section uses the selected source's
+observed VM inventory. Select the workload, then a destination WSD and **Show
+destinations**. Add the latest observation for each candidate. The source and
+destination generation numbers remain pinned during comparison; changing scope
+or logging out clears stale selections and results. Supply the method, guest
+profile, network mode and data mode. Where capacity should be evaluated, select
+the observed capacity kind and exact native ID for that destination.
+
+The equivalent CLI command is:
+
+```text
+<approved SSO token source> | hosting-operator --api-url https://control.example.org --token-stdin assessments compare --source-environment source-01 --source-generation 7 --workload-native-id vm-01 --destination target-01 3 --destination target-02 4 --capacity target-01 pool pool-01 --method REBUILD_RESTORE --guest-profile linux --network-mode routed --data-mode backup-restore
+```
+
+Repeat `--destination ENVIRONMENT GENERATION` for 2–20 distinct destinations.
+The source cannot also be a destination; two declarations for the same native
+endpoint/scope cannot count as distinct candidates. `--capacity ENVIRONMENT KIND NATIVE_ID`
+is optional per destination; supported kinds are `pool`, `cluster`, `quota` and
+`datastore`. These values select observations; they do not assert qualification.
+
+The authenticated API is `POST /v1/assessments/compare`. Its request has no
+operator-supplied tuple claims, reviews, credentials or success flags:
+
+```json
+{
+  "source": {"environmentId": "source-01", "generation": 7},
+  "workloadNativeId": "vm-01",
+  "destinations": [
+    {"environmentId": "target-01", "generation": 3,
+     "capacityKind": "pool", "capacityNativeId": "pool-01"},
+    {"environmentId": "target-02", "generation": 4}
+  ],
+  "method": "REBUILD_RESTORE",
+  "guestProfile": "linux",
+  "networkMode": "routed",
+  "dataMode": "backup-restore"
+}
+```
+
+Each selected environment needs the same exact-scope read grant as inventory.
+Missing installation proof or scope access refuses the request without exposing
+foreign identities; unavailable assessment configuration returns
+`ASSESSMENT_UNAVAILABLE`. Configure the independently signed durable inputs in
+the [assessment evidence guide](../operations/assessment-evidence-ingest.md).
+Missing route or control evidence produces explicit unknowns. The response pins
+raw and normalized input digests and reports `executionAuthorized: false`.
+It also identifies a selected generation superseded by a newer observation.
+Historical pins remain unchanged; any newer source or destination generation,
+including partial or unknown coverage, withholds current eligibility with a
+snapshot-superseded reason. Refresh the selection and review the new inputs
+rather than carrying an earlier positive result forward.
+
 ## Interpret a destination assessment
 
-The assessment engine currently runs inside trusted service code; it is not
-exposed as a public API or CLI command. It compares at least two *distinct*
-installed destinations against one observed native VM in a deterministic
-order. Each directed route binds exact source and destination organization,
+The service compares installed destinations against one observed native VM in
+a deterministic order. Each directed route binds exact source and destination organization,
 tenant, site, WSD, endpoint, native scope, product tuple ID and digest, method,
 guest profile, network mode and data mode. Reverse direction and same-family
 site moves need their own route records. Source and target qualification
@@ -72,10 +125,34 @@ equivalence and recovery reviews tied to both generation digests. Estimated
 copy time, when measured size and throughput exist, has **low** confidence and
 describes only the arithmetic copy phase. It is not an outage estimate.
 
-An application grouping is an owner-reviewed proposal with attributed and
-unresolved dependencies, not accepted membership. A brownfield adoption
-proposal is a no-change review artifact; ownership collision or unknown
-facts hold it. Neither proposal writes a native object or adopts a VM.
+Application drafts are now stored as UNREVIEWED proposals with an authenticated
+author and explicit known/unknown dependencies. The asserted owner is not the
+verified author and saving does not accept membership. The separate reviewed-
+candidate path now consumes independently signed exact-draft owner decisions;
+operator status reads do not issue those decisions. Brownfield adoption
+remains a no-change review artifact; none of these drafts adopts or mutates a VM.
+
+## Save and read an application draft
+
+Use `PUT /v1/environments/{id}/application-drafts/{applicationGroupId}` with an
+exact-scope EXECUTION_OPERATOR grant, current inventory generation/result digest,
+`expectedRevision` (zero for a new draft), `draft` and `dependencies`. See the
+[complete request contract](../engineering/application-drafts.md) for the bounded
+member, dataset, consistency, startup and dependency fields. Duplicate/extra fields
+and caller-supplied approval or actor claims are rejected. The
+[operator CLI and bounded listing](../engineering/application-draft-operator.md)
+now provide save/load/history with explicit revision/source pins. The
+[browser workspace](../engineering/application-draft-browser.md) edits existing draft
+metadata/startup order; full browser creation and dependency editing remain open.
+
+Read latest draft state with GET on the same route, or select immutable history
+with `?revision=N`. JOB_READER and EXECUTION_OPERATOR may read within their exact
+native scopes. Editing appends a revision; it never overwrites history. A 409 means
+the expected revision or new-save source selection changed: review the new state
+rather than automatically retrying modified content. An exact lost-response retry
+can return the original, now-superseded source pin with `sourceSuperseded: true`.
+That flag does not assess source freshness or completeness. Every response remains
+UNREVIEWED, without accepted ownership or execution authorization.
 
 ## Site qualification still required
 
@@ -83,17 +160,20 @@ The current VMware REST reader covers only VMs visible in independently
 selected folders, with a 4,000-visible-VM list limit and no native cursor.
 Inherited privilege gaps can hide objects. The AHV adapter assumes a pinned
 Prism Central VMM v4.0 installed profile and exact cluster; the OpenStack
-adapter assumes pinned HTTPS Nova/Cinder/Neutron catalog roots and a
-project-scoped read role. These are bounded, injected GET transports and local
-conformance tests, not deployed native collectors or proof of coverage.
+adapter assumes pinned HTTPS Nova/Cinder/Neutron/Glance catalog roots and a
+project-scoped read role. All three now have actual bounded HTTPS clients and an
+[installed stage/publish command](../engineering/discovery-collector-runtime.md).
+Protocol/integration tests are not proof of deployed custody or complete coverage.
 
 Before publishing production observations, the site owner must select and
 qualify the actual installed API/product tuple, constrained read credential,
 endpoint routing, paging/permission coverage and an independent inventory
-reconciliation. A separately operated campaign issuer, signed authority,
-enrolled worker, mTLS/PKI, read-only Vault role and result provenance verifier
-must be wired to the dedicated PostgreSQL ingest role. The repository rejects
-ingest without that verifier and role. Owner/security teams must qualify
+reconciliation. Deploy the separate [discovery ingest service](../discovery-ingest.md)
+with its dedicated PostgreSQL role, pinned mTLS/PKI, independently signed issuer
+and collector enrollment, fresh native read-credential witness and durable
+signature custody. Its implemented verifier refuses missing or invalid inputs.
+The independent campaign/witness producers and native collector credential
+retrieval still require actual site integration and qualification. Owner/security teams must qualify
 policy translation, recovery, capacity and the selected route on actual
 source and destination sites. The proposed 50,000-workload/100-endpoint
 benchmark and p95 under two seconds remain unmeasured acceptance targets.
@@ -101,3 +181,43 @@ benchmark and p95 under two seconds remain unmeasured acceptance targets.
 Discovery is a way to investigate movement. Provisioning, transfer, source
 fencing, cutover and useful-service verification remain later implementation
 and release gates.
+
+
+## Read independently signed owner-review status
+
+Use `hosting-operator ... application-drafts review --environment ENV --id APP
+--revision N` with an explicit immutable revision. Optionally supply `--record-digest`
+from a previous draft GET. The placeholders and ellipsis are explanatory; see the
+[complete command](../engineering/application-owner-review.md#inspect-the-review-from-the-operator-cli)
+for a runnable command structure and SSO/CA requirements.
+
+The command retrieves the current server evaluation for that exact draft: no
+review, explicit revocation, held historical/incomplete/stale source, or an assessment-
+only candidate with any unknown dependencies retained. Exit 0 means the response
+passed validation, not that it is eligible for migration. The timestamped response
+is not cached approval. Missing or invalid live evidence does not fall back to an
+older acceptance. Signing decisions, native ownership and mutation grants remain
+outside this command, and the draft itself remains UNREVIEWED.
+
+## Reviewed application-wide comparison
+
+The [application comparison endpoint](../engineering/application-comparison.md)
+now evaluates all members of an exact independently reviewed draft against multiple
+authorized destinations. It retains per-member route/profile issues and compares
+combined instance/CPU/memory/logical-disk demand with one selected capacity identity.
+Unreviewed/partial/superseded application input holds; missing or changed evidence
+cannot become eligibility. It does not reserve resources or authorize provisioning.
+The API is implemented; a guided application-wide browser/CLI comparison is not yet
+provided. Wave 2 remains open for the documented visibility, fact, review and
+scheduling work before the Wave 3 execution handoff can be considered complete.
+
+## Compare a reviewed application through the CLI
+
+The installed `hosting-operator assessments compare-application` command now
+accepts exact draft/source references, repeated member-profile selections and
+2–20 distinct destinations within the 200-combination bound. It consumes the
+existing application API, not a local assessment or mutation owner. Use the
+[full command and response contract](../engineering/application-comparison-operator.md)
+for selectors, interpretation version 2, unknowns, limits and exit codes.
+A valid report may still be held or blocked; exit zero never approves a migration.
+The browser application-comparison workflow and the remaining Wave 2 gates stay open.

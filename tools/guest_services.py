@@ -6,7 +6,7 @@ import re
 import ssl
 import struct
 
-from tools.run_files import digest, read_private, require
+from provisioner.execution.run_files import digest, read_private, require
 
 PROFILE = 'ubuntu-24.04-services-v1'
 ASSETS = {'log_ca', 'log_certificate', 'log_key'}

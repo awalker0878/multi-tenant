@@ -13,15 +13,36 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
 from provisioner.repository import ASSET_ROOT, asset_path
-from tools.check_release import verify
-from tools.compile_wsd import identity
+from provisioner.execution.source_integrity import verify
+from provisioner.compiler.wsd import identity
 from tools.guest_inventory import build, gate
 from tools.guest_services import PROFILE, verify_assets
-from tools.run_files import (digest, encoded, file_map, load_private, new_directory,
+from provisioner.execution.run_files import (digest, encoded, file_map, load_private, new_directory,
     private_path, read_private, require, utcnow, write_new)
-from tools.wsd_handoff import execution_outputs
+from provisioner.execution.wsd_handoff import execution_outputs
 
 PLAYBOOK = 'ansible/playbooks/native/configure_linux.yml'
+# The controller snapshot owns the pure guest gate's entire package import
+# closure. Copy source markers so hosting_resources selects this sealed root,
+# never an installed distribution or the preparing checkout.
+GUEST_PACKAGE_SOURCE = (
+    '.hosting-root', 'pyproject.toml', 'hosting_resources/__init__.py',
+    'provisioner/__init__.py', 'provisioner/domain/__init__.py',
+    'provisioner/domain/errors.py', 'provisioner/compiler/__init__.py',
+    'provisioner/compiler/wsd.py', 'provisioner/compiler/components.py',
+    'provisioner/execution/__init__.py', 'provisioner/execution/readback_core.py',
+    'provisioner/execution/neutron_observe.py', 'provisioner/execution/run_files.py',
+    'provisioner/execution/route_record_review.py', 'provisioner/execution/input_review.py',
+    'provisioner/execution/route_audit.py',
+    'provisioner/execution/flow_policy.py',
+    'provisioner/execution/lifecycle_transition.py',
+    'provisioner/execution/openstack_transition.py',
+    'provisioner/execution/plan_review.py',
+    'provisioner/execution/terraform_apply.py',
+    'provisioner/execution/terraform_run.py',
+    'provisioner/execution/wsd_handoff.py',
+
+)
 REFERENCES = {'target_binding_ref', 'bootstrap_ref', 'writer_coordination_ref', 'runtime_ref', 'recovery_ref'}
 RUNTIME_INSPECT = r'''
 import hashlib, importlib, importlib.metadata, json, pathlib, sys
@@ -72,9 +93,9 @@ def source_paths(root):
     def reviewed(name):
         return asset_path(name) if root == ROOT else root / name
 
-    paths = [reviewed(PLAYBOOK), root / 'scripts/__init__.py', root / 'scripts/build_wsd_compositions.py',
-             reviewed('ansible/filter_plugins/guest_filters.py'),
+    paths = [reviewed(PLAYBOOK), reviewed('ansible/filter_plugins/guest_filters.py'),
              reviewed('ansible/callback_plugins/hosting_guest_result.py')]
+    paths += [root / name for name in GUEST_PACKAGE_SOURCE]
     paths += list((root / 'tools').glob('*.py'))
     for role in ('linux_guest_baseline', 'linux_guest_services', 'linux_guest_backup'):
         tasks = reviewed(f'ansible/roles/{role}/tasks/main.yml')

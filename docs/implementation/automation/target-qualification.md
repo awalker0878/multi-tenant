@@ -2,7 +2,7 @@
 
 `tools/qualify_target.py` runs the existing exact-ID native observers before and
 after a bounded guest traffic campaign. It uses real HTTPS and certificate SSH.
-It ships `tools/guest_probe.py` unchanged as a fixed read-only script over that
+It ships `provisioner/execution/guest_probe.py` unchanged as a fixed read-only script over that
 SSH session; the probe needs no remote installation and returns only the bounded
 observations the campaign records. It neither changes native configuration nor
 marks a platform/site qualified.

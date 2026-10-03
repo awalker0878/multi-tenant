@@ -26,7 +26,8 @@ class Element {
   }
   replaceChildren(...children) {
     this.children = children;
-    if (['approval-role', 'wsd-selector', 'discovery-environment'].includes(this.name)) {
+    if (['approval-role', 'wsd-selector', 'discovery-environment', 'comparison-workload',
+      'destination-wsd', 'destination-environment'].includes(this.name)) {
       this.value = children[0]?.value ?? '';
     }
   }
@@ -63,7 +64,7 @@ function deferred() {
 }
 
 async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = digest,
-  exchange, scopes, environments, discovery, observedObjects } = {}) {
+  exchange, scopes, environments, discovery, observedObjects, comparison } = {}) {
   const elements = new Map();
   const element = (id) => {
     if (!elements.has(id)) elements.set(id, new Element(id));
@@ -73,6 +74,7 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
   element('plan-id').value = 'plan-01';
   const popups = [];
   const approvalRequests = [];
+  const comparisonRequests = [];
   const window = {
     location: { origin },
     listeners: {},
@@ -96,6 +98,11 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
     });
     if (url === '/portal/token') return exchange ? exchange() : json({ access_token: 'opaque', token_type: 'Bearer' });
     if (url === '/v1/access/scopes') return scopes ? scopes() : json({ items: [] });
+    if (url === '/v1/assessments/compare') {
+      const body = JSON.parse(options.body);
+      comparisonRequests.push(body);
+      return comparison ? comparison(body) : json(comparisonResponse(body));
+    }
     if (url.startsWith('/v1/environments?')) return environments ? environments(url) : json({ items: [], nextAfter: null });
     if (url.match(/^\/v1\/environments\/[^/]+\/discovery\/generations\/latest$/)) {
       return discovery ? discovery(url) : json({ error: {} }, 404);
@@ -135,7 +142,7 @@ async function harness({ stepUpAcr = 'urn:enterprise:mfa', receiptDigest = diges
     await finish();
     return params;
   }
-  return { context, element, authenticate, beginAuth, approvalRequests, json };
+  return { context, element, authenticate, beginAuth, approvalRequests, comparisonRequests, json };
 }
 
 test('approval requires configured step-up and fresh exact plan review', async () => {
@@ -414,4 +421,276 @@ test('late object page cannot repopulate rows after token clearance', async () =
   await loading;
   assert.equal(element('discovery-rows').children.length, 0);
   assert.equal(element('discovery-details').hidden, true);
+});
+
+function comparisonResponse(body) {
+  const input = (selection) => ({ ...selection,
+    endpointId: 'endpoint-' + selection.environmentId,
+    nativeScopeId: 'scope-' + selection.environmentId, platformFamily: 'vmware',
+    productTupleId: 'reviewed-tuple', productTupleDigest: digest, observation: null,
+    superseded: false, latestObservation: { generation: selection.generation,
+      rawSnapshotDigest: digest, capturedAt: '2026-09-28T11:00:00Z',
+      collectionCompleteness: 'COMPLETE', collectionErrors: [], missingPrivileges: [] } });
+  const sourceInput = input(body.source);
+  const destinationInputs = body.destinations.map(input);
+  return { format: 'hosting-discovery-comparison/1', executionAuthorized: false,
+    assessedAt: '2026-09-28T12:00:00Z', sourceInput, destinationInputs,
+    assessments: destinationInputs.map((destination, index) => ({
+      format: 'hosting-destination-assessment/1', executionAuthorized: false,
+      source: sourceInput, destination,
+      workload: { endpointId: sourceInput.endpointId, nativeScopeId: sourceInput.nativeScopeId,
+        platformFamily: sourceInput.platformFamily, nativeId: body.workloadNativeId, resourceKind: 'vm' },
+      method: body.method, guestProfile: body.guestProfile, networkMode: body.networkMode,
+      dataMode: body.dataMode, routeMaturity: 'NOT_QUALIFIED',
+      status: index === 0 ? 'UNKNOWN' : 'BLOCKED',
+      issues: [{ severity: index === 0 ? 'UNKNOWN' : 'BLOCKER', code: 'MISSING_EVIDENCE',
+        reason: '<img src=x onerror=alert(1)> Missing observed capacity',
+        remediation: 'Collect current capacity facts and verify the destination.' }],
+      estimate: { transferBytes: null, copyPhaseSeconds: null, confidence: 'NONE',
+        basis: ['Current throughput is unknown.'] }
+    })) };
+}
+
+async function comparisonHarness(options = {}) {
+  let json;
+  const target = await harness({
+    scopes: () => json({ items: [{ kind: 'NATIVE', role: 'JOB_READER', securityDomainId: 'wsd-01' },
+      { kind: 'NATIVE', role: 'JOB_READER', securityDomainId: 'wsd-02' }] }),
+    environments: (url) => json({ items: url.includes('wsdId=wsd-02')
+      ? [environment('environment-02'), environment('environment-03')].map((item) => ({
+        ...item, securityDomainId: 'wsd-02', displayName: item.environmentId === 'environment-02'
+          ? '<script>destination</script>' : 'Recovery environment' }))
+      : [environment()], nextAfter: null }),
+    discovery: (url) => {
+      if (options.discovery) return options.discovery(url, json);
+      const id = url.split('/')[3];
+      return json({ ...generation(id), generation: id === 'environment-03' ? 9 : 7 });
+    },
+    observedObjects: () => json({ environmentId: 'environment-01', generation: 7,
+      items: [{ resourceKind: 'vm', nativeId: 'folder/vm:101', displayName: 'Existing VM',
+        unknownCount: 2, objectDigest: digest },
+      { resourceKind: 'network', nativeId: 'network-01', displayName: 'Network',
+        unknownCount: 0, objectDigest: digest }], nextAfter: null }),
+    comparison: options.comparison
+  });
+  json = target.json;
+  const { context, element, authenticate } = target;
+  await authenticate(false);
+  element('environment-wsd').value = 'wsd-01';
+  await context.loadEnvironments(true);
+  element('discovery-environment').value = 'environment-01';
+  await context.loadDiscovery();
+  element('comparison-workload').value = 'folder/vm:101';
+  element('comparison-method').value = 'COLD_VM_CONVERSION';
+  element('comparison-guest').value = 'linux-uefi';
+  element('comparison-network').value = 'renumber';
+  element('comparison-data').value = 'image-copy';
+  element('destination-wsd').value = 'wsd-02';
+  await context.loadDestinationEnvironments(true);
+  if (!options.deferDestinations) {
+    for (const id of ['environment-02', 'environment-03']) {
+      element('destination-environment').value = id;
+      await context.addDestination();
+    }
+  }
+  return target;
+}
+
+function descendantText(element) {
+  return [element.textContent || '', ...(element.children || []).map(descendantText)].join(' ');
+}
+
+test('comparison selects observed VM, pins two destination generations, and renders unknowns safely', async () => {
+  const { context, element, comparisonRequests } = await comparisonHarness();
+  assert.equal(element('comparison-workload').children.length, 2);
+  assert.equal(element('destination-rows').children.length, 2);
+  assert.equal(element('compare-destinations').disabled, false);
+  await context.compareDestinations();
+  assert.deepEqual(comparisonRequests[0], {
+    source: { environmentId: 'environment-01', generation: 7 }, workloadNativeId: 'folder/vm:101',
+    destinations: [{ environmentId: 'environment-02', generation: 7 },
+      { environmentId: 'environment-03', generation: 9 }], method: 'COLD_VM_CONVERSION',
+    guestProfile: 'linux-uefi', networkMode: 'renumber', dataMode: 'image-copy'
+  });
+  const cards = element('comparison-results');
+  assert.equal(cards.hidden, false);
+  assert.equal(cards.children.length, 2);
+  assert.equal(cards.children[0].children[0].textContent, '<script>destination</script> · environment-02');
+  assert.match(descendantText(cards), /UNKNOWN · assessment only/);
+  assert.match(descendantText(cards), /BLOCKED · assessment only/);
+  assert.match(descendantText(cards), /<img src=x onerror=alert\(1\)>/);
+  assert.match(descendantText(cards), /Next: Collect current capacity/);
+  assert.match(descendantText(cards), /Copy phase estimate: Unknown/);
+  assert.match(element('comparison-status').textContent, /Execution is not authorized/);
+  assert.ok(!script.includes('innerHTML'));
+});
+
+test('capacity selectors map exact identity and any edit clears old comparison', async () => {
+  const { context, element, comparisonRequests } = await comparisonHarness();
+  const fields = element('destination-rows').children[0].children[2].children[0].children;
+  const kind = fields[0].children[0];
+  const native = fields[1].children[0];
+  kind.value = 'cluster';
+  kind.listeners.change();
+  await context.compareDestinations();
+  assert.equal(comparisonRequests.length, 0);
+  assert.match(element('comparison-status').textContent, /require both/);
+  native.value = 'cluster/path:02';
+  native.listeners.input();
+  await context.compareDestinations();
+  assert.equal(comparisonRequests[0].destinations[0].capacityKind, 'cluster');
+  assert.equal(comparisonRequests[0].destinations[0].capacityNativeId, 'cluster/path:02');
+  assert.equal(element('comparison-results').hidden, false);
+  native.value = 'cluster/path:03';
+  native.listeners.input();
+  assert.equal(element('comparison-results').hidden, true);
+  assert.equal(element('comparison-results').children.length, 0);
+});
+
+test('fabricated VM selection and fewer than two destinations never invoke assessment', async () => {
+  const { context, element, comparisonRequests } = await comparisonHarness();
+  element('comparison-workload').value = 'never-observed';
+  await context.compareDestinations();
+  assert.equal(comparisonRequests.length, 0);
+  element('comparison-workload').value = 'folder/vm:101';
+  element('destination-rows').children[0].children[3].children[0].listeners.click();
+  await context.compareDestinations();
+  assert.equal(comparisonRequests.length, 0);
+  assert.equal(element('compare-destinations').disabled, true);
+});
+
+test('late comparison cannot restore results after logout, source or route selection change', async () => {
+  for (const change of ['logout', 'source', 'route', 'workload', 'destination']) {
+    const waiting = deferred();
+    const { context, element, comparisonRequests, json } = await comparisonHarness({ comparison: () => waiting.promise });
+    const reading = context.compareDestinations();
+    await new Promise(setImmediate);
+    if (change === 'logout') context.clearSession();
+    if (change === 'source') context.clearDiscovery();
+    if (change === 'route') {
+      element('comparison-guest').value = 'windows-uefi';
+      element('comparison-guest').listeners.input();
+    }
+    if (change === 'workload') element('comparison-workload').listeners.change();
+    if (change === 'destination') element('destination-environment').listeners.change();
+    waiting.resolve(json(comparisonResponse(comparisonRequests[0])));
+    await reading;
+    assert.equal(element('comparison-results').hidden, true, change);
+    assert.equal(element('comparison-results').children.length, 0, change);
+    if (change === 'logout') {
+      assert.equal(element('destination-rows').children.length, 0);
+      assert.equal(element('comparison-workload').disabled, true);
+      assert.equal(element('destination-wsd').disabled, true);
+    }
+  }
+});
+
+test('mismatched generations, wrong workload and approval claims refuse the entire comparison', async () => {
+  for (const mutate of [
+    (response) => { response.destinationInputs[1].generation++; },
+    (response) => { response.assessments[0].workload.nativeId = 'another-vm'; },
+    (response) => { response.assessments[0].executionAuthorized = true; },
+    (response) => { response.executionAuthorized = true; },
+    (response) => { response.assessments[0].status = 'SUCCEEDED'; },
+    (response) => { delete response.sourceInput.latestObservation; },
+    (response) => { response.sourceInput.latestObservation.generation++; },
+    (response) => { response.destinationInputs[0].superseded = true; },
+    (response) => {
+      response.sourceInput.latestObservation.generation++;
+      response.sourceInput.superseded = true;
+      response.assessments[0].status = 'ELIGIBLE';
+    }
+  ]) {
+    let json;
+    const target = await comparisonHarness({ comparison: (body) => {
+      const response = comparisonResponse(body);
+      mutate(response);
+      return json(response);
+    } });
+    json = target.json;
+    await target.context.compareDestinations();
+    assert.equal(target.element('comparison-results').hidden, true);
+    assert.equal(target.element('comparison-results').children.length, 0);
+    assert.match(target.element('comparison-status').textContent, /does not match|differs/);
+  }
+});
+
+test('superseded pins show historical generation and latest collection uncertainty', async () => {
+  let json;
+  const target = await comparisonHarness({ comparison: (body) => {
+    const response = comparisonResponse(body);
+    response.sourceInput.superseded = true;
+    response.sourceInput.latestObservation.generation++;
+    response.sourceInput.latestObservation.collectionCompleteness = 'PARTIAL';
+    response.sourceInput.latestObservation.missingPrivileges = ['inventory.read'];
+    for (const assessment of response.assessments) {
+      assessment.status = 'UNKNOWN';
+      assessment.issues.push({ severity: 'UNKNOWN', code: 'SOURCE_SNAPSHOT_SUPERSEDED',
+        reason: 'A newer partial observation exists.',
+        remediation: 'Load the latest generation and resolve missing privileges.' });
+    }
+    return json(response);
+  } });
+  json = target.json;
+  await target.context.compareDestinations();
+  assert.equal(target.element('comparison-results').hidden, false);
+  const text = descendantText(target.element('comparison-results'));
+  assert.match(text, /Source: pinned generation 7; latest observed generation 8 \(PARTIAL\)/);
+  assert.match(text, /Historical pin; current eligibility unknown/);
+  assert.match(text, /SOURCE_SNAPSHOT_SUPERSEDED/);
+  assert.match(text, /Load the latest generation and resolve missing privileges/);
+});
+
+test('late destination generation cannot repopulate selections after source change', async () => {
+  const waiting = deferred();
+  let requested = false;
+  const target = await comparisonHarness({ deferDestinations: true,
+    discovery: (url, json) => {
+      if (url.includes('environment-02')) {
+        requested = true;
+        return waiting.promise;
+      }
+      return json(generation());
+    } });
+  assert.equal(target.element('comparison-workload').disabled, false);
+  target.element('destination-environment').value = 'environment-02';
+  const adding = target.context.addDestination();
+  assert.equal(requested, true);
+  target.context.clearDiscovery();
+  waiting.resolve(target.json(generation('environment-02')));
+  await adding;
+  assert.equal(target.element('destination-rows').children.length, 0);
+});
+
+test('unavailable verified provider leaves no old comparison visible', async () => {
+  let response;
+  let json;
+  const target = await comparisonHarness({ comparison: (body) =>
+    response || json(comparisonResponse(body)) });
+  json = target.json;
+  await target.context.compareDestinations();
+  assert.equal(target.element('comparison-results').hidden, false);
+  response = json({ error: { code: 'ASSESSMENT_UNAVAILABLE' } }, 503);
+  await target.context.compareDestinations();
+  assert.equal(target.element('comparison-results').hidden, true);
+  assert.match(target.element('comparison-status').textContent, /Verified assessment inputs are unavailable/);
+});
+
+test('conditional and eligible assessment results never become execution approval', async () => {
+  let json;
+  const target = await comparisonHarness({ comparison: (body) => {
+    const response = comparisonResponse(body);
+    response.assessments[0].status = 'CONDITIONAL';
+    response.assessments[0].issues[0].severity = 'CONDITION';
+    response.assessments[1].status = 'ELIGIBLE';
+    response.assessments[1].issues = [];
+    return json(response);
+  } });
+  json = target.json;
+  await target.context.compareDestinations();
+  const text = descendantText(target.element('comparison-results'));
+  assert.match(text, /CONDITIONAL · assessment only/);
+  assert.match(text, /ELIGIBLE · assessment only/);
+  assert.match(target.element('comparison-status').textContent, /Execution is not authorized/);
+  assert.equal(target.approvalRequests.length, 0);
 });

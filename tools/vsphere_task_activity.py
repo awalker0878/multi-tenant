@@ -1,6 +1,7 @@
 """Check visible task activity on exact VMs; observation is never a writer fence."""
-from tools import readback_core as c, vsphere_observe as vm, vsphere_task_observe as task
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import vsphere_observe as vm, vsphere_task_observe as task
+from provisioner.execution.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-vm-task-activity'
 CLONE_PROFILE = 'vsphere-vi-json-8.0.3.0-clone-task-activity'

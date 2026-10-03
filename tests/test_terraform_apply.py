@@ -6,9 +6,9 @@ import unittest
 from unittest.mock import patch
 
 from test_terraform_run import TerraformRunFixture
-from tools import terraform_apply as apply
-from tools.compile_wsd import STATE
-from tools.run_files import digest, encoded, load_private, read_private, utcnow, write_new
+from provisioner.execution import terraform_apply as apply
+from provisioner.compiler.wsd import STATE
+from provisioner.execution.run_files import digest, encoded, load_private, read_private, utcnow, write_new
 
 
 class TerraformApplyTests(TerraformRunFixture, unittest.TestCase):

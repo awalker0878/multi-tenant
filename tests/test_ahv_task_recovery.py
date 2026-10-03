@@ -13,9 +13,10 @@ from tests.test_flow_campaign import inputs
 from tests.test_target_campaign import window
 from tests import test_nutanix_vm_activity as activity_fixture
 from tools import nutanix_vm_task_observe as ahv, nutanix_flow_observe as flow
-from tools import nutanix_task_tree as tree, readback_core as c, recovery_review as rr, qualify_target as q
+from provisioner.execution import readback_core as c
+from tools import nutanix_task_tree as tree, recovery_review as rr, qualify_target as q
 from tools.guest_inventory import build
-from tools.run_files import digest, encoded, write_new
+from provisioner.execution.run_files import digest, encoded, write_new
 
 
 class RecoveryTests(unittest.TestCase):

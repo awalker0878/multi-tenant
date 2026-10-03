@@ -19,7 +19,7 @@ Default OpenStack security-group behaviour SHALL be reviewed and normalized to t
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Default OpenStack security-group behaviour SHALL be reviewed and normalized to the secure-by-default service baseline.
 
-**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [tools/neutron_observe.py](../../../tools/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [provisioner/execution/neutron_observe.py](../../../provisioner/execution/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-005, CT-021, CT-066
 
@@ -42,7 +42,7 @@ Provider networks and external-router capabilities SHALL remain provider control
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Provider networks and external-router capabilities SHALL remain provider controlled and SHALL not become unrestricted tenant escape paths.
 
-**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [tools/neutron_observe.py](../../../tools/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [provisioner/execution/neutron_observe.py](../../../provisioner/execution/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-019, CT-022, CT-023
 
@@ -65,7 +65,7 @@ The OpenStack profile SHALL record distribution, service/API versions, Neutron b
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations; native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.
 
-**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [tools/neutron_observe.py](../../../tools/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [provisioner/execution/neutron_observe.py](../../../provisioner/execution/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-015, CT-018, CT-022, CT-080
 
@@ -83,7 +83,7 @@ The OpenStack profile SHALL record distribution, service/API versions, Neutron b
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations
 
-**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [tools/neutron_observe.py](../../../tools/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [provisioner/execution/neutron_observe.py](../../../provisioner/execution/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-015, CT-018, CT-022, CT-080
 
@@ -101,7 +101,7 @@ The OpenStack profile SHALL record distribution, service/API versions, Neutron b
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.
 
-**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [tools/neutron_observe.py](../../../tools/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/openstack-domain](../../../terraform/modules/openstack-domain) · [provisioner/execution/neutron_observe.py](../../../provisioner/execution/neutron_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-015, CT-018, CT-022, CT-080
 

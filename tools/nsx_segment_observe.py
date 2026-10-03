@@ -5,9 +5,10 @@ import re
 import sys
 from urllib.parse import urlencode
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, nsx_observe as nsx
+from provisioner.execution import readback_core as c
+from tools import nsx_observe as nsx
 from tools.nutanix_vm_observe import uuid
-from tools.run_files import require
+from provisioner.execution.run_files import require
 
 PROFILE = 'nsx-local-policy-v1-segment-switches'
 FIELDS = {'resource_type', 'entity_type', 'id', 'path', '_revision', 'intent_reference',

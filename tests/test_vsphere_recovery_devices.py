@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 from tests import test_terraform_recovery_review as attempts
 from tools import terraform_recovery_review as r
-from tools.run_files import load_private
+from provisioner.execution.run_files import load_private
 
 
 class DiskBindingTests(unittest.TestCase):

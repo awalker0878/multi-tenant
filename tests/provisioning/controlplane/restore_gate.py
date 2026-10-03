@@ -24,7 +24,8 @@ from tests.provisioning.schema.test_enterprise_records import SOURCE, binding, w
 
 REQUIRED_TABLES = (
     'enterprise_records', 'enterprise_record_history', 'audit_events',
-    'native_ownership', 'schema_migrations',
+    'native_ownership', 'schema_migrations', 'application_draft_revisions', 'assessment_inputs',
+    'discovery_freshness_checks',
 )
 
 

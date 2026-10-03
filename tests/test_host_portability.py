@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'scripts'))
 
 from scripts.catalog_artifacts import collect
-from tools.terraform_catalog import entries
+from provisioner.execution.terraform_catalog import entries
 
 
 def relative_paths(value):

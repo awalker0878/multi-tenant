@@ -1,7 +1,7 @@
 """Existing session injection preserves the bounded, GET-only transport."""
 import unittest
 from lab.native_readback_fixture import Fixture
-from tools import readback_core as c
+from provisioner.execution import readback_core as c
 
 
 class SessionTransportTests(unittest.TestCase):

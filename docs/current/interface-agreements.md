@@ -1,24 +1,244 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.1 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.38 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
-Per-interface working design obligations across independently governed infrastructure.
+Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.
 
 This is a newly authored maintained Markdown record, not a reconstruction of an unavailable Word original. Its creation date is not an acceptance date. Source basis: [RA §8](../architecture/reference/8-zone-interfaces-routing-and-security-edge-topology.md) · [NBD §6](../engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md) · [SVC §1](../architecture/shared-services/1-shared-service-placement-and-consumption-boundaries.md).
 
 ## Design content
 
-For each interface identify producer, actual client, native endpoint, permitted operation, address family, trust material, resource entitlement, initiation/reply path, MTU/packet budget, capacity and security boundary. Record data-path and management-path ownership separately. A shared endpoint does not authorize a tenant to administer its backing service.
+Every agreement identifies producer, actual client, native endpoint, permitted
+operation, address family, trust material, entitlement, initiation/reply path, MTU,
+capacity and security boundary. Separate data and management ownership. Define
+feature/version compatibility, backpressure, finite retries, attribution, key expiry,
+recovery order, observer independence and release/retention terms. Shared service
+consumption never grants administration of the provider.
 
-The agreement identifies version/feature compatibility, failure detection, retry/backpressure, log attribution, identity/key expiry and recovery order. Define who can change a next hop, firewall scope, service credential or data object, and which observer can independently verify it.
+### Control-application interfaces
 
-Use a bounded allocation and lifecycle reference across owners rather than credentials or large state dumps. Include expected generation, operation identity and safe stopping conditions for partial success. Name release/retention conditions before reusing an address, attachment, service identity or data copy.
+| Boundary | Required binding and hold condition |
+|---|---|
+| Operator -> API | Verified tenant entitlement, immutable request/plan revision, applicable approval and live revocation. Client parameters are not authority. |
+| API -> workflow | Committed job, transactional outbox, exact workflow/run and idempotency identity. Dispatch/gate success is not native completion. |
+| Collector -> ingest | Separate enrolled read identity, signed campaign/result, independent credential witness, exact scope and original-byte custody before publication. |
+| Worker -> native owner | Approved action/resource, bounded grant, claim and durable intent; uncertain completion prevents blind retry. |
+| Native owner -> observer | Exact resource/task/attempt identity and independently observed complete postconditions; echoed requests do not qualify. |
+| Source -> transfer worker | Original repository/snapshot/dataset receipt, separate target/root binding, integrity/metadata policy and consistency-group membership. |
+| Workload -> service owner | Scoped endpoint/operation, entitlement, reply path and accepted service outcome, not provider privileges. |
+| Evidence -> custodian | Original signature/digest/scope/issuer/validity/retention; synthetic tests cannot become site observations. |
+
+These are obligations, not a claim of a fully wired mutation graph. The admitted
+workflow stops at its authority gate; target/root and transfer-worker authority
+composition remain open. A bounded allocation/lifecycle reference replaces credential
+or state dumps. Record expected generation, operation identity and partial-success
+stopping conditions before reusing any address, attachment, identity or data copy.
+
+### Versioned profile and capability interfaces
+
+The registry explicitly covers 97 IDs with one digest. Typed property requirements
+have exactly `property`, `operator`, `value`, and a required capability owner; integers
+exclude booleans. Resolution 3 and policy capsule/realization 2 bind interpretation.
+Normalizer 2 and signed findings bind both raw and normalized snapshots; old or changed
+interpretations require new review. Comparisons never set execution authorization.
+Ten catalog families now use a single typed requirement owner. Required fields,
+booleans, integer bounds, relationships and selectors are checked before resolution.
+Assurance recovery, workload-count and recovery-zone obligations are enforced once;
+independent-site recovery is refused without an implemented composition.
+
+Availability catalog 18 and revised profile entries remove a false equivalence between
+security zones and failure domains. Changing catalog identity requires regenerated
+examples and fresh plan approval; no HA, public ingress or native support is implied.
+A caller provides requirements, not installed support assertions. Support needs an
+exact current tuple and independently qualified directed method.
+
+### Native collection contracts
+
+VMware requires `vcenter-rest-vm-info-8.0.3.0-visible-only-2`; AHV requires
+`nutanix-ahv-v4.0-hardware-2`; OpenStack requires `openstack-project-https-4`, including the signed Glance endpoint for VM-referenced images. Glance custom properties are retained as strings; driver/security metadata is observation only and must be reconciled with the selected compute tuple and guest before qualification.
+Old selectors are not aliases. Native material, campaign root/issuer/collector keys
+and independent read-only witnesses have distinct custody. Pinned endpoints/IP/CA,
+service identity, validity, API profile, route/response budgets and live rechecks are
+mandatory. Returned links and metadata cannot provide new authority or destinations.
+Visible and empty native scans remain partial; failed/rotated/revoked reads cannot
+publish current observations. Credential issuance and complete visibility remain
+site obligations, not consequences of having GET-only code.
+
+OpenStack allocation fields have explicit MiB/GiB-to-byte conversion and signed-64-bit
+bounds. Nova relationships are bounded to 64; Cinder attachments to 32 and the existing
+8,192-byte fact limit. Unique UUIDs, exact enclosing volume identity and optional bounded
+guest device labels are validated. Missing and explicit false/null/empty are distinct.
+Flavor root capacity, attachment sorting and deletion flags are not total storage,
+boot order, fencing proof or disposal permission. No secrets or arbitrary properties
+are imported. Selector changes require matching enrollment/campaign/witness/material,
+a new signed generation and reassessment; retained results are not relabelled.
+
+### Original publication, application review and comparison
+
+Stage/publish commands preserve original bytes and explicit delivery. Cooperating
+processes share first-capture exclusion; incomplete intents stay held after exit.
+Publication retains separate native read and ingest authority. Revisioned draft
+save/load/history and initial/saved-revision browser authoring retain source/revision/content pins;
+initial creation obtains scope and matching generation from two serial existing GETs,
+then requests identity pages explicitly. Native IDs come only from that pinned source.
+First-save PUTs use expected revision zero; lost acknowledgements use exact revision-one
+GET reconciliation. Proposals remain unreviewed; no signed owner evidence is manufactured.
+Saved membership/data/evidence editing rechecks the latest source against the saved
+pin before copying the proposal. Earlier records, array ordering and timestamp precision
+are retained; explicit replacements only affect the new proposal. Save uses expected
+revision N and exact N+1 readback/reconciliation, never a first-write alias or automatic
+rebase. Source-read/page failure holds metadata editing and comparison too; dirty,
+historical, superseded and unknown-save records cannot reopen editing. No earlier
+owner review is copied into the changed record. Ambiguous saves reconcile by GET. Attributed assertions are not accepted dependencies.
+Independent signed owner decisions remain assessment-only and exact-draft bound.
+`hosting-application-review` is a separate installed owner-workstation command, not
+an operator/API signing privilege. It consumes a full immutable draft export, explicit
+record digest and prepared-evidence confirmation. One shared enrollment selector serves
+both pre-sign authorization and original signature verification. The unchanged signed
+assessment envelope and its signature travel as `evidence`/`signatures` to the existing
+custodian; the command performs no ingestion, enrollment or network call. Source/draft
+currency and evidence-stream concurrency remain server checks, not export claims.
+Private create-only POSIX output is never overwritten; an error may leave output and
+requires byte reconciliation, not another signature or automatic submission. Deployed
+owner onboarding, artifact delivery and policy revision-floor custody remain open.
+The browser now issues one exact-revision review GET from the loaded immutable draft.
+The standalone display and application comparison share a single wire validator; no
+new response format or issuer is added. All eight statuses retain their meaning and
+false dependency-verification, ownership and execution flags. Read errors remove prior
+advice, never fall back to unsigned metadata or another revision. Hidden-tab review
+reads are cancelled without cancelling a separate draft save or erasing its uncertainty.
+Scheduled clearance is a display bound, not a hard timer guarantee or revocation feed.
+Application report 2 binds every member/profile, canonical selection, source/review,
+destination and method/network/data settings. CLI/browser reject mismatched or stale
+reports and clear advice after changed selections or identity. No comparison reserves
+capacity, transfers ownership or launches mutation.
+
+### Batch, freshness and history interfaces
+
+`hosting-discovery-batch/1` binds due windows and protected inputs. Optional local
+checkpointing adds immutable start/outcome history, explicit wait/inspect/reconcile modes and
+no automatic retry after an uncertain start. It still supplies no campaign, implicit
+publication or global endpoint budget; aliases/processes beyond one local journal require
+external coordination. The scoped freshness API/CLI distinguish age, missing inventory and
+reported collection health without inventing visibility. Retained history adds exact-ID retry,
+predecessor/cursor checks, atomic audit and migration 0023/runtime grants. A finite periodic
+projection now maps exact target/time slots onto those retained checks and emits deterministic
+warning/critical alert intents only after report/record digest verification. It sends no
+notification, refreshes no credential, requests no collection and grants no execution.
+Deployed service scheduling, delivery/acknowledgement and fleet-global coordination remain
+external interface obligations.
+
+
+Exported IPAM allocation evidence is consumed through the package-owned reader, never by
+importing a script owner. The stable confirmed-allocation digest remains the DNS handoff
+binding; actual allocation values and mutation authority stay in the external IPAM service.
+See the [IPAM evidence runtime contract](../engineering/ipam-evidence-runtime.md).
+
+### Retirement and recovery ownership
+
+Current qualification owners remain in `provisioner.qualification`, and source-byte
+integrity is owned by `provisioner.execution.source_integrity`. Deleted script/tool
+owners have no compatibility wrapper. Other writers require freeze/drain/reconcile
+and one-time retained-state conversion before removal. Define credential renewal,
+lease expiry, unknown outcomes and independent recovery explicitly. Neither producer
+may assume another has excluded source writers or admitted target writes; activation
+is separate from source disposal, retention release and address reuse.
+
+### Signed owner artifact intake
+
+The installed custodian intake consumes the unchanged owner artifact and explicit
+submission digest, never a browser acceptance flag. One protected environment/scope,
+TLS/SCRAM database identity and append-only session guard precede the existing writer.
+The local unsigned receipt binds exact submitted/recorded identities after commit;
+it is neither remote delivery proof nor a current assessment approval. Unconfirmed
+commits and postcommit receipt failures preserve uncertainty without automatic retry.
+Owner-to-custodian transfer and deployed custody remain independent obligations.
+
+See the [custodian intake contract](../engineering/application-review-intake.md).
+
+
+The Terraform catalog implementation is now package-owned at
+`provisioner.execution.terraform_catalog`; every in-tree consumer migrated and the
+old tools module is removed without an alias. The reader validates finite JSON,
+canonical source paths, local root/module ownership and the registered source set.
+Existing catalog/configuration/plan bytes remain unchanged. Clean build staging
+removes deleted Python owners and bytecode; source-overlapping output is refused.
+Installed tests load the reader from bundled resources with legacy imports blocked.
+This does not convert state, renew old source-bound approvals or close other B05
+runtime owners. See the [catalog runtime contract](../engineering/terraform-catalog-runtime.md).
+
+### Checkpointed batch interface
+
+The existing manifest remains `hosting-discovery-batch/1`. Journal-selected results
+use `hosting-discovery-checkpointed-batch-outcome/1` with exact manifest/journal pins,
+pre-stage start records and append-only result/unknown/reconciled transitions.
+`batch-run` may wait only inside the manifest's finite authority window. `batch-inspect`
+reads retained history without collecting; `batch-reconcile` checks original signed
+outbox bytes and cannot recollect, publish or reset a task for retry.
+Journal/manifest/original-outbox custody must be restored together and reconciled;
+local hashes/locks do not supply global authority or independent rollback detection.
+
+See the [checkpointed scheduling contract](../engineering/discovery-checkpointed-scheduling.md).
+
+### Exported reservation evidence interface
+
+The same record format and canonical digest are consumed by the package-owned
+`provisioner.allocations.reservation_evidence` reader; the retired script has no alias.
+Bounded regular-file reads, duplicate/nonfinite JSON rejection and contained source
+references preserve the existing external-authority boundary and uncertainty rules.
+Malformed exports and ambiguous references hold instead of resolving another file.
+Export provenance and live commitments remain the external owner's obligations.
+No reservation lifecycle or IPAM authority is granted by successful parsing. See the
+[read-only runtime contract](../engineering/reservation-evidence-runtime.md).
+
+### Package-owned allocation planning chain
+
+Capacity evidence, site eligibility and reservation/IPAM/DNS preflight now share package-owned allocation modules with the exported reservation/IPAM/DNS evidence readers. Runtime repository consumers no longer import top-level scripts or tools. The move preserves exact identities, digests, holds and external owner boundaries; it creates no reservation, address or DNS mutation authority. Direct execution ownership, deployed service custody and retained-state conversion remain open.
+
+
+Target qualification now sources the fixed guest probe from the installed execution package. The probe contract remains one bounded source-bound connection and TLS/body observation; moving the file changes no endpoint, SSH authority, network policy or acceptance semantics.
+
+
+Offline route/intent checking now consumes the package-owned route-audit model. The modeled address/route/flow contract is unchanged and remains distinct from native routing, security-edge or service-owner evidence.
+
+
+The implementation-input review boundary now resolves through the installed execution
+package. It validates only submitted non-secret Terraform-root inputs and does not
+allocate addresses, validate external approvals or grant target/native authority.
+
+The [operator/readback runtime owners](../engineering/operator-readback-runtime.md) now resolve inside the installed execution package. Scope/digest/file contracts and explicit target-contact gates are unchanged; retained-state conversion and native qualification remain open.
+
+The [saved-plan/lifecycle runtime chain](../engineering/saved-plan-runtime.md) now resolves through package owners. Installed preparation/apply require an explicit clean checkout whose package-owned code/resources match the running installation. Existing approvals, starts, uncertainty and retained-state contracts remain in force.
 
 ## Engineering and implementation handoff
 
 Populate the controlled engineering schedule with exact native values and support evidence. Both owners review it. Link each field to the applicable assertion and actual procedure, and retain separately protected evidence. The repository’s examples do not supply those native values.
+
+Detailed producer/consumer, response, retry and deployment contracts remain at:
+
+- [NBD §6](../engineering/network-boundaries/6-issue-an-interface-control-and-handoff-record.md)
+- [verified research decisions](../engineering/platform-migration-research.md)
+- [native read custody and tests](../engineering/vmware-discovery-https.md)
+- [OpenStack read contract](../engineering/openstack-discovery-https.md)
+- [the publication and recovery contract](../engineering/discovery-publication-recovery.md)
+- [the installed collector contract](../engineering/discovery-collector-runtime.md)
+- [application-draft contract](../engineering/application-drafts.md)
+- [operator continuation](../engineering/application-draft-operator.md)
+- [browser workspace](../engineering/application-draft-browser.md)
+- [signed owner-review contract](../engineering/application-owner-review.md)
+- [offline owner preparation/signing contract](../engineering/application-owner-signing.md)
+- [exact-draft browser review contract](../engineering/application-review-browser.md)
+- [application comparison contract](../engineering/application-comparison.md)
+- [AHV HTTPS contract](../engineering/ahv-discovery-https.md)
+- [installed application-comparison command](../engineering/application-comparison-operator.md)
+- [saved-application browser](../engineering/application-comparison-browser.md)
+- [the batch interface contract](../engineering/discovery-batch-scheduling.md)
+- [interface contract](../engineering/discovery-freshness.md)
+
+See [the current research review](../engineering/platform-capability-review-2026-10-01.md) and
+[the B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md).
 
 ## Acceptance and open work
 

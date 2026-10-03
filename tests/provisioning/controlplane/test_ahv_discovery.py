@@ -37,11 +37,16 @@ def vm(vm_id: str = VM1, *, native_cluster: str = CLUSTER) -> dict:
         'extId': vm_id, 'name': 'app-01', 'cluster': {'extId': native_cluster},
         'powerState': 'ON', 'numSockets': 1, 'numCoresPerSocket': 4,
         'memorySizeBytes': 8 * 1024**3,
-        'disks': [{'extId': DISK, 'backingInfo': {
+        'bootConfig': {'$objectType': 'vmm.v4.ahv.config.UefiBoot',
+                       'isSecureBootEnabled': False},
+        'vtpmConfig': {'isVtpmEnabled': False}, 'isLiveMigrateCapable': True,
+        'disks': [{'extId': DISK, 'diskAddress': {'busType': 'SCSI', 'index': 0}, 'backingInfo': {
             '$objectType': 'vmm.v4.ahv.config.VmDisk',
             'diskSizeBytes': 100 * 1024**3,
             'storageContainer': {'extId': CLUSTER}}}],
-        'nics': [{'extId': NIC, 'networkInfo': {'subnet': {'extId': SUBNET}}}],
+        'nics': [{'extId': NIC, 'networkInfo': {'subnet': {'extId': SUBNET}},
+                  'backingInfo': {'model': 'VIRTIO', 'macAddress': '02:00:00:00:00:01',
+                                  'isConnected': True}}],
     }
 
 

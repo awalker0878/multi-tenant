@@ -24,27 +24,44 @@ from provisioner.controlplane.workflow.approval_gate import (
 from tests.provisioning.workflow.temporal_recovery_gate import _ready
 
 
+_REGISTRATION_ATTEMPTS = 30
+_RPC_TIMEOUT_SECONDS = 5
+
+
 async def _set_current(client: Client, deployment: str, build_id: str) -> None:
+    """Wait for this exact release; never select another or unversioned worker.
+
+    A successful Describe may contain only the previously registered release.
+    That is pending registration, not a permanent error. Bound both the poll
+    count and each RPC, and refresh the conflict token after every retry.
+    """
     service = client.service_client.workflow_service
-    for _ in range(30):
+    for attempt in range(_REGISTRATION_ATTEMPTS):
         try:
-            description = await service.describe_worker_deployment(
-                DescribeWorkerDeploymentRequest(namespace=client.namespace,
-                                                deployment_name=deployment))
-            if not any(v.deployment_version.build_id == build_id for v in
-                       description.worker_deployment_info.version_summaries):
-                raise RuntimeError('Worker deployment version has not registered')
-            await service.set_worker_deployment_current_version(
-                SetWorkerDeploymentCurrentVersionRequest(
-                    namespace=client.namespace, deployment_name=deployment,
-                    build_id=build_id, conflict_token=description.conflict_token,
-                    identity='mobility-ci-release-gate'))
-            return
+            description = await asyncio.wait_for(
+                service.describe_worker_deployment(
+                    DescribeWorkerDeploymentRequest(namespace=client.namespace,
+                                                    deployment_name=deployment)),
+                timeout=_RPC_TIMEOUT_SECONDS)
+            registered = any(
+                v.deployment_version.deployment_name == deployment
+                and v.deployment_version.build_id == build_id
+                for v in description.worker_deployment_info.version_summaries)
+            if registered:
+                await asyncio.wait_for(
+                    service.set_worker_deployment_current_version(
+                        SetWorkerDeploymentCurrentVersionRequest(
+                            namespace=client.namespace, deployment_name=deployment,
+                            build_id=build_id, conflict_token=description.conflict_token,
+                            identity='mobility-ci-release-gate')),
+                    timeout=_RPC_TIMEOUT_SECONDS)
+                return
         except RPCError as exc:
             if exc.status not in (RPCStatusCode.NOT_FOUND, RPCStatusCode.FAILED_PRECONDITION):
                 raise
-        await asyncio.sleep(1)
-    raise RuntimeError('Versioned Worker failed to register or activate')
+        if attempt + 1 < _REGISTRATION_ATTEMPTS:
+            await asyncio.sleep(1)
+    raise RuntimeError(f'Versioned Worker failed to register or activate: {deployment}/{build_id}')
 
 
 def _verifier(release: str, calls: list[tuple[str, str]]):

@@ -2,7 +2,7 @@ import json
 import unittest
 
 from scripts.build_wsd_compositions import ROOT, rendered
-from tools.terraform_catalog import entries
+from provisioner.execution.terraform_catalog import entries
 from tools.verify_terraform import plan_only_mock_tests
 
 

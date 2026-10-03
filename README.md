@@ -9,8 +9,8 @@ The Word library is now available as full linked Markdown chapters, tables, diag
 | Area | Start here |
 | --- | --- |
 | Complete documentation | [Documentation home](docs/README.md) |
-| Reference architecture / RAD | [Architecture](docs/architecture/README.md) · [RAD reading view](docs/architecture/RAD.md) |
-| Technical architecture / TAD | [Engineering](docs/engineering/README.md) · [TAD reading view](docs/engineering/TAD.md) |
+| Reference architecture / RAD | [Architecture](docs/architecture/README.md) · [Current RAD](docs/current/RAD-adoption.md) · [Source reading view](docs/architecture/RAD.md) |
+| Technical architecture / TAD | [Engineering](docs/engineering/README.md) · [Current TAD](docs/current/TAD-infrastructure.md) · [Source reading view](docs/engineering/TAD.md) |
 | Solution design | [Service decisions and worked infrastructure](docs/solutions/README.md) |
 | Architecture decisions | [Proposed ADR register](docs/adr/README.md) |
 | Implementation | [Commissioning and code map](docs/implementation/README.md) |
@@ -20,9 +20,31 @@ The Word library is now available as full linked Markdown chapters, tables, diag
 
 ## Product direction and implementation boundaries
 
-The [full audit and implementation plan](docs/product/enterprise-workload-mobility-audit-and-implementation-plan.md) defines the sequenced delivery. The [product mandate](docs/product/decisions/product-mandate.md) defines the future operator application; [workload/application identity](docs/product/decisions/workload-and-security-boundary.md) is distinct from the WSD security and placement boundary; [state and writer ownership](docs/product/decisions/state-ownership.md) governs the transition to one executable path. The infrastructure architecture remains the basis for topology, isolation and service ownership. Terraform and Ansible retain separately owned resource and guest configuration responsibilities within the future workflow. Native code remains candidate implementation until its installed target and evidence are accepted. Local fixtures, native readback and formal operating authorization are distinct.
+The [all-waves execution plan](docs/product/enterprise-workload-mobility-execution-plan.md) is the current B01–B50 delivery and closure authority; the [original audit](docs/product/enterprise-workload-mobility-audit-and-implementation-plan.md) retains its historical baseline. The [product mandate](docs/product/decisions/product-mandate.md) defines the future operator application; [workload/application identity](docs/product/decisions/workload-and-security-boundary.md) is distinct from the WSD security and placement boundary; [state and writer ownership](docs/product/decisions/state-ownership.md) governs the transition to one executable path. The infrastructure architecture remains the basis for topology, isolation and service ownership. Terraform and Ansible retain separately owned resource and guest configuration responsibilities within the future workflow. Native code remains candidate implementation until its installed target and evidence are accepted. Local fixtures, native readback and formal operating authorization are distinct.
 
 The ten native Terraform primitives are retained under `terraform/modules`; their execution roots now live under `terraform/stacks/components`. Six WSD compositions add separate domain and workload roots under `terraform/stacks/wsd`. Cluster-aware input compilation and a bound Linux guest Ansible profile connect those scopes without changing the native quarantine defaults. The integrated audit correction preserves production connectivity and resource semantics. Current source publication is recorded by Git and exact CI results; ZIP-era statements describe their original delivery only. Historical test reports remain historical, and no infrastructure is deployed by this repository review.
+
+## Current capability and profile revision
+
+All three platform profiles now explicitly cover 97 compute, storage, network,
+security, guest, discovery, migration, service and operational dimensions. The
+[capability registry](docs/engineering/platform-capability-registry.md) binds the
+single vocabulary digest; every installed tuple is still unselected and every
+native qualification claim is still absent. Coverage of a row is not implementation
+or qualification of the feature.
+
+Compute/storage/recovery/service requirements participate in placement and all
+selected profile limitations survive resolution. Catalogue revisions and the five-
+request, three-platform fixture corpus were updated together. The fixtures remain
+disabled and unauthorized. Registry and native-dossier validation now run from the
+installed `provisioner.qualification` package; the old script owners were removed
+without compatibility wrappers. Other runtime-owner migration and native workflow
+integration remain open.
+
+The [maintained architecture records](docs/current/README.md) distinguish the
+implemented control/discovery foundations from unfinished provisioning, transfer,
+fencing, cutover, recovery and release acceptance. In particular,
+`AdmittedMigrationJob` is currently an authority gate, not an end-to-end native job.
 
 ## Current automation delivery
 
@@ -65,7 +87,7 @@ front end to the existing compiler. One reviewed YAML request
 against a schema, resolved against reviewed profile catalogs, evaluated by
 standards and semantic rules, placed fail-closed over read-only inventory, expanded
 into a resolved internal desired state, and then handed to the existing
-`tools/compile_wsd.py`. The Terraform roots, the Ansible roles, the state backends
+`provisioner/compiler/wsd.py`. The Terraform roots, the Ansible roles, the state backends
 and every service owner keep their current authority.
 
 The current request-to-plan and delivery-artifact path is shown below. The
@@ -109,7 +131,7 @@ See [TESTING.md](docs/TESTING.md) for independent Terraform/Ansible and disposab
 
 [Corrective disposition register](docs/assurance/completion-corrections.md) records code-fidelity, semantic-negative, current-integrity, ADR lifecycle, test-family and assertion-allocation work. [Maintained design records](docs/current/README.md) are distinct from immutable Word transcriptions. Actual initial Terraform/Ansible engine results and provider locks are recorded in [engine evidence](evidence/completion-corrections/README.md); final-revision CI and native qualification are separate gates.
 
-## Current main integration follow-up
+## Historical foundation integration follow-up
 
 [Main integration audit](docs/assurance/main-integration-audit.md) records the mixed-correction test failures and their canonical-record resolution. The complete regression suite remains required alongside real Terraform/Ansible checks; no failing tests are skipped and no native acceptance is issued.
 

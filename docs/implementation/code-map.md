@@ -38,7 +38,7 @@ Design: [RA §10](../architecture/reference/10-addressing-name-services-and-end-
 
 Decisions: [ADR-0007](../adr/0007-allocate-isolated-domain-attachments-and-qualify-sharing.md) · [ADR-0035](../adr/0035-make-shared-service-replies-select-the-originating-security-context.md)
 
-Implementation: [tools/route_audit.py](../../tools/route_audit.py) · [tools/route_record_review.py](../../tools/route_record_review.py) · [tools/plan_review.py](../../tools/plan_review.py) · [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
+Implementation: [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py) · [provisioner/execution/route_record_review.py](../../provisioner/execution/route_record_review.py) · [provisioner/execution/plan_review.py](../../provisioner/execution/plan_review.py) · [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
 
 Offline graphs and exact-record checks are not observations of a live routing table or approval provenance.
 
@@ -60,7 +60,7 @@ Design: [PROV §5](provisioning-strategy/5-concurrency-ownership-and-failed-exec
 
 Decisions: [ADR-0031](../adr/0031-discover-uncertain-native-outcomes-instead-of-blind-replay-or-rollback.md) · [ADR-0032](../adr/0032-keep-incident-containment-above-routine-reconciliation.md)
 
-Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [tools/neutron_observe.py](../../tools/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
+Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [provisioner/execution/neutron_observe.py](../../provisioner/execution/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
 
 [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) is the disposable localhost HTTPS fixture behind the native readback observers, not a vendor emulator or a production service. [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py) scripts a small synthetic task tree over that same real loopback HTTPS fixture; its operation names, IDs and API bodies are synthetic.
 
@@ -102,7 +102,7 @@ Current documentation checks are separate from native engine/CI or platform runs
 
 Design: [Cross-vendor realization model](../architecture/reference/15-cross-vendor-realization-model.md) · [Site qualification and evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md)
 
-Implementation: [machine-readable registry](../../sources/capabilities/platform_registry.json) · [registry checker](../../scripts/check_platform_capabilities.py) · [engineering evidence boundary](../engineering/platform-capability-registry.md)
+Implementation: [machine-readable registry](../../sources/capabilities/platform_registry.json) · [registry checker](../../provisioner/qualification/registry.py) · [engineering evidence boundary](../engineering/platform-capability-registry.md)
 
 The registry distinguishes candidate source and local fixtures from native qualification. It currently makes no platform production-eligible and does not perform placement.
 
@@ -110,7 +110,7 @@ The registry distinguishes candidate source and local fixtures from native quali
 
 Design: [Site qualification and evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md) · [QUAL-001 / ASSUR-003 requirements](../assurance/requirements.md#QUAL-001)
 
-Implementation: [active qualification index](../../sources/capabilities/qualification_index.json) · [dossier validator](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/platform-native-qualification.md)
+Implementation: [active qualification index](../../sources/capabilities/qualification_index.json) · [dossier validator](../../provisioner/qualification/native.py) · [engineering boundary](../engineering/platform-native-qualification.md)
 
 A native-qualified registry claim must be backed by a current exact-tuple dossier with tested limits, owners, independent approval, matching CURRENT_SUPPORTED provenance and native evidence that exactly matches current latest-passing artifacts from a target-bound qualification campaign. The dossier cannot extend evidence validity beyond campaign freshness. The active index is intentionally empty and grants no placement or activation authority.
 
@@ -126,7 +126,7 @@ This precheck evaluates only platform-family capability evidence. It cannot sele
 
 Design: [Hosting cells and failure boundaries](../architecture/reference/4-hosting-cells-resource-pools-and-failure-boundaries.md) · [Capacity and service envelopes](../assurance/site-qualification/3-capacity-service-envelopes-and-growth-triggers.md) · [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md)
 
-Implementation: [active capacity inventory](../../sources/capabilities/site_service_capacity_index.json) · [capacity-envelope validator](../../scripts/check_site_service_capacity.py) · [read-only site/service precheck](../../scripts/check_site_service_eligibility.py) · [engineering boundary](../engineering/site-service-capacity-eligibility.md)
+Implementation: [active capacity inventory](../../sources/capabilities/site_service_capacity_index.json) · [capacity-envelope validator](../../provisioner/allocations/capacity_evidence.py) · [read-only site/service precheck](../../provisioner/allocations/site_eligibility.py) · [engineering boundary](../engineering/site-service-capacity-eligibility.md)
 
 The current inventory is intentionally empty. A commissioned envelope now pins the exact qualification dossier SHA-256, approval decision and one supporting target-bound campaign/site/cell scope, preventing silent drift when a dossier changes under the same ID. Matching envelopes still never create a reservation, select a site, allocate an address or authorize activation; one failed capacity/profile/quota dimension rejects the envelope.
 
@@ -134,7 +134,7 @@ The current inventory is intentionally empty. A commissioned envelope now pins t
 
 Design: [Place and reserve sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md) · [Reservation recovery](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [Concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
 
-Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../scripts/check_reservation_records.py) · [immutable intent preflight](../../scripts/check_reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
+Implementation: [exported reservation evidence index](../../sources/capabilities/reservation_record_index.json) · [record validator](../../provisioner/allocations/reservation_evidence.py) · [immutable intent preflight](../../provisioner/allocations/reservation_preflight.py) · [engineering boundary](../engineering/reservation-preflight-and-reconciliation.md)
 
 The authoritative reservation system remains external. Stable reservation/operation identity, generation, exact demand binding and the current commissioned-envelope SHA-256 are validated together; drift under the same envelope ID is a reconciliation conflict and the digest is propagated into the parent binding consumed by IPAM. CI never creates or releases a reservation or allocates an address.
 
@@ -142,7 +142,7 @@ The authoritative reservation system remains external. Stable reservation/operat
 
 Design: [Addressing and authoritative IPAM](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [ADR-0020](../adr/0020-use-authoritative-unique-by-default-address-allocation-and-controlled-reuse.md) · [Reserve/confirm/release lifecycle](provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md)
 
-Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../scripts/check_ipam_allocation_records.py) · [no-guess allocation preflight](../../scripts/check_ipam_allocation_preflight.py) · [live NetBox lifecycle operator](../../tools/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
+Implementation: [exported IPAM evidence index](../../sources/capabilities/ipam_allocation_index.json) · [lifecycle evidence validator](../../provisioner/allocations/ipam_evidence.py) · [no-guess allocation preflight](../../provisioner/allocations/ipam_preflight.py) · [live NetBox lifecycle operator](../../tools/netbox_ipam.py) · [operator procedure](automation/netbox-ipam.md) · [engineering boundary](../engineering/authoritative-ipam-allocation-handoff.md)
 
 Actual allocation values remain in authoritative IPAM. Stable operation identity, explicit ownership, unique-by-default policy, uncertain-outcome holds, dependent cleanup and reuse quarantine are validated from exported evidence without reserving/releasing an address or writing DNS. The live operator tool performs the same reserve/confirm/retire/quarantine/release lifecycle against NetBox under one authoritative writer lock, and refuses reuse except through a new explicit allocation decision.
 
@@ -150,7 +150,7 @@ Actual allocation values remain in authoritative IPAM. Stable operation identity
 
 Design: [Name/time/initialization service profiles](../architecture/shared-services/2-name-time-initialization-and-telemetry-profiles.md) · [Address/name lifecycle](../architecture/reference/10-addressing-name-services-and-end-to-end-traffic.md) · [Scoped DNS lifecycle](../DNS_LIFECYCLE.md)
 
-Implementation: [exported DNS evidence index](../../sources/capabilities/dns_registration_index.json) · [registration evidence validator](../../scripts/check_dns_registration_records.py) · [no-guess DNS preflight](../../scripts/check_dns_registration_preflight.py) · [engineering boundary](../engineering/authoritative-dns-registration-handoff.md)
+Implementation: [exported DNS evidence index](../../sources/capabilities/dns_registration_index.json) · [registration evidence validator](../../provisioner/allocations/dns_evidence.py) · [no-guess DNS preflight](../../provisioner/allocations/dns_preflight.py) · [engineering boundary](../engineering/authoritative-dns-registration-handoff.md)
 
 Actual DNS names and A/AAAA/PTR values remain outside Git. DNS evidence pins the stable SHA-256 of the confirmed IPAM allocation/realization plus the full normalized DNS-intent SHA-256; reused parent or DNS IDs cannot hide confirmation, TTL, zone, owner or scope drift. REGISTERED still requires CONFIRMED IPAM evidence and every declared required observation, and CI never invokes the RFC2136 writer.
 
@@ -182,7 +182,7 @@ Current assurance requires named operating decision owners, accepted as-built/su
 
 Design: [G32 version and source provenance](../assurance/gap-map/3-detailed-gap-register-and-treatment.md#gap_G32) · [Implementation tuple and decision package](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [Support tuple evidence checklist](../engineering/vendor-cards/7-support-tuple-variations-and-evidence-checklist.md)
 
-Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../scripts/check_version_source_provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../scripts/check_platform_qualification.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
+Implementation: [active version/source provenance index](../../sources/capabilities/version_source_provenance_index.json) · [provenance/lifecycle validator](../../provisioner/qualification/provenance.py) · [readiness preflight](../../scripts/check_version_source_readiness.py) · [native qualification dependency](../../provisioner/qualification/native.py) · [engineering boundary](../engineering/version-source-provenance-and-lifecycle-assurance.md)
 
 A current native qualification now requires the same exact product/API/provider/hardware/licence tuple to have CURRENT_SUPPORTED provenance. Source review, installed compatibility and native qualification remain separate evidence states; none grants placement or activation authority.
 
@@ -214,7 +214,7 @@ Current qualification requires exact pairwise scope, mandatory security-function
 
 Design: [Native readback](../NATIVE_READBACK.md) · [Interrupted-change recovery](../INTERRUPTED_CHANGE_RECOVERY.md) · [PROV §5 concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
 
-Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../tools/readback_core.py) · [offline recovery reviewer](../../tools/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
+Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../provisioner/execution/readback_core.py) · [offline recovery reviewer](../../tools/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
 
 A matching GET-only readback remains observation evidence only. Current reconciliation additionally requires exact installed-interface applicability, complete task/entity scope, verified native writer fencing, current containment state, operation-generation binding and an attributable data-safe reconciliation decision; CI performs no task mutation, state import, repair, deletion, apply or activation.
 
@@ -272,7 +272,7 @@ Current bootstrap qualification requires authoritative reservation/IPAM/DNS life
 
 Design: [IK §1 implementation workplan](delivery-guide/1-implementation-workplan-and-required-inputs.md) · [VND §7 implementation tuple](../engineering/platform-realizations/7-implementation-tuple-and-decision-package.md) · [GM §4 open decision package](../assurance/gap-map/4-open-decision-package-for-implementation.md)
 
-Implementation: [active target-selection assurance index](../../sources/capabilities/target_selection_assurance_index.json) · [assurance validator](../../scripts/check_target_selection_assurance.py) · [readiness preflight](../../scripts/check_target_selection_readiness.py) · [engineering boundary](../engineering/actual-target-selection-assurance.md)
+Implementation: [active target-selection assurance index](../../sources/capabilities/target_selection_assurance_index.json) · [assurance validator](../../provisioner/qualification/target_selection.py) · [readiness preflight](../../scripts/check_target_selection_readiness.py) · [engineering boundary](../engineering/actual-target-selection-assurance.md)
 
 Current target selection records the externally chosen site/cell, exact platform tuple references, security-edge/management/backend realization, restricted native API/observer/writer campaign scope, credential custody, evidence workspace, permitted/prohibited operations, cleanup and time-bounded target-contact authority. CI does not select or contact a target, retrieve credentials, run native tests, apply or activate.
 
@@ -280,7 +280,7 @@ Current target selection records the externally chosen site/cell, exact platform
 
 Design: [Native campaign procedure](native-reference/campaign.md) · [QCP §6 evidence packet](../assurance/qualification-campaign/6-build-an-evidence-packet-a-reviewer-can-challenge.md) · [QCP §8 disposition](../assurance/qualification-campaign/8-close-defects-and-issue-a-scoped-campaign-disposition.md) · [QUAL §5 applicability/evidence](../assurance/site-qualification/5-qualification-stages-applicability-and-evidence.md)
 
-Implementation: [active campaign evidence index](../../sources/capabilities/qualification_campaign_evidence_index.json) · [evidence validator](../../scripts/check_qualification_campaign_assurance.py) · [review-readiness preflight](../../scripts/check_qualification_campaign_readiness.py) · [engineering boundary](../engineering/qualification-campaign-evidence-assurance.md)
+Implementation: [active campaign evidence index](../../sources/capabilities/qualification_campaign_evidence_index.json) · [evidence validator](../../provisioner/qualification/campaign.py) · [review-readiness preflight](../../scripts/check_qualification_campaign_readiness.py) · [engineering boundary](../engineering/qualification-campaign-evidence-assurance.md)
 
 Current campaign assurance binds the reviewed target and service/topology scope to the exact restricted change/contact/stop authority, native API/observer/writer scopes, credential custody, evidence workspace, data restrictions, permitted/prohibited operations, cleanup and contact window, plus explicit applicability, retained attempts, healthy positive controls, freshness and residual gaps. Attempts outside the authorized window are rejected; evidence collected inside it may remain current after contact authority later expires, without granting new target contact. A complete packet remains review input only.
 
@@ -293,4 +293,4 @@ Design: [Portable provisioning index](../provisioning/README.md) · [Provisionin
 
 Implementation: [provisioner package](../../provisioner) · [reviewed profile catalogs](../../profiles) · [standards rules](../../policy/rules/standards.json) · [request schemas](../../provisioner/schemas/v1) · [reference requests](../../examples/requests) · [golden artifacts](../../examples/golden) · [command line](../provisioning/plan-workflow.md) · [service-profile matrix](../provisioning/service-profile-matrix.md)
 
-Current portable provisioning validates one `hosting.platform/v1` request against a schema, resolves it against ranked profile catalogs, evaluates standards and cross-field semantics, places it fail-closed over read-only inventory, allocates zone prefixes and service bindings, expands a fully resolved internal desired state and hands it to the existing `tools/compile_wsd.py`. Terraform, Ansible, state backends, delivery and every service owner keep their existing authority. CI does not contact a platform, retrieve credentials, run Terraform or Ansible, apply a plan, activate a service or promote fixture placement to an authorization.
+Current portable provisioning validates one `hosting.platform/v1` request against a schema, resolves it against ranked profile catalogs, evaluates standards and cross-field semantics, places it fail-closed over read-only inventory, allocates zone prefixes and service bindings, expands a fully resolved internal desired state and hands it to the existing `provisioner/compiler/wsd.py`. Terraform, Ansible, state backends, delivery and every service owner keep their existing authority. CI does not contact a platform, retrieve credentials, run Terraform or Ansible, apply a plan, activate a service or promote fixture placement to an authorization.

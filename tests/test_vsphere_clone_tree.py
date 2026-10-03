@@ -13,7 +13,8 @@ from tests.test_nutanix_vm_observe import uid
 from tests.test_vsphere_observe import ref
 from tests.test_vsphere_task_tree import manifest as tree_manifest, Client as TreeClient
 from tests.test_vsphere_recovery import reseal
-from tools import readback_core as c, recovery_review as rr, qualify_target as q
+from provisioner.execution import readback_core as c
+from tools import recovery_review as rr, qualify_target as q
 from tools import vsphere_task_observe as task, vsphere_task_tree_observe as tree, vsphere_observe as vm
 
 

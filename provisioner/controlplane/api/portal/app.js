@@ -4,6 +4,8 @@ const $ = (id) => document.getElementById(id);
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const digestPattern = /^[0-9a-f]{64}$/;
 const approvalRoles = new Set(['SOURCE_OWNER', 'DESTINATION_OWNER', 'SOURCE_SECURITY', 'DESTINATION_SECURITY']);
+let applicationDraftWorkspace = null;
+let applicationComparisonWorkspace = null;
 let config = null;
 let accessToken = null;
 let expiryTimer = null;
@@ -21,6 +23,17 @@ let discoveryGeneration = null;
 let discoveryCursor = null;
 let discoveryRequest = 0;
 let discoveryObjectRequest = 0;
+let observedVms = new Set();
+let comparisonDestinations = [];
+let destinationOptions = new Map();
+let destinationWsd = null;
+let destinationCursor = null;
+let destinationRequest = 0;
+let destinationAddRequest = 0;
+let comparisonRequest = 0;
+let comparisonBusy = false;
+const assessmentMethods = new Set(['REBUILD_RESTORE', 'COLD_VM_CONVERSION',
+  'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE', 'WARM_VM_TRANSFER']);
 let activeJob = null;
 let eventCursor = 0;
 let eventHasMore = false;
@@ -38,6 +51,8 @@ function announce(message, error = false) {
 }
 
 function clearSession(message = 'This tab has no active token.') {
+  applicationComparisonWorkspace?.clear();
+  applicationDraftWorkspace?.clear();
   accessToken = null;
   tokenVersion++;
   stepUpRequested = false;
@@ -53,6 +68,7 @@ function clearSession(message = 'This tab has no active token.') {
   environmentCursor = null;
   environmentRequest++;
   clearDiscovery('Sign in and load environment declarations to select a source.');
+  clearDestinationDirectory();
   $('discovery-environment').replaceChildren(new Option('Choose an environment', ''));
   $('discovery-environment').disabled = true;
   $('show-discovery').disabled = true;
@@ -106,10 +122,56 @@ function clearDiscovery(message = 'Choose an authorized environment to load obse
   discoveryCursor = null;
   discoveryRequest++;
   discoveryObjectRequest++;
+  clearAssessmentSource();
   $('discovery-rows').replaceChildren();
   $('discovery-details').hidden = true;
   $('more-discovery').hidden = true;
   $('discovery-status').textContent = message;
+}
+
+function updateComparisonControls() {
+  const sourceReady = Boolean(accessToken && discoveryEnvironment && discoveryGeneration &&
+    observedVms.has($('comparison-workload').value));
+  $('compare-destinations').disabled = comparisonBusy || !sourceReady || comparisonDestinations.length < 2;
+  $('add-destination').disabled = !accessToken || !discoveryGeneration ||
+    !destinationOptions.has($('destination-environment').value) || comparisonDestinations.length >= 20;
+}
+
+function invalidateComparison(message = 'Choose an observed VM and at least two destinations.') {
+  applicationComparisonWorkspace?.invalidate();
+  comparisonRequest++;
+  comparisonBusy = false;
+  $('comparison-results').replaceChildren();
+  $('comparison-results').hidden = true;
+  $('comparison-status').textContent = message;
+  updateComparisonControls();
+}
+
+function clearAssessmentSource() {
+  observedVms = new Set();
+  comparisonDestinations = [];
+  destinationAddRequest++;
+  $('comparison-workload').replaceChildren(new Option('Choose an observed VM', ''));
+  $('comparison-workload').disabled = true;
+  $('comparison-source').textContent = 'Load source observations first.';
+  $('destination-rows').replaceChildren();
+  invalidateComparison();
+}
+
+function clearDestinationDirectory() {
+  destinationRequest++;
+  destinationAddRequest++;
+  destinationOptions = new Map();
+  destinationWsd = null;
+  destinationCursor = null;
+  $('destination-wsd').replaceChildren(new Option('Choose an authorized WSD', ''));
+  $('destination-wsd').disabled = true;
+  $('show-destinations').disabled = true;
+  $('destination-environment').replaceChildren(new Option('Choose an environment', ''));
+  $('destination-environment').disabled = true;
+  $('more-destinations').hidden = true;
+  $('destination-status').textContent = 'Sign in to choose authorized destinations.';
+  updateComparisonControls();
 }
 
 function randomBase64Url(bytes = 32) {
@@ -139,6 +201,8 @@ async function signIn(forApproval = false) {
   const state = randomBase64Url();
   const verifier = randomBase64Url();
   const nonce = randomBase64Url();
+  applicationComparisonWorkspace?.clear();
+  applicationDraftWorkspace?.clear();
   // A new login supersedes any code exchange still in flight for this tab.
   tokenVersion++;
   pending = { popup, state, verifier, started: Date.now(), forApproval };
@@ -205,6 +269,10 @@ async function receiveAuthorization(event) {
     if (tokenVersion !== exchangeVersion) return;
     if (result.token_type !== 'Bearer' || typeof result.access_token !== 'string' || !result.access_token) throw new Error('token');
     if (expiryTimer) clearTimeout(expiryTimer);
+    clearAssessmentSource();
+    clearDestinationDirectory();
+    applicationComparisonWorkspace?.clear();
+    applicationDraftWorkspace?.clear();
     accessToken = result.access_token;
     tokenVersion++;
     stepUpRequested = forApproval;
@@ -317,6 +385,13 @@ async function loadScopes() {
     $('environment-selector').replaceChildren(new Option('Choose a WSD', ''));
     for (const id of environmentIds) $('environment-selector').add(new Option(id, id));
     $('environment-selector').disabled = environmentIds.length === 0;
+    $('destination-wsd').replaceChildren(new Option('Choose an authorized WSD', ''));
+    for (const id of environmentIds) $('destination-wsd').add(new Option(id, id));
+    $('destination-wsd').disabled = environmentIds.length === 0;
+    $('show-destinations').disabled = environmentIds.length === 0;
+    $('destination-status').textContent = environmentIds.length
+      ? 'Choose an authorized WSD to find destination environments.'
+      : 'No exact native read grants were returned for destination environments.';
     $('environment-status').textContent = environmentIds.length
       ? `${environmentIds.length} WSD declaration selector(s) available.`
       : 'No exact native read grants were returned for environment declarations.';
@@ -398,7 +473,7 @@ async function loadDiscovery() {
   try {
     const page = await apiGet(`/v1/environments/${encodeURIComponent(environmentId)}/discovery/generations/latest`);
     if (discoveryEnvironment !== environmentId || requestNumber !== discoveryRequest || !accessToken) return;
-    if (page.environmentId !== environmentId || !Number.isInteger(page.generation) ||
+    if (page.environmentId !== environmentId || !Number.isSafeInteger(page.generation) ||
         page.generation < 1 || !['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(page.completeness) ||
         !digestPattern.test(page.resultDigest) ||
         !['objectCount', 'collectionErrorCount', 'missingPrivilegeCount'].every((key) =>
@@ -408,6 +483,7 @@ async function loadDiscovery() {
       throw new Error('The observation summary does not match this environment.');
     }
     discoveryGeneration = page.generation;
+    $('comparison-source').textContent = `${environmentId} · observed generation ${page.generation}`;
     $('discovery-generation').textContent = String(page.generation);
     $('discovery-completeness').textContent = discoveryCoverage(page.completeness);
     $('discovery-captured').textContent = displayTime(page.capturedAt);
@@ -456,7 +532,13 @@ async function loadObservedObjects() {
       for (const value of [item.resourceKind, item.nativeId,
         item.displayName ?? 'Unknown', item.unknownCount]) textCell(row, value);
       $('discovery-rows').append(row);
+      if (item.resourceKind === 'vm' && nativeSelection(item.nativeId) && !observedVms.has(item.nativeId)) {
+        observedVms.add(item.nativeId);
+        $('comparison-workload').add(new Option(`${item.displayName ?? 'Unnamed VM'} · ${item.nativeId}`, item.nativeId));
+      }
     }
+    $('comparison-workload').disabled = observedVms.size === 0;
+    updateComparisonControls();
     discoveryCursor = page.nextAfter;
     $('more-discovery').hidden = !discoveryCursor;
   } catch (error) {
@@ -466,6 +548,323 @@ async function loadObservedObjects() {
       $('discovery-rows').replaceChildren();
       $('more-discovery').hidden = true;
       discoveryCursor = null;
+      clearAssessmentSource();
+    }
+  }
+}
+
+function nativeSelection(value) {
+  return typeof value === 'string' && value.length > 0 && value.length <= 512 &&
+    value.trim().length > 0 && !/[\u0000-\u001f\u007f]/.test(value);
+}
+
+async function loadDestinationEnvironments(reset = false) {
+  const wsd = $('destination-wsd').value;
+  if (!idPattern.test(wsd) || $('destination-wsd').disabled) return;
+  invalidateComparison();
+  destinationAddRequest++;
+  if (reset || destinationWsd !== wsd) {
+    destinationWsd = wsd;
+    destinationCursor = null;
+    destinationOptions = new Map();
+    $('destination-environment').replaceChildren(new Option('Choose an environment', ''));
+    $('destination-environment').disabled = true;
+    $('more-destinations').hidden = true;
+  }
+  const cursor = destinationCursor;
+  const requestNumber = ++destinationRequest;
+  $('destination-status').textContent = 'Loading authorized destination declarations…';
+  updateComparisonControls();
+  try {
+    const page = await apiGet('/v1/environments?wsdId=' + encodeURIComponent(wsd) + '&limit=50' +
+      (cursor ? '&after=' + encodeURIComponent(cursor) : ''));
+    if (!accessToken || requestNumber !== destinationRequest || destinationWsd !== wsd ||
+        $('destination-wsd').value !== wsd || destinationCursor !== cursor) return;
+    if (!Array.isArray(page.items) || page.items.length > 50 ||
+        (page.nextAfter !== null && (!idPattern.test(page.nextAfter) || page.nextAfter === cursor)) ||
+        page.items.some((item) => !idPattern.test(item.environmentId) ||
+          item.securityDomainId !== wsd || item.status !== 'DECLARED_UNVERIFIED' ||
+          typeof item.displayName !== 'string')) throw new Error('Invalid destination declaration page.');
+    for (const item of page.items) {
+      if (!destinationOptions.has(item.environmentId)) {
+        destinationOptions.set(item.environmentId, item);
+        $('destination-environment').add(new Option(`${item.displayName} · ${item.environmentId} · ${item.platformFamily}`, item.environmentId));
+      }
+    }
+    $('destination-environment').disabled = destinationOptions.size === 0;
+    destinationCursor = page.nextAfter;
+    $('more-destinations').hidden = !destinationCursor;
+    $('destination-status').textContent = `${destinationOptions.size} candidate declaration(s). Add a destination to pin its current observation.`;
+    updateComparisonControls();
+  } catch (error) {
+    if (requestNumber === destinationRequest && destinationWsd === wsd) {
+      $('destination-status').textContent = error.message;
+    }
+  }
+}
+
+function renderDestinations() {
+  $('destination-rows').replaceChildren();
+  for (const item of comparisonDestinations) {
+    const row = document.createElement('tr');
+    textCell(row, `${item.displayName} · ${item.environmentId}`);
+    textCell(row, `${item.generation} · ${discoveryCoverage(item.completeness)}`);
+    const capacity = document.createElement('td');
+    const container = document.createElement('div');
+    container.className = 'capacity-selection';
+    const kindLabel = document.createElement('label');
+    kindLabel.textContent = 'Capacity kind';
+    const kind = document.createElement('select');
+    kind.add(new Option('Not selected', ''));
+    for (const value of ['pool', 'cluster', 'quota', 'datastore']) kind.add(new Option(value, value));
+    kind.value = item.capacityKind ?? '';
+    const nativeLabel = document.createElement('label');
+    nativeLabel.textContent = 'Native capacity ID';
+    const native = document.createElement('input');
+    native.type = 'text';
+    native.maxLength = 512;
+    native.autocomplete = 'off';
+    native.value = item.capacityNativeId ?? '';
+    const changed = () => {
+      item.capacityKind = kind.value;
+      item.capacityNativeId = native.value;
+      invalidateComparison('Capacity selection changed. Compare again to assess the selected identity.');
+    };
+    kind.addEventListener('change', changed);
+    native.addEventListener('input', changed);
+    kindLabel.append(kind);
+    nativeLabel.append(native);
+    container.append(kindLabel, nativeLabel);
+    capacity.append(container);
+    row.append(capacity);
+    const action = document.createElement('td');
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'quiet';
+    remove.textContent = 'Remove';
+    remove.addEventListener('click', () => {
+      comparisonDestinations = comparisonDestinations.filter((candidate) => candidate !== item);
+      invalidateComparison();
+      renderDestinations();
+    });
+    action.append(remove);
+    row.append(action);
+    $('destination-rows').append(row);
+  }
+  updateComparisonControls();
+}
+
+async function addDestination() {
+  const environmentId = $('destination-environment').value;
+  const candidate = destinationOptions.get(environmentId);
+  invalidateComparison();
+  if (!accessToken || !discoveryGeneration || !candidate) return;
+  if (environmentId === discoveryEnvironment || comparisonDestinations.some((item) => item.environmentId === environmentId)) {
+    $('destination-status').textContent = 'Choose a destination distinct from the source and existing selections.';
+    return;
+  }
+  if (comparisonDestinations.length >= 20) return;
+  const sourceEnvironment = discoveryEnvironment;
+  const sourceGeneration = discoveryGeneration;
+  const requestNumber = ++destinationAddRequest;
+  $('destination-status').textContent = 'Loading the latest destination observation…';
+  try {
+    const page = await apiGet(`/v1/environments/${encodeURIComponent(environmentId)}/discovery/generations/latest`);
+    if (!accessToken || requestNumber !== destinationAddRequest ||
+        discoveryEnvironment !== sourceEnvironment || discoveryGeneration !== sourceGeneration ||
+        $('destination-environment').value !== environmentId || destinationOptions.get(environmentId) !== candidate) return;
+    if (page.environmentId !== environmentId || !Number.isSafeInteger(page.generation) || page.generation < 1 ||
+        !['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(page.completeness) || !digestPattern.test(page.resultDigest) ||
+        !['objectCount', 'collectionErrorCount', 'missingPrivilegeCount'].every((key) =>
+          Number.isSafeInteger(page[key]) && page[key] >= 0) ||
+        (page.completeness === 'COMPLETE' && (page.collectionErrorCount || page.missingPrivilegeCount))) {
+      throw new Error('Destination observation does not match the selected environment.');
+    }
+    comparisonDestinations.push({ environmentId, generation: page.generation,
+      displayName: candidate.displayName, completeness: page.completeness });
+    invalidateComparison();
+    renderDestinations();
+    $('destination-status').textContent = `${environmentId} pinned at generation ${page.generation}. ${comparisonDestinations.length} destination(s) selected.`;
+  } catch (error) {
+    if (requestNumber === destinationAddRequest && discoveryEnvironment === sourceEnvironment) {
+      $('destination-status').textContent = error.notFound
+        ? 'No current observation is available for this destination under your access.' : error.message;
+    }
+  }
+}
+
+function comparisonBody() {
+  if (!accessToken || !discoveryEnvironment || !Number.isSafeInteger(discoveryGeneration) ||
+      !observedVms.has($('comparison-workload').value) || comparisonDestinations.length < 2 ||
+      comparisonDestinations.length > 20) throw new Error('Choose an observed VM and between two and twenty distinct destinations.');
+  const method = $('comparison-method').value;
+  const guestProfile = $('comparison-guest').value.trim();
+  const networkMode = $('comparison-network').value.trim();
+  const dataMode = $('comparison-data').value.trim();
+  if (!assessmentMethods.has(method) || ![guestProfile, networkMode, dataMode].every((value) => idPattern.test(value))) {
+    throw new Error('Choose a migration method and enter the guest, network and data profile identifiers.');
+  }
+  const destinations = comparisonDestinations.map((item) => {
+    const result = { environmentId: item.environmentId, generation: item.generation };
+    if (item.capacityKind || item.capacityNativeId) {
+      if (!['pool', 'cluster', 'quota', 'datastore'].includes(item.capacityKind) || !nativeSelection(item.capacityNativeId)) {
+        throw new Error('Capacity selections require both an observed kind and its exact native identity.');
+      }
+      result.capacityKind = item.capacityKind;
+      result.capacityNativeId = item.capacityNativeId;
+    }
+    return result;
+  });
+  return { source: { environmentId: discoveryEnvironment, generation: discoveryGeneration },
+    workloadNativeId: $('comparison-workload').value, destinations, method, guestProfile, networkMode, dataMode };
+}
+
+async function requestComparison(body) {
+  const credential = accessToken;
+  const version = tokenVersion;
+  if (!credential) throw new Error('Sign in first.');
+  const response = await fetch('/v1/assessments/compare', {
+    method: 'POST', credentials: 'omit', cache: 'no-store',
+    headers: { Authorization: `Bearer ${credential}`, Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
+  if (response.status === 401) {
+    clearSession('Token rejected or expired. Sign in again.');
+    throw new Error('Token rejected or expired.');
+  }
+  if ([403, 404].includes(response.status)) throw new Error('Assessment unavailable under your current scope access.');
+  if (response.status === 409) throw new Error('Assessment inputs changed or are unavailable. Reload observations and compare again.');
+  if (response.status === 503) throw new Error('Verified assessment inputs are unavailable. No comparison was produced.');
+  if (!response.ok) throw new Error(`Assessment could not be completed (HTTP ${response.status}).`);
+  const result = await response.json();
+  if (tokenVersion !== version || accessToken !== credential) throw new Error('Identity changed. Load again.');
+  return result;
+}
+
+function validateComparison(result, body) {
+  const currentMetadata = (binding) => {
+    const latest = binding?.latestObservation;
+    return latest && Number.isSafeInteger(latest.generation) && latest.generation > 0 &&
+      typeof latest.rawSnapshotDigest === 'string' && /^[0-9a-f]{64}$/.test(latest.rawSnapshotDigest) &&
+      typeof latest.capturedAt === 'string' && !Number.isNaN(Date.parse(latest.capturedAt)) &&
+      ['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(latest.collectionCompleteness) &&
+      ['collectionErrors', 'missingPrivileges'].every((key) => Array.isArray(latest[key]) &&
+        latest[key].length <= 64 && latest[key].every((value) => typeof value === 'string')) &&
+      binding.superseded === (latest.generation > binding.generation) &&
+      (!binding.observation || (latest.generation >= binding.generation &&
+        (latest.generation !== binding.generation || latest.rawSnapshotDigest === binding.observation.rawSnapshotDigest)));
+  };
+  const bound = (binding, selection) => binding && binding.environmentId === selection.environmentId &&
+    binding.generation === selection.generation && typeof binding.endpointId === 'string' &&
+    typeof binding.nativeScopeId === 'string' && typeof binding.platformFamily === 'string' && currentMetadata(binding);
+  const installed = (tuple, binding) => tuple &&
+    ['endpointId', 'nativeScopeId', 'platformFamily', 'productTupleId', 'productTupleDigest']
+      .every((key) => typeof binding[key] === 'string' && tuple[key] === binding[key]);
+  if (!result || result.format !== 'hosting-discovery-comparison/1' || result.executionAuthorized !== false ||
+      !bound(result.sourceInput, body.source) || !Array.isArray(result.destinationInputs) ||
+      result.destinationInputs.length !== body.destinations.length || !Array.isArray(result.assessments) ||
+      result.assessments.length !== body.destinations.length || typeof result.assessedAt !== 'string') {
+    throw new Error('The assessment response does not match the selected observations.');
+  }
+  for (let index = 0; index < body.destinations.length; index++) {
+    const binding = result.destinationInputs[index];
+    const item = result.assessments[index];
+    if (!bound(binding, body.destinations[index]) || !item || item.format !== 'hosting-destination-assessment/1' ||
+        item.executionAuthorized !== false || !installed(item.source, result.sourceInput) || !installed(item.destination, binding) ||
+        !['ELIGIBLE', 'CONDITIONAL', 'BLOCKED', 'UNKNOWN'].includes(item.status) || typeof item.routeMaturity !== 'string' ||
+        !item.workload || item.workload.nativeId !== body.workloadNativeId || item.workload.resourceKind !== 'vm' ||
+        !['endpointId', 'nativeScopeId', 'platformFamily'].every((key) => item.workload[key] === result.sourceInput[key]) ||
+        !['method', 'guestProfile', 'networkMode', 'dataMode'].every((key) => item[key] === body[key]) ||
+        !Array.isArray(item.issues) || item.issues.length > 200 || item.issues.some((issue) =>
+          !issue || !['BLOCKER', 'UNKNOWN', 'CONDITION'].includes(issue.severity) ||
+          !['code', 'reason', 'remediation'].every((key) => typeof issue[key] === 'string' && issue[key].length > 0)) ||
+        [[result.sourceInput, 'SOURCE'], [binding, 'DESTINATION']].some(([input, side]) =>
+          input.superseded && (item.status !== 'UNKNOWN' || !item.issues.some((issue) =>
+            issue.severity === 'UNKNOWN' && issue.code === `${side}_SNAPSHOT_SUPERSEDED`))) ||
+        !item.estimate || !['NONE', 'LOW'].includes(item.estimate.confidence) ||
+        !['transferBytes', 'copyPhaseSeconds'].every((key) => item.estimate[key] === null ||
+          (Number.isSafeInteger(item.estimate[key]) && item.estimate[key] >= 0)) ||
+        !Array.isArray(item.estimate.basis) || !item.estimate.basis.every((value) => typeof value === 'string')) {
+      throw new Error('An assessment differs from the selected route or observation generation.');
+    }
+  }
+}
+
+function renderComparison(result, selections) {
+  const cards = [];
+  result.assessments.forEach((item, index) => {
+    const selection = selections[index];
+    const card = document.createElement('article');
+    card.className = `assessment-card assessment-${item.status.toLowerCase()}`;
+    const title = document.createElement('h3');
+    title.textContent = `${selection.displayName} · ${selection.environmentId}`;
+    const status = document.createElement('p');
+    status.className = 'assessment-status';
+    status.textContent = `${item.status} · assessment only`;
+    const observation = document.createElement('p');
+    observation.textContent = `Generation ${selection.generation} · ${item.destination.platformFamily} · Route maturity: ${item.routeMaturity}`;
+    const currency = document.createElement('p');
+    currency.className = 'muted';
+    currency.textContent = [[result.sourceInput, 'Source'], [result.destinationInputs[index], 'Destination']]
+      .map(([input, side]) => `${side}: pinned generation ${input.generation}; latest observed generation ` +
+        `${input.latestObservation.generation} (${input.latestObservation.collectionCompleteness})` +
+        (input.superseded ? '. Historical pin; current eligibility unknown.' : '.'))
+      .join(' ');
+    const issues = document.createElement('ul');
+    issues.className = 'assessment-issues';
+    for (const issue of item.issues) {
+      const entry = document.createElement('li');
+      const label = document.createElement('strong');
+      label.textContent = `${issue.severity} · ${issue.code}`;
+      const reason = document.createElement('p');
+      reason.textContent = issue.reason;
+      const remediation = document.createElement('p');
+      remediation.textContent = `Next: ${issue.remediation}`;
+      entry.append(label, reason, remediation);
+      issues.append(entry);
+    }
+    const estimate = document.createElement('p');
+    estimate.className = 'muted';
+    estimate.textContent = `Copy phase estimate: ${item.estimate.copyPhaseSeconds === null ? 'Unknown' : item.estimate.copyPhaseSeconds + ' seconds'}. ` +
+      `Transfer size: ${item.estimate.transferBytes === null ? 'Unknown' : item.estimate.transferBytes + ' bytes'}. ` +
+      `Confidence: ${item.estimate.confidence}. This is not an outage estimate.`;
+    const basis = document.createElement('p');
+    basis.className = 'muted';
+    basis.textContent = item.estimate.basis.join(' · ');
+    card.append(title, status, observation, currency, issues, estimate, basis);
+    cards.push(card);
+  });
+  $('comparison-results').replaceChildren(...cards);
+  $('comparison-results').hidden = false;
+  $('comparison-status').textContent = `Assessed ${displayTime(result.assessedAt)} against the selected generations. Execution is not authorized.`;
+}
+
+async function compareDestinations() {
+  invalidateComparison('Comparing the selected observations…');
+  let body;
+  try { body = comparisonBody(); } catch (error) {
+    $('comparison-status').textContent = error.message;
+    return;
+  }
+  const selections = comparisonDestinations.map((item) => ({ ...item }));
+  const requestNumber = ++comparisonRequest;
+  const version = tokenVersion;
+  comparisonBusy = true;
+  updateComparisonControls();
+  try {
+    const result = await requestComparison(body);
+    if (requestNumber !== comparisonRequest || version !== tokenVersion || !accessToken) return;
+    validateComparison(result, body);
+    renderComparison(result, selections);
+  } catch (error) {
+    if (requestNumber === comparisonRequest && version === tokenVersion && accessToken) {
+      $('comparison-status').textContent = error.message || 'The assessment request could not be completed.';
+    }
+  } finally {
+    if (requestNumber === comparisonRequest && version === tokenVersion) {
+      comparisonBusy = false;
+      updateComparisonControls();
     }
   }
 }
@@ -730,6 +1129,33 @@ $('discovery-form').addEventListener('submit', (event) => {
   loadDiscovery();
 });
 $('more-discovery').addEventListener('click', () => loadObservedObjects());
+$('comparison-workload').addEventListener('change', () => invalidateComparison());
+$('destination-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  loadDestinationEnvironments(true);
+});
+$('destination-wsd').addEventListener('change', () => {
+  destinationRequest++;
+  destinationAddRequest++;
+  destinationOptions = new Map();
+  $('destination-environment').replaceChildren(new Option('Choose an environment', ''));
+  $('destination-environment').disabled = true;
+  $('more-destinations').hidden = true;
+  invalidateComparison();
+});
+$('destination-environment').addEventListener('change', () => {
+  destinationAddRequest++;
+  invalidateComparison();
+});
+$('add-destination').addEventListener('click', () => addDestination());
+$('more-destinations').addEventListener('click', () => loadDestinationEnvironments());
+for (const id of ['comparison-method', 'comparison-guest', 'comparison-network', 'comparison-data']) {
+  $(id).addEventListener(id === 'comparison-method' ? 'change' : 'input', () => invalidateComparison());
+}
+$('comparison-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  compareDestinations();
+});
 $('workload-form').addEventListener('submit', (event) => {
   event.preventDefault();
   loadWorkloads(true);
@@ -763,6 +1189,34 @@ $('approval-form').addEventListener('submit', (event) => {
   event.preventDefault();
   recordApproval();
 });
+
+// The draft component uses the same tab identity, not a separate login or store.
+try {
+  applicationDraftWorkspace = ApplicationDraftWorkspace.mount({
+    document, window, session: () => ({token: accessToken, version: tokenVersion}),
+    fetch: (...args) => fetch(...args),
+    onSelection: (record) => applicationComparisonWorkspace?.setSource(record),
+    rejectSession: () => clearSession('Token rejected. An attempted draft save may still require history reconciliation.')
+  });
+} catch (_) {
+  $('draft-status').textContent = 'Application draft workspace unavailable. Use the supported operator CLI.';
+}
+
+// Reuse the same destination picker and route settings; application membership
+// comes only from the unchanged saved draft, never from the single-VM selector.
+try {
+  applicationComparisonWorkspace = ApplicationComparisonWorkspace.mount({
+    document, window, drafts: ApplicationDraftWorkspace,
+    session: () => ({token: accessToken, version: tokenVersion}),
+    destinations: () => comparisonDestinations.map((item) => ({...item})),
+    settings: () => ({method: $('comparison-method').value,
+      networkMode: $('comparison-network').value.trim(), dataMode: $('comparison-data').value.trim()}),
+    fetch: (...args) => fetch(...args),
+    rejectSession: () => clearSession('Token rejected. Sign in and reload current application inputs.')
+  });
+} catch (_) {
+  $('app-compare-status').textContent = 'Application comparison unavailable. Use the supported operator CLI.';
+}
 
 (async () => {
   try {

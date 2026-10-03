@@ -10,7 +10,8 @@ from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
 from tests.nsx_domain_fixture import scenario, responses
 from tests.test_nutanix_task_tree import reseal
-from tools import nsx_domain_observe as domain, readback_core as c, recovery_review as rr
+from provisioner.execution import readback_core as c
+from tools import nsx_domain_observe as domain, recovery_review as rr
 
 
 class DomainReadbackTests(unittest.TestCase):

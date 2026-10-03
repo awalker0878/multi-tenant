@@ -40,8 +40,8 @@ from tools import capacity as owner_module
 from tests.provisioning import support
 
 OWNER = support.ROOT / 'tools' / 'capacity.py'
-RECORD_CHECKER = support.ROOT / 'scripts' / 'check_reservation_records.py'
-PREFLIGHT = support.ROOT / 'scripts' / 'check_reservation_preflight.py'
+RECORD_CHECKER = support.ROOT / 'provisioner' / 'allocations' / 'reservation_evidence.py'
+PREFLIGHT = support.ROOT / 'provisioner' / 'allocations' / 'reservation_preflight.py'
 
 #: A relative path the repository really owns, for exported-evidence references.
 SOURCE_REF = 'examples/requests/internal-production.yaml'
@@ -223,7 +223,7 @@ class DeclaredContractTest(unittest.TestCase):
         self.assertEqual(set(capacity.RECORD_STATES), _declared(RECORD_CHECKER, 'STATES'))
 
     def test_the_mirrored_identifier_grammar_is_the_owner_grammar(self):
-        source = ast.parse((support.ROOT / 'tools' / 'readback_core.py').read_text(
+        source = ast.parse((support.ROOT / 'provisioner' / 'execution' / 'readback_core.py').read_text(
             encoding='utf-8'))
         patterns = [node.value.args[0].value for node in ast.walk(source)
                     if isinstance(node, ast.Assign)

@@ -4,6 +4,7 @@ from __future__ import annotations
 import unittest
 import json
 import tempfile
+import base64
 from pathlib import Path
 from unittest.mock import patch
 
@@ -34,6 +35,22 @@ class _VerifiedEvidence:
 
 
 class ServerCompositionTests(unittest.TestCase):
+    def test_assessment_trust_is_optional_but_partial_or_invalid_trust_refuses(self):
+        self.assertIsNone(settings().assessment_trust_path)
+        key = base64.b64encode(bytes(range(32))).decode()
+        valid = dict(assessment_trust_path='/private/reviewers.json',
+                     assessment_authority_public_key=key, assessment_minimum_revision=3)
+        self.assertEqual(settings(**valid).assessment_minimum_revision, 3)
+        for values in (
+            {'assessment_trust_path': '/private/reviewers.json'},
+            {**valid, 'assessment_trust_path': 'relative.json'},
+            {**valid, 'assessment_authority_public_key': 'not-a-key'},
+            {**valid, 'assessment_minimum_revision': 0},
+            {**valid, 'assessment_minimum_revision': True},
+        ):
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                settings(**values)
+
     def test_unreadable_evidence_startup_file_does_not_reveal_its_path(self):
         with (patch('provisioner.controlplane.api.server.ServiceSettings.from_environment',
                     return_value=settings()),

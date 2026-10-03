@@ -62,7 +62,7 @@ Source basis: [VMware/NSX commissioning](../../engineering/platform-build/4-vmwa
 | Workload/configuration | Coordinate network/router/port activation and VM bootstrap; accepted image initialization, guest roles and service enrollment | Safe first boot, retained boot/data volumes, correct project identity and independent guest/data access checks |
 | Lifecycle/readback | Add Nova/Cinder/Keystone coverage and Ansible Neutron dispatch; reconcile asynchronous build/attach/delete and partial volumes/ports | Import, resize, rebuild, restore, failure recovery and retirement preserve ownership and retained data |
 
-Source basis: [distribution commissioning](../../engineering/platform-build/6-openstack-commission-a-distribution-not-a-generic-label.md), [mandatory network ownership](../../engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md), [Neutron observer](../../../tools/neutron_observe.py).
+Source basis: [distribution commissioning](../../engineering/platform-build/6-openstack-commission-a-distribution-not-a-generic-label.md), [mandatory network ownership](../../engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md), [Neutron observer](../../../provisioner/execution/neutron_observe.py).
 
 ## Lifecycle targets
 

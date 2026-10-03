@@ -34,9 +34,34 @@ def validate(resolution: Resolution, catalogs: Catalog, capability_ids) -> Diagn
         diagnostics.add('POLICY_VIOLATION',
                         f'Environment profile {environment.profile} requires recovery to be enabled',
                         path='$.spec.recovery.enabled')
+    assurance_name = resolution.profiles['assurance']
+    assurance = catalogs.get('assurance', assurance_name) if assurance_name is not None else None
+    if (assurance is not None and assurance.requires['recovery_required']
+            and resolution.profiles.get('recovery') is None):
+        diagnostics.add('POLICY_VIOLATION',
+                        f'Assurance profile {assurance.profile} requires recovery to be enabled',
+                        path='$.spec.recovery.enabled')
+
+    if resolution.profiles['availability'] is not None:
+        availability = catalogs.get('availability', resolution.profiles['availability'])
+        minimum = availability.requires['min_workloads_per_zone']
+        actual = resolution.compute['workloads_per_zone']
+        if actual < minimum:
+            diagnostics.add('POLICY_VIOLATION',
+                            'Compute profile does not meet the availability workload count',
+                            path='$.spec.capacity.computeProfile',
+                            details={'minimum_per_zone': minimum, 'actual_per_zone': actual})
+
     if resolution.profiles.get('recovery') is not None:
-        assurance = catalogs.get('assurance', resolution.profiles['assurance'])
         recovery = catalogs.get('recovery', resolution.profiles['recovery'])
+        if recovery.requires['recovery_zone'] not in resolution.zones:
+            diagnostics.add('SEMANTIC_INCONSISTENT',
+                            'Recovery zone is not in the selected availability composition',
+                            path='$.spec.recovery.profile')
+        if recovery.requires.get('independent_site', False):
+            diagnostics.add('UNSUPPORTED_FEATURE',
+                            'Independent-site recovery has no implemented composition',
+                            path='$.spec.recovery.profile')
         for required_service in recovery.requires.get('services', []):
             if required_service not in resolution.services:
                 diagnostics.add('SEMANTIC_INCONSISTENT',

@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 import subprocess
 import sys
-from tools import readback_core as c
-from tools.run_files import (current_window, digest, encoded, load_private, private_path,
+from provisioner.execution import readback_core as c
+from provisioner.execution.run_files import (current_window, digest, encoded, load_private, private_path,
                              read_private, require, sync_directory, write_new)
 
 # Parameters, mandatory file bindings, optional file bindings. No shell command,
@@ -14,7 +14,10 @@ KINDS = {
     'openstack_quota': (set(), {'request','authority','token','ca'}, set()),
     'edge_containment': ({'nft','nft_sha256'}, {'spec','authority'}, set()),
     'remote_owner': ({'ssh','ssh_sha256'}, {'job','target','ssh_key','ssh_certificate'}, set()),
-    'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority'}),
+    'restic': ({'action','restic','restic_sha256','target'}, {'config','credentials'}, {'ca_bundle','receipt','manifest','restore_authority','transfer_manifest'}),
+    'dataset_restore': ({'action','restic','restic_sha256','target','transfer_manifest_sha256','dataset_id','target_ref','consistency_group_id','source_scope'},
+                        {'config','credentials','receipt','manifest','restore_authority','transfer_manifest'}, {'ca_bundle'}),
+    'dataset_acceptance': ({'group_id','datasets'}, set(), set()),
     'platform_transition': ({'prior_step','stage'}, {'inputs','acceptance'}, set()),
     'workload_inputs': ({'domain_steps','selected_input'}, {'environment'}, {'vmware_bindings'}),
     'capacity': ({'action','database'}, {'request','authority'}, {'native_ids','inputs','sizing'}),
@@ -24,9 +27,10 @@ KINDS = {
     'operations_alerts': (set(), {'review', 'result', 'acknowledgements'}, {'release'}),
     'terraform_plan': ({'catalog_id','terraform','terraform_sha256'}, {'inputs','backend','environment','authority'}, {'references','cloud','ca_bundle','transition'}),
     'terraform_apply': ({'prepared_step'}, {'approval'}, set()),
+    'terraform_approval': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
     'guest_apply': ({'prepared_step'}, {'approval'}, set()),
-    'vsphere_power': (set(), {'request','authority','session'}, {'ca_file'}),
+    'vsphere_power': ({'workload_step','member'}, {'request','authority','session'}, {'ca_file'}),
     'target_campaign': ({'ssh','ssh_sha256'}, {'plan','authority'}, set()),
     'edge_policy': ({'nft','nft_sha256','mode'}, {'spec','authority'}, set()),
     'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle','release_evidence'}),
@@ -80,22 +84,39 @@ def validate_packet(step, packet, plan, base):
             'plan_sha256':c.digest(plan),'step_id':step['id'],'dependencies':packet['dependencies']},
             'Remote owner job belongs to another coordinator handoff')
         remote_owner.validate(load_private(files['target']),job)
-    if kind=='restic':
+    if kind in {'restic','dataset_restore'}:
         from tools.restic_run import validate
-        config=load_private(files['config']); validate(config); match_scope(config['scope'],plan)
+        config=load_private(files['config']); validate(config)
+        transfer=restic_transfer(packet,files,plan)
+        if kind=='dataset_restore': dataset_binding(values,transfer)
         require(config['restic_sha256']==values['restic_sha256'],'Backup executable binding changed')
         require(values['action'] in {'backup','restore'},'Unknown backup transition')
         restore_files={'receipt','manifest','restore_authority'}
         if values['action']=='backup':
-            require(values['target'] is None and not restore_files.intersection(files),'Backup cannot carry restore inputs')
+            require(values['target'] is None and not (restore_files|{'transfer_manifest'}).intersection(files),'Backup cannot carry restore inputs')
         else:
             require(restore_files.issubset(files) and isinstance(values['target'],str)
                     and Path(values['target']).is_absolute(),'Exact restore input set required')
-    if kind in {'terraform_apply','guest_apply'}:
-        upstream=dependency(step,values['prepared_step'], 'terraform_plan' if kind=='terraform_apply' else 'guest_plan',plan,base)
+    if kind in {'terraform_apply','terraform_approval','guest_apply'}:
+        upstream=dependency(step,values['prepared_step'], 'terraform_plan' if kind in {'terraform_apply','terraform_approval'} else 'guest_plan',plan,base)
         require(read_private(upstream/'bundle.json')==read_private(upstream/'execution/bundle.json'), 'Prepared owner bundle changed')
         bundle=load_private(upstream/'bundle.json'); match_scope(bundle['scope'],plan)
         require(bundle['source_commit']==plan['source_commit'],'Prepared owner source changed')
+        if kind=='terraform_approval':
+            from provisioner.execution.terraform_apply import validate_bundle
+            from tools.delivery_run import ROOT
+            prior=load_private(upstream/'packet.json')['parameters']
+            validate_bundle(upstream/'execution',load_private(files['approval']),Path(prior['terraform']),ROOT)
+        if kind=='terraform_apply':
+            approvals=[item for item in plan['steps'] if item['id'] in step['needs']
+                       and item['kind']=='terraform_approval']
+            for approval_step in approvals:
+                approved=base/'steps'/approval_step['id']
+                accepted=load_private(approved/'result.json')
+                require(accepted['status']=='EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED'
+                        and accepted['bundle_sha256']==digest(read_private(upstream/'bundle.json'))
+                        and read_private(approved/'approval.json')==read_private(files['approval']),
+                        'Apply approval differs from its explicit reviewed-plan gate')
         if kind=='terraform_apply' and bundle['scope']['phase']=='workloads':
             from tools.capacity_demand import check_ancestors
             cloud_sha=load_private(upstream/'execution/contact.json')['cloud_sha256'] if plan['scope']['platform']=='openstack' else None
@@ -114,14 +135,25 @@ def validate_packet(step, packet, plan, base):
         for selected in values['domain_steps']: dependency(step,selected,'terraform_apply',plan,base)
         c.text(values['selected_input'],length=1024)
     if kind=='terraform_plan':
-        from tools.terraform_run import select_scope
+        from provisioner.execution.terraform_run import select_scope
         from tools.delivery_run import ROOT
         _,scope,_=select_scope(ROOT,values['catalog_id'],load_private(files['inputs']))
         match_scope(scope,plan)
+        transitions=[item for item in plan['steps'] if item['id'] in step['needs']
+                     and item['kind']=='platform_transition']
+        require(len(transitions)<=1,'One exact lifecycle transition per saved plan required')
+        if transitions:
+            require('transition' in files,'Lifecycle plan requires its prepared transition')
+            original=base/'steps'/transitions[0]['id']/'transition.json'
+            require(read_private(original)==read_private(files['transition']),
+                    'Lifecycle plan changed its prepared transition')
+            from provisioner.execution.lifecycle_transition import validate as validate_transition
+            validate_transition(load_private(original),scope,read_private(files['inputs']))
         if scope['phase']=='workloads':
             from tools.capacity_demand import check_ancestors
             check_ancestors(step,plan,base,load_private(files['inputs']),
                             cloud_sha256=digest(read_private(files['cloud'])) if 'cloud' in files else None)
+    if kind=='dataset_acceptance': dataset_group(step,packet,base,plan)
     if kind=='retirement_review':
         from tools.retirement import validate_evidence
         retirement_plan=load_private(files['plan'])
@@ -151,6 +183,8 @@ def validate_packet(step, packet, plan, base):
                 and accepted['step_id']==step['id'] and accepted['dependencies']==packet['dependencies']
                 and accepted['purpose']==values['purpose'], 'Acceptance does not bind this delivery gate')
         match_scope(accepted['scope'],plan); c.text(accepted['acceptance_ref']); current_window(accepted)
+        if values['purpose']=='bootstrap': bootstrap_postconditions(step,plan,base)
+        if values['purpose']=='services': dataset_coverage(step,base,plan)
     if kind in {'edge_policy','edge_containment','target_campaign','ipam','dns','capacity'}:
         field={'edge_policy':'spec','edge_containment':'spec','target_campaign':'plan','ipam':'request','dns':'allocation','capacity':'request'}[kind]
         value=load_private(files[field]); match_scope(value['scope'],plan)
@@ -180,7 +214,15 @@ def validate_packet(step, packet, plan, base):
                 owner_binding(values['database'],value,sizing,require_live=False)
     if kind=='vsphere_power':
         from tools.vsphere_power import validate
-        request=load_private(files['request']); validate(request)
+        request=load_private(files['request']); resource=validate(request)
+        upstream=dependency(step,values['workload_step'],'terraform_apply',plan,base)
+        execution=terraform_execution(values['workload_step'],plan,base)
+        from provisioner.execution.wsd_handoff import execution_outputs
+        outputs,_,_=execution_outputs(execution,'workloads')
+        member=outputs['members']['value'].get(values['member'])
+        require(member is not None and resource['expected']['config']['uuid']==member['vm_id']
+                and request['desired_power']=='poweredOn',
+                'Bootstrap power must bind the exact applied workload UUID and power-on intent')
         require(plan['scope']['platform']=='vmware' and request['source_commit']==plan['source_commit']
                 and request['snapshot']['tenant_id']==plan['scope']['tenant_key']
                 and request['snapshot']['scope_id']==plan['scope']['wsd_key'], 'Foreign native power handoff')
@@ -223,7 +265,7 @@ def child(root, module, arguments, directory, *, timeout):
     require(result.returncode==0,'Delivery owner did not complete; inspect its private journal')
 
 
-def dispatch(step, packet, directory, base, plan, root):
+def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
     validate_packet(step,packet,plan,base)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
     if kind=='openstack_quota':
@@ -238,24 +280,33 @@ def dispatch(step, packet, directory, base, plan, root):
                        owner_ledger(base,'edge_policy'),directory/'execution')
         write_new(directory/'containment.json',read_private(directory/'execution/containment.json'))
         names=['containment.json']
-    elif kind=='restic':
+    elif kind in {'restic','dataset_restore'}:
         from tools.restic_run import execute
+        if kind=='dataset_restore':
+            from tools.restic_transfer import TransferGuard
+            require(isinstance(transfer_guard,TransferGuard) and transfer_guard.step_id==step['id'],
+                    'Dataset restore requires live trusted worker authority for this exact child step')
         result=execute(values['action'],load_private(files['config']),load_private(files['credentials']),
             values['restic'],directory/'execution',ca_file=files.get('ca_bundle'),
             receipt=load_private(files['receipt']) if 'receipt' in files else None,
             expected=load_private(files['manifest']) if 'manifest' in files else None,target=values['target'],
-            authority=load_private(files['restore_authority']) if 'restore_authority' in files else None)
-        for name in ('receipt.json','context.json') + (('manifest.json',) if values['action']=='backup' else ()):
+            authority=load_private(files['restore_authority']) if 'restore_authority' in files else None,
+            transfer=load_private(files['transfer_manifest']) if 'transfer_manifest' in files else None,
+            transfer_guard=transfer_guard)
+        if 'transfer_manifest' in files:
+            result=load_private(directory/'execution/transfer-receipt.json')
+        for name in (('receipt.json','context.json') + (('manifest.json',) if values['action']=='backup' else ())
+                     + (('transfer-manifest.json','transfer-receipt.json') if 'transfer_manifest' in files else ())):
             write_new(directory/name,read_private(directory/'execution'/name)); names.append(name)
     elif kind=='platform_transition':
-        from tools.lifecycle_transition import prepare
+        from provisioner.execution.lifecycle_transition import prepare
         prior=terraform_execution(values['prior_step'],plan,base)
         record=prepare(prior,files['inputs'],files['acceptance'],values['stage'])
         match_scope(record['scope'],plan)
         write_new(directory/'transition.json',encoded(record)); names=['transition.json']
         result={'status':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW'}
     elif kind=='workload_inputs':
-        from tools.wsd_handoff import compile_scope_runs
+        from provisioner.execution.wsd_handoff import compile_scope_runs
         records=[terraform_execution(selected,plan,base) for selected in values['domain_steps']]
         outputs,scopes,provenance=compile_scope_runs(load_private(files['environment']),records,plan['scope'],
             load_private(files['vmware_bindings']) if 'vmware_bindings' in files else None)
@@ -275,6 +326,9 @@ def dispatch(step, packet, directory, base, plan, root):
             for name,value in {'result.json':result,'capacity-request.json':request,'sizing.json':sizing,
                                'demand.json':bind_request(request,load_private(files['inputs']),sizing)}.items():
                 write_new(directory/name,encoded(value)); names.append(name)
+    elif kind=='dataset_acceptance':
+        result=dataset_group(step,packet,base,plan)
+        write_new(directory/'result.json',encoded(result)); names=['result.json']
     elif kind=='retirement_review':
         from tools.retirement import evaluate
         result=evaluate(load_private(files['plan']),load_private(files['evidence']))
@@ -305,17 +359,30 @@ def dispatch(step, packet, directory, base, plan, root):
         write_new(directory/'acceptance.json',encoded(accepted))
         result={'status':'EXTERNAL_ACCEPTANCE_RECORDED','acceptance_ref':accepted['acceptance_ref']}
         names=['acceptance.json']
+        if values['purpose']=='services':
+            coverage=dataset_coverage(step,base,plan)
+            if coverage is not None:
+                write_new(directory/'dataset-coverage.json',encoded(coverage))
+                names.append('dataset-coverage.json')
     elif kind=='terraform_plan':
-        from tools.terraform_run import prepare
+        from provisioner.execution.terraform_run import prepare
         args={name:files.get(name) for name in ('inputs','backend','environment','authority','references','cloud','ca_bundle','transition')}
         result=prepare(argparse.Namespace(**args,catalog_id=values['catalog_id'],terraform=Path(values['terraform']),
                        output=directory/'execution',read_authorized_target=True),root)
         write_new(directory/'bundle.json',read_private(directory/'execution/bundle.json'))
         write_new(directory/'review.json',read_private(directory/'execution/review.json'))
         names=['bundle.json','review.json']
+    elif kind=='terraform_approval':
+        upstream=dependency(step,values['prepared_step'],'terraform_plan',plan,base)
+        approval=load_private(files['approval'])
+        write_new(directory/'approval.json',encoded(approval))
+        result={'status':'EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED',
+                'bundle_sha256':digest(read_private(upstream/'bundle.json')),
+                'approval_sha256':digest(encoded(approval))}
+        write_new(directory/'result.json',encoded(result)); names=['approval.json','result.json']
     elif kind=='terraform_apply':
-        from tools.terraform_apply import apply
-        from tools.wsd_handoff import execution_outputs
+        from provisioner.execution.terraform_apply import apply
+        from provisioner.execution.wsd_handoff import execution_outputs
         prepared=prepared_directory(step,packet,plan,base)
         prior=load_private(prepared.parent/'packet.json')['parameters']
         require(digest(Path(prior['terraform']).read_bytes())==prior['terraform_sha256'],'Terraform executable changed')
@@ -379,10 +446,227 @@ def dispatch(step, packet, directory, base, plan, root):
 
 def complete(step,packet,directory,plan,result,names):
     from tools.delivery_run import artifact_receipt
+    typed_postcondition(step,result,directory,packet,plan)
     completion={'format':'hosting-delivery-owner-completion/1','plan_sha256':c.digest(plan),'step_id':step['id'],
                 'packet_sha256':c.digest(packet),'status':result['status'],'artifacts':artifact_receipt(directory,names)}
     write_new(directory/'owner-completion.json',encoded(completion))
     return result,names+['owner-completion.json']
+
+
+def dataset_coverage(step,base,plan):
+    """Close the canonical plan's complete dataset set before service acceptance."""
+    from tools.dataset_acceptance import validate_coverage
+    groups=[item for item in plan['steps'] if item['id'] in step['needs']
+            and item['kind']=='dataset_acceptance']
+    if not groups:
+        return None
+    records=[]
+    for group in groups:
+        directory=dependency(step,group['id'],'dataset_acceptance',plan,base)
+        packet=load_private(directory/'packet.json')
+        observed=dataset_group(group,packet,base,plan)
+        require(observed==load_private(directory/'result.json'),
+                'Retained dataset group differs from its exact child proofs')
+        first=packet['parameters']['datasets'][0]['step_id']
+        envelope=load_private(base/'steps'/first/'transfer-manifest.json')
+        records.append({'group_result':observed,'migration_plan':envelope['migration_plan']})
+    return validate_coverage(records,plan['scope'])
+
+
+def dataset_binding(values,transfer):
+    require(values['action']=='restore' and transfer is not None,
+            'Dataset restore requires an exact cross-scope transfer')
+    spec=transfer['transfer']['spec']
+    require(values['source_scope']==transfer['source_execution_scope']
+            and values['transfer_manifest_sha256']==digest(encoded(transfer))
+            and (values['dataset_id'],values['target_ref'],values['consistency_group_id'])==
+                (spec['datasetId'],spec['targetRef'],spec['consistencyGroupId']),
+            'Dataset restore differs from the reviewed manifest or mapping')
+
+
+def dataset_group(step,packet,base,plan):
+    from tools.dataset_acceptance import validate_group
+    values=packet['parameters']; datasets=values['datasets']
+    require(isinstance(datasets,list) and datasets,'A dataset group requires every declared member')
+    require(set(step['needs'])=={row['step_id'] for row in datasets},
+            'Dataset group must depend on exactly its declared restore steps')
+    records={}
+    for row in datasets:
+        path=dependency(step,row['step_id'],'dataset_restore',plan,base)
+        records[row['step_id']]={
+            'transfer_manifest':load_private(path/'transfer-manifest.json'),
+            'transfer_receipt':load_private(path/'transfer-receipt.json'),
+            'restore_receipt':load_private(path/'receipt.json')}
+    return validate_group(values['group_id'],datasets,records,plan['scope'])
+
+
+def restic_transfer(packet,files,plan):
+    """Separate source ownership from the destination transfer evidence.
+
+    The envelope is evidence, not authority. The owner still requires a trusted
+    runtime TransferGuard before any cross-scope restore can contact restic.
+    """
+    config=load_private(files['config'])
+    if 'transfer_manifest' not in files:
+        match_scope(config['scope'],plan)
+        return None
+    from tools.restic_transfer import validate
+    require(packet['parameters']['action']=='restore', 'Backup cannot carry a transfer manifest')
+    require({'receipt','manifest','restore_authority'}<=set(files),'Exact transfer restore inputs required')
+    transfer=load_private(files['transfer_manifest'])
+    validate(transfer,config,load_private(files['receipt']),load_private(files['manifest']),
+             packet['parameters']['target'])
+    match_scope(transfer['destination_execution_scope'],plan)
+    return transfer
+
+
+def campaign_postcondition(result, campaign, raw):
+    """A collection status alone cannot discharge native/traffic verification."""
+    from tools.qualify_target import validate
+    cases=validate(campaign)
+    require(isinstance(result,dict)
+            and result.get('status')=='COLLECTED_REQUIRES_INDEPENDENT_ACCEPTANCE'
+            and result.get('scope')==campaign['scope']
+            and result.get('source_commit')==campaign['source_commit']
+            and result.get('plan_sha256')==digest(raw)
+            and result.get('production_qualified') is False,
+            'Campaign completion is not bound to the exact native observation plan')
+    for key in ('native_before_sha256','native_after_sha256'):
+        require(isinstance(result.get(key),str) and c.HEX.fullmatch(result[key]),
+                'Campaign requires native observations before and after traffic')
+    observations=result.get('cases')
+    require(isinstance(observations,list) and len(observations)==len(cases)
+            and {row.get('id') for row in observations}==set(cases)
+            and all(row.get('passed') is True for row in observations),
+            'Campaign requires every exact traffic case to pass')
+    require(c.timestamp(result['started_at'])<=c.timestamp(result['completed_at'])<=c.timestamp(c.now()),
+            'Campaign completion chronology is invalid')
+
+
+def transfer_postcondition(packet,directory,plan):
+    """Bind retained transfer evidence to the restore owner's actual host/root."""
+    from tools.restic_transfer import destination_receipt
+    files=file_paths(packet); values=packet['parameters']
+    transfer=restic_transfer(packet,files,plan)
+    config=load_private(files['config']); original=load_private(files['receipt'])
+    manifest=load_private(files['manifest']); authority=load_private(files['restore_authority'])
+    context=load_private(directory/'context.json'); restored=load_private(directory/'receipt.json')
+    require(context=={'action':'restore','config_sha256':digest(encoded(config)),
+        'receipt_sha256':digest(encoded(original)),'manifest_sha256':digest(encoded(manifest)),
+        'authority_sha256':digest(encoded(authority)),'machine_id':authority['machine_id'],
+        'target':values['target'],'transfer_manifest_sha256':digest(encoded(transfer))},
+        'Retained transfer execution context differs')
+    require(restored.get('format')=='hosting-restic-restore-receipt/1'
+            and restored.get('target_machine_id')==context['machine_id']==authority['machine_id']
+            and restored.get('restore_root')==context['target']==authority['target']==values['target']
+            and restored.get('status')=='RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
+            and restored.get('scope')==config['scope'] and restored.get('member')==config['member']
+            and restored.get('snapshot_id')==original['snapshot_id']
+            and restored.get('file_count')==len(manifest['files'])
+            and restored.get('production_activation') is False,
+            'Retained transfer requires its actual authorized restore machine and root')
+    destination=load_private(directory/'transfer-receipt.json')
+    require(load_private(directory/'transfer-manifest.json')==transfer
+            and destination==destination_receipt(transfer,original,restored),
+            'Retained destination receipt differs from its actual restore proof')
+    return destination
+
+
+def typed_postcondition(step,result,directory,packet,plan):
+    """Validate the owner's typed result before publishing a completion marker.
+
+    These statuses keep planning, application, observation and independent
+    acceptance distinct. None grants production activation.
+    """
+    expected={
+        'platform_transition':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW',
+        'workload_inputs':'BOUND_WORKLOAD_DRAFT_REQUIRES_REVIEW',
+        'terraform_plan':'AWAITING_EXACT_PLAN_REVIEW',
+        'terraform_approval':'EXACT_TERRAFORM_PLAN_APPROVAL_RECORDED',
+        'terraform_apply':'APPLIED_REQUIRES_NATIVE_ACCEPTANCE',
+        'vsphere_power':'POWER_CHANGED_REQUIRES_NATIVE_ACCEPTANCE',
+        'dataset_restore':'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
+        'dataset_acceptance':'DATASET_GROUP_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
+    }
+    if step['kind'] in expected:
+        require(result.get('status')==expected[step['kind']],
+                'Delivery owner has not met its typed postcondition')
+    if step['kind'] in {'restic','dataset_restore'} and 'transfer_manifest' in packet['files']:
+        require(result==transfer_postcondition(packet,directory,plan),
+                'Delivery result differs from its retained transfer proof')
+    if step['kind']=='target_campaign':
+        raw=read_private(packet['files']['plan']['path'])
+        campaign_postcondition(result,c.strict_loads(raw),raw)
+    if step['kind']=='vsphere_power':
+        request=load_private(packet['files']['request']['path'])
+        require(result.get('request_sha256')==c.digest(request)
+                and result.get('native_acceptance') is False
+                and result.get('production_activation') is False,
+                'Power result changed its exact operation binding')
+
+
+def bootstrap_postconditions(step,plan,base):
+    """Refuse external bootstrap acceptance until real native effects exist.
+
+    Transition preparation is only a review input. Require successful exact-plan
+    applies, every VMware power operation, and a native/traffic campaign, all as
+    explicit dependencies with the same workload outputs.
+    """
+    from provisioner.execution.wsd_handoff import execution_outputs
+    dependencies=[item for item in plan['steps'] if item['id'] in step['needs']]
+    require(not any(item['kind']=='platform_transition' for item in dependencies),
+            'A transition draft cannot satisfy bootstrap acceptance')
+    applies=[item for item in dependencies if item['kind']=='terraform_apply']
+    executions={}
+    for item in applies:
+        directory=terraform_execution(item['id'],plan,base)
+        bundle=load_private(directory/'bundle.json')
+        outputs,_,_=execution_outputs(directory,bundle['scope']['phase'])
+        require('transition.json' in bundle['artifacts'],
+                'Bootstrap requires applied lifecycle plans, not initial creation')
+        transition=load_private(directory/'transition.json')
+        require(transition['scope']==bundle['scope'] and transition['target_stage']=='bootstrap'
+                and digest(read_private(directory/'transition.json'))==bundle['artifacts']['transition.json'],
+                'Bootstrap apply lacks its exact sealed transition')
+        require(bundle['scope']['phase'] not in executions,'Duplicate bootstrap phase')
+        executions[bundle['scope']['phase']]=outputs
+    require('domains' in executions,'Bootstrap needs an applied native domain transition')
+    powers=[item for item in dependencies if item['kind']=='vsphere_power']
+    if plan['scope']['platform']=='vmware':
+        require(powers and 'workloads' not in executions,'Every VMware workload needs its fenced power owner')
+        identities=set()
+        for item in powers:
+            directory=base/'steps'/item['id']; packet=load_private(directory/'packet.json')
+            result=load_private(directory/'result.json')
+            typed_postcondition(item,result,directory,packet,plan)
+            request=load_private(packet['files']['request']['path'])
+            identities.add(request['snapshot']['resources'][0]['expected']['config']['uuid'])
+            outputs,_,_=execution_outputs(terraform_execution(packet['parameters']['workload_step'],plan,base),'workloads')
+            if 'workloads' in executions:
+                require(executions['workloads']==outputs,'Power operations reference different workload applies')
+            executions['workloads']=outputs
+        require(len(identities)==len(powers) and identities==
+                {member['vm_id'] for member in executions['workloads']['members']['value'].values()},
+                'Power results must cover every applied VM exactly once')
+    else:
+        require('workloads' in executions and not powers,'Bootstrap needs applied workload power and NIC transitions')
+    campaigns=[item for item in dependencies if item['kind']=='target_campaign']
+    require(len(campaigns)==1,'Bootstrap requires one exact native observation campaign')
+    directory=base/'steps'/campaigns[0]['id']; packet=load_private(directory/'packet.json')
+    raw=read_private(packet['files']['plan']['path']); campaign=c.strict_loads(raw)
+    result=load_private(directory/'result.json'); campaign_postcondition(result,campaign,raw)
+    require(campaign['format']=={'openstack':'hosting-target-campaign/2',
+                                'nutanix':'hosting-target-campaign/4',
+                                'vmware':'hosting-target-campaign/8'}[plan['scope']['platform']],
+            'Bootstrap campaign must observe native workload and domain bindings')
+    asset=campaign['assets']['inventory']; inventory=read_private(asset['path'])
+    require(digest(inventory)==asset['sha256'] and
+            c.strict_loads(inventory)['all']['vars']['hosting_workload_outputs']==executions['workloads'],
+            'Bootstrap campaign observed another workload execution')
+    if 'domain_outputs' in campaign['assets']:
+        asset=campaign['assets']['domain_outputs']; raw=read_private(asset['path'])
+        require(digest(raw)==asset['sha256'] and c.strict_loads(raw)==executions['domains'],
+                'Bootstrap campaign observed another domain execution')
 
 
 def retain(path,raw):
@@ -500,6 +784,20 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     from tools.delivery_run import artifact_receipt
     if not (directory/'owner-completion.json').exists():
         kind=step['kind']
+        if kind=='acceptance' and packet['parameters']['purpose']=='services':
+            validate_packet(step,packet,plan,base)
+            accepted=load_private(packet['files']['acceptance']['path'])
+            retain(directory/'acceptance.json',encoded(accepted))
+            names=['acceptance.json']; coverage=dataset_coverage(step,base,plan)
+            if coverage is not None:
+                retain(directory/'dataset-coverage.json',encoded(coverage))
+                names.append('dataset-coverage.json')
+            result={'status':'EXTERNAL_ACCEPTANCE_RECORDED','acceptance_ref':accepted['acceptance_ref']}
+            return complete(step,packet,directory,plan,result,names)
+        if kind=='dataset_acceptance':
+            result=dataset_group(step,packet,base,plan)
+            retain(directory/'result.json',encoded(result))
+            return complete(step,packet,directory,plan,result,['result.json'])
         if kind=='openstack_quota':
             return quota_dispatch(step,packet,directory,base,plan,root,observe=True,recovery_authority=recovery_authority)
         if kind=='dns_propagation':
@@ -584,9 +882,10 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                     'Recovered incident receipt changed')
             retain(directory/'containment.json',read_private(original))
             return complete(step,packet,directory,plan,result,['containment.json'])
-        if kind=='restic':
+        if kind in {'restic','dataset_restore'}:
             files=file_paths(packet); values=packet['parameters']; config=load_private(files['config'])
-            match_scope(config['scope'],plan)
+            transfer=restic_transfer(packet,files,plan)
+            if kind=='dataset_restore': dataset_binding(values,transfer)
             context=load_private(directory/'execution/context.json')
             original=load_private(files['receipt']) if 'receipt' in files else None
             expected=load_private(files['manifest']) if 'manifest' in files else None
@@ -596,7 +895,9 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                 'manifest_sha256':digest(encoded(expected)) if expected is not None else None,
                 'authority_sha256':digest(encoded(authority)) if authority is not None else None,
                 'machine_id':config['machine_id'] if values['action']=='backup' else authority['machine_id'],
-                'target':values['target']},'Interrupted backup execution context differs')
+                'target':values['target']} | ({'transfer_manifest_sha256':digest(encoded(transfer))}
+                                            if transfer is not None else {}),
+                    'Interrupted backup execution context differs')
             result=load_private(directory/'execution/receipt.json')
             require(result['scope']==config['scope'] and result['member']==config['member'],
                     'Interrupted backup receipt scope differs')
@@ -613,6 +914,15 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                 require(result['status']=='RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'
                         and result['snapshot_id']==original['snapshot_id'] and result['file_count']==len(expected['files'])
                         and result['production_activation'] is False,'Interrupted restore completion differs')
+            if transfer is not None:
+                from tools.restic_transfer import destination_receipt
+                require(load_private(directory/'execution/transfer-manifest.json')==transfer,
+                        'Interrupted transfer manifest changed')
+                destination=load_private(directory/'execution/transfer-receipt.json')
+                require(destination==destination_receipt(transfer,original,result),
+                        'Interrupted destination receipt changed')
+                result=destination
+                names.extend(['transfer-manifest.json','transfer-receipt.json'])
             for name in names: retain(directory/name,read_private(directory/'execution'/name))
             return complete(step,packet,directory,plan,result,names)
         if kind in {'terraform_apply','guest_apply'}:
@@ -624,8 +934,8 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                     and result['operation_id']==bundle['operation_id'] and result['generation']==bundle['generation'],
                     'Interrupted owner completion binding changed')
             if kind=='terraform_apply':
-                from tools.terraform_apply import scope_ledger
-                from tools.wsd_handoff import execution_outputs
+                from provisioner.execution.terraform_apply import scope_ledger
+                from provisioner.execution.wsd_handoff import execution_outputs
                 execution_outputs(prepared,bundle['scope']['phase'])
                 address=load_private(prepared/'backend.json')['address']
                 with scope_ledger(owner_ledger(base,'terraform'),address,bundle['scope']) as owned:
@@ -655,4 +965,19 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
     require(completed['format']=='hosting-delivery-owner-completion/1' and completed['plan_sha256']==c.digest(plan)
             and completed['step_id']==step['id'] and completed['packet_sha256']==c.digest(packet), 'Owner completion binding differs')
     require(artifact_receipt(directory,list(completed['artifacts']))==completed['artifacts'], 'Owner completion artifacts changed')
-    return {'status':completed['status']},list(completed['artifacts'])+['owner-completion.json']
+    result=load_private(directory/'result.json') if (directory/'result.json').exists() else {'status':completed['status']}
+    require(result.get('status')==completed['status'],'Retained owner status changed')
+    if step['kind'] in {'restic','dataset_restore'} and 'transfer_manifest' in packet['files']:
+        result=transfer_postcondition(packet,directory,plan)
+        require(result['status']==completed['status'],'Retained transfer owner status changed')
+    typed_postcondition(step,result,directory,packet,plan)
+    if step['kind']=='dataset_acceptance':
+        require(result==dataset_group(step,packet,base,plan),'Retained dataset group evidence changed')
+    if step['kind']=='acceptance' and packet['parameters']['purpose']=='services':
+        coverage=dataset_coverage(step,base,plan)
+        if coverage is not None:
+            require(coverage==load_private(directory/'dataset-coverage.json'),
+                    'Retained canonical dataset coverage changed')
+    if step['kind']=='acceptance' and packet['parameters']['purpose']=='bootstrap':
+        bootstrap_postconditions(step,plan,base)
+    return result,list(completed['artifacts'])+['owner-completion.json']

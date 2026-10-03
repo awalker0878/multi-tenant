@@ -143,8 +143,10 @@ class MobilityDeliveryTest(unittest.TestCase):
 
     def test_mobility_topology_binds_every_reviewed_subdecision(self):
         topology = self.plan['delivery']
-        self.assertEqual(topology['operation_bindings'],
-                         dict(sorted(mobility_handoff.OPERATION_BINDINGS.items())))
+        self.assertEqual({key: topology['operation_bindings'][key]
+                          for key in mobility_handoff.OPERATION_BINDINGS},
+                         mobility_handoff.OPERATION_BINDINGS)
+        self.assertIn('dataset-transfer-application-data', topology['operation_bindings'])
         self.assertEqual(topology['policy_digest'],
                          self.plan['policy_translation']['digest'])
         self.assertEqual(topology['data_transfer_digest'],

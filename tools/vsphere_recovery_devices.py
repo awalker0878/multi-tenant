@@ -1,8 +1,9 @@
 """Bind selected existing vSphere devices to pinned-provider plans; never mutate state."""
 import json
 import re
-from tools import readback_core as c, vsphere_observe as vm, vsphere_port_observe as ports, vsphere_network_observe as pg
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import vsphere_observe as vm, vsphere_port_observe as ports, vsphere_network_observe as pg
+from provisioner.execution.run_files import require
 
 SCSI = {'pvscsi': 'ParaVirtualSCSIController', 'lsilogic': 'VirtualLsiLogicController',
         'lsilogic-sas': 'VirtualLsiLogicSASController'}

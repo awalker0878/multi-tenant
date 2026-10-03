@@ -10,7 +10,7 @@ from tests.test_target_campaign import plan_fixture, window
 from tests.test_guest_inventory import fixture as guests
 from tools import qualify_target as q, vsphere_task_observe as tasks
 from tools.guest_inventory import build
-from tools.run_files import digest, encoded, write_new
+from provisioner.execution.run_files import digest, encoded, write_new
 
 
 def inputs(nsx_origin, vc_origin, task=False):
