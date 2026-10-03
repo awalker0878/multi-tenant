@@ -9,4 +9,3 @@ Unit=hosting-discovery-collect@%i.service
 
 [Install]
 WantedBy=timers.target
-
