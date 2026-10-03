@@ -223,7 +223,7 @@ class DeclaredContractTest(unittest.TestCase):
         self.assertEqual(set(capacity.RECORD_STATES), _declared(RECORD_CHECKER, 'STATES'))
 
     def test_the_mirrored_identifier_grammar_is_the_owner_grammar(self):
-        source = ast.parse((support.ROOT / 'tools' / 'readback_core.py').read_text(
+        source = ast.parse((support.ROOT / 'provisioner' / 'execution' / 'readback_core.py').read_text(
             encoding='utf-8'))
         patterns = [node.value.args[0].value for node in ast.walk(source)
                     if isinstance(node, ast.Assign)

@@ -4,9 +4,10 @@ from pathlib import Path
 import re
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, vsphere_observe as vm, nsx_observe as nsx
+from provisioner.execution import readback_core as c
+from tools import vsphere_observe as vm, nsx_observe as nsx
 from tools.nutanix_vm_observe import selected, uuid
-from tools.run_files import require
+from provisioner.execution.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-nsx-portgroups'
 CONFIG = {'_typeName', 'key', 'configVersion', 'distributedVirtualSwitch', 'backingType', 'type', 'uplink', 'logicalSwitchUuid'}

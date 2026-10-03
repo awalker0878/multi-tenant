@@ -10,12 +10,8 @@ from datetime import datetime,timezone
 import ipaddress
 import json
 from pathlib import Path
-try:
- from tools.neutron_observe import strict_loads,digest
- from provisioner.execution.input_review import PLACEHOLDER
-except ModuleNotFoundError:
- from neutron_observe import strict_loads,digest
- from input_review import PLACEHOLDER
+from provisioner.execution.neutron_observe import strict_loads,digest
+from provisioner.execution.input_review import PLACEHOLDER
 
 FIELDS={
  'nsx-route':{'gateway_path','next_hop_address'},

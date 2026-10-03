@@ -6,8 +6,9 @@ must be qualified separately for each affected entity kind.
 """
 from datetime import datetime, timezone
 from urllib.parse import urlencode
-from tools import readback_core as c, nutanix_task_tree as tree
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import nutanix_task_tree as tree
+from provisioner.execution.run_files import require
 
 KEY = 'task-activity'
 PAGE_SIZE = 25

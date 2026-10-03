@@ -6,8 +6,9 @@ import tempfile
 import unittest
 
 from provisioner.execution import handoff
-from tools import delivery_steps as steps, readback_core as c
-from tools.run_files import digest, encoded, read_private, utcnow, write_new
+from provisioner.execution import readback_core as c
+from tools import delivery_steps as steps
+from provisioner.execution.run_files import digest, encoded, read_private, utcnow, write_new
 
 
 SCOPE=dict(environment_key='test',site_key='site',platform='nutanix',tenant_key='tenant',wsd_key='wsd')
@@ -124,7 +125,7 @@ class ExactApprovalIntegrationTests(unittest.TestCase):
         self.assertEqual(len(f.apply_calls),2)
 
     def test_apply_cannot_substitute_another_approval_after_the_explicit_gate(self):
-        from tools.run_files import load_private
+        from provisioner.execution.run_files import load_private
         f=self.fixture; waiting=self.reviewed()
         changed=load_private(f.base/'apply-authority.json')|{'change_ref':'OTHER-APPROVAL'}
         path=f.base/'changed-approval.json'; write_new(path,encoded(changed))

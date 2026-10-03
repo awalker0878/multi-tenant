@@ -14,8 +14,9 @@ from tests.test_vmware_network_campaign import assets_at as port_assets_at
 from tests.nsx_domain_fixture import scenario
 from tests.test_target_campaign import window
 from tests.test_nutanix_task_tree import reseal
-from tools import qualify_target as q, nsx_domain_switch_observe as combined, readback_core as c
-from tools.run_files import digest, encoded, write_new, load_private, utcnow
+from provisioner.execution import readback_core as c
+from tools import qualify_target as q, nsx_domain_switch_observe as combined
+from provisioner.execution.run_files import digest, encoded, write_new, load_private, utcnow
 
 
 def inputs(nsx_origin='https://nsx.example.test', vc_origin='https://vc.example.test'):

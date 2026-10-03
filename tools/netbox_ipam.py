@@ -21,8 +21,8 @@ from urllib.parse import urlencode
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from provisioner.compiler.wsd import identity
-from tools.neutron_observe import strict_loads
-from tools.run_files import (current_window, digest, encoded, load_private, private_path,
+from provisioner.execution.neutron_observe import strict_loads
+from provisioner.execution.run_files import (current_window, digest, encoded, load_private, private_path,
                              read_private, replace_private, require, utcnow, write_new, OperatorError)
 from tools.service_http import JsonService
 

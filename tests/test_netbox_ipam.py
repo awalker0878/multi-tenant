@@ -15,7 +15,7 @@ from lab.native_readback_fixture import credentials
 from tools.netbox_ipam import (CLEANUP_CATEGORIES, MAX_QUARANTINE_SECONDS, QUARANTINE_RECEIPT,
                               RELEASE_EVIDENCE, RELEASE_RECEIPT, AllocationReader, operate,
                               validate_authority, validate)
-from tools.run_files import digest, encoded, load_private, replace_private, utcnow
+from provisioner.execution.run_files import digest, encoded, load_private, replace_private, utcnow
 from tools.service_http import JsonService
 
 

@@ -15,7 +15,7 @@ import sys
 from urllib.parse import urlencode
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c
+from provisioner.execution import readback_core as c
 
 PROFILE = 'nsx-local-policy-v1-selected-fields'
 PART = r'[A-Za-z0-9][A-Za-z0-9_-]{0,127}'
@@ -170,7 +170,7 @@ def realization_witness(body):
 
 def validate_observation_history(m, history, states, current=None):
     """Recompute realization and refuse matching summaries contradicted by either read."""
-    from tools.run_files import require
+    from provisioner.execution.run_files import require
     try:
         if len(states) == 1 and states[0].get('resource_key') == 'scope':
             require(states[0].get('config_status') == states[0].get('progress') == 'UNKNOWN', 'Invalid scope hold')

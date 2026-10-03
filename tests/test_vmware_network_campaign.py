@@ -16,7 +16,7 @@ from tests.test_target_campaign import window
 from tests.test_nutanix_vm_observe import uid
 from tools import qualify_target as q, vmware_network_binding as binding, nsx_segment_observe as nsx
 from tools.guest_inventory import build
-from tools.run_files import digest, encoded, write_new
+from provisioner.execution.run_files import digest, encoded, write_new
 
 
 def inputs(nsx_origin='https://nsx.example.test', vc_origin='https://vc.example.test'):

@@ -6,7 +6,7 @@ import unittest
 from tools import lifecycle_transition as t, terraform_run as run
 from provisioner.compiler.wsd import STATE
 from tools.plan_review import review
-from tools.run_files import digest, encoded, utcnow
+from provisioner.execution.run_files import digest, encoded, utcnow
 
 CATEGORY = '11111111-1111-4111-8111-111111111111'
 VPC = '22222222-2222-4222-8222-222222222222'

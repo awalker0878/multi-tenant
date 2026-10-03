@@ -7650,7 +7650,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Default OpenStack security-group behaviour SHALL be reviewed and normalized to the secure-by-default service baseline.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7676,7 +7676,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Provider networks and external-router capabilities SHALL remain provider controlled and SHALL not become unrestricted tenant escape paths.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7702,7 +7702,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations; native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7729,7 +7729,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7756,7 +7756,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",

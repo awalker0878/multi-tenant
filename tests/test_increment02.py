@@ -15,8 +15,8 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from tools import neutron_observe as no
-from tools.route_record_review import review,COMMON,FIELDS
+from provisioner.execution import neutron_observe as no
+from provisioner.execution.route_record_review import review,COMMON,FIELDS
 from lab.run_namespace_lab import validate_fixture,rules_for,endpoint
 from lab.worker import dns_question,dns_answer,validate_dns_answer,fixture_ip
 from lab.link_config import attribute,set_forwarding
@@ -134,7 +134,7 @@ class ObservationTests(unittest.TestCase):
  def test_empty_collection_never_success(self):
   with self.assertRaises(ValueError):no.observe({'project_id':PROJECT,'engineering_record_ref':'ENG','resources':[]},None)
  def test_live_command_requires_opt_in(self):
-  result=subprocess.run([os.sys.executable,str(ROOT/'tools/neutron_observe.py'),'does-not-exist',
+  result=subprocess.run([os.sys.executable,str(ROOT/'provisioner/execution/neutron_observe.py'),'does-not-exist',
     '--endpoint','https://invalid.example/v2.0','--expected-origin','https://invalid.example','--output','unused'],capture_output=True,text=True,timeout=5)
   self.assertNotEqual(result.returncode,0);self.assertIn('No target contacted',result.stderr)
 

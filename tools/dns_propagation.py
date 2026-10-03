@@ -21,8 +21,9 @@ import dns.rdatatype
 
 ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
-from tools import dns_change as writer, readback_core as c
-from tools.run_files import (current_window, digest, encoded, load_private, require,
+from provisioner.execution import readback_core as c
+from tools import dns_change as writer
+from provisioner.execution.run_files import (current_window, digest, encoded, load_private, require,
                              utcnow, write_new)
 
 STATUS = 'SELECTED_DNS_VIEWS_OBSERVED_REQUIRES_ACCEPTANCE'

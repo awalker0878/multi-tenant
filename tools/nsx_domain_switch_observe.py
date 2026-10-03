@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import nsx_domain_observe as domain, nsx_segment_observe as switches
-from tools.run_files import require
+from provisioner.execution.run_files import require
 
 PROFILE = 'nsx-local-policy-v1-domain-switches'
 observation_keys = switches.observation_keys

@@ -7,8 +7,9 @@ import os
 from pathlib import Path
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, recovery_review, vsphere_task_tree_observe as tree
-from tools.run_files import digest, encoded, load_private, private_path, read_private, require, write_new, utcnow
+from provisioner.execution import readback_core as c
+from tools import recovery_review, vsphere_task_tree_observe as tree
+from provisioner.execution.run_files import digest, encoded, load_private, private_path, read_private, require, write_new, utcnow
 from tools.terraform_run import ROOT, select_scope, backend_settings
 from tools.plan_review import has_true
 from tools import nutanix_terraform_recovery as ahv, nutanix_flow_terraform_recovery as flow, lifecycle_transition

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.36 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.37 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -207,6 +207,8 @@ Offline route/intent checking now consumes the package-owned route-audit model. 
 The implementation-input review boundary now resolves through the installed execution
 package. It validates only submitted non-secret Terraform-root inputs and does not
 allocate addresses, validate external approvals or grant target/native authority.
+
+The [operator/readback runtime owners](../engineering/operator-readback-runtime.md) now resolve inside the installed execution package. Scope/digest/file contracts and explicit target-contact gates are unchanged; retained-state conversion and native qualification remain open.
 
 ## Engineering and implementation handoff
 

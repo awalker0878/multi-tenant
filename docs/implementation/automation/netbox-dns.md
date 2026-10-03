@@ -44,7 +44,7 @@ python tools/netbox_dns.py --action register \
 ```
 
 This command makes no service contact. It returns `VALIDATED_NO_CONTACT` and
-`binding_sha256`: SHA-256 of `tools.run_files.encoded` applied to an object with
+`binding_sha256`: SHA-256 of `provisioner.execution.run_files.encoded` applied to an object with
 `allocation`, `confirmation`, `job` and `scope` containing those exact four parsed
 inputs. This is distinct from the DNS writer's compact JSON hashes.
 

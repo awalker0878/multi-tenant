@@ -14,14 +14,15 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import nutanix_flow_activity_observe
-from tools import readback_core as c, neutron_observe, nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
+from provisioner.execution import readback_core as c, neutron_observe
+from tools import nsx_observe, nutanix_observe, openstack_observe, nutanix_vm_observe, nutanix_flow_observe
 from provisioner.compiler.wsd import STATE
 from tools import vsphere_observe, vsphere_task_observe, vsphere_task_tree_observe, nutanix_vm_task_observe, nutanix_vm_activity_observe
 from tools import nsx_segment_observe, nsx_domain_switch_observe, nsx_domain_binding, vmware_network_binding
 from tools import recovery_review, vsphere_port_observe
 from provisioner.execution.source_integrity import verify
 from tools.guest_inventory import build
-from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
+from provisioner.execution.run_files import (current_window, digest, encoded, load_private, new_directory,
     read_private, replace_private, require, utcnow, write_new)
 
 ASSETS = {'inventory', 'native_manifest', 'native_credentials', 'native_ca',
@@ -316,7 +317,9 @@ def reader_child(plan, assets, authority, directory, label, script, manifest_nam
     output = directory / (label + '.json')
     vcenter = platform == 'vmware' and manifest_name in {'workload_manifest', 'portgroup_manifest'}
     origin = c.strict_loads(assets[manifest_name])['origin'] if vcenter else plan['origin']
-    argv = [sys.executable, str(ROOT / 'tools' / script), str(directory / manifest_name),
+    reader_path = (ROOT / 'provisioner/execution/neutron_observe.py'
+                   if script == 'neutron_observe.py' else ROOT / 'tools' / script)
+    argv = [sys.executable, str(reader_path), str(directory / manifest_name),
             '--read-authorized-target', '--expected-origin', origin,
             '--ca-file', str(directory / ('workload_ca' if vcenter else 'native_ca')), '--output', str(output)]
     env = {'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8', 'PYTHONDONTWRITEBYTECODE': '1'}

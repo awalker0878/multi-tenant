@@ -14,8 +14,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import readback_core as c, openstack_transition as os_transition
-from tools.run_files import current_window, digest, encoded, load_private, read_private, require, write_new
+from provisioner.execution import readback_core as c
+from tools import openstack_transition as os_transition
+from provisioner.execution.run_files import current_window, digest, encoded, load_private, read_private, require, write_new
 
 FORMAT = 'hosting-platform-transition/1'
 KNOBS = {'lifecycle_stage', 'bootstrap_acceptance_ref', 'bootstrap_rules'}

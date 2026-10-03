@@ -17,9 +17,10 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from tools import remote_owner,owner_worker,owner_install,owner_revocations,ssh_issuer,readback_core as c
+from provisioner.execution import readback_core as c
+from tools import remote_owner, owner_worker, owner_install, owner_revocations, ssh_issuer
 from provisioner.execution.source_integrity import verify
-from tools.run_files import digest,encoded,read_private,utcnow,write_new
+from provisioner.execution.run_files import digest,encoded,read_private,utcnow,write_new
 
 
 def run(user):

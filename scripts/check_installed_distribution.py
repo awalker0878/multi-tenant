@@ -45,9 +45,12 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
-    from provisioner.execution import terraform_catalog, source_integrity, guest_probe, route_audit, input_review
+    from provisioner.execution import terraform_catalog, source_integrity, guest_probe, route_audit, input_review, readback_core, neutron_observe, run_files, route_record_review
     assert terraform_catalog.entries()
     assert callable(input_review.review_inputs)
+    assert neutron_observe.strict_loads('{"value": true}') == {"value": True}
+    assert callable(readback_core.identifier) and callable(run_files.write_new)
+    assert callable(route_record_review.review)
     assert source_integrity.verify()['status'] == 'BLOCKED_NO_CURRENT_CHECKOUT'
     from provisioner.allocations import (reservation_evidence, ipam_evidence, dns_evidence,
         capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight)
@@ -143,6 +146,10 @@ assert importlib.util.find_spec('tools.terraform_catalog') is None
 assert importlib.util.find_spec('tools.guest_probe') is None
 assert importlib.util.find_spec('tools.route_audit') is None
 assert importlib.util.find_spec('tools.input_review') is None
+assert importlib.util.find_spec('tools.readback_core') is None
+assert importlib.util.find_spec('tools.neutron_observe') is None
+assert importlib.util.find_spec('tools.run_files') is None
+assert importlib.util.find_spec('tools.route_record_review') is None
 assert importlib.util.find_spec('tools.check_release') is None
 assert importlib.util.find_spec('scripts.check_reservation_records') is None
 import scripts
@@ -158,7 +165,7 @@ from provisioner.controlplane.discovery import (adoption, assessment, grouping,
 from provisioner.controlplane.discovery.adapters import (ahv, openstack, vmware,
                                                           vmware_rest)
 
-for module in (guest_probe, route_audit, input_review, reservation_evidence, ipam_evidence, dns_evidence, capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight, source_integrity, terraform_catalog,review_intake, review_files, owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
+for module in (readback_core, neutron_observe, run_files, route_record_review, guest_probe, route_audit, input_review, reservation_evidence, ipam_evidence, dns_evidence, capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight, source_integrity, terraform_catalog,review_intake, review_files, owner_signing, freshness, freshness_history, batch_runtime, read_budget, provisioner, draft_client, assessment_client, application_assessment, application_review, application_reviews, application_drafts, collector_runtime, collector_settings, collector_config, publication, publication_https, components, wsd, native_credentials, native_https, openstack_credentials, openstack_https, ahv_credentials, ahv_https, vmware_credentials, vmware_https, scripts, tools, hosting_resources, campaign, native, provenance, registry, target_selection, adoption, ahv, assessment, grouping,
                ingest, model, openstack, persistence, routes, runtime, trust,
                vmware, vmware_rest, witness):
     assert Path(module.__file__).resolve().is_relative_to(site), module.__file__

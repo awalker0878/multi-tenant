@@ -180,3 +180,19 @@ checks and active documentation migrated to the package owner. The old path is d
 and prohibited without a forwarding module. This is read-only input validation; it
 converts no retained state and grants no target, address-allocation or execution
 authority.
+
+### Package-owned operator files and readback primitives — 3 October 2026
+
+The actual `readback_core`, exact-ID `neutron_observe`, private `run_files` and
+`route_record_review` implementations now live under `provisioner.execution`.
+Every active import, command, source link and validation consumer migrated; the
+four old tool paths are deleted and independently registered as retired. Installed
+checks block legacy imports and require all owners in the wheel; reused staging
+cannot retain their old source or bytecode. The route reviewer has no standalone
+import fallback.
+
+Scope, digest, file/ledger formats, transport allowlists, explicit target-contact
+opt-in and uncertainty rules remain unchanged. This is implementation ownership,
+not a retained-state importer, distributed fence or native acceptance. B05 remains
+open for the dependent execution owners, installed service composition and retained
+state conversion. See the [runtime owner contract](../../engineering/operator-readback-runtime.md).

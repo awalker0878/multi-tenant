@@ -19,7 +19,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.run_files import (current_window, digest, encoded, load_private, new_directory,
+from provisioner.execution.run_files import (current_window, digest, encoded, load_private, new_directory,
                              private_path, replace_private, require, utcnow, write_new, OperatorError)
 
 

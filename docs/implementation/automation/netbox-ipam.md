@@ -34,7 +34,7 @@ search or automatic substitution occurs. The immutable request hash binds all of
 these fields to the native object and the durable ledger.
 
 The authority contains `request_sha256` (SHA-256 of sorted, two-space-indented
-JSON plus newline, as encoded by `tools.run_files.encoded`), exact `action`,
+JSON plus newline, as encoded by `provisioner.execution.run_files.encoded`), exact `action`,
 `valid_from`, `valid_until` (at most one hour), `change_ref`, `cleanup_ref`, and
 `token_sha256`/`ca_sha256` of the exact private credential/trust files. The CA hash
 is null when using system trust. `cleanup_ref` must identify separately accepted

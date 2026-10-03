@@ -5,9 +5,10 @@ from pathlib import Path
 import re
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, vsphere_network_observe as pg, vsphere_observe as vm
+from provisioner.execution import readback_core as c
+from tools import vsphere_network_observe as pg, vsphere_observe as vm
 from tools.nutanix_vm_observe import selected
-from tools.run_files import require
+from provisioner.execution.run_files import require
 
 PROFILE = 'vsphere-vi-json-8.0.3.0-nsx-port-attachments'
 PORT_FIELDS = {'_typeName', 'key', 'config', 'dvsUuid', 'portgroupKey', 'proxyHost',

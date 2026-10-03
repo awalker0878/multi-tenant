@@ -55,7 +55,15 @@ class InstalledDistributionTest(unittest.TestCase):
             path = cls.staging / relative / 'stale.json'
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
-        cls.retired_python = ('tools/terraform_catalog.py', 'tools/terraform_catalog.pyc',
+        cls.retired_python = ('tools/readback_core.py', 'tools/readback_core.pyc',
+                              'tools/__pycache__/readback_core.cpython-313.pyc',
+                              'tools/neutron_observe.py', 'tools/neutron_observe.pyc',
+                              'tools/__pycache__/neutron_observe.cpython-313.pyc',
+                              'tools/run_files.py', 'tools/run_files.pyc',
+                              'tools/__pycache__/run_files.cpython-313.pyc',
+                              'tools/route_record_review.py', 'tools/route_record_review.pyc',
+                              'tools/__pycache__/route_record_review.cpython-313.pyc',
+                              'tools/terraform_catalog.py', 'tools/terraform_catalog.pyc',
                               'tools/__pycache__/terraform_catalog.cpython-313.pyc',
                               'tools/check_release.py', 'tools/check_release.pyc',
                               'tools/__pycache__/check_release.cpython-313.pyc',
@@ -132,11 +140,70 @@ class InstalledDistributionTest(unittest.TestCase):
     def probe(self, source):
         return json.loads(self.run_checked([str(self.python), '-I', '-c', source]))
 
+    def test_installed_readback_and_route_review_work_without_legacy_imports(self):
+        result = self.probe(r"""
+import importlib.abc
+import importlib.util
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import sys
+class RejectLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('legacy import: '+fullname)
+sys.meta_path.insert(0, RejectLegacy())
+from provisioner.execution import neutron_observe as neutron, readback_core as core, run_files as files, route_record_review as route
+assert not any(x == 'tools' or x.startswith('tools.') for x in sys.modules)
+assert core.identifier('operation-1') == 'operation-1'
+inputs = {'tenant_key': 'tenant-a', 'domain_key': 'domain-a', 'route_key': 'route-a',
+ 'destination_cidr': '10.30.0.0/24', 'engineering_record_ref': 'ENG-1',
+ 'attachment_acceptance_ref': 'ATTACH-1', 'router_id': 'router-1',
+ 'next_hop_address': '10.20.0.1', 'allow_restricted_build': True,
+ 'test_authorization_ref': 'TEST-1'}
+now = datetime.now(timezone.utc)
+record = {'module': 'openstack-route', 'route': {k: inputs[k] for k in route.COMMON | route.FIELDS['openstack-route']},
+ 'valid_from': (now-timedelta(minutes=1)).isoformat(),
+ 'valid_until': (now+timedelta(minutes=1)).isoformat(), 'attachment_cidr': '10.20.0.0/24'}
+accepted = route.review('openstack-route', inputs, record, now=now)
+assert accepted['status'] == 'RECORD_MATCH_NOT_AUTHORIZED'
+record['route']['router_id'] = 'foreign-router'
+assert route.review('openstack-route', inputs, record, now=now)['status'] == 'BLOCKED'
+private = Path.cwd() / 'installed-private-operator'
+private.mkdir(mode=0o700)
+packet = private / 'packet.json'
+files.write_new(packet, files.encoded({'operation_id':'operation-1','value':True}))
+assert files.load_private(packet)['value'] is True
+try:
+    files.write_new(packet, b'{}')
+except FileExistsError:
+    pass
+else:
+    raise AssertionError('immutable start overwritten')
+try:
+    neutron.strict_loads('{"duplicate":1,"duplicate":2}')
+except ValueError:
+    pass
+else:
+    raise AssertionError('duplicate input accepted')
+print(json.dumps({'status':'PASSED','nativeContact':False}))
+""")
+        self.assertEqual(result, {'status': 'PASSED', 'nativeContact': False})
+
     def test_wheel_owns_all_data_without_shared_top_level_directories(self):
         with zipfile.ZipFile(self.wheel) as wheel:
             members = wheel.namelist()
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
         self.assertIn('provisioner/execution/input_review.py', members)
+        self.assertIn('provisioner/execution/readback_core.py', members)
+        self.assertFalse(any(name.startswith('tools/readback_core.') for name in members))
+        self.assertIn('provisioner/execution/neutron_observe.py', members)
+        self.assertFalse(any(name.startswith('tools/neutron_observe.') for name in members))
+        self.assertIn('provisioner/execution/run_files.py', members)
+        self.assertFalse(any(name.startswith('tools/run_files.') for name in members))
+        self.assertIn('provisioner/execution/route_record_review.py', members)
+        self.assertFalse(any(name.startswith('tools/route_record_review.') for name in members))
+
         self.assertIn('provisioner/execution/source_integrity.py', members)
         self.assertIn('provisioner/execution/guest_probe.py', members)
         self.assertIn('provisioner/execution/route_audit.py', members)

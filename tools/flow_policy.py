@@ -1,6 +1,6 @@
 """Exact Terraform Flow rule validation for the owned restricted policy."""
-from tools import readback_core as c
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from provisioner.execution.run_files import require
 
 ALTERNATE_SPECS = {'two_env_isolation_rule_spec', 'multi_env_isolation_rule_spec',
                    'application_rule_spec', 'intra_entity_group_rule_spec'}

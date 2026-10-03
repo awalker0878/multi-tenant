@@ -122,7 +122,7 @@ class MirroredContractTest(unittest.TestCase):
                 self.assertEqual(handoff._declared_parameters(kind), set(entry[0]))
 
     def test_the_identifier_grammar_is_the_declared_grammar(self):
-        from tools import readback_core
+        from provisioner.execution import readback_core
         self.assertEqual(handoff.IDENTIFIER.pattern, readback_core.ID.pattern)
 
     def test_the_graph_and_step_keys_are_the_ones_the_runner_requires(self):

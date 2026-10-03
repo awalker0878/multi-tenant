@@ -14,7 +14,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.restic_run import Restic, backup, restore, sha_file
-from tools.run_files import utcnow
+from provisioner.execution.run_files import utcnow
 
 
 def run(binary):

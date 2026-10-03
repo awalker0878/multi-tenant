@@ -14,7 +14,8 @@ from lab.native_readback_fixture import Fixture, TASK, VPC, TENANT
 from lab.nutanix_task_tree_fixture import reset, manifest, responses, CHILD_A, CHILD_B, GRANDCHILD, SUBNET
 from lab.run_readback_lab import operator_context
 from lab.run_task_tree_lab import cli_environment
-from tools import nutanix_observe as native, nutanix_task_tree as tree, readback_core as c, recovery_review as rr
+from provisioner.execution import readback_core as c
+from tools import nutanix_observe as native, nutanix_task_tree as tree, recovery_review as rr
 ROOT=Path(__file__).resolve().parents[1]
 
 

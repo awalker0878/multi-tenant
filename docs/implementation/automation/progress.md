@@ -779,3 +779,19 @@ Provide accepted records through private operator systems, not repository commit
 3. Declared image/OS/address-family/service/recovery offers, change and resource owners, restricted qualification authority, permitted bootstrap paths, and evidence locations.
 
 The reference product choices are already recorded and implemented to the limits above. These private inputs identify real assets and remaining service boundaries; they cannot be inferred from symbolic documentation. Supplying them is not evidence that the work is complete: each package still needs actual execution results and its accepting authority.
+
+### Package-owned operator files and readback primitives — 3 October 2026
+
+The actual `readback_core`, exact-ID `neutron_observe`, private `run_files` and
+`route_record_review` implementations now live under `provisioner.execution`.
+Every active import, command, source link and validation consumer migrated; the
+four old tool paths are deleted and independently registered as retired. Installed
+checks block legacy imports and require all owners in the wheel; reused staging
+cannot retain their old source or bytecode. The route reviewer has no standalone
+import fallback.
+
+Scope, digest, file/ledger formats, transport allowlists, explicit target-contact
+opt-in and uncertainty rules remain unchanged. This is implementation ownership,
+not a retained-state importer, distributed fence or native acceptance. B05 remains
+open for the dependent execution owners, installed service composition and retained
+state conversion. See the [runtime owner contract](../../engineering/operator-readback-runtime.md).

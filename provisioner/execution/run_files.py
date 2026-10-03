@@ -9,7 +9,7 @@ from pathlib import Path
 import stat
 import tempfile
 
-from tools.neutron_observe import strict_loads
+from provisioner.execution.neutron_observe import strict_loads
 
 
 class OperatorError(ValueError):

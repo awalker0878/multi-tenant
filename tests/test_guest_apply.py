@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 from tests.test_guest_run import inputs, prepare, SOURCE
 from tools import guest_apply as a, guest_run as g
-from tools.run_files import digest, encoded, file_map, load_private, utcnow, write_new
+from provisioner.execution.run_files import digest, encoded, file_map, load_private, utcnow, write_new
 
 
 def configured(folder, mode='check', ssh=None):

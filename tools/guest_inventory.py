@@ -16,7 +16,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from provisioner.compiler.wsd import STATE, fields, identity, require
-from tools.neutron_observe import strict_loads
+from provisioner.execution.neutron_observe import strict_loads
 from tools.guest_services import PROFILE, validate_services, verify_assets
 
 

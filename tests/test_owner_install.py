@@ -7,8 +7,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools import owner_install as d, readback_core as c
-from tools.run_files import digest, encoded, utcnow, write_new
+from provisioner.execution import readback_core as c
+from tools import owner_install as d
+from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 
 
 def key(byte):

@@ -15,7 +15,7 @@ from lab.native_readback_fixture import Fixture, manifest, responses, credential
 from provisioner.execution.guest_probe import probe
 from tools.qualify_target import (ASSETS, authority_matches, budget, native_readback,
                                   traffic_campaign, validate, bound_inputs, workload_binding, WORKLOAD_ASSETS)
-from tools.run_files import digest, encoded, utcnow, write_new
+from provisioner.execution.run_files import digest, encoded, utcnow, write_new
 from tools.guest_inventory import build
 from tests.test_guest_inventory import fixture
 
@@ -38,7 +38,7 @@ def plan_fixture():
 class CampaignTests(unittest.TestCase):
     def test_v2_real_tls_combines_network_and_workload_observations(self):
         from tests.test_openstack_observe import OpenStackReadbackTests, PROJECT
-        from tools import neutron_observe as n
+        from provisioner.execution import neutron_observe as n
         fixture = OpenStackReadbackTests(); fixture.setUp()
         try:
             with tempfile.TemporaryDirectory() as tmp:

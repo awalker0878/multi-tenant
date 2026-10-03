@@ -27,7 +27,7 @@ The canonical key is
 `{tenant_key}/{wsd_key}@{environment_key}/{site_key}/{platform}`, and the identity
 digest is the canonical digest of those five components. Every component must match
 the scoped-identifier grammar `^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$` — the same rule
-`tools/delivery_run.validate` already enforces through `tools.readback_core.ID`. The
+`tools/delivery_run.validate` already enforces through `provisioner.execution.readback_core.ID`. The
 identity is **derived** from the resolved desired state rather than stored beside it,
 because the desired state already carries all five components and a second stored
 copy could only drift.

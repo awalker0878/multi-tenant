@@ -266,6 +266,23 @@ This model still simulates only the documented reference routing semantics. It d
 
 This deletion changes no repository-check logic, native interface, source format, authority or retained execution state. The remaining direct operator/execution owners and B48 conversion work keep B05 open.
 
+
+### Package-owned operator files and readback primitives — 3 October 2026
+
+The actual `readback_core`, exact-ID `neutron_observe`, private `run_files` and
+`route_record_review` implementations now live under `provisioner.execution`.
+Every active import, command, source link and validation consumer migrated; the
+four old tool paths are deleted and independently registered as retired. Installed
+checks block legacy imports and require all owners in the wheel; reused staging
+cannot retain their old source or bytecode. The route reviewer has no standalone
+import fallback.
+
+Scope, digest, file/ledger formats, transport allowlists, explicit target-contact
+opt-in and uncertainty rules remain unchanged. This is implementation ownership,
+not a retained-state importer, distributed fence or native acceptance. B05 remains
+open for the dependent execution owners, installed service composition and retained
+state conversion. See the [runtime owner contract](../engineering/operator-readback-runtime.md).
+
 ## 2. Corrected dependencies and delivery order
 
 | Correction | Required sequence and reason |

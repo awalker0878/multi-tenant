@@ -13,8 +13,8 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools import readback_core as c
-from tools.run_files import current_window, digest, encoded, load_private, new_directory, read_private, require, utcnow, write_new
+from provisioner.execution import readback_core as c
+from provisioner.execution.run_files import current_window, digest, encoded, load_private, new_directory, read_private, require, utcnow, write_new
 
 KINDS = {
     'server': ('compute', 'servers', 'server', 'compute 2.79', {

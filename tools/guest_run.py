@@ -17,7 +17,7 @@ from provisioner.execution.source_integrity import verify
 from provisioner.compiler.wsd import identity
 from tools.guest_inventory import build, gate
 from tools.guest_services import PROFILE, verify_assets
-from tools.run_files import (digest, encoded, file_map, load_private, new_directory,
+from provisioner.execution.run_files import (digest, encoded, file_map, load_private, new_directory,
     private_path, read_private, require, utcnow, write_new)
 from tools.wsd_handoff import execution_outputs
 
@@ -30,6 +30,10 @@ GUEST_PACKAGE_SOURCE = (
     'provisioner/__init__.py', 'provisioner/domain/__init__.py',
     'provisioner/domain/errors.py', 'provisioner/compiler/__init__.py',
     'provisioner/compiler/wsd.py', 'provisioner/compiler/components.py',
+    'provisioner/execution/__init__.py', 'provisioner/execution/readback_core.py',
+    'provisioner/execution/neutron_observe.py', 'provisioner/execution/run_files.py',
+    'provisioner/execution/route_record_review.py', 'provisioner/execution/input_review.py',
+    'provisioner/execution/route_audit.py',
 )
 REFERENCES = {'target_binding_ref', 'bootstrap_ref', 'writer_coordination_ref', 'runtime_ref', 'recovery_ref'}
 RUNTIME_INSPECT = r'''

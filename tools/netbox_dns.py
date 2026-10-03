@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools import dns_change as dns_writer
 from tools.netbox_ipam import AllocationReader, allocation_lock, refs, validate as validate_allocation
-from tools.run_files import (current_window, digest, encoded, load_private, private_path,
+from provisioner.execution.run_files import (current_window, digest, encoded, load_private, private_path,
                              read_private, replace_private, require, sync_directory, utcnow, write_new)
 from tools.service_http import JsonService
 

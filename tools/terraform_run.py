@@ -22,9 +22,9 @@ from provisioner.repository import asset_path
 
 from provisioner.execution.source_integrity import verify
 from provisioner.compiler.wsd import identity
-from tools.neutron_observe import strict_loads
+from provisioner.execution.neutron_observe import strict_loads
 from tools.plan_review import review
-from tools.run_files import (current_window, digest, encoded, file_map, load_private,
+from provisioner.execution.run_files import (current_window, digest, encoded, file_map, load_private,
                              new_directory, private_path, read_private, require,
                              utcnow, write_new, OperatorError)
 from provisioner.execution.terraform_catalog import entries

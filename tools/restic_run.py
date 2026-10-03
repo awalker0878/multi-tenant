@@ -21,7 +21,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.run_files import (digest, encoded, load_private, new_directory, private_path,
+from provisioner.execution.run_files import (digest, encoded, load_private, new_directory, private_path,
                              read_private, replace_private, require, utcnow, write_new, OperatorError)
 
 
@@ -230,7 +230,7 @@ def execute(action, config, credentials, binary, operation, *, ca_file=None,
         require(all(value is None for value in (receipt, expected, target, authority, transfer, transfer_guard)),
                 'Backup cannot carry restore inputs')
     else:
-        from tools.run_files import current_window
+        from provisioner.execution.run_files import current_window
         require(all(value is not None for value in (receipt, expected, target, authority)), 'Exact restore inputs required')
         current_window(authority)
         require(set(authority) == {'valid_from', 'valid_until', 'config_sha256', 'receipt_sha256',

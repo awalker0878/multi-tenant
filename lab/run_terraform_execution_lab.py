@@ -17,7 +17,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.run_files import encoded, load_private, write_new
+from provisioner.execution.run_files import encoded, load_private, write_new
 from tools.terraform_run import command, process_environment
 
 

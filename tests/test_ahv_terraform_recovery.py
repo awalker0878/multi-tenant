@@ -13,8 +13,9 @@ from lab.run_readback_lab import operator_context
 from tests import test_nutanix_vm_activity as activity_fixture
 from tests.test_lifecycle_transition import fixture as lifecycle_fixture
 from tools import nutanix_terraform_recovery as ahv, terraform_recovery_review as review
-from tools import nutanix_vm_activity_observe as activity, lifecycle_transition as lifecycle, readback_core as c
-from tools.run_files import digest, encoded, write_new, load_private
+from provisioner.execution import readback_core as c
+from tools import nutanix_vm_activity_observe as activity, lifecycle_transition as lifecycle
+from provisioner.execution.run_files import digest, encoded, write_new, load_private
 from tools.terraform_run import select_scope
 
 

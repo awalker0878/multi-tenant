@@ -10,7 +10,8 @@ from unittest.mock import patch
 from lab.native_readback_fixture import Fixture
 from lab.nutanix_task_tree_fixture import reset
 from scripts.check_documentation import Builder
-from tools import readback_core as c, nutanix_observe as native, recovery_review as rr
+from provisioner.execution import readback_core as c
+from tools import nutanix_observe as native, recovery_review as rr
 
 ROOT = Path(__file__).resolve().parents[1]
 

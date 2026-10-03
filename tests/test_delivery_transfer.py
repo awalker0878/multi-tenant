@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from tools import delivery_steps as steps, restic_run
-from tools.run_files import digest, encoded, load_private, read_private, write_new, replace_private, utcnow
+from provisioner.execution.run_files import digest, encoded, load_private, read_private, write_new, replace_private, utcnow
 
 
 class DeliveryTransferTests(unittest.TestCase):
@@ -127,7 +127,7 @@ class DeliveryTransferTests(unittest.TestCase):
         self.assertEqual(self.fixture.calls,calls)
 
     def service_gate(self):
-        from tools import readback_core as c
+        from provisioner.execution import readback_core as c
         group,group_packet,group_path=self.group_packet()
         service={'id':'services','kind':'acceptance','needs':['group']}
         self.plan['steps'].append(service)

@@ -10,13 +10,13 @@ them. A Git merge and a structural documentation pass are not adoption or site a
 | Record | Version / status | Scope |
 |---|---|---|
 | [RAD-M01](RAD-adoption.md) | 0.15 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
-| [TAD-M01](TAD-infrastructure.md) | 0.37 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [TAD-M01](TAD-infrastructure.md) | 0.38 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
 | [SOL-M01](internal-hosting-solution.md) | 0.5 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
 | [SOL-M02](public-hosting-design-profile.md) | 0.5 / Proposed | Deferred public-extension design; no inherited public activation. |
-| [ICD-M01](interface-agreements.md) | 0.36 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [ICD-M01](interface-agreements.md) | 0.37 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
 | [TRANS-M01](transition-and-as-built.md) | 0.25 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-TAD-M01 is **version 0.37 (Proposed)**; ICD-M01 is **version 0.36 (Proposed)**.
+TAD-M01 is **version 0.38 (Proposed)**; ICD-M01 is **version 0.37 (Proposed)**.
 
 The current review consolidates chronological appendices, corrects stale collector
 selectors and separates completed repository components from unfinished deployment

@@ -9,8 +9,9 @@ from copy import deepcopy
 from pathlib import Path
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, nutanix_vm_task_observe as task, nutanix_entity_activity as activity
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import nutanix_vm_task_observe as task, nutanix_entity_activity as activity
+from provisioner.execution.run_files import require
 
 PROFILE = 'nutanix-ahv-v4.2-prism-v4.3-vm-task-activity'
 # Preserve the AHV adapter's public query interface and report vocabulary.

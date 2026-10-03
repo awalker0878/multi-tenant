@@ -36,7 +36,7 @@ import dns.update
 
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools.neutron_observe import strict_loads, write_private
+from provisioner.execution.neutron_observe import strict_loads, write_private
 
 DOC_NETS = tuple(ipaddress.ip_network(x) for x in (
     '192.0.2.0/24', '198.51.100.0/24', '203.0.113.0/24', '2001:db8::/32'))

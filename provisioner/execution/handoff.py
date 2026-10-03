@@ -51,7 +51,7 @@ TOPOLOGY_KEYS = ('format', 'steps', 'operationBindings', 'reviewedParameters',
                  'compiledCatalogIds')
 
 #: Mirrors `tools.delivery_steps.KINDS`, the declared typed-step contract, and
-#: `tools.readback_core.ID`, the declared identifier grammar. The tools are the
+#: `provisioner.execution.readback_core.ID`, the declared identifier grammar. The tools are the
 #: owners; `tests/provisioning/unit/test_delivery_handoff.py` compares every mirror
 #: against them, so a kind or a grammar the runner adds cannot drift unnoticed.
 KINDS = frozenset({

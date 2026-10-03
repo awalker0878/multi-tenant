@@ -35,7 +35,7 @@ Supply the ownership schedule, expected immutable identities, non-destructive ad
 Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [tools/recovery_review.py](../../tools/recovery_review.py)
-- [tools/route_record_review.py](../../tools/route_record_review.py)
+- [provisioner/execution/route_record_review.py](../../provisioner/execution/route_record_review.py)
 - [terraform/stacks/components](../../terraform/stacks/components)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

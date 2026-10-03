@@ -11,10 +11,11 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
-from tools import execution_journal as journal, readback_core as c
+from provisioner.execution import readback_core as c
+from tools import execution_journal as journal
 from tools import vsphere_observe as vm, vsphere_task_observe as task
 from provisioner.execution.source_integrity import verify
-from tools.run_files import current_window, encoded, load_private, require
+from provisioner.execution.run_files import current_window, encoded, load_private, require
 from tools.vsphere_history import CollectorClient
 
 FORMAT = 'hosting-vsphere-power/1'

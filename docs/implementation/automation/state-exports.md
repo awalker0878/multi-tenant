@@ -26,7 +26,7 @@ A private `hosting-state-export/1` request contains exactly:
 | --- | --- |
 | `format`, `enabled` | `hosting-state-export/1`; explicit boolean execution selection |
 | `source_commit`, `operation_id` | Exact clean export source SHA and stable export identifier |
-| `project_request_sha256`, `project_receipt_sha256` | `tools.readback_core.digest` of the original accepted project request and receipt |
+| `project_request_sha256`, `project_receipt_sha256` | `provisioner.execution.readback_core.digest` of the original accepted project request and receipt |
 | `reader_id` | Active native user ID in the accepted member list, with Developer-or-higher state-read permission |
 | `states` | Complete sorted state-slot expectations described below |
 | `consistency_ref` | Independent accepted writer-quiescence/application-consistency record for this capture |

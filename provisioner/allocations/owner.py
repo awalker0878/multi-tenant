@@ -71,7 +71,7 @@ ENVELOPE_KEYS = frozenset({'id', 'record_sha256'})
 REQUEST_KEYS = frozenset({'format', 'owner_id', 'reservation_id', 'operation_id',
                           'generation', 'scope', 'pool_id', 'units', 'capabilities'})
 
-#: Mirrors `tools.readback_core.ID`, the declared identifier grammar.
+#: Mirrors `provisioner.execution.readback_core.ID`, the declared identifier grammar.
 IDENTIFIER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')
 SHA256 = re.compile(r'^[0-9a-f]{64}$')
 

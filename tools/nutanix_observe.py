@@ -12,7 +12,7 @@ import sys
 from urllib.parse import quote
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c
+from provisioner.execution import readback_core as c
 
 PROFILE='nutanix-networking-prism-v4.3'
 TASK_ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9_=:+.-]{0,191}$')

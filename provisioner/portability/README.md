@@ -14,7 +14,7 @@ transferManifest:
   datasetId: application-dataset
   targetRef: application-target
   consistencyGroupId: application-group
-  sha256: <SHA-256 of tools.run_files.encoded(transfer_envelope)>
+  sha256: <SHA-256 of provisioner.execution.run_files.encoded(transfer_envelope)>
 ```
 
 `sha256` here identifies the complete `hosting-restic-transfer/1` envelope. It is

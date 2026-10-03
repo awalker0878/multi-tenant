@@ -24,7 +24,7 @@ The `hosting-owner-revocation/1` request has exactly:
 | Field | Meaning |
 | --- | --- |
 | `format` | `hosting-owner-revocation/1` |
-| `config_sha256` | `tools.readback_core.digest` of the original installation configuration |
+| `config_sha256` | `provisioner.execution.readback_core.digest` of the original installation configuration |
 | `operation_id` | Stable operation identifier retained on retry |
 | `keys` | One to 256 distinct, sorted `ssh-ed25519 <base64>` subject public keys, without comments |
 | `identity_ref` | Identity/incident owner's accepted subject-revocation decision |

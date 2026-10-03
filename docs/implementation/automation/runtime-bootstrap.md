@@ -51,7 +51,7 @@ checking their metadata and hashes does not substitute for provenance review.
 
 The separate `hosting-runtime-build-authority/1` object has exactly `format`,
 `config_sha256`, `valid_from`, `valid_until` and `change_ref`. The digest is
-`tools.readback_core.digest(config)`. The timezone-aware interval is current and
+`provisioner.execution.readback_core.digest(config)`. The timezone-aware interval is current and
 at most one hour. No repository template grants this authority.
 
 ```sh

@@ -5,9 +5,9 @@ import unittest
 from unittest.mock import patch
 from tests.test_terraform_run import TerraformRunFixture
 from tools import delivery_run as d, delivery_steps as s, terraform_run as tr, terraform_apply as ta
-from tools import readback_core as c
+from provisioner.execution import readback_core as c
 from provisioner.compiler.wsd import STATE
-from tools.run_files import digest, encoded, load_private, read_private, utcnow, write_new
+from provisioner.execution.run_files import digest, encoded, load_private, read_private, utcnow, write_new
 
 
 class DeliveryTerraformTests(TerraformRunFixture, unittest.TestCase):

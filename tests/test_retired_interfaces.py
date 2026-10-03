@@ -13,6 +13,11 @@ from scripts import check_retired_interfaces as retirement
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
+    'tools/neutron_observe.py': ('path', 'provisioner/execution/neutron_observe.py'),
+    'tools/readback_core.py': ('path', 'provisioner/execution/readback_core.py'),
+    'tools/route_record_review.py': ('path', 'provisioner/execution/route_record_review.py'),
+    'tools/run_files.py': ('path', 'provisioner/execution/run_files.py'),
+
     'tools/input_review.py': ('path', 'provisioner/execution/input_review.py'),
     'tools/check_package.py': ('path', 'scripts/check_repository.py'),
     'tools/route_audit.py': ('path', 'provisioner/execution/route_audit.py'),

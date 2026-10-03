@@ -36,7 +36,7 @@ Related implementation areas are traceability targets, not proof of complete imp
 
 - [tools/nsx_observe.py](../../tools/nsx_observe.py)
 - [tools/nutanix_observe.py](../../tools/nutanix_observe.py)
-- [tools/neutron_observe.py](../../tools/neutron_observe.py)
+- [provisioner/execution/neutron_observe.py](../../provisioner/execution/neutron_observe.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

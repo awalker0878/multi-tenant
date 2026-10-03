@@ -6,9 +6,10 @@ import unittest
 from tests.test_compile_wsd import example,receipts
 from tests.test_lifecycle_transition import fixture as platform_fixture
 from tests.test_openstack_transition import fixture as openstack_fixture
-from tools import delivery_steps as d,readback_core as c,lifecycle_transition as lifecycle
+from provisioner.execution import readback_core as c
+from tools import delivery_steps as d, lifecycle_transition as lifecycle
 from provisioner.compiler.wsd import compile_environment
-from tools.run_files import digest,encoded,load_private,read_private,utcnow,write_new
+from provisioner.execution.run_files import digest,encoded,load_private,read_private,utcnow,write_new
 
 
 class DeliveryHandoffTests(unittest.TestCase):

@@ -9,7 +9,8 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from tools import readback_core as c, nsx_observe as nsx, nutanix_observe as nut, recovery_review as rr
+from provisioner.execution import readback_core as c
+from tools import nsx_observe as nsx, nutanix_observe as nut, recovery_review as rr
 from lab.native_readback_fixture import Fixture, manifest, responses, VPC, EP
 
 ROOT=Path(__file__).resolve().parents[1]

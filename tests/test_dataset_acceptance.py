@@ -6,7 +6,7 @@ import unittest
 from tools.dataset_acceptance import STATUS, validate_group
 from tools.restic_transfer import TransferGuard
 from tools.restic_run import manifest as observed_files
-from tools.run_files import digest, encoded, load_private
+from provisioner.execution.run_files import digest, encoded, load_private
 import test_restic_transfer as harness
 
 

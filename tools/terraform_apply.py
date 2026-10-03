@@ -23,8 +23,8 @@ sys.path.insert(0, str(ROOT))
 from provisioner.execution.source_integrity import verify
 from provisioner.compiler.wsd import STATE
 from tools.plan_review import review
-from tools import readback_core as c
-from tools.run_files import (current_window, digest, encoded, file_map, load_private,
+from provisioner.execution import readback_core as c
+from provisioner.execution.run_files import (current_window, digest, encoded, file_map, load_private,
     private_path, read_private, replace_private, require, sync_directory, utcnow, write_new, OperatorError)
 from tools.terraform_run import backend_settings, command, runtime_environment, select_scope
 

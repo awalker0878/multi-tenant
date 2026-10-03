@@ -54,7 +54,7 @@ class GuestInventoryTests(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(ValueError): build(outputs, access, '/private/known_hosts')
 
     def test_cli_accepts_one_receipted_workload_run_without_manual_output_copy(self):
-        from tools.run_files import digest, encoded, utcnow, write_new
+        from provisioner.execution.run_files import digest, encoded, utcnow, write_new
         from provisioner.compiler.wsd import ROOT
         outputs, access = fixture()
         with tempfile.TemporaryDirectory() as tmp:

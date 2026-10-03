@@ -6,8 +6,9 @@ import sys
 import unittest
 from unittest.mock import patch
 import test_capacity as harness
-from tools import capacity,capacity_demand as demand,delivery_run as delivery,delivery_steps as steps,readback_core as c
-from tools.run_files import digest,encoded,load_private,read_private,replace_private,write_new
+from provisioner.execution import readback_core as c
+from tools import capacity, capacity_demand as demand, delivery_run as delivery, delivery_steps as steps
+from provisioner.execution.run_files import digest,encoded,load_private,read_private,replace_private,write_new
 
 ROOT=Path(__file__).resolve().parents[1]
 

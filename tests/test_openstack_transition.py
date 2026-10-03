@@ -8,7 +8,7 @@ from uuid import NAMESPACE_URL, uuid5
 from tools import openstack_transition as t, terraform_apply as apply, terraform_run as run
 from provisioner.compiler.wsd import STATE
 from tools.plan_review import review
-from tools.run_files import digest, encoded, load_private, read_private, utcnow, write_new
+from provisioner.execution.run_files import digest, encoded, load_private, read_private, utcnow, write_new
 from test_terraform_run import TerraformRunFixture
 
 

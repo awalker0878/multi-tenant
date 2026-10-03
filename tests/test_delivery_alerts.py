@@ -5,8 +5,9 @@ import tempfile
 import unittest
 
 from tests.test_operations_alerts import NOW, acknowledgement, benign_drift, release_record, review, security_drift
-from tools import delivery_steps as steps, operations_alerts as a, operations_review as o, readback_core as c
-from tools.run_files import digest, encoded, load_private, read_private, write_new
+from provisioner.execution import readback_core as c
+from tools import delivery_steps as steps, operations_alerts as a, operations_review as o
+from provisioner.execution.run_files import digest, encoded, load_private, read_private, write_new
 
 SOURCE='68b254d76589aadf55a0b38810e0bcc07bf12a68'
 SCOPE={'environment_key':'reference','site_key':'site-01','platform':'openstack',

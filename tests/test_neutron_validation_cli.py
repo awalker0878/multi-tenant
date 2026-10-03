@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from tools import neutron_observe as observer
+from provisioner.execution import neutron_observe as observer
 
 ROOT = Path(__file__).resolve().parents[1]
 

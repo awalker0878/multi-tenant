@@ -4,8 +4,9 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 from tests import test_openstack_quota as fixture
-from tools import delivery_steps as steps,readback_core as c,openstack_quota as quota
-from tools.run_files import digest,encoded,load_private,write_new
+from provisioner.execution import readback_core as c
+from tools import delivery_steps as steps, openstack_quota as quota
+from provisioner.execution.run_files import digest,encoded,load_private,write_new
 
 
 class DeliveryQuotaTests(unittest.TestCase):

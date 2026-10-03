@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.37 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.38 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -231,6 +231,8 @@ Implementation input review is now package-owned at
 `provisioner.execution.input_review`; its former tool path is retired without an alias.
 Offline schema/type/placeholder/address checks are unchanged and remain non-authoritative.
 See the [input-review runtime contract](../engineering/input-review-runtime.md).
+
+The [operator/readback runtime owners](../engineering/operator-readback-runtime.md) now resolve inside the installed execution package. Scope/digest/file contracts and explicit target-contact gates are unchanged; retained-state conversion and native qualification remain open.
 
 ## Engineering and implementation handoff
 

@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 from tools import terraform_run as run
-from tools.run_files import current_window, digest, encoded, load_private, read_private, utcnow, write_new
+from provisioner.execution.run_files import current_window, digest, encoded, load_private, read_private, utcnow, write_new
 
 
 def closed_plan():

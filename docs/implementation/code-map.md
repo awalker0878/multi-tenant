@@ -38,7 +38,7 @@ Design: [RA §10](../architecture/reference/10-addressing-name-services-and-end-
 
 Decisions: [ADR-0007](../adr/0007-allocate-isolated-domain-attachments-and-qualify-sharing.md) · [ADR-0035](../adr/0035-make-shared-service-replies-select-the-originating-security-context.md)
 
-Implementation: [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py) · [tools/route_record_review.py](../../tools/route_record_review.py) · [tools/plan_review.py](../../tools/plan_review.py) · [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
+Implementation: [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py) · [provisioner/execution/route_record_review.py](../../provisioner/execution/route_record_review.py) · [tools/plan_review.py](../../tools/plan_review.py) · [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
 
 Offline graphs and exact-record checks are not observations of a live routing table or approval provenance.
 
@@ -60,7 +60,7 @@ Design: [PROV §5](provisioning-strategy/5-concurrency-ownership-and-failed-exec
 
 Decisions: [ADR-0031](../adr/0031-discover-uncertain-native-outcomes-instead-of-blind-replay-or-rollback.md) · [ADR-0032](../adr/0032-keep-incident-containment-above-routine-reconciliation.md)
 
-Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [tools/neutron_observe.py](../../tools/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
+Implementation: [tools/nsx_observe.py](../../tools/nsx_observe.py) · [tools/nutanix_observe.py](../../tools/nutanix_observe.py) · [provisioner/execution/neutron_observe.py](../../provisioner/execution/neutron_observe.py) · [tools/recovery_review.py](../../tools/recovery_review.py) · [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) · [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py)
 
 [lab/native_readback_fixture.py](../../lab/native_readback_fixture.py) is the disposable localhost HTTPS fixture behind the native readback observers, not a vendor emulator or a production service. [lab/nutanix_task_tree_fixture.py](../../lab/nutanix_task_tree_fixture.py) scripts a small synthetic task tree over that same real loopback HTTPS fixture; its operation names, IDs and API bodies are synthetic.
 
@@ -214,7 +214,7 @@ Current qualification requires exact pairwise scope, mandatory security-function
 
 Design: [Native readback](../NATIVE_READBACK.md) · [Interrupted-change recovery](../INTERRUPTED_CHANGE_RECOVERY.md) · [PROV §5 concurrency and failed execution](provisioning-strategy/5-concurrency-ownership-and-failed-execution.md)
 
-Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../tools/readback_core.py) · [offline recovery reviewer](../../tools/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
+Implementation: [active native reconciliation assurance index](../../sources/capabilities/native_reconciliation_assurance_index.json) · [assurance validator](../../scripts/check_native_reconciliation_assurance.py) · [readiness preflight](../../scripts/check_native_reconciliation_readiness.py) · [existing observers](../../provisioner/execution/readback_core.py) · [offline recovery reviewer](../../tools/recovery_review.py) · [engineering boundary](../engineering/native-readback-writer-fencing-and-reconciliation-assurance.md)
 
 A matching GET-only readback remains observation evidence only. Current reconciliation additionally requires exact installed-interface applicability, complete task/entity scope, verified native writer fencing, current containment state, operation-generation binding and an attributable data-safe reconciliation decision; CI performs no task mutation, state import, repair, deletion, apply or activation.
 

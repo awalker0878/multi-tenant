@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 from provisioner.domain.enterprise_records import validate_record
 from tools.restic_transfer import FORMAT, RECEIPT_FORMAT
-from tools.run_files import digest, encoded, require
+from provisioner.execution.run_files import digest, encoded, require
 
 FORMAT_GROUP = 'hosting-dataset-group-verification/2'
 STATUS = 'DATASET_GROUP_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED'

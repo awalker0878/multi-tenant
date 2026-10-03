@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if __package__ in (None, ''): sys.path.insert(0, str(ROOT))
 from tools import guest_run as g
 from tools.guest_inventory import timestamp
-from tools.neutron_observe import strict_loads
-from tools.run_files import (current_window, digest, encoded, file_map, load_private, private_path,
+from provisioner.execution.neutron_observe import strict_loads
+from provisioner.execution.run_files import (current_window, digest, encoded, file_map, load_private, private_path,
     read_private, replace_private, require, sync_directory, utcnow, write_new)
 
 ARTIFACTS = {'outputs.json', 'access.json', 'original-access.json', 'references.json', 'inventory.json',

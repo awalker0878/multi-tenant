@@ -1,6 +1,7 @@
 """Selected template identity/revision evidence; no source mutation or adoption."""
-from tools import readback_core as c, vsphere_observe as vm
-from tools.run_files import require
+from provisioner.execution import readback_core as c
+from tools import vsphere_observe as vm
+from provisioner.execution.run_files import require
 
 FIELDS = {'_typeName', 'uuid', 'instanceUuid', 'template', 'changeVersion'}
 

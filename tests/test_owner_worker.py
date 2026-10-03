@@ -7,8 +7,9 @@ import struct
 import unittest
 from unittest.mock import patch
 import test_delivery_restic as harness
-from tools import owner_worker as worker, remote_owner, delivery_run as delivery, delivery_steps as steps, readback_core as c
-from tools.run_files import digest,encoded,load_private,read_private,replace_private,utcnow,write_new
+from provisioner.execution import readback_core as c
+from tools import owner_worker as worker, remote_owner, delivery_run as delivery, delivery_steps as steps
+from provisioner.execution.run_files import digest,encoded,load_private,read_private,replace_private,utcnow,write_new
 
 
 class OwnerWorkerTests(unittest.TestCase):

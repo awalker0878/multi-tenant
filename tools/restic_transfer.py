@@ -15,7 +15,7 @@ import re
 
 from provisioner.controlplane.authority import AuthorityService, PlanScope, WorkerGrant
 from provisioner.domain.enterprise_records import validate_record
-from tools.run_files import digest, encoded, require
+from provisioner.execution.run_files import digest, encoded, require
 
 FORMAT = 'hosting-restic-transfer/1'
 RECEIPT_FORMAT = 'hosting-restic-transfer-receipt/2'
@@ -175,7 +175,7 @@ class GuardedRestic:
 
     def _check(self):
         import time
-        from tools.run_files import utcnow
+        from provisioner.execution.run_files import utcnow
         _grant, deadline = self.guard.check_window(self.envelope)
         self.client.deadline = min(self.client.deadline, time.monotonic() +
                                    (deadline - utcnow()).total_seconds())

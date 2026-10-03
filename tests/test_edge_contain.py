@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from tests.test_nft_edge import fixture
 from tools import edge_contain as c,nft_edge as edge
-from tools.run_files import digest,encoded,load_private,replace_private,utcnow
+from provisioner.execution.run_files import digest,encoded,load_private,replace_private,utcnow
 
 
 def state(spec):

@@ -6,10 +6,11 @@ fence, import/adoption mechanism, ledger release or authorization for another ap
 from copy import deepcopy
 import ipaddress
 import json
-from tools import nsx_domain_observe as domain, readback_core as c, lifecycle_transition as lifecycle
+from provisioner.execution import readback_core as c
+from tools import nsx_domain_observe as domain, lifecycle_transition as lifecycle
 from tools.nutanix_terraform_recovery import valid_mask
 from tools.plan_review import has_true
-from tools.run_files import require
+from provisioner.execution.run_files import require
 
 RESOURCES = {
     'nsxt_policy_tier1_gateway.domain': ('tier1', 'tier1_path', ''),

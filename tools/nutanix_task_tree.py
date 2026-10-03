@@ -8,7 +8,7 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timezone
 from urllib.parse import quote
-from tools import readback_core as c
+from provisioner.execution import readback_core as c
 
 PROFILE = 'nutanix-networking-prism-v4.3-task-tree'
 MAX_TASKS = 16

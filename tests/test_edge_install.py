@@ -11,8 +11,9 @@ import unittest
 from unittest.mock import patch
 
 from tests import test_nft_edge as edge_fixture
-from tools import edge_install as d, readback_core as c
-from tools.run_files import digest, encoded, load_private, utcnow, write_new
+from provisioner.execution import readback_core as c
+from tools import edge_install as d
+from provisioner.execution.run_files import digest, encoded, load_private, utcnow, write_new
 
 
 class Host(d.Host):

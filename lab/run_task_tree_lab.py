@@ -19,9 +19,10 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from lab.native_readback_fixture import Fixture, TASK
 from lab.nutanix_task_tree_fixture import reset, CHILD_A, CHILD_B, GRANDCHILD
 from lab.run_readback_lab import operator_context
-from tools import nutanix_observe as native, nutanix_task_tree as tree, readback_core as c, recovery_review as rr
+from provisioner.execution import readback_core as c
+from tools import nutanix_observe as native, nutanix_task_tree as tree, recovery_review as rr
 ROOT=Path(__file__).resolve().parents[1]
-SOURCE_FILES=('tools/nutanix_task_tree.py','tools/nutanix_observe.py','tools/readback_core.py',
+SOURCE_FILES=('tools/nutanix_task_tree.py','tools/nutanix_observe.py','provisioner/execution/readback_core.py',
  'tools/readback_cli.py','tools/recovery_review.py','lab/native_readback_fixture.py',
  'lab/nutanix_task_tree_fixture.py','lab/run_readback_lab.py','lab/run_task_tree_lab.py')
 CLI_ENVIRONMENT=('PATH','LANG','LC_ALL','LD_LIBRARY_PATH','SYSTEMROOT','WINDIR')

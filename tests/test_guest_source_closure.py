@@ -14,6 +14,8 @@ PACKAGE_FILES = (
     'provisioner/__init__.py', 'provisioner/domain/__init__.py',
     'provisioner/domain/errors.py', 'provisioner/compiler/__init__.py',
     'provisioner/compiler/wsd.py', 'provisioner/compiler/components.py',
+    'provisioner/execution/__init__.py', 'provisioner/execution/neutron_observe.py',
+    'provisioner/execution/readback_core.py', 'provisioner/execution/run_files.py',
 )
 CHILD = r'''
 import importlib.util, pathlib, sys
@@ -86,7 +88,8 @@ class GuestSourceClosureTests(unittest.TestCase):
 
     def test_missing_package_owner_cannot_fall_back_to_installed_code(self):
         for relative in ('provisioner/compiler/wsd.py', 'provisioner/compiler/components.py',
-                         'hosting_resources/__init__.py'):
+                         'hosting_resources/__init__.py', 'provisioner/execution/neutron_observe.py',
+                         'provisioner/execution/run_files.py'):
             with self.subTest(owner=relative), tempfile.TemporaryDirectory() as folder:
                 destination = Path(folder) / 'source'
                 snapshot(destination)

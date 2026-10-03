@@ -1490,7 +1490,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: All inter-zone network paths SHALL traverse the applicable ZIP/security edge.",
     "verification_procedures": [
@@ -1516,7 +1516,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A ZIP SHALL identify exactly two authorized adjacent endpoints, each an internal domain instance or approved external/management domain, and SHALL NOT create a general-purpose third-zone transit path.",
     "verification_procedures": [
@@ -1542,7 +1542,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Default inter-zone policy SHALL be deny",
     "verification_procedures": [
@@ -1569,7 +1569,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: allowed flows SHALL be generated from approved Flow Intentions and Service Bindings.",
     "verification_procedures": [
@@ -1596,7 +1596,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: ZIP management traffic SHALL be segregated from operational traffic.",
     "verification_procedures": [
@@ -1622,7 +1622,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distinct security services",
     "verification_procedures": [
@@ -1649,7 +1649,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: shared virtualization SHALL only be used where the applicable assurance analysis supports it.",
     "verification_procedures": [
@@ -1676,7 +1676,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: two zone authorities",
     "verification_procedures": [
@@ -1703,7 +1703,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: joint approval",
     "verification_procedures": [
@@ -1730,7 +1730,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: required security functions",
     "verification_procedures": [
@@ -1757,7 +1757,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: management authority",
     "verification_procedures": [
@@ -1784,7 +1784,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: heightened posture",
     "verification_procedures": [
@@ -1811,7 +1811,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: session-revocation behavior",
     "verification_procedures": [
@@ -1838,7 +1838,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: current evidence",
     "verification_procedures": [
@@ -1865,7 +1865,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A distributed or shared-infrastructure ZIP SHALL be qualified against the same required security outcomes as a dedicated edge",
     "verification_procedures": [
@@ -1892,7 +1892,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: any unsupported mandatory function SHALL make that realization ineligible.",
     "verification_procedures": [
@@ -2303,7 +2303,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2332,7 +2332,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2362,7 +2362,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2392,7 +2392,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2423,7 +2423,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2454,7 +2454,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2485,7 +2485,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2516,7 +2516,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2547,7 +2547,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -3374,7 +3374,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment record covering forwarding authority, isolation, MTU, HA, capacity and cleanup",
     "verification_procedures": [
@@ -3402,7 +3402,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: consumers SHALL NOT choose its native topology identifiers.",
     "verification_procedures": [
@@ -3430,7 +3430,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A shared attachment SHALL be prohibited unless direct connected, neighbor, gateway and NAT/PBR paths preserve the required domain isolation and ZIP enforcement in normal and failure states.",
     "verification_procedures": [
@@ -6675,7 +6675,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Default OpenStack security-group behaviour SHALL be reviewed and normalized to the secure-by-default service baseline.",
     "verification_procedures": [
@@ -6703,7 +6703,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider networks and external-router capabilities SHALL remain provider controlled and SHALL not become unrestricted tenant escape paths.",
     "verification_procedures": [
@@ -6731,7 +6731,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations",
     "verification_procedures": [
@@ -6760,7 +6760,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.",
     "verification_procedures": [
@@ -7214,7 +7214,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -7245,7 +7245,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -8272,7 +8272,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Security-significant drift SHALL generate an actionable event and update technical conformance/readiness conditions until resolved or accepted",
     "verification_procedures": [
@@ -8301,7 +8301,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: formal authorization records SHALL remain separately attributable and immutable.",
     "verification_procedures": [
@@ -8330,7 +8330,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Emergency changes SHALL be reconciled back into the source of truth after the incident or maintenance action.",
     "verification_procedures": [
@@ -8358,7 +8358,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Incident containment overrides SHALL take precedence over ordinary reconciliation until explicitly released or handled by their approved expiry policy",
     "verification_procedures": [
@@ -8387,7 +8387,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: automated repair SHALL NOT silently undo containment.",
     "verification_procedures": [
@@ -9285,7 +9285,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Emergency containment SHALL be possible without requiring a physical-fabric redesign or broad outage to unrelated tenants.",
     "verification_procedures": [
@@ -9313,7 +9313,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Incident procedures SHALL define authority, scoped containment, evidence custody, coordination, recovery acceptance and reconciliation of emergency changes",
     "verification_procedures": [
@@ -9343,7 +9343,7 @@
       "tools/recovery_review.py",
       "tools/nsx_observe.py",
       "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: containment release SHALL be explicit and attributable.",
     "verification_procedures": [

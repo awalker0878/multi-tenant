@@ -15,9 +15,10 @@ from tests.test_vsphere_clone_activity_transport import routes as clone_routes
 from tests.test_vsphere_task_activity import context
 from tests.test_target_campaign import window
 from tests.test_vsphere_observe import ref
-from tools import qualify_target as q, readback_core as c, recovery_review as recovery
+from provisioner.execution import readback_core as c
+from tools import qualify_target as q, recovery_review as recovery
 from tools import vsphere_task_activity as activity
-from tools.run_files import digest, encoded, write_new
+from provisioner.execution.run_files import digest, encoded, write_new
 
 
 def inputs(*origins):

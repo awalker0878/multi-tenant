@@ -8,9 +8,10 @@ from copy import deepcopy
 from pathlib import Path
 import sys
 if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools import readback_core as c, nutanix_flow_observe as flow, nutanix_task_tree as tree
+from provisioner.execution import readback_core as c
+from tools import nutanix_flow_observe as flow, nutanix_task_tree as tree
 from tools import nutanix_entity_activity as activity
-from tools.run_files import require
+from provisioner.execution.run_files import require
 
 PROFILE = 'nutanix-microseg-v4.2-prism-v4.3-policy-task-activity'
 

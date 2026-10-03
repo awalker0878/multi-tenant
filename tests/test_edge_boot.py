@@ -8,7 +8,7 @@ from unittest.mock import patch
 from tests.test_nft_edge import fixture
 from tests.test_edge_contain import state
 from tools import edge_boot as boot,nft_edge as edge
-from tools.run_files import digest,encoded,read_private,write_new
+from provisioner.execution.run_files import digest,encoded,read_private,write_new
 
 
 class Kernel:

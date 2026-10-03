@@ -120,7 +120,7 @@ class IdentityTest(unittest.TestCase):
         _delivery_runner().validate(_delivery_document(plan))
 
     def test_the_scoped_identifier_rule_is_the_delivery_identifier_rule(self):
-        from tools import readback_core
+        from provisioner.execution import readback_core
         self.assertEqual(generation.SCOPE_IDENTIFIER.pattern, readback_core.ID.pattern)
 
     def test_an_identity_component_must_be_a_scoped_identifier(self):
@@ -225,7 +225,7 @@ class GenerationBindingTest(unittest.TestCase):
         self.assertEqual(record.identity_digest, plan.identity.digest)
 
     def test_every_owner_operation_is_generation_bound(self):
-        from tools import readback_core
+        from provisioner.execution import readback_core
         plan = support.reference_plan()
         operations = plan.delivery['operations']
         self.assertTrue(operations)

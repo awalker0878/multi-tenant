@@ -573,7 +573,7 @@ become current, because the commit is a compare-and-set against the record the
 claimant read.
 
 The delivery contract stays the owner of the scope grammar: `SCOPE_IDENTIFIER`
-mirrors `tools.readback_core.ID`, one test compares the two patterns, another reads
+mirrors `provisioner.execution.readback_core.ID`, one test compares the two patterns, another reads
 the scope set out of `tools/delivery_run.py` rather than restating it, and another
 proves the runner accepts this plan's scope and operation identity and refuses `0`,
 `-1`, `True`, `'1'` and `None` exactly as `require_generation` does.
@@ -813,7 +813,7 @@ subtests) covers every required case. The mirrored contract is compared against 
 authoritative owner's own source rather than restated: the request key set, the
 request format, the scope keys, the units, the identifier grammar
 (`tools/readback_core.ID`) and the `10 ** 15` unit bound are all read out of
-`tools/capacity.py` and `tools/readback_core.py`, and the compiled request is fed to
+`tools/capacity.py` and `provisioner/execution/readback_core.py`, and the compiled request is fed to
 the real `tools.capacity.validate_request`. A proposal is never a reservation: the
 handoff carries no `confirmed` or `held` key, the status is
 `PROPOSED_NOT_CONFIRMED`, `may_apply`/`may_activate` are always false, and the view

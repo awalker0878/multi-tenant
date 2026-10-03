@@ -20,7 +20,7 @@ from provisioning.schema.test_enterprise_records import (
 from tools import restic_run
 from tools.restic_transfer import (
     FORMAT, TransferGuard, execute_authorized_transfer, grant_digest, validate)
-from tools.run_files import digest, encoded, load_private, utcnow
+from provisioner.execution.run_files import digest, encoded, load_private, utcnow
 from test_restic_run import fixture
 
 
@@ -263,7 +263,7 @@ class TransferTests(unittest.TestCase):
         self.leases.lease = replace(self.leases.lease, expires_at=self.now + timedelta(seconds=1))
         _grant, deadline = self.guard.check_window(self.envelope)
         self.assertEqual(deadline, self.leases.lease.expires_at)
-        with patch('tools.run_files.utcnow', return_value=self.now), \
+        with patch('provisioner.execution.run_files.utcnow', return_value=self.now), \
              patch('time.monotonic', return_value=1000):
             GuardedRestic(self.engine, self.guard, self.envelope).repository()
         self.assertEqual(self.engine.deadline, 1001)
