@@ -1,6 +1,6 @@
 # SOL-M02 — Public service hosting design profile
 
-**Version:** 0.4 · **Status:** Proposed · **Accountable role:** Security and hosting solution architects.
+**Version:** 0.5 · **Status:** Proposed · **Accountable role:** Security and hosting solution architects.
 
 ## Scope and authority
 
@@ -51,7 +51,7 @@ no zone name establishes HA, restart reserves or recovery. Typed requirements no
 reject malformed flags/quantities and insufficient workload counts; independent-site
 recovery remains unsupported. New catalog digests require regenerated examples and
 fresh plan review. All five-request/three-platform examples stay disabled.
-OpenStack collector selector 2 preserves bounded native allocation/image/attachment
+OpenStack collector selector 3 preserves bounded native allocation/image/attachment
 facts without converting them into qualification. The [current research review](../engineering/platform-capability-review-2026-10-01.md)
 records these changes and remaining coverage. No deferred public, encryption, GPU,
 whole-VM, provisioning or migration capability is enabled by this correction.

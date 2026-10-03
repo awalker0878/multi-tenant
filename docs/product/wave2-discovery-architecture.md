@@ -223,8 +223,8 @@ Prism support or production authority.
 ## OpenStack signed native HTTPS continuation — 29 September 2026
 
 The [OpenStack HTTPS client](../engineering/openstack-discovery-https.md) implements
-actual project-scoped Nova/Cinder/Neutron collection and quota reads, not login or
-mutation. `openstack-project-https-2` pins compute 2.79, volume 3.60 and network v2.0
+actual project-scoped Nova/Cinder/Neutron collection/quota reads and exact VM-referenced Glance image reads, not login or
+mutation. `openstack-project-https-3` pins compute 2.79, volume 3.60, network v2.0 and a Glance v2 image root; image reads are restricted to UUIDs referenced by the captured Nova servers
 contracts. Its independent signed binding selects project/user, catalog evidence,
 region/interface, all three endpoint/IP/CA records, token digest/validity and revision.
 The native read-only witness must cover each service; a GET-only client does not

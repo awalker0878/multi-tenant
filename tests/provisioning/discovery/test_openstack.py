@@ -26,14 +26,15 @@ ENDPOINTS = OpenStackServiceEndpoints(
     'endpoint-01', PROJECT,
     f'https://nova.site.example/v2.1/{PROJECT}',
     f'https://cinder.site.example/v3/{PROJECT}',
-    'https://neutron.site.example/v2.0')
+    'https://neutron.site.example/v2.0',
+    'https://glance.site.example/v2')
 
 
 def campaign(*, page_size=2, max_pages=20, max_objects=100):
     now = datetime.now(timezone.utc)
     return DiscoveryCampaignAuthorization(
         'campaign-01', SCOPE, 'approval-01', 'site-worker-01',
-        ('vm', 'volume', 'nic', 'quota'), now - timedelta(minutes=1),
+        ('vm', 'volume', 'nic', 'quota', 'image'), now - timedelta(minutes=1),
         now + timedelta(minutes=10), max_pages, max_objects, page_size)
 
 
@@ -68,6 +69,14 @@ def responses():
             'quota_set': {'id': PROJECT, 'volumes': 30, 'gigabytes': 1024}},
         (ENDPOINTS.network, f'quotas/{PROJECT}', None): {
             'quota': {'network': 10, 'subnet': 10, 'port': 50}},
+        (ENDPOINTS.image, f'images/{VM3}', None): {
+            'id': VM3, 'name': 'ubuntu-golden', 'status': 'active',
+            'disk_format': 'qcow2', 'container_format': 'bare', 'size': 2147483648,
+            'virtual_size': 4294967296, 'min_disk': 20, 'min_ram': 2048,
+            'visibility': 'shared', 'owner': OTHER, 'protected': True, 'os_hidden': False,
+            'os_hash_algo': 'sha512', 'os_hash_value': 'a'*128,
+            'architecture': 'x86_64', 'os_distro': 'ubuntu',
+            'hw_machine_type': 'q35', 'hw_firmware_type': 'uefi', 'hw_disk_bus': 'scsi'},
     }
 
 
@@ -105,6 +114,55 @@ class OpenStackDiscoveryTests(unittest.TestCase):
         self.assertIsNone(facts['nic']['qos_policy_id'])
         self.assertNotIn('capabilityProperties', facts['nic'])
         self.assertNotIn('nativeQualified', facts['volume'])
+        self.assertEqual(facts['image']['diskFormat'], 'qcow2')
+        self.assertEqual(facts['image']['hashAlgorithm'], 'sha512')
+        self.assertEqual(facts['image']['ownerId'], OTHER)
+        self.assertEqual(facts['image']['minDiskBytes'], 20 * 1024**3)
+        self.assertNotIn('compatible', facts['image'])
+        self.assertNotIn('guestDriverReady', facts['image'])
+
+
+    def test_referenced_image_metadata_is_bounded_observation_not_compatibility(self):
+        values = responses()
+        image = values[(ENDPOINTS.image, f'images/{VM3}', None)]
+        result = self._collected(values)
+        obj = next(row for row in result.objects if row.identity.resource_kind == 'image')
+        facts = {fact.name: fact for fact in obj.facts}
+        self.assertEqual(facts['sizeBytes'].value(), image['size'])
+        self.assertEqual(facts['virtualSizeBytes'].value(), image['virtual_size'])
+        self.assertEqual(facts['architecture'].value(), 'x86_64')
+        self.assertEqual(facts['hwFirmwareType'].value(), 'uefi')
+        self.assertNotIn('checksum', facts)
+        self.assertNotIn('compatible', facts)
+        self.assertNotIn('nativeQualified', facts)
+
+    def test_image_hash_pair_and_referenced_identity_fail_closed(self):
+        for change in (
+            lambda row: row.pop('os_hash_value'),
+            lambda row: row.update(os_hash_algo='SHA-512'),
+            lambda row: row.update(os_hash_value='xyz'),
+            lambda row: row.update(id=OTHER)):
+            values = responses(); image = values[(ENDPOINTS.image, f'images/{VM3}', None)]
+            change(image)
+            with self.subTest(image=image), self.assertRaises(OpenStackDiscoveryHeld):
+                self._collected(values)
+
+    def test_volume_backed_vm_does_not_trigger_glance_read(self):
+        values = responses()
+        values[(ENDPOINTS.compute, 'servers/detail', None)]['servers'][0]['image'] = ''
+        del values[(ENDPOINTS.image, f'images/{VM3}', None)]
+        transport = FakeTransport(values); authority = campaign()
+        pages = collect_openstack_project(authority, ENDPOINTS, transport)
+        result = assemble_discovery_result(authority, pages, checked_at=datetime.now(timezone.utc))
+        self.assertNotIn('image', {obj.identity.resource_kind for obj in result.objects})
+        self.assertFalse(any(call[0] == ENDPOINTS.image for call in transport.calls))
+
+    def test_image_page_budget_is_not_out_of_band(self):
+        authority = campaign(max_pages=6)
+        pages = collect_openstack_project(authority, ENDPOINTS, FakeTransport())
+        self.assertEqual(pages[-1].terminal_completeness, 'PARTIAL')
+        self.assertIn('PAGE_BUDGET_EXCEEDED', pages[-1].collection_errors)
+        self.assertNotIn('image', {obj.identity.resource_kind for page in pages for obj in page.objects})
 
     def test_omitted_fields_remain_unknown_but_explicit_false_is_known(self):
         values = responses()
@@ -184,11 +242,12 @@ class OpenStackDiscoveryTests(unittest.TestCase):
         result = assemble_discovery_result(authority, pages,
                                            checked_at=datetime.now(timezone.utc))
         self.assertEqual(result.completeness, 'COMPLETE')
-        self.assertEqual(len(pages), 6)
+        self.assertEqual(len(pages), 7)
         self.assertEqual({obj.identity.key() for obj in result.objects}, {
             ('endpoint-01', PROJECT, 'openstack', 'vm', VM1),
             ('endpoint-01', PROJECT, 'openstack', 'volume', VOLUME),
             ('endpoint-01', PROJECT, 'openstack', 'nic', PORT),
+            ('endpoint-01', PROJECT, 'openstack', 'image', VM3),
             *{('endpoint-01', PROJECT, 'openstack', 'quota', service)
               for service in ('compute', 'volume', 'network')},
         })
@@ -197,7 +256,7 @@ class OpenStackDiscoveryTests(unittest.TestCase):
                           {'limit': '2', 'all_tenants': 'false'}))
         self.assertEqual([call[1] for call in transport.calls[3:]], [
             f'os-quota-sets/{PROJECT}', f'os-quota-sets/{PROJECT}',
-            f'quotas/{PROJECT}'])
+            f'quotas/{PROJECT}', f'images/{VM3}'])
 
     def test_native_marker_page_chain_and_link_are_not_followed(self):
         values = responses()
@@ -216,7 +275,7 @@ class OpenStackDiscoveryTests(unittest.TestCase):
         result = assemble_discovery_result(authority, pages,
                                            checked_at=datetime.now(timezone.utc))
         self.assertEqual(result.completeness, 'COMPLETE')
-        self.assertEqual(len(pages), 7)
+        self.assertEqual(len(pages), 8)
         self.assertEqual(transport.calls[1],
                          (ENDPOINTS.compute, 'servers/detail',
                           {'limit': '2', 'marker': VM2, 'all_tenants': 'false'}))
@@ -230,11 +289,11 @@ class OpenStackDiscoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             OpenStackServiceEndpoints('endpoint-01', PROJECT,
                 f'http://nova.site.example/v2.1/{PROJECT}',
-                ENDPOINTS.volume, ENDPOINTS.network)
+                ENDPOINTS.volume, ENDPOINTS.network, ENDPOINTS.image)
         with self.assertRaises(ValueError):
             OpenStackServiceEndpoints('endpoint-01', PROJECT,
                 f'https://nova.site.example/v2.1/{OTHER}',
-                ENDPOINTS.volume, ENDPOINTS.network)
+                ENDPOINTS.volume, ENDPOINTS.network, ENDPOINTS.image)
 
     def test_foreign_or_unattributed_row_and_quota_are_never_ingested(self):
         for key, field in ((ENDPOINTS.compute, 'tenant_id'),

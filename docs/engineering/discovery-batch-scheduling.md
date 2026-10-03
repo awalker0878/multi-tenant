@@ -43,7 +43,7 @@ Each endpoint policy contains exactly `policyId`, `organizationId`, `siteId`,
 admission spacing to 1–15000 milliseconds. Each exact organization/site/platform/
 endpoint has one policy. The policy is shared across tenant and native-scope
 selections using that endpoint, rather than allocating a new allowance per VM,
-project, cluster, credential or service. OpenStack's three service reads share its
+project, cluster, credential or service. OpenStack's four service reads (three project services plus referenced-image Glance reads) share its
 selected endpoint allowance. Endpoint aliases must be reconciled by the site owner;
 different logical endpoint IDs are not proof of different physical servers.
 

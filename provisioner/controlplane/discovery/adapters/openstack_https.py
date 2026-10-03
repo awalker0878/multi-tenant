@@ -1,7 +1,7 @@
-"""Actual bounded Nova/Cinder/Neutron GETs for one attested project campaign.
+"""Actual bounded Nova/Cinder/Neutron plus VM-referenced Glance GETs for one attested project campaign.
 
 No Keystone login, catalog discovery, token refresh, mutation, server-link follow
-or authentication fallback exists. The credential custodian signs all three
+or authentication fallback exists. The credential custodian signs all four
 native endpoints and the token's project scope; RBAC remains independently checked.
 """
 from __future__ import annotations
@@ -14,7 +14,7 @@ from typing import Callable, Mapping
 from urllib.parse import urlencode, urlsplit
 
 from .openstack import (OpenStackHTTPError, OpenStackServiceEndpoints,
-    _COLLECTIONS, _REQUIRED_KINDS, _SERVICES, _next_link, _object, _quota,
+    _COLLECTIONS, _CORE_SERVICES, _REQUIRED_KINDS, _SERVICES, _image, _next_link, _object, _quota,
     collect_openstack_project)
 from .openstack_credentials import API_VERSIONS, COLLECTOR_ID, SignedFileOpenStackCredentialSource
 from ..model import DiscoveryCampaignAuthorization, _id, _utc
@@ -66,6 +66,7 @@ class OpenStackHttpsTransport:
         self._requests = self._stage = self._objects = 0
         self._marker = None
         self._seen: set[tuple[str, str]] = set()
+        self._image_ids: set[str] = set()
         self._failed = self._finished = False
 
     @property
@@ -108,7 +109,7 @@ class OpenStackHttpsTransport:
             self._authorize()
             # The pure collector may turn an I/O error into a diagnostic page.
             # This native client must not release a failed/revoked or short scan.
-            if self._failed or self._stage != 6:
+            if self._failed or self._stage != 6 + len(self._image_ids):
                 raise NativeReadHeld('Native project collection did not finish its exact read set')
             last = pages[-1]
             return (*pages[:-1], replace(last, terminal_completeness='PARTIAL',
@@ -125,9 +126,9 @@ class OpenStackHttpsTransport:
         if not self._lock.acquire(timeout=self._timeout):
             raise NativeReadHeld('Native discovery read is already active')
         try:
-            if self._failed or self._finished or self._stage >= 6 or self._requests >= self._campaign.max_pages:
+            if self._failed or self._finished or self._requests >= self._campaign.max_pages:
                 raise NativeReadHeld('Native read budget or sequence is exhausted')
-            service = _SERVICES[self._stage % 3]
+            service = (_CORE_SERVICES[self._stage % 3] if self._stage < 6 else 'image')
             if self._stage < 3:
                 _, expected_path, list_key, links_key, kind = _COLLECTIONS[self._stage]
                 expected_params = {'limit': str(self._campaign.max_page_size)}
@@ -135,9 +136,16 @@ class OpenStackHttpsTransport:
                     expected_params['all_tenants'] = 'false'
                 if self._marker is not None:
                     expected_params['marker'] = self._marker
-            else:
+            elif self._stage < 6:
                 expected_path = (f'quotas/{self._endpoints.project_id}' if service == 'network'
                                  else f'os-quota-sets/{self._endpoints.project_id}')
+                expected_params = {}
+            else:
+                images = sorted(self._image_ids)
+                offset = self._stage - 6
+                if offset >= len(images):
+                    raise NativeReadHeld('Native image read sequence is exhausted')
+                expected_path = f'images/{images[offset]}'
                 expected_params = {}
             if (endpoint != self._endpoints.for_service(service) or path != expected_path
                     or not isinstance(params, Mapping) or dict(params) != expected_params):
@@ -150,7 +158,7 @@ class OpenStackHttpsTransport:
             selected = material.for_service(service)
             url = urlsplit(selected.url)
             headers = ({'OpenStack-API-Version': service + ' ' + API_VERSIONS[service]}
-                       if service != 'network' else {})
+                       if service in ('compute', 'volume') else {})
 
             def current():
                 if self._authorize().binding_digest != material.binding_digest:
@@ -179,7 +187,12 @@ class OpenStackHttpsTransport:
                         raise NativeReadHeld('Native collection row is not an object')
                     # Reuse the provider's actual parser, including ownership
                     # checks, before deriving an admitted next marker.
-                    identity = _object(self.bound_scope, kind, row).identity.native_id
+                    parsed = _object(self.bound_scope, kind, row)
+                    identity = parsed.identity.native_id
+                    if kind == 'vm':
+                        image_fact = next(fact for fact in parsed.facts if fact.name == 'imageId')
+                        if image_fact.state == 'KNOWN' and image_fact.value() is not None:
+                            self._image_ids.add(image_fact.value())
                     if (service, identity) in self._seen:
                         raise NativeReadHeld('Native identity repeated across pages')
                     self._seen.add((service, identity))
@@ -194,8 +207,18 @@ class OpenStackHttpsTransport:
                 else:
                     self._stage += 1
                     self._marker = None
-            else:
+            elif self._stage < 6:
                 _quota(self.bound_scope, service, value)
+                self._objects += 1
+                self._stage += 1
+            else:
+                expected_image = expected_path.removeprefix('images/')
+                parsed = _image(self.bound_scope, value)
+                if parsed.identity.native_id != expected_image:
+                    raise NativeReadHeld('Native image response differs from its VM reference')
+                if ('image', expected_image) in self._seen:
+                    raise NativeReadHeld('Native image identity repeated')
+                self._seen.add(('image', expected_image))
                 self._objects += 1
                 self._stage += 1
             if self._objects > self._campaign.max_objects:

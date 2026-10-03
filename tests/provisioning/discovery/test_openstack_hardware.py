@@ -49,7 +49,7 @@ class OpenStackHardwareTests(unittest.TestCase):
         # Flavor size + an attached data volume do not prove complete root storage.
         self.assertEqual(vm['diskCapacityBytes'].state, 'UNKNOWN')
         self.assertEqual(normalized.original.digest, raw.digest)
-        self.assertEqual(len(transport.calls), 6)
+        self.assertEqual(len(transport.calls), 7)
         self.assertFalse(any('flavor' in path for _, path, _ in transport.calls))
 
     def test_missing_or_legacy_embedded_values_do_not_become_zero(self):

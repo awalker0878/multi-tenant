@@ -1,6 +1,6 @@
 # TAD-M01 — Technical infrastructure composition
 
-**Version:** 0.29 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
+**Version:** 0.30 · **Status:** Proposed · **Accountable role:** Platform, network and security engineering.
 
 ## Scope and authority
 
@@ -44,7 +44,7 @@ rechecked around waits, transport and publication. No redirects, arbitrary URL
 following, credential issuance or privileged fallback are supplied by the collector.
 Successful native lists remain partial/visible-only, including empty lists.
 
-OpenStack selector 2 retains strict embedded vCPU/RAM allocation, nominal root,
+OpenStack selector 3 retains strict embedded vCPU/RAM allocation, nominal root,
 ephemeral and swap quantities, image references, attached-volume IDs and native
 delete-on-termination booleans. Cinder attachment/server/volume identities and optional
 guest device labels are bounded and canonical. Missing fields stay unknown; explicit

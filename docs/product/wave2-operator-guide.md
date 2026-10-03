@@ -160,7 +160,7 @@ The current VMware REST reader covers only VMs visible in independently
 selected folders, with a 4,000-visible-VM list limit and no native cursor.
 Inherited privilege gaps can hide objects. The AHV adapter assumes a pinned
 Prism Central VMM v4.0 installed profile and exact cluster; the OpenStack
-adapter assumes pinned HTTPS Nova/Cinder/Neutron catalog roots and a
+adapter assumes pinned HTTPS Nova/Cinder/Neutron/Glance catalog roots and a
 project-scoped read role. All three now have actual bounded HTTPS clients and an
 [installed stage/publish command](../engineering/discovery-collector-runtime.md).
 Protocol/integration tests are not proof of deployed custody or complete coverage.

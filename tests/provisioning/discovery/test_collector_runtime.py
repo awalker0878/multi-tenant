@@ -397,7 +397,7 @@ class CollectorOtherPlatformTests(RuntimeFixture, unittest.TestCase):
         self.assertEqual(len(self.native.calls), 2)
         self.assertEqual(self.native.calls[0][1], vmware_fixture.LIST)
 
-    def test_openstack_runtime_composes_all_three_services_and_signing(self):
+    def test_openstack_runtime_composes_all_four_services_and_signing(self):
         from tests.provisioning.discovery import test_openstack_https as fixture
         native = fixture.OpenStackHttpsTests()
         self.configure(native)
@@ -407,8 +407,8 @@ class CollectorOtherPlatformTests(RuntimeFixture, unittest.TestCase):
         result = self.command('stage')
         self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
         self.assertEqual(json.loads(result.stdout)['completeness'], 'PARTIAL')
-        self.assertEqual(len(native.calls), 6)
-        self.assertEqual([x[0] for x in native.calls], ['compute','volume','network']*2)
+        self.assertEqual(len(native.calls), 7)
+        self.assertEqual([x[0] for x in native.calls], ['compute','volume','network']*2 + ['image'])
         original = self.outbox().for_campaign(native.campaign, native.environment)
         self.assertNotIn(native.token.encode(), original.body)
 

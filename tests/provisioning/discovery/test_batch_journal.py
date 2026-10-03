@@ -442,13 +442,13 @@ class CheckpointedOtherPlatformsTests(runtime.RuntimeFixture, unittest.TestCase)
         self.stage()
         self.assertEqual(len(self.native.calls),2)
 
-    def test_openstack_checkpoint_uses_three_existing_service_routes(self):
+    def test_openstack_checkpoint_uses_four_existing_service_routes(self):
         from tests.provisioning.discovery import test_openstack_https as fixture
         self.configure(fixture.OpenStackHttpsTests())
         self.config['native']['selection']={s:self.native.endpoints.for_service(s) for s in fixture.API_VERSIONS}
         self.config['native']['caBundles']={s:str(self.native.root/'ca.pem') for s in fixture.API_VERSIONS}
         self.save();self.stage()
-        self.assertEqual([c[0] for c in self.native.calls],['compute','volume','network']*2)
+        self.assertEqual([c[0] for c in self.native.calls],['compute','volume','network']*2 + ['image'])
 
 
 

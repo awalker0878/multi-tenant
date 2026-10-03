@@ -1,6 +1,6 @@
 # RAD-M01 — Reference adoption and deviation design
 
-**Version:** 0.14 · **Status:** Proposed · **Accountable role:** Architecture authority.
+**Version:** 0.15 · **Status:** Proposed · **Accountable role:** Architecture authority.
 
 ## Scope and authority
 
@@ -51,7 +51,7 @@ failover or application recovery. No new HA or public capability is enabled.
 
 Signed native reads, original-byte custody, mTLS publication, persisted generations
 and scoped normalization are implemented. VMware, AHV and OpenStack have exact enrolled
-collector selectors; visible native inventory remains partial. OpenStack selector 2
+collector selectors; visible native inventory remains partial. OpenStack selector 3
 adds bounded allocation/image/attachment facts without extra endpoint privileges.
 Nominal flavor disk sizes do not prove complete transferable storage.
 

@@ -92,7 +92,7 @@ class DiscoveryCollectorSettings:
             native = _keys(doc['native'], {'profile', 'credentialFile', 'authorityKey',
                 'minimumRevision', 'caBundles', 'selection', 'timeoutSeconds', 'maxResponseBytes'})
             if (not _id(native['profile']) or not isinstance(native['selection'], dict)
-                    or not isinstance(native['caBundles'], dict) or not 1 <= len(native['caBundles']) <= 3
+                    or not isinstance(native['caBundles'], dict) or not 1 <= len(native['caBundles']) <= 4
                     or type(native['maxResponseBytes']) is not int
                     or not 1024 <= native['maxResponseBytes'] <= 4*1024*1024):
                 raise ValueError('Bounded native collector settings are required')

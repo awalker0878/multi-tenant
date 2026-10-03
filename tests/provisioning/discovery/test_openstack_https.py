@@ -70,7 +70,7 @@ class OpenStackHttpsTests(unittest.TestCase):
         self.policy = DiscoveryTrustPolicy(1, before, after, enrollments)
         self.write_trust()
         self.witness = NativeReadCredentialWitness(self.reference, COLLECTOR_ID, self.environment,
-            self.campaign.scope, 'three-service-rbac-review', 'a'*64, before, after, True)
+            self.campaign.scope, 'four-service-image-rbac-review', 'a'*64, before, after, True)
         self.witness_policy = NativeCredentialWitnessPolicy(1, before,
             self.now + timedelta(minutes=4), (self.witness,))
         self.write_witness()
@@ -90,7 +90,7 @@ class OpenStackHttpsTests(unittest.TestCase):
         self.version_headers = {
             'compute': [('OpenStack-API-Version', 'compute ' + API_VERSIONS['compute'])],
             'volume': [('OpenStack-API-Version', 'volume ' + API_VERSIONS['volume'])],
-            'network': []}
+            'network': [], 'image': []}
         self.extra_headers = []
         self.values = {(service, path, marker): value
             for (endpoint, path, marker), value in responses().items()
@@ -102,7 +102,8 @@ class OpenStackHttpsTests(unittest.TestCase):
         self.endpoints = OpenStackServiceEndpoints(ENDPOINTS.endpoint_id, PROJECT,
             f'https://localhost:{self.servers["compute"].server_port}/compute/v2.1/{PROJECT}',
             f'https://localhost:{self.servers["volume"].server_port}/volume/v3/{PROJECT}',
-            f'https://localhost:{self.servers["network"].server_port}/network/v2.0')
+            f'https://localhost:{self.servers["network"].server_port}/network/v2.0',
+            f'https://localhost:{self.servers["image"].server_port}/image/v2')
         self.credential_path = self.root / 'credential.json'
         self.token = 'synthetic-project-token-no-native-authority'
         self.binding = {
@@ -235,19 +236,19 @@ class OpenStackHttpsTests(unittest.TestCase):
         self.write_material()
         self.transport = self.client()
 
-    def test_three_real_tls_endpoints_receive_exact_scope_token_and_versions(self):
+    def test_four_real_tls_endpoints_receive_exact_scope_token_and_versions(self):
         result = assemble_discovery_result(self.campaign, self.transport.collect(), checked_at=self.now)
         self.assertEqual(result.completeness, 'PARTIAL')
         self.assertIn('VISIBLE_INVENTORY_ONLY', result.collection_errors)
-        self.assertEqual(len(result.objects), 6)
-        self.assertEqual([call[0] for call in self.calls], ['compute','volume','network']*2)
+        self.assertEqual(len(result.objects), 7)
+        self.assertEqual([call[0] for call in self.calls], ['compute','volume','network']*2 + ['image'])
         for service, method, path, headers in self.calls:
             self.assertEqual(method, 'GET')
             self.assertEqual(headers['X-Auth-Token'], self.token)
             self.assertEqual(headers['Host'], f'localhost:{self.servers[service].server_port}')
             self.assertNotIn('Authorization', headers)
             self.assertNotIn('X-Ntnx-Api-Key', headers)
-            if service != 'network':
+            if service in ('compute', 'volume'):
                 self.assertEqual(headers['OpenStack-API-Version'], service+' '+API_VERSIONS[service])
             else:
                 self.assertNotIn('OpenStack-API-Version', headers)
@@ -257,7 +258,7 @@ class OpenStackHttpsTests(unittest.TestCase):
         self.assertNotIn(self.token, repr(self.read_material()))
         with self.assertRaises(NativeReadHeld):
             self.transport.collect()
-        self.assertEqual(len(self.calls), 6)
+        self.assertEqual(len(self.calls), 7)
 
     def test_empty_visible_inventory_is_partial_not_complete(self):
         for service, path, key in (('compute','servers/detail','servers'),
@@ -273,7 +274,7 @@ class OpenStackHttpsTests(unittest.TestCase):
         self.values[('compute','servers/detail',VM2)] = {'servers': []}
         self.transport.collect()
         self.assertEqual(parse_qs(urlsplit(self.calls[1][2]).query)['marker'], [VM2])
-        self.assertEqual(len(self.calls), 7)
+        self.assertEqual(len(self.calls), 8)
 
     def test_linked_short_page_is_read_without_following_server_url(self):
         self.values[('compute','servers/detail',None)]['servers_links'] = [

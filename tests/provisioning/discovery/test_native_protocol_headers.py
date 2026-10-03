@@ -50,13 +50,14 @@ class NativeProtocolHeaderTests(unittest.TestCase):
         for value in invalid:
             with self.subTest(value=value), self.assertRaises(ValueError):
                 OpenStackServiceEndpoints(ENDPOINTS.endpoint_id, PROJECT, value,
-                                         ENDPOINTS.volume, ENDPOINTS.network)
+                                         ENDPOINTS.volume, ENDPOINTS.network, ENDPOINTS.image)
 
     def test_explicit_safe_reverse_proxy_prefixes_remain_supported(self):
         roots = OpenStackServiceEndpoints(ENDPOINTS.endpoint_id, PROJECT,
             f'https://api.site.example:8774/compute/v2.1/{PROJECT}',
             f'https://api.site.example:8776/volume/v3/{PROJECT}',
-            'https://api.site.example:9696/network/v2.0')
+            'https://api.site.example:9696/network/v2.0',
+            'https://api.site.example:9292/image/v2')
         self.assertEqual(roots.project_id, PROJECT)
 
 

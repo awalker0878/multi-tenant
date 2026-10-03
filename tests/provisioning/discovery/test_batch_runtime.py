@@ -198,7 +198,7 @@ class BatchOtherNativeTests(runtime_fixture.RuntimeFixture, unittest.TestCase):
         self.assertEqual(self.batch_stage()['stagedCount'], 1)
         self.assertEqual(len(self.native.calls), 2)
 
-    def test_openstack_batch_uses_all_three_actual_service_read_paths(self):
+    def test_openstack_batch_uses_all_four_actual_service_read_paths(self):
         from tests.provisioning.discovery import test_openstack_https as fixture
         self.configure(fixture.OpenStackHttpsTests())
         n = self.native
@@ -206,7 +206,7 @@ class BatchOtherNativeTests(runtime_fixture.RuntimeFixture, unittest.TestCase):
         self.config['native']['caBundles'] = {s:str(n.root/'ca.pem') for s in fixture.API_VERSIONS}
         self.save()
         self.assertEqual(self.batch_stage()['stagedCount'], 1)
-        self.assertEqual([c[0] for c in n.calls], ['compute','volume','network']*2)
+        self.assertEqual([c[0] for c in n.calls], ['compute','volume','network']*2 + ['image'])
 
 
 class BatchDispatchTests(unittest.TestCase):

@@ -28,8 +28,9 @@ from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact, DiscoveryObj
 
 
 _PROJECT = re.compile(r'(?:[0-9a-f]{32}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\Z')
-_REQUIRED_KINDS = frozenset({'vm', 'volume', 'nic', 'quota'})
-_SERVICES = ('compute', 'volume', 'network')
+_REQUIRED_KINDS = frozenset({'vm', 'volume', 'nic', 'quota', 'image'})
+_CORE_SERVICES = ('compute', 'volume', 'network')
+_SERVICES = (*_CORE_SERVICES, 'image')
 _COLLECTIONS = (
     ('compute', 'servers/detail', 'servers', 'servers_links', 'vm'),
     ('volume', 'volumes/detail', 'volumes', 'volumes_links', 'volume'),
@@ -77,6 +78,7 @@ class OpenStackServiceEndpoints:
     compute: str
     volume: str
     network: str
+    image: str
 
     def __post_init__(self) -> None:
         if not isinstance(self.project_id, str) or not _PROJECT.fullmatch(self.project_id):
@@ -88,6 +90,7 @@ class OpenStackServiceEndpoints:
             'compute': f'/v2.1/{self.project_id}',
             'volume': f'/v3/{self.project_id}',
             'network': '/v2.0',
+            'image': '/v2',
         }
         for service, suffix in expected.items():
             value = getattr(self, service)
@@ -310,6 +313,68 @@ def _volume_attachment_fact(row: Mapping[str, object], volume_id: str) -> Discov
 
 
 
+def _bounded_image_integer(row: Mapping[str, object], key: str, name: str, *, scale: int = 1) -> DiscoveryFact:
+    if key not in row:
+        return DiscoveryFact.unknown(name, 'NOT_RETURNED')
+    value = row[key]
+    if value is None:
+        return DiscoveryFact.known(name, None)
+    if type(value) is not int or not 0 <= value <= (2**63 - 1) // scale:
+        raise OpenStackDiscoveryHeld(f'Image {name} exceeds its typed bounds')
+    return DiscoveryFact.known(name, value * scale)
+
+
+def _image_hash_facts(row: Mapping[str, object]) -> tuple[DiscoveryFact, DiscoveryFact]:
+    present = ('os_hash_algo' in row, 'os_hash_value' in row)
+    if present == (False, False):
+        return (DiscoveryFact.unknown('hashAlgorithm', 'NOT_RETURNED'),
+                DiscoveryFact.unknown('hashValue', 'NOT_RETURNED'))
+    if present != (True, True):
+        raise OpenStackDiscoveryHeld('Image secure hash fields are incomplete')
+    algorithm, value = row['os_hash_algo'], row['os_hash_value']
+    if algorithm is None and value is None:
+        return DiscoveryFact.known('hashAlgorithm', None), DiscoveryFact.known('hashValue', None)
+    if (not isinstance(algorithm, str) or not re.fullmatch(r'[a-z0-9][a-z0-9_-]{0,31}', algorithm)
+            or not isinstance(value, str) or not 32 <= len(value) <= 256
+            or re.fullmatch(r'[0-9a-f]+', value) is None):
+        raise OpenStackDiscoveryHeld('Image secure hash fields have an invalid shape')
+    return DiscoveryFact.known('hashAlgorithm', algorithm), DiscoveryFact.known('hashValue', value)
+
+
+def _image(scope: PlanScope, row: Mapping[str, object]) -> DiscoveryObject:
+    """Retain bounded Glance metadata for a VM-referenced image only.
+
+    Image ownership/visibility is observed rather than constrained to the workload
+    project because public/shared images can legitimately be referenced. Metadata is
+    not interpreted as guest-driver, boot, key or migration compatibility.
+    """
+    native_id = _id(row.get('id'), 'image')
+    facts = (
+        _fact(row, 'name', 'name', str, nullable=True),
+        _fact(row, 'status', 'status', str),
+        _fact(row, 'disk_format', 'diskFormat', str, nullable=True),
+        _fact(row, 'container_format', 'containerFormat', str, nullable=True),
+        _bounded_image_integer(row, 'size', 'sizeBytes'),
+        _bounded_image_integer(row, 'virtual_size', 'virtualSizeBytes'),
+        _bounded_image_integer(row, 'min_disk', 'minDiskBytes', scale=1024**3),
+        _bounded_image_integer(row, 'min_ram', 'minRamBytes', scale=1024**2),
+        _fact(row, 'visibility', 'visibility', str),
+        _fact(row, 'owner', 'ownerId', str, nullable=True),
+        _fact(row, 'protected', 'protected', bool),
+        _fact(row, 'os_hidden', 'hidden', bool),
+        *_image_hash_facts(row),
+        _fact(row, 'architecture', 'architecture', str, nullable=True),
+        _fact(row, 'os_distro', 'osDistro', str, nullable=True),
+        _fact(row, 'hw_machine_type', 'hwMachineType', str, nullable=True),
+        _fact(row, 'hw_firmware_type', 'hwFirmwareType', str, nullable=True),
+        _fact(row, 'hw_disk_bus', 'hwDiskBus', str, nullable=True),
+    )
+    if 'owner' in row and row['owner'] is not None:
+        _id(row['owner'], 'image owner')
+    return DiscoveryObject(NativeIdentity(scope.endpoint_id, scope.native_scope_id,
+                           'openstack', 'image', native_id), facts)
+
+
 def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> DiscoveryObject:
     native_id = _id(row.get('id'), kind)
     if kind == 'vm':
@@ -479,6 +544,7 @@ def collect_openstack_project(
     cursor: str | None = None
     object_count = 0
     has_unknown = False
+    image_ids: set[str] = set()
 
     def append(objects: tuple[DiscoveryObject, ...], next_cursor: str | None,
                *, error: str | None = None, privilege: str | None = None) -> bool:
@@ -534,6 +600,10 @@ def collect_openstack_project(
                     raise OpenStackDiscoveryHeld('Repeated native object across OpenStack pages')
                 seen.add(key)
                 objects.append(obj)
+                if kind == 'vm':
+                    image_fact = next(f for f in obj.facts if f.name == 'imageId')
+                    if image_fact.state == 'KNOWN' and image_fact.value() is not None:
+                        image_ids.add(image_fact.value())
             last_id = objects[-1].identity.native_id if objects else None
             linked = _next_link(response, links_key, endpoints.for_service(service), path,
                                 last_id)
@@ -546,9 +616,9 @@ def collect_openstack_project(
                 used_markers.add(last_id)
                 next_cursor = f'openstack:{service}:{last_id}'
             else:
-                index = _SERVICES.index(service)
-                next_cursor = (f'openstack:{_SERVICES[index + 1]}:start'
-                               if index < len(_SERVICES) - 1 else
+                index = _CORE_SERVICES.index(service)
+                next_cursor = (f'openstack:{_CORE_SERVICES[index + 1]}:start'
+                               if index < len(_CORE_SERVICES) - 1 else
                                'openstack:quota:compute')
             if not append(tuple(objects), next_cursor):
                 return tuple(pages)
@@ -556,7 +626,7 @@ def collect_openstack_project(
                 break
             marker = last_id
 
-    for index, service in enumerate(_SERVICES):
+    for index, service in enumerate(_CORE_SERVICES):
         endpoint = endpoints.for_service(service)
         path = (f'os-quota-sets/{endpoints.project_id}' if service != 'network'
                 else f'quotas/{endpoints.project_id}')
@@ -570,7 +640,28 @@ def collect_openstack_project(
                    privilege=privileges[0] if privileges else None)
             return tuple(pages)
         obj = _quota(campaign.scope, service, response)
-        if not append((obj,), f'openstack:quota:{_SERVICES[index + 1]}'
-                      if index < len(_SERVICES) - 1 else None):
+        if index < len(_CORE_SERVICES) - 1:
+            next_cursor = f'openstack:quota:{_CORE_SERVICES[index + 1]}'
+        else:
+            next_cursor = 'openstack:image:start' if image_ids else None
+        if not append((obj,), next_cursor):
+            return tuple(pages)
+
+    ordered_images = sorted(image_ids)
+    for index, image_id in enumerate(ordered_images):
+        try:
+            response = read(endpoints.for_service('image'), f'images/{image_id}', {})
+        except OpenStackDiscoveryHeld:
+            raise
+        except Exception as exc:
+            errors, privileges = _error('image', exc)
+            append((), None, error=errors[0], privilege=privileges[0] if privileges else None)
+            return tuple(pages)
+        obj = _image(campaign.scope, response)
+        if obj.identity.native_id != image_id:
+            raise OpenStackDiscoveryHeld('Glance image response differs from the referenced image')
+        next_cursor = (f'openstack:image:{ordered_images[index + 1]}'
+                       if index < len(ordered_images) - 1 else None)
+        if not append((obj,), next_cursor):
             return tuple(pages)
     return tuple(pages)

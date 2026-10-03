@@ -2,14 +2,14 @@
 
 Reviewed 1 October 2026. This B10/B16 implementation continues the
 [existing B01–B50 wave plan](../product/enterprise-workload-mobility-execution-plan.md).
-It connects the existing project collector to actual Nova, Cinder and Neutron
-HTTPS GETs. No installed vendor environment was contacted in development.
+It connects the existing project collector to actual Nova, Cinder, Neutron and
+Glance HTTPS GETs. No installed vendor environment was contacted in development.
 
 ## Selected native contract
 
 `provisioner/controlplane/discovery/adapters/openstack_https.py` owns
 `OpenStackHttpsTransport`; `adapters/openstack_credentials.py` owns the signed
-project-token reader. The exact collector identity is `openstack-project-https-2`.
+project-token reader. The exact collector identity is `openstack-project-https-3`.
 A newly admitted matching campaign, independent credential witness and protected
 credential material are required. An arbitrary collector ID is not an alias.
 
@@ -18,6 +18,7 @@ credential material are required. An arbitrary collector ID is not an alias.
 | compute | `/v2.1/<project>` | `servers/detail`, `os-quota-sets/<project>` | `OpenStack-API-Version: compute 2.79` |
 | volume | `/v3/<project>` | `volumes/detail`, `os-quota-sets/<project>` | `OpenStack-API-Version: volume 3.60` |
 | network | `/v2.0` | `ports`, `quotas/<project>` | Neutron v2.0 path; no invented microversion header |
+| image | `/v2` | `images/<VM-referenced-image-id>` only | Glance Image API v2; signed minimum evidence contract `2.7`, no request microversion header |
 
 These are deliberately selected client contracts, not claims about a supported
 OpenStack distribution/release tuple. No `latest` negotiation or older-version
@@ -29,11 +30,11 @@ backend drivers, read roles and exact response visibility.
 Safe explicit reverse-proxy path prefixes are supported. Endpoints must be HTTPS
 roots without query/fragment delimiters, userinfo, URL controls, percent escapes,
 backslashes, dot segments or empty path components. Root validation rejects input
-that URL parsing would otherwise silently normalize. The three service URLs,
+that URL parsing would otherwise silently normalize. The four service URLs,
 endpoint identities, literal IP addresses and exact CA digests are signed; the
 client neither discovers endpoints from Keystone nor follows catalog/response URLs.
 
-## Hardware and storage observation contract
+## Hardware, storage and referenced-image observation contract
 
 The second collector profile retains Nova's embedded server allocation: `vcpus`
 becomes `vcpuCount`, RAM and swap MiB become bytes, and flavor root/ephemeral GiB
@@ -53,14 +54,26 @@ volume IDs and oversized relationships hold collection. The limits are 64 Nova
 relationships, 32 Cinder relationships and the existing 8,192-byte fact bound.
 Sorted relationship order does not establish boot order or guest disk order.
 
-Only these named fields are retained. Image properties, flavor extra-specs, host
-names, connector credentials, metadata and user data cannot enter qualification
-through this path. No new service, endpoint, privilege or native mutation is added.
-A complete relationship is not proof of writer exclusion, permission to delete,
-a consistency group or a complete migratable disk image.
+For each non-volume-backed Nova server, selector 3 also reads exactly the referenced
+Glance image by UUID. It does not enumerate the image catalog or download image bytes.
+The retained whitelist is name/status, disk/container format, size/virtual size,
+minimum disk/RAM, visibility, owner, protected/hidden state, secure multihash
+algorithm/value and selected architecture/OS/machine/firmware/disk-bus metadata.
+The secure hash pair must be complete and syntactically bounded; the legacy Glance
+`checksum` is deliberately not retained as the integrity claim. Shared/public image
+ownership is observed rather than forced to equal the workload project. Volume-backed
+servers trigger no Glance read.
 
-The first collector selector is retired, not forwarded. Deployments must enroll
-`openstack-project-https-2`, issue a fresh matching campaign/witness/credential
+These are observations, not compatibility. A qcow2/bare label, architecture or UEFI
+property does not prove the guest has required drivers, that keys are portable, that a
+target supports that format, or that the image is safe for a migration route. Arbitrary
+image properties, flavor extra-specs, host names, connector credentials, metadata and
+user data cannot enter qualification through this path. A complete relationship is not
+proof of writer exclusion, permission to delete, a consistency group or a complete
+migratable disk image.
+
+The previous OpenStack selectors are retired, not forwarded. Deployments must enroll
+`openstack-project-https-3`, issue a fresh matching campaign/witness/credential
 binding, collect a new signed generation, and reassess its exact digest. Old signed
 results remain immutable history; they are not relabelled or silently enriched.
 
@@ -83,15 +96,15 @@ Required binding fields are:
 | `campaignDigest`, `environmentId`, `collectorId`, `credentialReference` | Exact campaign/environment/collector and live enrolled native credential reference. |
 | `scopeType`, `projectId`, `userId` | Independently verified project-scoped token, exact project and native user identity. Domain, system and unscoped credentials are not admitted. |
 | `catalogDigest`, `regionId`, `interface` | Digest of independently verified catalog evidence, selected region and `internal` or `public` interface. `admin` endpoints are not admitted. |
-| `apiVersions` | Exact logical-service mapping: compute `2.79`, volume `3.60`, network `2.0`. |
-| `endpoints` | Exactly compute/volume/network records, each with `url`, unique `catalogEndpointId`, canonical `connectIp`, and `caDigest`. Every URL must equal the selected service root. |
+| `apiVersions` | Exact logical-service mapping: compute `2.79`, volume `3.60`, network `2.0`, image `2.7`. The image value binds this reviewed feature floor; it is not sent as a Glance microversion header. |
+| `endpoints` | Exactly compute/volume/network/image records, each with `url`, unique `catalogEndpointId`, canonical `connectIp`, and `caDigest`. Every URL must equal the selected service root. |
 | `tokenDigest`, `tokenIssuedAt`, `tokenExpiresAt` | SHA-256 of token bytes and independently verified native token validity. A custody lease does not extend native token expiry. |
 | `notBefore`, `expiresAt` | UTC custody interval covering the campaign, at most one hour and ending no later than token expiry. |
 
 The material signer must be independent of campaign root, issuer and collector
 keys. `BoundDiscoveryIngestVerifier` separately requires current enrollment and a
 native read-only witness for the exact project/environment scope. The custodian
-must verify scope, service catalog and read-only privileges across all three
+must verify scope, service catalog and read-only privileges across all four
 services, including ownership-field visibility; possession of token bytes and a
 local GET-only client cannot prove those facts. No privileged account fallback
 is introduced when Cinder or another service omits a required ownership field.
@@ -105,13 +118,14 @@ floors remain separate integration and qualification work.
 
 ## Request, response and publication boundaries
 
-The client owns one serial sequence: the three collection page chains, followed
-by their three project quota reads. Only the next exact service/path/parameter
+The client owns one serial sequence: the three project collection page chains, followed
+by their three project quota reads and then one exact Glance GET for each distinct
+non-null image UUID referenced by the collected Nova servers. Only the next exact service/path/parameter
 combination is admitted. Pagination uses the last observed native UUID, never a
 server-supplied destination. Nova requests exclude all-tenant enumeration; Neutron
 port requests additionally carry the exact signed project filter. Native row
 ownership and duplicate identities are checked by the existing provider parser
-before the next marker is admitted. Objects and attempted requests consume finite
+before the next marker is admitted. Image reads, objects and all attempted requests consume the same finite
 campaign budgets; failed/replayed/skipped requests close that client instance.
 
 The actual provider-neutral `discovery/native_https.py` mechanism is shared with

@@ -1,6 +1,6 @@
 # ICD-M01 — Infrastructure interface ownership and service agreements
 
-**Version:** 0.28 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
+**Version:** 0.29 · **Status:** Proposed · **Accountable role:** Producing and consuming infrastructure owners.
 
 ## Scope and authority
 
@@ -57,7 +57,7 @@ exact current tuple and independently qualified directed method.
 ### Native collection contracts
 
 VMware requires `vcenter-rest-vm-info-8.0.3.0-visible-only-2`; AHV requires
-`nutanix-ahv-v4.0-hardware-2`; OpenStack requires `openstack-project-https-2`.
+`nutanix-ahv-v4.0-hardware-2`; OpenStack requires `openstack-project-https-3`, including the signed Glance endpoint for VM-referenced images.
 Old selectors are not aliases. Native material, campaign root/issuer/collector keys
 and independent read-only witnesses have distinct custody. Pinned endpoints/IP/CA,
 service identity, validity, API profile, route/response budgets and live rechecks are

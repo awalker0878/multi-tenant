@@ -46,8 +46,8 @@ def _openstack(row, campaign, environment, verifier, clock, key, read_gate):
     from .openstack import OpenStackServiceEndpoints
     from .openstack_credentials import SignedFileOpenStackCredentialSource
     from .openstack_https import OpenStackHttpsTransport
-    selection = _keys(row['selection'], {'compute', 'volume', 'network'})
-    ca = _keys(row['caBundles'], {'compute', 'volume', 'network'})
+    selection = _keys(row['selection'], {'compute', 'volume', 'network', 'image'})
+    ca = _keys(row['caBundles'], {'compute', 'volume', 'network', 'image'})
     return OpenStackHttpsTransport(campaign, OpenStackServiceEndpoints(
         campaign.scope.endpoint_id, campaign.scope.native_scope_id, **selection),
         environment, verifier=verifier,
@@ -61,7 +61,7 @@ def _openstack(row, campaign, environment, verifier, clock, key, read_gate):
 _FACTORIES = {
     'nutanix-ahv-v4.0-hardware-2': _ahv,
     'vcenter-rest-vm-info-8.0.3.0-visible-only-2': _vmware,
-    'openstack-project-https-2': _openstack,
+    'openstack-project-https-3': _openstack,
 }
 
 

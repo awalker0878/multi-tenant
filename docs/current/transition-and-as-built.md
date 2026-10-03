@@ -1,6 +1,6 @@
 # TRANS-M01 — Transition states and observed acceptance
 
-**Version:** 0.18 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
+**Version:** 0.19 · **Status:** Proposed · **Accountable role:** Implementation and operations owners.
 
 ## Scope and authority
 
@@ -63,7 +63,7 @@ fleet-wide recovery remain open.
 
 ### Collector and catalog transition
 
-OpenStack selector 1 is retired, not redirected. Enroll selector 2 with new matching
+Earlier OpenStack selectors are retired, not redirected. Enroll selector 3 with new matching
 campaign/witness/credential material, capture a fresh signed generation and reassess
 raw/normalized identities. Preserve old signed evidence without relabelling. CPU/memory
 and image/volume/attachment facts now survive collection, but nominal flavor storage

@@ -16,8 +16,9 @@ is the only delivery backlog. No deployed vendor environment was contacted.
 | Standalone profile validation differed from full pipeline assurance recovery, and workload-count obligations were not enforced. | `profiles.validation` now owns assurance recovery, availability workload counts and recovery composition. Removed the redundant semantic branch, unused constant and parallel field table. | Full pipeline assurance recovery already existed; it was consolidated, not newly invented. Unsupported independent-site recovery remains refused. |
 | Availability descriptions confused security zones with failure domains. | Catalog 18, high/maximum profile revision 2, corrected descriptions and regenerated five-request/three-platform examples. | No behavior, HA qualification, public exposure or deferred feature is enabled by a label or fixture. |
 
-OpenStack collector admission is now `openstack-project-https-2`. Selector 1 is
-retired without an alias. Re-enroll, issue matching independent campaign/witness/
+OpenStack collector admission is now `openstack-project-https-3`. Earlier selectors are
+retired without aliases; selector 3 adds a signed Glance root and only exact VM-referenced
+image reads. Re-enroll, issue matching independent campaign/witness/
 credential material, capture new signed evidence and reassess. Retain old signed
 records as history; never restamp their facts or reinterpret approved plans.
 
@@ -50,8 +51,9 @@ incorrect interpretation of completeness. Keep explicit unknown, unsupported,
 deferred, implemented and qualified states separate.
 
 B05 retains actively used runtime owners and execution/state conversion. B14–B16
-retain complete hardware/Glance/driver/key/service visibility and independent coverage
-qualification. B17/B20 retain verified external dependencies, guided authoring and
+retain complete hardware/guest-driver/key/service visibility and independent coverage
+qualification. B16 now retains bounded Glance metadata for VM-referenced images, but
+image metadata is not guest/target compatibility or complete image-catalog visibility. B17/B20 retain verified external dependencies, guided authoring and
 owner-facing signing. B21 adoption is not an ownership-transfer workflow. B22 retains
 durable fleet scheduling, global budgets, periodic monitoring/alerts, resumability
 and measured estate qualification despite implemented batch/freshness/history paths.
