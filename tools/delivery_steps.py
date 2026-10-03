@@ -103,7 +103,7 @@ def validate_packet(step, packet, plan, base):
         bundle=load_private(upstream/'bundle.json'); match_scope(bundle['scope'],plan)
         require(bundle['source_commit']==plan['source_commit'],'Prepared owner source changed')
         if kind=='terraform_approval':
-            from tools.terraform_apply import validate_bundle
+            from provisioner.execution.terraform_apply import validate_bundle
             from tools.delivery_run import ROOT
             prior=load_private(upstream/'packet.json')['parameters']
             validate_bundle(upstream/'execution',load_private(files['approval']),Path(prior['terraform']),ROOT)
@@ -135,7 +135,7 @@ def validate_packet(step, packet, plan, base):
         for selected in values['domain_steps']: dependency(step,selected,'terraform_apply',plan,base)
         c.text(values['selected_input'],length=1024)
     if kind=='terraform_plan':
-        from tools.terraform_run import select_scope
+        from provisioner.execution.terraform_run import select_scope
         from tools.delivery_run import ROOT
         _,scope,_=select_scope(ROOT,values['catalog_id'],load_private(files['inputs']))
         match_scope(scope,plan)
@@ -147,7 +147,7 @@ def validate_packet(step, packet, plan, base):
             original=base/'steps'/transitions[0]['id']/'transition.json'
             require(read_private(original)==read_private(files['transition']),
                     'Lifecycle plan changed its prepared transition')
-            from tools.lifecycle_transition import validate as validate_transition
+            from provisioner.execution.lifecycle_transition import validate as validate_transition
             validate_transition(load_private(original),scope,read_private(files['inputs']))
         if scope['phase']=='workloads':
             from tools.capacity_demand import check_ancestors
@@ -217,7 +217,7 @@ def validate_packet(step, packet, plan, base):
         request=load_private(files['request']); resource=validate(request)
         upstream=dependency(step,values['workload_step'],'terraform_apply',plan,base)
         execution=terraform_execution(values['workload_step'],plan,base)
-        from tools.wsd_handoff import execution_outputs
+        from provisioner.execution.wsd_handoff import execution_outputs
         outputs,_,_=execution_outputs(execution,'workloads')
         member=outputs['members']['value'].get(values['member'])
         require(member is not None and resource['expected']['config']['uuid']==member['vm_id']
@@ -299,14 +299,14 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
                      + (('transfer-manifest.json','transfer-receipt.json') if 'transfer_manifest' in files else ())):
             write_new(directory/name,read_private(directory/'execution'/name)); names.append(name)
     elif kind=='platform_transition':
-        from tools.lifecycle_transition import prepare
+        from provisioner.execution.lifecycle_transition import prepare
         prior=terraform_execution(values['prior_step'],plan,base)
         record=prepare(prior,files['inputs'],files['acceptance'],values['stage'])
         match_scope(record['scope'],plan)
         write_new(directory/'transition.json',encoded(record)); names=['transition.json']
         result={'status':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW'}
     elif kind=='workload_inputs':
-        from tools.wsd_handoff import compile_scope_runs
+        from provisioner.execution.wsd_handoff import compile_scope_runs
         records=[terraform_execution(selected,plan,base) for selected in values['domain_steps']]
         outputs,scopes,provenance=compile_scope_runs(load_private(files['environment']),records,plan['scope'],
             load_private(files['vmware_bindings']) if 'vmware_bindings' in files else None)
@@ -365,7 +365,7 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
                 write_new(directory/'dataset-coverage.json',encoded(coverage))
                 names.append('dataset-coverage.json')
     elif kind=='terraform_plan':
-        from tools.terraform_run import prepare
+        from provisioner.execution.terraform_run import prepare
         args={name:files.get(name) for name in ('inputs','backend','environment','authority','references','cloud','ca_bundle','transition')}
         result=prepare(argparse.Namespace(**args,catalog_id=values['catalog_id'],terraform=Path(values['terraform']),
                        output=directory/'execution',read_authorized_target=True),root)
@@ -381,8 +381,8 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None):
                 'approval_sha256':digest(encoded(approval))}
         write_new(directory/'result.json',encoded(result)); names=['approval.json','result.json']
     elif kind=='terraform_apply':
-        from tools.terraform_apply import apply
-        from tools.wsd_handoff import execution_outputs
+        from provisioner.execution.terraform_apply import apply
+        from provisioner.execution.wsd_handoff import execution_outputs
         prepared=prepared_directory(step,packet,plan,base)
         prior=load_private(prepared.parent/'packet.json')['parameters']
         require(digest(Path(prior['terraform']).read_bytes())==prior['terraform_sha256'],'Terraform executable changed')
@@ -612,7 +612,7 @@ def bootstrap_postconditions(step,plan,base):
     applies, every VMware power operation, and a native/traffic campaign, all as
     explicit dependencies with the same workload outputs.
     """
-    from tools.wsd_handoff import execution_outputs
+    from provisioner.execution.wsd_handoff import execution_outputs
     dependencies=[item for item in plan['steps'] if item['id'] in step['needs']]
     require(not any(item['kind']=='platform_transition' for item in dependencies),
             'A transition draft cannot satisfy bootstrap acceptance')
@@ -934,8 +934,8 @@ def recover(step, packet, directory, base, plan, root, *, recovery_authority=Non
                     and result['operation_id']==bundle['operation_id'] and result['generation']==bundle['generation'],
                     'Interrupted owner completion binding changed')
             if kind=='terraform_apply':
-                from tools.terraform_apply import scope_ledger
-                from tools.wsd_handoff import execution_outputs
+                from provisioner.execution.terraform_apply import scope_ledger
+                from provisioner.execution.wsd_handoff import execution_outputs
                 execution_outputs(prepared,bundle['scope']['phase'])
                 address=load_private(prepared/'backend.json')['address']
                 with scope_ledger(owner_ledger(base,'terraform'),address,bundle['scope']) as owned:

@@ -231,7 +231,7 @@ Pay special attention to existing mechanisms equivalent to:
 
 ```text
 tools/compile_wsd.py
-tools/wsd_handoff.py
+provisioner/execution/wsd_handoff.py
 terraform/stacks/wsd/**
 terraform/compositions/**
 terraform/modules/**

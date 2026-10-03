@@ -15,18 +15,17 @@ import json
 import os
 from pathlib import Path
 import subprocess
-import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+from hosting_resources import SOURCE_ROOT
+ROOT = SOURCE_ROOT
 
-from provisioner.execution.source_integrity import verify
+from provisioner.execution.source_integrity import verify, verify_runtime
 from provisioner.compiler.wsd import STATE
-from tools.plan_review import review
+from provisioner.execution.plan_review import review
 from provisioner.execution import readback_core as c
 from provisioner.execution.run_files import (current_window, digest, encoded, file_map, load_private,
     private_path, read_private, replace_private, require, sync_directory, utcnow, write_new, OperatorError)
-from tools.terraform_run import backend_settings, command, runtime_environment, select_scope
+from provisioner.execution.terraform_run import backend_settings, command, runtime_environment, select_scope
 
 ATTEMPT_FIELDS = {'format','status','bundle_sha256','scope','operation_id','generation','change_ref','started_at'}
 
@@ -75,6 +74,9 @@ def completed_history(scope, expected_scope=None):
 
 
 def validate_bundle(operation, approval, binary, root=ROOT):
+    require(isinstance(root, Path), 'An explicit current source checkout is required')
+    require(verify_runtime(root)['status'] == 'RUNTIME_SOURCES_MATCH',
+            'Running package differs from the selected source checkout')
     operation = private_path(operation, directory=True)
     require(not operation.resolve().is_relative_to(root.resolve()), 'Private operation required')
     bundle_bytes = read_private(operation / 'bundle.json')
@@ -112,7 +114,7 @@ def validate_bundle(operation, approval, binary, root=ROOT):
     backend_settings(load_private(operation / 'backend.json'), state_key)
     transition = load_private(operation / 'transition.json') if 'transition.json' in bundle['artifacts'] else None
     if transition is not None:
-        from tools.lifecycle_transition import validate as validate_transition
+        from provisioner.execution.lifecycle_transition import validate as validate_transition
         validate_transition(transition, scope, read_private(operation / 'inputs.json'))
     result = review(load_private(operation / 'plan.json'), load_private(operation / 'references.json'), transition)
     require(result['status'] != 'BLOCKED' and result == load_private(operation / 'review.json'),
@@ -156,6 +158,7 @@ def verify_outputs(outputs, bundle, inputs):
 
 
 def apply(args, root=ROOT):
+    require(isinstance(root, Path), 'An explicit current source checkout is required')
     require(args.execute_approved_change is True, 'Explicit native mutation opt-in required')
     operation = private_path(args.bundle, directory=True)
     approval = load_private(args.approval)
@@ -213,9 +216,11 @@ def main():
     for name in ('bundle', 'approval', 'terraform', 'ledger'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--execute-approved-change', action='store_true')
+    parser.add_argument('--source-root', type=Path, default=ROOT,
+                        help='Exact clean source checkout; required outside source development')
     args = parser.parse_args()
     try:
-        print(json.dumps(apply(args)))
+        print(json.dumps(apply(args, root=args.source_root)))
         return 0
     except OperatorError as exc:
         print(json.dumps({'status': 'STOPPED', 'reason': str(exc), 'native_acceptance': False}))

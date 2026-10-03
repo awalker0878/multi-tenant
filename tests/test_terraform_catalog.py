@@ -214,7 +214,8 @@ class TerraformCatalogBoundaryTests(unittest.TestCase):
 
     def test_legacy_module_absent_and_consumers_use_the_real_package_owner(self):
         import importlib.util
-        from tools import terraform_run, verify_terraform
+        from provisioner.execution import terraform_run
+        from tools import verify_terraform
         from scripts import check_repository
         self.assertIsNone(importlib.util.find_spec('tools.terraform_catalog'))
         self.assertIs(terraform_run.entries,entries)

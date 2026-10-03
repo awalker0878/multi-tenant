@@ -7,9 +7,10 @@ from copy import deepcopy
 import ipaddress
 import json
 from provisioner.execution import readback_core as c
-from tools import nsx_domain_observe as domain, lifecycle_transition as lifecycle
+from provisioner.execution import lifecycle_transition as lifecycle
+from tools import nsx_domain_observe as domain
 from tools.nutanix_terraform_recovery import valid_mask
-from tools.plan_review import has_true
+from provisioner.execution.plan_review import has_true
 from provisioner.execution.run_files import require
 
 RESOURCES = {

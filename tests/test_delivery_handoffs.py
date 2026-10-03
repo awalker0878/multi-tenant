@@ -1,13 +1,15 @@
 """Execute the native-receipt compiler and transition adapters for all VM stacks."""
 from copy import deepcopy
 from pathlib import Path
+from hosting_resources import SOURCE_ROOT
 import tempfile
 import unittest
 from tests.test_compile_wsd import example,receipts
 from tests.test_lifecycle_transition import fixture as platform_fixture
 from tests.test_openstack_transition import fixture as openstack_fixture
 from provisioner.execution import readback_core as c
-from tools import delivery_steps as d, lifecycle_transition as lifecycle
+from provisioner.execution import lifecycle_transition as lifecycle
+from tools import delivery_steps as d
 from provisioner.compiler.wsd import compile_environment
 from provisioner.execution.run_files import digest,encoded,load_private,read_private,utcnow,write_new
 
@@ -39,7 +41,7 @@ class DeliveryHandoffTests(unittest.TestCase):
             path=base/(name+'.json'); write_new(path,encoded(value))
             packet['files'][name]={'path':str(path),'sha256':digest(read_private(path))}
         destination=base/'steps'/'handoff'; destination.mkdir(mode=0o700)
-        result,names=d.dispatch(step,packet,destination,base,plan,lifecycle.ROOT)
+        result,names=d.dispatch(step,packet,destination,base,plan,SOURCE_ROOT)
         return result,destination,names
     def test_three_platforms_compile_exact_native_lifecycle_transition(self):
         for platform in ('nutanix','vmware','openstack'):
@@ -79,7 +81,7 @@ class DeliveryHandoffTests(unittest.TestCase):
 
 
     def test_scoped_handoff_still_validates_other_tenant_intent_and_rejects_foreign_scope(self):
-        from tools.wsd_handoff import compile_scope_runs
+        from provisioner.execution.wsd_handoff import compile_scope_runs
         environment=example('openstack'); _,scopes=compile_environment(environment)
         scope={k:v for k,v in scopes['scopes'][0]['scope'].items() if k!='phase'}
         foreign=scope|{'tenant_key':'foreign'}

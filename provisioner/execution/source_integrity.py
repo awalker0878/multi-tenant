@@ -210,6 +210,84 @@ def verify(root=ROOT):
             'scope': 'Tracked worktree bytes equal current Git HEAD; not signature, architecture approval or native qualification.'}
 
 
+
+def verify_runtime(root):
+    """Compare installed package-owned execution bytes with an explicit source tree.
+
+    A clean other checkout must not be attributed to this running installation.
+    This is byte consistency under trusted installation/source custody, not a
+    signature, a lock against hostile writers or third-party dependency validation.
+    """
+    issues, count = [], 0
+    try:
+        import hosting_resources
+        package = Path(__file__).resolve().parents[1]
+        source = Path(root).resolve(strict=True)
+        extensions = {'.py', '.json', '.sql', '.html', '.js', '.css'}
+
+        def inventory(base, prefix, selected=None):
+            names = set()
+            for path in base.rglob('*'):
+                relative = path.relative_to(base)
+                if '__pycache__' in relative.parts:
+                    continue
+                if path.is_symlink() or path.is_junction():
+                    raise ValueError('Linked runtime source')
+                if len(names) >= MAX_FILES:
+                    raise ValueError('Runtime source inventory exceeds its bound')
+                if path.is_file() and (selected is None or path.suffix in selected):
+                    names.add((PurePosixPath(prefix) / relative.as_posix()).as_posix())
+            return names
+
+        runtime = inventory(package, 'provisioner', extensions)
+        expected = inventory(_path(source, 'provisioner'), 'provisioner', extensions)
+        runtime.add('hosting_resources/__init__.py')
+        expected.add('hosting_resources/__init__.py')
+        for name in sorted(runtime | expected):
+            if name not in runtime or name not in expected:
+                issues.append({'kind': 'RUNTIME_SOURCE_SET_MISMATCH', 'file': name})
+                continue
+            live = (_path(package.parent, name) if name.startswith('provisioner/')
+                    else Path(hosting_resources.__file__))
+            count += 1
+            if _read(live, MAX_FILE_BYTES) != _read(_path(source, name), MAX_FILE_BYTES):
+                issues.append({'kind': 'RUNTIME_SOURCE_MISMATCH', 'file': name})
+        assets = Path(hosting_resources.RESOURCE_ROOT).resolve(strict=True)
+        if assets != source:
+            def resource_names(base):
+                names = set()
+                for directory in ('profiles', 'policy', 'sources', 'terraform', 'ansible', 'config'):
+                    names.update(inventory(_path(base, directory), directory))
+                def documents(value):
+                    if isinstance(value, dict):
+                        for item in value.values(): documents(item)
+                    elif isinstance(value, list):
+                        for item in value: documents(item)
+                    elif isinstance(value, str) and value.startswith('docs/'):
+                        _relative(value)
+                        names.add(value)
+                for name in sorted(names.copy()):
+                    if name.startswith('sources/capabilities/') and name.endswith('.json'):
+                        raw = _read(_path(base, name), MAX_MANIFEST_BYTES, retain=True)
+                        documents(json.loads(raw, object_pairs_hook=_pairs,
+                                             parse_constant=_reject_number, parse_float=_number))
+                if len(names) > MAX_FILES:
+                    raise ValueError('Runtime asset inventory exceeds its bound')
+                return names
+            runtime_assets, source_assets = resource_names(assets), resource_names(source)
+            for name in sorted(runtime_assets | source_assets):
+                if name not in runtime_assets or name not in source_assets:
+                    issues.append({'kind': 'RUNTIME_ASSET_SET_MISMATCH', 'file': name})
+                    continue
+                count += 1
+                if _read(_path(assets, name), MAX_FILE_BYTES) != _read(_path(source, name), MAX_FILE_BYTES):
+                    issues.append({'kind': 'RUNTIME_ASSET_MISMATCH', 'file': name})
+    except (OSError, ValueError, TypeError):
+        issues.append({'kind': 'UNSAFE_OR_UNAVAILABLE_RUNTIME_SOURCE'})
+    return {'status': 'RUNTIME_SOURCES_MATCH' if not issues else 'FAILED_RUNTIME_SOURCE_CHECK',
+            'files_checked': count, 'issues': issues,
+            'scope': 'Package-owned source/assets only; not signer trust, dependency validation or native qualification.'}
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=ROOT,

@@ -55,7 +55,21 @@ class InstalledDistributionTest(unittest.TestCase):
             path = cls.staging / relative / 'stale.json'
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('{}', encoding='utf-8')
-        cls.retired_python = ('tools/readback_core.py', 'tools/readback_core.pyc',
+        cls.retired_python = ('tools/flow_policy.py', 'tools/flow_policy.pyc',
+                              'tools/__pycache__/flow_policy.cpython-313.pyc',
+                              'tools/lifecycle_transition.py', 'tools/lifecycle_transition.pyc',
+                              'tools/__pycache__/lifecycle_transition.cpython-313.pyc',
+                              'tools/openstack_transition.py', 'tools/openstack_transition.pyc',
+                              'tools/__pycache__/openstack_transition.cpython-313.pyc',
+                              'tools/plan_review.py', 'tools/plan_review.pyc',
+                              'tools/__pycache__/plan_review.cpython-313.pyc',
+                              'tools/terraform_apply.py', 'tools/terraform_apply.pyc',
+                              'tools/__pycache__/terraform_apply.cpython-313.pyc',
+                              'tools/terraform_run.py', 'tools/terraform_run.pyc',
+                              'tools/__pycache__/terraform_run.cpython-313.pyc',
+                              'tools/wsd_handoff.py', 'tools/wsd_handoff.pyc',
+                              'tools/__pycache__/wsd_handoff.cpython-313.pyc',
+                              'tools/readback_core.py', 'tools/readback_core.pyc',
                               'tools/__pycache__/readback_core.cpython-313.pyc',
                               'tools/neutron_observe.py', 'tools/neutron_observe.pyc',
                               'tools/__pycache__/neutron_observe.cpython-313.pyc',
@@ -190,11 +204,108 @@ print(json.dumps({'status':'PASSED','nativeContact':False}))
 """)
         self.assertEqual(result, {'status': 'PASSED', 'nativeContact': False})
 
+    def test_installed_execution_owners_refuse_missing_checkout_before_effects(self):
+        reviewed = self.base / 'source-binding'
+        shutil.copytree(ROOT, reviewed, ignore=shutil.ignore_patterns(
+            '.git', '.venv', '__pycache__', '.pytest_cache', 'build', 'dist', '*.egg-info'))
+        result = self.probe(r"""
+import importlib.abc
+import json
+from pathlib import Path
+import sys
+from types import SimpleNamespace
+from unittest.mock import patch
+class RejectLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('legacy import: '+fullname)
+sys.meta_path.insert(0, RejectLegacy())
+from provisioner.execution import (terraform_run as run, terraform_apply as apply,
+    wsd_handoff, lifecycle_transition, openstack_transition, flow_policy, plan_review)
+from provisioner.execution.run_files import OperatorError
+assert run.ROOT is None and apply.ROOT is None
+from provisioner.execution.source_integrity import verify_runtime
+reviewed = Path(FIXTURE_SOURCE_ROOT)
+runtime_binding = verify_runtime(reviewed)
+assert runtime_binding['status'] == 'RUNTIME_SOURCES_MATCH', runtime_binding
+changed = reviewed / 'provisioner/execution/flow_policy.py'
+original = changed.read_bytes()
+try:
+    changed.write_bytes(original+b'\n# changed fixture source\n')
+    assert verify_runtime(reviewed)['status'] == 'FAILED_RUNTIME_SOURCE_CHECK'
+    with patch.object(run, 'verify', return_value={'status':'HASHES_MATCH'}), \
+         patch.object(run, 'read_private') as private, patch.object(run, 'command') as native:
+        try:
+            run.prepare(SimpleNamespace(read_authorized_target=True), root=reviewed)
+        except OperatorError as error:
+            assert str(error) == 'Running package differs from the selected source checkout'
+        else:
+            raise AssertionError('mismatched installed implementation accepted')
+        private.assert_not_called()
+        native.assert_not_called()
+finally:
+    changed.write_bytes(original)
+for owner, invoke in ((run, lambda: run.prepare(SimpleNamespace(read_authorized_target=True))),
+                      (apply, lambda: apply.apply(SimpleNamespace())),
+                      (apply, lambda: apply.validate_bundle(None, None, None))):
+    with patch.object(owner, 'verify') as source, patch.object(owner, 'read_private') as inputs:
+        try:
+            invoke()
+        except OperatorError as error:
+            assert str(error) == 'An explicit current source checkout is required'
+        else:
+            raise AssertionError('installed effect accepted absent checkout')
+        source.assert_not_called()
+        inputs.assert_not_called()
+# Verify that both existing operator CLIs pass the explicit checkout to their
+# own implementation. A fixture intercepts the call before any source or target I/O.
+from contextlib import redirect_stdout
+import io
+source = Path.cwd() / 'explicit-reviewed-source'
+for owner, function, arguments in (
+    (run, 'prepare', ['--catalog-id', 'nutanix-wsd-domains', '--inputs', 'inputs',
+        '--backend', 'backend', '--authority', 'authority', '--environment', 'env',
+        '--output', 'output', '--terraform', 'terraform']),
+    (apply, 'apply', ['--bundle', 'operation', '--approval', 'approval',
+        '--ledger', 'ledger', '--terraform', 'terraform'])):
+    with patch.object(sys, 'argv', ['operator', *arguments, '--source-root', str(source)]), \
+         patch.object(owner, function, return_value={'status':'FIXTURE_ONLY'}) as effect, \
+         redirect_stdout(io.StringIO()):
+        assert owner.main() == 0
+        assert effect.call_args.kwargs == {'root':source}
+plan = {'format_version':'1.2','resource_changes':[{'address':'module.domain',
+ 'mode':'managed','type':'openstack_networking_network_v2',
+ 'provider_name':'registry.terraform.io/terraform-provider-openstack/openstack',
+ 'change':{'actions':['create'],'after_unknown':{},'after':{
+ 'admin_state_up':False,'shared':False,'external':False,'port_security_enabled':True}}}]}
+assert plan_review.review(plan)['status'] != 'BLOCKED'
+plan['resource_changes'][0]['change']['after']['shared'] = True
+assert plan_review.review(plan)['status'] == 'BLOCKED'
+assert all(not x.startswith('tools.') and x != 'tools' for x in sys.modules)
+print(json.dumps({'status':'PASSED','nativeContact':False}))
+""".replace("FIXTURE_SOURCE_ROOT", repr(str(reviewed))))
+        self.assertEqual(result, {'status': 'PASSED', 'nativeContact': False})
+
     def test_wheel_owns_all_data_without_shared_top_level_directories(self):
         with zipfile.ZipFile(self.wheel) as wheel:
             members = wheel.namelist()
         self.assertIn('provisioner/execution/terraform_catalog.py', members)
         self.assertIn('provisioner/execution/input_review.py', members)
+        self.assertIn('provisioner/execution/flow_policy.py', members)
+        self.assertFalse(any(name.startswith('tools/flow_policy.') for name in members))
+        self.assertIn('provisioner/execution/lifecycle_transition.py', members)
+        self.assertFalse(any(name.startswith('tools/lifecycle_transition.') for name in members))
+        self.assertIn('provisioner/execution/openstack_transition.py', members)
+        self.assertFalse(any(name.startswith('tools/openstack_transition.') for name in members))
+        self.assertIn('provisioner/execution/plan_review.py', members)
+        self.assertFalse(any(name.startswith('tools/plan_review.') for name in members))
+        self.assertIn('provisioner/execution/terraform_apply.py', members)
+        self.assertFalse(any(name.startswith('tools/terraform_apply.') for name in members))
+        self.assertIn('provisioner/execution/terraform_run.py', members)
+        self.assertFalse(any(name.startswith('tools/terraform_run.') for name in members))
+        self.assertIn('provisioner/execution/wsd_handoff.py', members)
+        self.assertFalse(any(name.startswith('tools/wsd_handoff.') for name in members))
+
         self.assertIn('provisioner/execution/readback_core.py', members)
         self.assertFalse(any(name.startswith('tools/readback_core.') for name in members))
         self.assertIn('provisioner/execution/neutron_observe.py', members)

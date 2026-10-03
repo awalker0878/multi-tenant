@@ -13,17 +13,15 @@ import os
 from pathlib import Path
 import re
 import subprocess
-import sys
 from urllib.parse import urlsplit
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from provisioner.repository import asset_path
+from hosting_resources import SOURCE_ROOT
+ROOT = SOURCE_ROOT
 
-from provisioner.execution.source_integrity import verify
+from provisioner.execution.source_integrity import verify, verify_runtime
 from provisioner.compiler.wsd import identity
 from provisioner.execution.neutron_observe import strict_loads
-from tools.plan_review import review
+from provisioner.execution.plan_review import review
 from provisioner.execution.run_files import (current_window, digest, encoded, file_map, load_private,
                              new_directory, private_path, read_private, require,
                              utcnow, write_new, OperatorError)
@@ -35,6 +33,7 @@ BACKEND_KEYS = {'state_key', 'address', 'lock_address', 'unlock_address', 'lock_
 
 
 def select_scope(root, catalog_id, inputs):
+    require(isinstance(root, Path), 'An explicit current source checkout is required')
     selected = [e for e in entries(root) if e['id'] == catalog_id and e['kind'] == 'composition']
     require(len(selected) == 1, 'Select one registered WSD composition')
     entry = selected[0]
@@ -174,15 +173,18 @@ def authorized_command(authority, *args, **kwargs):
 
 
 def prepare(args, root=ROOT):
+    require(isinstance(root, Path), 'An explicit current source checkout is required')
     require(args.read_authorized_target is True, 'Explicit native read/contact opt-in required')
     source = verify(root)
     require(source['status'] == 'HASHES_MATCH', 'A clean committed checkout is required')
+    require(verify_runtime(root)['status'] == 'RUNTIME_SOURCES_MATCH',
+            'Running package differs from the selected source checkout')
     input_bytes, backend_bytes = read_private(args.inputs), read_private(args.backend)
     inputs, backend = strict_loads(input_bytes), strict_loads(backend_bytes)
     entry, scope, state_key = select_scope(root, args.catalog_id, inputs)
     transition = load_private(args.transition) if getattr(args, 'transition', None) else None
     if transition is not None:
-        from tools.lifecycle_transition import validate as validate_transition
+        from provisioner.execution.lifecycle_transition import validate as validate_transition
         validate_transition(transition, scope, input_bytes)
     settings = backend_settings(backend, state_key)
     environment_bytes = read_private(args.environment)
@@ -225,7 +227,7 @@ def prepare(args, root=ROOT):
     write_new(operation / 'backend.hcl', ''.join(f'{k} = {json.dumps(v)}\n' for k, v in sorted(settings.items())).encode())
     authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json')
     version = strict_loads(read_private(operation / 'version.json'))['terraform_version']
-    toolchain = asset_path('config/toolchain.json') if root == ROOT else root / 'config/toolchain.json'
+    toolchain = root / 'config/toolchain.json'
     require(version == json.loads(toolchain.read_text(encoding='utf-8'))['terraform'], 'Terraform version differs from the pinned toolchain')
     current_window(authority)
     authorized_command(authority, binary, directory, ['init', '-input=false', '-no-color', '-lockfile=readonly',
@@ -266,9 +268,11 @@ def main():
     parser.add_argument('--cloud', type=Path)
     parser.add_argument('--ca-bundle', type=Path)
     parser.add_argument('--read-authorized-target', action='store_true')
+    parser.add_argument('--source-root', type=Path, default=ROOT,
+                        help='Exact clean source checkout; required outside source development')
     args = parser.parse_args()
     try:
-        result = prepare(args)
+        result = prepare(args, root=args.source_root)
         print(json.dumps(result))
         return 0
     except OperatorError as exc:

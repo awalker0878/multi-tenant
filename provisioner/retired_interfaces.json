@@ -270,6 +270,55 @@
       "reason": "Implementation and all active consumers moved into the installed execution package without an alias.",
       "replacement": "provisioner/execution/run_files.py",
       "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/flow_policy.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/flow_policy.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/lifecycle_transition.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/lifecycle_transition.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/openstack_transition.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/openstack_transition.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/plan_review.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/plan_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_apply.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/terraform_apply.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_run.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/terraform_run.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/wsd_handoff.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/wsd_handoff.py",
+      "enforcement": "the path must not exist"
     }
   ]
 }

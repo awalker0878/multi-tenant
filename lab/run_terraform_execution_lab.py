@@ -18,7 +18,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from provisioner.execution.run_files import encoded, load_private, write_new
-from tools.terraform_run import command, process_environment
+from provisioner.execution.terraform_run import command, process_environment
 
 
 def experiment(binary):
@@ -72,7 +72,7 @@ def experiment(binary):
         checks.append('sensitive-plan-output-and-logs-owner-only')
     return {'status': 'PASSED_LOCAL_TERRAFORM_EXECUTION_ONLY', 'checks': checks,
             'native_target_contacted': False, 'native_qualification': False,
-            'command_source_sha256': hashlib.sha256((ROOT / 'tools/terraform_run.py').read_bytes()).hexdigest(),
+            'command_source_sha256': hashlib.sha256((ROOT / 'provisioner/execution/terraform_run.py').read_bytes()).hexdigest(),
             'ci_head_sha': os.environ.get('GITHUB_SHA')}
 
 

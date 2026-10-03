@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools import terraform_run as run
+from provisioner.execution import terraform_run as run
 from provisioner.execution.run_files import current_window, digest, encoded, load_private, read_private, utcnow, write_new
 
 

@@ -1,7 +1,8 @@
 """Bind existing AHV power/NIC lifecycle plans to activity evidence; no ledger release."""
 from provisioner.execution import readback_core as c
-from tools import lifecycle_transition as lifecycle, nutanix_vm_activity_observe as activity
-from tools.plan_review import has_true
+from provisioner.execution import lifecycle_transition as lifecycle
+from tools import nutanix_vm_activity_observe as activity
+from provisioner.execution.plan_review import has_true
 from provisioner.execution.run_files import require
 
 OBSERVED_PLAN_FIELDS = {'id', 'ext_id', 'name', 'power_state', 'num_sockets', 'num_cores_per_socket',

@@ -5,10 +5,11 @@ The two retained denies and any retained service IDs must remain known and exact
 """
 from copy import deepcopy
 from provisioner.execution import readback_core as c
-from tools import lifecycle_transition as lifecycle, nutanix_flow_activity_observe as activity
+from provisioner.execution import lifecycle_transition as lifecycle
+from tools import nutanix_flow_activity_observe as activity
 from tools import nutanix_flow_observe as flow
 from tools.nutanix_terraform_recovery import valid_mask
-from tools.plan_review import has_true
+from provisioner.execution.plan_review import has_true
 from provisioner.execution.run_files import require
 
 OBSERVED_PLAN_FIELDS = {'id', 'ext_id', 'name', 'type', 'state', 'scope', 'vpc_reference',

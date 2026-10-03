@@ -7,10 +7,7 @@ import argparse
 import ipaddress
 import json
 from pathlib import Path
-import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
 from provisioner.execution import readback_core as c
 from provisioner.execution.run_files import current_window, digest, encoded, load_private, read_private, require, write_new
 
@@ -153,7 +150,7 @@ def any_true(value):
 
 
 def prepare(prior_run, inputs_path, acceptance_path, stage):
-    from tools.wsd_handoff import execution_outputs
+    from provisioner.execution.wsd_handoff import execution_outputs
     prior_run=Path(prior_run)
     prior=load_private(prior_run/'bundle.json')
     outputs,previous,provenance=execution_outputs(prior_run,prior['scope']['phase'])

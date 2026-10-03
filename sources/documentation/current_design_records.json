@@ -95,7 +95,7 @@
   {
     "id": "TAD-M01",
     "path": "docs/current/TAD-infrastructure.md",
-    "version": "0.38",
+    "version": "0.39",
     "status": "Proposed",
     "owner_role": "Platform, network and security engineering",
     "scope": "Technical decomposition of the control application, durable authority, discovery, provisioning and migration paths together with fabric, native stacks, security edge and shared services.",
@@ -298,6 +298,11 @@
         "version": "0.38",
         "date": "2026-10-03",
         "summary": "Package operator files, shared readback transport, exact-ID Neutron observation and route-record review without aliases; preserve authority and retained-record contracts."
+      },
+      {
+        "version": "0.39",
+        "date": "2026-10-03",
+        "summary": "Package saved-plan review/execution, lifecycle binding, Flow rules and execution handoff; require explicit source selection and package/source byte agreement before installed effects; preserve retained-state and authority contracts."
       }
     ]
   },
@@ -391,7 +396,7 @@
   {
     "id": "ICD-M01",
     "path": "docs/current/interface-agreements.md",
-    "version": "0.37",
+    "version": "0.38",
     "status": "Proposed",
     "owner_role": "Producing and consuming infrastructure owners",
     "scope": "Producer/consumer obligations across operator, discovery, workflow, native execution, data transfer, evidence and shared-service ownership boundaries.",
@@ -588,6 +593,11 @@
         "version": "0.37",
         "date": "2026-10-03",
         "summary": "Package operator files, shared readback transport, exact-ID Neutron observation and route-record review without aliases; preserve authority and retained-record contracts."
+      },
+      {
+        "version": "0.38",
+        "date": "2026-10-03",
+        "summary": "Package saved-plan review/execution, lifecycle binding, Flow rules and execution handoff; require explicit source selection and package/source byte agreement before installed effects; preserve retained-state and authority contracts."
       }
     ]
   },

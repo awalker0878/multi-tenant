@@ -10,7 +10,7 @@
 - name: Validate input without contacting any platform
   ansible.builtin.command:
     argv: >-
-      {{ [ansible_playbook_python, playbook_dir + '/../../../tools/' + hosting_platform + '_observe.py', hosting_manifest_path]
+      {{ [ansible_playbook_python, playbook_dir + '/../../../' + ('provisioner/execution/neutron_observe.py' if hosting_platform == 'neutron' else 'tools/' + hosting_platform + '_observe.py'), hosting_manifest_path]
          + (['--validate-only'] if hosting_platform == 'neutron' else []) }}
   register: hosting_readback_validation
   changed_when: false

@@ -13,6 +13,14 @@ from scripts import check_retired_interfaces as retirement
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
+    'tools/flow_policy.py': ('path', 'provisioner/execution/flow_policy.py'),
+    'tools/lifecycle_transition.py': ('path', 'provisioner/execution/lifecycle_transition.py'),
+    'tools/openstack_transition.py': ('path', 'provisioner/execution/openstack_transition.py'),
+    'tools/plan_review.py': ('path', 'provisioner/execution/plan_review.py'),
+    'tools/terraform_apply.py': ('path', 'provisioner/execution/terraform_apply.py'),
+    'tools/terraform_run.py': ('path', 'provisioner/execution/terraform_run.py'),
+    'tools/wsd_handoff.py': ('path', 'provisioner/execution/wsd_handoff.py'),
+
     'tools/neutron_observe.py': ('path', 'provisioner/execution/neutron_observe.py'),
     'tools/readback_core.py': ('path', 'provisioner/execution/readback_core.py'),
     'tools/route_record_review.py': ('path', 'provisioner/execution/route_record_review.py'),

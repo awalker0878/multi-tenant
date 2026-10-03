@@ -255,19 +255,19 @@ class ExtendedPlanTests(unittest.TestCase):
    'mode':'managed','type':'openstack_networking_router_route_v2','provider_name':'registry.terraform.io/terraform-provider-openstack/openstack',
    'change':{'actions':['create'],'after':{'router_id':RID,'destination_cidr':destination,'next_hop':next_hop},'after_unknown':{}}}]}
  def test_route_always_requires_independent_review(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   result=review(self.route_plan(),{'router_id':[RID]});self.assertEqual(result['status'],'REVIEW_REQUIRED')
  def test_route_default_blocked(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan('0.0.0.0/0'))['status'],'BLOCKED')
  def test_route_ipv6_not_silently_enabled(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan('2001:db8::/64'))['status'],'BLOCKED')
  def test_route_bad_hop_blocked(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan(next_hop='not-an-ip'))['status'],'BLOCKED')
  def test_route_foreign_target_blocked(self):
-  from tools.plan_review import review
+  from provisioner.execution.plan_review import review
   self.assertEqual(review(self.route_plan(),{'router_id':['other']})['status'],'BLOCKED')
  def test_all_mock_sources_plan_only(self):
   from tools.verify_terraform import plan_only_mock_tests

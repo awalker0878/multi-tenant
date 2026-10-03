@@ -85,7 +85,7 @@ class CapacityDemandTests(unittest.TestCase):
         binary=Path(sys.executable).resolve()
         self.offer('plan',waiting['dependencies'],{'catalog_id':'openstack-wsd-workloads','terraform':str(binary),
             'terraform_sha256':digest(binary.read_bytes())},{'inputs':changed,'backend':{},'environment':{},'authority':{},'cloud':{}})
-        from tools import terraform_run
+        from provisioner.execution import terraform_run
         with patch.object(terraform_run,'prepare',side_effect=AssertionError('native contact')) as native:
             with self.assertRaises(ValueError): self.run_delivery()
         self.assertEqual(native.call_count,0)

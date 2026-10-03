@@ -10,9 +10,10 @@ if __package__ in (None, ''): sys.path.insert(0, str(Path(__file__).resolve().pa
 from provisioner.execution import readback_core as c
 from tools import recovery_review, vsphere_task_tree_observe as tree
 from provisioner.execution.run_files import digest, encoded, load_private, private_path, read_private, require, write_new, utcnow
-from tools.terraform_run import ROOT, select_scope, backend_settings
-from tools.plan_review import has_true
-from tools import nutanix_terraform_recovery as ahv, nutanix_flow_terraform_recovery as flow, lifecycle_transition
+from provisioner.execution.terraform_run import ROOT, select_scope, backend_settings
+from provisioner.execution.plan_review import has_true
+from provisioner.execution import lifecycle_transition
+from tools import nutanix_terraform_recovery as ahv, nutanix_flow_terraform_recovery as flow
 from tools import vsphere_recovery_devices as devices, nsx_terraform_recovery as nsx
 
 HELD = {'STARTED_OUTCOME_UNKNOWN', 'HOLD_RECONCILIATION_REQUIRED'}

@@ -6926,7 +6926,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -6954,7 +6954,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -6982,7 +6982,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7011,7 +7011,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7040,7 +7040,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7069,7 +7069,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7098,7 +7098,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7127,7 +7127,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7156,7 +7156,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7185,7 +7185,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7276,7 +7276,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7305,7 +7305,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7335,7 +7335,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7365,7 +7365,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7395,7 +7395,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7425,7 +7425,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7455,7 +7455,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7485,7 +7485,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -7514,7 +7514,7 @@
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
       "provisioner/execution/input_review.py",
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       "tools/dns_change.py",
       "tools/recovery_review.py"
     ],
@@ -8029,7 +8029,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A change that modifies inter-zone policy, external exposure, route authority, management access, or assurance profile SHALL receive a higher change classification than an ordinary workload scale operation.",
     "verification_procedures": [
@@ -8055,7 +8055,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: An approval SHALL bind the immutable plan and all security-relevant input/policy/state/dependency digests",
     "verification_procedures": [
@@ -8081,7 +8081,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: stale, changed or expired artifacts SHALL be rejected at apply.",
     "verification_procedures": [
@@ -8107,7 +8107,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Privileged software/provider/module supply chains SHALL use approved sources, integrity verification, revocation and a compromise-response procedure covering already-executed artifacts and credentials.",
     "verification_procedures": [

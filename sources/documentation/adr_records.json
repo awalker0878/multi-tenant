@@ -1686,7 +1686,7 @@
       "OPS-001"
     ],
     "implementation_paths": [
-      "tools/plan_review.py",
+      "provisioner/execution/plan_review.py",
       ".github/workflows/validate.yml"
     ],
     "open_work": "Actual change classification, approval authority, installed support status and operational ownership are not supplied by CI success.",

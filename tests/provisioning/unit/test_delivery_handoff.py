@@ -658,6 +658,23 @@ class NoBypassTest(unittest.TestCase):
                     self.assertIn('enterprise scheduler', text)
                     self.assertIn('is not', text)
                     self.assertNotIn('execution_authorized = True', text.lower())
+                elif path == self.PACKAGE / 'execution' / 'terraform_apply.py':
+                    # This is the same pre-existing native saved-plan owner,
+                    # relocated without a second delivery journal or authority.
+                    self.assertIn('def scope_ledger(', text)
+                    self.assertIn("'STARTED_OUTCOME_UNKNOWN'", text)
+                    self.assertIn("'APPLIED_REQUIRES_NATIVE_ACCEPTANCE'", text)
+                    self.assertIn('Explicit native mutation opt-in required', text)
+                    module = ast.parse(text)
+                    calls = [node for node in ast.walk(module)
+                             if isinstance(node, ast.Call)
+                             and isinstance(node.func, ast.Attribute)
+                             and isinstance(node.func.value, ast.Name)
+                             and node.func.value.id == 'fcntl' and node.func.attr == 'flock']
+                    owned = next(node for node in module.body
+                                 if isinstance(node, ast.FunctionDef) and node.name == 'scope_ledger')
+                    self.assertEqual(len(calls), 1)
+                    self.assertTrue(all(owned.lineno <= node.lineno <= owned.end_lineno for node in calls))
                 else:
                     self.assertNotIn('flock', text)
 

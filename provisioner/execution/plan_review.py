@@ -14,10 +14,7 @@ import json
 import re
 from pathlib import Path
 from typing import Any
-try:
-    from provisioner.execution.route_audit import load_json
-except ModuleNotFoundError:
-    from route_audit import load_json
+from provisioner.execution.route_audit import load_json
 
 class PlanError(ValueError):pass
 
@@ -83,7 +80,7 @@ def review(plan:dict[str,Any], approved_references:dict[str,list[Any]]|None=None
         findings.append({'severity':level,'code':code,'resource':safe,'field':field})
     lifecycle = {}
     if transition is not None:
-        from tools.lifecycle_transition import plan_bindings
+        from provisioner.execution.lifecycle_transition import plan_bindings
         try:
             lifecycle = plan_bindings(plan, transition)
             finding('REVIEW', 'NATIVE_BOOTSTRAP_AND_WITHDRAWAL_ACCEPTANCE_REQUIRED')

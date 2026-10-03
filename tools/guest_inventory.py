@@ -131,7 +131,7 @@ def main():
         require(not folder.is_relative_to(ROOT), 'Private inventory must be outside the repository')
         require((args.workload_outputs is None) != (args.workload_run is None), 'Choose raw outputs or one successful workload run')
         if args.workload_run:
-            from tools.wsd_handoff import execution_outputs
+            from provisioner.execution.wsd_handoff import execution_outputs
             outputs, _, _ = execution_outputs(args.workload_run, 'workloads')
         else:
             outputs = strict_loads(args.workload_outputs.read_bytes())

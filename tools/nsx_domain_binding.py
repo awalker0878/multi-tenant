@@ -6,10 +6,11 @@ prove packet enforcement, renew apply authority or release a held operation.
 import ipaddress
 import re
 from provisioner.execution import readback_core as c
-from tools import nsx_domain_observe as domain, lifecycle_transition as lifecycle
+from provisioner.execution import lifecycle_transition as lifecycle
+from tools import nsx_domain_observe as domain
 from provisioner.compiler.wsd import STATE
 from provisioner.execution.run_files import require
-from tools.terraform_run import ROOT, select_scope
+from provisioner.execution.terraform_run import ROOT, select_scope
 
 OBJECTS = {'tier1': ('tier1_path', ''), 'segment': ('segment_path', '-network'),
            'group': ('group_path', '-members'), 'security_policy': ('quarantine_policy_path', '-quarantine')}

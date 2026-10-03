@@ -38,7 +38,7 @@ Design: [RA §10](../architecture/reference/10-addressing-name-services-and-end-
 
 Decisions: [ADR-0007](../adr/0007-allocate-isolated-domain-attachments-and-qualify-sharing.md) · [ADR-0035](../adr/0035-make-shared-service-replies-select-the-originating-security-context.md)
 
-Implementation: [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py) · [provisioner/execution/route_record_review.py](../../provisioner/execution/route_record_review.py) · [tools/plan_review.py](../../tools/plan_review.py) · [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
+Implementation: [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py) · [provisioner/execution/route_record_review.py](../../provisioner/execution/route_record_review.py) · [provisioner/execution/plan_review.py](../../provisioner/execution/plan_review.py) · [terraform/modules/nutanix-route](../../terraform/modules/nutanix-route)
 
 Offline graphs and exact-record checks are not observations of a live routing table or approval provenance.
 

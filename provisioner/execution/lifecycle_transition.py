@@ -10,12 +10,9 @@ import ipaddress
 import json
 from pathlib import Path
 import re
-import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
 from provisioner.execution import readback_core as c
-from tools import openstack_transition as os_transition
+from provisioner.execution import openstack_transition as os_transition
 from provisioner.execution.run_files import current_window, digest, encoded, load_private, read_private, require, write_new
 
 FORMAT = 'hosting-platform-transition/1'
@@ -192,7 +189,7 @@ def plan_bindings(plan, record, *, as_of=None):
         require(not os_transition.any_true(security_unknown), 'Unknown lifecycle security or mutation fields')
         member = record['requested_inputs']['members'][spec['member']]
         if spec['type'] == 'nutanix_network_security_policy_v2':
-            from tools import flow_policy
+            from provisioner.execution import flow_policy
             native = record['prior_outputs']['members']['value'][spec['member']]
             services = service_rules(member) if record['target_stage'] == 'bootstrap' else {}
             flow_policy.validate(after, native['security_category_id'], native['vpc_id'], services)
@@ -226,7 +223,7 @@ def plan_bindings(plan, record, *, as_of=None):
 
 
 def prepare(prior_run, inputs_path, acceptance_path, stage):
-    from tools.wsd_handoff import execution_outputs
+    from provisioner.execution.wsd_handoff import execution_outputs
     prior_run=Path(prior_run)
     bundle=load_private(prior_run/'bundle.json')
     if bundle['scope']['platform']=='openstack':

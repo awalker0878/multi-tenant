@@ -162,7 +162,7 @@ The inspected native guest playbook explicitly permits Ubuntu 24.04/systemd. Ter
 
 ### F13 — Compatibility residue survives the no-shim objective (P2)
 
-`provisioner/adapters/base.py:340–363` exposes explicit compatibility projections. `tools/terraform_apply.py:153–155` supplies a default for older receipt content. `provisioner/repository.py` dynamically imports repository scripts and adjusts the import path, coupling the runtime to the checkout layout. These are different problems: compatibility projections/defaults are removal candidates; the repository bridge is packaging debt. Native adapters themselves are necessary, not shims.
+`provisioner/adapters/base.py:340–363` exposes explicit compatibility projections. `provisioner/execution/terraform_apply.py:153–155` supplies a default for older receipt content. `provisioner/repository.py` dynamically imports repository scripts and adjusts the import path, coupling the runtime to the checkout layout. These are different problems: compatibility projections/defaults are removal candidates; the repository bridge is packaging debt. Native adapters themselves are necessary, not shims.
 
 **Disposition:** migrate callers to canonical contracts, perform explicit offline record conversion where records must survive, verify parity, then delete old fields/readers/aliases. Package runtime logic as a normal installable Python application. Do not retain implicit version fallback or a second execution stack.
 
@@ -594,7 +594,7 @@ The release must contain one execution path, one current request contract per ob
 | Current surface | Concrete transition | Deletion gate |
 |---|---|---|
 | Adapter compatibility projections in `provisioner/adapters/base.py` | Move all serializers, compiler callers and tests to the canonical realization contract | Full caller scan is empty; serialized contract tests pass without old fields |
-| Legacy lifecycle defaults in `tools/terraform_apply.py` | Version receipts explicitly; convert retained records through an offline validated importer | Old/missing-version runtime receipts are rejected; conversion counts/digests/native IDs reconcile |
+| Legacy lifecycle defaults in `provisioner/execution/terraform_apply.py` | Version receipts explicitly; convert retained records through an offline validated importer | Old/missing-version runtime receipts are rejected; conversion counts/digests/native IDs reconcile |
 | `provisioner/repository.py` path/import bridge | Move runtime validators and compilers into the installed package; leave build tools as consumers | Service and CLI work outside a checkout; runtime cannot import `scripts.*` |
 | Public refusal-only `apply`/`mobility-apply` implementation | Replace with authorized execution submission through the same application service as the UI | End-to-end approved job runs; unauthorized/stale jobs still refuse |
 | Target-only mobility graph | Replace with source/target-aware durable workflow and per-dataset/VM children | Source capture, target restore, cutover and recovery tested with native IDs |
@@ -939,9 +939,9 @@ All repository links below are pinned to the audited revision. They are the basi
 | Restricted guest profile | [configure_linux.yml](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/ansible/playbooks/native/configure_linux.yml#L41-L46) |
 | VMware resource/guest shape | [vsphere-workload module](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/terraform/modules/vsphere-workload/main.tf.json) |
 | VMware address explanation | [VMware adapter](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/adapters/vmware/__init__.py) |
-| Restricted lifecycle transitions | [lifecycle_transition.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/lifecycle_transition.py#L95-L103) |
+| Restricted lifecycle transitions | [lifecycle_transition.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/lifecycle_transition.py#L95-L103) |
 | Compatibility projections | [adapters/base.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/adapters/base.py#L340-L363) |
-| Legacy receipt defaults | [terraform_apply.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/terraform_apply.py#L153-L155) |
+| Legacy receipt defaults | [terraform_apply.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/terraform_apply.py#L153-L155) |
 | Runtime repository bridge | [repository.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/repository.py) |
 | Completion claim requiring correction | [NEXT_WORK.md](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/docs/NEXT_WORK.md) |
 | CI workflow | [validate.yml](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/.github/workflows/validate.yml) |

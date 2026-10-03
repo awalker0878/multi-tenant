@@ -19,7 +19,7 @@ from tools.guest_inventory import build, gate
 from tools.guest_services import PROFILE, verify_assets
 from provisioner.execution.run_files import (digest, encoded, file_map, load_private, new_directory,
     private_path, read_private, require, utcnow, write_new)
-from tools.wsd_handoff import execution_outputs
+from provisioner.execution.wsd_handoff import execution_outputs
 
 PLAYBOOK = 'ansible/playbooks/native/configure_linux.yml'
 # The controller snapshot owns the pure guest gate's entire package import
@@ -34,6 +34,14 @@ GUEST_PACKAGE_SOURCE = (
     'provisioner/execution/neutron_observe.py', 'provisioner/execution/run_files.py',
     'provisioner/execution/route_record_review.py', 'provisioner/execution/input_review.py',
     'provisioner/execution/route_audit.py',
+    'provisioner/execution/flow_policy.py',
+    'provisioner/execution/lifecycle_transition.py',
+    'provisioner/execution/openstack_transition.py',
+    'provisioner/execution/plan_review.py',
+    'provisioner/execution/terraform_apply.py',
+    'provisioner/execution/terraform_run.py',
+    'provisioner/execution/wsd_handoff.py',
+
 )
 REFERENCES = {'target_binding_ref', 'bootstrap_ref', 'writer_coordination_ref', 'runtime_ref', 'recovery_ref'}
 RUNTIME_INSPECT = r'''

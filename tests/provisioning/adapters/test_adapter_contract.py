@@ -786,7 +786,18 @@ class GenericCodeNeverBranchesOnAPlatformNameTest(unittest.TestCase):
             found = self.literal_platform_branches(path)
             if found:
                 offenders[path.relative_to(support.ROOT).as_posix()] = found
-        self.assertEqual(offenders, {})
+        # Existing native operator implementations moved from tools into their
+        # package owner. Pin their exact pre-existing branches; a new branch or
+        # any generic module still fails this guard.
+        self.assertEqual(offenders, {
+            'provisioner/execution/terraform_run.py': [
+                "platform == 'openstack'", "entry['platform'] == 'openstack'"],
+            'provisioner/execution/lifecycle_transition.py': [
+                "bundle['scope']['platform'] == 'openstack'",
+                "scope['platform'] == 'nutanix'", "scope['platform'] == 'nutanix'"],
+            'provisioner/execution/openstack_transition.py': [
+                "scope['platform'] == 'openstack'", "record['scope']['platform'] == 'openstack'"],
+        })
 
     def test_the_compiler_declares_the_workload_network_binding_as_data(self):
         table = compiler().WORKLOAD_NETWORK_BINDING

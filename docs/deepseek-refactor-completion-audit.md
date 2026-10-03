@@ -1533,7 +1533,7 @@ as a prefix, so its 420 include the 339 `compatibility` hits.
 | `TODO` | 12 | the term inside the governing prompts and this audit's own requirement text; the "do not create another TODO list" and "remove stale TODO language" prohibitions in `docs/production-deepseek-implementation-plan.md`. No source marker | CURRENT_REQUIRED |
 | `FIXME` | 6 | the same requirement text and prohibitions. No source marker | CURRENT_REQUIRED |
 | `TBD` | 6 | the same requirement text, plus the lowercase `'tbd'` placeholder sentinel in `scripts/adr_lifecycle.py`'s not-recorded vocabulary | CURRENT_REQUIRED |
-| `legacy` | 128 | provider "legacy resource" guidance, the Nutanix `legacyErrorMessage` task field, and prepared-receipt readability in `tools/terraform_apply.py` | CURRENT_REQUIRED, HISTORICAL_ONLY |
+| `legacy` | 128 | provider "legacy resource" guidance, the Nutanix `legacyErrorMessage` task field, and prepared-receipt readability in `provisioner/execution/terraform_apply.py` | CURRENT_REQUIRED, HISTORICAL_ONLY |
 | `deprecated` | 144 | mostly the term list and the NetBox native lifecycle status `deprecated`, which is provider vocabulary the IPAM and DNS owners must write and read | CURRENT_REQUIRED |
 | `compat` | 420 | the `compatibility` evidence block of the version/source-provenance gate, the term list, and the local `compat = record['compatibility']` variable in `provisioner/qualification/provenance.py` | CURRENT_REQUIRED |
 | `compatibility` | 339 | the same gate's evidence block and the `tools/compatibility` entry in the retired-interface register that records the path as removed | CURRENT_REQUIRED |

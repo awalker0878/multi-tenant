@@ -1,14 +1,9 @@
 # Enterprise workload mobility: execution plan for all waves
 
-**Current review:** 3 October 2026, `implementation/all-waves`, starting at
-`9d4c6685b6fd0fcb6df211aebd47857562265456`, with discovery/profile corrections
-`b993470` and `249d75f`, catalog/design alignment and the subsequent guided
-initial application-draft creation continuation from `d663821ae9b594bd6b035755a0113218169ff40b`
-and saved-revision authoring continuation from `a83c4aa5f328a598012fbc822dad48201a0a446b`.
-The owner preparation/signing continuation starts at `1db0e51fa7a0ed8a974268c9d5202dd13fea7b40`;
-read-only browser review inspection continues from `b0704b559d70a8f5b6af875ab933ef2fbf898fd4`.
-Custodian signed-artifact intake continues from `4123efd543832bb9cff3087227f87165d90305d5`.
-The parallel B05 Terraform catalog continuation starts at `7438fb375d95188d1258141f06c2940d9e5d9a31`.
+**Current review:** 3 October 2026, continuing `implementation/all-waves` from
+`32d0f77002a549302ed8149c575bcad64d3b71db`, through operator/readback ownership
+`d2dfdc8d967543d8412ebd21a95db3cc96e3a124` and the saved-plan/lifecycle/source-binding
+continuation documented below. Earlier continuation boundaries remain in Git history.
 **Historical baseline:** `main` at `3cbc0c1e1e52a4bedd70972b05b04ccec48de699`.
 **Status:** substantial Wave 0/1 foundations; B05 remains open, Wave 2 is partial,
 and Waves 3–6 are not complete. No native qualification or operating acceptance added.
@@ -30,7 +25,7 @@ Lack of native access does not prevent repository implementation and local testi
 
 | Area | Implemented repository boundary | Still open |
 |---|---|---|
-| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, package-owned implementation-input review, fixed guest probe, offline route-audit model, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Direct operator/execution-tool ownership, installed service composition and retained-state conversion. |
+| Packaging (B05) | Package-owned resources, WSD compiler, Terraform catalog, source-integrity verifier, package-owned implementation-input review, operator/readback primitives, saved-plan/lifecycle chain, fixed guest probe, offline route-audit model, capacity/eligibility/preflight chain, reservation/IPAM/DNS evidence readers and qualification registry/native/provenance owners; retired entry points deleted without aliases and stale build copies removed. `provisioner` has no top-level `scripts`/`tools` imports. | Remaining guest/transfer/native-operation and other execution owners, installed service composition and retained-state conversion. |
 | B06–B13 | Authenticated control application, tenant state, approval/admission/outbox, workflow gating, worker identity, claims/intents and evidence primitives. | Complete admitted native effect composition and deployed authority/operating acceptance. |
 | B14–B16 | Three signed, bounded native HTTPS collectors, independent read-material custody, original signatures, explicit publication and normalization. OpenStack selector 4 retains allocation/attachment facts plus bounded VM-referenced Glance driver/security metadata. | Guest-installed driver/key/service evidence, deployed custody, independent visibility and native profile qualification. |
 | B17–B20 | Revisioned drafts, attributed assertions, signed assessment-only owner decisions, generation-pinned multi-member comparison, CLI, guided initial and saved-revision browser membership/data/evidence editing, installed offline owner preparation/signing, exact-revision browser review inspection and installed custodian signed-artifact intake. | Independent dependencies, deployed owner/key onboarding, owner-to-custodian artifact transfer and complete enterprise/administrator acceptance. |
@@ -282,6 +277,33 @@ opt-in and uncertainty rules remain unchanged. This is implementation ownership,
 not a retained-state importer, distributed fence or native acceptance. B05 remains
 open for the dependent execution owners, installed service composition and retained
 state conversion. See the [runtime owner contract](../engineering/operator-readback-runtime.md).
+
+
+### Package-owned saved-plan and lifecycle chain — 3 October 2026
+
+Seven actual implementations now live under `provisioner.execution`: `plan_review`,
+`flow_policy`, `openstack_transition`, `lifecycle_transition`, `terraform_run`,
+`terraform_apply` and `wsd_handoff`. Imports, current commands, source links,
+qualification/recovery/delivery consumers and sealed guest snapshots migrated
+together. Their former tool paths are deleted and independently prohibited; no
+forwarding modules, standalone import fallback or `sys.path` mutation remain.
+
+Installed preparation/apply require an explicit `--source-root` and refuse absent
+checkout selection before private inputs or target effects. Source development
+uses only the marked source root. Package-owned Python/data and bundled execution
+resources must match that selected checkout, including exact code/resource sets,
+bounded no-follow reads and referenced evidence documents. A clean unrelated
+checkout cannot be attributed to a different running package. This is byte
+consistency under trusted custody, not signer trust or hostile-writer exclusion.
+
+Existing plan, transition, approval, output, attempt, ledger and handoff formats,
+digests, implicit retained-stage behaviour and uncertainty rules are unchanged.
+Prepared/bootstrap default retirement still requires B48 retained-state conversion.
+The saved-plan operator remains the existing authorized owner; relocation does not
+compose the admitted control-plane workflow or qualify a native route. B05 remains
+open for guest/transfer/native-operation and other execution owners, deployed
+service composition and actual retained-state conversion. See the
+[saved-plan runtime contract](../engineering/saved-plan-runtime.md).
 
 ## 2. Corrected dependencies and delivery order
 

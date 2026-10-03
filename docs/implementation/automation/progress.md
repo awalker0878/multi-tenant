@@ -795,3 +795,29 @@ opt-in and uncertainty rules remain unchanged. This is implementation ownership,
 not a retained-state importer, distributed fence or native acceptance. B05 remains
 open for the dependent execution owners, installed service composition and retained
 state conversion. See the [runtime owner contract](../../engineering/operator-readback-runtime.md).
+
+### Package-owned saved-plan and lifecycle chain — 3 October 2026
+
+Seven actual implementations now live under `provisioner.execution`: `plan_review`,
+`flow_policy`, `openstack_transition`, `lifecycle_transition`, `terraform_run`,
+`terraform_apply` and `wsd_handoff`. Imports, current commands, source links,
+qualification/recovery/delivery consumers and sealed guest snapshots migrated
+together. Their former tool paths are deleted and independently prohibited; no
+forwarding modules, standalone import fallback or `sys.path` mutation remain.
+
+Installed preparation/apply require an explicit `--source-root` and refuse absent
+checkout selection before private inputs or target effects. Source development
+uses only the marked source root. Package-owned Python/data and bundled execution
+resources must match that selected checkout, including exact code/resource sets,
+bounded no-follow reads and referenced evidence documents. A clean unrelated
+checkout cannot be attributed to a different running package. This is byte
+consistency under trusted custody, not signer trust or hostile-writer exclusion.
+
+Existing plan, transition, approval, output, attempt, ledger and handoff formats,
+digests, implicit retained-stage behaviour and uncertainty rules are unchanged.
+Prepared/bootstrap default retirement still requires B48 retained-state conversion.
+The saved-plan operator remains the existing authorized owner; relocation does not
+compose the admitted control-plane workflow or qualify a native route. B05 remains
+open for guest/transfer/native-operation and other execution owners, deployed
+service composition and actual retained-state conversion. See the
+[saved-plan runtime contract](../../engineering/saved-plan-runtime.md).

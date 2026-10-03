@@ -120,10 +120,77 @@ class SourceIntegrityTests(unittest.TestCase):
     def test_old_module_is_absent_and_runtime_consumers_use_owner(self):
         import importlib.util
         from provisioner import repository
-        from tools import terraform_run,terraform_apply,state_export,vsphere_power
+        from provisioner.execution import terraform_run, terraform_apply
+        from tools import state_export, vsphere_power
         self.assertIsNone(importlib.util.find_spec('tools.check_release'))
         for module in (terraform_run,terraform_apply,state_export,vsphere_power):self.assertIs(module.verify,owner.verify)
         self.assertEqual(repository.source_commit(self.root)['commit'],self.commit)
 
 
 if __name__=='__main__':unittest.main()
+
+
+class RuntimeSourceBindingTests(unittest.TestCase):
+    """A copied reviewed tree must match running package bytes before contact."""
+    @classmethod
+    def setUpClass(cls):
+        import shutil
+        cls.temp = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(cls.temp.cleanup)
+        cls.copy = Path(cls.temp.name) / 'reviewed'
+        actual = Path(owner.__file__).resolve().parents[2]
+        for name in ('provisioner', 'hosting_resources', 'profiles', 'policy', 'sources',
+                     'terraform', 'ansible', 'config', 'docs'):
+            shutil.copytree(actual / name, cls.copy / name,
+                            ignore=shutil.ignore_patterns('__pycache__', '_assets'))
+
+    def test_identical_code_and_owned_resources_match(self):
+        result = owner.verify_runtime(self.copy)
+        self.assertEqual(result['status'], 'RUNTIME_SOURCES_MATCH', result)
+        self.assertGreater(result['files_checked'], 100)
+
+    def test_changed_code_and_runtime_resource_refuse(self):
+        for relative, kind in (('provisioner/execution/flow_policy.py', 'RUNTIME_SOURCE_MISMATCH'),
+                               ('config/toolchain.json', 'RUNTIME_ASSET_MISMATCH')):
+            with self.subTest(file=relative):
+                path = self.copy / relative
+                original = path.read_bytes()
+                try:
+                    path.write_bytes(original + b'\n')
+                    result = owner.verify_runtime(self.copy)
+                    self.assertIn({'kind': kind, 'file': relative}, result['issues'])
+                finally:
+                    path.write_bytes(original)
+
+    def test_extra_code_or_native_resource_cannot_be_attributed_to_this_package(self):
+        for relative, kind in (('provisioner/execution/extra.py', 'RUNTIME_SOURCE_SET_MISMATCH'),
+                               ('terraform/extra.tf', 'RUNTIME_ASSET_SET_MISMATCH')):
+            path = self.copy / relative
+            try:
+                path.write_bytes(b'fixture only\n')
+                result = owner.verify_runtime(self.copy)
+                self.assertIn({'kind': kind, 'file': relative}, result['issues'])
+            finally:
+                path.unlink()
+
+    def test_linked_missing_or_bounded_source_refuses_without_modification(self):
+        path = self.copy / 'provisioner/execution/flow_policy.py'
+        original = path.read_bytes()
+        target = self.copy / 'copied-original.py'
+        target.write_bytes(original)
+        try:
+            path.unlink()
+            self.assertNotEqual(owner.verify_runtime(self.copy)['status'], 'RUNTIME_SOURCES_MATCH')
+            path.symlink_to(target)
+            self.assertNotEqual(owner.verify_runtime(self.copy)['status'], 'RUNTIME_SOURCES_MATCH')
+        finally:
+            path.unlink(missing_ok=True)
+            path.write_bytes(original)
+            target.unlink()
+        with patch.object(owner, 'MAX_FILE_BYTES', 4):
+            self.assertNotEqual(owner.verify_runtime(self.copy)['status'], 'RUNTIME_SOURCES_MATCH')
+        self.assertEqual(path.read_bytes(), original)
+
+
+if __name__ == '__main__':
+    unittest.main()

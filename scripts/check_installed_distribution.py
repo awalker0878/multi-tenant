@@ -45,12 +45,14 @@ compiler_path = list(sys.path)
 try:
     import provisioner
     from provisioner.compiler import components, wsd
-    from provisioner.execution import terraform_catalog, source_integrity, guest_probe, route_audit, input_review, readback_core, neutron_observe, run_files, route_record_review
+    from provisioner.execution import terraform_catalog, source_integrity, guest_probe, route_audit, input_review, readback_core, neutron_observe, run_files, route_record_review, flow_policy, lifecycle_transition, openstack_transition, plan_review, terraform_apply, terraform_run, wsd_handoff
     assert terraform_catalog.entries()
     assert callable(input_review.review_inputs)
     assert neutron_observe.strict_loads('{"value": true}') == {"value": True}
     assert callable(readback_core.identifier) and callable(run_files.write_new)
     assert callable(route_record_review.review)
+    assert terraform_run.ROOT is None and terraform_apply.ROOT is None
+    assert callable(lifecycle_transition.plan_bindings) and callable(wsd_handoff.execution_outputs)
     assert source_integrity.verify()['status'] == 'BLOCKED_NO_CURRENT_CHECKOUT'
     from provisioner.allocations import (reservation_evidence, ipam_evidence, dns_evidence,
         capacity_evidence, site_eligibility, reservation_preflight, ipam_preflight, dns_preflight)
@@ -146,6 +148,13 @@ assert importlib.util.find_spec('tools.terraform_catalog') is None
 assert importlib.util.find_spec('tools.guest_probe') is None
 assert importlib.util.find_spec('tools.route_audit') is None
 assert importlib.util.find_spec('tools.input_review') is None
+assert importlib.util.find_spec('tools.flow_policy') is None
+assert importlib.util.find_spec('tools.lifecycle_transition') is None
+assert importlib.util.find_spec('tools.openstack_transition') is None
+assert importlib.util.find_spec('tools.plan_review') is None
+assert importlib.util.find_spec('tools.terraform_apply') is None
+assert importlib.util.find_spec('tools.terraform_run') is None
+assert importlib.util.find_spec('tools.wsd_handoff') is None
 assert importlib.util.find_spec('tools.readback_core') is None
 assert importlib.util.find_spec('tools.neutron_observe') is None
 assert importlib.util.find_spec('tools.run_files') is None

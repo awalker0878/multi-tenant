@@ -13,7 +13,7 @@ points remains required before retiring an executable or persisted contract.
 | Current interface | Known consumers and retained state | Replacement | Removal check and disposition |
 | --- | --- | --- | --- |
 | `Adapter.placement_shape()`, `network_shape()`, and `to_dict()` | Adapter tests and `docs/provisioning/adapter-contract.md`; no runtime call found in `provisioner/`. Repository code search found no other source consumer. No adapter JSON record is written by this interface. | `placement_contract()`, `readback_contract()`, and `realization_contract()` | **Removed in Phase 0.** The adapter tests now consume canonical surfaces and explicitly assert the old methods are absent. The separate `hosting-platform-adapter/2` marker remains because `provisioner/execution/manifest.py` binds it into approved plan digests; changing that marker would invalidate plan identity and is a separate versioned migration. |
-| Implicit `lifecycle_stage='prepared'` in `tools/terraform_apply.py:verify_outputs` | Prepared plans and older Terraform output receipts can omit the stage. `tools/lifecycle_transition.py`, `tools/openstack_transition.py`, native modules and their tests also read or emit lifecycle stage; these must be audited together. Retained private operation bundles, inputs, output receipts and ledgers may be affected. | Versioned input/output and attempt receipt contract; an offline importer with a verified native-stage observation, or an explicit `UNRESOLVED` hold when the stage cannot be proven. | **Keep until retained-state conversion.** Enumerate records, validate digests and native IDs, freeze old writers, import and reconcile, then reject absent stage at runtime. Require prepared and bootstrap negative/positive tests plus mixed-old/new-ledger tests. No silent runtime default in the new contract. |
+| Implicit `lifecycle_stage='prepared'` in `provisioner/execution/terraform_apply.py:verify_outputs` | Prepared plans and older Terraform output receipts can omit the stage. `provisioner/execution/lifecycle_transition.py`, `provisioner/execution/openstack_transition.py`, native modules and their tests also read or emit lifecycle stage; these must be audited together. Retained private operation bundles, inputs, output receipts and ledgers may be affected. | Versioned input/output and attempt receipt contract; an offline importer with a verified native-stage observation, or an explicit `UNRESOLVED` hold when the stage cannot be proven. | **Keep until retained-state conversion.** Enumerate records, validate digests and native IDs, freeze old writers, import and reconcile, then reject absent stage at runtime. Require prepared and bootstrap negative/positive tests plus mixed-old/new-ledger tests. No silent runtime default in the new contract. |
 | Dynamic `repository_module` loader and root `sys.path` mutation | The dynamic loader was used by `adapters/base.py`, `placement/eligibility.py`, `compiler/environment.py`, repository validation wrappers and tests. Owner modules still live in installed top-level `tools.*` and `scripts.*` packages; some owner CLIs still mutate `sys.path` for direct script invocation. `reviewed_source` and catalog paths retain checkout semantics. | Typed repository operations with explicit lazy owner imports, followed by package-owned compiler, validators and reviewed catalog resources; build scripts call the package. | **Dynamic loader removed.** The package boundary still imports top-level owners and some scripts mutate the import path. Relocate those owners, remove the path mutations and verify installed CLI and service outside the checkout before closing B05. Preserve native adapter boundaries and reviewed source/catalog digests. |
 | Refusal-only `hosting apply` and `hosting mobility-apply` | `provisioner/cli/main.py` dispatches to `cli/apply.py` and `cli/mobility_apply.py`; tests and operator docs consume handoff payloads. Existing approved plan digests are not authority for a new executor without revalidation. | One application service submits an approved, scoped, idempotent durable job to the execution authority used by both CLI and UI. | Remove handoff-as-success projection only when approved jobs run end to end and refusal cases remain enforced. Reject old request/output formats at mutation entry; retain historical handoffs for read-only audit. |
 | Target-only `provisioner/portability/handoff.py` graph | `cli/mobility_apply.py` and migration plan emit a `hosting-mobility-delivery-topology/1` graph; `dataset-restore` exists without source capture/fence activities. Old runner packets and journals can contain the graph. | Directed source and target workflow with native operation IDs, verified source snapshot/export, data transfer, target import/restore, cutover and bounded rollback. | Drain/reconcile old graphs before replacement. Native task and ownership reconciliation must pass for each supported source→target route. No replacement graph may rely on a target-only packet to claim migration. |
@@ -196,3 +196,29 @@ opt-in and uncertainty rules remain unchanged. This is implementation ownership,
 not a retained-state importer, distributed fence or native acceptance. B05 remains
 open for the dependent execution owners, installed service composition and retained
 state conversion. See the [runtime owner contract](../../engineering/operator-readback-runtime.md).
+
+### Package-owned saved-plan and lifecycle chain — 3 October 2026
+
+Seven actual implementations now live under `provisioner.execution`: `plan_review`,
+`flow_policy`, `openstack_transition`, `lifecycle_transition`, `terraform_run`,
+`terraform_apply` and `wsd_handoff`. Imports, current commands, source links,
+qualification/recovery/delivery consumers and sealed guest snapshots migrated
+together. Their former tool paths are deleted and independently prohibited; no
+forwarding modules, standalone import fallback or `sys.path` mutation remain.
+
+Installed preparation/apply require an explicit `--source-root` and refuse absent
+checkout selection before private inputs or target effects. Source development
+uses only the marked source root. Package-owned Python/data and bundled execution
+resources must match that selected checkout, including exact code/resource sets,
+bounded no-follow reads and referenced evidence documents. A clean unrelated
+checkout cannot be attributed to a different running package. This is byte
+consistency under trusted custody, not signer trust or hostile-writer exclusion.
+
+Existing plan, transition, approval, output, attempt, ledger and handoff formats,
+digests, implicit retained-stage behaviour and uncertainty rules are unchanged.
+Prepared/bootstrap default retirement still requires B48 retained-state conversion.
+The saved-plan operator remains the existing authorized owner; relocation does not
+compose the admitted control-plane workflow or qualify a native route. B05 remains
+open for guest/transfer/native-operation and other execution owners, deployed
+service composition and actual retained-state conversion. See the
+[saved-plan runtime contract](../../engineering/saved-plan-runtime.md).

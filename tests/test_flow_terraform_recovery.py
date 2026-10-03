@@ -12,9 +12,10 @@ from tests.test_flow_lifecycle import fixture as lifecycle_fixture
 from tests import test_nutanix_flow_activity as fixtures
 from tools import nutanix_flow_terraform_recovery as flow, terraform_recovery_review as review
 from provisioner.execution import readback_core as c
-from tools import nutanix_flow_activity_observe as activity, lifecycle_transition as lifecycle
+from provisioner.execution import lifecycle_transition as lifecycle
+from tools import nutanix_flow_activity_observe as activity
 from provisioner.execution.run_files import digest, encoded, write_new, load_private
-from tools.terraform_run import select_scope
+from provisioner.execution.terraform_run import select_scope
 
 
 def scenario(origin, stage='bootstrap', *, expired=False):

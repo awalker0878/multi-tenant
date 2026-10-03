@@ -1,5 +1,5 @@
 import copy,json,unittest
-from tools.plan_review import PlanError,review
+from provisioner.execution.plan_review import PlanError,review
 
 def plan(kind='openstack_networking_network_v2',after=None,actions=None):
  return {'format_version':'1.2','terraform_version':'synthetic','resource_changes':[{'address':'module.owned.'+kind+'.domain','mode':'managed','type':kind,'provider_name':'registry.terraform.io/terraform-provider-openstack/openstack',
