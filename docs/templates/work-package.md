@@ -7,6 +7,7 @@ Use a stable PNN.NN ID. Keep progress values in the delivery register.
 | Outcome and scope | User/operator result; included and excluded behavior |
 | Accountability | Owner role now; actual assignee/reviewer when assigned |
 | Traceability | Requirement, ADR, service/contract, campaign and gate criterion IDs |
+| Engineering controls | Applicable [ENG controls](../engineering/coverage.md), required proof and any reviewed exception |
 | Dependencies | Exact preceding package/output; current decision constraints; external access/owner dependency |
 | Inputs | Source revisions, schemas, synthetic fixtures and environment prerequisites |
 | Outputs | Concrete paths/artifacts; distinguish existing documents from planned future files |

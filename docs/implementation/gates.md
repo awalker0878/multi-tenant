@@ -4,6 +4,8 @@ These checklists define required outcomes; checked delivery results live only in
 
 Gate Gxx closes phase Pxx. Entry dependencies come from the phased plan and canonical register. P09 is evaluated per selected tranche; P10 must include every expansion tuple advertised for release. Negative and recovery cases remain required when the happy path passes. A failed criterion blocks the gate until corrected or the supported scope is explicitly revised and re-reviewed.
 
+The [engineering coverage map](../engineering/coverage.md) supplies concrete framework and code-quality proof for the existing criteria below. Evaluate applicable ENG controls with their package's evidence; document a reviewed applicability reason or exception when needed. A common standard or passed documentation validator is not proof of an implemented control.
+
 ## G00 — Product and architecture baseline
 
 | Criterion | Required pass/fail check | Evidence | Environment | Reviewer role |
@@ -19,10 +21,10 @@ Gate Gxx closes phase Pxx. Entry dependencies come from the phased plan and cano
 
 | Criterion | Required pass/fail check | Evidence | Environment | Reviewer role |
 | --- | --- | --- | --- | --- |
-| G01.01 — Independent builds | A clean checkout builds seven principal application images and selected worker images from exact locks; changing one service does not require rebuilding unrelated services. | E1: build/typecheck/test logs, locked inputs and image digests | Clean developer/CI runners | Engineering lead |
+| G01.01 — Independent builds | A clean checkout builds seven principal application images and selected worker images from exact locks; changing one service does not require rebuilding unrelated services. PSR-4, formatter, static/Vue type checks and service dependency rules pass against the agreed layout. | E1: build/typecheck/test logs, architecture checks, locked inputs and image digests | Clean developer/CI runners | Engineering lead |
 | G01.02 — Clean integration install | Install into an empty isolated integration environment, seed synthetic data and exercise authenticated health; no production credentials or endpoints are present. | E2: install inventory, health/auth results and endpoint restriction check | Integration | SRE lead |
-| G01.03 — Cross-language contracts | Validate PHP/Python payload compatibility, reject incompatible payload/version and wrong tenant/caller, and prove duplicate inbox delivery and outbox atomic rollback in the foundation harness. | E1/E2: conformance and negative messaging reports | CI and real-dependency integration | Architecture and quality leads |
-| G01.04 — Supply-chain provenance | Publish signed images/SBOM/manifest; verify signatures before promotion; a deliberately unsigned or mismatched artifact fails admission. | E1/E2: digest/signature records and negative promotion result | CI and isolated registry | Security and SRE leads |
+| G01.03 — Cross-language contracts | Validate PHP/Python payload compatibility and safe error/field handling; reject incompatible payload/version and wrong tenant/caller. Prove duplicate inbox delivery, atomic rollback and relay recovery after commit-before-publication failure against real dependencies. | E1/E2: conformance, transaction/crash and negative messaging reports | CI and real-dependency integration | Architecture and quality leads |
+| G01.04 — Supply-chain provenance | Enforce dependency-aware required CI checks, ownership review and locked dependency/security checks. Publish signed images/SBOM/manifest; verify signatures before promotion; a deliberately unsigned or mismatched artifact fails admission. | E1/E2: CI selection/rejection, digest/signature records and negative promotion result | CI and isolated registry | Security and SRE leads |
 | G01.05 — Data and secret isolation | Prove runtime roles cannot read other service databases or execute schema administration; exercise controlled migrations and invalid/revoked workload identity. | E2: database/identity negative tests and dependency configuration | Integration | Security and service owners |
 | G01.06 — Baseline recovery | Restore a synthetic database and evidence object, verify identity/digest, restart services, deliver a test alert and rehearse failed deployment recovery with native writes disabled. | E2: restore/restart/alert receipt and deployment recovery records | Integration | SRE and qualification leads |
 
@@ -30,10 +32,10 @@ Gate Gxx closes phase Pxx. Entry dependencies come from the phased plan and cano
 
 | Criterion | Required pass/fail check | Evidence | Environment | Reviewer role |
 | --- | --- | --- | --- | --- |
-| G02.01 — Identity and isolation | Q01 denies forged tenant, guessed IDs, wrong audience, expired token and unauthorized search/export/evidence access for at least two tenants. | E1/E2: permission matrix and negative results | Integration | IAM and security leads |
+| G02.01 — Identity and isolation | Q01 denies forged tenant, guessed IDs, wrong audience, expired token and unauthorized search/export/evidence access for at least two tenants. Include cache/file/job context, props/history, field permissions and real browser request-forgery/session boundaries. | E1/E2: permission/surface matrix, middleware/browser and negative results | Integration | IAM and security leads |
 | G02.02 — Bound approvals | Plan digest, action, resource scope, expiry and separation of duties bind approval; edited/revoked plans cannot reuse it. | E2: approval and revocation scenarios | Integration | Governance owner and quality lead |
 | G02.03 — Dependency failure | Issuer/key service loss follows the selected fail-closed behavior; rotation and revocation prevent new privileged admission. | E2: identity failure/recovery observations | Integration | IAM and SRE leads |
-| G02.04 — Audit and usability | Approval/audit restart preserves immutable history; delegated roles complete tenant selection and access-denied journeys using keyboard controls. | E2: restart and browser task reports | Integration | Product and quality leads |
+| G02.04 — Audit and usability | Approval/audit restart preserves immutable history; revocation does not discard already committed audit/custody facts. Delegated roles complete tenant selection and denied/session/conflict journeys under the selected accessibility scope; stale responses/history cannot cross tenant context. | E2: restart/revocation and browser/accessibility task reports | Integration | Product and quality leads |
 
 ## G03 — Application catalogue and workspace
 
@@ -42,7 +44,7 @@ Gate Gxx closes phase Pxx. Entry dependencies come from the phased plan and cano
 | G03.01 — Application intent | Register/revise the synthetic multi-workload, multi-domain application and inspect immutable history through service APIs. | E1/E2: Q01 domain and UI reports | Integration | Catalogue owner |
 | G03.02 — Negative invariants | Cross-tenant/domain associations, dangling references, dependency cycles and concurrent stale edits fail deterministically. | E1/E2: invariant and conflict matrix | CI/integration | Architecture and quality leads |
 | G03.03 — Retry and persistence failure | Duplicate command creates one revision; outbox failure rolls back mutation; restart and replay retain history without duplicate intent. | E2: transaction/fault and replay evidence | Integration PostgreSQL/broker | Quality lead |
-| G03.04 — Operator task | Owner can explain validation errors, compare revisions and complete the journey with declared accessibility constraints. | E2: browser plus representative-user review | Integration | Product owner |
+| G03.04 — Operator task | Owner can explain validation errors, compare revisions and complete the journey with declared accessibility constraints. Query/payload bounds and safe resource serialization hold on representative tenant data. | E2: browser, query/bounds and representative-user review | Integration | Product owner |
 
 ## G04 — Site commissioning and inventory
 
@@ -103,8 +105,8 @@ Gate Gxx closes phase Pxx. Entry dependencies come from the phased plan and cano
 | Criterion | Required pass/fail check | Evidence | Environment | Reviewer role |
 | --- | --- | --- | --- | --- |
 | G10.01 — Measured resilience | Approved scale, latency/SLO, native endpoint limits, failure domains and control-plane RPO/RTO pass with representative mix. | E3/E4: Q09/Q10 performance/failure/restore measurements | Representative preproduction and qualified native labs | SRE, performance and service owners |
-| G10.02 — Restore and upgrade safety | Restore DB/workflows/evidence/state/keys read-only, reconcile epochs/native outcomes and enable writes only after review; mixed versions and incompatible-contract rejection pass. | E3/E4: Q09 full restore and upgrade/failure evidence | Preproduction | Independent SRE and qualification reviewers |
-| G10.03 — Security and installation | Required security findings close; custody/sovereignty, key/identity rotation and clean/restricted-network installation pass for selected scope. | E3/E4: Q09 security/install and dependency-recovery records | Preproduction approved trust boundary | Security and service owners |
+| G10.02 — Restore and upgrade safety | Restore DB/workflows/evidence/state/keys read-only, reconcile epochs/native outcomes and enable writes only after review. Prove mixed-version contracts/jobs, expand/contract and interrupted backfills, applied migration state, key rotation and worker draining with their recovery limits. | E3/E4: Q09 full restore and upgrade/failure evidence | Preproduction | Independent SRE and qualification reviewers |
+| G10.03 — Security and installation | Applicable versioned security-verification requirements and required findings close; deployed browser/tenant/input controls, custody/sovereignty, key/identity rotation and clean/restricted-network installation pass for selected scope. Verify protected runtime configuration and probe behavior. | E3/E4: Q09 security/applicability, install and dependency-recovery records | Preproduction approved trust boundary | Security and service owners |
 | G10.04 — Release support acceptance | Release candidate reruns affected tuples, delivers alerts/on-call exercises and reconciles artifacts/evidence/claims; receiving team accepts responsibilities and limitations. | E4: Q09/Q10 release dossier and receiving-owner decision | Preproduction/operational review | Service owner and qualification lead |
 
 ## G11 — Pilot and supported release

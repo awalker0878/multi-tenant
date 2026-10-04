@@ -11,6 +11,7 @@ Keep product intent, target design, delivered behavior and observed evidence dis
 | `docs/product/` | User journeys, vocabulary, entity semantics and application examples | A user-visible concept, workflow or domain invariant changes |
 | `docs/architecture/` | Cross-service ownership, trust boundaries, topology and design rules | A boundary, data owner, dependency or trust assumption changes |
 | `docs/services/<service>.md` | Service responsibilities, data, interfaces, failure and operating behavior | A service changes behavior, persistence, permissions or dependencies |
+| `docs/engineering/` | Shared implementation standards, primary-source rationale and control-to-package verification mapping | Framework behavior, engineering policy, CI enforcement or a cross-cutting risk changes |
 | `docs/contracts/` | Human-readable API/event conventions and examples | Contract semantics or cross-language usage changes |
 | `contracts/openapi/`, `contracts/asyncapi/`, `contracts/schemas/` | Future canonical machine-readable API/event/message definitions | Schemas are implemented; clients and rendered references derive from these sources |
 | `docs/decisions/` | Decision register and full ADR rationale | A consequential choice is proposed, accepted, rejected or superseded |
@@ -35,6 +36,7 @@ Paths described as future are not implemented artifacts. When adding a real sche
 1. Identify the user outcome and affected R-series requirements. New requirements receive a stable ID and recorded source or proposal rationale.
 2. Select the phase/package, identify prerequisite decisions and contracts, and write a concrete work-package card before implementation.
 3. Update the domain/service specification. Use an ADR for boundaries, trust, persistence, compatibility, major dependencies or support scope.
+   Link applicable [engineering controls](engineering/coverage.md), their verification and any reviewed exception; keep detailed common conventions in the engineering guide rather than copying them into each service.
 4. Specify positive, negative and recovery behavior. Give gate criteria stable IDs and identify the test environment and evidence level.
 5. Implement contracts, code, deployment and meaningful tests in coherent increments. Reference requirement/package/decision IDs in change descriptions.
 6. Record actual verification references and limitations in the delivery register. Regenerate views and update the next queue.

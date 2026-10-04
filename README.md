@@ -70,6 +70,7 @@ These are future milestones. The [progress view](docs/implementation/progress.md
 | --- | --- |
 | Understand the product | [Product overview](docs/product/README.md) → [worked example](docs/product/application-walkthrough.md) |
 | Understand domain and architecture | [Domain model](docs/product/domain-model.md) → [target architecture](docs/architecture/target-architecture.md) → [service specifications](docs/services/README.md) |
+| Build consistent Laravel services and UI | [Engineering standards](docs/engineering/README.md) → [coverage and delivery map](docs/engineering/coverage.md) → [research assessment](docs/reference/laravel-practices-review.md) |
 | Implement the next increment | [Next work](next_work.md) → [P00](docs/implementation/phases/p00.md) → [P01](docs/implementation/phases/p01.md) → [contract examples](docs/contracts/examples.md) |
 | Plan and track delivery | [Phase plan](docs/implementation/phased-plan.md) → [detailed phase documents](docs/implementation/phases/README.md) → [traceability](docs/implementation/traceability.md) → [gates](docs/implementation/gates.md) |
 | Deploy and operate | [Operations index](docs/operations/README.md) → [deployment model](docs/operations/deployment-model.md) |

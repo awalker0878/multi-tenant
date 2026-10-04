@@ -17,6 +17,8 @@ This documentation describes a proposed enterprise product and its delivery prog
 | [Target architecture](architecture/target-architecture.md) | Where do data, decisions and execution authority belong? |
 | [Service specifications](services/README.md) | What does each deployable own and expose? |
 | [Contracts](contracts/README.md) and [examples](contracts/examples.md) | How do the PHP/Python services communicate? |
+| [Engineering standards](engineering/README.md) | How are Laravel services, tenant persistence, Inertia/Vue, tests and CI implemented consistently? |
+| [Engineering coverage](engineering/coverage.md) and [research assessment](reference/laravel-practices-review.md) | Which best-practice controls apply, why, and which packages and gates verify them? |
 | [Architecture decisions](decisions/README.md) and [register](decisions/decision-register.md) | What is the reasoning, disposition and deadline for each choice? |
 
 ## Implementation and assurance

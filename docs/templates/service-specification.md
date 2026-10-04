@@ -24,4 +24,6 @@ Specify image/process roles, configuration versus secrets, trust/network flows, 
 
 ## Acceptance and delivery
 
+Identify applicable [engineering controls](../engineering/coverage.md), owning implementation locations and justified exceptions. Include input/response bounds, query/cache/queue limits, schema evolution, request/job tenant cleanup and relevant browser/security checks. Link common standards; do not duplicate or silently weaken them.
+
 Map requirements to package/gate IDs and positive, denied, conflicting and interrupted cases. Identify required evidence environments and known design decisions. Link status/evidence in the canonical register; do not add independently maintained completion flags.

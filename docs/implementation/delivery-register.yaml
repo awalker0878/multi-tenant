@@ -313,6 +313,8 @@ work_packages:
   - G00.02
   doc_refs:
   - docs/implementation/phases/p00.md
+  - docs/engineering/coverage.md
+  - docs/engineering/laravel-conventions.md
 - id: P00.03
   phase_id: P00
   title: Technical decisions
@@ -333,6 +335,10 @@ work_packages:
   - G00.03
   doc_refs:
   - docs/implementation/phases/p00.md
+  - docs/engineering/coverage.md
+  - docs/engineering/developer-workflow.md
+  - docs/engineering/frontend.md
+  - docs/releases/release-process.md
 - id: P00.04
   phase_id: P00
   title: Qualification design
@@ -373,6 +379,9 @@ work_packages:
   - G00.05
   doc_refs:
   - docs/implementation/phases/p00.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/developer-workflow.md
 - id: P00.06
   phase_id: P00
   title: Delivery decomposition
@@ -414,6 +423,11 @@ work_packages:
   - G01.01
   doc_refs:
   - docs/implementation/phases/p01.md
+  - docs/engineering/coverage.md
+  - docs/engineering/developer-workflow.md
+  - docs/engineering/frontend.md
+  - docs/engineering/laravel-conventions.md
+  - docs/engineering/testing-and-ci.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -434,6 +448,11 @@ work_packages:
   - G01.02
   doc_refs:
   - docs/implementation/phases/p01.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/frontend.md
+  - docs/operations/deployment-model.md
+  - docs/operations/runbooks/install.md
 - id: P01.03
   phase_id: P01
   title: Contracts and messaging
@@ -453,6 +472,11 @@ work_packages:
   - G01.03
   doc_refs:
   - docs/implementation/phases/p01.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/laravel-conventions.md
+  - docs/engineering/data-and-messaging.md
+  - docs/contracts/README.md
 - id: P01.04
   phase_id: P01
   title: CI and supply chain
@@ -472,6 +496,10 @@ work_packages:
   - G01.04
   doc_refs:
   - docs/implementation/phases/p01.md
+  - docs/engineering/coverage.md
+  - docs/engineering/developer-workflow.md
+  - docs/engineering/testing-and-ci.md
+  - docs/releases/release-process.md
 - id: P01.05
   phase_id: P01
   title: Runtime dependencies
@@ -490,6 +518,10 @@ work_packages:
   - G01.05
   doc_refs:
   - docs/implementation/phases/p01.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/data-and-messaging.md
+  - docs/operations/runbooks/upgrade.md
 - id: P01.06
   phase_id: P01
   title: Baseline operations
@@ -511,6 +543,13 @@ work_packages:
   - G01.06
   doc_refs:
   - docs/implementation/phases/p01.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
+  - docs/operations/deployment-model.md
+  - docs/operations/runbooks/install.md
+  - docs/operations/runbooks/upgrade.md
+  - docs/operations/observability.md
+  - docs/engineering/testing-and-ci.md
 - id: P02.01
   phase_id: P02
   title: Authentication
@@ -524,6 +563,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p02.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/frontend.md
   criterion_ids:
   - G02.01
   - G02.03
@@ -540,6 +582,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p02.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/data-and-messaging.md
   criterion_ids:
   - G02.01
   - G02.04
@@ -556,6 +601,10 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p02.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/laravel-conventions.md
+  - docs/engineering/data-and-messaging.md
   criterion_ids:
   - G02.01
   - G02.03
@@ -572,6 +621,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p02.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
   criterion_ids:
   - G02.02
   - G02.04
@@ -588,6 +639,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p02.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/frontend.md
   criterion_ids:
   - G02.01
   - G02.04
@@ -604,6 +658,10 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p03.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/laravel-conventions.md
+  - docs/engineering/data-and-messaging.md
   criterion_ids:
   - G03.01
   - G03.02
@@ -636,6 +694,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p03.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
   criterion_ids:
   - G03.03
 - id: P03.04
@@ -651,6 +711,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p03.md
+  - docs/engineering/coverage.md
+  - docs/engineering/frontend.md
   criterion_ids:
   - G03.01
   - G03.04
@@ -667,6 +729,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p03.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
+  - docs/engineering/testing-and-ci.md
   criterion_ids:
   - G03.02
   - G03.03
@@ -684,6 +749,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p04.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
   criterion_ids:
   - G04.02
   - G04.04
@@ -732,6 +799,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p04.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
   criterion_ids:
   - G04.03
 - id: P04.05
@@ -842,6 +911,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p05.md
+  - docs/engineering/coverage.md
+  - docs/contracts/README.md
+  - docs/engineering/laravel-conventions.md
   criterion_ids:
   - G05.02
   - G05.03
@@ -876,6 +948,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p06.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
   criterion_ids:
   - G06.01
   - G06.03
@@ -923,6 +997,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p06.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
+  - docs/engineering/testing-and-ci.md
   criterion_ids:
   - G06.01
   - G06.02
@@ -941,6 +1018,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p06.md
+  - docs/engineering/coverage.md
+  - docs/engineering/frontend.md
   criterion_ids:
   - G06.01
   - G06.04
@@ -1231,6 +1310,10 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p10.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
+  - docs/operations/observability.md
+  - docs/engineering/testing-and-ci.md
   criterion_ids:
   - G10.01
 - id: P10.02
@@ -1246,6 +1329,11 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p10.md
+  - docs/engineering/coverage.md
+  - docs/engineering/data-and-messaging.md
+  - docs/operations/runbooks/upgrade.md
+  - docs/contracts/README.md
+  - docs/engineering/laravel-conventions.md
   criterion_ids:
   - G10.01
   - G10.02
@@ -1262,6 +1350,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p10.md
+  - docs/engineering/coverage.md
+  - docs/engineering/security-and-tenancy.md
+  - docs/engineering/developer-workflow.md
   criterion_ids:
   - G10.03
 - id: P10.04
@@ -1277,6 +1368,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p10.md
+  - docs/engineering/coverage.md
+  - docs/operations/observability.md
+  - docs/engineering/testing-and-ci.md
   criterion_ids:
   - G10.04
 - id: P10.05
@@ -1292,6 +1386,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p10.md
+  - docs/engineering/coverage.md
+  - docs/operations/deployment-model.md
+  - docs/operations/runbooks/install.md
   criterion_ids:
   - G10.02
   - G10.03
@@ -1308,6 +1405,9 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p10.md
+  - docs/engineering/coverage.md
+  - docs/engineering/developer-workflow.md
+  - docs/releases/release-process.md
   criterion_ids:
   - G10.01
   - G10.02
@@ -1341,6 +1441,8 @@ work_packages:
   blocker_ids: []
   doc_refs:
   - docs/implementation/phases/p11.md
+  - docs/engineering/coverage.md
+  - docs/engineering/frontend.md
   criterion_ids:
   - G11.02
 - id: P11.03

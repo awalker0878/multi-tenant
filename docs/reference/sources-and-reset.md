@@ -36,3 +36,7 @@ Checked on 2026-10-04. These establish candidate compatibility and design constr
 | [Kubernetes NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/) | Policies require an enforcing network implementation | Verify the selected CNI and actual allowed/denied traffic; independently configure authenticated/encrypted service channels |
 
 Framework existence does not establish managed-browser support, enterprise identity integration, operating-system/container compatibility, accessibility or package security. These are explicit P00/P01 checks. The requested versions remain the target; a necessary change must be documented rather than silently substituted.
+
+## Enterprise engineering review
+
+The [Laravel practices assessment](laravel-practices-review.md), reviewed 2026-10-04, evaluates the supplied Strapi article against primary Laravel, PHP-FIG, frontend, OWASP, W3C and secure-delivery sources. It establishes [engineering guidance](../engineering/README.md) and a [control-to-delivery map](../engineering/coverage.md). Framework facts, project policy and future verification remain distinguishable; these additions do not accept open ADRs or create execution evidence.

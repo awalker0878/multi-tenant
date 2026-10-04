@@ -80,6 +80,36 @@ def validate():
         require(set(package.get("criterion_ids", [])) <= criterion_ids, f"Unknown package criterion: {pid}")
         for path in package.get("doc_refs", []):
             require((ROOT / path).is_file(), f"Missing package document: {pid}: {path}")
+    # Engineering controls remain linked to real packages, criteria and source docs.
+    coverage_path = ROOT / "docs/engineering/coverage.md"
+    require(coverage_path.is_file(), "Missing engineering coverage map")
+    engineering_ids = []
+    if coverage_path.is_file():
+        for line in coverage_path.read_text().splitlines():
+            if not re.match(r"^\| ENG\d{2} \|", line):
+                continue
+            cells = [cell.strip() for cell in line.strip("|").split("|")]
+            require(len(cells) == 5, "Malformed engineering coverage row")
+            if len(cells) != 5:
+                continue
+            control, guidance, package_cell, gate_cell, proof = cells
+            engineering_ids.append(control)
+            package_ids = set(re.findall(r"P\d{2}\.\d{2}", package_cell))
+            mapped_criteria = set(re.findall(r"G\d{2}\.\d{2}", gate_cell))
+            require(bool(package_ids) and package_ids <= set(packages), f"Invalid package mapping: {control}")
+            require(bool(mapped_criteria) and mapped_criteria <= criterion_ids, f"Invalid criterion mapping: {control}")
+            available = {criterion for pid in package_ids for criterion in packages.get(pid, {}).get("criterion_ids", [])}
+            require(mapped_criteria <= available, f"Engineering criteria not owned by mapped packages: {control}")
+            links = re.findall(r"\]\(([^)]+)\)", guidance)
+            require(bool(links) and bool(proof), f"Missing engineering guidance/proof: {control}")
+            for pid in package_ids & set(packages):
+                expected = {"docs/engineering/coverage.md"}
+                for link in links:
+                    resolved = (coverage_path.parent / link).resolve()
+                    if resolved.is_relative_to(ROOT):
+                        expected.add(str(resolved.relative_to(ROOT)))
+                require(expected <= set(packages[pid].get("doc_refs", [])), f"Missing engineering doc_refs: {control}/{pid}")
+        require(bool(engineering_ids) and len(engineering_ids) == len(set(engineering_ids)), "Missing/duplicate engineering control IDs")
     # Detect a cycle in the phase dependency graph.
     active, done = set(), set()
     def visit(pid):
@@ -166,6 +196,7 @@ def validate():
             print("ERROR:", error, file=sys.stderr)
         return 1
     print(f"Validated {len(markdown_files)} Markdown documents; {len(phases)} phases, {len(packages)} packages, {len(requirements)} requirements and {len(gates)} gates. Views, local links, IDs and status/evidence references are consistent.")
+    print(f"Validated {len(engineering_ids)} engineering controls against package, criterion and document references.")
     print("This checks repository documentation only; no product behavior or native outcome is verified.")
     return 0
 
