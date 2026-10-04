@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "run_id": 37238718424,
+  "run_attempt": 1,
+  "source_sha": "af1bf00ad84831a84817975e2ffc124190e3bdcc",
+  "artifact_id": 11316473354,
+  "archive_sha256": "8191c60dcbaf55a5d5bf07d4f72f6b08a1e0be6b9a003cfc819b0fdfa9092d51",
+  "archive_checksum_verified": true,
+  "artifact_sha256_verified": true,
+  "source_bindings_verified_against_commit": 23,
+  "command_log_hashes_verified": 36,
+  "wheel_envelope_verified": true,
+  "report_sha256": "fb935f92f7f47aecbf4795cd5c53267b9a596206df9b02362becbcc5903ae765",
+  "result": "PASS"
+}
