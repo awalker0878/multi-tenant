@@ -33,6 +33,7 @@ phases:
   - EV-P00-002
   - EV-P00-003
   - EV-P00-004
+  - EV-P00-005
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -345,6 +346,7 @@ work_packages:
   - EV-P00-002
   - EV-P00-003
   - EV-P00-004
+  - EV-P00-005
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -1581,6 +1583,7 @@ requirements:
   - EV-P00-002
   - EV-P00-003
   - EV-P00-004
+  - EV-P00-005
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2735,6 +2738,7 @@ gates:
   - EV-P00-002
   - EV-P00-003
   - EV-P00-004
+  - EV-P00-005
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2929,6 +2933,43 @@ evidence:
     prohibition covers HTTPX and Pydantic in these fixtures, not every future SDK.
     Advisory observation is time-specific. Historical fixed-input observation has
     no time expiry; changed inputs require new execution.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-005
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/3a7fe1187f2583c09cc353b0b1ec31362e1af09c/spikes/compatibility/results/integration-37226789018/report.json
+  sha256: 12c397be5d8c096ee4698b85de11d3079da9215e14c5518c9e671b2b3340b3bf
+  source_revision: fb03c98478ba0d533d330174f34dc50227de8a18
+  artifact_revisions:
+    retained_artifact_commit: 3a7fe1187f2583c09cc353b0b1ec31362e1af09c
+    spikes/compatibility/php/composer.lock: 2f4291ae8d40bf77cb83e5c558cf3eab22405214402f979051e6881d5f996d4f
+    spikes/compatibility/frontend/package-lock.json: 510497df56757fa3d56cce7669f2a5372a2cb274f7f9bfd898d310dce778af36
+    spikes/compatibility/results/integration-37226789018/pest.log: b777338199854e4fc943046d8ba272b697608f2b1f1b73b9230b8726b988287b
+    spikes/compatibility/results/integration-37226789018/quality-canaries.log: edf2310092a38e9eed1a8d02a92d256409d8091d79a15ee59d9354c0c0133ccc
+    spikes/compatibility/results/integration-37226789018/browser.json: e49cfb9660a6bb3c54e5fa836e30034490d563c60d58cd9f79fe532399b3b983
+    spikes/compatibility/results/integration-37226789018/retrieval.json: 62afb0febb65739ca2ed6efaba054dc306b9f128312f095de285f1a412e8159f
+  environment: GitHub-hosted Ubuntu 24.04 x64; PHP 8.5.11; Composer 2.10.3; Node 24.19.0;
+    npm 11.17.0; Playwright 1.63.0; Chromium 153.0.8010.12
+  scope: 'Run 37226789018 passed 26 commands: identical Composer lock and installed-reference
+    replay; Pint, Larastan/PHPStan, Deptrac; 20 Pest tests with 200 assertions; 14
+    intended negative controls; clean npm install, Vue typecheck/build; one complete
+    Chromium/Inertia flow; package advisory lookups. All 52 source bindings and artifact
+    archive digest verified.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T19:04:28.137982+00:00'
+  observer: GitHub Actions run 37226789018 / attempt 1; inspected by Codex /root
+  reviewer: 'Codex /root: source bindings, artifact hash and actual outcome review
+    only; accountable engineering/SRE acceptance pending'
+  limitations: Isolated synthetic Laravel/SQLite and Chromium evidence. No product
+    service or public contract, PostgreSQL concurrency, real SSO, cross-service runtime
+    integration, managed-browser/accessibility matrix, production image/mirror, native
+    qualification or operating acceptance. Negative controls cover the declared fixture
+    rules. Historical fixed-input observation has no time expiry; changed inputs require
+    a new run. Advisory lookups are time-specific. Earlier failed attempts remain
+    retained.
   valid_until: null
   invalidated_at: null
 blockers:

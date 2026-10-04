@@ -2,7 +2,7 @@
 
 An enterprise application for planning and operating multi-tenant hosting across **VMware, Nutanix and OpenStack**. It brings application requirements, infrastructure discovery, placement assessment, approvals, provisioning, migration and recovery into one governed operator experience.
 
-**Current state:** P00 is underway, with scope/domain reviews and isolated PHP/frontend/Python compatibility results recorded alongside the product design and implementation programme. The application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
+**Current state:** P00 is underway, with scope/domain reviews and executed Laravel HTTP, Chromium and PHP/Python quality-tool compatibility checks recorded alongside the product design and implementation programme. The product application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
 
 ## What the application does
 
@@ -94,4 +94,4 @@ The [documentation index](docs/README.md) maps the complete set. Active branch: 
 
 ## P00 execution
 
-P00 has started. The [baseline review](docs/implementation/p00-baseline-review.md) connects the scope/domain findings, historical source assessment, actual compatibility experiments and route/operating requirements. Compatibility code under `spikes/compatibility/` is an isolated experiment; product services and native qualification are still future work. Follow [progress](docs/implementation/progress.md) for evidence and unresolved inputs, and [next work](next_work.md) for the next concrete step.
+P00 has started. The [baseline review](docs/implementation/p00-baseline-review.md) connects the scope/domain findings, historical source assessment, actual compatibility experiments and route/operating requirements. The [Laravel integration](docs/implementation/p00-integration-results.md) now passes 20 tests/200 assertions, quality and boundary controls, clean lock replay and a real Chromium flow. The [Python tooling experiment](docs/implementation/p00-python-tooling-results.md) passes strict typing, behavior tests and intended import-boundary rejections. Compatibility code under `spikes/compatibility/` is an isolated experiment; product services and native qualification are still future work. Follow [progress](docs/implementation/progress.md) for evidence and unresolved inputs, and [next work](next_work.md) for the next concrete step.

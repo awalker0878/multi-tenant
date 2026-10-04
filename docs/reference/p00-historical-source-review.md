@@ -57,3 +57,7 @@ The greenfield safety obligations are retained while the first-method proposal i
 This review reads documents at a pinned revision. It does not audit every historical source file, re-run the earlier branch, assess current site access or authenticate any operational acceptance. Historical implementation claims are neither accepted nor disproved by this document.
 
 Prospective product/application/service reviewers must confirm the first-slice scope. The records owner must determine retained-state applicability. Platform and qualification reviewers must resolve the proposed migration method with actual bounded feasibility evidence. Record those decisions against G00 rather than editing this historical comparison to imply they already occurred.
+
+## Tooling continuation source check
+
+The [Python tooling continuation](../implementation/p00-python-tooling-results.md) re-read the pinned historical `pyproject.toml` (blob `e160485bab8a2e665843e303e0caa2e69b9c8dfa`) and engineering TAD navigation (blob `ad51d70454cbcfd0071a943478bf844496b26631`). Exact dependency identity and explicit composition are useful review inputs. The earlier single `provisioner` package, optional infrastructure libraries and historical verification claims are not current service boundaries or implementation evidence. The new probe uses two synthetic service namespaces and the current four-layer Python rule, while PHP independently follows ADR-024.

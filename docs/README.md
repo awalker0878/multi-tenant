@@ -57,3 +57,5 @@ Use the linked phase, decision, qualification, operations and release indexes to
 ## P00 work in progress
 
 The [baseline review](implementation/p00-baseline-review.md) links current scope/domain analysis, historical-source dispositions, compatibility results and route/operating-measure reviews. It separates completed analytical or experimental work from decisions, installed facts and qualification still required. The [delivery register](implementation/delivery-register.yaml) and generated views remain the status authority.
+
+Detailed execution evidence is separated into [Laravel HTTP/PHP quality](implementation/p00-integration-results.md), [Chromium transport](implementation/p00-browser-results.md) and [Python tooling](implementation/p00-python-tooling-results.md). Each report binds actual source/lock identities, failures, corrections and limits. The compatibility index preserves earlier experiments rather than retargeting their hashes to newer locks.
