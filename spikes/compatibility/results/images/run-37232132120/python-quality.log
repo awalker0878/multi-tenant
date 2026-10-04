@@ -1,0 +1,105 @@
+3.12.14 (main, Sep 19 2026, 01:05:48) [GCC 12.2.0]
+uv 0.12.19 (x86_64-unknown-linux-musl)
+Resolved 51 packages in 0.72ms
+Checked 49 packages in 0.99ms
+All checks passed!
+26 files already formatted
+Success: no issues found in 26 source files
+....                                                                     [100%]
+4 passed in 0.40s
+
+---------
+Contracts
+---------
+
+Analyzed 26 files, 14 dependencies.
+-----------------------------------
+
+Owned Python layer direction KEPT
+Independent service sources KEPT
+No transport libraries in core KEPT
+
+Contracts: 3 kept, 0 broken.
+{
+  "result": "PASS",
+  "cases": [
+    {
+      "case": "domain-to-application",
+      "injected_path": "probe_inventory/domain/violation.py",
+      "injected_source": "from ..application.advance import advance as aliased_advance\n",
+      "expected_rule": "Owned Python layer direction",
+      "expected_diagnostic": "probe_inventory.domain.violation",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 15 dependencies.\n-----------------------------------\n\nOwned Python layer direction BROKEN\nIndependent service sources KEPT\nNo transport libraries in core KEPT\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nOwned Python layer direction\n----------------------------\n\nprobe_inventory.domain is not allowed to import probe_inventory.application:\n\n- probe_inventory.domain.violation -> probe_inventory.application.advance (l.1)\n\n\n",
+      "stderr": ""
+    },
+    {
+      "case": "application-to-infrastructure",
+      "injected_path": "probe_inventory/application/violation.py",
+      "injected_source": "from probe_inventory.infrastructure.memory import MemoryStore as Store\n",
+      "expected_rule": "Owned Python layer direction",
+      "expected_diagnostic": "probe_inventory.application.violation",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 15 dependencies.\n-----------------------------------\n\nOwned Python layer direction BROKEN\nIndependent service sources KEPT\nNo transport libraries in core KEPT\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nOwned Python layer direction\n----------------------------\n\nprobe_inventory.application is not allowed to import \nprobe_inventory.infrastructure:\n\n- probe_inventory.application.violation -> probe_inventory.infrastructure.memory\n(l.1)\n\n\n",
+      "stderr": ""
+    },
+    {
+      "case": "interfaces-to-infrastructure",
+      "injected_path": "probe_inventory/interfaces/violation.py",
+      "injected_source": "from ..infrastructure.memory import MemoryStore\n",
+      "expected_rule": "Owned Python layer direction",
+      "expected_diagnostic": "probe_inventory.interfaces.violation",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 15 dependencies.\n-----------------------------------\n\nOwned Python layer direction BROKEN\nIndependent service sources KEPT\nNo transport libraries in core KEPT\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nOwned Python layer direction\n----------------------------\n\nprobe_inventory.interfaces is not allowed to import \nprobe_inventory.infrastructure:\n\n- probe_inventory.interfaces.violation -> probe_inventory.infrastructure.memory \n(l.1)\n\n\n",
+      "stderr": ""
+    },
+    {
+      "case": "private-service-import",
+      "injected_path": "probe_planning/application/violation.py",
+      "injected_source": "from probe_inventory.domain.sample import Sample as ForeignSample\n",
+      "expected_rule": "Independent service sources",
+      "expected_diagnostic": "probe_planning.application.violation",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 15 dependencies.\n-----------------------------------\n\nOwned Python layer direction KEPT\nIndependent service sources BROKEN\nNo transport libraries in core KEPT\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nIndependent service sources\n---------------------------\n\nprobe_planning is not allowed to import probe_inventory:\n\n- probe_planning.application.violation -> probe_inventory.domain.sample (l.1)\n\n\n",
+      "stderr": ""
+    },
+    {
+      "case": "domain-transport-import",
+      "injected_path": "probe_inventory/domain/violation.py",
+      "injected_source": "import httpx as transport\n",
+      "expected_rule": "No transport libraries in core",
+      "expected_diagnostic": "probe_inventory.domain.violation",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 15 dependencies.\n-----------------------------------\n\nOwned Python layer direction KEPT\nIndependent service sources KEPT\nNo transport libraries in core BROKEN\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nNo transport libraries in core\n------------------------------\n\nprobe_inventory.domain is not allowed to import httpx:\n\n-   probe_inventory.domain.violation -> httpx (l.1)\n\n\n",
+      "stderr": ""
+    },
+    {
+      "case": "application-transport-model",
+      "injected_path": "probe_inventory/application/violation.py",
+      "injected_source": "from pydantic import BaseModel as TransportModel\n",
+      "expected_rule": "No transport libraries in core",
+      "expected_diagnostic": "probe_inventory.application.violation",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 15 dependencies.\n-----------------------------------\n\nOwned Python layer direction KEPT\nIndependent service sources KEPT\nNo transport libraries in core BROKEN\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nNo transport libraries in core\n------------------------------\n\nprobe_inventory.application is not allowed to import pydantic:\n\n-   probe_inventory.application.violation -> pydantic (l.1)\n\n\n",
+      "stderr": ""
+    },
+    {
+      "case": "undeclared-layer",
+      "injected_path": "probe_inventory/unclassified.py",
+      "injected_source": "VALUE = 1\n",
+      "expected_rule": "Owned Python layer direction",
+      "expected_diagnostic": "probe_inventory.unclassified",
+      "exit_code": 1,
+      "outcome": "EXPECTED_REJECTION",
+      "stdout": "\n---------\nContracts\n---------\n\nAnalyzed 27 files, 14 dependencies.\n-----------------------------------\n\nOwned Python layer direction BROKEN\nIndependent service sources KEPT\nNo transport libraries in core KEPT\n\nContracts: 2 kept, 1 broken.\n\n\n----------------\nBroken contracts\n----------------\n\nOwned Python layer direction\n----------------------------\n\nThe following modules are not listed as layers:\n\n- probe_inventory.unclassified\n\n(Since this contract is marked as 'exhaustive', every child of every container \nmust be declared as a layer.)\n\n",
+      "stderr": ""
+    }
+  ]
+}
+{"result": "PASS", "checks": 5, "pydantic": "2.13.5", "httpx": "0.28.1", "network": "MockTransport only"}

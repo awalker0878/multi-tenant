@@ -2,6 +2,8 @@
 
 Scope: P00.03/R01/R32/R34. These images package the existing synthetic compatibility fixtures. They are not the seven product deployables, an accepted production baseline, or a native integration environment. [The image report](../../../docs/implementation/p00-image-results.md) owns measured outcomes and limits.
 
+The first [recorded run](../results/images/run-37232132120/report.json), `37232132120` at source `5052f8c0e7f27cb2bbc31cd59f1d992a096e738f`, passed all 49 commands. It resolved five immutable base references, built four non-root targets, replayed the PHP/Python quality controls and exercised real runtime HTTP/asset/CSRF behavior. The retained input lock has SHA-256 `9298a430b975ab50d7cf4ccd89f627194bacc205682f61b92ad1f8f3db65d935`. The separate [committed-lock replay](../results/images/run-37232393563/report.json), run `37232393563` at source `d988cfe5d09e32a22da93c9c1b4816878fe4c495`, passed 39 commands with the byte-identical input lock. Base identities and OS/PHP/Python inventories matched; derived local image configuration digests differed. The experiment demonstrates successful replay of the selected inputs and checks, not byte-identical derived images. See the report for both runs' exact digests, inventories and diagnostics.
+
 `candidates.json` fixes the runtime patches and Debian family to be investigated. Resolution selects each upstream `linux/amd64` child manifest and records both its digest and the upstream index identity. The runner builds exclusively with immutable image references; it never uses a candidate tag as an installed identity. An explicit resolution is needed when a reviewed candidate changes. Replay rejects altered candidates, unexpected repositories, mutable references and platform drift.
 
 Run from a checkout with Docker, Buildx and Python 3:
@@ -11,7 +13,7 @@ python3 spikes/compatibility/images/run.py --workspace "$PWD" --output /tmp/p00-
 python3 spikes/compatibility/images/run.py --workspace "$PWD" --output /tmp/p00-image-replay --mode replay --lock /tmp/p00-image-first/evidence/inputs.lock.json
 ```
 
-Each output directory must be new. The initial `evidence/inputs.lock.json` is the measured lock to review and commit as `images/inputs.lock.json` after successful execution. Default replay then reads that committed file. Candidate-resolution failure has no floating-tag or alternate-runtime fallback. The runner retains command output, failure status and source identities and removes its disposable containers in a `finally` block.
+Each output directory must be new. The initial `evidence/inputs.lock.json` is the measured lock reviewed for `images/inputs.lock.json` after successful execution. Default replay reads that committed file; each replay retains a separate result. Resolution/build and the separate committed-lock replay both have retained results, with independent source and output identities. Candidate-resolution failure has no floating-tag or alternate-runtime fallback. The runner retains command output, failure status and source identities and removes its disposable containers in a `finally` block.
 
 ## Targets and assertions
 
@@ -35,3 +37,5 @@ Base/index/platform image digests, candidate and source SHA-256 values, Composer
 The connected build uses public Docker Hub/GHCR, Debian snapshot, Packagist/GitHub, npm and PyPI. This is not an approved mirror, trust/custody or disconnected-installation result. Locked package versions/source references are not a claim that all upstream distribution bytes have independent archive hashes. No byte-for-byte reproducibility, signed release provenance, published image, OCI archive retention, full SBOM standard conformance or OS vulnerability qualification is asserted. The report distinguishes local image configuration identity from a published registry artifact digest.
 
 Proposed update ownership is in the report. Any changed base digest, snapshot, extension, runtime patch, dependency lock, source or build instruction requires a reviewed new candidate result. Installed environment records must later reference published immutable artifacts and accepted release/configuration identities under the [configuration/BOM standard](../../../docs/operations/configuration-and-bom.md).
+
+The measured PHP runtime retains inherited libc-related development headers, despite removal of `libpq-dev` and compiler commands. The candidate has not completed production minimization. Package inventories cover Debian packages, loaded PHP extensions/Composer entries and the selected Python virtual environment; they are not an exhaustive file-level image SBOM.

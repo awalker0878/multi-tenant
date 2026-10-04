@@ -1,0 +1,109 @@
+Name:      docker.io/library/php:8.5.11-fpm-bookworm
+MediaType: application/vnd.oci.image.index.v1+json
+Digest:    sha256:53eab56a8f43f51a92119f6c29b3448af98eec288ff17f92829354a4b4c9ca05
+           
+Manifests: 
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/amd64
+  Annotations: 
+    org.opencontainers.image.revision:        79320e28b93fdc720d6f07d150709310cf54e757
+    org.opencontainers.image.source:          https://github.com/docker-library/php.git#79320e28b93fdc720d6f07d150709310cf54e757:8.5/bookworm/fpm
+    org.opencontainers.image.url:             https://hub.docker.com/_/php
+    org.opencontainers.image.version:         8.5.11-fpm-bookworm
+    com.docker.official-images.bashbrew.arch: amd64
+    org.opencontainers.image.base.digest:     sha256:f3034a6ec3c1205360777c4aae76234998866ad18806ae62b63a3f84ccad782b
+    org.opencontainers.image.base.name:       debian:bookworm-slim
+    org.opencontainers.image.created:         2026-09-24T19:07:34Z
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:449c7602f7ee336583af50a5ab1d619bd5b57b0ba46b50c273cc21a3f0650c2f
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.type:                attestation-manifest
+    com.docker.official-images.bashbrew.arch: amd64
+    vnd.docker.reference.digest:              sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:d8b0afb226ae966b8b85be86966edbc4db00d56d0cb8fcbde5406510893efd87
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/arm/v7
+  Annotations: 
+    org.opencontainers.image.base.name:       debian:bookworm-slim
+    org.opencontainers.image.created:         2026-09-24T19:19:48Z
+    org.opencontainers.image.revision:        79320e28b93fdc720d6f07d150709310cf54e757
+    org.opencontainers.image.source:          https://github.com/docker-library/php.git#79320e28b93fdc720d6f07d150709310cf54e757:8.5/bookworm/fpm
+    org.opencontainers.image.url:             https://hub.docker.com/_/php
+    org.opencontainers.image.version:         8.5.11-fpm-bookworm
+    com.docker.official-images.bashbrew.arch: arm32v7
+    org.opencontainers.image.base.digest:     sha256:523460af6da3f308775ef6f50ce4fdaa5b71c8ca2b88d0ddbb44d7b17d497379
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:97f475c79809a645a078a78205a870f59fb98d5b8de193f50542c97674e663d4
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    com.docker.official-images.bashbrew.arch: arm32v7
+    vnd.docker.reference.digest:              sha256:d8b0afb226ae966b8b85be86966edbc4db00d56d0cb8fcbde5406510893efd87
+    vnd.docker.reference.type:                attestation-manifest
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:34c11fa3a1d45dc99db46e681c63a3c7821d6b771a09b673ca655a3f0c41671d
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/arm64/v8
+  Annotations: 
+    org.opencontainers.image.revision:        79320e28b93fdc720d6f07d150709310cf54e757
+    org.opencontainers.image.source:          https://github.com/docker-library/php.git#79320e28b93fdc720d6f07d150709310cf54e757:8.5/bookworm/fpm
+    org.opencontainers.image.url:             https://hub.docker.com/_/php
+    org.opencontainers.image.version:         8.5.11-fpm-bookworm
+    com.docker.official-images.bashbrew.arch: arm64v8
+    org.opencontainers.image.base.digest:     sha256:0c8bbb8e987a035fe1d9704eb2e571b7e9a836e1caa46345290674b45b69e417
+    org.opencontainers.image.base.name:       debian:bookworm-slim
+    org.opencontainers.image.created:         2026-09-24T19:05:28Z
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:cfeee03d14a09d2e317c7545311c10d656649e3017d01e42ff2363d9e20dd2c3
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.type:                attestation-manifest
+    com.docker.official-images.bashbrew.arch: arm64v8
+    vnd.docker.reference.digest:              sha256:34c11fa3a1d45dc99db46e681c63a3c7821d6b771a09b673ca655a3f0c41671d
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:176eb01644bf5dccf7c0907094e756d78820426bd5578690f72a29cc28dc195b
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/386
+  Annotations: 
+    org.opencontainers.image.url:             https://hub.docker.com/_/php
+    org.opencontainers.image.version:         8.5.11-fpm-bookworm
+    com.docker.official-images.bashbrew.arch: i386
+    org.opencontainers.image.base.digest:     sha256:605e8292d9d3e5288094fb9dffd68869a19771546cc11d7c3c777f9d7e0f705d
+    org.opencontainers.image.base.name:       debian:bookworm-slim
+    org.opencontainers.image.created:         2026-09-24T19:08:16Z
+    org.opencontainers.image.revision:        79320e28b93fdc720d6f07d150709310cf54e757
+    org.opencontainers.image.source:          https://github.com/docker-library/php.git#79320e28b93fdc720d6f07d150709310cf54e757:8.5/bookworm/fpm
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:d8ab569d1ac17e4aa6883be8f43a18d1f5544e25b9948e201174c010b0e4fe70
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    vnd.docker.reference.type:                attestation-manifest
+    com.docker.official-images.bashbrew.arch: i386
+    vnd.docker.reference.digest:              sha256:176eb01644bf5dccf7c0907094e756d78820426bd5578690f72a29cc28dc195b
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:4078cc82a4ed6fc8fd075a8c4d827832d2dc557139e1f6e80d22afdc448713cb
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    linux/ppc64le
+  Annotations: 
+    org.opencontainers.image.version:         8.5.11-fpm-bookworm
+    com.docker.official-images.bashbrew.arch: ppc64le
+    org.opencontainers.image.base.digest:     sha256:fed77b78795122da1e752c586260935d4254aaf96b7da8bfb9139d8b5bbba9ff
+    org.opencontainers.image.base.name:       debian:bookworm-slim
+    org.opencontainers.image.created:         2026-09-24T19:53:57Z
+    org.opencontainers.image.revision:        79320e28b93fdc720d6f07d150709310cf54e757
+    org.opencontainers.image.source:          https://github.com/docker-library/php.git#79320e28b93fdc720d6f07d150709310cf54e757:8.5/bookworm/fpm
+    org.opencontainers.image.url:             https://hub.docker.com/_/php
+               
+  Name:        docker.io/library/php:8.5.11-fpm-bookworm@sha256:9f71cd2fd83375bc9338a85c15f9c5b3270b6ac2e5f0f8de13646a7d4965eb59
+  MediaType:   application/vnd.oci.image.manifest.v1+json
+  Platform:    unknown/unknown
+  Annotations: 
+    com.docker.official-images.bashbrew.arch: ppc64le
+    vnd.docker.reference.digest:              sha256:4078cc82a4ed6fc8fd075a8c4d827832d2dc557139e1f6e80d22afdc448713cb
+    vnd.docker.reference.type:                attestation-manifest

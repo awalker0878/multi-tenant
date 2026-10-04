@@ -1,0 +1,60 @@
+{
+  "buildx.build.provenance": {
+    "builder": {
+      "id": ""
+    },
+    "buildType": "https://mobyproject.org/buildkit@v1",
+    "materials": [
+      {
+        "uri": "pkg:docker/composer?digest=sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d\u0026platform=linux%2Famd64",
+        "digest": {
+          "sha256": "4a939fe44be0ca509e3e5a83b343ebf54386d91e91ca882f3840a2edb1f5f8b1"
+        }
+      },
+      {
+        "uri": "pkg:docker/node?digest=sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174\u0026platform=linux%2Famd64",
+        "digest": {
+          "sha256": "174abe3f732c1f9248156409492742b40024e1607f134666792d4381ad346354"
+        }
+      },
+      {
+        "uri": "pkg:docker/php?digest=sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3\u0026platform=linux%2Famd64",
+        "digest": {
+          "sha256": "aa97b46d868212734e0c3bb2b9a23d718d37637978c2b4132e3d3896e992df98"
+        }
+      }
+    ],
+    "invocation": {
+      "configSource": {
+        "entryPoint": "php.Dockerfile"
+      },
+      "parameters": {
+        "frontend": "dockerfile.v0",
+        "args": {
+          "build-arg:COMPOSER_BASE": "docker.io/library/composer@sha256:bdd249749908be12facc9dec72e19704371bb893f96dff3e024ec89528a5a08d",
+          "build-arg:DEBIAN_SNAPSHOT": "20261004T000000Z",
+          "build-arg:NODE_BASE": "docker.io/library/node@sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174",
+          "build-arg:PHP_BASE": "docker.io/library/php@sha256:c0dc98639fddeaad891a338e1e3fa2b2d724eb616bcd5a0bb1d8afd650e0fda3",
+          "build-arg:PYTHON_BASE": "docker.io/library/python@sha256:1aaa65a85fda306ffb8b910824d4e93bdce61e212c7e87168123ea3073b41a1a",
+          "build-arg:UV_BASE": "ghcr.io/astral-sh/uv@sha256:d46db4c7b7f2e75ff80aeef95da4c2c6ff1ad399c13ab85067db4430b7c3b9c3",
+          "target": "php-runtime"
+        },
+        "locals": [
+          {
+            "name": "context"
+          },
+          {
+            "name": "dockerfile"
+          }
+        ]
+      },
+      "environment": {
+        "platform": "linux/amd64"
+      }
+    }
+  },
+  "buildx.build.ref": "default/default/1h0ziwjbh0gcd3m2mbz8yt5j4",
+  "containerimage.config.digest": "sha256:795f5d370a98d3be2d7d2c881b4403de74cbb67e1efb5842a1e77c3bde5f6064",
+  "containerimage.digest": "sha256:795f5d370a98d3be2d7d2c881b4403de74cbb67e1efb5842a1e77c3bde5f6064",
+  "image.name": "docker.io/library/p00-34704622552f:php-runtime"
+}

@@ -1,0 +1,282 @@
+8.5.11
+PHP version 8.5.11 (/usr/local/bin/php)
+Run the "diagnose" command to get more detailed diagnostics output.
+Composer version 2.10.3 2026-08-27 13:34:23
+Python 3.11.2
+./composer.json is valid
+Checking platform requirements for packages in the vendor dir
+composer-plugin-api  2.9.0      success                                       
+composer-runtime-api 2.2.2      success                                       
+ext-ctype            *          success provided by symfony/polyfill-ctype    
+ext-date             8.5.11     success                                       
+ext-dom              20031129   success                                       
+ext-fileinfo         8.5.11     success                                       
+ext-filter           8.5.11     success                                       
+ext-hash             8.5.11     success                                       
+ext-iconv            8.5.11     success                                       
+ext-json             8.5.11     success                                       
+ext-libxml           8.5.11     success                                       
+ext-mbstring         *          success provided by symfony/polyfill-mbstring 
+ext-openssl          8.5.11     success                                       
+ext-pcre             8.5.11     success                                       
+ext-pdo              8.5.11     success                                       
+ext-pdo_sqlite       8.5.11     success                                       
+ext-phar             8.5.11     success                                       
+ext-reflection       8.5.11     success                                       
+ext-session          8.5.11     success                                       
+ext-simplexml        8.5.11     success                                       
+ext-tokenizer        8.5.11     success                                       
+ext-xml              8.5.11     success                                       
+ext-xmlwriter        8.5.11     success                                       
+php                  8.5.11     success                                       
+{"result":"PASS","php":"8.5.11","laravel":"v13.34.0","inertia":"v3.5.1"}
+
+  ...............................
+
+  ──────────────────────────────────────────────────────────────────── Laravel  
+    PASS   .......................................................... 31 files  
+
+Note: Using configuration file /app/phpstan.neon.
+
+ [OK] No errors                                                                 
+
+  0/12 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%
+ 12/12 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+
+ -------------------------- 
+  Report                    
+ -------------------- ----- 
+  Violations           0    
+  Skipped violations   0    
+  Uncovered            0    
+  Allowed              67   
+  Warnings             0    
+  Errors               0    
+ -------------------- ----- 
+
+
+   PASS  Tests\Unit\SampleTest
+  ✓ it rejects invalid state and stale revision before changing attribu… 0.02s  
+
+   PASS  Tests\Feature\CompatibilityHttpTest
+  ✓ it boots Laravel and returns an initial Inertia HTML page            0.09s  
+  ✓ it returns Inertia JSON with the component props URL and asset vers… 0.01s  
+  ✓ it requires a fresh page when the Inertia asset version differs
+  ✓ it redirects web validation errors and shares them through Inertia   0.01s  
+  ✓ it redirects a valid synthetic form to its Inertia page              0.01s  
+[2026-10-04 20:32:09] testing.ERROR: Sample state or revision does not allow approval. {"userId":100,"exception":"[object] (App\\Domain\\Compatibility\\Exceptions\\InvalidSampleTransition(code: 0): Sample state or revision does not allow approval. at /app/app/Domain/Compatibility/Models/Sample.php:34)
+[stacktrace]
+#0 /app/app/Application/Compatibility/Actions/ApproveSample.php(23): App\\Domain\\Compatibility\\Models\\Sample->approve()
+#1 /app/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): App\\Application\\Compatibility\\Actions\\ApproveSample->{closure:App\\Application\\Compatibility\\Actions\\ApproveSample::handle():16}()
+#2 /app/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(502): Illuminate\\Database\\Connection->transaction()
+#3 /app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(364): Illuminate\\Database\\DatabaseManager->__call()
+#4 /app/app/Application/Compatibility/Actions/ApproveSample.php(16): Illuminate\\Support\\Facades\\Facade::__callStatic()
+#5 /app/app/Http/Controllers/SampleController.php(40): App\\Application\\Compatibility\\Actions\\ApproveSample->handle()
+#6 /app/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\SampleController->approve()
+#7 /app/vendor/laravel/framework/src/Illuminate/Routing/Route.php(276): Illuminate\\Routing\\ControllerDispatcher->dispatch()
+#8 /app/vendor/laravel/framework/src/Illuminate/Routing/Route.php(216): Illuminate\\Routing\\Route->runController()
+#9 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#10 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}()
+#11 /app/vendor/inertiajs/inertia-laravel/src/Middleware.php(150): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}()
+#12 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware->handle()
+#13 /app/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#14 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle()
+#15 /app/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#16 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle()
+#17 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php(104): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#18 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle()
+#19 /app/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(48): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#20 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle()
+#21 /app/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(120): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#22 /app/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(63): Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest()
+#23 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Session\\Middleware\\StartSession->handle()
+#24 /app/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(36): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#25 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle()
+#26 /app/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#27 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\EncryptCookies->handle()
+#28 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#29 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then()
+#30 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack()
+#31 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute()
+#32 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute()
+#33 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch()
+#34 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}()
+#35 /app/vendor/inertiajs/inertia-laravel/src/Middleware/EnsureGetOnRedirect.php(19): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}()
+#36 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware\\EnsureGetOnRedirect->handle()
+#37 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#38 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle()
+#39 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle()
+#40 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#41 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle()
+#42 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle()
+#43 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#44 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle()
+#45 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#46 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle()
+#47 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#48 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle()
+#49 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#50 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle()
+#51 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#52 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle()
+#53 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#54 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle()
+#55 /app/vendor/inertiajs/inertia-laravel/src/Middleware/EnsureDeferredCallbacksRun.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#56 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware\\EnsureDeferredCallbacksRun->handle()
+#57 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#58 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then()
+#59 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#60 /app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\\Foundation\\Http\\Kernel->handle()
+#61 /app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(604): Illuminate\\Foundation\\Testing\\TestCase->call()
+#62 /app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json()
+#63 /app/tests/Feature/SampleAuthorizationTest.php(82): Illuminate\\Foundation\\Testing\\TestCase->postJson()
+#64 /app/vendor/pestphp/pest/src/Factories/TestCaseMethodFactory.php(177): P\\Tests\\Feature\\SampleAuthorizationTest->{closure:/app/tests/Feature/SampleAuthorizationTest.php:78}()
+#65 [internal function]: P\\Tests\\Feature\\SampleAuthorizationTest->{closure:Pest\\Factories\\TestCaseMethodFactory::getClosure():167}()
+#66 /app/vendor/pestphp/pest/src/Concerns/Testable.php(514): call_user_func_array()
+#67 /app/vendor/pestphp/pest/src/Support/ExceptionTrace.php(26): P\\Tests\\Feature\\SampleAuthorizationTest->{closure:Pest\\Concerns\\Testable::__callClosure():514}()
+#68 /app/vendor/pestphp/pest/src/Concerns/Testable.php(514): Pest\\Support\\ExceptionTrace::ensure()
+#69 /app/vendor/pestphp/pest/src/Concerns/Testable.php(336): P\\Tests\\Feature\\SampleAuthorizationTest->__callClosure()
+#70 /app/vendor/pestphp/pest/src/Factories/TestCaseFactory.php(179) : eval()'d code(100): P\\Tests\\Feature\\SampleAuthorizationTest->__runTest()
+#71 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): P\\Tests\\Feature\\SampleAuthorizationTest->__pest_evaluable_it_rejects_stale_and_repeated_transitions_without_adding_an_audit()
+#72 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\\Framework\\TestCase->invokeTestMethod()
+#73 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\\Framework\\TestCase->runTest()
+#74 /app/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#75 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run()
+#76 /app/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#77 /app/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#78 /app/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#79 /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#80 /app/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run()
+#81 /app/vendor/pestphp/pest/src/Kernel.php(103): PHPUnit\\TextUI\\Application->run()
+#82 /app/vendor/pestphp/pest/bin/pest(196): Pest\\Kernel->handle()
+#83 /app/vendor/pestphp/pest/bin/pest(204): {closure:/app/vendor/pestphp/pest/bin/pest:19}()
+#84 /app/vendor/bin/pest(119): include('...')
+#85 {main}
+"} 
+[2026-10-04 20:32:09] testing.ERROR: Sample state or revision does not allow approval. {"userId":100,"exception":"[object] (App\\Domain\\Compatibility\\Exceptions\\InvalidSampleTransition(code: 0): Sample state or revision does not allow approval. at /app/app/Domain/Compatibility/Models/Sample.php:34)
+[stacktrace]
+#0 /app/app/Application/Compatibility/Actions/ApproveSample.php(23): App\\Domain\\Compatibility\\Models\\Sample->approve()
+#1 /app/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php(35): App\\Application\\Compatibility\\Actions\\ApproveSample->{closure:App\\Application\\Compatibility\\Actions\\ApproveSample::handle():16}()
+#2 /app/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php(502): Illuminate\\Database\\Connection->transaction()
+#3 /app/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php(364): Illuminate\\Database\\DatabaseManager->__call()
+#4 /app/app/Application/Compatibility/Actions/ApproveSample.php(16): Illuminate\\Support\\Facades\\Facade::__callStatic()
+#5 /app/app/Http/Controllers/SampleController.php(40): App\\Application\\Compatibility\\Actions\\ApproveSample->handle()
+#6 /app/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): App\\Http\\Controllers\\SampleController->approve()
+#7 /app/vendor/laravel/framework/src/Illuminate/Routing/Route.php(276): Illuminate\\Routing\\ControllerDispatcher->dispatch()
+#8 /app/vendor/laravel/framework/src/Illuminate/Routing/Route.php(216): Illuminate\\Routing\\Route->runController()
+#9 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\\Routing\\Route->run()
+#10 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Routing\\Router->{closure:Illuminate\\Routing\\Router::runRouteWithinStack():821}()
+#11 /app/vendor/inertiajs/inertia-laravel/src/Middleware.php(150): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}()
+#12 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware->handle()
+#13 /app/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#14 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle()
+#15 /app/vendor/laravel/framework/src/Illuminate/Auth/Middleware/Authenticate.php(63): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#16 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Auth\\Middleware\\Authenticate->handle()
+#17 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php(104): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#18 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestForgery->handle()
+#19 /app/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(48): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#20 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\View\\Middleware\\ShareErrorsFromSession->handle()
+#21 /app/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(120): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#22 /app/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(63): Illuminate\\Session\\Middleware\\StartSession->handleStatefulRequest()
+#23 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Session\\Middleware\\StartSession->handle()
+#24 /app/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(36): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#25 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\AddQueuedCookiesToResponse->handle()
+#26 /app/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(74): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#27 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Cookie\\Middleware\\EncryptCookies->handle()
+#28 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#29 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then()
+#30 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack()
+#31 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute()
+#32 /app/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute()
+#33 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch()
+#34 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->{closure:Illuminate\\Foundation\\Http\\Kernel::dispatchToRouter():197}()
+#35 /app/vendor/inertiajs/inertia-laravel/src/Middleware/EnsureGetOnRedirect.php(19): Illuminate\\Pipeline\\Pipeline->{closure:Illuminate\\Pipeline\\Pipeline::prepareDestination():178}()
+#36 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware\\EnsureGetOnRedirect->handle()
+#37 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#38 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle()
+#39 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle()
+#40 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#41 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle()
+#42 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle()
+#43 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#44 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle()
+#45 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#46 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle()
+#47 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#48 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle()
+#49 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#50 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle()
+#51 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#52 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle()
+#53 /app/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#54 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle()
+#55 /app/vendor/inertiajs/inertia-laravel/src/Middleware/EnsureDeferredCallbacksRun.php(21): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#56 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Inertia\\Middleware\\EnsureDeferredCallbacksRun->handle()
+#57 /app/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->{closure:{closure:Illuminate\\Pipeline\\Pipeline::carry():194}:195}()
+#58 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then()
+#59 /app/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#60 /app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\\Foundation\\Http\\Kernel->handle()
+#61 /app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(604): Illuminate\\Foundation\\Testing\\TestCase->call()
+#62 /app/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\\Foundation\\Testing\\TestCase->json()
+#63 /app/tests/Feature/SampleAuthorizationTest.php(87): Illuminate\\Foundation\\Testing\\TestCase->postJson()
+#64 /app/vendor/pestphp/pest/src/Factories/TestCaseMethodFactory.php(177): P\\Tests\\Feature\\SampleAuthorizationTest->{closure:/app/tests/Feature/SampleAuthorizationTest.php:78}()
+#65 [internal function]: P\\Tests\\Feature\\SampleAuthorizationTest->{closure:Pest\\Factories\\TestCaseMethodFactory::getClosure():167}()
+#66 /app/vendor/pestphp/pest/src/Concerns/Testable.php(514): call_user_func_array()
+#67 /app/vendor/pestphp/pest/src/Support/ExceptionTrace.php(26): P\\Tests\\Feature\\SampleAuthorizationTest->{closure:Pest\\Concerns\\Testable::__callClosure():514}()
+#68 /app/vendor/pestphp/pest/src/Concerns/Testable.php(514): Pest\\Support\\ExceptionTrace::ensure()
+#69 /app/vendor/pestphp/pest/src/Concerns/Testable.php(336): P\\Tests\\Feature\\SampleAuthorizationTest->__callClosure()
+#70 /app/vendor/pestphp/pest/src/Factories/TestCaseFactory.php(179) : eval()'d code(100): P\\Tests\\Feature\\SampleAuthorizationTest->__runTest()
+#71 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): P\\Tests\\Feature\\SampleAuthorizationTest->__pest_evaluable_it_rejects_stale_and_repeated_transitions_without_adding_an_audit()
+#72 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\\Framework\\TestCase->invokeTestMethod()
+#73 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\\Framework\\TestCase->runTest()
+#74 /app/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\\Framework\\TestCase->runBare()
+#75 /app/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\\Framework\\TestRunner->run()
+#76 /app/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestCase->run()
+#77 /app/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#78 /app/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\\Framework\\TestSuite->run()
+#79 /app/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\\Framework\\TestSuite->run()
+#80 /app/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\\TextUI\\TestRunner->run()
+#81 /app/vendor/pestphp/pest/src/Kernel.php(103): PHPUnit\\TextUI\\Application->run()
+#82 /app/vendor/pestphp/pest/bin/pest(196): Pest\\Kernel->handle()
+#83 /app/vendor/pestphp/pest/bin/pest(204): {closure:/app/vendor/pestphp/pest/bin/pest:19}()
+#84 /app/vendor/bin/pest(119): include('...')
+#85 {main}
+"} 
+
+   PASS  Tests\Feature\SampleAuthorizationTest
+  ✓ it requires authentication for sample reads and writes               0.02s  
+  ✓ it returns only the actor tenant and explicitly presented fields     0.01s  
+  ✓ it rejects denied readers and malformed commands without writes      0.01s  
+  ✓ it does not reveal or mutate another tenant sample
+  ✓ it authorizes the explicit actor when the Action is called without HTTP
+  ✓ it commits the authorized transition and its local audit together
+  ✓ it rejects stale and repeated transitions without adding an audit    0.01s  
+  ✓ it rolls back the first write when the second local write fails
+
+   PASS  Tests\Architecture\PragmaticBoundariesTest
+  ✓ the architecture suite inspects implemented spike classes            0.01s  
+  ✓ domain does not depend on orchestration or delivery                  0.32s  
+  ✓ application does not depend on concrete infrastructure or delivery   0.01s  
+  ✓ actions expose a public non-static handle method
+  ✓ domain models may use eloquent under the selected convention
+  ✓ the spike resolves only its own application source
+
+  Tests:    20 passed (200 assertions)
+  Duration: 0.57s
+
+PASS Deptrac canary: Domain -> Application
+PASS Deptrac canary: Domain -> Infrastructure
+PASS Deptrac canary: Domain -> Delivery
+PASS Deptrac canary: Application -> Infrastructure
+PASS Deptrac canary: Application -> Delivery
+PASS Deptrac canary: Application -> ForeignPrivate
+PASS Deptrac canary: Domain -> Transport
+PASS Deptrac canary: Application -> Transport
+PASS Deptrac canary: Domain -> Transport
+PASS Deptrac canary: Application -> Transport
+PASS Deptrac canary: Application -> PublishedContracts
+PASS PHPStan canary: return.type
+PASS Pint canary: formatting fault and repaired positive control
+PASS Pest canary: private Action handle
+PASS: 11 dependency faults, 1 type fault, 1 formatting fault, 1 Action visibility fault; source restored
