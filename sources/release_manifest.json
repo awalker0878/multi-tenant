@@ -1,6 +1,0 @@
-{
-  "kind": "HISTORICAL_MANIFEST_POINTER",
-  "historical_manifest": "evidence/historical/increment04_release_manifest.json",
-  "current_integrity": "python tools/check_release.py compares the current Git HEAD. Exports require their explicitly supplied snapshot manifest.",
-  "not_current_file_digest_map": true
-}
