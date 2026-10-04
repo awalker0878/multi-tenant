@@ -36,10 +36,10 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 2 / 1 |
 | P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
 | P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 8 / 0 |
-| P01.02 | Local and integration runtime | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
+| P01.02 | Local and integration runtime | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 2 |
 | P01.03 | Contracts and messaging | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.04 | CI and supply chain | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 1 |
-| P01.05 | Runtime dependencies | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
+| P01.05 | Runtime dependencies | SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P01.06 | Baseline operations | SRE/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
 | P02.01 | Authentication | Product/IAM | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.02 | Tenancy | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

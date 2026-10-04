@@ -31,6 +31,7 @@ RUN composer --version \
 
 FROM php-base AS php-runtime
 ARG SOURCE_REVISION
+LABEL io.product.component="assurance"
 LABEL org.opencontainers.image.revision=$SOURCE_REVISION
 COPY --from=dependencies /app/vendor/ ./vendor/
 COPY --from=dependencies /app/app/ ./app/

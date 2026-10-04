@@ -19,6 +19,7 @@ RUN uv sync --locked --only-group build --no-install-project --no-managed-python
 
 FROM ${PYTHON_BASE} AS runtime
 ARG SOURCE_REVISION=unrecorded
+LABEL io.product.component="lifecycle"
 LABEL org.opencontainers.image.title="product-lifecycle bootstrap" \
       org.opencontainers.image.revision="${SOURCE_REVISION}" \
       org.opencontainers.image.source="https://github.com/awalker0878/multi-tenant"

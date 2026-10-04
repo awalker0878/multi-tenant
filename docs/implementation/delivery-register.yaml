@@ -550,8 +550,8 @@ work_packages:
   title: Local and integration runtime
   owner_role: SRE
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
@@ -633,8 +633,8 @@ work_packages:
   title: Runtime dependencies
   owner_role: SRE
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []

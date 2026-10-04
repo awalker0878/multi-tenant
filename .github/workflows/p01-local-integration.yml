@@ -1,0 +1,32 @@
+name: P01 isolated Compose integration
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths: [services/**, apps/console/**, deploy/**, scripts/p01/**, .github/workflows/p01-local-integration.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: p01-local-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  install:
+    name: Private foundation installation and denial checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Validate installer and evidence controls
+        run: python3 -m unittest discover -s scripts/p01 -p 'test_*.py' -q
+      - name: Build and install empty isolated foundation
+        run: python3 scripts/p01/run_local.py --output "$RUNNER_TEMP/p01-local-evidence" --source-revision "$GITHUB_SHA"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: p01-local-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-local-evidence/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
