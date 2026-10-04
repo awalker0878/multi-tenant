@@ -141,7 +141,7 @@ BEGIN
     END IF;
     RETURN original;
 END; $$;
-CREATE FUNCTION hosting_sync.record_commit(stream text,position text,transaction_digest text,selection_digest text,kind text)
+CREATE FUNCTION hosting_sync.record_commit(stream text,end_position text,transaction_digest text,selection_digest text,kind text)
 RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_sync AS $$
 DECLARE original hosting_sync.streams%ROWTYPE;
 BEGIN
@@ -149,21 +149,21 @@ BEGIN
     IF current_setting('role') IS DISTINCT FROM original.login_role
         OR original.selection_digest IS DISTINCT FROM selection_digest OR transaction_digest IS NULL
         OR transaction_digest !~ '^[0-9a-f]{64}$' OR kind IS NULL OR kind NOT IN ('INITIAL','INCREMENTAL')
-        OR position IS NULL OR position !~ '^[0-9A-F]{1,8}/[0-9A-F]{1,8}$' THEN
+        OR end_position IS NULL OR end_position !~ '^[0-9A-F]{1,8}/[0-9A-F]{1,8}$' THEN
         RAISE EXCEPTION 'Exact original committed transaction is required' USING ERRCODE='23514';
     END IF;
     INSERT INTO hosting_sync.commits(stream_id,end_lsn,transaction_digest,selection_digest,kind)
-        VALUES(stream,position::pg_lsn,transaction_digest,selection_digest,kind);
+        VALUES(stream,end_position::pg_lsn,transaction_digest,selection_digest,kind);
     RETURN 'COMMIT_RECORDED';
 END; $$;
-CREATE FUNCTION hosting_sync.inspect_commit(stream text,position text) RETURNS jsonb
+CREATE FUNCTION hosting_sync.inspect_commit(stream text,end_position text) RETURNS jsonb
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_sync AS $$
 DECLARE original hosting_sync.streams%ROWTYPE; result jsonb;
 BEGIN
     original:=hosting_sync.current_stream(stream);
     SELECT jsonb_build_object('transactionDigest',c.transaction_digest,'selectionDigest',c.selection_digest,
         'kind',c.kind,'recordedAt',c.committed_at) INTO result FROM hosting_sync.commits c
-        WHERE c.stream_id=stream AND c.end_lsn=position::pg_lsn;
+        WHERE c.stream_id=stream AND c.end_lsn=end_position::pg_lsn;
     RETURN result;
 END; $$;
 CREATE FUNCTION hosting_sync.inspect_subscription(stream text) RETURNS jsonb
@@ -191,7 +191,7 @@ REVOKE ALL ON FUNCTION hosting_sync.fence_application_writers(text,text) FROM PU
 REVOKE ALL ON FUNCTION hosting_sync.inspect_writer_fence(text,text) FROM PUBLIC;
 
 CREATE FUNCTION hosting_sync.peek_source(stream text,selection_digest text)
-RETURNS TABLE(position text,transaction_id xid,message bytea)
+RETURNS TABLE("position" text,transaction_id xid,message bytea)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_sync AS $$
 DECLARE original hosting_sync.source_streams%ROWTYPE;
 BEGIN
