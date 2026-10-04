@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "run_id": 37238718424,
+  "run_attempt": 1,
+  "source_sha": "af1bf00ad84831a84817975e2ffc124190e3bdcc",
+  "artifact_id": 11316512064,
+  "archive_sha256": "59c708efec31be16a2ea8d733166c54ee00663c7be6b9730b65e0c6f0e8ae740",
+  "archive_checksum_verified": true,
+  "present_artifact_sha256_verified": true,
+  "omitted_artifacts": [
+    "application-logs/.gitignore"
+  ],
+  "omission_reason": "upload-artifact default excludes hidden files; only tracked application-logs/.gitignore is absent. Actual command/application logs, manifests, locks and browser envelopes are present. Replay workflow explicitly includes hidden files.",
+  "source_bindings_verified_against_commit": 62,
+  "command_log_hashes_verified": 46,
+  "http_log_hash_verified": true,
+  "browser_envelope_files_verified": 2,
+  "report_sha256": "6b4f86c49de0c8c38ad45c16b5d382cc25a15e9c08c4840ca79b69e4e7d03b2c",
+  "result": "FAIL",
+  "failure": "RuntimeError: pest: exit 2 (expected 0); see retained logs",
+  "resolved_lock_sha256": "926d7cd6f70cea71f705e6233ee2c2a219f5824c5a08faeece99068d3f7fd913"
+}

@@ -1,0 +1,7 @@
+
+  ⨯..............
+
+  ──────────────────────────────────────────────────────────────────── Laravel  
+    FAIL   ........................................... 15 files, 1 style issue  
+  ⨯ bootstrap/providers.php                       fully_qualified_strict_types  
+

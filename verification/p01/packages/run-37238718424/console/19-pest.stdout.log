@@ -1,0 +1,266 @@
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Feature\FoundationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit serves the public foundation page with only its declared page pr[39m[90m…[39m [90m0.11s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mit supports Inertia navigation without adding an authenticated iden[39m[90m…[39m [90m0.01s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mit sets a private non-cacheable response and secure server-session[39m[90m… [39m [90m0.01s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundatio[39m[90m…[39m [90m0.01s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/register')[39m
+  [31;1m⨯[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/tenants')[39m
+  [31;1m⨯[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/workloads')[39m
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Feature\HealthTest[39m
+  [32;1m✓[39;22m[90m [39m[90mliveness reports only a running process with no configured authorit[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreadiness remains closed until the console dependencies are impleme[39m[90m…[39m [90m0.01s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mhealth endpoints reject writes with ('/health/live')[39m
+  [31;1m⨯[39;22m[90m [39m[90mhealth endpoints reject writes with ('/health/ready')[39m
+  [31;1m⨯[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/tenants')[39m
+  [31;1m⨯[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/authorization-decisions')[39m
+  [31;1m⨯[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/approvals')[39m
+  [32;1m✓[39;22m[90m [39m[90ma caller cannot configure readiness or start a browser session through health input[39m
+  [31;1m⨯[39;22m[90m [39m[90munimplemented browser pages return an ordinary not-found response[39m
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Feature\RequestForgeryTest[39m
+  [31;1m⨯[39;22m[90m [39m[90mit rejects a browser mutation without its session request-forgery t[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts a matching session token through the same web middleware[39m[90m [39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Architecture\FoundationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mservice autoload exposes only its own application and tests[39m[90m         [39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe actual bootstrap classes are loaded from the service source[39m
+  [32;1m✓[39;22m[90m [39m[90mimplemented application classes use strict types[39m[90m                    [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mimplemented application classes are final[39m
+  [32;1m✓[39;22m[90m [39m[90mdelivery does not reference sibling service source[39m
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\FoundationTest[22m [90m>[39m it supports Inertia navigation wit…   
+[39;1m  Expected response status code [200] but received 409.
+Failed asserting that 409 is identical to 200.[39;22m
+
+  at [32mtests/Feature/FoundationTest.php[39m:[32m25[39m
+     21▕ });
+     22▕ 
+     23▕ it('supports Inertia navigation without adding an authenticated identity', function (): void {
+     24▕     $this->get('/', ['X-Inertia' => 'true'])
+  ➜  25▕         ->assertOk()
+     26▕         ->assertHeader('X-Inertia', 'true')
+     27▕         ->assertJsonPath('component', 'Foundation')
+     28▕         ->assertJsonPath('props.implementationState', 'foundation')
+     29▕         ->assertJsonPath('url', '/');
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\FoundationTest[22m [90m>[39m it sets a private non-cacheable re…   
+[39;1m  Failed asserting that false is true.[39;22m
+
+  at [32mtests/Feature/FoundationTest.php[39m:[32m38[39m
+     34▕     expect($response->headers->get('Cache-Control'))->toContain('no-store')->toContain('private');
+     35▕     $cookie = $response->getCookie('console_session');
+     36▕     expect($cookie)->not->toBeNull();
+     37▕     expect($cookie->isHttpOnly())->toBeTrue()
+  ➜  38▕         ->and($cookie->isSecure())->toBeTrue()
+     39▕         ->and($cookie->getSameSite())->toBe('lax');
+     40▕ });
+     41▕ 
+     42▕ it('exposes no authentication or workload endpoints in the foundation', function (string $path): void {
+
+  [33m1   [39m[39;1mtests/Feature/FoundationTest.php[39;22m:[39;1m38[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\FoundationTest[22m [90m>[39m it exp… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/FoundationTest.php[39;22m:[39;1m43[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\FoundationTest[22m [90m>[39m it exp… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/FoundationTest.php[39;22m:[39;1m43[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\FoundationTest[22m [90m>[39m it exp… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/FoundationTest.php[39;22m:[39;1m43[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\FoundationTest[22m [90m>[39m it exp… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/FoundationTest.php[39;22m:[39;1m43[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\HealthTest[22m [90m>[39m health end… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/HealthTest.php[39;22m:[39;1m26[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\HealthTest[22m [90m>[39m health end… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/HealthTest.php[39;22m:[39;1m26[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\HealthTest[22m [90m>[39m business a… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/HealthTest.php[39;22m:[39;1m30[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\HealthTest[22m [90m>[39m business a… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/HealthTest.php[39;22m:[39;1m30[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\HealthTest[22m [90m>[39m business a… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/HealthTest.php[39;22m:[39;1m30[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\HealthTest[22m [90m>[39m unimplemen… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/HealthTest.php[39;22m:[39;1m48[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Feature\RequestForgeryTest[22m [90m>[39m it… [41;1m BindingResolutionException [49;22m  
+[39;1m  Target [Illuminate\Contracts\Debug\ExceptionHandler] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕ 
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕ 
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+9 vendor frames [22m
+  [33m10  [39m[39;1mtests/Feature/RequestForgeryTest.php[39;22m:[39;1m15[39;22m
+
+
+  [90mTests:[39m    [31;1m13 failed[39;22m[90m,[39m[39m [39m[32;1m10 passed[39;22m[90m (56 assertions)[39m
+  [90mDuration:[39m [39m0.33s[39m
+

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "run_id": 37238718424,
+  "run_attempt": 1,
+  "source_sha": "af1bf00ad84831a84817975e2ffc124190e3bdcc",
+  "artifact_id": 11316358748,
+  "archive_sha256": "bc7c6b8d30a4083c31bc13d6bd1b884d46afdd09d38eb68c4676c2a8d892127b",
+  "archive_checksum_verified": true,
+  "present_artifact_sha256_verified": true,
+  "omitted_artifacts": [
+    "application-logs/.gitignore"
+  ],
+  "omission_reason": "upload-artifact default excludes hidden files; only tracked application-logs/.gitignore is absent. Actual command/application logs, manifests, locks and browser envelopes are present. Replay workflow explicitly includes hidden files.",
+  "source_bindings_verified_against_commit": 40,
+  "command_log_hashes_verified": 30,
+  "http_log_hash_verified": true,
+  "browser_envelope_files_verified": 0,
+  "report_sha256": "a5262b3f7d1cd04ad33e559248115664e96dc5633df9178dab54d797a244c1c1",
+  "result": "FAIL",
+  "failure": "RuntimeError: pint: exit 1 (expected 0); see retained logs",
+  "resolved_lock_sha256": "9dacdf289986884e8f016d602b608403ecc687f306cb273bc15c18537443ac96"
+}

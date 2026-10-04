@@ -1,0 +1,1 @@
+> pest --fail-on-warning --fail-on-risky --fail-on-empty-test-suite
