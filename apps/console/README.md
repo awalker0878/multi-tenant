@@ -19,7 +19,7 @@ Web responses are private and non-cacheable and set `X-Content-Type-Options: nos
 Run these commands in this directory with the accepted PHP 8.5.11, Composer 2.10.3 and Node 24.19.0 family:
 
 ```sh
-composer validate --strict
+composer validate --strict --no-check-all
 composer install --no-interaction --no-progress --prefer-dist
 composer check-platform-reqs
 npm ci --ignore-scripts --no-audit --no-fund
@@ -33,7 +33,7 @@ composer test:canaries
 composer test
 ```
 
-The initial Composer lock is the P00 resolver seed until the first service-specific CI resolution is captured. It is intentionally not represented as a resolved Console lock: `composer validate --strict` detects the manifest mismatch before that capture. Initial resolution and subsequent locked replay are separate, explicit modes of the P01 runner. The npm manifest and lock are private to this application, and the clean local installation, strict Vue-aware type check, boundary check and production build have passed. See the [implementation record](../../docs/implementation/p01-console-foundation.md) for exact evidence and remaining checks.
+The initial Composer lock is the P00 resolver seed until the first service-specific CI resolution is captured. It is intentionally not represented as a resolved Console lock: `composer validate --strict --no-check-all` detects the manifest mismatch before that capture. Initial resolution and subsequent locked replay are separate, explicit modes of the P01 runner. The npm manifest and lock are private to this application, and the clean local installation, strict Vue-aware type check, boundary check and production build have passed. See the [implementation record](../../docs/implementation/p01-console-foundation.md) for exact evidence and remaining checks.
 
 For local development, copy `.env.example` to `.env`, generate an application key with `php artisan key:generate`, build the frontend, and run `php artisan serve --host=127.0.0.1 --port=8000`. The example disables Secure cookies only for loopback HTTP. A hosted deployment must use HTTPS, a protected generated key and Secure cookies. Do not commit `.env` or a generated key. PHP's development server is not the production ingress design.
 

@@ -4,7 +4,7 @@
   "composer_version": "2.10.3",
   "python_version": "3.12.14",
   "uv_version": "0.12.19",
-  "php_dependency_mode": "resolve",
+  "php_dependency_mode": "replay",
   "scope": "P01 independently installed foundation candidates; no service dependency readiness or native qualification",
   "components": {
     "governance": {

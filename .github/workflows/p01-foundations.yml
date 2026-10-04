@@ -75,6 +75,7 @@ jobs:
           name: p01-${{ matrix.component }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/p01-quality/evidence/
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 14
 
   php:
@@ -123,6 +124,7 @@ jobs:
           name: p01-${{ matrix.component }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/p01-quality/evidence/
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 14
 
   foundation-checks:
