@@ -51,12 +51,12 @@ Requirement wording and campaigns are owned by [requirements-and-qualification.m
 
 | Requirement | Work | Verification | Native qualification | Operating acceptance | Evidence | Blockers |
 | --- | --- | --- | --- | --- | --- | --- |
-| R01 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
+| R01 | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | EV-P00-001, EV-P00-002, EV-P00-003 | BL-P00-001, BL-P00-002 |
 | R02 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R03 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R04 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R05 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
-| R06 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
+| R06 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | BL-P00-001 |
 | R07 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R08 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R09 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
@@ -82,11 +82,11 @@ Requirement wording and campaigns are owned by [requirements-and-qualification.m
 | R29 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R30 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R31 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
-| R32 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
+| R32 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | BL-P00-001 |
 | R33 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
-| R34 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
+| R34 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | BL-P00-001 |
 | R35 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
-| R36 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
+| R36 | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | — | BL-P00-001 |
 
 ## Package coverage
 

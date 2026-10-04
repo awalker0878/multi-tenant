@@ -2,21 +2,22 @@
 
 Active branch: `greenfield/enterprise-microservices-plan`. The previous Laravel foundation remains reference material only. The requested `implementation/all-waves` source branch is pinned for this review at `a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e`; current documentation, stack and ADR-024 take precedence. P00 execution has started: scope/domain review, an isolated compatibility attempt and route/operating-baseline review are underway. Product application implementation and native qualification have not started. [Canonical delivery state](docs/implementation/delivery-register.yaml) owns status; [progress](docs/implementation/progress.md) and [traceability](docs/implementation/traceability.md) are generated views.
 
-## Read and start here
+## Current handoff
 
-Read the [README](README.md) for the product, [documentation guide](docs/documentation-guide.md) for where future work belongs, [worked application](docs/product/application-walkthrough.md) for the complete journey and [P00 cards](docs/implementation/phases/p00.md) for acceptance-ready tasks. Treat examples as synthetic design examples, not running software.
+The [P00 baseline review](docs/implementation/p00-baseline-review.md) links the completed analytical work and concrete decisions still needed. Scope/persona, domain/ownership and route/operating-measure reviews are prepared. [Compatibility execution](docs/implementation/p00-compatibility-results.md) records successful locked frontend/Python probes and remote PHP lock replay, including the rejected TypeScript 7 candidate. Product services and native feasibility remain unimplemented/unrun.
 
-| Sequence | Concrete action | Required output / unblock condition |
+The current preferred first migration proposal is `application_rebuild_restore` for a reproducible Linux application. Whole-VM conversion is separately scoped to P09. This updates the earlier technical proposal through the current P00 discussion; it does not import the historical runtime or qualification.
+
+| Next work | Concrete action | Completion condition |
 | --- | --- | --- |
-| 1 — P00.01 | Review personas, first application/route, mandatory capabilities and release exclusions with accountable roles; determine whether retained operational data exists | Reviewed scope and owner assignments; unresolved owner/input becomes a concrete blocker |
-| 2 — P00.02 | Review domain relationships and seven service ownership boundaries against valid/invalid examples; settle sharing, revision and authority semantics | Accepted invariants and now-blocking architecture decisions; one writer per owned state |
-| 3 — P00.03, can overlap 1/2 | Execute the isolated compatibility spike, recording exact dependency locks/build results; select initial broker, identity/trust, data/runtime and installation choices | Actual E1 results and accepted NOW decisions; failed compatibility yields an explicit decision, not a silent stack change |
-| 4 — P00.04, can overlap 2/3 | Obtain source/target tuple facts and approved fixtures, test initial offline-method feasibility, and design isolated lab authority plus negative/recovery campaigns | Actual bounded feasibility results and reviewed route; unavailable facts/access remain identified dependencies |
-| 5 — P00.05 | Ratify measurable scale/SLO/RPO/RTO/application objectives, custody, threat/recovery cases, retention and operating responsibilities | Reviewed targets with methods/owners; provisional values are not service promises |
-| 6 — P00.06 | Refine staffing/estimates and all requirement mappings; review the six G00 criteria with actual evidence and independent reviewers | G00 decision registered with evidence/blockers; later ADRs retain their explicit blocking checkpoints |
-| 7 — P01 after its entry decisions | Implement the [six foundation cards](docs/implementation/phases/p01.md): independent builds, integration runtime, contracts, supply chain, dependencies and baseline recovery | Each G01 criterion independently demonstrated; no native administrator access required |
+| P00.03 — independent engineering can continue | Extend the isolated spike from the tested locks to a real Laravel/Inertia HTTP exchange and a selected formatter/static-analysis/Pest/architecture-tool tuple; capture failures and fresh lock replay | Executed, source-bound results with remaining browser/image limits explicit; no product feature or G00 completion claim |
+| P00.01/P00.02/P00.05 — baseline decisions | Review the prepared scope/domain/operating recommendations, assign actual accountable owners, and decide retained-state applicability | Recorded scope, cardinality/ownership, workload/targets, retention and now-blocking decisions; BL-P00-001 resolved only for accepted scope |
+| P00.03 — operated runtime inputs | Select the production image/runtime family, dependencies, trust/custody and mirror path with operating owners; use measured candidates as evidence | Immutable build inputs and actual build/integration results, with explicit supported browser and network assumptions |
+| P00.04 — first-route feasibility | Supply exact VMware/OpenStack facts, reproducible application artifacts, approved consistent-capture/restore fixture and scoped lab authority using the RT/RF matrices | Actual bounded application_rebuild_restore observations; BL-P00-002 remains open until inputs and experiment evidence exist |
+| P00.06 — gate review | Bind accepted decisions and remaining experiments to G00.01–G00.06; reconcile staffing and external dates | Accountable gate review with immutable evidence; passing compatibility probes alone cannot close G00 |
+| P01 — after affected entry conditions | Implement the six foundation cards against accepted boundaries and proven inputs | Independent service builds, real contract/dependency checks and actual review/release enforcement |
 
-P00 decisions do not all have to be final. [The decision register](docs/decisions/decision-register.md) separates NOW choices, provisional baselines and later refinements. Proceed with independent authorized work while a dependency is unresolved; do not bypass the package it actually blocks. Neither a plan nor a documentation review authorizes native mutation.
+The canonical register records scoped E1 evidence and actual acceptance dependencies. Missing owner/lab inputs do not prevent the independent P00.03 engineering work above. G00 remains unreviewed by accountable owners; native mutation requires its separate authorized campaign.
 
 ## Document each implementation increment
 

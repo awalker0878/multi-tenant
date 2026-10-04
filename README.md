@@ -2,7 +2,7 @@
 
 An enterprise application for planning and operating multi-tenant hosting across **VMware, Nutanix and OpenStack**. It brings application requirements, infrastructure discovery, placement assessment, approvals, provisioning, migration and recovery into one governed operator experience.
 
-**Current state:** this branch contains the product design and implementation programme. The application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
+**Current state:** P00 is underway, with scope/domain reviews and isolated PHP/frontend/Python compatibility results recorded alongside the product design and implementation programme. The application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
 
 ## What the application does
 
@@ -62,7 +62,9 @@ Each independently built Laravel service owns its own `App\` namespace. Capabili
 
 ## First release and delivery milestones
 
-The proposed first native path provisions a selected Linux application on OpenStack, then qualifies one VMware-to-OpenStack offline migration method. Source/destination versions, guest profile, stateful application and conversion feasibility must be selected in P00. Further platforms, directions, guest profiles and methods receive separate qualification.
+The preferred P00 proposal first provisions a selected Linux application on OpenStack, then migrates a VMware deployment by **rebuilding the application on OpenStack and restoring its application-consistent data**. The target uses reviewed images, application artifacts and configuration; cutover requires source-writer fencing, verified data and controlled target write admission. P00 must establish rebuild reproducibility, restore compatibility, the exact platform/guest tuple and accepted outage/recovery objectives. ADR-014 remains proposed pending that review.
+
+Whole-VM disk capture/conversion is a separate P09 option for applications that cannot be rebuilt, with its own feasibility and qualification. It is never a silent fallback. Historical rebuild/restore code and tests supply design information only; they establish no implementation or support on this branch.
 
 | Milestone | What a user can demonstrate | Phases |
 | --- | --- | --- |
@@ -89,3 +91,7 @@ These are future milestones. The [progress view](docs/implementation/progress.md
 | Add or change documentation | [Documentation guide](docs/documentation-guide.md) → [templates](docs/templates/README.md) |
 
 The [documentation index](docs/README.md) maps the complete set. Active branch: `greenfield/enterprise-microservices-plan`. The [reset and source record](docs/reference/sources-and-reset.md) explains its relationship to earlier work.
+
+## P00 execution
+
+P00 has started. The [baseline review](docs/implementation/p00-baseline-review.md) connects the scope/domain findings, historical source assessment, actual compatibility experiments and route/operating requirements. Compatibility code under `spikes/compatibility/` is an isolated experiment; product services and native qualification are still future work. Follow [progress](docs/implementation/progress.md) for evidence and unresolved inputs, and [next work](next_work.md) for the next concrete step.

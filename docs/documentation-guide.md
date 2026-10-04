@@ -82,3 +82,7 @@ The [status model](implementation/status-model.md) owns status meaning; [require
 Keep the phase plan as an overview and maintain detailed work in the phase pages. Review each phase against actual learning before implementation starts. Maintain procedures in the operating runbooks and bind their execution results to the tested artifact/environment rather than inferring readiness from written instructions.
 
 Run the documentation generation/validation commands in [CONTRIBUTING](../CONTRIBUTING.md). Structural checks do not prove product behavior, native safety or operating acceptance.
+
+## Documenting P00 experiments
+
+Keep disposable compatibility inputs, lockfiles, bounded smoke probes and recorded command results under `spikes/compatibility/`; keep interpreted findings and their limits in `docs/implementation/p00-compatibility-results.md`. Pin source input digests and immutable commit/artifact references when registering evidence. Review packets under `docs/implementation/p00-*.md` explain decisions and missing inputs; they do not create a second editable delivery-status ledger. Update the owning ADR, service/product specification and canonical register together when a finding changes implementation direction. Experimental code is promoted into a registered service only through its normal P01 architecture, build and behavior gates.

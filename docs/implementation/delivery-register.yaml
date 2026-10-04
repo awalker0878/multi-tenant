@@ -25,11 +25,16 @@ phases:
   gate_id: G00
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P00-001
+  - EV-P00-002
+  - EV-P00-003
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
 - id: P01
   title: Delivery and runtime foundation
   owner_role: Platform/SRE lead
@@ -286,7 +291,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
     conditions in the detailed card still apply.
@@ -294,6 +300,8 @@ work_packages:
   - G00.01
   doc_refs:
   - docs/implementation/phases/p00.md
+  - docs/implementation/p00-scope-review.md
+  - docs/reference/p00-historical-source-review.md
 - id: P00.02
   phase_id: P00
   title: Domain and ownership
@@ -304,7 +312,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids:
   - P00.01
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
@@ -319,17 +328,23 @@ work_packages:
   - docs/engineering/code-control.md
   - architecture/context-map.yaml
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
+  - docs/implementation/p00-domain-review.md
+  - docs/product/domain-model.md
 - id: P00.03
   phase_id: P00
   title: Technical decisions
   owner_role: Engineering/SRE
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P00-001
+  - EV-P00-002
+  - EV-P00-003
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids:
   - P00.01
   - P00.02
@@ -347,6 +362,8 @@ work_packages:
   - docs/architecture/context-code-structure.md
   - docs/engineering/code-control.md
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
+  - docs/implementation/p00-compatibility-results.md
+  - spikes/compatibility/README.md
 - id: P00.04
   phase_id: P00
   title: Qualification design
@@ -357,7 +374,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-002
   dependency_package_ids:
   - P00.01
   - P00.02
@@ -367,6 +385,8 @@ work_packages:
   - G00.04
   doc_refs:
   - docs/implementation/phases/p00.md
+  - docs/implementation/p00-route-and-operations-review.md
+  - docs/qualification/feasibility/initial-route.md
 - id: P00.05
   phase_id: P00
   title: Operating requirements
@@ -377,7 +397,8 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids:
   - P00.01
   - P00.04
@@ -390,17 +411,20 @@ work_packages:
   - docs/engineering/coverage.md
   - docs/engineering/security-and-tenancy.md
   - docs/engineering/developer-workflow.md
+  - docs/implementation/p00-route-and-operations-review.md
+  - docs/product/operating-targets.md
 - id: P00.06
   phase_id: P00
   title: Delivery decomposition
   owner_role: Leads
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids:
   - P00.01
   - P00.02
@@ -413,6 +437,7 @@ work_packages:
   - G00.06
   doc_refs:
   - docs/implementation/phases/p00.md
+  - docs/implementation/p00-baseline-review.md
 - id: P01.01
   phase_id: P01
   title: Repository scaffolding
@@ -1543,11 +1568,16 @@ requirements:
   - G01
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P00-001
+  - EV-P00-002
+  - EV-P00-003
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
 - id: R02
   package_ids:
   - P01.01
@@ -1715,7 +1745,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
 - id: R07
   package_ids:
   - P03.02
@@ -2542,7 +2573,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
 - id: R33
   package_ids:
   - P03.04
@@ -2616,7 +2648,8 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
 - id: R35
   package_ids:
   - P01.03
@@ -2683,15 +2716,21 @@ requirements:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
 gates:
 - id: G00
   phase_id: P00
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
-  blocker_ids: []
+  evidence_ids:
+  - EV-P00-001
+  - EV-P00-002
+  - EV-P00-003
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
 - id: G01
   phase_id: P01
   decision: NOT_REVIEWED
@@ -2769,5 +2808,134 @@ gates:
   reviewed_at: null
   evidence_ids: []
   blocker_ids: []
-evidence: []
-blockers: []
+evidence:
+- id: EV-P00-001
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/9a214f6ea2f0bba02abb7959cbd2f3523efbba1c/spikes/compatibility/results/15-clean-frontend-build.json
+  sha256: 4a3b2af411ebfecdb42019d7ca4c6909b12d4758a1eaf0f7089fc893d9421b59
+  source_revision: 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c
+  artifact_revisions:
+    retained_artifact_commit: 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c
+    spikes/compatibility/frontend/package-lock.json: c38e50f2df1bc9d4135ae1abbdbe957d786fd267a6d2344ba2182b4e8cae7756
+    spikes/compatibility/results/13-frontend-clean-install.json: 2db40e07d392f8eb0d3c3ef94f27ec792c79c933661c4bff020033c061d78934
+    spikes/compatibility/results/14-clean-frontend-typecheck.json: 02dd3e61a1816ae3d3d477fc4ab755d52befb969ac8fcfd14bae6dfb9e0f27e6
+  environment: Local Linux x86-64; Node 24.19.0; npm 11.9.0
+  scope: Clean npm lock install, strict Vue typecheck and Vite asset build; tested
+    TypeScript 6.0.3 tuple. TypeScript 7.0.2 failed and remains unselected.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T18:21:27.151589+00:00'
+  observer: Codex /root/p00_compatibility
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
+    acceptance pending'
+  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser
+    integration, production image, native qualification or operating acceptance. Historical
+    fixed-input observation has no time expiry; changed inputs require a new run.
+    Failed earlier attempts remain in the spike results.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-002
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/9a214f6ea2f0bba02abb7959cbd2f3523efbba1c/spikes/compatibility/results/08-python-smoke.json
+  sha256: c0bdf2555c3687b2381d0e8673ca39537980079928894747325f1e6be5ba7a63
+  source_revision: 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c
+  artifact_revisions:
+    retained_artifact_commit: 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c
+    spikes/compatibility/python/uv.lock: a0b67b86cb701051af0fb6899cf3cd4d933c54c96b1c7bdf18f0c5d29257bf2b
+    spikes/compatibility/python/smoke.py: ef3b76d56127c8d2019790bbd737b6c3962112719793119daaf74e9e1411f5a1
+    spikes/compatibility/results/07-python-frozen-install.json: bce43f3ad1b815f94326b49c712650b8459b05e2420a888becb251f5070d872b
+  environment: Local Linux x86-64; Python 3.12.14; uv 0.12.19
+  scope: Fresh locked Python environment, synthetic valid/invalid JSON handling and
+    in-memory HTTP-library exchange.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T18:19:52.100216+00:00'
+  observer: Codex /root/p00_compatibility
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
+    acceptance pending'
+  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser
+    integration, production image, native qualification or operating acceptance. Historical
+    fixed-input observation has no time expiry; changed inputs require a new run.
+    Failed earlier attempts remain in the spike results.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-003
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/9a214f6ea2f0bba02abb7959cbd2f3523efbba1c/spikes/compatibility/results/php-ci/report.json
+  sha256: 95de4a6efa0edef987df51353d11212d8dca3b0eb9c20a2b655fc55c995c2e2b
+  source_revision: 06df7bfb15d83eb5a180e10c0d6c65970c5b0a54
+  artifact_revisions:
+    retained_artifact_commit: 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c
+    spikes/compatibility/php/composer.lock: ef1985e1756631f170f2ab2b8e0fb8e3cd0c34111ad54b87f99e3afa53b24c22
+    spikes/compatibility/results/php-ci/probe.json: c8509898a563e208b34bfd0d728a31d119f2868812ec951f147e76200d62c7e0
+    spikes/compatibility/results/php-ci/retrieval.json: 983b89ce5e5c95e23160795609f8bf6bffd13b48d971af1b2c64b15951f3ed9b
+  environment: GitHub-hosted ubuntu-24.04 x64; PHP 8.5.11; Composer 2.10.3
+  scope: 'GitHub Actions run 37224453605: PHP dependency resolution, platform checks,
+    SQLite Eloquent commit/rollback, Inertia class autoload and clean lock replay
+    with identical package versions/references.'
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T18:26:50.905512+00:00'
+  observer: GitHub Actions run 37224453605 / attempt 1; inspected by Codex /root
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
+    acceptance pending'
+  limitations: Isolated compatibility evidence only; no product service, full HTTP/browser
+    integration, production image, native qualification or operating acceptance. Historical
+    fixed-input observation has no time expiry; changed inputs require a new run.
+    Failed earlier attempts remain in the spike results.
+  valid_until: null
+  invalidated_at: null
+blockers:
+- id: BL-P00-001
+  scope_ids:
+  - P00
+  - P00.01
+  - P00.02
+  - P00.03
+  - P00.05
+  - P00.06
+  - R01
+  - R06
+  - R32
+  - R34
+  - R36
+  - G00
+  owner_role: Product/architecture/SRE/security and records owners; named assignments
+    not supplied
+  description: No accountable owner roster or accepted NOW/provisional decision set
+    has been supplied for this greenfield baseline. Prepared scope/domain/target recommendations
+    are review candidates; retained operational-state applicability remains unconfirmed.
+    This blocks acceptance, not continued independent engineering.
+  unblock_condition: Record named accountable reviewers and accept or revise the scope/domain/runtime/operating
+    recommendations, retained-state disposition and assigned later checkpoints.
+  next_action: Use docs/implementation/p00-baseline-review.md and its linked review
+    packets to record concrete decisions and owner assignments; retain unaccepted
+    items explicitly.
+  state: OPEN
+  resolution_evidence_ids: []
+- id: BL-P00-002
+  scope_ids:
+  - P00
+  - P00.04
+  - R01
+  - G00
+  owner_role: Platform, application and qualification owners; named assignments not
+    supplied
+  description: The repository/session supplies no verified VMware/OpenStack installation
+    tuple, approved representative application capture/restore fixture or scoped lab
+    authority for the new preferred rebuild/restore route. Historical runtime examples
+    are not installed facts or authorization.
+  unblock_condition: Supply the RT input inventory and approved RF experiment scope
+    from the route review, then execute bounded rebuild/capture/restore feasibility
+    and recovery observations.
+  next_action: Complete docs/qualification/feasibility/initial-route.md inputs with
+    platform/application owners and run the selected application_rebuild_restore feasibility
+    experiment; keep native effects unattempted until their own scope is authorized.
+  state: OPEN
+  resolution_evidence_ids: []

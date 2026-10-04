@@ -53,3 +53,7 @@ This documentation describes a proposed enterprise product and its delivery prog
 | [Sources and reset](reference/sources-and-reset.md) | Which source direction applies and what is historical reference only? |
 
 Use the linked phase, decision, qualification, operations and release indexes to navigate the working documents. The [guide](documentation-guide.md) defines ownership and update rules. Executable schemas, test results and release-specific evidence are added through their implementation work packages.
+
+## P00 work in progress
+
+The [baseline review](implementation/p00-baseline-review.md) links current scope/domain analysis, historical-source dispositions, compatibility results and route/operating-measure reviews. It separates completed analytical or experimental work from decisions, installed facts and qualification still required. The [delivery register](implementation/delivery-register.yaml) and generated views remain the status authority.
