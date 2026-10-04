@@ -6,9 +6,11 @@ Date: 2026-10-04. Status: proposed implementation baseline. Branch: `greenfield/
 
 Build a new enterprise control plane for portable hosting and workload mobility. Operators must be able to register an application, describe its security and service requirements, discover approved infrastructure, compare eligible destinations, review an immutable plan, obtain approval, execute through scoped workers and examine independently verifiable outcomes.
 
-The later greenfield direction in the supplied transcript is authoritative. Earlier suggestions to put Laravel over the old APIs, wrap old modules as services or transfer old database ownership are superseded. The previous implementation supplies domain knowledge and scenarios only. Reuse of any small algorithm, adapter idea or test scenario requires review and implementation against the new contracts; no bulk copying of the old runtime, database, configuration or tests as proof of correctness.
+The [source and reset record](../reference/sources-and-reset.md) defines the greenfield baseline. Prior implementations supply domain knowledge and scenarios only; new behavior is specified and verified against this product's contracts.
 
 This delivery creates the plan and clean branch. It does not implement the phases. Every phase below begins as **planned**.
+
+Read the [product walkthrough](../product/application-walkthrough.md) for a concrete example. The [service specifications](../services/README.md) and [domain model](../product/domain-model.md) describe candidate behavior. Detailed [P00](phases/p00.md) and [P01](phases/p01.md) cards turn the first packages into actionable work; later phases are elaborated before implementation under the [documentation guide](../documentation-guide.md).
 
 ### First release boundary
 
@@ -44,7 +46,7 @@ Use the [target architecture](../architecture/target-architecture.md) for bounda
 
 Every work package must produce: reviewed code/configuration where applicable; owned contracts and migrations; meaningful tests; operational documentation; a versioned evidence record; and explicit unsupported cases. Small commits should each describe a coherent change. Update the architecture and progress records in the same delivery as a changed boundary or behavior.
 
-Status progression is `planned → in progress → implemented → verified → qualified → accepted`, with `blocked` available at any stage. Verification must name its environment. A phase closes only when its gate is met or its scope is formally narrowed; unfinished work never becomes complete through a waiver that silently broadens support.
+The [status model](status-model.md) separates work completion, verification, native qualification and operational acceptance. Blockers preserve the underlying work state. The [delivery register](delivery-register.yaml) is the canonical execution record; [progress](progress.md) and [traceability](traceability.md) are generated views. Narrative exit gates below summarize the individually reviewable [gate criteria](gates.md); no phase closes without its required evidence and explicit review.
 
 ## 3. Phase sequence and dependencies
 
@@ -67,7 +69,7 @@ Duration ranges are planning estimates in elapsed working weeks for the named wo
 
 P02/P03/P04 can overlap once their contracts stabilize. P09 research and adapter development can overlap P07/P08, but qualification cannot skip their safety gates. P10 engineering starts in P01 and runs throughout; its final campaign is repeated after material changes. A narrow first release may defer P09 tuples explicitly. A release claiming all three platforms cannot defer their qualification.
 
-The principal path is P00 → P01 → P02/P03/P04 → P05 → P06 → P07 → P08 → P10 → P11. With concurrent product, infrastructure and platform teams, budget roughly 9–15 months for a narrow first supported release as an initial planning range; re-estimate at P00 and after P06. Broad platform parity is a separate scope and may take longer. A smaller team should reduce concurrency and feature breadth rather than weaken gates.
+The principal path is P00 → P01 → P02/P03/P04 → P05 → P06 → P07 → P08 → P10 → P11. The [estimation and dependency model](estimation-and-dependencies.md) explains the conditional 9–15 month initial planning range, staffing assumptions, confidence and external dependencies. P00 and P06 trigger re-estimation. Broad platform parity is a separate scope; a smaller team changes concurrency and release breadth.
 
 ### P00 — Establish the product and architecture baseline
 
@@ -84,7 +86,7 @@ The principal path is P00 → P01 → P02/P03/P04 → P05 → P06 → P07 → P0
 
 The compatibility spike must resolve Composer/npm/Python locks, build the requested Vue/Inertia application, run PHP/TypeScript checks and confirm container support. It should prove the selected stack rather than implement product features. Confirm the selected cold migration method can handle the source disks, boot mode, drivers, network identities and stateful application requirements. If it cannot, record a changed baseline before implementation proceeds.
 
-**Exit gate:** accountable owners accept the product glossary, initial route, contract ownership and decision register; unresolved items have owners and blocking phases; feasibility and dependency resolution have actual results. Repository publication of this plan alone does not close P00.
+**Exit gate:** meet G00 in the [gate checklist](gates.md). Accountable owners accept the product glossary, initial route and contract ownership; decisions required now close, while permitted provisional/deferred decisions retain explicit owners, constraints and deadlines in the [decision register](../decisions/decision-register.md). Feasibility and dependency resolution have actual results. Repository publication alone does not close P00.
 
 ### P01 — Build the delivery and runtime foundation
 
@@ -275,6 +277,8 @@ HA and backups are delivered incrementally from P01. This phase tests their comp
 ## 4. Greenfield deployment sequence
 
 Use a central control plane per approved trust/residency boundary and scoped site-local workers. Separate tenant network/security isolation from container scheduling; a Kubernetes namespace alone is not a tenant security design. Do not assume one control plane may span every security classification or disconnected enclave.
+
+The [deployment model](../operations/deployment-model.md) owns environment, dependency, identity/network-flow and recovery design detail. The table below remains the programme-level installation sequence.
 
 | Stage | Deployment action | Required evidence |
 | --- | --- | --- |

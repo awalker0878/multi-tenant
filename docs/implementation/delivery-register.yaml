@@ -1,0 +1,2484 @@
+# Canonical delivery state. Edit this file; regenerate progress.md and traceability.md.
+schema_version: 1
+baseline_date: '2026-10-04'
+branch: greenfield/enterprise-microservices-plan
+defaults:
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+phases:
+- id: P00
+  title: Product and architecture baseline
+  owner_role: Product and architecture leads
+  dependency_phase_ids: []
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P00.01
+  - P00.02
+  - P00.03
+  - P00.04
+  - P00.05
+  - P00.06
+  gate_id: G00
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P01
+  title: Delivery and runtime foundation
+  owner_role: Platform/SRE lead
+  dependency_phase_ids:
+  - P00
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P01.01
+  - P01.02
+  - P01.03
+  - P01.04
+  - P01.05
+  - P01.06
+  gate_id: G01
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P02
+  title: Identity, tenancy and governance
+  owner_role: Product engineering and IAM leads
+  dependency_phase_ids:
+  - P01
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P02.01
+  - P02.02
+  - P02.03
+  - P02.04
+  - P02.05
+  gate_id: G02
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P03
+  title: Application catalogue and workspace
+  owner_role: Product engineering lead
+  dependency_phase_ids:
+  - P01
+  - P02
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P03.01
+  - P03.02
+  - P03.03
+  - P03.04
+  - P03.05
+  gate_id: G03
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P04
+  title: Site commissioning and inventory
+  owner_role: Infrastructure engineering lead
+  dependency_phase_ids:
+  - P01
+  - P02
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P04.01
+  - P04.02
+  - P04.03
+  - P04.04
+  - P04.05
+  gate_id: G04
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P05
+  title: Capabilities and immutable plans
+  owner_role: Infrastructure engineering lead
+  dependency_phase_ids:
+  - P03
+  - P04
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P05.01
+  - P05.02
+  - P05.03
+  - P05.04
+  - P05.05
+  - P05.06
+  gate_id: G05
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P06
+  title: Durable execution in simulation
+  owner_role: Infrastructure engineering lead
+  dependency_phase_ids:
+  - P02
+  - P05
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P06.01
+  - P06.02
+  - P06.03
+  - P06.04
+  - P06.05
+  - P06.06
+  gate_id: G06
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P07
+  title: Native OpenStack provisioning
+  owner_role: Infrastructure and platform owners
+  dependency_phase_ids:
+  - P06
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P07.01
+  - P07.02
+  - P07.03
+  - P07.04
+  - P07.05
+  - P07.06
+  gate_id: G07
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P08
+  title: VMware-to-OpenStack migration
+  owner_role: Infrastructure and application owner
+  dependency_phase_ids:
+  - P07
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P08.01
+  - P08.02
+  - P08.03
+  - P08.04
+  - P08.05
+  - P08.06
+  gate_id: G08
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P09
+  title: Platform and capability expansion
+  owner_role: Infrastructure and qualification leads
+  dependency_phase_ids:
+  - P05
+  - P06
+  - P07
+  - P08
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P09.01
+  - P09.02
+  - P09.03
+  - P09.04
+  - P09.05
+  gate_id: G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P10
+  title: Enterprise operating qualification
+  owner_role: Platform/SRE and security leads
+  dependency_phase_ids:
+  - P08
+  - P09
+  dependency_note: P09 only for tuples selected for this release; explicit deferral
+    is required.
+  package_ids:
+  - P10.01
+  - P10.02
+  - P10.03
+  - P10.04
+  - P10.05
+  - P10.06
+  gate_id: G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: P11
+  title: Pilot and supported release
+  owner_role: Product and service owner
+  dependency_phase_ids:
+  - P10
+  dependency_note: Dependencies are entry gates; contract development may overlap
+    as specified in phased-plan.md.
+  package_ids:
+  - P11.01
+  - P11.02
+  - P11.03
+  - P11.04
+  - P11.05
+  gate_id: G11
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+work_packages:
+- id: P00.01
+  phase_id: P00
+  title: Scope and journeys
+  owner_role: Product
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids: []
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G00.01
+  doc_refs:
+  - docs/implementation/phases/p00.md
+- id: P00.02
+  phase_id: P00
+  title: Domain and ownership
+  owner_role: Architecture
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P00.01
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G00.02
+  doc_refs:
+  - docs/implementation/phases/p00.md
+- id: P00.03
+  phase_id: P00
+  title: Technical decisions
+  owner_role: Engineering/SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P00.01
+  - P00.02
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G00.03
+  doc_refs:
+  - docs/implementation/phases/p00.md
+- id: P00.04
+  phase_id: P00
+  title: Qualification design
+  owner_role: Quality/platform owners
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P00.01
+  - P00.02
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G00.04
+  doc_refs:
+  - docs/implementation/phases/p00.md
+- id: P00.05
+  phase_id: P00
+  title: Operating requirements
+  owner_role: SRE/security
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P00.01
+  - P00.04
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G00.05
+  doc_refs:
+  - docs/implementation/phases/p00.md
+- id: P00.06
+  phase_id: P00
+  title: Delivery decomposition
+  owner_role: Leads
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P00.01
+  - P00.02
+  - P00.03
+  - P00.04
+  - P00.05
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G00.06
+  doc_refs:
+  - docs/implementation/phases/p00.md
+- id: P01.01
+  phase_id: P01
+  title: Repository scaffolding
+  owner_role: Engineering
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids: []
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G01.01
+  doc_refs:
+  - docs/implementation/phases/p01.md
+- id: P01.02
+  phase_id: P01
+  title: Local and integration runtime
+  owner_role: SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P01.01
+  - P01.05
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G01.02
+  doc_refs:
+  - docs/implementation/phases/p01.md
+- id: P01.03
+  phase_id: P01
+  title: Contracts and messaging
+  owner_role: Architecture
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P01.05
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G01.03
+  doc_refs:
+  - docs/implementation/phases/p01.md
+- id: P01.04
+  phase_id: P01
+  title: CI and supply chain
+  owner_role: SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P01.01
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G01.04
+  doc_refs:
+  - docs/implementation/phases/p01.md
+- id: P01.05
+  phase_id: P01
+  title: Runtime dependencies
+  owner_role: SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids: []
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G01.05
+  doc_refs:
+  - docs/implementation/phases/p01.md
+- id: P01.06
+  phase_id: P01
+  title: Baseline operations
+  owner_role: SRE/security
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  dependency_package_ids:
+  - P01.02
+  - P01.04
+  - P01.05
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
+    conditions in the detailed card still apply.
+  criterion_ids:
+  - G01.06
+  doc_refs:
+  - docs/implementation/phases/p01.md
+- id: P02.01
+  phase_id: P02
+  title: Authentication
+  owner_role: Product/IAM
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P02.02
+  phase_id: P02
+  title: Tenancy
+  owner_role: Governance
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P02.03
+  phase_id: P02
+  title: Authorization
+  owner_role: Governance/security
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P02.04
+  phase_id: P02
+  title: Approval lifecycle
+  owner_role: Governance
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P02.05
+  phase_id: P02
+  title: Console foundation
+  owner_role: Console
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P03.01
+  phase_id: P03
+  title: Core aggregates
+  owner_role: Catalogue
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P03.02
+  phase_id: P03
+  title: Intent semantics
+  owner_role: Catalogue
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P03.03
+  phase_id: P03
+  title: Revision behavior
+  owner_role: Catalogue
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P03.04
+  phase_id: P03
+  title: Product workflows
+  owner_role: Console/catalogue
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P03.05
+  phase_id: P03
+  title: Domain verification
+  owner_role: Quality
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P04.01
+  phase_id: P04
+  title: Site enrollment
+  owner_role: Inventory/SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P04.02
+  phase_id: P04
+  title: Collectors
+  owner_role: Inventory
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P04.03
+  phase_id: P04
+  title: Observation store
+  owner_role: Inventory
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P04.04
+  phase_id: P04
+  title: Discovery controls
+  owner_role: Infrastructure
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P04.05
+  phase_id: P04
+  title: Inventory experience
+  owner_role: Console
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P05.01
+  phase_id: P05
+  title: Capability registry
+  owner_role: Planning
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P05.02
+  phase_id: P05
+  title: Policy and assessment
+  owner_role: Planning
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P05.03
+  phase_id: P05
+  title: Capacity and reservations
+  owner_role: Planning/lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P05.04
+  phase_id: P05
+  title: Plan compilation
+  owner_role: Planning
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P05.05
+  phase_id: P05
+  title: Review experience
+  owner_role: Console
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P05.06
+  phase_id: P05
+  title: Admission contract
+  owner_role: Planning/governance/lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P06.01
+  phase_id: P06
+  title: Admission and dispatch
+  owner_role: Lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P06.02
+  phase_id: P06
+  title: Workflow state
+  owner_role: Lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P06.03
+  phase_id: P06
+  title: Execution authority
+  owner_role: Lifecycle/workers
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P06.04
+  phase_id: P06
+  title: Evidence custody
+  owner_role: Assurance
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P06.05
+  phase_id: P06
+  title: Simulation and fault injection
+  owner_role: Quality
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P06.06
+  phase_id: P06
+  title: Jobs experience
+  owner_role: Console
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P07.01
+  phase_id: P07
+  title: Native site readiness
+  owner_role: SRE/platform owners
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P07.02
+  phase_id: P07
+  title: Infrastructure automation
+  owner_role: Infrastructure
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P07.03
+  phase_id: P07
+  title: Guest and service integration
+  owner_role: Infrastructure/service owners
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P07.04
+  phase_id: P07
+  title: Activation and verification
+  owner_role: Lifecycle/quality
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P07.05
+  phase_id: P07
+  title: Failure and retirement
+  owner_role: Lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P07.06
+  phase_id: P07
+  title: Native support dossier
+  owner_role: Assurance
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P08.01
+  phase_id: P08
+  title: Source readiness
+  owner_role: Inventory/lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P08.02
+  phase_id: P08
+  title: Method and data movement
+  owner_role: Infrastructure
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P08.03
+  phase_id: P08
+  title: Rehearsal
+  owner_role: Lifecycle/application owner
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P08.04
+  phase_id: P08
+  title: Cutover
+  owner_role: Lifecycle/governance
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P08.05
+  phase_id: P08
+  title: Recovery decisions
+  owner_role: Infrastructure/application owner
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P08.06
+  phase_id: P08
+  title: Acceptance
+  owner_role: Quality/assurance
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P09.01
+  phase_id: P09
+  title: Platform tranches
+  owner_role: Infrastructure
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P09.02
+  phase_id: P09
+  title: Migration matrix
+  owner_role: Infrastructure/quality
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P09.03
+  phase_id: P09
+  title: Brownfield adoption
+  owner_role: Inventory/lifecycle
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P09.04
+  phase_id: P09
+  title: Enterprise capabilities
+  owner_role: Planning/workers
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P09.05
+  phase_id: P09
+  title: Extension contract
+  owner_role: Architecture
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P10.01
+  phase_id: P10
+  title: Resilience and performance
+  owner_role: SRE/quality
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P10.02
+  phase_id: P10
+  title: Recovery and upgrades
+  owner_role: SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P10.03
+  phase_id: P10
+  title: Security assurance
+  owner_role: Security
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P10.04
+  phase_id: P10
+  title: Operations
+  owner_role: SRE/service owner
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P10.05
+  phase_id: P10
+  title: Installation qualification
+  owner_role: SRE/quality
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P10.06
+  phase_id: P10
+  title: Release dossier
+  owner_role: Quality/product
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P11.01
+  phase_id: P11
+  title: Production commissioning
+  owner_role: SRE/service owners
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P11.02
+  phase_id: P11
+  title: Controlled pilot
+  owner_role: Product/operators
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P11.03
+  phase_id: P11
+  title: Acceptance
+  owner_role: Application/security/service owners
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P11.04
+  phase_id: P11
+  title: Release publication
+  owner_role: Engineering/SRE
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+- id: P11.05
+  phase_id: P11
+  title: Historical disposition
+  owner_role: Product/records owner
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+  doc_refs:
+  - docs/implementation/phased-plan.md
+requirements:
+- id: R01
+  package_ids:
+  - P00.01
+  - P00.02
+  - P00.03
+  - P00.04
+  - P00.05
+  - P00.06
+  - P01.01
+  phase_ids:
+  - P00
+  - P01
+  decision_ids:
+  - ADR-001
+  - ADR-002
+  - ADR-004
+  - ADR-005
+  - ADR-013
+  - ADR-014
+  contract_refs:
+  - docs/services/catalogue.md
+  - docs/services/governance.md
+  campaign_ids:
+  - Q01
+  gate_ids:
+  - G00
+  - G01
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R02
+  package_ids:
+  - P01.01
+  - P01.02
+  - P01.03
+  - P01.04
+  - P01.05
+  - P10.02
+  phase_ids:
+  - P01
+  - P10
+  decision_ids:
+  - ADR-003
+  - ADR-004
+  - ADR-005
+  - ADR-006
+  - ADR-008
+  - ADR-012
+  contract_refs:
+  - docs/contracts/README.md
+  - docs/contracts/examples.md
+  campaign_ids:
+  - Q01
+  - Q09
+  gate_ids:
+  - G01
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R03
+  package_ids:
+  - P02.01
+  - P02.02
+  - P02.03
+  - P02.04
+  - P02.05
+  - P06.01
+  - P06.03
+  phase_ids:
+  - P02
+  - P06
+  decision_ids:
+  - ADR-009
+  - ADR-010
+  - ADR-018
+  contract_refs:
+  - docs/services/governance.md
+  - docs/services/lifecycle.md
+  campaign_ids:
+  - Q01
+  - Q03
+  - Q04
+  gate_ids:
+  - G02
+  - G06
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R04
+  package_ids:
+  - P02.03
+  - P03.05
+  - P04.04
+  - P05.02
+  - P06.03
+  - P10.03
+  phase_ids:
+  - P02
+  - P03
+  - P04
+  - P05
+  - P06
+  - P10
+  decision_ids:
+  - ADR-006
+  - ADR-009
+  - ADR-010
+  contract_refs:
+  - docs/services/governance.md
+  - docs/contracts/examples.md
+  campaign_ids:
+  - Q01
+  - Q02
+  - Q03
+  - Q04
+  - Q09
+  gate_ids:
+  - G02
+  - G03
+  - G04
+  - G05
+  - G06
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R05
+  package_ids:
+  - P03.01
+  - P03.02
+  - P03.03
+  - P03.04
+  - P03.05
+  phase_ids:
+  - P03
+  decision_ids:
+  - ADR-013
+  - ADR-012
+  contract_refs:
+  - docs/services/catalogue.md
+  - docs/contracts/examples.md
+  campaign_ids:
+  - Q01
+  gate_ids:
+  - G03
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R06
+  package_ids:
+  - P00.02
+  - P03.01
+  - P03.02
+  - P03.05
+  - P05.02
+  phase_ids:
+  - P00
+  - P03
+  - P05
+  decision_ids:
+  - ADR-013
+  - ADR-004
+  contract_refs:
+  - docs/services/catalogue.md
+  - docs/services/planning.md
+  campaign_ids:
+  - Q01
+  - Q06
+  gate_ids:
+  - G00
+  - G03
+  - G05
+  - G07
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R07
+  package_ids:
+  - P03.02
+  - P05.02
+  - P07.02
+  - P07.04
+  - P09.01
+  - P09.04
+  phase_ids:
+  - P03
+  - P05
+  - P07
+  - P09
+  decision_ids:
+  - ADR-013
+  - ADR-015
+  - ADR-016
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/lifecycle.md
+  campaign_ids:
+  - Q05
+  - Q06
+  - Q08
+  gate_ids:
+  - G03
+  - G05
+  - G07
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R08
+  package_ids:
+  - P04.01
+  - P04.02
+  - P04.03
+  - P05.02
+  - P07.01
+  - P09.01
+  phase_ids:
+  - P04
+  - P05
+  - P07
+  - P09
+  decision_ids:
+  - ADR-011
+  - ADR-015
+  - ADR-018
+  contract_refs:
+  - docs/services/inventory.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q02
+  - Q05
+  - Q06
+  gate_ids:
+  - G04
+  - G05
+  - G07
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R09
+  package_ids:
+  - P04.02
+  - P04.03
+  - P09.01
+  - P09.05
+  phase_ids:
+  - P04
+  - P09
+  decision_ids:
+  - ADR-015
+  - ADR-012
+  contract_refs:
+  - docs/services/inventory.md
+  campaign_ids:
+  - Q02
+  - Q08
+  gate_ids:
+  - G04
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R10
+  package_ids:
+  - P04.01
+  - P04.02
+  - P04.03
+  - P04.04
+  - P04.05
+  phase_ids:
+  - P04
+  decision_ids:
+  - ADR-009
+  - ADR-010
+  - ADR-015
+  contract_refs:
+  - docs/services/inventory.md
+  - docs/services/governance.md
+  campaign_ids:
+  - Q02
+  gate_ids:
+  - G04
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R11
+  package_ids:
+  - P04.03
+  - P05.02
+  - P09.03
+  phase_ids:
+  - P04
+  - P05
+  - P09
+  decision_ids:
+  - ADR-013
+  - ADR-016
+  - ADR-021
+  contract_refs:
+  - docs/services/inventory.md
+  - docs/services/lifecycle.md
+  campaign_ids:
+  - Q02
+  - Q03
+  - Q08
+  gate_ids:
+  - G04
+  - G05
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R12
+  package_ids:
+  - P05.01
+  - P05.02
+  - P05.05
+  phase_ids:
+  - P05
+  decision_ids:
+  - ADR-015
+  - ADR-017
+  - ADR-018
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q03
+  gate_ids:
+  - G05
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R13
+  package_ids:
+  - P04.02
+  - P05.01
+  - P05.02
+  - P06.01
+  - P06.04
+  - P09.05
+  phase_ids:
+  - P04
+  - P05
+  - P06
+  - P09
+  decision_ids:
+  - ADR-015
+  - ADR-018
+  - ADR-022
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q02
+  - Q03
+  - Q08
+  gate_ids:
+  - G04
+  - G05
+  - G06
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R14
+  package_ids:
+  - P05.04
+  - P05.06
+  - P06.01
+  phase_ids:
+  - P05
+  - P06
+  decision_ids:
+  - ADR-009
+  - ADR-012
+  - ADR-016
+  - ADR-018
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/governance.md
+  - docs/services/lifecycle.md
+  - docs/contracts/examples.md
+  campaign_ids:
+  - Q03
+  gate_ids:
+  - G05
+  - G06
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R15
+  package_ids:
+  - P01.03
+  - P06.01
+  - P06.02
+  - P06.05
+  phase_ids:
+  - P01
+  - P06
+  decision_ids:
+  - ADR-007
+  - ADR-008
+  - ADR-012
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/contracts/examples.md
+  campaign_ids:
+  - Q04
+  gate_ids:
+  - G01
+  - G06
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R16
+  package_ids:
+  - P06.03
+  - P06.05
+  - P07.02
+  - P07.05
+  phase_ids:
+  - P06
+  - P07
+  decision_ids:
+  - ADR-007
+  - ADR-009
+  - ADR-016
+  - ADR-018
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/governance.md
+  campaign_ids:
+  - Q04
+  - Q05
+  gate_ids:
+  - G06
+  - G07
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R17
+  package_ids:
+  - P05.03
+  - P05.06
+  - P06.03
+  - P06.05
+  - P07.03
+  - P08.02
+  phase_ids:
+  - P05
+  - P06
+  - P07
+  - P08
+  decision_ids:
+  - ADR-015
+  - ADR-016
+  - ADR-017
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/lifecycle.md
+  campaign_ids:
+  - Q03
+  - Q04
+  - Q05
+  - Q07
+  gate_ids:
+  - G05
+  - G06
+  - G07
+  - G08
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R18
+  package_ids:
+  - P07.01
+  - P07.02
+  - P07.03
+  - P07.04
+  - P07.06
+  phase_ids:
+  - P07
+  decision_ids:
+  - ADR-014
+  - ADR-015
+  - ADR-016
+  - ADR-018
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/console.md
+  campaign_ids:
+  - Q05
+  gate_ids:
+  - G07
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R19
+  package_ids:
+  - P03.02
+  - P05.02
+  - P05.04
+  - P07.02
+  - P07.03
+  - P07.04
+  phase_ids:
+  - P03
+  - P05
+  - P07
+  decision_ids:
+  - ADR-013
+  - ADR-014
+  - ADR-015
+  - ADR-016
+  contract_refs:
+  - docs/services/catalogue.md
+  - docs/services/planning.md
+  - docs/services/lifecycle.md
+  campaign_ids:
+  - Q05
+  gate_ids:
+  - G03
+  - G05
+  - G07
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R20
+  package_ids:
+  - P05.02
+  - P07.04
+  - P07.06
+  - P08.06
+  - P09.01
+  - P09.04
+  phase_ids:
+  - P05
+  - P07
+  - P08
+  - P09
+  decision_ids:
+  - ADR-013
+  - ADR-015
+  - ADR-018
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q06
+  - Q07
+  - Q08
+  gate_ids:
+  - G05
+  - G07
+  - G08
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R21
+  package_ids:
+  - P05.02
+  - P07.03
+  - P07.04
+  - P08.04
+  - P08.06
+  phase_ids:
+  - P05
+  - P07
+  - P08
+  decision_ids:
+  - ADR-010
+  - ADR-015
+  - ADR-017
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/planning.md
+  campaign_ids:
+  - Q05
+  - Q07
+  gate_ids:
+  - G05
+  - G07
+  - G08
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R22
+  package_ids:
+  - P06.02
+  - P06.05
+  - P08.01
+  - P08.02
+  - P08.03
+  - P08.06
+  phase_ids:
+  - P06
+  - P08
+  decision_ids:
+  - ADR-014
+  - ADR-015
+  - ADR-017
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/inventory.md
+  campaign_ids:
+  - Q07
+  gate_ids:
+  - G06
+  - G08
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R23
+  package_ids:
+  - P06.02
+  - P06.03
+  - P06.05
+  - P08.03
+  - P08.04
+  - P08.06
+  phase_ids:
+  - P06
+  - P08
+  decision_ids:
+  - ADR-014
+  - ADR-016
+  - ADR-018
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/governance.md
+  campaign_ids:
+  - Q04
+  - Q07
+  gate_ids:
+  - G06
+  - G08
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R24
+  package_ids:
+  - P06.02
+  - P06.05
+  - P08.05
+  - P08.06
+  phase_ids:
+  - P06
+  - P08
+  decision_ids:
+  - ADR-014
+  - ADR-017
+  contract_refs:
+  - docs/services/lifecycle.md
+  campaign_ids:
+  - Q04
+  - Q07
+  gate_ids:
+  - G06
+  - G08
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R25
+  package_ids:
+  - P07.05
+  - P08.06
+  - P10.04
+  phase_ids:
+  - P07
+  - P08
+  - P10
+  decision_ids:
+  - ADR-009
+  - ADR-010
+  - ADR-021
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/governance.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q05
+  - Q07
+  - Q09
+  gate_ids:
+  - G07
+  - G08
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R26
+  package_ids:
+  - P09.01
+  - P09.02
+  - P09.05
+  phase_ids:
+  - P09
+  decision_ids:
+  - ADR-014
+  - ADR-015
+  - ADR-022
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q08
+  gate_ids:
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R27
+  package_ids:
+  - P09.02
+  - P09.04
+  - P09.05
+  phase_ids:
+  - P09
+  decision_ids:
+  - ADR-014
+  - ADR-015
+  - ADR-022
+  contract_refs:
+  - docs/services/planning.md
+  - docs/services/lifecycle.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q08
+  gate_ids:
+  - G09
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R28
+  package_ids:
+  - P09.04
+  - P10.01
+  phase_ids:
+  - P09
+  - P10
+  decision_ids:
+  - ADR-007
+  - ADR-017
+  - ADR-022
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/planning.md
+  campaign_ids:
+  - Q08
+  - Q10
+  gate_ids:
+  - G09
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R29
+  package_ids:
+  - P01.05
+  - P01.06
+  - P06.02
+  - P06.05
+  - P07.05
+  - P10.02
+  phase_ids:
+  - P01
+  - P06
+  - P07
+  - P10
+  decision_ids:
+  - ADR-007
+  - ADR-010
+  - ADR-011
+  - ADR-017
+  - ADR-020
+  contract_refs:
+  - docs/services/lifecycle.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q04
+  - Q09
+  gate_ids:
+  - G01
+  - G06
+  - G07
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R30
+  package_ids:
+  - P01.06
+  - P06.06
+  - P07.06
+  - P10.04
+  phase_ids:
+  - P01
+  - P06
+  - P07
+  - P10
+  decision_ids:
+  - ADR-010
+  - ADR-011
+  - ADR-017
+  contract_refs:
+  - docs/services/console.md
+  - docs/services/lifecycle.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q04
+  - Q09
+  - Q10
+  gate_ids:
+  - G01
+  - G06
+  - G07
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R31
+  package_ids:
+  - P01.04
+  - P01.06
+  - P02.01
+  - P06.03
+  - P06.04
+  - P07.01
+  - P08.02
+  - P09.05
+  - P10.03
+  phase_ids:
+  - P01
+  - P02
+  - P06
+  - P07
+  - P08
+  - P09
+  - P10
+  decision_ids:
+  - ADR-006
+  - ADR-009
+  - ADR-010
+  - ADR-011
+  - ADR-020
+  contract_refs:
+  - docs/services/governance.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q01
+  - Q04
+  - Q06
+  - Q09
+  gate_ids:
+  - G01
+  - G02
+  - G06
+  - G07
+  - G08
+  - G09
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R32
+  package_ids:
+  - P00.05
+  - P02.03
+  - P05.02
+  - P10.03
+  phase_ids:
+  - P00
+  - P02
+  - P05
+  - P10
+  decision_ids:
+  - ADR-009
+  - ADR-010
+  - ADR-011
+  - ADR-020
+  - ADR-021
+  contract_refs:
+  - docs/services/governance.md
+  - docs/services/planning.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q03
+  - Q09
+  gate_ids:
+  - G00
+  - G02
+  - G05
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R33
+  package_ids:
+  - P03.04
+  - P04.05
+  - P05.05
+  - P06.06
+  - P07.04
+  - P08.04
+  - P11.02
+  - P11.03
+  phase_ids:
+  - P03
+  - P04
+  - P05
+  - P06
+  - P07
+  - P08
+  - P11
+  decision_ids:
+  - ADR-019
+  - ADR-017
+  contract_refs:
+  - docs/services/console.md
+  campaign_ids:
+  - Q01
+  - Q05
+  - Q07
+  - Q10
+  gate_ids:
+  - G03
+  - G04
+  - G05
+  - G06
+  - G07
+  - G08
+  - G11
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R34
+  package_ids:
+  - P00.05
+  - P04.04
+  - P10.01
+  phase_ids:
+  - P00
+  - P04
+  - P10
+  decision_ids:
+  - ADR-017
+  - ADR-020
+  - ADR-022
+  contract_refs:
+  - docs/services/inventory.md
+  - docs/services/lifecycle.md
+  - docs/services/console.md
+  campaign_ids:
+  - Q02
+  - Q10
+  gate_ids:
+  - G00
+  - G04
+  - G10
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R35
+  package_ids:
+  - P01.03
+  - P01.04
+  - P10.02
+  - P10.05
+  - P10.06
+  - P11.01
+  - P11.02
+  - P11.03
+  - P11.04
+  phase_ids:
+  - P01
+  - P10
+  - P11
+  decision_ids:
+  - ADR-012
+  - ADR-017
+  - ADR-020
+  - ADR-022
+  contract_refs:
+  - docs/contracts/README.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q09
+  - Q10
+  gate_ids:
+  - G01
+  - G10
+  - G11
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+- id: R36
+  package_ids:
+  - P00.01
+  - P00.05
+  - P10.05
+  - P11.05
+  phase_ids:
+  - P00
+  - P10
+  - P11
+  decision_ids:
+  - ADR-021
+  contract_refs:
+  - docs/services/inventory.md
+  - docs/services/lifecycle.md
+  - docs/services/assurance.md
+  campaign_ids:
+  - Q09
+  gate_ids:
+  - G00
+  - G10
+  - G11
+  status:
+    work: NOT_STARTED
+    verification: NOT_RUN
+    native_qualification: NOT_STARTED
+    operational_acceptance: NOT_STARTED
+  evidence_ids: []
+  blocker_ids: []
+gates:
+- id: G00
+  phase_id: P00
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G01
+  phase_id: P01
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G02
+  phase_id: P02
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G03
+  phase_id: P03
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G04
+  phase_id: P04
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G05
+  phase_id: P05
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G06
+  phase_id: P06
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G07
+  phase_id: P07
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G08
+  phase_id: P08
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G09
+  phase_id: P09
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G10
+  phase_id: P10
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+- id: G11
+  phase_id: P11
+  decision: NOT_REVIEWED
+  reviewer: null
+  reviewed_at: null
+  evidence_ids: []
+  blocker_ids: []
+evidence: []
+blockers: []

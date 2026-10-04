@@ -1,0 +1,67 @@
+# Console service
+
+Status: proposed service specification; no UI or executable routes are claimed. Runtime: Laravel, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8, with exact compatible patches subject to P00.03. Destination: `apps/console/`. Owner: product engineering.
+
+## Purpose and responsibility boundary
+
+Give application owners, reviewers and operators a coherent application journey: describe intent, inspect eligibility, review and approve an exact plan, observe a job and act on authorized recovery choices. Explain incomplete evidence, stale data and blocked actions in terms of the task the user is performing.
+
+The console owns browser sessions, navigation, composed page state and presentation preferences. It does not own tenant authority, domain records, plans, jobs or qualification. It never reads service databases, accepts reusable platform credentials or sends browser-selected native commands to workers.
+
+## Owned data and view model
+
+| Record | Rule |
+| --- | --- |
+| Browser session | Bound to trusted federated identity, server-side lifecycle and CSRF protection; configured expiry and logout behavior. |
+| Presentation preference | User-owned theme/table/filter preferences; tenant-specific saved selections are reauthorized when loaded. |
+| Page composition | Disposable view of API results with each source's version, freshness and authorization outcome. |
+| Pending command presentation | Client retry key and response reference; the owning API remains authoritative for whether the command succeeded. |
+
+Session and cache storage are private to console. Page caching must include effective tenant and authorization scope; shared fragments cannot reveal one tenant's names to another. Do not place credentials, evidence artifacts or complete intent documents in analytics.
+
+## Proposed browser surface and backend calls
+
+Browser routes are presentation routes, not a second public domain API. Exact route names are finalized with P02.05/P03.04 accessibility prototypes.
+
+| Browser task | Owning API interaction |
+| --- | --- |
+| `/tenants/{tenant_id}/applications` | Catalogue list/create with current authorized tenant selection. |
+| `/tenants/{tenant_id}/applications/{id}` | Catalogue current revision/history; conditional edit retains the fetched ETag. |
+| `/tenants/{tenant_id}/assessments/{id}` | Planning assessment result/status and input freshness. |
+| `/tenants/{tenant_id}/plans/{id}` | Planning immutable plan plus separately sourced governance approval view. |
+| `/tenants/{tenant_id}/jobs/{id}` | Lifecycle job/operation status and assurance evidence references. |
+| `/tenants/{tenant_id}/sites/{id}` | Inventory observation health; lifecycle/assurance commissioning state shown distinctly. |
+
+Server-side handlers call the service-relative `/v1/tenants/{tenant_id}` contracts using approved delegated identity. Cross-service actions retain the same correlation chain, but each command gets its own stable idempotency key. Polling is the initial status transport (ADR-019); it does not permit aggressive polling without service budgets.
+
+## Authentication and authorization
+
+The identity provider authenticates users; governance evaluates tenant membership, resource scope, action and separation of duties. Console can hide unavailable actions for usability, while receiving APIs independently authorize every request. User-controlled tenant IDs, hidden fields or enabled buttons prove nothing.
+
+Validate issuer, audience and expiry through the selected federation design; renew only through the approved session flow. Preserve the effective actor and console service identity when delegating. Expiry during a form submission must not turn into an anonymous retry or new command identity. Logout clears local session state according to the chosen provider contract.
+
+## Concurrency, retries and events
+
+Carry the catalogue ETag from the displayed version to the revision command. A `412` preserves the user's local edits and offers a comparison/reload action; it never silently overwrites current intent. A changed plan digest invalidates the old approval presentation and requires a fresh review.
+
+Reuse the command idempotency key after a connection failure, query the returned owning-service identifier and show an uncertain/pending response when status is unavailable. Do not invent a second job after an HTTP timeout. Native `outcome_unknown` is shown as held, with the recorded cause and allowed reconciliation action; cancellation is displayed as a request until the job confirms a safe stop.
+
+Console publishes no authoritative domain events. It may later consume versioned notification projections, but those notifications only prompt an authorized refresh. Broker or live-transport access from the browser requires a separately designed tenant subscription policy.
+
+## Dependencies and degraded behavior
+
+Federated identity, session storage and service APIs are dependencies. A failed page subsection must show its source and unavailable/stale state; it cannot turn a partial view into a fabricated healthy summary. Governance failure disables new privileged commands. Planning failure can leave catalogue browsing available where authorized; lifecycle failure must not imply jobs stopped.
+
+Bootstrap is P01 deployment plus P02 identity/governance establishment, then P03 real catalogue interaction. Development fixtures are explicitly synthetic. No production tenant, grants or workload resources are created as a side effect of starting the console.
+
+## Deployment and operation
+
+Build static assets reproducibly and bind their digest to the server release; keep secrets out of asset bundles. Run Laravel request workers with an approved session store; background UI notifications have bounded work queues. Configure trusted proxy and cookie behavior for the accepted topology. Server rendering is deferred unless ADR-019 changes.
+
+Health distinguishes a live server from a ready session/API composition path. Measure critical-page latency, API dependency failures, session failures and stale/status refresh lag. Trace browser request → service request → job without logging sensitive input. Validate keyboard navigation, screen-reader states, visible focus, actionable errors and destructive-action review with representative roles.
+
+## Verification and delivery
+
+P02.01/P02.05 establish sessions/navigation; P03.04 delivers create/edit/history; P04.05 inventory; P05.05 review; P06.06 jobs; P07/P08 the native user journeys. Trace to R02–R05, R14–R15 and R33; Q01/Q03/Q04/Q10 provide evidence at the relevant stages.
+
+Test direct API denial despite manipulated UI, tenant-switch cache isolation, expired session during retry, stale edit preservation, exact digest in approval, partial dependency outage, unknown operation status, polling authorization and safe cancel wording. End-to-end success requires recorded service outcomes; screenshots alone do not close native gates.

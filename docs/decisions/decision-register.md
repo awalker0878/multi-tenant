@@ -1,32 +1,46 @@
-# Architecture and delivery decision register
+# Architecture and delivery decisions
 
-Date: 2026-10-04. `DIRECTED` records user/source direction. `PROPOSED` is the planning recommendation. `OPEN` requires a recorded P00 decision. None of these statuses means code exists or infrastructure is authorized.
+Baseline date: 2026-10-04. This register owns decision origin, disposition and blocking checkpoint. [Delivery status](../implementation/status-model.md) is separate: a decision neither implements a feature nor authorizes a native operation.
 
-Each resolved ADR must record context, options considered, choice, consequences, owner, date, affected contracts and validation evidence. The register is the starting backlog, not fabricated approval minutes.
+## Origin, disposition and checkpoints
 
-| ID | Decision | Status and baseline | Accountable role | Must close before |
-| --- | --- | --- | --- | --- |
-| ADR-001 | Product reset | DIRECTED: fresh implementation; `greenfield/laravel-product-foundation` is abandoned for this work; previous runtime is reference only | Product | Completed as planning direction; P00 confirms scope |
-| ADR-002 | Languages and UI | DIRECTED: Laravel/PHP + Python; Inertia 3, Vue 3, TypeScript, Tailwind 4, Vite 8 | Architecture | P00 dependency spike |
-| ADR-003 | Exact runtime versions | PROPOSED: Laravel 13, PHP 8.5 candidate; supported Node/Python minors and all patch versions OPEN | Engineering | P01 scaffolding |
-| ADR-004 | Contexts | PROPOSED: console; governance; catalogue; inventory; planning; lifecycle; assurance. Laravel assurance; no generic integrations service | Architecture | P01 contracts |
-| ADR-005 | Deployment granularity | PROPOSED: seven principal application deployables plus independently scoped worker pools in one repository | Architecture/SRE | P01 |
-| ADR-006 | Data isolation | PROPOSED: database per service with separate roles on an operated PostgreSQL cluster; physical cluster separation follows trust/scale needs | SRE/security | P01 persistence |
-| ADR-007 | Durable execution | DIRECTED baseline: Temporal with Python workflows/activities; lifecycle owns admission and native-operation ledger | Infrastructure | P01/P06 |
-| ADR-008 | Domain-event broker | OPEN: choose broker supported by the operating team; RabbitMQ is an initial candidate to assess against ordering/replay/HA requirements | Architecture/SRE | P01 outbox transport |
-| ADR-009 | Identity and delegated authority | OPEN: enterprise OIDC provider, service identities, token delegation, revocation, break-glass and approval policy | IAM/security | P02 |
-| ADR-010 | Secrets, PKI and evidence | OPEN: approved secret/key services, trust bootstrap, protected S3-compatible artifact store, retention and immutable evidence mechanism | Security/SRE | P01/P06 |
-| ADR-011 | Central/site topology | PROPOSED: central Kubernetes per approved trust boundary; site-local worker pools; exact distribution/CNI/site runtime and network flows OPEN | SRE/security | P01 infrastructure |
-| ADR-012 | API/event compatibility | PROPOSED: OpenAPI + AsyncAPI, schema-first cross-language contracts, at-least-once delivery, outbox/inbox and expand/contract changes | Architecture | P01 |
-| ADR-013 | Domain cardinality | OPEN: validate Tenant/WSD/SecurityDomain/DomainInstance/Workload relationships, sharing rules and deletion invariants | Product/architecture | P03 schema |
-| ADR-014 | Initial native route | PROPOSED: OpenStack provisioning, VMware→OpenStack cold guest/disk conversion/import, one Linux stateful application; exact method contingent on feasibility | Product/infrastructure | P00/P04 |
-| ADR-015 | Platform and service tuples | OPEN: installed versions/backends/network topology, guest image, IPAM/DNS, identity, backup, monitoring and service-owner APIs | Platform/service owners | P04/P07 |
-| ADR-016 | Terraform/Ansible ownership | PROPOSED: reviewed saved-plan workflow and explicit field/state ownership; version/toolchain/backend selections OPEN | Infrastructure | P06/P07 |
-| ADR-017 | SLO, scale and recovery | PROPOSED targets in phased plan; actual load model, RPO/RTO and application outage objectives OPEN | Product/SRE | P00 baseline; P10 acceptance |
-| ADR-018 | Qualification admission | PROPOSED: separate lab campaign authorization for unqualified candidates; supported operational admission requires qualified tuple evidence | Security/quality | P06 native admission design |
-| ADR-019 | Frontend runtime | PROPOSED: compiled assets with server sessions and polling first; SSR and live event channel deferred unless justified | Product engineering | P01 console |
-| ADR-020 | Restricted-network installation | OPEN: registry/dependency mirrors, signed offline bundles, site disconnection policy and permitted continuation | SRE/security | P01 design, P10 qualification |
-| ADR-021 | Retained historical state | OPEN: default clean product data; import/archive only for identified retention or operating needs; never import active workflow authority blindly | Product/records owner | P00 decision, P11 disposition |
-| ADR-022 | Release support scope | OPEN: exact P09 tranche included in first release, support ownership, platform qualification expiry and revalidation rules | Product/service owner | P00 scope, P10 release freeze |
+`origin` is `DIRECTED` for an explicit source/user constraint or `DESIGN` for an engineering choice. `disposition` is `ACCEPTED` only for an already explicit user direction or a recorded accountable-owner decision; otherwise `PROPOSED`, `OPEN`, `DEFERRED` or `SUPERSEDED`. A direction can be binding while its implementation details remain open. `DIRECTED` is never a substitute for an ADR disposition or test result.
 
-Changing a proposed choice is normal design work. Changes to user-directed architecture or release scope require an explicit documented decision; do not silently substitute another stack, reintroduce the previous runtime or label a different migration method as equivalent.
+P00 does **not** close every future decision. It closes the decisions needed to proceed safely and assigns the remainder:
+
+- **NOW:** required for G00 or before the affected P01 package starts. Record the selected baseline, rationale and operating owner; do not scaffold around an unresolved critical choice.
+- **PROVISIONAL:** accept an explicit initial constraint in P00, with assumptions and a later checkpoint. Actual acceptance is still outstanding where the row says `OPEN`/`PROPOSED`.
+- **LATER:** P00 assigns an owner, options and blocking checkpoint; final selection occurs before that package/gate. No implementation may depend silently on an undecided option.
+
+The two `ACCEPTED` entries below record explicit user instructions, not invented engineering sign-off. Every other row remains a proposal or unresolved choice. No individual ADR files or signed technical decisions have been created yet.
+
+| ID | Decision and initial baseline | Origin | Disposition | Accountable role | Initial checkpoint | Later refinement / mandatory validation |
+| --- | --- | --- | --- | --- | --- | --- |
+| ADR-001 | Fresh implementation; previous Laravel foundation is superseded; old runtime is reference only | DIRECTED | ACCEPTED | Product lead | NOW: user direction already recorded; P00.01 scopes product | G00 confirms release exclusions and no legacy runtime dependency |
+| ADR-002 | Laravel/PHP and Python; Inertia 3, Vue 3, TypeScript, Tailwind 4 and Vite 8 | DIRECTED | ACCEPTED | Architecture lead | NOW: requested stack binding; P00.03 tests compatibility | Failed compatibility returns a concrete choice to user; no silent stack substitution |
+| ADR-003 | Laravel 13/PHP 8.5 candidates; exact Node/Python/runtime and dependency patches unresolved | DESIGN | PROPOSED | Engineering lead | NOW: P00.03 / G00.03 before P01.01 | Exact lock/image resolution, update policy and support lifecycle before G01 |
+| ADR-004 | Seven contexts: console, governance, catalogue, inventory, planning, lifecycle, assurance; Laravel assurance | DESIGN | PROPOSED | Architecture lead | NOW: P00.02 / G00.02 before contract scaffolding | Review boundary changes through owning ADR and contract impact |
+| ADR-005 | Seven principal deployables plus independently scoped worker pools in one repository | DESIGN | PROPOSED | Architecture/SRE leads | NOW: P00.03 before P01.01/P01.02 | Independently build/deploy proof at G01; reassess operational cost at P10 |
+| ADR-006 | Service-owned databases/roles on operated PostgreSQL; trust/scale may require separate clusters | DESIGN | PROPOSED | SRE/security leads | NOW: P00.03 before P01.05 | Cross-service access denial at G01; physical separation/load/restore at G10 |
+| ADR-007 | Temporal/Python durable workflow baseline; lifecycle owns admission and operation journal | DIRECTED | PROPOSED | Infrastructure lead | NOW: P00.03 confirms supported runtime/operation owner before P01.05 | Workflow/version/replay/failure model finalized before P06.02; G06/G10 proof |
+| ADR-008 | Domain-event transport; RabbitMQ candidate, assess delivery/ordering/replay/HA needs and team support | DESIGN | OPEN | Architecture/SRE leads | NOW: P00.03 before P01.03 | Actual outbox/inbox interoperability at G01; HA/retention/restore at G10 |
+| ADR-009 | Enterprise OIDC, service identities, delegation, revocation, approval and break-glass | DESIGN | OPEN | IAM/security leads | PROVISIONAL: P00.03 provider and trust prerequisites before P01.06 | Final identity/authorization semantics before P02.01–P02.04; immediate pre-effect rechecks before P06.03 |
+| ADR-010 | Secret/key services, PKI/trust bootstrap and protected S3-compatible evidence store | DESIGN | OPEN | Security/SRE leads | NOW: P00.03 initial services/custody before P01.05/P01.06 | Immutable evidence/retention/finalization before P06.04; key-loss/restore at G10 |
+| ADR-011 | Central Kubernetes per accepted trust boundary; scoped site workers; runtime/CNI/flows unresolved | DESIGN | PROPOSED | SRE/security leads | NOW: P00.03 distribution/initial topology before P01.02 | Site trust/network scope before P04.01; native write readiness before G07 |
+| ADR-012 | OpenAPI/AsyncAPI schema-first contracts, outbox/inbox, at-least-once events and expand/contract evolution | DESIGN | PROPOSED | Architecture lead | NOW: P00.02/P00.03 before P01.03 | Compatibility/version/deprecation proof at G01 and rolling upgrades at G10 |
+| ADR-013 | Tenant/WSD/SecurityDomain/DomainInstance/Application/Workload cardinalities and sharing/deletion rules | DESIGN | OPEN | Product/architecture leads | NOW: P00.02 / G00.02 baseline invariants | Aggregate constraints before P03.01; real placement semantics before P05.02 |
+| ADR-014 | OpenStack provisioning and VMware→OpenStack cold conversion/import for one Linux stateful application, subject to feasibility | DESIGN | PROPOSED | Product/infrastructure leads | NOW: P00.04 / G00.04 chooses exact initial method and feasibility | Discovery confirms assumptions at G04; separate native qualification at G07/G08; changed method needs revised scope |
+| ADR-015 | Exact platform/API/backend/network/guest and IPAM/DNS/identity/backup/monitoring interfaces | DESIGN | OPEN | Platform/service owners | PROVISIONAL: P00.04 candidate tuple and confirmed input owners | Read contracts/installed tuples before P04.02; each real integration before P07.03; expansion per P09 tranche |
+| ADR-016 | Reviewed Terraform saved plan and explicit resource/field ownership; tool/backend versions unresolved | DESIGN | PROPOSED | Infrastructure lead | LATER: assign owner in P00; select before P05.04 plan model | Lock backend/workspace/ownership and toolchain before P06.03/P07.02; qualify uncertainty/recovery at G07 |
+| ADR-017 | Workload model, scale/SLO/RPO/RTO/outage objectives and measures | DESIGN | PROPOSED | Product/SRE leads | PROVISIONAL: P00.05 / G00.05 accepts initial targets and owners | Refine after P06 measurements; native app targets before P08; measured service acceptance at G10 |
+| ADR-018 | Separate authorized lab qualification lane; operational admission requires qualified exact-tuple evidence | DESIGN | PROPOSED | Security/qualification leads | PROVISIONAL: P00.04 defines authority boundary and campaign scope | Final admission/fencing design before P06.01; deny tests G06; every native campaign separately authorized |
+| ADR-019 | Compiled console assets/server sessions/polling initially; SSR and live events only if justified | DESIGN | PROPOSED | Product engineering lead | NOW: P00.03 before P01.01 | Browser/session/accessibility constraints before P02.05; user/performance evidence G03/G10 |
+| ADR-020 | Restricted-network artifacts/mirrors, site disconnection and permitted continuation | DESIGN | OPEN | SRE/security leads | PROVISIONAL: P00.03/P00.05 selects required deployment modes before P01.02/P01.04 | Site authority expiry before P06.03; restricted install/restore qualification at G10 |
+| ADR-021 | Clean product data by default; identify any required archive/import without inheriting active workflow authority | DESIGN | OPEN | Product/records owners | PROVISIONAL: P00.01/P00.05 decides whether retained data exists | If applicable, import/reconcile procedure before P10.05; final disposition before P11.05; reviewed non-applicability otherwise |
+| ADR-022 | First-release expansion tranche, support owners, tuple expiry and requalification rules | DESIGN | OPEN | Product/service owners | PROVISIONAL: P00.01 lists included/excluded routes and expiry-policy owner | Final tranche before P09 qualification; release freeze P10.06; publish exact support G11 |
+
+## Decision record requirements
+
+Create a separate ADR when resolving a technical choice; planned filename `docs/decisions/adr-NNN-short-title.md`. Preserve context, origin, disposition, scope, decision owner/date, alternatives, rationale, consequences, affected requirements/packages/contracts, assumptions, evidence references, blocking checkpoint, reconsideration trigger and superseding ADR if any. Copying this table into individual files without the actual decision adds no evidence.
+
+An accepted provisional decision must name what is fixed now, what remains uncertain and which package cannot start until it is resolved. Record actual reviewer identities when available; the role column does not imply staffing or approval. Update this register and the affected specifications together. User-directed choices can only change through an explicit documented user decision; technical proposal changes need their accountable review and impact analysis.

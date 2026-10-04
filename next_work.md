@@ -1,31 +1,27 @@
-# Next work — begin P00
+# Next work — begin P00 implementation work
 
-Active branch: `greenfield/enterprise-microservices-plan`.
+Active branch: `greenfield/enterprise-microservices-plan`. The previous Laravel foundation remains reference material only. This branch contains proposed product and delivery specifications; application implementation and qualification have not started. [Canonical delivery state](docs/implementation/delivery-register.yaml) owns status; [progress](docs/implementation/progress.md) and [traceability](docs/implementation/traceability.md) are generated views.
 
-The requested planning delivery is complete when these documents are committed and checked. Product implementation is **not started**. Use the [phased plan](docs/implementation/phased-plan.md) as the delivery sequence and [progress](docs/implementation/progress.md) as the evidence-backed status record.
+## Read and start here
 
-## Ordered implementation backlog
+Read the [README](README.md) for the product, [documentation guide](docs/documentation-guide.md) for where future work belongs, [worked application](docs/product/application-walkthrough.md) for the complete journey and [P00 cards](docs/implementation/phases/p00.md) for acceptance-ready tasks. Treat examples as synthetic design examples, not running software.
 
-| Order | Package | Concrete next task | Completion evidence |
-| --- | --- | --- | --- |
-| 1 | P00.01 | Confirm first application journey, personas, release scope, mandatory versus deferred platform capabilities and named owners | Product brief with explicit scope and acceptance outcomes |
-| 2 | P00.02 | Create domain examples and cardinality rules for Tenant, WSD, SecurityDomain, DomainInstance, Application and Workload | Reviewed glossary, entity relationships and invariant cases |
-| 3 | P00.02 | Specify ownership for intent, observation, plan, approval, admission, workflow history, native operation and evidence | Context/authority matrix with no competing writers |
-| 4 | P00.03 | Resolve the requested PHP/Node/frontend/Python dependency set in an isolated compatibility spike | Exact locks, container versions, build/typecheck/test results and browser constraints |
-| 5 | P00.03 | Select event transport, identity, secrets/PKI, PostgreSQL isolation, object storage and central/site runtime | Resolved ADRs with alternatives and operating owners |
-| 6 | P00.04 | Select OpenStack and VMware lab tuples, one Linux image, stateful application and proposed cold migration method | Feasibility report including disk/boot/driver/consistency constraints and access readiness |
-| 7 | P00.04 | Specify the lab-only qualification admission lane and production support gate | Permission/credential separation, campaign scope and negative tests |
-| 8 | P00.05 | Set load tiers, discovery freshness, SLO/RPO/RTO, outage budget, retention, sovereignty and threat model | Owner-approved testable targets and trust/data flow register |
-| 9 | P00.06 | Break P01 into small contract, skeleton, CI, deployment and operating-control changes | Ordered issue/commit-sized backlog mapped to R01–R36 |
-| 10 | P00 gate | Review unresolved decisions and external dependencies; record accepted baseline and evidence | Gate record with owners, evidence and explicit blockers |
-| 11 | P01.01–P01.06 | Build independent service skeletons and the delivery/runtime foundation | Clean-checkout build, contract checks, empty-environment install and initial restore |
+| Sequence | Concrete action | Required output / unblock condition |
+| --- | --- | --- |
+| 1 — P00.01 | Review personas, first application/route, mandatory capabilities and release exclusions with accountable roles; determine whether retained operational data exists | Reviewed scope and owner assignments; unresolved owner/input becomes a concrete blocker |
+| 2 — P00.02 | Review domain relationships and seven service ownership boundaries against valid/invalid examples; settle sharing, revision and authority semantics | Accepted invariants and now-blocking architecture decisions; one writer per owned state |
+| 3 — P00.03, can overlap 1/2 | Execute the isolated compatibility spike, recording exact dependency locks/build results; select initial broker, identity/trust, data/runtime and installation choices | Actual E1 results and accepted NOW decisions; failed compatibility yields an explicit decision, not a silent stack change |
+| 4 — P00.04, can overlap 2/3 | Obtain source/target tuple facts and approved fixtures, test initial offline-method feasibility, and design isolated lab authority plus negative/recovery campaigns | Actual bounded feasibility results and reviewed route; unavailable facts/access remain identified dependencies |
+| 5 — P00.05 | Ratify measurable scale/SLO/RPO/RTO/application objectives, custody, threat/recovery cases, retention and operating responsibilities | Reviewed targets with methods/owners; provisional values are not service promises |
+| 6 — P00.06 | Refine staffing/estimates and all requirement mappings; review the six G00 criteria with actual evidence and independent reviewers | G00 decision registered with evidence/blockers; later ADRs retain their explicit blocking checkpoints |
+| 7 — P01 after its entry decisions | Implement the [six foundation cards](docs/implementation/phases/p01.md): independent builds, integration runtime, contracts, supply chain, dependencies and baseline recovery | Each G01 criterion independently demonstrated; no native administrator access required |
 
-## Working rules
+P00 decisions do not all have to be final. [The decision register](docs/decisions/decision-register.md) separates NOW choices, provisional baselines and later refinements. Proceed with independent authorized work while a dependency is unresolved; do not bypass the package it actually blocks. Neither a plan nor a documentation review authorizes native mutation.
 
-- Start from this clean branch. Do not resume or copy the abandoned Laravel foundation's unfinished implementation.
-- Use older code and documents only to understand requirements and edge cases. Reimplement against the new domain and contracts.
-- Keep schema definitions and domain ownership explicit before implementing API handlers.
-- No application feature, Terraform apply or native mutation is authorized merely by the existence of this plan. Future implementation work follows its environment and execution gates.
-- Record lab access or owner decisions as concrete blockers while continuing independent authorized work. Do not invent credentials, approvals or successful tests.
-- Keep commits small and coherent; use the GitHub connector to publish changes, consistent with the existing delivery workflow.
-- Update the phase progress, requirements coverage, ADRs and current next work whenever behavior or scope changes.
+## Document each implementation increment
+
+For every coherent change, identify requirement/package IDs and the owning service. Update its behavior/contract specification and any affected ADR; put future API/event schemas in the contract tree, operational procedures under `docs/operations/runbooks/`, and qualification definitions/evidence indexes under `docs/qualification/`. The [documentation guide](docs/documentation-guide.md) defines the complete placement and naming rules.
+
+Record actual source/artifact revisions, environment, positive/negative/recovery results, evidence identity and reviewer in `delivery-register.yaml`. Add a blocker with owner and unblock condition when necessary. Regenerate the progress/traceability views and validate references. Update this file to name the next concrete task, without copying a second status table here.
+
+Use small coherent commits and the established GitHub connector workflow. No historical passing test, approval, credential, native support claim or operational acceptance transfers from the old programme. Scaffolding and design examples cannot be described as completed product behavior.

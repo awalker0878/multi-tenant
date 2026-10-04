@@ -1,10 +1,10 @@
 # Greenfield target architecture
 
-Status: proposed enterprise baseline; implementation decisions close in P00.
+Status: proposed enterprise baseline. P00 establishes the decisions required to begin; later refinements close at their explicit checkpoints in the [decision register](../decisions/decision-register.md).
 
-This document defines a fresh product architecture for portable application hosting and workload mobility. The previous implementation supplies requirements, infrastructure knowledge and useful failure cases. It is not a runtime dependency, compatibility layer or foundation to refactor. The abandoned `greenfield/laravel-product-foundation` branch is not the delivery branch for this plan.
+This document defines the cross-service architecture for portable application hosting and workload mobility. The [source and reset record](../reference/sources-and-reset.md) defines how historical requirements are used.
 
-The attached source establishes Laravel/PHP business services, a Laravel/Inertia/Vue console, Python infrastructure services, durable workflows, explicit data ownership and independently deployable containers. This document resolves those ideas into a proposed baseline. Choices not expressly required by the source remain proposals until their P00 decisions are recorded.
+The source establishes Laravel/PHP business services, a Laravel/Inertia/Vue console, Python infrastructure services, durable workflows, explicit data ownership and independently deployable containers. Proposed choices remain subject to their recorded decision checkpoints. Detailed behavior belongs to the [service specifications](../services/README.md), [domain model](../product/domain-model.md) and [contract examples](../contracts/examples.md).
 
 Implementation order, deliverables and acceptance gates are in [the phased implementation plan](../implementation/phased-plan.md).
 
@@ -61,6 +61,8 @@ Workers belong to the context whose activities they execute. Discovery pools imp
 Shared-service adapters implement capabilities such as DNS allocation, IP address reservation, backup enrolment and monitoring registration. They run within approved workflow activities. There is no catchall integrations service with independent business authority.
 
 ## 4. Product model
+
+The [domain model](../product/domain-model.md) owns detailed candidate cardinalities, invariants and examples, including proposed `ApplicationDeployment` and `WorkloadPlacement` records. This table identifies the principal cross-context responsibilities; it does not override that specification or turn ADR-013 into an accepted decision.
 
 | Entity | Owner | Meaning and essential relationships |
 | --- | --- | --- |
@@ -186,7 +188,7 @@ Database upgrades use compatible expand/contract changes. Running workflows and 
 
 ## 10. Decisions and phased realization
 
-P00 records dependency compatibility, exact versions, identity provider integration, broker, database isolation, object retention, Kubernetes distribution, site connectivity, secrets technology, approved native environments and measurable service objectives. All are explicit decisions rather than implied facts from this architecture.
+P00 records the compatibility and architecture decisions needed to begin implementation, candidate native environments and measurable objectives. The decision register distinguishes required-now choices, constrained provisional choices and later refinements. Installed tuple confirmation, detailed admission policy and final release support scope close at their applicable checkpoints rather than all being claimed settled in P00.
 
 P01 establishes delivery foundations. P02 delivers governance and P03 the catalogue. P04 adds read-only inventory; P05 adds planning. P06 proves durable workflows and failure semantics using simulation. P07 qualifies native provisioning. P08 qualifies the selected VMware-to-OpenStack migration. P09 expands supported platforms and capability combinations. P10 completes enterprise operational readiness. P11 performs pilot acceptance and general-availability release.
 
