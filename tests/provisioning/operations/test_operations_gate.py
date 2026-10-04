@@ -15,6 +15,7 @@ from provisioner.controlplane.operations.action_gate import (
 )
 from tests.provisioning.operations.campaign_fixtures import AS_OF, fixture
 from tests.provisioning.operations.test_release import TestSigner
+from tests.provisioning.operations.signed_intake_fixtures import minimum_prerequisite_artifacts
 
 
 class Cursor:
@@ -33,7 +34,10 @@ class Evidence:
         self.checks = 0
         self.evidence = self
     def get(self, context, key):
-        return self.retained
+        if key in getattr(self, 'artifacts', {}):
+            return (SimpleNamespace(event_key=key, evidence_kind='VERIFICATION_RESULT',
+                subject_id=self.retained[0].subject_id), self.artifacts[key])
+        return self.retained if self.retained and self.retained[0].event_key == key else None
     def require(self, context):
         self.checks += 1
 
@@ -45,6 +49,7 @@ class OperatingGateTests(unittest.TestCase):
             job_id='job-fixture', plan_id='plan-fixture', plan_revision=1,
             plan_digest='c' * 64, revocation_epoch=0)
         self.signer = TestSigner()
+        self.observer = TestSigner('synthetic-separate-prerequisite-observer')
         self.payload = {'format': 'hosting-selected-operating-acceptance/1',
             'scopeDigest': scope_digest(self.selection), 'sourceCommit': self.selection['sourceCommit'],
             'planId': self.admitted.plan_id, 'revocationEpoch': 0,
@@ -60,10 +65,12 @@ class OperatingGateTests(unittest.TestCase):
                 for ident in sorted(MINIMUM_PREREQUISITES)]}
         self.evidence = Evidence()
         self.gate = OperationsActionGate(evidence_gate=self.evidence, operating_verifier=self.signer,
-                                         operating_key_ids=frozenset({self.signer.key_id}))
+            operating_key_ids=frozenset({self.signer.key_id}), observer_verifier=self.observer,
+            observer_key_ids=frozenset({self.observer.key_id}))
         self.retain()
 
     def retain(self):
+        self.evidence.artifacts = minimum_prerequisite_artifacts(self.payload, self.observer)
         envelope = {'payload': self.payload, 'keyId': self.signer.key_id,
                     'signature': base64.b64encode(self.signer.sign(_canonical(self.payload))).decode()}
         digest = acceptance_digest(envelope)
@@ -75,6 +82,29 @@ class OperatingGateTests(unittest.TestCase):
     def test_current_actual_signed_retained_prerequisites_and_epoch_pass_synthetic_fixture(self):
         self.gate.require_action(Cursor(), self.admitted, self.selection, 'VM_CREATE')
         self.assertEqual(self.evidence.checks, 2)
+
+    def test_signed_acceptance_with_missing_or_changed_original_prerequisite_is_held(self):
+        fact = self.payload['prerequisites'][0]
+        original = self.evidence.artifacts.pop(fact['evidenceRef'])
+        with self.assertRaisesRegex(AuthorityDenied, 'prerequisite bytes'):
+            self.gate.require_action(Cursor(), self.admitted, self.selection, 'VM_CREATE')
+        self.evidence.artifacts[fact['evidenceRef']] = original
+        original['payload']['observerRef'] = 'controlled-observer:forged'
+        with self.assertRaises(AuthorityDenied):
+            self.gate.require_action(Cursor(), self.admitted, self.selection, 'VM_CREATE')
+        # Original held facts remain locally inspectable and confer no credential.
+        self.gate.require_observation(Cursor(), self.admitted, self.selection)
+
+    def test_raw_measurements_and_separate_current_observer_cannot_be_replaced_by_acceptance(self):
+        fact = self.payload['prerequisites'][0]
+        proof = self.evidence.artifacts[fact['evidenceRef']]
+        del self.evidence.artifacts[proof['payload']['observationEventKey']]
+        with self.assertRaisesRegex(AuthorityDenied, 'measurements'):
+            self.gate.require_action(Cursor(), self.admitted, self.selection, 'VM_CREATE')
+        self.retain()
+        self.gate.observer_keys = frozenset({'withdrawn-observer'})
+        with self.assertRaises(AuthorityDenied):
+            self.gate.require_action(Cursor(), self.admitted, self.selection, 'VM_CREATE')
 
     def test_absent_record_bool_claim_or_modified_signature_never_allows_native_write(self):
         retained = self.evidence.retained

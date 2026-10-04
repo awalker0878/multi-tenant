@@ -25,7 +25,7 @@ ALLOWED_OPERATIONS = frozenset({
     'DISCOVER_READ', 'VM_CREATE', 'VM_POWER', 'DISK_ATTACH', 'NETWORK_ATTACH',
     'SNAPSHOT_CREATE', 'SNAPSHOT_EXPORT', 'SNAPSHOT_IMPORT', 'RESTORE_DATA',
     'SOURCE_FENCE', 'DESTINATION_ACTIVATE', 'DNS_CHANGE', 'IPAM_RESERVE',
-    'GUEST_CONFIG', 'POLICY_APPLY', 'QUOTA_CHANGE',
+    'GUEST_CONFIG', 'POLICY_APPLY', 'QUOTA_CHANGE', 'NATIVE_CLEANUP',
 })
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _FINGERPRINT = re.compile(r'^[0-9a-f]{64}$')
@@ -183,6 +183,7 @@ class PostgresWorkerGrants:
         _identity(context, identity, at)
         if operation_scope not in (job.source, job.destination):
             raise GrantDenied('Operation scope differs from the approved job')
+        self._conversion(cursor,context,job,operation_scope,operation_kind)
         credential_ref, enrollment_expiry = _enrollment(
             cursor, context, identity, operation_scope, operation_kind, at)
         authority_postgres.revalidate_start(cursor, job, at)
@@ -198,11 +199,34 @@ class PostgresWorkerGrants:
         if enrollment_expiry <= current:
             raise GrantDenied('Worker enrollment expired while waiting for authority')
         authority_postgres.revalidate_start(cursor, job, current)
+        self._conversion(cursor,context,job,operation_scope,operation_kind)
         self._leases.require_current(
             cursor, context, lease_key=lease_key, lease_epoch=lease_epoch,
             job_id=job.job_id, operation_id=operation_id,
             scope=operation_scope, worker_subject=identity.subject)
         return credential_ref, min(identity.expires_at, enrollment_expiry), current
+
+    @staticmethod
+    def _conversion(cursor, context, job, scope, operation_kind):
+        if operation_kind == 'DISCOVER_READ':
+            return
+        # Site workers already see only their started job's exact current
+        # canonical plan/workload under migrations 0016/0017. This read uses
+        # those existing policies and adds no enterprise inventory access.
+        cursor.execute('SELECT w.record_id FROM hosting_controlplane.enterprise_records p '
+            'JOIN hosting_controlplane.enterprise_records w ON '
+            'w.organization_id=p.organization_id AND w.tenant_id=p.tenant_id '
+            "AND w.record_kind='Workload' AND w.record_id=p.record_json->'spec'->>'workloadId' "
+            "AND w.revision=(p.record_json->'spec'->>'workloadRevision')::bigint "
+            'WHERE p.organization_id=%s AND p.tenant_id=%s '
+            "AND p.record_kind='MigrationPlan' AND p.record_id=%s AND p.revision=%s "
+            "AND p.record_json->'metadata'->>'planDigest'=%s",
+            (context.organization_id,context.tenant_id,job.plan_id,job.plan_revision,job.plan_digest))
+        current=cursor.fetchone()
+        if current is None:
+            raise GrantDenied('Exact current canonical plan/workload is unavailable for conversion admission')
+        from provisioner.controlplane.conversion.handover import require_write_admission
+        require_write_admission(cursor,context,security_domain_id=scope.security_domain_id,workload_id=current[0])
 
     def issue_grant(self, context: TenantContext, identity: VerifiedWorkerIdentity,
                     request: GrantRequest) -> WorkerGrant:
@@ -221,6 +245,10 @@ class PostgresWorkerGrants:
                     operation_kind=request.operation_kind,
                     operation_scope=request.operation_scope,
                     lease_key=request.lease_key, lease_epoch=request.lease_epoch, at=at)
+                operation_owner = getattr(self._leases, 'require_operation', None)
+                if operation_owner is not None:
+                    operation_owner(cursor, context, lease_key=request.lease_key,
+                                    operation_kind=request.operation_kind, step_id=request.step_id)
                 # The authority check verifies every approval's validity at
                 # issue time. Grant lifetime remains short and is rechecked
                 # against approvals at each subsequent use.
@@ -336,6 +364,10 @@ class PostgresWorkerGrants:
             cursor, context, identity, job, operation_id=operation_id,
             operation_kind=operation_kind, operation_scope=operation_scope,
             lease_key=lease_key, lease_epoch=lease_epoch, at=at)
+        operation_owner = getattr(self._leases, 'require_operation', None)
+        if operation_owner is not None:
+            operation_owner(cursor, context, lease_key=lease_key,
+                            operation_kind=operation_kind, step_id=step_id)
         if expires <= checked_at:
             raise GrantDenied('Worker grant expired while waiting for authority')
         grant = WorkerGrant(grant_id, context.organization_id,
@@ -392,5 +424,30 @@ class CredentialBroker:
             operation_id=operation_id, operation_kind=operation_kind,
             operation_scope=operation_scope, lease_key=lease_key,
             lease_epoch=lease_epoch,
+            use=lambda reference, grant, expiry: self._issuer.issue(
+                reference, grant=grant, expires_at=expiry))
+
+    def acquire_observation(self, cursor, transport_evidence: object,
+                            context: TenantContext, grant_id: str, **binding):
+        """Mint a fixed read handle in the original proof transaction.
+
+        A registry proof already holds the independent reader's job and native
+        lease locks. Opening another grant connection there can deadlock that
+        same reader. Reuse the actual transaction and every ordinary B10 check;
+        this port cannot issue mutation credentials or accept a fake cursor.
+        """
+        import psycopg
+        from .vault import VaultDynamicCredentialIssuer
+        if (not isinstance(cursor, psycopg.Cursor)
+                or cursor.connection.autocommit
+                or cursor.connection.info.transaction_status != psycopg.pq.TransactionStatus.INTRANS
+                or not isinstance(self._grants, PostgresWorkerGrants)
+                or not isinstance(self._issuer, VaultDynamicCredentialIssuer)
+                or binding.get('operation_kind') != 'DISCOVER_READ'):
+            raise GrantDenied('Actual in-progress observation transaction and read credential owners required')
+        identity = self._identities.verify(transport_evidence)
+        if not isinstance(identity, VerifiedWorkerIdentity):
+            raise GrantDenied('Independent worker identity verification is required')
+        return self._grants._verify_common(cursor, context, identity, grant_id, **binding,
             use=lambda reference, grant, expiry: self._issuer.issue(
                 reference, grant=grant, expires_at=expiry))

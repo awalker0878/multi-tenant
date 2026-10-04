@@ -41,6 +41,8 @@ GUEST_PACKAGE_SOURCE = (
     'provisioner/execution/wsd_handoff.py',
     'provisioner/execution/guest_inventory.py',
     'provisioner/execution/guest_services.py',
+    'provisioner/execution/guest_command_client.py',
+    'provisioner/execution/guest_native_profiles.py',
     'provisioner/execution/restic_run.py',
 )
 REFERENCES = {'target_binding_ref', 'bootstrap_ref', 'writer_coordination_ref', 'runtime_ref', 'recovery_ref'}
@@ -92,7 +94,8 @@ def runtime_record(python, ssh):
 def source_paths(root):
     require(isinstance(root, Path), 'An explicit current source checkout is required')
     paths = [root / PLAYBOOK, root / 'ansible/filter_plugins/guest_filters.py',
-             root / 'ansible/callback_plugins/hosting_guest_result.py']
+             root / 'ansible/callback_plugins/hosting_guest_result.py',
+             root / 'ansible/connection_plugins/hosting_guarded_ssh.py']
     paths += [root / name for name in GUEST_PACKAGE_SOURCE]
     for role in ('linux_guest_baseline', 'linux_guest_services', 'linux_guest_backup'):
         tasks = root / f'ansible/roles/{role}/tasks/main.yml'

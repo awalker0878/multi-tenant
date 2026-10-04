@@ -32,11 +32,15 @@ KINDS = {
     'terraform_approval': ({'prepared_step'}, {'approval'}, set()),
     'guest_plan': ({'workload_step','python','python_sha256','ssh','ssh_sha256','mode','max_seconds'}, {'access','references','ssh_key','ssh_certificate'}, set()),
     'guest_apply': ({'prepared_step'}, {'approval'}, set()),
+    'windows_guest_apply': (set(), {'windows_selection','winrm_ca'}, set()),
+    'windows_guest_observe': ({'original_operation_id'}, {'windows_selection','original_windows_selection','winrm_ca'}, set()),
+    'windows_guest_remediate': ({'original_operation_id'}, {'windows_selection','original_windows_selection','winrm_ca'}, set()),
     'vsphere_power': ({'workload_step','member'}, {'request','authority','session'}, {'ca_file'}),
     'target_campaign': ({'ssh','ssh_sha256'}, {'plan','authority'}, set()),
     'edge_policy': ({'nft','nft_sha256','mode'}, {'spec','authority'}, set()),
     'ipam': ({'action'}, {'request','authority','token_file'}, {'ca_bundle','release_evidence'}),
     'dns': ({'action'}, {'allocation','confirmation','job','scope','authority','token_file','tsig_file'}, {'ca_bundle','registration_job','registration_scope'}),
+    'dns_cutover': ({'prior_operation_id'}, {'allocation','confirmation','job','scope','registration'}, {'ca_bundle'}),
     'dns_propagation': ({'dns_step'}, {'config','secrets'}, set()),
 }
 
@@ -60,11 +64,37 @@ def dependency(step, selected, expected, plan, base):
     return base/'steps'/selected
 
 
-def validate_packet(step, packet, plan, base, *, root=SOURCE_ROOT):
+def validate_packet(step, packet, plan, base, *, root=SOURCE_ROOT,enrolled_dns_context=None):
+    require(enrolled_dns_context is None or step['kind']=='dns_propagation',
+            'Fresh DNS read authentication belongs only to its selected resolver observation')
     params, required, optional = KINDS[step['kind']]
     c.exact_keys(packet['parameters'], params)
     c.exact_keys(packet['files'], required, optional)
     files = file_paths(packet); values=packet['parameters']; kind=step['kind']
+    if kind in {'windows_guest_apply','windows_guest_observe','windows_guest_remediate'}:
+        from provisioner.execution.windows_guest import WindowsGuestSelection
+        selected=WindowsGuestSelection(read_private(files['windows_selection']))
+        descriptor=selected.to_dict()
+        require(descriptor['native_binding']['platformFamily']==plan['scope']['platform']
+                and descriptor['ca_sha256']==digest(read_private(files['winrm_ca'])),
+                'Windows native platform or WinRM listener trust differs from the selected delivery')
+        if kind!='windows_guest_apply':
+            from provisioner.controlplane.workflow.approval_gate import _valid_id
+            require(_valid_id(values['original_operation_id']), 'The exact original Windows native operation is required')
+            original=WindowsGuestSelection(read_private(files['original_windows_selection']))
+            original.require_same_services(selected)
+            if kind=='windows_guest_observe':
+                require(original.to_dict()['mapped_user'].lower()!=descriptor['mapped_user'].lower()
+                        and original.to_dict()['certificate_upn'].lower()!=descriptor['certificate_upn'].lower(),
+                        'Independent Windows readback must use its separately enrolled native identity')
+    if kind=='dns_cutover':
+        from provisioner.execution import dns_change
+        from provisioner.controlplane.workflow.approval_gate import _valid_id
+        allocation=load_private(files['allocation']); match_scope(allocation['scope'],plan)
+        job,scope=load_private(files['job']),load_private(files['scope'])
+        dns_change.validate(job,scope)
+        require(_valid_id(values['prior_operation_id']) and job['previous_marker'] is not None,
+                'Traffic switching requires the exact prior resolved native DNS generation')
     if kind=='openstack_quota':
         from provisioner.execution.openstack_quota import validate
         request=load_private(files['request']); validate(request)
@@ -73,7 +103,12 @@ def validate_packet(step, packet, plan, base, *, root=SOURCE_ROOT):
     if kind=='dns_propagation':
         from provisioner.execution.dns_propagation import validate
         job,scope,receipt=dns_handoff(step,packet,plan,base)
-        validate(load_private(files['config']),job,scope,receipt,load_private(files['secrets']))
+        if enrolled_dns_context is not None:
+            from provisioner.controlplane.reconciliation.service_propagation import EnrolledDnsPropagationContext
+            require(type(enrolled_dns_context) is EnrolledDnsPropagationContext,
+                    'Concrete enrolled DNS observer contact required')
+            enrolled_dns_context.validate(load_private(files['config']),job,scope,receipt)
+        else: validate(load_private(files['config']),job,scope,receipt,load_private(files['secrets']))
     for binary in ('terraform','python','ssh','nft','restic'):
         if binary in values:
             path=Path(values[binary])
@@ -292,6 +327,8 @@ def dispatch(step, packet, directory, base, plan, root, *, transfer_guard=None, 
             'An ephemeral OpenStack context belongs only to its selected saved-plan apply')
     validate_packet(step,packet,plan,base,root=root)
     files=file_paths(packet); values=packet['parameters']; kind=step['kind']; names=[]
+    require(kind not in {'windows_guest_apply','windows_guest_observe','windows_guest_remediate','dns_cutover'},
+            'This selected native step requires its actual enrolled runtime owner')
     if kind=='openstack_quota':
         return quota_dispatch(step,packet,directory,base,plan,root)
     if kind=='remote_owner':
@@ -603,11 +640,97 @@ def transfer_postcondition(packet,directory,plan):
 
 
 def typed_postcondition(step,result,directory,packet,plan):
-    """Validate the owner's typed result before publishing a completion marker.
-
-    These statuses keep planning, application, observation and independent
-    acceptance distinct. None grants production activation.
-    """
+    """Validate exact owner results before publishing a completion marker."""
+    if step['kind'] in {'windows_guest_apply','windows_guest_remediate','windows_guest_observe'}:
+        from provisioner.execution.windows_guest import WindowsGuestSelection
+        files=file_paths(packet); descriptor=WindowsGuestSelection(read_private(files['windows_selection']))
+        body=descriptor.to_dict(); readonly=step['kind']=='windows_guest_observe'
+        require(result.get('native_acceptance') is False and result.get('production_activation') is False
+                and result.get('selection_sha256')==descriptor.sha256
+                and result.get('native_binding')==descriptor.to_dict()['native_binding']
+                and result.get('source_commit')==plan['source_commit'] and result.get('scope')==plan['scope'],
+                'Windows completion must bind the exact native guest, source and selected service descriptor')
+        operation=result.get('read_operation_id' if readonly else 'operation_id')
+        require(isinstance(operation,str) and isinstance(result.get('job_id'),str),
+                'Windows completion requires its actual original command and job identities')
+        if readonly:
+            require(result.get('format')=='hosting-independent-windows-services/1'
+                    and result.get('status')=='SERVICE_POSTCONDITIONS_VERIFIED_REQUIRES_NATIVE_EXCLUSION'
+                    and result.get('native_quiesced') is False
+                    and isinstance(result.get('reader_subject'),str)
+                    and result['reader_subject']!=result.get('original_worker_subject')
+                    and isinstance(result.get('reader_certificate_digest'),str)
+                    and c.HEX.fullmatch(result['reader_certificate_digest']),
+                    'Independent Windows service readback cannot assert old native command exclusion or acceptance')
+        else:
+            require(result.get('format')=='hosting-windows-guest-result/1'
+                    and result.get('status')=='CONFIGURED_REQUIRES_NATIVE_ACCEPTANCE'
+                    and result.get('guest_profile')=='windows-server-2022',
+                    'Windows service configuration remains subject to independent native acceptance')
+        if step['kind']!='windows_guest_apply':
+            original=WindowsGuestSelection(read_private(files['original_windows_selection']))
+            original.require_same_services(descriptor)
+            require(result.get('original_operation_id')==packet['parameters']['original_operation_id']
+                    and result.get('original_selection_sha256')==original.sha256
+                    and isinstance(result.get('original_request_digest'),str)
+                    and c.HEX.fullmatch(result['original_request_digest']),
+                    'Windows follow-up completion changed the original native intent or selected input')
+        expected=[('IDENTITY',None)]
+        for service in body['services']:
+            expected += [('OBSERVE_SERVICE',service)] if readonly else [
+                ('OBSERVE_SERVICE',service),('SET_STARTUP',service),
+                ('START_SERVICE' if service['state']=='Running' else 'STOP_SERVICE',service),('OBSERVE_SERVICE',service)]
+        observations=result.get('observations')
+        require(isinstance(observations,list) and len(observations)==len(expected),
+                'Windows completion requires every exact fixed service observation')
+        for observed,(action,service) in zip(observations,expected):
+            require(isinstance(observed,dict) and observed.get('format')=='hosting-windows-guest-observation/1'
+                    and (observed.get('action'),observed.get('job_id'),observed.get('operation_id'),observed.get('selection_sha256'))==
+                        (action,result['job_id'],operation,descriptor.sha256),
+                    'Windows observation changed its original command, source or descriptor')
+            identity=observed.get('observation',{})
+            require(identity.get('build')=='20348' and identity.get('machine_guid')==body['machine_guid']
+                    and identity.get('native_uuid')==body['native_uuid']
+                    and identity.get('principal','').lower()==body['mapped_user'].lower(),
+                    'Windows completion contains another guest or native identity')
+            if service is not None:
+                row=identity.get('service',{})
+                require(row.get('name')==service['name'] and row.get('image_path')==service['image_path']
+                        and row.get('executable_sha256')==service['binary_sha256'],
+                        'Windows completion contains another service or executable')
+        for index,service in enumerate(body['services']):
+            row=observations[1+index if readonly else 4+4*index]['observation']['service']
+            require(row.get('state')==service['state'] and row.get('startup')==
+                    {'Automatic':'Auto','Manual':'Manual','Disabled':'Disabled'}[service['startup']],
+                    'Windows completion must independently observe its selected service postconditions')
+        return
+    if step['kind']=='dns_cutover':
+        from provisioner.execution import dns_change
+        files=file_paths(packet)
+        require(result.get('format')=='hosting-netbox-dns-receipt/1'
+                and result.get('status')=='AUTHORITATIVE_REGISTRATION_OBSERVED'
+                and result.get('activation_authorized') is False and result.get('reusable') is False
+                and result.get('native_acceptance') is False and result.get('production_activation') is False
+                and result.get('dns',{}).get('status') in dns_change.STATES
+                and result['dns']['job_sha256']==c.digest(load_private(files['job']))
+                and result['dns']['scope_sha256']==c.digest(load_private(files['scope']))
+                and type(result.get('service_observation_digest')) is str
+                and c.HEX.fullmatch(result['service_observation_digest']),
+                'Traffic completion requires the exact non-accepting primary generation and independent readback')
+        return
+    if step['kind']=='dns_propagation' and result.get('format')=='hosting-enrolled-dns-propagation/1':
+        from provisioner.execution.dns_propagation import STATUS
+        config=load_private(file_paths(packet)['config']); observed=result.get('observation',{})
+        require(result.get('native_acceptance') is False and result.get('production_activation') is False
+                and result['original_config_digest']==c.digest(config)
+                and observed.get('status')==STATUS and observed.get('activation_authorized') is False
+                and observed.get('reusable') is False
+                and observed.get('job_sha256')==config['job_sha256']
+                and observed.get('scope_sha256')==config['scope_sha256']
+                and observed.get('primary_receipt_sha256')==config['receipt_sha256']==result['primary_receipt_digest']
+                and len(observed.get('observations',[]))==2*len(config['targets']),
+                'Resolver completion must preserve every selected view, generation and independent primary receipt')
+        return
     expected={
         'platform_transition':'TRANSITION_REQUIRES_EXACT_PLAN_REVIEW',
         'workload_inputs':'BOUND_WORKLOAD_DRAFT_REQUIRES_REVIEW',
@@ -753,7 +876,10 @@ def quota_dispatch(step,packet,directory,base,plan,root,*,observe=False,recovery
 
 
 def dns_handoff(step,packet,plan,base):
-    upstream=dependency(step,packet['parameters']['dns_step'],'dns',plan,base)
+    selected=packet['parameters']['dns_step']
+    kind=next(item['kind'] for item in plan['steps'] if item['id']==selected)
+    require(kind in {'dns','dns_cutover'}, 'Resolver observation requires a completed selected authoritative DNS owner')
+    upstream=dependency(step,selected,kind,plan,base)
     parent=load_private(upstream/'packet.json')
     files=file_paths({'files':{key:parent['files'][key] for key in ('allocation','job','scope')}})
     match_scope(load_private(files['allocation'])['scope'],plan)

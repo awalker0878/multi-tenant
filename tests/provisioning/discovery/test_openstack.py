@@ -43,6 +43,8 @@ def responses():
         (ENDPOINTS.compute, 'servers/detail', None): {
             'servers': [{'id': VM1, 'tenant_id': PROJECT, 'name': 'app',
                          'status': 'ACTIVE',
+                         'locked': False,'OS-EXT-STS:vm_state':'active','OS-EXT-STS:task_state':None,
+                         'OS-EXT-STS:power_state':1,'OS-EXT-AZ:availability_zone':'az-1',
                          'flavor': {'vcpus': 4, 'ram': 8192, 'disk': 20,
                                     'ephemeral': 0, 'swap': 0},
                          'image': {'id': VM3},
@@ -123,6 +125,18 @@ class OpenStackDiscoveryTests(unittest.TestCase):
         self.assertEqual(facts['image']['minDiskBytes'], 20 * 1024**3)
         self.assertNotIn('compatible', facts['image'])
         self.assertNotIn('guestDriverReady', facts['image'])
+
+    def test_exact_extended_server_states_are_observations_and_omission_is_unknown(self):
+        values=responses();server=values[(ENDPOINTS.compute,'servers/detail',None)]['servers'][0]
+        result=self._collected(values);facts={fact.name:fact for fact in next(obj for obj in result.objects if obj.identity.resource_kind=='vm').facts}
+        self.assertIs(facts['locked'].value(),False);self.assertIsNone(facts['nativeTaskState'].value())
+        self.assertEqual(facts['nativePowerState'].value(),1)
+        del server['OS-EXT-STS:power_state']
+        result=self._collected(values);facts={fact.name:fact for fact in next(obj for obj in result.objects if obj.identity.resource_kind=='vm').facts}
+        self.assertEqual(facts['nativePowerState'].state,'UNKNOWN');self.assertEqual(result.completeness,'PARTIAL')
+        for value in (True,'1',-1,2,2**63):
+            server['OS-EXT-STS:power_state']=value
+            with self.subTest(value=value),self.assertRaises((ValueError,OpenStackDiscoveryHeld)):self._collected(values)
 
 
     def test_referenced_image_metadata_is_bounded_observation_not_compatibility(self):

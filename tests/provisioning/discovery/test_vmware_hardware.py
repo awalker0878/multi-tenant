@@ -63,6 +63,29 @@ def observed(value=None, **kwargs):
 
 
 class VmwareHardwareTests(unittest.TestCase):
+    def test_configured_controller_models_sharing_pci_and_boot_sequence_are_observed(self):
+        value=detail();value.update(scsi_adapters={'1000':{'type':'PVSCSI','scsi':{'bus':0,'unit':7},'sharing':'PHYSICAL','pci_slot_number':160}},
+            sata_adapters={},nvme_adapters={},boot_devices=[{'type':'ETHERNET','nic':'4000'}, {'type':'DISK','disks':['2000']}],
+            hardware={'version':'VMX_21'},instant_clone_frozen=False)
+        result,facts,_=observed(value)
+        self.assertEqual(facts['scsiControllers'].value()[0]['model'],'PVSCSI')
+        self.assertEqual(facts['scsiControllers'].value()[0]['pciSlotNumber'],160)
+        self.assertEqual(facts['scsiBusSharing'].value(),[{'nativeControllerId':'1000','sharing':'PHYSICAL'}])
+        self.assertEqual(facts['configuredBootDevices'].value()[0]['nativeNicId'],'4000')
+        self.assertEqual(facts['configuredBootDevices'].value()[1]['nativeDiskIds'],['2000'])
+        self.assertEqual(facts['hardwareVersion'].value(),'VMX_21');self.assertIs(facts['instantCloneFrozen'].value(),False)
+        self.assertEqual(facts['sharedDisks'].state,'UNKNOWN');self.assertEqual(facts['architecture'].state,'UNKNOWN')
+        value['scsi_adapters']['1000']['sharing']=False
+        self.assertEqual(observed(value)[1]['scsiControllers'].reason,'COLLECTION_ERROR')
+        value['boot_devices'][1]['disks']=['foreign']
+        self.assertEqual(observed(value)[1]['configuredBootDevices'].reason,'COLLECTION_ERROR')
+
+    def test_explicit_native_default_boot_sequence_never_invents_boot_disk(self):
+        value=detail();value['boot_devices']=[]
+        self.assertEqual(observed(value)[1]['configuredBootDevices'].value(),[])
+        del value['boot_devices']
+        self.assertEqual(observed(value)[1]['configuredBootDevices'].reason,'NOT_RETURNED')
+
     def test_native_hardware_flows_into_campaign_and_normalization(self):
         result, facts, transport = observed()
         self.assertEqual(transport.calls, [LIST, DETAIL])

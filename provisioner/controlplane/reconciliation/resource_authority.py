@@ -72,7 +72,8 @@ class PostgresResourceAuthority:
             execution=plan['spec'].get('execution')
             if (not isinstance(execution,dict)
                     or execution.get('format')!='hosting-execution-selection/1'
-                    or execution.get('driver')!='openstack-linux-rebuild/1'
+                    or execution.get('driver') not in {
+                        'openstack-linux-rebuild/1', 'openstack-linux-application-staging/1'}
                     or execution.get('artifactDigest')!=bundle.selection_digest
                     or (plan['spec']['workloadId'],plan['spec']['workloadRevision'])!=
                        (bundle.workload_id,bundle.workload_revision)):

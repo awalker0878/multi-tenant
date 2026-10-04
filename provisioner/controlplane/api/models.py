@@ -321,7 +321,10 @@ class ReviewScope(_StrictModel):
 
 
 class ExecutionReview(_StrictModel):
-    driver: Literal['openstack-linux-rebuild/1']
+    driver: Literal['openstack-linux-rebuild/1', 'openstack-linux-application-staging/1',
+                    'openstack-linux-application-cutover/1', 'openstack-linux-application-database/1',
+                    'application-postwrite-recovery/1', 'windows-server-2022-existing-services/1',
+                    'vmware-openstack-cold-capture/1']
     artifact_digest: str = Field(alias='artifactDigest', pattern='^[0-9a-f]{64}$')
 
 

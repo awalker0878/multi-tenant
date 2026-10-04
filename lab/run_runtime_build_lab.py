@@ -102,6 +102,21 @@ def run(terraform):
         python=Path(config['output'])/'env/bin/python'
         host.command([python,'-I','-c','import ansible, jinja2, yaml, dns.resolver, cryptography, provisioner.execution.owner_worker; print(ansible.__version__)'],base)
         d.build(config,None,host=host,observe=True)
+        # Exercise the new operating identity with the *actual* sealed Python,
+        # accepted application wheel and installed tree in an empty network
+        # namespace. This is installation verification, not commissioning.
+        identity_config=base/'installed-identity-config.json'
+        write_new(identity_config,encoded(config))
+        identity_code=('from pathlib import Path;import sys;'
+            'from provisioner.controlplane.workflow.installed_identity import InstalledApplicationIdentity;'
+            'identity=InstalledApplicationIdentity.from_configuration(Path(sys.argv[1]),Path(sys.argv[2]));'
+            'assert identity.require_current()==(sys.argv[3],sys.argv[4]);'
+            'print("SEALED_INSTALLED_IDENTITY_VERIFIED")')
+        application=next(row for row in config['wheels'] if row['name']=='hosting-provisioner')
+        identity_result=host.command([python,'-I','-B','-c',identity_code,identity_config,ROOT,
+                                     source['commit'],application['sha256']],base)
+        require(identity_result.strip()=='SEALED_INSTALLED_IDENTITY_VERIFIED',
+                'Actual installed interpreter identity was not verified')
         # A transitive omission is permitted by the request schema but must fail
         # the actual offline dependency check, without a completed receipt.
         missing=deepcopy(config); missing['output']=str(base/'missing-dependency')
@@ -123,7 +138,8 @@ def run(terraform):
         return dict(status='PASSED_OFFLINE_RUNTIME_ENGINE_ONLY',source_commit=source['commit'],python=platform.python_version(),
             packages=receipt['packages'],sealed_entries=len(receipt['files']),empty_network_namespace=True,
             offline_build=True,missing_dependency_held=True,incomplete_build_not_repeated=True,changed_runtime_held=True,
-            ordinary_imports_preserve_seal=True,production_activation=False,native_qualification=False,
+            ordinary_imports_preserve_seal=True,installed_identity_verified=True,
+            production_activation=False,native_qualification=False,
             provenance='Disposable candidate wheel and Terraform packaging; hosted base custody not production-qualified')
 
 

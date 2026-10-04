@@ -4,6 +4,10 @@
   "organizationId": "organization-1",
   "tenantId": "tenant-1",
   "tokenFile": "/etc/hosting/discovery/monitors/service-access-token",
+  "serviceEnrollment": {
+    "file": "/etc/hosting/discovery/monitors/service-enrollment.json",
+    "digest": "REPLACE_WITH_ACTUAL_MANIFEST_SHA256"
+  },
   "targets": [
     {
       "environmentId": "environment-1",
@@ -28,6 +32,8 @@
     "caDigest": "REPLACE_WITH_CA_SHA256",
     "credentialFile": "/etc/hosting/discovery/monitors/alert-owner-access-token",
     "receiptPublicKey": "REPLACE_WITH_BASE64_ED25519_OWNER_PUBLIC_KEY",
+    "ownershipPublicKey": "REPLACE_WITH_SEPARATE_BASE64_ED25519_ONCALL_AUTHORITY_KEY",
+    "minimumOwnershipRevision": 1,
     "timeoutSeconds": 5
   }
 }

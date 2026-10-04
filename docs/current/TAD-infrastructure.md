@@ -37,9 +37,9 @@ The installed collector composes three exact read-only profiles:
 
 | Platform | Collector selector | Native read boundary |
 |---|---|---|
-| VMware | `vcenter-rest-vm-info-8.0.3.0-visible-only-2` | Reviewed folders and list-derived VM detail; captured visible set, not invented native paging. |
-| AHV | `nutanix-ahv-v4.0-hardware-2` | Pinned VMM v4.0 VM reads and typed boot/device facts. |
-| OpenStack | `openstack-project-https-4` | Exact project Nova 2.79, Cinder 3.60, Neutron v2.0 and Glance v2 roots; image reads are limited to UUIDs referenced by captured Nova servers. |
+| VMware | `vcenter-rest-vm-info-8.0.3.0-visible-only-3` | Reviewed folders and list-derived VM detail; captured visible set, not invented native paging. |
+| AHV | `nutanix-ahv-v4.0-hardware-3` | Pinned VMM v4.0 VM reads and typed boot/device facts. |
+| OpenStack | `openstack-project-https-5` | Exact project Nova 2.79, Cinder 3.60, Neutron v2.0 and Glance v2 roots; image reads are limited to UUIDs referenced by captured Nova servers. |
 
 Native material is independently signed and bound to campaign, environment, credential
 reference, service identity, TLS origin/IP/CA and validity. Current campaign enrollment

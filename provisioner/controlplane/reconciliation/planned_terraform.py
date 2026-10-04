@@ -93,7 +93,10 @@ class VaultOpenStackCredentialConsumer:
                     or payload.get('auth') is not None or payload.get('wrap_info') is not None):
                 raise GrantDenied('Dynamic role must return one bounded native/backend lease')
             process_environment(data['environment'])
-            return data,min(handle.expires_at,grant.expires_at,_now()+timedelta(seconds=seconds)),digest(lease_id.encode())
+            expiry=min(handle.expires_at,grant.expires_at,_now()+timedelta(seconds=seconds))
+            if self.issuer._lease_store is not None:
+                self.issuer._lease_store.consumed(handle,grant,lease_id,expiry)
+            return data,expiry,digest(lease_id.encode())
         except (OSError,TimeoutError,ssl.SSLError,http.client.HTTPException,ValueError,UnicodeError) as exc:
             raise GrantDenied('Ephemeral OpenStack credential consumption failed') from exc
         finally:
@@ -249,6 +252,8 @@ class EphemeralOpenStackApplyContext:
                 'Independent current native readback must cover every selected target VM')
         self.runtime.registry.acknowledge_created(self.runtime.context,self.runtime.lease,
             self.runtime.grant.operation_id,self.runtime.identity,observed)
+        self.runtime.retirement.retire(self.runtime,self.admitted,self.selection)
+        self.runtime.resource_accounting.confirm_creation(self.runtime,self.admitted,self.selection,self.bundle,observed)
 
 
 class PlannedTerraformRuntime:
@@ -257,7 +262,7 @@ class PlannedTerraformRuntime:
                  registry: PlannedNativeCreationRegistry, grants: PostgresWorkerGrants,
                  identity: VerifiedWorkerIdentity, grant: WorkerGrant,
                  broker: CredentialBroker, transport_evidence,
-                 authority: PostgresExecutionAuthority, bundles, observer):
+                 authority: PostgresExecutionAuthority, bundles, observer, resource_accounting=None):
         if (not isinstance(context,TenantContext) or not isinstance(lease,PlannedResourceLease)
                 or not isinstance(registry,PlannedNativeCreationRegistry)
                 or not isinstance(grants,PostgresWorkerGrants) or registry._grants is not grants
@@ -280,6 +285,17 @@ class PlannedTerraformRuntime:
         self.identity,self.grant,self.broker=identity,grant,broker
         self.transport_evidence,self.authority,self.bundles,self.observer=transport_evidence,authority,bundles,observer
         self.consumer=VaultOpenStackCredentialConsumer(broker._issuer)
+        from provisioner.controlplane.worker.native_retirement import CompletedNativeGrantRetirement
+        self.retirement=CompletedNativeGrantRetirement(store=broker._issuer._lease_store,
+            issuer=broker._issuer,grants=grants)
+        from .application_accounting import ApplicationResourceAccounting
+        if resource_accounting is None:
+            resource_accounting=ApplicationResourceAccounting(resources=registry.leases.resources,destination=observer)
+        require(type(resource_accounting) is ApplicationResourceAccounting
+                and resource_accounting.resources is registry.leases.resources
+                and resource_accounting.destination is observer,
+                'Concrete independently enrolled resource accounting must precede target delivery completion')
+        self.resource_accounting=resource_accounting
 
     def grant_arguments(self):
         return {'job_id':self.lease.job_id,'step_id':self.grant.step_id,

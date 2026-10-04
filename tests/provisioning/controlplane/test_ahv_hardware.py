@@ -19,6 +19,20 @@ def observed(value):
 
 
 class AhvHardwareTests(unittest.TestCase):
+    def test_native_cpu_pinning_passthrough_agent_and_generation_are_distinct_and_typed(self):
+        source=vm();source['isCpuPassthroughEnabled']=True;source['isAgentVm']=True
+        result,facts=observed(source)
+        self.assertIs(facts['cpuPassthroughEnabled'].value(),True);self.assertIs(facts['agentVm'].value(),True)
+        self.assertIs(facts['vcpuHardPinningEnabled'].value(),False);self.assertEqual(facts['numNumaNodes'].value(),0)
+        self.assertEqual(facts['nativeGenerationUuid'].value(),source['generationUuid'])
+        self.assertNotIn('passthroughDevices',facts);self.assertNotIn('architecture',facts)
+        for field,name in (('isCpuPassthroughEnabled','cpuPassthroughEnabled'),('isVcpuHardPinningEnabled','vcpuHardPinningEnabled'),('isAgentVm','agentVm')):
+            for invalid in ('false',0,{},[]):
+                value=vm();value[field]=invalid
+                with self.subTest(field=field,invalid=invalid):self.assertEqual(observed(value)[1][name].reason,'COLLECTION_ERROR')
+            value=vm();del value[field]
+            self.assertEqual(observed(value)[1][name].reason,'NOT_RETURNED')
+
     def test_explicit_boot_vtpm_and_hardware_survive_normalization(self):
         source = vm()
         source['bootConfig']['isSecureBootEnabled'] = True

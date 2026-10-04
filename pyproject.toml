@@ -36,8 +36,14 @@ hosting-site-worker = "provisioner.controlplane.worker.runtime:main"
 hosting-discovery-ingest = "provisioner.controlplane.discovery.runtime:main"
 hosting-discovery-collect = "provisioner.controlplane.discovery.collector_runtime:main"
 hosting-discovery-monitor = "provisioner.controlplane.discovery.monitor_runtime:main"
+hosting-discovery-alert-owner = "provisioner.controlplane.discovery.alert_receiver:main"
+hosting-discovery-fleet = "provisioner.controlplane.discovery.fleet_read_budget:main"
 hosting-workflow = "provisioner.controlplane.workflow.runtime:main"
 hosting-application-runtime = "provisioner.controlplane.workflow.application_runtime:main"
+hosting-conversion = "provisioner.controlplane.conversion.runtime:main"
+hosting-operating-drill = "provisioner.controlplane.operations.drills:main"
+hosting-qualification-intake = "provisioner.qualification.intake:main"
+hosting-commissioning-dossier = "provisioner.qualification.commissioning:main"
 
 [tool.setuptools.packages.find]
 include = ["provisioner*", "hosting_resources", "tools", "scripts"]

@@ -170,6 +170,7 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
         return 200, value
     finally:
         timer.cancel()
+        cleanup_completed=False
         try:
             # Buffered readers are independently owned; release all local resources
             # before making the endpoint concurrency slot available to another GET.
@@ -183,7 +184,14 @@ def read_json(*, origin: str, connect_ip: str, ca_digest: str,
                 finally:
                     if active[0] is not None:
                         active[0].close()
+            cleanup_completed=True
         finally:
             timer.join()
             if entered:
-                permit.__exit__(None, None, None)
+                # A fleet reservation remains occupied if local close itself
+                # failed. Passing a fabricated successful context exit would
+                # misreport a possibly live socket as released capacity.
+                if cleanup_completed:permit.__exit__(None, None, None)
+                else:
+                    error=NativeReadHeld('Native socket cleanup was not observed')
+                    permit.__exit__(type(error),error,None)

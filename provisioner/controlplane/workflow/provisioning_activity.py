@@ -27,7 +27,9 @@ _OFFLINE = frozenset({'acceptance', 'workload_inputs', 'platform_transition',
 _OPERATIONS = {'terraform_plan': 'DISCOVER_READ', 'terraform_apply': 'VM_CREATE',
     'target_campaign': 'DISCOVER_READ', 'guest_apply': 'GUEST_CONFIG',
     'edge_policy': 'POLICY_APPLY', 'openstack_quota': 'QUOTA_CHANGE',
-    'ipam': 'IPAM_RESERVE', 'dns': 'DNS_CHANGE', 'dns_propagation': 'DISCOVER_READ'}
+    'ipam': 'IPAM_RESERVE', 'dns': 'DNS_CHANGE', 'dns_cutover': 'DNS_CHANGE',
+    'dns_propagation': 'DISCOVER_READ', 'windows_guest_apply': 'GUEST_CONFIG',
+    'windows_guest_remediate': 'GUEST_CONFIG', 'windows_guest_observe': 'DISCOVER_READ'}
 
 
 class FileResourceBundleStore:
@@ -78,11 +80,17 @@ class ProvisioningRuntimeBindings:
     """Only concrete enrolled owners may dispatch a reviewed native stage."""
     def __init__(self, bindings=None):
         from provisioner.controlplane.reconciliation.planned_terraform import PlannedTerraformRuntime
+        from provisioner.controlplane.reconciliation.service_runtime import EnrolledServiceProvisioningRuntime
+        from provisioner.controlplane.reconciliation.service_propagation import EnrolledDnsPropagationRuntime
+        from provisioner.controlplane.worker.windows_commands import ScopedWindowsGuestRuntime
+        from provisioner.controlplane.worker.windows_services import ScopedWindowsServiceReadRuntime
         from provisioner.migration.provisioning import ObservedProvisioningRuntime
         bindings = {} if bindings is None else dict(bindings)
         require(all(isinstance(key, tuple) and len(key) == 2 and
                     all(_valid_id(value) for value in key) and
-                    isinstance(owner, (PlannedTerraformRuntime, ObservedProvisioningRuntime))
+                    isinstance(owner, (PlannedTerraformRuntime, ObservedProvisioningRuntime,
+                                       EnrolledServiceProvisioningRuntime, EnrolledDnsPropagationRuntime,
+                                       ScopedWindowsGuestRuntime, ScopedWindowsServiceReadRuntime))
                     for key, owner in bindings.items()), 'Typed enrolled native stage owners required')
         self.bindings = MappingProxyType(bindings)
 
@@ -92,7 +100,8 @@ class ProvisioningRuntimeBindings:
 
 class ApplicationProvisioningActivities:
     def __init__(self, *, authority, resources, bundles, delivery_directory,
-                 inbox_directory, journals_directory, source_root, native_bindings):
+                 inbox_directory, journals_directory, source_root, native_bindings,
+                 migration_selections=None, staged_resources=None):
         require(isinstance(authority, PostgresExecutionAuthority)
                 and isinstance(resources, ResourceTransactions)
                 and isinstance(bundles, FileResourceBundleStore)
@@ -104,6 +113,27 @@ class ApplicationProvisioningActivities:
         self.journals = private_path(journals_directory, directory=True)
         self.root = Path(source_root)
         self.native_bindings = native_bindings
+        if migration_selections is not None:
+            from provisioner.migration.activities import FileMigrationSelectionStore
+            require(isinstance(migration_selections, FileMigrationSelectionStore),
+                    'Concrete protected lifecycle descriptor owner required')
+        self.migration_selections = migration_selections
+        from types import MappingProxyType
+        from provisioner.controlplane.reconciliation.staged_resources import StagedApplicationResourceAuthority
+        owners = {} if staged_resources is None else dict(staged_resources)
+        require(all(type(owner) is StagedApplicationResourceAuthority and owner.admitted.job_id == job_id
+                    and owner.resources is resources and owner.connect is authority.connect
+                    for job_id, owner in owners.items()),
+                'Current cutover requires actual immutable original resource parents')
+        self.staged_resources = MappingProxyType(owners)
+
+    def _require_ready(self, admitted, selection):
+        if selection['driver'] in {'openstack-linux-application-cutover/1', 'openstack-linux-application-database/1'}:
+            owner = self.staged_resources.get(admitted.job_id)
+            require(owner is not None, 'The concrete independently revalidated staged resource owner is required')
+            owner.bundle_for(admitted, selection)
+            return owner.require_ready(admitted, selection)
+        return self.resources.require_ready(self.bundles(admitted, selection))
 
     @staticmethod
     def _held(request, reason, hold_code=None):
@@ -116,6 +146,9 @@ class ApplicationProvisioningActivities:
                 'Typed admitted resource phase required')
         try:
             _, selection = self.authority.require_current(request.admitted, request.selection_digest, 'IPAM_RESERVE')
+            require(selection['driver'] in {'openstack-linux-rebuild/1', 'openstack-linux-application-staging/1'}
+                    and 'resourceRecoverySelectionDigest' not in selection,
+                    'A current cutover or recovery cannot reserve the original target again')
             bundle = self.bundles(request.admitted, selection)
             result = self.resources.reserve(bundle)
             self.resources.require_ready(bundle)
@@ -135,13 +168,35 @@ class ApplicationProvisioningActivities:
             # The original artifact determines the kind; an activity argument
             # cannot request a different platform action.
             selection = self.authority.selections.load_verified(request.selection_digest)
+            if selection.get('applicationLifecycleSelectionDigest') is not None:
+                require(self.migration_selections is not None,
+                        'The phase-owned lifecycle selection is unavailable')
+                lifecycle = self.migration_selections.lifecycle(
+                    selection['applicationLifecycleSelectionDigest']).to_dict()
+                deferred = {step_id for member in lifecycle['members']
+                            for step_id in member['traffic_steps'].values()}
+                require(request.step_id not in deferred,
+                        'Application traffic can be dispatched only by its exact lifecycle phase')
             binding = selection['stageBindings'].get(request.step_id)
             require(binding is not None, 'Step is absent from the approved selected graph')
             kind = binding['kind']
+            if selection['driver'] in {'openstack-linux-application-cutover/1',
+                    'openstack-linux-application-database/1'} and kind == 'guest_apply':
+                staged = self.staged_resources.get(request.admitted.job_id)
+                if staged is None or not callable(getattr(staged, 'require_guest_ready', None)):
+                    return self._held(request, 'OPERATOR_HOLD', 'ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+                staged.require_guest_ready(request.admitted, selection)
+            from .application_selection import CREATION_STAGES
+            require(selection['driver'] not in {'openstack-linux-application-cutover/1',
+                    'openstack-linux-application-database/1'} or kind not in CREATION_STAGES,
+                    'A current staged cutover cannot create or reserve the original target again')
+            require('resourceRecoverySelectionDigest' not in selection
+                    and 'applicationRecoverySelectionDigest' not in selection,
+                    'Resource recovery requires its fixed original-intent workflow')
             require(kind in _OFFLINE | _OPERATIONS.keys(), 'This stage has no admitted concrete owner')
             operation = _OPERATIONS.get(kind, 'DISCOVER_READ')
             _, selection = self.authority.require_current(request.admitted, request.selection_digest, operation)
-            self.resources.require_ready(self.bundles(request.admitted, selection))
+            self._require_ready(request.admitted, selection)
             delivery = load_private(self.deliveries / (selection['deliveryPlanDigest'] + '.json'))
             delivery_run.validate(delivery)
             require(_digest(delivery) == selection['deliveryPlanDigest'], 'Delivery graph content changed')
@@ -162,7 +217,7 @@ class ApplicationProvisioningActivities:
                         'An earlier unresolved stage must be reconciled independently')
                 self.authority.require_packet(request.admitted, request.selection_digest,
                     delivery, selected_step, packet, operation)
-                self.resources.require_ready(self.bundles(request.admitted, selection))
+                self._require_ready(request.admitted, selection)
 
             def owner(selected_step, packet, directory, base, plan, root, **keywords):
                 require(selected_step['id'] == request.step_id, 'A different native step cannot be dispatched')

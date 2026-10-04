@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import re
+import stat
 import subprocess
 from typing import Callable
 from uuid import uuid4
@@ -27,7 +28,8 @@ _ISOLATED_DB = re.compile(r'^hosting_observation_restore_[a-z0-9_]{1,48}$')
 _SHA = re.compile(r'^[0-9a-f]{64}$')
 _REQUIRED = {'enterprise_records', 'enterprise_record_history', 'audit_events',
              'schema_migrations', 'native_ownership', 'operation_jobs',
-             'job_outbox', 'native_operation_intents', 'evidence_entries'}
+             'job_outbox', 'native_operation_intents', 'evidence_entries',
+             'operating_instance'}
 
 
 def _canonical(value) -> bytes:
@@ -52,16 +54,33 @@ def _tls_dsn(dsn: str) -> dict:
     return info
 
 
+def _reviewed_pg_binary(command: str) -> Path:
+    """No PATH discovery or unreviewed PostgreSQL client on an operating owner."""
+    variables = {'pg_dump': ('HOSTING_PG_DUMP_PATH', 'HOSTING_PG_DUMP_SHA256'),
+                 'pg_restore': ('HOSTING_PG_RESTORE_PATH', 'HOSTING_PG_RESTORE_SHA256')}
+    if command not in variables:
+        raise ValueError('Only reviewed pg_dump/pg_restore archive binaries are permitted')
+    path_name, digest_name = variables[command]
+    path = Path(os.environ[path_name]).resolve(strict=True)
+    allowed = str(path) in ('/usr/bin/' + command, '/usr/local/bin/' + command) or bool(
+        re.fullmatch(r'/usr/lib/postgresql/[0-9]{1,2}/bin/' + command, str(path)))
+    info = path.stat()
+    expected = os.environ[digest_name]
+    if (not allowed or not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022
+            or not info.st_mode & 0o111 or not _SHA.fullmatch(expected) or _digest_file(path) != expected):
+        raise ValueError('Reviewed root-owned PostgreSQL archive binary custody is unavailable')
+    return path
+
+
 def _client(dsn: str, command: str, archive: Path, *, snapshot: str | None = None,
             section: str | None = None, runner: Callable = subprocess.run) -> None:
     info = _tls_dsn(dsn)
     # Do not place passwords in process arguments or command/error output.
     password = info.pop('password', None)
-    env = {key: value for key, value in os.environ.items()
-           if not key.startswith('PG')}
+    env = {'PATH': '/usr/bin:/bin', 'LANG': 'C', 'LC_ALL': 'C'}
     if password is not None:
         env['PGPASSWORD'] = password
-    argv = [command, '--dbname=' + make_conninfo(**info), '--no-owner', '--no-acl']
+    argv = [str(_reviewed_pg_binary(command)), '--dbname=' + make_conninfo(**info), '--no-owner', '--no-acl']
     if command == 'pg_dump':
         if snapshot is None or not re.fullmatch(r'[0-9A-Fa-f-]{1,128}', snapshot):
             raise ValueError('A current exported PostgreSQL snapshot is required')
@@ -267,9 +286,15 @@ def restore(dsn: str, source: Path, *, expected_manifest_sha256: str,
             connection.execute("SELECT c.relname,c.relrowsecurity,c.relforcerowsecurity "
                 "FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace "
                 "WHERE n.nspname='hosting_controlplane' AND c.relkind='r' ORDER BY c.relname").fetchall()}
+        # Compare the original retained bytes first, including the archived
+        # instance row. Then rotate only this restored control-instance identity.
+        # The old database OID already blocks claims even before quarantine.
+        report = compare_restore(manifest, observed)
+        from .instance import quarantine
+        report['instanceInterlock'] = quarantine(connection, manifest_sha256=expected_manifest_sha256)
         connection.execute(sql.SQL('ALTER DATABASE {} SET default_transaction_read_only=on')
                            .format(sql.Identifier(info['dbname'])))
-    return compare_restore(manifest, observed)
+    return report
 
 
 def main(argv=None) -> int:

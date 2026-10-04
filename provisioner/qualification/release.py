@@ -17,6 +17,7 @@ import re
 import ssl
 
 from provisioner.qualification import mobility, target_selection
+from provisioner.qualification.intake import FinalEvidenceIntake
 
 PILOT_SCENARIOS = ('GUIDED_DISCOVERY_AND_APPLICATION_REVIEW',
                    'GUIDED_PROVISIONING_AND_MIGRATION',
@@ -82,10 +83,12 @@ def _verify_pilot(envelope: dict, verifier, *, revision: str, artifact_digest: s
 def prepare(archive: Path, specifications: list[mobility.MobilityCampaign], *,
             qualification_index: dict, provenance_index: dict, campaign_index: dict,
             selection_index: dict, pilot_envelope: dict, pilot_verifier, release_signer,
-            destination: Path, as_of: datetime | None = None) -> dict:
+            evidence_intake: FinalEvidenceIntake, destination: Path,
+            as_of: datetime | None = None) -> dict:
     """Create a signed final-revision release/support artifact after real pilot evidence."""
     as_of = as_of or datetime.now(timezone.utc)
-    if as_of.tzinfo is None or not specifications or len(specifications) > 128:
+    if (as_of.tzinfo is None or not specifications or len(specifications) > 128
+            or type(evidence_intake) is not FinalEvidenceIntake):
         raise ValueError('Finite final-code route set and current review instant required')
     digest = hashlib.sha256()
     with Path(archive).open('rb') as source:
@@ -99,13 +102,18 @@ def prepare(archive: Path, specifications: list[mobility.MobilityCampaign], *,
         selection_index=selection_index, as_of=as_of) for spec in specifications]
     if any(item['status'] != 'CURRENT_NATIVE_EVIDENCE_SELECTED' for item in assessments):
         raise ValueError('Every advertised route must have current final-code native evidence')
+    for spec, assessment in zip(specifications, assessments):
+        evidence_intake.require_campaign(spec, assessment, campaign_index, qualification_index, as_of=as_of)
     matrix = mobility.unsupported_matrix(assessments)
     matrix_digest = hashlib.sha256(_canonical(matrix)).hexdigest()
     acceptance = _verify_pilot(pilot_envelope, pilot_verifier,
         revision=matrix['codeRevision'], artifact_digest=artifact_digest,
         matrix_digest=matrix_digest, as_of=as_of)
+    evidence_intake.require_pilot(acceptance, as_of=as_of)
     if release_signer.key_id == pilot_envelope['keyId']:
         raise ValueError('Receiving pilot acceptance and release signing require different owner identities')
+    if (release_signer.key_id in evidence_intake.key_ids or pilot_envelope['keyId'] in evidence_intake.key_ids):
+        raise ValueError('Independent observation, receiving acceptance and release need different owner keys')
     manifest = {'format': 'hosting-supported-release-manifest/1',
                 'codeRevision': matrix['codeRevision'], 'installedArtifactSha256': artifact_digest,
                 'supportMatrixSha256': matrix_digest,
@@ -132,7 +140,7 @@ def prepare(archive: Path, specifications: list[mobility.MobilityCampaign], *,
 
 
 def verify_artifact(archive: Path, signed_manifest: dict, support_matrix: dict,
-                    pilot_envelope: dict, *, release_verifier) -> dict:
+                    pilot_envelope: dict, *, release_verifier, pilot_verifier) -> dict:
     """Verify offline release bytes/custody before installation, granting no action."""
     if (not isinstance(signed_manifest, dict) or set(signed_manifest) != {'payload', 'keyId', 'signature'}
             or not isinstance(signed_manifest['payload'], dict)):
@@ -155,6 +163,12 @@ def verify_artifact(archive: Path, signed_manifest: dict, support_matrix: dict,
             or support_matrix.get('codeRevision') != manifest['codeRevision']
             or support_matrix.get('installedArtifactSha256') != manifest['installedArtifactSha256']):
         raise ValueError('Installed bytes/support/pilot evidence differ from signed final release')
+    _verify_pilot(pilot_envelope, pilot_verifier, revision=manifest['codeRevision'],
+                  artifact_digest=manifest['installedArtifactSha256'],
+                  matrix_digest=manifest['supportMatrixSha256'],
+                  as_of=target_selection.instant(manifest['preparedAt'], 'preparedAt'))
+    if signed_manifest['keyId'] == pilot_envelope['keyId']:
+        raise ValueError('Receiving pilot and release custody must remain separate')
     return {'status': 'SIGNED_ARTIFACT_CUSTODY_VERIFIED', 'codeRevision': manifest['codeRevision'],
             'mutationAuthorized': False, 'currentQualificationRecheckRequired': True}
 
@@ -233,16 +247,18 @@ def main(argv=None) -> int:
         elif args.mode == 'verify-artifact':
             if args.directory is None or args.archive is None:
                 raise ValueError('Exact archived runtime and signed release directory required')
-            _, verifier, _ = _vault_owners(signing=False)
+            pilot_verifier, verifier, _ = _vault_owners(signing=False)
             result = verify_artifact(args.archive,
                 _protected_index(args.directory / 'release-manifest.json'),
                 _protected_index(args.directory / 'support-matrix.json'),
-                _protected_index(args.directory / 'pilot-acceptance.json'), release_verifier=verifier)
+                _protected_index(args.directory / 'pilot-acceptance.json'), release_verifier=verifier,
+                pilot_verifier=pilot_verifier)
         else:
             if (not args.specification or len(args.specification) > 128 or args.archive is None
                     or args.directory is None or args.pilot_acceptance is None):
                 raise ValueError('Final route specifications, runtime bytes and original pilot acceptance required')
             verifier, _, signer = _vault_owners(signing=True)
+            from provisioner.qualification.intake import build_final_intake
             result = prepare(args.archive,
                 [mobility.from_document(_protected_index(path)) for path in args.specification],
                 qualification_index=_protected_index(args.qualification_index or native.INDEX),
@@ -250,7 +266,7 @@ def main(argv=None) -> int:
                 campaign_index=_protected_index(args.campaign_index or campaign.INDEX),
                 selection_index=_protected_index(args.selection_index or target_selection.INDEX),
                 pilot_envelope=_protected_index(args.pilot_acceptance), pilot_verifier=verifier,
-                release_signer=signer, destination=args.directory)
+                release_signer=signer, evidence_intake=build_final_intake(), destination=args.directory)
         print(json.dumps(result, sort_keys=True))
         return 0
     except Exception:

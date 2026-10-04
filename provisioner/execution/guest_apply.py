@@ -162,9 +162,9 @@ def scope_ledger(path, scope):
     finally: os.close(descriptor)
 
 
-def command(directory, bundle, runtime):
+def command(directory, bundle, runtime, *, inventory=None):
     argv = [runtime['python_path'], '-I', '-B', '-m', 'ansible.cli.playbook',
-            '-i', str(directory/'inventory.json'), '--private-key', str(directory/'runtime/ssh_key'),
+            '-i', str(inventory or directory/'inventory.json'), '--private-key', str(directory/'runtime/ssh_key'),
             str(directory/'source'/g.PLAYBOOK)]
     if bundle['mode'] == 'check': argv.append('--check')
     return argv
@@ -200,10 +200,17 @@ def validate_stats(raw, targets, started, completed):
     return digest(raw), report['hosts']
 
 
-def apply(args, root=ROOT):
+def apply(args, root=ROOT, *, guest_context=None):
     require(args.execute is True, 'Explicit authorized guest execution required')
     directory = private_path(args.bundle, directory=True); approval = load_private(args.approval)
     bundle, access, runtime = validate_bundle(directory, approval, root)
+    if guest_context is not None:
+        from provisioner.controlplane.worker.guest_commands import GuestExecutionContext
+        require(isinstance(guest_context, GuestExecutionContext)
+                and guest_context.prepared == directory and guest_context.root == root
+                and guest_context.approval == Path(args.approval),
+                'Concrete original selected per-command guest authority required')
+        guest_context.require_current()
     require(not file_map(directory/'runtime'), 'Runtime output already exists; reconcile the prior attempt')
     attempt = digest(encoded({'operation_id': bundle['operation_id'], 'generation': bundle['generation']}))
     with scope_ledger(args.ledger, bundle['scope']) as ledger:
@@ -224,8 +231,16 @@ def apply(args, root=ROOT):
             write_new(directory/'runtime/ssh_key', key)
             # Recheck after waiting for coordination, before the child can open SSH.
             validate_bundle(directory, approval, root)
-            run_process(command(directory, bundle, runtime), directory, g.runtime_environment(directory),
-                        execution_budget(bundle, access, approval))
+            if guest_context is None:
+                run_process(command(directory, bundle, runtime), directory, g.runtime_environment(directory),
+                            execution_budget(bundle, access, approval))
+            else:
+                with guest_context.controller(runtime) as selected:
+                    environment = g.runtime_environment(directory)
+                    environment['ANSIBLE_CONFIG'] = str(selected['configuration'])
+                    environment['HOSTING_GUEST_COMMAND_SESSION'] = str(selected['session'])
+                    run_process(command(directory, bundle, runtime, inventory=selected['inventory']), directory,
+                                environment, execution_budget(bundle, access, approval))
             current_window(approval)
             require(execution_deadline(access, approval) > utcnow(), 'Guest access or enrollment expired during execution')
             stats_raw = read_private(directory/'runtime/stats.json')

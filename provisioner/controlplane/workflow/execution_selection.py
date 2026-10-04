@@ -7,6 +7,7 @@ custody; this reader neither enrolls that custody nor qualifies a platform.
 """
 from __future__ import annotations
 
+from contextlib import ExitStack
 from pathlib import Path
 from typing import Callable
 
@@ -24,25 +25,42 @@ from .approval_gate import _valid_digest, _valid_id
 
 FORMAT = 'hosting-openstack-execution-artifact/1'
 DRIVER = 'openstack-linux-rebuild/1'
+DATABASE_DRIVER = 'openstack-linux-application-database/1'
+STAGING_DRIVER = 'openstack-linux-application-staging/1'
+CUTOVER_DRIVER = 'openstack-linux-application-cutover/1'
+APPLICATION_RECOVERY_DRIVER = 'application-postwrite-recovery/1'
+COLD_DRIVER = 'vmware-openstack-cold-capture/1'
+COLD_FORMAT = 'hosting-cold-capture-artifact/1'
+_COLD_FIELDS = frozenset({'format', 'driver', 'sourceCommit', 'workloadId', 'workloadRevision',
+    'source', 'destination', 'executionScope', 'sourceTuple', 'destinationTuple', 'guestProfile',
+    'qualificationDigest', 'operationsAcceptanceDigest', 'resourceBundleDigest', 'coldCaptureSelectionDigest'})
 _FIELDS = frozenset({
     'format', 'driver', 'sourceCommit', 'workloadId', 'workloadRevision',
     'source', 'destination', 'executionScope', 'resourceBundleDigest',
     'datasetSelectionDigest', 'cutoverSelectionDigest', 'deliveryPlanDigest',
     'qualificationDigest', 'operationsAcceptanceDigest', 'sourceTuple', 'destinationTuple', 'guestProfile', 'stageBindings',
 })
-_OPTIONAL_FIELDS = frozenset({'ipamSelections'})
+_OPTIONAL_FIELDS = frozenset({'ipamSelections', 'applicationLifecycleSelectionDigest',
+                             'applicationRecoverySelectionDigest', 'applicationDatabaseSelectionDigest',
+                             'resourceRecoverySelectionDigest', 'applicationStagingSelectionDigest'})
 _AUTHORITY_FILES = frozenset({
     'authority', 'approval', 'environment', 'credentials', 'token',
     'token_file', 'session', 'ssh_key', 'ssh_certificate', 'tsig_file',
-    'restore_authority', 'receipt',
+    'restore_authority', 'receipt', 'secrets',
 })
 
 
 def validate_selection(value: dict) -> dict:
+    if type(value) is dict and value.get('format') == 'hosting-existing-windows-services-artifact/1':
+        from .windows_service_selection import validate_artifact
+        return validate_artifact(value)
+    if type(value) is dict and value.get('format') == COLD_FORMAT:
+        return _validate_cold_artifact(value)
     require(type(value) is dict and _FIELDS <= value.keys()
             and value.keys() <= _FIELDS | _OPTIONAL_FIELDS,
             'An exact versioned OpenStack execution selection is required')
-    require(value['format'] == FORMAT and value['driver'] == DRIVER,
+    require(value['format'] == FORMAT and value['driver'] in {
+                DRIVER, DATABASE_DRIVER, STAGING_DRIVER, CUTOVER_DRIVER, APPLICATION_RECOVERY_DRIVER},
             'An implemented directed execution driver is required')
     require(type(value['sourceCommit']) is str and len(value['sourceCommit']) == 40
             and all(c in '0123456789abcdef' for c in value['sourceCommit']),
@@ -51,7 +69,11 @@ def validate_selection(value: dict) -> dict:
             and value['workloadRevision'] > 0, 'An immutable workload selection is required')
     source = PlanScope.from_record(value['source'])
     destination = PlanScope.from_record(value['destination'])
-    require((source.platform_family, destination.platform_family) == ('vmware', 'openstack')
+    require(((source.platform_family, destination.platform_family) == ('vmware', 'openstack')
+                if value['driver'] != APPLICATION_RECOVERY_DRIVER else
+                ((source.platform_family, destination.platform_family) == ('vmware', 'openstack')
+                    or source == destination and
+                        (source.platform_family, destination.platform_family) == ('openstack', 'openstack')))
             and (source.organization_id, source.tenant_id) ==
                 (destination.organization_id, destination.tenant_id),
             'Only the selected same-tenant VMware to OpenStack route is implemented')
@@ -93,6 +115,68 @@ def validate_selection(value: dict) -> dict:
             'Exact IPAM selection must match the approved destination owner scope')
         validate_ipam_selection(item)
     require(len({_digest(item) for item in ipam}) == len(ipam), 'Duplicate selected IPAM allocations')
+    if 'applicationLifecycleSelectionDigest' in value:
+        require(_valid_digest(value['applicationLifecycleSelectionDigest']),
+                'The selected application lifecycle needs an exact immutable digest')
+    if 'applicationRecoverySelectionDigest' in value:
+        require(_valid_digest(value['applicationRecoverySelectionDigest'])
+                and value['driver'] == APPLICATION_RECOVERY_DRIVER
+                and _valid_digest(value.get('applicationLifecycleSelectionDigest')),
+                'The separately approved application recovery needs an exact immutable digest')
+    require((value['driver'] == APPLICATION_RECOVERY_DRIVER) == ('applicationRecoverySelectionDigest' in value)
+            and not (value['driver'] == APPLICATION_RECOVERY_DRIVER and {
+                'applicationDatabaseSelectionDigest', 'applicationStagingSelectionDigest',
+                'resourceRecoverySelectionDigest', 'ipamSelections'}.intersection(value)),
+            'Post-write recovery needs its own exact purpose without new creation or allocation')
+    if 'applicationDatabaseSelectionDigest' in value:
+        require(_valid_digest(value['applicationDatabaseSelectionDigest'])
+                and _valid_digest(value.get('applicationLifecycleSelectionDigest'))
+                and value['driver'] == DATABASE_DRIVER,
+                'Database synchronization requires the exact selected lifecycle and database descriptor')
+    require(value['driver'] != DATABASE_DRIVER or 'applicationDatabaseSelectionDigest' in value,
+            'The dedicated database method requires its immutable database selection')
+    if 'resourceRecoverySelectionDigest' in value:
+        require(_valid_digest(value['resourceRecoverySelectionDigest']) and value['driver'] == DRIVER
+                and 'applicationRecoverySelectionDigest' not in value
+                and 'applicationDatabaseSelectionDigest' not in value,
+                'Resource cleanup requires its exact separately approved fixed purpose')
+    if 'applicationStagingSelectionDigest' in value:
+        require(_valid_digest(value['applicationStagingSelectionDigest'])
+                and _valid_digest(value.get('applicationLifecycleSelectionDigest'))
+                and value['driver'] in {CUTOVER_DRIVER, DATABASE_DRIVER},
+                'Staged cutover requires its actual target handover and current lifecycle')
+    require(value['driver'] != CUTOVER_DRIVER or 'applicationStagingSelectionDigest' in value,
+            'The cutover driver requires exact independently observed staged targets')
+    require(value['driver'] != STAGING_DRIVER or not {
+                'applicationLifecycleSelectionDigest', 'applicationStagingSelectionDigest',
+                'applicationRecoverySelectionDigest', 'applicationDatabaseSelectionDigest',
+                'resourceRecoverySelectionDigest'}.intersection(value),
+            'Initial creation cannot approve future native IDs or copied application data')
+    return value
+
+
+def _validate_cold_artifact(value):
+    require(value.keys() == _COLD_FIELDS and value['driver'] == COLD_DRIVER,
+            'One exact cold capture purpose artifact is required')
+    require(type(value['sourceCommit']) is str and len(value['sourceCommit']) == 40
+            and all(c in '0123456789abcdef' for c in value['sourceCommit'])
+            and _valid_id(value['workloadId']) and type(value['workloadRevision']) is int
+            and value['workloadRevision'] > 0, 'Exact installed cold source and workload revision required')
+    source, destination = PlanScope.from_record(value['source']), PlanScope.from_record(value['destination'])
+    require((source.platform_family, destination.platform_family) == ('vmware', 'openstack')
+            and (source.organization_id, source.tenant_id) == (destination.organization_id, destination.tenant_id)
+            and value['guestProfile'] in {'linux-ubuntu-2404', 'windows-server-2022'}
+            and type(value['sourceTuple']) is dict and type(value['destinationTuple']) is dict,
+            'Only the exact same-tenant VMware snapshot to OpenStack image purpose exists')
+    scope = value['executionScope']
+    require(type(scope) is dict and scope.keys() == {
+                'environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key'}
+            and all(_valid_id(item) for item in scope.values())
+            and (scope['platform'], scope['site_key'], scope['tenant_key'], scope['wsd_key']) ==
+                (destination.platform_family, destination.site_id, destination.tenant_id, destination.security_domain_id)
+            and all(_valid_digest(value[key]) for key in {
+                'qualificationDigest', 'operationsAcceptanceDigest', 'resourceBundleDigest', 'coldCaptureSelectionDigest'}),
+            'Exact cold scope, resource accounting and original qualification evidence required')
     return value
 
 
@@ -118,7 +202,8 @@ class PostgresExecutionAuthority:
     """
 
     def __init__(self, connect: Callable, selections: FileExecutionSelectionStore,
-                 qualification, evidence, operations):
+                 qualification, evidence, operations, instance_gate=None):
+        from provisioner.controlplane.operations.instance import OperatingInstanceGate
         require(callable(connect) and callable(getattr(selections, 'load_verified', None))
                 and callable(getattr(qualification, 'require_action', None))
                 and callable(getattr(evidence, 'require', None))
@@ -127,6 +212,9 @@ class PostgresExecutionAuthority:
         self.connect, self.selections = connect, selections
         self.qualification, self.evidence = qualification, evidence
         self.operations = operations
+        require(instance_gate is None or isinstance(instance_gate, OperatingInstanceGate),
+                'Fixed restored-instance operating custody owner required')
+        self.instance_gate = instance_gate
 
     def require_current(self, admitted: AdmittedInput, selection_digest: str,
                         operation_kind: str, *, continuation_grant=None,
@@ -136,14 +224,38 @@ class PostgresExecutionAuthority:
             continuation_grant=continuation_grant, continuation_identity=continuation_identity)
 
     def require_observation(self, admitted: AdmittedInput, selection_digest: str,
-                            operation_kind: str) -> tuple[dict, dict]:
+                            operation_kind: str, *, cursor=None) -> tuple[dict, dict]:
         """Read bound local evidence; this result has no native effect authority."""
         require(callable(getattr(self.operations, 'require_observation', None)),
                 'A separately named operating observation gate is required')
-        return self._require(admitted, selection_digest, operation_kind, purpose='OBSERVATION')
+        return self._require(admitted, selection_digest, operation_kind,
+                             purpose='OBSERVATION', observation_cursor=cursor)
+
+    def require_database_current(self, admitted: AdmittedInput, selection_digest: str,
+                                 operation_kind: str, *, coordination):
+        """Coordinate only the actual selected source, target and SQL fence owners."""
+        from provisioner.migration.postgresql_authority import DatabaseOperationContext
+        require(isinstance(coordination, DatabaseOperationContext)
+                and coordination.admitted == admitted
+                and coordination.artifact_digest == selection_digest
+                and all(worker.command.authority is self for worker in coordination.workers.values())
+                and operation_kind in {'RESTORE_DATA', 'SOURCE_FENCE'}
+                and callable(getattr(self.operations, 'require_database_continuation', None)),
+                'The exact separately enrolled original SQL operation context is required')
+        return self._require(admitted, selection_digest, operation_kind,
+                             purpose='DATABASE', database_coordination=coordination)
+
+    def require_canonical_transition(self, admitted: AdmittedInput, selection_digest: str, *,
+                                     cursor, operation_kind='DESTINATION_ACTIVATE'):
+        """Recheck the original approved logical transition in its real owner transaction."""
+        require(operation_kind in {'DISCOVER_READ', 'DESTINATION_ACTIVATE'},
+                'Only staged target association or independently proved application promotion is allowed')
+        return self._require(admitted, selection_digest, operation_kind,
+                             purpose='CANONICAL_TRANSITION', observation_cursor=cursor)
 
     def _require(self, admitted, selection_digest, operation_kind, *, purpose,
-                 continuation_grant=None, continuation_identity=None):
+                 continuation_grant=None, continuation_identity=None, observation_cursor=None,
+                 database_coordination=None):
         from provisioner.controlplane.worker.grants import WorkerGrant, VerifiedWorkerIdentity
         continuing = continuation_grant is not None or continuation_identity is not None
         require(not continuing or (isinstance(continuation_grant, WorkerGrant)
@@ -155,7 +267,19 @@ class PostgresExecutionAuthority:
                 'The immutable admitted job and execution selection are required')
         context = TenantContext(admitted.organization_id, admitted.tenant_id)
         self.evidence.require(context)
-        with self.connect() as connection, connection.cursor() as cursor:
+        with ExitStack() as owned:
+            if observation_cursor is None:
+                connection = owned.enter_context(self.connect())
+                cursor = owned.enter_context(connection.cursor())
+            else:
+                import psycopg
+                require(purpose in {'OBSERVATION', 'CANONICAL_TRANSITION'} and not continuing
+                        and isinstance(observation_cursor, psycopg.Cursor)
+                        and not observation_cursor.connection.autocommit
+                        and observation_cursor.connection.info.transaction_status ==
+                            psycopg.pq.TransactionStatus.INTRANS,
+                        'An original observation requires the actual existing scoped transaction')
+                cursor = observation_cursor
             _tenant(cursor, context)
             cursor.execute('SELECT hosting_controlplane.lock_job_scope(%s, %s, %s)',
                            (context.organization_id, context.tenant_id, admitted.job_id))
@@ -200,11 +324,11 @@ class PostgresExecutionAuthority:
                 self._require_retained_workload(cursor, context, plan)
             else:
                 _ensure_workload(cursor, context, plan)
+            selection = self.selections.load_verified(selection_digest)
             require(plan['spec'].get('execution') == {
-                'format': 'hosting-execution-selection/1', 'driver': DRIVER,
+                'format': 'hosting-execution-selection/1', 'driver': selection['driver'],
                 'artifactDigest': selection_digest},
                 'The original approved plan does not select this execution artifact')
-            selection = self.selections.load_verified(selection_digest)
             require((selection['workloadId'], selection['workloadRevision'],
                      selection['source'], selection['destination'], selection['qualificationDigest'],
                      selection['guestProfile']) ==
@@ -212,16 +336,77 @@ class PostgresExecutionAuthority:
                      plan['spec']['source'], plan['spec']['destination'],
                      plan['spec']['route']['qualificationDigest'], plan['spec']['route']['guestProfile']),
                     'Execution content differs from the approved workload, route or scope')
+            recovery = plan['spec'].get('resourceRecovery')
+            require((recovery is None and 'resourceRecoverySelectionDigest' not in selection) or
+                    (type(recovery) is dict and selection.get('resourceRecoverySelectionDigest') ==
+                     canonical_record_digest(recovery)),
+                    'The selected resource recovery purpose differs from the approved original intents')
+            cutover = plan['spec'].get('applicationStagedCutover')
+            require((cutover is None and 'applicationStagingSelectionDigest' not in selection) or
+                    (type(cutover) is dict and selection.get('applicationStagingSelectionDigest') ==
+                     cutover['stagedHandoverDigest'] and selection['driver'] in {CUTOVER_DRIVER, DATABASE_DRIVER}),
+                    'The current cutover differs from the approved actual staged targets')
+            require((selection['driver'] == STAGING_DRIVER) ==
+                    (plan['spec'].get('applicationStaging') == {'format': 'hosting-application-staging-plan/1'}),
+                    'Only an explicit staging approval may create and associate new targets')
+            application_recovery = plan['spec'].get('applicationRecovery')
+            require((selection['driver'] == APPLICATION_RECOVERY_DRIVER) == (application_recovery is not None),
+                    'Post-write application recovery requires a separately approved fixed purpose')
+            if application_recovery is not None:
+                require(application_recovery['mode'] == 'FORWARD_REPAIR'
+                        and application_recovery['originalJobId'] != admitted.job_id
+                        and application_recovery['originalPlanDigest'] != admitted.plan_digest,
+                        'Only independently admitted forward repair of the existing target has an effect owner')
+            cold = plan['spec'].get('coldCapture')
+            require((selection['driver'] == COLD_DRIVER) == (cold is not None)
+                    and (cold is None or cold == {'format': 'hosting-cold-capture-purpose/1',
+                        'selectionDigest': selection.get('coldCaptureSelectionDigest')}),
+                    'Cold bytes require their exact partial purpose and original selection')
+            from .windows_service_selection import DRIVER as WINDOWS_DRIVER, WindowsServiceSelection
+            require((selection['driver'] == WINDOWS_DRIVER) == ('windowsServices' in plan['spec']),
+                    'Existing Windows services require their separately approved operational purpose')
+            if selection['driver'] == WINDOWS_DRIVER:
+                WindowsServiceSelection.from_record(selection['windowsServices']).require_plan(plan, selection)
             if purpose == 'OBSERVATION':
                 self.operations.require_observation(cursor, admitted, selection)
+                if self.instance_gate is not None:
+                    self.instance_gate.require_observation(cursor, context)
+            elif purpose == 'DATABASE':
+                from provisioner.execution.run_files import encoded
+                require(selection['driver'] == DATABASE_DRIVER
+                        and encoded(selection) == database_coordination.artifact
+                        and selection['applicationDatabaseSelectionDigest'] ==
+                            database_coordination.descriptor.sha256,
+                        'The SQL operation context differs from the original protected artifact')
+                self._require_instance(cursor, context, selection, operation_kind)
+                self.qualification.require_action(cursor, admitted, selection, operation_kind)
+                self.operations.require_database_continuation(cursor, admitted, selection,
+                    coordination=database_coordination)
             elif continuing:
+                self._require_instance(cursor, context, selection, operation_kind)
                 self.qualification.require_action(cursor, admitted, selection, operation_kind)
                 self.operations.require_continuation(cursor, admitted, selection,
                     grant=continuation_grant, worker_identity=continuation_identity)
             else:
+                self._require_instance(cursor, context, selection, operation_kind)
                 self.qualification.require_action(cursor, admitted, selection, operation_kind)
                 self.operations.require_action(cursor, admitted, selection, operation_kind)
             return plan, selection
+
+    def _require_instance(self, cursor, context, selection, operation_kind):
+        # Genuine enrolled read-only discovery remains available to establish
+        # independent commissioning facts. It cannot select a mutation owner.
+        if operation_kind == 'DISCOVER_READ':
+            if self.instance_gate is not None:
+                self.instance_gate.require_observation(cursor, context)
+            return
+        require(self.instance_gate is not None,
+                'Uncommissioned operating instance cannot authorize a native effect')
+        require(selection['sourceCommit'] == self.instance_gate.source_commit,
+                'Execution selection differs from the commissioned installed source')
+        self.instance_gate.require_write_admission(cursor, context,
+            security_domain_id=selection['destination']['securityDomainId'],
+            workload_id=selection['workloadId'])
 
     @staticmethod
     def _require_retained_workload(cursor, context, plan):

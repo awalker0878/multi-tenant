@@ -84,7 +84,7 @@ const ApplicationComparisonWorkspace = (() => {
     if (o !== null) {
       require(keys(o, ['rawSnapshotDigest', 'assessmentSnapshotDigest', 'normalizerVersion', 'capturedAt',
         'collectionCompleteness', 'assessmentCompleteness']) && sha(o.rawSnapshotDigest) && sha(o.assessmentSnapshotDigest) &&
-        o.normalizerVersion === 'hosting-assessment-normalizer/2' &&
+        o.normalizerVersion === 'hosting-assessment-normalizer/3' &&
         ['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(o.collectionCompleteness) &&
         ['COMPLETE', 'PARTIAL', 'UNKNOWN'].includes(o.assessmentCompleteness));
       stamp(o.capturedAt);

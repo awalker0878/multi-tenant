@@ -16,7 +16,8 @@ from hosting_resources import RESOURCE_ROOT
 from provisioner.allocations import capacity_evidence
 from provisioner.controlplane.authority.service import AuthorityDenied
 from provisioner.qualification import native, provenance, campaign, target_selection
-from provisioner.qualification.directed_mobility import require_implemented_action_selection
+from provisioner.qualification.directed_mobility import (
+    require_implemented_action_selection, expansion_assertions)
 
 _PLATFORM = {'vmware': 'vmware-nsx', 'vmware-nsx': 'vmware-nsx',
              'nutanix': 'nutanix', 'openstack': 'openstack'}
@@ -42,7 +43,10 @@ _ACTION_CAPABILITIES = {
                                     'policy_equivalence', 'controlled_ingress',
                                     'controlled_egress', 'audit_logging'}),
     'QUOTA_CHANGE': ('destination', {'quota_readback', 'capacity_reservation', 'concurrency_budget'}),
+    'NATIVE_CLEANUP': ('destination', {'native_cleanup', 'old_writer_exclusion', 'resource_recovery'}),
 }
+_DATABASE_DRIVER = 'openstack-linux-application-database/1'
+_DATABASE_METHOD = 'APPLICATION_NATIVE_DATABASE_SYNC'
 
 
 def bundle_digest(bundle: dict) -> str:
@@ -58,10 +62,52 @@ def action_variant(selection: dict, operation_kind: str) -> str:
     fields = ('sourceCommit', 'driver', 'sourceTuple', 'destinationTuple',
               'guestProfile', 'source', 'destination')
     value = {key: selection[key] for key in fields}
+    for key in ('applicationDatabaseSelectionDigest', 'applicationRecoverySelectionDigest',
+                'resourceRecoverySelectionDigest'):
+        if key in selection:
+            value[key] = selection[key]
     value['operationKind'] = operation_kind
     return 'controlled-execution-action:' + hashlib.sha256(json.dumps(
         value, sort_keys=True, separators=(',', ':'), ensure_ascii=False,
         allow_nan=False).encode('utf-8')).hexdigest()
+
+
+def database_method_variant(selection: dict) -> str:
+    """Preflight method proof for these exact native tables/engines and route.
+
+    This excludes future job/plan digests: preliminary method qualification must
+    be selectable before an execution plan binds its qualification bundle. Final
+    migration/pilot proof additionally retains the original job/plan/wheel variant.
+    """
+    value = selection.get('applicationDatabaseSelectionDigest')
+    if (selection.get('driver') != _DATABASE_DRIVER or not isinstance(value, str)
+            or len(value) != 64 or any(character not in '0123456789abcdef' for character in value)):
+        raise AuthorityDenied('An exact selected native database descriptor is required for method qualification')
+    return 'controlled-execution-method:' + action_variant(selection, 'METHOD_' + _DATABASE_METHOD).split(':', 1)[1]
+
+
+def database_method_assertions() -> dict[str, str]:
+    from provisioner.qualification.mobility import METHOD_ASSERTIONS
+    return {**METHOD_ASSERTIONS[_DATABASE_METHOD], **expansion_assertions(_DATABASE_METHOD)}
+
+
+def _has_current_assertion(dossier, campaigns, raw_campaigns, current_targets, *,
+                           assertion, variant, observation_class=None):
+    evidence_pairs = {(item['ref'], item['sha256']) for item in dossier['evidence']}
+    for campaign_id in dossier['campaign_evidence_ids']:
+        current = campaigns[campaign_id]
+        if (current['selection_id'] not in current_targets
+                or current['state'] != 'CURRENT_EVIDENCE_COMPLETE'
+                or assertion not in current['latest_passing_assertions']):
+            continue
+        attempts = [item for item in raw_campaigns[campaign_id]['attempts']
+                    if item['assertion_id'] == assertion]
+        latest = max(attempts, key=lambda item: target_selection.instant(item['observed_at'], 'observed_at'))
+        if (latest['variant_ref'] == variant
+                and (observation_class is None or latest['observation_class'] == observation_class)
+                and (latest['evidence_ref'], latest['artifact_sha256']) in evidence_pairs):
+            return True
+    return False
 
 
 def _protected_index(path: Path) -> dict:
@@ -148,6 +194,11 @@ class SelectedQualificationGate:
         campaign_by_id = {row['campaign_id']: row for row in campaigns['records']}
         raw_campaign_by_id = {row['campaign_id']: row for row in bundle['campaign']['records']}
         side_for_action, required = _ACTION_CAPABILITIES[operation_kind]
+        database_method = selection['driver'] == _DATABASE_DRIVER
+        if database_method and operation_kind == 'RESTORE_DATA':
+            # Unlike file restoration, the selected SQL method mutates its
+            # source publication/slot as well as the target application tables.
+            side_for_action = 'both'
         for side in ('source', 'destination'):
             scope = selection[side]
             platform = _PLATFORM[scope['platformFamily']]
@@ -159,25 +210,20 @@ class SelectedQualificationGate:
                 raise AuthorityDenied('Both directed tuples need exact current guest-profile dossiers')
             dossier = matching[0]
             if side_for_action in (side, 'both'):
-                if not required <= set(dossier['qualified_capabilities']):
+                side_required = required | ({'capture_export', 'snapshot_consistency'}
+                    if database_method and operation_kind == 'RESTORE_DATA' and side == 'source' else set())
+                if not side_required <= set(dossier['qualified_capabilities']):
                     raise AuthorityDenied('Native dossier does not qualify the selected action capabilities')
                 assertion = 'ACTION_' + operation_kind
-                evidence_pairs = {(item['ref'], item['sha256']) for item in dossier['evidence']}
-                supported = False
-                for campaign_id in dossier['campaign_evidence_ids']:
-                    current = campaign_by_id[campaign_id]
-                    if (current['selection_id'] not in current_targets
-                            or current['state'] != 'CURRENT_EVIDENCE_COMPLETE'
-                            or assertion not in current['latest_passing_assertions']):
-                        continue
-                    attempts = [item for item in raw_campaign_by_id[campaign_id]['attempts']
-                                if item['assertion_id'] == assertion]
-                    latest = max(attempts, key=lambda item: target_selection.instant(item['observed_at'], 'observed_at'))
-                    if (latest['variant_ref'] == action_variant(selection, operation_kind)
-                            and (latest['evidence_ref'], latest['artifact_sha256']) in evidence_pairs):
-                        supported = True
-                if not supported:
+                if not _has_current_assertion(dossier, campaign_by_id, raw_campaign_by_id, current_targets,
+                        assertion=assertion, variant=action_variant(selection, operation_kind)):
                     raise AuthorityDenied('No current direction/action/profile/code bound native campaign')
+            if database_method and operation_kind != 'DISCOVER_READ':
+                for assertion, observation_class in database_method_assertions().items():
+                    if not _has_current_assertion(dossier, campaign_by_id, raw_campaign_by_id, current_targets,
+                            assertion=assertion, observation_class=observation_class,
+                            variant=database_method_variant(selection)):
+                        raise AuthorityDenied('No current exact database method/descriptor native campaign')
             # The destination's commissioned envelope binds the exact dossier,
             # selected topology and site. A platform-wide pass is insufficient.
             if side == 'destination':

@@ -1,8 +1,7 @@
 """Observed resource owners for the selected OpenStack application stages.
 
-Controller subprocess checks do not fence remote Ansible tasks. Guest dispatch
-therefore remains held until the actual SSH server/connection owner enforces the
-current grant for each remote command. Local nft transactions and observation
+Enrolled planning and guest command owners recheck the exact live grant for
+each provider subprocess and SSH command. Local nft transactions and observation
 commands reuse the existing owners under their exact current operation grants.
 """
 from __future__ import annotations
@@ -199,9 +198,12 @@ class ObservedProvisioningRuntime:
     operation_id: str
     scope: PlanScope
     local_target: LocalOpenStackTarget | None = None
-    guest_commands: GuestCommandExclusion | None = None
+    guest_commands: object | None = None
+    planning_credentials: object | None = None
 
     def __post_init__(self):
+        from provisioner.controlplane.worker.guest_commands import GuestCommandRuntime
+        from provisioner.controlplane.worker.adapters.openstack_planning import ScopedOpenStackPlanningRuntime
         require(isinstance(self.execution_authority, PostgresExecutionAuthority)
                 and isinstance(self.worker_authority, AuthorityService)
                 and isinstance(self.registry, NativeOperationRegistry)
@@ -209,7 +211,10 @@ class ObservedProvisioningRuntime:
                 and isinstance(self.identity, VerifiedWorkerIdentity) and isinstance(self.scope, PlanScope)
                 and all(_valid_id(value) for value in (self.grant_id, self.lease_key, self.operation_id))
                 and (self.local_target is None or type(self.local_target) is LocalOpenStackTarget)
-                and (self.guest_commands is None or type(self.guest_commands) is GuestCommandExclusion),
+                and (self.guest_commands is None or type(self.guest_commands) in
+                     {GuestCommandExclusion, GuestCommandRuntime})
+                and (self.planning_credentials is None or type(self.planning_credentials) is
+                     ScopedOpenStackPlanningRuntime),
                 'Concrete enrolled observed-native worker dependencies are required')
         binding = self.lease.binding
         require((self.context.organization_id, self.context.tenant_id, self.scope.site_id,
@@ -225,6 +230,17 @@ class ObservedProvisioningRuntime:
                 'The resource lease and verified worker must name the exact selected native scope')
         if self.local_target is not None:
             require(self.local_target.binding == binding, 'Local guest observer names another native resource')
+        for owner in (self.guest_commands, self.planning_credentials):
+            if hasattr(owner, 'command_runtime'):
+                command = owner.command_runtime
+                require(command.authority is self.execution_authority
+                        and command.context == self.context and command.identity == self.identity
+                        and command.grant.grant_id == self.grant_id
+                        and command.grant.operation_id == self.operation_id
+                        and command.grant.lease_key == self.lease_key
+                        and command.grant.lease_epoch == self.lease.epoch
+                        and command.grant.operation_scope == self.scope,
+                        'The native command owner differs from the exact original resource enrollment')
 
     def _claim(self, guard, request):
         guard.require_current()
@@ -265,17 +281,32 @@ class ObservedProvisioningRuntime:
             require(target['native_id'] == self.lease.binding.native_id
                     and bundle['operation_id'] == self.operation_id,
                     'The prepared guest target differs from the exact adopted native operation')
-            if type(self.guest_commands) is not GuestCommandExclusion:
+            from provisioner.controlplane.worker.guest_commands import GuestCommandRuntime
+            if type(self.guest_commands) is not GuestCommandRuntime:
+                if type(self.guest_commands) is GuestCommandExclusion:
+                    self.guest_commands.require_current(guard, prepared, target)
                 raise ProvisioningHeld('GUEST_PER_COMMAND_AUTHORITY_UNAVAILABLE')
-            self.guest_commands.require_current(guard, prepared, target)
-            raise ProvisioningHeld('GUEST_PER_COMMAND_AUTHORITY_UNAVAILABLE')
+            command = self.guest_commands.command_runtime.select(admitted, selection, plan,
+                step, packet, root, intent_guard=guard)
+            self._claim(guard, {'kind': 'guest_apply', 'bundle': bundle,
+                               'target': target, 'approval_sha256': digest(read_private(files['approval']))})
+            try:
+                result = self.guest_commands.execute_prepared(command, prepared, self.lease.binding,
+                    files['approval'], delivery_steps.owner_ledger(base, 'guest'), root)
+                guard.require_current()
+                write_new(directory/'result.json', encoded(result))
+                return delivery_steps.complete(step, packet, directory, plan, result, ['result.json'])
+            except Exception:
+                self.registry.mark_uncertain(self.context, self.operation_id, self.identity.subject)
+                raise
         if step['kind'] == 'edge_policy':
             return self._policy(guard, plan, step, packet, values, files, directory, base, root)
         if step['kind'] == 'terraform_plan':
-            # Static cloud labels and contact hashes do not authenticate the
-            # old planner's actual native project. The apply owner's VM_CREATE
-            # credential cannot be borrowed for a DISCOVER_READ planning step.
-            raise ProvisioningHeld('SCOPED_PLANNING_CREDENTIAL_OWNER_UNAVAILABLE')
+            from provisioner.controlplane.worker.adapters.openstack_planning import ScopedOpenStackPlanningRuntime
+            if type(self.planning_credentials) is not ScopedOpenStackPlanningRuntime:
+                raise ProvisioningHeld('SCOPED_PLANNING_CREDENTIAL_OWNER_UNAVAILABLE')
+            return self.planning_credentials.run_step(admitted, selection, plan, step, packet,
+                directory, base, root, guard=guard)
         else:
             campaign = load_private(files['plan'])
             require(campaign['scope'] == selection['executionScope']

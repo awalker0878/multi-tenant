@@ -36,6 +36,7 @@ from .freshness_monitor import FreshnessMonitor, FreshnessMonitorPolicy, Freshne
 from .model import _id, _scope, _utc
 from .native_credentials import decode_json, read_protected
 from .persistence import DiscoveryRepository
+from .service_enrollment import ServiceEnrollment
 from .trust import _keys
 
 _INSERT_TABLES=('discovery_freshness_checks','discovery_alert_deliveries','audit_events')
@@ -54,12 +55,15 @@ class MonitorSettings:
     policy:FreshnessMonitorPolicy
     freshness_policy:FreshnessPolicy
     owner:AlertOwnerTarget
+    service_enrollment:ServiceEnrollment|None=None
 
     @classmethod
     def from_file(cls,path):
         path=protected_path(str(path));raw=read_protected(path,131072)
-        doc=_keys(decode_json(raw,131072),{'format','subject','organizationId','tenantId',
-                     'tokenFile','targets','policy','freshnessPolicy','alertOwner'})
+        doc=decode_json(raw,131072)
+        required={'format','subject','organizationId','tenantId','tokenFile','targets','policy','freshnessPolicy','alertOwner'}
+        if not isinstance(doc,dict) or not required<=doc.keys() or not doc.keys()<=required|{'serviceEnrollment'}:
+            raise ValueError('Exact monitor settings are required')
         if (doc['format']!='hosting-discovery-monitor/1' or not _id(doc['subject'])
                 or not _id(doc['organizationId']) or not _id(doc['tenantId'])):
             raise ValueError('Exact monitor service identity is required')
@@ -81,10 +85,18 @@ class MonitorSettings:
         targets=FreshnessMonitor._targets(targets,policy.max_targets)
         if len({target.scope for target in targets})!=len(targets):
             raise ValueError('Each monitor environment requires an unambiguous native scope')
+        enrollment=None
+        if 'serviceEnrollment' in doc:
+            value=_keys(doc['serviceEnrollment'],{'file','digest'})
+            enrollment=ServiceEnrollment.from_file(value['file'],value['digest'])
+            enrollment.require_store('monitor-config',path.parent)
+            if enrollment.document['serviceId']!=doc['subject']:
+                raise ValueError('Monitor identity differs from the commissioned service')
         return cls(path,hashlib.sha256(raw).hexdigest(),doc['subject'],ctx,
-                   protected_path(doc['tokenFile']),targets,policy,freshness,AlertOwnerTarget.parse(doc['alertOwner']))
+                   protected_path(doc['tokenFile']),targets,policy,freshness,AlertOwnerTarget.parse(doc['alertOwner']),enrollment)
 
     def recheck(self):
+        if self.service_enrollment is not None:self.service_enrollment.require_current()
         if hashlib.sha256(read_protected(self.config_path,131072)).hexdigest()!=self.config_digest:
             raise PermissionError('Monitor deployment configuration changed; restart required')
 
@@ -197,6 +209,10 @@ def _secure_dsn(value):
 
 
 def create_runtime(settings,values:Mapping[str,str],*,connect_factory=None,evidence_gate=None,identities=None):
+    if settings.service_enrollment is None:
+        raise ValueError('Installed monitor service/interpreter/store enrollment is required')
+    if settings.owner.ownership_public_key is None:
+        raise ValueError('Independent current scoped alert/on-call ownership is required')
     dsn=_secure_dsn(_required(values,'HOSTING_MONITOR_DSN'))
     directory_dsn=_secure_dsn(_required(values,'HOSTING_DIRECTORY_DSN'))
     if dsn==directory_dsn:raise ValueError('Monitor and directory database credentials must be distinct')

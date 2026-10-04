@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from provisioner.controlplane.operations import recovery
 
@@ -77,9 +78,10 @@ class RecoveryTests(unittest.TestCase):
             kwargs['stdout'].write(b'fixture-pg-custom-dump')
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'archive'
-            recovery._client('host=backup.example user=custodian password=synthetic-password '
-                'dbname=hosting sslmode=verify-full', 'pg_dump', path,
-                snapshot='00000003-00000007-1', runner=run)
+            with patch.object(recovery, '_reviewed_pg_binary', return_value=Path('/usr/bin/pg_dump')):
+                recovery._client('host=backup.example user=custodian password=synthetic-password '
+                    'dbname=hosting sslmode=verify-full', 'pg_dump', path,
+                    snapshot='00000003-00000007-1', runner=run)
             argv, options = calls[0]
             self.assertTrue(any(value.startswith('--snapshot=') for value in argv))
             self.assertFalse(any('synthetic-password' in value for value in argv))
@@ -93,6 +95,13 @@ class RecoveryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             recovery._client('host=backup.example user=custodian dbname=hosting sslmode=verify-full',
                              '/bin/sh', Path('/missing'), runner=lambda *args: self.fail('must not run'))
+
+    def test_archive_binary_owner_absent_changed_or_arbitrary_path_cannot_run(self):
+        for value in ('/bin/sh', '/missing/pg_dump'):
+            with patch.dict('os.environ', {'HOSTING_PG_DUMP_PATH': value,
+                                          'HOSTING_PG_DUMP_SHA256': '0' * 64}):
+                with self.assertRaises((ValueError, FileNotFoundError)):
+                    recovery._reviewed_pg_binary('pg_dump')
 
 
 if __name__ == '__main__':

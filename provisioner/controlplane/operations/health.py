@@ -32,6 +32,7 @@ RUNBOOKS = {
     'CONTAINMENT_ACTIVE': 'docs/operations/control-application/1-operating-the-selected-slice.md#active-containment',
     'EVIDENCE_UNAVAILABLE': 'docs/operations/control-application/1-operating-the-selected-slice.md#evidence-or-recovery-hold',
     'DISCOVERY_STALE': 'docs/operations/control-application/1-operating-the-selected-slice.md#stale-discovery',
+    'OPERATING_INSTANCE_HELD': 'docs/operations/control-application/3-controlled-ha-and-restore-drills.md#writer-interlock-and-role-separation',
 }
 
 
@@ -85,6 +86,13 @@ def collect(connection_factory: Callable, context: TenantContext, policy: Monito
         connection.execute("SELECT set_config('app.organization_id',%s,true),"
                            "set_config('app.tenant_id',%s,true)",
                            (context.organization_id, context.tenant_id))
+        instance = connection.execute('SELECT generation,mode,review_until>clock_timestamp(),'
+            'database_oid=(SELECT oid FROM pg_catalog.pg_database WHERE datname=current_database()) '
+            'FROM hosting_controlplane.operating_instance WHERE singleton').fetchone()
+        if instance is None or instance[1] != 'ACTIVE' or not instance[2] or not instance[3]:
+            signals.append(signal(context, 'OPERATING_INSTANCE_HELD', 'control-operating-instance',
+                epoch=0 if instance is None else instance[0],
+                detail='retained-operating-mode:' + ('MISSING' if instance is None else instance[1])))
         jobs = connection.execute(
             'SELECT job_id,status,last_event_sequence FROM hosting_controlplane.operation_jobs '
             'WHERE organization_id=%s AND tenant_id=%s '

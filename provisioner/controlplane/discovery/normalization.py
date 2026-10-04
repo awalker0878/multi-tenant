@@ -20,7 +20,7 @@ from .model import (DiscoveryFact, DiscoveryObject, DiscoveryResult, _digest,
 from .persistence import StoredGeneration, StoredObservation
 
 
-NORMALIZER_VERSION = 'hosting-assessment-normalizer/2'
+NORMALIZER_VERSION = 'hosting-assessment-normalizer/3'
 _MAX = 2**63 - 1
 _MIB = 1024**2
 _GIB = 1024**3
@@ -221,6 +221,13 @@ def _semantic_properties(facts: dict[str, DiscoveryFact], *, source: bool) -> No
 
 def _vm(facts: dict[str, DiscoveryFact]) -> None:
     _semantic_properties(facts, source=True)
+    # New native hardware observations do not backfill historical generations.
+    # CPU passthrough is distinct from PCI/device passthrough and agent/host pinning
+    # flags describe native configuration, never a migration eligibility claim.
+    for name in ('cpuPassthroughEnabled','vcpuHardPinningEnabled','agentVm'):
+        item=facts.get(name)
+        if item is None or item.state=='UNKNOWN':facts[name]=_unknown(name,item)
+        elif type(item.value()) is not bool:facts[name]=DiscoveryFact.unknown(name,'COLLECTION_ERROR')
     cpu = _number(facts, 'vcpuCount', minimum=1, alias='vcpus')
     sockets, cores = (facts.get(name) for name in ('numSockets', 'numCoresPerSocket'))
     if all(item is not None and item.state == 'KNOWN' for item in (sockets, cores)):

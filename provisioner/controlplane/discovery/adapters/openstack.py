@@ -408,7 +408,14 @@ def _object(scope: PlanScope, kind: str, row: Mapping[str, object]) -> Discovery
     if kind == 'vm':
         _project(row, scope.native_scope_id, ('tenant_id', 'project_id'))
         facts = (_fact(row, 'name', 'name', str),
-                 _fact(row, 'status', 'status', str)) + _flavor_facts(row) + _server_storage_facts(row)
+                 _fact(row, 'status', 'status', str),
+                 _fact(row,'locked','locked',bool),
+                 _fact(row,'OS-EXT-STS:vm_state','nativeVmState',str),
+                 _fact(row,'OS-EXT-STS:task_state','nativeTaskState',str,nullable=True),
+                 _fact(row,'OS-EXT-STS:power_state','nativePowerState',int),
+                 _fact(row,'OS-EXT-AZ:availability_zone','availabilityZone',str)) + _flavor_facts(row) + _server_storage_facts(row)
+        if 'OS-EXT-STS:power_state' in row and row['OS-EXT-STS:power_state'] not in (0,1,3,4,6,7):
+            raise OpenStackDiscoveryHeld('Native power state is outside the selected API vocabulary')
     elif kind == 'volume':
         _project(row, scope.native_scope_id,
                  ('os-vol-tenant-attr:tenant_id', 'project_id'))

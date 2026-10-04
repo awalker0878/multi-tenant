@@ -83,7 +83,10 @@ def validate(config, *, fixture=False, allow_expired=False):
 
 class Restic:
     def __init__(self, binary, config, credentials, operation, ca_file=None,
-                 resource_control=None):
+                 resource_control=None, upload_kib_per_second=None):
+        require(upload_kib_per_second is None or (type(upload_kib_per_second) is int
+                and 1 <= upload_kib_per_second <= 1048576), 'A finite selected restic upload rate is required')
+        self.upload_kib_per_second = upload_kib_per_second
         if resource_control is not None:
             from provisioner.migration.resources import LinuxTransferResources
             require(isinstance(resource_control, LinuxTransferResources),
@@ -115,6 +118,8 @@ class Restic:
         self.counter += 1
         stdout, stderr = [self.operation / f'{self.counter:02d}.{name}' for name in ('json', 'log')]
         argv = [str(self.binary), '--no-cache', '--json', '--repo', self.config['repository']]
+        if self.upload_kib_per_second is not None:
+            argv += ['--limit-upload', str(self.upload_kib_per_second)]
         if self.resource_control is not None:
             argv += ['--limit-download',
                      str(self.resource_control.limits.download_kib_per_second)]
@@ -136,7 +141,12 @@ class Restic:
         require(config.get('id') == self.config['repository_id'], 'Repository identity changed')
 
 
-def backup(config, client, operation, *, fixture=False):
+def prepare_capture(config, operation, *, fixture=False):
+    """Retain the immutable useful-file manifest before the one backup command.
+
+    Remote application owners use this pure filesystem boundary, then dispatch
+    each actual repository command through their own live worker connection.
+    """
     tag = validate(config, fixture=fixture)
     source = Path(config['source'])
     require(not Path(operation).resolve().is_relative_to(source.resolve()), 'Execution artifacts must be outside the export')
@@ -146,37 +156,51 @@ def backup(config, client, operation, *, fixture=False):
                'source': str(source), 'files': before, 'captured_at': captured, 'consistency_ref': config['consistency_ref']}
     path = Path(operation) / 'manifest.json'
     write_new(path, encoded(payload))
-    client.repository()
     attempt = {'status': 'BACKUP_OUTCOME_UNKNOWN', 'config_sha256': digest(encoded(config)), 'started_at': captured}
     write_new(Path(operation) / 'attempt.json', encoded(attempt))
-    output = client.command(['backup', '--force', '--one-file-system', '--host', config['member'],
-                            '--tag', tag, '--tag', 'manifest-' + digest(encoded(payload)), '--', str(source), str(path)])
+    return payload
+
+
+def capture_arguments(config, payload, operation, *, fixture=False):
+    tag = validate(config, fixture=fixture)
+    require(load_private(Path(operation) / 'manifest.json') == payload
+            and payload['scope'] == config['scope'] and payload['source'] == config['source']
+            and payload['member'] == config['member'] and payload['consistency_ref'] == config['consistency_ref'],
+            'The exact originally retained backup manifest is required')
+    return ['backup', '--force', '--one-file-system', '--host', config['member'],
+            '--tag', tag, '--tag', 'manifest-' + digest(encoded(payload)), '--',
+            config['source'], str(Path(operation) / 'manifest.json')]
+
+
+def finish_capture(config, payload, output, operation, *, fixture=False):
+    validate(config, fixture=fixture)
+    require(load_private(Path(operation) / 'manifest.json') == payload,
+            'The originally retained capture manifest changed')
     summaries = [json.loads(line) for line in output.splitlines() if line.strip()]
     summaries = [x for x in summaries if x.get('message_type') == 'summary']
     require(len(summaries) == 1 and re.fullmatch('[0-9a-f]{64}', summaries[0].get('snapshot_id', '')),
             'One exact completed snapshot ID required')
-    require(manifest(source) == before, 'Export changed during capture; preserve snapshot but do not accept it')
+    require(manifest(config['source']) == payload['files'], 'Export changed during capture; preserve snapshot but do not accept it')
+    path = Path(operation) / 'manifest.json'
     result = {'format': 'hosting-restic-receipt/1', 'status': 'CAPTURED_REQUIRES_RESTORE_TEST',
-              'scope': config['scope'], 'member': config['member'], 'source': str(source),
+              'scope': config['scope'], 'member': config['member'], 'source': config['source'],
               'repository_id': config['repository_id'], 'snapshot_id': summaries[0]['snapshot_id'],
               'manifest_sha256': digest(encoded(payload)), 'manifest_path': str(path),
-              'captured_at': captured, 'completed_at': utcnow().isoformat(), 'file_count': len(before),
+              'captured_at': payload['captured_at'], 'completed_at': utcnow().isoformat(), 'file_count': len(payload['files']),
               'application_consistency': 'EXTERNAL_EXPORT_OWNER', 'native_qualification': False}
     write_new(Path(operation) / 'receipt.json', encoded(result))
     return result, payload
 
 
-def restore(config, receipt, expected, client, operation, target, *, fixture=False,
-            transfer=None, transfer_guard=None):
-    tag = validate(config, fixture=fixture)
-    if transfer is not None or transfer_guard is not None:
-        from provisioner.execution.restic_transfer import GuardedRestic, TransferGuard, validate as validate_transfer
-        require(transfer is not None and isinstance(transfer_guard, TransferGuard),
-                'Cross-scope restore requires live trusted worker authority')
-        validate_transfer(transfer, config, receipt, expected, target)
-        transfer_guard.check(transfer)
-        client = GuardedRestic(client, transfer_guard, transfer)
+def backup(config, client, operation, *, fixture=False):
+    payload = prepare_capture(config, operation, fixture=fixture)
+    client.repository()
+    output = client.command(capture_arguments(config, payload, operation, fixture=fixture))
+    return finish_capture(config, payload, output, operation, fixture=fixture)
 
+
+def validate_restore_capture(config, receipt, expected, target, *, fixture=False):
+    tag = validate(config, fixture=fixture)
     require(receipt['format'] == 'hosting-restic-receipt/1' and receipt['status'] == 'CAPTURED_REQUIRES_RESTORE_TEST'
             and receipt['repository_id'] == config['repository_id'] and receipt['scope'] == config['scope']
             and receipt['member'] == config['member'] and receipt['source'] == config['source']
@@ -198,11 +222,11 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
     require(timestamp(receipt['captured_at']) <= timestamp(receipt['completed_at']) <= utcnow(),
             'Capture timestamps are inconsistent or future-dated')
     require(not Path(target).exists(), 'Restore requires a new isolated destination')
-    target_machine_id = Path('/etc/machine-id').read_text().strip()
-    require(re.fullmatch('[0-9a-f]{32}', target_machine_id), 'Observed restore machine identity required')
-    started = time.monotonic()
-    client.repository()
-    snapshots = json.loads(client.command(['snapshots', receipt['snapshot_id']]))
+    return tag
+
+
+def prepare_restore_target(config, receipt, expected, operation, target, snapshots, *, fixture=False):
+    tag = validate_restore_capture(config, receipt, expected, target, fixture=fixture)
     require(len(snapshots) == 1 and snapshots[0]['id'] == receipt['snapshot_id']
             and tag in snapshots[0].get('tags', [])
             and 'manifest-' + receipt['manifest_sha256'] in snapshots[0].get('tags', [])
@@ -211,7 +235,15 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
             'Native snapshot identity, scope or contents differ')
     target = new_directory(target, ROOT)
     write_new(Path(operation) / 'attempt.json', encoded({'status': 'RESTORE_INCOMPLETE', 'snapshot_id': receipt['snapshot_id']}))
-    client.command(['restore', receipt['snapshot_id'], '--target', str(target), '--verify'])
+    return target
+
+
+def finish_restore(config, receipt, expected, operation, target, *, elapsed_seconds):
+    require(type(elapsed_seconds) in {int, float} and elapsed_seconds >= 0,
+            'The measured original restore duration is required')
+    target = Path(target)
+    target_machine_id = Path('/etc/machine-id').read_text().strip()
+    require(re.fullmatch('[0-9a-f]{32}', target_machine_id), 'Observed restore machine identity required')
     recovered_manifest = target / receipt['manifest_path'].lstrip('/')
     require(digest(recovered_manifest.read_bytes()) == receipt['manifest_sha256'], 'Recovered manifest differs')
     actual = manifest(target / config['source'].lstrip('/'))
@@ -220,10 +252,30 @@ def restore(config, receipt, expected, client, operation, target, *, fixture=Fal
               'status': 'RESTORED_FILE_BYTES_VERIFIED_NOT_APPLICATION_ACCEPTED',
               'target_machine_id': target_machine_id, 'restore_root': str(target),
               'snapshot_id': receipt['snapshot_id'], 'scope': config['scope'], 'member': config['member'],
-              'file_count': len(actual), 'restore_seconds': round(time.monotonic() - started, 3),
+              'file_count': len(actual), 'restore_seconds': round(elapsed_seconds, 3),
               'data_age_seconds': round((utcnow() - timestamp(receipt['captured_at'])).total_seconds(), 3),
               'completed_at': utcnow().isoformat(), 'production_activation': False}
     write_new(Path(operation) / 'receipt.json', encoded(result))
+    return result
+
+
+def restore(config, receipt, expected, client, operation, target, *, fixture=False,
+            transfer=None, transfer_guard=None):
+    validate_restore_capture(config, receipt, expected, target, fixture=fixture)
+    if transfer is not None or transfer_guard is not None:
+        from provisioner.execution.restic_transfer import GuardedRestic, TransferGuard, validate as validate_transfer
+        require(transfer is not None and isinstance(transfer_guard, TransferGuard),
+                'Cross-scope restore requires live trusted worker authority')
+        validate_transfer(transfer, config, receipt, expected, target)
+        transfer_guard.check(transfer)
+        client = GuardedRestic(client, transfer_guard, transfer)
+    started = time.monotonic()
+    client.repository()
+    snapshots = json.loads(client.command(['snapshots', receipt['snapshot_id']]))
+    target = prepare_restore_target(config, receipt, expected, operation, target, snapshots, fixture=fixture)
+    client.command(['restore', receipt['snapshot_id'], '--target', str(target), '--verify'])
+    result = finish_restore(config, receipt, expected, operation, target,
+                            elapsed_seconds=time.monotonic() - started)
     if transfer is not None:
         from provisioner.execution.restic_transfer import destination_receipt
         transfer_guard.check(transfer)

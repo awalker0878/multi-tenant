@@ -42,6 +42,7 @@ def inventory(name, *, at=NOW - timedelta(minutes=30), partial=False):
                   'secureBootEnabled': False, 'vtpmEnabled': False,
                   'storageEncrypted': False, 'sharedDisks': False,
                   'passthroughDevices': [], 'memoryStateRequired': False,
+                  'cpuPassthroughEnabled': False, 'vcpuHardPinningEnabled': False, 'agentVm': False,
                   'capabilityPropertySchemaDigest': contract_digest(),
                   'requiredCapabilities': [], 'capabilityRequirements': []}
     else:
@@ -198,6 +199,20 @@ class AssessmentServiceTests(unittest.TestCase):
         result = self.compare()
         self.assertEqual(result.assessments[0].status, 'UNKNOWN')
         self.assertIn('POLICY_TRANSLATION_SCOPE_MISMATCH', result.assessments[0].unknowns)
+
+    def test_historical_generations_without_new_hardware_facts_remain_unknown(self):
+        self.inputs.qualified=True
+        source=self.repository.results['source',7]
+        missing={'cpuPassthroughEnabled','vcpuHardPinningEnabled','agentVm'}
+        old=replace(source,objects=(replace(source.objects[0],facts=tuple(
+            fact for fact in source.objects[0].facts if fact.name not in missing)),))
+        self.repository.results['source',7]=old
+        result=self.compare()
+        self.assertTrue(all(item.status=='UNKNOWN' for item in result.assessments))
+        self.assertEqual(result.source.discovery.original.digest,old.digest)
+        facts={fact.name:fact for fact in result.source.discovery.inventory.objects[0].facts}
+        self.assertTrue(all(facts[name].state=='UNKNOWN' for name in missing))
+        self.assertFalse(missing&{fact.name for fact in result.source.discovery.original.objects[0].facts})
 
     def test_all_read_scopes_authorized_before_any_repository_access(self):
         for field in ('denied', 'expired', 'wrong_actor'):

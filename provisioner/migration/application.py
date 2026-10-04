@@ -211,27 +211,46 @@ class ApplicationDataRunner:
     protected storage and revalidate its current job/plan/revocation epoch. A
     fixture, comparison result or JSON boolean never supplies those authorities.
     """
-    def __init__(self, *, job_id, plan, execution_artifact, selection, ledger):
+    def __init__(self, *, job_id, plan, execution_artifact, selection, ledger, database_selection=None):
         require(isinstance(job_id, str) and _ID.fullmatch(job_id)
                 and isinstance(selection, ApplicationDataSelection)
                 and isinstance(plan, dict) and plan.get('kind') == 'MigrationPlan'
                 and not validate_record(plan), 'Exact admitted migration selection and canonical plan required')
         execution = plan['spec'].get('execution', {})
         require(execution.get('format') == 'hosting-execution-selection/1'
-                and execution.get('driver') == 'openstack-linux-rebuild/1'
+                and execution.get('driver') in {'openstack-linux-rebuild/1',
+                    'openstack-linux-application-cutover/1', 'openstack-linux-application-database/1'}
                 and execution.get('artifactDigest') == canonical_record_digest(execution_artifact)
                 and execution_artifact.get('datasetSelectionDigest') == selection.sha256,
                 'Canonical plan must approve this full independent execution artifact and dataset slice')
         body = selection.to_dict()
         require(plan['spec']['source'] == body['source_scope']
                 and plan['spec']['destination'] == body['destination_scope']
-                and plan['spec']['route']['method'] == 'REBUILD_RESTORE'
+                and (execution.get('driver'), plan['spec']['route']['method']) in {
+                    ('openstack-linux-rebuild/1', 'REBUILD_RESTORE'),
+                    ('openstack-linux-application-cutover/1', 'REBUILD_RESTORE'),
+                    ('openstack-linux-application-database/1', 'APPLICATION_NATIVE')}
                 and plan['spec']['route']['guestProfile'] == body['guest_profile'],
                 'Selected application data descriptors differ from the approved directional route')
+        database_mapping = set()
+        if execution.get('driver') == 'openstack-linux-application-database/1':
+            from .postgresql_sync import PostgresqlSyncSelection
+            require(isinstance(database_selection, PostgresqlSyncSelection)
+                and execution_artifact.get('applicationDatabaseSelectionDigest') == database_selection.sha256,
+                'Only the actual separately selected SQL descriptor may exclude a canonical database from file copy')
+            database = database_selection.to_dict()
+            require(database['datasetId'] not in {row['dataset_id'] for row in body['datasets']}
+                and (database['source_scope'], database['target_scope']) ==
+                    (body['source_scope'], body['destination_scope']),
+                'A database dataset cannot be copied or accepted by a Restic child')
+            database_mapping.add((database['datasetId'], database['targetRef'], database['consistencyGroupId']))
+        else:
+            require(database_selection is None and 'applicationDatabaseSelectionDigest' not in execution_artifact,
+                'A file route cannot silently exclude database datasets')
         require({(row['dataset_id'], row['target_ref'], row['consistency_group_id'])
                  for row in body['datasets']} ==
                 {(row['datasetId'], row['targetRef'], row['consistencyGroupId'])
-                 for row in plan['spec']['datasetMappings']},
+                 for row in plan['spec']['datasetMappings']} - database_mapping,
                 'Dataset slice must cover every selected canonical dataset mapping')
         self.job_id = job_id
         self.plan_bytes = encoded(plan)
@@ -300,8 +319,10 @@ class ApplicationDataRunner:
             key = data['dataset_id']
             if event['kind'] == 'DATASET_STARTED':
                 require(key not in states
-                        and set(data) == {'dataset_id', 'descriptor_sha256', 'envelope_sha256',
-                                         'operation_directory', 'started_at'},
+                        and set(data) in ({'dataset_id', 'descriptor_sha256', 'envelope_sha256',
+                                          'operation_directory', 'started_at'},
+                                         {'dataset_id', 'descriptor_sha256', 'envelope_sha256',
+                                          'operation_directory', 'started_at', 'original_intent'}),
                         'Dataset restore cannot be repeated or rebound')
                 states[key] = dict(started=data, complete=None)
             else:
@@ -354,6 +375,12 @@ class ApplicationDataRunner:
             started = dict(dataset_id=dataset_id, descriptor_sha256=digest(encoded(row)),
                            envelope_sha256=digest(encoded(envelope)),
                            operation_directory=str(operation), started_at=execution_journal.c.now())
+            started['original_intent'] = dict(organization_id=runtime.context.organization_id,
+                tenant_id=runtime.context.tenant_id, operation_id=row['operation_id'], grant_id=runtime.grant_id,
+                step_id=row['step_id'], lease_key=runtime.lease_key, binding=runtime.lease.binding.__dict__,
+                workload_id=runtime.lease.workload_id, security_domain_id=runtime.lease.security_domain_id,
+                worker_id=runtime.identity.subject, owner_epoch=runtime.lease.epoch,
+                operation_kind='RESTORE_DATA', request_digest=operation_digest)
             log.append('DATASET_STARTED', started)
             require(runtime.registry.claim_once(runtime.context, runtime.lease, scope,
                                                 row['operation_id'], runtime.identity),
@@ -372,7 +399,12 @@ class ApplicationDataRunner:
                 records = self._receipts(row, envelope, operation)
                 guard.check(envelope)
                 runtime.resources.require_current()
-                result = dict(status='DATASET_BYTES_AND_SELECTED_METADATA_VERIFIED',
+                result = dict(format='hosting-application-phase-result/1', phase='INITIAL_TRANSFER',
+                              job_id=self.job_id, member_id=dataset_id,
+                              selection_sha256=self.selection.sha256,
+                              plan_digest=strict_loads(self.plan_bytes)['metadata']['planDigest'],
+                              original_intent=started['original_intent'],
+                              status='DATASET_BYTES_AND_SELECTED_METADATA_VERIFIED',
                               records=records, measured_bytes=runtime.resources.limits.expected_bytes,
                               elapsed_seconds=round(time.monotonic() - clock, 6),
                               resource_binding=runtime.resources.binding(),
@@ -420,6 +452,11 @@ class ApplicationDataRunner:
                           elapsed_seconds=None, resource_binding=runtime.resources.binding(),
                           production_activation=False, application_acceptance=False,
                           native_intent_requires_independent_resolution=True)
+            if 'original_intent' in started:
+                result.update(format='hosting-application-phase-result/1', phase='INITIAL_TRANSFER',
+                    job_id=self.job_id, member_id=dataset_id, selection_sha256=self.selection.sha256,
+                    plan_digest=strict_loads(self.plan_bytes)['metadata']['planDigest'],
+                    original_intent=started['original_intent'])
             log.append('DATASET_RECONCILED', dict(dataset_id=dataset_id, result=result))
             return result
 

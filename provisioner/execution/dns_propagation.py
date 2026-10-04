@@ -157,7 +157,13 @@ def matches(observed, job, *, recursive):
                 for a, b in zip(observed['records'], expected['records'])))
 
 
-def observe(config, job, scope, receipt, secrets, *, fixture=False):
+def observe(config, job, scope, receipt, secrets, *, fixture=False,enrolled_context=None):
+    if enrolled_context is not None:
+        from provisioner.controlplane.reconciliation.service_propagation import EnrolledDnsPropagationContext
+        require(type(enrolled_context) is EnrolledDnsPropagationContext and not fixture
+                and config==enrolled_context.effective and secrets==enrolled_context.secrets,
+                'Only the actual enrolled read owner may refresh DNS authentication')
+        enrolled_context.require_current()
     validate(config, job, scope, receipt, secrets, fixture=fixture)
     require(Path('/etc/machine-id').read_text().strip() == config['observer_machine_id']
             and Path('/proc/self/ns/net').stat().st_ino == config['network_namespace_inode'],
@@ -167,7 +173,8 @@ def observe(config, job, scope, receipt, secrets, *, fixture=False):
     # They are finite observations, never a claim of universal cache expiry.
     for sweep in (1, 2):
         for target in config['targets']:
-            client = Client(target, secrets[target['id']], config, end)
+            client = (enrolled_context.client(target,config,end) if enrolled_context is not None
+                      else Client(target,secrets[target['id']],config,end))
             control = client.rrset(target['control_name'], 'TXT', job['zone'])
             require(control is not None and control['values'] == [target['control_value']],
                     'DNS view positive control differs')

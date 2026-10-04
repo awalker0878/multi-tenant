@@ -81,7 +81,7 @@ class SignedFixture:
                 'evidenceDigest': '3' * 64, 'observedAt': (NOW - timedelta(minutes=2)).isoformat(),
                 'sourceRawSnapshotDigest': '4' * 64, 'destinationRawSnapshotDigest': '5' * 64,
                 'sourceSnapshotDigest': '6' * 64, 'destinationSnapshotDigest': '7' * 64,
-                'normalizerVersion': 'hosting-assessment-normalizer/2'}
+                'normalizerVersion': 'hosting-assessment-normalizer/3'}
         return {'format': 'hosting-assessment-evidence/1', 'evidenceId': kind + '-evidence',
                 'kind': kind, 'revision': 1, 'issuedAt': (NOW - timedelta(minutes=1)).isoformat(),
                 'expiresAt': (NOW + timedelta(minutes=30)).isoformat(), 'payload': payload}

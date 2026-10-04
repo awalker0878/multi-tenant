@@ -24,7 +24,9 @@ INPUT = ApplicationJobInput(ADMITTED, 'b'*64, ('compile', 'apply'), ('files', 'd
 
 
 class ApplicationWorkflowTests(unittest.IsolatedAsyncioTestCase):
-    async def run_case(self, *, fail_apply=False, hold_resources=False):
+    async def run_case(self, *, fail_apply=False, hold_resources=False,
+                       lifecycle=False, complete_stages=False, hold_acceptance=False,
+                       lose_acceptance=False):
         calls = []
         @activity.defn(name=VERIFY_ADMITTED_JOB_ACTIVITY)
         async def approve(request: AdmittedInput) -> ApprovalCheck:
@@ -58,10 +60,39 @@ class ApplicationWorkflowTests(unittest.IsolatedAsyncioTestCase):
         @activity.defn(name='application_rehearsal')
         async def rehearse(request: MigrationActivityRequest) -> MigrationActivityResult:
             calls.append('rehearsal')
+            if complete_stages:
+                return MigrationActivityResult('STAGE_VERIFIED', request.admitted.job_id, '',
+                                               evidence_digest='3'*64)
             return MigrationActivityResult('HELD', request.admitted.job_id, '',
                 'OPERATOR_HOLD', 'ISOLATED_REHEARSAL_OWNER_UNAVAILABLE')
+        @activity.defn(name='application_source_fence')
+        async def source_fence(request: MigrationActivityRequest) -> MigrationActivityResult:
+            calls.append('source-fence-' + request.member_id)
+            return MigrationActivityResult('STAGE_VERIFIED', request.admitted.job_id,
+                                           request.member_id, evidence_digest='4'*64)
+        @activity.defn(name='application_final_sync')
+        async def final_sync(request: MigrationActivityRequest) -> MigrationActivityResult:
+            calls.append('final-sync')
+            return MigrationActivityResult('STAGE_VERIFIED', request.admitted.job_id, '',
+                                           evidence_digest='5'*64)
+        @activity.defn(name='application_cutover')
+        async def cutover(request: MigrationActivityRequest) -> MigrationActivityResult:
+            calls.append('cutover')
+            return MigrationActivityResult('STAGE_VERIFIED', request.admitted.job_id, '',
+                                           evidence_digest='6'*64)
+        @activity.defn(name='application_verify_cutover')
+        async def verify(request: MigrationActivityRequest) -> MigrationActivityResult:
+            calls.append('independent-acceptance')
+            if lose_acceptance:
+                raise RuntimeError('lost independent acceptance result')
+            if hold_acceptance:
+                return MigrationActivityResult('HELD', request.admitted.job_id, '',
+                    'OPERATOR_HOLD', 'CURRENT_APPLICATION_TRAFFIC_REQUIRED')
+            return MigrationActivityResult('STAGE_VERIFIED', request.admitted.job_id, '',
+                                           evidence_digest='7'*64)
         async with await WorkflowEnvironment.start_local() as env:
-            selector = lambda admitted: replace(INPUT, admitted=admitted)
+            selector = lambda admitted: replace(INPUT, admitted=admitted,
+                lifecycle_selection_digest='8'*64 if lifecycle else None)
             starter = TemporalWorkflowStarter(TemporalConnection(
                 env.client.service_client.config.target_host, 'default', 'application',
                 insecure_loopback_for_tests=True), application_selector=selector)
@@ -73,14 +104,15 @@ class ApplicationWorkflowTests(unittest.IsolatedAsyncioTestCase):
                                                      result_type=ApplicationJobResult)
             async with Worker(env.client, task_queue='application',
                     workflows=[OpenStackApplicationMigration],
-                    activities=[approve, reserve, provision, transfer, join, rehearse]):
+                    activities=[approve, reserve, provision, transfer, join, rehearse,
+                                source_fence, final_sync, cutover, verify]):
                 result = await asyncio.wait_for(handle.result(), 20)
             history = await handle.fetch_history()
             await Replayer(workflows=[OpenStackApplicationMigration]).replay_workflow(history)
             self.assertEqual(result, await asyncio.to_thread(starter.completed_job, receipt))
             # An altered artifact cannot reuse this original native-capable run.
             changed = TemporalWorkflowStarter(starter.connection, application_selector=
-                lambda admitted: replace(INPUT, admitted=admitted, selection_digest='2'*64))
+                lambda admitted: replace(selector(admitted), selection_digest='2'*64))
             with self.assertRaises(AdmissionConflict):
                 await asyncio.to_thread(changed.start, namespace='default',
                     workflow_id=ADMITTED.job_id, payload=PAYLOAD)
@@ -106,6 +138,41 @@ class ApplicationWorkflowTests(unittest.IsolatedAsyncioTestCase):
         result, calls = await self.run_case(hold_resources=True)
         self.assertEqual(calls, ['approval', 'resources'])
         self.assertEqual(result.phase, 'PREPARE')
+
+    async def test_lifecycle_requires_final_acceptance_before_success_and_replays(self):
+        result, calls = await self.run_case(lifecycle=True, complete_stages=True)
+        self.assertEqual(result.status, 'SUCCEEDED')
+        self.assertEqual((result.completed, result.total), (12, 12))
+        self.assertEqual(result.evidence_digest, '7'*64)
+        self.assertEqual(result.lifecycle_selection_digest, '8'*64)
+        self.assertEqual(calls[-4:], ['source-fence-vm', 'final-sync', 'cutover', 'independent-acceptance'])
+
+    async def test_old_selected_history_remains_held_after_every_modeled_stage(self):
+        result, calls = await self.run_case(complete_stages=True)
+        self.assertEqual(result.hold_code, 'FINAL_APPLICATION_ACCEPTANCE_UNAVAILABLE')
+        self.assertNotIn('independent-acceptance', calls)
+        self.assertEqual((result.completed, result.total), (11, 11))
+
+    async def test_missing_or_lost_acceptance_cannot_close_or_retry_the_application(self):
+        for options in ({'hold_acceptance': True}, {'lose_acceptance': True}):
+            with self.subTest(options=options):
+                result, calls = await self.run_case(lifecycle=True, complete_stages=True, **options)
+                self.assertEqual(result.status, 'HELD')
+                self.assertEqual((result.completed, result.total), (11, 12))
+                self.assertEqual(calls.count('independent-acceptance'), 1)
+                if options.get('hold_acceptance'):
+                    self.assertEqual(result.hold_code, 'CURRENT_APPLICATION_TRAFFIC_REQUIRED')
+                else:
+                    self.assertEqual(result.reason_code, 'NATIVE_UNCERTAIN')
+
+    def test_original_application_memo_digest_survives_new_optional_input_field(self):
+        from dataclasses import asdict
+        from provisioner.controlplane.workflow.temporal_adapter import _application_input_digest
+        original = asdict(INPUT)
+        original.pop('lifecycle_selection_digest')
+        self.assertEqual(_application_input_digest(INPUT), _digest(original))
+        self.assertNotEqual(_application_input_digest(replace(INPUT,
+            lifecycle_selection_digest='8'*64)), _digest(original))
 
 
 class ApplicationReferenceTests(unittest.TestCase):

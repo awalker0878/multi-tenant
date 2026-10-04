@@ -113,7 +113,7 @@ requirements. Wave 2 stays partial until its remaining repository work is comple
 
 ## Platform semantic comparison increment
 
-Normalizer `hosting-assessment-normalizer/2` now binds typed source requirements
+Normalizer `hosting-assessment-normalizer/3` now binds typed source requirements
 and target observed capability/property sets to the current property schema digest.
 Old-normalizer signed reviews cannot authorize the new interpretation. Whole-VM
 compatibility requires explicit source boot/architecture/security/device facts and
@@ -147,8 +147,8 @@ REST inventory, even when the result is empty. Native read failures emit `UNKNOW
 without publishing a truncated scan as complete; expiry cannot produce late evidence.
 The emitted cursors partition the captured observations, not a native paging API.
 
-Collector identities are `nutanix-ahv-v4.0-hardware-2` and
-`vcenter-rest-vm-info-8.0.3.0-visible-only-2`. Re-admit campaigns and reissue the
+Collector identities are `nutanix-ahv-v4.0-hardware-3` and
+`vcenter-rest-vm-info-8.0.3.0-visible-only-3`. Re-admit campaigns and reissue the
 matching worker/credential witnesses; old collector identities are rejected rather
 than aliased. Raw hardware and folder-evidence changes affect snapshot digests.
 The normalizer remains version 2: its interpretation is unchanged, and the changed
@@ -224,7 +224,7 @@ Prism support or production authority.
 
 The [OpenStack HTTPS client](../engineering/openstack-discovery-https.md) implements
 actual project-scoped Nova/Cinder/Neutron collection/quota reads and exact VM-referenced Glance image reads, not login or
-mutation. `openstack-project-https-4` pins compute 2.79, volume 3.60, network v2.0 and a Glance v2 image root; image reads are restricted to UUIDs referenced by the captured Nova servers
+mutation. `openstack-project-https-5` pins compute 2.79, volume 3.60, network v2.0 and a Glance v2 image root; image reads are restricted to UUIDs referenced by the captured Nova servers
 contracts. Its independent signed binding selects project/user, catalog evidence,
 region/interface, all three endpoint/IP/CA records, token digest/validity and revision.
 The native read-only witness must cover each service; a GET-only client does not

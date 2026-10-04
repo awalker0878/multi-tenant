@@ -999,7 +999,10 @@ function validReview(plan, requestedId) {
     plan.planRevision > 0 && digestPattern.test(plan.planDigest) &&
     typeof plan.workloadId === 'string' && Number.isInteger(plan.workloadRevision) &&
     typeof plan.routeMethod === 'string' && plan.routeMethod.length > 0 &&
-    (plan.execution == null || (plan.execution.driver === 'openstack-linux-rebuild/1' &&
+    (plan.execution == null || (['openstack-linux-rebuild/1', 'openstack-linux-application-staging/1',
+      'openstack-linux-application-cutover/1', 'openstack-linux-application-database/1',
+      'application-postwrite-recovery/1', 'windows-server-2022-existing-services/1',
+      'vmware-openstack-cold-capture/1'].includes(plan.execution.driver) &&
       digestPattern.test(plan.execution.artifactDigest))) &&
     typeof plan.frozenAt === 'string' && scopeValid(plan.source) && scopeValid(plan.destination) &&
     ['selectedMachineCount', 'selectedDatasetCount', 'maxDowntimeSeconds',

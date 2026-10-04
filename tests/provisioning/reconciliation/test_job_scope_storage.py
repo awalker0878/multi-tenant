@@ -51,6 +51,7 @@ class _StoredJob:
             self.context.organization_id, self.context.tenant_id, 'worker-1',
             self.scope.site_id, 'd' * 64, self.now + timedelta(minutes=5))
         self.role = (False, False)
+        self.conversion_admitted = True
         self.contained = False
         self.mapping = None
         self.operation = None
@@ -123,6 +124,11 @@ class _Cursor:
                     self.result = (facts.source_json, facts.destination_json, facts.status)
         elif sql == 'SELECT clock_timestamp()':
             self.result = (facts.now,)
+        elif sql.startswith('SELECT hosting_controlplane.retained_conversion_write_is_admitted('):
+            if params != (facts.context.organization_id,facts.context.tenant_id,
+                          facts.owner.security_domain_id,facts.owner.workload_id):
+                raise AssertionError('Unexpected converted workload scope')
+            self.result = (facts.conversion_admitted,)
         elif 'FROM hosting_controlplane.native_ownership' in sql:
             if params == facts.binding.key():
                 self.result = facts.owner_row
@@ -287,6 +293,20 @@ class NativeJobScopeStorageTest(unittest.TestCase):
                     facts.prepare()
                 self.assertEqual(facts.writes, [])
                 self.assertEqual(facts.grants.calls, 1)
+
+    def test_converted_observation_only_scope_denies_both_owners_before_grants_or_writes(self):
+        from provisioner.controlplane.authority.service import AuthorityDenied
+        for owner in ('register','prepare'):
+            with self.subTest(owner=owner):
+                facts=_StoredJob()
+                if owner=='prepare':
+                    facts.register()
+                    facts.writes.clear()
+                facts.conversion_admitted=False
+                with self.assertRaisesRegex(AuthorityDenied,'observation-only'):
+                    getattr(facts,owner)()
+                self.assertEqual(facts.writes,[])
+                self.assertEqual(facts.grants.calls,0)
 
 
 if __name__ == '__main__':

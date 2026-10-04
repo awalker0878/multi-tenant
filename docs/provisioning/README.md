@@ -52,6 +52,15 @@ that cites it cites every reviewed decision. See
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |
 | [Plan workflow](plan-workflow.md) | `validate resolve plan mobility-plan mobility-apply status verify evidence apply` |
 | [Supported service-profile matrix](service-profile-matrix.md) | What is implemented, what is deferred, why |
+| [Installed runtime identity](installed-runtime-identity.md) | Exact protected interpreter, source, wheel and installed receipt before each writer use |
+| [Current command authority](../operations/current-command-authority.md) | Scoped planning, each guarded Linux SSH command and certificate-only Windows command custody |
+| [Fleet discovery and on-call owners](../engineering/discovery-fleet-and-oncall-owners.md) | Global database read budgets, installed collector custody and independently assigned human alert ownership |
+| [Enterprise wave pools](enterprise-wave-pools.md) | One aggregate physical budget and tenant turn over existing B09 wave members and retained uncertain charges |
+| [Enrolled resource and service recovery](../engineering/enrolled-resource-service-recovery.md) | Current approved service intents, independently observed outcomes and separate old-credential exclusion |
+| [Authenticated retained-state handover](../operations/retained-state-authenticated-handover.md) | Original retained import, independent proof verification, native reconciliation and owner-epoch interlock |
+| [Controlled HA and restore drills](../operations/control-application/3-controlled-ha-and-restore-drills.md) | Actual commissioned failover and observation-only restoration under current command authority |
+| [Final-code evidence intake](../operations/control-application/4-original-final-code-evidence-intake.md) | Independent raw campaign and pilot originals required by final release preparation |
+| [Final-code commissioning dossier](../operations/control-application/5-final-code-commissioning-dossier.md) | Exact direction, method, profile and tuple acquisition instructions from the sealed installed command |
 
 ## Retained refactor history
 

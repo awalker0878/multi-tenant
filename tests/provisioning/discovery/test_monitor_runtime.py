@@ -3,6 +3,7 @@ import base64
 from copy import deepcopy
 from datetime import datetime,timezone,timedelta
 import io
+import hashlib
 import json
 from dataclasses import replace
 from contextlib import redirect_stdout
@@ -18,6 +19,7 @@ from provisioner.controlplane.authority.model import RoleGrant
 from provisioner.controlplane.authority.oidc import DirectoryIdentity,OIDCIdentityProvider
 from provisioner.controlplane.authority.service import AuthenticationFailed,DISCOVERY_MONITOR
 from provisioner.controlplane.discovery import monitor_runtime as module
+from provisioner.controlplane.discovery import service_enrollment as service
 from provisioner.controlplane.discovery.alert_delivery import AlertDeliveryRepository
 from provisioner.controlplane.discovery.freshness_history import FreshnessHistoryRepository
 from provisioner.controlplane.discovery.model import _json
@@ -111,6 +113,23 @@ class MonitorRuntimeTests(OwnerFixture,unittest.TestCase):
         self.write_token();self.config_doc['policy']['intervalSeconds']=600;write_json(self.path,self.config_doc)
         self.assertEqual(self.runtime.cycle()['status'],'MONITOR_HELD')
         self.assertEqual(self.owner_calls,[])
+
+    def test_installed_composition_requires_actual_service_manifest_and_independent_oncall_owner(self):
+        with self.assertRaisesRegex(ValueError,'service/interpreter/store enrollment'):
+            module.create_runtime(self.settings,{})
+        # Local protocol fixture for the installed distribution/interpreter only;
+        # store identity and manifest custody below use the actual filesystem.
+        with patch.object(service,'package_facts',return_value={'unitProtocolFixture':True}),patch.object(
+                service,'interpreter_facts',return_value={'unitProtocolFixture':True}):
+            manifest=self.pki.root/'monitor-service.json'
+            raw=_json(service.capture_service_facts(self.subject,{'monitor-config':self.path.parent})).encode('ascii')
+            manifest.write_bytes(raw);manifest.chmod(0o600)
+            self.config_doc['serviceEnrollment']={'file':str(manifest),'digest':hashlib.sha256(raw).hexdigest()}
+            write_json(self.path,self.config_doc);settings=module.MonitorSettings.from_file(self.path)
+            with self.assertRaisesRegex(ValueError,'scoped alert/on-call ownership'):
+                module.create_runtime(settings,{})
+            settings.recheck();manifest.write_bytes(raw+b'\n')
+            with self.assertRaises(PermissionError):settings.recheck()
 
     def test_exact_retained_check_ack_refresh_does_not_create_current_slot_or_resample(self):
         value=self.runtime.cycle();check=value['items'][0]['checkId']

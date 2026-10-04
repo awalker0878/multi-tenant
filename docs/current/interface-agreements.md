@@ -61,8 +61,8 @@ exact current tuple and independently qualified directed method.
 
 ### Native collection contracts
 
-VMware requires `vcenter-rest-vm-info-8.0.3.0-visible-only-2`; AHV requires
-`nutanix-ahv-v4.0-hardware-2`; OpenStack requires `openstack-project-https-4`, including the signed Glance endpoint for VM-referenced images. Glance custom properties are retained as strings; driver/security metadata is observation only and must be reconciled with the selected compute tuple and guest before qualification.
+VMware requires `vcenter-rest-vm-info-8.0.3.0-visible-only-3`; AHV requires
+`nutanix-ahv-v4.0-hardware-3`; OpenStack requires `openstack-project-https-5`, including the signed Glance endpoint for VM-referenced images. Glance custom properties are retained as strings; driver/security metadata is observation only and must be reconciled with the selected compute tuple and guest before qualification.
 Old selectors are not aliases. Native material, campaign root/issuer/collector keys
 and independent read-only witnesses have distinct custody. Pinned endpoints/IP/CA,
 service identity, validity, API profile, route/response budgets and live rechecks are

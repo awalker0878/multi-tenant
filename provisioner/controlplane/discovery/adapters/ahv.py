@@ -28,7 +28,7 @@ from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact,
 
 
 API_VERSION = 'v4.0'
-COLLECTOR_ID = 'nutanix-ahv-v4.0-hardware-2'
+COLLECTOR_ID = 'nutanix-ahv-v4.0-hardware-3'
 VM_PATH = '/api/vmm/v4.0/ahv/config/vms'
 _MAX_NATIVE_PAGE = 100
 _MAX_INTEGER = 2**63 - 1
@@ -235,6 +235,16 @@ def _vm(value: object, scope: PlanScope) -> DiscoveryObject:
                valid=lambda v: type(v) is bool),
         _field('nativeLiveMigrationCapable', value.get('isLiveMigrateCapable'),
                valid=lambda v: type(v) is bool),
+        _field('numThreadsPerCore',value.get('numThreadsPerCore'),valid=lambda v:_positive(v) is not None),
+        _field('numNumaNodes',value.get('numNumaNodes'),valid=lambda v:type(v) is int and 0<=v<=_MAX_INTEGER),
+        _field('cpuPassthroughEnabled',value.get('isCpuPassthroughEnabled'),valid=lambda v:type(v) is bool),
+        _field('vcpuHardPinningEnabled',value.get('isVcpuHardPinningEnabled'),valid=lambda v:type(v) is bool),
+        _field('cpuHotAddEnabled',value.get('isCpuHotplugEnabled'),valid=lambda v:type(v) is bool),
+        _field('memoryOvercommitEnabled',value.get('isMemoryOvercommitEnabled'),valid=lambda v:type(v) is bool),
+        _field('agentVm',value.get('isAgentVm'),valid=lambda v:type(v) is bool),
+        _field('machineType',value.get('machineType'),valid=lambda v:isinstance(v,str) and 0<len(v)<=128),
+        _field('biosUuid',value.get('biosUuid'),valid=lambda v:_uuid(v) is not None),
+        _field('nativeGenerationUuid',value.get('generationUuid'),valid=lambda v:_uuid(v) is not None),
     )
     return DiscoveryObject(NativeIdentity(scope.endpoint_id, scope.native_scope_id,
                                           'nutanix', 'vm', vm_id), facts)

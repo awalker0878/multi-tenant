@@ -64,6 +64,35 @@ def require_creation_inputs(bundle: ResourceBundle, scope: PlanScope, resource_i
         raise OperationConflict('Saved Terraform inputs differ from the immutable capacity/workload selection')
 
 
+SERVICE_OPERATIONS = {'ipam': 'IPAM_RESERVE', 'dns': 'DNS_CHANGE',
+                      'dns_cutover':'DNS_CHANGE','openstack_quota': 'QUOTA_CHANGE'}
+
+
+def reservation_identity_digest(receipts: list) -> str:
+    """Lifecycle/readback changes do not change the originally charged demand.
+
+    Current readiness still checks the actual authoritative receipt. Hashing its
+    status, observation time or speculative deadline would make a legitimate
+    capacity confirmation invalidate the following active-address/DNS grant.
+    Legacy owner snapshots with another digest require retained-state review.
+    """
+    fields=('format','owner_id','reservation_id','request_sha256','scope','pool_id',
+            'units','envelope_sha256','resource_binding_sha256')
+    return c.digest({'format':'hosting-reservation-identity/1',
+                     'receipts':[{key:receipt[key] for key in fields} for receipt in receipts]})
+
+
+def service_request_digest(bundle: ResourceBundle, artifact: dict, step_id: str) -> str:
+    binding = artifact.get('stageBindings', {}).get(step_id)
+    if (not isinstance(binding, dict) or binding.get('kind') not in SERVICE_OPERATIONS
+            or artifact.get('resourceBundleDigest') != bundle.digest
+            or _digest(artifact) != bundle.selection_digest):
+        raise OperationConflict('The protected selection lacks this exact service operation')
+    return c.digest({'format': 'hosting-selected-service-operation/1',
+                     'resource_bundle_digest': bundle.digest, 'step_id': step_id,
+                     'operation_kind': SERVICE_OPERATIONS[binding['kind']], 'binding': binding})
+
+
 @dataclass(frozen=True)
 class PlannedResourceLease:
     organization_id: str
@@ -79,6 +108,20 @@ class PlannedResourceLease:
     worker_id: str
     epoch: int
     expires_at: datetime
+
+
+@dataclass(frozen=True)
+class PlannedServiceLease:
+    owner: PlannedResourceLease
+    step_id: str
+    operation_kind: str
+    request_digest: str
+
+    def __post_init__(self):
+        if (not isinstance(self.owner, PlannedResourceLease) or not _key(self.step_id)
+                or self.operation_kind not in SERVICE_OPERATIONS.values()
+                or not c.HEX.fullmatch(self.request_digest)):
+            raise ValueError('An exact planned service lease projection is required')
 
 
 @dataclass(frozen=True)
@@ -136,6 +179,13 @@ class PlannedLeaseAuthority:
         self.bundle_lookup,self.authority=bundle_lookup,authority
         self.native=NativeLeaseAuthority(connect)
 
+    def _require_selected_driver(self,execution):
+        if (not isinstance(execution,dict)
+                or execution.get('format')!='hosting-execution-selection/1'
+                or execution.get('driver') not in {
+                    'openstack-linux-rebuild/1', 'openstack-linux-application-staging/1'}):
+            raise OperationConflict('Canonical plan lacks a selected creation driver')
+
     def _bundle(self,cursor,context,job_id):
         cursor.execute('SELECT hosting_controlplane.lock_job_scope(%s, %s, %s)',
                        (context.organization_id,context.tenant_id,job_id))
@@ -158,10 +208,7 @@ class PlannedLeaseAuthority:
                        (context.organization_id,context.tenant_id,job.plan_id))
         plan=_ensure_plan(cursor.fetchone(),context,job)
         execution=plan['spec'].get('execution')
-        if (not isinstance(execution,dict)
-                or execution.get('format')!='hosting-execution-selection/1'
-                or execution.get('driver')!='openstack-linux-rebuild/1'):
-            raise OperationConflict('Canonical plan lacks a selected creation driver')
+        self._require_selected_driver(execution)
         artifact=self.selections.load_verified(execution['artifactDigest'])
         admitted=AdmittedInput(job.job_id,job.organization_id,job.tenant_id,job.plan_id,
                               job.plan_revision,job.plan_digest,job.revocation_epoch,
@@ -197,6 +244,9 @@ class PlannedLeaseAuthority:
             job,plan,bundle=self._bundle(cursor,context,job_id)
             if scope!=job.destination:
                 raise OperationConflict('Creation scope differs from approved destination')
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            require_write_admission(cursor,context,security_domain_id=scope.security_domain_id,
+                                    workload_id=bundle.workload_id)
             selected={mapping['targetMachineId'] for mapping in plan['spec']['machineMappings']}
             members={member for pool in bundle.pools if pool.scope==scope and pool.inputs is not None
                      for member in pool.inputs['members']}
@@ -204,7 +254,7 @@ class PlannedLeaseAuthority:
                 raise OperationConflict('Every approved target machine must match the immutable creation children')
             request_digest=creation_request_digest(bundle,scope,resource_id)
             accounted=self.resources._require_accounted(bundle)
-            reservation_digest=c.digest(accounted['receipts'])
+            reservation_digest=reservation_identity_digest(accounted['receipts'])
             now=NativeOperationRegistry._clock(cursor)
             if worker_identity.expires_at<=now:
                 raise OperationConflict('Planned writer certificate expired')
@@ -284,7 +334,7 @@ class PlannedLeaseAuthority:
         _job_record,_plan,bundle=self._bundle(cursor,context,job_id)
         accounted=self.resources._require_accounted(bundle)
         if (row[13]!=bundle.selection_digest or row[14]!=creation_request_digest(bundle,scope,row[2])
-                or row[15]!=c.digest(accounted['receipts'])):
+                or row[15]!=reservation_identity_digest(accounted['receipts'])):
             raise OperationConflict('Planned resource reservation or immutable selection changed')
         cursor.execute('SELECT target_machine_id FROM hosting_controlplane.planned_creation_children '
                        'WHERE organization_id=%s AND tenant_id=%s AND job_id=%s AND resource_id=%s '
@@ -292,6 +342,64 @@ class PlannedLeaseAuthority:
                        (context.organization_id,context.tenant_id,job_id,row[2]))
         if tuple(child[0] for child in cursor.fetchall())!=creation_children(bundle,scope,row[2]):
             raise OperationConflict('Immutable planned creation children differ from approved demand')
+        cursor.execute('SELECT step_id,operation_kind,request_digest,job_id,resource_id '
+                       'FROM hosting_controlplane.planned_service_bindings WHERE '
+                       'organization_id=%s AND tenant_id=%s AND lease_key=%s',
+                       (context.organization_id,context.tenant_id,lease_key))
+        service=cursor.fetchone()
+        if service is not None:
+            artifact=self.selections.load_verified(bundle.selection_digest)
+            if (service[3:]!=(job_id,row[2])
+                    or service[1]!=SERVICE_OPERATIONS.get(artifact.get('stageBindings',{}).get(service[0],{}).get('kind'))
+                    or service[2]!=service_request_digest(bundle,artifact,service[0])):
+                raise OperationConflict('Selected service lease differs from its approved exact stage')
+
+    def register_service(self,context,scope,*,job_id,resource_id,lease_key,operation_id,
+                         step_id,worker_identity,ttl_seconds=300):
+        # The same immutable logical deployment owns IPAM before any VM ID
+        # exists. Its capacity receipt and selected children remain authoritative.
+        owner=self.register(context,scope,job_id=job_id,resource_id=resource_id,
+            lease_key=lease_key,operation_id=operation_id,worker_identity=worker_identity,
+            ttl_seconds=ttl_seconds)
+        with self._connect() as connection,connection.cursor() as cursor:
+            _tenant(cursor,context)
+            _job_record,_plan,bundle=self._bundle(cursor,context,job_id)
+            artifact=self.selections.load_verified(bundle.selection_digest)
+            request_digest=service_request_digest(bundle,artifact,step_id)
+            operation_kind=SERVICE_OPERATIONS[artifact['stageBindings'][step_id]['kind']]
+            cursor.execute('INSERT INTO hosting_controlplane.planned_service_bindings '
+                '(organization_id,tenant_id,lease_key,job_id,resource_id,step_id,operation_kind,request_digest) '
+                'VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING',
+                (context.organization_id,context.tenant_id,lease_key,job_id,resource_id,
+                 step_id,operation_kind,request_digest))
+            cursor.execute('SELECT step_id,operation_kind,request_digest,job_id,resource_id '
+                'FROM hosting_controlplane.planned_service_bindings WHERE organization_id=%s '
+                'AND tenant_id=%s AND lease_key=%s',
+                (context.organization_id,context.tenant_id,lease_key))
+            if cursor.fetchone()!=(step_id,operation_kind,request_digest,job_id,resource_id):
+                raise OperationConflict('Service operation lease was used for another selected stage')
+            self.require_current(cursor,context,lease_key=lease_key,lease_epoch=owner.epoch,
+                job_id=job_id,operation_id=operation_id,scope=scope,worker_subject=owner.worker_id)
+            return PlannedServiceLease(owner,step_id,operation_kind,request_digest)
+
+    def require_operation(self,cursor,context,*,lease_key,operation_kind,step_id):
+        """B10 cannot turn a pre-create address lease into a creation grant."""
+        cursor.execute('SELECT l.planned_resource_id,s.step_id,s.operation_kind FROM '
+            'hosting_controlplane.native_operation_leases l LEFT JOIN '
+            'hosting_controlplane.planned_service_bindings s ON '
+            '(l.organization_id,l.tenant_id,l.lease_key)=(s.organization_id,s.tenant_id,s.lease_key) '
+            'WHERE l.organization_id=%s AND l.tenant_id=%s AND l.lease_key=%s',
+            (context.organization_id,context.tenant_id,lease_key))
+        row=cursor.fetchone()
+        if row is None:
+            raise OperationConflict('The operation lease is unavailable')
+        if row[0] is None:
+            return  # Existing observed identities retain the B10 operation domain.
+        if row[1] is None:
+            if operation_kind!='VM_CREATE':
+                raise OperationConflict('The original planned creation lease only admits VM_CREATE')
+        elif row[1:]!=(step_id,operation_kind):
+            raise OperationConflict('The grant kind or step differs from its exact selected service lease')
 
 
 _SELECT=('operation_id,job_id,grant_id,step_id,lease_key,planned_resource_id,resource_kind,'
@@ -312,7 +420,7 @@ class PlannedNativeCreationRegistry:
     def _get(cursor,context,operation_id,*,lock=True):
         cursor.execute(f'SELECT {_SELECT} FROM hosting_controlplane.native_operation_intents '
                        'WHERE organization_id=%s AND tenant_id=%s AND operation_id=%s '
-                       'AND planned_resource_id IS NOT NULL'+(' FOR UPDATE' if lock else ''),
+                       "AND planned_resource_id IS NOT NULL AND operation_kind='VM_CREATE'"+(' FOR UPDATE' if lock else ''),
                        (context.organization_id,context.tenant_id,operation_id))
         row=cursor.fetchone()
         if row is None: raise OperationConflict('Planned creation intent is unavailable in this tenant')
@@ -324,6 +432,9 @@ class PlannedNativeCreationRegistry:
         return PlannedCreationOperation(*row[:7],scope,row[10],row[12],row[13],*row[14:])
 
     def _grant(self,cursor,context,lease,operation,identity):
+        from provisioner.controlplane.conversion.handover import require_write_admission
+        require_write_admission(cursor,context,security_domain_id=lease.scope.security_domain_id,
+                                workload_id=lease.workload_id)
         if ((operation.job_id,operation.resource_id,operation.scope,operation.worker_id,
              operation.owner_epoch,operation.request_digest)!=
                 (lease.job_id,lease.resource_id,lease.scope,lease.worker_id,lease.epoch,lease.request_digest)):
@@ -441,7 +552,7 @@ class PlannedNativeCreationRegistry:
             proposed=self._get(cursor,context,operation_id,lock=False)
             self._grant(cursor,context,lease,proposed,worker_identity)
             operation=self._get(cursor,context,operation_id)
-            if operation!=proposed or operation.state not in {'IN_FLIGHT','TASK_ACCEPTED','UNCERTAIN'}:
+            if operation!=proposed or operation.state not in {'IN_FLIGHT','TASK_ACCEPTED'}:
                 raise RecoveryHeld('Creation cannot acknowledge from this state')
             self._verify_observation(cursor,operation,observation)
             native=observation.observation

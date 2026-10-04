@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -76,6 +77,27 @@ class TerraformRunFixture:
              patch.object(run, 'snapshot', side_effect=self.snapshot), \
              patch.object(run, 'command', side_effect=self.engine):
             return run.prepare(self.args)
+
+
+class TerraformSnapshotTests(unittest.TestCase):
+    def test_snapshot_uses_selected_commit_and_ignores_ambient_git_worktree(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            environment={key:value for key,value in os.environ.items() if not key.startswith('GIT_')}
+            environment|={'GIT_CONFIG_NOSYSTEM':'1','GIT_CONFIG_GLOBAL':os.devnull}
+            for name,data in (('selected',b'selected source\n'),('other',b'other source\n')):
+                root=base/name; root.mkdir(mode=0o700)
+                source=root/'terraform'; source.mkdir(mode=0o700)
+                (source/'owned.tf.json').write_bytes(data)
+                for command in (['init','--quiet'],['add','terraform'],
+                                ['-c','user.name=fixture','-c','user.email=fixture@example.invalid',
+                                 'commit','--quiet','-m','Private source fixture']):
+                    subprocess.run(['git','-C',str(root),*command],env=environment,
+                        stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+                        check=True,timeout=10)
+            with patch.dict(os.environ,{'GIT_DIR':str(base/'other/.git'),'GIT_WORK_TREE':str(base/'other')}):
+                run.snapshot(base/'selected',base/'snapshot')
+            self.assertEqual((base/'snapshot/terraform/owned.tf.json').read_bytes(),b'selected source\n')
 
 
 class TerraformRunTests(TerraformRunFixture, unittest.TestCase):

@@ -20,6 +20,7 @@ from unittest.mock import patch
 from provisioner.controlplane.discovery import batch_runtime, collector_runtime
 from provisioner.controlplane.discovery.batch_runtime import DiscoveryBatch, run_batch
 from tests.provisioning.discovery import test_collector_runtime as runtime_fixture
+from tests.provisioning.discovery import test_fleet_read_budget as fleet_fixture
 
 
 def specification(config, campaign, environment, *, now):
@@ -208,6 +209,44 @@ class BatchOtherNativeTests(runtime_fixture.RuntimeFixture, unittest.TestCase):
         self.assertEqual(self.batch_stage()['stagedCount'], 1)
         self.assertEqual([c[0] for c in n.calls], ['compute','volume','network']*2 + ['image'])
 
+
+class FleetBatchTests(runtime_fixture.RuntimeFixture,fleet_fixture.FleetFixture,unittest.TestCase):
+    def setUp(self):
+        self.configure();collector_config=self.config;self.setup_fleet(self.native.root)
+        self.fleet_config=self.config;self.config=collector_config
+        self.journal=self.native.root/'batch-journal';self.journal.mkdir(mode=0o700)
+        self.path=self.native.root/'batch.json'
+        runtime_fixture.write_json(self.path,specification(self.config_path,self.native.campaign,
+            self.native.environment,now=self.native.now))
+        self.enroll_stores({'outbox':Path(self.config['outboxRoot']),'batch-journal':self.journal})
+
+    def enroll_stores(self,stores):
+        raw=fleet_fixture.service._json(fleet_fixture.service.capture_service_facts('collector-service',stores)).encode('ascii')
+        self.manifest.write_bytes(raw)
+        selected=json.loads(self.fleet_config.read_text())
+        selected['serviceEnrollmentDigest']=hashlib.sha256(raw).hexdigest()
+        self.fleet_config=self.native.root/'fleet.json';self.fleet_config.write_text(json.dumps(selected))
+
+    def execute(self):
+        with patch.object(fleet_fixture.module.FleetBudgetSettings,'connect',self.db.connect):
+            return run_batch(self.path,clock=lambda:self.native.now,state_directory=self.journal,fleet_config=self.fleet_config)
+
+    def test_batch_uses_enrolled_fleet_owner_and_retained_original_without_read_replay(self):
+        result=self.execute()
+        self.assertEqual(result['stagedCount'],1);self.assertEqual(result['limitScope'],'ONE_ENROLLED_POSTGRESQL_FLEET')
+        self.assertTrue(result['durableEndpointBudget']);self.assertFalse(result['unknownReadLeasesAutoReleased'])
+        self.assertEqual((len(self.native.calls),len(self.db.starts),len(self.db.closes)),(2,2,2))
+        second=self.execute();self.assertEqual(second['stagedCount'],0)
+        self.assertEqual(second['items'][0]['recordedEvent'],'TASK_STAGED')
+        self.assertEqual((len(self.native.calls),len(self.db.starts)),(2,2))
+
+    def test_unenrolled_journal_or_outbox_and_mixed_budget_modes_never_read(self):
+        with self.assertRaises(ValueError):run_batch(self.path,fleet_config=self.fleet_config,fleet_state_directory=self.store)
+        self.enroll_stores({'outbox':Path(self.config['outboxRoot'])})
+        with self.assertRaises(PermissionError):self.execute()
+        self.enroll_stores({'batch-journal':self.journal})
+        result=self.execute();self.assertEqual(result['stagedCount'],0)
+        self.assertEqual(result['items'][0]['status'],'HELD');self.assertFalse(self.native.calls);self.assertFalse(self.db.starts)
 
 class BatchDispatchTests(unittest.TestCase):
     def setUp(self):

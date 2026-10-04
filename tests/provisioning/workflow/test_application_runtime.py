@@ -94,7 +94,9 @@ class ApplicationRuntimeTests(unittest.TestCase):
         self.database = self.root / 'capacity.db'
         self.environment.update(HOSTING_APPLICATION_CAPACITY_DATABASE=str(self.database),
             HOSTING_APPLICATION_SOURCE_ROOT=str(self.source_root), HOSTING_APPLICATION_EXECUTION='1',
-            HOSTING_OPS_ACCEPTANCE_VAULT_TRUST_JSON='{"operating-fixture":["operating","acceptance"]}')
+            HOSTING_OPS_ACCEPTANCE_VAULT_TRUST_JSON='{"operating-fixture":["operating","acceptance"]}',
+            HOSTING_NATIVE_OBSERVER_VAULT_TRUST_JSON='{"observer-fixture":["observer","native"]}',
+            HOSTING_OPERATING_HANDOVER_VAULT_TRUST_JSON='{"handover-fixture":["operating","handover"]}')
         self.source = deepcopy(SOURCE)
         self.destination = TARGET | {'platformFamily': 'openstack', 'endpointId': 'openstack-01',
                                     'nativeScopeId': 'native-pool-01'}
@@ -239,7 +241,7 @@ class ApplicationRuntimeTests(unittest.TestCase):
         self.assertIs(components.authority.operations, components.action_gate.operations)
         self.assertIs(components.action_gate.operations.worker_grants, components.worker_grants)
         self.assertIs(components.provisioning.authority, components.migration.authority)
-        self.assertEqual(len(components.activities), 11)
+        self.assertEqual(len(components.activities), 33)
         self.assertIsNone(components.creation_registry)
         self.assertIsNone(components.native_registry)
         self.assertIn('ENROLLED_NATIVE_PROVISIONING_WORKERS_REQUIRED', components.hold_codes)

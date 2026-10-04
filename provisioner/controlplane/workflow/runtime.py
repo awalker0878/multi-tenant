@@ -31,6 +31,12 @@ from provisioner.controlplane.persistence import TenantContext
 
 from .admitted_job import AdmittedMigrationJob
 from .application_job import ApplicationJobResult, OpenStackApplicationMigration
+from .application_staging_job import ApplicationStagingResult, OpenStackApplicationStaging
+from .application_cutover_job import OpenStackStagedApplicationCutover
+from .resource_recovery_job import ResourceRecoveryResult, SelectedResourceRecovery
+from .application_recovery_job import ApplicationRecoveryResult, SelectedApplicationPostwriteRecovery
+from .windows_service_job import WindowsServiceResult, SelectedWindowsExistingServices
+from .cold_capture_job import ColdCaptureResult, SelectedColdCapture
 from .approval_activity import PostgresApprovalVerifier
 from .temporal_adapter import TemporalConnection, TemporalWorkflowStarter
 
@@ -89,7 +95,13 @@ async def _worker(settings: TemporalConnection, *, application_components=None) 
         if not isinstance(application_components, ApplicationWorkerComponents):
             raise TypeError('Actual installed application worker components required')
         application_components.settings.require_current()
-        workflows.append(OpenStackApplicationMigration)
+        seal = getattr(application_components.planned_leases, 'seal_for_worker', None)
+        if callable(seal):
+            seal()
+        workflows.extend((OpenStackApplicationMigration, OpenStackApplicationStaging,
+                          OpenStackStagedApplicationCutover, SelectedResourceRecovery,
+                          SelectedApplicationPostwriteRecovery, SelectedWindowsExistingServices,
+                          SelectedColdCapture))
         activities.extend(application_components.activities)
     client = await Client.connect(settings.target_host, namespace=settings.namespace,
                                   tls=settings.tls())
@@ -160,17 +172,39 @@ def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
     result = workflow.completed_job(receipt)
     if result is None:
         return False
-    if isinstance(result, ApplicationJobResult):
+    if isinstance(result, (ApplicationJobResult, ApplicationStagingResult, ResourceRecoveryResult,
+                           ApplicationRecoveryResult, WindowsServiceResult, ColdCaptureResult)):
+        phase = {'CAPTURE': 'TRANSFER', 'IMPORT': 'PROVISION'}.get(result.phase, result.phase)
         detail = {'stepId': {'APPROVAL': 'approval-gate', 'PREPARE': 'prepare',
             'PROVISION': 'provision', 'TRANSFER': 'transfer', 'CUTOVER': 'cutover',
-            'VERIFY': 'verify'}[result.phase], 'phase': result.phase,
-            'reasonCode': result.reason_code, 'completed': result.completed, 'total': result.total}
+            'VERIFY': 'verify', 'RECONCILE': 'reconcile', 'CLEANUP': 'cleanup'}[phase], 'phase': phase,
+            'completed': result.completed, 'total': result.total}
+        if result.reason_code is not None:
+            detail['reasonCode'] = result.reason_code
         if result.evidence_digest is not None:
             detail['evidenceDigest'] = result.evidence_digest
-        if result.hold_code is not None:
+        if getattr(result, 'hold_code', None) is not None:
             detail['holdCode'] = result.hold_code
+        if isinstance(result, ApplicationStagingResult):
+            event = 'APPLICATION_TARGETS_STAGED' if result.status == 'STAGED' else 'APPLICATION_STAGING_HELD'
+            projected_status = 'SUCCEEDED' if result.status == 'STAGED' else 'HELD'
+        elif isinstance(result, ResourceRecoveryResult):
+            event = 'RESOURCE_RECOVERY_SUCCEEDED' if result.status == 'SUCCEEDED' else 'RESOURCE_RECOVERY_HELD'
+            projected_status = result.status
+        elif isinstance(result, ApplicationRecoveryResult):
+            event = 'APPLICATION_RECOVERY_SUCCEEDED' if result.status == 'SUCCEEDED' else 'APPLICATION_RECOVERY_HELD'
+            projected_status = result.status
+        elif isinstance(result, WindowsServiceResult):
+            event = 'WINDOWS_SERVICE_POSTCONDITIONS_OBSERVED' if result.service_postconditions_observed else 'WINDOWS_SERVICE_HELD'
+            projected_status = 'HELD'
+        elif isinstance(result, ColdCaptureResult):
+            event = 'COLD_BYTES_IMPORTED' if result.status == 'IMPORTED' else 'COLD_CAPTURE_HELD'
+            projected_status = 'SUCCEEDED' if result.status == 'IMPORTED' else 'HELD'
+        else:
+            event = 'APPLICATION_EXECUTION_SUCCEEDED' if result.status == 'SUCCEEDED' else 'APPLICATION_EXECUTION_HELD'
+            projected_status = result.status
         jobs.append_progress(context, job_id, event_key=f'temporal-application:{receipt.run_id}',
-            event_type='APPLICATION_EXECUTION_HELD', status='HELD', detail=detail)
+            event_type=event, status=projected_status, detail=detail)
         return True
     passed = result.status == 'GATE_PASSED'
     jobs.append_progress(

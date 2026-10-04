@@ -8,6 +8,7 @@ Type=oneshot
 User=hosting-discovery-monitor
 Group=hosting-discovery-monitor
 UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1 PYTHONSAFEPATH=1
 EnvironmentFile=/etc/hosting/discovery/monitors/%i.env
 ExecStart=/opt/hosting/bin/hosting-discovery-monitor cycle --config /etc/hosting/discovery/monitors/%i.json
 TimeoutStartSec=60min

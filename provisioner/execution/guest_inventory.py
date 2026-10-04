@@ -96,10 +96,13 @@ def build(outputs, access, known_hosts, now=None):
     return {'all': {'vars': variables, 'children': {'hosting_guests': {'hosts': hosts}}}}, '\n'.join(key_lines) + '\n'
 
 
-def gate(enabled, outputs, access, known_hosts, targets, hostvars):
+def gate(enabled, outputs, access, known_hosts, targets, hostvars, *, expected_connection='ssh'):
     require(enabled is True, 'Native profile requires explicit Boolean opt-in')
     inventory, expected_keys = build(outputs, access, known_hosts)
     expected = inventory['all']['children']['hosting_guests']['hosts']
+    require(expected_connection in {'ssh', 'hosting_guarded_ssh'}, 'A fixed owned guest transport is required')
+    if expected_connection == 'hosting_guarded_ssh':
+        for values in expected.values(): values['ansible_connection'] = expected_connection
     require(set(targets) == set(expected), 'Native inventory target set changed')
     path = Path(known_hosts)
     require(path.is_file() and not path.is_symlink() and path.stat().st_mode & 0o077 == 0,

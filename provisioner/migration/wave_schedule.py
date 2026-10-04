@@ -776,6 +776,11 @@ class WaveScheduler:
                      'Authority, budget or window expired while awaiting admission')
             for scope in (member.source, member.destination):
                 require_scoped_role(principal, EXECUTION_OPERATOR, scope, current)
+            from .enterprise_wave import require_pool_turn
+            if not require_pool_turn(cursor, context, domain, state, principal, authorization, current):
+                return WaveAdmission('WAITING_ENTERPRISE_TURN',
+                    'wave-' + state.schedule_digest, member.member_id, None,
+                    'ENTERPRISE_TENANT_TURN_OR_BUDGET_UNAVAILABLE', totals)
             key = 'wave-' + _digest({'scheduleDigest': state.schedule_digest, 'memberId': member.member_id})
             job = self.jobs.submit_in_transaction(cursor, context, authorization, idempotency_key=key)
             _require(job.status == 'QUEUED', 'A saved wave cannot adopt an already executing or terminal job')

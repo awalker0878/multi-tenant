@@ -189,6 +189,27 @@ class EphemeralSavedPlanTests(TerraformRunFixture, unittest.TestCase):
         self.ledger=self.base/'owner-ledger'; self.ledger.mkdir(mode=0o700); self.applies=[]
         self.apply_directory=self.delivery_base/'steps'/'apply'; self.apply_directory.mkdir(mode=0o700)
         self.runtime.registry=_FixtureRegistry(self.apply_directory); self.runtime.observer=_FixtureObserver()
+        # This suite's B10/persistence ports are explicit process doubles.
+        # Exact custody/revoke protocol and PostgreSQL closure have their own
+        # tests; still enforce their position before the completion marker.
+        from provisioner.controlplane.worker.native_retirement import CompletedNativeGrantRetirement
+        self.runtime.retirement=object.__new__(CompletedNativeGrantRetirement)
+        self.retirements=[]
+        def retired(*_):
+            self.assertEqual(self.runtime.registry.state,'RESOLVED')
+            self.assertFalse((self.apply_directory/'owner-completion.json').exists())
+            self.retirements.append('sealed');return 'e'*64
+        self.retirement_patch=patch.object(CompletedNativeGrantRetirement,'retire',side_effect=retired)
+        self.retirement_patch.start();self.addCleanup(self.retirement_patch.stop)
+        from provisioner.controlplane.reconciliation.application_accounting import ApplicationResourceAccounting
+        self.runtime.resource_accounting=object.__new__(ApplicationResourceAccounting)
+        self.confirmations=[]
+        def confirmed(*_):
+            self.assertEqual(self.retirements,['sealed'])
+            self.assertFalse((self.apply_directory/'owner-completion.json').exists())
+            self.confirmations.append('confirmed')
+        self.accounting_patch=patch.object(ApplicationResourceAccounting,'confirm_creation',side_effect=confirmed)
+        self.accounting_patch.start();self.addCleanup(self.accounting_patch.stop)
         self.delivery={'format':'hosting-delivery/2','source_commit':self.source,'operation_id':'delivery-01',
             'generation':1,'scope':self.selection['executionScope'],
             'steps':[{'id':'plan','kind':'terraform_plan','needs':[]},
@@ -261,6 +282,8 @@ class EphemeralSavedPlanTests(TerraformRunFixture, unittest.TestCase):
         self.assertEqual(result['status'],'APPLIED_REQUIRES_NATIVE_ACCEPTANCE')
         self.assertEqual(self.runtime.registry.state,'RESOLVED')
         self.assertIn('owner-completion.json',names)
+        self.assertEqual(self.retirements,['sealed'])
+        self.assertEqual(self.confirmations,['confirmed'])
         with self.assertRaises(RecoveryHeld): self.run_step()
         self.assertEqual(self.runtime.registry.claims,1); self.assertEqual(len(self.applies),2)
 

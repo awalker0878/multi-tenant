@@ -60,7 +60,8 @@ KINDS = frozenset({
     'platform_transition', 'workload_inputs', 'capacity', 'acceptance',
     'retirement_review', 'operations_review', 'operations_alerts', 'terraform_plan',
     'terraform_apply', 'terraform_approval', 'guest_plan', 'guest_apply', 'vsphere_power', 'target_campaign',
-    'edge_policy', 'ipam', 'dns', 'dns_propagation',
+    'edge_policy', 'ipam', 'dns', 'dns_propagation', 'dns_cutover', 'windows_guest_apply',
+    'windows_guest_observe', 'windows_guest_remediate',
 })
 IDENTIFIER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')
 ACCEPTANCE_PURPOSES = frozenset({'admission', 'domain', 'bootstrap', 'services',
@@ -483,6 +484,10 @@ def _declared_parameters(kind: str) -> frozenset:
 
 
 _DECLARED_PARAMETERS = {
+    'dns_cutover': frozenset({'prior_operation_id'}),
+    'windows_guest_apply': frozenset(),
+    'windows_guest_observe': frozenset({'original_operation_id'}),
+    'windows_guest_remediate': frozenset({'original_operation_id'}),
     'openstack_quota': frozenset(),
     'edge_containment': frozenset({'nft', 'nft_sha256'}),
     'remote_owner': frozenset({'ssh', 'ssh_sha256'}),

@@ -1,0 +1,10 @@
+{
+  "format": "hosting-discovery-fleet-fence-receiver/1",
+  "fleetId": "commissioned-fleet-1",
+  "databaseRole": "hosting_discovery_fleet_fencer_1",
+  "databaseCaDigest": "REPLACE_WITH_POSTGRESQL_CA_SHA256",
+  "dsnFile": "/etc/hosting/discovery/fleets/fencer-1.dsn",
+  "fencePublicKey": "REPLACE_WITH_INDEPENDENT_ED25519_FENCE_OWNER_KEY",
+  "serviceEnrollmentFile": "/etc/hosting/discovery/fleets/fencer-1-service.json",
+  "serviceEnrollmentDigest": "REPLACE_WITH_ACTUAL_MANIFEST_SHA256"
+}

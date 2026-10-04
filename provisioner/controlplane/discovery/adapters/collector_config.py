@@ -59,9 +59,9 @@ def _openstack(row, campaign, environment, verifier, clock, key, read_gate):
 
 # Exact existing collector IDs are admission selectors, not new capability claims.
 _FACTORIES = {
-    'nutanix-ahv-v4.0-hardware-2': _ahv,
-    'vcenter-rest-vm-info-8.0.3.0-visible-only-2': _vmware,
-    'openstack-project-https-4': _openstack,
+    'nutanix-ahv-v4.0-hardware-3': _ahv,
+    'vcenter-rest-vm-info-8.0.3.0-visible-only-3': _vmware,
+    'openstack-project-https-5': _openstack,
 }
 
 

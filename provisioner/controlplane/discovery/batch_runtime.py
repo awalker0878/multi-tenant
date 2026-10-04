@@ -107,19 +107,27 @@ class DiscoveryBatch:
 
 
 def run_batch(path, *, clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
-              state_directory=None, wait_for_due=False, fleet_state_directory=None) -> dict:
+              state_directory=None, wait_for_due=False, fleet_state_directory=None,fleet_config=None) -> dict:
     if type(wait_for_due) is not bool or wait_for_due and state_directory is None:
         raise ValueError('Waiting requires an explicit durable batch journal')
+    if fleet_config is not None and fleet_state_directory is not None:
+        raise ValueError('Select one explicit fleet budget owner')
+    budget=None
+    if fleet_config is not None:
+        from .fleet_read_budget import FleetBudgetSettings,PostgresFleetBudget
+        settings=FleetBudgetSettings.from_file(fleet_config)
+        if state_directory is not None:settings.enrollment.require_store('batch-journal',protected_path(str(state_directory)))
+        budget=PostgresFleetBudget(settings)
     spec = DiscoveryBatch.from_file(path)
     if state_directory is None:
-        return _run_batch(spec, clock=clock, fleet_state_directory=fleet_state_directory)
+        return _run_batch(spec, clock=clock, fleet_state_directory=fleet_state_directory,fleet_budget=budget)
     from .batch_journal import BatchJournal
     with BatchJournal(state_directory, spec, manifest_path=path, clock=clock, enroll=True) as journal:
         return _run_batch(spec, clock=clock, journal=journal, wait_for_due=wait_for_due,
-                          fleet_state_directory=fleet_state_directory)
+                          fleet_state_directory=fleet_state_directory,fleet_budget=budget)
 
 
-def _run_batch(spec, *, clock, journal=None, wait_for_due=False, fleet_state_directory=None) -> dict:
+def _run_batch(spec, *, clock, journal=None, wait_for_due=False, fleet_state_directory=None,fleet_budget=None) -> dict:
     """Use one dispatcher; optionally wait for pre-enrolled future tasks.
 
     Due tasks are round-robin across selected endpoints, oldest first within each
@@ -132,7 +140,10 @@ def _run_batch(spec, *, clock, journal=None, wait_for_due=False, fleet_state_dir
         raise ValueError('A trusted UTC batch clock is required')
     stopped = Event()
     deadline = time.monotonic() + spec.max_seconds
-    if fleet_state_directory is None:
+    if fleet_budget is not None:
+        from .fleet_read_budget import FleetNativeReadGate
+        gates={name:FleetNativeReadGate(policy,stopped=stopped,budget=fleet_budget) for name,policy in spec.policies}
+    elif fleet_state_directory is None:
         gates = {name: NativeReadGate(policy, stopped=stopped) for name, policy in spec.policies}
     else:
         from .shared_read_budget import SharedNativeReadGate
@@ -259,6 +270,9 @@ def _run_batch(spec, *, clock, journal=None, wait_for_due=False, fleet_state_dir
                       pendingTaskCount=sum(item['status'] in ('NOT_DUE', 'NOT_STARTED') for item in items))
     if fleet_state_directory is not None:
         result.update(limitScope='ONE_SHARED_POSIX_COORDINATOR_HOST', durableEndpointBudget=True)
+    if fleet_budget is not None:
+        result.update(limitScope='ONE_ENROLLED_POSTGRESQL_FLEET',durableEndpointBudget=True,
+                      fleetId=fleet_budget.settings.fleet_id,unknownReadLeasesAutoReleased=False)
     return result
 
 

@@ -127,6 +127,73 @@ def _nics(raw: object) -> tuple[DiscoveryFact, ...]:
         return tuple(DiscoveryFact.unknown(n, 'COLLECTION_ERROR') for n in names)
 
 
+def _controllers(detail:dict) -> tuple[DiscoveryFact,...]:
+    result=[]
+    for key,name,kind in (('scsi_adapters','scsiControllers','SCSI'),
+                          ('sata_adapters','sataControllers','SATA'),
+                          ('nvme_adapters','nvmeControllers','NVME')):
+        try:
+            devices=_devices(detail.get(key))
+            if devices is None:
+                result.append(DiscoveryFact.unknown(name,'NOT_RETURNED'));continue
+            values=[];buses=set()
+            for native_id,item in devices:
+                bus=item.get('scsi',{}).get('bus') if kind=='SCSI' and isinstance(item.get('scsi',{}),dict) else item.get('bus')
+                if not _integer(bus):raise ValueError('Controller bus is not observed')
+                if bus in buses:raise ValueError('Duplicate controller bus')
+                buses.add(bus)
+                value={'nativeControllerId':native_id,'controllerKind':kind,'bus':bus}
+                for field,output in (('type','model'),('sharing','sharing')):
+                    if field in item:
+                        if not _text(item[field]):raise ValueError('Invalid controller model/sharing')
+                        value[output]=item[field]
+                if 'pci_slot_number' in item:
+                    if not _integer(item['pci_slot_number']):raise ValueError('Invalid controller PCI address')
+                    value['pciSlotNumber']=item['pci_slot_number']
+                values.append(value)
+            result.append(_fact(name,values))
+        except ValueError:result.append(DiscoveryFact.unknown(name,'COLLECTION_ERROR'))
+    # Bus sharing is its own observation, never proof that no disk has another
+    # writer. Missing sharing stays unknown even when models/buses were retained.
+    devices=detail.get('scsi_adapters')
+    if not isinstance(devices,dict):sharing=None
+    else:
+        sharing=[{'nativeControllerId':key,'sharing':item.get('sharing')}
+                 for key,item in sorted(devices.items()) if isinstance(item,dict)]
+        if len(sharing)!=len(devices) or any(not _text(item['sharing']) for item in sharing):sharing=None
+    result.append(_fact('scsiBusSharing',sharing))
+    return tuple(result)
+
+
+def _boot_devices(detail:dict) -> DiscoveryFact:
+    raw=detail.get('boot_devices')
+    if raw is None:return DiscoveryFact.unknown('configuredBootDevices','NOT_RETURNED')
+    try:
+        if not isinstance(raw,list) or len(raw)>256:raise ValueError('Invalid boot sequence')
+        values=[]
+        for item in raw:
+            if not isinstance(item,dict) or item.get('type') not in ('CDROM','DISK','ETHERNET','FLOPPY'):
+                raise ValueError('Invalid boot device kind')
+            value={'type':item['type']}
+            if item['type']=='ETHERNET':
+                if not _text(item.get('nic')):raise ValueError('Boot NIC identity is unavailable')
+                if not isinstance(detail.get('nics'),dict) or item['nic'] not in detail['nics']:
+                    raise ValueError('Boot NIC differs from observed hardware')
+                value['nativeNicId']=item['nic']
+            if item['type']=='DISK':
+                disks=item.get('disks')
+                if not isinstance(disks,list) or len(disks)>256 or any(not _text(disk) for disk in disks) or len(set(disks))!=len(disks):
+                    raise ValueError('Boot disk identities are unavailable')
+                if not isinstance(detail.get('disks'),dict) or not set(disks)<=detail['disks'].keys():
+                    raise ValueError('Boot disk differs from observed hardware')
+                value['nativeDiskIds']=list(disks)
+            values.append(value)
+        # Preserve configured sequence. Empty means native default sequence,
+        # not a known physical boot disk or an assumed guest boot order.
+        return _fact('configuredBootDevices',values)
+    except ValueError:return DiscoveryFact.unknown('configuredBootDevices','COLLECTION_ERROR')
+
+
 def observe_vm(scope: PlanScope, vm_id: str, instance_uuid: str, detail: dict) -> DiscoveryObject:
     """Capture only the already identity-checked VM-info response's own facts."""
     cpu = detail.get('cpu') if isinstance(detail.get('cpu'), dict) else {}
@@ -146,6 +213,11 @@ def observe_vm(scope: PlanScope, vm_id: str, instance_uuid: str, detail: dict) -
         _fact('numCoresPerSocket', cpu.get('cores_per_socket'), lambda v: _integer(v, 1)),
         memory_fact, _fact('firmware', firmware),
         *_disks(detail.get('disks')), *_nics(detail.get('nics')),
+        *_controllers(detail),_boot_devices(detail),
+        _fact('hardwareVersion',detail.get('hardware',{}).get('version') if isinstance(detail.get('hardware',{}),dict) else None,_text),
+        _fact('instantCloneFrozen',detail.get('instant_clone_frozen'),lambda value:type(value) is bool),
+        _fact('cpuHotAddEnabled',cpu.get('hot_add_enabled'),lambda value:type(value) is bool),
+        _fact('memoryHotAddEnabled',memory.get('hot_add_enabled'),lambda value:type(value) is bool),
         # REST's efi_legacy_boot is not SOAP's efiSecureBootEnabled.
         DiscoveryFact.unknown('secureBootEnabled', 'NOT_RETURNED'),
         DiscoveryFact.unknown('vtpmEnabled', 'NOT_RETURNED'),

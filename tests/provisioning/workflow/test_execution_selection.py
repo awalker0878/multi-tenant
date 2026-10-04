@@ -66,12 +66,42 @@ class ExecutionSelectionTests(unittest.TestCase):
         for profile in ('LINUX', 'WINDOWS', 'linux-debian-12'):
             selected = artifact(); selected['guestProfile'] = profile; cases.append(selected)
         selected = artifact(); selected['stageBindings']['prepare']['inputDigests']['credentials'] = '4'*64; cases.append(selected)
+        selected = artifact(); selected['stageBindings']['prepare']['inputDigests']['secrets'] = '4'*64; cases.append(selected)
         selected = artifact(); selected['credentialFile'] = '/private/token'; cases.append(selected)
         selected = artifact(); selected['executionScope']['tenant_key'] = 'other-tenant'; cases.append(selected)
         selected = artifact(); selected['ipamSelections'] = [{'operation_id': 'runtime-job'}]; cases.append(selected)
         for selected in cases:
             with self.subTest(selected=selected), self.assertRaises(ValueError):
                 validate_selection(selected)
+
+    def test_database_sync_requires_separate_descriptor_and_whole_application_lifecycle(self):
+        selected = artifact() | {'applicationDatabaseSelectionDigest': '4'*64}
+        with self.assertRaises(ValueError):
+            validate_selection(selected)
+        selected['applicationLifecycleSelectionDigest'] = '5'*64
+        with self.assertRaises(ValueError):
+            validate_selection(selected)
+        selected['driver'] = 'openstack-linux-application-database/1'
+        self.assertEqual(validate_selection(selected), selected)
+        with self.assertRaises(ValueError):
+            validate_selection({key: value for key, value in selected.items()
+                                if key != 'applicationDatabaseSelectionDigest'})
+        for field in ('applicationLifecycleSelectionDigest', 'applicationRecoverySelectionDigest',
+                      'applicationDatabaseSelectionDigest'):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate_selection(selected | {field: '/private/unchecked'})
+
+    def test_database_plan_requires_its_explicit_method_and_new_reviewed_digest(self):
+        selected = plan(target=artifact()['destination'])
+        selected['spec']['execution'] = {'format': 'hosting-execution-selection/1',
+            'driver': 'openstack-linux-application-database/1', 'artifactDigest': 'a' * 64}
+        selected['spec']['route']['method'] = 'REBUILD_RESTORE'
+        selected['metadata']['planDigest'] = plan_digest(selected)
+        self.assertTrue(any(problem['path'] == '$.spec.execution'
+                            for problem in validate_record(selected)))
+        selected['spec']['route']['method'] = 'APPLICATION_NATIVE'
+        selected['metadata']['planDigest'] = plan_digest(selected)
+        self.assertEqual(validate_record(selected), [])
 
     def test_plan_digest_binds_driver_and_artifact_without_reinterpreting_old_plan(self):
         target = artifact()['destination']

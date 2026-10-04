@@ -33,7 +33,7 @@ from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact, DiscoveryObj
                      _object_json, _utc, assemble_discovery_result)
 
 API_RELEASE = '8.0.3.0'
-PROFILE = 'vcenter-rest-vm-info-8.0.3.0-visible-only-2'
+PROFILE = 'vcenter-rest-vm-info-8.0.3.0-visible-only-3'
 _FOLDER = re.compile(r'group-v[1-9][0-9]{0,15}\Z')
 _DATACENTER = re.compile(r'datacenter-[1-9][0-9]{0,15}\Z')
 _SHA256 = re.compile(r'[0-9a-f]{64}\Z')

@@ -165,7 +165,7 @@ def _binding(value, selected):
         _keys(observation, {'rawSnapshotDigest', 'assessmentSnapshotDigest', 'normalizerVersion',
                            'capturedAt', 'collectionCompleteness', 'assessmentCompleteness'})
         _require(_sha(observation['rawSnapshotDigest']) and _sha(observation['assessmentSnapshotDigest'])
-                 and observation['normalizerVersion'] == 'hosting-assessment-normalizer/2'
+                 and observation['normalizerVersion'] == 'hosting-assessment-normalizer/3'
                  and observation['collectionCompleteness'] in ('COMPLETE', 'PARTIAL', 'UNKNOWN')
                  and observation['assessmentCompleteness'] in ('COMPLETE', 'PARTIAL', 'UNKNOWN'))
         _time(observation['capturedAt'])

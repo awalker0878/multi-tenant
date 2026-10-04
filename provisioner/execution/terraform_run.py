@@ -18,7 +18,7 @@ from urllib.parse import urlsplit
 from hosting_resources import SOURCE_ROOT
 ROOT = SOURCE_ROOT
 
-from provisioner.execution.source_integrity import verify, verify_runtime
+from provisioner.execution.source_integrity import verify, verify_runtime, _git
 from provisioner.compiler.wsd import identity
 from provisioner.execution.neutron_observe import strict_loads
 from provisioner.execution.plan_review import review
@@ -132,7 +132,7 @@ def runtime_environment(operation, credentials, platform, directory):
 
 def snapshot(root, destination):
     destination.mkdir(mode=0o700)
-    listing = subprocess.check_output(['git', '-C', str(root), 'ls-tree', '-rz', 'HEAD', 'terraform'], timeout=60)
+    listing = _git(root, 'ls-tree', '-rz', 'HEAD', 'terraform')
     for item in listing.split(b'\0'):
         if not item:
             continue
@@ -147,7 +147,7 @@ def snapshot(root, destination):
             if parent == destination:
                 break
             parent.chmod(0o700)
-        data = subprocess.check_output(['git', '-C', str(root), 'cat-file', 'blob', blob.decode()], timeout=60)
+        data = _git(root, 'cat-file', 'blob', blob.decode())
         write_new(path, data)
 
 
@@ -164,7 +164,7 @@ def command(binary, directory, argv, environment, output, *, timeout=900, ok=(0,
     return result.returncode
 
 
-def authorized_command(authority, *args, command_guard=None, **kwargs):
+def authorized_command(authority, *args, command_guard=None, planning_context=None, **kwargs):
     current_window(authority)
     remaining = (datetime.fromisoformat(authority['valid_until'].replace('Z', '+00:00')) - utcnow()).total_seconds()
     require(remaining > 0, 'Native contact window expired')
@@ -175,13 +175,19 @@ def authorized_command(authority, *args, command_guard=None, **kwargs):
                 and command_guard.operation_kind == 'DISCOVER_READ',
                 'Exact current observed Terraform read authority is required')
         kwargs['timeout'] = command_guard.timeout(kwargs['timeout'])
-    result = command(*args, **kwargs)
+    if planning_context is not None:
+        from provisioner.controlplane.worker.adapters.openstack_planning import EphemeralOpenStackPlanningContext
+        require(isinstance(planning_context, EphemeralOpenStackPlanningContext),
+                'Concrete scoped ephemeral planning credentials required')
+        result = planning_context.execute_command(authority, *args, **kwargs)
+    else:
+        result = command(*args, **kwargs)
     if command_guard is not None:
         command_guard.require_current()
     return result
 
 
-def prepare(args, root=ROOT, *, command_guard=None):
+def prepare(args, root=ROOT, *, command_guard=None, planning_context=None):
     require(isinstance(root, Path), 'An explicit current source checkout is required')
     require(args.read_authorized_target is True, 'Explicit native read/contact opt-in required')
     source = verify(root)
@@ -205,6 +211,11 @@ def prepare(args, root=ROOT, *, command_guard=None):
     env = process_environment(credentials)
     require((entry['platform'] == 'openstack') == (cloud_bytes is not None), 'Cloud profile required only for OpenStack')
     cloud = cloud_config(cloud_bytes, inputs['openstack_cloud']) if cloud_bytes else None
+    if planning_context is not None:
+        from provisioner.controlplane.worker.adapters.openstack_planning import EphemeralOpenStackPlanningContext
+        require(isinstance(planning_context, EphemeralOpenStackPlanningContext),
+                'Concrete scoped ephemeral planning credentials required')
+        planning_context.bind_prepare(args, entry, scope, credentials, cloud, ca_bytes)
     binary = Path(args.terraform).resolve(strict=True)
     require(binary.is_file() and os.access(binary, os.X_OK), 'An explicit Terraform executable is required')
     operation = new_directory(args.output, root)
@@ -235,20 +246,20 @@ def prepare(args, root=ROOT, *, command_guard=None):
         write_new(operation / 'transition.json', encoded(transition))
     write_new(operation / 'backend.hcl', ''.join(f'{k} = {json.dumps(v)}\n' for k, v in sorted(settings.items())).encode())
     authorized_command(authority, binary, directory, ['version', '-json'], env, operation / 'version.json',
-                       command_guard=command_guard)
+                       command_guard=command_guard, planning_context=planning_context)
     version = strict_loads(read_private(operation / 'version.json'))['terraform_version']
     toolchain = root / 'config/toolchain.json'
     require(version == json.loads(toolchain.read_text(encoding='utf-8'))['terraform'], 'Terraform version differs from the pinned toolchain')
     current_window(authority)
     authorized_command(authority, binary, directory, ['init', '-input=false', '-no-color', '-lockfile=readonly',
             '-reconfigure', f'-backend-config={operation / "backend.hcl"}'], env, operation / 'init.log',
-            command_guard=command_guard)
+            command_guard=command_guard, planning_context=planning_context)
     current_window(authority)
     authorized_command(authority, binary, directory, ['plan', '-input=false', '-no-color', '-lock=true', '-lock-timeout=60s',
             '-detailed-exitcode', f'-var-file={operation / "inputs.json"}', f'-out={operation / "saved.tfplan"}'],
-            env, operation / 'plan.log', ok=(0, 2), command_guard=command_guard)
+            env, operation / 'plan.log', ok=(0, 2), command_guard=command_guard, planning_context=planning_context)
     authorized_command(authority, binary, directory, ['show', '-json', str(operation / 'saved.tfplan')],
-                       env, operation / 'plan.json', command_guard=command_guard)
+                       env, operation / 'plan.json', command_guard=command_guard, planning_context=planning_context)
     result = review(strict_loads(read_private(operation / 'plan.json')), references, transition)
     write_new(operation / 'review.json', encoded(result))
     require(result['status'] != 'BLOCKED', 'Restricted plan has blocked changes; no execution bundle issued')

@@ -37,7 +37,7 @@ def report(document):
             'nativeScopeId': env + '-scope', 'platformFamily': family,
             'productTupleId': 'tuple-' + env, 'productTupleDigest': 'b' * 64,
             'observation': {'rawSnapshotDigest': 'c' * 64, 'assessmentSnapshotDigest': 'd' * 64,
-                'normalizerVersion': 'hosting-assessment-normalizer/2', 'capturedAt': STAMP,
+                'normalizerVersion': 'hosting-assessment-normalizer/3', 'capturedAt': STAMP,
                 'collectionCompleteness': 'COMPLETE', 'assessmentCompleteness': 'COMPLETE'},
             'superseded': False, 'latestObservation': {'generation': 7,
                 'rawSnapshotDigest': 'c' * 64, 'capturedAt': STAMP,

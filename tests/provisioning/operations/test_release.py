@@ -11,7 +11,10 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import hashes
 
 from provisioner.qualification import mobility, release
+from provisioner.qualification.intake import FinalEvidenceIntake
+from provisioner.controlplane.persistence import TenantContext
 from tests.provisioning.operations.campaign_fixtures import AS_OF, fixture
+from tests.provisioning.operations.signed_intake_fixtures import RetainedFixture, attach_native, attach_pilot
 
 
 class TestSigner:
@@ -36,6 +39,12 @@ class ReleaseTests(unittest.TestCase):
         self.archive.write_bytes(b'synthetic-runtime-artifact')
         artifact_digest = hashlib.sha256(self.archive.read_bytes()).hexdigest()
         self.spec, self.bundle, _ = fixture(artifact_digest)
+        self.observer = TestSigner('independent-synthetic-native-observer-key')
+        self.context = TenantContext('synthetic-final-evidence-org', 'synthetic-final-evidence-tenant')
+        self.custody = RetainedFixture(self.context)
+        attach_native(self.spec, self.bundle, self.custody, self.observer)
+        self.intake = FinalEvidenceIntake(evidence_gate=self.custody, context=self.context,
+            observer_verifier=self.observer, observer_key_ids=frozenset({self.observer.key_id}))
         assessment = mobility.assess(self.spec, qualification_index=self.bundle['qualification'],
             provenance_index=self.bundle['provenance'], campaign_index=self.bundle['campaign'],
             selection_index=self.bundle['targetSelection'], as_of=AS_OF)
@@ -53,6 +62,7 @@ class ReleaseTests(unittest.TestCase):
                            'evidenceRef': 'controlled-pilot-evidence:' + scenario,
                            'artifactSha256': hashlib.sha256(scenario.encode()).hexdigest()}
                           for scenario in release.PILOT_SCENARIOS]}
+        attach_pilot(self.payload, self.custody, self.observer)
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -66,7 +76,8 @@ class ReleaseTests(unittest.TestCase):
             qualification_index=self.bundle['qualification'], provenance_index=self.bundle['provenance'],
             campaign_index=self.bundle['campaign'], selection_index=self.bundle['targetSelection'],
             pilot_envelope=kwargs.pop('pilot_envelope', self.envelope()), pilot_verifier=self.signer,
-            release_signer=self.release_signer, destination=self.root / 'prepared-release', as_of=AS_OF, **kwargs)
+            release_signer=self.release_signer, evidence_intake=self.intake,
+            destination=self.root / 'prepared-release', as_of=AS_OF, **kwargs)
 
     def test_signed_synthetic_pilot_and_current_routes_prepare_verifiable_release(self):
         result = self.prepare()
@@ -76,12 +87,14 @@ class ReleaseTests(unittest.TestCase):
         signed = json.loads((root / 'release-manifest.json').read_bytes())
         matrix = json.loads((root / 'support-matrix.json').read_bytes())
         pilot = json.loads((root / 'pilot-acceptance.json').read_bytes())
-        verified = release.verify_artifact(self.archive, signed, matrix, pilot, release_verifier=self.release_signer)
+        verified = release.verify_artifact(self.archive, signed, matrix, pilot,
+                                           release_verifier=self.release_signer, pilot_verifier=self.signer)
         self.assertFalse(verified['mutationAuthorized'])
         self.assertTrue(verified['currentQualificationRecheckRequired'])
         self.archive.write_bytes(b'changed-code')
         with self.assertRaises(ValueError):
-            release.verify_artifact(self.archive, signed, matrix, pilot, release_verifier=self.release_signer)
+            release.verify_artifact(self.archive, signed, matrix, pilot,
+                                     release_verifier=self.release_signer, pilot_verifier=self.signer)
 
     def test_no_pilot_stale_final_revision_or_unsupported_route_cannot_prepare_release(self):
         with self.assertRaises(ValueError):

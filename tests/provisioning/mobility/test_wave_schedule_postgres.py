@@ -65,6 +65,8 @@ class WavePostgresTests(unittest.TestCase):
                 'hosting_controlplane.migration_waves,hosting_controlplane.migration_wave_events TO '+runtime)
             connection.execute('GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_authority_scope(text,text,text),'
                 'hosting_controlplane.lock_migration_wave_domain(text,text,text),'
+                'hosting_controlplane.migration_wave_pool_turn(text,text,text,text,text,text,timestamptz),'
+                'hosting_controlplane.retained_conversion_write_is_admitted(text,text,text,text),'
                 'hosting_controlplane.migration_wave_job_window(text,text,text),'
                 'hosting_controlplane.migration_wave_release_is_current(text,text,text,text,timestamptz) TO '+runtime)
             connection.execute('GRANT SELECT,INSERT ON hosting_controlplane.migration_wave_domains,'

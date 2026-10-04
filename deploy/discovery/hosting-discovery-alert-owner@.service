@@ -1,0 +1,29 @@
+[Unit]
+Description=Enrolled discovery alert and on-call receipt owner %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=hosting-discovery-alerts
+Group=hosting-discovery-alerts
+UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1 PYTHONSAFEPATH=1
+EnvironmentFile=/etc/hosting/discovery/alerts/%i.env
+StateDirectory=hosting-discovery/alert-inbox/%i
+StateDirectoryMode=0700
+ExecStart=/opt/hosting/bin/hosting-discovery-alert-owner --config /etc/hosting/discovery/alerts/%i.json
+Restart=on-failure
+RestartSec=15
+TimeoutStopSec=10
+KillMode=control-group
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

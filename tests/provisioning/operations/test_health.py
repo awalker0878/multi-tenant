@@ -7,7 +7,7 @@ import threading
 from types import SimpleNamespace
 import unittest
 
-from provisioner.controlplane.operations.health import IncidentDispatcher, MonitorPolicy, signal, retain_delivery
+from provisioner.controlplane.operations.health import IncidentDispatcher, MonitorPolicy, signal, retain_delivery, collect
 from provisioner.controlplane.persistence import TenantContext
 from tests.provisioning.worker.tls_fixtures import TestPki
 
@@ -133,6 +133,50 @@ class HealthTests(unittest.TestCase):
         for policy in ({'limit': 0}, {'stuck_seconds': True}, {'freshness_seconds': 1}):
             with self.assertRaises(ValueError):
                 MonitorPolicy(**policy)
+
+
+class HealthProjectionTests(unittest.TestCase):
+    def test_instance_hold_is_immediate_and_collection_cannot_rearm_writers(self):
+        context = TenantContext('health-fixture-org', 'health-fixture-tenant')
+        class ReadFixture:
+            def __init__(self, instance):
+                self.instance, self.queries, self.rows = instance, [], []
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+            def execute(self, sql, params=None):
+                self.queries.append(sql)
+                if 'rolsuper' in sql:
+                    self.rows = [(False, False)]
+                elif 'operating_instance' in sql:
+                    self.rows = [] if self.instance is None else [self.instance]
+                else:
+                    self.rows = []
+                return self
+            def fetchone(self):
+                return self.rows[0] if self.rows else None
+            def fetchall(self):
+                return self.rows
+        evidence = SimpleNamespace(require=lambda scoped: None)
+        for row in (None, (7, 'UNCOMMISSIONED', False, True),
+                    (7, 'OBSERVATION_ONLY', False, True), (8, 'DRAINED', True, True),
+                    (9, 'ACTIVE', False, True), (9, 'ACTIVE', True, False)):
+            with self.subTest(instance=row):
+                connection = ReadFixture(row)
+                result = collect(lambda: connection, context, MonitorPolicy(), evidence_gate=evidence)
+                self.assertEqual([item['code'] for item in result['signals']], ['OPERATING_INSTANCE_HELD'])
+                self.assertEqual(result['signals'][0]['epoch'], 0 if row is None else row[0])
+                self.assertIn('3-controlled-ha-and-restore-drills', result['signals'][0]['runbook'])
+                self.assertFalse(result['mutationAuthorized'])
+                self.assertEqual(result['serviceReadiness'], 'NOT_ASSERTED')
+                self.assertEqual(connection.queries[0], 'SET TRANSACTION READ ONLY')
+                self.assertTrue(all(query.startswith(('SELECT ', 'SET TRANSACTION READ ONLY'))
+                                    for query in connection.queries))
+        connection = ReadFixture((9, 'ACTIVE', True, True))
+        result = collect(lambda: connection, context, MonitorPolicy(), evidence_gate=evidence)
+        self.assertFalse(result['signals'])
+        self.assertEqual(result['serviceReadiness'], 'NOT_ASSERTED')
 
 
 if __name__ == '__main__':

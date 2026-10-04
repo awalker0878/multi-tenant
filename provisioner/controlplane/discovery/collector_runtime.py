@@ -71,6 +71,12 @@ def execute(config_path, action: str, *, clock: Callable[[], datetime] = lambda:
             authority_public_key=Ed25519PublicKey.from_public_bytes(settings.witness.root_key),
             minimum_revision=settings.witness.minimum_revision))
     verifier.bind(signature).verify_campaign(campaign, environment, now())
+    from .fleet_read_budget import FleetNativeReadGate
+    if action=='stage' and isinstance(read_gate,FleetNativeReadGate):
+        # Bind only after the existing independently signed current campaign was
+        # verified. The fleet owner reduces admission; it cannot issue authority.
+        read_gate=read_gate.bind_campaign(campaign,environment)
+        read_gate.budget.settings.enrollment.require_store('outbox',settings.outbox_root)
     outbox = PrivateDiscoveryOutbox(settings.outbox_root,
         TenantContext(campaign.scope.organization_id, campaign.scope.tenant_id))
     if action == 'inspect':
@@ -126,8 +132,12 @@ def main(argv=None) -> int:
     parser.add_argument('--config', required=True, help='Absolute protected collector JSON file')
     parser.add_argument('--state-directory', help='Existing private directory for one checkpointed batch')
     parser.add_argument('--fleet-state-directory', help='Existing private shared POSIX endpoint budget directory')
+    parser.add_argument('--fleet-config', help='Protected enrolled PostgreSQL multi-host budget configuration')
     try:
         args = parser.parse_args(argv)
+        if args.fleet_config is not None and (args.fleet_state_directory is not None
+                or args.action not in ('batch-stage','batch-run')):
+            raise ValueError('Select one fleet owner for collection batches')
         if args.fleet_state_directory is not None and args.action not in ('batch-stage', 'batch-run'):
             raise ValueError('Shared endpoint budgets are only supported for collection batch actions')
         if args.state_directory is not None and args.action not in ('batch-stage', 'batch-inspect',
@@ -137,7 +147,7 @@ def main(argv=None) -> int:
             from .batch_runtime import run_batch
             result = run_batch(args.config, state_directory=args.state_directory,
                                wait_for_due=args.action == 'batch-run',
-                               fleet_state_directory=args.fleet_state_directory)
+                               fleet_state_directory=args.fleet_state_directory,fleet_config=args.fleet_config)
             code = 0 if result['status'] == 'BATCH_EVALUATED' else 2
         elif args.action in ('batch-inspect', 'batch-reconcile'):
             if args.state_directory is None:

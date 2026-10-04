@@ -7,6 +7,8 @@ from provisioner.execution import readback_core as c
 from provisioner.execution.run_files import (encoded, digest, load_private, private_path, require,
                              sync_directory, write_new)
 
+FORMAT = 'hosting-execution-event/1'
+
 
 class Journal:
     def __init__(self, directory, scope):
@@ -19,7 +21,7 @@ class Journal:
             require(path.name == f'{number:08d}.json', 'Execution journal sequence is incomplete')
             event = load_private(path)
             c.exact_keys(event, {'format', 'sequence', 'scope', 'previous_sha256', 'at', 'kind', 'data'})
-            require(event['format'] == 'hosting-execution-event/1' and type(event['sequence']) is int
+            require(event['format'] == FORMAT and type(event['sequence']) is int
                     and event['sequence'] == number and event['scope'] == scope
                     and event['previous_sha256'] == previous, 'Execution journal chain differs')
             c.identifier(event['kind'])
@@ -33,7 +35,7 @@ class Journal:
     def append(self, kind, data):
         c.identifier(kind)
         require(isinstance(data, dict), 'Execution event data must be an object')
-        event = dict(format='hosting-execution-event/1', sequence=len(self.events) + 1,
+        event = dict(format=FORMAT, sequence=len(self.events) + 1,
                      scope=self.scope, previous_sha256=digest(encoded(self.events[-1])) if self.events else None,
                      at=c.now(), kind=kind, data=data)
         if self.events:

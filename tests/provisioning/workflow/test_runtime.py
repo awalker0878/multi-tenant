@@ -42,6 +42,22 @@ class RuntimeConnectionTests(unittest.TestCase):
 
 
 class GateProjectionTests(unittest.TestCase):
+    def test_verified_application_projects_success_with_final_acceptance_reference(self):
+        receipt = StartReceipt('ns', 'job', 'run', 'job', 'plan', 1, 'a'*64, 'b'*64)
+        events = []
+        jobs = SimpleNamespace(start_run=lambda context, job_id: receipt,
+            append_progress=lambda context, job_id, **event: events.append(event))
+        result = ApplicationJobResult('job', 'plan', 1, 'a'*64, 'c'*64,
+            'SUCCEEDED', 'VERIFY', None, 'd'*64, 12, 12, None, 'e'*64)
+        self.assertTrue(project_one(jobs, SimpleNamespace(completed_job=lambda _: result),
+                                   TenantContext('org', 'tenant'), 'job'))
+        self.assertEqual(events[0]['event_type'], 'APPLICATION_EXECUTION_SUCCEEDED')
+        self.assertEqual(events[0]['status'], 'SUCCEEDED')
+        self.assertEqual(events[0]['detail']['evidenceDigest'], 'd'*64)
+        self.assertNotIn('reasonCode', events[0]['detail'])
+        self.assertNotIn('holdCode', events[0]['detail'])
+        _progress_detail(events[0]['detail'])
+
     def test_selected_hold_retains_fixed_reason_and_progress_without_authority(self):
         receipt = StartReceipt('ns', 'job', 'run', 'job', 'plan', 1, 'a'*64, 'b'*64)
         events = []

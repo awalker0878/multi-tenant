@@ -122,6 +122,7 @@ class BuildRuntime(build_py):
             'terraform/catalog.json', 'ansible/catalog.json', 'config/toolchain.json',
             'ansible/filter_plugins/guest_filters.py',
             'ansible/callback_plugins/hosting_guest_result.py',
+            'ansible/connection_plugins/hosting_guarded_ssh.py',
         }
         terraform = json.loads((source / 'terraform/catalog.json').read_text(encoding='utf-8'))
         for entry in terraform['entries']:

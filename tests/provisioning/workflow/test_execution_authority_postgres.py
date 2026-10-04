@@ -48,6 +48,10 @@ from provisioner.execution.delivery_run import validate as validate_delivery
 from provisioner.execution.run_files import encoded, write_new
 from tests.provisioning.operations.campaign_fixtures import fixture
 from tests.provisioning.operations.test_release import TestSigner
+from tests.provisioning.operations.isolated_instance import (
+    commission_isolated_instance, SyntheticIsolatedInstanceGate,
+)
+from tests.provisioning.operations.signed_intake_fixtures import minimum_prerequisite_artifacts
 from tests.provisioning.schema.test_enterprise_records import plan, workload
 from tests.provisioning.worker.test_postgres_worker import (
     TestEnrollmentAuthorizer, TestWorkerVerifier,
@@ -90,11 +94,12 @@ class SelectedQualificationProof:
 class RetainedOperatingProof:
     """Synthetic independently retained evidence; no external checkpoint claimed."""
 
-    def __init__(self, context, selection, envelope):
+    def __init__(self, context, selection, envelope, artifacts):
         self.context, self.evidence = context, self
         self.available_contexts = {context}
         self.available = True
         self.checks = 0
+        self.artifacts = artifacts
         self.key = acceptance_event_key(selection['operationsAcceptanceDigest'])
         self.retained = (SimpleNamespace(evidence_kind='VERIFICATION_RESULT',
             subject_id=scope_digest(selection), event_key=self.key), deepcopy(envelope))
@@ -106,6 +111,9 @@ class RetainedOperatingProof:
 
     def get(self, context, key):
         self.require(context)
+        if key in self.artifacts:
+            return (SimpleNamespace(event_key=key, evidence_kind='VERIFICATION_RESULT',
+                subject_id=self.retained[0].subject_id), self.artifacts[key])
         return self.retained if key == self.key else None
 
 
@@ -136,6 +144,7 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
         cls.authority_dsn = os.environ['HOSTING_TEST_POSTGRES_AUTHORITY_DSN']
         cls.enrollment_dsn = os.environ['HOSTING_TEST_POSTGRES_ENROLLMENT_DSN']
         apply_migrations(lambda: psycopg.connect(cls.migration_dsn))
+        commission_isolated_instance(cls.migration_dsn)
 
     def runtime(self):
         return self.psycopg.connect(self.runtime_dsn)
@@ -200,6 +209,7 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
                        'files': {'workload': {'sha256': '5' * 64}}}
 
         self.signer = TestSigner('synthetic-independent-operating-fixture')
+        self.observer = TestSigner('synthetic-independent-prerequisite-observer')
         payload = {'format': 'hosting-selected-operating-acceptance/1',
             'scopeDigest': scope_digest(self.selection), 'sourceCommit': self.selection['sourceCommit'],
             'planId': self.selected['metadata']['planId'], 'revocationEpoch': 0,
@@ -213,6 +223,7 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
                 'observedAt': (self.now - timedelta(minutes=2)).isoformat(),
                 'freshUntil': (self.now + timedelta(hours=1)).isoformat()}
                 for ident in sorted(MINIMUM_PREREQUISITES)]}
+        self.prerequisite_artifacts = minimum_prerequisite_artifacts(payload, self.observer)
         self.envelope = {'payload': payload, 'keyId': self.signer.key_id,
                         'signature': base64.b64encode(self.signer.sign(_canonical(payload))).decode()}
         self.selection['operationsAcceptanceDigest'] = acceptance_digest(self.envelope)
@@ -262,14 +273,16 @@ class ExecutionAuthorityPostgresTests(unittest.TestCase):
             self.context.tenant_id, self.frozen.plan_id, 1, self.frozen.digest, 0,
             self.receipt.payload_digest)
         self.qualification = SelectedQualificationProof(self.context, self.selection_digest)
-        self.evidence = RetainedOperatingProof(self.context, self.selection, self.envelope)
+        self.evidence = RetainedOperatingProof(self.context, self.selection, self.envelope, self.prerequisite_artifacts)
         self.leases = NativeLeaseAuthority(self.runtime)
         self.grants = PostgresWorkerGrants(self.runtime, self.leases)
         self.operations = OperationsActionGate(evidence_gate=self.evidence,
             operating_verifier=self.signer, operating_key_ids=frozenset({self.signer.key_id}),
-            worker_grants=self.grants)
+            worker_grants=self.grants, observer_verifier=self.observer,
+            observer_key_ids=frozenset({self.observer.key_id}))
         self.authority = PostgresExecutionAuthority(self.runtime, self.selections,
-            self.qualification, self.evidence, self.operations)
+            self.qualification, self.evidence, self.operations,
+            instance_gate=SyntheticIsolatedInstanceGate(self.selection['sourceCommit']))
 
     def boundary(self, *, admitted=None, selection_digest=None, **continuation):
         plan_record, selection = self.authority.require_current(admitted or self.admitted,
