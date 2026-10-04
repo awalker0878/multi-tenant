@@ -1,0 +1,79 @@
+{
+  "source_revision": "bc42d17a31aca91ea8736dee3a73f1124bb59eed",
+  "scope": "P00 RT/IP input validation only; no native calls, observation authentication or execution authority",
+  "started_at": "2026-10-04T20:55:59.404104+00:00",
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39"
+  },
+  "source_sha256": {
+    "scripts/validate_p00_inputs.py": "e57abccd5569711ad2f2042cde3d8711b9ccd3de68256044bda32455ee8a6134",
+    "tests/documentation/test_p00_inputs.py": "6c663006e4ddcde8858019607fd488317afb6fe17666f30f644ba643e400132d",
+    "docs/qualification/feasibility/p00-input-schema.json": "b370352851b4167014230543cc9651d196deeee6785d533ae7df9ef5d8349f52",
+    "docs/qualification/feasibility/p00-input-record.json": "f779227204331fb58c63a706b8c23ec5bf66b4bfc486c887bccc9e96ba34ad3f",
+    ".github/workflows/architecture-policy.yml": "d923b16b39b9c1ea605d4925593b1e98fc3b54f2aa559b3e89552e3fb3d24bf0"
+  },
+  "commands": [
+    {
+      "label": "input-tests",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/documentation",
+        "-p",
+        "test_p00_inputs.py",
+        "-q"
+      ],
+      "expected_exit": 0,
+      "exit_code": 0,
+      "log": "input-tests.log",
+      "log_sha256": "ff000f912f65c26ffdfa9b4677846f97356c5acf1eef86058fe3bff937720761"
+    },
+    {
+      "label": "declared-route-inputs",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "scripts/validate_p00_inputs.py"
+      ],
+      "expected_exit": 0,
+      "exit_code": 0,
+      "log": "declared-route-inputs.log",
+      "log_sha256": "500a0ce49a02da6261f885930dab1c6e9e06fa04b860e557307b873591deb8f2"
+    },
+    {
+      "label": "require-route-ready",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "scripts/validate_p00_inputs.py",
+        "--require-ready"
+      ],
+      "expected_exit": 2,
+      "exit_code": 2,
+      "log": "require-route-ready.log",
+      "log_sha256": "500a0ce49a02da6261f885930dab1c6e9e06fa04b860e557307b873591deb8f2"
+    },
+    {
+      "label": "all-inputs",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "scripts/validate_p00_inputs.py",
+        "--scope",
+        "all"
+      ],
+      "expected_exit": 0,
+      "exit_code": 0,
+      "log": "all-inputs.log",
+      "log_sha256": "abe0b2f37b91ab6a832347f630d50dab5b240456d196e48a289eea20b6027b2d"
+    }
+  ],
+  "missing_input_counts": {
+    "declared-route-inputs": 69,
+    "require-route-ready": 69,
+    "all-inputs": 90
+  },
+  "result": "PASS",
+  "finished_at": "2026-10-04T20:55:59.911302+00:00"
+}

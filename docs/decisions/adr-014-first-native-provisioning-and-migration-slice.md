@@ -4,7 +4,7 @@ Owner role: Product/infrastructure leads. Related phases: P00. Record date: 2026
 
 Origin: `DESIGN`. Disposition: `PROPOSED` as recorded in the [decision register](decision-register.md).
 
-This record develops the current recommendation for review. No accountable-owner acceptance, experiment result or native qualification is claimed; the register disposition is unchanged.
+This record develops the current recommendation for review. No accountable-owner acceptance or native qualification is claimed; the register disposition is unchanged.
 
 ## Context
 
@@ -63,3 +63,13 @@ The application cannot be reproduced completely, capture/restore cannot preserve
 - [P00 route and operating review](../implementation/p00-route-and-operations-review.md) — candidate input records, experiments and unresolved decisions.
 - [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
 - [ADR authoring template](../templates/adr.md) — required decision-record fields.
+
+
+The [engineering selection record](../implementation/p00-engineering-selections.md) now fixes this choice for reversible development at its stated scope. It does not supply missing operating facts, native authority or accountable acceptance.
+
+
+## Bounded state-recovery observation
+
+The [PostgreSQL/attachment fixture report](../implementation/p00-restore-fixture-results.md) now records actual consistent-state capture, clean restore, exact invalid-bundle rejection and both fixture recovery boundaries. It retains an initial archive-transfer failure and corrected locked execution. This is E2 real-dependency evidence at the declared fixture scope. It does not show the full application deployment/configuration, a particular installed source/target backend, independent native fencing or recovery after loss of uncaptured target state.
+
+Use this result in the G00.04 bounded feasibility review alongside the pinned candidate/application profile and appropriate fixture review. Full E3 native provisioning/migration remains G07/G08; actual native effects require their own scoped authority. Method acceptance remains incomplete where the required application/profile/review evidence is absent.

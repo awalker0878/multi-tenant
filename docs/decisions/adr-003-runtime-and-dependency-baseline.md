@@ -72,3 +72,6 @@ The [image experiment](../implementation/p00-image-results.md) now provides an e
 The candidates run as UID/GID 10001 with no added capabilities and test read-only roots plus explicitly writable temporary mounts. This establishes the recorded fixture behavior and candidate BOM. It does not establish byte-identical rebuilt images, signed publication, an installed environment BOM, OS vulnerability qualification, production FPM/ingress behavior or an approved enterprise mirror path. Complete service images and their operational controls remain P01 obligations. Review the exact inventories and limitations before adopting the family; any changed source, lock, OS snapshot or extension selection requires a new measured result.
 
 The [decision and input packet](../implementation/p00-decision-and-input-review.md) consolidates DC04–DC08 and IP02, including runtime/update ownership, dependencies, trust/custody and managed-browser/network decisions. These actual operating choices remain required; the executable image and contract experiments are no longer missing engineering work.
+
+
+The [engineering selection record](../implementation/p00-engineering-selections.md) now fixes this choice for reversible development at its stated scope. It does not supply missing operating facts, native authority or accountable acceptance.

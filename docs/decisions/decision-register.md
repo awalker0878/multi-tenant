@@ -46,3 +46,8 @@ The three `ACCEPTED` entries below record explicit user instructions, not invent
 Maintain the linked ADR when developing or resolving each technical choice; use `docs/decisions/adr-NNN-short-title.md` for additional decisions. Preserve context, origin, disposition, scope, decision owner/date, alternatives, rationale, consequences, affected requirements/packages/contracts, assumptions, evidence references, blocking checkpoint, reconsideration trigger and superseding ADR if any. Copying this table into individual files without the actual decision adds no evidence.
 
 An accepted provisional decision must name what is fixed now, what remains uncertain and which package cannot start until it is resolved. Record actual reviewer identities when available; the role column does not imply staffing or approval. Update this register and the affected specifications together. User-directed choices can only change through an explicit documented user decision; technical proposal changes need their accountable review and impact analysis.
+
+
+## Engineering selections during P00 continuation
+
+The [2026-10-04 engineering selections](../implementation/p00-engineering-selections.md) record concrete DC01–DC10 choices for reversible development under the user's implementation request. They carry forward measured candidates and the existing product direction. Codex is the recorded decision author; no operating role, installed fact or third-party approval is inferred. These choices guide ordinary implementation without adding another permission step. Overall accountable ADR dispositions and their actual contract/native/release checkpoints remain as listed above.
