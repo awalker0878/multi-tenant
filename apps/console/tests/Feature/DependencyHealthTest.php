@@ -87,7 +87,6 @@ test('credential paths cannot use a stream wrapper', function () {
     $this->withToken($this->healthToken)->getJson('/health/dependencies')->assertStatus(401);
 });
 
-
 test('mounted application key wins and an unavailable file never falls back to the environment key', function () {
     $previousEnv = $_ENV['APP_KEY_FILE'] ?? null;
     $previousServer = $_SERVER['APP_KEY_FILE'] ?? null;

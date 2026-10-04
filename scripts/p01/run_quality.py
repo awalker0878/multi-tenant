@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import base64
 import datetime as dt
+from email.parser import Parser
 import hashlib
 import json
 import os
@@ -12,12 +13,16 @@ from pathlib import Path
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import time
+import tomllib
 import urllib.error
 import urllib.request
 import zipfile
+
+from python_lock import canonical_name, production_inventory
 
 
 EXCLUDED = {
@@ -105,6 +110,7 @@ def python_quality(e: Evidence, component: Path, config: dict, candidate: dict) 
     e.state["input_lock_sha256"] = lock_hash
     version = e.run("python-version", [sys.executable, "-c", "import sys; print(sys.version.split()[0])"], component, timeout=20).decode().strip()
     e.require("exact-python-version", version == candidate["python_version"])
+    e.require("accepted-python-platform", sys.platform == "linux" and sys.implementation.name == "cpython")
     uv_version = e.run("uv-version", ["uv", "--version"], component, timeout=20).decode().split()
     e.require("exact-uv-version", uv_version[:2] == ["uv", candidate["uv_version"]])
     e.run("lock-check", ["uv", "lock", "--check", "--no-managed-python"], component)
@@ -130,20 +136,32 @@ def python_quality(e: Evidence, component: Path, config: dict, candidate: dict) 
     e.require("one-owned-wheel", len(wheels) == 1)
     wheel = wheels[0]
     module = config["module"]
+    project = tomllib.loads((component / "pyproject.toml").read_text())["project"]
+    expected_inventory = production_inventory(project, tomllib.loads((component / "uv.lock").read_text()))
+    e.state["expected_runtime_distributions"] = expected_inventory
     with zipfile.ZipFile(wheel) as archive:
         members = archive.namelist()
         metadata = [name for name in members if name.endswith(".dist-info/METADATA")]
         e.require("one-wheel-metadata", len(metadata) == 1)
         metadata_root = metadata[0].split("/", 1)[0]
         e.require("wheel-contains-only-private-module-and-metadata", all(name.startswith((module + "/", metadata_root + "/")) for name in members))
-        e.require("no-runtime-dependencies", "Requires-Dist:" not in archive.read(metadata[0]).decode())
+        wheel_metadata = Parser().parsestr(archive.read(metadata[0]).decode())
+        e.require("wheel-identity-matches-owned-project", canonical_name(wheel_metadata["Name"]) == canonical_name(project["name"]) and wheel_metadata["Version"] == project["version"])
+        normalize = lambda requirements: sorted(re.sub(r"\s+", "", value) for value in requirements)
+        e.require("wheel-runtime-requirements-match-manifest", normalize(wheel_metadata.get_all("Requires-Dist", [])) == normalize(project["dependencies"]))
         e.state["wheel_members"] = members
     runtime = e.output / "runtime"
     e.run("empty-runtime", ["uv", "venv", "--no-managed-python", "--python", candidate["python_version"], str(runtime)], component)
     executable = runtime / "bin/python"
+    requirements = e.root / "production-requirements.txt"
+    e.run("export-production-lock", ["uv", "export", "--locked", "--no-default-groups", "--no-emit-project", "--no-annotate", "--no-header", "--format", "requirements.txt", "--output-file", str(requirements)], component)
+    e.run("isolated-production-install", ["uv", "pip", "sync", "--python", str(executable), "--require-hashes", "--only-binary", ":all:", str(requirements)], component)
     e.run("isolated-wheel-install", ["uv", "pip", "install", "--python", str(executable), "--no-index", "--no-deps", str(wheel)], component)
+    e.run("runtime-dependency-check", ["uv", "pip", "check", "--python", str(executable)], runtime)
     inventory = json.loads(e.run("runtime-inventory", ["uv", "pip", "list", "--python", str(executable), "--format", "json"], runtime))
-    e.require("only-one-runtime-distribution", len(inventory) == 1)
+    observed_inventory = {canonical_name(package["name"]): package["version"] for package in inventory}
+    e.require("exact-production-lock-runtime-distributions", observed_inventory == expected_inventory and len(inventory) == len(expected_inventory))
+    e.state["runtime_distributions"] = observed_inventory
     imported = e.run("isolated-import", [str(executable), "-I", "-c", f"import {module}; print({module}.__file__)"], runtime, timeout=20).decode().strip()
     e.require("import-resolves-inside-installed-runtime", Path(imported).is_relative_to(runtime))
     live = json.loads(e.run("isolated-liveness", [str(executable), "-I", "-m", module + ".bootstrap.health", "liveness"], runtime, timeout=20))
@@ -154,10 +172,84 @@ def python_quality(e: Evidence, component: Path, config: dict, candidate: dict) 
     e.require("invalid-input-produces-no-success-document", not invalid)
     installed = json.loads(e.run("installed-entrypoint", [str(runtime / "bin" / config["entrypoint"]), "liveness"], runtime, timeout=20))
     e.require("installed-command-agrees-with-module", installed == live)
+    server_entrypoint = module + "-serve"
+    if server_entrypoint in project["scripts"]:
+        python_http(e, runtime, module, server_entrypoint)
     e.require("lock-unchanged", sha256(component / "uv.lock") == lock_hash)
     envelope = {"schema_version": 1, "filename": wheel.name, "size": wheel.stat().st_size, "sha256": sha256(wheel), "encoding": "base64", "content": base64.b64encode(wheel.read_bytes()).decode()}
     (e.root / "wheel-envelope.json").write_text(json.dumps(envelope, indent=2) + "\n")
     e.state["wheel_sha256"] = envelope["sha256"]
+
+
+def python_http(e: Evidence, runtime: Path, service: str, entrypoint: str) -> None:
+    """Probe the installed persistent entrypoint without any real database settings."""
+    with socket.socket() as port_source:
+        port_source.bind(("127.0.0.1", 0))
+        port = port_source.getsockname()[1]
+    token = "synthetic-quality-fixture-token-0000000000"
+    token_file = e.output / "synthetic-health-token"
+    token_file.write_text(token + "\n")
+    token_file.chmod(0o600)
+    environment = {key: value for key, value in e.env.items() if not key.startswith(("DB_", "PG", "HEALTH_"))}
+    environment["HEALTH_TOKEN_FILE"] = str(token_file)
+    command = [str(runtime / "bin" / entrypoint), "--host", "127.0.0.1", "--port", str(port)]
+    entry = {"command": command, "started_at": now(), "log": "http-server.log", "bound_address": f"127.0.0.1:{port}"}
+    e.state["http_server"] = entry
+    e.state["http_responses"] = []
+    e.save()
+    with (e.root / entry["log"]).open("wb") as log:
+        process = subprocess.Popen(command, cwd=runtime, env=environment, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+        try:
+            deadline = time.monotonic() + 30
+            while True:
+                if process.poll() is not None:
+                    raise RuntimeError("Installed ASGI entrypoint exited during startup")
+                try:
+                    with urllib.request.urlopen(f"http://127.0.0.1:{port}/health/live", timeout=2) as response:
+                        if response.status == 200:
+                            break
+                except OSError:
+                    pass
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("Installed ASGI startup exceeded 30 seconds")
+                time.sleep(0.1)
+            dependency_base = {"service": service, "scope": "foundation_dependencies", "native_operations_enabled": False}
+            cases = [
+                ("/health/live", False, 200, {"service": service, "status": "alive", "scope": "process"}),
+                ("/health/ready", False, 503, {"service": service, "status": "not_ready", "scope": "service", "reason": "foundation_only"}),
+                ("/health/dependencies", False, 401, dependency_base | {"status": "unauthorized"}),
+                ("/health/dependencies", True, 503, dependency_base | {"status": "not_ready", "reason": "dependencies_unavailable"}),
+            ]
+            for route, authenticated, status, payload in cases:
+                request = urllib.request.Request(f"http://127.0.0.1:{port}" + route)
+                if authenticated:
+                    request.add_header("Authorization", "Bearer " + token)
+                try:
+                    response = urllib.request.urlopen(request, timeout=10)
+                except urllib.error.HTTPError as error:
+                    response = error
+                with response:
+                    raw = response.read()
+                    e.state["http_responses"].append({"route": route, "authenticated": authenticated, "status": response.status, "headers": dict(response.headers), "body": raw.decode(), "body_sha256": hashlib.sha256(raw).hexdigest()})
+                    label = f"http-{route}-{'authenticated' if authenticated else 'public'}"
+                    e.require(label + "-status", response.status == status)
+                    e.require(label + "-body", json.loads(raw) == payload)
+                    e.require(label + "-no-cache", "no-store" in response.headers.get("Cache-Control", ""))
+                    if status == 503:
+                        e.require(label + "-retry-after", response.headers.get("Retry-After") == "10")
+        finally:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+                process.wait(timeout=5)
+            except ProcessLookupError:
+                pass
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait(timeout=5)
+            entry.update({"exit_code_after_stop": process.poll(), "stopped_at": now(), "cleanup_passed": process.poll() is not None})
+            entry["log_sha256"] = sha256(e.root / entry["log"])
+            token_file.unlink(missing_ok=True)
+            e.save()
 
 
 def php_http(e: Evidence, component: Path, service: str, *, browser: bool = False) -> None:

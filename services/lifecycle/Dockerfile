@@ -10,8 +10,12 @@ COPY .python-version pyproject.toml uv.lock README.md ./
 COPY src/ ./src/
 RUN uv sync --locked --only-group build --no-install-project --no-managed-python \
     && uv build --offline --no-build-isolation --wheel \
+    && uv export --locked --no-default-groups --no-emit-project --no-annotate --no-header \
+         --format requirements.txt --output-file /build/production-requirements.txt \
     && uv venv --no-managed-python --python /usr/local/bin/python /opt/venv \
-    && uv pip install --python /opt/venv/bin/python --offline --no-index --no-deps dist/*.whl
+    && uv pip sync --python /opt/venv/bin/python --require-hashes --only-binary :all: /build/production-requirements.txt \
+    && uv pip install --python /opt/venv/bin/python --offline --no-index --no-deps dist/*.whl \
+    && uv pip check --python /opt/venv/bin/python
 
 FROM ${PYTHON_BASE} AS runtime
 ARG SOURCE_REVISION=unrecorded
@@ -22,7 +26,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PATH=/opt/venv/bin:$PATH
 WORKDIR /app
 COPY --from=build /opt/venv/ /opt/venv/
 USER 10001:10001
-# This one-shot CLI proves process bootstrap only. No persistent service exists yet.
+# The default remains a one-shot process diagnostic. Development Compose selects
+# the separately installed service-owned ASGI entrypoint and private port 8080.
 HEALTHCHECK NONE
 ENTRYPOINT ["/opt/venv/bin/lifecycle-health"]
 CMD ["liveness"]

@@ -1,0 +1,3 @@
+[console_scripts]
+inventory-health = inventory.bootstrap.health:main
+inventory-serve = inventory.bootstrap.server:main

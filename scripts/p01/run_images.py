@@ -16,6 +16,8 @@ import time
 import tomllib
 from typing import Any
 
+from python_lock import production_inventory
+
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -85,7 +87,18 @@ def load_inputs(workspace: Path, component_id: str) -> tuple[dict[str, Any], dic
         project = tomllib.loads((root / "pyproject.toml").read_text())["project"]
         require(project["name"] == component["distribution"] and project["version"] == component["version"],
                 "Distribution identity differs from registry")
-        require(project["dependencies"] == [], "Runtime dependency installation requires an explicit image change")
+        require(project["dependencies"] == component["runtime_requirements"],
+                "Runtime requirements differ from the accepted image capability")
+        require(component["runtime_mode"] in {"asgi", "cli"}, "Unknown runtime mode")
+        if component["runtime_mode"] == "asgi":
+            require(context.parts[0] == "services" and component["runtime_entrypoint"] == "/opt/venv/bin/" + component["id"] + "-serve",
+                    "Persistent runtime belongs to the named service")
+            require(project["scripts"].get(component["id"] + "-serve") == component["module"] + ".bootstrap.server:main",
+                    "Persistent entrypoint differs from its package manifest")
+        else:
+            require(project["dependencies"] == [] and set(project["scripts"]) == {component["entrypoint"].rsplit("/", 1)[1]},
+                    "Worker bootstrap cannot inherit service runtime dependencies or entrypoints")
+        component["runtime_distributions"] = production_inventory(project, tomllib.loads((root / "uv.lock").read_text()))
         require((root / ".python-version").read_text().strip() == lock["python_version"],
                 "Interpreter selection differs from image lock")
         require(component["entrypoint"] == "/opt/venv/bin/" + next(iter(project["scripts"])),
@@ -139,7 +152,7 @@ class Recorder:
 
 
 def isolation_program(component: dict[str, Any]) -> str:
-    return f'''import importlib, importlib.metadata, json, os, pathlib, sys
+    return f'''import importlib, importlib.metadata, json, os, pathlib, re, sys
 module = importlib.import_module({component['module']!r})
 root = pathlib.Path('/opt/venv')
 status = dict(line.split(':', 1) for line in pathlib.Path('/proc/self/status').read_text().splitlines() if ':' in line)
@@ -152,14 +165,14 @@ result = {{
  'root_read_only': 'ro' in mount[5].split(','),
  'network_interfaces': sorted(p.name for p in pathlib.Path('/sys/class/net').iterdir()),
  'module_file': module.__file__,
- 'installed_distributions': sorted((d.metadata['Name'], d.version) for d in importlib.metadata.distributions()),
+ 'installed_distributions': sorted((re.sub(r'[-_.]+', '-', d.metadata['Name']).lower(), d.version) for d in importlib.metadata.distributions()),
  'application_source_absent': not pathlib.Path('/app/src').exists() and not pathlib.Path('/build').exists(),
 }}
 assert result['uid'] == result['gid'] == 10001
 assert result['capabilities_effective'] == 0 and result['no_new_privileges'] == 1
 assert result['root_read_only'] and result['network_interfaces'] == ['lo']
 assert pathlib.Path(module.__file__).is_relative_to(root)
-assert result['installed_distributions'] == [({component['distribution']!r}, {component['version']!r})]
+assert result['installed_distributions'] == {sorted(component['runtime_distributions'].items())!r}
 assert result['application_source_absent']
 print(json.dumps(result, sort_keys=True))
 '''
@@ -229,6 +242,7 @@ def main() -> int:
     output.mkdir(parents=True, exist_ok=False)
     bound = sources + [workspace / path for path in (
         "scripts/p01/run_images.py", "deploy/build/components.json", "deploy/build/inputs.lock.json",
+        "scripts/p01/python_lock.py",
         ".github/workflows/p01-images.yml", "scripts/p01/select_components.py",
         "scripts/p01/check_jobs.py", "scripts/p01/candidates.json",
     )]
@@ -283,8 +297,8 @@ def main() -> int:
         require(configuration["Entrypoint"] == [component["entrypoint"]], "Unexpected entrypoint")
         if component["language"] == "python":
             require(configuration["Cmd"] == ["liveness"], "Unexpected default probe")
-            require(configuration.get("Healthcheck", {}).get("Test") == ["NONE"], "Bootstrap image cannot claim persistent health")
-            require(not configuration.get("ExposedPorts"), "Bootstrap image cannot expose a service port")
+            require(configuration.get("Healthcheck", {}).get("Test") == ["NONE"], "Diagnostic default cannot claim persistent health")
+            require(not configuration.get("ExposedPorts"), "Diagnostic default cannot advertise a service listener")
         else:
             require(configuration["Cmd"] == ["php-fpm", "-F"], "Unexpected PHP process command")
             require(not any(value.startswith("APP_KEY=") for value in configuration.get("Env", [])),

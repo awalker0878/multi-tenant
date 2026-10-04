@@ -26,7 +26,13 @@
         "native_operations_enabled": false
       },
       "readiness_reason": "service_dependencies_not_implemented",
-      "language": "python"
+      "language": "python",
+      "runtime_mode": "asgi",
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0"
+      ],
+      "runtime_entrypoint": "/opt/venv/bin/planning-serve"
     },
     {
       "id": "inventory",
@@ -52,7 +58,13 @@
         "native_operations_enabled": false
       },
       "readiness_reason": "service_dependencies_not_implemented",
-      "language": "python"
+      "language": "python",
+      "runtime_mode": "asgi",
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0"
+      ],
+      "runtime_entrypoint": "/opt/venv/bin/inventory-serve"
     },
     {
       "id": "lifecycle",
@@ -78,7 +90,13 @@
         "native_operations_enabled": false
       },
       "readiness_reason": "service_dependencies_not_implemented",
-      "language": "python"
+      "language": "python",
+      "runtime_mode": "asgi",
+      "runtime_requirements": [
+        "psycopg[binary]==3.3.6",
+        "uvicorn==0.53.0"
+      ],
+      "runtime_entrypoint": "/opt/venv/bin/lifecycle-serve"
     },
     {
       "id": "inventory-workers",
@@ -107,7 +125,9 @@
         "task_consumption_enabled": false
       },
       "readiness_reason": "worker_dependencies_not_implemented",
-      "language": "python"
+      "language": "python",
+      "runtime_mode": "cli",
+      "runtime_requirements": []
     },
     {
       "id": "lifecycle-workers",
@@ -136,7 +156,9 @@
         "task_consumption_enabled": false
       },
       "readiness_reason": "worker_dependencies_not_implemented",
-      "language": "python"
+      "language": "python",
+      "runtime_mode": "cli",
+      "runtime_requirements": []
     },
     {
       "id": "governance",

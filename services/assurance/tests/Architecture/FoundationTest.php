@@ -24,7 +24,7 @@ test('the actual bootstrap classes are loaded from the service source', function
 });
 
 arch('implemented application classes use strict types')->expect('App')->toUseStrictTypes();
-arch('implemented application classes are final')->expect('App')->toBeFinal();
+arch('implemented application classes are final')->expect('App')->classes()->toBeFinal();
 arch('delivery does not reference sibling source or frontend transport')
     ->expect('App\\Http')
     ->not->toUse(['Product\\Contexts', 'Product\\Services', 'Inertia']);

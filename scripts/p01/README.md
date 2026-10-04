@@ -17,12 +17,30 @@ python -m unittest discover -s scripts/p01 -p 'test_*.py' -v
 
 The candidate record pins the already measured interpreter and package-tool
 versions. Python components require their own committed lock, run Ruff, mypy and
-their tests, build one owned wheel, and install it without network resolution or
-dependencies into an empty runtime. The installed module must resolve inside that
-runtime. Liveness is restricted to process bootstrap; readiness must return a
-failure and unsupported input must be rejected. These initial stdlib bootstraps
-have no implemented business layers, database clients or task consumers; their
-current checks do not establish those future boundaries.
+their tests and build one owned wheel. The runner exports the owned production
+lock with hashes, installs that complete closure into an empty runtime using
+`uv pip sync --require-hashes --only-binary :all:`, then installs only the owned
+wheel without dependency resolution. `uv pip check` and an independent exact
+lock inventory comparison reject missing or unexpected distributions, including
+development/build tools. The installed module must resolve inside that runtime.
+The retained `production-requirements.txt` binds the hashes used for installation.
+
+The three services own pinned Uvicorn and Psycopg binary dependencies and install
+an additional `<service>-serve` entrypoint for private ASGI dependency diagnostics.
+The runner launches that installed entrypoint on loopback with a disposable token
+file and no database settings, retains the real HTTP responses, and verifies live
+200, service-ready 503, anonymous dependency 401 and authenticated dependency 503.
+It stops the server and removes the synthetic token after the checks.
+The default CLI still measures process bootstrap, rejects readiness and refuses
+unsupported input. Both workers retain a single stdlib distribution and one-shot
+CLI behavior; installing the service runtime never adds task consumption.
+`python_lock.py` recognizes only the current Linux/CPython string-platform marker
+forms and selected dependency extras. Unknown marker semantics, forked package
+versions or non-PyPI sources fail closed and need an explicit verifier update.
+
+The unified package workflow covers Planning alongside every registered owner.
+It replaces the redundant Planning-only workflow, whose zero-dependency assertion
+was specific to the earlier bootstrap package.
 
 PHP candidates now use committed `php_dependency_mode: replay`. All four private
 Composer locks were resolved and retained during the initial candidate run, then
