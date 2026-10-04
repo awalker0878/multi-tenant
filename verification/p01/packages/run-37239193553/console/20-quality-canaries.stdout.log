@@ -1,0 +1,14 @@
+PASS allowed boundary: Domain -> Illuminate\Database\Eloquent\Model
+PASS allowed boundary: Application -> Illuminate\Support\Facades\DB
+PASS allowed boundary: Application -> Illuminate\Support\Facades\Gate
+PASS allowed boundary: Infrastructure -> Product\Contracts\BoundaryFixture
+PASS forbidden boundary: Domain -> Application
+PASS forbidden boundary: Domain -> Infrastructure
+PASS forbidden boundary: Domain -> Delivery
+PASS forbidden boundary: Application -> Infrastructure
+PASS forbidden boundary: Application -> Delivery
+PASS forbidden boundary: Domain -> Transport
+PASS forbidden boundary: Application -> Transport
+PASS forbidden boundary: Application -> PublishedContracts
+PASS forbidden boundary: Application -> ForeignPrivate
+PASS: 4 allowed convention controls and 9 forbidden dependencies; source restored.
