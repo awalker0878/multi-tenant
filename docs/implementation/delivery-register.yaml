@@ -63,6 +63,11 @@ phases:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-001
+  - EV-P01-002
+  - EV-P01-003
+  - EV-P01-004
+  - EV-P01-005
+  - EV-P01-006
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -505,6 +510,11 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-001
+  - EV-P01-002
+  - EV-P01-003
+  - EV-P01-004
+  - EV-P01-005
+  - EV-P01-006
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -523,6 +533,8 @@ work_packages:
   - architecture/context-map.yaml
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
   - docs/implementation/p01-planning-bootstrap.md
+  - docs/implementation/p01-python-foundations.md
+  - docs/implementation/p01-image-foundations.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -1648,6 +1660,11 @@ requirements:
   - EV-P00-010
   - EV-P00-011
   - EV-P01-001
+  - EV-P01-002
+  - EV-P01-003
+  - EV-P01-004
+  - EV-P01-005
+  - EV-P01-006
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -1686,6 +1703,11 @@ requirements:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P01-001
+  - EV-P01-002
+  - EV-P01-003
+  - EV-P01-004
+  - EV-P01-005
+  - EV-P01-006
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2818,6 +2840,11 @@ gates:
   reviewed_at: null
   evidence_ids:
   - EV-P01-001
+  - EV-P01-002
+  - EV-P01-003
+  - EV-P01-004
+  - EV-P01-005
+  - EV-P01-006
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3287,6 +3314,169 @@ evidence:
     other principal deployable, worker, native outcome or operating acceptance. Local cached replay does
     not qualify an operated mirror. This evidence cannot pass G01.01 or G01; hosted CI is recorded separately
     in the bootstrap report.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-002
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/cc69116995a4d4a53c58b1d300e5300b0c9d8d03/services/inventory/verification/bootstrap-20261004/report.json
+  sha256: 290245034641f3b6f411f62f5b30020a1a20b881d2dda895f60fa16a67be56be
+  source_revision: 7c98743badebf7ec59309a605b8781b649c11034
+  artifact_revisions:
+    retained_artifact_commit: cc69116995a4d4a53c58b1d300e5300b0c9d8d03
+    services/inventory/uv.lock: 391ba024ac2d23bde704acccfb0a1998f5988ca07220d2a02fc652132c6b5e2f
+    wheel_sha256: 6e6848a305a122b358ca7e8945e1ca6467e5252353c6afc0ce5c2e00bdffc6e5
+    wheel_envelope_sha256: f9b51c152d6f44f9cff59bd3c4221af6e48842a343f48dedfb5d6cea6295410b
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
+    locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 inventory package: ten installed diagnostic tests, Ruff lint/format, strict mypy and
+    18 commands with all expected outcomes; inspected wheel installed without dependencies after removal of
+    copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel bytes
+    verified; other Python service/worker modules absent.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T21:49:10.838206+00:00'
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
+  limitations: Service package diagnostic only; native operations disabled. One-shot process liveness does
+    not establish a persistent service or dependency readiness, which remains unavailable. No product domain,
+    authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome is claimed
+    by this local record. Cached offline installation does not qualify an operating mirror. Partial evidence
+    cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build record, and relevant
+    changes require rerun.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-003
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/cc69116995a4d4a53c58b1d300e5300b0c9d8d03/services/lifecycle/verification/bootstrap-20261004/report.json
+  sha256: 45e169e446437bea9196cd1592a4fd420f0bb3068d6e00d35d29ecde6d232a64
+  source_revision: 7c98743badebf7ec59309a605b8781b649c11034
+  artifact_revisions:
+    retained_artifact_commit: cc69116995a4d4a53c58b1d300e5300b0c9d8d03
+    services/lifecycle/uv.lock: fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4
+    wheel_sha256: 6931167142ad4b7ac975e76b33a88b00eb9d8eadf8b810a9497c8792e2417f0e
+    wheel_envelope_sha256: 5b6192647aa67d881d2bdfebe7da68f9e8382c4cff137920aff5e476b2c76f92
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
+    locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 lifecycle package: ten installed diagnostic tests, Ruff lint/format, strict mypy and
+    18 commands with all expected outcomes; inspected wheel installed without dependencies after removal of
+    copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel bytes
+    verified; other Python service/worker modules absent.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T21:49:23.801860+00:00'
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
+  limitations: Service package diagnostic only; native operations disabled. One-shot process liveness does
+    not establish a persistent service or dependency readiness, which remains unavailable. No product domain,
+    authority, persistence, messaging, provider or native outcome. No image or hosted-CI outcome is claimed
+    by this local record. Cached offline installation does not qualify an operating mirror. Partial evidence
+    cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build record, and relevant
+    changes require rerun.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-004
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/ebfc1b84fb42177db093c11abe8be2a9a2a7e816/workers/inventory/verification/bootstrap-20261004/report.json
+  sha256: f42e76f37b2961149912e018198393eab274e23ed3f127d0632134713a3e9d3c
+  source_revision: 7c98743badebf7ec59309a605b8781b649c11034
+  artifact_revisions:
+    retained_artifact_commit: ebfc1b84fb42177db093c11abe8be2a9a2a7e816
+    workers/inventory/uv.lock: f2a0b4cc9553b6af8091d724e506d524d3dcc9f334f24bccd6f68decab408860
+    wheel_sha256: 525226782a37090e7f4ae55fe8b2340ea9b7a0cda2b94306d07020bdca4d75c8
+    wheel_envelope_sha256: 1ca5159dbb6cc83f237586ab80e257eb7d10ed9d169dafcca11004e3f9844685
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
+    locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 inventory-workers package: ten installed diagnostic tests, Ruff lint/format, strict
+    mypy and 18 commands with all expected outcomes; inspected wheel installed without dependencies after removal
+    of copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel
+    bytes verified; other Python service/worker modules absent.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T21:49:25.501848+00:00'
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
+  limitations: Owned worker package diagnostic only; task consumption and native operations disabled. One-shot
+    process liveness does not establish a persistent service or dependency readiness, which remains unavailable.
+    No product domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI
+    outcome is claimed by this local record. Cached offline installation does not qualify an operating mirror.
+    Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build
+    record, and relevant changes require rerun.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-005
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/ebfc1b84fb42177db093c11abe8be2a9a2a7e816/workers/lifecycle/verification/bootstrap-20261004/report.json
+  sha256: 356d355a38f1ed8cd1af9099e05e00ce4d4738eb72406e408397a6a72f072a5b
+  source_revision: 7c98743badebf7ec59309a605b8781b649c11034
+  artifact_revisions:
+    retained_artifact_commit: ebfc1b84fb42177db093c11abe8be2a9a2a7e816
+    workers/lifecycle/uv.lock: 119e31605521f64e26fac8ea549eb3a50189a705eb3856b3936f7c795df39ac3
+    wheel_sha256: 79481265397affac2891b7caa159d1b4011890b43023706da5635e57f331d81f
+    wheel_envelope_sha256: 3f3fafeb690472b99907f962b102649793cd57dc581b7aafb289a41bc56efe36
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; only this package copied into a fresh source directory;
+    locked offline development install and independent empty runtime wheel install
+  scope: 'Partial P01.01 lifecycle-workers package: ten installed diagnostic tests, Ruff lint/format, strict
+    mypy and 18 commands with all expected outcomes; inspected wheel installed without dependencies after removal
+    of copied source/development environment. Eleven source bindings, 36 command-log hashes and full wheel
+    bytes verified; other Python service/worker modules absent.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T21:49:25.061136+00:00'
+  observer: Codex — implementation and local execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
+  limitations: Owned worker package diagnostic only; task consumption and native operations disabled. One-shot
+    process liveness does not establish a persistent service or dependency readiness, which remains unavailable.
+    No product domain, authority, persistence, messaging, provider or native outcome. No image or hosted-CI
+    outcome is claimed by this local record. Cached offline installation does not qualify an operating mirror.
+    Partial evidence cannot pass G01.01 or G01; no time-based expiry assigned to this immutable source/build
+    record, and relevant changes require rerun.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-006
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/7aced8f2cba673a500c060116eb431627f727aeb/verification/p01/images/run-37238148501/retrieval.json
+  sha256: 748d01cc160321c1cb409d34fbc417897559255493e2e061f85964fec8d2e1c3
+  source_revision: ba6acd71513c7d999cf51249d70d9c2be50967d9
+  artifact_revisions:
+    retained_artifact_commit: 7aced8f2cba673a500c060116eb431627f727aeb
+    workflow_run_id: 37238148501
+    source_tree: ede2dcc88635c8e446644bcd1e08f893c3925cc4
+    component_reports:
+      inventory: 601648204782894d8b19274f641ed8cd620e051f4ca357244e4987375d765149
+      inventory-workers: 22b7d2c499d1eef30af404e39df508cf9be108d21a979b8105ad77f3e6099583
+      lifecycle: 8e2c1427c483ed9f6d55b143386b1ed8f7d0621be92e524d46d7ce23ff3bf13f
+      lifecycle-workers: 286477669eb54958ab74747414448dbe6da71f981014627d8038142d1c71c022
+      planning: dcb588a52dda2441cdeff530c7a93c469bd510e0618b59f6a55263aeee910716
+    local_image_configuration_digests:
+      inventory: sha256:3d768c3f42f40fbf289f882f490f34f396cf0ded85e8a48ff513578541e39cbd
+      inventory-workers: sha256:4a19676e471c21d45ff773beb29ab749e808d72b9cdf5a46f9cbbe8b829cbd3b
+      lifecycle: sha256:1429951f2c3d98874b753510338e5f0aed487504697618ea5c01170d7ba3fcb8
+      lifecycle-workers: sha256:3176fa6493a06e2ba18a4ea3009814f082375326003cf0f76d2b7cc2d12b3228
+      planning: sha256:a142a20e5366fd1f5d9d266bbbffa5a747d984d21c9e52b946098e8c95acb7dd
+  environment: GitHub-hosted ubuntu-24.04 linux/amd64; Docker 28.0.4 and Buildx 0.37.1; immutable Python 3.12.14/uv
+    0.12.19 base manifests; five isolated owned build contexts and real restricted diagnostic containers
+  scope: 'Partial P01.01 image evidence for Planning, Inventory, Lifecycle and both owned worker bootstraps:
+    50 expected command outcomes including five unavailable-readiness and five rejected-override checks; UID/GID
+    10001, read-only root, zero effective capabilities, no-new-privileges and loopback-only networking observed.
+    Five archive digests/sizes, 100 log hashes and 75 source bindings (59 unique files) verified against immutable
+    source blobs. Exact measured input-validation replay passed for all five components.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T21:58:19.358892+00:00'
+  observer: Codex — authored workflow executed on GitHub-hosted runners
+  reviewer: Codex — engineering verification of exact source, archives, logs and observed container controls
+  limitations: Five Python bootstrap images only; no Laravel image represented. One-shot liveness is not persistent
+    service readiness or task consumption. No database/broker/Temporal integration, tenant isolation, native
+    platform or operating acceptance. Runner-local configuration digests are not published registry digests;
+    image-layer bytes were not archived. No registry push, signed image, provenance attestation, SBOM, vulnerability
+    assessment, complete base inventory, byte-identical rebuild or operating mirror claim. Partial evidence
+    cannot pass G01.01 or G01; no time-based expiry assigned to this immutable run record, and relevant changes
+    require rerun.
   valid_until: null
   invalidated_at: null
 blockers:
