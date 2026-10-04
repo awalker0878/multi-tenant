@@ -29,7 +29,7 @@ php artisan route:cache
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-The first committed lock is the retained P00 resolver seed until the initial service-specific CI resolution is captured. During that transition, `composer validate --strict --no-check-all` intentionally detects its mismatch and a normal locked replay must not claim success. The initial CI job performs the explicitly selected resolution, captures the resulting lock and inventory, and the subsequent replay uses only the retained service lock. See the [implementation record](../../docs/implementation/p01-governance-bootstrap.md) for observed status.
+The committed lock is the private Governance lock. [Package run 37239193553](../../docs/implementation/p01-laravel-foundations.md) passed clean locked replay, installed version/reference equality, PHP quality, 14 Pest tests / 44 assertions and cached HTTP probes. Ordinary checks use replay and reject a missing or changed lock. See the [Governance record](../../docs/implementation/p01-governance-bootstrap.md) for measured source and limits.
 
 `--no-check-all` disables Composer's exact/loose constraint advisory for the deliberately pinned direct dependencies; strict manifest and lock validation remain enabled.
 
@@ -43,4 +43,4 @@ The service owns `App\` and `Tests\` autoload roots, its framework configuration
 
 The normal test command includes HTTP and Architecture suites. Deptrac analyzes the actual service and rejects uncovered first-party dependencies; its separate canary command creates temporary parser fixtures, confirms four allowed Laravel/convention dependencies and nine forbidden dependencies, then removes them. A canary must produce its exact intended rule diagnostic, not merely any nonzero process status. These fixtures establish analyzer behavior, not implemented Domain/Application layers or real tenant isolation. The retained P00 convention examples remain reference experiments.
 
-No actual service container, database role isolation, federation, delegation, audit/outbox, grant/approval model, business readiness or operating acceptance is established by this increment. Those obligations remain in P01 and P02.
+The [image record](../../docs/implementation/p01-laravel-images.md) separately verifies the independently built Governance container and restricted diagnostic process. Database role isolation, federation, delegation, audit/outbox, grant/approval behavior, business readiness and operating acceptance remain P01/P02 work.

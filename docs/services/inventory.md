@@ -1,6 +1,10 @@
 # Inventory service
 
-Status: proposed service specification. Runtime: Python; destination: `services/inventory/` and its read-only collection workers. Owner: infrastructure engineering with site/platform owners.
+Status: P01 independently packaged service and owned worker foundations are implemented; the discovery, observation and collection behavior specified below remains planned. Runtime: Python; source: `services/inventory/` and `workers/inventory/`. Owner: infrastructure engineering with site/platform owners.
+
+The [service package](../../services/inventory/README.md) and [Inventory-owned worker package](../../workers/inventory/README.md) each have a private manifest, dependency lock, wheel and diagnostic entrypoint. `inventory-health` and `inventory-worker-health` implement one-shot process liveness only. Readiness deliberately exits unavailable; the worker declares task consumption disabled. No HTTP API, discovery request, endpoint collection, persistence or other business behavior is implemented, and neither package performs native operations.
+
+The [Python package report](../implementation/p01-python-foundations.md) records independent installations and isolated wheel execution. The [Python image report](../implementation/p01-image-foundations.md) records the actual restricted container builds and diagnostics. These results establish bootstrap boundaries, not discovery readiness or a running collector.
 
 ## Purpose and responsibility boundary
 

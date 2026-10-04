@@ -1,8 +1,10 @@
 # Planning service
 
-Status: the initial independently packaged [bootstrap](../../services/planning/README.md) is implemented; the assessment, profile and plan behavior specified below is not yet implemented. Runtime: Python; source: `services/planning/`. Owner: infrastructure engineering with architecture/security and platform profile owners.
+Status: the initial independently packaged [service foundation](../../services/planning/README.md) and development image are implemented; the assessment, profile and plan behavior specified below remains planned. Runtime: Python; source: `services/planning/`. Owner: infrastructure engineering with architecture/security and platform profile owners.
 
-The [P01 execution report](../implementation/p01-planning-bootstrap.md) records the owned lock, installed process-liveness diagnostic, explicitly unavailable dependency readiness, isolated wheel checks and hosted CI. This short-lived command is not a running Planning API or proof of application readiness.
+The private service package owns its manifest, dependency lock, wheel and installed `planning-health` diagnostic. It implements one-shot process liveness; dependency readiness deliberately exits unavailable. No HTTP API, compilation worker, task consumption, assessment, plan compilation, persistence or other business behavior is implemented. Native operations are disabled.
+
+The [Planning package report](../implementation/p01-planning-bootstrap.md) records isolated wheel checks, installed-command tests and hosted CI. The [Python image report](../implementation/p01-image-foundations.md) records the actual restricted container build and diagnostics. These results establish a bootstrap boundary, not a running Planning API or application readiness.
 
 ## Purpose and responsibility boundary
 

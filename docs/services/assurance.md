@@ -1,6 +1,8 @@
 # Assurance service
 
-Status: proposed service specification. Runtime: Laravel/PHP; destination: `services/assurance/`. Owner: quality/assurance with security, records and receiving operations owners.
+Status: P01 independently packaged Laravel diagnostic foundation is implemented and measured; evidence custody, decisions and qualification behavior below remain planned. Runtime: Laravel/PHP; source: `services/assurance/`. Owner: quality/assurance with security, records and receiving operations owners.
+
+The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 
 ## Purpose and responsibility boundary
 

@@ -1,6 +1,6 @@
 # P01 Console foundation
 
-Owner role: Console maintainer. Phase/work package: P01 / P01.01. Date: 2026-10-04. Status: implementation present; PHP service lock resolution and hosted runtime verification pending at initial publication. This increment does not complete G01.
+Owner role: Console maintainer. Phase/work package: P01 / P01.01. Date: 2026-10-04. Status: private lock replay, PHP/frontend quality and hosted Chromium foundation checks passed; image packaging and corrective verification are recorded separately. This increment does not complete G01.
 
 ## Implemented boundary
 
@@ -10,18 +10,18 @@ The public `/` entrypoint renders the product name and an honest foundation-stat
 
 The server session uses a named Console cookie with Secure-by-default, HttpOnly and SameSite=Lax flags. Web responses are private/no-store with framing, MIME-sniffing and referrer headers. The HTTP test suite exercises initial HTML, Inertia JSON, explicit page disclosure, cookie attributes, route absence, health behavior and request-forgery middleware. The CSRF negative/positive tests register a test-only route and deliberately exit Laravel's `testing` environment to exercise real token verification; no product mutation route is created for the test.
 
-## Dependencies and measured local checks
+## Dependencies and measured checks
 
-| Input/check | State at initial publication |
+| Input/check | Observed state and evidence |
 | --- | --- |
 | PHP framework | Manifest selects PHP `~8.5.0`, Laravel `13.34.0`, Inertia Laravel `3.5.1` and measured P00 quality-tool versions. Required PostgreSQL extension is declared; no database connection or product persistence is configured. |
-| Composer lock | P00 lock used as an explicitly identified resolver seed. Requires service-specific resolution, capture and subsequent locked replay; it is not yet proof of Console installation. |
+| Composer lock | Private resolved lock replayed unchanged in run 37239193553; SHA256 `926d7cd6f70cea71f705e6233ee2c2a219f5824c5a08faeece99068d3f7fd913`. Both installs produced equal package versions/references. |
 | Browser dependencies | Private npm lock retains Inertia Vue/Vite `3.8.0`, Vue `3.5.43`, TypeScript `6.0.3`, Tailwind `4.3.3`, Vite `8.3.2`, Vue plugin `6.0.9`, Laravel Vite plugin `3.2.0`, Vue TSC `3.3.12`, Node types `24.19.1`, Playwright `1.63.0`. |
 | Local installation | Node `24.19.0`, npm `11.9.0`; `npm ci --ignore-scripts --no-audit --no-fund` passed with 77 installed packages. No advisory assessment is claimed by this command. |
 | Local source/build | `npm run typecheck`, `npm run test:boundaries` and `npm run build` passed. Boundary check inspected three implemented source files and ten allowed/forbidden import fixtures. Vite transformed 565 modules and produced a main bundle, lazy Foundation page chunk and stylesheet. |
-| PHP / browser execution | Not available in the local executor at initial publication. Hosted exact-runtime installation, formatting, type analysis, PHP tests, Deptrac, canaries and actual browser hydration must be recorded from their real executions. |
+| PHP / browser execution | Hosted run 37239193553 passed 23 expected commands, 24 Pest tests / 86 assertions, formatting, type analysis, Deptrac/canaries, cached HTTP probes and one Chromium hydration test with no retries, skips or unexpected outcomes. |
 
-The existing P00 PHP/browser measurements support the accepted dependency choice, but are not reused as a pass for these new application files. The Composer manifest has changed and must be resolved in its own application directory. An independent Console lock and actual execution evidence are required before claiming service verification.
+The [package record](p01-laravel-foundations.md) binds the independent Console lock and actual source at `4142571874a53b351a9c6023313185fe718d0dac`; its [Console report](../../verification/p01/packages/run-37239193553/console/report.json) preserves the raw observations. The earlier Pest exception-handler binding failure remains in the failed-run record. P00 measurements do not substitute for these product-source results.
 
 ## Code controls
 
@@ -31,6 +31,6 @@ The frontend checker parses TypeScript module references and Vue SFC scripts. It
 
 ## Outstanding scope
 
-The [Console specification](../services/console.md), [frontend standard](../engineering/frontend.md) and [P01 plan](phases/p01.md) remain authoritative for unfinished work. The current file session driver is for this local scaffold, not a measured highly available session design. No service container, proxy/CSP configuration, remote-service delegation, authentication provider, tenant switch, protected command, native operation, accessibility conformance or operating acceptance is claimed.
+The [Console specification](../services/console.md), [frontend standard](../engineering/frontend.md) and [P01 plan](phases/p01.md) remain authoritative for unfinished work. The current file session driver is for this local scaffold, not a measured highly available session design. The [image record](p01-laravel-images.md) retains the initial missing-page packaging failure and the corrective image execution that includes the server-side Inertia page lookup inputs. This is separate from integrated ingress/proxy/CSP configuration, remote-service delegation, authentication, tenant switching, protected commands, native operations, accessibility conformance or operating acceptance.
 
-Record hosted failures as well as passing service-specific resolution/replay artifacts, retain their exact source/lock and runtime bindings, and update this record when results are available. Keep actual readiness closed until real dependencies and their checks are implemented. Subsequent deployment/qualification results must remain separate from this public foundation page.
+Preserve the source/lock/runtime bindings of both failed and passing executions; later source or dependency changes require affected checks. Keep actual readiness closed until real dependencies and their checks are implemented. Subsequent deployment/qualification results must remain separate from this public foundation page.

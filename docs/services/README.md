@@ -2,7 +2,7 @@
 
 Apply the common [engineering standards](../engineering/README.md) with each service specification. Laravel conventions govern console, governance, catalogue and assurance; cross-language contracts, isolation, delivery and evidence rules apply to Python contexts and worker pools as well. Service owners document applicable [controls](../engineering/coverage.md), local performance/retention limits and reviewed exceptions rather than inventing independent conventions.
 
-Status: proposed implementation contracts, E0 design material. These pages do not assert that services, endpoints, schemas, tests or deployments exist. Resolve the relevant decisions and publish machine-readable contracts before implementing consumers.
+Status: product behavior and contracts below remain E0 design material. All seven application roots and Inventory/Lifecycle worker roots now contain private P01 foundations. Their local READMEs describe implemented diagnostics; the [complete package replay](../implementation/p01-laravel-foundations.md), [Python foundations](../implementation/p01-python-foundations.md) and [image records](../implementation/p01-laravel-images.md) bind actual execution evidence. Product routes and schemas in these specifications remain proposals until their owning work packages implement and verify them. Publish machine-readable contracts before implementing consumers.
 
 The [target architecture](../architecture/target-architecture.md) defines context boundaries. The [domain model](../product/domain-model.md) defines shared vocabulary; service pages specify the owner, behavior and failure boundaries. The [worked application](../product/application-walkthrough.md) connects them into one proposed journey.
 
@@ -34,7 +34,7 @@ See [contract conventions](../contracts/README.md) and [illustrative exchanges](
 
 ## Bootstrap and first service slice
 
-P01 starts services with health checks and synthetic integration fixtures. P02 establishes an approved identity provider, service identities and the initial governance administrator; that administrator creates tenant `t_demo` and grants in the isolated fixture environment. Catalogue then creates its tenant-scoped environments, WSDs and logical domains before accepting an application intent referencing them.
+P01 has started the independent application boundaries with diagnostic health entrypoints. Laravel liveness reports process health and readiness returns HTTP 503; Python packages are one-shot diagnostics whose readiness exits nonzero. They do not connect to service dependencies or perform native operations. Synthetic integration fixtures and persistent runtime readiness remain P01.02/P01.05 work. P02 establishes an approved identity provider, service identities and the initial governance administrator; that administrator creates tenant `t_demo` and grants in the isolated fixture environment. Catalogue then creates its tenant-scoped environments, WSDs and logical domains before accepting an application intent referencing them.
 
 Catalogue is the first complete product slice, not an authorization island. P03 can develop against the locked governance contract with explicit test doubles, but its integrated acceptance requires real governance and identity services. Test fixtures never become a production default administrator, implicit tenant or bypass flag.
 

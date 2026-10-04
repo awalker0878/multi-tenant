@@ -1,6 +1,8 @@
 # Governance service
 
-Status: proposed service specification. Runtime: Laravel/PHP; destination: `services/governance/`. Owner: product engineering with IAM/security. ADR-009 selects the actual identity/delegation system and revocation guarantees.
+Status: P01 independently packaged Laravel diagnostic foundation is implemented and measured; the identity, authority and governance behavior below remains planned. Runtime: Laravel/PHP; source: `services/governance/`. Owner: product engineering with IAM/security. ADR-009 selects the actual identity/delegation system and revocation guarantees.
+
+The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 
 ## Purpose and responsibility boundary
 

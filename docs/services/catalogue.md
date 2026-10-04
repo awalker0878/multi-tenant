@@ -1,6 +1,8 @@
 # Catalogue service
 
-Status: proposed first complete product slice; no application code or locked schema is claimed. Runtime: Laravel/PHP; destination: `services/catalogue/`. Owner: product engineering, with product/architecture review of ADR-013.
+Status: P01 independently packaged Laravel diagnostic foundation is implemented and measured; the catalogue aggregates, schemas and complete product slice below remain planned. Runtime: Laravel/PHP; source: `services/catalogue/`. Owner: product engineering, with product/architecture review of ADR-013.
+
+The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 
 ## Purpose and responsibility boundary
 

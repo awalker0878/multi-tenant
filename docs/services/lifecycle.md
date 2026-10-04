@@ -1,6 +1,10 @@
 # Lifecycle service
 
-Status: proposed service specification. Runtime: Python with Temporal; destination: `services/lifecycle/` and scoped execution pools. Owner: infrastructure engineering with SRE/security and native resource owners.
+Status: P01 independently packaged service and owned worker foundations are implemented; the admission, workflow and execution behavior specified below remains planned. Current runtime: Python; Temporal is a planned dependency. Source: `services/lifecycle/` and `workers/lifecycle/`. Owner: infrastructure engineering with SRE/security and native resource owners.
+
+The [service package](../../services/lifecycle/README.md) and [Lifecycle-owned worker package](../../workers/lifecycle/README.md) each have a private manifest, dependency lock, wheel and diagnostic entrypoint. `lifecycle-health` and `lifecycle-worker-health` implement one-shot process liveness only. Readiness deliberately exits unavailable; the worker declares task consumption disabled. No HTTP API, admission, operation journal, Temporal worker, dispatch, fencing, recovery or other business behavior is implemented, and neither package performs native operations.
+
+The [Python package report](../implementation/p01-python-foundations.md) records independent installations and isolated wheel execution. The [Python image report](../implementation/p01-image-foundations.md) records the actual restricted container builds and diagnostics. These results establish bootstrap boundaries, not execution readiness or authority to consume tasks or change native resources.
 
 ## Purpose and responsibility boundary
 

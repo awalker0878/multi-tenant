@@ -12,24 +12,24 @@ The configuration declares a future service-private PostgreSQL connection withou
 
 ## Dependency and quality scope
 
-The manifest pins Laravel 13.34.0, Pint 1.32.1, Larastan 3.12.2, PHPStan 2.2.16, Deptrac 4.7.2, Pest 4.7.8, Pest Laravel 4.1.0 and Mockery 1.6.15 on the accepted PHP 8.5 development family. Transitive versions must come from Composer resolution and a captured private lock; they are not manually authored. The initial source commit carries the measured P00 lock unchanged solely as the explicit resolver seed. This seed is not a validated Governance lock and normal lock validation must fail until the service-specific output is retained.
+The manifest pins Laravel 13.34.0, Pint 1.32.1, Larastan 3.12.2, PHPStan 2.2.16, Deptrac 4.7.2, Pest 4.7.8, Pest Laravel 4.1.0 and Mockery 1.6.15 on the accepted PHP 8.5 development family. Transitive versions must come from Composer resolution and a captured private lock; they are not manually authored. The initial source commit used the measured P00 lock as an explicit resolver seed. The current private Governance lock was resolved and retained, then replayed unchanged in [package run 37239193553](p01-laravel-foundations.md) at source `4142571874a53b351a9c6023313185fe718d0dac`. Its SHA256 is `e5ddd1d1218174f0be042650de80d9b4df67ce3c73749e761384890ff340a988`.
 
 | Check | Authored coverage | Execution status |
 | --- | --- | --- |
-| HTTP feature suite | Actual kernel liveness/readiness, no-cache/retry headers, denied probe writes, absent business endpoints, input cannot enable readiness, no session cookie, JSON errors | Awaiting hosted execution |
-| Pest architecture | Private autoload, reflection confirms service-local source, actual class strict types/finality, no sibling/frontend transport imports | Awaiting hosted execution |
-| Deptrac | Actual HTTP/provider graph; layer policy includes future Domain/Application and transport separation | Awaiting hosted execution |
-| Deptrac controls | Four allowed framework/contract parser controls; nine exact forbidden dependency diagnostics; cleanup and restored baseline | Awaiting hosted execution |
-| Pint / PHPStan | Entire formatted source tree; level 8 application analysis with no baseline suppression | Awaiting hosted execution |
-| Cached HTTP boot | Configuration and route cache, real HTTP liveness/readiness from the built-in development server | Awaiting hosted execution |
-| Independent lock replay | Clean installation and platform checks from the captured service-only lock | Awaiting initial resolution and retained lock |
+| HTTP feature suite | Actual kernel liveness/readiness, no-cache/retry headers, denied probe writes, absent business endpoints, input cannot enable readiness, no session cookie, JSON errors | Passed in the retained private-package replay |
+| Pest architecture | Private autoload, reflection confirms service-local source, actual class strict types/finality, no sibling/frontend transport imports | Passed in the retained private-package replay |
+| Deptrac | Actual HTTP/provider graph; layer policy includes future Domain/Application and transport separation | Passed in the retained private-package replay |
+| Deptrac controls | Four allowed framework/contract parser controls; nine exact forbidden dependency diagnostics; cleanup and restored baseline | Passed in the retained private-package replay |
+| Pint / PHPStan | Entire formatted source tree; level 8 application analysis with no baseline suppression | Passed in the retained private-package replay |
+| Cached HTTP boot | Configuration and route cache, real HTTP liveness/readiness from the built-in development server | Passed in the retained private-package replay |
+| Independent lock replay | Clean installation and platform checks from the captured service-only lock | Passed; lock unchanged and installed versions/references equal |
 
-PHP and Composer are unavailable in the local authoring environment. The source has not been reported as passing from local inspection; the P01 hosted workflow must produce the actual outputs before this table advances. Failed attempts remain evidence and receive a source correction plus a new run.
+PHP and Composer were unavailable in the local authoring environment, so these results come from the hosted execution, not local source inspection. The [Governance report](../../verification/p01/packages/run-37239193553/governance/report.json) records 15 successful expected command outcomes and 14 Pest tests / 44 assertions on PHP 8.5.11 and Composer 2.10.3. Cached loopback HTTP returned liveness 200 and readiness 503 with the required bodies and headers. The earlier Pint failure remains in the [package history](p01-laravel-foundations.md).
 
 ## Remaining work and limits
 
 The positive/negative analyzer fixtures are temporary synthetic classes. Domain, Application and Infrastructure product behavior is absent; there are no skipped suites claiming that those layers are implemented. This source cannot close the complete pragmatic convention foundation, durable outbox or tenant-isolation criteria by itself.
 
-P01 still needs independently verified service images and inventories, actual runtime/process isolation, the complete context/build matrix, deployment and repository controls and the implemented foundation behavior specified by G01. P02 supplies actual identity, tenancy, current authorization, approval and revocation. Retained P00 experiments do not substitute for those service executions. Full native campaigns remain later qualification work and are not prerequisites for independently checking this process foundation.
+The [image record](p01-laravel-images.md) supplies a separate independently built Governance image and restricted process measurements. P01 still needs deployed service/dependency behavior, independent service deployment, repository admission controls and the remaining foundation behavior specified by G01. P02 supplies actual identity, tenancy, current authorization, approval and revocation. Retained P00 experiments do not substitute for those service executions. Full native campaigns remain later qualification work and are not prerequisites for independently checking this process foundation.
 
 The [service README](../../services/governance/README.md) gives commands and diagnostics. The [P01 phase](phases/p01.md) and [delivery register](delivery-register.yaml) own overall status; this record does not declare a gate passed.

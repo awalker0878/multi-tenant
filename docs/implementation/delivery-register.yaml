@@ -68,6 +68,9 @@ phases:
   - EV-P01-004
   - EV-P01-005
   - EV-P01-006
+  - EV-P01-007
+  - EV-P01-008
+  - EV-P01-009
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -515,6 +518,8 @@ work_packages:
   - EV-P01-004
   - EV-P01-005
   - EV-P01-006
+  - EV-P01-007
+  - EV-P01-008
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -535,6 +540,11 @@ work_packages:
   - docs/implementation/p01-planning-bootstrap.md
   - docs/implementation/p01-python-foundations.md
   - docs/implementation/p01-image-foundations.md
+  - docs/implementation/p01-laravel-foundations.md
+  - docs/implementation/p01-laravel-images.md
+  - docs/implementation/p01-governance-bootstrap.md
+  - docs/implementation/p01-console-foundation.md
+  - docs/implementation/p01-code-control.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -591,11 +601,12 @@ work_packages:
   title: CI and supply chain
   owner_role: SRE
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-009
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -614,6 +625,9 @@ work_packages:
   - architecture/context-map.yaml
   - docs/architecture/context-code-structure.md
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
+  - docs/implementation/p01-code-control.md
+  - docs/implementation/p01-laravel-foundations.md
+  - docs/implementation/p01-laravel-images.md
 - id: P01.05
   phase_id: P01
   title: Runtime dependencies
@@ -1665,6 +1679,8 @@ requirements:
   - EV-P01-004
   - EV-P01-005
   - EV-P01-006
+  - EV-P01-007
+  - EV-P01-008
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -1708,6 +1724,9 @@ requirements:
   - EV-P01-004
   - EV-P01-005
   - EV-P01-006
+  - EV-P01-007
+  - EV-P01-008
+  - EV-P01-009
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2628,11 +2647,12 @@ requirements:
   - G09
   - G10
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-009
   blocker_ids: []
 - id: R32
   package_ids:
@@ -2778,11 +2798,12 @@ requirements:
   - G10
   - G11
   status:
-    work: NOT_STARTED
-    verification: NOT_RUN
+    work: IN_PROGRESS
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-009
   blocker_ids: []
 - id: R36
   package_ids:
@@ -2845,6 +2866,9 @@ gates:
   - EV-P01-004
   - EV-P01-005
   - EV-P01-006
+  - EV-P01-007
+  - EV-P01-008
+  - EV-P01-009
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3477,6 +3501,127 @@ evidence:
     assessment, complete base inventory, byte-identical rebuild or operating mirror claim. Partial evidence
     cannot pass G01.01 or G01; no time-based expiry assigned to this immutable run record, and relevant changes
     require rerun.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-007
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/87af80f4034678cc0cf0b172865bd330fd1fbfbf/verification/p01/packages/run-37239193553/retrieval.json
+  sha256: 9d194360cbb589f8ca8e32c5d9693263728fa5d0470e5b71711385e18d89258c
+  source_revision: 4142571874a53b351a9c6023313185fe718d0dac
+  artifact_revisions:
+    retained_artifact_commit: 87af80f4034678cc0cf0b172865bd330fd1fbfbf
+    workflow_run_id: 37239193553
+    run_attempt: 1
+    source_verification_sha256: 6d7d5a99f624e6b8a1581fd8fb49e14c014bf83a34ee13b376ac8321e9218750
+    component_report_sha256:
+      catalogue: 52527e72df698609484d8321cb2e9c53054a32b9d4b045336583159144886f31
+      lifecycle: 92eb211eada98981324953327ca5f35bc94b09ca63dbaebffd202b71bdd00358
+      governance: 73cb383cab2a57c40c2a535505f0e92ae5e3e15542b8b5d25b912e75399a53ef
+      lifecycle-workers: b022e696ae87f9079f01b092d4beaf9d18430f3b62a2bbfa9c6e65cf8a744970
+      inventory-workers: 3591299bfc304af9e66350acff7aef7ec6f77419ffe093261b773cee328f289d
+      planning: a2a5147ba4ac43b1e71dd9444001302d673d452112cb9b55866a0befb73209ef
+      console: 8c433f5dafcd112b79bd51c262c0376700dbbdf101ac54d0bdef13b1553827d1
+      inventory: 34a26c3a2ff25951698f8946971446f7e4af14fcf25000552cb2e7e1b2ce4849
+      assurance: 60c4fd824f3c510de19020877a54f8e27c85f6e74e3226e753ac497053cc2730
+    failed_resolution_run_id: 37238718424
+    failed_resolution_source: af1bf00ad84831a84817975e2ffc124190e3bdcc
+  environment: GitHub-hosted Ubuntu 24.04; isolated owned component copies; PHP 8.5.11/Composer 2.10.3,
+    Python 3.12.14/uv 0.12.19 and Node 24.19.0; real loopback Laravel and Chromium foundation page
+  scope: 'Partial P01.01/P01.04 package evidence: nine private components passed 158 expected command
+    outcomes. Four Laravel private locks replayed unchanged with equal installed package versions/references,
+    quality and cached HTTP diagnostics; Console passed 24 Pest tests/86 assertions and one browser test
+    with no retries, skips or unexpected results. Five Python packages passed owned wheel and isolated
+    diagnostic checks. Retrieval binds 226 unique source inputs, 316 command-log hashes and 350 retained
+    artifact hashes. Earlier four PHP failures remain recorded separately.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  - G01.04
+  observed_at: '2026-10-04T22:16:47.462672+00:00'
+  observer: GitHub Actions — owned package execution
+  reviewer: Codex — retained archive, source binding and artifact/log examination
+  limitations: Development package/process evidence only; public fixture page is not an authenticated
+    product journey. Readiness remains unavailable. No integrated service topology, database roles, real
+    messaging, deployment independence, operated mirror, signing, native qualification or operating acceptance.
+    Initial failed-run uploads omit only four recorded hidden marker files; replay includes them. Later
+    source changes require affected verification. Does not complete P01.01 or pass G01.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-008
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/87af80f4034678cc0cf0b172865bd330fd1fbfbf/verification/p01/images/run-37239193485/retrieval.json
+  sha256: 6753efef5204fb84db11d9c8caf01f2ca9d9f433cffd7a9168287379a0ba80d7
+  source_revision: 4142571874a53b351a9c6023313185fe718d0dac
+  artifact_revisions:
+    retained_artifact_commit: 87af80f4034678cc0cf0b172865bd330fd1fbfbf
+    workflow_run_id: 37239193485
+    initial_run_conclusion: failure
+    corrective_workflow_run_id: 37239487917
+    corrective_source_revision: d0a7cefb23352ffc112638178bb225d20bf12368
+    corrective_retrieval_uri: https://github.com/awalker0878/multi-tenant/blob/87af80f4034678cc0cf0b172865bd330fd1fbfbf/verification/p01/images/run-37239487917/retrieval.json
+    corrective_retrieval_sha256: 2fc896f97efa1cf076ab369dbec623428fa3f04f01101c8b7704053168d51822
+    corrective_console_report_sha256: 0ecbfe0d51812ca8ec475682c194f2dcef35aca23672c3949752b8fef3002896
+    corrective_console_image_id: sha256:501a19c0798e79f2c3105249975a4021eea064d3772ed2bcad15c4ebccc54727
+    implementation_record: docs/implementation/p01-laravel-images.md
+  environment: GitHub-hosted Ubuntu 24.04 linux/amd64; pinned Python/uv and PHP/Composer/Node base inputs;
+    isolated owned Docker build contexts and restricted diagnostic containers
+  scope: 'Partial P01.01 image evidence: nine builds at 414257 produced eight passing runtime checks and
+    a retained Console runtime failure, with 85 commands and 170 log hashes checked. Corrective Console
+    run at d0a7ce includes server-side Inertia page lookup inputs and passed nine commands, with 18 log
+    hashes and 40 source bindings checked. Each result retains its own source, image-configuration identity
+    and artifact metadata; the failed aggregate was not rewritten as a passing nine-image run.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T22:18:56.807458+00:00'
+  observer: GitHub Actions — isolated image builds and diagnostics
+  reviewer: Codex — archive, source binding and runtime/log examination
+  limitations: Restricted image/process and in-process HTTP kernel measurements only. Image configuration
+    IDs are not published registry manifest digests. No listening FastCGI/proxy deployment, browser hydration
+    inside these images, independent service deployment, integrated dependency health, network/identity
+    qualification, signing/promotion, native operation or operating acceptance. Console browser evidence
+    belongs to separate package run 37239193553. Does not complete P01.01 or pass G01; source changes
+    require affected reruns.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-009
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/95889ca0d224c25f84437c226a7631d7195eb165/docs/implementation/p01-code-control.md
+  sha256: ddac12bd64838854f3c1450220bb7ae9bff9126ff2bdd400c796970228bd8c21
+  source_revision: 46dd6823504a7d6856588aa4c1c7b31306710e7c
+  artifact_revisions:
+    retained_artifact_commit: 95889ca0d224c25f84437c226a7631d7195eb165
+    implementation_record: docs/implementation/p01-code-control.md
+    documentation_only_check_source: 7aced8f2cba673a500c060116eb431627f727aeb
+    documentation_only_package_run_id: 37238841029
+    package_run_id: 37239193553
+    package_source_revision: 4142571874a53b351a9c6023313185fe718d0dac
+    evidence_classifier_source_revision: 46dd6823504a7d6856588aa4c1c7b31306710e7c
+    evidence_classifier_workflow_run_id: 37242069458
+    evidence_classifier_workflow_conclusion: success
+    repository_settings_observed_at: '2026-10-04T22:10:00.127Z'
+    image_failure_run_id: 37239193485
+    image_corrective_run_id: 37239487917
+    corrective_source_revision: d0a7cefb23352ffc112638178bb225d20bf12368
+  environment: Local Python control suites and read-only GitHub connector observations; exact-source GitHub
+    Actions selection, package/image matrices and stable aggregate outcomes
+  scope: 'Partial P01.04 code controls: private component and owner-worker selection, conservative shared-input
+    selection, documentation-only skips and stable aggregate outcomes. Local selection/aggregate/recorder
+    and architecture/documentation checks are recorded with their coverage limits. Hosted runs retain
+    successful package checks and a failed image aggregate followed by the independently successful Console
+    corrective image run. Read-only settings observations reported an unprotected active branch and no
+    repository rulesets.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.04
+  observed_at: '2026-10-04T22:59:33Z'
+  observer: Codex — local controls and read-only repository observations; GitHub Actions — hosted checks
+  reviewer: Codex — engineering examination; no independent admission-policy acceptance claimed
+  limitations: These controls provide execution evidence and feedback, not enforced repository admission.
+    No verified CODEOWNERS/reviewer-account mapping, distinct-role review, trusted-base enforcement, complete
+    base/head consumer graph, branch protection mutation, secret/dependency/image-vulnerability assessment,
+    SBOM/signature or verified promotion. Current settings observations are point-in-time. P01.04 remains
+    in progress and G01.04 is not accepted.
   valid_until: null
   invalidated_at: null
 blockers:

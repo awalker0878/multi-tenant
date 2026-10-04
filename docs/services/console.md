@@ -1,8 +1,10 @@
 # Console service
 
-Status: proposed service specification; no UI or executable routes are claimed. Runtime: Laravel, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8, with exact compatible patches subject to P00.03. Destination: `apps/console/`. Owner: product engineering.
+Status: P01 public foundation page, diagnostic routes and private Laravel/Inertia/Vue package are implemented and measured; authenticated product journeys below remain planned. Runtime: Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8, with exact private locks recorded in P01 evidence. Source: `apps/console/`. Owner: product engineering.
 
 The [frontend engineering standard](../engineering/frontend.md) defines component structure, typed page contracts, browser data handling, session transitions, accessibility and verification. It includes primary-source compatibility research reviewed on 2026-10-04. Runtime and browser support require the exact BOM and qualification evidence; requested major versions alone do not demonstrate compatibility.
+
+The [package replay](../implementation/p01-laravel-foundations.md) and [image measurements](../implementation/p01-laravel-images.md) bind actual source, dependency and execution results. Diagnostic liveness does not establish application readiness; readiness remains HTTP 503 until real dependencies and their probes are implemented.
 
 ## Purpose and responsibility boundary
 

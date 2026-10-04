@@ -21,7 +21,7 @@ Both endpoints return JSON with `Cache-Control: no-store`; readiness also return
 
 The candidate uses PHP 8.5 with the measured Laravel 13.34.0 and exact development tool versions. A private PostgreSQL driver is declared for the intended persistence boundary, but no connection or credentials are configured and no database is created. Runtime deployment must supply its own environment, application key and writable cache/storage paths.
 
-Run from this directory after the service-private Composer lock has been resolved and retained by the P01 dependency workflow:
+The service-private Composer lock is retained. Run from this directory with the pinned runtime:
 
 ```sh
 composer install --no-interaction --prefer-dist --no-progress
@@ -39,4 +39,4 @@ The ordinary tests exercise actual HTTP responses, absent routes, write rejectio
 
 ## Current verification scope
 
-The implementation is a candidate until its service-private dependency lock is resolved and actual PHP runtime checks run. The P01 implementation record is authoritative for retained results. Dependency readiness remains unavailable until its real probes and required dependencies are implemented; process liveness cannot promote this state.
+The [package record](../../docs/implementation/p01-laravel-foundations.md) binds the successful private-lock replay, PHP quality, 14 Pest tests / 44 assertions and cached HTTP probes in run 37239193553. The [image record](../../docs/implementation/p01-laravel-images.md) separately binds the independently built image and restricted process diagnostics. These are foundation measurements, not acceptance of the future product behavior. Dependency readiness remains unavailable until its real probes and required dependencies are implemented; process liveness cannot promote this state.
