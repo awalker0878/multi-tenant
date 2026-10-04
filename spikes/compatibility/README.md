@@ -9,7 +9,7 @@ Read the [execution report](../../docs/implementation/p00-compatibility-results.
 | Path | Purpose |
 | --- | --- |
 | `frontend/` | Exact npm lock, strict Vue type checking, Inertia 3/Vue 3/Tailwind 4/Vite 8 build probe |
-| `python/` | uv lock, Python 3.12 family probe, synthetic positive/invalid-input/HTTP transport checks |
+| `python/` | Exact uv lock, Ruff/mypy/pytest/Import Linter, synthetic behavior and seven semantic boundary negatives |
 | `php/` | Laravel HTTP fixtures, model/Action/policy behavior, PHP quality tools and negative controls |
 | `run-integration.py` | Isolated PHP lock replay, quality/HTTP tests and real Chromium run with source-bound evidence |
 | `record.py` | Executes one command without a shell and records output, exit status, timestamps and input SHA-256 values |
@@ -39,13 +39,13 @@ uv sync --locked --python 3.12
 uv run --frozen python smoke.py
 ```
 
-Use an isolated environment without production credentials. The Python probe sends no external request: HTTPX uses an in-memory `MockTransport`. It verifies installed libraries and strict synthetic input handling, not a service contract or real network integration. The lock covers Python 3.12 only; another production Python family requires its own resolution and tests.
+Use an isolated environment without production credentials. The library smoke sends no external request: HTTPX uses an in-memory `MockTransport`. It verifies installed libraries and strict synthetic input handling, not a service contract or real network integration. The lock covers Python 3.12 only; another production Python family requires its own resolution and tests. The [tooling report](../../docs/implementation/p00-python-tooling-results.md) gives the full measured quality-check sequence. Dependency installation and advisory lookup use public PyPI and do not establish a restricted-network mirror path.
 
 ## Laravel HTTP and browser experiment
 
-The [integration report](../../docs/implementation/p00-integration-results.md) describes the newly implemented checks and their current execution status. The first remote run explicitly resolved the new PHP quality-tool dependencies, then deletes `vendor` and reinstalls that same lock. The measured quality-tool lock is now committed. The first run passed dependency replay but failed two style checks; see the report for follow-up status.
+The [integration report](../../docs/implementation/p00-integration-results.md) records the complete passing run `37226789018`: 20 PHP tests/200 assertions, Pint, Larastan, Deptrac, 14 intended negative controls, clean Composer/npm lock replay, Vue typecheck/build and a real Chromium flow. Earlier failed attempts remain recorded separately. The measured quality-tool lock is committed; push runs install it without resolving new versions.
 
-The committed workflow runs the orchestrator outside the checkout with PHP 8.5.11, Composer 2.10.3 and Node 24.19.0. Reproduce a measured lock with:
+The committed workflow runs the orchestrator outside the checkout with PHP 8.5.11, Composer 2.10.3 and Node 24.19.0; the successful remote run observed npm 11.17.0. Reproduce a measured lock with:
 
 ```sh
 python3 spikes/compatibility/run-integration.py --workspace "$PWD" --output /tmp/p00-integration-replay --dependency-mode install
@@ -67,4 +67,4 @@ The recorder refuses to replace an existing result. It records only command argu
 
 ## PHP execution evidence
 
-[Actions run 37224453605](https://github.com/awalker0878/multi-tenant/actions/runs/37224453605) passed at source commit `06df7bfb15d83eb5a180e10c0d6c65970c5b0a54`: PHP 8.5.11, Composer 2.10.3, Laravel 13.34.0 and Inertia Laravel 3.5.1. The historical Composer lock at source commit `9a214f6ea2f0bba02abb7959cbd2f3523efbba1c` and [source-bound report](results/php-ci/report.json) preserve that earlier run. Check out that revision to replay its dependency-only inputs; current source adds separate integration and quality-tool dependencies. Dependency updates are a new experiment, not a reproduction command. This probe does not prove full Laravel/Inertia HTTP behavior or a production image.
+[Actions run 37224453605](https://github.com/awalker0878/multi-tenant/actions/runs/37224453605) passed at source commit `06df7bfb15d83eb5a180e10c0d6c65970c5b0a54`: PHP 8.5.11, Composer 2.10.3, Laravel 13.34.0 and Inertia Laravel 3.5.1. The historical Composer lock at source commit `9a214f6ea2f0bba02abb7959cbd2f3523efbba1c` and [source-bound report](results/php-ci/report.json) preserve that earlier run. Check out that revision to replay its dependency-only inputs; current source adds separate integration and quality-tool dependencies. Dependency updates are a new experiment, not a reproduction command. That earlier dependency-only probe did not test HTTP. The separate integration result above now covers synthetic HTTP/browser behavior; neither experiment qualifies a production image.
