@@ -1,0 +1,475 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "node-version",
+      "log_sha256": "b7677d3ec37ee1897ba07dc2cfe8292fe421c9ac93396cca5bbece486d1a2a41"
+    },
+    {
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "npm-version",
+      "log_sha256": "914292ceb275d166f6be503a5816e64ab31d82bbce8df5924c8c52cc3cf1f13e"
+    },
+    {
+      "argv": [
+        "java",
+        "-version"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "java-version",
+      "log_sha256": "bc035065e1316ef11781a4b1e36dc4aa58d003abc47094dc55b4f7620f15f7c8"
+    },
+    {
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "uv-version",
+      "log_sha256": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "version"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generator-version",
+      "log_sha256": "51587aac6244156fa9045620237e41443cdde69c47a5a3c3d10f8a1450878be2"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "validate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "openapi-validate",
+      "log_sha256": "df88cdf3e20eb0ba6b83bee97985a85c77097484ae127674b370104554d720a1"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json",
+        "-g",
+        "php",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-php.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/first/php",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-first-php",
+      "log_sha256": "938be571deae2d8546e8f1cfc4604287807404e744bdb7a25d6ca979573f1afc"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json",
+        "-g",
+        "python",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-python.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/first/python",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-first-python",
+      "log_sha256": "5d51f26c0bed30e527202e79b4a08bad0627b4ccd5f2cdb9eb7c6314aaaca460"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json",
+        "-g",
+        "typescript-fetch",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-typescript-fetch.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/first/typescript-fetch",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-first-typescript-fetch",
+      "log_sha256": "c074c6b43e7f6e00e39a5e0e75af24c10ace605bbd652c8be4adb467fb5b6de9"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json",
+        "-g",
+        "php",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-php.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/second/php",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-second-php",
+      "log_sha256": "7cb3bb69d8a68a6bd275a81b0095400c5b6f98ba46650f1c5627ac39479ff8db"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json",
+        "-g",
+        "python",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-python.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/second/python",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-second-python",
+      "log_sha256": "9e3df3ec2c7c3213e53b8be02cf4b5dc97b2b7bfab06f825f31809b9c1c76785"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/openapi.json",
+        "-g",
+        "typescript-fetch",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-typescript-fetch.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/second/typescript-fetch",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-second-typescript-fetch",
+      "log_sha256": "9463b38e76e04bf63b9fcf8bd31f697792751d304cac1a08e2f42293286129c4"
+    },
+    {
+      "argv": [
+        "openapi-generator-cli",
+        "generate",
+        "-i",
+        "/tmp/p00-contracts-ta76k3do/changed.json",
+        "-g",
+        "typescript-fetch",
+        "-c",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/config-typescript-fetch.json",
+        "-o",
+        "/tmp/p00-contracts-ta76k3do/changed",
+        "--global-property",
+        "apiTests=false,modelTests=false,apiDocs=false,modelDocs=false"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "generate-changed-schema",
+      "log_sha256": "3265484f7ccbb8b98f2e8581e281626db9d94412a62717039db8d4b6e54bf2ba"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/.venv/bin/python",
+        "-m",
+        "compileall",
+        "-q",
+        "/tmp/p00-contracts-ta76k3do/first/python"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "python-compile",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/.venv/bin/python",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/probe-python.py",
+        "/tmp/p00-contracts-ta76k3do/first/python",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/fixtures.json"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "python-models",
+      "log_sha256": "0ab8f432e756e311ff3474c87261b41605e8ac3ddaa83bf2465cb69f3f82b2b9"
+    },
+    {
+      "argv": [
+        "node",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/node_modules/typescript/bin/tsc",
+        "-p",
+        "/tmp/p00-contracts-ta76k3do/first/tsconfig.json"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "typescript-compile",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "node",
+        "/tmp/p00-contracts-ta76k3do/compiled/probe-typescript.js",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/fixtures.json"
+      ],
+      "exit_code": 0,
+      "expected_exit": 0,
+      "id": "typescript-models-and-mock-http",
+      "log_sha256": "a4bb4c64fe4f21b3f4583c9198fc2149076e8ed3e4bb2548a82cd44520a76b38"
+    },
+    {
+      "argv": [
+        "node",
+        "/workspace/scratch/33f7fb7df757/enterprise-plan/spikes/compatibility/contracts/node_modules/typescript/bin/tsc",
+        "-p",
+        "/tmp/p00-contracts-ta76k3do/first/tsconfig.json"
+      ],
+      "exit_code": 2,
+      "expected_exit": 2,
+      "id": "typescript-invalid-enum",
+      "log_sha256": "4c01db9e9e66f28e424001c639dfb8b82dc7a85959ddfe50b9f4df1e047c7250"
+    }
+  ],
+  "deterministic_generation": true,
+  "environment": {
+    "architecture": "x86_64",
+    "generator-version": "7.25.0",
+    "java-version": "openjdk version \"17.0.20\" 2026-07-21\nOpenJDK Runtime Environment (build 17.0.20+8-1-24.04-Ubuntu)\nOpenJDK 64-Bit Server VM (build 17.0.20+8-1-24.04-Ubuntu, mixed mode, sharing)",
+    "node-version": "v24.19.0",
+    "npm-version": "11.9.0\nnpm warn Unknown env config \"http-proxy\". This will stop working in the next major version of npm.",
+    "python": "3.12.14",
+    "system": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "uv-version": "uv 0.12.19 (x86_64-unknown-linux-gnu)"
+  },
+  "finished_at": "2026-10-04T20:24:55.012288+00:00",
+  "fixture_results": [
+    {
+      "actual_valid": true,
+      "expected_valid": true,
+      "id": "sample-valid",
+      "rejections": []
+    },
+    {
+      "actual_valid": true,
+      "expected_valid": true,
+      "id": "sample-additive-field",
+      "rejections": []
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "sample-unknown-enum",
+      "rejections": [
+        "enum"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "sample-unknown-version",
+      "rejections": [
+        "enum"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "sample-numeric-precision",
+      "rejections": [
+        "type"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "sample-required-missing",
+      "rejections": [
+        "required"
+      ]
+    },
+    {
+      "actual_valid": true,
+      "expected_valid": true,
+      "id": "request-valid",
+      "rejections": []
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "request-unknown-field",
+      "rejections": [
+        "additionalProperties"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "request-empty-label",
+      "rejections": [
+        "minLength"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "request-wrong-type",
+      "rejections": [
+        "type"
+      ]
+    },
+    {
+      "actual_valid": true,
+      "expected_valid": true,
+      "id": "problem-valid",
+      "rejections": []
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "problem-invalid-status",
+      "rejections": [
+        "minimum"
+      ]
+    },
+    {
+      "actual_valid": true,
+      "expected_valid": true,
+      "id": "event-valid",
+      "rejections": []
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "event-invalid-date",
+      "rejections": [
+        "format"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "event-unknown-version",
+      "rejections": [
+        "const"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "event-missing-tenant",
+      "rejections": [
+        "required"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "event-unknown-field",
+      "rejections": [
+        "additionalProperties"
+      ]
+    },
+    {
+      "actual_valid": false,
+      "expected_valid": false,
+      "id": "event-invalid-aggregate-version",
+      "rejections": [
+        "minimum"
+      ]
+    }
+  ],
+  "generated_counts": {
+    "php": 20,
+    "python": 16,
+    "typescript-fetch": 17
+  },
+  "generator_jar_sha256": "41ce4f6b07f196676439d710759fa1ced7a08066d06ff1bf314681470289efae",
+  "github_run_attempt": null,
+  "github_run_id": null,
+  "github_workflow_ref": null,
+  "input_sha256": {
+    "config-php.json": "729d083268ff7786c24b3163ac54454c2a036e4a883dd6c065efc61b4a795b05",
+    "config-python.json": "5c6d262ad2e7224b936a05013c14a3a37032e955c84e92b0d6805d5069403ee0",
+    "config-typescript-fetch.json": "c498189a28030802fd5a53329630f98f91bbc856a930807101845c12c3acd8ba",
+    "event.schema.json": "30122652b391070414b33f452e9cae4eaabb6118cf8eea0daba152b45523b963",
+    "fixtures.json": "c7408f91b2ead9eee5e1344b69a341e370bc2b2c98ece75c9d8eb7f37aea534d",
+    "openapi.json": "61f84a4bdb76227f4d75600a716476165b21f27850f17cf66608ece4f604f460",
+    "package-lock.json": "1c236919916fa9b80aefae8ab8b7323c332457787f21bdaa7e7d37b5865e3fd5",
+    "package.json": "4199a463f4275ed9b014c82c5a12274329f6a27048f0e8c1b155df00b6d8d596",
+    "probe-php.php": "daa2e69cb59fe645220edab12242425b9693ae70943d4de42b87a51cd2dbdef2",
+    "probe-python.py": "33b2708faa9c7d1d103f84db73f0c36b4e3dc7d26f71577e47eb9af71189d65c",
+    "probe-typescript-negative.ts": "3d46c42d6d36efa44cb810b95e9936d013073b5f26fad712b9c1fafa09d6f227",
+    "probe-typescript.ts": "be1cfb244e171d199fd3b23b512538efd5e44bd46e8d3abcdce405a115677c25",
+    "probe.py": "e11dd71b20d30aef70604c27002eb014c3c85e4c1d3fd189dd544fde667c6737",
+    "pyproject.toml": "4837c41d97c8e05855f1f5d0ca8b5ac5c8b8661b57ce6285f280e08829d3005e",
+    "uv.lock": "ab2b455e439aeef970ce31f18b158633e4d6a854c7f575e180b4880a35b4818b"
+  },
+  "limitations": [
+    "Synthetic OpenAPI 3.0.4 subset; no product contract or service is implemented.",
+    "JSON Schema event envelope validation does not implement AsyncAPI channels, broker behavior, outbox or inbox.",
+    "Generated models/decoders are not complete runtime schema validators; validation must precede deserialization.",
+    "No live HTTP endpoint, authentication authority, canonical digest protocol or native operation is tested.",
+    "No independent service contract compatibility window or breaking-change checker is qualified."
+  ],
+  "packages": {
+    "httpx": "0.28.1",
+    "jsonschema": "4.26.0",
+    "openapi-generator-cli": "7.25.0",
+    "openapi-schema-validator": "0.9.0",
+    "openapi-spec-validator": "0.9.0",
+    "pydantic": "2.13.5"
+  },
+  "php_status": "NOT_RUN",
+  "schema_drift_negative_control": "PASS",
+  "schema_negative_controls": [
+    {
+      "exception": "OpenAPIValidationError",
+      "id": "missing-operation-responses",
+      "rejected": true
+    },
+    {
+      "exception": "SchemaError",
+      "id": "invalid-event-schema-type",
+      "rejected": true
+    }
+  ],
+  "source_revision": null,
+  "started_at": "2026-10-04T20:24:35.990795+00:00",
+  "status": "LOCAL_PASS_PHP_NOT_RUN",
+  "workflow_sha256": {
+    ".github/workflows/p00-contract-compatibility.yml": "af92896d439035befabcccf3ecd85808843ffa8b107e2a370cb062e4bc361df2"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "invokerPackage": "P00\\Infrastructure\\Generated",
+  "composerPackageName": "p00/private-synthetic-client",
+  "library": "guzzle",
+  "hideGenerationTimestamp": true,
+  "disallowAdditionalPropertiesIfNotPresent": false
+}

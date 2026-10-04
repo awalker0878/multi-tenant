@@ -1,0 +1,71 @@
+name: P00 contract tooling
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - spikes/compatibility/contracts/**
+      - spikes/compatibility/run-contracts.py
+      - .github/workflows/p00-contract-compatibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p00-contracts-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contract-compatibility:
+    name: Validate schemas and replay generated clients across languages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out synthetic contract inputs
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, resolved 2026-10-04
+        with:
+          python-version: '3.12.14'
+
+      - name: Set up exact uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7, resolved 2026-10-04
+        with:
+          version: '0.12.19'
+          enable-cache: false
+
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6, resolved 2026-10-04
+        with:
+          node-version: '24.19.0'
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2, resolved 2026-10-04
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, json, mbstring, pcre
+          coverage: none
+        env:
+          fail-fast: 'true'
+
+      - name: Record clean installs and execute cross-language contract checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          python spikes/compatibility/run-contracts.py \
+            --workspace "$GITHUB_WORKSPACE" --output "$RUNNER_TEMP/p00-contracts"
+
+      - name: Retain schema, tool identities and actual execution evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, resolved 2026-10-04
+        with:
+          name: p00-contracts-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p00-contracts/
+          if-no-files-found: error
+          retention-days: 14
