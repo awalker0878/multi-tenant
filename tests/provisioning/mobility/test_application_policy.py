@@ -12,8 +12,8 @@ from provisioner.controlplane.persistence import canonical_record_digest
 from provisioner.migration.application_network import management_snapshot
 from provisioner.migration.bootstrap_selection import validate_policy_selection
 from provisioner.migration.lifecycle import ApplicationLifecycleSelection
-from provisioner.migration.native_openstack import OpenStackApplicationClient
-from provisioner.execution.run_files import encoded
+from provisioner.migration.native_openstack import NativeAcceptedReplyUnreadable, OpenStackApplicationClient
+from provisioner.execution.run_files import digest, encoded
 from tests.provisioning.mobility import test_application_network as network
 from tests.provisioning.mobility.test_application_openstack_native import PROJECT, REQUEST, SERVER
 
@@ -155,6 +155,30 @@ class ProductionPolicyWireTests(unittest.TestCase):
         self.assertIn(('TARGET_POLICY_CHANGE_RETURNED', {'native_request_id': REQUEST}),
             [call.args for call in log.append.call_args_list])
         self.assertEqual(sum(row['method'] == 'PUT' for row in self.wire.fixture.native.requests), 1)
+
+    def test_unreadable_accepted_json_retains_only_authentic_request_and_body_digest_without_followup(self):
+        runtime, _, _, _, handover = self.independent_runtime()
+        for raw in (b'{"port":', b'\xff', b'{"port":{},"port":{}}'):
+            for revoked in (False, True):
+                with self.subTest(raw=raw, revoked=revoked):
+                    self.wire.port['security_groups'] = [network.GROUP]
+                    self.wire.fixture.revoked = False
+                    self.wire.fixture.native.requests.clear()
+                    def unreadable(request):
+                        result = self.update(request); result['raw'] = raw
+                        result['before_response'] = lambda: setattr(self.wire.fixture, 'revoked', revoked)
+                        return result
+                    self.wire.fixture.native.routes[('PUT', '/v2.0/ports/' + network.PORT)] = unreadable
+                    log = SimpleNamespace(append=Mock())
+                    with patch.object(type(self.wire.fixture.runtime), 'client', return_value=self.client):
+                        with self.assertRaises(NativeAcceptedReplyUnreadable) as held:
+                            runtime.execute_policy(self.wire.fixture.authority, handover, log,
+                                self.wire.fixture.runtime, enable=True)
+                    self.assertEqual(held.exception.native_request_id, REQUEST)
+                    self.assertEqual(log.append.call_args.args, ('NATIVE_ACCEPTED_REPLY_UNREADABLE',
+                        {'native_request_id': REQUEST, 'response_sha256': digest(raw)}))
+                    self.assertEqual(self.wire.fixture.native.requests[-1]['method'], 'PUT')
+                    self.assertEqual(sum(row['method'] == 'PUT' for row in self.wire.fixture.native.requests), 1)
 
     def test_late_genuine_policy_reply_is_retained_before_revocation_blocks_followup_reads(self):
         runtime, _, _, _, handover = self.independent_runtime()

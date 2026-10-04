@@ -27,7 +27,7 @@ from .authority import ApplicationCommandAuthority
 from .lifecycle import ApplicationLifecycleSelection, LifecycleCommandGuard
 from .lifecycle_evidence import ApplicationEvidenceReader
 from .lifecycle_evidence import CurrentWriterExclusions
-from .native_openstack import OpenStackApplicationRuntime
+from .native_openstack import NativeAcceptedReplyUnreadable, OpenStackApplicationRuntime
 from .remote_app import ApplicationGuestRuntime, ApplicationHealthReadRuntime
 from .source_exclusion import (
     SourceDiskFenceRuntime, _ApplicationVsphereClient, observe_removed, observe_added, selected_disks)
@@ -184,7 +184,8 @@ class ApplicationLifecycleRunner:
                          'TARGET_DISK_TASK_RETURNED', 'SOURCE_DISK_ADD_STARTED', 'SOURCE_DISK_ADD_RETURNED',
                          'TARGET_DISK_ADD_STARTED', 'TARGET_DISK_ADD_RETURNED', 'NATIVE_START_STARTED', 'NATIVE_START_RETURNED',
                          'MANAGEMENT_PORT_ENABLE_STARTED', 'MANAGEMENT_PORT_ENABLE_RETURNED',
-                         'TARGET_POLICY_CHANGE_STARTED', 'TARGET_POLICY_CHANGE_RETURNED'},
+                         'TARGET_POLICY_CHANGE_STARTED', 'TARGET_POLICY_CHANGE_RETURNED',
+                         'NATIVE_ACCEPTED_REPLY_UNREADABLE'},
                         'The original application phase journal was changed')
         return started, complete
 
@@ -786,9 +787,14 @@ class ApplicationLifecycleRunner:
                     native_qualification=False)
                 log.append('APPLICATION_PHASE_COMPLETED', dict(result=result))
                 return result
-            except BaseException:
+            except BaseException as error:
                 try:
-                    guard.uncertain()
-                except Exception:
-                    pass
+                    if isinstance(error, NativeAcceptedReplyUnreadable) and phase not in {
+                            'TARGET_BOOTSTRAP', 'TARGET_POLICY', 'TARGET_ISOLATE'}:
+                        error.retain(log)
+                finally:
+                    try:
+                        guard.uncertain()
+                    except Exception:
+                        pass
                 raise

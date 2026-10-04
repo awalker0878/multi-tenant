@@ -144,6 +144,22 @@ class ManagementWireTests(unittest.TestCase):
         with self.assertRaises(PermissionError): self.snapshot(True)
         self.assertEqual(len(self.fixture.native.requests), count)
 
+    def test_unreadable_original_enablement_reply_retains_request_before_any_current_read(self):
+        from provisioner.migration.native_openstack import NativeAcceptedReplyUnreadable
+        runtime, _, _, _, handover = self.independent_runtime()
+        raw = b'{"port":'
+        def unreadable(request):
+            spec = self.enable(request); spec['raw'] = raw
+            return spec
+        self.fixture.native.routes[('PUT', '/v2.0/ports/' + PORT)] = unreadable
+        log = SimpleNamespace(append=Mock())
+        with patch.object(type(self.fixture.runtime), 'client', return_value=self.client):
+            with self.assertRaises(NativeAcceptedReplyUnreadable): runtime.execute(self.fixture.authority, handover, log)
+        self.assertEqual(log.append.call_args.args, ('NATIVE_ACCEPTED_REPLY_UNREADABLE',
+            {'native_request_id': REQUEST, 'response_sha256': digest(raw)}))
+        self.assertEqual(self.fixture.native.requests[-1]['method'], 'PUT')
+        self.assertEqual(sum(row['method'] == 'PUT' for row in self.fixture.native.requests), 1)
+
     def test_power_disk_or_policy_capability_cannot_enable_a_management_port(self):
         before = self.snapshot()
         for kind in ('VM_POWER', 'DISK_ATTACH', 'POLICY_APPLY', 'SOURCE_FENCE', 'DISCOVER_READ'):

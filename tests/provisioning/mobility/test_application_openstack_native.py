@@ -6,6 +6,8 @@ application health, independent exclusion or production acceptance.
 from copy import deepcopy
 from datetime import timedelta
 from types import SimpleNamespace
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import Mock, patch
 
@@ -13,7 +15,7 @@ from provisioner.controlplane.authority import PlanScope
 from provisioner.execution.run_files import digest, encoded, utcnow
 from provisioner.migration.application_lifecycle import ApplicationLifecycleRunner
 from provisioner.migration.lifecycle import LifecycleCommandGuard
-from provisioner.migration.native_openstack import OpenStackApplicationClient, OpenStackApplicationRuntime
+from provisioner.migration.native_openstack import NativeAcceptedReplyUnreadable, OpenStackApplicationClient, OpenStackApplicationRuntime
 from tests.provisioning.mobility.cold_fixture import NativeTls
 
 
@@ -147,6 +149,97 @@ class NativeApplicationWireTests(unittest.TestCase):
         self.registry.task_accepted.assert_not_called()
         self.assertIn(('NATIVE_START_RETURNED', {'native_request_id': REQUEST}),
                       [call.args for call in log.append.call_args_list])
+
+    def test_invalid_native_json_holds_with_authentic_request_and_no_reply_bytes(self):
+        raw = b'{"secret":"synthetic-never-retained",'
+        self.native.routes[('POST', '/v2.1/servers/' + SERVER + '/action')] = dict(
+            status=202, raw=raw, headers=[('X-OpenStack-Request-Id', REQUEST)])
+        with self.assertRaises(NativeAcceptedReplyUnreadable) as held: self.client.start()
+        self.assertEqual(held.exception.native_request_id, REQUEST)
+        self.assertEqual(held.exception.response_sha256, digest(raw))
+        self.assertNotIn('synthetic-never-retained', str(held.exception))
+        self.assertEqual(self.native.requests[-1]['method'], 'POST')
+        self.registry.task_accepted.assert_not_called()
+
+    def test_retained_unreadable_reply_is_an_incomplete_original_phase_not_a_completed_receipt(self):
+        started = {'original_intent': {'operation_id': 'original-operation'}}
+        error = NativeAcceptedReplyUnreadable(REQUEST, digest(b'{'))
+        log = SimpleNamespace(append=Mock()); error.retain(log)
+        kind, data = log.append.call_args.args
+        original, completed = ApplicationLifecycleRunner._state([
+            {'kind': 'APPLICATION_PHASE_STARTED', 'data': started}, {'kind': kind, 'data': data}])
+        self.assertEqual(original, started); self.assertIsNone(completed)
+
+    def test_unreadable_read_only_json_cannot_claim_an_accepted_native_effect(self):
+        self.native.routes[('GET', '/v2.1/servers/' + SERVER)] = dict(
+            raw=b'{', headers=[('X-OpenStack-Request-Id', REQUEST)])
+        with self.assertRaises(ValueError) as held: self.client.snapshot(attached=True)
+        self.assertNotIsInstance(held.exception, NativeAcceptedReplyUnreadable)
+        self.assertFalse(any(row['path'].endswith('/action') for row in self.native.requests))
+
+    def test_normal_and_forward_power_journals_retain_unreadable_reply_and_never_dispatch_twice(self):
+        from provisioner.controlplane.persistence import TenantContext
+        from provisioner.controlplane.persistence.store import NativeBinding, OwnerLease
+        from provisioner.controlplane.workflow.admitted_job import AdmittedInput
+        from provisioner.execution import execution_journal
+        from provisioner.migration.application_lifecycle import LifecycleHeld
+        from provisioner.migration.lifecycle import ApplicationLifecycleSelection
+        from provisioner.migration.remote_app import ApplicationGuestRuntime
+        from provisioner.migration.recovery import ApplicationRecoveryRunner
+        from tests.test_application_lifecycle import lifecycle_record
+        admitted = AdmittedInput('job-01', 'org-01', 'tenant-01', 'plan-01', 1, 'a' * 64, 0, 'b' * 64)
+        binding = NativeBinding('openstack', 'openstack-01', PROJECT, 'vm', SERVER)
+        worker = SimpleNamespace(context=TenantContext('org-01', 'tenant-01'),
+            lease=OwnerLease(binding, 'org-01', 'tenant-01', 'wsd-01', 'workload-01',
+                'power-worker', 1, self.deadline), identity=SimpleNamespace(subject='power-worker'),
+            grant_id='original-application-grant', lease_key='power-lease', registry=self.registry)
+        guest = object.__new__(ApplicationGuestRuntime)
+        object.__setattr__(guest, 'worker', worker)
+        object.__setattr__(guest, 'commands', self.guest.commands)
+        object.__setattr__(self.runtime, 'guest', guest)
+        raw = b'{"native":'
+        self.native.routes[('POST', '/v2.1/servers/' + SERVER + '/action')] = dict(
+            status=202, raw=raw, headers=[('X-OpenStack-Request-Id', REQUEST)])
+        with TemporaryDirectory() as temporary:
+            ledger = Path(temporary); ledger.chmod(0o700)
+            lifecycle = ApplicationLifecycleSelection.from_record(lifecycle_record(ledger))
+            for runner_type, phase in ((ApplicationLifecycleRunner, 'TARGET_PREPARE'),
+                                       (ApplicationRecoveryRunner, 'TARGET_START')):
+                with self.subTest(owner=runner_type.__name__):
+                    runner = object.__new__(runner_type)
+                    runner.admitted, runner.lifecycle, runner.ledger = admitted, lifecycle, ledger
+                    runner.artifact_bytes = encoded({'applicationLifecycleSelectionDigest': lifecycle.sha256})
+                    runner.plan_bytes = encoded({'metadata': {'planDigest': admitted.plan_digest}})
+                    if runner_type is ApplicationRecoveryRunner:
+                        runner.selection = SimpleNamespace(sha256='c' * 64)
+                        runner._prerequisites = Mock(return_value=(None, {}))
+                        runner.independently_resolved = Mock()
+                    guard = self.guard
+                    guard.runtime, guard.lifecycle, guard.member_id = worker, lifecycle, 'machine-1'
+                    guard.member = lifecycle.member('machine-1')
+                    guard.phase, guard.operation_kind = phase, 'VM_POWER'
+                    guard.selection_digest = 'd' * 64
+                    guard.claim, guard.uncertain = Mock(), Mock()
+                    guard.row = dict(scope_side='destination', operation_id='original-operation', step_id='power-step')
+                    self.native.requests.clear()
+                    with patch('provisioner.migration.' + ('recovery' if runner_type is ApplicationRecoveryRunner
+                            else 'application_lifecycle') + '.LifecycleCommandGuard', return_value=guard), \
+                         patch.object(ApplicationGuestRuntime, 'select', return_value=self.authority), \
+                         patch.object(OpenStackApplicationRuntime, 'client', return_value=self.client):
+                        with self.assertRaises(NativeAcceptedReplyUnreadable):
+                            runner.execute(phase, 'machine-1', guest=guest, native_runtime=self.runtime)
+                        with self.assertRaises(ValueError):
+                            runner.execute(phase, 'machine-1', guest=guest, native_runtime=self.runtime)
+                    guard.claim.assert_called_once(); guard.uncertain.assert_called_once()
+                    with execution_journal.locked(ledger, runner._scope('machine-1', phase)) as log:
+                        started, complete = ApplicationLifecycleRunner._state(log.events)
+                        self.assertEqual(started['original_intent']['binding'], binding.__dict__)
+                        self.assertIsNone(complete)
+                        self.assertEqual(log.events[-1]['kind'], 'NATIVE_ACCEPTED_REPLY_UNREADABLE')
+                        self.assertEqual(log.events[-1]['data'], {'native_request_id': REQUEST,
+                            'response_sha256': digest(raw)})
+                    with self.assertRaises(LifecycleHeld): runner.receipt('machine-1', phase)
+                    self.assertEqual(sum(row['path'].endswith('/action') for row in self.native.requests), 1)
 
     def test_wrong_native_project_duplicate_role_or_changed_catalog_cannot_dispatch_effect(self):
         for change in ('project', 'role', 'catalog'):

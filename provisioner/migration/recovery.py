@@ -20,7 +20,7 @@ from provisioner.execution.neutron_observe import strict_loads
 from provisioner.execution.run_files import digest, encoded, private_path, require
 from .application_lifecycle import ApplicationLifecycleRunner, ApplicationRepositoryRuntime, LifecycleHeld
 from .lifecycle import ApplicationLifecycleSelection, LifecycleCommandGuard
-from .native_openstack import OpenStackApplicationRuntime
+from .native_openstack import NativeAcceptedReplyUnreadable, OpenStackApplicationRuntime
 from .remote_app import ApplicationGuestRuntime, ApplicationHealthReadRuntime
 
 FORMAT = 'hosting-application-recovery-selection/1'
@@ -368,11 +368,15 @@ class ApplicationRecoveryRunner:
                     native_intent_requires_independent_resolution=True, production_acceptance=False, native_qualification=False)
                 log.append('APPLICATION_PHASE_COMPLETED', dict(result=result))
                 return result
-            except BaseException:
+            except BaseException as error:
                 try:
-                    guard.uncertain()
-                except Exception:
-                    pass
+                    if isinstance(error, NativeAcceptedReplyUnreadable):
+                        error.retain(log)
+                finally:
+                    try:
+                        guard.uncertain()
+                    except Exception:
+                        pass
                 raise
 
     def verify(self, *, traffic, health_readers, promotion, network_readers=None):

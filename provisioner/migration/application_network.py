@@ -18,7 +18,7 @@ from provisioner.controlplane.reconciliation.read_enrollment import NativeReadEn
 from provisioner.execution.run_files import digest, read_private, require, utcnow
 from provisioner.execution.neutron_observe import strict_loads
 from .bootstrap_selection import RULE_FIELDS, validate_management_selection, validate_policy_selection
-from .native_openstack import OpenStackApplicationRuntime
+from .native_openstack import NativeAcceptedReplyUnreadable, OpenStackApplicationRuntime
 from .remote_app import ApplicationHealthReadRuntime
 from .staging import ApplicationStagedHandover
 
@@ -197,7 +197,11 @@ class OpenStackBootstrapRuntime:
         client = self.native.client(guard)
         log.append('MANAGEMENT_PORT_ENABLE_STARTED', dict(
             original_native_snapshot_digest=canonical_record_digest(before['native_snapshot'])))
-        request_id, reply = client.enable_management(before['native_snapshot'], retain_response=True)
+        try:
+            request_id, reply = client.enable_management(before['native_snapshot'], retain_response=True)
+        except NativeAcceptedReplyUnreadable as error:
+            error.retain(log)
+            raise
         log.append('MANAGEMENT_PORT_ENABLE_RETURNED', dict(native_request_id=request_id))
         require(type(reply) is dict and reply.get('port', {}).get('id') == guard.member['target_management']['port_id']
                 and reply['port'].get('admin_state_up') is True,
@@ -233,7 +237,11 @@ class OpenStackBootstrapRuntime:
             original_native_snapshot_digest=canonical_record_digest(before['native_snapshot'])))
         request_id = None
         if enable or before['native_snapshot']['production_policy_enabled']:
-            request_id, reply = native.client(guard).set_production_policy(before['native_snapshot'], enable=enable)
+            try:
+                request_id, reply = native.client(guard).set_production_policy(before['native_snapshot'], enable=enable)
+            except NativeAcceptedReplyUnreadable as error:
+                error.retain(log)
+                raise
             # Preserve an authentic accepted identity before validating body or
             # making another current check, including a malformed late reply.
             log.append('TARGET_POLICY_CHANGE_RETURNED', dict(native_request_id=request_id))

@@ -195,6 +195,11 @@ production group IDs, retaining its genuine native request ID before reply
 validation or another authority check. Two fresh independent policy sweeps must
 agree before the original result is eligible for independent B11 resolution.
 Lost replies, revision conflicts, drift and revoked authority hold without retry.
+An accepted reply with invalid UTF-8, duplicate keys or unreadable JSON retains
+the authenticated request ID and a digest of its bounded response bytes in the
+incomplete original journal. No response bytes enter evidence, and no follow-up
+contact or successful phase receipt is issued. The same boundary applies to
+management bootstrap and retained-volume power/recovery effects.
 The Temporal `retained-target-production-policy-v1` marker preserves earlier
 histories while inserting this phase before activation for current workflows.
 

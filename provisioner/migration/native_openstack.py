@@ -30,6 +30,20 @@ _UUID = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 _REQUEST_ID = re.compile(r'req-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
 
+class NativeAcceptedReplyUnreadable(ValueError):
+    """An authentic accepted request identity survives unreadable reply JSON."""
+    def __init__(self, native_request_id, response_sha256):
+        require(type(native_request_id) is str and _REQUEST_ID.fullmatch(native_request_id)
+                and type(response_sha256) is str and re.fullmatch('[0-9a-f]{64}', response_sha256),
+                'Exact authentic accepted reply identity and bounded byte digest required')
+        self.native_request_id, self.response_sha256 = native_request_id, response_sha256
+        super().__init__('The accepted original native reply is unreadable; independent reconciliation is required')
+
+    def retain(self, log):
+        log.append('NATIVE_ACCEPTED_REPLY_UNREADABLE', dict(
+            native_request_id=self.native_request_id, response_sha256=self.response_sha256))
+
+
 def _endpoint(value):
     parsed = urlsplit(value)
     require(parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password
@@ -132,7 +146,6 @@ class OpenStackApplicationClient:
             require(response.status in accepted and len(raw) <= 2**20
                     and (not raw or response.headers.get_content_type() == 'application/json'),
                     'The exact native exchange failed or returned unbounded data')
-            result = strict_loads(raw) if raw else None
             retained_headers = {key.lower(): value for key, value in response.getheaders()
                                 if key.lower() in {'x-openstack-request-id', 'x-subject-token'}}
             if retain_native_response:
@@ -144,7 +157,17 @@ class OpenStackApplicationClient:
                 # Retain a genuine late reply before the caller's next current
                 # check. Revocation must stop readback/acceptance, never erase
                 # the identity of an effect that the native service accepted.
-            else:
+            try:
+                result = strict_loads(raw) if raw else None
+            except (ValueError, UnicodeError):
+                if retain_native_response:
+                    # Framing, TLS endpoint, accepted status and the unique
+                    # native request header were checked above. Preserve that
+                    # identity without trusting or retaining the body bytes.
+                    raise NativeAcceptedReplyUnreadable(
+                        retained_headers['x-openstack-request-id'], digest(raw)) from None
+                raise
+            if not retain_native_response:
                 self._current()
             return result, retained_headers
         finally:
