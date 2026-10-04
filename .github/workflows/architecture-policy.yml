@@ -1,0 +1,40 @@
+name: Context policy
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: context-policy-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  architecture-and-docs:
+    name: Architecture registry and documentation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
+        with:
+          persist-credentials: false
+      - name: Set up documentation Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, resolved 2026-10-04
+        with:
+          python-version: '3.12'
+      - name: Install pinned documentation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-docs.txt
+      - name: Check context registry and supported source boundaries
+        run: python scripts/validate_architecture.py
+      - name: Prove valid and forbidden architecture fixtures
+        run: python -m unittest discover -s tests/documentation -p 'test_*.py' -v
+      - name: Check generated delivery views
+        run: python scripts/render_delivery_views.py --check
+      - name: Check documentation and delivery references
+        run: python scripts/validate_docs.py
