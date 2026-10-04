@@ -62,3 +62,6 @@ Detailed execution evidence is separated into [Laravel HTTP/PHP quality](impleme
 
 
 The [image/BOM report](implementation/p00-image-results.md) and [contract-tool report](implementation/p00-contract-tooling-results.md) add digest-pinned runtime builds and deterministic PHP/Python/TypeScript contract generation. The [decision and input review](implementation/p00-decision-and-input-review.md) consolidates the remaining choices, accountable roles, exact native inputs and G00 criterion mapping. These records distinguish completed experiments from owner decisions and native feasibility still outstanding.
+
+
+The [P00 engineering selections](implementation/p00-engineering-selections.md) now resolve development choices. [Real database/attachment restore](implementation/p00-restore-fixture-results.md) supplies bounded recovery observations. The [RT/IP input record](qualification/feasibility/input-record.md) makes supplied/missing information checkable, and the [G00 engineering assessment](qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md) records criterion findings without inventing accountable acceptance or native outcomes.

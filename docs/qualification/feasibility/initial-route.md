@@ -60,6 +60,13 @@ P09 may qualify `cold_guest_disk_conversion_import` for workloads whose requirem
 
 Reassess affected findings when the method, platform/backend, guest/application/database versions, deployment/configuration artifacts, capture/restore tooling, encryption, dataset consistency mechanism or recovery strategy changes. Carry forward an unaffected finding only with a scoped impact review; never transfer qualification from the earlier branch.
 
-The [2026-10-04 route and operating review](../../implementation/p00-route-and-operations-review.md) records the completed desk assessment, RT01–RT10 input inventory and RF01–RF11 experiment design. Installed tuples, fixture bytes and lab authority have not been supplied, and every native experiment remains **NOT RUN**. RI01–RI06 define the finite input handoff; they must be reflected in the canonical register before gate review.
+The [2026-10-04 route and operating review](../../implementation/p00-route-and-operations-review.md) records the completed desk assessment, RT01–RT10 input inventory and RF01–RF11 experiment design. Installed tuples and native lab authority have not been supplied, and every native experiment remains **NOT RUN**. An executable synthetic database/attachment fixture is now implemented separately; its actual command evidence and limits are recorded in the [restore report](../../implementation/p00-restore-fixture-results.md). RI01–RI06 define the finite input handoff; they must be reflected in the canonical register before gate review.
 
 Every supplied tuple fact needs status, source/digest, observation time, scope and owner. Preserve `UNKNOWN` separately from false and from observed incompatibility. Execute only the selected, approved bounded experiment, and retain both successful and failed outcomes.
+
+
+## Bounded feasibility and input handling
+
+The [engineering G00 examination](../gate-reviews/g00-engineering-assessment-2026-10-04.md) distinguishes the bounded E1/E2 experiments required by G00.04 from later E3 native qualification. Do not require a complete VMware/OpenStack migration campaign before examining isolated application feasibility. Pin the candidate profile and every actually tested artifact; mark unavailable installation facts unknown. An experiment that contacts a native endpoint needs its actual resource/effect scope and authority, independently of a local fixture result.
+
+The [input record and validator](input-record.md) make RT/IP completeness inspectable. Their `route` scope describes the full RT native handoff; an incomplete report does not prevent local fixture preparation. Neither a complete record nor a restore result is execution authority or proof of the complete application/route. The [engineering selections](../../implementation/p00-engineering-selections.md) now choose the development method and bounded synthetic fixture without claiming a real application owner accepted it.

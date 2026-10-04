@@ -75,3 +75,8 @@ The recorder refuses to replace an existing result. It records only command argu
 The [image experiment](images/README.md) builds separate quality/runtime stages from captured upstream digests and a fixed Debian snapshot. Normal pushes replay `images/inputs.lock.json`; explicit candidate resolution is a distinct update operation. The [image report](../../docs/implementation/p00-image-results.md) owns actual BOM, runtime observations and limits.
 
 The [contract experiment](contracts/README.md) pins schema validation and a bundled generator, checks valid/invalid fixtures, generates three language clients twice and exercises selected model/compiler/mock-transport behavior. `run-contracts.py` records clean installs, runtime identities and the required PHP CI execution. The [contract report](../../docs/implementation/p00-contract-tooling-results.md) owns its exact observed results and unsupported claims. Neither experiment creates a public product contract, service deployment or native operation.
+
+
+## Bounded rebuild/restore feasibility
+
+The [restore fixture](restore/README.md) uses an immutable PostgreSQL image and actual synthetic database/attachment state to exercise consistent capture, clean restore, corrupt/incomplete-bundle rejection, source return before target writes and post-write recovery preserving a known target change. It runs without native endpoints or published ports. The [result report](../../docs/implementation/p00-restore-fixture-results.md) preserves the initial failure, corrected locked execution and exact E2 scope. It is not a complete product application, native fencing mechanism or VMware/OpenStack qualification.

@@ -36,6 +36,9 @@ phases:
   - EV-P00-005
   - EV-P00-006
   - EV-P00-007
+  - EV-P00-008
+  - EV-P00-009
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -294,7 +297,8 @@ work_packages:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
@@ -307,6 +311,8 @@ work_packages:
   - docs/implementation/p00-scope-review.md
   - docs/reference/p00-historical-source-review.md
   - docs/implementation/p00-decision-and-input-review.md
+  - docs/implementation/p00-engineering-selections.md
+  - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
 - id: P00.02
   phase_id: P00
   title: Domain and ownership
@@ -316,7 +322,8 @@ work_packages:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -336,6 +343,8 @@ work_packages:
   - docs/implementation/p00-domain-review.md
   - docs/product/domain-model.md
   - docs/implementation/p00-decision-and-input-review.md
+  - docs/implementation/p00-engineering-selections.md
+  - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
 - id: P00.03
   phase_id: P00
   title: Technical decisions
@@ -353,6 +362,7 @@ work_packages:
   - EV-P00-005
   - EV-P00-006
   - EV-P00-007
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -382,16 +392,21 @@ work_packages:
   - docs/implementation/p00-contract-tooling-results.md
   - spikes/compatibility/images/README.md
   - spikes/compatibility/contracts/README.md
+  - docs/implementation/p00-engineering-selections.md
+  - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
 - id: P00.04
   phase_id: P00
   title: Qualification design
   owner_role: Quality/platform owners
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P00-008
+  - EV-P00-009
+  - EV-P00-010
   blocker_ids:
   - BL-P00-002
   dependency_package_ids:
@@ -405,6 +420,10 @@ work_packages:
   - docs/implementation/phases/p00.md
   - docs/implementation/p00-route-and-operations-review.md
   - docs/qualification/feasibility/initial-route.md
+  - docs/implementation/p00-engineering-selections.md
+  - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
+  - docs/qualification/feasibility/input-record.md
+  - docs/implementation/p00-restore-fixture-results.md
 - id: P00.05
   phase_id: P00
   title: Operating requirements
@@ -414,7 +433,8 @@ work_packages:
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -432,6 +452,8 @@ work_packages:
   - docs/implementation/p00-route-and-operations-review.md
   - docs/product/operating-targets.md
   - docs/implementation/p00-decision-and-input-review.md
+  - docs/implementation/p00-engineering-selections.md
+  - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
 - id: P00.06
   phase_id: P00
   title: Delivery decomposition
@@ -441,7 +463,9 @@ work_packages:
     verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P00-009
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -458,6 +482,10 @@ work_packages:
   - docs/implementation/phases/p00.md
   - docs/implementation/p00-baseline-review.md
   - docs/implementation/p00-decision-and-input-review.md
+  - docs/implementation/p00-engineering-selections.md
+  - docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
+  - docs/qualification/feasibility/input-record.md
+  - docs/implementation/p00-restore-fixture-results.md
 - id: P01.01
   phase_id: P01
   title: Repository scaffolding
@@ -1599,6 +1627,9 @@ requirements:
   - EV-P00-005
   - EV-P00-006
   - EV-P00-007
+  - EV-P00-008
+  - EV-P00-009
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2745,9 +2776,9 @@ requirements:
 gates:
 - id: G00
   phase_id: P00
-  decision: NOT_REVIEWED
-  reviewer: null
-  reviewed_at: null
+  decision: IN_REVIEW
+  reviewer: "Codex — engineering examination only; accountable criterion acceptance pending"
+  reviewed_at: '2026-10-04T21:03:32.386379+00:00'
   evidence_ids:
   - EV-P00-001
   - EV-P00-002
@@ -2756,6 +2787,9 @@ gates:
   - EV-P00-005
   - EV-P00-006
   - EV-P00-007
+  - EV-P00-008
+  - EV-P00-009
+  - EV-P00-010
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3065,6 +3099,121 @@ evidence:
     require new execution.
   valid_until: null
   invalidated_at: null
+- id: EV-P00-008
+  level: E2
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/9231c97caeab056b94537296a8f1aa75e38acf4f/spikes/compatibility/results/restore/run-37234051654/report.json
+  sha256: 96be5bc02a704b0a1fe739a4f4db93b09ec40396d7776f2139c8c322beef0f8b
+  source_revision: fcb9fe0ea9bde275b09dfc8c0547e89021edafc9
+  artifact_revisions:
+    retained_artifact_commit: 9231c97caeab056b94537296a8f1aa75e38acf4f
+    spikes/compatibility/results/restore/run-37234051654/retrieval.json: 8a425ba9ca4f131fb8f84209991fa71fa28271498069492bca6ffedee6ddfb2e
+    spikes/compatibility/results/restore/run-37234051654/initial-capture-bundle.json: 1ea10d44699e7248dc103f6dbf05d19dc4432390693b3d5d17d82ce98e129fdb
+    spikes/compatibility/results/restore/run-37234051654/final-capture-bundle.json: 7cb46d1d3e2bc122e10438748e7bb83a8f173302151af809adaf67354ed26ebe
+    spikes/compatibility/results/restore/run-37234051654/post-write-capture-bundle.json: b7aa7db46f1dc1c186d618b319b526a455435c0b8d4ad0a7573e593d0dbe1aba
+    spikes/compatibility/restore/inputs.lock.json: 122ba9014bb072c4304d7dc7764d17e4ecd0e29df8c9ef8cea5cdccc457fcda9
+    spikes/compatibility/restore/schema.sql: 6024d300a3ada764a3796493313cd91aefa6bd7845ebe4c2755affafeeba727d
+  environment: GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4; PostgreSQL 18.6 Debian Bookworm
+    linux/amd64; source, target and recovery databases on one isolated container; attachment
+    files on disposable runner
+  scope: Locked replay run 37234051654 passed 76 commands (72 successful and four expected
+    SQL rejections), 138 explicit checks, three invalid-lock controls and four invalid-bundle
+    controls before target creation. Three complete capture envelopes preserve database archives,
+    exact attachment bytes/metadata and configuration/writer manifests. Actual pre-target-write
+    source return and target-forward recovery to a clean database preserved a known accepted
+    target write. All 11 source bindings, archive/log hashes and decoded binary envelopes
+    verified; initial transfer failure 37233785398 retained.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.04
+  observed_at: '2026-10-04T20:57:07.088924+00:00'
+  observer: GitHub Actions run 37234051654 / attempt 1; artifacts examined by Codex
+  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion
+    and operating acceptance remain pending'
+  limitations: Synthetic real-dependency E2 evidence, not native qualification or full Permit
+    Desk deployment. No VMware/OpenStack endpoint, independent native fence, real identity/service/network
+    integration or operating acceptance. Fixture gates do not fence administrator access.
+    Target-forward recovery requires readable target and new complete capture; uncaptured
+    target loss and concurrent database/file crash consistency are not proved. Fixed-input
+    observation has no time expiry; changed inputs require affected re-execution.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-009
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/2819027baec3891e4591332a910930f9b55effd7/spikes/compatibility/results/input-review-20261004/report.json
+  sha256: aeba93ec01da9cdf60efba88d6287066248e9f980b7920f92d049dc946a8bbe0
+  source_revision: bc42d17a31aca91ea8736dee3a73f1124bb59eed
+  artifact_revisions:
+    retained_artifact_commit: 2819027baec3891e4591332a910930f9b55effd7
+    scripts/validate_p00_inputs.py: e57abccd5569711ad2f2042cde3d8711b9ccd3de68256044bda32455ee8a6134
+    tests/documentation/test_p00_inputs.py: 6c663006e4ddcde8858019607fd488317afb6fe17666f30f644ba643e400132d
+    docs/qualification/feasibility/p00-input-record.json: f779227204331fb58c63a706b8c23ec5bf66b4bfc486c887bccc9e96ba34ad3f
+    docs/qualification/feasibility/p00-input-schema.json: b370352851b4167014230543cc9651d196deeee6785d533ae7df9ef5d8349f52
+    spikes/compatibility/results/input-review-20261004/input-tests.log: ff000f912f65c26ffdfa9b4677846f97356c5acf1eef86058fe3bff937720761
+    spikes/compatibility/results/input-review-20261004/require-route-ready.log: 500a0ce49a02da6261f885930dab1c6e9e06fa04b860e557307b873591deb8f2
+  environment: Local Linux x86-64; Python 3.12.14; standard library; no network or native
+    API
+  scope: Four recorded commands passed their exact expected outcomes. Twenty focused input-validation
+    tests pass. Truthful incomplete record validates; require-ready exits 2 and reports 69
+    route gaps; all-input scope reports 90 gaps. Contradictory status, missing provenance,
+    mutable references, wildcard scope, absent recovery and non-finite JSON values are rejected.
+    All reports deny any execution-authority or feasibility implication.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.04
+  - G00.06
+  observed_at: '2026-10-04T20:55:59.911302+00:00'
+  observer: Codex local execution and raw-byte source/log review
+  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion
+    and operating acceptance remain pending'
+  limitations: Validates declared input structure and completeness only. Does not authenticate
+    observers/reviewers, retrieve or verify evidence content, establish installed facts, check
+    current native permission, authorize an action or pass G00. Synthetic test identities
+    remain only in tests. Full route completeness is not a prerequisite for unrelated isolated
+    engineering. Fixed-input observation has no time expiry; changed record or validator requires
+    revalidation.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-010
+  level: E0
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/2819027baec3891e4591332a910930f9b55effd7/docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md
+  sha256: 004c235728e86fcdac453ea927c6f6b0978dbbbbf653bc9fdd55530e51cd0701
+  source_revision: eb78e463e66d154e58fcfce7e65fad1eaab38914
+  artifact_revisions:
+    retained_artifact_commit: 2819027baec3891e4591332a910930f9b55effd7
+    docs/implementation/p00-engineering-selections.md: c9b9332da9804b07254d438c65e024989af343c61e51a59ab321b7a4dd56a82d
+    spikes/compatibility/results/restore/run-37234051654/report.json: 96be5bc02a704b0a1fe739a4f4db93b09ec40396d7776f2139c8c322beef0f8b
+    spikes/compatibility/results/input-review-20261004/report.json: aeba93ec01da9cdf60efba88d6287066248e9f980b7920f92d049dc946a8bbe0
+  environment: Repository engineering examination by Codex on 2026-10-04; initial baseline
+    eb78e463e66d154e58fcfce7e65fad1eaab38914 plus explicitly identified restore/input source
+    revisions
+  scope: Examined all six G00 criteria, verified the seven prior primary artifact hashes,
+    reviewed the selected development baseline and new E2 restore/E1 input evidence, and recorded
+    exact remaining candidate/application/operating/reviewer obligations. Separates bounded
+    E1/E2 G00 feasibility from later E3 native campaigns; no criterion is represented as accountable
+    acceptance.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.01
+  - G00.02
+  - G00.03
+  - G00.04
+  - G00.05
+  - G00.06
+  observed_at: '2026-10-04T21:03:32.386379+00:00'
+  observer: Codex, engineering examiner
+  reviewer: 'Codex: engineering evidence and scope examination only; accountable criterion
+    and operating acceptance remain pending'
+  limitations: Reviewed design/evidence assessment only; no named organizational owner approval,
+    accepted service target, installed tuple, staffing commitment, native qualification or
+    operational acceptance. Earlier seven artifacts retain their original source/environment
+    limits. Later decisions require attributable reviewer/evidence records; this examination
+    starts IN_REVIEW and does not pass G00. No fixed historical expiry; material changes require
+    scoped re-examination.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -3080,17 +3229,18 @@ blockers:
   - R34
   - R36
   - G00
-  owner_role: Product/architecture/SRE/security and records owners; named assignments
-    not supplied
-  description: No accountable owner roster or accepted NOW/provisional decision set
-    has been supplied for this greenfield baseline. Prepared scope/domain/target recommendations
-    are review candidates; retained operational-state applicability remains unconfirmed.
-    This blocks acceptance, not continued independent engineering.
+  owner_role: Product/architecture/SRE/security and records owners; named assignments not
+    supplied
+  description: Development choices DC01–DC10 are selected at their reversible engineering
+    scope, but no actual accountable owner roster, receiving-operator dispositions or retained-state
+    inventory has been supplied. Missing decisions block their affected acceptance, not independent
+    engineering.
   unblock_condition: Record named accountable reviewers and accept or revise the scope/domain/runtime/operating
     recommendations, retained-state disposition and assigned later checkpoints.
-  next_action: Use DC01–DC10 and IP01/IP02/IP06/IP07 in docs/implementation/p00-decision-and-input-review.md
-    to record concrete decisions and owner assignments against measured evidence; retain
-    unaccepted items explicitly.
+  next_action: Review docs/implementation/p00-engineering-selections.md and the criterion-level
+    G00 assessment; record attributable scope/domain/operating/retention decisions and actual
+    owner/capacity inputs in the existing RT/IP record. One decision record may cover multiple
+    fields.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P00-002
@@ -3099,17 +3249,20 @@ blockers:
   - P00.04
   - R01
   - G00
-  owner_role: Platform, application and qualification owners; named assignments not
-    supplied
-  description: The repository/session supplies no verified VMware/OpenStack installation
-    tuple, approved representative application capture/restore fixture or scoped lab
-    authority for the new preferred rebuild/restore route. Historical runtime examples
-    are not installed facts or authorization.
-  unblock_condition: Supply the RT input inventory and approved RF experiment scope
-    from the route review, then execute bounded rebuild/capture/restore feasibility
-    and recovery observations.
-  next_action: Complete docs/qualification/feasibility/initial-route.md inputs with
-    platform/application owners and run the selected application_rebuild_restore feasibility
-    experiment; keep native effects unattempted until their own scope is authorized.
+  owner_role: Platform, application and qualification owners; named assignments not supplied
+  description: The bounded PostgreSQL/attachment consistency and both fixture recovery boundaries
+    now have E2 evidence. Complete representative application deployment/configuration, the
+    pinned candidate platform/guest/topology profile and accountable fixture/method review
+    remain incomplete. Actual native installation facts and campaign scope/authority are also
+    unavailable for any later native cases; they do not block isolated E1/E2 preparation or
+    become a full E3 requirement at G00.
+  unblock_condition: Supply and review the candidate/application profile, complete reproducible
+    fixture and application recovery bounds; execute the uncovered bounded G00.04 checks.
+    Before any native calls/effects, additionally supply verified installation/resource facts
+    and current permitted campaign scope through the approved access mechanism.
+  next_action: Use docs/qualification/feasibility/input-record.md and the G00 engineering
+    assessment to distinguish supplied fixture evidence, untested full-application behavior
+    and native-only inputs. Extend the fixture only against the reviewed representative application;
+    preserve the passing state-recovery evidence at its true scope.
   state: OPEN
   resolution_evidence_ids: []

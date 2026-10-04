@@ -2,7 +2,7 @@
 
 An enterprise application for planning and operating multi-tenant hosting across **VMware, Nutanix and OpenStack**. It brings application requirements, infrastructure discovery, placement assessment, approvals, provisioning, migration and recovery into one governed operator experience.
 
-**Current state:** P00 is underway, with scope/domain reviews and executed Laravel HTTP, Chromium, PHP/Python quality-tool, candidate-image and cross-language contract checks recorded alongside the product design and implementation programme. The product application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
+**Current state:** P00 is underway, with scope/domain reviews and executed Laravel HTTP, Chromium, PHP/Python quality-tool, candidate-image, cross-language contract and PostgreSQL/attachment recovery checks recorded alongside the product design and implementation programme. The product application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
 
 ## What the application does
 
@@ -98,3 +98,6 @@ P00 has started. The [baseline review](docs/implementation/p00-baseline-review.m
 
 
 The [candidate images](docs/implementation/p00-image-results.md) now have immutable upstream inputs, measured OS/extension/package inventories and passing isolated runtime probes. The [contract-tool experiment](docs/implementation/p00-contract-tooling-results.md) validates synthetic wire schemas and reproducible PHP/Python/TypeScript generation, including intentional rejection cases and documented decoder limits. The remaining P00 work is consolidated in the [decision and input review](docs/implementation/p00-decision-and-input-review.md): actual baseline/operating decisions, exact application/platform/lab inputs, bounded rebuild/restore observations and accountable G00 review.
+
+
+P00 now also has [executed rebuild/restore fixture results](docs/implementation/p00-restore-fixture-results.md), [selected development decisions](docs/implementation/p00-engineering-selections.md), an [executable RT/IP input record](docs/qualification/feasibility/input-record.md) and a [criterion-level G00 engineering assessment](docs/qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md). The restore experiment measures real database/file state and both fixture recovery boundaries; it does not claim a deployed Permit Desk application or VMware/OpenStack qualification. G00 is in review, with actual operating decisions and remaining candidate/application evidence explicit.
