@@ -1,0 +1,60 @@
+name: P01 bootstrap images
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - services/planning/**
+      - services/inventory/**
+      - services/lifecycle/**
+      - workers/inventory/**
+      - workers/lifecycle/**
+      - deploy/build/**
+      - .github/workflows/p01-images.yml
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - services/planning/**
+      - services/inventory/**
+      - services/lifecycle/**
+      - workers/inventory/**
+      - workers/lifecycle/**
+      - deploy/build/**
+      - .github/workflows/p01-images.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p01-images-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-image:
+    name: ${{ matrix.component }} isolated image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [planning, inventory, lifecycle, inventory-workers, lifecycle-workers]
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Build owned context and inspect bootstrap isolation
+        run: >-
+          python3 scripts/p01/run_images.py
+          --component '${{ matrix.component }}'
+          --output "$RUNNER_TEMP/p01-image-${{ matrix.component }}"
+          --source-revision "$GITHUB_SHA"
+      - name: Retain source, input, image and execution evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p01-image-${{ matrix.component }}-${{ github.sha }}
+          path: ${{ runner.temp }}/p01-image-${{ matrix.component }}/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,12 @@
+**
+!Dockerfile
+!.dockerignore
+!.python-version
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+!src/**
+**/__pycache__/
+**/*.pyc
+**/*.egg-info/

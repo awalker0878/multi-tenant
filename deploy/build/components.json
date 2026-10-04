@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "scope": "P01 Python bootstrap images; no persistent service or worker execution",
+  "components": [
+    {
+      "id": "planning",
+      "context": "services/planning",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "planning",
+      "distribution": "product-planning",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/planning-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "planning",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false
+      },
+      "readiness_reason": "service_dependencies_not_implemented"
+    },
+    {
+      "id": "inventory",
+      "context": "services/inventory",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "inventory",
+      "distribution": "product-inventory",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/inventory-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "inventory",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false
+      },
+      "readiness_reason": "service_dependencies_not_implemented"
+    },
+    {
+      "id": "lifecycle",
+      "context": "services/lifecycle",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "lifecycle",
+      "distribution": "product-lifecycle",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/lifecycle-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "lifecycle",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false
+      },
+      "readiness_reason": "service_dependencies_not_implemented"
+    },
+    {
+      "id": "inventory-workers",
+      "context": "workers/inventory",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "inventory_worker",
+      "distribution": "product-inventory-worker",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/inventory-worker-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "inventory",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false,
+        "component": "inventory-workers",
+        "component_kind": "worker_bootstrap",
+        "task_consumption_enabled": false
+      },
+      "readiness_reason": "worker_dependencies_not_implemented"
+    },
+    {
+      "id": "lifecycle-workers",
+      "context": "workers/lifecycle",
+      "dockerfile": "Dockerfile",
+      "target": "runtime",
+      "module": "lifecycle_worker",
+      "distribution": "product-lifecycle-worker",
+      "version": "0.1.0.dev0",
+      "entrypoint": "/opt/venv/bin/lifecycle-worker-health",
+      "inputs": [
+        "Dockerfile",
+        ".dockerignore",
+        ".python-version",
+        "pyproject.toml",
+        "uv.lock",
+        "README.md",
+        "src"
+      ],
+      "probe_base": {
+        "service": "lifecycle",
+        "scope": "process_bootstrap",
+        "native_operations_enabled": false,
+        "component": "lifecycle-workers",
+        "component_kind": "worker_bootstrap",
+        "task_consumption_enabled": false
+      },
+      "readiness_reason": "worker_dependencies_not_implemented"
+    }
+  ]
+}
