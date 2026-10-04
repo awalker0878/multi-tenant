@@ -32,6 +32,7 @@ phases:
   - EV-P00-001
   - EV-P00-002
   - EV-P00-003
+  - EV-P00-004
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -343,6 +344,7 @@ work_packages:
   - EV-P00-001
   - EV-P00-002
   - EV-P00-003
+  - EV-P00-004
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -364,6 +366,9 @@ work_packages:
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
   - docs/implementation/p00-compatibility-results.md
   - spikes/compatibility/README.md
+  - docs/implementation/p00-python-tooling-results.md
+  - docs/implementation/p00-integration-results.md
+  - docs/implementation/p00-browser-results.md
 - id: P00.04
   phase_id: P00
   title: Qualification design
@@ -1575,6 +1580,7 @@ requirements:
   - EV-P00-001
   - EV-P00-002
   - EV-P00-003
+  - EV-P00-004
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2728,6 +2734,7 @@ gates:
   - EV-P00-001
   - EV-P00-002
   - EV-P00-003
+  - EV-P00-004
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2889,6 +2896,39 @@ evidence:
     integration, production image, native qualification or operating acceptance. Historical
     fixed-input observation has no time expiry; changed inputs require a new run.
     Failed earlier attempts remain in the spike results.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-004
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/aa452ec53909cb2c059e8cf2d0e2e7ddbae24055/spikes/compatibility/results/python-tooling/artifact-inventory.json
+  sha256: c55759b9b368881ba119e17701096411e276b5de097a4bfa171307fbda6f900d
+  source_revision: aa452ec53909cb2c059e8cf2d0e2e7ddbae24055
+  artifact_revisions:
+    retained_artifact_commit: aa452ec53909cb2c059e8cf2d0e2e7ddbae24055
+    spikes/compatibility/python/pyproject.toml: de0380f117644ebd949e317b5885ea5bc40c352d622bf9ca9fbdb00e7af50697
+    spikes/compatibility/python/uv.lock: 66070660564e8e83a8a27d5c7b149a1f6ae591b8a948b04a2fc058db55fdc302
+    spikes/compatibility/python/.importlinter: 55d258a8f15006ac021ae11176412c79508cb1326333cd3631e3bfb5cc925880
+    spikes/compatibility/results/python-tooling/09-negative-boundaries.json: 9f5af20c99f3ed0a20498ff65b19360d1887e5c1f90649541bdefb69e062b19e
+    spikes/compatibility/results/python-tooling/15-strict-advisories.json: fd3424d5325aa091470ac0541393f3430647bb3fd8c72fb8793b131d68ef13ea
+  environment: Local Linux x86-64; Python 3.12.14; uv 0.12.19; new isolated temporary
+    environment
+  scope: Locked Python tooling installation, Ruff lint/format, strict mypy over 26
+    files, four synthetic behavior tests, three Import Linter contracts and seven
+    semantic negative cases; installed dependency consistency and strict advisory
+    lookup over 49 packages.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T18:46:41.615634+00:00'
+  observer: Codex /root/p00_python_quality
+  reviewer: 'Codex /root: artifact, hash and outcome review only; accountable engineering/SRE
+    acceptance pending'
+  limitations: Synthetic non-product compatibility evidence; no actual service source
+    analyzed, production image, native qualification or operating acceptance. External-library
+    prohibition covers HTTPX and Pydantic in these fixtures, not every future SDK.
+    Advisory observation is time-specific. Historical fixed-input observation has
+    no time expiry; changed inputs require new execution.
   valid_until: null
   invalidated_at: null
 blockers:

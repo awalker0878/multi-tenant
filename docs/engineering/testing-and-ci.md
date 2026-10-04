@@ -33,6 +33,8 @@ Project-owned Pest architecture assertions check namespace dependencies and Acti
 
 The current `python scripts/validate_architecture.py` checks the registry and supported source forms, with validator fixtures in `tests/documentation/test_architecture_controls.py`. Its PHP prechecks are conservative; parser-aware Deptrac and the complete Pest architecture configuration remain P01 implementation work. Reports distinguish registry validation, analyzed source, skipped assertions and absent application code. Registry success is not application security or isolation evidence.
 
+The [P00 Python tooling results](../implementation/p00-python-tooling-results.md) record a fresh locked installation, successful Ruff lint/format and strict mypy checks, four synthetic behavior tests, and real Import Linter positive/negative executions. Each negative case requires the intended contract and offending module in the diagnostic as well as the expected nonzero exit; an unrelated tool failure is not accepted. This experiment validates the candidate tools on disposable fixtures. It does not replace P01 tests against real service source, generated clients, build isolation or runtime identities.
+
 ## Minimum behavioral matrix
 
 For each changed surface, identify applicable rows and link the tests to the corresponding requirement or gate criterion. Record a reason when a row does not apply. The matrix is a design obligation, not a claim that the suites already exist.

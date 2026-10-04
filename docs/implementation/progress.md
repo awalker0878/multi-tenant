@@ -10,7 +10,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 
 | Phase | Outcome | Work | Verification | Native qualification | Operating acceptance | Gate | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: NOT_REVIEWED | 3 / 2 |
+| P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: NOT_REVIEWED | 4 / 2 |
 | P01 | Delivery and runtime foundation | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 0 / 0 |
 | P02 | Identity, tenancy and governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
@@ -31,7 +31,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00.01 | Scope and journeys | Product | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P00.02 | Domain and ownership | Architecture | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
-| P00.03 | Technical decisions | Engineering/SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
+| P00.03 | Technical decisions | Engineering/SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 1 |
 | P00.04 | Qualification design | Quality/platform owners | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
 | P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 0 / 1 |
@@ -99,13 +99,14 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **3**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **4**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
 | EV-P00-001 | E1 | Local Linux x86-64; Node 24.19.0; npm 11.9.0 | 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c | Isolated compatibility evidence only; no product service, full HTTP/browser integration, production image, native qualification or operating acceptance. Historical fixed-input observation has no time expiry; changed inputs require a new run. Failed earlier attempts remain in the spike results. |
 | EV-P00-002 | E1 | Local Linux x86-64; Python 3.12.14; uv 0.12.19 | 9a214f6ea2f0bba02abb7959cbd2f3523efbba1c | Isolated compatibility evidence only; no product service, full HTTP/browser integration, production image, native qualification or operating acceptance. Historical fixed-input observation has no time expiry; changed inputs require a new run. Failed earlier attempts remain in the spike results. |
 | EV-P00-003 | E1 | GitHub-hosted ubuntu-24.04 x64; PHP 8.5.11; Composer 2.10.3 | 06df7bfb15d83eb5a180e10c0d6c65970c5b0a54 | Isolated compatibility evidence only; no product service, full HTTP/browser integration, production image, native qualification or operating acceptance. Historical fixed-input observation has no time expiry; changed inputs require a new run. Failed earlier attempts remain in the spike results. |
+| EV-P00-004 | E1 | Local Linux x86-64; Python 3.12.14; uv 0.12.19; new isolated temporary environment | aa452ec53909cb2c059e8cf2d0e2e7ddbae24055 | Synthetic non-product compatibility evidence; no actual service source analyzed, production image, native qualification or operating acceptance. External-library prohibition covers HTTPX and Pydantic in these fixtures, not every future SDK. Advisory observation is time-specific. Historical fixed-input observation has no time expiry; changed inputs require new execution. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, G00 | Product/architecture/SRE/security and records owners; named assignments not supplied | OPEN | Record named accountable reviewers and accept or revise the scope/domain/runtime/operating recommendations, retained-state disposition and assigned later checkpoints. | Use docs/implementation/p00-baseline-review.md and its linked review packets to record concrete decisions and owner assignments; retain unaccepted items explicitly. |

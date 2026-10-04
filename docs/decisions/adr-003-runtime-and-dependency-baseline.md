@@ -4,15 +4,15 @@ Owner role: Engineering lead. Related phases: P00, P01. Record date: 2026-10-04.
 
 Origin: `DESIGN`. Disposition: `PROPOSED` as recorded in the [decision register](decision-register.md).
 
-This record develops the existing baseline for review. No accountable-owner acceptance, experiment result or native qualification is claimed; the register disposition is unchanged.
+This record develops the existing baseline for review and records bounded experiments below. No accountable-owner acceptance or native qualification is claimed; the register disposition is unchanged.
 
 ## Context
 
-The requested frontend stack leaves exact backend, runtime and patch versions unresolved. Laravel 13 and PHP 8.5 are current candidates in the register, not a verified bill of materials. Reproducible builds and upgrade responsibility require one reviewed set of runtime, package and image identifiers.
+The requested frontend stack now has measured dependency candidates from isolated compatibility experiments. Laravel 13 and PHP 8.5 remain candidates in the register, and the full production bill of materials is not accepted. Reproducible builds and upgrade responsibility require one reviewed set of runtime, package and image identifiers for actual deployables.
 
 ## Decision and scope
 
-Laravel 13/PHP 8.5 candidates; exact Node/Python/runtime and dependency patches unresolved.
+Laravel 13/PHP 8.5 remain candidates. Measured Node/Python/runtime and dependency versions are recorded in the P00 compatibility reports; production runtime/image selection, complete service dependencies and accountable update ownership remain unresolved.
 
 Initial checkpoint: NOW: P00.03 / G00.03 before P01.01.
 
@@ -33,7 +33,7 @@ Refinement and validation: Exact lock/image resolution, update policy and suppor
 
 ## Unresolved details and evidence needed
 
-- Resolve exact PHP, Laravel, Python, Node, package-manager and operating-system image versions.
+- Review the measured PHP, Laravel, Python, Node and package-manager candidates; resolve remaining service dependencies and immutable operating-system image identities.
 - Document compatibility sources, vulnerability/update policy, mirror availability and support lifecycle boundaries.
 
 ## Acceptance and validation
@@ -57,3 +57,7 @@ A dependency reaches its accepted support boundary, an unresolved vulnerability 
 ## P00 compatibility execution
 
 The [P00.03 results](../implementation/p00-compatibility-results.md) record the actual resolved versions, successful probes, failed attempts and remaining runtime limits. Candidate selection now follows those measurements; upstream support tables alone do not close this decision. The spike remains separate from product service code, and this ADR remains proposed until the complete bill of materials and operating owner are reviewed.
+
+The [Python tooling continuation](../implementation/p00-python-tooling-results.md) measured CPython 3.12.14 and uv 0.12.19 with Ruff 0.16.10, mypy 2.4.0, pytest 9.1.1, Import Linter 2.15/Grimp 3.17 and pip-audit 2.10.1. A fresh locked installation passed lint/format, strict typing over 26 files, four synthetic behavior tests, three dependency contracts and seven intended negative boundary cases. Strict advisory lookup returned no known advisories for the 49 audited packages at execution time. These are feasible tool candidates, not adopted production versions or evidence that business services are implemented.
+
+Adoption requires an accountable engineering/SRE decision, update and support ownership, actual service locks and images, and P01 executions against the registered service, worker and shared-package roots. The Python probe forbids only its included HTTPX/Pydantic transport libraries in core layers; actual service rules must cover their complete approved dependency set. The measured spike does not qualify restricted-network mirrors, runtime isolation, native workflows or production security.
