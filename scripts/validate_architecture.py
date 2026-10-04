@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import ast
 from dataclasses import dataclass, field
+import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
@@ -68,6 +69,7 @@ class Result:
     php_sources: int = 0
     frontend_sources: int = 0
     manifests: int = 0
+    evidence_manifests: int = 0
     services: int = 0
 
 
@@ -539,6 +541,45 @@ class Validator:
                 if not isinstance(target, str) or target.rstrip("/") != correct:
                     self.error(f"{path.relative_to(self.root)}: missing/exact context PSR-4 mapping required: {expected} -> {correct}/")
 
+    def retained_manifest(self, path):
+        """Classify a bound P01 manifest snapshot without excluding evidence source."""
+        parts = path.relative_to(self.root).parts
+        if (path.name not in MANIFEST_NAMES or len(parts) != 6
+                or parts[:3] != ("verification", "p01", "packages")
+                or not re.fullmatch(r"run-[1-9][0-9]*", parts[3])):
+            return False
+        record = self.services.get(parts[4]) or self.workers.get(parts[4])
+        if not record:
+            return False
+        permitted = {"pyproject.toml"} if record["language"] == "python" else {"composer.json"}
+        if record["id"] == "console":
+            permitted.add("package.json")
+        if path.name not in permitted:
+            return False
+        label = str(path.relative_to(self.root))
+        report_path = path.with_name("report.json")
+        try:
+            if report_path.is_symlink() or not report_path.is_file():
+                raise ValueError("a regular sibling report.json is required")
+            report = json.loads(report_path.read_text())
+            if (not isinstance(report, dict) or report.get("schema_version") != 1
+                    or report.get("component") != record["id"]
+                    or report.get("run_id") != parts[3].removeprefix("run-")
+                    or not isinstance(report.get("source_sha"), str)
+                    or not re.fullmatch(r"[0-9a-f]{40}", report["source_sha"])):
+                raise ValueError("report identity does not match its evidence location")
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            for key, name in (("artifact_sha256", path.name),
+                              ("source_sha256", f"{record['root']}/{path.name}")):
+                bindings = report.get(key)
+                if not isinstance(bindings, dict) or bindings.get(name) != digest:
+                    raise ValueError(f"{key} does not bind the retained manifest bytes")
+        except (OSError, ValueError) as exc:
+            self.error(f"{label}: invalid retained evidence manifest: {exc}")
+        else:
+            self.result.evidence_manifests += 1
+        return True
+
     def run(self):
         self.load()
         if self.result.errors:
@@ -560,6 +601,8 @@ class Validator:
                     continue
                 if path.is_symlink():
                     self.error(f"{path.relative_to(self.root)}: source/dependency symlinks are forbidden")
+                    continue
+                if self.retained_manifest(path):
                     continue
                 record = self.owner(path)
                 if not record:
@@ -597,6 +640,8 @@ def main():
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
     print(f"Architecture registry passed: {result.services} services; {result.manifests} manifests checked.")
+    if result.evidence_manifests:
+        print(f"Retained evidence: {result.evidence_manifests} manifest snapshots classified separately; source and artifact hashes matched their reports.")
     if not result.sources:
         print("Application source absent: source-boundary checks have not yet been exercised on product code.")
     else:

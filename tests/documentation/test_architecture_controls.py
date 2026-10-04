@@ -1,6 +1,7 @@
 """Negative fixtures prove the checks fail; they are not application evidence."""
 
 import copy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -54,6 +55,94 @@ class ArchitectureControlsTest(unittest.TestCase):
     def test_other_spikes_cannot_bypass_product_registration(self):
         self.write("spikes/unregistered/main.py", "pass\n")
         self.assertFails("unregistered source")
+
+    def retained_manifest(self, component="console", filename="package.json"):
+        path = f"verification/p01/packages/run-123/{component}/{filename}"
+        content = '[project]\nname = "historical"\n' if filename.endswith(".toml") else '{"name":"historical"}\n'
+        digest = hashlib.sha256(content.encode()).hexdigest()
+        record = next(record for kind in ("services", "workers") for record in self.registry[kind]
+                      if record["id"] == component)
+        report = {
+            "schema_version": 1, "component": component, "run_id": "123",
+            "source_sha": "a" * 40, "result": "FAIL",
+            "artifact_sha256": {filename: digest},
+            "source_sha256": {f"{record['root']}/{filename}": digest},
+        }
+        self.write(path, content)
+        self.write(str(Path(path).with_name("report.json")), json.dumps(report))
+        return path, report
+
+    def test_bound_historical_manifests_are_evidence_not_product_source(self):
+        for component, filename in (("console", "package.json"), ("governance", "composer.json"),
+                                    ("planning", "pyproject.toml"), ("inventory-workers", "pyproject.toml")):
+            self.retained_manifest(component, filename)
+        result = self.check()
+        self.assertEqual([], result.errors)
+        self.assertEqual(4, result.evidence_manifests)
+        self.assertEqual(0, result.manifests)
+        self.assertEqual(0, result.sources)
+
+    def test_evidence_does_not_hide_runtime_source(self):
+        manifest, report = self.retained_manifest()
+        for filename in ("main.py", "index.php", "app.ts", "app.vue"):
+            path = str(Path(manifest).with_name(filename))
+            self.write(path, "runtime source\n")
+            report["artifact_sha256"][filename] = hashlib.sha256(b"runtime source\n").hexdigest()
+            self.write(str(Path(manifest).with_name("report.json")), json.dumps(report))
+            with self.subTest(filename=filename):
+                self.assertFails(f"{path}: unregistered source")
+
+    def test_evidence_manifests_cannot_extend_their_allowed_location(self):
+        manifest, _ = self.retained_manifest()
+        for path in ("verification/p01/packages/run-123/console/nested/package.json",
+                     "verification/p01/packages/run-123/unknown/package.json",
+                     "verification/p01/images/run-123/console/package.json",
+                     "verification/p01/packages/run-not-a-run/console/package.json",
+                     "verification/p01/packages/run-123/console/pyproject.toml"):
+            self.write(path, (self.root / manifest).read_text())
+            with self.subTest(path=path):
+                self.assertFails(f"{path}: unregistered source")
+
+    def test_evidence_manifest_requires_matching_report_and_bytes(self):
+        for field, replacement in (("schema_version", 99), ("component", "governance"),
+                                   ("run_id", "456"), ("source_sha", "not-a-revision"),
+                                   ("artifact_sha256", {}), ("source_sha256", {})):
+            path, report = self.retained_manifest()
+            report[field] = replacement
+            self.write(str(Path(path).with_name("report.json")), json.dumps(report))
+            with self.subTest(field=field):
+                self.assertFails(f"{path}: invalid retained evidence manifest")
+                self.assertEqual(0, self.check().evidence_manifests)
+        path, _ = self.retained_manifest()
+        self.write(path, '{"name":"modified"}')
+        self.assertFails("artifact_sha256 does not bind")
+
+    def test_evidence_manifest_requires_regular_report(self):
+        path, _ = self.retained_manifest()
+        report_path = (self.root / path).with_name("report.json")
+        report_path.unlink()
+        self.assertFails("a regular sibling report.json is required")
+        report_path.write_text("not json")
+        self.assertFails("invalid retained evidence manifest")
+        report_path.unlink()
+        self.write("historical-report.json", "{}")
+        report_path.symlink_to(self.root / "historical-report.json")
+        self.assertFails("a regular sibling report.json is required")
+
+    def test_evidence_manifest_symlink_is_rejected(self):
+        path, _ = self.retained_manifest()
+        manifest_path = self.root / path
+        manifest_path.rename(manifest_path.with_name("manifest-copy.json"))
+        manifest_path.symlink_to(manifest_path.with_name("manifest-copy.json"))
+        self.assertFails(f"{path}: source/dependency symlinks are forbidden")
+
+    def test_evidence_does_not_hide_invalid_live_manifest(self):
+        self.retained_manifest()
+        self.write("services/governance/composer.json", json.dumps({
+            "autoload": {"psr-4": {"App\\": "app/"}},
+            "require": {"product/catalogue": "1.0"},
+        }))
+        self.assertFails("services/governance/composer.json: direct service package dependency")
 
     def test_valid_python_imports_and_relative_imports(self):
         self.write("services/inventory/src/inventory/domain/model.py", "from dataclasses import dataclass\n")
