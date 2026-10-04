@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
+from html.parser import HTMLParser
+from http.cookies import SimpleCookie
 import json
 import os
 from pathlib import Path
@@ -14,6 +16,7 @@ import sys
 import tempfile
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 from local_runtime import prepare
@@ -23,6 +26,47 @@ SERVICES = ('console', 'governance', 'catalogue', 'assurance', 'planning', 'inve
 
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+class ConsoleMarkup(HTMLParser):
+    """Read server markup only; this does not execute JavaScript or hydrate Inertia."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.mount = False
+        self.page = None
+        self.assets = set()
+        self.page_script = False
+        self.page_parts = []
+
+    def decode_page(self, value: str):
+        try:
+            candidate = json.loads(value)
+        except json.JSONDecodeError:
+            return
+        if isinstance(candidate, dict) and 'component' in candidate:
+            self.page = candidate
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == 'div' and attributes.get('id') == 'app':
+            self.mount = True
+            self.decode_page(attributes.get('data-page') or '')
+        if tag == 'script' and attributes.get('type') == 'application/json' and 'data-page' in attributes:
+            self.page_script = True
+            self.page_parts = []
+        asset = attributes.get('src') if tag == 'script' else attributes.get('href') if tag == 'link' else None
+        if asset is not None and urllib.parse.urlsplit(asset).path.startswith('/build/'):
+            self.assets.add(asset)
+
+    def handle_data(self, data):
+        if self.page_script:
+            self.page_parts.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == 'script' and self.page_script:
+            self.decode_page(''.join(self.page_parts))
+            self.page_script = False
 
 
 class Campaign:
@@ -77,7 +121,7 @@ class Campaign:
     def admin(self, sql: str, database: str = 'postgres') -> bytes:
         return self.command('administrator-sql', self.dc('exec', '-T', '--user', 'postgres', 'postgres', 'psql', '-X', '-qAt', '-v', 'ON_ERROR_STOP=1', '-d', database), data=sql.encode(), timeout=15)
 
-    def request(self, service: str, path: str, token: str | None = None, *, context=None, host: str | None = None):
+    def request(self, service: str, path: str, token: str | None = None, *, context=None, host: str | None = None, max_bytes: int = 65536):
         headers = {} if token is None else {'Authorization': 'Bearer '+token}
         if host is not None:
             headers['Host'] = host
@@ -87,12 +131,62 @@ class Campaign:
         except urllib.error.HTTPError as error:
             response = error
         with response:
-            return response.status, response.read(65536), dict(response.headers)
+            body = response.read(max_bytes + 1)
+            if len(body) > max_bytes:
+                raise RuntimeError('HTTP response exceeded the bounded evidence read')
+            # Keep repeated Set-Cookie headers available without retaining their values.
+            return response.status, body, response.headers
 
     def health(self, service: str, status: int, token: str | None, name: str):
         observed, body, headers = self.request(service, '/health/dependencies', token)
         payload = json.loads(body)
         self.check(name, observed == status and payload.get('scope') == 'foundation_dependencies', {'service': service, 'http_status': observed, 'body': payload, 'cache_control': headers.get('Cache-Control')})
+
+    def check_console_http(self):
+        """Measure HTTPS HTML, session flags and static delivery, never browser behavior."""
+        status, body, headers = self.request('console', '/')
+        content_type = headers.get('Content-Type', '').split(';', 1)[0].lower()
+        markup = ConsoleMarkup()
+        markup.feed(body.decode('utf-8'))
+        markup.close()
+        page = markup.page or {}
+        props = page.get('props', {})
+        self.check('console-https-foundation-html', status == 200 and content_type == 'text/html'
+                   and markup.mount and page.get('component') == 'Foundation' and isinstance(props, dict)
+                   and props.get('productName') == 'Enterprise Workload Mobility and Secure Hosting'
+                   and props.get('implementationState') == 'foundation',
+                   {'http_status': status, 'content_type': content_type, 'bytes': len(body),
+                    'sha256': digest(body), 'component': page.get('component'),
+                    'scope': 'raw_https_server_markup_without_javascript_execution'})
+        session_cookies = []
+        for value in headers.get_all('Set-Cookie', []):
+            parsed = SimpleCookie()
+            parsed.load(value)
+            if 'console_session' in parsed:
+                session_cookies.append(parsed['console_session'])
+        flags = ({'secure': bool(session_cookies[0]['secure']),
+                  'http_only': bool(session_cookies[0]['httponly']),
+                  'same_site': session_cookies[0]['samesite'].lower()}
+                 if len(session_cookies) == 1 else {})
+        self.check('console-https-session-cookie-flags', flags == {'secure': True, 'http_only': True, 'same_site': 'lax'},
+                   {'cookie_name': 'console_session', 'count': len(session_cookies), 'flags': flags})
+        extensions = {Path(urllib.parse.urlsplit(asset).path).suffix for asset in markup.assets}
+        self.check('console-compiled-script-and-style-references', {'.js', '.css'} <= extensions,
+                   {'references': len(markup.assets), 'extensions': sorted(extensions)})
+        for asset in sorted(markup.assets):
+            target = urllib.parse.urlsplit(asset)
+            suffix = Path(target.path).suffix
+            self.check('console-asset-reference-is-local', target.scheme in ('', 'https')
+                       and target.netloc in ('', f'localhost:{self.ports["console"]}')
+                       and not target.fragment and '..' not in Path(target.path).parts and suffix in ('.js', '.css'),
+                       {'path': target.path})
+            path = target.path + ('?' + target.query if target.query else '')
+            asset_status, asset_body, asset_headers = self.request('console', path, max_bytes=4 * 1024 * 1024)
+            asset_type = asset_headers.get('Content-Type', '').split(';', 1)[0].lower()
+            allowed_types = {'text/css'} if suffix == '.css' else {'text/javascript', 'application/javascript'}
+            self.check('console-compiled-asset-delivered', asset_status == 200 and bool(asset_body) and asset_type in allowed_types,
+                       {'path': target.path, 'http_status': asset_status, 'content_type': asset_type,
+                        'bytes': len(asset_body), 'sha256': digest(asset_body), 'scope': 'raw_https_static_delivery'})
 
     def wait_health(self, services=SERVICES):
         deadline = time.monotonic()+90
@@ -168,6 +262,12 @@ class Campaign:
         for service in SERVICES:
             self.sql(service, f'\\set owner {service}_owner\n\\set runtime {service}_runtime\n'+migration, identity='migrator')
         self.command('install-applications', self.dc('up','-d'), timeout=180)
+        # Retain process/port diagnostics before port discovery can fail. Never inspect secret-bearing config.
+        for service in SERVICES:
+            container_id = self.command('proxy-container-id-'+service, self.dc('ps','-a','-q',service+'-proxy')).decode().strip()
+            self.check('proxy-container-created', bool(container_id) and len(container_id.split()) == 1, {'service': service})
+            self.command('proxy-container-state-'+service, ['docker','inspect','--format',
+                         '{{json .State}} {{json .NetworkSettings.Ports}} {{json .HostConfig.PortBindings}}', container_id])
         self.ports = {}
         for service in SERVICES:
             address = self.command('proxy-port', self.dc('port',service+'-proxy','8443')).decode().strip()
@@ -176,6 +276,7 @@ class Campaign:
         self.tokens = {s:(self.runtime/'secrets'/f'{s}-health-token').read_text().strip() for s in SERVICES}
         self.tls = ssl.create_default_context(cafile=str(self.runtime/'secrets/ca.crt'))
         self.wait_health()
+        self.check_console_http()
         initial_data = {}
         for service in SERVICES:
             self.health(service, 401, None, 'missing-health-identity-denied')

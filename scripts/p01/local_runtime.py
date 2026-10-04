@@ -191,6 +191,11 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str)
         for service in SERVICES:
             networks[f"db_{service}"] = {"internal": True}
             networks[f"web_{service}"] = {"internal": True}
+            # Docker does not publish host ports for a container attached only to
+            # internal bridges. Give just this proxy its own publication bridge;
+            # applications remain confined to internal database/proxy networks.
+            networks[f"ingress_{service}"] = {"internal": False, "driver": "bridge",
+                                               "driver_opts": {"com.docker.network.bridge.enable_ip_masquerade": "false"}}
             environment = {"APP_ENV": "production", "APP_DEBUG": "false", "DB_HOST": "postgres",
                            "DB_PORT": "5432", "DB_DATABASE": service, "DB_USERNAME": f"{service}_runtime",
                            "DB_PASSWORD_FILE": "/run/secrets/db-password", "DB_SSLMODE": "verify-full",
@@ -213,8 +218,8 @@ def prepare(root: Path, runtime: Path, images: Mapping[str, str], revision: str)
             services[service] = app
             proxy = _base(dependencies["nginx"])
             proxy.update(user="10001:10001", entrypoint=["/usr/sbin/nginx"], command=["-g", "daemon off;"],
-                         networks=[f"web_{service}"], depends_on={service: {"condition": "service_started"}},
-                         ports=[{"target": 8443, "host_ip": "127.0.0.1", "protocol": "tcp"}],
+                         networks=[f"web_{service}", f"ingress_{service}"], depends_on={service: {"condition": "service_started"}},
+                         ports=[{"target": 8443, "published": "0", "host_ip": "127.0.0.1", "protocol": "tcp"}],
                          tmpfs=["/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"],
                          secrets=[_secret(f"{service}.crt", "tls.crt"), _secret(f"{service}.key", "tls.key")],
                          volumes=[_bind(runtime / "nginx" / f"{service}.conf", "/etc/nginx/nginx.conf")])

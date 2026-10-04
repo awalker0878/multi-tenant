@@ -60,7 +60,7 @@ class RuntimeGenerationTest(unittest.TestCase):
         for name, service in self.document["services"].items():
             with self.subTest(service=name):
                 if name.endswith("-proxy"):
-                    self.assertEqual(service["ports"], [{"target": 8443, "host_ip": "127.0.0.1", "protocol": "tcp"}])
+                    self.assertEqual(service["ports"], [{"target": 8443, "published": "0", "host_ip": "127.0.0.1", "protocol": "tcp"}])
                 else:
                     self.assertNotIn("ports", service)
                 self.assertNotIn("network_mode", service)
@@ -76,6 +76,12 @@ class RuntimeGenerationTest(unittest.TestCase):
                 self.assertEqual(members, {name, "postgres"})
                 web_members = {member for member, value in services.items() if f"web_{name}" in value["networks"]}
                 self.assertEqual(web_members, {name, f"{name}-proxy"})
+                ingress_members = {member for member, value in services.items() if f"ingress_{name}" in value["networks"]}
+                self.assertEqual(ingress_members, {f"{name}-proxy"})
+                self.assertFalse(networks[f"ingress_{name}"]["internal"])
+                self.assertEqual(networks[f"ingress_{name}"]["driver_opts"],
+                                 {"com.docker.network.bridge.enable_ip_masquerade": "false"})
+                self.assertTrue(all(networks[network]["internal"] for network in services[name]["networks"]))
 
     def test_unprivileged_services_have_readonly_root_and_no_capabilities(self):
         for name, service in self.document["services"].items():

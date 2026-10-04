@@ -69,8 +69,11 @@ disposable installation when they expire.
 ## Isolation and lifecycle
 
 Each application joins its own internal database network and its own internal proxy
-network. PostgreSQL joins the seven database networks; each Nginx proxy joins only its
-application's proxy network. Applications, database ports, and PHP FPM ports have no
+network. PostgreSQL joins the seven database networks. Each Nginx proxy joins its
+application's proxy network and a separate bridge used only by that proxy to publish
+the loopback TLS port. Docker requires a noninternal bridge for host port publication;
+this bridge disables IP masquerading and no application joins it. Applications,
+database ports, and PHP FPM ports have no
 host mappings. Only TLS port 8443 on each proxy publishes to an automatically assigned
 port on `127.0.0.1`. The campaign records those assigned ports.
 
