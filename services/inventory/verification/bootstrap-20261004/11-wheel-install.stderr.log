@@ -1,0 +1,5 @@
+Using Python 3.12.14 environment at: /tmp/p01-inventory-4wn1bxzt/runtime
+Resolved 1 package in 1ms
+Prepared 1 package in 5ms
+Installed 1 package in 2ms
+ + product-inventory==0.1.0.dev0 (from file:///tmp/p01-inventory-4wn1bxzt/artifacts/product_inventory-0.1.0.dev0-py3-none-any.whl)

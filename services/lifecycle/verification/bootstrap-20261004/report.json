@@ -1,0 +1,518 @@
+{
+  "schema_version": 1,
+  "component": "lifecycle",
+  "owner_service": "lifecycle",
+  "component_kind": "service_bootstrap",
+  "source_binding": "sha256 of exact package files; Git source and retained artifact commits recorded by delivery evidence after publication",
+  "source_files": {
+    "services/lifecycle/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "services/lifecycle/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "services/lifecycle/README.md": "84f42f846f3aaad6bbc60d8da58c65dd19e2191d7aac2e174bb02b1c87056da8",
+    "services/lifecycle/pyproject.toml": "0690036faba2fcb939f9ddad72da3b2e0157fad44bc65fb6a87d8baa4274e034",
+    "services/lifecycle/src/lifecycle/__init__.py": "6ef74fd0e8a102879b2b7dfea8ad56a3d8a35c5fb67561e5774aa8b986db2263",
+    "services/lifecycle/src/lifecycle/bootstrap/__init__.py": "ef6adabd1f5e063e8fc84022c413520bedb752a95eedc2181ea1fcaadbe5ec84",
+    "services/lifecycle/src/lifecycle/bootstrap/health.py": "c9d0d3a850c41373c168d85edbf35b5472d5aaedf24c5659134c7b1c6f968e67",
+    "services/lifecycle/src/lifecycle/interfaces/__init__.py": "36c59f445f3f701ece7b2016379abbbfabfd269ac5f6e2dac30860791a7d6a42",
+    "services/lifecycle/src/lifecycle/interfaces/health.py": "2ff7d45481e2926fd48f825546d55b05b6fa5034a8afc1082fe8960ef426766c",
+    "services/lifecycle/tests/test_health.py": "30fe8c535732cd4a452ce1f41e07af257475f1e570aa717c7cfe95e79b018e98",
+    "services/lifecycle/uv.lock": "fb93d6bfcf1f601f44572575d48c682132c2d7ef7e4a2152a00502f33b6ec2d4"
+  },
+  "started_at": "2026-10-04T21:49:17.561187+00:00",
+  "runtime": {
+    "python": "3.12.14",
+    "uv": "0.12.19",
+    "build_backend": "setuptools==84.0.0",
+    "wheel_helper": "wheel==0.48.0"
+  },
+  "environment": {
+    "source_copy": "only 11 explicitly listed package files; no sibling source, Dockerfile, CI file or evidence enters the build",
+    "clean_install": "fresh virtual environment with locked dependencies from existing uv cache",
+    "index_access": "owned lock resolved offline against the existing PyPI artifact cache; isolated verification used --offline",
+    "runtime_install": "empty virtual environment; offline --no-index --no-deps wheel installation",
+    "runtime_isolation": "copied source and development environment removed; outside checkout; Python -I; PYTHONPATH unset",
+    "container": "not executed by this report",
+    "native_platform": "not executed"
+  },
+  "artifact": {
+    "path": "wheel-envelope.json",
+    "sha256": "6931167142ad4b7ac975e76b33a88b00eb9d8eadf8b810a9497c8792e2417f0e",
+    "envelope_sha256": "5b6192647aa67d881d2bdfebe7da68f9e8382c4cff137920aff5e476b2c76f92",
+    "filename": "product_lifecycle-0.1.0.dev0-py3-none-any.whl",
+    "bytes": 4606,
+    "members": [
+      "lifecycle/__init__.py",
+      "lifecycle/bootstrap/__init__.py",
+      "lifecycle/bootstrap/health.py",
+      "lifecycle/interfaces/__init__.py",
+      "lifecycle/interfaces/health.py",
+      "product_lifecycle-0.1.0.dev0.dist-info/METADATA",
+      "product_lifecycle-0.1.0.dev0.dist-info/WHEEL",
+      "product_lifecycle-0.1.0.dev0.dist-info/entry_points.txt",
+      "product_lifecycle-0.1.0.dev0.dist-info/top_level.txt",
+      "product_lifecycle-0.1.0.dev0.dist-info/RECORD"
+    ]
+  },
+  "status": "PASSED",
+  "limitations": [
+    "Short-lived installed CLI diagnostic only; no persistent HTTP service or task consumption.",
+    "No product domain, authorization, persistence, discovery, workflow, provider or native integration.",
+    "No container, CI, platform qualification or operational acceptance claim from this local package record.",
+    "No runtime owner dependency is needed or bundled by these worker diagnostics; future owner artifact inclusion requires explicit compatible immutable input."
+  ],
+  "commands": [
+    {
+      "id": "01-python",
+      "argv": [
+        "python",
+        "--version"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "01-python.stdout.log",
+        "sha256": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8",
+        "bytes": 15
+      },
+      "stderr": {
+        "path": "01-python.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "02-uv",
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "02-uv.stdout.log",
+        "sha256": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+        "bytes": 38
+      },
+      "stderr": {
+        "path": "02-uv.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "03-lock-check",
+      "argv": [
+        "uv",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "03-lock-check.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "03-lock-check.stderr.log",
+        "sha256": "6ca67a1a90baee31d9ab30e35e418bcdf35c1589eadfb921660330df2fa9af0f",
+        "bytes": 143
+      }
+    },
+    {
+      "id": "04-clean-frozen-install",
+      "argv": [
+        "uv",
+        "sync",
+        "--locked",
+        "--offline",
+        "--group",
+        "build",
+        "--no-managed-python",
+        "--no-editable"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "04-clean-frozen-install.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "04-clean-frozen-install.stderr.log",
+        "sha256": "b8b9630b4d79d09cd444d56a2b3028506961f5a85a94d19eafc027fc7cec822d",
+        "bytes": 751
+      }
+    },
+    {
+      "id": "05-ruff",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "05-ruff.stdout.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      },
+      "stderr": {
+        "path": "05-ruff.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "06-format",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "06-format.stdout.log",
+        "sha256": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+        "bytes": 27
+      },
+      "stderr": {
+        "path": "06-format.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "07-mypy",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "mypy"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "07-mypy.stdout.log",
+        "sha256": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+        "bytes": 43
+      },
+      "stderr": {
+        "path": "07-mypy.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "08-tests",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "pytest",
+        "-q"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "08-tests.stdout.log",
+        "sha256": "b0312056bd52a988aea1222bdee92f5e4664454d315ddd8af10ca760c4a1126f",
+        "bytes": 99
+      },
+      "stderr": {
+        "path": "08-tests.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "09-wheel-build",
+      "argv": [
+        "uv",
+        "build",
+        "--offline",
+        "--no-build-isolation",
+        "--wheel",
+        "--out-dir",
+        "/tmp/p01-lifecycle-g60tuxx5/artifacts"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "09-wheel-build.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "09-wheel-build.stderr.log",
+        "sha256": "f5f96d281ca25d653bfbd5fd0a3b053f27bb02066b44e0028281461d0819e62f",
+        "bytes": 2336
+      }
+    },
+    {
+      "id": "10-empty-runtime",
+      "argv": [
+        "uv",
+        "venv",
+        "--offline",
+        "--no-managed-python",
+        "--python",
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/tmp/p01-lifecycle-g60tuxx5/runtime"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "10-empty-runtime.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "10-empty-runtime.stderr.log",
+        "sha256": "3ca283fb352a77353eadec791bbd909cdcdc6e031c3c0fd65b46918123e45a14",
+        "bytes": 181
+      }
+    },
+    {
+      "id": "11-wheel-install",
+      "argv": [
+        "uv",
+        "pip",
+        "install",
+        "--offline",
+        "--python",
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "--no-index",
+        "--no-deps",
+        "/tmp/p01-lifecycle-g60tuxx5/artifacts/product_lifecycle-0.1.0.dev0-py3-none-any.whl"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "11-wheel-install.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "11-wheel-install.stderr.log",
+        "sha256": "a1a7011092276337510590e16cd758d6484c36a642a10a326f16b25cd7c1c73a",
+        "bytes": 283
+      }
+    },
+    {
+      "id": "12-runtime-inventory",
+      "argv": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "12-runtime-inventory.stdout.log",
+        "sha256": "d29a30c896f9a410ea2715d8690d37da893062c55138fc5de24d62a167614a32",
+        "bytes": 54
+      },
+      "stderr": {
+        "path": "12-runtime-inventory.stderr.log",
+        "sha256": "85075b3f99bf05d7124c312ddaaf086bf9c5adf49ef2a95296a8289ff8732e79",
+        "bytes": 73
+      }
+    },
+    {
+      "id": "13-isolated-import",
+      "argv": [
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "-I",
+        "-c",
+        "import importlib.metadata,json,pathlib,lifecycle,sys; p=pathlib.Path(lifecycle.__file__).resolve(); assert p.is_relative_to(pathlib.Path(sys.prefix)); assert importlib.metadata.requires('product-lifecycle') is None; print(json.dumps({'module':str(p),'version':importlib.metadata.version('product-lifecycle'),'python':sys.version.split()[0],'runtime_requirements':[]}))"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "13-isolated-import.stdout.log",
+        "sha256": "9244166232733bca8268bcbda5cc6b753b889f221046aa3ae15726332e1d51fc",
+        "bytes": 175
+      },
+      "stderr": {
+        "path": "13-isolated-import.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "14-isolated-liveness",
+      "argv": [
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.health",
+        "liveness"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "14-isolated-liveness.stdout.log",
+        "sha256": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+        "bytes": 119
+      },
+      "stderr": {
+        "path": "14-isolated-liveness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "15-isolated-readiness",
+      "argv": [
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.health",
+        "readiness"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/outside-checkout",
+      "expected_exit": 1,
+      "exit_code": 1,
+      "passed": true,
+      "stdout": {
+        "path": "15-isolated-readiness.stdout.log",
+        "sha256": "0a577cc36a0f23fc6200b5f008f18c398b3c4701b67beffd59088e451db93402",
+        "bytes": 175
+      },
+      "stderr": {
+        "path": "15-isolated-readiness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "16-isolated-invalid-input",
+      "argv": [
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "-I",
+        "-m",
+        "lifecycle.bootstrap.health",
+        "readiness",
+        "--force"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/outside-checkout",
+      "expected_exit": 2,
+      "exit_code": 2,
+      "passed": true,
+      "stdout": {
+        "path": "16-isolated-invalid-input.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "16-isolated-invalid-input.stderr.log",
+        "sha256": "db2ce41829f676bbf3c305ee5c139ef7bfb24f38fe6c5742815bb5835efbb736",
+        "bytes": 107
+      }
+    },
+    {
+      "id": "17-installed-entrypoint",
+      "argv": [
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/lifecycle-health",
+        "liveness"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "17-installed-entrypoint.stdout.log",
+        "sha256": "cba8061f6539309b6d220088d0d4556c2c4d6fd7f38cb28e049ed5a2f8ec627c",
+        "bytes": 119
+      },
+      "stderr": {
+        "path": "17-installed-entrypoint.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "18-isolated-siblings-absent",
+      "argv": [
+        "/tmp/p01-lifecycle-g60tuxx5/runtime/bin/python",
+        "-I",
+        "-c",
+        "import importlib.util,json; names=['inventory', 'inventory_worker', 'lifecycle_worker', 'planning']; observed={name:importlib.util.find_spec(name) is None for name in names}; print(json.dumps(observed,sort_keys=True)); assert all(observed.values())"
+      ],
+      "cwd": "/tmp/p01-lifecycle-g60tuxx5/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "18-isolated-siblings-absent.stdout.log",
+        "sha256": "c3188f30ce3a3e886448ddf6b6cc93d76c966e1cde7aaa66eb985bb2e912a829",
+        "bytes": 90
+      },
+      "stderr": {
+        "path": "18-isolated-siblings-absent.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "checks": {
+    "ten_installed_command_tests_passed": true,
+    "wheel_contains_only_five_owned_modules_and_metadata": true,
+    "runtime_dependencies_empty": true,
+    "fresh_runtime_contains_only_owned_distribution": true,
+    "copied_source_and_development_environment_removed_before_runtime_probes": true,
+    "isolated_liveness_exact_payload": true,
+    "isolated_readiness_exact_unavailable_payload": true,
+    "invalid_override_rejected_without_success_payload": true,
+    "installed_entrypoint_matches_module": true,
+    "other_python_service_and_worker_modules_absent": true,
+    "all_expected_exit_codes_observed": true
+  },
+  "completed_at": "2026-10-04T21:49:23.801860+00:00"
+}
