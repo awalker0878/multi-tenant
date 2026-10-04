@@ -65,7 +65,7 @@ CREATE FUNCTION hosting_sync.current_fence(stream text,selection_digest text) RE
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_sync AS $$
 DECLARE original hosting_sync.writer_fences%ROWTYPE; role_name text; native_role record;
 BEGIN
-    SELECT * INTO original FROM hosting_sync.writer_fences WHERE stream_id=stream FOR SHARE;
+    SELECT * INTO original FROM hosting_sync.writer_fences WHERE stream_id=stream;
     IF NOT FOUND OR NOT original.enabled OR original.valid_until<=clock_timestamp()
         OR original.selection_digest IS DISTINCT FROM selection_digest
         OR current_setting('role') IS DISTINCT FROM original.fence_role
@@ -133,7 +133,7 @@ CREATE FUNCTION hosting_sync.current_stream(stream text) RETURNS hosting_sync.st
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_sync AS $$
 DECLARE original hosting_sync.streams%ROWTYPE;
 BEGIN
-    SELECT * INTO original FROM hosting_sync.streams WHERE stream_id=stream FOR SHARE;
+    SELECT * INTO original FROM hosting_sync.streams WHERE stream_id=stream;
     IF NOT FOUND OR NOT original.enabled OR original.valid_until<=clock_timestamp()
         OR current_setting('role') NOT IN (original.login_role,original.read_role)
         OR NOT pg_has_role(session_user,current_setting('role'),'SET') THEN
@@ -196,7 +196,7 @@ RETURNS TABLE("position" text,transaction_id xid,message bytea)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,hosting_sync AS $$
 DECLARE original hosting_sync.source_streams%ROWTYPE;
 BEGIN
-    SELECT * INTO original FROM hosting_sync.source_streams WHERE stream_id=stream FOR SHARE;
+    SELECT * INTO original FROM hosting_sync.source_streams WHERE stream_id=stream;
     IF NOT FOUND OR NOT original.enabled OR original.valid_until<=clock_timestamp()
         OR original.selection_digest IS DISTINCT FROM selection_digest
         OR current_setting('role') IS DISTINCT FROM original.read_role

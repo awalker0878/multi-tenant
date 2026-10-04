@@ -47,8 +47,8 @@ class _CustodyCursor:
         elif query.startswith('SELECT set_config('):
             assert parameters==(test.guard.runtime.command.context.organization_id,test.guard.runtime.command.context.tenant_id)
             self.row=None
-        elif query.startswith('SELECT grant_id FROM hosting_controlplane.worker_grants'):
-            assert 'FOR UPDATE' in query and parameters[-1]==test.guard.runtime.command.grant.grant_id
+        elif query=='SELECT hosting_controlplane.lock_native_credential_grant(%s,%s,%s)':
+            assert parameters[-1]==test.guard.runtime.command.grant.grant_id
             self.row=(parameters[-1],)
         elif query.startswith('INSERT INTO hosting_controlplane.native_credential_issuance_closures'):
             if test.closed:raise ValueError('Original issuance closure already exists')
@@ -56,7 +56,7 @@ class _CustodyCursor:
                 test.guard.runtime.command.grant.operation_id,test.guard.descriptor.sha256))
             self.connection.pending=True
         elif query.startswith('SELECT a.issuance_id,l.lease_id,l.lease_digest'):
-            assert 'FOR SHARE OF a' in query and parameters[-1]==test.guard.runtime.command.grant.grant_id
+            assert 'FOR SHARE' not in query and parameters[-1]==test.guard.runtime.command.grant.grant_id
             self.rows=test.rows
         else:raise AssertionError('Unexpected synthetic custody query: '+query)
     def fetchone(self):return self.row
