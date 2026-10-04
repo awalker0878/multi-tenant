@@ -1,0 +1,925 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:multi-tenant:p00-input-record:1",
+  "title": "P00 factual input record; completeness is not execution authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "claimed_input_readiness",
+    "groups"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "record_id": {
+      "const": "P00-INPUTS"
+    },
+    "claimed_input_readiness": {
+      "enum": [
+        "NOT_READY",
+        "READY"
+      ]
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "RT01",
+        "RT02",
+        "RT03",
+        "RT04",
+        "RT05",
+        "RT06",
+        "RT07",
+        "RT08",
+        "RT09",
+        "RT10",
+        "IP01",
+        "IP02",
+        "IP06",
+        "IP07"
+      ],
+      "properties": {
+        "RT01": {
+          "type": "object",
+          "title": "route",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "direction",
+                "method",
+                "application_workload_ids",
+                "target_environment",
+                "fixture_revision"
+              ],
+              "properties": {
+                "direction": {
+                  "$ref": "#/$defs/cell"
+                },
+                "method": {
+                  "$ref": "#/$defs/cell"
+                },
+                "application_workload_ids": {
+                  "$ref": "#/$defs/cell"
+                },
+                "target_environment": {
+                  "$ref": "#/$defs/cell"
+                },
+                "fixture_revision": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT02": {
+          "type": "object",
+          "title": "source",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "vcenter_esxi_builds",
+                "api_version",
+                "endpoint_tenant_scope",
+                "native_vm_ids",
+                "observation_generation_completeness",
+                "permitted_reads_effects"
+              ],
+              "properties": {
+                "vcenter_esxi_builds": {
+                  "$ref": "#/$defs/cell"
+                },
+                "api_version": {
+                  "$ref": "#/$defs/cell"
+                },
+                "endpoint_tenant_scope": {
+                  "$ref": "#/$defs/cell"
+                },
+                "native_vm_ids": {
+                  "$ref": "#/$defs/cell"
+                },
+                "observation_generation_completeness": {
+                  "$ref": "#/$defs/cell"
+                },
+                "permitted_reads_effects": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT03": {
+          "type": "object",
+          "title": "target",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "distribution_release",
+                "service_api_microversions",
+                "hypervisor_storage_network_backends",
+                "project_region",
+                "failure_domains",
+                "quotas",
+                "feature_configuration"
+              ],
+              "properties": {
+                "distribution_release": {
+                  "$ref": "#/$defs/cell"
+                },
+                "service_api_microversions": {
+                  "$ref": "#/$defs/cell"
+                },
+                "hypervisor_storage_network_backends": {
+                  "$ref": "#/$defs/cell"
+                },
+                "project_region": {
+                  "$ref": "#/$defs/cell"
+                },
+                "failure_domains": {
+                  "$ref": "#/$defs/cell"
+                },
+                "quotas": {
+                  "$ref": "#/$defs/cell"
+                },
+                "feature_configuration": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT04": {
+          "type": "object",
+          "title": "application_and_guest",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "source_target_os_architecture",
+                "runtime_versions",
+                "application_dependency_artifacts",
+                "database_compatibility",
+                "service_units",
+                "guest_device_features",
+                "volume_mount_mappings",
+                "configuration_secret_references"
+              ],
+              "properties": {
+                "source_target_os_architecture": {
+                  "$ref": "#/$defs/cell"
+                },
+                "runtime_versions": {
+                  "$ref": "#/$defs/cell"
+                },
+                "application_dependency_artifacts": {
+                  "$ref": "#/$defs/cell"
+                },
+                "database_compatibility": {
+                  "$ref": "#/$defs/cell"
+                },
+                "service_units": {
+                  "$ref": "#/$defs/cell"
+                },
+                "guest_device_features": {
+                  "$ref": "#/$defs/cell"
+                },
+                "volume_mount_mappings": {
+                  "$ref": "#/$defs/cell"
+                },
+                "configuration_secret_references": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT05": {
+          "type": "object",
+          "title": "crypto",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "encryption_layers",
+                "key_certificate_custody",
+                "authorized_capture_access",
+                "destination_key_availability",
+                "identity_replacement"
+              ],
+              "properties": {
+                "encryption_layers": {
+                  "$ref": "#/$defs/cell"
+                },
+                "key_certificate_custody": {
+                  "$ref": "#/$defs/cell"
+                },
+                "authorized_capture_access": {
+                  "$ref": "#/$defs/cell"
+                },
+                "destination_key_availability": {
+                  "$ref": "#/$defs/cell"
+                },
+                "identity_replacement": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT06": {
+          "type": "object",
+          "title": "fixture",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "seed_revision",
+                "database_engine_version",
+                "schema_datasets",
+                "attachment_inventory",
+                "relationship_digest_metadata_expectations",
+                "writer_manifest",
+                "consistency_procedure",
+                "correctness_queries",
+                "post_activation_write_marker"
+              ],
+              "properties": {
+                "seed_revision": {
+                  "$ref": "#/$defs/cell"
+                },
+                "database_engine_version": {
+                  "$ref": "#/$defs/cell"
+                },
+                "schema_datasets": {
+                  "$ref": "#/$defs/cell"
+                },
+                "attachment_inventory": {
+                  "$ref": "#/$defs/cell"
+                },
+                "relationship_digest_metadata_expectations": {
+                  "$ref": "#/$defs/cell"
+                },
+                "writer_manifest": {
+                  "$ref": "#/$defs/cell"
+                },
+                "consistency_procedure": {
+                  "$ref": "#/$defs/cell"
+                },
+                "correctness_queries": {
+                  "$ref": "#/$defs/cell"
+                },
+                "post_activation_write_marker": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT07": {
+          "type": "object",
+          "title": "network_and_services",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "nic_zone_mappings",
+                "addressing_ipam_dns",
+                "allowed_denied_forward_reply_flows",
+                "mtu",
+                "service_dependencies",
+                "business_effect_suppression"
+              ],
+              "properties": {
+                "nic_zone_mappings": {
+                  "$ref": "#/$defs/cell"
+                },
+                "addressing_ipam_dns": {
+                  "$ref": "#/$defs/cell"
+                },
+                "allowed_denied_forward_reply_flows": {
+                  "$ref": "#/$defs/cell"
+                },
+                "mtu": {
+                  "$ref": "#/$defs/cell"
+                },
+                "service_dependencies": {
+                  "$ref": "#/$defs/cell"
+                },
+                "business_effect_suppression": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT08": {
+          "type": "object",
+          "title": "deployment_and_restore",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "deployment_capture_transfer_restore_tools",
+                "schema_compatibility",
+                "configuration_secret_references",
+                "metadata_treatment",
+                "artifact_manifests",
+                "operation_ownership"
+              ],
+              "properties": {
+                "deployment_capture_transfer_restore_tools": {
+                  "$ref": "#/$defs/cell"
+                },
+                "schema_compatibility": {
+                  "$ref": "#/$defs/cell"
+                },
+                "configuration_secret_references": {
+                  "$ref": "#/$defs/cell"
+                },
+                "metadata_treatment": {
+                  "$ref": "#/$defs/cell"
+                },
+                "artifact_manifests": {
+                  "$ref": "#/$defs/cell"
+                },
+                "operation_ownership": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT09": {
+          "type": "object",
+          "title": "budget",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "deployment_capture_restore_measurements",
+                "effective_transfer_rate",
+                "staging_backup_target_retained_source_bytes",
+                "attachment_limits",
+                "tenant_endpoint_concurrency_caps"
+              ],
+              "properties": {
+                "deployment_capture_restore_measurements": {
+                  "$ref": "#/$defs/cell"
+                },
+                "effective_transfer_rate": {
+                  "$ref": "#/$defs/cell"
+                },
+                "staging_backup_target_retained_source_bytes": {
+                  "$ref": "#/$defs/cell"
+                },
+                "attachment_limits": {
+                  "$ref": "#/$defs/cell"
+                },
+                "tenant_endpoint_concurrency_caps": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "RT10": {
+          "type": "object",
+          "title": "recovery_and_authority",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "quiesce_fence_observers",
+                "stop_cleanup_authorities",
+                "first_write_proof_design",
+                "application_outage_data_bounds",
+                "pre_write_return_procedure",
+                "post_write_recovery_method",
+                "post_write_preservation_procedure",
+                "source_target_key_retention",
+                "independent_reviewers",
+                "permitted_resource_scope",
+                "permitted_effects",
+                "campaign_window"
+              ],
+              "properties": {
+                "quiesce_fence_observers": {
+                  "$ref": "#/$defs/cell"
+                },
+                "stop_cleanup_authorities": {
+                  "$ref": "#/$defs/cell"
+                },
+                "first_write_proof_design": {
+                  "$ref": "#/$defs/cell"
+                },
+                "application_outage_data_bounds": {
+                  "$ref": "#/$defs/cell"
+                },
+                "pre_write_return_procedure": {
+                  "$ref": "#/$defs/cell"
+                },
+                "post_write_recovery_method": {
+                  "$ref": "#/$defs/cell"
+                },
+                "post_write_preservation_procedure": {
+                  "$ref": "#/$defs/cell"
+                },
+                "source_target_key_retention": {
+                  "$ref": "#/$defs/cell"
+                },
+                "independent_reviewers": {
+                  "$ref": "#/$defs/cell"
+                },
+                "permitted_resource_scope": {
+                  "$ref": "#/$defs/cell"
+                },
+                "permitted_effects": {
+                  "$ref": "#/$defs/cell"
+                },
+                "campaign_window": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "IP01": {
+          "type": "object",
+          "title": "accountability_and_baseline",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "criterion_reviewers",
+                "decision_dispositions",
+                "retained_records_inventory",
+                "unresolved_checkpoints"
+              ],
+              "properties": {
+                "criterion_reviewers": {
+                  "$ref": "#/$defs/cell"
+                },
+                "decision_dispositions": {
+                  "$ref": "#/$defs/cell"
+                },
+                "retained_records_inventory": {
+                  "$ref": "#/$defs/cell"
+                },
+                "unresolved_checkpoints": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "IP02": {
+          "type": "object",
+          "title": "operated_runtime_and_trust",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "component_environment_bom",
+                "support_update_ownership",
+                "registry_mirror_verification",
+                "deployment_network_constraints",
+                "identity_key_evidence_custody",
+                "browser_assistive_matrix"
+              ],
+              "properties": {
+                "component_environment_bom": {
+                  "$ref": "#/$defs/cell"
+                },
+                "support_update_ownership": {
+                  "$ref": "#/$defs/cell"
+                },
+                "registry_mirror_verification": {
+                  "$ref": "#/$defs/cell"
+                },
+                "deployment_network_constraints": {
+                  "$ref": "#/$defs/cell"
+                },
+                "identity_key_evidence_custody": {
+                  "$ref": "#/$defs/cell"
+                },
+                "browser_assistive_matrix": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "IP06": {
+          "type": "object",
+          "title": "operating_targets_and_custody",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "capacity_freshness_native_call_budgets",
+                "support_access",
+                "evidence_alert_recipients",
+                "measurement_conditions",
+                "control_plane_targets",
+                "trust_restore_model"
+              ],
+              "properties": {
+                "capacity_freshness_native_call_budgets": {
+                  "$ref": "#/$defs/cell"
+                },
+                "support_access": {
+                  "$ref": "#/$defs/cell"
+                },
+                "evidence_alert_recipients": {
+                  "$ref": "#/$defs/cell"
+                },
+                "measurement_conditions": {
+                  "$ref": "#/$defs/cell"
+                },
+                "control_plane_targets": {
+                  "$ref": "#/$defs/cell"
+                },
+                "trust_restore_model": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        },
+        "IP07": {
+          "type": "object",
+          "title": "capacity_to_deliver_and_review",
+          "additionalProperties": false,
+          "required": [
+            "accountable_role",
+            "fields"
+          ],
+          "properties": {
+            "accountable_role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "workstream_reviewer_capacity",
+                "availability",
+                "external_requested_confirmed_dates",
+                "affected_dependencies",
+                "reviewer_implementer_conflicts"
+              ],
+              "properties": {
+                "workstream_reviewer_capacity": {
+                  "$ref": "#/$defs/cell"
+                },
+                "availability": {
+                  "$ref": "#/$defs/cell"
+                },
+                "external_requested_confirmed_dates": {
+                  "$ref": "#/$defs/cell"
+                },
+                "affected_dependencies": {
+                  "$ref": "#/$defs/cell"
+                },
+                "reviewer_implementer_conflicts": {
+                  "$ref": "#/$defs/cell"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "uri",
+        "sha256",
+        "revision"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "repository",
+            "protected"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "value",
+        "evidence",
+        "observed_at",
+        "observed_by",
+        "scope",
+        "review"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "UNKNOWN",
+            "PROPOSED",
+            "OBSERVED",
+            "BLOCKED"
+          ]
+        },
+        "value": {
+          "type": [
+            "null",
+            "string",
+            "boolean",
+            "number"
+          ],
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "observed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "observed_by": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "scope": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "campaign",
+            "resource_ids"
+          ],
+          "properties": {
+            "campaign": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"
+            },
+            "resource_ids": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "disposition",
+            "reviewed_by",
+            "reviewed_at"
+          ],
+          "properties": {
+            "disposition": {
+              "enum": [
+                "NOT_REVIEWED",
+                "ACCEPTED",
+                "REJECTED"
+              ]
+            },
+            "reviewed_by": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            },
+            "reviewed_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-input-packages": {
+    "IP01": [
+      "IP01"
+    ],
+    "IP02": [
+      "IP02"
+    ],
+    "IP03": [
+      "RT02",
+      "RT03",
+      "RT04",
+      "RT05"
+    ],
+    "IP04": [
+      "RT04",
+      "RT06",
+      "RT08",
+      "RT10"
+    ],
+    "IP05": [
+      "RT02",
+      "RT03",
+      "RT07",
+      "RT09",
+      "RT10"
+    ],
+    "IP06": [
+      "RT05",
+      "RT09",
+      "RT10",
+      "IP06"
+    ],
+    "IP07": [
+      "IP07"
+    ]
+  },
+  "x-route-groups": [
+    "RT01",
+    "RT02",
+    "RT03",
+    "RT04",
+    "RT05",
+    "RT06",
+    "RT07",
+    "RT08",
+    "RT09",
+    "RT10"
+  ],
+  "x-authoritative-documents": [
+    "docs/implementation/p00-route-and-operations-review.md",
+    "docs/implementation/p00-decision-and-input-review.md",
+    "docs/qualification/feasibility/initial-route.md"
+  ]
+}

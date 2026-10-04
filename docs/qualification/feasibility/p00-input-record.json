@@ -1,0 +1,1261 @@
+{
+  "schema_version": 1,
+  "record_id": "P00-INPUTS",
+  "claimed_input_readiness": "NOT_READY",
+  "groups": {
+    "RT01": {
+      "accountable_role": "Product/application owners",
+      "fields": {
+        "direction": {
+          "status": "PROPOSED",
+          "value": "VMware -> OpenStack",
+          "evidence": [
+            {
+              "kind": "repository",
+              "uri": "git://awalker0878/multi-tenant/eb78e463e66d154e58fcfce7e65fad1eaab38914/docs/implementation/p00-route-and-operations-review.md",
+              "sha256": "5855aeedc58e4c7811029ee91ba9bb1e9ba24c71413289a833e60121d5a11682",
+              "revision": "eb78e463e66d154e58fcfce7e65fad1eaab38914"
+            }
+          ],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "method": {
+          "status": "PROPOSED",
+          "value": "application_rebuild_restore",
+          "evidence": [
+            {
+              "kind": "repository",
+              "uri": "git://awalker0878/multi-tenant/eb78e463e66d154e58fcfce7e65fad1eaab38914/docs/implementation/p00-route-and-operations-review.md",
+              "sha256": "5855aeedc58e4c7811029ee91ba9bb1e9ba24c71413289a833e60121d5a11682",
+              "revision": "eb78e463e66d154e58fcfce7e65fad1eaab38914"
+            }
+          ],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "application_workload_ids": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "target_environment": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "fixture_revision": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT02": {
+      "accountable_role": "VMware platform owner",
+      "fields": {
+        "vcenter_esxi_builds": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "api_version": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "endpoint_tenant_scope": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "native_vm_ids": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "observation_generation_completeness": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "permitted_reads_effects": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT03": {
+      "accountable_role": "OpenStack platform owner",
+      "fields": {
+        "distribution_release": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "service_api_microversions": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "hypervisor_storage_network_backends": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "project_region": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "failure_domains": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "quotas": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "feature_configuration": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT04": {
+      "accountable_role": "Application/guest/platform owners",
+      "fields": {
+        "source_target_os_architecture": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "runtime_versions": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "application_dependency_artifacts": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "database_compatibility": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "service_units": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "guest_device_features": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "volume_mount_mappings": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "configuration_secret_references": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT05": {
+      "accountable_role": "Security/key owners",
+      "fields": {
+        "encryption_layers": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "key_certificate_custody": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "authorized_capture_access": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "destination_key_availability": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "identity_replacement": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT06": {
+      "accountable_role": "Application/data owner",
+      "fields": {
+        "seed_revision": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "database_engine_version": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "schema_datasets": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "attachment_inventory": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "relationship_digest_metadata_expectations": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "writer_manifest": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "consistency_procedure": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "correctness_queries": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "post_activation_write_marker": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT07": {
+      "accountable_role": "Network/service owners",
+      "fields": {
+        "nic_zone_mappings": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "addressing_ipam_dns": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "allowed_denied_forward_reply_flows": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "mtu": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "service_dependencies": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "business_effect_suppression": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT08": {
+      "accountable_role": "Engineering/application owners",
+      "fields": {
+        "deployment_capture_transfer_restore_tools": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "schema_compatibility": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "configuration_secret_references": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "metadata_treatment": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "artifact_manifests": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "operation_ownership": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT09": {
+      "accountable_role": "SRE/platform owners",
+      "fields": {
+        "deployment_capture_restore_measurements": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "effective_transfer_rate": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "staging_backup_target_retained_source_bytes": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "attachment_limits": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "tenant_endpoint_concurrency_caps": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "RT10": {
+      "accountable_role": "Application/platform/security/qualification owners",
+      "fields": {
+        "quiesce_fence_observers": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "stop_cleanup_authorities": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "first_write_proof_design": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "application_outage_data_bounds": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "pre_write_return_procedure": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "post_write_recovery_method": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "post_write_preservation_procedure": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "source_target_key_retention": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "independent_reviewers": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "permitted_resource_scope": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "permitted_effects": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "campaign_window": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "IP01": {
+      "accountable_role": "Product/architecture/delivery leads",
+      "fields": {
+        "criterion_reviewers": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "decision_dispositions": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "retained_records_inventory": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "unresolved_checkpoints": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "IP02": {
+      "accountable_role": "Engineering/SRE/security/IAM owners",
+      "fields": {
+        "component_environment_bom": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "support_update_ownership": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "registry_mirror_verification": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "deployment_network_constraints": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "identity_key_evidence_custody": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "browser_assistive_matrix": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "IP06": {
+      "accountable_role": "Application/SRE/security/records/service owners",
+      "fields": {
+        "capacity_freshness_native_call_budgets": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "support_access": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "evidence_alert_recipients": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "measurement_conditions": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "control_plane_targets": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "trust_restore_model": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    },
+    "IP07": {
+      "accountable_role": "Delivery lead",
+      "fields": {
+        "workstream_reviewer_capacity": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "availability": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "external_requested_confirmed_dates": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "affected_dependencies": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        },
+        "reviewer_implementer_conflicts": {
+          "status": "UNKNOWN",
+          "value": null,
+          "evidence": [],
+          "observed_at": null,
+          "observed_by": null,
+          "scope": null,
+          "review": {
+            "disposition": "NOT_REVIEWED",
+            "reviewed_by": null,
+            "reviewed_at": null
+          }
+        }
+      }
+    }
+  }
+}

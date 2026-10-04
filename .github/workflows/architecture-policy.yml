@@ -34,6 +34,8 @@ jobs:
         run: python scripts/validate_architecture.py
       - name: Prove valid and forbidden architecture fixtures
         run: python -m unittest discover -s tests/documentation -p 'test_*.py' -v
+      - name: Validate declared P00 inputs without requiring external readiness
+        run: python scripts/validate_p00_inputs.py
       - name: Check generated delivery views
         run: python scripts/render_delivery_views.py --check
       - name: Check documentation and delivery references
