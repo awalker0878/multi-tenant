@@ -1,0 +1,5 @@
+Using Python 3.12.14 environment at: /tmp/p01-inventory_worker-yistabor/runtime
+Resolved 1 package in 3ms
+Prepared 1 package in 9ms
+Installed 1 package in 8ms
+ + product-inventory-worker==0.1.0.dev0 (from file:///tmp/p01-inventory_worker-yistabor/artifacts/product_inventory_worker-0.1.0.dev0-py3-none-any.whl)

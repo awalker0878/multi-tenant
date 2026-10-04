@@ -1,0 +1,2 @@
+usage: lifecycle-worker-health [-h] {liveness,readiness}
+lifecycle-worker-health: error: unrecognized arguments: --force

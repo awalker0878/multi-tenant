@@ -1,0 +1,518 @@
+{
+  "schema_version": 1,
+  "component": "inventory-workers",
+  "owner_service": "inventory",
+  "component_kind": "worker_bootstrap",
+  "source_binding": "sha256 of exact package files; Git source and retained artifact commits recorded by delivery evidence after publication",
+  "source_files": {
+    "workers/inventory/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "workers/inventory/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "workers/inventory/README.md": "90d2971b1e11641a1c5ce18a37e737f1aca39636312183825ac526f5024a7ae5",
+    "workers/inventory/pyproject.toml": "de8eb115eec0541a9cb2b60b6cad9c4bdcc9b8896742d66d13ca343d70da23fa",
+    "workers/inventory/src/inventory_worker/__init__.py": "6e853d964278e02193a4dcba0223e8b0cf54f1be8cb35814f521ddf3e09f4756",
+    "workers/inventory/src/inventory_worker/bootstrap/__init__.py": "637c638429b138e5bb55497bb6b3741398f01268d099c2b295fdccb670e5385d",
+    "workers/inventory/src/inventory_worker/bootstrap/health.py": "2bae4c6e2013c2924fc85761d0b531bc3ce05cd9427249cc428d7a75dfb8e694",
+    "workers/inventory/src/inventory_worker/interfaces/__init__.py": "2137fe4ce5fde3321fb026bf7801201b1de41d361d86d6c13509d83b2a9233d5",
+    "workers/inventory/src/inventory_worker/interfaces/health.py": "1fe7a7aaaeea8c9512232d3a8bb393742aa771423c52d10b841081099fd1b192",
+    "workers/inventory/tests/test_health.py": "b77100c7ecb7cad4db8c3a7e0455d2e35aea22de51c3660f07c934bcfd4cbb82",
+    "workers/inventory/uv.lock": "f2a0b4cc9553b6af8091d724e506d524d3dcc9f334f24bccd6f68decab408860"
+  },
+  "started_at": "2026-10-04T21:49:17.588813+00:00",
+  "runtime": {
+    "python": "3.12.14",
+    "uv": "0.12.19",
+    "build_backend": "setuptools==84.0.0",
+    "wheel_helper": "wheel==0.48.0"
+  },
+  "environment": {
+    "source_copy": "only 11 explicitly listed package files; no sibling source, Dockerfile, CI file or evidence enters the build",
+    "clean_install": "fresh virtual environment with locked dependencies from existing uv cache",
+    "index_access": "owned lock resolved offline against the existing PyPI artifact cache; isolated verification used --offline",
+    "runtime_install": "empty virtual environment; offline --no-index --no-deps wheel installation",
+    "runtime_isolation": "copied source and development environment removed; outside checkout; Python -I; PYTHONPATH unset",
+    "container": "not executed by this report",
+    "native_platform": "not executed"
+  },
+  "artifact": {
+    "path": "wheel-envelope.json",
+    "sha256": "525226782a37090e7f4ae55fe8b2340ea9b7a0cda2b94306d07020bdca4d75c8",
+    "envelope_sha256": "1ca5159dbb6cc83f237586ab80e257eb7d10ed9d169dafcca11004e3f9844685",
+    "filename": "product_inventory_worker-0.1.0.dev0-py3-none-any.whl",
+    "bytes": 4938,
+    "members": [
+      "inventory_worker/__init__.py",
+      "inventory_worker/bootstrap/__init__.py",
+      "inventory_worker/bootstrap/health.py",
+      "inventory_worker/interfaces/__init__.py",
+      "inventory_worker/interfaces/health.py",
+      "product_inventory_worker-0.1.0.dev0.dist-info/METADATA",
+      "product_inventory_worker-0.1.0.dev0.dist-info/WHEEL",
+      "product_inventory_worker-0.1.0.dev0.dist-info/entry_points.txt",
+      "product_inventory_worker-0.1.0.dev0.dist-info/top_level.txt",
+      "product_inventory_worker-0.1.0.dev0.dist-info/RECORD"
+    ]
+  },
+  "status": "PASSED",
+  "limitations": [
+    "Short-lived installed CLI diagnostic only; no persistent HTTP service or task consumption.",
+    "No product domain, authorization, persistence, discovery, workflow, provider or native integration.",
+    "No container, CI, platform qualification or operational acceptance claim from this local package record.",
+    "No runtime owner dependency is needed or bundled by these worker diagnostics; future owner artifact inclusion requires explicit compatible immutable input."
+  ],
+  "commands": [
+    {
+      "id": "01-python",
+      "argv": [
+        "python",
+        "--version"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "01-python.stdout.log",
+        "sha256": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8",
+        "bytes": 15
+      },
+      "stderr": {
+        "path": "01-python.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "02-uv",
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "02-uv.stdout.log",
+        "sha256": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+        "bytes": 38
+      },
+      "stderr": {
+        "path": "02-uv.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "03-lock-check",
+      "argv": [
+        "uv",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "03-lock-check.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "03-lock-check.stderr.log",
+        "sha256": "6ca67a1a90baee31d9ab30e35e418bcdf35c1589eadfb921660330df2fa9af0f",
+        "bytes": 143
+      }
+    },
+    {
+      "id": "04-clean-frozen-install",
+      "argv": [
+        "uv",
+        "sync",
+        "--locked",
+        "--offline",
+        "--group",
+        "build",
+        "--no-managed-python",
+        "--no-editable"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "04-clean-frozen-install.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "04-clean-frozen-install.stderr.log",
+        "sha256": "1e93034a74a809af3b7c232323c8d1216e2acf3d635aca7b84460622d89cfa09",
+        "bytes": 793
+      }
+    },
+    {
+      "id": "05-ruff",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "05-ruff.stdout.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      },
+      "stderr": {
+        "path": "05-ruff.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "06-format",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "06-format.stdout.log",
+        "sha256": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+        "bytes": 27
+      },
+      "stderr": {
+        "path": "06-format.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "07-mypy",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "mypy"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "07-mypy.stdout.log",
+        "sha256": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+        "bytes": 43
+      },
+      "stderr": {
+        "path": "07-mypy.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "08-tests",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "pytest",
+        "-q"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "08-tests.stdout.log",
+        "sha256": "fcfe733faf1da1fe65e6a0c33cf730878d590b4fe34624794624942df115692a",
+        "bytes": 99
+      },
+      "stderr": {
+        "path": "08-tests.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "09-wheel-build",
+      "argv": [
+        "uv",
+        "build",
+        "--offline",
+        "--no-build-isolation",
+        "--wheel",
+        "--out-dir",
+        "/tmp/p01-inventory_worker-yistabor/artifacts"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "09-wheel-build.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "09-wheel-build.stderr.log",
+        "sha256": "15068a75bf65c413c58818ee90aea17316b6a9a194610b00e3bcd8d09b7e0c02",
+        "bytes": 2588
+      }
+    },
+    {
+      "id": "10-empty-runtime",
+      "argv": [
+        "uv",
+        "venv",
+        "--offline",
+        "--no-managed-python",
+        "--python",
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/tmp/p01-inventory_worker-yistabor/runtime"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "10-empty-runtime.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "10-empty-runtime.stderr.log",
+        "sha256": "3800b81d736e27c4dc77174305844ecfecbad01b69fbb448552b7d085a4b54e5",
+        "bytes": 188
+      }
+    },
+    {
+      "id": "11-wheel-install",
+      "argv": [
+        "uv",
+        "pip",
+        "install",
+        "--offline",
+        "--python",
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "--no-index",
+        "--no-deps",
+        "/tmp/p01-inventory_worker-yistabor/artifacts/product_inventory_worker-0.1.0.dev0-py3-none-any.whl"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "11-wheel-install.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "11-wheel-install.stderr.log",
+        "sha256": "5b21fe485045925d807b2a29163659f71cc044c8d2cf3b70c389c4ec891c8e4a",
+        "bytes": 311
+      }
+    },
+    {
+      "id": "12-runtime-inventory",
+      "argv": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/source",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "12-runtime-inventory.stdout.log",
+        "sha256": "677711ad7999596aed8692f2e57771e9564f74a6d5c824c35aa3a8c85b835638",
+        "bytes": 61
+      },
+      "stderr": {
+        "path": "12-runtime-inventory.stderr.log",
+        "sha256": "367362e2e9b0e01248f8616d83cc7887e693b2e4488e48103ea2bc1f7daf86dc",
+        "bytes": 80
+      }
+    },
+    {
+      "id": "13-isolated-import",
+      "argv": [
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "-I",
+        "-c",
+        "import importlib.metadata,json,pathlib,inventory_worker,sys; p=pathlib.Path(inventory_worker.__file__).resolve(); assert p.is_relative_to(pathlib.Path(sys.prefix)); assert importlib.metadata.requires('product-inventory-worker') is None; print(json.dumps({'module':str(p),'version':importlib.metadata.version('product-inventory-worker'),'python':sys.version.split()[0],'runtime_requirements':[]}))"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "13-isolated-import.stdout.log",
+        "sha256": "00a773c581815ef0d280e4bcdfeafc244da232ebb689fc1295be031c64e272eb",
+        "bytes": 189
+      },
+      "stderr": {
+        "path": "13-isolated-import.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "14-isolated-liveness",
+      "argv": [
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "-I",
+        "-m",
+        "inventory_worker.bootstrap.health",
+        "liveness"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "14-isolated-liveness.stdout.log",
+        "sha256": "992ee5e474f58dc02d49cb822c5c585a064f8a76412cd97cd15d4f72f73774d8",
+        "bytes": 220
+      },
+      "stderr": {
+        "path": "14-isolated-liveness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "15-isolated-readiness",
+      "argv": [
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "-I",
+        "-m",
+        "inventory_worker.bootstrap.health",
+        "readiness"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/outside-checkout",
+      "expected_exit": 1,
+      "exit_code": 1,
+      "passed": true,
+      "stdout": {
+        "path": "15-isolated-readiness.stdout.log",
+        "sha256": "0c6406d31fa0a3f7f33b4b0f0cc289f1c346cb6854dcc163eaaef220b9fb1665",
+        "bytes": 275
+      },
+      "stderr": {
+        "path": "15-isolated-readiness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "16-isolated-invalid-input",
+      "argv": [
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "-I",
+        "-m",
+        "inventory_worker.bootstrap.health",
+        "readiness",
+        "--force"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/outside-checkout",
+      "expected_exit": 2,
+      "exit_code": 2,
+      "passed": true,
+      "stdout": {
+        "path": "16-isolated-invalid-input.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "16-isolated-invalid-input.stderr.log",
+        "sha256": "cf63856c43187cc175382ce1a1876db067afd3976cf6cf06fccd1a52be663561",
+        "bytes": 121
+      }
+    },
+    {
+      "id": "17-installed-entrypoint",
+      "argv": [
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/inventory-worker-health",
+        "liveness"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "17-installed-entrypoint.stdout.log",
+        "sha256": "992ee5e474f58dc02d49cb822c5c585a064f8a76412cd97cd15d4f72f73774d8",
+        "bytes": 220
+      },
+      "stderr": {
+        "path": "17-installed-entrypoint.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "18-isolated-siblings-absent",
+      "argv": [
+        "/tmp/p01-inventory_worker-yistabor/runtime/bin/python",
+        "-I",
+        "-c",
+        "import importlib.util,json; names=['inventory', 'lifecycle', 'lifecycle_worker', 'planning']; observed={name:importlib.util.find_spec(name) is None for name in names}; print(json.dumps(observed,sort_keys=True)); assert all(observed.values())"
+      ],
+      "cwd": "/tmp/p01-inventory_worker-yistabor/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "18-isolated-siblings-absent.stdout.log",
+        "sha256": "61fbff810fdcf07699a6b40637d9e9da384a4b99fdcf8beae2a4900219f8e19b",
+        "bytes": 83
+      },
+      "stderr": {
+        "path": "18-isolated-siblings-absent.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "checks": {
+    "ten_installed_command_tests_passed": true,
+    "wheel_contains_only_five_owned_modules_and_metadata": true,
+    "runtime_dependencies_empty": true,
+    "fresh_runtime_contains_only_owned_distribution": true,
+    "copied_source_and_development_environment_removed_before_runtime_probes": true,
+    "isolated_liveness_exact_payload": true,
+    "isolated_readiness_exact_unavailable_payload": true,
+    "invalid_override_rejected_without_success_payload": true,
+    "installed_entrypoint_matches_module": true,
+    "other_python_service_and_worker_modules_absent": true,
+    "all_expected_exit_codes_observed": true
+  },
+  "completed_at": "2026-10-04T21:49:25.501848+00:00"
+}
