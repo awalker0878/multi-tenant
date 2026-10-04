@@ -13,8 +13,7 @@ phases:
   title: Product and architecture baseline
   owner_role: Product and architecture leads
   dependency_phase_ids: []
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P00.01
   - P00.02
@@ -39,6 +38,7 @@ phases:
   - EV-P00-008
   - EV-P00-009
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -47,8 +47,7 @@ phases:
   owner_role: Platform/SRE lead
   dependency_phase_ids:
   - P00
-  dependency_note: Dependencies are entry gates; contract development may overlap
-    as specified in phased-plan.md.
+  dependency_note: Dependencies are entry gates; contract development may overlap as specified in phased-plan.md.
   package_ids:
   - P01.01
   - P01.02
@@ -58,12 +57,14 @@ phases:
   - P01.06
   gate_id: G01
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
 - id: P02
   title: Identity, tenancy and governance
   owner_role: Product engineering and IAM leads
@@ -299,11 +300,12 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   dependency_package_ids: []
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G00.01
   doc_refs:
@@ -324,12 +326,13 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
   - P00.01
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G00.02
   doc_refs:
@@ -363,13 +366,14 @@ work_packages:
   - EV-P00-006
   - EV-P00-007
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
   - P00.01
   - P00.02
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G00.03
   doc_refs:
@@ -407,13 +411,14 @@ work_packages:
   - EV-P00-008
   - EV-P00-009
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-002
   dependency_package_ids:
   - P00.01
   - P00.02
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G00.04
   doc_refs:
@@ -435,13 +440,14 @@ work_packages:
     operational_acceptance: NOT_STARTED
   evidence_ids:
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
   - P00.01
   - P00.04
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G00.05
   doc_refs:
@@ -466,6 +472,7 @@ work_packages:
   evidence_ids:
   - EV-P00-009
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -474,8 +481,8 @@ work_packages:
   - P00.03
   - P00.04
   - P00.05
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G00.06
   doc_refs:
@@ -491,15 +498,15 @@ work_packages:
   title: Repository scaffolding
   owner_role: Engineering
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
   blocker_ids: []
   dependency_package_ids: []
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G01.01
   doc_refs:
@@ -523,12 +530,14 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
   dependency_package_ids:
   - P01.01
   - P01.05
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G01.02
   doc_refs:
@@ -572,11 +581,12 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids:
   - P01.01
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G01.04
   doc_refs:
@@ -599,10 +609,11 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
   dependency_package_ids: []
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G01.05
   doc_refs:
@@ -621,13 +632,15 @@ work_packages:
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
   dependency_package_ids:
   - P01.02
   - P01.04
   - P01.05
-  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate
-    conditions in the detailed card still apply.
+  dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
+    in the detailed card still apply.
   criterion_ids:
   - G01.06
   doc_refs:
@@ -1630,6 +1643,7 @@ requirements:
   - EV-P00-008
   - EV-P00-009
   - EV-P00-010
+  - EV-P00-011
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -1662,7 +1676,7 @@ requirements:
   - G01
   - G10
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -2776,9 +2790,9 @@ requirements:
 gates:
 - id: G00
   phase_id: P00
-  decision: IN_REVIEW
-  reviewer: "Requesting user — accountable G00 reviewer, self-designated 2026-10-04; review decision pending. Codex — engineering examiner only."
-  reviewed_at: '2026-10-04T21:03:32.386379+00:00'
+  decision: PASSED
+  reviewer: Requesting user — accountable G00 reviewer
+  reviewed_at: '2026-10-04T21:23:57Z'
   evidence_ids:
   - EV-P00-001
   - EV-P00-002
@@ -2790,16 +2804,17 @@ gates:
   - EV-P00-008
   - EV-P00-009
   - EV-P00-010
-  blocker_ids:
-  - BL-P00-001
-  - BL-P00-002
+  - EV-P00-011
+  blocker_ids: []
 - id: G01
   phase_id: P01
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
   evidence_ids: []
-  blocker_ids: []
+  blocker_ids:
+  - BL-P00-001
+  - BL-P00-002
 - id: G02
   phase_id: P02
   decision: NOT_REVIEWED
@@ -3214,6 +3229,33 @@ evidence:
     scoped re-examination.
   valid_until: null
   invalidated_at: null
+- id: EV-P00-011
+  level: E0
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/974f218a459c47a62c3615f9d8f985d3868bb7dc/docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md
+  sha256: cc0f53b27d958e7248d9b3e132f041bcd186bd64a26d89aa6833486dc7d1d18d
+  source_revision: 994d4e9819df941c7e30e8bd52ba329a8edbbd7c
+  artifact_revisions:
+    retained_artifact_commit: 974f218a459c47a62c3615f9d8f985d3868bb7dc
+  environment: Accountable reviewer decision in the current user conversation, recorded in the repository
+  scope: G00.01–G00.06 baseline approval and advancement to P01/G01, with explicit carry-forward of incomplete
+    application feasibility and actual integration/operating/native inputs
+  campaign_ids: []
+  criterion_ids:
+  - G00.01
+  - G00.02
+  - G00.03
+  - G00.04
+  - G00.05
+  - G00.06
+  observed_at: '2026-10-04T21:23:57Z'
+  observer: Codex — recorder of the user statement
+  reviewer: Requesting user — accountable G00 reviewer
+  limitations: E0 baseline and advancement decision only. Does not make unperformed tests pass, complete
+    all P00 task axes, supply missing installed facts or staffing, accept receiving-service obligations,
+    qualify native outcomes or authorize unspecified native effects. Remaining full application/configuration
+    and candidate topology checks are assigned to P01.02/P01.06 before G01.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -3228,21 +3270,23 @@ blockers:
   - R32
   - R34
   - R36
-  - G00
-  owner_role: Requesting user — accountable G00 reviewer; remaining product/architecture/SRE/security
-    and records owner assignments not supplied
-  description: Development choices DC01–DC10 are selected at their reversible engineering
-    scope. The requesting user is the accountable G00 reviewer, self-designated on 2026-10-04;
-    the remaining subject-owner roster, receiving-operator dispositions and retained-state
-    inventory have not been supplied. Missing decisions block their affected acceptance,
-    not independent engineering.
-  unblock_condition: Record remaining subject-owner assignments and the G00 reviewer's acceptance
-    or revision of the scope/domain/runtime/operating recommendations, retained-state disposition
-    and assigned later checkpoints.
-  next_action: Review docs/implementation/p00-engineering-selections.md and the criterion-level
-    G00 assessment; record attributable scope/domain/operating/retention decisions and actual
-    owner/capacity inputs in the existing RT/IP record. One decision record may cover multiple
-    fields.
+  - P01
+  - P01.02
+  - P01.04
+  - P01.05
+  - P01.06
+  - G01
+  owner_role: Requesting user for baseline decisions; actual integration, operating and records owners
+    at their affected checkpoints
+  description: The requesting user approved the G00 development baseline and advancement to P01. Remaining
+    actual integration/trust/runtime inputs, operating assignments, retained-state inventory and capacity
+    facts stay open for their affected work; they no longer block G00 or independent P01 scaffolding.
+  unblock_condition: Supply the concrete runtime, registry/signer, trust, operating or records input before
+    the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward
+    checkpoints; do not request baseline approval again.
+  next_action: Implement P01 from the approved DC01–DC10 baseline. Resolve required integration inputs
+    during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service acceptance
+    at P10/P11, and record actual staffing dates only when supplied.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P00-002
@@ -3250,21 +3294,22 @@ blockers:
   - P00
   - P00.04
   - R01
-  - G00
+  - P01
+  - P01.02
+  - P01.06
+  - G01
   owner_role: Platform, application and qualification owners; named assignments not supplied
-  description: The bounded PostgreSQL/attachment consistency and both fixture recovery boundaries
-    now have E2 evidence. Complete representative application deployment/configuration, the
-    pinned candidate platform/guest/topology profile and accountable fixture/method review
-    remain incomplete. Actual native installation facts and campaign scope/authority are also
-    unavailable for any later native cases; they do not block isolated E1/E2 preparation or
-    become a full E3 requirement at G00.
-  unblock_condition: Supply and review the candidate/application profile, complete reproducible
-    fixture and application recovery bounds; execute the uncovered bounded G00.04 checks.
-    Before any native calls/effects, additionally supply verified installation/resource facts
-    and current permitted campaign scope through the approved access mechanism.
-  next_action: Use docs/qualification/feasibility/input-record.md and the G00 engineering
-    assessment to distinguish supplied fixture evidence, untested full-application behavior
-    and native-only inputs. Extend the fixture only against the reviewed representative application;
-    preserve the passing state-recovery evidence at its true scope.
+  description: The reviewer approved G00 advancement with complete application/configuration and candidate-topology
+    feasibility carried into P01.02/P01.06. Existing PostgreSQL/attachment consistency and both fixture
+    recovery boundaries retain E2 evidence. Missing native installation facts and scoped campaign authority
+    remain due at G04/G07/G08; no native claim is inferred.
+  unblock_condition: Supply and review the candidate/application profile, complete reproducible fixture
+    and application recovery bounds; execute the uncovered bounded G00.04 checks. Before any native calls/effects,
+    additionally supply verified installation/resource facts and current permitted campaign scope through
+    the approved access mechanism.
+  next_action: Complete the approved synthetic Permit Desk deployment/configuration fixture and pinned
+    candidate topology with P01 installation and recovery work. Preserve passing state-recovery evidence
+    and add only uncovered application checks. Obtain actual native facts and authority before the relevant
+    native campaign.
   state: OPEN
   resolution_evidence_ids: []

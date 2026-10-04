@@ -2,7 +2,7 @@
 
 An enterprise application for planning and operating multi-tenant hosting across **VMware, Nutanix and OpenStack**. It brings application requirements, infrastructure discovery, placement assessment, approvals, provisioning, migration and recovery into one governed operator experience.
 
-**Current state:** P00 is underway, with scope/domain reviews and executed Laravel HTTP, Chromium, PHP/Python quality-tool, candidate-image, cross-language contract and PostgreSQL/attachment recovery checks recorded alongside the product design and implementation programme. The product application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
+**Current state:** the accountable reviewer has [approved G00 advancement](docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md), and P01 delivery/runtime foundation work is underway toward G01. P00 retains measured Laravel/browser, Python, image, contract and PostgreSQL/attachment recovery evidence. Complete application-fixture coverage is carried into P01. Product journeys and native platform qualifications remain unimplemented/unrun; the capabilities below describe the intended product.
 
 ## What the application does
 
@@ -62,7 +62,7 @@ Each independently built Laravel service owns its own `App\` namespace. Capabili
 
 ## First release and delivery milestones
 
-The preferred P00 proposal first provisions a selected Linux application on OpenStack, then migrates a VMware deployment by **rebuilding the application on OpenStack and restoring its application-consistent data**. The target uses reviewed images, application artifacts and configuration; cutover requires source-writer fencing, verified data and controlled target write admission. P00 must establish rebuild reproducibility, restore compatibility, the exact platform/guest tuple and accepted outage/recovery objectives. ADR-014 remains proposed pending that review.
+The approved initial direction first provisions a selected Linux application on OpenStack, then migrates a VMware deployment by **rebuilding the application on OpenStack and restoring its application-consistent data**. The target uses reviewed images, application artifacts and configuration; cutover requires source-writer fencing, verified data and controlled target write admission. The approved direction retains the remaining application/configuration feasibility work at P01/G01. Exact installed tuples, application outage/recovery objectives and native outcomes remain required at their discovery, provisioning and migration checkpoints.
 
 Whole-VM disk capture/conversion is a separate P09 option for applications that cannot be rebuilt, with its own feasibility and qualification. It is never a silent fallback. Historical rebuild/restore code and tests supply design information only; they establish no implementation or support on this branch.
 

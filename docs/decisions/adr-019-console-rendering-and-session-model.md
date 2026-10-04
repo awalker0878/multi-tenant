@@ -2,13 +2,13 @@
 
 Owner role: Product engineering lead. Related phases: P00, P01, P02. Record date: 2026-10-04.
 
-Origin: `DESIGN`. Disposition: `PROPOSED` as recorded in the [decision register](decision-register.md).
+Origin: `DESIGN`. Disposition: `ACCEPTED` for the P01 development baseline as recorded in the [decision register](decision-register.md).
 
-This record develops the existing baseline for review. No accountable-owner acceptance, experiment result or native qualification is claimed; the register disposition is unchanged.
+Reviewer: the requesting user, accountable G00 reviewer. Decision time: `2026-10-04T17:23:57-04:00`. The [G00 decision](../qualification/gate-reviews/g00-user-decision-2026-10-04.md) accepts compiled assets, Laravel server sessions and bounded polling for P01. Actual console authorization, session behavior and supported-browser/accessibility checks remain implementation obligations.
 
 ## Context
 
-The console must present long-running work accurately while fitting the requested Laravel/Inertia/Vue stack. Compiled assets, server sessions and polling are proposed initially. Server-side rendering and live events should be introduced only for a measured user or operating requirement.
+The console must present long-running work accurately while fitting the requested Laravel/Inertia/Vue stack. Compiled assets, server sessions and bounded polling are the accepted initial model. Server-side rendering and live events should be introduced only for a measured user or operating requirement.
 
 ## Decision and scope
 
@@ -16,9 +16,9 @@ Compiled console assets/server sessions/polling initially; SSR and live events o
 
 Use the [frontend engineering standard](../engineering/frontend.md) for implementation conventions. The Laravel/Inertia server remains the browser presentation boundary; domain services retain authorization and records. Inertia's first-party integration does not justify a separate frontend token store, client-side authority or direct browser access to worker/broker interfaces.
 
-Research reviewed on 2026-10-04 confirms the [Laravel 13 Vue starter kit](https://laravel.com/docs/13.x/starter-kits) uses Inertia 3, and [Inertia 3 documentation](https://inertiajs.com/docs/v3/getting-started) is available for the released major. Exact versions, adapter/plugin compatibility and production/browser tests still belong to P00.03; this research does not change the decision's `PROPOSED` disposition.
+Research reviewed on 2026-10-04 confirms the [Laravel 13 Vue starter kit](https://laravel.com/docs/13.x/starter-kits) uses Inertia 3, and [Inertia 3 documentation](https://inertiajs.com/docs/v3/getting-started) is available for the released major. The [P00 integration results](../implementation/p00-integration-results.md) and [browser results](../implementation/p00-browser-results.md) supply measured candidate evidence. The G00 reviewer decision accepts the development model; actual Console implementation and its production/browser checks remain required.
 
-Initial checkpoint: NOW: P00.03 before P01.01.
+Initial checkpoint: P00.03 rendering/session baseline accepted by the recorded G00 decision before P01.01.
 
 Refinement and validation: Browser/session/accessibility constraints before P02.05; user/performance evidence G03/G10.
 
@@ -46,12 +46,12 @@ Refinement and validation: Browser/session/accessibility constraints before P02.
 
 ## Acceptance and validation
 
-- Confirm the build and production session path before P01.01.
+- Carry the measured build/session candidate into P01.01 and verify the actual Console build and protected session path before G01.
 - Exercise session expiry, revoked access, held operations and connection loss before P02.05.
 - Exercise a tenant switch with delayed responses, history/back navigation after logout, real CSRF middleware, permission changes and form error isolation. Prove that an altered UI still cannot authorize a denied command.
 - Assess accessibility, task completion and update performance at G03/G10 before expanding the delivery model.
 
-Record actual reviewer identity, decision date and evidence references when review occurs. Record delivery and gate outcomes in the delivery register; updating this ADR does not complete a work package.
+The reviewer and decision reference are recorded above. Record implementation and gate outcomes in the delivery register; accepting this ADR does not complete a work package.
 
 ## Revisit conditions
 

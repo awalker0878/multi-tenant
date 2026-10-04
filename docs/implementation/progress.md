@@ -10,8 +10,8 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 
 | Phase | Outcome | Work | Verification | Native qualification | Operating acceptance | Gate | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: IN_REVIEW | 10 / 2 |
-| P01 | Delivery and runtime foundation | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 0 / 0 |
+| P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
+| P01 | Delivery and runtime foundation | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 0 / 2 |
 | P02 | Identity, tenancy and governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
@@ -29,18 +29,18 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 | Package | Output | Owner role | Work | Verification | Native qualification | Operating acceptance | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P00.01 | Scope and journeys | Product | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 1 / 1 |
-| P00.02 | Domain and ownership | Architecture | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 1 / 1 |
-| P00.03 | Technical decisions | Engineering/SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 8 / 1 |
-| P00.04 | Qualification design | Quality/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
-| P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 1 / 1 |
-| P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 2 / 1 |
-| P01.01 | Repository scaffolding | Engineering | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P01.02 | Local and integration runtime | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.01 | Scope and journeys | Product | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 2 / 1 |
+| P00.02 | Domain and ownership | Architecture | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 2 / 1 |
+| P00.03 | Technical decisions | Engineering/SRE | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 9 / 1 |
+| P00.04 | Qualification design | Quality/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 1 |
+| P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 2 / 1 |
+| P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
+| P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P01.02 | Local and integration runtime | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
 | P01.03 | Contracts and messaging | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P01.04 | CI and supply chain | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P01.05 | Runtime dependencies | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P01.06 | Baseline operations | SRE/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P01.04 | CI and supply chain | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
+| P01.05 | Runtime dependencies | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
+| P01.06 | Baseline operations | SRE/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
 | P02.01 | Authentication | Product/IAM | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.02 | Tenancy | Governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P02.03 | Authorization | Governance/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **10**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **11**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -113,7 +113,8 @@ Evidence records: **10**. Blocker records: **2**. Planning inputs awaiting selec
 | EV-P00-008 | E2 | GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4; PostgreSQL 18.6 Debian Bookworm linux/amd64; source, target and recovery databases on one isolated container; attachment files on disposable runner | fcb9fe0ea9bde275b09dfc8c0547e89021edafc9 | Synthetic real-dependency E2 evidence, not native qualification or full Permit Desk deployment. No VMware/OpenStack endpoint, independent native fence, real identity/service/network integration or operating acceptance. Fixture gates do not fence administrator access. Target-forward recovery requires readable target and new complete capture; uncaptured target loss and concurrent database/file crash consistency are not proved. Fixed-input observation has no time expiry; changed inputs require affected re-execution. |
 | EV-P00-009 | E1 | Local Linux x86-64; Python 3.12.14; standard library; no network or native API | bc42d17a31aca91ea8736dee3a73f1124bb59eed | Validates declared input structure and completeness only. Does not authenticate observers/reviewers, retrieve or verify evidence content, establish installed facts, check current native permission, authorize an action or pass G00. Synthetic test identities remain only in tests. Full route completeness is not a prerequisite for unrelated isolated engineering. Fixed-input observation has no time expiry; changed record or validator requires revalidation. |
 | EV-P00-010 | E0 | Repository engineering examination by Codex on 2026-10-04; initial baseline eb78e463e66d154e58fcfce7e65fad1eaab38914 plus explicitly identified restore/input source revisions | eb78e463e66d154e58fcfce7e65fad1eaab38914 | Reviewed design/evidence assessment only; no named organizational owner approval, accepted service target, installed tuple, staffing commitment, native qualification or operational acceptance. Earlier seven artifacts retain their original source/environment limits. Later decisions require attributable reviewer/evidence records; this examination starts IN_REVIEW and does not pass G00. No fixed historical expiry; material changes require scoped re-examination. |
+| EV-P00-011 | E0 | Accountable reviewer decision in the current user conversation, recorded in the repository | 994d4e9819df941c7e30e8bd52ba329a8edbbd7c | E0 baseline and advancement decision only. Does not make unperformed tests pass, complete all P00 task axes, supply missing installed facts or staffing, accept receiving-service obligations, qualify native outcomes or authorize unspecified native effects. Remaining full application/configuration and candidate topology checks are assigned to P01.02/P01.06 before G01. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
-| BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, G00 | Requesting user — accountable G00 reviewer; remaining product/architecture/SRE/security and records owner assignments not supplied | OPEN | Record remaining subject-owner assignments and the G00 reviewer's acceptance or revision of the scope/domain/runtime/operating recommendations, retained-state disposition and assigned later checkpoints. | Review docs/implementation/p00-engineering-selections.md and the criterion-level G00 assessment; record attributable scope/domain/operating/retention decisions and actual owner/capacity inputs in the existing RT/IP record. One decision record may cover multiple fields. |
-| BL-P00-002 | P00, P00.04, R01, G00 | Platform, application and qualification owners; named assignments not supplied | OPEN | Supply and review the candidate/application profile, complete reproducible fixture and application recovery bounds; execute the uncovered bounded G00.04 checks. Before any native calls/effects, additionally supply verified installation/resource facts and current permitted campaign scope through the approved access mechanism. | Use docs/qualification/feasibility/input-record.md and the G00 engineering assessment to distinguish supplied fixture evidence, untested full-application behavior and native-only inputs. Extend the fixture only against the reviewed representative application; preserve the passing state-recovery evidence at its true scope. |
+| BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Implement P01 from the approved DC01–DC10 baseline. Resolve required integration inputs during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service acceptance at P10/P11, and record actual staffing dates only when supplied. |
+| BL-P00-002 | P00, P00.04, R01, P01, P01.02, P01.06, G01 | Platform, application and qualification owners; named assignments not supplied | OPEN | Supply and review the candidate/application profile, complete reproducible fixture and application recovery bounds; execute the uncovered bounded G00.04 checks. Before any native calls/effects, additionally supply verified installation/resource facts and current permitted campaign scope through the approved access mechanism. | Complete the approved synthetic Permit Desk deployment/configuration fixture and pinned candidate topology with P01 installation and recovery work. Preserve passing state-recovery evidence and add only uncovered application checks. Obtain actual native facts and authority before the relevant native campaign. |

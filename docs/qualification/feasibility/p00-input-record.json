@@ -7,43 +7,63 @@
       "accountable_role": "Product/application owners",
       "fields": {
         "direction": {
-          "status": "PROPOSED",
-          "value": "VMware -> OpenStack",
+          "status": "OBSERVED",
+          "value": "vmware_to_openstack",
           "evidence": [
             {
               "kind": "repository",
-              "uri": "git://awalker0878/multi-tenant/eb78e463e66d154e58fcfce7e65fad1eaab38914/docs/implementation/p00-route-and-operations-review.md",
-              "sha256": "5855aeedc58e4c7811029ee91ba9bb1e9ba24c71413289a833e60121d5a11682",
-              "revision": "eb78e463e66d154e58fcfce7e65fad1eaab38914"
+              "uri": "git://awalker0878/multi-tenant/974f218a459c47a62c3615f9d8f985d3868bb7dc/docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md",
+              "sha256": "cc0f53b27d958e7248d9b3e132f041bcd186bd64a26d89aa6833486dc7d1d18d",
+              "revision": "974f218a459c47a62c3615f9d8f985d3868bb7dc"
             }
           ],
-          "observed_at": null,
-          "observed_by": null,
-          "scope": null,
+          "observed_at": "2026-10-04T21:23:57Z",
+          "observed_by": "Codex — recorder of the user approval",
+          "scope": {
+            "campaign": "G00-baseline-20261004",
+            "resource_ids": [
+              "G00.01",
+              "G00.02",
+              "G00.03",
+              "G00.04",
+              "G00.05",
+              "G00.06"
+            ]
+          },
           "review": {
-            "disposition": "NOT_REVIEWED",
-            "reviewed_by": null,
-            "reviewed_at": null
+            "disposition": "ACCEPTED",
+            "reviewed_by": "Requesting user — accountable G00 reviewer",
+            "reviewed_at": "2026-10-04T21:23:57Z"
           }
         },
         "method": {
-          "status": "PROPOSED",
+          "status": "OBSERVED",
           "value": "application_rebuild_restore",
           "evidence": [
             {
               "kind": "repository",
-              "uri": "git://awalker0878/multi-tenant/eb78e463e66d154e58fcfce7e65fad1eaab38914/docs/implementation/p00-route-and-operations-review.md",
-              "sha256": "5855aeedc58e4c7811029ee91ba9bb1e9ba24c71413289a833e60121d5a11682",
-              "revision": "eb78e463e66d154e58fcfce7e65fad1eaab38914"
+              "uri": "git://awalker0878/multi-tenant/974f218a459c47a62c3615f9d8f985d3868bb7dc/docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md",
+              "sha256": "cc0f53b27d958e7248d9b3e132f041bcd186bd64a26d89aa6833486dc7d1d18d",
+              "revision": "974f218a459c47a62c3615f9d8f985d3868bb7dc"
             }
           ],
-          "observed_at": null,
-          "observed_by": null,
-          "scope": null,
+          "observed_at": "2026-10-04T21:23:57Z",
+          "observed_by": "Codex — recorder of the user approval",
+          "scope": {
+            "campaign": "G00-baseline-20261004",
+            "resource_ids": [
+              "G00.01",
+              "G00.02",
+              "G00.03",
+              "G00.04",
+              "G00.05",
+              "G00.06"
+            ]
+          },
           "review": {
-            "disposition": "NOT_REVIEWED",
-            "reviewed_by": null,
-            "reviewed_at": null
+            "disposition": "ACCEPTED",
+            "reviewed_by": "Requesting user — accountable G00 reviewer",
+            "reviewed_at": "2026-10-04T21:23:57Z"
           }
         },
         "application_workload_ids": {
@@ -968,29 +988,63 @@
       "accountable_role": "Product/architecture/delivery leads",
       "fields": {
         "criterion_reviewers": {
-          "status": "UNKNOWN",
-          "value": null,
-          "evidence": [],
-          "observed_at": null,
-          "observed_by": null,
-          "scope": null,
+          "status": "OBSERVED",
+          "value": "Requesting user: accountable G00.01–G00.06 reviewer; actual subject-owner and operating assignments remain required at their affected checkpoints.",
+          "evidence": [
+            {
+              "kind": "repository",
+              "uri": "git://awalker0878/multi-tenant/974f218a459c47a62c3615f9d8f985d3868bb7dc/docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md",
+              "sha256": "cc0f53b27d958e7248d9b3e132f041bcd186bd64a26d89aa6833486dc7d1d18d",
+              "revision": "974f218a459c47a62c3615f9d8f985d3868bb7dc"
+            }
+          ],
+          "observed_at": "2026-10-04T21:23:57Z",
+          "observed_by": "Codex — recorder of the user approval",
+          "scope": {
+            "campaign": "G00-baseline-20261004",
+            "resource_ids": [
+              "G00.01",
+              "G00.02",
+              "G00.03",
+              "G00.04",
+              "G00.05",
+              "G00.06"
+            ]
+          },
           "review": {
-            "disposition": "NOT_REVIEWED",
-            "reviewed_by": null,
-            "reviewed_at": null
+            "disposition": "ACCEPTED",
+            "reviewed_by": "Requesting user — accountable G00 reviewer",
+            "reviewed_at": "2026-10-04T21:23:57Z"
           }
         },
         "decision_dispositions": {
-          "status": "UNKNOWN",
-          "value": null,
-          "evidence": [],
-          "observed_at": null,
-          "observed_by": null,
-          "scope": null,
+          "status": "OBSERVED",
+          "value": "Approved DC01–DC10 product, architecture and development baseline for advancement to P01/G01; no installed facts, completed missing experiments or receiving-service acceptance inferred.",
+          "evidence": [
+            {
+              "kind": "repository",
+              "uri": "git://awalker0878/multi-tenant/974f218a459c47a62c3615f9d8f985d3868bb7dc/docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md",
+              "sha256": "cc0f53b27d958e7248d9b3e132f041bcd186bd64a26d89aa6833486dc7d1d18d",
+              "revision": "974f218a459c47a62c3615f9d8f985d3868bb7dc"
+            }
+          ],
+          "observed_at": "2026-10-04T21:23:57Z",
+          "observed_by": "Codex — recorder of the user approval",
+          "scope": {
+            "campaign": "G00-baseline-20261004",
+            "resource_ids": [
+              "G00.01",
+              "G00.02",
+              "G00.03",
+              "G00.04",
+              "G00.05",
+              "G00.06"
+            ]
+          },
           "review": {
-            "disposition": "NOT_REVIEWED",
-            "reviewed_by": null,
-            "reviewed_at": null
+            "disposition": "ACCEPTED",
+            "reviewed_by": "Requesting user — accountable G00 reviewer",
+            "reviewed_at": "2026-10-04T21:23:57Z"
           }
         },
         "retained_records_inventory": {
@@ -1007,16 +1061,33 @@
           }
         },
         "unresolved_checkpoints": {
-          "status": "UNKNOWN",
-          "value": null,
-          "evidence": [],
-          "observed_at": null,
-          "observed_by": null,
-          "scope": null,
+          "status": "OBSERVED",
+          "value": "Complete application/configuration and candidate topology at P01.02/P01.06 before G01; actual dependency/trust prerequisites before affected P01 integration; native inputs and authorized discovery at G04, native outcomes at G07/G08; application objectives before P08, retained-state and service acceptance at P10/P11.",
+          "evidence": [
+            {
+              "kind": "repository",
+              "uri": "git://awalker0878/multi-tenant/974f218a459c47a62c3615f9d8f985d3868bb7dc/docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md",
+              "sha256": "cc0f53b27d958e7248d9b3e132f041bcd186bd64a26d89aa6833486dc7d1d18d",
+              "revision": "974f218a459c47a62c3615f9d8f985d3868bb7dc"
+            }
+          ],
+          "observed_at": "2026-10-04T21:23:57Z",
+          "observed_by": "Codex — recorder of the user approval",
+          "scope": {
+            "campaign": "G00-baseline-20261004",
+            "resource_ids": [
+              "G00.01",
+              "G00.02",
+              "G00.03",
+              "G00.04",
+              "G00.05",
+              "G00.06"
+            ]
+          },
           "review": {
-            "disposition": "NOT_REVIEWED",
-            "reviewed_by": null,
-            "reviewed_at": null
+            "disposition": "ACCEPTED",
+            "reviewed_by": "Requesting user — accountable G00 reviewer",
+            "reviewed_at": "2026-10-04T21:23:57Z"
           }
         }
       }

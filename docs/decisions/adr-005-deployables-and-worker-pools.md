@@ -2,19 +2,19 @@
 
 Owner role: Architecture/SRE leads. Related phases: P00, P01, P10. Record date: 2026-10-04.
 
-Origin: `DESIGN`. Disposition: `PROPOSED` as recorded in the [decision register](decision-register.md).
+Origin: `DESIGN`. Disposition: `ACCEPTED` for the P01 development baseline as recorded in the [decision register](decision-register.md).
 
-This record develops the existing baseline for review. No accountable-owner acceptance, experiment result or native qualification is claimed; the register disposition is unchanged.
+Reviewer: the requesting user, accountable G00 reviewer. Decision time: `2026-10-04T17:23:57-04:00`. The [G00 decision](../qualification/gate-reviews/g00-user-decision-2026-10-04.md) accepts the seven-deployable and scoped-worker model for P01. Independent builds, actual deployment and worker authorization still require implementation evidence.
 
 ## Context
 
-Service boundaries need a concrete build and deployment model. The proposed baseline keeps seven principal deployables and separately scoped worker pools in one repository. Repository colocation must not require simultaneous rollout or grant a site worker central administrative reach.
+Service boundaries need a concrete build and deployment model. The accepted baseline keeps seven principal deployables and separately scoped worker pools in one repository. Repository colocation must not require simultaneous rollout or grant a site worker central administrative reach.
 
 ## Decision and scope
 
-Seven principal deployables plus independently scoped worker pools in one repository.
+Seven principal deployables — Console, Governance, Catalogue, Inventory, Planning, Lifecycle and Assurance — plus independently scoped Inventory/Lifecycle worker pools in one repository. Keep service-private source, locks, images, data and identities. Actual runtime topology, operated providers and deployment scope remain separate P01 inputs.
 
-Initial checkpoint: NOW: P00.03 before P01.01/P01.02.
+Initial checkpoint: P00.03 deployable model accepted by the recorded G00 decision before P01.01/P01.02.
 
 Refinement and validation: Independently build/deploy proof at G01; reassess operational cost at P10.
 
@@ -33,7 +33,7 @@ Refinement and validation: Independently build/deploy proof at G01; reassess ope
 
 ## Unresolved details and evidence needed
 
-- Define image boundaries, shared package rules and which workers require site-local deployment.
+- Implement the accepted image and ownership boundaries; determine the actual site-local worker placements from their trust and operation scope.
 - Choose release manifest composition and the supported independent version compatibility window.
 
 ## Acceptance and validation
@@ -42,7 +42,7 @@ Refinement and validation: Independently build/deploy proof at G01; reassess ope
 - Verify that a worker cannot claim work outside its assigned identity and scope.
 - Measure deployment and operating overhead and reassess the decomposition at P10.
 
-Record actual reviewer identity, decision date and evidence references when review occurs. Record delivery and gate outcomes in the delivery register; updating this ADR does not complete a work package.
+The reviewer and decision reference are recorded above. Record implementation and gate outcomes in the delivery register; accepting this ADR does not complete a work package.
 
 ## Revisit conditions
 

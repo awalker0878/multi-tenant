@@ -8,6 +8,9 @@ The [engineering coverage map](../engineering/coverage.md) supplies concrete fra
 
 ## G00 — Product and architecture baseline
 
+The [2026-10-04 accountable decision](../qualification/gate-reviews/g00-user-decision-2026-10-04.md) approves G00 advancement for the documented development baseline and explicitly carries incomplete full-application/configuration and candidate-topology feasibility into P01.02/P01.06 before G01. Read the original criteria below with that recorded scope disposition; it is not evidence that the carried checks ran.
+
+
 | Criterion | Required pass/fail check | Evidence | Environment | Reviewer role |
 | --- | --- | --- | --- | --- |
 | G00.01 — Scope and ownership | Review the first application journey, roles, release exclusions and accountable owner assignments; identify every missing input. | E0: signed baseline and owner roster | Design review | Product lead |
