@@ -32,7 +32,7 @@ Each direction below needs its own method, guest, data and recovery qualificatio
 
 | Source → target | Planning scope | Method selection | Required qualification before a support claim |
 | --- | --- | --- | --- |
-| VMware → OpenStack | Initial candidate, P08 | Cold guest/disk capture, conversion and import, conditional on P00 feasibility; application rebuild/restore is a separately named fallback decision | Q07 for exact source/target/guest/data/security/service tuple; complete disk chains, boot/drivers, all datasets, writer fencing, application checks and post-target-write recovery |
+| VMware → OpenStack | Initial candidate, P08 | Preferred `application_rebuild_restore`, conditional on reproducible application deployment and P00 restore feasibility | Q07 for exact source/target/guest/data/security/service tuple; deployment/configuration reconstruction, consistent capture, all datasets and required metadata, writer fencing, application checks and post-target-write recovery |
 | OpenStack → VMware | Expansion candidate, P09 or later | Selection needed; no reverse-method assumption | Q08 independently covering export/import or selected restore method, target policy/service realization and recovery |
 | VMware → Nutanix AHV | Expansion candidate, P09 or later | Selection needed | Q08 independently covering source/target mapping, selected method, guest/data and recovery |
 | Nutanix AHV → VMware | Expansion candidate, P09 or later | Selection needed | Q08 independently; VMware→AHV results are not evidence for this direction |
@@ -41,7 +41,7 @@ Each direction below needs its own method, guest, data and recovery qualificatio
 
 Same-family VMware→VMware, AHV→AHV and OpenStack→OpenStack movement are separate topology-specific candidates. A cross-site, cross-cluster, cross-version or different backend move is not automatically native live migration. Same-family routes need recorded source/target tuples, method and independent evidence when advertised.
 
-P00 selects only one initial offline method. If cold capture/conversion is infeasible, record why and change the baseline explicitly before claiming application restore satisfies the initial path. Neither method proves warm/live migration, zero downtime or universal guest portability.
+P00 selects only one initial offline method; application rebuild/restore is preferred. Cold capture/conversion/import is separately evaluated in P09 for applications that cannot be rebuilt, with disk-chain, boot, device, driver and encryption checks. If either method is infeasible, record why and approve the changed scope explicitly before substituting the other. Neither method proves warm/live migration, zero downtime or universal guest portability.
 
 ## 4. Guest, data and special-feature scope
 
@@ -55,7 +55,7 @@ These dimensions compose with every operation and route; a row is never a standa
 | Appliance / no guest mutation | Expansion candidate | Vendor-supported import/export, immutable guest constraints, licensing and external readiness/health contract; R27/Q08 |
 | Stateful application dataset | Initial candidate: explicitly selected application and consistency rules | Dataset inventory, transaction consistency, metadata/keys, final sync, integrity, writer fencing and divergence recovery; R22–R24 |
 | Multi-VM/disk/NIC application | Selected initial representative path | Explicit dependency/order, mappings, consistency groups and failure-domain constraints; R19; complexity bounded in P00 |
-| Rebuild / application restore | Separately named candidate or fallback | Reconstruction completeness, configuration/secrets and every approved dataset; not proof of whole-VM conversion |
+| Rebuild / application restore | Preferred initial P08 method, conditional on P00 feasibility | Reconstruction completeness, configuration/secrets and every approved dataset; not proof of whole-VM conversion |
 | Database replication / warm synchronization | Deferred expansion | Engine/version-specific consistency, lag, writer handoff, split-brain prevention and target-write recovery |
 | Warm/live movement / zero downtime | Deferred | Separate implementation, topology/API support, measured outage and failure/recovery evidence |
 | UEFI / BIOS / secure boot / vTPM / encrypted disks | Only exact selected initial values | Unsupported or unassessed combinations block placement; keys, attestation and imported boot behavior need specific evidence |

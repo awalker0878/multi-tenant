@@ -10,7 +10,7 @@ Use the [application walkthrough](../../product/application-walkthrough.md), [Q0
 
 ## Preparation
 
-1. Pin source/target installation, method, guest/image, all VM/disk/NIC mappings, dataset/consistency group, keys, network/service topology and product/adapter artifacts.
+1. Pin source/target installation, selected `application_rebuild_restore` method, target image and reproducible application deployment/configuration, source VM/NIC/dataset mappings, consistency groups, keys, network/service topology and product/adapter artifacts. Whole-VM disk-chain/device preservation belongs to its separate method qualification.
 2. Reconcile every source dataset, writer, scheduled job, integration and business side effect against the fixture manifest.
 3. Obtain bounded source quiesce/capture/fence, target creation/activation, traffic change, retention and recovery authority. Keep retirement separately authorized.
 4. Establish staging/bandwidth/snapshot/retained-source budgets, accepted outage/data thresholds and an independently timestamped observation path.
@@ -20,9 +20,9 @@ Use the [application walkthrough](../../product/application-walkthrough.md), [Q0
 
 | Case | Action or injected fault | Required observation | Evidence |
 | --- | --- | --- | --- |
-| Q07.01 | Reconcile source readiness, boot/disk chains, drivers, encryption, dataset and dependency inventory | All required scope is represented; unsupported or unknown mandatory features block migration | Source/profile reconciliation and denial cases |
+| Q07.01 | Reconcile source readiness, reproducible target deployment/configuration, encryption, consistent-capture method, dataset/metadata and dependency inventory | All required scope is represented; unsupported or unknown mandatory features block migration | Source/profile reconciliation and denial cases |
 | Q07.02 | Rehearse the exact method in isolation with production effects suppressed | Guest and application become usable without unintended mail, jobs, traffic or writers | Rehearsal topology, suppression probes and application checks |
-| Q07.03 | Capture, transfer, convert/import or rebuild/restore according to the selected method | Dataset, metadata, identity treatment and all mapped resources match declared acceptance | Transfer/conversion logs, manifests, digests and native readback |
+| Q07.03 | Rebuild the target application and restore consistently captured datasets according to the explicitly selected method | Dataset, metadata, identity treatment and all mapped resources match declared acceptance | Deployment/restore logs, consistent-capture manifests, digests and native readback |
 | Q07.04 | Interrupt transfer or exhaust the bounded staging budget | Transfer safely resumes or restarts as declared; partial data cannot activate; budget uncertainty remains held | Fault timeline, storage observations and recovery record |
 | Q07.05 | Attempt cutover with stale approval, unfenced source or another active writer | Final sync/activation is denied until independent fencing and current authority are proven | Authority/fencing denial matrix |
 | Q07.06 | Quiesce/fence source and other writers, final-sync, validate target, then enable traffic/writes | Observed order prevents split brain; final accepted source data reaches target before first permitted target write | Timestamped writer/traffic observations and final integrity checks |

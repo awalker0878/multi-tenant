@@ -53,3 +53,7 @@ Observed load or business criticality changes, an accepted objective is repeated
 - [Decision register](decision-register.md) — authority for disposition, origin and blocking checkpoint.
 - [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
 - [ADR authoring template](../templates/adr.md) — required decision-record fields.
+
+## P00 measurement review
+
+The [P00 route and operations review](../implementation/p00-route-and-operations-review.md) supplies candidate initial/growth distributions and explicit measurement methods for the operating targets. The proposed numbers are synthetic design inputs, not measured capacity or application-owner commitments. Owner selection of workload, outage/data and custody constraints remains necessary before this ADR is accepted.

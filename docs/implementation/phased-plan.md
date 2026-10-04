@@ -21,7 +21,7 @@ The first supported release should operate a deliberately bounded application pa
 | Hosting | Fresh control plane and newly commissioned site workers | No dependency on previous runtime or live state |
 | Product users | Platform administrator, tenant administrator, application owner, planner/operator, approver, auditor and service operator | Separate permissions and separation of duties; no role name implicitly grants every action |
 | Provisioning | One selected OpenStack installation and one approved Linux guest profile | Exact platform, network, storage and guest versions selected in P00 |
-| Migration | One VMware-to-OpenStack offline application route | Prefer cold guest/disk conversion and import if P00 feasibility succeeds; rebuild/restore is a separately named method, never equivalent proof |
+| Migration | One VMware-to-OpenStack offline application route | Prefer application rebuild/restore for reproducible applications if P00 feasibility succeeds; cold guest/disk conversion and import is a separately qualified P09 option, never equivalent proof |
 | Application | A small multi-workload application with a real stateful component, declared dependencies and explicit security boundaries | Freeze dataset, correctness checks, downtime window and recovery procedure before native testing |
 | Services | Real IPAM/DNS, identity, backup and observability paths needed by that application | Choose actual owners and interfaces in P00; simulated substitutes cannot satisfy a native gate |
 | Platform breadth | VMware, Nutanix and OpenStack represented by full capability dimensions and explicit unsupported/unknown states | Qualify additional tuples independently in P09 |
@@ -215,7 +215,7 @@ Lifecycle owns reservation intent, attempts and receipts; the external capacity/
 | Work package | Deliverable and owner |
 | --- | --- |
 | P08.01 Source readiness | Inventory/lifecycle: VMware discovery, application membership/dependencies, boot/storage/network compatibility, source authority and export/capture access |
-| P08.02 Method and data movement | Infrastructure: selected offline transfer/conversion or rebuild/restore path, checksums, encryption, resumability, capacity and direct approved endpoint flow |
+| P08.02 Method and data movement | Infrastructure: selected application rebuild/restore path, reproducible deployment/configuration, consistent capture, checksums, metadata, encryption, resumability, capacity and direct approved endpoint flow |
 | P08.03 Rehearsal | Lifecycle/application owner: isolated rehearsal target, representative dataset, measured downtime, application validation and cleanup |
 | P08.04 Cutover | Lifecycle/governance: final approval, change window, data quiesce, source fencing, final transfer, target verification and controlled DNS/traffic switch |
 | P08.05 Recovery decisions | Infrastructure/application owner: pre-activation rollback, post-write recovery strategy, point of no return, split-brain prevention and explicit human decision states |

@@ -21,7 +21,7 @@ The [context code structure](context-code-structure.md) applies the selected [pr
 - Preserve infrastructure security and recovery constraints even though the software starts from an empty product tree.
 - Keep the first usable release narrow enough to qualify one complete application path.
 
-The first proposed native path provisions a selected Linux workload on OpenStack, then qualifies one VMware-to-OpenStack migration method. P00 confirms the platform versions, guest profile, data method, application acceptance checks and native test environments. Broader platform coverage follows separate qualification campaigns.
+The preferred P00 proposal provisions a selected Linux application on OpenStack, then qualifies VMware-to-OpenStack application rebuild/restore. The target is rebuilt from reviewed image/application/configuration artifacts; application-consistent capture and restore, source-writer fencing and controlled cutover preserve the selected data and service requirements. P00 confirms reproducibility, version/restore compatibility, platform/guest tuple, acceptance checks and native test environments. ADR-014 remains proposed until the required review and feasibility results exist. Whole-VM disk conversion for applications that cannot be rebuilt is a separately selected P09 method, never an implicit fallback or a capability inherited from earlier code.
 
 ## 2. Logical topology
 

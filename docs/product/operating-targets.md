@@ -52,3 +52,13 @@ Exact thresholds derive from the accepted objective and measured normal variatio
 ## Review and change
 
 Reassess targets at scope/feasibility acceptance, after P06 simulation, after first native qualification, after material topology/dependency changes and before pilot acceptance. Preserve the previous target and reason for change. A failed objective leads to corrective work or explicit scope renegotiation, not an edited historical result.
+
+## P00 measurement design under review
+
+The [2026-10-04 route and operating review](../implementation/p00-route-and-operations-review.md) adds proposed initial/growth synthetic workload tiers and OM01–OM07 measurement definitions. These are reviewable generator and instrumentation inputs, not an accepted estate forecast, production rate limit or measured result. Accountable owners must accept or replace them through ADR-017.
+
+Availability needs an explicit eligible-journey denominator and maintenance/dependency treatment; a short successful load run cannot establish a monthly objective. Read latency includes the usable authorized browser outcome. Durable acceptance ends at a committed receipt, with lost acknowledgements and duplicate requests tested separately from later workflow duration. Discovery freshness advances only on a complete authorized generation. Native concurrency and request rates remain bounded by actual endpoint/resource allocations.
+
+Report control-plane restoration to safe reviewed service and restoration of native write permission separately. Test key/identity/site loss, missing evidence and restored workflow state older than a target business write. The selected application still needs its own outage/data/recovery targets and complete fixture; no control-plane RPO or RTO silently applies to that data. Current missing inputs and accountable roles are recorded as RI01–RI06 in the review.
+
+The current P00 recommendation is `application_rebuild_restore` for the first VMware-to-OpenStack Linux route. OM06 must measure clean target deployment, consistent final capture, transfer/restore, application validation, writer exclusion and activation according to their actual place in the outage window. Earlier target preparation does not count as avoided downtime unless the final consistency and cutover observations prove it. Whole-VM conversion is a separate P09 qualification and performance scope; it does not set the first route’s budget. This method recommendation follows the current assessment and user clarification, while actual tools, fixtures, data objectives and owner acceptance remain unresolved.

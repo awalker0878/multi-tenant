@@ -18,15 +18,19 @@ The product owns its catalogue, governance, plans, operation authority and evide
 | Assessment | Capability/policy matching, explainable eligibility and destination comparison | Required unknown or unsupported outcomes block execution |
 | Planning | Immutable effects, resource mappings, service prerequisites, risks and recovery boundaries | Each plan binds exact revisions, environment, method and scope |
 | Provisioning | Selected OpenStack/Linux application with networking, guest and shared-service readiness | Exact image, backend, security and service profile qualified by Q05/Q06 |
-| Migration | One VMware-to-OpenStack offline application method | Cold capture/conversion/import requires P00 feasibility; a restore/rebuild route is a different method |
+| Migration | Preferred first method: VMware-to-OpenStack application rebuild/restore | Reproduce the target application and restore application-consistent data; P00 feasibility and owner review remain required under proposed ADR-014 |
 | Operations | Controlled cancellation, reconciliation, recovery and retirement | Only the operations and failure cases included in the support record |
 | Assurance | Traceable evidence and exact-scope qualification/acceptance | Claims apply to the recorded tuple and product revision |
 
 The first application is a bounded multi-workload service with stateful data. Its selection records source membership, dependencies, datasets, keys, boot/device constraints, required network flows, service dependencies, acceptance queries and allowed outage. The [walkthrough](application-walkthrough.md) is the synthetic model used to challenge those requirements.
 
+For rebuild/restore, the selection also pins target image and application artifacts, configuration and secret references, application/database version compatibility, the capture/restore mechanism and consistency procedure. The target must be reproducible without copying an opaque source operating-system disk. Final cutover quiesces application writes, establishes an application-consistent capture and independently excludes source/other writers before permitting target writes. “Offline” describes this application outage; it does not imply whole-VM disk conversion. Actual image, guest and tool versions remain P00 inputs rather than inherited historical selections.
+
 ## Release expansion
 
 P09 selects additional platform operations, migration directions, guest profiles, data methods and brownfield adoption. The [support matrix](../implementation/support-matrix.md) contains all six directed cross-platform routes and relevant profile dimensions. Selecting a tranche creates concrete packages, campaigns and capacity needs; it does not confer inherited qualification.
+
+Whole-VM cold capture/conversion/import is a separate P09 option for applications that cannot be rebuilt. Its boot, device, encryption, image/import and recovery constraints need their own assessment and campaigns. An unsuccessful rebuild/restore assessment does not switch methods automatically; it blocks that route until a separately selected method is planned, approved and qualified.
 
 The initial release does not promise live migration, zero downtime, universal guest conversion, all API/backend combinations, every same-family relocation topology or autonomous operation across disconnected trust boundaries. Required capabilities remain represented even when their implementation is deferred. A later release may include them only after scope selection and relevant evidence.
 
