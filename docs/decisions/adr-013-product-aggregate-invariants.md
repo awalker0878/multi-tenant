@@ -53,3 +53,7 @@ A required application or site topology cannot be represented without breaking a
 - [Decision register](decision-register.md) — authority for disposition, origin and blocking checkpoint.
 - [Phased implementation plan](../implementation/phased-plan.md) — package and gate sequence.
 - [ADR authoring template](../templates/adr.md) — required decision-record fields.
+
+## P00 domain review
+
+The [P00.02 domain review](../implementation/p00-domain-review.md) now provides concrete valid/invalid cases, command/event concurrency and one-writer assignments, including logical datasets, observed native identity, managed workload bindings and reservation journals. These are inspectable recommendations for the current service model. They do not import the historical schema or accept cardinalities without the designated architecture/service/security review.

@@ -12,18 +12,22 @@ Each record has one authoritative writer. Cross-context references are IDs and v
 | Environment | Catalogue | Tenant-owned deployment context such as test or production; `environment_id`, `tenant_id`; does not itself prove network isolation |
 | Application | Catalogue | Tenant-owned business grouping with accountable service owner and acceptance requirements; `application_id`, `tenant_id` |
 | Workload | Catalogue | Stable logical component belonging to one application; `workload_id`, `application_id`, `tenant_id`; native VM IDs are separate references |
+| DatasetDefinition | Catalogue; part of versioned application intent | Logical data and consistency requirements with `dataset_id`, accountable data owner and consistency-group identity; native volumes, backup copies and transfer artifacts have separate provenance |
 | ApplicationDeployment | Catalogue; proposed association | One application in one environment; `deployment_id`, `application_id`, `environment_id`, `tenant_id`; separates environment-specific intent from the reusable application identity |
 | WorkloadSecurityDomain (WSD) | Catalogue | Tenant-owned grouping by service ownership, lifecycle and security/recovery requirements; `wsd_id`, `tenant_id`, accountable owner and policy references |
 | SecurityDomain | Catalogue | Tenant-owned logical zone instance with zone class and security authority; `security_domain_id`, `tenant_id`; zone taxonomy such as OZ/RZ is a reusable value, not a shared tenant boundary |
 | IntentRevision | Catalogue | Immutable desired state for one ApplicationDeployment; `intent_revision_id`, parent, schema version, actor, canonical digest and complete requirement/placement snapshot |
 | WorkloadPlacement | Catalogue; contained in IntentRevision | Places one workload in that revision with exactly one WSD and one logical SecurityDomain, plus compute, dataset, network and service requirements |
 | DomainInstance | Inventory | Observation of a native routing/enforcement context at an endpoint; stable observation identity includes endpoint, native ID and generation/incarnation provenance |
+| Observed native workload | Inventory | Exact endpoint/resource/incarnation facts in an immutable observation generation; neither a workload name nor a discovered VM assigns Catalogue identity or mutation authority |
 | ManagedDomainBinding | Lifecycle; proposed managed record | Authorized mapping of one native isolation scope to one tenant/logical domain, with resource/field ownership and fencing epoch; does not rewrite the DomainInstance observation |
+| ManagedWorkloadBinding | Lifecycle; proposed managed record | Reviewed association of logical workload/deployment with an exact native resource incarnation, source/target/retained role and field-owner schedule; simultaneous migration bindings do not permit simultaneous data writers |
 | Assessment | Planning | Explained requirement fit against pinned intent, observations, policy and capability versions; asynchronous assessment identity is not a native-execution Job |
 | Plan | Planning | Immutable proposal for one deployment/intent and operation scope; binds action graph, inputs, artifacts, preconditions, expiry and recovery rules to a digest |
 | Approval / Revocation | Governance | Immutable, attributable authorization decision bound to exact plan digest, scope, conditions and time bounds; revocation is a new decision record |
 | Job / Admission | Lifecycle | One admitted execution identity and its checks; rejected admission is auditable but creates no executable job; user-facing progress is a projection of durable workflow history |
 | NativeOperation | Lifecycle | One logical native effect under a Job, with durable identity, target/field scope, fencing and attempts/outcomes; retry does not create a second logical effect |
+| Reservation journal | Lifecycle | Intent, attempt and receipt for a scoped reservation operation, bound to exact demand/envelope digest, generation and external owner; authoritative capacity/IPAM/DNS systems retain allocation truth |
 | Evidence | Assurance | Metadata and protected artifact references for a stated observation or claim, with digest, producer/observer, environment, time, custody and source bindings |
 | Qualification | Assurance | Reviewed support decision over an exact operation tuple and product artifacts, supported by evidence, limitations and revalidation rules |
 
@@ -82,6 +86,10 @@ erDiagram
 
 An active ManagedDomainBinding is unique for a native isolation scope. Several historical bindings may reference a DomainInstance, but overlapping active owners are invalid. Native ID reuse requires a distinct incarnation identity and fresh validation; it must not silently attach a new resource to an old binding. Inventory may observe an unbound DomainInstance without granting lifecycle any write authority. One network belongs to exactly one native DomainInstance; one DomainInstance may contain multiple networks.
 
+A logical workload can retain source and target ManagedWorkloadBindings during migration, with explicit active, candidate or retained roles. Neither binding changes its stable workload identity. Dataset requirements remain Catalogue intent; Inventory records observed storage facts, while Lifecycle binds transfer/copy lineage and single-writer transitions to its operation journal. A target's existence is not permission to enable data writes, and a retained source is not permission to resume its old writer. Sensitive field ownership identifies the native scope, responsible controller and epoch; a service's database ownership alone does not prove native fencing.
+
+Reservation expiry is not evidence that resources are unused. Lifecycle preserves an uncertain reservation or dependency receipt until the external owner and native observations establish a safe disposition. Changing demand or an envelope digest under the same operation identity is a conflict. Planning's capacity assessment and Inventory's free-capacity observation never decrement an authoritative allocation or transfer its ownership.
+
 A plan may have multiple approval decisions to satisfy distinct authorities and multiple historical admissions, but an idempotent retry returns the same logical Job. A later intentional rerun needs a fresh admission and renewed validation; completed effects are never replayed merely because the plan was once approved. A Job references the exact approval set used at admission and any subsequent revocations. Before each privileged boundary, current authority and qualification are checked again.
 
 EvidenceBinding is a logical metadata link. Evidence may also bind a plan, intent, observation generation, application acceptance or campaign directly. The many-to-many relationship does not permit changing a finalized evidence claim to cover a different effect. Additional claims need independently reviewed bindings and compatible scope.
@@ -123,5 +131,7 @@ EvidenceBinding is a logical metadata link. Evidence may also bind a plan, inten
 ## Open decisions and change discipline
 
 ADR-013 must settle deployment keys, WSD sharing, ordinary workload domain cardinality, domain-binding uniqueness, default resolution and reference-retention behavior. ADR-009 settles concrete authorization policy; ADR-014 selects the route; ADR-018 settles campaign admission. The [decision register](../decisions/decision-register.md) owns their status and deadlines.
+
+The [P00 domain and ownership review](../implementation/p00-domain-review.md) records the executed design walkthrough, historical-source dispositions, recommended decisions and command/event concurrency cases. Its analytical conclusions refine this proposal; they are not owner acceptance, implemented schemas or runtime test evidence.
 
 P01/P03 schemas must reference DM invariant IDs and add both valid and invalid fixtures to the appropriate owning service. Changes to meaning or cardinality update this page, the ADR, [service specifications](../services/README.md), [contract examples](../contracts/examples.md) and [the walkthrough](application-walkthrough.md) together. Implemented contract versions and migration behavior become authoritative only after the corresponding decision and delivery gates; this proposal alone is E0 design material.
