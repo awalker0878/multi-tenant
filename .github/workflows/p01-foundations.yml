@@ -1,0 +1,143 @@
+name: P01 foundation packages
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+  workflow_dispatch:
+    inputs:
+      dependency_mode:
+        description: PHP lock replay or explicit candidate resolution
+        type: choice
+        options: [replay, resolve]
+        default: replay
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p01-foundations-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  selection:
+    name: Select affected independent packages
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      python: ${{ steps.select.outputs.python }}
+      php: ${{ steps.select.outputs.php }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Prove package selection boundaries
+        run: python3 -m unittest discover -s scripts/p01 -p 'test_*.py' -v
+      - name: Select from changed paths and owner dependencies
+        id: select
+        run: python3 scripts/p01/select_components.py --workspace "$GITHUB_WORKSPACE"
+
+  python:
+    name: Python ${{ matrix.component }}
+    needs: selection
+    if: needs.selection.outputs.python != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.selection.outputs.python) }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12.14'
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Verify owned lock, quality and independently installed wheel
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+        run: >-
+          python scripts/p01/run_quality.py
+          --workspace "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/p01-quality"
+          --component "$P01_COMPONENT"
+      - name: Retain all logs, wheel bytes and input bindings
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p01-${{ matrix.component }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-quality/evidence/
+          if-no-files-found: error
+          retention-days: 14
+
+  php:
+    name: Laravel ${{ matrix.component }}
+    needs: selection
+    if: needs.selection.outputs.php != '[]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.selection.outputs.php) }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, pdo_pgsql, session, tokenizer, xml, xmlwriter
+          coverage: none
+          tools: composer:2.10.3
+        env:
+          fail-fast: 'true'
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: matrix.component == 'console'
+        with:
+          node-version: '24.19.0'
+      - name: Resolve or replay private dependencies and verify application
+        env:
+          P01_COMPONENT: ${{ matrix.component }}
+          P01_DISPATCH_MODE: ${{ inputs.dependency_mode }}
+        run: |
+          args=()
+          if [ -n "$P01_DISPATCH_MODE" ]; then
+            args+=(--dependency-mode "$P01_DISPATCH_MODE")
+          fi
+          python3 scripts/p01/run_quality.py \
+            --workspace "$GITHUB_WORKSPACE" \
+            --output "$RUNNER_TEMP/p01-quality" \
+            --component "$P01_COMPONENT" "${args[@]}"
+      - name: Retain lock, HTTP proof and all quality logs even on failure
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: p01-${{ matrix.component }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p01-quality/evidence/
+          if-no-files-found: error
+          retention-days: 14
+
+  foundation-checks:
+    name: Foundation checks
+    if: always()
+    needs: [selection, python, php]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Require every selected package family to pass
+        env:
+          P01_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: >-
+          python3 scripts/p01/check_jobs.py --workspace "$GITHUB_WORKSPACE"
+          --family python --family php

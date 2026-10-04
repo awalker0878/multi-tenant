@@ -16,7 +16,7 @@ Both endpoints return `service: governance` and `Cache-Control: no-store`; readi
 Use the accepted PHP 8.5.11 and Composer 2.10.3 development baseline. Commands run in this directory:
 
 ```sh
-composer validate --strict
+composer validate --strict --no-check-all
 composer install --no-interaction --no-progress --prefer-dist
 composer check-platform-reqs
 composer test:format
@@ -29,7 +29,9 @@ php artisan route:cache
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-The first committed lock is the retained P00 resolver seed until the initial service-specific CI resolution is captured. During that transition, `composer validate --strict` intentionally detects its mismatch and a normal locked replay must not claim success. The initial CI job performs the explicitly selected resolution, captures the resulting lock and inventory, and the subsequent replay uses only the retained service lock. See the [implementation record](../../docs/implementation/p01-governance-bootstrap.md) for observed status.
+The first committed lock is the retained P00 resolver seed until the initial service-specific CI resolution is captured. During that transition, `composer validate --strict --no-check-all` intentionally detects its mismatch and a normal locked replay must not claim success. The initial CI job performs the explicitly selected resolution, captures the resulting lock and inventory, and the subsequent replay uses only the retained service lock. See the [implementation record](../../docs/implementation/p01-governance-bootstrap.md) for observed status.
+
+`--no-check-all` disables Composer's exact/loose constraint advisory for the deliberately pinned direct dependencies; strict manifest and lock validation remain enabled.
 
 The runtime requires PHP extensions declared by the manifest and its dependency lock, including PDO PostgreSQL. Quality tools additionally require their locked platform requirements; use `composer check-platform-reqs` on the actual installation. There is no SQLite fixture, Node build, Inertia package, frontend, identity provider, broker or native endpoint dependency. PostgreSQL configuration has no default host, database, username or password and defaults to `verify-full` TLS; no database is opened by this foundation.
 

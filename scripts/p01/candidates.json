@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "php_version": "8.5.11",
+  "composer_version": "2.10.3",
+  "python_version": "3.12.14",
+  "uv_version": "0.12.19",
+  "php_dependency_mode": "resolve",
+  "scope": "P01 independently installed foundation candidates; no service dependency readiness or native qualification",
+  "components": {
+    "governance": {
+      "language": "php",
+      "path": "services/governance"
+    },
+    "planning": {
+      "language": "python",
+      "path": "services/planning",
+      "module": "planning",
+      "entrypoint": "planning-health"
+    },
+    "inventory": {
+      "language": "python",
+      "path": "services/inventory",
+      "module": "inventory",
+      "entrypoint": "inventory-health"
+    },
+    "lifecycle": {
+      "language": "python",
+      "path": "services/lifecycle",
+      "module": "lifecycle",
+      "entrypoint": "lifecycle-health"
+    },
+    "inventory-workers": {
+      "language": "python",
+      "path": "workers/inventory",
+      "module": "inventory_worker",
+      "entrypoint": "inventory-worker-health"
+    },
+    "lifecycle-workers": {
+      "language": "python",
+      "path": "workers/lifecycle",
+      "module": "lifecycle_worker",
+      "entrypoint": "lifecycle-worker-health"
+    },
+    "catalogue": {
+      "language": "php",
+      "path": "services/catalogue"
+    },
+    "assurance": {
+      "language": "php",
+      "path": "services/assurance"
+    },
+    "console": {
+      "language": "php",
+      "path": "apps/console",
+      "frontend": true
+    }
+  },
+  "node_version": "24.19.0"
+}
