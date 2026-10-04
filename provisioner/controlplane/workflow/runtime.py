@@ -131,14 +131,18 @@ class ProjectionBatch:
     checked: int
     progressed: bool
     next_cursor: ProjectionCursor | None
+    upper_bound: ProjectionCursor | None
 
 
 def _pending_jobs(context: TenantContext, *, limit: int = 32,
-                  after: ProjectionCursor | None = None) -> tuple[ProjectionCursor, ...]:
+                  after: ProjectionCursor | None = None,
+                  through: ProjectionCursor | None = None,
+                  newest_first: bool = False) -> tuple[ProjectionCursor, ...]:
     if type(limit) is not int or not 1 <= limit <= 128:
         raise ValueError('Projection page size must be between 1 and 128')
-    if after is not None and not isinstance(after, ProjectionCursor):
-        raise TypeError('An immutable projection cursor is required')
+    if (any(value is not None and not isinstance(value, ProjectionCursor)
+            for value in (after, through)) or type(newest_first) is not bool):
+        raise TypeError('Immutable projection ordering keys are required')
     query = (
         'SELECT j.job_id, j.created_at FROM hosting_controlplane.operation_jobs j '
         'JOIN hosting_controlplane.job_outbox o '
@@ -151,7 +155,11 @@ def _pending_jobs(context: TenantContext, *, limit: int = 32,
     if after is not None:
         query += 'AND (j.created_at, j.job_id) > (%s, %s) '
         parameters.extend((after.created_at, after.job_id))
-    query += 'ORDER BY j.created_at, j.job_id LIMIT %s'
+    if through is not None:
+        query += 'AND (j.created_at, j.job_id) <= (%s, %s) '
+        parameters.extend((through.created_at, through.job_id))
+    query += ('ORDER BY j.created_at DESC, j.job_id DESC LIMIT %s' if newest_first
+              else 'ORDER BY j.created_at, j.job_id LIMIT %s')
     parameters.append(limit)
     with _connect() as connection, connection.cursor() as cursor:
         _tenant(cursor, context)
@@ -218,24 +226,33 @@ def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
 
 def project_batch(jobs: JobRepository, workflow: TemporalWorkflowStarter,
                   context: TenantContext, *, after: ProjectionCursor | None = None,
+                  through: ProjectionCursor | None = None,
                   limit: int = 32) -> ProjectionBatch:
     """Check every job in one bounded, fair keyset page.
 
     An unfinished workflow is not a progress result and cannot monopolize the
-    oldest page. After the final page the next scan wraps, so earlier pending jobs
-    remain observable. The cursor only schedules readback; it carries no workflow
-    completion or native execution authority and can safely reset on restart.
+    oldest page. Each pass freezes the current greatest ordering key so new
+    arrivals cannot indefinitely postpone wrapping to earlier unfinished jobs.
+    These bounds only schedule readback; they carry no workflow completion or
+    native execution authority and can safely reset on restart.
     """
-    pending = _pending_jobs(context, limit=limit, after=after)
-    if not pending and after is not None:
-        pending = _pending_jobs(context, limit=limit)
+    if (after is None) != (through is None):
+        raise ValueError('A projection continuation requires both pass ordering keys')
+    if after is None:
+        latest = _pending_jobs(context, limit=1, newest_first=True)
+        if not latest:
+            return ProjectionBatch(0, False, None, None)
+        through = latest[0]
+    pending = _pending_jobs(context, limit=limit, after=after, through=through)
     progressed = False
     for candidate in pending:
         # Evaluate every row even when an earlier projection made progress.
         if project_one(jobs, workflow, context, candidate.job_id):
             progressed = True
-    return ProjectionBatch(len(pending), progressed,
-                           pending[-1] if len(pending) == limit else None)
+    continuation = (pending[-1] if len(pending) == limit
+                    and pending[-1] != through else None)
+    return ProjectionBatch(len(pending), progressed, continuation,
+                           through if continuation is not None else None)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -280,6 +297,7 @@ def main(argv: list[str] | None = None) -> int:
             start_history_retention_seconds=int(_required('HOSTING_TEMPORAL_START_RETENTION_SECONDS')),
             evidence_guard=gate.require)
     projection_cursor = None
+    projection_bound = None
     try:
         while True:
             if args.mode == 'dispatch':
@@ -287,9 +305,11 @@ def main(argv: list[str] | None = None) -> int:
                 busy = result is not None
             else:
                 gate.require(context)
-                batch = project_batch(jobs, workflow, context, after=projection_cursor)
+                batch = project_batch(jobs, workflow, context, after=projection_cursor,
+                                      through=projection_bound)
                 busy = batch.progressed
                 projection_cursor = batch.next_cursor
+                projection_bound = batch.upper_bound
             if args.once:
                 return 0
             if not busy:
