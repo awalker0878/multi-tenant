@@ -60,3 +60,10 @@ Back up non-secret configuration, manifest/signature policy and protected secret
 Before removing a component, enumerate active workflows, object/data retention, replay consumers, identity/key dependencies and recovery obligations. Remove obsolete secret references and flows only after dependent work is completed or safely migrated. Record independent observations of retired access and retained recovery material.
 
 Gate evidence comprises installed BOM export, rendered configuration digest, trust/role/network negative checks, artifact verification, measured sizing and restore results. File presence or a successful schema parse establishes none of these operating outcomes.
+
+
+## P00 candidate records
+
+The [candidate image report](../implementation/p00-image-results.md) links actual digest-pinned image inputs, OS/runtime/extension/package inventories and source-bound build/probe results. These are experimental build BOMs, not installed environment records, published signed images or a claimed SPDX/CycloneDX SBOM. Use their measured identities as review inputs for ADR-003; select the operating owner, approved artifact/mirror path and support/update policy through IP02 in the [decision and input packet](../implementation/p00-decision-and-input-review.md).
+
+P01 release/environment records must replace fixture assumptions with the selected service artifacts, dependency closure, trust and deployment configuration. Keep candidate build evidence immutable when a later environment selects different inputs.

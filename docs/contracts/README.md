@@ -1,6 +1,6 @@
 # Contract conventions and ownership
 
-Status: proposed contract design for P00/P01. The examples are illustrative, not executable schemas. No OpenAPI, AsyncAPI, generated clients or compatibility test results are claimed to exist. Exact cardinalities, authentication delegation and canonicalization await ADR-009/012/013 decisions.
+Status: proposed product contract design for P00/P01. The examples in this document remain illustrative. A separate [P00 contract-tool experiment](../implementation/p00-contract-tooling-results.md) now executes synthetic OpenAPI and JSON Schema fixtures and generated PHP/Python/TypeScript clients; it defines no product API or AsyncAPI channel. Exact cardinalities, authentication delegation and canonicalization await ADR-009/012/013 decisions.
 
 ## Where contracts will live
 
@@ -64,3 +64,10 @@ Each integration defines connect/total timeouts, permitted endpoints, payload an
 P01.03 locks initial contracts with both provider and consumer owners. Document additive-field handling, enum expansion, nullability, date/number precision and unknown-version behavior; do not assume every additive change is safe. HTTP breaking changes require a new supported major route or a reviewed compatibility bridge; event breaking changes require a new schema/version and migration/replay plan.
 
 CI should regenerate clients, validate valid/invalid fixtures, compare schema compatibility and run both PHP and Python against digest/error/idempotency golden cases. New behavior links requirements, packages and evidence through the [status model](../implementation/status-model.md); passing these checks proves contract behavior, not native qualification.
+
+
+## Measured tool candidate
+
+[ADR-012](../decisions/adr-012-contracts-and-event-evolution.md) records the tested OpenAPI 3.0.4 subset, JSON Schema 2020-12 event envelope and OpenAPI Generator 7.25.0 candidate. The [isolated source](../../spikes/compatibility/contracts/README.md) supplies locked reproduction commands and negative fixtures. Generator outputs remain private Infrastructure adapters; wire-schema validation must precede domain translation because generated models and decoders do not enforce every constraint.
+
+P01.03 must still publish the reviewed product schemas in this contract tree, choose AsyncAPI channels/bindings, implement the selected compatibility checker and golden digest/error/idempotency vectors, and execute real provider/consumer and outbox/inbox tests. Deterministic generation and synthetic fixture rejection do not complete those gates.
