@@ -49,7 +49,16 @@ The proposed implementation uses Laravel/PHP for product services and Python for
 
 Services own their data and communicate through versioned APIs and events. Central services are proposed for Kubernetes within approved trust boundaries; workers run near their authorized endpoints. Application data moves directly between approved source and target paths. See the [service catalogue](docs/services/README.md), [architecture](docs/architecture/target-architecture.md) and [deployment model](docs/operations/deployment-model.md).
 
-The codebase is organized by explicit business contexts inside those microservices. Each context separates Domain, Application, Infrastructure and Interfaces code; Laravel hosts the PHP contexts, and Python services follow equivalent boundaries. Context-private models and use cases stay private. A [context registry](architecture/context-map.yaml), [source structure](docs/architecture/context-code-structure.md) and [code-control policy](docs/engineering/code-control.md) define allowed dependencies, contract exports, ownership, review and CI enforcement.
+Each business context owns its service, data and rules. Inside each Laravel application, capabilities use the pragmatic domain convention selected in [ADR-024](docs/decisions/adr-024-pragmatic-laravel-domain-convention.md):
+
+| Location within each Laravel application | Responsibility |
+| --- | --- |
+| `app/Domain/<Capability>/` | Business behavior and invariants, including Eloquent models |
+| `app/Application/<Capability>/Actions/` | Use cases with a `handle()` entrypoint, authorization and local transaction orchestration |
+| `app/Infrastructure/` | External clients and adapters for real integration boundaries |
+| Normal Laravel directories | Controllers, requests, jobs, listeners, policies, providers, migrations and factories |
+
+Each independently built Laravel service owns its own `App\` namespace. Capabilities within one context can collaborate directly; direct Eloquent access is the default, and repositories or DTOs need a concrete reason. Python services retain their own domain/application/infrastructure/interfaces structure. Across service boundaries, internal models and use cases remain private and integration uses versioned contracts. The [context registry](architecture/context-map.yaml), [source structure](docs/architecture/context-code-structure.md) and [code-control policy](docs/engineering/code-control.md) define ownership, dependency checks and required review. Full application checks and repository protections are P01 deliverables.
 
 ## First release and delivery milestones
 

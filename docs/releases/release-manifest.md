@@ -1,6 +1,6 @@
 # Release manifest contract
 
-Owner: delivery lead. Consumers: deployment automation, service operators, assurance and support. Related decisions: ADR-003, ADR-005, ADR-012, ADR-022 and ADR-023.
+Owner: delivery lead. Consumers: deployment automation, service operators, assurance and support. Related decisions: ADR-003, ADR-005, ADR-012, ADR-022 and ADR-024.
 
 The manifest identifies a reproducible product release and its evaluated scope. Its human release name is a label; immutable artifact and configuration identities are the binding references.
 

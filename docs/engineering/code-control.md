@@ -25,19 +25,29 @@ Change this inventory in the same pull request as a boundary or contract change.
 
 ## 2. Source dependency policy
 
-PHP service code lives under `services/<service>/src/Contexts/<Context>/`. The Laravel host supplies bootstrap, configuration, bindings and process entrypoints. Python service code lives under `services/<service>/src/<service>/` with the corresponding lowercase layers. Use distinct PSR-4 namespace roots and Python package names for each service.
+Laravel services use their own standard `app/` tree and local `App\` namespace, following [ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md). `app/Domain/<Capability>` and `app/Application/<Capability>` organize business behavior within the service's bounded context; `app/Infrastructure` holds integrations. Controllers, commands, jobs, listeners, policies and providers retain Laravel's normal locations. The selected convention is documented by its author [C6]. Reusing `App\` in independently built services is expected: namespace resolution is relative to the owning Composer application, never a global shared namespace.
 
-| Layer | May depend on | Must not depend on |
+| PHP area | Permitted responsibility/dependencies | Forbidden coupling |
 | --- | --- | --- |
-| `Domain` / `domain` | Owned entities, values, domain events, pure rules and explicitly approved language-level primitives | Laravel, Eloquent, web/session globals, framework container, ORM, broker, Temporal or provider SDKs; another context's internals |
-| `Application` / `application` | Owned Domain, use-case input/output, narrow ports defined by the consuming application | Infrastructure or Interfaces implementations, framework request objects, native provider calls, sibling service code |
-| `Infrastructure` / `infrastructure` | Owned Application ports and Domain; approved database, transport, workflow and provider adapters | Another service's private models, direct foreign SQL, undeclared public-client versions |
-| `Interfaces` / `interfaces` | Owned Application use cases and input/output; approved HTTP/job/CLI transport types | Direct persistence or native mutation; direct invocation of Infrastructure; a second implementation of business rules |
-| Host composition root | Explicitly registers adapters and entrypoints for its service | Business invariants, cross-service aggregate ownership, native actions during bootstrap |
+| `App\Domain\<Capability>` | Owned Eloquent models and business transitions, value objects, rules, exceptions and events; Laravel facilities appropriate to those responsibilities | Application, Infrastructure or delivery classes; transport request/response objects; another service's private source/data |
+| `App\Application\<Capability>` | Domain capabilities, Actions with public `handle()`, Laravel authorization, direct Eloquent persistence and local transactions; consumer-owned contracts for external behavior | Concrete Infrastructure or delivery classes; HTTP request/response objects as use-case input/output; native provider SDK calls |
+| `App\Infrastructure` | External SDK/client adapters, specialized persistence and implementations of owned contracts; approved generated transport clients and technical integration packages | Private foreign models/SQL, undeclared client versions or taking ownership of another context's business rules |
+| Standard Laravel entrypoints | Validated transport input, caller context, Action invocation and response presentation; simple authorized/scoped reads may query owned models | Business mutation workflows duplicated outside Actions, foreign database access or direct native mutation |
+| Policies and providers | Policies express resource/action authorization; providers register bindings and framework integration | Business state transitions hidden in authorization or bootstrap; cross-service aggregate ownership |
 
-An adapter may use an approved external generated client to implement an application port. The use case consumes its own port and typed results, preserving the owner's vocabulary and error semantics. An HTTP controller, queue listener or console command invokes the same use case after establishing its input and caller context. Infrastructure implements local persistence with Eloquent; Domain entities do not extend Eloquent models. This is the project's chosen boundary, not a claim that Laravel requires this architecture.
+Domain/Application may use Laravel. Dependency checks prohibit upward first-party dependencies and transport coupling; they do not reject Eloquent or a framework facade merely because it is a vendor class. Using `Gate` to evaluate a registered policy is normal Action behavior. Container lookups, custom facades and string class references must not conceal an otherwise forbidden Infrastructure/delivery dependency. Actions coordinate durable publication through the owning service's outbox protocol; asynchronous reactions do not authorize direct job-class imports into the use-case layer.
 
-Within a service hosting multiple contexts, prohibit direct imports of another context's Domain, Application and Infrastructure internals. Any exceptional in-process public boundary requires an explicit reviewed export and registry edge; colocating contexts is not permission to share aggregates or transactions. Cross-service interaction always uses a versioned API or event contract. Tests may replace an owned port with a test adapter, but cannot normalize forbidden production dependencies.
+Capabilities in the same bounded context can collaborate directly, including owned model relationships. Do not require a repository or Data class for every operation. An external service/provider boundary requires an explicit owned contract and adapter; an ordinary local Eloquent query does not. The initial six business contexts each have their own service. If one service later hosts another bounded context, that topology needs an ownership decision and explicit public boundary before private code is shared. Cross-service interaction continues to use versioned API/event contracts, never shared Eloquent models or a combined autoloader.
+
+Python retains `services/<service>/src/<service>/` and distinct package names:
+
+| Python layer | May depend on | Must not depend on |
+| --- | --- | --- |
+| `domain` | Owned entities, values, events, pure rules and approved language primitives | Application/infrastructure/interfaces, ORM, web/broker/Temporal/provider SDKs or foreign service internals |
+| `application` | Owned domain, use-case types and consuming application ports | Concrete infrastructure/interfaces, transport request objects, native provider SDKs or sibling service code |
+| `infrastructure` | Owned application/domain and approved adapters | Foreign private source/SQL or undeclared clients |
+| `interfaces` | Owned application and transport types | Infrastructure implementation calls, direct persistence/native mutation or duplicated invariants |
+| Bootstrap | Binding the service's adapters and entrypoints | Business invariants or native actions during startup |
 
 The console applies equivalent feature boundaries in PHP and TypeScript. Feature modules expose narrow entrypoints; a feature cannot reach into another feature's private state or backend internals. Generated contract types describe transport, not new sources of authorization. The BFF's own session and presentation persistence does not authorize connections to business-service databases.
 
@@ -49,16 +59,16 @@ The repository's [architecture validator](../../scripts/validate_architecture.py
 
 | Enforcement surface | P01 implementation and proof | Limits to cover separately |
 | --- | --- | --- |
-| PHP dependency graph | Pin Deptrac and its parser in owned Composer locks; collect each context/layer and external dependency explicitly; apply the table above; fail unclassified first-party code and forbidden edges [C3] | Dynamic container lookups, string class names, reflection, helper functions and runtime configuration need custom static rules, explicit composition review and integration tests |
-| PHP architecture-specific assertions | Use focused Pest architecture assertions or reviewed PHPStan rules where the graph needs additional checks; pin the selected implementation and prove it with violating fixtures | Style/type success does not imply the architecture rules ran; retain an independent architecture result |
+| PHP dependency graph | Pin Deptrac and its parser in each application lock; collect the local `App\` layers and normal delivery directories, allow Laravel as specified above, and fail unclassified first-party code and forbidden edges [C3] | Dynamic container lookups, string class names, reflection, helper functions and runtime configuration need custom static rules, explicit composition review and integration tests |
+| PHP architecture-specific assertions | Require Pest architecture checks for the adopted namespaces, Action `handle()` presence and any selected Data naming convention; add reflection/PHPStan assertions for public visibility and project-specific gaps | Method-presence assertions do not prove public visibility, authorization, transactions, outbox durability or every dynamic dependency; test those separately |
 | Python dependency graph | Pin Import Linter; combine forbidden, layered and independence contracts for service roots and modules [C4] | Layer order alone can permit unwanted lateral edges; forbid Interfaces-to-Infrastructure and service-to-service imports explicitly; review dynamic import/plugin paths |
 | TypeScript/Vue imports | Pin ESLint plus the selected TypeScript/Vue parsers and boundary rules; check feature public entrypoints, path aliases, generated clients and server-only modules | ESLint `no-restricted-imports` covers static imports; dynamic imports and CommonJS forms need corresponding rules or syntax restrictions [C5] |
 | Build isolation | Build a service from only its declared service root, contract inputs and versioned technical packages | A successful monorepo-wide build can conceal missing dependencies or sibling source copied into an image |
 | Runtime data ownership | Execute denial tests with actual per-service database, object and broker identities | Static import analysis cannot establish database permissions, message ACLs or remote endpoint authorization |
 
-Do not select a linear layer rule that implicitly allows Interfaces to reach Infrastructure. Configure the actual permitted edges. Domain receives a positive list of allowed primitives; allowing all external vendor packages would defeat the framework-independent boundary. Analyzer configuration must cover aliases, fully qualified references, inheritance, traits, attributes and generated entrypoints as supported by the selected parser.
+Configure the permitted edges for each language rather than applying one linear layer rule to both. PHP permits Laravel within Domain/Application while forbidding upward application dependencies; Python retains its framework-independent core and explicit Interfaces-to-Infrastructure prohibition. External provider SDKs and generated transport clients remain infrastructure concerns. Analyzer configuration must cover aliases, fully qualified references, inheritance, traits, attributes and generated entrypoints as supported by the selected parser.
 
-The initial registry excludes generated and technical shared packages from Domain/Application even when their service can use them in adapters. Python standard-library imports are accepted by the initial smoke check; that is not proof that code avoids network, process, filesystem or database effects. Likewise, host-root classification does not prove a file contains only composition. Complete language rules and semantic review must close those gaps before G01 architecture acceptance.
+The project registry keeps generated transport clients and shared technical integration packages out of Domain/Application even when the service may use them in adapters. This project-specific boundary does not ban Laravel itself. Python standard-library imports are accepted by the initial smoke check; that does not prove freedom from I/O. PHP host-root classification likewise does not establish correct policy or Action delegation. Complete language rules and behavioral review must close those gaps before G01 architecture acceptance.
 
 Report scanned roots, files/classes/modules classified, excluded paths, uncovered symbols, rule failures and tool/configuration identities. Generated and vendor exclusions must be narrow, attributable and validated through their own build/contract checks. A renamed namespace, empty source set or missing configuration cannot turn a required check green.
 
@@ -68,16 +78,18 @@ Maintain a small architecture-tool fixture suite separate from product tests. Ea
 
 | Fixture | Required rejection |
 | --- | --- |
-| PHP Domain entity imports an Eloquent model or Laravel facade | Framework dependency in Domain |
+| PHP Domain model imports an Application Action, Infrastructure adapter or HTTP request | Upward first-party dependency or transport coupling |
 | Application use case imports its Infrastructure repository | Reversed dependency instead of an owned port |
-| Interfaces controller calls an Infrastructure adapter directly | Entry adapter bypasses the application boundary |
+| Application Action imports an `App\Http` controller, `App\Jobs` class or concrete Infrastructure adapter | Use case depends on delivery or integration implementation |
 | Catalogue imports governance source, including an aliased/fully qualified reference | Private service import |
 | Python use case imports `lifecycle.infrastructure` from planning | Sibling-service import and adapter leak |
 | Console feature imports another feature's private state through an alias or re-export | Undeclared frontend dependency |
 | An unregistered source root, context or contract consumer appears | Ownership/impact classification incomplete |
 | Analyzer configuration drops a source root or adds broad exclusions | Enforcement coverage shrinks without approval |
 
-P01 records real executions of the selected tools against these fixtures. Tests of the lightweight registry validator establish that validator's behavior only; they do not satisfy the PHP, Python or frontend acceptance evidence by themselves.
+Legal PHP fixtures must include an Eloquent Domain model, an Action using `Gate` and `DB`, ordinary Laravel controllers, and two isolated services each using `App\`. A simple authorized read and collaboration between capabilities in one context must pass. Foreign Composer source mappings and sibling service build inputs must still fail even when their namespaces look identical.
+
+P01 records real executions of the selected tools against these fixtures. Tests of the lightweight registry validator establish that validator's behavior only; they do not satisfy the PHP, Python or frontend acceptance evidence by themselves. A skipped namespace check cannot satisfy G01 for a required service whose implementation or adopted namespace is missing.
 
 ## 4. Review and merge control
 
@@ -146,3 +158,4 @@ Reviewed 2026-10-04. These sources establish tool behavior; source layout, revie
 | C3 | [Deptrac configuration](https://deptrac.github.io/deptrac/configuration/) and [collectors](https://deptrac.github.io/deptrac/collectors/) | Explicit layer collection, allowed edges and covered dependency types |
 | C4 | [Import Linter layers](https://import-linter.readthedocs.io/en/stable/contract_types/layers/), [forbidden imports](https://import-linter.readthedocs.io/en/stable/contract_types/forbidden/) and [independence](https://import-linter.readthedocs.io/en/stable/contract_types/independence/) | Complementary Python dependency contracts |
 | C5 | [ESLint restricted imports](https://eslint.org/docs/latest/rules/no-restricted-imports) | Static import restriction and its dynamic-import limitation |
+| C6 | [Pragmatic Domain-Driven Design in Laravel](https://dev.to/maiobarbero/pragmatic-domain-driven-design-in-laravel-with-laravel-boost-3bcm) | Author's Laravel convention; no package or assistant program is adopted |

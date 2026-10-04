@@ -30,7 +30,7 @@ Refinement and validation: Review boundary changes through owning ADR and contra
 
 - Console, governance, catalogue, inventory, planning, lifecycle and assurance each own their assigned data and write operations.
 - Cross-context access uses owned interfaces; assurance is proposed as a Laravel service and must preserve evidence responsibilities independently of UI concerns.
-- [ADR-023](adr-023-context-code-boundaries-and-controls.md) develops the required context-oriented source structure and code controls. Framework models and internal use cases remain private to their owning context; capability modules do not acquire independent service authority.
+- [ADR-024](adr-024-pragmatic-laravel-domain-convention.md) selects the pragmatic Laravel convention within the context-oriented source structure and code controls. Framework models and internal use cases remain private to their owning context; capability modules do not acquire independent service authority.
 
 ## Unresolved details and evidence needed
 

@@ -14,7 +14,7 @@ The [Strapi article](https://strapi.io/blog/laravel-best-practices) is a useful 
 
 | Advice requiring interpretation | Project treatment and primary basis |
 | --- | --- |
-| Put business logic in large models | Use context-owned Domain aggregates/invariants and Application use cases, with separate Eloquent Infrastructure records. Laravel permits flexible organization; [context conventions](../engineering/laravel-conventions.md) define this project's stricter choice. |
+| Put business logic in large models | Place business transitions on capability-owned Eloquent models where they belong; coordinate authorization and persistence in Application Actions. Avoid giant models and mandatory parallel persistence mappings. The user-selected [Laravel convention](../engineering/laravel-conventions.md) governs placement within each service. |
 | Validation examples allow every caller | Validation, authenticated tenant context, field permissions and resource authorization are separate checks. Follow Laravel validation/authorization and the [security standard](../engineering/security-and-tenancy.md). |
 | Administrator authorization bypass | Tenant and privileged support access remain explicitly scoped, time-bound and audited. No universal bypass; preserve the existing governance model. |
 | URL forcing as HTTPS enforcement | Enforce transport at approved ingress, restrict trusted proxies/hosts and test cookie/redirect behavior. Correct generated URLs alone do not block plaintext traffic. |
@@ -48,10 +48,18 @@ The detailed engineering pages cite the primary pages used for each topic. These
 
 ## Coverage conclusion and follow-through
 
-Following the user's explicit rejection of the initial lightweight folder structure, [ADR-023](../decisions/adr-023-context-code-boundaries-and-controls.md) and the [context code structure](../architecture/context-code-structure.md) replace the application-wide actions/models convention with bounded-context layers. The [code-control policy](../engineering/code-control.md) and machine-readable context map make ownership and allowed dependencies inspectable. This is a project architecture requirement, not a claim that Laravel mandates one structure.
+The user subsequently selected the [pragmatic Laravel DDD article](https://dev.to/maiobarbero/pragmatic-domain-driven-design-in-laravel-with-laravel-boost-3bcm) and its [author-maintained package](https://github.com/maiobarbero/laravel-boost-ddd). [ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md) replaces ADR-023's framework-independent PHP proposal. The [context code structure](../architecture/context-code-structure.md) now applies that convention inside independent Laravel services, retaining the [code-control policy](../engineering/code-control.md), service-private data and machine-readable ownership map. Capability folders are not automatically bounded contexts. This is an explicit project choice; it is not a claim that Laravel mandates this structure.
 
 The documentation now defines a coherent enterprise Laravel baseline with owners, implementation packages and specific verification obligations for architecture, security, frontend, persistence, messaging, quality and operations. This is documentary coverage: the corresponding runtime controls and tests must still be built and demonstrated.
 
 Before scaffolding, P00 must resolve compatible tooling, identity/session choices, approved deployment dependencies and operating/security applicability. P01 then implements the common engineering foundation. P02/P03 must prove it against real tenant and catalogue behavior. The [coverage map](../engineering/coverage.md) supplies the review route through later scale, security, recovery and pilot gates.
 
 Do not infer completed security, code quality, accessibility or performance from this assessment. Future reviews should inspect actual code and evidence against the same mapped controls, record concrete failures, and update the affected canonical document rather than adding disconnected advice.
+
+## Preferred convention review
+
+Reviewed on 2026-10-04 against the author's repository README, core guidance and architecture-test stub. The selected convention is binding through ADR-024. The user explicitly requests only the convention, so the repository is a reference source; no Laravel Boost DDD or Boost installation is included in this plan.
+
+Project-owned architecture tests must be included in the normal Laravel test suite. The reference stub helps identify rules to cover, but does not replace positive and negative fixtures for this repository's service ownership, Composer boundaries and registered source roots. Version compatibility for the project's formatter, analyzer and test tools remains part of P00/P01.
+
+Project additions cover tenant and actor isolation across entrypoints, durable outbox/inbox recovery, independently built services, protected source ownership and native qualification. The [coverage map](../engineering/coverage.md) retains all 24 controls and their phase/gate obligations. An architecture-test pass covers only its assertions; skipped namespaces and dynamic lookups require explicit accounting.

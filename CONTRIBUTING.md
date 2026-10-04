@@ -14,7 +14,7 @@ Use the GitHub connector to publish branch changes in this workflow. Do not comm
 
 Each deployable owns its dependency locks, tests and build configuration. Install from reviewed locks; make dependency resolution intentional and reviewable. Use the pinned formatter and static analyzer configuration, with no unreviewed suppressions or baseline growth. P01 will establish CODEOWNERS and enforced review/status checks; its required outputs are described in the developer workflow.
 
-Start source work from the [context code structure](docs/architecture/context-code-structure.md) and [code-control policy](docs/engineering/code-control.md). Register source/package ownership in [the context map](architecture/context-map.yaml) before introducing a new boundary. Domain/Application code must stay independent of framework and adapter implementations. Changes to the map, analyzers, ownership or CI are policy changes requiring their designated review.
+Start source work from the [context code structure](docs/architecture/context-code-structure.md) and [code-control policy](docs/engineering/code-control.md). Register source/package ownership in [the context map](architecture/context-map.yaml) before introducing a new boundary. Laravel capabilities belong in the owning service's `app/Domain/` and `app/Application/`; retain Eloquent and normal Laravel entrypoints. Domain code must not depend on Application or Infrastructure. Application Actions expose `handle()` and may use Eloquent, policies and local transactions; interfaces belong at actual external dependency boundaries. Python retains its documented dependency direction. Changes to the map, analyzers, ownership or CI are policy changes requiring their designated review.
 
 ## Documentation checks
 

@@ -10,8 +10,8 @@ Keep product intent, target design, delivered behavior and observed evidence dis
 | --- | --- | --- |
 | `docs/product/` | User journeys, vocabulary, entity semantics and application examples | A user-visible concept, workflow or domain invariant changes |
 | `docs/architecture/` | Cross-service ownership, trust boundaries, topology and design rules | A boundary, data owner, dependency or trust assumption changes |
-| `architecture/context-map.yaml` | Machine-readable service/context roots, owners, layer policy and package/worker dependencies | A source boundary, dependency or deployment ownership changes; update checks and design together |
-| `docs/services/<service>.md` | Service responsibilities, data, interfaces, failure and operating behavior | A service changes behavior, persistence, permissions or dependencies |
+| `architecture/context-map.yaml` | Machine-readable service/context roots, owners, language-specific dependency policy and package/worker dependencies | A source boundary, dependency or deployment ownership changes; update checks and design together |
+| `docs/services/<service>.md` | Service responsibilities, capability behavior, data, interfaces, failure and operating behavior | A capability changes behavior, persistence, permissions or dependencies |
 | `docs/engineering/` | Shared implementation standards, primary-source rationale and control-to-package verification mapping | Framework behavior, engineering policy, CI enforcement or a cross-cutting risk changes |
 | `docs/contracts/` | Human-readable API/event conventions and examples | Contract semantics or cross-language usage changes |
 | `contracts/openapi/`, `contracts/asyncapi/`, `contracts/schemas/` | Future canonical machine-readable API/event/message definitions | Schemas are implemented; clients and rendered references derive from these sources |
@@ -31,6 +31,8 @@ Keep product intent, target design, delivered behavior and observed evidence dis
 | `next_work.md` | Immediate queue and navigation to package definitions | The next actionable work changes; do not duplicate the entire backlog or statuses |
 
 Paths described as future are not implemented artifacts. When adding a real schema, move authoritative field definitions into it and retain explanatory examples in service/contract docs. Service docs still own why an interface exists, authorization and business semantics.
+
+Document each capability under its owning service. Record its vocabulary, invariants, authorization, local transaction boundary, external interactions and verification alongside the relevant work package. The source layout follows [ADR-024](decisions/adr-024-pragmatic-laravel-domain-convention.md) for Laravel and the [context code structure](architecture/context-code-structure.md) for both languages. A Laravel capability folder is not a new service or a reason to duplicate the domain model, add a contract for every class, or create an empty document. When a capability needs a larger design, add a substantive linked design in `docs/services/<service>/`; keep the service page as its ownership and navigation index.
 
 ## 2. New work follows a linked record
 
@@ -60,6 +62,7 @@ Operational credentials, live inventory, endpoint addresses, Terraform state and
 | Change | Documentation and evidence impact |
 | --- | --- |
 | New entity/invariant | Domain model, owning service, schema/example, requirement mapping and invariant tests |
+| Laravel capability/use case | Owning service behavior, Domain model rules, Action or simple authorized read, transaction/tenant boundaries, affected contracts and behavioral tests |
 | API/event | Source schema, semantic examples, compatibility policy, client impact and contract-test reference |
 | Workflow/activity | Lifecycle specification, state/sequence diagram, retry/uncertainty/recovery rules and replay/failure evidence |
 | Platform adapter | Capability declaration, affected support combinations, campaign design and scoped native evidence |

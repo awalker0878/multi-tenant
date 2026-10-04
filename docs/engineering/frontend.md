@@ -25,10 +25,12 @@ Keep Laravel presentation routing and controller composition in the console. Ine
 
 | Location under `apps/console/` | Responsibility |
 | --- | --- |
-| `src/Contexts/Console/Interfaces/Http/` | Thin page/command adapters, Form Requests and presenters; validated input and allowlisted Inertia responses. |
-| `src/Contexts/Console/Application/` | Console task composition and presentation DTOs through remote-service ports; no copied business-service invariants. |
-| `src/Contexts/Console/Infrastructure/` | Approved service clients, session/presentation persistence and transport adapters. |
-| `app/Providers/`, `bootstrap/`, `routes/` | Laravel host registration and explicit dependency composition. |
+| `app/Http/Controllers/`, `app/Http/Requests/`, `app/Http/Presenters/` | Normal Laravel HTTP entrypoints, validation and explicit allowlisting for Inertia responses; a simple authorized read may stay in its controller. Presenters are the project's response-shaping convention. |
+| `app/Application/<Capability>/Actions/` | Console use cases with `handle()`, authorization and remote-service orchestration; dependencies on external services use owned contracts. |
+| `app/Domain/<Capability>/` | Console-owned behavior and any corresponding Eloquent models; no copies of another service's aggregates or database models. |
+| `app/Infrastructure/` | Approved remote-service clients and external transport adapters. |
+| `app/Policies/`, `app/Jobs/`, `app/Listeners/`, `app/Providers/` | Normal Laravel authorization, asynchronous entrypoints and dependency registration. |
+| `bootstrap/`, `routes/`, `database/` | Framework bootstrapping, routing, migrations, factories and seeders for console-owned data. |
 | `resources/js/app/` | Browser bootstrap, providers and shell composition. |
 | `resources/js/pages/` and `journeys/` | Thin Inertia route entrypoints and cross-context operator journeys using public context interfaces. |
 | `resources/js/contexts/<context>/features/<capability>/` | Context-aligned feature components, composables, view models, API adaptation and tests; private internals behind explicit exports. |
@@ -36,7 +38,7 @@ Keep Laravel presentation routing and controller composition in the console. Ine
 | `resources/js/shared/ui/`, `shared/lib/`, `shared/types/` | Accessible UI primitives and narrow technical utilities; no service aggregates, hidden API calls or tenant authority. |
 | `resources/css/` | Tailwind theme tokens, typography and approved shared styles. |
 
-These context and presenter conventions are project choices, extending Laravel's documented starter structure and the [context code model](../architecture/context-code-structure.md). Prefer Vue single-file components with `<script setup lang="ts">`, typed props/emits and Composition API. A feature cannot deep-import another context's files or import an owning service's PHP/Python implementation. Cross-context composition belongs in `journeys/` and consumes reviewed context exports. Shared UI/utilities cannot import upward into contexts or pages. Enforce resolved aliases, relative paths and dynamic-import rules through the selected frontend boundary tooling in P01; TypeScript path aliases alone do not enforce architecture. Do not create a global store that duplicates every server aggregate. Keep temporary form state close to its feature. [S1, S6]
+The PHP layout follows [ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md) and the [context code model](../architecture/context-code-structure.md). It allows direct Eloquent access to console-owned data; DTOs and repositories need a concrete purpose. The TypeScript context and presenter conventions are project choices, extending Laravel's documented starter structure. Prefer Vue single-file components with `<script setup lang="ts">`, typed props/emits and Composition API. A feature cannot deep-import another frontend context's files or import an owning service's PHP/Python implementation. Cross-context composition belongs in `journeys/` and consumes reviewed context exports; capabilities within one frontend context can collaborate directly. Shared UI/utilities cannot import upward into contexts or pages. Enforce resolved aliases, relative paths and dynamic-import rules through the selected frontend boundary tooling in P01; TypeScript path aliases alone do not enforce architecture. Do not create a global store that duplicates every server aggregate. Keep temporary form state close to its feature. [S1, S6]
 
 Enable TypeScript `strict`, run Vue-aware type checking separately from bundling, and fail CI on errors. Vite transformation is not a type-check gate. Share generated contract types from the canonical versioned schemas where available; presenters still own the narrower page contract. Treat network input as untrusted at runtime: a TypeScript assertion is not validation. Test schema-to-client generation for drift; do not hand-maintain competing definitions of job states or approval digests. Represent identifiers and revisions using their contract types without unsafe numeric coercion. [S6–S7]
 

@@ -2,9 +2,10 @@
 
 ## Authoritative direction
 
-1. The current request asks for a detailed implementation plan with phases, abandonment of the previous Laravel foundation branch and a new branch.
-2. The supplied `Pasted markdown(6).md` contains successive proposals. Its later explicit greenfield direction takes precedence over its earlier transition plan.
-3. Historical repository material supplies hosting, workload mobility and execution-safety requirements. It does not supply current product completion or qualification evidence.
+1. The current request selects [pragmatic Laravel DDD](https://dev.to/maiobarbero/pragmatic-domain-driven-design-in-laravel-with-laravel-boost-3bcm) and the [author's repository](https://github.com/maiobarbero/laravel-boost-ddd) for code organization inside the required contexts/microservices. [ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md) supersedes the prior pure-PHP layout while retaining service ownership and code controls.
+2. Earlier instructions require a detailed phased implementation plan, actual documentation, an improved product README, abandonment of the previous Laravel foundation branch and a new branch.
+3. The supplied `Pasted markdown(6).md` contains successive proposals. Its later explicit greenfield direction takes precedence over its earlier transition plan.
+4. Historical repository material supplies hosting, workload mobility and execution-safety requirements. It does not supply current product completion or qualification evidence.
 
 The source transcript's claims about earlier local tests and partly built applications are historical narrative. They are not validated achievements of this branch. Embedded rendering/CSS noise from the pasted transcript is not copied into the product documentation.
 
@@ -40,3 +41,5 @@ Framework existence does not establish managed-browser support, enterprise ident
 ## Enterprise engineering review
 
 The [Laravel practices assessment](laravel-practices-review.md), reviewed 2026-10-04, evaluates the supplied Strapi article against primary Laravel, PHP-FIG, frontend, OWASP, W3C and secure-delivery sources. It establishes [engineering guidance](../engineering/README.md) and a [control-to-delivery map](../engineering/coverage.md). Framework facts, project policy and future verification remain distinguishable; these additions do not accept open ADRs or create execution evidence.
+
+The later user-selected Laravel DDD convention takes precedence over the earlier source-layout proposal and generic article examples. Its package README/core guidance and test stub describe the convention and tooling; official Laravel sources define framework behavior. Product ownership, security, delivery and qualification obligations remain project requirements. The user requests the convention only; adding Laravel Boost DDD or Boost is outside this plan.

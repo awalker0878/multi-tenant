@@ -8,8 +8,8 @@ These standards turn the product architecture into implementation and review rul
 
 | Guide | Owns |
 | --- | --- |
-| [Laravel conventions](laravel-conventions.md) | Service layout, use-case boundaries, dependencies, typing and API adapters |
-| [Context code structure](../architecture/context-code-structure.md) | Explicit bounded-context namespaces, capability modules, layers and host composition |
+| [Laravel conventions](laravel-conventions.md) | Capability-based Domain/Application code, Eloquent behavior, Actions, normal Laravel entrypoints and external adapters |
+| [Context code structure](../architecture/context-code-structure.md) | Service ownership, pragmatic Laravel layout, Python layers and private/public code boundaries |
 | [Code controls](code-control.md) | Machine-readable ownership, dependency rules, protected changes, review policy and CI enforcement |
 | [Data and messaging](data-and-messaging.md) | Eloquent, tenant persistence, transactions, outbox/inbox, queues, caches and schema evolution |
 | [Security and tenancy](security-and-tenancy.md) | Authentication, authorization, tenant context, browser protection and hostile input |
@@ -20,6 +20,8 @@ These standards turn the product architecture into implementation and review rul
 | [Research assessment](../reference/laravel-practices-review.md) | Sources, assessment of the supplied article and the reasons for these additions |
 
 Deployment procedures remain in [operations](../operations/README.md); API/event semantics remain in [contracts](../contracts/README.md). Do not maintain competing framework instructions in every service document. Service specifications explain their particular models, permissions, dependencies and exceptions to these common rules.
+
+[ADR-024](../decisions/adr-024-pragmatic-laravel-domain-convention.md) selects the Laravel convention. Domain code can use Eloquent while remaining independent of Application and Infrastructure. Application Actions orchestrate use cases through `handle()`; direct Eloquent access and same-context collaboration are normal. Add repositories, DTOs and contracts when they clarify a concrete dependency or behavior. Service-private data, tenant authorization and versioned integration contracts remain mandatory.
 
 ## Apply the standards to a change
 

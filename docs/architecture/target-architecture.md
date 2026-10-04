@@ -8,7 +8,7 @@ The source establishes Laravel/PHP business services, a Laravel/Inertia/Vue cons
 
 Implementation order, deliverables and acceptance gates are in [the phased implementation plan](../implementation/phased-plan.md).
 
-The [context code structure](context-code-structure.md) defines explicit Domain, Application, Infrastructure and Interfaces boundaries inside each owning microservice. Laravel supplies the host and adapters; business contexts do not live in application-wide model/action folders. The [context map](../../architecture/context-map.yaml) records source and dependency ownership, while [code controls](../engineering/code-control.md) connect it to import analysis, review policy and CI. The [engineering coverage map](../engineering/coverage.md) ties those controls to implementation and gate evidence.
+The [context code structure](context-code-structure.md) applies the selected [pragmatic Laravel convention](../decisions/adr-024-pragmatic-laravel-domain-convention.md) inside each PHP service: `App\Domain\<Capability>` for business behavior, `App\Application\<Capability>` for use cases and `App\Infrastructure` for external adapters, alongside normal Laravel directories. Eloquent models may own invariants; Actions may use Eloquent, authorization policies and transactions directly. Python services retain their own four-layer convention. The [context map](../../architecture/context-map.yaml) records source and dependency ownership, while [code controls](../engineering/code-control.md) connect it to import analysis, review policy and CI. The [engineering coverage map](../engineering/coverage.md) ties those controls to implementation and gate evidence.
 
 ## 1. Architectural objectives and boundaries
 
@@ -45,7 +45,7 @@ Arrows show logical dependencies rather than a complete firewall policy. Event d
 
 ## 3. Bounded contexts and deployable services
 
-A bounded context owns business meaning and invariants; a capability module groups related behavior inside it; a microservice is an independently released application; a worker pool is an execution process with an owning context. The initial mapping has six business contexts plus the console composition boundary, packaged as seven principal applications. Keep those concepts distinct when splitting or combining deployables. The [detailed source model](context-code-structure.md) specifies their internal layers and public/private code boundaries.
+A bounded context owns business meaning and invariants; a capability module groups related behavior inside it; a microservice is an independently released application; a worker pool is an execution process with an owning context. The initial mapping has six business contexts plus the console composition boundary, packaged as seven principal applications. Capability folders within the same context may collaborate directly and do not imply a service split. Each Laravel service has its own `App\` namespace and autoloader; this shared namespace convention does not create shared implementation code. The [detailed source model](context-code-structure.md) specifies internal dependency direction and public/private code boundaries.
 
 | Repository location | Proposed implementation | Authoritative responsibility |
 | --- | --- | --- |

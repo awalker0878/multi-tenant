@@ -2,7 +2,7 @@
 
 Owner role: Architecture and engineering leads. Related phases: P00, P01, P10. Record date: 2026-10-04.
 
-Origin: `DESIGN`. Disposition: `PROPOSED`, as recorded in the [decision register](decision-register.md). The user's requirement for context-oriented microservices and code control is binding; the detailed namespace, layer and enforcement design below is its proposed implementation. This record does not claim that repository protection settings or application CI gates are active.
+Origin: `DESIGN`. Disposition: `SUPERSEDED` by [ADR-024 — Pragmatic Laravel domain convention](adr-024-pragmatic-laravel-domain-convention.md) on 2026-10-04 following the user's explicit convention choice. The text below preserves the earlier proposal for history and is not the current Laravel implementation standard. ADR-024 carries forward service ownership and code controls while replacing the framework-independent PHP layout. No active repository protection or completed application CI is claimed.
 
 ## Context
 

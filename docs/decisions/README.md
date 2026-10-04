@@ -1,6 +1,6 @@
 # Architecture decision records
 
-The [decision register](decision-register.md) is the authority for origin, disposition, owner role and blocking checkpoint. These records explain the choices, trade-offs, consequences and required validation. ADR-001 and ADR-002 retain the explicit accepted user directions; all other dispositions remain as recorded in the register.
+The [decision register](decision-register.md) is the authority for origin, disposition, owner role and blocking checkpoint. These records explain the choices, trade-offs, consequences and required validation. ADR-001, ADR-002 and ADR-024 retain the explicit accepted user directions; all other dispositions remain as recorded in the register.
 
 A decision record is not implementation evidence. Update an ADR and the register together when an accountable review changes a decision. Preserve a superseded record and link its replacement.
 
@@ -30,7 +30,8 @@ A decision record is not implementation evidence. Update an ADR and the register
 | [ADR-020](adr-020-restricted-network-and-disconnection-behavior.md) | Restricted-network and disconnection behavior |
 | [ADR-021](adr-021-retained-data-and-import-boundary.md) | Retained data and import boundary |
 | [ADR-022](adr-022-release-support-and-requalification.md) | Release support and requalification |
-| [ADR-023](adr-023-context-code-boundaries-and-controls.md) | Context code boundaries and automated code/review controls |
+| [ADR-023](adr-023-context-code-boundaries-and-controls.md) | Superseded framework-independent PHP proposal; controls carried into ADR-024 |
+| [ADR-024](adr-024-pragmatic-laravel-domain-convention.md) | User-selected pragmatic Laravel DDD within service boundaries |
 
 ## Review and maintenance
 

@@ -10,8 +10,8 @@ Requirement wording and campaigns are owned by [requirements-and-qualification.m
 
 | Requirement | Packages | Decisions | Contract / service specifications | Campaigns | Gates |
 | --- | --- | --- | --- | --- | --- |
-| R01 | P00.01, P00.02, P00.03, P00.04, P00.05, P00.06, P01.01 | ADR-001, ADR-002, ADR-004, ADR-005, ADR-013, ADR-014, ADR-023 | [catalogue](../../docs/services/catalogue.md), [governance](../../docs/services/governance.md) | Q01 | G00, G01 |
-| R02 | P01.01, P01.02, P01.03, P01.04, P01.05, P10.02 | ADR-003, ADR-004, ADR-005, ADR-006, ADR-008, ADR-012, ADR-023 | [README](../../docs/contracts/README.md), [examples](../../docs/contracts/examples.md) | Q01, Q09 | G01, G10 |
+| R01 | P00.01, P00.02, P00.03, P00.04, P00.05, P00.06, P01.01 | ADR-001, ADR-002, ADR-004, ADR-005, ADR-013, ADR-014, ADR-024 | [catalogue](../../docs/services/catalogue.md), [governance](../../docs/services/governance.md) | Q01 | G00, G01 |
+| R02 | P01.01, P01.02, P01.03, P01.04, P01.05, P10.02 | ADR-003, ADR-004, ADR-005, ADR-006, ADR-008, ADR-012, ADR-024 | [README](../../docs/contracts/README.md), [examples](../../docs/contracts/examples.md) | Q01, Q09 | G01, G10 |
 | R03 | P02.01, P02.02, P02.03, P02.04, P02.05, P06.01, P06.03 | ADR-009, ADR-010, ADR-018 | [governance](../../docs/services/governance.md), [lifecycle](../../docs/services/lifecycle.md) | Q01, Q03, Q04 | G02, G06 |
 | R04 | P02.03, P03.05, P04.04, P05.02, P06.03, P10.03 | ADR-006, ADR-009, ADR-010 | [governance](../../docs/services/governance.md), [examples](../../docs/contracts/examples.md) | Q01, Q02, Q03, Q04, Q09 | G02, G03, G04, G05, G06, G10 |
 | R05 | P03.01, P03.02, P03.03, P03.04, P03.05 | ADR-013, ADR-012 | [catalogue](../../docs/services/catalogue.md), [examples](../../docs/contracts/examples.md) | Q01 | G03 |
@@ -44,7 +44,7 @@ Requirement wording and campaigns are owned by [requirements-and-qualification.m
 | R32 | P00.05, P02.03, P05.02, P10.03 | ADR-009, ADR-010, ADR-011, ADR-020, ADR-021 | [governance](../../docs/services/governance.md), [planning](../../docs/services/planning.md), [assurance](../../docs/services/assurance.md) | Q03, Q09 | G00, G02, G05, G10 |
 | R33 | P03.04, P04.05, P05.05, P06.06, P07.04, P08.04, P11.02, P11.03 | ADR-019, ADR-017 | [console](../../docs/services/console.md) | Q01, Q05, Q07, Q10 | G03, G04, G05, G06, G07, G08, G11 |
 | R34 | P00.05, P04.04, P10.01 | ADR-017, ADR-020, ADR-022 | [inventory](../../docs/services/inventory.md), [lifecycle](../../docs/services/lifecycle.md), [console](../../docs/services/console.md) | Q02, Q10 | G00, G04, G10 |
-| R35 | P01.03, P01.04, P10.02, P10.05, P10.06, P11.01, P11.02, P11.03, P11.04 | ADR-012, ADR-017, ADR-020, ADR-022, ADR-023 | [README](../../docs/contracts/README.md), [assurance](../../docs/services/assurance.md) | Q09, Q10 | G01, G10, G11 |
+| R35 | P01.03, P01.04, P10.02, P10.05, P10.06, P11.01, P11.02, P11.03, P11.04 | ADR-012, ADR-017, ADR-020, ADR-022, ADR-024 | [README](../../docs/contracts/README.md), [assurance](../../docs/services/assurance.md) | Q09, Q10 | G01, G10, G11 |
 | R36 | P00.01, P00.05, P10.05, P11.05 | ADR-021 | [inventory](../../docs/services/inventory.md), [lifecycle](../../docs/services/lifecycle.md), [assurance](../../docs/services/assurance.md) | Q09 | G00, G10, G11 |
 
 ## Requirement state
