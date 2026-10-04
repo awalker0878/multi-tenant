@@ -120,7 +120,12 @@ without giving the listener UPDATE on native ownership. Run migrations and
 enrollment with different credentials outside this process.
 
 The trusted runtime role also needs `EXECUTE` on `lock_native_worker_scope`
-for B11 intent checks. It must remain a separate login. Configure all required
+for B11 intent checks and `lock_native_credential_grant(text,text,text)`
+(migration 0036) for original credential issuance/closure. Grant `SELECT, INSERT`
+on the native credential custody tables without `UPDATE` or `DELETE` on those
+tables or `worker_grants`. The scoped function requires authenticated tenant
+settings and `READ COMMITTED`; the site listener receives no custody-lock grant.
+It must remain a separate login. Configure all required
 variables before starting the site service:
 
 | Setting | Meaning |

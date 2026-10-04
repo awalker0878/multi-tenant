@@ -136,13 +136,20 @@ accepted installed Python environment.
 
 ## Explicit remaining holds and verification
 
-The component summary separately identifies missing independent resource,
-creation and native observation/exclusion proof; native provisioning, isolated
-transfer and source-power workers; scoped planning-credential authority;
-per-command guest SSH authority; isolated
-rehearsal; persistent source restart/other-writer exclusion; final consistency;
-traffic/target activation; and useful post-write recovery. The application
-workflow cannot report successful migration while these owners are absent.
+The component summary reports missing **enrollment** for independent resource,
+creation/native observation, planning, per-command guest, lifecycle, database,
+cold-capture or recovery owners separately. Concrete implementations now exist;
+missing process-local native owners still hold before dispatch. Register the fixed
+owner set once, seal it before worker registration and commission its exact
+source/wheel/interpreter, grant database, custody and native product tuples.
+The application workflow cannot succeed with an absent required owner, unknown
+native outcome, expired/revoked permission or unaccepted final proof.
+
+Separate staging/cutover, PostgreSQL17 sync, cold image capture and post-write
+forward repair are explicit purposes. None grants unimplemented Windows/cold
+boot, warm-VM or additional directed migration support. The cold capture purpose
+ends `IMPORTED`; final code, native campaign and receiving-owner acceptance remain
+independent requirements.
 
 `tests/provisioning/workflow/test_application_runtime.py` executes real SQLite
 chain checks, the actual fixed gate construction with a synthetic Vault transport,

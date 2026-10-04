@@ -12,8 +12,14 @@ This is a newly authored maintained Markdown record, not a reconstruction of an 
 
 ### Current selected application increment
 
-Retained-state conversion rehearsal preserves original bytes and reconciles canonical records, actual Terraform/delivery journals, counts/native IDs/scope/epochs. Rehearsal is observation-only, with no import, lease or writer permission. Actual independent native inventory, frozen old writers, owner-epoch advance and accepted database import remain required. Operating backup/restore, health/ITSM, final-code campaign and pilot/release validators exist; deployed acceptance and final supported release remain unrecorded.
-
+Retained-state rehearsal preserves original bytes and reconciles canonical records,
+Terraform/delivery journals, counts/native IDs/scope/epochs. Authenticated import
+and independently proved epoch-handover owners now exist; actual native inventory,
+frozen old writers and accepted production custody remain required. Imported
+uncertainty never authorizes replay. Controlled HA/restore owners and final-code
+campaign/pilot/commissioning validators exist; their deployed acceptance and final
+supported release remain unrecorded. See the [current execution plan](../product/enterprise-workload-mobility-execution-plan.md)
+for the implemented purposes and remaining directed-driver work.
 
 Record observed ownership/topology before introducing an isolated target. Every
 intermediate state names routes, identities, protected dependencies, data consistency,

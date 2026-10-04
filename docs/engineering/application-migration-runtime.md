@@ -105,20 +105,29 @@ request. Completion and read-only resume both reread the native task, VM/device
 state and activity; a retained shutdown receipt cannot hide a subsequent source
 restart.
 
-Successful shutdown returns
-`SOURCE_POWERED_OFF_RESTART_EXCLUSION_HELD`. A powered-off VM does not prove
-persistent restart exclusion, delayed-request exclusion, exclusion of other
-application writers or a final application consistency point. Those real native
-owners remain required before final sync, traffic switching and activation.
+The shutdown-only owner retains `SOURCE_POWERED_OFF_RESTART_EXCLUSION_HELD`.
+The separately enrolled `ApplicationLifecycleRunner` additionally stops/masks the
+selected application, captures its final data under current authority, powers
+and observes the source off, and removes its exact retained data disks through
+a genuine vSphere task. Persistent disk exclusion and independent original
+writer/readback proof are mandatory before final sync or source return. A power
+receipt alone does not establish that exclusion.
 
-`recovery_projection` consumes the original tenant/job-bound native activation
-intent and returns read-only operator choices. Missing, claimed, task-accepted
-or uncertain activation is treated as potentially committed target data. The
-post-write path requires a separate reverse-sync, restore or forward-repair
-owner. Even a prepared or independently resolved no-effect intent still needs
-current target/writer exclusion before source return. Every displayed result
-keeps source restart, retirement, capacity release and production activation
-unauthorized.
+Separate staging and cutover workflows require current handover accounting and
+an explicit existing-target power phase before guest/data contact. Nova request
+IDs are retained as request identities, not B11 task IDs. Isolated rehearsal,
+final restore, application acceptance and target activation use the exact enrolled
+systemd, repository, resource/service and independent readback owners. Missing
+native enrollment holds each phase before its effect. Fixture success does not
+prove native management reachability, traffic exposure or service acceptance.
+
+`recovery_projection` still presents conservative read-only choices from the
+original activation intent. The implemented pre-write source-return path requires
+current source/target disk exclusions and independently observed no target writes.
+The separately admitted post-write recovery owner retains actual target data and
+performs fixed reattach, start, forward repair and activation phases with new
+B10/B11 authority. It never restarts the old source and does not implement general
+reverse-sync. Unknown original outcomes prohibit replay or resource release.
 
 ## Trusted Temporal composition
 
@@ -150,8 +159,8 @@ delivery/packet bindings before invoking an existing concrete owner.
 
 | Selected stage | Implemented boundary |
 |---|---|
-| Terraform prepare | The existing saved-plan owner has typed current `DISCOVER_READ` hooks around each subprocess and grant-bounded deadlines. The admitted runtime holds before dispatch until an independently scoped planning credential owner authenticates the exact Keystone project/native origin. |
-| Guest configuration | Validate the sealed bundle and require exactly one target whose native VM/operation equals the observed lease. Hold before claim or SSH dispatch because commissioned per-command server/connection authority is absent. |
+| Terraform prepare | The existing saved-plan owner has typed current `DISCOVER_READ` hooks around each subprocess and grant-bounded deadlines. The concrete scoped planning credential owner authenticates the exact Keystone project/native origin before each subprocess; missing enrollment holds before dispatch. |
+| Guest configuration | Validate the sealed bundle and require exactly one target whose native VM/operation equals the observed lease. Dispatch through the enrolled per-command server/connection owner with fresh authority and bounded credentials for each fixed remote command; hold if it is absent. |
 | Local expiring edge policy | Require current `POLICY_APPLY` rather than a power grant, claim the original native intent and call the existing `nft_edge.apply`. Recheck the full execution artifact, real grant, exact binary and local guest identity around every kernel command. |
 | Native/service campaign | Require OpenStack workload/native manifests to select the actual granted project, then call the existing campaign owner in-process. Recheck actual `DISCOVER_READ` before/after each observer and fixed SSH probe, and each direct OpenStack request. Return retained observations requiring independent acceptance. |
 
@@ -165,22 +174,18 @@ inside the actual worker grant window; the wrapper preserves the original
 authority and receipt rather than widening them. A successful edge receipt is
 not native intent resolution or production qualification.
 
-`GuestCommandExclusion` deliberately has no permissive boolean/callback path.
-The route returns `GUEST_PER_COMMAND_AUTHORITY_UNAVAILABLE` even for a correctly
-sealed single-VM bundle. Checking once around the Ansible controller process
-cannot fence already dispatched remote work. A real server/connection owner
-must be commissioned before this route can execute guest writes. Multi-VM guest
-configuration additionally needs independent current grants for each host.
+`GuestCommandExclusion` has no permissive boolean/callback path. The concrete
+`GuestCommandRuntime` and guarded Ansible SSH plugin recheck the original binding,
+current grant, executable/input bytes, Unix peer and private connection custody
+for each remote command. Multi-member work needs the exact current host grant for
+each host. Checking only around an Ansible controller process is insufficient.
+See [current command authority](../operations/current-command-authority.md).
 
-`SCOPED_PLANNING_CREDENTIAL_OWNER_UNAVAILABLE` is a separate implementation gap.
-The saved-plan contact/cloud hashes alone do not prove that the original planner
-authenticated to the granted native project. A concrete planning context must
-reuse the commissioned Vault/mTLS broker under its own `DISCOVER_READ` grant,
-authenticate the exact Keystone project/compute origin and bind refreshed
-secrets without changing source, inputs, trust, executable or non-secret cloud
-projection. The existing creation apply context uses `VM_CREATE`; it cannot
-substitute for that planning owner. This wrapper issues no preparation contact
-while the owner is absent.
+The selected scoped planning owner separately uses a `DISCOVER_READ` grant,
+fresh Vault credential and actual reader-role Keystone authentication for each
+fixed Terraform planning subprocess. Creation's `VM_CREATE` context cannot
+substitute for it. Missing commissioning retains
+`SCOPED_PLANNING_CREDENTIAL_OWNER_UNAVAILABLE` as an enrollment hold.
 
 Existing typed bootstrap dependencies, useful-service receipts, dataset coverage
 and independent acceptance retain their original owners. Neither a campaign
@@ -197,10 +202,11 @@ Implemented activity names are:
 | `application_reconcile_dataset` | Reread only the original retained transfer and current useful bytes; never rerestore. |
 | `application_join_datasets` | Require complete exact group/plan coverage without promoting application acceptance. |
 | `application_inspect_datasets` | Retain explicit unstarted/uncertain/completed child progress. |
-| `application_source_fence` | Actual VMware shutdown and current task/VM readback; hold pending persistent native writer exclusion. |
-| `application_rehearsal` | Hold: no commissioned native isolation/side-effect suppression owner. |
-| `application_final_sync` | Hold: no authorized final consistency/export owner. |
-| `application_cutover` | Hold: no implemented native traffic/target activation owner. |
+| `application_source_fence` | Exact source application quiesce/final capture, native shutdown and retained data-disk removal; current independent original exclusion required. |
+| `application_target_prepare` | Start the exact independently observed existing target with current Nova authority; retain its genuine request identity before further readback. |
+| `application_rehearsal` | Fixed isolated systemd rehearsal and independent application/data acceptance; missing enrolled native owners hold. |
+| `application_final_sync` | Bounded final capture restore and complete current source/database exclusions. |
+| `application_cutover` | Current final consistency, counted service ownership and explicit target write admission/activation; independent final verification required. |
 | `application_recovery_inspect` | Read the original tenant/job-bound activation intent and expose conservative recovery holds. |
 
 `STAGE_VERIFIED` means one implemented stage retained its stated evidence. It is
@@ -223,8 +229,10 @@ native subprocesses and local identity facts are synthetic fixtures.
 The test engines and kernel fixtures are not native campaign evidence. Native
 B30/B31 qualification still requires commissioned repositories/keys, dedicated
 worker/cgroup/staging custody, actual metadata/consistency acceptance and measured
-limits. B32–B35 remain open for isolated rehearsal, persistent writer fencing,
-final sync, traffic/activation effects and useful pre/post-write recovery. B36
+limits. B32–B35 native acceptance remains open for isolated rehearsal, persistent
+writer fencing, final sync, traffic/write admission and useful pre/post-write
+recovery; the implemented target power phase additionally needs a concrete
+isolated management/bootstrap network owner before guest contact. B36
 still requires administrator acceptance of complete portal/CLI actions. B37
 native mutation remains held until minimum operating controls and independently
 authorized site/application inputs are present.

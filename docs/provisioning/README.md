@@ -56,6 +56,8 @@ that cites it cites every reviewed decision. See
 | [Current command authority](../operations/current-command-authority.md) | Scoped planning, each guarded Linux SSH command and certificate-only Windows command custody |
 | [Fleet discovery and on-call owners](../engineering/discovery-fleet-and-oncall-owners.md) | Global database read budgets, installed collector custody and independently assigned human alert ownership |
 | [Enterprise wave pools](enterprise-wave-pools.md) | One aggregate physical budget and tenant turn over existing B09 wave members and retained uncertain charges |
+| [Cold capture and private images](../operations/cold-capture-and-private-images.md) | Powered-off snapshot export and private Glance disk import; separate from a booted cold migration |
+| [PostgreSQL17 sync and credential closure](../operations/postgresql17-sync-and-credential-closure.md) | Disabled native metadata, original transaction journal, current writer exclusion and immutable credential retirement |
 | [Enrolled resource and service recovery](../engineering/enrolled-resource-service-recovery.md) | Current approved service intents, independently observed outcomes and separate old-credential exclusion |
 | [Authenticated retained-state handover](../operations/retained-state-authenticated-handover.md) | Original retained import, independent proof verification, native reconciliation and owner-epoch interlock |
 | [Controlled HA and restore drills](../operations/control-application/3-controlled-ha-and-restore-drills.md) | Actual commissioned failover and observation-only restoration under current command authority |
