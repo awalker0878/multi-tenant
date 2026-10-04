@@ -1,0 +1,483 @@
+{
+  "schema_version": 1,
+  "started_source_binding": "sha256 of exact service files; Git commit is recorded by the delivery evidence entry after publication",
+  "source_files": {
+    "services/planning/.gitignore": "c95d538d814abdee4b85b0190ecdff09a9cf312e47e64374c78f984994ab34b6",
+    "services/planning/.python-version": "f50159fad3f4319868eb38717b91d55843c41e9803014c8de05e116a6d0bcfdc",
+    "services/planning/README.md": "371771854561b1c6ba610660574787ac8f46015984b4cdced7d43a3799161a44",
+    "services/planning/pyproject.toml": "79fd5abce10f145fad924d506b40f0b199f8cc1ec50df28465253d3613325ae2",
+    "services/planning/src/planning/__init__.py": "d33acb57dfc2000f2c59d7e6d3fda69dc1785f8f63c053aff460cfad69b9b8a0",
+    "services/planning/src/planning/bootstrap/__init__.py": "82a5df3924fa02353da3bd5efeb4f9e2f3474cf3768ee1a74962f79757c10fc0",
+    "services/planning/src/planning/bootstrap/health.py": "50b864a7f7d1d5c100fa58d0ffe4fb31ecf7bae8169f0c9be94dab705f503b2b",
+    "services/planning/src/planning/interfaces/__init__.py": "d29a95e5c802f25989fdeabb4de10092c480413fff97e55e632d41daaa1fe2a8",
+    "services/planning/src/planning/interfaces/health.py": "5f0cfd6e9aea930e7135b1c58d52d22c18463556cfa1532f3c95b80ae37e9a22",
+    "services/planning/tests/test_health.py": "eff6c57b1f76f4cb5c52c58d5d4c9c1ca497516f5ac8c50606ae61840987d854",
+    "services/planning/uv.lock": "4f71d32df8231b93f948d143dc5572e0eb9dc104c295d40375d3baca6bbeddbf"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "uv": "0.12.19",
+    "build_backend": "setuptools==84.0.0",
+    "wheel_helper": "wheel==0.48.0"
+  },
+  "environment": {
+    "source_copy": "only services/planning, excluding caches and generated artifacts",
+    "clean_install": "fresh virtual environment with locked dependencies from existing uv cache",
+    "index_access": "lock initially resolved against public PyPI; measured replay used offline cached artifacts",
+    "runtime_install": "empty virtual environment; offline --no-index --no-deps wheel installation",
+    "runtime_isolation": "source copy and development environment removed; outside checkout; Python -I; PYTHONPATH unset",
+    "container": "not executed",
+    "native_platform": "not executed"
+  },
+  "commands": [
+    {
+      "id": "01-python",
+      "argv": [
+        "python",
+        "--version"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "01-python.stdout.log",
+        "sha256": "4c3569f5da09975434dd9fd9a91fadbc4367a91d8f3c3fab59e9241ab9ee4bd8",
+        "bytes": 15
+      },
+      "stderr": {
+        "path": "01-python.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "02-uv",
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "02-uv.stdout.log",
+        "sha256": "d27c5539d426b7ed041c1d392e585a95dc9090b740d43a659fc38e4e48adadf6",
+        "bytes": 38
+      },
+      "stderr": {
+        "path": "02-uv.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "03-lock-check",
+      "argv": [
+        "uv",
+        "lock",
+        "--check",
+        "--offline"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "03-lock-check.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "03-lock-check.stderr.log",
+        "sha256": "6ca67a1a90baee31d9ab30e35e418bcdf35c1589eadfb921660330df2fa9af0f",
+        "bytes": 143
+      }
+    },
+    {
+      "id": "04-clean-frozen-install",
+      "argv": [
+        "uv",
+        "sync",
+        "--locked",
+        "--offline",
+        "--group",
+        "build",
+        "--no-managed-python",
+        "--no-editable"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "04-clean-frozen-install.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "04-clean-frozen-install.stderr.log",
+        "sha256": "cfdcd5eb75c8a9a6a8217db230c83ffff0546be7730ee9faf32eef5e9e6e08a4",
+        "bytes": 748
+      }
+    },
+    {
+      "id": "05-ruff",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "check",
+        "."
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "05-ruff.stdout.log",
+        "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+        "bytes": 19
+      },
+      "stderr": {
+        "path": "05-ruff.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "06-format",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "06-format.stdout.log",
+        "sha256": "cfe5c6461b42a90595a492aed11f2c8e6eb98b7c4caf2cc9f47e3333185e3f33",
+        "bytes": 27
+      },
+      "stderr": {
+        "path": "06-format.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "07-mypy",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "mypy"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "07-mypy.stdout.log",
+        "sha256": "ab35ee42183d4d6d3ba483825ab037d18a5a15622d03be01d82220b1564851ff",
+        "bytes": 43
+      },
+      "stderr": {
+        "path": "07-mypy.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "08-tests",
+      "argv": [
+        "uv",
+        "run",
+        "--locked",
+        "--no-sync",
+        "pytest",
+        "-q"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "08-tests.stdout.log",
+        "sha256": "7fca7a8d71c9c2029ca566d01d2e9026fb3d599af3b46d7ed5cab69ea30e0d09",
+        "bytes": 98
+      },
+      "stderr": {
+        "path": "08-tests.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "09-wheel-build",
+      "argv": [
+        "uv",
+        "build",
+        "--offline",
+        "--no-build-isolation",
+        "--wheel",
+        "--out-dir",
+        "/tmp/p01-planning-yinjn8rn/artifacts"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "09-wheel-build.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "09-wheel-build.stderr.log",
+        "sha256": "febce958f99d98beffee85161555e8dcddf354bffb35a9d6a7ebf31d8dd6f37b",
+        "bytes": 2300
+      }
+    },
+    {
+      "id": "10-empty-runtime",
+      "argv": [
+        "uv",
+        "venv",
+        "--offline",
+        "--no-managed-python",
+        "--python",
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "/tmp/p01-planning-yinjn8rn/runtime"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "10-empty-runtime.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "10-empty-runtime.stderr.log",
+        "sha256": "d5b8566a9884dd0a40f14a2ca9132330653397f784c8a47e89b4223a47a49437",
+        "bytes": 179
+      }
+    },
+    {
+      "id": "11-wheel-install",
+      "argv": [
+        "uv",
+        "pip",
+        "install",
+        "--offline",
+        "--python",
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/python",
+        "--no-index",
+        "--no-deps",
+        "/tmp/p01-planning-yinjn8rn/artifacts/product_planning-0.1.0.dev0-py3-none-any.whl"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "11-wheel-install.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "11-wheel-install.stderr.log",
+        "sha256": "a353d53b9b223827de5434806f0875e0869278e9731aaf554f90860233b9e943",
+        "bytes": 279
+      }
+    },
+    {
+      "id": "12-runtime-inventory",
+      "argv": [
+        "uv",
+        "pip",
+        "list",
+        "--python",
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/python",
+        "--format",
+        "json"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/service",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "12-runtime-inventory.stdout.log",
+        "sha256": "b9c8472260372c419c19dc9e9a0d1c3299a30668d456e5962fa854b537869aa7",
+        "bytes": 53
+      },
+      "stderr": {
+        "path": "12-runtime-inventory.stderr.log",
+        "sha256": "d99f88e13c588b5bea74a9f42f44ebcbb9eb22ec097d6ff98ea9086d667ac398",
+        "bytes": 72
+      }
+    },
+    {
+      "id": "13-isolated-import",
+      "argv": [
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/python",
+        "-I",
+        "-c",
+        "import importlib.metadata,json,pathlib,planning,sys; p=pathlib.Path(planning.__file__).resolve(); assert p.is_relative_to(pathlib.Path(sys.prefix)); assert importlib.metadata.requires('product-planning') is None; print(json.dumps({'module':str(p),'version':importlib.metadata.version('product-planning'),'python':sys.version.split()[0],'runtime_requirements':[]}))"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "13-isolated-import.stdout.log",
+        "sha256": "6fc76518bbb17ef8b290e9be079690ea1cd1a0129e7ff733478a34bc46c9c8f7",
+        "bytes": 173
+      },
+      "stderr": {
+        "path": "13-isolated-import.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "14-isolated-liveness",
+      "argv": [
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/python",
+        "-I",
+        "-m",
+        "planning.bootstrap.health",
+        "liveness"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "14-isolated-liveness.stdout.log",
+        "sha256": "0194c2ae2c86ecb197887d5a0e57ae8478187c32adba4a29101173209dcd58c4",
+        "bytes": 118
+      },
+      "stderr": {
+        "path": "14-isolated-liveness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "15-isolated-readiness",
+      "argv": [
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/python",
+        "-I",
+        "-m",
+        "planning.bootstrap.health",
+        "readiness"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/outside-checkout",
+      "expected_exit": 1,
+      "exit_code": 1,
+      "passed": true,
+      "stdout": {
+        "path": "15-isolated-readiness.stdout.log",
+        "sha256": "0305cf3d68f514472ccb22fdd27d41072a29dbbb6527cbbfb1e56c9685c0bbb8",
+        "bytes": 174
+      },
+      "stderr": {
+        "path": "15-isolated-readiness.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "16-isolated-invalid-input",
+      "argv": [
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/python",
+        "-I",
+        "-m",
+        "planning.bootstrap.health",
+        "readiness",
+        "--force"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/outside-checkout",
+      "expected_exit": 2,
+      "exit_code": 2,
+      "passed": true,
+      "stdout": {
+        "path": "16-isolated-invalid-input.stdout.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "16-isolated-invalid-input.stderr.log",
+        "sha256": "163ecd4ed03b3b25349edae7663b51d04784faffe04668ed99fcb7623561ef4c",
+        "bytes": 105
+      }
+    },
+    {
+      "id": "17-installed-entrypoint",
+      "argv": [
+        "/tmp/p01-planning-yinjn8rn/runtime/bin/planning-health",
+        "liveness"
+      ],
+      "cwd": "/tmp/p01-planning-yinjn8rn/outside-checkout",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "passed": true,
+      "stdout": {
+        "path": "17-installed-entrypoint.stdout.log",
+        "sha256": "0194c2ae2c86ecb197887d5a0e57ae8478187c32adba4a29101173209dcd58c4",
+        "bytes": 118
+      },
+      "stderr": {
+        "path": "17-installed-entrypoint.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "artifact": {
+    "path": "wheel-envelope.json",
+    "sha256": "a610e1854370ce606c552d96988fadb9705eca34740a43e86235fff60fb7a527",
+    "filename": "product_planning-0.1.0.dev0-py3-none-any.whl",
+    "bytes": 4542,
+    "members": [
+      "planning/__init__.py",
+      "planning/bootstrap/__init__.py",
+      "planning/bootstrap/health.py",
+      "planning/interfaces/__init__.py",
+      "planning/interfaces/health.py",
+      "product_planning-0.1.0.dev0.dist-info/METADATA",
+      "product_planning-0.1.0.dev0.dist-info/WHEEL",
+      "product_planning-0.1.0.dev0.dist-info/entry_points.txt",
+      "product_planning-0.1.0.dev0.dist-info/top_level.txt",
+      "product_planning-0.1.0.dev0.dist-info/RECORD"
+    ]
+  },
+  "checks": {
+    "wheel_contains_only_owned_package_and_metadata": true,
+    "runtime_dependencies_empty": true,
+    "copied_source_removed_before_runtime_import": true,
+    "all_expected_exit_codes_observed": true
+  },
+  "limitations": [
+    "Short-lived CLI bootstrap only; no HTTP server or dependency readiness.",
+    "No product domain, assessment, compilation, tenant authorization, persistence, messaging, worker or native integration.",
+    "One local Python package build; no container, all-seven-service, CI, publication or operational acceptance claim.",
+    "Setuptools and wheel are newly measured build-tool candidates; production image adoption remains separate."
+  ],
+  "status": "PASSED",
+  "completed_at": "2026-10-04T21:32:08.469699+00:00"
+}
