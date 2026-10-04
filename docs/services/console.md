@@ -2,6 +2,8 @@
 
 Status: proposed service specification; no UI or executable routes are claimed. Runtime: Laravel, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8, with exact compatible patches subject to P00.03. Destination: `apps/console/`. Owner: product engineering.
 
+The [frontend engineering standard](../engineering/frontend.md) defines component structure, typed page contracts, browser data handling, session transitions, accessibility and verification. It includes primary-source compatibility research reviewed on 2026-10-04. Runtime and browser support require the exact BOM and qualification evidence; requested major versions alone do not demonstrate compatibility.
+
 ## Purpose and responsibility boundary
 
 Give application owners, reviewers and operators a coherent application journey: describe intent, inspect eligibility, review and approve an exact plan, observe a job and act on authorized recovery choices. Explain incomplete evidence, stale data and blocked actions in terms of the task the user is performing.
@@ -18,6 +20,8 @@ The console owns browser sessions, navigation, composed page state and presentat
 | Pending command presentation | Client retry key and response reference; the owning API remains authoritative for whether the command succeeded. |
 
 Session and cache storage are private to console. Page caching must include effective tenant and authorization scope; shared fragments cannot reveal one tenant's names to another. Do not place credentials, evidence artifacts or complete intent documents in analytics.
+
+Create explicit page presenters and allowlist serialized fields. The initial HTML, shared/deferred/partial props, prefetch caches and browser history all belong to the disclosure boundary. Do not expose a complete service response or model and rely on Vue to hide fields. Authorization hints, current approvals and operation status cannot be cached as once props. Use encrypted history and clear its key on logout or context changes; this does not make secret-bearing props acceptable.
 
 ## Proposed browser surface and backend calls
 
@@ -40,13 +44,19 @@ The identity provider authenticates users; governance evaluates tenant membershi
 
 Validate issuer, audience and expiry through the selected federation design; renew only through the approved session flow. Preserve the effective actor and console service identity when delegating. Expiry during a form submission must not turn into an anonymous retry or new command identity. Logout clears local session state according to the chosen provider contract.
 
+Regenerate the session after authentication and privilege transitions; invalidate it and regenerate the CSRF token on logout. Preserve the adapter's supported CSRF refresh flow and production middleware. Tenant changes clear remembered forms, prefetched props, history and feature stores; cancel view requests and ignore late results from the old tenant/context generation. Each command carries explicit tenant/resource scope, including in multiple tabs. Reauthorize after restore/reconnect before enabling privileged actions.
+
 ## Concurrency, retries and events
 
 Carry the catalogue ETag from the displayed version to the revision command. A `412` preserves the user's local edits and offers a comparison/reload action; it never silently overwrites current intent. A changed plan digest invalidates the old approval presentation and requires a fresh review.
 
+Map domain validation failures into the console's server-validated Inertia redirect/error-bag flow; do not pass an API JSON `422` through unchanged to an Inertia form. Preserve only safe form inputs, associate errors with fields and an accessible summary, and keep validation messages separate from authorization, conflict and uncertain-outcome states.
+
 Reuse the command idempotency key after a connection failure, query the returned owning-service identifier and show an uncertain/pending response when status is unavailable. Do not invent a second job after an HTTP timeout. Native `outcome_unknown` is shown as held, with the recorded cause and allowed reconciliation action; cancellation is displayed as a request until the job confirms a safe stop.
 
 Console publishes no authoritative domain events. It may later consume versioned notification projections, but those notifications only prompt an authorized refresh. Broker or live-transport access from the browser requires a separately designed tenant subscription policy.
+
+Bound polling to active views, stop it on unmount and back off during failures. A future live channel must reauthorize on reconnect and recover gaps through the owning API; duplicated or older notifications cannot move a displayed revision backwards. Client cancellation of a request never proves that the server command was cancelled.
 
 ## Dependencies and degraded behavior
 
@@ -59,6 +69,8 @@ Bootstrap is P01 deployment plus P02 identity/governance establishment, then P03
 Build static assets reproducibly and bind their digest to the server release; keep secrets out of asset bundles. Run Laravel request workers with an approved session store; background UI notifications have bounded work queues. Configure trusted proxy and cookie behavior for the accepted topology. Server rendering is deferred unless ADR-019 changes.
 
 Health distinguishes a live server from a ready session/API composition path. Measure critical-page latency, API dependency failures, session failures and stale/status refresh lag. Trace browser request → service request → job without logging sensitive input. Validate keyboard navigation, screen-reader states, visible focus, actionable errors and destructive-action review with representative roles.
+
+Use WCAG 2.2 AA as the project target and record tested criteria and browser/assistive-technology combinations; do not claim conformance from an automated scan. Enforce a reviewed CSP, compile trusted Vue templates and prohibit unreviewed raw-HTML rendering. TypeScript/Vue checks run separately from the Vite build. Keep public build variables free of secrets and test old-page/new-asset behavior during releases.
 
 ## Verification and delivery
 

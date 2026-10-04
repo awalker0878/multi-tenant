@@ -12,6 +12,8 @@ The attacker model includes an authenticated user of another tenant, a compromis
 
 The [deployment model](deployment-model.md) owns the logical flow register. Evaluate browser→console, console→owner API, service→private persistence, service→broker, lifecycle→site worker, worker→native/guest/service API, source→staging→target, evidence producer→assurance/object store, and operations→trust/backup infrastructure separately. Evaluate tenant isolation within each shared component as well as network isolation between components.
 
+The [security and tenant isolation engineering standard](../engineering/security-and-tenancy.md) maps these boundaries to Laravel policies, scoped binding, input/output handling, sessions, workers, caches, files and integrations. Use ASVS 5.0.0 to record the selected security verification scope and versioned requirement references; a threat table or API Top 10 checklist alone is not a complete application-security assessment.
+
 ## Threat and verification register
 
 | ID / threat | Required prevention or containment | Detection and evidence obligation |
@@ -31,6 +33,10 @@ The [deployment model](deployment-model.md) owns the logical flow register. Eval
 | T13 Availability or shared-budget exhaustion | Per-tenant/API budgets, backpressure, bounded buffers and failure-domain capacity | Q10: noisy tenant, endpoint throttling, full evidence staging and loss of capacity preserve required safety behavior |
 | T14 Target-write loss during recovery | Observe source fencing and target first write; application-approved reconciliation or forward recovery | Q07: post-cutover target changes survive recovery; old-source restart cannot silently discard them |
 | T15 Privileged support misuse | Time-bounded scoped access, separate approver/acceptor roles and protected accountability | Q01/Q09: ordinary support cannot approve its own elevated action or retrieve arbitrary tenant secrets |
+| T16 Browser/session and edge-trust abuse | Request-forgery protection, session lifecycle controls, explicit trusted hosts/proxies, safe output and tested security headers | Q01/Q09: cross-origin mutation, session fixation, hostile Host/forwarded headers, stored script input and logout/tenant-switch behavior with deployed middleware |
+| T17 Input or property-level privilege escalation | Command field allowlists, tenant-scoped validation, resource/field policy and explicit response DTOs | Q01: nested unexpected properties, forged authority/status fields, raw query identifiers and sensitive serialized properties cannot alter authority or disclose data |
+| T18 Tenant state survives a process boundary | Fresh job/request context, scoped cache/lock/idempotency keys and protected export/channel retrieval | Q01/Q04: alternate tenants in one process, fail a job before the next tenant, revoke queued authority, warm another tenant's cache and replay a download/channel subscription |
+| T19 Integration callback abuse | Registered producer/destination identity, signature and replay checks, bounded parsing and endpoint-specific egress | Q02/Q04: forged/replayed webhook, redirect or DNS destination change and excessive response cannot cause unauthorized effects or credential forwarding |
 
 These entries define required analysis and tests. They do not assert that controls have been implemented or that residual risk has been accepted.
 

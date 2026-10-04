@@ -27,6 +27,20 @@ Keep new native admission disabled and mutating worker pools isolated throughout
 
 D03 service deployment order follows the selected readiness dependencies rather than a fabricated startup sequence. Services may start without downstream readiness, but no deployment may report an operable journey until its actual required dependencies pass. Domain operations still enforce their own failure rules.
 
+## Laravel service acceptance at D03
+
+Apply the [Laravel runtime contract](../deployment-model.md) and [data/messaging standard](../../engineering/data-and-messaging.md). The release-specific binding must provide the selected commands and process manager settings for these checks; the framework commands referenced by those standards are not a complete installation script.
+
+1. Verify each service's runtime and PHP extensions against its dependency lock/BOM. Confirm separate runtime/migration credentials and deny cross-context data access.
+2. Provision its persistent application encryption key through the approved secret mechanism. All replicas use the correct service/environment key reference; restarts do not generate new keys. Check recovery custody without copying key values into evidence.
+3. Supply deployment configuration before generating the protected configuration cache. Inspect the effective non-secret settings, ingress document root, production debug behavior and permitted writable paths. Confirm the image/build artifacts contain no environment secrets or resolved configuration cache.
+4. Run one controlled migration job and verify the expected schema/migration state independently of exit code. Check that application replicas lack migration privileges and do not migrate concurrently at startup.
+5. Verify startup, liveness and readiness as separate signals. An unavailable shared dependency must produce the documented traffic/admission hold without a fleet-wide restart loop. A successful default health response is insufficient for this step.
+6. Start only the selected context-local queues and scheduler owner. Confirm queue/worker deadline ordering, retry/failed-job policy, durable outbox recovery and named scheduled task ownership. Keep these mechanisms separate from Temporal/native mutation authority.
+7. Execute synthetic jobs for alternating tenants in the same worker, including a failure, and verify context cleanup. Exercise controlled process replacement and ensure only the intended scheduler remains active.
+
+Attach actual observations to D03/D04 evidence with secret values redacted. A missing setting, unexplained duplicate execution, key mismatch or tenant context leak holds service acceptance.
+
 ## Native qualification and pilot boundary
 
 After D07, record installation acceptance scope separately from native support. D08 requires P06 safety controls, commissioned isolated endpoints, explicit campaign authority, compatible artifacts, recovery/evidence readiness and the appropriate qualification lane. Ordinary operational use additionally requires current exact-tuple support and plan-specific authority. A successful installation cannot supply those decisions.

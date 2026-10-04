@@ -57,6 +57,10 @@ Events carry facts, never reusable credentials or independent permission to run 
 
 ## Compatibility and review
 
+Framework adapters follow [Laravel conventions](../engineering/laravel-conventions.md), [data and messaging](../engineering/data-and-messaging.md) and [frontend rules](../engineering/frontend.md). Explicit resource serialization must match the owning schema rather than expose an Eloquent graph. Form validation never grants authority over referenced objects. Inertia browser forms use their redirect/error-bag protocol; the console maps safe service errors without changing this JSON API contract.
+
+Each integration defines connect/total timeouts, permitted endpoints, payload and pagination bounds, rate-limit behavior and one coordinated retry budget. Record which operations are safe to retry and how accepted-but-unanswered commands are reconciled. Client, queue and workflow retries cannot multiply into unbounded attempts. Contract fixtures include old/new enum and nullable-field handling, precision boundaries, unknown fields, denied resource fields and sanitized dependency failures.
+
 P01.03 locks initial contracts with both provider and consumer owners. Document additive-field handling, enum expansion, nullability, date/number precision and unknown-version behavior; do not assume every additive change is safe. HTTP breaking changes require a new supported major route or a reviewed compatibility bridge; event breaking changes require a new schema/version and migration/replay plan.
 
 CI should regenerate clients, validate valid/invalid fixtures, compare schema compatibility and run both PHP and Python against digest/error/idempotency golden cases. New behavior links requirements, packages and evidence through the [status model](../implementation/status-model.md); passing these checks proves contract behavior, not native qualification.

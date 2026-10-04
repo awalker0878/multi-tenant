@@ -1,5 +1,7 @@
 # Service specifications
 
+Apply the common [engineering standards](../engineering/README.md) with each service specification. Laravel conventions govern console, governance, catalogue and assurance; cross-language contracts, isolation, delivery and evidence rules apply to Python contexts and worker pools as well. Service owners document applicable [controls](../engineering/coverage.md), local performance/retention limits and reviewed exceptions rather than inventing independent conventions.
+
 Status: proposed implementation contracts, E0 design material. These pages do not assert that services, endpoints, schemas, tests or deployments exist. Resolve the relevant decisions and publish machine-readable contracts before implementing consumers.
 
 The [target architecture](../architecture/target-architecture.md) defines context boundaries. The [domain model](../product/domain-model.md) defines shared vocabulary; service pages specify the owner, behavior and failure boundaries. The [worked application](../product/application-walkthrough.md) connects them into one proposed journey.

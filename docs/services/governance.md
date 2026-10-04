@@ -44,6 +44,14 @@ Before catalogue integrated acceptance, create the isolated fixture tenant and t
 
 Scopes distinguish tenant administration, grants, application authorship, approval, admission and recovery. Scope comparisons use resource identifiers and permitted sets, not substring matching or user-provided labels. Authority to administer one tenant grants no estate-wide inspection privilege.
 
+## Laravel enforcement boundary
+
+Apply the [security and tenant isolation engineering standard](../engineering/security-and-tenancy.md) to every governance route, job and administrative command. Resolve the requested tenant from verified membership/delegation, scope resource binding and queries, then evaluate a named action policy. No administrator `Gate::before` allow-all may bypass that sequence or the approver-independence rule. Owner APIs continue to enforce their own resources even when governance supplies a decision.
+
+Use explicit command validation and writable-field allowlists. Actor identity, tenant ownership, approval disposition, decision revision and audit fields come from verified context and domain transitions; request fields cannot set them directly. Validation of nested grants must reject unexpected authority fields and constrain referenced resources to permitted scope. Responses expose only authorized fields, including for denied, expired or revoked decisions.
+
+Cache decision results only within ADR-009's accepted freshness and revocation bounds, keyed by all relevant actor/service/tenant/action/resource and policy revisions. A cache miss or unavailable mandatory authority check cannot broaden access. Background commands recheck current actor authority; consumers of committed facts validate provenance and their scoped service authority so later actor revocation cannot erase accountability or suppress revocation/audit propagation. Follow the [data and messaging rules](../engineering/data-and-messaging.md). Long-lived Laravel processes must not retain the previous request's tenant, grants or log context. Token abilities, if used, supplement resource policies and are never the sole check for a first-party session.
+
 ## Consistency, retries and events
 
 Commit grants/approvals/revocations, command receipts, audit and outbox atomically. Idempotency is scoped by tenant/effective actor/command; same key with a changed digest/scope is a conflict. Grant mutations compare expected revision; concurrent approval/revocation requests preserve a deterministic versioned history.
@@ -65,3 +73,5 @@ RPO/RTO, decision freshness bounds, break-glass process and independent review o
 P02.01–P02.04 deliver authentication/tenancy/authorization/approval; P05.06 exact admission contract and P06.03 effect-boundary rechecks integrate lifecycle. Requirements R03/R04/R14/R16/R25/R31/R32; campaigns Q01/Q03/Q04/Q09.
 
 Test forged tenant/subject/service audience, excessive delegation, grant expiry/revocation, duplicate decision, same-key changed digest, self-approval where forbidden, plan scope widening, expired approval, retirement under migration approval, authority outage and restore of previously revoked grants. Record deny and allow behavior for two tenants and independent author/reviewer/operator identities.
+
+Include known cross-tenant object IDs, bulk and nested relationships, forged writable privilege fields, stale cached decisions, revocation between enqueue and execution, and alternating tenants in one worker process after an exception. Inspect persisted history, outbox and audit independently of the response. Browser identity acceptance additionally exercises real request-forgery/session middleware and hostile host/proxy headers; a hidden action or test-mode middleware bypass provides no authorization evidence.

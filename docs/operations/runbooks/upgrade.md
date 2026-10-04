@@ -18,6 +18,8 @@ Confirm exercised recovery from the existing release, protected keys and an inde
 | Native adapters/plans | Artifact/profile changes assessed against immutable plans, qualifications and running effect semantics |
 | Trust/configuration | New and retiring issuer/certificate/configuration behavior validated without broadening scope |
 | Evidence/state | Stored evidence, key references, IaC state and operation journal remain readable and consistent |
+| Laravel local jobs/schedules | Old payloads and failed-job replays remain compatible; driver-specific redelivery budgets, tenant context reset, drain and scheduler handover are exercised |
+| Runtime configuration/keys | Protected caches rebuilt for the target environment; every process reloads the selected key/configuration revision; mixed-instance decryption and rollback policy verified |
 
 Do not upgrade simply because every component has a newer available version. The release BOM defines the tested dependency combination. Select dependency-first or application-first order from that combination's compatibility requirements.
 
@@ -32,6 +34,23 @@ Do not upgrade simply because every component has a newer available version. The
 7. **Validate under bounded load — SRE/quality.** Exercise representative operator journeys, idempotent retry, denial, evidence finalization, queue recovery and supported native observations in the authorized environment. Compare against accepted latency/error/backlog and safety conditions.
 8. **Release holds gradually — lifecycle/service owner.** Recheck grants, plan freshness, reservations, commissioning and qualification before resuming each held scope. Upgrade completion alone does not renew old approvals or authorize a changed plan.
 9. **Contract later — migration/release owner.** Remove old columns/contracts/workers only when old readers/writers, retained workflow histories, event replay windows and the published rollback window no longer need them. Record the irreversible boundary before execution.
+
+## Laravel rollout controls within steps 3–4
+
+Follow [data and messaging](../../engineering/data-and-messaging.md) for schema and job compatibility and the [deployment model](../deployment-model.md) for process/configuration/key ownership.
+
+| Control | Operator action and observation |
+| --- | --- |
+| Schema expansion | Use the dedicated migration job/identity; confirm expected schema and index validity, not only a successful exit. Keep large backfills separately resumable with lock/load limits and invariant checks |
+| Config and caches | Generate the target environment's protected cache only after injecting its configuration and secret references. Check non-secret effective settings; prevent resolved secrets entering images or evidence. Avoid whole-store cache flushes |
+| HTTP instance retirement | Remove the instance from new traffic, allow the bounded request drain, then replace it. Verify target readiness and tenant-negative journeys before restoring traffic |
+| Local queue retirement | Stop new consumption by retiring workers; observe completion or record interruption at the declared deadline. Replace processes under the supervisor/orchestrator and verify their image/configuration revision. Preserve stable job/operation identities |
+| Queue timing | Recheck external request deadlines, job/worker timeout, redelivery (`retry_after` or SQS visibility) and process termination grace together. A forced exit may leave work outcome unknown; it is not proof that its effect failed |
+| Scheduled tasks | Hand over the single scheduler ownership mechanism; interrupt/replace any sub-minute process running the prior code. Preserve named lock scope and missed-run reconciliation; do not clear locks blindly |
+| Long-lived state | Verify alternating tenant/actor jobs after replacement, including an exception path. If Octane is selected, include retained HTTP worker state and memory checks |
+| Encryption rotation | Follow the staged key lifecycle in the deployment model; old and new instances must decrypt each other's required values before changing the encryption key. Confirm old queued ciphertext/backup recovery and the key retirement boundary |
+
+Release bindings record the tested graceful reload/replacement mechanism for the selected Laravel version and process manager. A generic reload signal is not sufficient evidence that all workers exited, the scheduler handed over, or old native writers were fenced. Do not use Laravel maintenance mode alone as a system-wide lifecycle/native admission hold.
 
 ## Stop and recovery decisions
 

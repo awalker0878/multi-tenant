@@ -89,6 +89,33 @@ Task polling can make worker-initiated site connectivity practical; callback, gu
 
 Run secrets through an approved mounted/in-memory or broker mechanism selected in ADR-010. Do not bake them into images, source, fixtures, evidence or logs. Environment-variable use, if selected, requires exposure/redaction review. Rotation procedures establish overlap, expiry, affected running work and safe continuation; a new credential does not automatically reauthorize an old job.
 
+### Laravel runtime and process contract
+
+Each PHP service publishes its runtime binding: PHP/extension versions, web process model, separate local queue/scheduler processes, startup validation, permitted writable paths, resource/connection budgets, probe behavior and graceful shutdown. Use the [data and messaging standard](../engineering/data-and-messaging.md) for job authority, queue deadlines, tenant isolation and schema evolution. Octane is optional and needs measured benefit plus long-lived request isolation tests before selection.
+
+The web root is Laravel's `public` directory; source/configuration files are unreachable through ingress. Set `APP_DEBUG=false` for production. Grant runtime write access only to approved storage/cache/temp paths and keep credentials out of assets. These follow [Laravel deployment guidance](https://laravel.com/docs/13.x/deployment), reviewed 2026-10-04.
+
+Build immutable images without environment-specific configuration caches. At deployment, supply the selected environment configuration and secrets, validate them, then generate any configuration cache in an access-restricted runtime filesystem. That cache may contain resolved secrets: exclude it from image layers, artifact uploads, diagnostic bundles and logs. Application code reads `config()`; `env()` is confined to configuration files. Environment changes require deliberate cache regeneration and process replacement; editing an external variable cannot update a running process's cached configuration. Test route/event/view caching against the actual application during delivery. [Laravel configuration caching](https://laravel.com/docs/13.x/configuration#configuration-caching)
+
+| Health signal | Purpose and dependency treatment |
+| --- | --- |
+| Startup | Allow the measured bootstrap/configuration period before normal probes; no migrations or native effects inside the probe |
+| Liveness | Detect a locally stuck process. Do not restart every replica because a common database, broker, IdP or native platform is unavailable |
+| Readiness | Decide whether this instance can safely serve its assigned traffic, including required schema and bounded essential dependency checks. Keep optional downstream failures scoped to the affected operation |
+| Journey/dependency monitoring | Measure actual service operation, backlog/freshness and downstream failures independently of process restart decisions |
+
+Laravel's default `/up` reports successful application boot; it does not prove tenant isolation, schema compatibility or a working native journey. Additional diagnostic checks must not turn liveness into a dependency restart cascade. Probe responses expose minimal status, while detailed diagnostics remain restricted. Kubernetes startup/readiness/liveness semantics inform this project policy; exact timings require installation/load evidence. [Laravel health route](https://laravel.com/docs/13.x/deployment#the-health-route), [Kubernetes probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+
+Roll HTTP, Laravel job and scheduler processes independently with explicit drain behavior. Stop new consumption/admission to the retiring instance, allow bounded in-flight work to reach the documented safe boundary, and reconcile interrupted work using stable IDs. The process supervisor/orchestrator restarts exited workers with the target image/configuration. Record termination grace, job timeout and redelivery ordering. Changing code on disk does not refresh a running worker. Do not use broad cache-clearing commands to coordinate deployment; locks, sessions and durable queues have separate loss policies.
+
+### Application encryption key lifecycle
+
+Provision an independent Laravel application key per service/environment, consistent across replicas of that service. Do not generate a new `APP_KEY` on every boot or reuse one across all contexts. ADR-010 records custody, recovery and rotation authority separately from native credentials and evidence signing keys.
+
+Laravel supports previous decryption keys through `APP_PREVIOUS_KEYS`. For planned rotation, first make the new key readable by every continuing/rollback-compatible instance while retaining the existing encryption key; then promote the new key for encryption while retaining the old decryption key. Regenerate protected configuration caches and replace all affected processes at each stage. Test old/new cookies, encrypted records and encrypted jobs across the mixed-version window. [Laravel key rotation](https://laravel.com/docs/13.x/encryption#gracefully-rotating-encryption-keys), reviewed 2026-10-04.
+
+Inventory retained ciphertext, queued payloads and backup recovery requirements before retiring a key. Re-encrypt or retain protected decryption access according to policy; a key list does not automatically rewrite stored data. A suspected compromise follows the incident decision on revocation, forced reauthentication and recovery instead of automatically preserving a compromised key for continuity. Restore tests must include the key versions needed by their recovery points.
+
 ## 6. Installation readiness and evidence
 
 Apply D01–D09 in the phased plan as the authoritative sequence. Before progressing each stage, attach its evidence to the associated work package and campaign. This table adds the operational checks that make that sequence reviewable.

@@ -8,6 +8,8 @@ The source establishes Laravel/PHP business services, a Laravel/Inertia/Vue cons
 
 Implementation order, deliverables and acceptance gates are in [the phased implementation plan](../implementation/phased-plan.md).
 
+The [engineering standards](../engineering/README.md) define how these boundaries become Laravel/Python code and verified deployments. Laravel services keep ordinary framework structure with cohesive use cases, typed adapters and owned models; shared code is restricted to explicit contracts and technical utilities. The [coverage map](../engineering/coverage.md) ties these rules to package and gate evidence, including tenant context in long-lived workers and queues, safe Inertia data, database evolution and dependency-aware CI.
+
 ## 1. Architectural objectives and boundaries
 
 - Model an application as a set of workloads, dependencies and desired outcomes spanning environments and workload security domains.

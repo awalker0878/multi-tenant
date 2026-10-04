@@ -17,6 +17,8 @@ Owners: IAM/security for trust and grants; service owners for enforcement; SRE f
 
 Environment separation applies to issuers/audiences, identities, credentials, data stores, worker registrations and signing policies. An integration token must not authenticate to production even when both use the same identity product.
 
+The [security and tenant isolation engineering standard](../engineering/security-and-tenancy.md) governs Laravel guards/policies, request context and non-HTTP enforcement. Guards establish identity; policies evaluate action and resource scope. A global administrator policy hook must not skip tenant or separation-of-duties checks. First-party session authentication and machine delegation are different trust paths and must have separate acceptance cases.
+
 ## Trust establishment
 
 1. SRE and IAM record the environment, trust roots, accepted issuers/audiences, PKI chains, discovery endpoints, time source and recovery owners in controlled configuration. Validate endpoint ownership independently of values presented by a new worker.
@@ -27,11 +29,15 @@ Environment separation applies to issuers/audiences, identities, credentials, da
 
 Accepted configuration is an input to the installation; the procedure must stop if required trust/identity configuration is absent. Record actual products and supported authentication mechanisms in the [configuration and BOM](configuration-and-bom.md); this document selects no identity vendor.
 
+For browser access, that configuration also records accepted hosts, ingress proxy/header trust, enterprise callback/redirect destinations, session-cookie domain and security attributes, session lifetime, logout/revocation behavior and any reauthentication requirement. Verify the actual Laravel 13 request-forgery middleware and browser flow through the deployed ingress. Do not infer these controls from framework feature tests that bypass CSRF or from a successful identity-provider login.
+
 ## Request and effect validation
 
 At each owner API, authenticate the transport/caller, validate issuer/audience/time and bind the effective actor through the reviewed delegation mechanism. Intersect service authority, actor authority, tenant membership and resource/action scope. Check revision and idempotency conditions only after authorization; guessed identifiers must not expose resource existence.
 
 For privileged effects, lifecycle additionally validates the current exact approval/plan binding, commissioning, qualification, reservation and ownership/fencing state. The worker validates the admitted job, intended endpoint, operation scope, authority lifetime and its own audience before using a native credential. Capture the authorization decision revision/time and operation attempt; never store the credential in the journal.
+
+Queued work carries an attributable tenant/actor/delegation reference, not a reusable browser session or an assumed authorization result. Each consumer establishes fresh scope and reloads current authority before its required action boundary. Clear identity and tenant state after every successful or failed job/request in long-lived processes. Cached authorization and protected download capabilities must have explicit expiry/revocation behavior; neither cache isolation nor a signed URL establishes current permission by itself.
 
 A signed token proves a claim from a trusted issuer under its validation rules; it is not proof that current approval, qualification or resource ownership remains valid. Select explicit freshness and maximum-skew limits before P06/P07. If current mandatory checks cannot be performed, hold the effect under the approved safe-point policy.
 
