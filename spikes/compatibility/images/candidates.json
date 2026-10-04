@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "scope": "P00.03 disposable candidate image experiment; not a production baseline",
+  "platform": "linux/amd64",
+  "debian_snapshot": "20261004T000000Z",
+  "images": {
+    "php": "docker.io/library/php:8.5.11-fpm-bookworm",
+    "python": "docker.io/library/python:3.12.14-slim-bookworm",
+    "node": "docker.io/library/node:24.19.0-bookworm-slim",
+    "composer": "docker.io/library/composer:2.10.3",
+    "uv": "ghcr.io/astral-sh/uv:0.12.19"
+  },
+  "expected_versions": {
+    "php": "8.5.11",
+    "python": "3.12.14",
+    "node": "v24.19.0",
+    "composer": "2.10.3",
+    "uv": "0.12.19"
+  },
+  "php_required_extensions": [
+    "ctype", "curl", "dom", "fileinfo", "filter", "hash", "mbstring",
+    "openssl", "pcre", "PDO", "pdo_pgsql", "pdo_sqlite", "session",
+    "tokenizer", "xml", "xmlwriter", "Zend OPcache"
+  ],
+  "network_assumption": "Connected public registries, Debian snapshot, Packagist/GitHub, npm and PyPI; no approved mirror or disconnected claim"
+}

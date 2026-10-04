@@ -1,0 +1,55 @@
+name: P00 candidate images
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - spikes/compatibility/images/**
+      - spikes/compatibility/php/**
+      - spikes/compatibility/python/**
+      - spikes/compatibility/frontend/**
+      - .github/workflows/p00-image-compatibility.yml
+  workflow_dispatch:
+    inputs:
+      image_mode:
+        description: Replay immutable image inputs, or resolve an explicit new candidate set
+        type: choice
+        options: [replay, resolve]
+        default: replay
+
+permissions:
+  contents: read
+
+concurrency:
+  group: p00-images-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  image-compatibility:
+    name: Build and exercise isolated candidate images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Check out candidate inputs
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
+        with:
+          persist-credentials: false
+
+      - name: Resolve candidate digests, build and exercise the images
+        env:
+          # First experiment resolves exact digests; switch pushes to replay with the measured lock.
+          P00_IMAGE_MODE: ${{ inputs.image_mode || 'resolve' }}
+        run: >-
+          python3 spikes/compatibility/images/run.py
+          --workspace "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/p00-images"
+          --mode "$P00_IMAGE_MODE"
+
+      - name: Retain immutable input lock, BOM and actual command evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, resolved 2026-10-04
+        with:
+          name: p00-images-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p00-images/evidence/
+          if-no-files-found: error
+          retention-days: 14
