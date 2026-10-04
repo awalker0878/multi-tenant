@@ -132,7 +132,11 @@ class StagedApplicationResourceAuthority:
         accounted=self.resources._require_accounted(self.bundle)
         require(all(receipt['status']=='CONFIRMED' for receipt in accounted['receipts']),
                 'Only independently confirmed original native occupancy can be handed over; speculative/expired holds remain charged')
-        bindings,facts,units=self.staging.native_reader._read(self.bundle,job.destination,custody['outputs'],cursor=cursor)
+        # Original creation acceptance retains its strict prepared state. A
+        # current occupancy read measures the same IDs/charge while separately
+        # admitted power/management owners advance their lifecycle states.
+        bindings,facts,units=self.staging.native_reader._read(self.bundle,job.destination,custody['outputs'],
+                                                             cursor=cursor,occupancy=True)
         observed={binding.key() for binding in bindings}
         require(observed=={binding.key() for binding in self.staging.observation.bindings},
                 'The actual staged VM, port or storage UUID changed before current cutover')

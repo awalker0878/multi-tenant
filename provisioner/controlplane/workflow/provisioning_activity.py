@@ -101,7 +101,7 @@ class ProvisioningRuntimeBindings:
 class ApplicationProvisioningActivities:
     def __init__(self, *, authority, resources, bundles, delivery_directory,
                  inbox_directory, journals_directory, source_root, native_bindings,
-                 migration_selections=None, staged_resources=None):
+                 migration_selections=None, staged_resources=None, management=None):
         require(isinstance(authority, PostgresExecutionAuthority)
                 and isinstance(resources, ResourceTransactions)
                 and isinstance(bundles, FileResourceBundleStore)
@@ -118,6 +118,12 @@ class ApplicationProvisioningActivities:
             require(isinstance(migration_selections, FileMigrationSelectionStore),
                     'Concrete protected lifecycle descriptor owner required')
         self.migration_selections = migration_selections
+        if management is not None:
+            from provisioner.migration.activities import ApplicationMigrationActivities
+            require(type(management) is ApplicationMigrationActivities and management.authority is authority
+                    and management.selections is migration_selections,
+                    'The management gate must reuse this exact installed application owner')
+        self.management = management
         from types import MappingProxyType
         from provisioner.controlplane.reconciliation.staged_resources import StagedApplicationResourceAuthority
         owners = {} if staged_resources is None else dict(staged_resources)
@@ -162,6 +168,7 @@ class ApplicationProvisioningActivities:
     @activity.defn(name='application_provision_step')
     def provision_step(self, request: ApplicationStageRequest) -> ApplicationStageResult:
         from provisioner.migration.provisioning import ProvisioningHeld
+        from provisioner.migration.application_lifecycle import LifecycleHeld
         require(isinstance(request, ApplicationStageRequest) and request.step_id,
                 'Typed selected provisioning step required')
         try:
@@ -182,10 +189,9 @@ class ApplicationProvisioningActivities:
             kind = binding['kind']
             if selection['driver'] in {'openstack-linux-application-cutover/1',
                     'openstack-linux-application-database/1'} and kind == 'guest_apply':
-                staged = self.staged_resources.get(request.admitted.job_id)
-                if staged is None or not callable(getattr(staged, 'require_guest_ready', None)):
+                if self.management is None:
                     return self._held(request, 'OPERATOR_HOLD', 'ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
-                staged.require_guest_ready(request.admitted, selection)
+                self.management.require_management_ready(request.admitted, selection)
             from .application_selection import CREATION_STAGES
             require(selection['driver'] not in {'openstack-linux-application-cutover/1',
                     'openstack-linux-application-database/1'} or kind not in CREATION_STAGES,
@@ -218,6 +224,8 @@ class ApplicationProvisioningActivities:
                 self.authority.require_packet(request.admitted, request.selection_digest,
                     delivery, selected_step, packet, operation)
                 self._require_ready(request.admitted, selection)
+                if kind == 'guest_apply' and self.management is not None:
+                    self.management.require_management_ready(request.admitted, selection)
 
             def owner(selected_step, packet, directory, base, plan, root, **keywords):
                 require(selected_step['id'] == request.step_id, 'A different native step cannot be dispatched')
@@ -246,6 +254,8 @@ class ApplicationProvisioningActivities:
         except AuthorityDenied:
             return self._held(request, 'AUTHORITY_REVOKED')
         except ProvisioningHeld as held:
+            return self._held(request, 'OPERATOR_HOLD', held.hold_code)
+        except LifecycleHeld as held:
             return self._held(request, 'OPERATOR_HOLD', held.hold_code)
         except Exception:
             return self._held(request, 'NATIVE_UNCERTAIN')

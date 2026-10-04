@@ -164,6 +164,22 @@ class EnrolledOpenStackReadbackTests(unittest.TestCase):
             self.assertFalse(any('/servers/' in path for method,path in self.server.contacts))
             self.server.token=original
 
+    def test_current_occupancy_preserves_original_ids_and_charge_after_separate_power_or_port_transition(self):
+        original_bindings, _facts, original_units = self.read()
+        server = self.server.rows['/v2.1/project-01/servers/' + SERVER]['server']
+        port = self.server.rows['/v2.0/ports/' + PORT]['port']
+        server['status'] = 'ACTIVE'
+        for enabled in (False, True):
+            port['admin_state_up'] = enabled
+            bindings, facts, units = self.owner._read(self.bundle, self.scope, self.outputs, occupancy=True)
+            self.assertEqual((bindings, units), (original_bindings, original_units))
+            self.assertIs(facts['processor-01']['port']['admin_state_up'], enabled)
+            with self.assertRaises(ValueError): self.read()
+        server['status'] = 'BUILD'
+        with self.assertRaises(ValueError): self.owner._read(self.bundle, self.scope, self.outputs, occupancy=True)
+        server['status'] = 'ACTIVE'; port['admin_state_up'] = None
+        with self.assertRaises(ValueError): self.owner._read(self.bundle, self.scope, self.outputs, occupancy=True)
+
     def test_changed_scope_flavor_policy_or_unknown_native_attachment_keeps_charge(self):
         cases=[('/v2.1/project-01/servers/'+SERVER,'server','tenant_id','foreign-project'),
             ('/v2.1/project-01/servers/'+SERVER,'server','os-extended-volumes:volumes_attached',[{'id':VOLUME},{'id':'foreign'}]),

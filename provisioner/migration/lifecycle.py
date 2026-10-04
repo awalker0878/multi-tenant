@@ -23,6 +23,7 @@ _ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,127}')
 _HASH = re.compile(r'[0-9a-f]{64}')
 PHASES = {
     'TARGET_PREPARE': ('destination', 'VM_POWER'),
+    'TARGET_BOOTSTRAP': ('destination', 'NETWORK_ATTACH'),
     'REHEARSAL': ('destination', 'DESTINATION_ACTIVATE'),
     'SOURCE_FENCE': ('source', 'SOURCE_FENCE'),
     'FINAL_SYNC': ('destination', 'RESTORE_DATA'),
@@ -118,7 +119,8 @@ class ApplicationLifecycleSelection:
                     'native_fence', 'target_native_fence', 'traffic_steps', 'source_io', 'target_io',
                     'source_resources', 'target_resources'}
             require(isinstance(member, dict) and required <= set(member)
-                    and set(member) - required in (set(), {'source_database_directory', 'target_database_directory'}),
+                    and set(member) - required <= {'source_database_directory', 'target_database_directory', 'target_management'}
+                    and ('source_database_directory' in member) == ('target_database_directory' in member),
                     'The exact selected application member is required')
             if 'source_database_directory' in member:
                 for side in ('source', 'target'):
@@ -167,8 +169,13 @@ class ApplicationLifecycleSelection:
                 require(config['machine_id'] == guest['machine_id'] and config['source'] == guest['data_path'],
                         'A final export must bind its exact original application guest and path')
             require(isinstance(member['phases'], dict) and set(member['phases']) in
-                    (set(PHASES), set(PHASES) - {'TARGET_PREPARE'}),
+                    (set(PHASES), set(PHASES) - {'TARGET_BOOTSTRAP'},
+                     set(PHASES) - {'TARGET_PREPARE', 'TARGET_BOOTSTRAP'})
+                    and ('TARGET_BOOTSTRAP' in member['phases']) == ('target_management' in member),
                     'Every application phase needs its own immutable original operation')
+            if 'target_management' in member:
+                from .bootstrap_selection import validate_management_selection
+                validate_management_selection(member['target_management'], target)
             for phase, expected in PHASES.items():
                 if phase not in member['phases']:
                     continue
@@ -278,7 +285,7 @@ class LifecycleWorkerRuntime:
 
 class LifecycleCommandGuard:
     """One concrete immutable lifecycle phase; claims no arbitrary callback."""
-    def __init__(self, runtime, admitted, selection, lifecycle, phase, member_id, *, recovery=None):
+    def __init__(self, runtime, admitted, selection, lifecycle, phase, member_id, *, recovery=None, network_gate=None):
         require(isinstance(runtime, LifecycleWorkerRuntime) and isinstance(admitted, AdmittedInput)
                 and isinstance(selection, dict) and isinstance(lifecycle, ApplicationLifecycleSelection)
                 and selection.get('applicationLifecycleSelectionDigest') == lifecycle.sha256
@@ -296,6 +303,11 @@ class LifecycleCommandGuard:
                 and phase in {'TARGET_REATTACH', 'TARGET_START', 'FORWARD_REPAIR', 'FORWARD_ACTIVATE'},
                 'Recovery admits only the exact separately approved retained-target effect')
         self.recovery = recovery
+        if network_gate is not None:
+            from .application_network import OpenStackBootstrapRuntime
+            require(type(network_gate) is OpenStackBootstrapRuntime and network_gate.registry is runtime.registry,
+                    'The guest network gate must use the same original native registry')
+        self.network_gate = network_gate
         self.row = self.member['phases'][phase]
         self.step = dict(id=self.row['step_id'], kind='application_' + phase.lower())
         self.operation_kind = self.row['operation_kind']
@@ -309,6 +321,14 @@ class LifecycleCommandGuard:
                 and runtime.lease.workload_id == selection['workloadId'],
                 'The lifecycle phase is not enrolled on its exact selected original VM')
         self.claimed = False
+
+    def require_guest_network(self):
+        if self.row['scope_side'] != 'destination' or 'applicationStagingSelectionDigest' not in \
+                strict_loads(self.selection_bytes):
+            return
+        require(self.network_gate is not None and self.phase != 'TARGET_BOOTSTRAP',
+                'Current independently enrolled management policy is required before a guest effect')
+        self.network_gate.observe(self.admitted, strict_loads(self.selection_bytes), self.lifecycle, self.member_id)
 
     def require_current(self):
         require(self.lifecycle.sha256 == self.descriptor_sha256

@@ -77,7 +77,7 @@ class OpenStackApplicationRuntime:
 
     def client(self, guard):
         require(isinstance(guard, LifecycleCommandGuard) and guard.runtime is self.guest.worker
-                and guard.operation_kind in {'SOURCE_FENCE', 'DISK_ATTACH', 'VM_POWER'},
+                and guard.operation_kind in {'SOURCE_FENCE', 'DISK_ATTACH', 'VM_POWER', 'NETWORK_ATTACH'},
                 'Only exact enrolled fence, retained attachment and power actions are implemented')
         return OpenStackApplicationClient(self, guard, self.guest.select(guard))
 
@@ -85,7 +85,11 @@ class OpenStackApplicationRuntime:
 class OpenStackApplicationClient:
     def __init__(self, runtime, guard, authority):
         self.runtime, self.guard, self.authority = runtime, guard, authority
-        self.selected = guard.member['target_native_fence' if guard.row['scope_side'] == 'destination' else 'native_fence']
+        self.selected = dict(guard.member['target_native_fence' if guard.row['scope_side'] == 'destination' else 'native_fence'])
+        if guard.phase == 'TARGET_BOOTSTRAP':
+            from .bootstrap_selection import validate_management_selection
+            validate_management_selection(guard.member['target_management'], guard.scope)
+            self.selected['network_endpoint'] = guard.member['target_management']['network_endpoint']
         for key in ('identity_url', 'compute_endpoint', 'volume_endpoint'):
             _endpoint(self.selected[key])
         require(urlsplit(self.selected['identity_url']).path.rstrip('/') == '/v3'
@@ -132,8 +136,9 @@ class OpenStackApplicationClient:
             retained_headers = {key.lower(): value for key, value in response.getheaders()
                                 if key.lower() in {'x-openstack-request-id', 'x-subject-token'}}
             if retain_native_response:
-                require(method in {'POST', 'DELETE'} and endpoint in
-                        {self.selected['compute_endpoint'], self.selected['volume_endpoint']}
+                require(method in {'POST', 'DELETE', 'PUT'} and endpoint in
+                        {self.selected['compute_endpoint'], self.selected['volume_endpoint'],
+                         self.selected.get('network_endpoint')}
                         and _REQUEST_ID.fullmatch(retained_headers.get('x-openstack-request-id', '')),
                         'An authentic native request identity is required for the original effect receipt')
                 # Retain a genuine late reply before the caller's next current
@@ -171,7 +176,10 @@ class OpenStackApplicationClient:
                 and [role.get('name') for role in token['roles']] == ['member']
                 and headers.get('x-subject-token'),
                 'Actual native authentication differs from the exact enrolled project-member role')
-        for service_type, field in (('compute', 'compute_endpoint'), ('volumev3', 'volume_endpoint')):
+        services = [('compute', 'compute_endpoint'), ('volumev3', 'volume_endpoint')]
+        if 'network_endpoint' in self.selected:
+            services.append(('network', 'network_endpoint'))
+        for service_type, field in services:
             endpoints = [endpoint for service in token.get('catalog', []) if service.get('type') == service_type
                 for endpoint in service.get('endpoints', [])
                 if endpoint.get('region_id', endpoint.get('region')) == self.selected['region']
@@ -182,14 +190,44 @@ class OpenStackApplicationClient:
         require(deadline > utcnow(), 'The actual native project token expired')
         return headers['x-subject-token'], deadline
 
-    def request(self, service, method, suffix, body=None, *, accepted=(200,)):
-        require(service in {'compute', 'volume'} and method in {'GET', 'POST', 'DELETE'},
+    def request(self, service, method, suffix, body=None, *, accepted=(200,), revision=None):
+        require(service in {'compute', 'volume', 'network'} and method in {'GET', 'POST', 'DELETE', 'PUT'},
                 'Only the fixed compute and block storage application owners may contact native APIs')
+        if service == 'network':
+            require(self.guard.phase == 'TARGET_BOOTSTRAP' and self.guard.operation_kind == 'NETWORK_ATTACH'
+                    and ((method == 'GET' and revision is None and body is None) or
+                         (method == 'PUT' and suffix == '/ports/' + self.guard.member['target_management']['port_id']
+                          and body == {'port': {'admin_state_up': True}}
+                          and type(revision) is int and revision >= 0)),
+                    'Only the exact original management-port administrative transition is implemented')
+        else:
+            require(method != 'PUT' and revision is None, 'A management revision cannot authorize another native effect')
         token, expires = self._credential()
-        headers = {'X-Auth-Token': token,
-            'OpenStack-API-Version': 'compute 2.89' if service == 'compute' else 'volume 3.70'}
+        headers = {'X-Auth-Token': token}
+        if service != 'network':
+            headers['OpenStack-API-Version'] = 'compute 2.89' if service == 'compute' else 'volume 3.70'
+        if revision is not None:
+            headers['If-Match'] = 'revision_number=' + str(revision)
         return self._http(self.selected[service + '_endpoint'], method, suffix, body, headers,
                           set(accepted), expires, retain_native_response=method != 'GET')
+
+    def enable_management(self, before):
+        from .application_network import management_snapshot
+        require(self.guard.phase == 'TARGET_BOOTSTRAP' and self.guard.operation_kind == 'NETWORK_ATTACH',
+                'The original management-port operation needs its separate network capability')
+        selected = self.guard.member['target_management']
+        require(management_snapshot(lambda service, path: self.request(service, 'GET', '/' + path)[0],
+                    selected, self.guard.scope, self.server_id, enabled=False) == before,
+                'The original isolated management policy changed before port enablement')
+        extension, _ = self.request('network', 'GET', '/extensions/revision-if-match')
+        require(extension.get('extension', {}).get('alias') == 'revision-if-match',
+                'Native compare-and-swap port transitions are not available on this deployment')
+        result, headers = self.request('network', 'PUT', '/ports/' + selected['port_id'],
+            {'port': {'admin_state_up': True}}, revision=before['port']['revision_number'])
+        require(result.get('port', {}).get('id') == selected['port_id']
+                and result['port'].get('admin_state_up') is True,
+                'The original management-port update has no exact native response')
+        return headers['x-openstack-request-id']
 
     def snapshot(self, *, attached, powered=False):
         server, _ = self.request('compute', 'GET', '/servers/' + self.server_id)

@@ -196,6 +196,8 @@ class GuestCommandRuntime:
                 for name, path in [('ssh_key', key), ('ssh_key-cert.pub', certificate)]:
                     write_new(directory/name, read_private(path))
             write_new(directory/'known_hosts', pins.encode())
+            if isinstance(authority, ApplicationWorkerCommandAuthority):
+                authority.intent_guard.require_guest_network()
             interval = authority.timeout(timeout)
             if native_deadline is not None:
                 interval = min(interval, (native_deadline - utcnow()).total_seconds())

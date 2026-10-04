@@ -95,6 +95,8 @@ def _binding_holds(native=None, migration=None):
             any(isinstance(getattr(owner, 'guest_commands', None), GuestCommandRuntime)
                 for owner in owners),
         'ISOLATED_REHEARSAL_OWNER_UNAVAILABLE': 'REHEARSAL' in phases,
+        'ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED':
+            migration is not None and bool(migration.network_bootstraps),
         'SOURCE_RESTART_OR_OTHER_WRITER_EXCLUSION_REQUIRED':
             migration is not None and bool(migration.source_disk_fences),
         'FINAL_CONSISTENCY_OWNER_UNAVAILABLE': 'FINAL_SYNC' in phases and bool(migration.repositories),
@@ -324,7 +326,7 @@ class ApplicationWorkerComponents:
                 self.migration.source_reattach, self.migration.source_start,
                 self.migration.prewrite_return, self.migration.capture_committed_target,
                 self.migration.stage_targets, self.migration.verify_staged_data,
-                self.migration.target_prepare,
+                self.migration.target_prepare, self.migration.target_bootstrap,
                 self.migration.recovery_inspect,
                 self.migration.recovery_reattach, self.migration.recovery_start,
                 self.migration.recovery_restore, self.migration.recovery_activate,
@@ -377,16 +379,16 @@ class ApplicationWorkerComponents:
             require(isinstance(self.planned_leases, PlannedImageLeaseAuthority),
                     'The original combined lease owner must have been constructed before enrollment')
             self.planned_leases.enroll_staged_resources(staged_resource_bindings)
+        migration = ApplicationMigrationActivities(authority=self.authority, selections=self.migration.selections,
+            runtimes=migration_runtime, journals_directory=self.settings.journal_store,
+            outputs_directory=self.settings.result_store, source_root=self.settings.source_root,
+            database_final_proof=DatabaseFinalProofOwner(database) if database is not None else None)
         provisioning = ApplicationProvisioningActivities(authority=self.authority, resources=self.resources,
             bundles=self.bundles, delivery_directory=self.settings.delivery_store,
             inbox_directory=self.settings.inbox_store, journals_directory=self.settings.journal_store,
             source_root=self.settings.source_root, native_bindings=native,
             migration_selections=self.migration.selections,
-            staged_resources=getattr(self.planned_leases, 'staged_resources', {}))
-        migration = ApplicationMigrationActivities(authority=self.authority, selections=self.migration.selections,
-            runtimes=migration_runtime, journals_directory=self.settings.journal_store,
-            outputs_directory=self.settings.result_store, source_root=self.settings.source_root,
-            database_final_proof=DatabaseFinalProofOwner(database) if database is not None else None)
+            staged_resources=getattr(self.planned_leases, 'staged_resources', {}), management=migration)
         worker_holds = {
             'ENROLLED_NATIVE_PROVISIONING_WORKERS_REQUIRED': not native.bindings,
             'ENROLLED_ISOLATED_TRANSFER_WORKERS_REQUIRED': not migration_runtime.dataset_workers,
@@ -420,6 +422,7 @@ def _require_bound_owners(connect, grants, proofs, native, migration_runtime, da
                 *migration_runtime.source_workers.values(), *migration_runtime.lifecycle_guests.values(),
                 *migration_runtime.repositories.values(), *migration_runtime.source_disk_fences.values(),
                 *migration_runtime.target_native_workers.values(), *migration_runtime.evidence_readers.values(),
+                *migration_runtime.network_bootstraps.values(),
                 *migration_runtime.health_readers.values(),
                 *migration_runtime.recoveries.values(),
                 *migration_runtime.staging.values(),
@@ -631,16 +634,16 @@ def build_application_worker_components(connect, evidence_gate, *, settings=None
         lifecycle_directory=settings.lifecycle_store, recovery_directory=settings.recovery_store,
         staging_directory=settings.staging_store)
     database = _database_components(settings, authority, database_runtime)
-    provisioning = ApplicationProvisioningActivities(authority=authority, resources=resources,
-        bundles=bundles, delivery_directory=settings.delivery_store, inbox_directory=settings.inbox_store,
-        journals_directory=settings.journal_store, source_root=settings.source_root, native_bindings=native,
-        migration_selections=migration_selections,
-        staged_resources=getattr(planned_leases, 'staged_resources', {}))
     migration = ApplicationMigrationActivities(authority=authority,
         selections=migration_selections,
         runtimes=migration_runtime, journals_directory=settings.journal_store,
         outputs_directory=settings.result_store, source_root=settings.source_root,
         database_final_proof=DatabaseFinalProofOwner(database) if database is not None else None)
+    provisioning = ApplicationProvisioningActivities(authority=authority, resources=resources,
+        bundles=bundles, delivery_directory=settings.delivery_store, inbox_directory=settings.inbox_store,
+        journals_directory=settings.journal_store, source_root=settings.source_root, native_bindings=native,
+        migration_selections=migration_selections,
+        staged_resources=getattr(planned_leases, 'staged_resources', {}), management=migration)
     holds = []
     if instance_gate is None:
         holds.append('COMMISSIONED_INSTALLED_OPERATING_INSTANCE_REQUIRED')

@@ -596,6 +596,67 @@ class ApplicationGuestReadTests(_Fixture):
         with self.assertRaises(ValueError): self.exchange('source-initial',command,packet)
         self.assertEqual(len(self.server.contacts),contacts)
 
+    def bootstrap_reader(self):
+        from provisioner.migration.lifecycle import ApplicationLifecycleSelection
+        from provisioner.migration.remote_app import ApplicationGuestRuntime, ApplicationHealthReadRuntime
+        from tests.provisioning.mobility.test_application_network import management_record
+        body=self.lifecycle.to_dict();member=body['members'][0]
+        selected=management_record(project=self.destination.native_scope_id)
+        self.target=self.target | {'address':selected['ipv4_address'],'port':22}
+        selected['ssh_host_key_sha256']=digest(self.target['host_key'].encode())
+        member['target_management']=selected
+        member['phases']['TARGET_BOOTSTRAP']=dict(step_id='bootstrap-target',operation_id='bootstrap-original',
+            scope_side='destination',operation_kind='NETWORK_ATTACH')
+        self.lifecycle=ApplicationLifecycleSelection.from_record(body)
+        self.selection['applicationLifecycleSelectionDigest']=self.lifecycle.sha256
+        self.enrollment=replace(self.enrollment,selection_digest=_digest(self.selection))
+        self.profile=replace(self.profile,source_range=selected['worker_ipv4_address']+'/32')
+        self.guest=GuestCommandRuntime(self.runtime,self.profile)
+        self.authority=self.runtime.select_application_reader(self.admitted,self.selection,self.lifecycle,
+            'machine-1',ROOT,enrollment=self.enrollment,writer=self.writer,writer_native_user='hosting_writer')
+        writer_guest=object.__new__(ApplicationGuestRuntime)
+        for key,value in dict(worker=self.writer,commands=None,
+                target=self.target | {'user':'hosting_writer'},source_root=ROOT).items():
+            object.__setattr__(writer_guest,key,value)
+        return ApplicationHealthReadRuntime(self.guest,self.enrollment,self.writer,writer_guest,
+            self.target,self.ssh_runtime,None,None,self.root,ROOT)
+
+    def test_bootstrap_reads_image_and_masked_service_with_separate_current_native_read_certificates(self):
+        from provisioner.execution.neutron_observe import strict_loads
+        reader=self.bootstrap_reader();commands=[]
+        def process(argv,input_bytes,directory,interval):
+            commands.append(argv[-1])
+            self.assertIn('StrictHostKeyChecking=yes',argv)
+            if input_bytes:
+                packet=strict_loads(input_bytes)
+                self.assertEqual(packet['parameters'],{})
+                result=dict(format='hosting-application-guest-observation/1',action='IMAGE_OBSERVE',
+                    job_id=self.admitted.job_id,operation_id=self.authority.operation_id,
+                    selection_sha256=self.lifecycle.sha256,identity=dict(machine_id=self.authority.guest['machine_id'],
+                        native_uuid=self.authority.guest['native_uuid'],image='ubuntu-24.04'),
+                    observation=dict(executable_sha256=self.authority.guest['executable']['sha256'],
+                        unit_sha256=self.authority.guest['unit_sha256']))
+                raw=encoded(result)
+            else:raw=b'ActiveState=inactive\nSubState=dead\nUnitFileState=masked\nMainPID=0\n'
+            write_new(directory/'stdout',raw);return 0
+        with patch.object(guest_run,'runtime_record',return_value=self.ssh_runtime), \
+                patch('provisioner.controlplane.worker.guest_commands._bounded_process',side_effect=process):
+            result=reader.observe_bootstrap(self.admitted,self.selection,self.lifecycle,'machine-1')
+        self.assertEqual(result['service']['UnitFileState'],'masked')
+        self.assertEqual(result['read_operation_id'],self.authority.operation_id)
+        self.assertEqual([cert.serial for cert in self.certificates],[1,2])
+        self.assertEqual(len(commands),2)
+        self.assertEqual(self.writer.registry.calls,[])
+
+    def test_bootstrap_foreign_transport_or_host_pin_is_refused_before_native_credential_contact(self):
+        reader=self.bootstrap_reader()
+        for target in (reader.target | {'address':'192.0.2.30'},reader.target | {'port':2222},
+                       reader.target | {'host_key':reader.target['host_key']+' changed'}):
+            changed=replace(reader,target=target)
+            with self.assertRaises(ValueError):
+                changed.observe_bootstrap(self.admitted,self.selection,self.lifecycle,'machine-1')
+        self.assertEqual(self.server.contacts,[])
+
 
 class GuestCommandTests(_Fixture):
     def setUp(self):

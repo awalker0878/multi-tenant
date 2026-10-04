@@ -114,12 +114,65 @@ writer/readback proof are mandatory before final sync or source return. A power
 receipt alone does not establish that exclusion.
 
 Separate staging and cutover workflows require current handover accounting and
-an explicit existing-target power phase before guest/data contact. Nova request
-IDs are retained as request identities, not B11 task IDs. Isolated rehearsal,
+an explicit existing-target power phase and retained-port management bootstrap
+before guest/data contact. Nova and Neutron request IDs are retained as request
+identities, not B11 task IDs. Isolated rehearsal,
 final restore, application acceptance and target activation use the exact enrolled
 systemd, repository, resource/service and independent readback owners. Missing
 native enrollment holds each phase before its effect. Fixture success does not
 prove native management reachability, traffic exposure or service acceptance.
+
+### Selected isolated management bootstrap
+
+The lifecycle's `TARGET_BOOTSTRAP` phase has its own destination `NETWORK_ATTACH`
+step and original operation. Its `target_management` selection binds one existing
+port/network/subnet/security-group UUID set, fixed IPv4/MAC, MTU, exact subnet
+services/routes, worker IPv4, SSH host-key digest and complete native rule IDs.
+The protected staged handover must retain that port as the target's only NIC.
+Historical descriptors without this phase remain readable and cannot invent its
+grant or advance a current staged cutover.
+
+`OpenStackBootstrapRuntime` enrolls the concrete native writer, a separate
+`NativeReadEnrollment` for the project-reader role, and a separate
+`ApplicationHealthReadRuntime` with a distinct SSH read account. The installed
+`MigrationRuntimeBindings.network_bootstraps` map selects `(job_id, member_id)`;
+queue history carries neither runtime objects nor credentials. Both readers
+must share the actual current application/registry/grant owners.
+
+Before the effect, both the independent reader and native writer inspect the
+booted server, its complete interface set, exact disabled port, private network,
+subnet and full stateful security-group rules. The supported port must be a normal
+OVS/bridge vNIC with observed port filtering, no address pairs, extra NICs or trunk
+and one policy group. Only the exact worker's `/32` TCP/22 ingress is admitted;
+approved egress services have exact IPv4 hosts/protocol/ports. Extra/default
+allow-all, IPv6 and remote-group/address-group selectors hold this bounded owner.
+
+The only write is `PUT /v2.0/ports/<original-id>` with
+`{"port":{"admin_state_up":true}}` and `If-Match: revision_number=<observed>`.
+The deployment must advertise `revision-if-match`. The original journal retains
+the update request ID before post-effect authority/readback. Revision conflicts,
+lost replies and subsequent revocation never retry or enable another port.
+The independent reader then confirms the live policy; the independently scoped
+SSH reader checks the pinned host, guest/native identity, selected image and
+persistently masked inactive application unit. A second native policy sweep must
+match before the bootstrap receipt completes.
+
+Current cutover workflows perform power and bootstrap before provisioning/data
+transfer. A Temporal patch marker preserves historical command ordering.
+Direct provisioning/transfer callers require original independently resolved
+bootstrap evidence and fresh management readback too; application guest effects
+check the management path before each command. Current occupancy measures the
+same original UUIDs and charge across power/port transitions. Original creation
+acceptance continues to require its selected prepared/bootstrap state.
+
+This owner enables a management path over an existing approved isolated policy.
+It does not create network infrastructure, compile production policy, admit
+application traffic or certify positive/negative datapath behavior. Those owners
+and native campaigns remain separate requirements. The original source accounting
+reader also holds detached backings until their own complete native datastore
+accounting is supplied; a retained old receipt cannot establish current storage.
+
+Primary protocol: [Neutron port update and revision constraints](https://docs.openstack.org/api-ref/network/v2/).
 
 `recovery_projection` still presents conservative read-only choices from the
 original activation intent. The implemented pre-write source-return path requires
@@ -231,8 +284,9 @@ B30/B31 qualification still requires commissioned repositories/keys, dedicated
 worker/cgroup/staging custody, actual metadata/consistency acceptance and measured
 limits. B32–B35 native acceptance remains open for isolated rehearsal, persistent
 writer fencing, final sync, traffic/write admission and useful pre/post-write
-recovery; the implemented target power phase additionally needs a concrete
-isolated management/bootstrap network owner before guest contact. B36
+recovery. The implemented power/management-bootstrap owners need commissioned
+readers and native policy/reachability qualification; production policy and
+retained detached source-backing accounting remain implementation work. B36
 still requires administrator acceptance of complete portal/CLI actions. B37
 native mutation remains held until minimum operating controls and independently
 authorized site/application inputs are present.

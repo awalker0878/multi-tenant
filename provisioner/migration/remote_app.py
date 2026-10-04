@@ -228,7 +228,20 @@ class ApplicationHealthReadRuntime:
         require(self.side == 'destination', 'Only the selected target has an initial restore staging read')
         return self._observe(admitted, selection, lifecycle, member_id, initial=True)
 
-    def _observe(self, admitted, selection, lifecycle, member_id, *, initial=False):
+    def observe_bootstrap(self, admitted, selection, lifecycle, member_id):
+        require(self.side == 'destination' and self.recovery is None,
+                'Only the original target has an isolated management bootstrap read')
+        selected = lifecycle.member(member_id)['target_management']
+        require(self.target['address'] == selected['ipv4_address'] and self.target['port'] == 22
+                and self.writer_guest.target['address'] == self.target['address']
+                and self.writer_guest.target['port'] == self.target['port']
+                and digest(self.target['host_key'].encode()) == selected['ssh_host_key_sha256']
+                and self.writer_guest.target['host_key'] == self.target['host_key']
+                and self.commands.read_credentials.source_range == selected['worker_ipv4_address'] + '/32',
+                'The independent pinned SSH read does not use the selected isolated management path')
+        return self._observe(admitted, selection, lifecycle, member_id, bootstrap=True)
+
+    def _observe(self, admitted, selection, lifecycle, member_id, *, initial=False, bootstrap=False):
         authority = self.commands.command_runtime.select_application_reader(admitted, selection, lifecycle,
             member_id, self.source_root, enrollment=self.enrollment, writer=self.writer, side=self.side,
             writer_native_user=self.writer_guest.target['user'], recovery=self.recovery)
@@ -263,6 +276,28 @@ class ApplicationHealthReadRuntime:
             return result['observation']
 
         image = action('IMAGE_OBSERVE', {})
+        if bootstrap:
+            properties = ('ActiveState', 'SubState', 'UnitFileState', 'MainPID')
+            raw = exchange(('/usr/bin/sudo', '-n', '--', '/usr/bin/systemctl', 'show', '--no-pager', guest['unit'],
+                            *('--property=' + name for name in properties))).decode('utf-8')
+            state = {}
+            for line in raw.splitlines():
+                key, separator, value = line.partition('=')
+                require(separator and key in properties and key not in state,
+                        'The bootstrap reader returned a missing or repeated service state')
+                state[key] = value
+            require(set(state) == set(properties) and state['ActiveState'] == 'inactive'
+                    and state['SubState'] == 'dead' and state['UnitFileState'] == 'masked'
+                    and state['MainPID'] == '0',
+                    'The isolated target already admits a production application writer')
+            grant, _ = authority.require_current()
+            return dict(format='hosting-independent-application-bootstrap/1', original_job_id=admitted.job_id,
+                lifecycle_digest=lifecycle.sha256, member_id=member_id,
+                reader_subject=self.commands.command_runtime.identity.subject,
+                reader_certificate_digest=self.commands.command_runtime.identity.certificate_sha256,
+                read_grant_id=grant.grant_id, read_operation_id=authority.operation_id,
+                image=image, service=state, address=self.target['address'], port=self.target['port'],
+                ssh_host_key_sha256=digest(self.target['host_key'].encode()), observed_at=utcnow().isoformat())
         if initial:
             data = action('DATA_OBSERVE', dict(path=authority.member['initial_target_path'],
                                               max_bytes=authority.member['max_bytes']))

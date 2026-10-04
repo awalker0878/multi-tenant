@@ -87,7 +87,7 @@ class ApplicationRepositoryRuntime:
 
 class ApplicationLifecycleRunner:
     def __init__(self, *, admitted, plan, execution_artifact, lifecycle, datasets, ledger, evidence,
-                 database_final_proof=None):
+                 database_final_proof=None, staged=None, management=None):
         require(isinstance(plan, dict) and not validate_record(plan)
                 and isinstance(lifecycle, ApplicationLifecycleSelection)
                 and isinstance(datasets, ApplicationDataSelection)
@@ -135,6 +135,8 @@ class ApplicationLifecycleRunner:
                     'The application cannot replace its source repository or initial restored dataset mapping')
         self.admitted, self.plan_bytes, self.artifact_bytes = admitted, encoded(plan), encoded(execution_artifact)
         self.lifecycle, self.datasets, self.evidence = lifecycle, datasets, evidence
+        self.staged = staged
+        self.management = management
         self.ledger = private_path(ledger, directory=True)
 
     def _target_prepare(self, guest, authority, native_runtime, log):
@@ -180,7 +182,8 @@ class ApplicationLifecycleRunner:
                         {'SOURCE_DISK_REMOVE_STARTED', 'SOURCE_DISK_TASK_RETURNED', 'TARGET_WRITE_ADMISSION_STARTED',
                          'NATIVE_SHUTDOWN_STARTED', 'NATIVE_SHUTDOWN_RETURNED', 'TARGET_DISK_REMOVE_STARTED',
                          'TARGET_DISK_TASK_RETURNED', 'SOURCE_DISK_ADD_STARTED', 'SOURCE_DISK_ADD_RETURNED',
-                         'TARGET_DISK_ADD_STARTED', 'TARGET_DISK_ADD_RETURNED', 'NATIVE_START_STARTED', 'NATIVE_START_RETURNED'},
+                         'TARGET_DISK_ADD_STARTED', 'TARGET_DISK_ADD_RETURNED', 'NATIVE_START_STARTED', 'NATIVE_START_RETURNED',
+                         'MANAGEMENT_PORT_ENABLE_STARTED', 'MANAGEMENT_PORT_ENABLE_RETURNED'},
                         'The original application phase journal was changed')
         return started, complete
 
@@ -589,7 +592,7 @@ class ApplicationLifecycleRunner:
         transfer_guard = TransferGuard(guest.worker.worker_authority, guest.worker.credential,
             digest(encoded(envelope)), guest.worker.grant_id, guard.row['step_id'], guard.row['operation_id'],
             ApplicationCommandAuthority(guest.worker.execution_authority, self.admitted, guard.selection_digest,
-                                        guest.worker.identity, 'RESTORE_DATA'))
+                                        guest.worker.identity, 'RESTORE_DATA', management=self.management))
         transfer_guard.check(envelope)
         guest.action(authority, 'RESTORE_PREPARE', base)
         for stage in ('REPOSITORY', 'SNAPSHOTS', 'RESTORE'):
@@ -654,24 +657,30 @@ class ApplicationLifecycleRunner:
                     independent_database_final_proof=database_proof,
                     target_write_boundary='TARGET_WRITES_POSSIBLE')
 
-    def execute(self, phase, member_id, *, guest, repository=None, native_runtime=None):
-        require(isinstance(guest, ApplicationGuestRuntime) and phase in {'TARGET_PREPARE', 'REHEARSAL', 'SOURCE_FENCE', 'FINAL_SYNC', 'ACTIVATE',
+    def execute(self, phase, member_id, *, guest, repository=None, native_runtime=None, network_runtime=None):
+        require(isinstance(guest, ApplicationGuestRuntime) and phase in {'TARGET_PREPARE', 'TARGET_BOOTSTRAP', 'REHEARSAL', 'SOURCE_FENCE', 'FINAL_SYNC', 'ACTIVATE',
                 'TARGET_FENCE', 'SOURCE_REATTACH', 'SOURCE_START', 'PREWRITE_RETURN', 'POSTWRITE_CAPTURE'},
                 'The concrete selected application phase owner is required')
         if phase in {'REHEARSAL', 'SOURCE_FENCE', 'FINAL_SYNC', 'ACTIVATE'} and \
                 'applicationStagingSelectionDigest' in strict_loads(self.artifact_bytes):
-            # The target power receipt cannot establish a current isolated SSH
-            # path. The concrete enrolled Neutron/policy owner is commissioned
-            # independently before these guest effects can enter this graph.
-            raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+            from .application_network import OpenStackBootstrapRuntime
+            if type(network_runtime) is not OpenStackBootstrapRuntime:
+                raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+            self.independently_resolved(member_id, 'TARGET_BOOTSTRAP')
+            network_runtime.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id)
         guard = LifecycleCommandGuard(guest.worker, self.admitted, strict_loads(self.artifact_bytes),
-                                      self.lifecycle, phase, member_id)
+                                      self.lifecycle, phase, member_id, network_gate=network_runtime)
         authority = guest.select(guard)
         # The current independently retained original results are required before
         # creating another native intent. Missing facts cannot create a new
         # uncertain command merely by asking to continue the graph.
         if phase == 'TARGET_PREPARE':
             require('TARGET_PREPARE' in guard.member['phases'], 'Historical selections cannot invent target power authority')
+        elif phase == 'TARGET_BOOTSTRAP':
+            from .application_network import OpenStackBootstrapRuntime
+            if type(network_runtime) is not OpenStackBootstrapRuntime:
+                raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+            self.independently_resolved(member_id, 'TARGET_PREPARE')
         elif phase == 'REHEARSAL':
             self._initial(member_id)
         elif phase == 'SOURCE_FENCE':
@@ -710,6 +719,8 @@ class ApplicationLifecycleRunner:
                 guard.claim(request_digest)
                 if phase == 'TARGET_PREPARE':
                     observed = self._target_prepare(guest, authority, native_runtime, log)
+                elif phase == 'TARGET_BOOTSTRAP':
+                    observed = network_runtime.execute(authority, self.staged, log)
                 elif phase == 'REHEARSAL':
                     observed = self._rehearsal(guest, authority)
                 elif phase == 'SOURCE_FENCE':

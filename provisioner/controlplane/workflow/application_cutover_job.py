@@ -45,7 +45,10 @@ class OpenStackStagedApplicationCutover:
     @workflow.run
     async def run(self, input: ApplicationCutoverInput) -> ApplicationJobResult:
         admitted = input.admitted
+        bootstrap = workflow.patched('isolated-management-bootstrap-v1')
         total = 7 + len(input.provisioning_steps) + len(input.dataset_ids) + 2 * len(input.machine_ids)
+        if bootstrap:
+            total += len(input.machine_ids)
         if input.database_selection_digest is not None:
             total += 4
         completed, evidence = 0, None
@@ -96,6 +99,10 @@ class OpenStackStagedApplicationCutover:
         for machine in input.machine_ids:
             result = await stage('application_target_prepare', machine, phase='PREPARE')
             if result: return result
+        if bootstrap:
+            for machine in input.machine_ids:
+                result = await stage('application_target_bootstrap', machine, phase='PREPARE')
+                if result: return result
         for step in input.provisioning_steps:
             result = await stage('application_provision_step', step, provisioning=True, phase='PROVISION')
             if result: return result

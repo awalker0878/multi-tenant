@@ -16,8 +16,11 @@ signed alert/on-call intake, scoped planning credentials, per-command guest
 authorization, enrolled resource/service dispatch and separately admitted cleanup.
 The selected application route remains VMware → OpenStack rebuild/restore for
 Ubuntu24.04. Separate staging/cutover workflows compose isolated rehearsal,
-persistent source data-disk exclusion, final capture/restore, target preparation
-and activation, pre-write source return and retained-target post-write repair.
+persistent source data-disk exclusion, final capture/restore, target power and
+isolated management-port bootstrap, activation, pre-write source return and
+retained-target post-write repair. The bootstrap uses retained NIC identities,
+conditional Neutron updates, an independent project reader and a separate pinned
+SSH reader before guest effects; it does not qualify the native datapath.
 
 Further implemented increments include selected PostgreSQL17 application-native
 sync, enterprise cross-tenant wave pools, authenticated retained-state import and
@@ -41,9 +44,10 @@ implemented boundary is also recorded in the execution plan's opening table.
    with actual scoped credentials and independent target/policy observations;
    obtain Linux/service acceptance. A revoked old job requires a newly approved
    recovery admission and independently excluded old credentials for cleanup.
-3. Complete the selected isolated management/bootstrap network owner and its
-   independent reachability/policy checks before subsequent guest contact; the
-   implemented target power phase does not supply that owner. Run the selected
+3. Commission the implemented isolated management/bootstrap owner and its
+   independent project/guest readers before subsequent guest contact. Complete
+   production policy/traffic realization and independently account for the
+   retained detached source backing throughout cutover. Run the selected
    application campaign against actual isolated guests. Prove
    rehearsal isolation, source restart/late-writer exclusion, final consistency,
    traffic/target write admission and useful-service acceptance. Rehearse pre-write

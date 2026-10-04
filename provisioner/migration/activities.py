@@ -38,6 +38,7 @@ from .remote_app import ApplicationGuestRuntime, ApplicationHealthReadRuntime
 from .source_exclusion import SourceDiskFenceRuntime
 from .native_openstack import OpenStackApplicationRuntime
 from .lifecycle_evidence import ApplicationEvidenceReader
+from .application_network import OpenStackBootstrapRuntime, require_staged_management
 from .traffic import ApplicationTrafficRuntime
 from .staging import ApplicationStagedHandover, ApplicationStagingRuntime
 from .promotion import ApplicationPromotionRuntime
@@ -164,6 +165,7 @@ class MigrationRuntimeBindings:
     repositories: Mapping[tuple[str, str, str], ApplicationRepositoryRuntime] = field(default_factory=dict)
     source_disk_fences: Mapping[tuple[str, str, str], SourceDiskFenceRuntime] = field(default_factory=dict)
     target_native_workers: Mapping[tuple[str, str, str], OpenStackApplicationRuntime] = field(default_factory=dict)
+    network_bootstraps: Mapping[tuple[str, str], OpenStackBootstrapRuntime] = field(default_factory=dict)
     evidence_readers: Mapping[str, ApplicationEvidenceReader] = field(default_factory=dict)
     traffic: Mapping[str, ApplicationTrafficRuntime] = field(default_factory=dict)
     health_readers: Mapping[tuple[str, str, str], ApplicationHealthReadRuntime] = field(default_factory=dict)
@@ -185,6 +187,7 @@ class MigrationRuntimeBindings:
         for name, owner, arity in (
             ('lifecycle_guests', ApplicationGuestRuntime, 3), ('repositories', ApplicationRepositoryRuntime, 3),
             ('source_disk_fences', SourceDiskFenceRuntime, 3), ('target_native_workers', OpenStackApplicationRuntime, 3),
+            ('network_bootstraps', OpenStackBootstrapRuntime, 2),
             ('evidence_readers', ApplicationEvidenceReader, 1), ('traffic', ApplicationTrafficRuntime, 1),
             ('health_readers', ApplicationHealthReadRuntime, 3),
             ('staging', ApplicationStagingRuntime, 1), ('promotions', ApplicationPromotionRuntime, 1),
@@ -283,6 +286,9 @@ class ApplicationMigrationActivities:
         return ApplicationLifecycleRunner(admitted=request.admitted, plan=plan, execution_artifact=artifact,
             lifecycle=lifecycle, datasets=self.selections.datasets(artifact['datasetSelectionDigest']),
             ledger=self._journal(request.admitted.job_id), evidence=reader,
+            management=self,
+            staged=self.selections.staged(artifact['applicationStagingSelectionDigest'])
+                if 'applicationStagingSelectionDigest' in artifact else None,
             database_final_proof=self.database_final_proof if 'applicationDatabaseSelectionDigest' in artifact else None)
 
     def _lifecycle_phase(self, request, phase):
@@ -311,7 +317,8 @@ class ApplicationMigrationActivities:
                     native = self.runtimes.target_native_workers.get(key) if phase in {'TARGET_PREPARE', 'TARGET_FENCE', 'POSTWRITE_CAPTURE'} \
                         else self.runtimes.source_disk_fences.get(key)
                     receipt = runner.execute(phase, member_id, guest=guest,
-                        repository=self.runtimes.repositories.get(key), native_runtime=native)
+                        repository=self.runtimes.repositories.get(key), native_runtime=native,
+                        network_runtime=self.runtimes.network_bootstraps.get((request.admitted.job_id, member_id)))
                     reference = self._retain(receipt)
                     try:
                         receipt, proof = runner.independently_resolved(member_id, phase)
@@ -332,6 +339,21 @@ class ApplicationMigrationActivities:
             return self._held(request, 'CURRENT_AUTHORITY_UNAVAILABLE', reason='AUTHORITY_REVOKED')
         except Exception:
             return self._held(request, 'ORIGINAL_APPLICATION_EFFECT_REQUIRES_RECONCILIATION', reason='NATIVE_UNCERTAIN')
+
+    def require_management_ready(self, admitted, artifact):
+        """Fresh original bootstrap proof for direct activity/old-history callers."""
+        if 'applicationStagingSelectionDigest' not in artifact:
+            return
+        request = MigrationActivityRequest(admitted, canonical_record_digest(artifact))
+        runner = self._lifecycle(request, 'DISCOVER_READ')
+        for member in runner.lifecycle.to_dict()['members']:
+            member_id = member['machine_id']
+            runtime = self.runtimes.network_bootstraps.get((admitted.job_id, member_id))
+            if type(runtime) is not OpenStackBootstrapRuntime or 'target_management' not in member:
+                raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+            require_staged_management(runner.staged, runner.lifecycle, member_id)
+            runner.independently_resolved(member_id, 'TARGET_BOOTSTRAP')
+            runtime.observe(admitted, artifact, runner.lifecycle, member_id)
 
     def _recovery(self, request, operation):
         plan, artifact = self._observation(request, operation)
@@ -425,17 +447,17 @@ class ApplicationMigrationActivities:
             runner = self._data(request)
             require(request.mode == 'EXECUTE', 'Restore effects cannot use observation mode')
             _plan, artifact = self._current(request, 'RESTORE_DATA')
-            if 'applicationStagingSelectionDigest' in artifact:
-                raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+            self.require_management_ready(request.admitted, artifact)
             runtime = self.runtimes.dataset_workers[(request.admitted.job_id, request.member_id)]
             packet = self.selections.dataset_packet(request.admitted.job_id, request.member_id)
             # The descriptor and packet load may have taken time. Recheck the
             # complete admitted artifact immediately before entering the owner.
             self._current(request, 'RESTORE_DATA')
+            self.require_management_ready(request.admitted, artifact)
             result = runner.execute_dataset(request.member_id, runtime=runtime,
                 envelope=packet['envelope'], restore_authority=packet['restore_authority'],
                 command_authority=ApplicationCommandAuthority(self.authority, request.admitted,
-                    request.selection_digest, runtime.identity, 'RESTORE_DATA'))
+                    request.selection_digest, runtime.identity, 'RESTORE_DATA', management=self))
             reference = self._retain(result)
             self._continuation(request, 'RESTORE_DATA', runtime, runner._row(request.member_id),
                 PlanScope.from_record(runner.selection.to_dict()['destination_scope']))
@@ -641,6 +663,10 @@ class ApplicationMigrationActivities:
                 and all(row['target']['native_id'] == associations[row['machine_id']]['targetBinding']['nativeId']
                     for row in lifecycle.to_dict()['members']),
                 'The application lifecycle selects another actual staged target')
+            for member in lifecycle.to_dict()['members']:
+                if 'target_management' not in member:
+                    raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+                require_staged_management(handover, lifecycle, member['machine_id'])
             result = dict(format='hosting-verified-staged-application-targets/1',
                 job_id=request.admitted.job_id, staging_selection_digest=digest,
                 original_job_id=body['originalAdmitted']['job_id'], workload_digest=body['stagedWorkloadDigest'],
@@ -662,6 +688,10 @@ class ApplicationMigrationActivities:
     @activity.defn(name='application_target_prepare')
     def target_prepare(self, request: MigrationActivityRequest) -> MigrationActivityResult:
         return self._lifecycle_phase(request, 'TARGET_PREPARE')
+
+    @activity.defn(name='application_target_bootstrap')
+    def target_bootstrap(self, request: MigrationActivityRequest) -> MigrationActivityResult:
+        return self._lifecycle_phase(request, 'TARGET_BOOTSTRAP')
 
     @activity.defn(name='application_source_reattach')
     def source_reattach(self, request: MigrationActivityRequest) -> MigrationActivityResult:

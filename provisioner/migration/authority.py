@@ -23,6 +23,7 @@ class ApplicationCommandAuthority:
     selection_digest: str
     identity: VerifiedWorkerIdentity
     operation_kind: str
+    management: object = None
 
     def __post_init__(self):
         require(isinstance(self.authority, PostgresExecutionAuthority)
@@ -32,6 +33,16 @@ class ApplicationCommandAuthority:
                 and (self.identity.organization_id, self.identity.tenant_id) ==
                     (self.admitted.organization_id, self.admitted.tenant_id),
                 'The actual admitted continuation authority and enrolled identity are required')
+        if self.management is not None:
+            from .activities import ApplicationMigrationActivities
+            require(type(self.management) is ApplicationMigrationActivities
+                    and self.management.authority is self.authority,
+                    'Transfer management checks require the same concrete application owner')
+
+    def _management(self, selection):
+        if 'applicationStagingSelectionDigest' in selection and self.operation_kind == 'RESTORE_DATA':
+            require(self.management is not None, 'The original transfer has no current management network owner')
+            self.management.require_management_ready(self.admitted, selection)
 
     def _bound(self, grant):
         require(isinstance(grant, WorkerGrant) and grant.operation_kind == self.operation_kind
@@ -52,12 +63,14 @@ class ApplicationCommandAuthority:
     def require_admission(self, grant):
         """Preclaim checking never exempts an existing unresolved native intent."""
         self._bound(grant)
-        plan, _selection = self.authority.require_current(self.admitted, self.selection_digest,
+        plan, selection = self.authority.require_current(self.admitted, self.selection_digest,
                                                         self.operation_kind)
         self._scopes(grant, plan)
+        self._management(selection)
 
     def require_current(self, grant):
         self._bound(grant)
-        plan, _selection = self.authority.require_current(self.admitted, self.selection_digest,
+        plan, selection = self.authority.require_current(self.admitted, self.selection_digest,
             self.operation_kind, continuation_grant=grant, continuation_identity=self.identity)
         self._scopes(grant, plan)
+        self._management(selection)

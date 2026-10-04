@@ -44,7 +44,7 @@ class OpenStackProjectReader:
         self.tls.verify_flags|=ssl.VERIFY_X509_STRICT
         self.tls.load_verify_locations(cadata=self.ca.decode('ascii'))
         self.material=enrollment.acquire(**({'cursor':cursor} if cursor is not None else {}))
-        require(self.material.data.keys()=={'environment','cloud'},
+        require(self.material.data.keys()=={'environment','cloud'} and self.material.data['environment']=={},
                 'The read-only role must issue the fixed native OpenStack credential payload')
         cloud=cloud_config(encoded(self.material.data['cloud']),alias)['clouds'][alias]
         require(cloud['auth']['auth_url'].rstrip('/')==self.identity_endpoint,
@@ -103,6 +103,13 @@ class OpenStackProjectReader:
             connection.request(method,address.path+path,body=encoded(body) if body else None,headers=headers)
             response=connection.getresponse(); raw=response.read(c.LIMIT+1)
             self._current()
+            lengths=response.headers.get_all('Content-Length',[])
+            require(len(lengths)==1 and lengths[0].isdigit() and int(lengths[0])==len(raw)
+                    and not response.headers.get_all('Transfer-Encoding',[])
+                    and response.headers.get_all('Content-Encoding',[]) in ([],['identity'])
+                    and all(len(response.headers.get_all(name,[]))<=1 for name in
+                        ('Content-Type','X-Subject-Token','X-OpenStack-Request-Id','OpenStack-API-Version')),
+                    'Independent native read has ambiguous framing or identity/version headers')
             require(response.status in {200,201} and len(raw)<=c.LIMIT
                     and response.headers.get_content_type()=='application/json'
                     and response.getheader('Content-Encoding','identity')=='identity',
@@ -116,7 +123,7 @@ class OpenStackProjectReader:
 
     def get(self,service,path):
         allowed={'compute':('servers/','flavors/'), 'volume':('volumes/',),
-                 'network':('ports/','security-groups/')}
+                 'network':('ports/','security-groups/','networks/','subnets/')}
         require(service in allowed and any(path.startswith(prefix) for prefix in allowed[service])
                 and all(part not in {'','..','.'} for part in path.split('/')),
                 'Only compiled exact-ID native observation routes are supported')
@@ -134,7 +141,7 @@ class OpenStackNativeReadbackOwner:
         self.directory=private_path(directory,directory=True); self.bundles=bundles
         self.lease_store=lease_store
 
-    def _read(self,bundle,scope,outputs,*,cursor=None):
+    def _read(self,bundle,scope,outputs,*,cursor=None,occupancy=False):
         require(scope==self.enrollment.scope, 'The independent reader is enrolled in another native project')
         pools=[pool for pool in bundle.pools if pool.scope==scope and pool.inputs is not None]
         require(len(pools)==1,'One exact OpenStack workload pool is required')
@@ -155,6 +162,10 @@ class OpenStackNativeReadbackOwner:
                 require(type(identity) is str and c.UUID.fullmatch(identity), 'Actual native UUID selectors required')
             server=reader.get('compute','servers/'+ids['server_id'])['server']
             state='ACTIVE' if selected.get('lifecycle_stage','prepared')=='bootstrap' else 'SHUTOFF'
+            if occupancy:
+                state=server.get('status')
+                require(state in {'ACTIVE','SHUTOFF'},
+                        'Changing native target state cannot supply current occupancy')
             metadata={'tenant_key':inputs['tenant_key'],'domain_key':selected['domain_key'],'workload_key':name}
             require(server.get('id')==ids['server_id'] and server.get('tenant_id')==scope.native_scope_id
                     and server.get('name')==name and server.get('status')==state
@@ -182,7 +193,8 @@ class OpenStackNativeReadbackOwner:
                     and port.get('port_security_enabled') is True and port.get('allowed_address_pairs')==[]
                     and port.get('security_groups')==[selected['security_group_id']]
                     and port.get('fixed_ips')==[{'subnet_id':selected['subnet_id'],'ip_address':selected['ipv4_address']}]
-                    and port.get('admin_state_up') is (state=='ACTIVE'),
+                    and (type(port.get('admin_state_up')) is bool if occupancy else
+                         port.get('admin_state_up') is (state=='ACTIVE')),
                     'Actual native mandatory policy, address, ownership or attachment differs')
             group=reader.get('network','security-groups/'+selected['security_group_id'])['security_group']
             require(group.get('id')==selected['security_group_id'] and group.get('project_id')==scope.native_scope_id,
