@@ -68,3 +68,10 @@ The recorder refuses to replace an existing result. It records only command argu
 ## PHP execution evidence
 
 [Actions run 37224453605](https://github.com/awalker0878/multi-tenant/actions/runs/37224453605) passed at source commit `06df7bfb15d83eb5a180e10c0d6c65970c5b0a54`: PHP 8.5.11, Composer 2.10.3, Laravel 13.34.0 and Inertia Laravel 3.5.1. The historical Composer lock at source commit `9a214f6ea2f0bba02abb7959cbd2f3523efbba1c` and [source-bound report](results/php-ci/report.json) preserve that earlier run. Check out that revision to replay its dependency-only inputs; current source adds separate integration and quality-tool dependencies. Dependency updates are a new experiment, not a reproduction command. That earlier dependency-only probe did not test HTTP. The separate integration result above now covers synthetic HTTP/browser behavior; neither experiment qualifies a production image.
+
+
+## Candidate images and contract tooling
+
+The [image experiment](images/README.md) builds separate quality/runtime stages from captured upstream digests and a fixed Debian snapshot. Normal pushes replay `images/inputs.lock.json`; explicit candidate resolution is a distinct update operation. The [image report](../../docs/implementation/p00-image-results.md) owns actual BOM, runtime observations and limits.
+
+The [contract experiment](contracts/README.md) pins schema validation and a bundled generator, checks valid/invalid fixtures, generates three language clients twice and exercises selected model/compiler/mock-transport behavior. `run-contracts.py` records clean installs, runtime identities and the required PHP CI execution. The [contract report](../../docs/implementation/p00-contract-tooling-results.md) owns its exact observed results and unsupported claims. Neither experiment creates a public product contract, service deployment or native operation.

@@ -51,7 +51,7 @@ Requirement wording and campaigns are owned by [requirements-and-qualification.m
 
 | Requirement | Work | Verification | Native qualification | Operating acceptance | Evidence | Blockers |
 | --- | --- | --- | --- | --- | --- | --- |
-| R01 | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | EV-P00-001, EV-P00-002, EV-P00-003, EV-P00-004, EV-P00-005 | BL-P00-001, BL-P00-002 |
+| R01 | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | EV-P00-001, EV-P00-002, EV-P00-003, EV-P00-004, EV-P00-005, EV-P00-006, EV-P00-007 | BL-P00-001, BL-P00-002 |
 | R02 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R03 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |
 | R04 | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | — | — |

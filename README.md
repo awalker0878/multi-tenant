@@ -2,7 +2,7 @@
 
 An enterprise application for planning and operating multi-tenant hosting across **VMware, Nutanix and OpenStack**. It brings application requirements, infrastructure discovery, placement assessment, approvals, provisioning, migration and recovery into one governed operator experience.
 
-**Current state:** P00 is underway, with scope/domain reviews and executed Laravel HTTP, Chromium and PHP/Python quality-tool compatibility checks recorded alongside the product design and implementation programme. The product application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
+**Current state:** P00 is underway, with scope/domain reviews and executed Laravel HTTP, Chromium, PHP/Python quality-tool, candidate-image and cross-language contract checks recorded alongside the product design and implementation programme. The product application is not yet implemented, and no platform or migration method is qualified. The capabilities below describe the intended product.
 
 ## What the application does
 
@@ -36,7 +36,7 @@ The console should make each task understandable through clear requirements, dif
 
 ## How it is organized
 
-The proposed implementation uses Laravel/PHP for product services and Python for infrastructure intelligence and execution. The console uses **Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8**. Exact runtime and dependency pins are a P00 validation task; the [source checks](docs/reference/sources-and-reset.md) record the candidate baseline.
+The proposed implementation uses Laravel/PHP for product services and Python for infrastructure intelligence and execution. The console uses **Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4 and Vite 8**. Exact candidate pins and image inputs are recorded in the P00 compatibility reports; operated adoption and complete service dependencies remain open; the [source checks](docs/reference/sources-and-reset.md) record the candidate baseline.
 
 | Area | Responsibility |
 | --- | --- |
@@ -95,3 +95,6 @@ The [documentation index](docs/README.md) maps the complete set. Active branch: 
 ## P00 execution
 
 P00 has started. The [baseline review](docs/implementation/p00-baseline-review.md) connects the scope/domain findings, historical source assessment, actual compatibility experiments and route/operating requirements. The [Laravel integration](docs/implementation/p00-integration-results.md) now passes 20 tests/200 assertions, quality and boundary controls, clean lock replay and a real Chromium flow. The [Python tooling experiment](docs/implementation/p00-python-tooling-results.md) passes strict typing, behavior tests and intended import-boundary rejections. Compatibility code under `spikes/compatibility/` is an isolated experiment; product services and native qualification are still future work. Follow [progress](docs/implementation/progress.md) for evidence and unresolved inputs, and [next work](next_work.md) for the next concrete step.
+
+
+The [candidate images](docs/implementation/p00-image-results.md) now have immutable upstream inputs, measured OS/extension/package inventories and passing isolated runtime probes. The [contract-tool experiment](docs/implementation/p00-contract-tooling-results.md) validates synthetic wire schemas and reproducible PHP/Python/TypeScript generation, including intentional rejection cases and documented decoder limits. The remaining P00 work is consolidated in the [decision and input review](docs/implementation/p00-decision-and-input-review.md): actual baseline/operating decisions, exact application/platform/lab inputs, bounded rebuild/restore observations and accountable G00 review.

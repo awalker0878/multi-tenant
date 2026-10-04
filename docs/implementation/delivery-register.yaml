@@ -34,6 +34,8 @@ phases:
   - EV-P00-003
   - EV-P00-004
   - EV-P00-005
+  - EV-P00-006
+  - EV-P00-007
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -304,6 +306,7 @@ work_packages:
   - docs/implementation/phases/p00.md
   - docs/implementation/p00-scope-review.md
   - docs/reference/p00-historical-source-review.md
+  - docs/implementation/p00-decision-and-input-review.md
 - id: P00.02
   phase_id: P00
   title: Domain and ownership
@@ -332,6 +335,7 @@ work_packages:
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
   - docs/implementation/p00-domain-review.md
   - docs/product/domain-model.md
+  - docs/implementation/p00-decision-and-input-review.md
 - id: P00.03
   phase_id: P00
   title: Technical decisions
@@ -347,6 +351,8 @@ work_packages:
   - EV-P00-003
   - EV-P00-004
   - EV-P00-005
+  - EV-P00-006
+  - EV-P00-007
   blocker_ids:
   - BL-P00-001
   dependency_package_ids:
@@ -371,6 +377,11 @@ work_packages:
   - docs/implementation/p00-python-tooling-results.md
   - docs/implementation/p00-integration-results.md
   - docs/implementation/p00-browser-results.md
+  - docs/implementation/p00-decision-and-input-review.md
+  - docs/implementation/p00-image-results.md
+  - docs/implementation/p00-contract-tooling-results.md
+  - spikes/compatibility/images/README.md
+  - spikes/compatibility/contracts/README.md
 - id: P00.04
   phase_id: P00
   title: Qualification design
@@ -420,6 +431,7 @@ work_packages:
   - docs/engineering/developer-workflow.md
   - docs/implementation/p00-route-and-operations-review.md
   - docs/product/operating-targets.md
+  - docs/implementation/p00-decision-and-input-review.md
 - id: P00.06
   phase_id: P00
   title: Delivery decomposition
@@ -445,6 +457,7 @@ work_packages:
   doc_refs:
   - docs/implementation/phases/p00.md
   - docs/implementation/p00-baseline-review.md
+  - docs/implementation/p00-decision-and-input-review.md
 - id: P01.01
   phase_id: P01
   title: Repository scaffolding
@@ -1584,6 +1597,8 @@ requirements:
   - EV-P00-003
   - EV-P00-004
   - EV-P00-005
+  - EV-P00-006
+  - EV-P00-007
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2739,6 +2754,8 @@ gates:
   - EV-P00-003
   - EV-P00-004
   - EV-P00-005
+  - EV-P00-006
+  - EV-P00-007
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -2972,6 +2989,82 @@ evidence:
     retained.
   valid_until: null
   invalidated_at: null
+- id: EV-P00-006
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/a8614085e2ed97929f8f12fdd57a904ab082c4d9/spikes/compatibility/results/images/run-37232393563/report.json
+  sha256: e3764c8dc9cdbb1c43f820d2e88665a792c00a5d00bb570041984f20e4880db4
+  source_revision: d988cfe5d09e32a22da93c9c1b4816878fe4c495
+  artifact_revisions:
+    retained_artifact_commit: a8614085e2ed97929f8f12fdd57a904ab082c4d9
+    spikes/compatibility/results/images/run-37232393563/retrieval.json: 1119d0d0e2d122fb7af60d62ca05426b903570737994e60cad24ac27e4ab72c5
+    spikes/compatibility/images/inputs.lock.json: 9298a430b975ab50d7cf4ccd89f627194bacc205682f61b92ad1f8f3db65d935
+    spikes/compatibility/images/candidates.json: e20eeda5ed589b3dfc428f7103127eac986d68fa78f7ed15a8e8bd8b663a094f
+    spikes/compatibility/results/images/run-37232393563/php-runtime.json: b8e6ebaf383e7a06f2f3caa76a26dc99f78e31a0bb2539adc478dca563917dfe
+    spikes/compatibility/results/images/run-37232393563/python-runtime.json: 3cf26436f4084d659b5e65257384ab8f94d8d849d7a6b3dc8dc1e82892eebfa9
+    spikes/compatibility/results/images/run-37232132120/report.json: 789b4e5ca3a4dde415aa39647462b2a8e521f46a5d616827cac3160e0c9a2191
+  environment: GitHub-hosted Ubuntu 24.04 x64; Docker 28.0.4 / Buildx 0.37.1; Debian Bookworm
+    linux/amd64; PHP 8.5.11; Python 3.12.14; Node 24.19.0; Composer 2.10.3; uv 0.12.19
+  scope: Run 37232132120 resolved five immutable platform manifests and passed 49 commands;
+    separate run 37232393563 replayed identical input lock and passed 39 commands. Four quality/runtime
+    targets, measured OS/extension/language inventories, UID10001 and read-only controls,
+    four invalid-lock rejections, 20 PHP tests/200 assertions/14 canaries, four Python tests/three
+    contracts/seven rejections, real Laravel HTML/Inertia JSON/two assets and expected CSRF
+    419. All 94 replay source bindings and archive/log hashes verified.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T20:32:24.565496+00:00'
+  observer: GitHub Actions run 37232393563 / attempt 1; inspected by Codex /root
+  reviewer: 'Codex /root: source bindings, archive/log hashes and actual outcomes reviewed;
+    accountable engineering/SRE acceptance pending'
+  limitations: Candidate fixture evidence only; no product service, native platform, actual
+    PostgreSQL server, production FPM/ingress, mirror/offline installation, operating acceptance,
+    signed/published image, full SBOM or OS vulnerability qualification. Package inventories
+    match across runs; derived config digests differ, so no byte-identical image claim. Inherited
+    PHP development headers remain recorded. Fixed-input observations have no time expiry;
+    changed inputs need new execution.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P00-007
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/9ba0aa1fe3c6be68af2a11ba7c9b4260edf8f079/spikes/compatibility/results/contracts/run-37232194144/evidence/report.json
+  sha256: 922bf7e85d4ef259b0b528f04749c05692cfed5c8c3ded76dacc4cb4a3866c49
+  source_revision: 9843a0ab62452f8edcb0f5e19f25eb692ba3d723
+  artifact_revisions:
+    retained_artifact_commit: 9ba0aa1fe3c6be68af2a11ba7c9b4260edf8f079
+    spikes/compatibility/results/contracts/run-37232194144/retrieval.json: 3e031c86b917d771876e09f99c5c43b51e8546a635ba4a6d278aa7b2a7fb410b
+    spikes/compatibility/results/contracts/run-37232194144/bootstrap/report.json: b023a0ce16c09de70d13d880bc325e9c37ee176d40d5266e25c4a5db3bc62c38
+    spikes/compatibility/results/contracts/run-37232194144/evidence/generated-sha256.json: f802b6aa911f4bed5a27f628b252164a92b02d867d4f54fd3ee28bbe2f4e96d4
+    spikes/compatibility/results/contracts/run-37232194144/evidence/php-models.log: fbc0ded6d7a3d4d18f43ff53a49a7e90b43e9b68877f6bc8ec7fd49a95f5bc2f
+    spikes/compatibility/contracts/uv.lock: ab2b455e439aeef970ce31f18b158633e4d6a854c7f575e180b4880a35b4818b
+    spikes/compatibility/contracts/package-lock.json: 1c236919916fa9b80aefae8ab8b7323c332457787f21bdaa7e7d37b5865e3fd5
+    spikes/compatibility/contracts/openapi.json: 61f84a4bdb76227f4d75600a716476165b21f27850f17cf66608ece4f604f460
+    spikes/compatibility/contracts/event.schema.json: 30122652b391070414b33f452e9cae4eaabb6118cf8eea0daba152b45523b963
+  environment: GitHub-hosted Ubuntu 24.04 x64; PHP 8.5.11; Python 3.12.14; Node 24.19.0 /
+    npm 11.17.0; uv 0.12.19; Temurin 17.0.20.1+1; OpenAPI Generator 7.25.0
+  scope: Run 37232194144 passed nine bootstrap commands and 31 contract commands, including
+    clean locked installation; 18 wire fixtures (five valid, 13 invalid), two malformed-schema
+    rejections, 53 identically generated PHP/Python/TypeScript files, changed-schema detection,
+    Python/TypeScript compile/model checks, mock TypeScript HTTP, intentional TypeScript compiler
+    rejection and 11 PHP lints plus model/two negative cases. Generated hashes also match
+    the retained local run. All recorded source/log/archive hashes verified.
+  campaign_ids:
+  - Q01
+  criterion_ids:
+  - G00.03
+  observed_at: '2026-10-04T20:28:38.806386+00:00'
+  observer: GitHub Actions run 37232194144 / attempt 1; inspected by Codex /root
+  reviewer: 'Codex /root: source bindings, archive/log hashes and actual outcomes reviewed;
+    accountable engineering/SRE acceptance pending'
+  limitations: Synthetic OpenAPI 3.0.4 subset and JSON Schema 2020-12 event envelope only;
+    no product or AsyncAPI channel/broker/outbox/inbox implementation, live HTTP, authorization,
+    canonical digest vectors, compatibility window or operating acceptance. Generated decoders
+    have observed gaps and require wire-schema validation before domain translation. PHP HTTP
+    transport is not tested. Fixed-input observations have no time expiry; changed inputs
+    require new execution.
+  valid_until: null
+  invalidated_at: null
 blockers:
 - id: BL-P00-001
   scope_ids:
@@ -2995,9 +3088,9 @@ blockers:
     This blocks acceptance, not continued independent engineering.
   unblock_condition: Record named accountable reviewers and accept or revise the scope/domain/runtime/operating
     recommendations, retained-state disposition and assigned later checkpoints.
-  next_action: Use docs/implementation/p00-baseline-review.md and its linked review
-    packets to record concrete decisions and owner assignments; retain unaccepted
-    items explicitly.
+  next_action: Use DC01–DC10 and IP01/IP02/IP06/IP07 in docs/implementation/p00-decision-and-input-review.md
+    to record concrete decisions and owner assignments against measured evidence; retain
+    unaccepted items explicitly.
   state: OPEN
   resolution_evidence_ids: []
 - id: BL-P00-002
