@@ -1,0 +1,70 @@
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\DependencyHealthTest[39m
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency wit[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency with ('Bearer short')[39m
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency with ('Bearer xxxxxxxxxxxxxxxxxxxxxx…xxxxxx')[39m
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency with ('Basic TOKEN')[39m
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency with ('Basic Bearer TOKEN')[39m
+  [32;1m✓[39;22m[90m [39m[90munknown or malformed health identities never reach a dependency with ('Bearer TOKEN extra')[39m
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly valid credential with ('absent')[39m
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly valid credential with ('empty')[39m
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly valid credential with ('multiline')[39m
+  [32;1m✓[39;22m[90m [39m[90man absent or malformed mounted identity denies even the formerly valid credential with ('oversize')[39m
+  [32;1m✓[39;22m[90m [39m[90mauthenticated dependency failure is sanitized and never changes product readiness[39m
+  [32;1m✓[39;22m[90m [39m[90msuccessful foundation checks grant only dependency readiness and no[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing a credential file revokes the old token without restarting the application[39m
+  [32;1m✓[39;22m[90m [39m[90mcredential paths cannot use a stream wrapper[39m
+  [32;1m✓[39;22m[90m [39m[90mmounted application key wins and an unavailable file never falls ba[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\FoundationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit serves the public foundation page with only its declared page pr[39m[90m…[39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit supports Inertia navigation without adding an authenticated identity[39m
+  [32;1m✓[39;22m[90m [39m[90mit sets a private non-cacheable response and secure cookie for the HTTPS configuration[39m
+  [32;1m✓[39;22m[90m [39m[90mit requires a fresh page when the browser supplies an obsolete asset version[39m
+  [32;1m✓[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/login')[39m
+  [32;1m✓[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/register')[39m
+  [32;1m✓[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/tenants')[39m
+  [32;1m✓[39;22m[90m [39m[90mit exposes no authentication or workload endpoints in the foundation with ('/workloads')[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\HealthTest[39m
+  [32;1m✓[39;22m[90m [39m[90mliveness reports only a running process with no configured authorit[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreadiness remains closed until the console dependencies are implemented[39m
+  [32;1m✓[39;22m[90m [39m[90mhealth endpoints reject writes with ('/health/live')[39m
+  [32;1m✓[39;22m[90m [39m[90mhealth endpoints reject writes with ('/health/ready')[39m
+  [32;1m✓[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/tenants')[39m
+  [32;1m✓[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/authorization-decisions')[39m
+  [32;1m✓[39;22m[90m [39m[90mbusiness authority routes are absent and expose no exception diagnostics with ('/v1/approvals')[39m
+  [32;1m✓[39;22m[90m [39m[90ma caller cannot configure readiness or start a browser session through health input[39m
+  [32;1m✓[39;22m[90m [39m[90munimplemented browser pages return an ordinary not-found response[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RequestForgeryTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit rejects a browser mutation without its session request-forgery t[39m[90m…[39m [90m0.01s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts a matching session token through the same web middleware[39m
+
+  [39;41;1m FAIL [39;49;22m[39m Tests\Architecture\FoundationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mservice autoload exposes only its own application and tests[39m
+  [32;1m✓[39;22m[90m [39m[90mthe actual bootstrap classes are loaded from the service source[39m
+  [32;1m✓[39;22m[90m [39m[90mimplemented application classes use strict types[39m[90m                    [39m [90m0.02s[39m  
+  [31;1m⨯[39;22m[90m [39m[90mimplemented application classes are final[39m
+  [32;1m✓[39;22m[90m [39m[90mdelivery does not reference sibling service source[39m
+  [31m────────────────────────────────────────────────────────────────────────────[39m  
+  [41;1m FAILED [49;22m [1mTests\Architecture\FoundationTest[22m… [41;1m ArchExpectationFailedException [49;22m  
+[39;1m  Expecting 'app/Application/Foundation/Data/DependencyStatus.php' to be final.[39;22m
+
+  at [32mapp/Application/Foundation/Data/DependencyStatus.php[39m:[32m0[39m
+      1▕ <?php
+      2▕ 
+      3▕ declare(strict_types=1);
+      4▕ 
+      5▕ namespace App\Application\Foundation\Data;
+      6▕ 
+      7▕ enum DependencyStatus: string
+      8▕ {
+      9▕     case Ready = 'ready';
+
+  [33m1   [39m[39;1mapp/Application/Foundation/Data/DependencyStatus.php[39;22m:[39;1m0[39;22m
+
+
+  [90mTests:[39m    [31;1m1 failed[39;22m[90m,[39m[39m [39m[32;1m38 passed[39;22m[90m (167 assertions)[39m
+  [90mDuration:[39m [39m0.29s[39m
+

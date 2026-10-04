@@ -1,0 +1,1225 @@
+{
+  "name": "p01-c28c87e6c680-1afa616b",
+  "networks": {
+    "db_assurance": {
+      "internal": true
+    },
+    "db_catalogue": {
+      "internal": true
+    },
+    "db_console": {
+      "internal": true
+    },
+    "db_governance": {
+      "internal": true
+    },
+    "db_inventory": {
+      "internal": true
+    },
+    "db_lifecycle": {
+      "internal": true
+    },
+    "db_planning": {
+      "internal": true
+    },
+    "web_assurance": {
+      "internal": true
+    },
+    "web_catalogue": {
+      "internal": true
+    },
+    "web_console": {
+      "internal": true
+    },
+    "web_governance": {
+      "internal": true
+    },
+    "web_inventory": {
+      "internal": true
+    },
+    "web_lifecycle": {
+      "internal": true
+    },
+    "web_planning": {
+      "internal": true
+    }
+  },
+  "secrets": {
+    "assurance-app-key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/assurance-app-key"
+    },
+    "assurance-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/assurance-health-token"
+    },
+    "assurance-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/assurance-migrator-password"
+    },
+    "assurance-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/assurance-runtime-password"
+    },
+    "assurance.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/assurance.crt"
+    },
+    "assurance.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/assurance.key"
+    },
+    "ca.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/ca.crt"
+    },
+    "catalogue-app-key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/catalogue-app-key"
+    },
+    "catalogue-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/catalogue-health-token"
+    },
+    "catalogue-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/catalogue-migrator-password"
+    },
+    "catalogue-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/catalogue-runtime-password"
+    },
+    "catalogue.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/catalogue.crt"
+    },
+    "catalogue.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/catalogue.key"
+    },
+    "console-app-key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/console-app-key"
+    },
+    "console-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/console-health-token"
+    },
+    "console-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/console-migrator-password"
+    },
+    "console-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/console-runtime-password"
+    },
+    "console.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/console.crt"
+    },
+    "console.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/console.key"
+    },
+    "governance-app-key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/governance-app-key"
+    },
+    "governance-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/governance-health-token"
+    },
+    "governance-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/governance-migrator-password"
+    },
+    "governance-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/governance-runtime-password"
+    },
+    "governance.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/governance.crt"
+    },
+    "governance.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/governance.key"
+    },
+    "inventory-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/inventory-health-token"
+    },
+    "inventory-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/inventory-migrator-password"
+    },
+    "inventory-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/inventory-runtime-password"
+    },
+    "inventory.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/inventory.crt"
+    },
+    "inventory.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/inventory.key"
+    },
+    "lifecycle-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/lifecycle-health-token"
+    },
+    "lifecycle-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/lifecycle-migrator-password"
+    },
+    "lifecycle-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/lifecycle-runtime-password"
+    },
+    "lifecycle.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/lifecycle.crt"
+    },
+    "lifecycle.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/lifecycle.key"
+    },
+    "planning-health-token": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/planning-health-token"
+    },
+    "planning-migrator-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/planning-migrator-password"
+    },
+    "planning-runtime-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/planning-runtime-password"
+    },
+    "planning.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/planning.crt"
+    },
+    "planning.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/planning.key"
+    },
+    "postgres-password": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/postgres-password"
+    },
+    "postgres.crt": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/postgres.crt"
+    },
+    "postgres.key": {
+      "file": "/tmp/p01-private-parent-7obgfrcu/runtime/secrets/postgres.key"
+    }
+  },
+  "services": {
+    "assurance": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "sh",
+        "-ec",
+        "php artisan config:cache && exec php-fpm -F"
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "APP_KEY_FILE": "/run/secrets/app-key",
+        "DB_DATABASE": "assurance",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "assurance_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:c406068041bd74c494ae030c85c53c6fc6691dcf021c83082ce62aae73f80f5b",
+      "init": true,
+      "networks": [
+        "db_assurance",
+        "web_assurance"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "assurance-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "assurance-health-token",
+          "target": "health-token"
+        },
+        {
+          "source": "assurance-app-key",
+          "target": "app-key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777",
+        "/app/storage:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=0770",
+        "/app/bootstrap/cache:rw,noexec,nosuid,size=16m,uid=10001,gid=10001,mode=0770"
+      ],
+      "user": "10001:10001"
+    },
+    "assurance-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "assurance": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_assurance"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "assurance.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "assurance.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/assurance.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/public/assurance",
+          "target": "/srv/public",
+          "type": "bind"
+        }
+      ]
+    },
+    "catalogue": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "sh",
+        "-ec",
+        "php artisan config:cache && exec php-fpm -F"
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "APP_KEY_FILE": "/run/secrets/app-key",
+        "DB_DATABASE": "catalogue",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "catalogue_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:525735c6da0af87dd5822aeb9373f23f168a547093cc5db1eab119e3036a934c",
+      "init": true,
+      "networks": [
+        "db_catalogue",
+        "web_catalogue"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "catalogue-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "catalogue-health-token",
+          "target": "health-token"
+        },
+        {
+          "source": "catalogue-app-key",
+          "target": "app-key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777",
+        "/app/storage:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=0770",
+        "/app/bootstrap/cache:rw,noexec,nosuid,size=16m,uid=10001,gid=10001,mode=0770"
+      ],
+      "user": "10001:10001"
+    },
+    "catalogue-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "catalogue": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_catalogue"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "catalogue.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "catalogue.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/catalogue.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/public/catalogue",
+          "target": "/srv/public",
+          "type": "bind"
+        }
+      ]
+    },
+    "console": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "sh",
+        "-ec",
+        "php artisan config:cache && exec php-fpm -F"
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "APP_KEY_FILE": "/run/secrets/app-key",
+        "DB_DATABASE": "console",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "console_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:59b49936a3eebdf8c32a007e7bafb66e1b8a0dc8cff75ccbd81494c960298ffb",
+      "init": true,
+      "networks": [
+        "db_console",
+        "web_console"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "console-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "console-health-token",
+          "target": "health-token"
+        },
+        {
+          "source": "console-app-key",
+          "target": "app-key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777",
+        "/app/storage:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=0770",
+        "/app/bootstrap/cache:rw,noexec,nosuid,size=16m,uid=10001,gid=10001,mode=0770"
+      ],
+      "user": "10001:10001"
+    },
+    "console-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "console": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_console"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "console.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "console.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/console.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/public/console",
+          "target": "/srv/public",
+          "type": "bind"
+        }
+      ]
+    },
+    "governance": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "sh",
+        "-ec",
+        "php artisan config:cache && exec php-fpm -F"
+      ],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "APP_KEY_FILE": "/run/secrets/app-key",
+        "DB_DATABASE": "governance",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "governance_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:9b12f703cbc7bb23c8e31c8e3fe2c91eb24cbf2e9db4a7a1fe6768dee20e9a2a",
+      "init": true,
+      "networks": [
+        "db_governance",
+        "web_governance"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "governance-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "governance-health-token",
+          "target": "health-token"
+        },
+        {
+          "source": "governance-app-key",
+          "target": "app-key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777",
+        "/app/storage:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=0770",
+        "/app/bootstrap/cache:rw,noexec,nosuid,size=16m,uid=10001,gid=10001,mode=0770"
+      ],
+      "user": "10001:10001"
+    },
+    "governance-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "governance": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_governance"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "governance.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "governance.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/governance.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/public/governance",
+          "target": "/srv/public",
+          "type": "bind"
+        }
+      ]
+    },
+    "inventory": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/opt/venv/bin/inventory-serve"
+      ],
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "DB_DATABASE": "inventory",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "inventory_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:96459d3fecbdf94d369275fab8444900823cb11c8cd7bf001ab9b1dfe664e9ce",
+      "init": true,
+      "networks": [
+        "db_inventory",
+        "web_inventory"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "inventory-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "inventory-health-token",
+          "target": "health-token"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001"
+    },
+    "inventory-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "inventory": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_inventory"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "inventory.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "inventory.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/inventory.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        }
+      ]
+    },
+    "lifecycle": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/opt/venv/bin/lifecycle-serve"
+      ],
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "DB_DATABASE": "lifecycle",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "lifecycle_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:9b39f90a933c530c77d8f5b4d8a2b454a0b48ac90c6b6132f96d1b04691cb88f",
+      "init": true,
+      "networks": [
+        "db_lifecycle",
+        "web_lifecycle"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "lifecycle-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "lifecycle-health-token",
+          "target": "health-token"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001"
+    },
+    "lifecycle-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "lifecycle": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_lifecycle"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "lifecycle.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "lifecycle.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/lifecycle.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        }
+      ]
+    },
+    "planning": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [],
+      "depends_on": {
+        "postgres": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/opt/venv/bin/planning-serve"
+      ],
+      "environment": {
+        "APP_DEBUG": "false",
+        "APP_ENV": "production",
+        "DB_DATABASE": "planning",
+        "DB_HOST": "postgres",
+        "DB_PASSWORD_FILE": "/run/secrets/db-password",
+        "DB_PORT": "5432",
+        "DB_SSLMODE": "verify-full",
+        "DB_SSLROOTCERT": "/run/secrets/ca.crt",
+        "DB_USERNAME": "planning_runtime",
+        "HEALTH_TOKEN_FILE": "/run/secrets/health-token"
+      },
+      "image": "sha256:cbdad3b7716ace677d8162de2ea34d23238610a8586dc108dcf11e105a622c78",
+      "init": true,
+      "networks": [
+        "db_planning",
+        "web_planning"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "planning-runtime-password",
+          "target": "db-password"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "planning-health-token",
+          "target": "health-token"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001"
+    },
+    "planning-proxy": {
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "-g",
+        "daemon off;"
+      ],
+      "depends_on": {
+        "planning": {
+          "condition": "service_started"
+        }
+      },
+      "entrypoint": [
+        "/usr/sbin/nginx"
+      ],
+      "image": "docker.io/library/nginx@sha256:3d2f995522ddb52c3a4eb8008b8fa26f184f7146851df1da831f88885ac40aae",
+      "init": true,
+      "networks": [
+        "web_planning"
+      ],
+      "platform": "linux/amd64",
+      "ports": [
+        {
+          "host_ip": "127.0.0.1",
+          "protocol": "tcp",
+          "target": 8443
+        }
+      ],
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "planning.crt",
+          "target": "tls.crt"
+        },
+        {
+          "source": "planning.key",
+          "target": "tls.key"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=32m,uid=10001,gid=10001,mode=1777"
+      ],
+      "user": "10001:10001",
+      "volumes": [
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/tmp/p01-private-parent-7obgfrcu/runtime/nginx/planning.conf",
+          "target": "/etc/nginx/nginx.conf",
+          "type": "bind"
+        }
+      ]
+    },
+    "postgres": {
+      "cap_add": [
+        "CHOWN",
+        "DAC_OVERRIDE",
+        "FOWNER",
+        "SETGID",
+        "SETUID"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "command": [
+        "postgres"
+      ],
+      "entrypoint": [
+        "/bin/bash",
+        "/opt/foundation/entrypoint.sh"
+      ],
+      "healthcheck": {
+        "interval": "2s",
+        "retries": 30,
+        "test": [
+          "CMD",
+          "pg_isready",
+          "-h",
+          "127.0.0.1",
+          "-U",
+          "postgres"
+        ],
+        "timeout": "2s"
+      },
+      "image": "docker.io/library/postgres@sha256:9e73daeb439141c2b11eea2463f5f1a3b269fd90d897b41cddb7cb440f21aa5d",
+      "init": true,
+      "networks": [
+        "db_console",
+        "db_governance",
+        "db_catalogue",
+        "db_assurance",
+        "db_planning",
+        "db_inventory",
+        "db_lifecycle"
+      ],
+      "platform": "linux/amd64",
+      "pull_policy": "never",
+      "read_only": true,
+      "secrets": [
+        {
+          "source": "postgres-password",
+          "target": "postgres-password"
+        },
+        {
+          "source": "postgres.key",
+          "target": "postgres.key"
+        },
+        {
+          "source": "postgres.crt",
+          "target": "postgres.crt"
+        },
+        {
+          "source": "ca.crt",
+          "target": "ca.crt"
+        },
+        {
+          "source": "console-runtime-password",
+          "target": "console-runtime-password"
+        },
+        {
+          "source": "console-migrator-password",
+          "target": "console-migrator-password"
+        },
+        {
+          "source": "governance-runtime-password",
+          "target": "governance-runtime-password"
+        },
+        {
+          "source": "governance-migrator-password",
+          "target": "governance-migrator-password"
+        },
+        {
+          "source": "catalogue-runtime-password",
+          "target": "catalogue-runtime-password"
+        },
+        {
+          "source": "catalogue-migrator-password",
+          "target": "catalogue-migrator-password"
+        },
+        {
+          "source": "assurance-runtime-password",
+          "target": "assurance-runtime-password"
+        },
+        {
+          "source": "assurance-migrator-password",
+          "target": "assurance-migrator-password"
+        },
+        {
+          "source": "planning-runtime-password",
+          "target": "planning-runtime-password"
+        },
+        {
+          "source": "planning-migrator-password",
+          "target": "planning-migrator-password"
+        },
+        {
+          "source": "inventory-runtime-password",
+          "target": "inventory-runtime-password"
+        },
+        {
+          "source": "inventory-migrator-password",
+          "target": "inventory-migrator-password"
+        },
+        {
+          "source": "lifecycle-runtime-password",
+          "target": "lifecycle-runtime-password"
+        },
+        {
+          "source": "lifecycle-migrator-password",
+          "target": "lifecycle-migrator-password"
+        }
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "tmpfs": [
+        "/tmp:rw,noexec,nosuid,size=64m,mode=1777",
+        "/var/run/postgresql:rw,noexec,nosuid,size=16m,mode=1777"
+      ],
+      "user": "0:0",
+      "volumes": [
+        {
+          "source": "postgres_data",
+          "target": "/var/lib/postgresql",
+          "type": "volume"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/home/runner/work/multi-tenant/multi-tenant/deploy/dependencies/postgres/entrypoint.sh",
+          "target": "/opt/foundation/entrypoint.sh",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/home/runner/work/multi-tenant/multi-tenant/deploy/dependencies/postgres/initialize.sh",
+          "target": "/docker-entrypoint-initdb.d/10-private-identities.sh",
+          "type": "bind"
+        },
+        {
+          "bind": {
+            "create_host_path": false
+          },
+          "read_only": true,
+          "source": "/home/runner/work/multi-tenant/multi-tenant/deploy/dependencies/postgres/migrate.sql",
+          "target": "/opt/foundation/migrate.sql",
+          "type": "bind"
+        }
+      ]
+    }
+  },
+  "volumes": {
+    "postgres_data": {}
+  }
+}

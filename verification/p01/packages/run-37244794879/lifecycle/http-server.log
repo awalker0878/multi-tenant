@@ -1,0 +1,4 @@
+INFO:     Started server process [2782]
+INFO:     Uvicorn running on http://127.0.0.1:54107 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Finished server process [2782]

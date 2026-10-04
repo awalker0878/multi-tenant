@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "run_id": 37244201538,
+  "source_revision": "4464d2c52c332d6161d26d713ac3084568c23eca",
+  "workflow": {
+    "id": 37244201538,
+    "name": "P01 foundation packages",
+    "head_sha": "4464d2c52c332d6161d26d713ac3084568c23eca",
+    "status": "completed",
+    "conclusion": "failure",
+    "run_attempt": 1,
+    "created_at": "2026-10-04T23:33:41Z",
+    "updated_at": "2026-10-04T23:35:00Z",
+    "html_url": "https://github.com/awalker0878/multi-tenant/actions/runs/37244201538"
+  },
+  "result": "VERIFIED_WITH_RETAINED_FAILURES",
+  "retention_scope": "Four failed PHP package components only; no outcomes inferred for other components.",
+  "components": [
+    {
+      "component": "governance",
+      "result": "FAIL",
+      "failure": "RuntimeError: pint: exit 1 (expected 0); see retained logs; pest: exit 1 (expected 0); see retained logs",
+      "artifact_id": 11318920524,
+      "archive_sha256": "8fa3d13a7cd58c93222f0bb5a08f81900c9fa0aa1863bdb89bea5f9c2f9024ed",
+      "report_sha256": "ff73c82dd9f23d3949c19c3537f3d5aad1036cb031ae33f9be1ff7582a57a808",
+      "retrieval_sha256": "ee66a3009d52530808b9ad79d3fbcb708cb113d3704423647938bb7897031a80",
+      "command_log_hashes_verified": 30,
+      "artifact_hashes_verified": 34,
+      "source_bindings_verified_against_commit": 54,
+      "commands": 15,
+      "retained_files": 35
+    },
+    {
+      "component": "catalogue",
+      "result": "FAIL",
+      "failure": "RuntimeError: pint: exit 1 (expected 0); see retained logs; pest: exit 1 (expected 0); see retained logs",
+      "artifact_id": 11318880629,
+      "archive_sha256": "d5745b4010e858191f4879c671c597047957ab36a2609b823959c00748a59932",
+      "report_sha256": "dfefb0181e9ecaec513f673ecded1f5970ca5ec8811a6130c95150f98afdad41",
+      "retrieval_sha256": "d1c654392a96bb3505138671119ce47381204ab295e56bc2c28a3a2ee3db4205",
+      "command_log_hashes_verified": 30,
+      "artifact_hashes_verified": 34,
+      "source_bindings_verified_against_commit": 54,
+      "commands": 15,
+      "retained_files": 35
+    },
+    {
+      "component": "console",
+      "result": "FAIL",
+      "failure": "RuntimeError: pint: exit 1 (expected 0); see retained logs; pest: exit 1 (expected 0); see retained logs",
+      "artifact_id": 11318337794,
+      "archive_sha256": "aeb4c5dd10f9f2148d2b2ff388863d4248e1a747ac040efafff66deb643b2e74",
+      "report_sha256": "94a8f01ef701e1ad3ff65c2ee21008892017cc1b9302340b96f6f72fe40f4c5a",
+      "retrieval_sha256": "fbc43eb278698c73fb83c0c4e01202fe005956d6412c58b79f4edb894bf43f31",
+      "command_log_hashes_verified": 46,
+      "artifact_hashes_verified": 53,
+      "source_bindings_verified_against_commit": 76,
+      "commands": 23,
+      "retained_files": 54
+    },
+    {
+      "component": "assurance",
+      "result": "FAIL",
+      "failure": "RuntimeError: pint: exit 1 (expected 0); see retained logs; pest: exit 1 (expected 0); see retained logs",
+      "artifact_id": 11318247930,
+      "archive_sha256": "49265607e577e395e3f365c3f97cdb1b9d6b1a3c3c3a32dc3d348d7536915bf7",
+      "report_sha256": "c53ce7c62a6c39ed7c1ba28954a3cb1514b3b510ac57672a76832022921a75b4",
+      "retrieval_sha256": "b62a5937d971ee5e579130cecd85f8519f383d3b5abb0d38231a9978fda77cde",
+      "command_log_hashes_verified": 30,
+      "artifact_hashes_verified": 34,
+      "source_bindings_verified_against_commit": 54,
+      "commands": 15,
+      "retained_files": 35
+    }
+  ],
+  "source_verification_sha256": "37e223513fb214182860e02998bb815fb5e6c4fa69a897121c93eb8969f208a5",
+  "unique_source_bindings_verified": 202,
+  "command_count": 68,
+  "command_log_hashes_verified": 136,
+  "artifact_hashes_verified": 155,
+  "scope_limitations": "Source-bound development verification only. Package/image outcomes do not establish integrated deployment, operating acceptance, native qualifications or a passed gate. Image IDs identify local image configurations, not published registry manifests."
+}

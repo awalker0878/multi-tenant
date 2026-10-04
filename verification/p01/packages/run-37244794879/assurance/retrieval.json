@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "run_id": 37244794879,
+  "source_revision": "c28c87e6c6804450fea9f6d6817a818eed37fc03",
+  "component": "assurance",
+  "artifact": {
+    "id": 11318961243,
+    "name": "p01-assurance-37244794879-1",
+    "size_in_bytes": 75735,
+    "url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11318961243",
+    "archive_download_url": "https://api.github.com/repos/awalker0878/multi-tenant/actions/artifacts/11318961243/zip",
+    "expired": false,
+    "created_at": "2026-10-04T23:44:25Z",
+    "expires_at": "2026-10-18T23:44:24Z",
+    "updated_at": "2026-10-04T23:44:25Z",
+    "digest": "sha256:b195fcb291561b2d546665f0fc0266a88d4bb5fa310b9c38a579cfd17aefb0e0",
+    "workflow_run": {
+      "id": 37244794879,
+      "repository_id": 1374801496,
+      "head_repository_id": 1374801496,
+      "head_branch": "greenfield/enterprise-microservices-plan",
+      "head_sha": "c28c87e6c6804450fea9f6d6817a818eed37fc03"
+    }
+  },
+  "archive_sha256": "b195fcb291561b2d546665f0fc0266a88d4bb5fa310b9c38a579cfd17aefb0e0",
+  "archive_bytes": 75735,
+  "archive_checksum_verified": true,
+  "archive_size_verified": true,
+  "report_sha256": "48c2666dd60488c07c60b806757509c3e783c5ddb92194df636eb8258db4b4a3",
+  "result": "PASS",
+  "failure": null,
+  "source_checks": {
+    "services/assurance/.dockerignore": {
+      "sha256": "6e52bb0ef70b55a5bb4a4eaf553c36d3a8dc0d14fcff285823b864f56b4209b9",
+      "git_blob_sha": "1cb30eb5a24083cc010f6fb52be799e83710481a"
+    },
+    "services/assurance/.env.example": {
+      "sha256": "7bf7eb9d2b53653e1df29d4b6f7b8e3fd4411f4648b7c8ca04514f78ed9bfb83",
+      "git_blob_sha": "81879ff204bcf3cf5e1976c20607457602df0fb0"
+    },
+    "services/assurance/.gitignore": {
+      "sha256": "8b26495180f3143fc90b845284bc42f9153e42e17afd30567cadf938096f6f26",
+      "git_blob_sha": "f39843c64d509ccf42391963068828ac98694e25"
+    },
+    "services/assurance/Dockerfile": {
+      "sha256": "920292eedf9b77b30bc02d54d32f67cf4d834fad22683969fc6ed9baf7276ded",
+      "git_blob_sha": "44b99d4151ed986e64e82667a4bcfd925c878cbc"
+    },
+    "services/assurance/README.md": {
+      "sha256": "2c2ff8634f1609fc3162b2066ab4fa9809cf0686f13a4ed84b86e6763d529d26",
+      "git_blob_sha": "2825007e0dc21a820ee79f6ed9760f2f0431c1e4"
+    },
+    "services/assurance/app/Application/Foundation/Actions/InspectDependencies.php": {
+      "sha256": "019459639caec1e3d3fb397026215fe77777a3dd77c18efc41c5a1ca406ff74b",
+      "git_blob_sha": "243774854b14e2984156d6c6781ff04c2bc487a2"
+    },
+    "services/assurance/app/Application/Foundation/Contracts/DependencyProbe.php": {
+      "sha256": "b79f3e6ed6c6e08677d3c0b61f90fb382c98e96d26e807b3d119fd81a0990c66",
+      "git_blob_sha": "103ccc23f01816c0e547e9f8b93334be26a96385"
+    },
+    "services/assurance/app/Application/Foundation/Contracts/HealthCredential.php": {
+      "sha256": "7fdeb5b78e2eb9f676ab955a1f1451fd27eb2f861b2670657e3438a6babb8a93",
+      "git_blob_sha": "1d7a41314ac8946efa9e4991647b23f7ce7fbc71"
+    },
+    "services/assurance/app/Application/Foundation/Data/DependencyStatus.php": {
+      "sha256": "5b19fe2dee35b14359e8a4d4438185a4c77d51f25a82dc6aeb80f5a14ce465f3",
+      "git_blob_sha": "af97aa59377e930e15111e7717afded554a2297d"
+    },
+    "services/assurance/app/Http/Controllers/DependencyHealthController.php": {
+      "sha256": "7d3abb4ef7c28d3837a435589e55116cf3c3bebae724a7970abdabcb2e1901db",
+      "git_blob_sha": "d765a28ddfd6aba72f9448356460892c2fd09958"
+    },
+    "services/assurance/app/Http/Controllers/HealthController.php": {
+      "sha256": "b3e0fc3caaa271d8ac6292463f5b8c2bcdd0d0bf57212ce4838f22b8901a4f2f",
+      "git_blob_sha": "0b64b3efc6a12d202fdb8074c2c0c89eae27480c"
+    },
+    "services/assurance/app/Infrastructure/Foundation/MountedHealthCredential.php": {
+      "sha256": "3c0a622df2f954de62f6f2864a56157394bc1d4a63788a992fabc4df7b765d86",
+      "git_blob_sha": "3c5913c372e8adffd6294741924fe9c813cb4a3a"
+    },
+    "services/assurance/app/Infrastructure/Foundation/MountedSecret.php": {
+      "sha256": "2e395919fe9c8d42c78e4b28bdb04a5a38d69c7a0d4fa6e6715beabb42b61162",
+      "git_blob_sha": "57be0996f9e98fda74f27fadb15ea7b8b7bd000f"
+    },
+    "services/assurance/app/Infrastructure/Foundation/PostgresDependencyProbe.php": {
+      "sha256": "5ea77ffab7707dbbbee55b6f6758ad366a7fedaed4c699919807cf4bdca851ee",
+      "git_blob_sha": "c2312fc6c143cbfbeb873261ae83ed766f084ab0"
+    },
+    "services/assurance/app/Providers/AppServiceProvider.php": {
+      "sha256": "3237015f10000feb4451aef22bb92ff008f056d1571e41c09437dc30b6321ac9",
+      "git_blob_sha": "c87ee04e0e99154454e30e447f9081edd7fb5b4a"
+    },
+    "services/assurance/artisan": {
+      "sha256": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+      "git_blob_sha": "015ca1dea3513877be66918b6f2417dd43427f91"
+    },
+    "services/assurance/bootstrap/app.php": {
+      "sha256": "3cd38ee3305ab579386857096686e0dd5ce653f19916735f4cd6951090043d8b",
+      "git_blob_sha": "55d0763c7ddd835191c050683d354e5f25d3dade"
+    },
+    "services/assurance/bootstrap/cache/.gitignore": {
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+      "git_blob_sha": "d6b7ef32c8478a48c3994dcadc86837f4371184d"
+    },
+    "services/assurance/bootstrap/providers.php": {
+      "sha256": "a3848357a2e0cc535c8b200081cfe9d437821db79c01a58227e782e378e9f656",
+      "git_blob_sha": "888aae0aeb8ff40a499090d43cc69cb855546ea2"
+    },
+    "services/assurance/composer.json": {
+      "sha256": "fd9d4a1c0e710231f046e2b132bd19f19b596349a35c2a105bba5502b71db1ae",
+      "git_blob_sha": "39101eeabc97ccfffeb510b2fa19efc22b30f6c4"
+    },
+    "services/assurance/composer.lock": {
+      "sha256": "9dacdf289986884e8f016d602b608403ecc687f306cb273bc15c18537443ac96",
+      "git_blob_sha": "342922e8a8393760be98b4cebb2cbd8aeefd46be"
+    },
+    "services/assurance/config/app.php": {
+      "sha256": "73ab377df24ff5f021f07b41376f626a6de3b256a99e1cbc67f0f3aabed4d924",
+      "git_blob_sha": "f4f98e798cb890715050392bba87451022958129"
+    },
+    "services/assurance/config/cache.php": {
+      "sha256": "e4fd7102926ea267762e996509abfb2ca1928ccd68c9ee56ace924ea34dba55c",
+      "git_blob_sha": "54395fef3c112e37188e1af9dedb19360656fd56"
+    },
+    "services/assurance/config/database.php": {
+      "sha256": "d5da2e6c1d133cb44557969b54a9149bfc67aa5e68619730aeecf3ffb9da4df1",
+      "git_blob_sha": "3416356fa71c38ae62e092d5a20670389af138d1"
+    },
+    "services/assurance/config/foundation.php": {
+      "sha256": "0fc9a39a95f0a5cf307fc3cdcf7af0a728cb313ef9b82ab6ef5600de9b6efb6d",
+      "git_blob_sha": "1a8d2747d31f0fd09df32456fd69870e9675afc8"
+    },
+    "services/assurance/config/logging.php": {
+      "sha256": "29eabe013cf03a79de0f56893816a7ec97b561536009f634607b957e0fd099f4",
+      "git_blob_sha": "c4c3b93dad438656563ebfba924de4ea37050740"
+    },
+    "services/assurance/deptrac.yaml": {
+      "sha256": "4b2ef77835d3f4bd62467a1b712461773beab5bc54062c71144e0164f2924eaa",
+      "git_blob_sha": "9950dc09ca0769a867fc009425a1e8675c23f6ec"
+    },
+    "services/assurance/phpstan.neon": {
+      "sha256": "040531182713abfa15e3063d5806473131d805007ef888e0fd54c2e09f05fd84",
+      "git_blob_sha": "d0b28288ddc0813920be122e4d51a4aab9087a11"
+    },
+    "services/assurance/phpunit.xml": {
+      "sha256": "1197e1d1b02d4ce7d9fb269e3b2b53542a8d2714ba1304a2ca16533e68c899fa",
+      "git_blob_sha": "aeb18c9d3506fc771010fee8aa949ec594233b7b"
+    },
+    "services/assurance/pint.json": {
+      "sha256": "e54acf88cddb03d9f17392c062c70b8bdf5c8426391adecaed4c3105a21d4bdb",
+      "git_blob_sha": "9096f4c20128379e45408cc24cdaaa2635af9aa1"
+    },
+    "services/assurance/public/index.php": {
+      "sha256": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+      "git_blob_sha": "1c3f915a2c355b63f4cb4386ba5b375841b01b4f"
+    },
+    "services/assurance/routes/api.php": {
+      "sha256": "522eea762a2c04f8719f3fcc70520bdaa9720bd3ac89b022a06907116bf5b4fa",
+      "git_blob_sha": "e5353ec76befd4565f5fadbf74a682592c1535e9"
+    },
+    "services/assurance/storage/framework/cache/.gitignore": {
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+      "git_blob_sha": "d6b7ef32c8478a48c3994dcadc86837f4371184d"
+    },
+    "services/assurance/storage/framework/phpstan/.gitignore": {
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+      "git_blob_sha": "d6b7ef32c8478a48c3994dcadc86837f4371184d"
+    },
+    "services/assurance/storage/framework/views/.gitignore": {
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+      "git_blob_sha": "d6b7ef32c8478a48c3994dcadc86837f4371184d"
+    },
+    "services/assurance/storage/logs/.gitignore": {
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+      "git_blob_sha": "d6b7ef32c8478a48c3994dcadc86837f4371184d"
+    },
+    "services/assurance/tests/Architecture/FoundationTest.php": {
+      "sha256": "f642f6a0e4b88a28a124d039357c79035e9483b0916a402b54f6f38e96aff39d",
+      "git_blob_sha": "0e55b8a1849e7b6ebcbd46e27defb6ae296a1f53"
+    },
+    "services/assurance/tests/Architecture/verify_quality_canaries.php": {
+      "sha256": "087e36ea7319bddb64ac139a9b5dd6683bf7494bb4bb60559509d884b8632ad5",
+      "git_blob_sha": "c076506d987d93a09a338e291e6ad82336f9afd1"
+    },
+    "services/assurance/tests/Feature/DependencyHealthTest.php": {
+      "sha256": "6a900c665d8715192be64d6d9f41360e057dee2e1056378b3b6e325b7c302a0f",
+      "git_blob_sha": "87b1f37a07358ea9e414e8add6d58530084a299f"
+    },
+    "services/assurance/tests/Feature/HealthTest.php": {
+      "sha256": "33302b850d907f6e1ea7fe9bc691e0d41033612e73227bbdef84ec9678afe62a",
+      "git_blob_sha": "7b09ce11e6136d388f76fec93478057da58da077"
+    },
+    "services/assurance/tests/Pest.php": {
+      "sha256": "96349833b104dc5890a9f917834a82581c5ad679598cd0fbc0eb728fa14a2648",
+      "git_blob_sha": "7b15ab417c1817362f65ffef0b07b3c15d78b273"
+    },
+    "services/assurance/tests/TestCase.php": {
+      "sha256": "9bf01af61ef8aafb5ae927f5bd42a7c74a1993e4fbcaea3c58c630c90f6e4dd9",
+      "git_blob_sha": "c5195662f30858768c4f3cfb5b103e43e89128f7"
+    },
+    "scripts/p01/README.md": {
+      "sha256": "c43804617f0f238bb226742ffefecf8f3f2c2131aa688b6ae4e0bfbf989c1812",
+      "git_blob_sha": "8568cd6366b24facc6f5ba628b7d1e4094829149"
+    },
+    "scripts/p01/candidates.json": {
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c"
+    },
+    "scripts/p01/check_jobs.py": {
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c"
+    },
+    "scripts/p01/local_runtime.py": {
+      "sha256": "86b3029b42d91f647453d4535e76cca55ce9d799826f7b102473035a3685060f",
+      "git_blob_sha": "4ed4f6529099c8dcc00472b313238ddb300c379a"
+    },
+    "scripts/p01/php_image_probe.php": {
+      "sha256": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+      "git_blob_sha": "968e38f291368ef278d5de2a92e30653b1258ed0"
+    },
+    "scripts/p01/python_lock.py": {
+      "sha256": "05b4074482edb8899c95da980b4886975a9ce36adb19c2894bd4e42b40d76769",
+      "git_blob_sha": "3c4c5cf63af395b12015764e3cac8cbfb2549f4e"
+    },
+    "scripts/p01/resolve_dependencies.py": {
+      "sha256": "5bf284a7bff395bd29a344dfc311c4e2b97ad814da58f373c4a0703dc16e9210",
+      "git_blob_sha": "a678b8423df27a68295cb8189036514bff4ac935"
+    },
+    "scripts/p01/run_images.py": {
+      "sha256": "7898d827e081ee477ff99ad154bd289d571350a4483aa5b74d64e8bdbde72c8b",
+      "git_blob_sha": "86b8e47487cbdb7ff1cac83d1a7d6885e843f597"
+    },
+    "scripts/p01/run_local.py": {
+      "sha256": "e7569816ae9662c5091b4251adcec41cb8f54b57a1381a8ff0c13cd5c7c4abe5",
+      "git_blob_sha": "ddc26263a06b988f6d628ff0b3e4170e2eca9314"
+    },
+    "scripts/p01/run_quality.py": {
+      "sha256": "134733b7907e0484eda4971bd7af7d8d16383966b257de7b6570d8813c85b496",
+      "git_blob_sha": "4fc3971cd687931a8a0cedf1a23da5788e9914c3"
+    },
+    "scripts/p01/select_components.py": {
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8"
+    },
+    "scripts/p01/test_jobs.py": {
+      "sha256": "b103af1562f26ceb28e13e36fa13a09fb131333bc8cf4144e071d05b7c23bbf5",
+      "git_blob_sha": "39e6eda6731a45d62ac13ce98c72f3e2d4ee9cb0"
+    },
+    "scripts/p01/test_local_runtime.py": {
+      "sha256": "24a7bed777b0ac072143416a4a6459c29bec33a15e24c39df9f4548ef79d6833",
+      "git_blob_sha": "fc8fc028ffced10fdfcc566b99a4660a70b84b82"
+    },
+    "scripts/p01/test_python_lock.py": {
+      "sha256": "0e64837b214d31eaa2fa8004e3c5a49230f039742f15a1b2d6875a1b983d173b",
+      "git_blob_sha": "a2de3f67f3d27b1adf13c69610122a41f900a360"
+    },
+    "scripts/p01/test_recorder.py": {
+      "sha256": "afc5002982dfb8d1d71a71974fdf5a2d3471854c6cfccc91f31f06b0d3bbe56f",
+      "git_blob_sha": "e76c76d21d2808271ce2a67fc5feb6d23bd21bc9"
+    },
+    "scripts/p01/test_selection.py": {
+      "sha256": "d6122c2ac881b206f4871e3f77dda8e5f0194f3f1b790864154cd6bf20367ab6",
+      "git_blob_sha": "d25462046b36c9cdfd959b47374db6f104862987"
+    },
+    ".github/workflows/p01-foundations.yml": {
+      "sha256": "7843fd6cca1c4116fec105ad8f5e9101aa67014304b21a2a3bf2343af70e0b00",
+      "git_blob_sha": "6f0ddbf0a6e984bdfb4025716a21c550d5ecdc58"
+    }
+  },
+  "source_bindings_verified_against_commit": 59,
+  "command_log_hashes_verified": 30,
+  "artifact_hashes_verified": 34,
+  "retained_file_sha256": {
+    "01-php-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-php-version.stdout.log": "78c7007ae057d38c850ca704a277e6191e0dc7f0599549c22e2614ef55030b72",
+    "02-composer-version.stderr.log": "4acf068af6281ef9fbbc5dbd2d747263c3675e7cf932189d53b274050e7d37a4",
+    "02-composer-version.stdout.log": "6dca12c153909313c4e7537ed657ec2f5a9f303611d5d516a9b0d4d0e3f2f472",
+    "03-locked-install.stderr.log": "3aeb744f9ba4a1ee8a1565346b73d152181c96a7eac8718403ee12cdd731f0cf",
+    "03-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-composer-validate.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-composer-validate.stdout.log": "43add299dc97ecbd90ec2dc456ef5a0bd824bb9abdae2a3d7cdb520e21f8e86d",
+    "05-platform-requirements.stderr.log": "0fbede05e037d5229f008b1901345217d825139d02c2a1b60590c0bd7c61cdca",
+    "05-platform-requirements.stdout.log": "650b51a7dd4febbe5e3c0bf64eb06b3fccee5145b4e67ce66a5e912262714a5f",
+    "06-installed-packages-initial.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-installed-packages-initial.stdout.log": "8fe38ac4d6268ef29851593a8ceb130a0a7889d44cb2fd2f3dbc2e2c979298c5",
+    "07-clean-locked-install.stderr.log": "45ea5d3f1a745425f953857f2d72d21d11dbf46944784e54a6a23637b75f3dbc",
+    "07-clean-locked-install.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-installed-packages-replay.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-installed-packages-replay.stdout.log": "8fe38ac4d6268ef29851593a8ceb130a0a7889d44cb2fd2f3dbc2e2c979298c5",
+    "09-pint.stderr.log": "9271b2fe7eb35336d59a4bb008f074d3e37f99bf90b8baf598ef6627ec0891f6",
+    "09-pint.stdout.log": "2031da4c79d4623c69a65b92910353f28108406503108e9c6ab32ebf36ca8787",
+    "10-larastan.stderr.log": "4ed9f0665b650b18cf127ae4d7a9cb779b3f39d08aaa4b607b2c5e7c8f9f89b9",
+    "10-larastan.stdout.log": "9dd3eeb023e498eff4ab6e14af3d76d6e6c7672da330c9e3edf35753590df0d7",
+    "11-deptrac.stderr.log": "970d4cf2b5b49d96c8922824da459934dc93cf2961a3237e3e1eeefb99cd2c28",
+    "11-deptrac.stdout.log": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+    "12-pest.stderr.log": "a1e8d48b6acd61607faebab2be993be9f110433614b8108c8ad0981562e73389",
+    "12-pest.stdout.log": "cf52637414531d4dedb7982de675fa05e0bef16018d8b2f516ba0fb3657de516",
+    "13-quality-canaries.stderr.log": "86c3ee76dc56e026ee9f6a2bfaef2727dd14d0c3f2aeceb450eaec8f0d0d42b0",
+    "13-quality-canaries.stdout.log": "82c506929a17b12815e6e5cffc07538293bc0aeec1443c97148fce1f2999119b",
+    "14-config-cache.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "14-config-cache.stdout.log": "2ee7f0aba1d533d27bcb1fe295b80c698ffbdbd42142042771720681424407c9",
+    "15-route-cache.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "15-route-cache.stdout.log": "952523a762a8362973a179b58c0e20d376bff6f706fc4381c0f89300400448ce",
+    "application-logs/.gitignore": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+    "composer.json": "fd9d4a1c0e710231f046e2b132bd19f19b596349a35c2a105bba5502b71db1ae",
+    "composer.lock": "9dacdf289986884e8f016d602b608403ecc687f306cb273bc15c18537443ac96",
+    "http-server.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "report.json": "48c2666dd60488c07c60b806757509c3e783c5ddb92194df636eb8258db4b4a3"
+  },
+  "http_log_hash_verified": true,
+  "run_attempt": "1",
+  "dependency_mode": "replay",
+  "input_lock_sha256": "9dacdf289986884e8f016d602b608403ecc687f306cb273bc15c18537443ac96",
+  "resolved_lock_sha256": "9dacdf289986884e8f016d602b608403ecc687f306cb273bc15c18537443ac96"
+}

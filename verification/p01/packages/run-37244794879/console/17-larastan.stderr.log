@@ -1,0 +1,2 @@
+> phpstan analyse --no-progress --memory-limit=1G
+Note: Using configuration file /home/runner/work/_temp/p01-quality/component/phpstan.neon.
