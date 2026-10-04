@@ -24,13 +24,13 @@ failure and unsupported input must be rejected. These initial stdlib bootstraps
 have no implemented business layers, database clients or task consumers; their
 current checks do not establish those future boundaries.
 
-PHP candidates intentionally begin with the explicitly committed
-`php_dependency_mode: resolve`. This resolves each changed private manifest,
-exports its actual Composer lock, removes `vendor`, and replays the resulting lock.
-After the four service locks are retained, change the candidate mode to `replay`
-and repeat the measurement. Replay refuses a missing lock and rejects lock changes;
-it never silently switches to dependency resolution. A manual workflow request can
-explicitly select resolution for a later reviewed candidate update.
+PHP candidates now use committed `php_dependency_mode: replay`. All four private
+Composer locks were resolved and retained during the initial candidate run, then
+successfully replayed in package run 37239193553. Replay refuses a missing lock
+and rejects lock changes; it never silently switches to dependency resolution.
+A manual workflow request can explicitly select resolution for a later reviewed
+candidate update. The [package evidence record](../../docs/implementation/p01-laravel-foundations.md)
+retains the initial failures, corrected resolution and successful locked replay.
 
 The PHP path checks the measured runtime, Composer, strict manifest/lock validity,
 platform requirements, installed version/reference equality after clean install,
