@@ -1,52 +1,49 @@
 # Operating the portable hosting service
 
-**Status: candidate operating documentation.** The product has not been implemented, installed, native-qualified or accepted for operations. This directory describes the operating design to build and the records operators will need; it does not authorize a deployment.
+These documents define deployment, trust, support and operating procedures for the portable hosting control plane and its scoped site workers. Implementation and actual exercise results are tracked in the [delivery register](../implementation/delivery-register.yaml); document existence supplies no installation, native qualification or operational acceptance evidence.
 
-Start with the [deployment model](deployment-model.md) for component placement, trust, dependencies, installation, recovery and upgrades. Use the [support matrix](../implementation/support-matrix.md) to distinguish intended scope from qualified capability, and the [requirements register](../implementation/requirements-and-qualification.md) for the obligations each operating procedure must satisfy. The [status model](../implementation/status-model.md) governs completion claims.
+Start with the [deployment model](deployment-model.md) for placement and D01–D09 sequencing, then use the task-specific procedures below. The [support matrix](../implementation/support-matrix.md) separates intended combinations from supported scope; [requirements and qualification](../implementation/requirements-and-qualification.md) defines evidence obligations.
 
-## Documentation to grow with implementation
+## Operating specifications
 
-| Future location | Contents and owner | First required delivery |
+| Document | Owns | Accountable role |
 | --- | --- | --- |
-| `docs/operations/runbooks/install.md` | SRE: executable clean-install procedure, validated dependency order, health checks and failure containment | P01 development/integration install; native prerequisites before P07 |
-| `docs/operations/runbooks/upgrade.md` | Delivery/SRE: tested version compatibility, migrations, workflow routing and downgrade limits | P01 compatibility policy; each released upgrade; Q09 in P10 |
-| `docs/operations/runbooks/recovery.md` | SRE/lifecycle: coordinated backup, isolated restore, native reconciliation and controlled resume | Design in P01; rehearsal before P07 writes; complete Q09 in P10 |
-| `docs/operations/runbooks/commissioning.md` | Inventory/platform owners: site identity, credential scopes, flow checks and accepted resource/service readiness | Read-only in P04; mutation readiness before P07 |
-| `docs/operations/runbooks/` | Owning service plus operations: task-specific diagnostic, containment and recovery procedures | With the corresponding behavior, before native enablement |
-| `docs/operations/observability.md` | SRE/service owners: indicators, redacted telemetry, alert conditions, routing and exercised receipt | P01 baseline; before P07 actionable alerts |
-| `docs/operations/support.md` | Service owner: responsibilities, incident triage, escalation roles, support hours and handover | Draft in P00/P01; accepted in P10/P11 |
-| `deploy/` | SRE: versioned manifests, environment schemas, secret-reference definitions and dependency locks | P01; updated with changes |
-| `tests/acceptance/` | Quality: executable campaign definitions and non-sensitive synthetic fixtures | With each associated work package |
+| [Deployment model](deployment-model.md) | Placement, environment ladder, logical network flows, dependency/recovery architecture | SRE/architecture |
+| [Configuration and BOM](configuration-and-bom.md) | Artifact/environment identities, typed configuration, component/dependency inventory and change rules | SRE/delivery |
+| [Identity and trust](identity-and-trust.md) | Human/service/worker identity, delegation, bootstrap, rotation, revocation and trust recovery | IAM/security |
+| [Threat model](threat-model.md) | Assets, trust-boundary threats, required controls, abuse tests and finding lifecycle | Security architecture |
+| [Observability](observability.md) | Correlated signals, freshness/unknown state, indicators, alert payloads/routing and collection failure | SRE/context owners |
+| [Support](support.md) | Service boundary, incident responsibility, escalation, communications and operational handover | Service owner |
+| [Operating targets](../product/operating-targets.md) | Objective ownership, workload/measurement inputs and accepted-target process | Product/SRE |
 
-Paths in this table are the planned structure, not a claim that these files exist. Split a runbook by an operator task or failure outcome, not by arbitrary document size. A service specification links to its operating procedures; it must not reproduce the same instructions.
+## Task procedures
 
-Real endpoint names, tenant identities, credential references, native resource inventories, firewall approvals, contacts and production recovery evidence belong in approved restricted operational systems. Repository examples use synthetic identifiers. Documentation links to access-controlled records through non-sensitive record references only where policy permits; credentials and private evidence never belong in example files, commits or issue bodies.
+The [runbook index](runbooks/README.md) defines common execution records, evidence and maintenance rules.
 
-## Runbook contract
-
-Every runbook must include these fields before it can support operational acceptance:
-
-| Field | Required detail |
+| Task | Procedure |
 | --- | --- |
-| Identity | Stable runbook ID, owner role, service/workflow, revision and related R/Q/work-package IDs |
-| Applicability | Supported release and platform tuple, environment, triggering symptoms and exclusions |
-| Authority | Roles, approved scopes, required change/incident context and separation of duties |
-| Preconditions | Required dependency health, evidence freshness, data retention, available keys and safe state |
-| Diagnose | Read-only checks first, expected observations and ways to distinguish missing evidence from confirmed failure |
-| Contain | Exact admission hold, fencing and isolation actions; what continues safely and what must stop |
-| Execute | Ordered commands or API operations, exact inputs, idempotency behavior and expected outputs |
-| Decision points | Conditions to proceed, retry, reconcile, compensate or escalate; named point of no return |
-| Validate | Independent native and application observations establishing the postcondition |
-| Recover | Partial-failure handling, target-write implications, reverse-operation limits and safe abort |
-| Record | Redacted evidence receipt, correlation/job/operation identifiers, time and protected artifact references |
-| Prove | Last exercise on exact artifacts/environment, result, reviewer, open limits and retest triggers |
+| Create a clean environment and establish read-only acceptance | [Install](runbooks/install.md) |
+| Verify and transfer an immutable artifact set | [Promote release](runbooks/promote-release.md) |
+| Roll out compatible application/dependency/worker versions | [Upgrade](runbooks/upgrade.md) |
+| Reverse a failed deployment within its actual compatibility limits | [Rollback deployment](runbooks/rollback-deployment.md) |
+| Restore or fail over required stateful/trust services | [Dependency recovery](runbooks/dependency-recovery.md) |
+| Restore control-plane state in an isolated environment | [Restore control plane](runbooks/restore-control-plane.md) |
+| Reconcile native/data/authority state and resume safely | [Recovery](runbooks/recovery.md) |
+| Establish site/worker discovery and native-readiness scope | [Commissioning](runbooks/commissioning.md) |
+| Diagnose a signal, contain impact and route an incident | [Handle alert](runbooks/handle-alert.md) |
 
-A design-only runbook is labelled unexercised. Copying commands from a development environment does not qualify a production procedure. An operator other than its author must exercise release-critical installation and recovery procedures before P11 acceptance.
+## Environment records and executable bindings
 
-The first runbook backlog covers: lost native response; duplicate delivery; expired execution authority; disconnected site worker; failed evidence delivery; exhausted reservation; partially completed provisioning; failed activation; rejected/stale approval; migration before and after target writes; backup/restore; signing-key or certificate rotation; and mixed-version workflow upgrade. Each attaches to the owning work package rather than creating an independent completion list.
+Real endpoint names, tenant identities, credential references, native resource inventories, network approvals, contacts and production evidence belong in approved restricted operating systems. Repository examples use synthetic identifiers. Preserve only authorized non-sensitive record references in source and change descriptions.
 
-## Change and review rules
+The procedures name actions, owners, required inputs, expected observations, stop/recovery decisions and evidence. Each implementation supplies the release-specific command/API bindings and an actual exercise record before the procedure supports operational acceptance. Do not invent a command or assume a service is installed because a procedure describes its required behavior.
 
-When a change modifies deployment topology, configuration, identity, persistence or operator-visible behavior, update the applicable procedure in the same delivery. Record required rehearsal changes alongside tests. SRE reviews runtime procedures; security reviews trust and credential changes; lifecycle and the application owner review mutation and data-recovery behavior. Qualification reviewers assess actual evidence independently of the authors.
+Runtime manifests, schemas and locks belong under `deploy/` as implementation delivers them. Test/campaign code belongs in its owning test area; raw evidence belongs in the approved evidence store. Link those outputs from their work package and procedure without duplicating execution status here.
 
-Configuration examples, commands and manifest references must match the tested release. Keep immutable historical evidence in its approved store and publish a current evidence reference; never edit old evidence to describe a newer revision. A failed or stale rehearsal leaves the corresponding operational gate open.
+## Change and acceptance
+
+When deployment topology, identity, configuration, persistence, native scope or operator-visible behavior changes, update its operating specification and affected procedure in the same delivery. SRE reviews runtime changes; security reviews trust/data boundaries; lifecycle and application owners review mutation and data recovery. Qualification reviewers assess actual evidence independently of its producers.
+
+Each exercise records exact artifacts/configuration, operator/reviewer, starting state, action observations, elapsed time, failures/limits and evidence references. An independent operator exercises release-critical install/recovery tasks before P11 acceptance. Historical evidence remains immutable; new versions require explicit impact analysis and any affected reruns.
+
+Use a separate task runbook when a behavior introduces a distinct operator trigger, authority boundary or recovery outcome. Link common trust, upgrade and recovery rules instead of copying them. Future procedures for migration cutover, uncertain operations, rotation or retirement belong with the package that implements those behaviors and must be available before their native enablement.
