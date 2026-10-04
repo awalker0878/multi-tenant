@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "scope": "Verified retrieval of five hosted-CI Python bootstrap image records",
+  "workflow": {
+    "id": 37238148501,
+    "url": "https://github.com/awalker0878/multi-tenant/actions/runs/37238148501",
+    "head_sha": "ba6acd71513c7d999cf51249d70d9c2be50967d9",
+    "name": "P01 bootstrap images",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-10-04T21:57:29Z",
+    "updated_at": "2026-10-04T21:58:22Z",
+    "run_attempt": 1
+  },
+  "source_revision": "ba6acd71513c7d999cf51249d70d9c2be50967d9",
+  "source_tree": "ede2dcc88635c8e446644bcd1e08f893c3925cc4",
+  "components": [
+    {
+      "component": "inventory",
+      "report_path": "verification/p01/images/run-37238148501/inventory/report.json",
+      "report_sha256": "601648204782894d8b19274f641ed8cd620e051f4ca357244e4987375d765149",
+      "retrieval_sha256": "f110ba20bcc63f4050b4ac23bf87b4e64326ae047e52ba787fb23a25dd58308d",
+      "artifact_id": 11315873303,
+      "archive_sha256": "fd949f4ef839f3c03f7870dd0af98c442bb7dd402af2bcd7f8af5b17dcf62e67",
+      "archive_bytes": 11619,
+      "image_id": "sha256:3d768c3f42f40fbf289f882f490f34f396cf0ded85e8a48ff513578541e39cbd",
+      "image_bytes": 124376442,
+      "source_bindings": 15,
+      "commands": 10,
+      "completed_at": "2026-10-04T21:57:44.160256+00:00"
+    },
+    {
+      "component": "inventory-workers",
+      "report_path": "verification/p01/images/run-37238148501/inventory-workers/report.json",
+      "report_sha256": "22b7d2c499d1eef30af404e39df508cf9be108d21a979b8105ad77f3e6099583",
+      "retrieval_sha256": "da6fbfe9b2330d51066c74679934141f407bb326df0116f8748b6bda8473c48f",
+      "artifact_id": 11316352875,
+      "archive_sha256": "5fb18231fd0793d52575404fad1f8ce7e2f4886fb28d7d58c2a2670c3c571e40",
+      "archive_bytes": 11747,
+      "image_id": "sha256:4a19676e471c21d45ff773beb29ab749e808d72b9cdf5a46f9cbbe8b829cbd3b",
+      "image_bytes": 124377077,
+      "source_bindings": 15,
+      "commands": 10,
+      "completed_at": "2026-10-04T21:58:19.358892+00:00"
+    },
+    {
+      "component": "lifecycle",
+      "report_path": "verification/p01/images/run-37238148501/lifecycle/report.json",
+      "report_sha256": "8e2c1427c483ed9f6d55b143386b1ed8f7d0621be92e524d46d7ce23ff3bf13f",
+      "retrieval_sha256": "90d2252e1c40399d516305f9937d43d3b814555c04cc6afcf21ad37380201ec3",
+      "artifact_id": 11316188166,
+      "archive_sha256": "1d2d2f087c711d8bef6f921e8c75b54dc1e7d0f3fa688bb7962114d49912f72d",
+      "archive_bytes": 11624,
+      "image_id": "sha256:1429951f2c3d98874b753510338e5f0aed487504697618ea5c01170d7ba3fcb8",
+      "image_bytes": 124376463,
+      "source_bindings": 15,
+      "commands": 10,
+      "completed_at": "2026-10-04T21:57:42.202403+00:00"
+    },
+    {
+      "component": "lifecycle-workers",
+      "report_path": "verification/p01/images/run-37238148501/lifecycle-workers/report.json",
+      "report_sha256": "286477669eb54958ab74747414448dbe6da71f981014627d8038142d1c71c022",
+      "retrieval_sha256": "954c0820c4a41c9229d27a21b33bc49237a58fdb2234434fdb2735bdc42818c7",
+      "artifact_id": 11315963055,
+      "archive_sha256": "174daca1a83b1e57e788b133c3738c81135eac1a19be079ebe486749ae37fee5",
+      "archive_bytes": 11730,
+      "image_id": "sha256:3176fa6493a06e2ba18a4ea3009814f082375326003cf0f76d2b7cc2d12b3228",
+      "image_bytes": 124377118,
+      "source_bindings": 15,
+      "commands": 10,
+      "completed_at": "2026-10-04T21:57:45.296398+00:00"
+    },
+    {
+      "component": "planning",
+      "report_path": "verification/p01/images/run-37238148501/planning/report.json",
+      "report_sha256": "dcb588a52dda2441cdeff530c7a93c469bd510e0618b59f6a55263aeee910716",
+      "retrieval_sha256": "c74d701edb0f459bf86a73f372ec81166b10a8dfa3bb53682026360ea3f772ad",
+      "artifact_id": 11316352816,
+      "archive_sha256": "ae5c70b07154872bea03b6ec96a55fe78bcec5b6aaf8da32e2636e819b1ca846",
+      "archive_bytes": 11597,
+      "image_id": "sha256:a142a20e5366fd1f5d9d266bbbffa5a747d984d21c9e52b946098e8c95acb7dd",
+      "image_bytes": 124376376,
+      "source_bindings": 15,
+      "commands": 10,
+      "completed_at": "2026-10-04T21:57:48.081947+00:00"
+    }
+  ],
+  "totals": {
+    "archives": 5,
+    "raw_artifact_files": 105,
+    "command_logs": 100,
+    "commands": 50,
+    "successful_exit_zero": 40,
+    "expected_readiness_exit_one": 5,
+    "expected_override_exit_two": 5,
+    "source_bindings": 75,
+    "unique_source_files": 59
+  },
+  "result": "VERIFIED",
+  "verified_at": "2026-10-04T22:04:25.869711+00:00"
+}
