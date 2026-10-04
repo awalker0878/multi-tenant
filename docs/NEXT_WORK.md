@@ -17,10 +17,15 @@ authorization, enrolled resource/service dispatch and separately admitted cleanu
 The selected application route remains VMware → OpenStack rebuild/restore for
 Ubuntu24.04. Separate staging/cutover workflows compose isolated rehearsal,
 persistent source data-disk exclusion, final capture/restore, target power and
-isolated management-port bootstrap, activation, pre-write source return and
+isolated management-port bootstrap, conditional production-policy attachment,
+activation, pre-write source return and
 retained-target post-write repair. The bootstrap uses retained NIC identities,
 conditional Neutron updates, an independent project reader and a separate pinned
 SSH reader before guest effects; it does not qualify the native datapath.
+Production policy attaches one explicitly approved existing stateful group to
+that retained port after final sync and before activation. Pre-write return
+removes it through a separate policy operation before target exclusion. Current
+resource accounting and useful-service/traffic checks re-read the approved policy.
 Current source accounting also reads retained detached base VMDKs through a
 separate pinned native file reader, preserving their original UUIDs and charges.
 
@@ -47,8 +52,10 @@ implemented boundary is also recorded in the execution plan's opening table.
    obtain Linux/service acceptance. A revoked old job requires a newly approved
    recovery admission and independently excluded old credentials for cleanup.
 3. Commission the implemented isolated management/bootstrap owner and its
-   independent project/guest readers before subsequent guest contact. Complete
-   production policy/traffic realization. Commission current native detached
+   independent project/guest readers before subsequent guest contact. Commission
+   the separately scoped production/isolation policy operations, approved existing
+   security groups and current selection-backed occupancy reader. Qualify actual
+   traffic and positive/negative native datapath behavior. Commission current native detached
    source-backing accounting throughout cutover. Run the selected
    application campaign against actual isolated guests. Prove
    rehearsal isolation, source restart/late-writer exclusion, final consistency,

@@ -77,7 +77,7 @@ class OpenStackApplicationRuntime:
 
     def client(self, guard):
         require(isinstance(guard, LifecycleCommandGuard) and guard.runtime is self.guest.worker
-                and guard.operation_kind in {'SOURCE_FENCE', 'DISK_ATTACH', 'VM_POWER', 'NETWORK_ATTACH'},
+                and guard.operation_kind in {'SOURCE_FENCE', 'DISK_ATTACH', 'VM_POWER', 'NETWORK_ATTACH', 'POLICY_APPLY'},
                 'Only exact enrolled fence, retained attachment and power actions are implemented')
         return OpenStackApplicationClient(self, guard, self.guest.select(guard))
 
@@ -86,7 +86,7 @@ class OpenStackApplicationClient:
     def __init__(self, runtime, guard, authority):
         self.runtime, self.guard, self.authority = runtime, guard, authority
         self.selected = dict(guard.member['target_native_fence' if guard.row['scope_side'] == 'destination' else 'native_fence'])
-        if guard.phase == 'TARGET_BOOTSTRAP':
+        if guard.phase in {'TARGET_BOOTSTRAP', 'TARGET_POLICY', 'TARGET_ISOLATE'}:
             from .bootstrap_selection import validate_management_selection
             validate_management_selection(guard.member['target_management'], guard.scope)
             self.selected['network_endpoint'] = guard.member['target_management']['network_endpoint']
@@ -194,14 +194,21 @@ class OpenStackApplicationClient:
         require(service in {'compute', 'volume', 'network'} and method in {'GET', 'POST', 'DELETE', 'PUT'},
                 'Only the fixed compute and block storage application owners may contact native APIs')
         if service == 'network':
-            require(self.guard.phase == 'TARGET_BOOTSTRAP' and self.guard.operation_kind == 'NETWORK_ATTACH'
-                    and ((method == 'GET' and revision is None and body is None) or
-                         (method == 'PUT' and suffix == '/ports/' + self.guard.member['target_management']['port_id']
-                          and body == {'port': {'admin_state_up': True}}
-                          and type(revision) is int and revision >= 0)),
-                    'Only the exact original management-port administrative transition is implemented')
+            bootstrap = self.guard.phase == 'TARGET_BOOTSTRAP' and self.guard.operation_kind == 'NETWORK_ATTACH'
+            policy = self.guard.phase in {'TARGET_POLICY', 'TARGET_ISOLATE'} and self.guard.operation_kind == 'POLICY_APPLY'
+            groups = [self.guard.member['target_management']['security_group_id']]
+            if self.guard.phase == 'TARGET_POLICY':
+                groups.append(self.guard.member['target_policy']['security_group_id'])
+            expected = {'port': {'admin_state_up': True}} if bootstrap else {'port': {'security_groups': groups}}
+            require((bootstrap or policy) and
+                    ((method == 'GET' and revision is None and body is None) or
+                     (method == 'PUT' and suffix == '/ports/' + self.guard.member['target_management']['port_id']
+                      and body == expected and type(revision) is int and revision >= 0)),
+                    'Only the original port enablement or exact approved production/isolation policy set is implemented')
         else:
             require(method != 'PUT' and revision is None, 'A management revision cannot authorize another native effect')
+            require(self.guard.operation_kind not in {'NETWORK_ATTACH', 'POLICY_APPLY'} or method == 'GET',
+                    'A network capability cannot authorize native power or storage effects')
         token, expires = self._credential()
         headers = {'X-Auth-Token': token}
         if service != 'network':
@@ -211,23 +218,48 @@ class OpenStackApplicationClient:
         return self._http(self.selected[service + '_endpoint'], method, suffix, body, headers,
                           set(accepted), expires, retain_native_response=method != 'GET')
 
-    def enable_management(self, before):
+    def enable_management(self, before, *, retain_response=False):
         from .application_network import management_snapshot
         require(self.guard.phase == 'TARGET_BOOTSTRAP' and self.guard.operation_kind == 'NETWORK_ATTACH',
                 'The original management-port operation needs its separate network capability')
+        require(type(retain_response) is bool, 'The original reply retention mode must be explicit')
         selected = self.guard.member['target_management']
         require(management_snapshot(lambda service, path: self.request(service, 'GET', '/' + path)[0],
-                    selected, self.guard.scope, self.server_id, enabled=False) == before,
+                    selected, self.guard.scope, self.server_id, enabled=False,
+                    policy=self.guard.member.get('target_policy'),
+                    health_port=self.guard.member.get('target', {}).get('health', {}).get('port')) == before,
                 'The original isolated management policy changed before port enablement')
         extension, _ = self.request('network', 'GET', '/extensions/revision-if-match')
         require(extension.get('extension', {}).get('alias') == 'revision-if-match',
                 'Native compare-and-swap port transitions are not available on this deployment')
         result, headers = self.request('network', 'PUT', '/ports/' + selected['port_id'],
             {'port': {'admin_state_up': True}}, revision=before['port']['revision_number'])
+        if retain_response:
+            return headers['x-openstack-request-id'], result
         require(result.get('port', {}).get('id') == selected['port_id']
                 and result['port'].get('admin_state_up') is True,
                 'The original management-port update has no exact native response')
         return headers['x-openstack-request-id']
+
+    def set_production_policy(self, before, *, enable):
+        from .application_network import management_snapshot
+        require(type(enable) is bool and self.guard.operation_kind == 'POLICY_APPLY'
+                and self.guard.phase == ('TARGET_POLICY' if enable else 'TARGET_ISOLATE'),
+                'Only the separate exact production/isolation policy capability is executable')
+        member = self.guard.member
+        require(management_snapshot(lambda service, path: self.request(service, 'GET', '/' + path)[0],
+                    member['target_management'], self.guard.scope, self.server_id, enabled=True,
+                    policy=member['target_policy'], policy_enabled=False if enable else True,
+                    health_port=member['target']['health']['port']) == before,
+                'The exact retained port or independently approved production rules changed before policy realization')
+        extension, _ = self.request('network', 'GET', '/extensions/revision-if-match')
+        require(extension.get('extension', {}).get('alias') == 'revision-if-match',
+                'Native conditional policy transitions are unavailable')
+        groups = [member['target_management']['security_group_id']] + \
+            ([member['target_policy']['security_group_id']] if enable else [])
+        reply, headers = self.request('network', 'PUT', '/ports/' + member['target_management']['port_id'],
+            {'port': {'security_groups': groups}}, revision=before['port']['revision_number'])
+        return headers['x-openstack-request-id'], reply
 
     def snapshot(self, *, attached, powered=False):
         server, _ = self.request('compute', 'GET', '/servers/' + self.server_id)

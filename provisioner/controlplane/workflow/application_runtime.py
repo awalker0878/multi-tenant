@@ -97,6 +97,8 @@ def _binding_holds(native=None, migration=None):
         'ISOLATED_REHEARSAL_OWNER_UNAVAILABLE': 'REHEARSAL' in phases,
         'ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED':
             migration is not None and bool(migration.network_bootstraps),
+        'APPLICATION_PRODUCTION_POLICY_REQUIRED':
+            'TARGET_POLICY' in phases and 'TARGET_ISOLATE' in phases,
         'SOURCE_RESTART_OR_OTHER_WRITER_EXCLUSION_REQUIRED':
             migration is not None and bool(migration.source_disk_fences),
         'FINAL_CONSISTENCY_OWNER_UNAVAILABLE': 'FINAL_SYNC' in phases and bool(migration.repositories),
@@ -327,6 +329,7 @@ class ApplicationWorkerComponents:
                 self.migration.prewrite_return, self.migration.capture_committed_target,
                 self.migration.stage_targets, self.migration.verify_staged_data,
                 self.migration.target_prepare, self.migration.target_bootstrap,
+                self.migration.target_policy, self.migration.target_isolate,
                 self.migration.recovery_inspect,
                 self.migration.recovery_reattach, self.migration.recovery_start,
                 self.migration.recovery_restore, self.migration.recovery_activate,

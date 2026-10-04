@@ -304,12 +304,18 @@ class ApplicationRecoveryRunner:
             target_write_marker=marker, published=published, application_service=service, useful_health=health,
             target_write_boundary='TARGET_WRITES_POSSIBLE')
 
-    def execute(self, phase, member_id, *, guest, repository=None, native_runtime=None):
+    def execute(self, phase, member_id, *, guest, repository=None, native_runtime=None, network_runtime=None):
         require(phase in FORWARD_PHASES and isinstance(guest, ApplicationGuestRuntime),
             'A concrete retained-target repair phase is required')
         self._prerequisites(member_id, phase)
+        if 'target_policy' in self.lifecycle.member(member_id):
+            from .application_network import OpenStackBootstrapRuntime
+            if type(network_runtime) is not OpenStackBootstrapRuntime:
+                raise LifecycleHeld('APPLICATION_PRODUCTION_POLICY_REQUIRED')
+            network_runtime.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id,
+                policy_enabled=True, require_booted=phase in {'FORWARD_REPAIR', 'FORWARD_ACTIVATE'})
         guard = LifecycleCommandGuard(guest.worker, self.admitted, strict_loads(self.artifact_bytes),
-            self.lifecycle, phase, member_id, recovery=self.selection)
+            self.lifecycle, phase, member_id, recovery=self.selection, network_gate=network_runtime)
         authority = guest.select(guard)
         request_digest = canonical_record_digest(dict(recovery_digest=self.selection.sha256,
             lifecycle_digest=self.lifecycle.sha256, artifact_digest=guard.selection_digest,
@@ -369,13 +375,21 @@ class ApplicationRecoveryRunner:
                     pass
                 raise
 
-    def verify(self, *, traffic, health_readers, promotion):
+    def verify(self, *, traffic, health_readers, promotion, network_readers=None):
         from .traffic import ApplicationTrafficRuntime
         require(type(traffic) is ApplicationTrafficRuntime and traffic.lifecycle == self.original.lifecycle,
             'Forward repair must independently recontact the original current authoritative target traffic')
         members = []
         for member in self.lifecycle.to_dict()['members']:
             member_id = member['machine_id']
+            network = None
+            if 'target_policy' in member:
+                from .application_network import OpenStackBootstrapRuntime
+                network = (network_readers or {}).get((self.admitted.job_id, member_id))
+                if type(network) is not OpenStackBootstrapRuntime:
+                    raise LifecycleHeld('APPLICATION_PRODUCTION_POLICY_REQUIRED')
+                network.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id,
+                                policy_enabled=True)
             _capture, original = self.original_capture(member_id, detached=False)
             activated, activation_proof = self.independently_resolved(member_id, 'FORWARD_ACTIVATE')
             repaired, repair_proof = self.independently_resolved(member_id, 'FORWARD_REPAIR')
@@ -392,6 +406,9 @@ class ApplicationRecoveryRunner:
                 'The repaired independent reader differs from the exact new original activation writer')
             health = reader.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id)
             current_traffic = traffic.verify(self.original.admitted, strict_loads(self.original.artifact_bytes), member_id)
+            if network is not None:
+                network.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id,
+                                policy_enabled=True)
             self.original_capture(member_id, detached=False)
             members.append(dict(member_id=member_id, original_source_exclusion=original['SOURCE_FENCE'],
                 repair=repair_proof, activation=activation_proof, independent_useful_health=health, current_traffic=current_traffic))

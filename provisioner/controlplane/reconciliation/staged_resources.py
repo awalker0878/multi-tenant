@@ -41,7 +41,7 @@ def staged_service_parent_digest(handover,bundle,scope,resource_id):
 
 class StagedApplicationResourceAuthority:
     def __init__(self,*,connect,execution_authority,resources,selections,bundles,staging,handover,admitted,exclusion,
-                 source_capacity=None):
+                 source_capacity=None,migration_selections=None):
         from provisioner.controlplane.workflow.execution_selection import FileExecutionSelectionStore
         from provisioner.controlplane.workflow.provisioning_activity import FileResourceBundleStore
         require(callable(connect) and type(execution_authority) is PostgresExecutionAuthority
@@ -58,9 +58,14 @@ class StagedApplicationResourceAuthority:
             from .adapters.vmware_source_capacity import SourceCapacityReadRuntime
             require(type(source_capacity) is SourceCapacityReadRuntime,
                     'Only the separately enrolled actual VMware retained-source occupancy owner is accepted')
+        if migration_selections is not None:
+            from provisioner.migration.activities import FileMigrationSelectionStore
+            require(type(migration_selections) is FileMigrationSelectionStore,
+                    'Only the protected actual selected application policy/lifecycle store is accepted')
         self.connect,self.execution_authority,self.resources=connect,execution_authority,resources
         self.selections,self.bundles,self.staging,self.handover=selections,bundles,staging,handover
         self.admitted,self.exclusion,self.source_capacity=admitted,exclusion,source_capacity
+        self.migration_selections=migration_selections
         self.bundle=staging.bundle;self.context=TenantContext(admitted.organization_id,admitted.tenant_id)
         self._transactions=ResourceTransactions(resources.database,self,clock=resources._clock)
 
@@ -135,8 +140,13 @@ class StagedApplicationResourceAuthority:
         # Original creation acceptance retains its strict prepared state. A
         # current occupancy read measures the same IDs/charge while separately
         # admitted power/management owners advance their lifecycle states.
+        lifecycle = None
+        if self.migration_selections is not None:
+            lifecycle = self.migration_selections.lifecycle(selection['applicationLifecycleSelectionDigest'])
+            require(lifecycle.to_dict()['destination_scope'] == body['destinationScope'],
+                    'The protected current policy changes the original retained native destination')
         bindings,facts,units=self.staging.native_reader._read(self.bundle,job.destination,custody['outputs'],
-                                                             cursor=cursor,occupancy=True)
+                                                             cursor=cursor,occupancy=True,lifecycle=lifecycle)
         observed={binding.key() for binding in bindings}
         require(observed=={binding.key() for binding in self.staging.observation.bindings},
                 'The actual staged VM, port or storage UUID changed before current cutover')

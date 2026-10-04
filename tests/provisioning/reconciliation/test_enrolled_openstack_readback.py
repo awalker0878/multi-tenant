@@ -192,6 +192,57 @@ class EnrolledOpenStackReadbackTests(unittest.TestCase):
             with self.subTest(field=field),self.assertRaises(ValueError): self.read()
             self.server.rows=original
 
+    def current_policy(self):
+        from tests.test_application_lifecycle import lifecycle_record
+        from tests.provisioning.mobility.test_application_network import management_record
+        from tests.provisioning.mobility.test_application_policy import policy_record
+        from provisioner.migration.lifecycle import ApplicationLifecycleSelection
+        body = lifecycle_record(self.root)
+        body['destination_scope'] = dict(organizationId=self.scope.organization_id, tenantId=self.scope.tenant_id,
+            locationId=self.scope.site_id, securityDomainId=self.scope.security_domain_id,
+            endpointId=self.scope.endpoint_id, nativeScopeId=self.scope.native_scope_id, platformFamily='openstack')
+        member = body['members'][0]; member['target']['native_id'] = SERVER
+        management = management_record(self.origin, self.scope.native_scope_id)
+        management.update(port_id=PORT, network_id=self.member['network_id'], subnet_id=self.member['subnet_id'],
+                          security_group_id=self.member['security_group_id'], ipv4_address=self.member['ipv4_address'])
+        policy = policy_record(member['target']['health']['port'], self.scope.native_scope_id)
+        member.update(target_management=management, target_policy=policy)
+        for phase, kind in (('TARGET_BOOTSTRAP', 'NETWORK_ATTACH'), ('TARGET_POLICY', 'POLICY_APPLY'),
+                            ('TARGET_ISOLATE', 'POLICY_APPLY')):
+            member['phases'][phase] = dict(step_id=phase.lower(), operation_id=phase.lower() + '-operation',
+                                         scope_side='destination', operation_kind=kind)
+        for selected in (management, policy):
+            self.server.rows['/v2.0/security-groups/' + selected['security_group_id']] = dict(security_group=dict(
+                id=selected['security_group_id'], project_id=self.scope.native_scope_id,
+                stateful=True, security_group_rules=deepcopy(selected['security_group_rules'])))
+        return ApplicationLifecycleSelection.from_record(body)
+
+    def test_current_approved_production_policy_changes_no_native_identity_or_original_charge(self):
+        bindings, _facts, units = self.read()
+        lifecycle = self.current_policy(); member = lifecycle.to_dict()['members'][0]
+        port = self.server.rows['/v2.0/ports/' + PORT]['port']
+        for groups in ([member['target_management']['security_group_id']],
+            [member['target_policy']['security_group_id'], member['target_management']['security_group_id']]):
+            port['security_groups'] = groups
+            current_ids, facts, current_units = self.owner._read(self.bundle, self.scope, self.outputs,
+                                                               occupancy=True, lifecycle=lifecycle)
+            self.assertEqual((current_ids, current_units), (bindings, units))
+            self.assertEqual(len(facts['processor-01']['current_policies']), 2)
+        with self.assertRaises(ValueError): self.read()
+        with self.assertRaises(ValueError): self.owner._read(self.bundle, self.scope, self.outputs, lifecycle=lifecycle)
+
+    def test_unapproved_additive_group_rule_or_another_retained_port_stays_held(self):
+        lifecycle = self.current_policy(); member = lifecycle.to_dict()['members'][0]
+        port = self.server.rows['/v2.0/ports/' + PORT]['port']
+        port['security_groups'] = [member['target_management']['security_group_id'], VOLUME]
+        with self.assertRaises(ValueError): self.owner._read(self.bundle, self.scope, self.outputs,
+                                                           occupancy=True, lifecycle=lifecycle)
+        port['security_groups'] = [member['target_management']['security_group_id'], member['target_policy']['security_group_id']]
+        group = self.server.rows['/v2.0/security-groups/' + member['target_policy']['security_group_id']]['security_group']
+        group['security_group_rules'][0]['remote_ip_prefix'] = '0.0.0.0/0'
+        with self.assertRaisesRegex(ValueError, 'exact approved rules'):
+            self.owner._read(self.bundle, self.scope, self.outputs, occupancy=True, lifecycle=lifecycle)
+
     def test_missing_native_identity_protocol_or_midread_revocation_is_not_absence(self):
         original=deepcopy(self.outputs)
         del self.outputs['members']['value']['processor-01']['port_id']

@@ -166,13 +166,58 @@ same original UUIDs and charge across power/port transitions. Original creation
 acceptance continues to require its selected prepared/bootstrap state.
 
 This owner enables a management path over an existing approved isolated policy.
-It does not create network infrastructure, compile production policy, admit
-application traffic or certify positive/negative datapath behavior. Those owners
-and native campaigns remain separate requirements. Detached source storage uses
+The separate selected production-policy owner below admits the approved listener
+after final sync. Network infrastructure creation, general policy compilation and
+positive/negative datapath qualification remain separate requirements. Detached source storage uses
 the separate current native accounting owner described below; a retained old
 receipt cannot establish current storage.
 
 Primary protocol: [Neutron port update and revision constraints](https://docs.openstack.org/api-ref/network/v2/).
+
+### Selected production policy and pre-write isolation
+
+Current staged cutover also selects `target_policy` and separate destination
+`POLICY_APPLY` phases, `TARGET_POLICY` and `TARGET_ISOLATE`. The immutable selection
+contains one distinct existing security-group UUID and its complete rule identities.
+The bounded group must be stateful, belong to the destination project and contain
+only explicitly approved IPv4 `/32` peers and single TCP/UDP ports. Ingress admits
+only the selected application TCP health listener; broad/default, foreign,
+additive, IPv6, remote-group and address-group rules hold before mutation. This
+owner attaches existing reviewed rules; it does not create or compile arbitrary
+network policy.
+
+After independently resolved source exclusion and final sync, the policy worker
+and independent project reader inspect the original booted server, sole port,
+management group and complete approved production group. A separate pinned guest
+read confirms the application remains persistently masked. The one conditional
+Neutron port update replaces `security_groups` with the exact management and
+production group IDs, retaining its genuine native request ID before reply
+validation or another authority check. Two fresh independent policy sweeps must
+agree before the original result is eligible for independent B11 resolution.
+Lost replies, revision conflicts, drift and revoked authority hold without retry.
+The Temporal `retained-target-production-policy-v1` marker preserves earlier
+histories while inserting this phase before activation for current workflows.
+
+Pre-write return runs the separately authorized isolation operation before target
+fencing, replacing the same port's groups with the original management group. An
+already isolated port produces a read-only `NO_EFFECT` candidate; independent B11
+resolution remains mandatory. Health, traffic and forward-repair owners re-read
+the exact currently approved policy around their effects. A stopped retained VM
+can be inspected during source return/forward repair, without asserting guest
+reachability before its separate boot operation.
+
+Commission `StagedResourceReadRuntime.migration_selections` with the protected
+`FileMigrationSelectionStore` used by the admitted plan. Occupancy then accepts
+only the original management group or its exact approved production combination,
+independently reads every group's complete current rules and preserves original
+resource IDs/charges across policy transitions. Original creation acceptance
+continues to reject an exposed production port.
+
+The protocol tests use real TLS Keystone/Neutron exchanges and distinct writer
+and project-reader credentials; B10 ports and guest transport remain explicit
+fixtures. Historical Temporal command histories replay without the new phase.
+These checks establish repository behavior, not native positive/negative flows,
+datapath enforcement, useful-service acceptance or operating qualification.
 
 ### Current retained source-backing accounting
 
@@ -321,9 +366,10 @@ worker/cgroup/staging custody, actual metadata/consistency acceptance and measur
 limits. B32–B35 native acceptance remains open for isolated rehearsal, persistent
 writer fencing, final sync, traffic/write admission and useful pre/post-write
 recovery. The implemented power/management-bootstrap owners need commissioned
-readers and native policy/reachability qualification. The current detached-backing
-owner needs exact native commissioning; production policy remains implementation
-work. B36
+readers and native policy/reachability qualification. Production/isolation policy
+operations and current selection-backed target occupancy require independent
+commissioning and native datapath acceptance. The current detached-backing
+owner needs exact native commissioning. B36
 still requires administrator acceptance of complete portal/CLI actions. B37
 native mutation remains held until minimum operating controls and independently
 authorized site/application inputs are present.

@@ -104,6 +104,8 @@ class ApplicationTrafficRuntime:
                 else:
                     lifecycle_runner._all_source_exclusions()
                     lifecycle_runner.independently_resolved(member['machine_id'], 'ACTIVATE')
+                lifecycle_runner.current_policy(member['machine_id'], production=not returning,
+                                                require_booted=not returning)
                 lifecycle_runner.current_health(member['machine_id'], health_readers,
                                                 side='source' if returning else 'destination')
             self._delivery(admitted, selection, step_id, observation=False)
@@ -124,6 +126,9 @@ class ApplicationTrafficRuntime:
             log.append('STEP_STARTED', dict(step_id=step_id, packet=packet, packet_sha256=canonical_record_digest(packet)))
             owner = self.writers.get(step_id) or self.readers[step_id]
             result, names = owner.run_step(admitted, selection, delivery, step, packet, directory, base, self.source_root)
+            for member in self.lifecycle.to_dict()['members']:
+                lifecycle_runner.current_policy(member['machine_id'], production=not returning,
+                                                require_booted=not returning)
             receipt = dict(step_id=step_id, packet_sha256=canonical_record_digest(packet), status=result['status'],
                 artifacts=delivery_run.artifact_receipt(directory, names), native_acceptance=False, production_activation=False)
             log.append('STEP_COMPLETED', receipt)

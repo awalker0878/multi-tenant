@@ -22,6 +22,42 @@ def unicast(value):
     return address
 
 
+def validate_policy_selection(selected, scope, management, health_port):
+    """A sole pre-existing stateful group for the bounded application listener."""
+    require(type(health_port) is int and 1024 <= health_port <= 65535
+        and type(selected) is dict and set(selected) == {'security_group_id', 'security_group_rules'}
+        and type(selected['security_group_id']) is str and UUID.fullmatch(selected['security_group_id'])
+        and selected['security_group_id'] not in {management[key] for key in
+            ('port_id', 'network_id', 'subnet_id', 'security_group_id')},
+        'Production policy needs one exact distinct existing native security group')
+    rules = selected['security_group_rules']
+    require(type(rules) is list and 1 <= len(rules) <= 32, 'Every bounded production policy rule must be selected')
+    known = {rule['id'] for rule in management['security_group_rules']}
+    ingress = 0
+    for rule in rules:
+        require(type(rule) is dict and set(rule) == RULE_FIELDS
+            and type(rule['id']) is str and UUID.fullmatch(rule['id']) and rule['id'] not in known
+            and rule['project_id'] == scope.native_scope_id
+            and rule['security_group_id'] == selected['security_group_id']
+            and rule['direction'] in {'ingress', 'egress'} and rule['ethertype'] == 'IPv4'
+            and rule['protocol'] in {'tcp', 'udp'}
+            and type(rule['port_range_min']) is int and type(rule['port_range_max']) is int
+            and 1 <= rule['port_range_min'] == rule['port_range_max'] <= 65535
+            and rule['remote_group_id'] is None and rule['remote_address_group_id'] is None
+            and type(rule['remote_ip_prefix']) is str,
+            'Production policy requires exact native rule IDs, single ports and explicit service peers')
+        known.add(rule['id'])
+        remote = ipaddress.IPv4Network(rule['remote_ip_prefix'], strict=True)
+        require(str(remote) == rule['remote_ip_prefix'] and remote.prefixlen == 32,
+            'Production service peers must each be one approved IPv4 host')
+        unicast(str(remote.network_address))
+        if rule['direction'] == 'ingress':
+            require(rule['protocol'] == 'tcp' and rule['port_range_min'] == health_port,
+                'This application policy admits only its selected useful-service listener')
+            ingress += 1
+    require(ingress > 0, 'Production policy needs a selected useful-service client')
+
+
 def validate_management_selection(selected, scope):
     require(type(selected) is dict and set(selected) == {'network_endpoint', 'port_id', 'network_id',
             'subnet_id', 'ipv4_address', 'mac_address', 'security_group_id', 'security_group_rules',

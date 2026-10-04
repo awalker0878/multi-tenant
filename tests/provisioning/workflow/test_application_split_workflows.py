@@ -5,11 +5,14 @@ The fixed synthetic activities isolate workflow ordering, no-repeat boundaries,
 typed retained results and original start/result binding from native owners.
 """
 import asyncio
+from contextlib import nullcontext
 from dataclasses import replace
 import hashlib
 import unittest
+from unittest.mock import patch
 
 from temporalio import activity
+from temporalio import workflow as workflow_api
 from temporalio.api.enums.v1 import EventType
 from temporalio.testing import WorkflowEnvironment
 from temporalio.worker import Replayer, Worker
@@ -76,7 +79,8 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
                         await asyncio.to_thread(starter.completed_job, receipt)
 
     async def run_case(self, selected, *, held=None, lose_result=None, foreign_member=None,
-                       invalid_evidence=None, revoke_approval=False, lose_start_response=False):
+                       invalid_evidence=None, revoke_approval=False, lose_start_response=False,
+                       historical_markers=None):
         calls, requests, simulated_effects = [], [], []
 
         @activity.defn(name=VERIFY_ADMITTED_JOB_ACTIVITY)
@@ -129,7 +133,7 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
 
         names = (
             'application_stage_targets', 'application_verify_staged_data', 'application_target_prepare',
-            'application_target_bootstrap',
+            'application_target_bootstrap', 'application_target_policy',
             'application_transfer_dataset',
             'application_join_datasets', 'application_rehearsal', 'application_database_initialize',
             'application_database_synchronize', 'application_database_source_fence', 'application_database_final',
@@ -159,9 +163,14 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
                 workflow_id=ADMITTED.job_id, payload=PAYLOAD))
             handle = environment.client.get_workflow_handle(receipt.workflow_id, run_id=receipt.run_id,
                                                               result_type=result_type)
-            async with Worker(environment.client, task_queue='split-application',
-                              workflows=[workflow], activities=activities):
-                result = await asyncio.wait_for(handle.result(), 20)
+            original_patch = workflow_api.patched
+            marker_context = patch.object(workflow_api, 'patched',
+                side_effect=lambda name: original_patch(name) if name in historical_markers else False) \
+                if historical_markers is not None else nullcontext()
+            with marker_context:
+                async with Worker(environment.client, task_queue='split-application',
+                                  workflows=[workflow], activities=activities):
+                    result = await asyncio.wait_for(handle.result(), 20)
             history = await handle.fetch_history()
             self.assertEqual(sum(event.event_type == EventType.EVENT_TYPE_WORKFLOW_EXECUTION_STARTED
                                  for event in history.events), 1)
@@ -221,7 +230,7 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_staged_cutover_never_reserves_or_creates_and_has_separate_final_proof(self):
         result, calls, _ = await self.run_case(CUTOVER)
-        self.assertEqual((result.status, result.completed, result.total), ('SUCCEEDED', 17, 17))
+        self.assertEqual((result.status, result.completed, result.total), ('SUCCEEDED', 19, 19))
         self.assertEqual(calls[:8], ['approval', 'application_verify_staged_data',
                                     'application_target_prepare:vm-alpha', 'application_target_prepare:vm-beta',
                                     'application_target_bootstrap:vm-alpha', 'application_target_bootstrap:vm-beta',
@@ -229,7 +238,8 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(set(calls[8:10]), {'application_transfer_dataset:files', 'application_transfer_dataset:static'})
         self.assertEqual(calls[10:], ['application_join_datasets', 'application_rehearsal',
             'application_source_fence:vm-alpha', 'application_source_fence:vm-beta',
-            'application_final_sync', 'application_cutover', 'application_verify_cutover'])
+            'application_final_sync', 'application_target_policy:vm-alpha', 'application_target_policy:vm-beta',
+            'application_cutover', 'application_verify_cutover'])
         self.assertNotIn('reserve', calls); self.assertNotIn('provision:initial-create', calls)
         self.assertEqual(result.lifecycle_selection_digest, CUTOVER.lifecycle_selection_digest)
         self.assertEqual(result.staging_selection_digest, CUTOVER.staging_selection_digest)
@@ -238,7 +248,7 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_current_staged_handover_hold_stops_every_data_or_native_cutover_effect(self):
         result, calls, effects = await self.run_case(DATABASE, held='application_verify_staged_data')
-        self.assertEqual((result.status, result.phase, result.completed, result.total), ('HELD', 'PREPARE', 1, 21))
+        self.assertEqual((result.status, result.phase, result.completed, result.total), ('HELD', 'PREPARE', 1, 23))
         self.assertEqual(result.hold_code, 'CURRENT_STAGED_APPLICATION_TARGET_REQUIRED')
         self.assertEqual(calls, ['approval', 'application_verify_staged_data']); self.assertEqual(effects, [])
 
@@ -247,7 +257,7 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
             with self.subTest(option=option):
                 result, calls, effects = await self.run_case(CUTOVER, **option)
                 self.assertEqual((result.status, result.phase, result.completed, result.total),
-                                 ('HELD', 'PREPARE', 2, 17))
+                                 ('HELD', 'PREPARE', 2, 19))
                 self.assertEqual(calls, ['approval', 'application_verify_staged_data',
                                         'application_target_prepare:vm-alpha'])
                 self.assertLessEqual(effects.count('application_target_prepare:vm-alpha'), 1)
@@ -257,7 +267,7 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_database_copy_sync_and_final_native_position_precede_vm_fence_and_activation(self):
         result, calls, _ = await self.run_case(DATABASE)
-        self.assertEqual((result.status, result.completed, result.total), ('SUCCEEDED', 21, 21))
+        self.assertEqual((result.status, result.completed, result.total), ('SUCCEEDED', 23, 23))
         self.assertEqual(calls[8:10], ['application_database_initialize:vm-alpha', 'application_database_synchronize:vm-alpha'])
         db_fence = calls.index('application_database_source_fence:vm-alpha')
         self.assertEqual(calls[db_fence:db_fence + 4], ['application_database_source_fence:vm-alpha',
@@ -270,7 +280,7 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
             with self.subTest(option=option):
                 result, calls, effects = await self.run_case(CUTOVER, **option)
                 self.assertEqual((result.status, result.phase, result.completed, result.total),
-                                 ('HELD', 'PREPARE', 4, 17))
+                                 ('HELD', 'PREPARE', 4, 19))
                 self.assertEqual(calls, ['approval', 'application_verify_staged_data',
                     'application_target_prepare:vm-alpha', 'application_target_prepare:vm-beta',
                     'application_target_bootstrap:vm-alpha'])
@@ -281,16 +291,35 @@ class SplitWorkflowTests(unittest.IsolatedAsyncioTestCase):
     async def test_lost_database_final_result_never_fences_vms_or_activates_target(self):
         result, calls, effects = await self.run_case(DATABASE, lose_result='application_database_final')
         self.assertEqual((result.status, result.phase, result.reason_code, result.completed, result.total),
-                         ('HELD', 'CUTOVER', 'NATIVE_UNCERTAIN', 15, 21))
+                         ('HELD', 'CUTOVER', 'NATIVE_UNCERTAIN', 15, 23))
         self.assertEqual(effects.count('application_database_final:vm-alpha'), 1)
         self.assertFalse(any(call.startswith('application_source_fence:') for call in calls))
         self.assertNotIn('application_cutover', calls)
+
+    async def test_policy_hold_or_lost_reply_stops_before_activation_and_is_not_repeated(self):
+        for option in ({'held': 'application_target_policy'}, {'lose_result': 'application_target_policy'}):
+            with self.subTest(option=option):
+                result, calls, effects = await self.run_case(CUTOVER, **option)
+                self.assertEqual((result.status, result.phase, result.completed, result.total),
+                                 ('HELD', 'CUTOVER', 15, 19))
+                self.assertEqual(calls[-1], 'application_target_policy:vm-alpha')
+                self.assertNotIn('application_target_policy:vm-beta', calls)
+                self.assertNotIn('application_cutover', calls)
+                self.assertLessEqual(effects.count('application_target_policy:vm-alpha'), 1)
+
+    async def test_historical_ordering_replays_under_new_code_without_inventing_policy_or_bootstrap(self):
+        for markers, total in ((set(), 15), ({'isolated-management-bootstrap-v1'}, 17)):
+            with self.subTest(markers=markers):
+                result, calls, _ = await self.run_case(CUTOVER, historical_markers=markers)
+                self.assertEqual((result.status, result.completed, result.total), ('SUCCEEDED', total, total))
+                self.assertFalse(any(call.startswith('application_target_policy') for call in calls))
+                self.assertEqual(any(call.startswith('application_target_bootstrap') for call in calls), bool(markers))
 
     async def test_final_acceptance_hold_or_lost_result_cannot_close_or_repeat_cutover(self):
         for option in ({'held': 'application_verify_cutover'}, {'lose_result': 'application_verify_cutover'}):
             with self.subTest(option=option):
                 result, calls, effects = await self.run_case(DATABASE, **option)
-                self.assertEqual((result.status, result.phase, result.completed, result.total), ('HELD', 'VERIFY', 20, 21))
+                self.assertEqual((result.status, result.phase, result.completed, result.total), ('HELD', 'VERIFY', 22, 23))
                 self.assertEqual(calls.count('application_cutover'), 1)
                 self.assertEqual(calls.count('application_verify_cutover'), 1)
                 self.assertEqual(effects.count('application_cutover'), 1)

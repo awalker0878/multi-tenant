@@ -241,7 +241,7 @@ class ApplicationRuntimeTests(unittest.TestCase):
         self.assertIs(components.authority.operations, components.action_gate.operations)
         self.assertIs(components.action_gate.operations.worker_grants, components.worker_grants)
         self.assertIs(components.provisioning.authority, components.migration.authority)
-        self.assertEqual(len(components.activities), 34)
+        self.assertEqual(len(components.activities), 36)
         self.assertIsNone(components.creation_registry)
         self.assertIsNone(components.native_registry)
         self.assertIn('ENROLLED_NATIVE_PROVISIONING_WORKERS_REQUIRED', components.hold_codes)

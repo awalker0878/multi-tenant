@@ -68,7 +68,7 @@ def lifecycle_record(root, *, source_root=None, source_scope=None, destination_s
         'target_io': {'cgroup': '/hosting/target-export', 'block_device': '8:4', 'bandwidth_kib_per_second': 256, 'block_iops': 20},
         'phases': {name: {'step_id': 'application-' + name.lower().replace('_', '-'),
             'operation_id': 'operation-' + name.lower().replace('_', '-'), 'scope_side': side, 'operation_kind': kind}
-            for name, (side, kind) in PHASES.items() if name != 'TARGET_BOOTSTRAP'},
+            for name, (side, kind) in PHASES.items() if name not in {'TARGET_BOOTSTRAP', 'TARGET_POLICY', 'TARGET_ISOLATE'}},
         'native_fence': {'power_request': native, 'disk_keys': [2001],
             'previous_owner': {'worker_id': 'old-source-writer', 'owner_epoch': 1, 'incident_id': 'source-incident'}},
         'target_native_fence': {'volume_id': volume_id, 'device': '/dev/vdb',

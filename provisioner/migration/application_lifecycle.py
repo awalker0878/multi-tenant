@@ -183,7 +183,8 @@ class ApplicationLifecycleRunner:
                          'NATIVE_SHUTDOWN_STARTED', 'NATIVE_SHUTDOWN_RETURNED', 'TARGET_DISK_REMOVE_STARTED',
                          'TARGET_DISK_TASK_RETURNED', 'SOURCE_DISK_ADD_STARTED', 'SOURCE_DISK_ADD_RETURNED',
                          'TARGET_DISK_ADD_STARTED', 'TARGET_DISK_ADD_RETURNED', 'NATIVE_START_STARTED', 'NATIVE_START_RETURNED',
-                         'MANAGEMENT_PORT_ENABLE_STARTED', 'MANAGEMENT_PORT_ENABLE_RETURNED'},
+                         'MANAGEMENT_PORT_ENABLE_STARTED', 'MANAGEMENT_PORT_ENABLE_RETURNED',
+                         'TARGET_POLICY_CHANGE_STARTED', 'TARGET_POLICY_CHANGE_RETURNED'},
                         'The original application phase journal was changed')
         return started, complete
 
@@ -202,7 +203,22 @@ class ApplicationLifecycleRunner:
         receipt = self.receipt(member_id, phase)
         selected = self.lifecycle.member(member_id)['phases'][phase]
         scope = PlanScope.from_record(self.lifecycle.to_dict()[selected['scope_side'] + '_scope'])
-        return receipt, self.evidence.require_resolved(receipt, scope)
+        outcome = 'NO_EFFECT' if phase == 'TARGET_ISOLATE' and receipt['observations']['status'] == \
+            'TARGET_POLICY_ALREADY_ISOLATED' else 'EFFECT_PRESENT'
+        return receipt, self.evidence.require_resolved(receipt, scope, outcome=outcome)
+
+    def current_policy(self, member_id, *, production, require_booted=True):
+        if 'applicationStagingSelectionDigest' not in strict_loads(self.artifact_bytes):
+            return None
+        from .activities import ApplicationMigrationActivities
+        from .application_network import OpenStackBootstrapRuntime
+        require(type(self.management) is ApplicationMigrationActivities,
+                'The actual current selected application management owner is required')
+        runtime = self.management.runtimes.network_bootstraps.get((self.admitted.job_id, member_id))
+        if type(runtime) is not OpenStackBootstrapRuntime or 'target_policy' not in self.lifecycle.member(member_id):
+            raise LifecycleHeld('APPLICATION_PRODUCTION_POLICY_REQUIRED')
+        return runtime.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id,
+                               policy_enabled=production, require_booted=require_booted)
 
     def _initial(self, member_id):
         member = self.lifecycle.member(member_id)
@@ -218,6 +234,7 @@ class ApplicationLifecycleRunner:
         return result
 
     def current_health(self, member_id, readers, *, side='destination'):
+        self.current_policy(member_id, production=side == 'destination', require_booted=side == 'destination')
         reader = readers.get((self.admitted.job_id, member_id, side))
         if not isinstance(reader, ApplicationHealthReadRuntime):
             raise LifecycleHeld('APPLICATION_LIFECYCLE_OWNER_UNAVAILABLE')
@@ -228,7 +245,9 @@ class ApplicationLifecycleRunner:
                      reader.writer.lease.binding.__dict__) ==
                     (original['grant_id'], original['worker_id'], original['owner_epoch'], original['binding']),
                 'The independent health reader was not enrolled against this exact original application writer')
-        return reader.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id)
+        result = reader.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id)
+        self.current_policy(member_id, production=side == 'destination', require_booted=side == 'destination')
+        return result
 
     def verify_cutover(self, *, traffic, health_readers, promotion):
         from .traffic import ApplicationTrafficRuntime
@@ -658,7 +677,7 @@ class ApplicationLifecycleRunner:
                     target_write_boundary='TARGET_WRITES_POSSIBLE')
 
     def execute(self, phase, member_id, *, guest, repository=None, native_runtime=None, network_runtime=None):
-        require(isinstance(guest, ApplicationGuestRuntime) and phase in {'TARGET_PREPARE', 'TARGET_BOOTSTRAP', 'REHEARSAL', 'SOURCE_FENCE', 'FINAL_SYNC', 'ACTIVATE',
+        require(isinstance(guest, ApplicationGuestRuntime) and phase in {'TARGET_PREPARE', 'TARGET_BOOTSTRAP', 'TARGET_POLICY', 'TARGET_ISOLATE', 'REHEARSAL', 'SOURCE_FENCE', 'FINAL_SYNC', 'ACTIVATE',
                 'TARGET_FENCE', 'SOURCE_REATTACH', 'SOURCE_START', 'PREWRITE_RETURN', 'POSTWRITE_CAPTURE'},
                 'The concrete selected application phase owner is required')
         if phase in {'REHEARSAL', 'SOURCE_FENCE', 'FINAL_SYNC', 'ACTIVATE'} and \
@@ -667,7 +686,12 @@ class ApplicationLifecycleRunner:
             if type(network_runtime) is not OpenStackBootstrapRuntime:
                 raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
             self.independently_resolved(member_id, 'TARGET_BOOTSTRAP')
-            network_runtime.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id)
+            if phase == 'ACTIVATE':
+                if 'target_policy' not in self.lifecycle.member(member_id):
+                    raise LifecycleHeld('APPLICATION_PRODUCTION_POLICY_REQUIRED')
+                self.independently_resolved(member_id, 'TARGET_POLICY')
+            network_runtime.observe(self.admitted, strict_loads(self.artifact_bytes), self.lifecycle, member_id,
+                                    policy_enabled=phase == 'ACTIVATE')
         guard = LifecycleCommandGuard(guest.worker, self.admitted, strict_loads(self.artifact_bytes),
                                       self.lifecycle, phase, member_id, network_gate=network_runtime)
         authority = guest.select(guard)
@@ -681,6 +705,16 @@ class ApplicationLifecycleRunner:
             if type(network_runtime) is not OpenStackBootstrapRuntime:
                 raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
             self.independently_resolved(member_id, 'TARGET_PREPARE')
+        elif phase in {'TARGET_POLICY', 'TARGET_ISOLATE'}:
+            from .application_network import OpenStackBootstrapRuntime
+            if type(network_runtime) is not OpenStackBootstrapRuntime or 'target_policy' not in guard.member:
+                raise LifecycleHeld('APPLICATION_PRODUCTION_POLICY_REQUIRED')
+            self.independently_resolved(member_id, 'TARGET_BOOTSTRAP')
+            if phase == 'TARGET_POLICY':
+                self._all_source_exclusions(database_phase='PRE_WRITE')
+                self.independently_resolved(member_id, 'FINAL_SYNC')
+            else:
+                self._require_before_target_writes(member_id)
         elif phase == 'REHEARSAL':
             self._initial(member_id)
         elif phase == 'SOURCE_FENCE':
@@ -721,6 +755,9 @@ class ApplicationLifecycleRunner:
                     observed = self._target_prepare(guest, authority, native_runtime, log)
                 elif phase == 'TARGET_BOOTSTRAP':
                     observed = network_runtime.execute(authority, self.staged, log)
+                elif phase in {'TARGET_POLICY', 'TARGET_ISOLATE'}:
+                    observed = network_runtime.execute_policy(authority, self.staged, log, native_runtime,
+                                                              enable=phase == 'TARGET_POLICY')
                 elif phase == 'REHEARSAL':
                     observed = self._rehearsal(guest, authority)
                 elif phase == 'SOURCE_FENCE':

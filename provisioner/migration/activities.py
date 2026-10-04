@@ -314,7 +314,7 @@ class ApplicationMigrationActivities:
                     if guest is None:
                         raise LifecycleHeld('APPLICATION_LIFECYCLE_OWNER_UNAVAILABLE')
                     self._current(request, operation)
-                    native = self.runtimes.target_native_workers.get(key) if phase in {'TARGET_PREPARE', 'TARGET_FENCE', 'POSTWRITE_CAPTURE'} \
+                    native = self.runtimes.target_native_workers.get(key) if phase in {'TARGET_PREPARE', 'TARGET_POLICY', 'TARGET_ISOLATE', 'TARGET_FENCE', 'POSTWRITE_CAPTURE'} \
                         else self.runtimes.source_disk_fences.get(key)
                     receipt = runner.execute(phase, member_id, guest=guest,
                         repository=self.runtimes.repositories.get(key), native_runtime=native,
@@ -387,7 +387,8 @@ class ApplicationMigrationActivities:
                     self._current(request, operation)
                     receipt = runner.execute(phase, member_id, guest=guest,
                         repository=self.runtimes.repositories.get(key),
-                        native_runtime=self.runtimes.target_native_workers.get(key))
+                        native_runtime=self.runtimes.target_native_workers.get(key),
+                        network_runtime=self.runtimes.network_bootstraps.get((request.admitted.job_id, member_id)))
                     reference = self._retain(receipt)
                     try:
                         receipt, proof = runner.independently_resolved(member_id, phase)
@@ -431,7 +432,8 @@ class ApplicationMigrationActivities:
             runner = self._recovery(request, 'DESTINATION_ACTIVATE')
             original_traffic = self.runtimes.traffic.get(runner.original.admitted.job_id)
             result = runner.verify(traffic=original_traffic, health_readers=self.runtimes.health_readers,
-                promotion=self.runtimes.promotions.get(request.admitted.job_id))
+                promotion=self.runtimes.promotions.get(request.admitted.job_id),
+                network_readers=self.runtimes.network_bootstraps)
             self._observation(request, 'DESTINATION_ACTIVATE')
             return MigrationActivityResult(STAGE_VERIFIED, request.admitted.job_id, '', evidence_digest=self._retain(result))
         except LifecycleHeld as exc:
@@ -666,6 +668,8 @@ class ApplicationMigrationActivities:
             for member in lifecycle.to_dict()['members']:
                 if 'target_management' not in member:
                     raise LifecycleHeld('ISOLATED_MANAGEMENT_BOOTSTRAP_REQUIRED')
+                if 'target_policy' not in member:
+                    raise LifecycleHeld('APPLICATION_PRODUCTION_POLICY_REQUIRED')
                 require_staged_management(handover, lifecycle, member['machine_id'])
             result = dict(format='hosting-verified-staged-application-targets/1',
                 job_id=request.admitted.job_id, staging_selection_digest=digest,
@@ -683,6 +687,16 @@ class ApplicationMigrationActivities:
 
     @activity.defn(name='application_target_exclude')
     def target_exclude(self, request: MigrationActivityRequest) -> MigrationActivityResult:
+        try:
+            runner = self._lifecycle(request, 'SOURCE_FENCE')
+            if any('target_policy' in row for row in runner.lifecycle.to_dict()['members']):
+                isolated = self._lifecycle_phase(request, 'TARGET_ISOLATE')
+                if isolated.status != STAGE_VERIFIED:
+                    return isolated
+        except LifecycleHeld as exc:
+            return self._held(request, exc.hold_code)
+        except Exception:
+            return self._held(request, 'CURRENT_AUTHORITY_UNAVAILABLE', reason='AUTHORITY_REVOKED')
         return self._lifecycle_phase(request, 'TARGET_FENCE')
 
     @activity.defn(name='application_target_prepare')
@@ -692,6 +706,14 @@ class ApplicationMigrationActivities:
     @activity.defn(name='application_target_bootstrap')
     def target_bootstrap(self, request: MigrationActivityRequest) -> MigrationActivityResult:
         return self._lifecycle_phase(request, 'TARGET_BOOTSTRAP')
+
+    @activity.defn(name='application_target_policy')
+    def target_policy(self, request: MigrationActivityRequest) -> MigrationActivityResult:
+        return self._lifecycle_phase(request, 'TARGET_POLICY')
+
+    @activity.defn(name='application_target_isolate')
+    def target_isolate(self, request: MigrationActivityRequest) -> MigrationActivityResult:
+        return self._lifecycle_phase(request, 'TARGET_ISOLATE')
 
     @activity.defn(name='application_source_reattach')
     def source_reattach(self, request: MigrationActivityRequest) -> MigrationActivityResult:

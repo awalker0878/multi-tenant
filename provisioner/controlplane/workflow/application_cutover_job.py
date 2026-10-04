@@ -46,8 +46,11 @@ class OpenStackStagedApplicationCutover:
     async def run(self, input: ApplicationCutoverInput) -> ApplicationJobResult:
         admitted = input.admitted
         bootstrap = workflow.patched('isolated-management-bootstrap-v1')
+        production_policy = workflow.patched('retained-target-production-policy-v1')
         total = 7 + len(input.provisioning_steps) + len(input.dataset_ids) + 2 * len(input.machine_ids)
         if bootstrap:
+            total += len(input.machine_ids)
+        if production_policy:
             total += len(input.machine_ids)
         if input.database_selection_digest is not None:
             total += 4
@@ -127,7 +130,13 @@ class OpenStackStagedApplicationCutover:
         for machine in input.machine_ids:
             result = await stage('application_source_fence', machine)
             if result: return result
-        for name in ('application_final_sync', 'application_cutover', 'application_verify_cutover'):
+        result = await stage('application_final_sync')
+        if result: return result
+        if production_policy:
+            for machine in input.machine_ids:
+                result = await stage('application_target_policy', machine)
+                if result: return result
+        for name in ('application_cutover', 'application_verify_cutover'):
             result = await stage(name, phase='VERIFY' if name == 'application_verify_cutover' else 'CUTOVER')
             if result: return result
         return ApplicationJobResult(admitted.job_id, admitted.plan_id, admitted.plan_revision,

@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 from uuid import uuid4
 
 from provisioner.allocations.transactions import ResourceObservation, ResourceUnits
+from provisioner.controlplane.authority import PlanScope
 from provisioner.controlplane.persistence import NativeBinding
 from provisioner.execution import readback_core as c
 from provisioner.execution.run_files import digest, encoded, load_private, private_path, read_private, require, utcnow, write_new
@@ -141,7 +142,7 @@ class OpenStackNativeReadbackOwner:
         self.directory=private_path(directory,directory=True); self.bundles=bundles
         self.lease_store=lease_store
 
-    def _read(self,bundle,scope,outputs,*,cursor=None,occupancy=False):
+    def _read(self,bundle,scope,outputs,*,cursor=None,occupancy=False,lifecycle=None):
         require(scope==self.enrollment.scope, 'The independent reader is enrolled in another native project')
         pools=[pool for pool in bundle.pools if pool.scope==scope and pool.inputs is not None]
         require(len(pools)==1,'One exact OpenStack workload pool is required')
@@ -149,6 +150,16 @@ class OpenStackNativeReadbackOwner:
         members=outputs.get('members',{}).get('value')
         require(type(members) is dict and members.keys()==inputs['members'].keys(),
                 'The retained output does not cover every selected target child')
+        policies = {}
+        if lifecycle is not None:
+            from provisioner.migration.lifecycle import ApplicationLifecycleSelection
+            require(occupancy and type(lifecycle) is ApplicationLifecycleSelection
+                    and PlanScope.from_record(lifecycle.to_dict()['destination_scope']) == scope,
+                    'Current policy occupancy needs the protected exact destination lifecycle selection')
+            policies = {row['target']['native_id']: row for row in lifecycle.to_dict()['members']}
+            require(len(policies) == len(members)
+                    and set(policies) == {row['server_id'] for row in members.values()},
+                    'Current policy occupancy does not cover the complete originally retained server set')
         reader=OpenStackProjectReader(self.enrollment,identity_endpoint=self.identity_endpoint,
             ca_bundle=self.ca_bundle,alias=inputs['openstack_cloud'],compute_origin=pool.catalog['origin'],cursor=cursor)
         bindings=[]; facts={}; cpu=memory=storage=0
@@ -188,10 +199,21 @@ class OpenStackNativeReadbackOwner:
                     and flavor.get('OS-FLV-EXT-DATA:ephemeral')==0 and flavor.get('swap') in {0,''},
                     'The current actual flavor differs from the commissioned zero-local-disk demand')
             port=reader.get('network','ports/'+ids['port_id'])['port']
+            groups = [selected['security_group_id']]
+            policy_member = policies.get(ids['server_id'])
+            if policy_member is not None:
+                require(policy_member.get('target_management', {}).get('port_id') == ids['port_id']
+                        and policy_member['target_management']['security_group_id'] == selected['security_group_id'],
+                        'Current policy occupancy changes the original management group or retained port')
+                production = policy_member.get('target_policy')
+                choices = [groups, sorted(groups + [production['security_group_id']])] if production else [groups]
+                require(type(port.get('security_groups')) is list and sorted(port['security_groups']) in choices,
+                        'The current retained port has an unselected production policy')
+                groups = port['security_groups']
             require(port.get('id')==ids['port_id'] and port.get('project_id')==scope.native_scope_id
                     and port.get('device_id')==ids['server_id'] and port.get('network_id')==selected['network_id']
                     and port.get('port_security_enabled') is True and port.get('allowed_address_pairs')==[]
-                    and port.get('security_groups')==[selected['security_group_id']]
+                    and port.get('security_groups')==groups
                     and port.get('fixed_ips')==[{'subnet_id':selected['subnet_id'],'ip_address':selected['ipv4_address']}]
                     and (type(port.get('admin_state_up')) is bool if occupancy else
                          port.get('admin_state_up') is (state=='ACTIVE')),
@@ -199,6 +221,25 @@ class OpenStackNativeReadbackOwner:
             group=reader.get('network','security-groups/'+selected['security_group_id'])['security_group']
             require(group.get('id')==selected['security_group_id'] and group.get('project_id')==scope.native_scope_id,
                     'Selected native policy belongs to another project')
+            policy_facts = []
+            if policy_member is not None:
+                from provisioner.migration.bootstrap_selection import RULE_FIELDS
+                for policy in [policy_member['target_management']] + \
+                        ([policy_member['target_policy']] if policy_member.get('target_policy') else []):
+                    current_group = group if policy['security_group_id'] == selected['security_group_id'] else \
+                        reader.get('network', 'security-groups/' + policy['security_group_id'])['security_group']
+                    require(current_group.get('id') == policy['security_group_id']
+                            and current_group.get('project_id') == scope.native_scope_id
+                            and current_group.get('stateful') is True
+                            and type(current_group.get('security_group_rules')) is list
+                            and all(type(rule) is dict and RULE_FIELDS <= rule.keys()
+                                    for rule in current_group['security_group_rules']),
+                            'Current charged policy has incomplete native rules or another tenant')
+                    projected = [{key: rule[key] for key in RULE_FIELDS} for rule in current_group['security_group_rules']]
+                    require(sorted(projected,key=lambda rule:rule['id']) ==
+                            sorted(policy['security_group_rules'],key=lambda rule:rule['id']),
+                            'Current charged native policy differs from its exact approved rules')
+                    policy_facts.append(current_group)
             volume_facts=[]
             for number,identity in enumerate(volumes):
                 volume=reader.get('volume','volumes/'+identity)['volume']
@@ -219,6 +260,8 @@ class OpenStackNativeReadbackOwner:
                              NativeBinding(scope.platform_family,scope.endpoint_id,scope.native_scope_id,'nic',ids['port_id'])))
             cpu+=flavor['vcpus']; memory+=flavor['ram']*MIB
             facts[name]={'server':server,'interfaces':interfaces,'flavor':flavor,'port':port,'group':group,'volumes':volume_facts}
+            if policy_facts:
+                facts[name]['current_policies'] = policy_facts
         require(len({binding.key() for binding in bindings})==len(bindings),
                 'Two selected targets share a native resource identity')
         units=ResourceUnits.from_bytes(vcpu=cpu,memory_bytes=memory,storage_bytes=storage)
