@@ -1,10 +1,18 @@
 # Isolated P00 contract tooling experiment
 
-This directory tests a synthetic OpenAPI contract and JSON Schema event envelope. It implements no product endpoint, domain behavior, broker or native operation. The current [contract conventions](../../../docs/contracts/README.md) and ADR-012 remain authoritative.
+This directory tests a synthetic OpenAPI contract and JSON Schema event envelope. The full [CI run 37232194144](https://github.com/awalker0878/multi-tenant/actions/runs/37232194144) passed against source [9843a0a](https://github.com/awalker0878/multi-tenant/commit/9843a0ab62452f8edcb0f5e19f25eb692ba3d723), including PHP 8.5.11 lint/model execution, after clean locked installs. It implements no product endpoint, domain behavior, broker or native operation. The current [contract conventions](../../../docs/contracts/README.md) and ADR-012 remain authoritative.
 
 The exact generator, validation and client-runtime dependencies are in `uv.lock`; TypeScript and its compiler dependencies are in `package-lock.json`. The Python distribution embeds the OpenAPI Generator JAR. Its hash is recorded during each run. Java 17, Python 3.12, Node 24 and the optional PHP 8.5 runtime are observed separately in the report.
 
-From the repository root:
+For a source-bound replay with recorded dependency-install logs, run the repository orchestrator with a new output directory:
+
+```sh
+python spikes/compatibility/run-contracts.py --workspace . --output /tmp/p00-contract-run
+```
+
+It requires PHP and records runtime versions, input hashes and bootstrap logs alongside probe evidence. The [retained complete CI result](../results/contracts/run-37232194144/evidence/report.json) records 18 wire fixtures, two invalid-schema controls, 53 deterministic generated files, Python/TypeScript checks and 11 PHP lint checks plus model behavior. Generated PHP/Python transport behavior is not claimed; the TypeScript HTTP call uses a mock.
+
+For a manual probe from the repository root:
 
 ```sh
 uv sync --locked --directory spikes/compatibility/contracts
