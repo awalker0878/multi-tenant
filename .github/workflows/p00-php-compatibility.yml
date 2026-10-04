@@ -23,8 +23,6 @@ jobs:
     env:
       COMPOSER_NO_INTERACTION: '1'
       COMPOSER_PROCESS_TIMEOUT: '300'
-      COMPOSER_HOME: ${{ runner.temp }}/p00-composer-home
-      COMPOSER_CACHE_DIR: ${{ runner.temp }}/p00-composer-cache
     steps:
       - name: Check out spike inputs
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5, resolved 2026-10-04
@@ -56,6 +54,9 @@ jobs:
       - name: Resolve, validate, smoke and reinstall from the same lock
         id: probe
         shell: python
+        env:
+          COMPOSER_HOME: ${{ runner.temp }}/p00-composer-home
+          COMPOSER_CACHE_DIR: ${{ runner.temp }}/p00-composer-cache
         run: |
           import datetime
           import hashlib
