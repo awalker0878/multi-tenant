@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "source_revision": "4142571874a53b351a9c6023313185fe718d0dac",
+  "run_id": 37239193485,
+  "artifact": {
+    "id": 11316598824,
+    "name": "p01-image-console-4142571874a53b351a9c6023313185fe718d0dac",
+    "digest": "sha256:58ec131650e851721d2a0f4c38c49e38783888a4ac5dc1f25284acade3b6defb",
+    "size_in_bytes": 26209,
+    "created_at": "2026-10-04T22:14:23Z",
+    "updated_at": "2026-10-04T22:14:23Z",
+    "expires_at": "2026-10-18T22:14:22Z",
+    "head_sha": "4142571874a53b351a9c6023313185fe718d0dac"
+  },
+  "archive_sha256": "58ec131650e851721d2a0f4c38c49e38783888a4ac5dc1f25284acade3b6defb",
+  "archive_verified": true,
+  "source_checks": [
+    {
+      "path": ".github/workflows/p01-images.yml",
+      "sha256": "0776d380e416d599d5fc49ac93c032eec7bd8d5afea91aec91f3a092d6d6b29a",
+      "git_blob_sha": "ea20ce6a580d896b3a82802f9dd919af1f353a1e",
+      "verified": true
+    },
+    {
+      "path": "apps/console/.dockerignore",
+      "sha256": "96ef707ce3a806240a07612afb0fe8c30118b66c1f539edb7ace74e003d1b246",
+      "git_blob_sha": "8dccb8de826dedf72ab351b3fd459df1befe90f1",
+      "verified": true
+    },
+    {
+      "path": "apps/console/Dockerfile",
+      "sha256": "e5b7c3af2db06810ebc348be0379eb4a06dca4f91b22ac328e0953e4d1bf8154",
+      "git_blob_sha": "99a77f6a949ed766e247970928ac2fa4c1f3fa2f",
+      "verified": true
+    },
+    {
+      "path": "apps/console/app/Http/Controllers/FoundationController.php",
+      "sha256": "424bcdcf54b1132f7913fff6486d7aaab0bc358637da69cc68920541ca42d769",
+      "git_blob_sha": "dfd35220eec22cf4f64f30ae76c0e3f65299405f",
+      "verified": true
+    },
+    {
+      "path": "apps/console/app/Http/Controllers/HealthController.php",
+      "sha256": "a7dd34dea6aff50897bc3e087618c9df27aed516af6211de7766a91afe343ba6",
+      "git_blob_sha": "0cc4e6bdc857291699a83b2786725e648a3750a1",
+      "verified": true
+    },
+    {
+      "path": "apps/console/app/Http/Middleware/HandleInertiaRequests.php",
+      "sha256": "abd23bfa82d399043c4ff2efd4bd3ea893d056488db6d43668982d41d554d7f2",
+      "git_blob_sha": "7dc738aee307bff9e3c4d7763c19fec5d2f8fdb7",
+      "verified": true
+    },
+    {
+      "path": "apps/console/app/Http/Middleware/PageResponseHeaders.php",
+      "sha256": "660b8b523fdbbd646880ad48436f1ceeabcb92db8f972a91a0f22652836d763d",
+      "git_blob_sha": "1136a5fb5a7486cd9cbc52592507f3649dd420c8",
+      "verified": true
+    },
+    {
+      "path": "apps/console/app/Providers/AppServiceProvider.php",
+      "sha256": "acbd46729b048dff385d6b19977be69b710a3e4ce89666681d4c8b838bb4fdcf",
+      "git_blob_sha": "879c5c475d05b1fedc6f4488614a2db9a34de7d9",
+      "verified": true
+    },
+    {
+      "path": "apps/console/artisan",
+      "sha256": "83c95e93ffda62b12bdfd605f5626762ee239fd61cf46ff56fd244dc828f609a",
+      "git_blob_sha": "015ca1dea3513877be66918b6f2417dd43427f91",
+      "verified": true
+    },
+    {
+      "path": "apps/console/bootstrap/app.php",
+      "sha256": "aae3c6d5ace64a4e1b543a63f53f0485921ce7344f205cc4b3ba6a7a594daae7",
+      "git_blob_sha": "e2394ba75e3ee080e11d691df1c0863fd6917b6b",
+      "verified": true
+    },
+    {
+      "path": "apps/console/bootstrap/providers.php",
+      "sha256": "2c593cbec5439e1288dcfe52e9f67b951736fb067ee7df206030583a1f28515f",
+      "git_blob_sha": "42342e35724782ab6276f31d9631bbff8145ebdc",
+      "verified": true
+    },
+    {
+      "path": "apps/console/build/snapshot.sh",
+      "sha256": "f2bada6d41cc464634d2893db0b0121e130a6728d49d3660d551307e2178bebf",
+      "git_blob_sha": "eddd2c53b948442bbe19acd4922e1df971426e50",
+      "verified": true
+    },
+    {
+      "path": "apps/console/composer.json",
+      "sha256": "d5ddf7bb6a28b5ec81c0742a7359104e49dc2cf441a6eedce768ae4963d62998",
+      "git_blob_sha": "1d28e21218c432b22c89b53c463db0e79df05b0c",
+      "verified": true
+    },
+    {
+      "path": "apps/console/composer.lock",
+      "sha256": "926d7cd6f70cea71f705e6233ee2c2a219f5824c5a08faeece99068d3f7fd913",
+      "git_blob_sha": "7304a5c87107fdefafe2b9ccc86dab810e09cb21",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/app.php",
+      "sha256": "eda9fecb2f65ec4e61e01d8baa6fbce9c8aa564ebf6835d79ead2a3ed49220d3",
+      "git_blob_sha": "57df712a43d644942c956ccf47c5decc6410e5d8",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/cache.php",
+      "sha256": "e71933aceb1165a6cdab6c0c8c8a4aa14ab17308f598199c54655fe9773e6404",
+      "git_blob_sha": "0a946c0e79f57195bd7855cc23ccf18633f57c29",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/database.php",
+      "sha256": "f68cd337fda456c15db359c271f0d48d12ff2d54d4524d5d9ed8776cce2bb0b2",
+      "git_blob_sha": "bbf8ee1cb8adfd7dbc0ac961e75d1964bc1dacb6",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/inertia.php",
+      "sha256": "c96484a0b44476835303ea6965a39e679dd475a992c13cf32605bcd7b8540719",
+      "git_blob_sha": "39281247d2ffb96d96a37e8908d89c5be0e2e585",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/logging.php",
+      "sha256": "c154451dae662c1b268bd2820c29be58686319013c5f37590937a6a1d8ac2d74",
+      "git_blob_sha": "fa0c54ce7363475e81852a3ceed69f4bb5f7bacc",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/session.php",
+      "sha256": "65a22de5882cf376b1aa48336bdd6cee540f1de56ecd9f04c8dc6d83256c5435",
+      "git_blob_sha": "060a7ceb6c86d1ac26b37a1c0026243739380e0a",
+      "verified": true
+    },
+    {
+      "path": "apps/console/config/view.php",
+      "sha256": "d218f409e17b4f64d6b58ba46c08127d62c3341b360baaff63102eadca96a13c",
+      "git_blob_sha": "183bee5fe3b7aa1039345bd6da0a9063f80ad47d",
+      "verified": true
+    },
+    {
+      "path": "apps/console/package-lock.json",
+      "sha256": "5e626b04d3aeb7d54eb645806130b98c7a60d12b81a744cf886869cbd3b3cc8f",
+      "git_blob_sha": "495fe70f6f432da6c21899c14cf4fecd13c454c8",
+      "verified": true
+    },
+    {
+      "path": "apps/console/package.json",
+      "sha256": "60a8fe17aa38ad6c8d2200926f68880413631c1108beebb3f6e3ff0499f2a5c2",
+      "git_blob_sha": "5560815faba9828c97b9d8ddd3de05d969e3cb07",
+      "verified": true
+    },
+    {
+      "path": "apps/console/public/index.php",
+      "sha256": "59caa93d7583ba8fbb335d7bf0c31f3c382a7cda6c6c6915fd844af840c09c13",
+      "git_blob_sha": "1c3f915a2c355b63f4cb4386ba5b375841b01b4f",
+      "verified": true
+    },
+    {
+      "path": "apps/console/resources/css/app.css",
+      "sha256": "ed04d8ad7236e95057729066d34d1f1fc353f7bcc6abee710bf0bfc21a0c0d37",
+      "git_blob_sha": "7acd6225383a91b2c60c02843070020d18ce90de",
+      "verified": true
+    },
+    {
+      "path": "apps/console/resources/js/app/bootstrap.ts",
+      "sha256": "d4d4409130075d42205090026d0c6f9f8934dc8b8d63af3d0e32693c4f79e7a1",
+      "git_blob_sha": "1b9af643264bb9d4c653d0ffd9ad7d6b98291936",
+      "verified": true
+    },
+    {
+      "path": "apps/console/resources/js/app.ts",
+      "sha256": "e8e3b4209dd38ab67f3bd6081b8b1fd5b95a36b34eb857983f2ce9312916cebb",
+      "git_blob_sha": "ef0a8f3333aed3a16660829e27602d5c4309207c",
+      "verified": true
+    },
+    {
+      "path": "apps/console/resources/js/pages/Foundation.vue",
+      "sha256": "9bed89a9d4c1a11ec8423b44f47a4cd26ef0b02d5ee01e0413625265e1bfadb8",
+      "git_blob_sha": "0c1fcfe6a974e888c2aaf12c1eadff6ee877b6dd",
+      "verified": true
+    },
+    {
+      "path": "apps/console/resources/views/app.blade.php",
+      "sha256": "135f549bdd66ce6712e9d9b7d75f9895948ab2f37222f2e068919716488ee41c",
+      "git_blob_sha": "f97efc288a9f2cedb9a25ff1cb25d61dbd14ce62",
+      "verified": true
+    },
+    {
+      "path": "apps/console/routes/health.php",
+      "sha256": "6f4b0bc4404bb8571c941a7d630bea20f699726dbf5c0b7eb86c5b459fd5a472",
+      "git_blob_sha": "59708b209c8b19e71304d046894a90d85a6de600",
+      "verified": true
+    },
+    {
+      "path": "apps/console/routes/web.php",
+      "sha256": "83320a6f93fbbdef2eebf02848c525fd94477fde4a086f9e6744b77fbbdb98a8",
+      "git_blob_sha": "b5da218acdfb23df623a320b7305921336ad4b7f",
+      "verified": true
+    },
+    {
+      "path": "apps/console/tsconfig.json",
+      "sha256": "ec89dd260831ea387a56e0fa0184dbe0ae15acc036583eed495899a80d89be53",
+      "git_blob_sha": "0f6ffc0cc232e2ab615d17de8bab183c745e29f2",
+      "verified": true
+    },
+    {
+      "path": "apps/console/vite.config.ts",
+      "sha256": "df9065a949f3905c2e92c5671b0d9d592594546278114aaaf0d42e0e4b6a7318",
+      "git_blob_sha": "1218960820b117ba5f43d7843f68834f3f22eb74",
+      "verified": true
+    },
+    {
+      "path": "deploy/build/components.json",
+      "sha256": "e63325cad71e2c7814c0a9bb307d140748a78c9a1acd96058edcf3da9515e176",
+      "git_blob_sha": "4a3fa98e271c3dd672b08b4fe87366844aaf36e2",
+      "verified": true
+    },
+    {
+      "path": "deploy/build/inputs.lock.json",
+      "sha256": "2423a82d62c4f556f93ce675fad865e8b96c987bc1edd2955895b99bd813dc4c",
+      "git_blob_sha": "71e76d8bb189414572a6f18a96ce51a84d1b88bc",
+      "verified": true
+    },
+    {
+      "path": "scripts/p01/candidates.json",
+      "sha256": "86f0eeff807db8e0f2acedb47f1d28018675d5b015c0f3061bd9539755b86086",
+      "git_blob_sha": "afa963d567cef41c678d47732bc692470855b48c",
+      "verified": true
+    },
+    {
+      "path": "scripts/p01/check_jobs.py",
+      "sha256": "ae10f92fedbc4a71214b97ce5481df876c4f6bb9e25d8c2ffbb1ca5b09338760",
+      "git_blob_sha": "67494c7fbee17097e2ee656b8fc4baff6034323c",
+      "verified": true
+    },
+    {
+      "path": "scripts/p01/php_image_probe.php",
+      "sha256": "f4ac97d5b8638258e6d595869d7324cc624d3c5958199e9f969d6f77badbaf74",
+      "git_blob_sha": "968e38f291368ef278d5de2a92e30653b1258ed0",
+      "verified": true
+    },
+    {
+      "path": "scripts/p01/run_images.py",
+      "sha256": "8cbd14470ea0f84d1f5403aa68820289d0b192515c660a37ca8a46215b04c4bf",
+      "git_blob_sha": "ed9a2ed1bf6d77854bbb7ab6e3036a518cdd3a98",
+      "verified": true
+    },
+    {
+      "path": "scripts/p01/select_components.py",
+      "sha256": "37575f2fb29659ae7d72d477c9b09f1d981571386ef20ccd0ce4d039b5cd79d7",
+      "git_blob_sha": "ad1a608ea86fd1c5dd66b16e1d4c75af8cb3ade8",
+      "verified": true
+    }
+  ],
+  "log_hashes_verified": 16,
+  "report_sha256": "f3f4e0a0e57c4f9a8afe0dd225dd6214e224e0927be7def14c2bf732f47633a0",
+  "retained_files": {
+    "01-source-revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "01-source-revision.stdout.log": "4a70c20f096640cc3027f4783782423d9d6dcaf902e42d5fe93dd22aa90de955",
+    "02-source-clean.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "02-source-clean.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "03-docker-version.stdout.log": "58d5180149fd3334dbb3ff73de521946336e4052a1b769cb475f72486c934b1b",
+    "04-buildx-version.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "04-buildx-version.stdout.log": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+    "05-build.stderr.log": "27483bd86cc2cc62d24c889d4867baf41f27893efb9883399ace5eb4b90709d5",
+    "05-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "06-image-inspect.stdout.log": "c0ee65acf7cbf875e6dfa190fd86702958938e682dd44ff572a32a3dc2713f6b",
+    "07-fpm-configuration.stderr.log": "79087f14884f3c6f0e2d69a9c6ed3fda7dccd381a105a2fe6d18856174bb06c7",
+    "07-fpm-configuration.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "08-kernel-and-runtime-isolation.stderr.log": "afbb8f18f976fb9f3f9761b0f643f43c54afa549211aa0449b2bcb987d2cbc97",
+    "08-kernel-and-runtime-isolation.stdout.log": "a215c32a7074a7812564265b331a70fdedc7c443a8ff3e4b7da01f39d39c17ff",
+    "report.json": "f3f4e0a0e57c4f9a8afe0dd225dd6214e224e0927be7def14c2bf732f47633a0"
+  }
+}
