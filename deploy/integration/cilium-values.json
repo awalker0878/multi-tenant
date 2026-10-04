@@ -1,0 +1,7 @@
+{
+  "ipam": {"mode": "kubernetes"},
+  "kubeProxyReplacement": false,
+  "operator": {"replicas": 1},
+  "hubble": {"enabled": false},
+  "envoy": {"enabled": false}
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "scope": "Synthetic isolated kind integration; installation and policy enforcement remain unmeasured until the Kubernetes campaign",
+  "platform": "linux/amd64",
+  "kind": {
+    "version": "v0.33.0",
+    "binary": "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-linux-amd64",
+    "sha256": "aee6151561422756b764a4ae28e7f44cda5af5a9eead3cc9985112b1de8d8e0d",
+    "source": "https://github.com/kubernetes-sigs/kind/releases/tag/v0.33.0",
+    "checksum_source": "https://api.github.com/repos/kubernetes-sigs/kind/releases/assets/531396433"
+  },
+  "helm": {
+    "version": "v3.22.0",
+    "binary": "https://get.helm.sh/helm-v3.22.0-linux-amd64.tar.gz",
+    "sha256": "1e4ab49e429626cf6c6958d914248b78c9730803c2751b87627e171dc800e7bb",
+    "source": "https://github.com/helm/helm/releases/tag/v3.22.0",
+    "checksum_source": "https://get.helm.sh/helm-v3.22.0-linux-amd64.tar.gz.sha256sum",
+    "archive_member": "linux-amd64/helm"
+  },
+  "node": {
+    "version": "v1.36.4",
+    "reference": "kindest/node:v1.36.4@sha256:099e049362a1526b2db71494e1947aae99bd16290d7c895f2b7ea312e3cbfaed",
+    "provenance": "Published node digest in the kind v0.33.0 release; registry resolution and installed inventory must still be recorded"
+  },
+  "cilium": {
+    "version": "1.20.2",
+    "chart": "oci://quay.io/cilium/charts/cilium",
+    "source": "https://docs.cilium.io/en/stable/installation/kind/",
+    "compatibility_source": "https://docs.cilium.io/en/stable/network/kubernetes/compatibility/",
+    "documented_kubernetes_minors": ["1.33", "1.34", "1.35", "1.36"],
+    "remaining": "Resolve chart artifact digest and all rendered images before installation; record installed CNI identities and measured denial behavior"
+  },
+  "verified_sources_at": "2026-10-04"
+}
