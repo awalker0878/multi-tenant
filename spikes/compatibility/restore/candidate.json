@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "scope": "Disposable Permit Desk database and attachment experiment; no native route qualification",
+  "image": "docker.io/library/postgres:18.6-bookworm",
+  "platform": "linux/amd64",
+  "expected_server_version_num": "180006",
+  "database_encoding": "UTF8",
+  "database_locale": "C",
+  "sources": [
+    "https://hub.docker.com/_/postgres",
+    "https://www.postgresql.org/docs/18/app-pgdump.html",
+    "https://www.postgresql.org/docs/18/app-pgrestore.html"
+  ]
+}
