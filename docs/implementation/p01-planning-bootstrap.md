@@ -23,7 +23,7 @@ Initial offline dependency resolution could not find setuptools in the local cac
 
 ## Execution and evidence
 
-The complete retained record is `services/planning/verification/bootstrap-20261004/report.json`, with SHA-256 `8d2901fadedfd4b2bf9a3090ae5c4d0a0c5621a7af2591924b66d00f95e16450`. It binds 11 exact service files by SHA-256, all command arguments and expected exit codes, separate stdout/stderr bytes and hashes, and the full wheel bytes in `wheel-envelope.json`. Source and evidence Git revisions are bound by the delivery register after publication; no future revision is presumed here.
+The complete retained record is `services/planning/verification/bootstrap-20261004/report.json`, with SHA-256 `8d2901fadedfd4b2bf9a3090ae5c4d0a0c5621a7af2591924b66d00f95e16450`. It binds 11 exact service files by SHA-256, all command arguments and expected exit codes, separate stdout/stderr bytes and hashes, and the full wheel bytes in `wheel-envelope.json`. The measured source is pinned at `7154ef41eb1766446e076d1436eb7a5c22fd193a`; the raw evidence is retained at `10cda19e8e5851a9cf006ce28a4e12196d795da8` and registered as EV-P01-001.
 
 The completed local execution contains 17 commands: 15 exit successfully, readiness returns the required exit 1, and the unsupported `--force` request returns the required exit 2. All expected outcomes passed.
 
@@ -40,8 +40,14 @@ The completed local execution contains 17 commands: 15 exit successfully, readin
 
 The [service README](../../services/planning/README.md) supplies normal installation, quality and build commands. The recorded command list supplies the isolated execution details and its temporary paths. Raw logs and the binary envelope are evidence; they are not runtime package inputs.
 
+## Hosted CI replay
+
+[Planning foundation run 37236731462](https://github.com/awalker0878/multi-tenant/actions/runs/37236731462) passed at source `7154ef41eb1766446e076d1436eb7a5c22fd193a`. The service-specific workflow selects Python 3.12.14 and uv 0.12.19, installs the owned lock, checks lint/format/types and the nine command tests, builds the wheel, installs it without runtime dependencies into a fresh environment and checks isolated imports, liveness, unavailable readiness and rejected override input. Every job step completed successfully. [Context policy run 37236731411](https://github.com/awalker0878/multi-tenant/actions/runs/37236731411) also passed at the same source.
+
+The workflow retains a development wheel for 14 days; it is not a signed or approved release artifact. The permanent local evidence above retains its own complete wheel and measured hashes. No byte-identical wheel claim is made across the two environments. Actual required-check and review enforcement, image/signature/SBOM controls and the other deployables remain P01 work.
+
 ## Completion boundary and next increment
 
-This is E1 local package/build evidence for part of P01.01. It does not pass G01.01 or G01: no container build, persistent server, HTTP readiness, running service dependency, CI execution for this package, production publication, worker package or other application boundary has been demonstrated. There are no product assessments, plan compilation, tenant/actor authorization, persistence, messaging or native integration. The static checks cover only this small implemented source; no architecture suite can yet claim exercised domain/application dependencies that do not exist.
+This is E1 local package/build evidence for part of P01.01. It does not pass G01.01 or G01: no container build, persistent server, HTTP readiness, running service dependency, production publication, worker package or other application boundary has been demonstrated. There are no product assessments, plan compilation, tenant/actor authorization, persistence, messaging or native integration. The static checks cover only this small implemented source; no architecture suite can yet claim exercised domain/application dependencies that do not exist.
 
 The next P01.01 increment should add an independently buildable Laravel boundary from the accepted convention and measured runtime inputs, then wire complete service-owned architecture checks and actual per-service image/CI evidence as the scaffold coverage grows. P01.02/P01.05 own running integration topology and dependency readiness. Preserve the explicit unavailable readiness response until those dependencies and their failure behavior exist.

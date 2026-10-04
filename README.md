@@ -2,7 +2,7 @@
 
 An enterprise application for planning and operating multi-tenant hosting across **VMware, Nutanix and OpenStack**. It brings application requirements, infrastructure discovery, placement assessment, approvals, provisioning, migration and recovery into one governed operator experience.
 
-**Current state:** the accountable reviewer has [approved G00 advancement](docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md), and P01 delivery/runtime foundation work is underway toward G01. P00 retains measured Laravel/browser, Python, image, contract and PostgreSQL/attachment recovery evidence. Complete application-fixture coverage is carried into P01. Product journeys and native platform qualifications remain unimplemented/unrun; the capabilities below describe the intended product.
+**Current state:** the accountable reviewer has [approved G00 advancement](docs/qualification/gate-reviews/g00-user-decision-2026-10-04.md), and P01 delivery/runtime foundation work is underway toward G01. The [first Planning package](docs/implementation/p01-planning-bootstrap.md) has passing build, isolated-install and CI checks. P00 retains measured Laravel/browser, Python, image, contract and PostgreSQL/attachment recovery evidence. Complete application-fixture coverage is carried into P01. Product journeys and native platform qualifications remain unimplemented/unrun; the capabilities below describe the intended product.
 
 ## What the application does
 

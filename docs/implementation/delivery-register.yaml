@@ -58,10 +58,11 @@ phases:
   gate_id: G01
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-001
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -499,10 +500,11 @@ work_packages:
   owner_role: Engineering
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-001
   blocker_ids: []
   dependency_package_ids: []
   dependency_note: Candidate design inputs may be reviewed in parallel; entry decision/gate conditions
@@ -520,6 +522,7 @@ work_packages:
   - docs/engineering/code-control.md
   - architecture/context-map.yaml
   - docs/decisions/adr-024-pragmatic-laravel-domain-convention.md
+  - docs/implementation/p01-planning-bootstrap.md
 - id: P01.02
   phase_id: P01
   title: Local and integration runtime
@@ -1644,6 +1647,7 @@ requirements:
   - EV-P00-009
   - EV-P00-010
   - EV-P00-011
+  - EV-P01-001
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -1677,10 +1681,11 @@ requirements:
   - G10
   status:
     work: IN_PROGRESS
-    verification: NOT_RUN
+    verification: IN_PROGRESS
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-001
   blocker_ids: []
 - id: R03
   package_ids:
@@ -2811,7 +2816,8 @@ gates:
   decision: NOT_REVIEWED
   reviewer: null
   reviewed_at: null
-  evidence_ids: []
+  evidence_ids:
+  - EV-P01-001
   blocker_ids:
   - BL-P00-001
   - BL-P00-002
@@ -3254,6 +3260,33 @@ evidence:
     all P00 task axes, supply missing installed facts or staffing, accept receiving-service obligations,
     qualify native outcomes or authorize unspecified native effects. Remaining full application/configuration
     and candidate topology checks are assigned to P01.02/P01.06 before G01.
+  valid_until: null
+  invalidated_at: null
+- id: EV-P01-001
+  level: E1
+  artifact_uri: https://github.com/awalker0878/multi-tenant/blob/10cda19e8e5851a9cf006ce28a4e12196d795da8/services/planning/verification/bootstrap-20261004/report.json
+  sha256: 8d2901fadedfd4b2bf9a3090ae5c4d0a0c5621a7af2591924b66d00f95e16450
+  source_revision: 7154ef41eb1766446e076d1436eb7a5c22fd193a
+  artifact_revisions:
+    retained_artifact_commit: 10cda19e8e5851a9cf006ce28a4e12196d795da8
+    services/planning/uv.lock: 4f71d32df8231b93f948d143dc5572e0eb9dc104c295d40375d3baca6bbeddbf
+    wheel_sha256: a610e1854370ce606c552d96988fadb9705eca34740a43e86235fff60fb7a527
+  environment: Local Linux/Python 3.12.14 and uv 0.12.19; isolated service copy; fresh locked offline
+    development install; empty runtime with offline no-dependency wheel install
+  scope: 'Partial P01.01 Planning package only: 17 expected command outcomes, nine installed CLI tests,
+    Ruff lint/format and strict typing, built wheel and isolated runtime after removal of source/development
+    environment. Eleven source bindings, 34 raw log hashes and complete wheel bytes independently checked.'
+  campaign_ids: []
+  criterion_ids:
+  - G01.01
+  observed_at: '2026-10-04T21:32:08.469699+00:00'
+  observer: Codex — implementation and execution
+  reviewer: Codex — engineering verification of retained source, logs and wheel
+  limitations: One bootstrap package only; process liveness is not dependency readiness, which exits unavailable.
+    No product domain, persistent HTTP server, authorization, data/messaging integration, container image,
+    other principal deployable, worker, native outcome or operating acceptance. Local cached replay does
+    not qualify an operated mirror. This evidence cannot pass G01.01 or G01; hosted CI is recorded separately
+    in the bootstrap report.
   valid_until: null
   invalidated_at: null
 blockers:

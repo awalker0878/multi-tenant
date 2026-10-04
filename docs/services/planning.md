@@ -1,6 +1,8 @@
 # Planning service
 
-Status: proposed service specification. Runtime: Python; destination: `services/planning/`. Owner: infrastructure engineering with architecture/security and platform profile owners.
+Status: the initial independently packaged [bootstrap](../../services/planning/README.md) is implemented; the assessment, profile and plan behavior specified below is not yet implemented. Runtime: Python; source: `services/planning/`. Owner: infrastructure engineering with architecture/security and platform profile owners.
+
+The [P01 execution report](../implementation/p01-planning-bootstrap.md) records the owned lock, installed process-liveness diagnostic, explicitly unavailable dependency readiness, isolated wheel checks and hosted CI. This short-lived command is not a running Planning API or proof of application readiness.
 
 ## Purpose and responsibility boundary
 

@@ -54,7 +54,7 @@ This documentation describes a proposed enterprise product and its delivery prog
 
 Use the linked phase, decision, qualification, operations and release indexes to navigate the working documents. The [guide](documentation-guide.md) defines ownership and update rules. Executable schemas, test results and release-specific evidence are added through their implementation work packages.
 
-## P00 work in progress
+## Approved baseline and P01 implementation
 
 The [baseline review](implementation/p00-baseline-review.md) links current scope/domain analysis, historical-source dispositions, compatibility results and route/operating-measure reviews. It separates completed analytical or experimental work from decisions, installed facts and qualification still required. The [delivery register](implementation/delivery-register.yaml) and generated views remain the status authority.
 
@@ -65,3 +65,5 @@ The [image/BOM report](implementation/p00-image-results.md) and [contract-tool r
 
 
 The [P00 engineering selections](implementation/p00-engineering-selections.md) now resolve development choices. [Real database/attachment restore](implementation/p00-restore-fixture-results.md) supplies bounded recovery observations. The [RT/IP input record](qualification/feasibility/input-record.md) makes supplied/missing information checkable, and the [G00 engineering assessment](qualification/gate-reviews/g00-engineering-assessment-2026-10-04.md) records criterion findings without inventing accountable acceptance or native outcomes.
+
+The [accountable G00 decision](qualification/gate-reviews/g00-user-decision-2026-10-04.md) accepts advancement to P01/G01, with the remaining application/configuration and topology feasibility assigned to the foundation work. The [Planning bootstrap report](implementation/p01-planning-bootstrap.md) records the first independently owned package, actual build/install checks and hosted CI. Follow [next work](../next_work.md) for the next implementation increment.

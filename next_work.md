@@ -4,7 +4,7 @@ Active branch: `greenfield/enterprise-microservices-plan`. The requesting user a
 
 ## Current handoff
 
-Start with the [P01 work packages](docs/implementation/phases/p01.md), [approved development selections](docs/implementation/p00-engineering-selections.md), [decision register](docs/decisions/decision-register.md) and [G01 review](docs/qualification/gate-reviews/g01.md). The first implementation increment creates the Planning service's independently owned Python package and bootstrap. Complete the remaining deployables from the measured P00 inputs, with no dependency on disposable spike code or historical runtime code.
+Start with the [P01 work packages](docs/implementation/phases/p01.md), [approved development selections](docs/implementation/p00-engineering-selections.md), [decision register](docs/decisions/decision-register.md) and [G01 review](docs/qualification/gate-reviews/g01.md). The [first Planning package](docs/implementation/p01-planning-bootstrap.md) now has an owned lock, installed bootstrap command, nine passing tests, isolated wheel evidence and passing hosted CI. Its readiness deliberately remains unavailable. Next, build the first Laravel service boundary using the accepted convention and runtime inputs, then extend coverage to the remaining applications and selected workers. No product build may depend on disposable spike code or historical runtime code.
 
 | Work | Next concrete action | Evidence needed before G01 |
 | --- | --- | --- |

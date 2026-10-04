@@ -11,7 +11,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 | Phase | Outcome | Work | Verification | Native qualification | Operating acceptance | Gate | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | P00 | Product and architecture baseline | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G00: PASSED | 11 / 2 |
-| P01 | Delivery and runtime foundation | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 0 / 2 |
+| P01 | Delivery and runtime foundation | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 1 / 2 |
 | P02 | Identity, tenancy and governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
 | P04 | Site commissioning and inventory | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G04: NOT_REVIEWED | 0 / 0 |
@@ -35,7 +35,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 | P00.04 | Qualification design | Quality/platform owners | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 4 / 1 |
 | P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 2 / 1 |
 | P00.06 | Delivery decomposition | Leads | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 3 / 1 |
-| P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P01.01 | Repository scaffolding | Engineering | IN_PROGRESS | IN_PROGRESS | NOT_STARTED | NOT_STARTED | 1 / 0 |
 | P01.02 | Local and integration runtime | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 2 |
 | P01.03 | Contracts and messaging | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.04 | CI and supply chain | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 1 |
@@ -99,7 +99,7 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 ## Registered evidence and blockers
 
-Evidence records: **11**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
+Evidence records: **12**. Blocker records: **2**. Planning inputs awaiting selection are described in the phase cards; an empty blocker register does not mean those inputs are already available.
 
 | ID | Level | Environment | Revision | Limitations |
 | --- | --- | --- | --- | --- |
@@ -114,6 +114,7 @@ Evidence records: **11**. Blocker records: **2**. Planning inputs awaiting selec
 | EV-P00-009 | E1 | Local Linux x86-64; Python 3.12.14; standard library; no network or native API | bc42d17a31aca91ea8736dee3a73f1124bb59eed | Validates declared input structure and completeness only. Does not authenticate observers/reviewers, retrieve or verify evidence content, establish installed facts, check current native permission, authorize an action or pass G00. Synthetic test identities remain only in tests. Full route completeness is not a prerequisite for unrelated isolated engineering. Fixed-input observation has no time expiry; changed record or validator requires revalidation. |
 | EV-P00-010 | E0 | Repository engineering examination by Codex on 2026-10-04; initial baseline eb78e463e66d154e58fcfce7e65fad1eaab38914 plus explicitly identified restore/input source revisions | eb78e463e66d154e58fcfce7e65fad1eaab38914 | Reviewed design/evidence assessment only; no named organizational owner approval, accepted service target, installed tuple, staffing commitment, native qualification or operational acceptance. Earlier seven artifacts retain their original source/environment limits. Later decisions require attributable reviewer/evidence records; this examination starts IN_REVIEW and does not pass G00. No fixed historical expiry; material changes require scoped re-examination. |
 | EV-P00-011 | E0 | Accountable reviewer decision in the current user conversation, recorded in the repository | 994d4e9819df941c7e30e8bd52ba329a8edbbd7c | E0 baseline and advancement decision only. Does not make unperformed tests pass, complete all P00 task axes, supply missing installed facts or staffing, accept receiving-service obligations, qualify native outcomes or authorize unspecified native effects. Remaining full application/configuration and candidate topology checks are assigned to P01.02/P01.06 before G01. |
+| EV-P01-001 | E1 | Local Linux/Python 3.12.14 and uv 0.12.19; isolated service copy; fresh locked offline development install; empty runtime with offline no-dependency wheel install | 7154ef41eb1766446e076d1436eb7a5c22fd193a | One bootstrap package only; process liveness is not dependency readiness, which exits unavailable. No product domain, persistent HTTP server, authorization, data/messaging integration, container image, other principal deployable, worker, native outcome or operating acceptance. Local cached replay does not qualify an operated mirror. This evidence cannot pass G01.01 or G01; hosted CI is recorded separately in the bootstrap report. |
 | ID | Scope | Owner | State | Unblock condition | Next action |
 | --- | --- | --- | --- | --- | --- |
 | BL-P00-001 | P00, P00.01, P00.02, P00.03, P00.05, P00.06, R01, R06, R32, R34, R36, P01, P01.02, P01.04, P01.05, P01.06, G01 | Requesting user for baseline decisions; actual integration, operating and records owners at their affected checkpoints | OPEN | Supply the concrete runtime, registry/signer, trust, operating or records input before the dependent integration, acceptance or disposition. Preserve the G00 user decision and its carry-forward checkpoints; do not request baseline approval again. | Implement P01 from the approved DC01–DC10 baseline. Resolve required integration inputs during P01.02/P01.04/P01.05/P01.06, retain application targets before P08 and records/service acceptance at P10/P11, and record actual staffing dates only when supplied. |
