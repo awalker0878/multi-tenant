@@ -2,6 +2,8 @@
 
 [p00-input-record.json](p00-input-record.json) turns the existing RT01–RT10 and IP01–IP07 handoff into individual fields. [p00-input-schema.json](p00-input-schema.json) defines their structure. The [route review](../../implementation/p00-route-and-operations-review.md) and [decision and input review](../../implementation/p00-decision-and-input-review.md) remain the source of the requirements; this record introduces no new gate or approval. It records the proposed VMware → OpenStack rebuild/restore direction and explicitly unknown installed facts, accountable decisions, fixture acceptance and lab authority. It does not contain native endpoints, credentials or accepted owner identities.
 
+The requesting user has since identified themselves as the [accountable G00 reviewer](../gate-reviews/g00.md#current-reviewer) on 2026-10-04. That assignment is recorded in the current gate review and delivery register. The aggregate IP01 reviewer/decision inputs remain incomplete for their full subject-owner and accepted-scope coverage; their unresolved status does not mean the G00 reviewer's identity is still being requested.
+
 Run from the repository root:
 
 ```sh

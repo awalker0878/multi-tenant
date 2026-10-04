@@ -2777,7 +2777,7 @@ gates:
 - id: G00
   phase_id: P00
   decision: IN_REVIEW
-  reviewer: "Codex — engineering examination only; accountable criterion acceptance pending"
+  reviewer: "Requesting user — accountable G00 reviewer, self-designated 2026-10-04; review decision pending. Codex — engineering examiner only."
   reviewed_at: '2026-10-04T21:03:32.386379+00:00'
   evidence_ids:
   - EV-P00-001
@@ -3229,14 +3229,16 @@ blockers:
   - R34
   - R36
   - G00
-  owner_role: Product/architecture/SRE/security and records owners; named assignments not
-    supplied
+  owner_role: Requesting user — accountable G00 reviewer; remaining product/architecture/SRE/security
+    and records owner assignments not supplied
   description: Development choices DC01–DC10 are selected at their reversible engineering
-    scope, but no actual accountable owner roster, receiving-operator dispositions or retained-state
-    inventory has been supplied. Missing decisions block their affected acceptance, not independent
-    engineering.
-  unblock_condition: Record named accountable reviewers and accept or revise the scope/domain/runtime/operating
-    recommendations, retained-state disposition and assigned later checkpoints.
+    scope. The requesting user is the accountable G00 reviewer, self-designated on 2026-10-04;
+    the remaining subject-owner roster, receiving-operator dispositions and retained-state
+    inventory have not been supplied. Missing decisions block their affected acceptance,
+    not independent engineering.
+  unblock_condition: Record remaining subject-owner assignments and the G00 reviewer's acceptance
+    or revision of the scope/domain/runtime/operating recommendations, retained-state disposition
+    and assigned later checkpoints.
   next_action: Review docs/implementation/p00-engineering-selections.md and the criterion-level
     G00 assessment; record attributable scope/domain/operating/retention decisions and actual
     owner/capacity inputs in the existing RT/IP record. One decision record may cover multiple
