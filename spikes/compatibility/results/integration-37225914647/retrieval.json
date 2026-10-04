@@ -1,0 +1,14 @@
+{
+  "run_id": 37225914647,
+  "artifact_id": 11311518449,
+  "archive_sha256": "8185e087c7f609b897b90b6d1a293d1679c7940d41e766c924e705db971afc3f",
+  "retrieved_at": "2026-10-04T18:52:02.032340+00:00",
+  "source_sha": "4b8a538ad7d605a5a4f3d0cc3a9e05641eaa9267",
+  "result": "FAIL",
+  "retained_lock_path": "spikes/compatibility/php/composer.lock",
+  "lock_sha256": "2f4291ae8d40bf77cb83e5c558cf3eab22405214402f979051e6881d5f996d4f",
+  "omitted_duplicate_artifact_files": [
+    "composer.json",
+    "composer.lock"
+  ]
+}

@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Providers\AppServiceProvider;
+use Inertia\ServiceProvider;
+
 return [
-    Inertia\ServiceProvider::class,
-    App\Providers\AppServiceProvider::class,
+    ServiceProvider::class,
+    AppServiceProvider::class,
 ];

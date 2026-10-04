@@ -95,6 +95,14 @@ def main() -> int:
         if entry["exit_code"]:
             raise RuntimeError(f"{label} failed with exit {entry['exit_code']}")
 
+    failures: list[str] = []
+
+    def check(label: str, argv: list[str], cwd: Path = php, timeout: int = 300) -> None:
+        try:
+            run(label, argv, cwd, timeout)
+        except RuntimeError as error:
+            failures.append(str(error))
+
     lock = php / "composer.lock"
     flags = ["--no-interaction", "--prefer-dist", "--no-scripts", "--no-progress"]
     package_snapshot = ('require "vendor/autoload.php"; $packages=[]; '
@@ -130,12 +138,12 @@ def main() -> int:
             raise RuntimeError("Clean install changed installed versions or references")
         state["packages"] = second
         run("smoke-clean", ["php", "smoke.php"], timeout=60)
-        run("pint", ["php", "vendor/bin/pint", "--test"])
-        run("larastan", ["php", "vendor/bin/phpstan", "analyse", "--no-progress", "--memory-limit=1G"])
-        run("deptrac", ["php", "vendor/bin/deptrac", "analyse", "--no-cache", "--fail-on-uncovered"])
-        run("pest", ["php", "vendor/bin/pest", "--colors=never"])
-        run("quality-canaries", ["python3", "tools/verify_quality_canaries.py"])
-        run("composer-audit", ["composer", "audit", "--locked", "--no-interaction"])
+        check("pint", ["php", "vendor/bin/pint", "--test"])
+        check("larastan", ["php", "vendor/bin/phpstan", "analyse", "--no-progress", "--memory-limit=1G"])
+        check("deptrac", ["php", "vendor/bin/deptrac", "analyse", "--no-cache", "--fail-on-uncovered"])
+        check("pest", ["php", "vendor/bin/pest", "--colors=never"])
+        check("quality-canaries", ["python3", "tools/verify_quality_canaries.py"])
+        check("composer-audit", ["composer", "audit", "--locked", "--no-interaction"])
         run("node-runtime", ["node", "--version"], frontend, 30)
         run("npm-runtime", ["npm", "--version"], frontend, 30)
         run("npm-clean-install", ["npm", "ci", "--ignore-scripts", "--no-audit", "--no-fund"], frontend)
@@ -164,10 +172,13 @@ def main() -> int:
         browser_report = json.loads((evidence / "browser.json").read_text())
         if browser_report["stats"]["expected"] < 1 or any(browser_report["stats"][key] for key in ["unexpected", "flaky", "skipped"]):
             raise RuntimeError("Browser report contains no executed test, a failure, a retry or a skip")
+        if failures:
+            raise RuntimeError("; ".join(failures))
         state["result"] = "PASS"
     except Exception as error:
         state["result"] = "FAIL"
         state["failure"] = str(error)
+        state["quality_failures"] = failures
     finally:
         if server is not None:
             try:

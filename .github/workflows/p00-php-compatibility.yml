@@ -56,8 +56,8 @@ jobs:
         env:
           COMPOSER_HOME: ${{ runner.temp }}/p00-composer-home
           COMPOSER_CACHE_DIR: ${{ runner.temp }}/p00-composer-cache
-          # Initial quality-tool experiment; switch push default to install with its measured lock.
-          P00_DEPENDENCY_MODE: ${{ inputs.dependency_mode || 'resolve' }}
+          # Dependency updates require an explicit dispatch; pushes replay the measured lock.
+          P00_DEPENDENCY_MODE: ${{ inputs.dependency_mode || 'install' }}
         run: >-
           python3 spikes/compatibility/run-integration.py
           --workspace "$GITHUB_WORKSPACE"

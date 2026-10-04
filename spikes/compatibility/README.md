@@ -43,7 +43,7 @@ Use an isolated environment without production credentials. The Python probe sen
 
 ## Laravel HTTP and browser experiment
 
-The [integration report](../../docs/implementation/p00-integration-results.md) describes the newly implemented checks and their current execution status. The first remote run explicitly resolves the new PHP quality-tool dependencies, then deletes `vendor` and reinstalls that same lock. Until the measured lock is committed, the previous lock represents the earlier dependency-only experiment.
+The [integration report](../../docs/implementation/p00-integration-results.md) describes the newly implemented checks and their current execution status. The first remote run explicitly resolved the new PHP quality-tool dependencies, then deletes `vendor` and reinstalls that same lock. The measured quality-tool lock is now committed. The first run passed dependency replay but failed two style checks; see the report for follow-up status.
 
 The committed workflow runs the orchestrator outside the checkout with PHP 8.5.11, Composer 2.10.3 and Node 24.19.0. Reproduce a measured lock with:
 
