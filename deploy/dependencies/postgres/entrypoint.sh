@@ -47,6 +47,13 @@ export POSTGRES_HOST_AUTH_METHOD=scram-sha-256
 export PGDATA=/var/lib/postgresql/18/docker
 unset POSTGRES_PASSWORD POSTGRES_USER_FILE POSTGRES_DB_FILE POSTGRES_INITDB_ARGS_FILE
 
+# With umask 077, mkdir -p in the official entrypoint leaves the intermediate
+# version directory root-owned and untraversable after it switches to postgres.
+# Prepare the volume root and both levels explicitly; do not recursively change
+# existing database data, including a volume initially created with root ownership.
+install -d -m 0750 -o postgres -g postgres /var/lib/postgresql /var/lib/postgresql/18
+install -d -m 0700 -o postgres -g postgres "$PGDATA"
+
 exec /usr/local/bin/docker-entrypoint.sh postgres \
     -c listen_addresses='*' \
     -c password_encryption=scram-sha-256 \
