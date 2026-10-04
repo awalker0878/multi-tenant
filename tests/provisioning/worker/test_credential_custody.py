@@ -147,6 +147,27 @@ class CredentialCustodyPostgresTests(unittest.TestCase):
         self.assertEqual(self.rows('native_credential_leases'),[])
         self.assertFalse(hasattr(self.store,'clear_expired'))
 
+    def test_actual_runtime_requires_original_worker_and_every_certificate_revocation(self):
+        def excluded(context=None):
+            with self.psycopg.connect(self.runtime_dsn) as connection,connection.cursor() as cursor:
+                from provisioner.controlplane.jobs.repository import _tenant
+                _tenant(cursor,context or self.context)
+                self.store._worker_excluded(cursor,context or self.context,self.identity.subject)
+        with self.assertRaisesRegex(ValueError,'enrollment must be explicitly revoked'):excluded()
+        with self.psycopg.connect(self.enrollment_dsn) as connection:
+            self._tenant(connection)
+            connection.execute('UPDATE hosting_controlplane.worker_enrollments SET revoked_at=clock_timestamp() '
+                'WHERE organization_id=%s AND tenant_id=%s AND worker_subject=%s',
+                (self.context.organization_id,self.context.tenant_id,self.identity.subject))
+        with self.assertRaisesRegex(ValueError,'certificate version must be explicitly revoked'):excluded()
+        with self.psycopg.connect(self.enrollment_dsn) as connection:
+            self._tenant(connection)
+            connection.execute('UPDATE hosting_controlplane.worker_certificate_versions SET revoked_at=clock_timestamp() '
+                'WHERE organization_id=%s AND tenant_id=%s AND worker_subject=%s',
+                (self.context.organization_id,self.context.tenant_id,self.identity.subject))
+        excluded()
+        with self.assertRaisesRegex(ValueError,'enrollment must be explicitly revoked'):excluded(self.foreign)
+
     def test_foreign_or_changed_grant_cannot_create_custody_or_contact_vault(self):
         with self.assertRaises(Exception):
             self.store.begin(replace(self.grant,plan_digest='f'*64),self.role)

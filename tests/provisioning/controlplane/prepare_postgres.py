@@ -86,7 +86,8 @@ def main() -> int:
             'GRANT EXECUTE ON FUNCTION '
             'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
             'GRANT SELECT ON hosting_controlplane.worker_enrollments, '
-            'hosting_controlplane.worker_capabilities TO {}',
+            'hosting_controlplane.worker_capabilities, '
+            'hosting_controlplane.worker_certificate_versions TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.worker_grants TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.native_credential_attempts, '
             'hosting_controlplane.native_credential_wrappings, '

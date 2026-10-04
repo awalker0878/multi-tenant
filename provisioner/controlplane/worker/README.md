@@ -125,6 +125,9 @@ for B11 intent checks and `lock_native_credential_grant(text,text,text)`
 on the native credential custody tables without `UPDATE` or `DELETE` on those
 tables or `worker_grants`. The scoped function requires authenticated tenant
 settings and `READ COMMITTED`; the site listener receives no custody-lock grant.
+Recovery also requires tenant-scoped `SELECT` on `worker_enrollments`,
+`worker_capabilities` and `worker_certificate_versions` to observe the original
+irreversible enrollment/certificate revocations; it receives no enrollment UPDATE.
 It must remain a separate login. Configure all required
 variables before starting the site service:
 
