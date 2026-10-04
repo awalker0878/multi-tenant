@@ -67,3 +67,11 @@ Measure queue age, admission denials, unknown outcomes, held resources, fencing 
 P05.03/P05.06 establish contracts; P06.01–P06.03 admission/workflows/authority; P06.05 faults; P07 native provisioning; P08 migration/recovery; P09 expansion. Requirements R14–R18/R21–R30/R35/R36; Q03–Q05/Q07–Q10.
 
 Test crash before/after acceptance, lost response, duplicate dispatch, old-worker resurrection, lease expiry, revoke during native call, partial reservation, cancel after point of no return, restore of stale ledger and target-first-write recovery. Completion requires independent native and application postconditions; a successful activity return alone is insufficient.
+
+## Context source ownership and code control
+
+Owned source root: `services/lifecycle/src/lifecycle/`. Admission, execution authority, operation journaling and recovery capabilities. Temporal workflows/activities and site execution adapters implement the reviewed lifecycle coordination boundary; deterministic domain decisions remain independently testable.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

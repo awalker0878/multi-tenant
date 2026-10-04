@@ -63,3 +63,11 @@ Deploy API and outbox publisher independently if required, sharing catalogue own
 P03.01/P03.02 implement aggregate invariants; P03.03 implements concurrency/atomicity; P03.04 delivers console create/edit/history; P03.05 verifies R04–R07 and R19 with Q01. P00.02/ADR-013 must resolve associations before schema lock; P01.03 supplies the contract framework.
 
 Acceptance cases: create a two-workload application across two domains; reject foreign-tenant or retired references; preserve unsupported requested capability; reject dependency-order cycles; allow valid reply-flow edges; reject stale edit; deduplicate lost-response retry; reject key/payload mismatch; prove rollback when outbox persistence fails; deny revoked/cross-tenant history access; regenerate comparison from immutable versions after restart. Integrated evidence requires the actual governance contract and independent PHP/Python schema consumption. None of these tests proves native platform support.
+
+## Context source ownership and code control
+
+Owned source root: `services/catalogue/src/Contexts/Catalogue/`. Application/deployment identity, workload/domain associations and immutable intent capabilities. Domain aggregates and revision rules map to separate Infrastructure persistence records.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

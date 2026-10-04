@@ -15,6 +15,8 @@ This documentation describes a proposed enterprise product and its delivery prog
 | Document | Question answered |
 | --- | --- |
 | [Target architecture](architecture/target-architecture.md) | Where do data, decisions and execution authority belong? |
+| [Context code structure](architecture/context-code-structure.md) and [context map](../architecture/context-map.yaml) | How do bounded contexts, capabilities, service hosts, layers and workers map to source code? |
+| [Code controls](engineering/code-control.md) | Which dependencies, changes, reviewers and CI checks govern that source structure? |
 | [Service specifications](services/README.md) | What does each deployable own and expose? |
 | [Contracts](contracts/README.md) and [examples](contracts/examples.md) | How do the PHP/Python services communicate? |
 | [Engineering standards](engineering/README.md) | How are Laravel services, tenant persistence, Inertia/Vue, tests and CI implemented consistently? |

@@ -67,3 +67,11 @@ Measure freshness, complete-generation age, pagination/permission gaps, endpoint
 P04.01 site enrollment; P04.02 collectors; P04.03 observation store; P04.04 budgets; P04.05 console experience. Later P09 adoption uses these facts but requires separate lifecycle ownership transfer. Requirements R04/R08–R11/R34; Q02 and Q03.
 
 Test partial page sets, hidden permissions, rate-limited endpoints, stale clocks, native ID reuse, tenant mapping errors, revoked/forged collector, late results, collector restart, outbox retry and incomplete-scan deletion. Independently observe that P04 collection makes no native changes and cannot receive write credentials.
+
+## Context source ownership and code control
+
+Owned source root: `services/inventory/src/inventory/`. Site/endpoint registration, observed resource identity, collection provenance and freshness capabilities. Platform collectors are Infrastructure adapters under inventory authority.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

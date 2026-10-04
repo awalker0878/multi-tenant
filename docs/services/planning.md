@@ -67,3 +67,11 @@ Measure task age, rule evaluation time, stale/unknown input rates, deterministic
 P05.01 profiles; P05.02 policy/assessment; P05.03 reservation design; P05.04 compilation; P05.05 review; P05.06 admission binding. Requirements R06–R08/R12–R14/R17/R19–R21/R32; campaigns Q03/Q06.
 
 Test equivalent pinned inputs across runtimes, stale/incomplete inventory, revoked qualification, unsupported required capabilities, hidden destination denial, domain/interface mapping, changed policy/profile digest, capacity race, cyclic action graph and post-target-write recovery omissions. A readable dry run does not prove the compiled actions are safe or executable.
+
+## Context source ownership and code control
+
+Owned source root: `services/planning/src/planning/`. Capability/profile interpretation, placement/assessment and immutable plan compilation capabilities. Provider-neutral rules stay separate from observation and contract clients.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

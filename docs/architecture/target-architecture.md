@@ -8,7 +8,7 @@ The source establishes Laravel/PHP business services, a Laravel/Inertia/Vue cons
 
 Implementation order, deliverables and acceptance gates are in [the phased implementation plan](../implementation/phased-plan.md).
 
-The [engineering standards](../engineering/README.md) define how these boundaries become Laravel/Python code and verified deployments. Laravel services keep ordinary framework structure with cohesive use cases, typed adapters and owned models; shared code is restricted to explicit contracts and technical utilities. The [coverage map](../engineering/coverage.md) ties these rules to package and gate evidence, including tenant context in long-lived workers and queues, safe Inertia data, database evolution and dependency-aware CI.
+The [context code structure](context-code-structure.md) defines explicit Domain, Application, Infrastructure and Interfaces boundaries inside each owning microservice. Laravel supplies the host and adapters; business contexts do not live in application-wide model/action folders. The [context map](../../architecture/context-map.yaml) records source and dependency ownership, while [code controls](../engineering/code-control.md) connect it to import analysis, review policy and CI. The [engineering coverage map](../engineering/coverage.md) ties those controls to implementation and gate evidence.
 
 ## 1. Architectural objectives and boundaries
 
@@ -44,6 +44,8 @@ flowchart TD
 Arrows show logical dependencies rather than a complete firewall policy. Event distribution, observability and identity are cross-cutting facilities. The production network flow register must identify endpoints, protocols, initiating direction, credentials and allowed scopes for every connection.
 
 ## 3. Bounded contexts and deployable services
+
+A bounded context owns business meaning and invariants; a capability module groups related behavior inside it; a microservice is an independently released application; a worker pool is an execution process with an owning context. The initial mapping has six business contexts plus the console composition boundary, packaged as seven principal applications. Keep those concepts distinct when splitting or combining deployables. The [detailed source model](context-code-structure.md) specifies their internal layers and public/private code boundaries.
 
 | Repository location | Proposed implementation | Authoritative responsibility |
 | --- | --- | --- |

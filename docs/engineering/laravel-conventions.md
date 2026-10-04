@@ -1,69 +1,99 @@
-# Laravel service and code conventions
+# Laravel context and code conventions
 
-Owner: Engineering and Laravel service leads. Applies to console, governance, catalogue and assurance. Reviewed: 2026-10-04. Related delivery: P00.02/P00.03, P01.01/P01.03/P01.04 and all later Laravel feature packages.
+Owner: Engineering and Laravel context leads. Applies to Governance, Catalogue, Assurance and the Console composition boundary. Reviewed: 2026-10-04. Related delivery: P00.02/P00.03, P01.01/P01.03/P01.04 and all later Laravel feature packages.
 
-Laravel supplies the application framework; the [target architecture](../architecture/target-architecture.md) defines which service owns each decision. These are project conventions for the planned implementation. They do not change the Laravel/Python split or the dispositions of ADR-003/004/005.
+Business code is organized by bounded context, dependency layer and capability. The [context code structure](../architecture/context-code-structure.md) is the canonical layout and allowed-dependency matrix; [code control](code-control.md) defines ownership and enforcement. Laravel supplies the framework host and adapters. A framework-wide `app/Models` or `app/Actions` grouping is no longer the business architecture for this project.
 
-## 1. Preserve ordinary Laravel applications
+This stricter separation follows the user's requested enterprise context model. It is a project rule, not a claim that Laravel requires domain-driven design. It preserves the seven principal deployables and the existing PHP/Python split.
 
-Each Laravel deployable has its own `composer.json`, committed lockfile, `artisan`, `bootstrap/`, `config/`, `routes/`, `app/`, `database/`, `tests/` and image definition. The console additionally owns its frontend manifest, lockfile and build configuration. Use conventional framework discovery and generators where practical. Laravel permits application-specific organization; a large repository does not require replacing the framework's structure with a custom kernel. See [directory structure](https://laravel.com/framework/docs/13.x/structure).
+## 1. Separate the framework host from context code
 
-| Location within a service | Responsibility | Keep out |
-| --- | --- | --- |
-| `app/Http/Controllers/`, `Requests/`, `Resources/` | HTTP adaptation, declared validation, authorization invocation and explicit serialization | Long workflows, native credentials, cross-service SQL |
-| `app/Actions/<Capability>/` | One named application use case, its transaction boundary and domain coordination | Transport response formatting and hidden external side effects |
-| `app/Queries/<Capability>/` | Bounded, tenant-scoped read composition | Mutation, authorization bypass and unbounded relationship expansion |
-| `app/Models/` | Owned persistence mapping, relationships, casts and local query scopes | Estate-wide workflows or models owned by another service |
-| `app/Domain/<Capability>/` | Reusable invariants, typed values and state transitions when complexity warrants separation | Framework request/session state and provider SDK calls |
-| `app/Policies/` | Resource/action decisions using authenticated scope | A global administrator shortcut around tenant or separation-of-duties checks |
-| `app/Integrations/<Dependency>/` | Typed contract clients and bounded transport/error mapping | Direct platform mutation outside lifecycle's authorized worker path |
-| `app/Jobs/`, `Listeners/`, `Console/` | Background, event and CLI entry adapters into the same use cases | A second implementation of business permissions or orchestration |
-| `app/Providers/` | Explicit binding and framework boot configuration | Database changes or remote calls during application bootstrap |
+Each Laravel deployable owns its `composer.json`, committed lockfile, `artisan`, `bootstrap/`, `config/`, `routes/`, `public/`, `database/`, `storage/`, `tests/` and image definition. Console additionally owns its frontend manifest, lockfile and build configuration. Conventional host paths remain available for deployment, configuration caching and framework lifecycle operations.
 
-Create these additional capability folders when the first relevant implementation needs them. Do not generate empty layers, a repository interface for every table, or a separate deployable for every capability. A simple read can use a scoped query directly; extract a query object when composition or reuse justifies it. A multi-entity revision or approval operation merits a named action with a visible transaction.
+| Source destination | Required content |
+| --- | --- |
+| `services/<service>/src/Contexts/<Context>/Domain/` | Framework-free aggregates, invariants, domain values/events |
+| `services/<service>/src/Contexts/<Context>/Application/` | Use cases, typed input/output, local transaction and dependency ports |
+| `services/<service>/src/Contexts/<Context>/Infrastructure/` | Eloquent records/mappers, repositories, queries, transport and storage implementations |
+| `services/<service>/src/Contexts/<Context>/Interfaces/` | HTTP, message, CLI and local-job adapters into the same use cases |
+| `app/Providers/` and narrowly defined host glue | Binding, route/policy/command registration and framework initialization |
+| `database/` | Context-owned migrations, development seeds and configured factories |
+| `tests/` | Context/layer tests plus local contract and runtime integration checks |
 
-## 2. Keep decisions in one place
+Use `Product\Contexts\Governance\`, `Product\Contexts\Catalogue\` and `Product\Contexts\Assurance\` mapped only inside their owning applications. Console uses `apps/console/src/Contexts/Console/` and `Product\Contexts\Console\`; it has no business-service entities. Its domain layer is optional when no genuine console-owned invariant requires one.
 
-Controllers translate input and output. Form Requests enforce the HTTP input shape and invoke the declared authorization policy; their successful validation is not authority to access every referenced object. Convert allowed fields to typed application input and add authenticated tenant/actor context separately. Jobs and commands call the same use case with independently established authority.
+Capabilities belong inside layers: `Domain/Applications/`, `Application/Applications/Commands/` and `Interfaces/Http/Controllers/`. Do not create a context, Composer package or service for every controller, aggregate or capability. Do not move business classes under `App\` to accommodate a generator default. Configure discovery explicitly or relocate and namespace generated files before merging them.
 
-Local rules may live on a cohesive model or domain object. Put cross-aggregate coordination in a named action, not in a growing model, generic `Service` class or model observer. Keep native provisioning, migration, fencing and compensation in lifecycle/Temporal and site workers. Model events must not invisibly start a native operation or an external side effect before a transaction commits.
+## 2. Enforce dependency direction
 
-A catalogue revision use case, for example, checks current caller scope, recognizes a previously accepted command, verifies the expected parent revision, validates domain associations, and commits the new revision, command receipt and outbox event together. Its HTTP adapter returns the contracted receipt; a CLI adapter cannot skip those rules. The exact order and status codes remain owned by the [contract conventions](../contracts/README.md).
+Domain depends only on owned Domain code and effect-free language primitives. Application depends on its own Domain/Application types and locally defined ports. Shared packages are excluded from these core layers in the initial policy. Infrastructure implements the ports. Interfaces calls application use cases and maps input/output. Host providers wire implementations. Context code does not import host `App\` classes.
 
-The project deliberately avoids prescribing either maximum-size models or fully framework-independent persistence for every feature. Extract pure domain code where state transitions and invariants benefit from fast independent tests; use Eloquent normally for service-owned persistence. The criterion is explicit ownership and testable behavior.
+Domain and Application must not import `Illuminate`, Eloquent, framework facades, request/session state, generated HTTP clients, provider SDKs or Infrastructure/Interfaces classes. Neither layer locates dependencies through the global container. Constructors expose collaborators; return types expose meaningful results or failures.
 
-## 3. Dependency direction and shared code
+No service imports another service's internal namespaces, migration classes, ORM records or configuration. Contracts and generated clients are the integration boundary. Shared packages cannot carry mutable business entities or permission decisions. A new package requires an owner, consumers, dependency rules and release/compatibility impact before adoption.
 
-- No service imports another service's `app/` classes, migrations, models or runtime configuration. The console reads business data through APIs and owns only its sessions/preferences and authorized presentation state.
-- Application actions depend on owned domain code and narrow integration contracts. HTTP/queue/CLI adapters depend on actions; domain value objects do not depend on controllers or request globals.
-- Share schema-generated clients, interoperable scalar formats and small technical helpers only when there is a real consumer need. Shared libraries have owners, explicit versions and compatibility checks. A common business model package would recreate joint data ownership and requires a boundary redesign.
-- Use interfaces for external dependencies or meaningful interchangeable behavior. Do not wrap every framework method simply to avoid using Laravel. Constructor injection makes use-case dependencies inspectable; ordinary framework facades remain acceptable at framework adapters and in focused integration code.
-- Review library changes against every transitive consumer. Service-only deployment remains possible when its public contracts are compatible.
+Use the architecture dependency matrix and executable checks in code control. File paths alone are insufficient: imports, Composer autoload/package dependencies, generated sources and runtime wiring must agree with ownership. Within a context, review capability dependencies and cycles as well as layer direction.
 
-The [service container](https://laravel.com/framework/docs/13.x/container) provides injection and scoped bindings. Mutable tenant, actor, authorization, request and correlation context must never be process-global or a long-lived singleton. Establish it per request/job and clear it on completion and failure. Framework scoped bindings help; custom loops, static state and caches still require explicit isolation tests.
+## 3. Separate Domain models from Eloquent records
 
-Follow the [provider lifecycle](https://laravel.com/framework/docs/13.x/providers): register bindings in `register`, then configure boot behavior in `boot` after providers are registered. Providers must be safe to load in HTTP, workers, CLI, tests and cache-building commands. Service startup must not acquire native authority as a side effect.
+Domain aggregates encode accepted state transitions and invariants in pure PHP. Eloquent models live under `Infrastructure/Persistence/Eloquent/Models/` and map the context's tables, relationships, casts and query scopes. Mappers reconstruct valid domain state and persist allowed transitions. A domain entity never extends `Model` or returns a query builder.
 
-## 4. PHP naming, types and formatting
+Use a repository port at a meaningful aggregate consistency boundary where persistence is required. Avoid generic repository interfaces for every table and pass-through service chains. Read use cases use an application reader port implemented by bounded SQL/Eloquent projections; lists need not hydrate full aggregates. Both read and write adapters enforce tenant scope, concurrency requirements and explicit output shape.
 
-Use [PSR-4](https://www.php-fig.org/psr/psr-4/) namespace/path correspondence, including case-sensitive filenames. Keep capability and action names specific, such as `CreateIntentRevision`, rather than a catchall `Helper` or `Manager`. Names in public contracts follow the contract schema, not a formatter's naming preference.
+Changes involving multiple owned records define their local consistency boundary in the application handler. Domain logic rejects invalid values and transitions; database constraints enforce storage uniqueness and referential integrity. Neither replaces the other. Cross-context references are IDs/versions/digests, not cross-database Eloquent relationships.
 
-First-party PHP uses declared parameter, return and property types, strict scalar typing where applicable, explicit nullability and bounded enums/value objects for meaningful states, units and identifiers. `declare(strict_types=1)` does not validate an HTTP body or make an untrusted integer/string a tenant identity. Validate at trust boundaries; do not pass loosely shaped arrays through a chain of actions. Use PHPDoc generics/shapes for Eloquent collections and framework types that native PHP cannot express. Avoid suppressions and unsafe casts used only to silence analysis.
+Preserve aggregate/mapping tests during schema evolution. Database-backed tests exercise races, stale revisions, tenant constraints and transaction failure using the selected production database engine. A fake repository cannot prove those properties. See [data and messaging](data-and-messaging.md).
 
-Use one committed, pinned Pint policy with the `laravel` preset across the Laravel applications; generated/vendor code has separate generation ownership. [Pint](https://laravel.com/framework/docs/13.x/pint) supports multiple presets, so selecting this one does not establish conformance to every PHP-FIG style rule. [PER Coding Style](https://www.php-fig.org/per/coding-style/) is the current evolving style reference; PSR-2 is not the target. The [developer workflow](developer-workflow.md) owns tool versions and exceptions, while [testing and CI](testing-and-ci.md) owns enforcement.
+## 4. Give use cases authority and transaction control
 
-Preserve rationale in comments for non-obvious invariants, trust assumptions and recovery boundaries. Avoid comments that restate the next line of code or automatic rules that discard useful design rationale. Prefer explicit named dependencies and states over reflection-based conventions developers cannot trace.
+Controllers, Form Requests, queue entrypoints and Artisan commands are adapters. They translate permitted fields and establish verified actor/tenant/delegation context before invoking the same use case. A successful Form Request or Laravel policy is an early check; it does not authorize every nested reference or replace application authorization.
 
-## 5. HTTP adapters and failure semantics
+The application authorization port checks the current action/resource permission. Its infrastructure implementation calls Governance or the approved authority mechanism. Domain policies enforce product invariants independently of identity infrastructure. Domain code never fetches a token, inspects a session or resolves a remote grant.
 
-Serialize with explicit resource/DTO field lists; do not return an Eloquent model graph as an accidental public API. [Laravel API resources](https://laravel.com/framework/docs/13.x/eloquent-resources) provide a transformation boundary, but the versioned OpenAPI schema still owns fields, relationships, pagination and permissions. Loaded relationships are not necessarily authorized relationships. New Laravel JSON:API support is optional; do not silently change the existing problem/receipt contracts to another protocol.
+A Catalogue revision handler coordinates current authority, durable idempotency, expected parent revision, domain associations and atomic revision/receipt/outbox persistence. The [worked command path](../architecture/context-code-structure.md#end-to-end-revision-command) defines the sequence. Transaction ports expose a local unit of work, not raw database connections; Infrastructure implements it on the owning connection.
 
-Dependency clients have declared connect/total timeouts, permitted endpoints, payload/page limits, caller identity, cancellation behavior and bounded retry budgets. [Laravel's HTTP client](https://laravel.com/framework/docs/13.x/http-client) requires deliberate handling of unsuccessful responses; map failures explicitly and never treat a parsed body as success. Retry reads only when their contract permits it. Retry writes only with an accepted idempotency/reconciliation contract; a timeout does not prove the remote operation failed. Avoid multiplicative retries at proxy, client, queue and workflow layers.
+Remote authorization/reference reads have declared freshness semantics and occur outside the database transaction. A retryable transaction closure contains repeatable local work only: no HTTP calls, mail sends, queue publication or native mutation. Stronger admission guarantees use the defined approval/reservation/fencing protocol, not a database transaction spanning services.
 
-Map expected domain conflicts and validation failures to stable contract codes. Unexpected exceptions produce a safe correlation reference and restricted diagnostics. Do not catch an exception, log it and return a success value or empty dataset. [Error configuration](https://laravel.com/framework/docs/13.x/errors) is centralized; debug traces, SQL and tokens never belong in public responses. Browser Inertia validation follows the distinct [frontend](frontend.md) protocol.
+Idempotency includes tenant, principal/action scope and canonical request identity. The same key with changed intent is a conflict. Retrieving a prior receipt still requires permission to disclose it. Unknown external outcomes require reconciliation by the effect owner; database rollback cannot undo a provider write.
 
-## 6. Review and delivery proof
+Native provisioning, migration, fencing and compensation belong to Lifecycle/Temporal and its owned workers. Laravel observers, controllers and local jobs cannot create an alternate native execution path. Internal domain events express local facts; outbox mapping produces the public event contract.
 
-P01 implements a representative action, query, policy, resource and integration adapter in the owning service, then exercises it through HTTP and the applicable background entry point. It must demonstrate forbidden-import detection, configured formatter/static analysis, typed contract handling, clean configuration caching and tenant-context isolation. Feature packages extend this pattern rather than copying a demonstration into every service.
+## 5. Register adapters explicitly
 
-Reviewers inspect permissions and transaction boundaries before naming/style details. Require the relevant evidence in [the coverage map](coverage.md), especially cross-tenant access, stale revisions, duplicates and dependency failure. Data and runtime rules are detailed in [data and messaging](data-and-messaging.md); security rules in [security and tenancy](security-and-tenancy.md).
+Host providers bind application ports to infrastructure implementations. Use `register` for bindings and `boot` for framework registration after providers are available. Providers load safely during HTTP, workers, CLI, tests and cache construction. They do not read business state, start migrations, call remote services or acquire native credentials during bootstrap. See the official [provider lifecycle](https://laravel.com/framework/docs/13.x/providers).
+
+Custom context paths need deliberate registration of routes, commands, policy mappings, listeners and factories. Test actual boot/discovery behavior rather than assuming defaults find classes outside `app/`. Keep routes declarative and delegate to interface controllers. Interface policies use application authorization/resource references instead of directly querying Eloquent records.
+
+Framework abstractions belong at adapters. Facades may be used inside focused Infrastructure or Interfaces code where allowed by their responsibilities; they are prohibited in Domain/Application. Laravel's [container](https://laravel.com/framework/docs/13.x/container) supplies constructor injection and scoped bindings. A provider may depend on both port and implementation; application handlers may not.
+
+Tenant, actor, authority, request and correlation context is established for each request/job and cleared after success or failure. It is not static or a process-lifetime singleton. Scoped bindings help with framework-managed lifecycles; custom loops and library caches still require reset and alternating-tenant tests.
+
+## 6. Types, names and formatting
+
+Follow [PSR-4](https://www.php-fig.org/psr/psr-4/) namespace/path correspondence and case-sensitive filenames. Use specific names such as `CreateIntentRevisionHandler`, `GovernanceAuthorization` and `ApplicationReader`. Avoid catchall `Helper`, `Manager` and `BaseService` classes that obscure ownership. Public field/event names follow the schema.
+
+First-party PHP declares parameter, return and property types, strict scalar typing where applicable, explicit nullability, and bounded enums/value objects for states, units and identifiers. `declare(strict_types=1)` does not validate a payload or authenticate a tenant; boundary validation remains explicit. Application DTOs contain permitted values/references, never `Request`, Eloquent models, query builders or anonymous arrays passed through a use-case chain.
+
+PHPDoc generics/shapes describe collections or types that native PHP cannot express, primarily at adapters. Avoid unsafe casts, broad ignored-error patterns and static-analysis baselines added to accept new violations. Narrow exceptions follow code-control review and expiry rules.
+
+Use one pinned, committed Pint policy with the `laravel` preset across Laravel services, including context source paths. [Pint](https://laravel.com/framework/docs/13.x/pint) offers multiple presets; this choice does not claim exact conformance to every PHP-FIG rule. [PER Coding Style](https://www.php-fig.org/per/coding-style/) is the current style reference; PSR-2 is not the target. [Developer workflow](developer-workflow.md) owns versions; [testing and CI](testing-and-ci.md) owns enforcement.
+
+Comments preserve non-obvious invariant, trust and recovery reasoning. Avoid comments that restate code and magic conventions that hide control flow. Developers must be able to trace input through use case, ports, aggregate rules, transaction and output contract.
+
+## 7. Keep public contracts independent of domain classes
+
+Canonical schemas remain in `contracts/openapi/<service>.yaml`, `contracts/asyncapi/<service>.yaml` and `contracts/schemas/`, with fixtures under `contracts/fixtures/<service>/`, as defined by the [contract catalogue](../contracts/README.md). Generated clients and transport DTOs are schema artifacts. Infrastructure translates them into the consuming context's types. Publishing a PHP class does not establish a cross-language contract.
+
+Interface resources serialize explicit application-result fields rather than an Eloquent graph. [Laravel API resources](https://laravel.com/framework/docs/13.x/eloquent-resources) supply transformation; versioned schemas own fields, relationships, pagination and permission semantics. Loaded data is not automatically authorized data. JSON:API does not silently replace the established problem/receipt protocol.
+
+Infrastructure HTTP clients declare endpoints, identity, payload/page bounds, timeouts and retry budgets. Handle unsuccessful responses and map them to application failures: Laravel's [HTTP client](https://laravel.com/framework/docs/13.x/http-client) does not make a parsed response proof of success. Retry writes only under an idempotency/reconciliation contract. Coordinate retry budgets across proxy, client, queue and workflow layers.
+
+Map expected domain/application failures to stable interface errors. Unexpected exceptions return a safe correlation reference with restricted diagnostics; never log failure then return success or an empty authorized dataset. Browser Inertia errors follow the [frontend](frontend.md) protocol. Event consumers validate schemas and source/scope, deduplicate durably and invoke use cases rather than mutating ORM records in listeners.
+
+## 8. Prove the boundaries before feature expansion
+
+P01 delivers a representative context path with port bindings, registration, typed command/query results, Eloquent mapping, current authority handling and durable outbox. P02/P03 extend it into real Governance/Catalogue behavior. Do not copy demonstration scaffolding into every capability without a use case.
+
+Architecture proof includes rejected forbidden imports and unowned paths, case-correct autoloading, contract compatibility, cached bootstrap and tenant-context isolation. Runtime proof includes real transaction/idempotency races and alternate-entrypoint permission checks. Language-level enforcement examines dependencies beyond simple path/text validation.
+
+Review ownership, authority, aggregate/transaction boundaries and contract impact before style details. Attach observed proof to the [coverage map](coverage.md) packages and gates. Data, security, frontend and deployment guidance continues to apply within this structure; a layered directory alone cannot establish correctness.

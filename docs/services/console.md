@@ -77,3 +77,11 @@ Use WCAG 2.2 AA as the project target and record tested criteria and browser/ass
 P02.01/P02.05 establish sessions/navigation; P03.04 delivers create/edit/history; P04.05 inventory; P05.05 review; P06.06 jobs; P07/P08 the native user journeys. Trace to R02–R05, R14–R15 and R33; Q01/Q03/Q04/Q10 provide evidence at the relevant stages.
 
 Test direct API denial despite manipulated UI, tenant-switch cache isolation, expired session during retry, stale edit preservation, exact digest in approval, partial dependency outage, unknown operation status, polling authorization and safe cancel wording. End-to-end success requires recorded service outcomes; screenshots alone do not close native gates.
+
+## Context source ownership and code control
+
+Owned source root: `apps/console/src/Contexts/Console/`. Composition of authenticated sessions, tenant navigation, page DTOs and remote-service ports. It has no copies of the business contexts or their database models.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

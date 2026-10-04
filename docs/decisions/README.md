@@ -30,6 +30,7 @@ A decision record is not implementation evidence. Update an ADR and the register
 | [ADR-020](adr-020-restricted-network-and-disconnection-behavior.md) | Restricted-network and disconnection behavior |
 | [ADR-021](adr-021-retained-data-and-import-boundary.md) | Retained data and import boundary |
 | [ADR-022](adr-022-release-support-and-requalification.md) | Release support and requalification |
+| [ADR-023](adr-023-context-code-boundaries-and-controls.md) | Context code boundaries and automated code/review controls |
 
 ## Review and maintenance
 

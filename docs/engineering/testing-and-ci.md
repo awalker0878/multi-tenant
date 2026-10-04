@@ -1,12 +1,12 @@
 # Testing, continuous integration and verification
 
-Owner: quality lead with engineering, security and SRE. Reviewed: 2026-10-04. Applies from P01 to all seven services, workers and the console. P01.03 establishes contract/messaging checks; P01.04 implements the pipeline. The [qualification campaigns](../qualification/README.md) and [gate criteria](../implementation/gates.md) define the later evidence needed for admission and support.
+Owner: quality lead with engineering, security and SRE. Reviewed: 2026-10-04. Applies from P01 to the six business services, console and site workers. P01.03 establishes contract/messaging checks; P01.04 implements the pipeline. The [qualification campaigns](../qualification/README.md) and [gate criteria](../implementation/gates.md) define the later evidence needed for admission and support.
 
 This standard connects everyday developer feedback with enterprise failure cases. Tests are selected by behavior and risk, not file counts. A documentation check, formatter result, unit suite or successful image build cannot establish native-platform qualification.
 
 ## Test ownership and environment levels
 
-Each service owns tests of its behavior and persistence. Producers own API/event conformance; consumers own their expectations and compatibility checks. The quality lead owns the integrated critical journeys; security reviews denial coverage; SRE owns deployment and recovery verification. P01 defines named suite entrypoints and a machine-readable dependency/consumer map so CI selection is reproducible.
+Each service owns tests of its behavior and persistence. Producers own API/event conformance; consumers own their expectations and compatibility checks. The quality lead owns the integrated critical journeys; security reviews denial coverage; SRE owns deployment and recovery verification. The [context inventory](../../architecture/context-map.yaml) supplies declared ownership and dependencies. P01 binds its entries to actual source/build/contract artifacts and named suite entrypoints so CI selection is reproducible. The [code-control policy](code-control.md) defines architecture checks, required review and merge admission.
 
 Laravel supports focused unit tests and framework feature tests; units do not automatically boot the application. Prefer feature tests for actual HTTP, validation, policy and database behavior, while pure algorithms and value objects stay fast and isolated [T1]. Python services follow the same boundary principle. These suite categories complement the E0–E4 [evidence model](../implementation/status-model.md); a test's location or name does not assign its evidence level.
 
@@ -20,6 +20,14 @@ Laravel supports focused unit tests and framework feature tests; units do not au
 | Deployment, resilience and native qualification | Exact isolated deployment or authorized native tuple | The scoped installation/recovery/native outcomes in the campaign; never inferred from mocks |
 
 SQLite and array/synchronous drivers may support narrow feedback loops. They do not replace PostgreSQL constraints/locking, shared cache/session behavior, broker redelivery or long-running workers when those are the subject of the assertion. Laravel database transaction helpers are useful for test isolation; tests of actual commit visibility, `after_commit` dispatch and concurrent connections need a separately reset real-commit environment [T2].
+
+## Architecture verification is a distinct suite
+
+Mirror production context/layer boundaries in test ownership. Domain tests use plain values and owned types without booting Laravel, persistence, broker or Temporal. Application tests exercise use cases through owned ports. Infrastructure tests prove the actual adapter contract against isolated dependencies. Interfaces tests prove authenticated transport, validation and application invocation. Cross-service tests use published contracts; test setup must not import another service's private ORM model to seed its database.
+
+P01 proves parser-aware PHP/Python/frontend boundary configuration using legal and violating fixtures described in [code control](code-control.md). Required failures include Domain-to-framework, Application-to-Infrastructure, Interfaces-to-Infrastructure, sibling-service imports, frontend private-module imports and unknown first-party roots. Include qualified/aliased references, re-exports and deleted dependency edges. An always-failing checker does not satisfy this suite: legal examples must pass and illegal examples must report the intended rule.
+
+The current `python scripts/validate_architecture.py` checks the registry and supported source forms, with validator fixtures in `tests/documentation/test_architecture_controls.py`. Its PHP prechecks are conservative; parser-aware Deptrac and supplemental architecture rules remain P01 implementation work. Reports must distinguish a validated registry, analyzed source and absent application code. Registry success is not application security or isolation evidence.
 
 ## Minimum behavioral matrix
 
@@ -64,12 +72,13 @@ Use synthetic histories for ordinary CI. If operational histories are needed, ob
 
 ## Change-to-check selection
 
-The fast pull-request path runs affected service checks and expands through declared dependency and contract consumers. Selection is tested against known change fixtures and fails conservatively when dependency classification is unknown. A required aggregate result must report incomplete/failed constituent checks rather than treating a skipped job as a pass.
+The fast pull-request path runs affected service checks and expands through declared dependency and contract consumers in both the base and proposed inventories. Selection is tested against known change fixtures, including renames and deletions, and fails conservatively when dependency classification is unknown. A required aggregate result must report incomplete, cancelled, stale or failed constituent checks rather than treating a skipped job as a pass. Record why a suite is inapplicable; do not use a successful empty matrix as admission evidence.
 
 | Change | Required scope |
 | --- | --- |
-| Documentation only | Existing documentation generation/validation; manual technical review of changed assertions |
-| One service implementation | Full owning service lint/types/unit/feature suites, relevant real-dependency integration and affected contracts |
+| Documentation only | Documentation generation/validation; architecture registry validation when referenced; technical review of changed assertions |
+| Context inventory, ownership map, analyzer rules or source layout | Complete architecture/ownership checks and negative fixtures; all affected builds; independent policy review; inspect both old and new dependency edges |
+| One context/service implementation | Owning context boundaries and full service lint/types/unit/feature suites, relevant real-dependency integration and affected contracts |
 | Schema, generated client or shared technical package | Producer and every direct/transitive consumer build/typecheck/contract suite; integrated affected journeys |
 | Authorization, tenancy, shared HTTP middleware, session or evidence policy | All affected service denial cases, full critical isolation suite and relevant browser/identity integration |
 | Composer/Python/frontend lock, runtime, base image, shared CI or build tool | Every affected build plus the full critical cross-service suite; all services when shared runtime/tooling changes; advisory/license/BOM review |
@@ -85,12 +94,12 @@ Run complete integration regressions on the protected integration branch and rel
 
 P01 implements these jobs using verified commands and locked tools; this document does not introduce working CI configuration.
 
-1. Validate documentation, contracts and deterministic generated-client drift. Check architecture dependency rules: no sibling-service runtime import, no shared private ORM/domain model, no forbidden layer dependency and no hidden runtime bootstrap from legacy code. Database/network role denial tests complement static import checks.
-2. Run the service's pinned formatter/linter and type/static analyzer under the [developer standard](developer-workflow.md). Validate manifest/lock consistency, dependency advisories, secrets and licenses. A clean static scan is one signal, not proof of authorization correctness.
+1. Validate documentation, the ownership/dependency inventory, contracts and deterministic generated-client drift. Execute the pinned language-aware architecture tools: no sibling-service runtime import, no shared private ORM/domain model, no forbidden layer dependency and no hidden runtime bootstrap from legacy code. Fail unknown/unclassified source, unexpected empty scans and unapproved exclusion growth. Run negative tool fixtures whenever rules, parser versions or source discovery change. Database/network role denial tests complement static import checks.
+2. Run the service's pinned formatter/linter and type/static analyzer under the [developer standard](developer-workflow.md). Validate manifest/lock consistency, dependency advisories, secrets and licenses; compare suppression and policy baselines with the reviewed base. Reject expired exceptions or silent baseline expansion. A clean static scan is one signal, not proof of authorization correctness.
 3. Run risk-selected test suites and produce machine-readable results with counts, failures, skipped/quarantined cases, environment/tool versions, source revision and fixture/schema identities. Keep sensitive payloads out of logs and reports.
 4. Build independently from locks and immutable base inputs. Exercise application boot and optimized production configuration in the built image, including route/config caching where supported by the selected runtime. Check actual platform requirements, health and least-privileged runtime behavior.
 5. Produce the SBOM, image digest and provenance linking source revision, build definition and inputs. Sign and verify through the selected trust policy, then promote the same tested digest. Provenance verification includes the allowed builder/source identity; a valid signature alone does not establish an approved build.
-6. Evaluate required results and exceptions before merge/promotion. Release jobs consume immutable evidence references and the [release manifest](../releases/release-manifest.md); they do not rebuild an allegedly identical release with fresh dependencies.
+6. Evaluate the complete required aggregate, current revision/role reviews and scoped exceptions before merge/promotion. Prove failed or missing checks and insufficient review block admission under the selected repository rules. Changes to the gate or workflow itself require trusted-base enforcement and independent review under [code control](code-control.md). Release jobs consume immutable evidence references and the [release manifest](../releases/release-manifest.md); they do not rebuild an allegedly identical release with fresh dependencies.
 
 GitHub Actions uses minimal token permissions, full commit SHA pins for actions/reusable workflows, and separate untrusted PR test and privileged release contexts. Never checkout or execute untrusted PR code with release credentials under `pull_request_target` or an equivalent privileged workflow. Treat upstream artifacts and caches as untrusted inputs unless verified; isolate runners and cache permissions accordingly. Pass untrusted metadata as data rather than interpolating it into shell code [T5].
 

@@ -49,6 +49,8 @@ The proposed implementation uses Laravel/PHP for product services and Python for
 
 Services own their data and communicate through versioned APIs and events. Central services are proposed for Kubernetes within approved trust boundaries; workers run near their authorized endpoints. Application data moves directly between approved source and target paths. See the [service catalogue](docs/services/README.md), [architecture](docs/architecture/target-architecture.md) and [deployment model](docs/operations/deployment-model.md).
 
+The codebase is organized by explicit business contexts inside those microservices. Each context separates Domain, Application, Infrastructure and Interfaces code; Laravel hosts the PHP contexts, and Python services follow equivalent boundaries. Context-private models and use cases stay private. A [context registry](architecture/context-map.yaml), [source structure](docs/architecture/context-code-structure.md) and [code-control policy](docs/engineering/code-control.md) define allowed dependencies, contract exports, ownership, review and CI enforcement.
+
 ## First release and delivery milestones
 
 The proposed first native path provisions a selected Linux application on OpenStack, then qualifies one VMware-to-OpenStack offline migration method. Source/destination versions, guest profile, stateful application and conversion feasibility must be selected in P00. Further platforms, directions, guest profiles and methods receive separate qualification.

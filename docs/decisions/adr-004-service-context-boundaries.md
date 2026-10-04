@@ -8,11 +8,11 @@ This record develops the existing baseline for review. No accountable-owner acce
 
 ## Context
 
-The product combines user interaction, governance, desired application structure, observed inventory, planning, execution and assurance. Without explicit data ownership, these responsibilities could recreate a distributed shared database and couple releases through undocumented behavior. The proposed seven contexts allocate authority before API scaffolding.
+The product combines user interaction, governance, desired application structure, observed inventory, planning, execution and assurance. Without explicit data ownership, these responsibilities could recreate a distributed shared database and couple releases through undocumented behavior. Six business contexts allocate authority before API scaffolding; the console is a separate presentation/composition boundary.
 
 ## Decision and scope
 
-Seven contexts: console, governance, catalogue, inventory, planning, lifecycle, assurance; Laravel assurance.
+Six business contexts: governance, catalogue, inventory, planning, lifecycle and assurance; Laravel assurance. The console composes their user experience and owns its session/presentation state. The initial deployment still has seven principal applications. A context, capability module, runtime process and independently deployed service are distinct concepts; their initial mapping is explicit in the [context code structure](../architecture/context-code-structure.md).
 
 Initial checkpoint: NOW: P00.02 / G00.02 before contract scaffolding.
 
@@ -22,7 +22,7 @@ Refinement and validation: Review boundary changes through owning ADR and contra
 
 | Option | Assessment |
 | --- | --- |
-| Seven bounded contexts in the register | Makes business ownership explicit and separates planning from execution and evidence. |
+| Six business contexts plus console composition | Makes business ownership explicit and separates planning from execution, evidence and presentation. |
 | Fewer deployables containing several contexts | May reduce early operating overhead, but still requires separate internal ownership and an explicit consolidation decision. |
 | A deployable for every capability | Provides fine deployment boundaries at the cost of more contracts, operating dependencies and failure paths. |
 
@@ -30,6 +30,7 @@ Refinement and validation: Review boundary changes through owning ADR and contra
 
 - Console, governance, catalogue, inventory, planning, lifecycle and assurance each own their assigned data and write operations.
 - Cross-context access uses owned interfaces; assurance is proposed as a Laravel service and must preserve evidence responsibilities independently of UI concerns.
+- [ADR-023](adr-023-context-code-boundaries-and-controls.md) develops the required context-oriented source structure and code controls. Framework models and internal use cases remain private to their owning context; capability modules do not acquire independent service authority.
 
 ## Unresolved details and evidence needed
 

@@ -25,16 +25,18 @@ Keep Laravel presentation routing and controller composition in the console. Ine
 
 | Location under `apps/console/` | Responsibility |
 | --- | --- |
-| `app/Http/Controllers/` and `app/Http/Requests/` | Thin page/command adapters; validated input and session-aware authorization; map service results into presentation responses. |
-| `app/Presenters/` | Explicit, tested page data transfer objects and allowlisted serialization; no whole domain model passthrough. |
-| `resources/js/pages/` | Inertia page entry points grouped by application journey; compose features and handle page-level loading/error states. |
-| `resources/js/features/` | Application, plan-review, inventory and job-view UI modules; public exports and feature-local components/types. |
-| `resources/js/components/` | Reusable accessible UI primitives; no hidden service calls or tenant authority. |
-| `resources/js/composables/` | Reusable presentation behavior with explicit inputs, cancellation and lifecycle cleanup. |
-| `resources/js/layouts/`, `lib/`, `types/` | Shells; small integration helpers; shared presentation types. Avoid a single miscellaneous service module. |
+| `src/Contexts/Console/Interfaces/Http/` | Thin page/command adapters, Form Requests and presenters; validated input and allowlisted Inertia responses. |
+| `src/Contexts/Console/Application/` | Console task composition and presentation DTOs through remote-service ports; no copied business-service invariants. |
+| `src/Contexts/Console/Infrastructure/` | Approved service clients, session/presentation persistence and transport adapters. |
+| `app/Providers/`, `bootstrap/`, `routes/` | Laravel host registration and explicit dependency composition. |
+| `resources/js/app/` | Browser bootstrap, providers and shell composition. |
+| `resources/js/pages/` and `journeys/` | Thin Inertia route entrypoints and cross-context operator journeys using public context interfaces. |
+| `resources/js/contexts/<context>/features/<capability>/` | Context-aligned feature components, composables, view models, API adaptation and tests; private internals behind explicit exports. |
+| `resources/js/contexts/<context>/index.ts` | Reviewed public presentation interface for that context; no blanket re-export of all internals. |
+| `resources/js/shared/ui/`, `shared/lib/`, `shared/types/` | Accessible UI primitives and narrow technical utilities; no service aggregates, hidden API calls or tenant authority. |
 | `resources/css/` | Tailwind theme tokens, typography and approved shared styles. |
 
-The `features/` and presenter conventions are project choices, extending Laravel's documented starter structure. Prefer Vue single-file components with `<script setup lang="ts">`, typed props/emits and Composition API. Pages may compose features; a feature imports another feature through its reviewed public interface. Do not create a global store that duplicates every server aggregate. Keep temporary form state close to its page and introduce shared client state only for a concrete cross-page need. [S1, S6]
+These context and presenter conventions are project choices, extending Laravel's documented starter structure and the [context code model](../architecture/context-code-structure.md). Prefer Vue single-file components with `<script setup lang="ts">`, typed props/emits and Composition API. A feature cannot deep-import another context's files or import an owning service's PHP/Python implementation. Cross-context composition belongs in `journeys/` and consumes reviewed context exports. Shared UI/utilities cannot import upward into contexts or pages. Enforce resolved aliases, relative paths and dynamic-import rules through the selected frontend boundary tooling in P01; TypeScript path aliases alone do not enforce architecture. Do not create a global store that duplicates every server aggregate. Keep temporary form state close to its feature. [S1, S6]
 
 Enable TypeScript `strict`, run Vue-aware type checking separately from bundling, and fail CI on errors. Vite transformation is not a type-check gate. Share generated contract types from the canonical versioned schemas where available; presenters still own the narrower page contract. Treat network input as untrusted at runtime: a TypeScript assertion is not validation. Test schema-to-client generation for drift; do not hand-maintain competing definitions of job states or approval digests. Represent identifiers and revisions using their contract types without unsafe numeric coercion. [S6–S7]
 

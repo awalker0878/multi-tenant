@@ -75,3 +75,11 @@ P02.01–P02.04 deliver authentication/tenancy/authorization/approval; P05.06 ex
 Test forged tenant/subject/service audience, excessive delegation, grant expiry/revocation, duplicate decision, same-key changed digest, self-approval where forbidden, plan scope widening, expired approval, retirement under migration approval, authority outage and restore of previously revoked grants. Record deny and allow behavior for two tenants and independent author/reviewer/operator identities.
 
 Include known cross-tenant object IDs, bulk and nested relationships, forged writable privilege fields, stale cached decisions, revocation between enqueue and execution, and alternating tenants in one worker process after an exception. Inspect persisted history, outbox and audit independently of the response. Browser identity acceptance additionally exercises real request-forgery/session middleware and hostile host/proxy headers; a hidden action or test-mode middleware bypass provides no authorization evidence.
+
+## Context source ownership and code control
+
+Owned source root: `services/governance/src/Contexts/Governance/`. Tenant membership/delegation, permission decisions and approval/revocation capabilities, with framework-independent rules and explicit persistence/identity ports.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

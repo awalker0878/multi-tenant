@@ -42,7 +42,7 @@ Neither unique jobs nor an inbox make remote effects exactly once. Lifecycle rem
 
 ## 3. Eloquent and query contracts
 
-Use Eloquent for straightforward persistence inside its owning context. A specialized query object is appropriate for complex projections or measured query work; do not wrap every model in a generic repository solely to rename framework methods.
+Use Eloquent within the owning context's `Infrastructure/Persistence` adapters. Domain aggregates and Application use cases depend on their own types and ports, with explicit mapping to Eloquent persistence records. Application query handlers depend on read ports; Infrastructure implements optimized Eloquent/SQL queries and returns owned DTOs. Group repositories around aggregate consistency boundaries rather than generating a generic repository for every table. The [context structure](../architecture/context-code-structure.md) owns layer placement and allowed imports.
 
 - Construct explicit field maps from validated input. Tenant ID, owner ID, approval status, grants, evidence status and internal state are assigned by authorized application actions, not by mass assignment. Use a deliberate model allowlist and fail on silently discarded attributes in development/tests. [Eloquent mass assignment](https://laravel.com/docs/13.x/eloquent#mass-assignment)
 - Select required columns, eager-load only the necessary relationships and their fields, and use aggregate queries instead of loading collections to count them. Enable lazy-loading violations in development/tests; production handling must be chosen and observed rather than silently accepting growing query cost. [Eloquent relationships](https://laravel.com/docs/13.x/eloquent-relationships#preventing-lazy-loading)

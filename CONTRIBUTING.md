@@ -14,6 +14,8 @@ Use the GitHub connector to publish branch changes in this workflow. Do not comm
 
 Each deployable owns its dependency locks, tests and build configuration. Install from reviewed locks; make dependency resolution intentional and reviewable. Use the pinned formatter and static analyzer configuration, with no unreviewed suppressions or baseline growth. P01 will establish CODEOWNERS and enforced review/status checks; its required outputs are described in the developer workflow.
 
+Start source work from the [context code structure](docs/architecture/context-code-structure.md) and [code-control policy](docs/engineering/code-control.md). Register source/package ownership in [the context map](architecture/context-map.yaml) before introducing a new boundary. Domain/Application code must stay independent of framework and adapter implementations. Changes to the map, analyzers, ownership or CI are policy changes requiring their designated review.
+
 ## Documentation checks
 
 Install the pinned documentation dependency in your chosen Python environment, then run from the repository root:
@@ -22,9 +24,13 @@ Install the pinned documentation dependency in your chosen Python environment, t
 python -m pip install -r requirements-docs.txt
 python scripts/render_delivery_views.py
 python scripts/validate_docs.py
+python scripts/validate_architecture.py
+python -m unittest discover -s tests/documentation -p 'test_*.py' -v
 ```
 
 The scripts require Python 3.10 or newer and the pinned PyYAML dependency. They generate progress/traceability views and check links, IDs, statuses and register references. The scripts themselves do not install packages or contact external systems. Use `python scripts/render_delivery_views.py --check` to detect stale views without modifying them. These checks do not run application tests or native campaigns.
+
+The architecture check reports registry validation separately from supported source analysis and absent applications. Its fixture tests verify accepted/rejected examples; they do not establish full PHP or frontend analyzer coverage. [The Context policy workflow](.github/workflows/architecture-policy.yml) runs these checks for this branch and pull requests targeting it, using read-only permissions and pinned action revisions. Publishing a workflow does not activate required reviews or branch protection; P01.04 must verify those settings and the complete application gates.
 
 ## Change description
 

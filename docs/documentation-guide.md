@@ -10,6 +10,7 @@ Keep product intent, target design, delivered behavior and observed evidence dis
 | --- | --- | --- |
 | `docs/product/` | User journeys, vocabulary, entity semantics and application examples | A user-visible concept, workflow or domain invariant changes |
 | `docs/architecture/` | Cross-service ownership, trust boundaries, topology and design rules | A boundary, data owner, dependency or trust assumption changes |
+| `architecture/context-map.yaml` | Machine-readable service/context roots, owners, layer policy and package/worker dependencies | A source boundary, dependency or deployment ownership changes; update checks and design together |
 | `docs/services/<service>.md` | Service responsibilities, data, interfaces, failure and operating behavior | A service changes behavior, persistence, permissions or dependencies |
 | `docs/engineering/` | Shared implementation standards, primary-source rationale and control-to-package verification mapping | Framework behavior, engineering policy, CI enforcement or a cross-cutting risk changes |
 | `docs/contracts/` | Human-readable API/event conventions and examples | Contract semantics or cross-language usage changes |
@@ -65,6 +66,7 @@ Operational credentials, live inventory, endpoint addresses, Terraform state and
 | Access/secret policy | Governance/trust model, permissions, credential lifecycle/runbook and negative tests |
 | Database migration | Migrator privileges, compatibility window, upgrade/recovery procedure and representative data verification |
 | Deployment/dependency | Version/BOM, configuration/network flows, rollback constraints and restore/upgrade evidence |
+| Context/layer/code-control rule | Context map, ADR, source ownership, language-aware architecture checks and positive/forbidden-change fixtures; review actual repository enforcement impact |
 | UI task | Journey, error/held/empty/permission states, accessibility and browser verification |
 | Release | Artifact manifest, support scope, qualification-impact review, upgrade notes, known issues and acceptance |
 

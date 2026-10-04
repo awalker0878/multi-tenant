@@ -68,3 +68,11 @@ Measure finalization backlog, digest/provenance failures, missing expected evide
 P06.04 custody/decisions; P07.06 first native dossier; P08/Q07 migration proof; P09 separate route expansion; P10/P11 operating acceptance. Requirements R04/R08/R13/R20/R24/R26/R29/R31/R35; Q01 and the relevant Q03–Q10 campaigns.
 
 Test wrong tenant/campaign, forged observer, altered bytes, mismatched digest, repeated finalization, orphan upload, expired access URL, stale/revoked qualification, unsupported reverse route, changed adapter artifact and incomplete restore. Publishing a support row requires traceable evidence and reviewer decision, never only passing unit tests.
+
+## Context source ownership and code control
+
+Owned source root: `services/assurance/src/Contexts/Assurance/`. Evidence metadata/custody, qualification and support publication capabilities. Artifact storage and verification transports implement owned Application ports.
+
+Use the [context code structure](../architecture/context-code-structure.md), [context registry](../../architecture/context-map.yaml) and [code-control policy](../engineering/code-control.md). Domain, Application, Infrastructure and Interfaces have explicit dependency direction (lowercase equivalents in Python). Framework host composition binds adapters; public API/event schemas define cross-service access. Internal models, use cases and migrations are not exported as shared business packages.
+
+The service owner reviews source/dependency changes and maintains legal/forbidden import fixtures, contract consumers and isolated build inputs. Runtime data-access denials remain separate tests. Registration or a static check does not grant a worker additional native authority.

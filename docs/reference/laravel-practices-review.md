@@ -14,7 +14,7 @@ The [Strapi article](https://strapi.io/blog/laravel-best-practices) is a useful 
 
 | Advice requiring interpretation | Project treatment and primary basis |
 | --- | --- |
-| Put business logic in large models | Keep cohesive model behavior; place multi-aggregate use cases in named actions and pure invariants where useful. Laravel permits flexible organization; [conventions](../engineering/laravel-conventions.md) explains this project choice. |
+| Put business logic in large models | Use context-owned Domain aggregates/invariants and Application use cases, with separate Eloquent Infrastructure records. Laravel permits flexible organization; [context conventions](../engineering/laravel-conventions.md) define this project's stricter choice. |
 | Validation examples allow every caller | Validation, authenticated tenant context, field permissions and resource authorization are separate checks. Follow Laravel validation/authorization and the [security standard](../engineering/security-and-tenancy.md). |
 | Administrator authorization bypass | Tenant and privileged support access remain explicitly scoped, time-bound and audited. No universal bypass; preserve the existing governance model. |
 | URL forcing as HTTPS enforcement | Enforce transport at approved ingress, restrict trusted proxies/hosts and test cookie/redirect behavior. Correct generated URLs alone do not block plaintext traffic. |
@@ -47,6 +47,8 @@ The [Strapi article](https://strapi.io/blog/laravel-best-practices) is a useful 
 The detailed engineering pages cite the primary pages used for each topic. These are living upstream references, not immutable dependency pins. Revisit them on major upgrades; preserve source/lock/image identities in real compatibility and release records. A newer draft standard or article update does not automatically change the accepted delivery baseline.
 
 ## Coverage conclusion and follow-through
+
+Following the user's explicit rejection of the initial lightweight folder structure, [ADR-023](../decisions/adr-023-context-code-boundaries-and-controls.md) and the [context code structure](../architecture/context-code-structure.md) replace the application-wide actions/models convention with bounded-context layers. The [code-control policy](../engineering/code-control.md) and machine-readable context map make ownership and allowed dependencies inspectable. This is a project architecture requirement, not a claim that Laravel mandates one structure.
 
 The documentation now defines a coherent enterprise Laravel baseline with owners, implementation packages and specific verification obligations for architecture, security, frontend, persistence, messaging, quality and operations. This is documentary coverage: the corresponding runtime controls and tests must still be built and demonstrated.
 

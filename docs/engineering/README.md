@@ -9,6 +9,8 @@ These standards turn the product architecture into implementation and review rul
 | Guide | Owns |
 | --- | --- |
 | [Laravel conventions](laravel-conventions.md) | Service layout, use-case boundaries, dependencies, typing and API adapters |
+| [Context code structure](../architecture/context-code-structure.md) | Explicit bounded-context namespaces, capability modules, layers and host composition |
+| [Code controls](code-control.md) | Machine-readable ownership, dependency rules, protected changes, review policy and CI enforcement |
 | [Data and messaging](data-and-messaging.md) | Eloquent, tenant persistence, transactions, outbox/inbox, queues, caches and schema evolution |
 | [Security and tenancy](security-and-tenancy.md) | Authentication, authorization, tenant context, browser protection and hostile input |
 | [Frontend](frontend.md) | Inertia/Vue architecture, safe props, forms, accessible journeys and browser compatibility |

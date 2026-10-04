@@ -1,6 +1,6 @@
 # Release manifest contract
 
-Owner: delivery lead. Consumers: deployment automation, service operators, assurance and support. Related decisions: ADR-003, ADR-005, ADR-012 and ADR-022.
+Owner: delivery lead. Consumers: deployment automation, service operators, assurance and support. Related decisions: ADR-003, ADR-005, ADR-012, ADR-022 and ADR-023.
 
 The manifest identifies a reproducible product release and its evaluated scope. Its human release name is a label; immutable artifact and configuration identities are the binding references.
 
@@ -8,6 +8,7 @@ The manifest identifies a reproducible product release and its evaluated scope. 
 | --- | --- |
 | Identity | Unique release/candidate ID, repository revision, build provenance, manifest digest and signature identity |
 | Services | Console and six domain-service image digests, configuration schema versions and required runtime dependencies |
+| Context and code controls | Context-map revision/digest, service source paths and context IDs, language-analysis/configuration identities and coverage, required-check/review evidence and scoped unexpired exception references |
 | Workers | Workflow, discovery, infrastructure, guest, shared-service and data-mover artifact identities; permitted routing/version combinations |
 | Automation | Terraform/provider/module and Ansible/role identities, schema/input versions and approved ownership model |
 | Contracts | HTTP/event/schema versions, client compatibility and canonicalization/digest version |
@@ -23,6 +24,8 @@ Do not include private keys, passwords, tokens, live inventory or sensitive evid
 ## Validation rules
 
 Every referenced artifact must exist, match its digest and satisfy signature/provenance policy. The dependency closure includes offline installation dependencies when that mode is in scope. Schemas, migrations and mixed worker/API versions must be compatible under the documented upgrade sequence.
+
+Reconcile each service image with the owning context and its declared source/package build inputs. The [code-control review](../engineering/code-control.md) must apply to that exact source/configuration revision. A passed structural smoke check cannot stand in for required PHP/Python/frontend analysis or verified merge/release policy; missing analysis and expired exceptions remain blocking findings.
 
 Each advertised support row must refer to the actual candidate artifacts and applicable qualification evidence or an explicit unaffected-evidence review. Expired or revoked support cannot be restored by publishing the same artifact under a new release name.
 
