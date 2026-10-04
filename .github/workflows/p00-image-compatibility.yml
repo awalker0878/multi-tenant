@@ -37,8 +37,8 @@ jobs:
 
       - name: Resolve candidate digests, build and exercise the images
         env:
-          # First experiment resolves exact digests; switch pushes to replay with the measured lock.
-          P00_IMAGE_MODE: ${{ inputs.image_mode || 'resolve' }}
+          # Resolve only for an explicit candidate update; normal pushes replay measured digests.
+          P00_IMAGE_MODE: ${{ inputs.image_mode || 'replay' }}
         run: >-
           python3 spikes/compatibility/images/run.py
           --workspace "$GITHUB_WORKSPACE"
