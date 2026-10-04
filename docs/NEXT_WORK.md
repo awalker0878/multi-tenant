@@ -21,6 +21,8 @@ isolated management-port bootstrap, activation, pre-write source return and
 retained-target post-write repair. The bootstrap uses retained NIC identities,
 conditional Neutron updates, an independent project reader and a separate pinned
 SSH reader before guest effects; it does not qualify the native datapath.
+Current source accounting also reads retained detached base VMDKs through a
+separate pinned native file reader, preserving their original UUIDs and charges.
 
 Further implemented increments include selected PostgreSQL17 application-native
 sync, enterprise cross-tenant wave pools, authenticated retained-state import and
@@ -46,8 +48,8 @@ implemented boundary is also recorded in the execution plan's opening table.
    recovery admission and independently excluded old credentials for cleanup.
 3. Commission the implemented isolated management/bootstrap owner and its
    independent project/guest readers before subsequent guest contact. Complete
-   production policy/traffic realization and independently account for the
-   retained detached source backing throughout cutover. Run the selected
+   production policy/traffic realization. Commission current native detached
+   source-backing accounting throughout cutover. Run the selected
    application campaign against actual isolated guests. Prove
    rehearsal isolation, source restart/late-writer exclusion, final consistency,
    traffic/target write admission and useful-service acceptance. Rehearse pre-write

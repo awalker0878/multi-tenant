@@ -1,8 +1,9 @@
 """Retained-source occupancy from a separately enrolled vCenter reader.
 
 Only approved original VM selectors are read. Power-off does not release a
-charge, a disk UUID comes from actual backing data, and native snapshot chains
-remain held until their own complete storage accounting owner is commissioned.
+charge, a disk UUID comes from actual backing data, and detached base disks
+require their separately enrolled current file reader. Native snapshot chains
+remain held until their complete storage accounting owner is commissioned.
 """
 from __future__ import annotations
 
@@ -31,6 +32,7 @@ class SourceCapacityReadRuntime:
     resource_pool_id: str
     ca_file: Path
     directory: Path
+    backing_reader: object = None
 
     def __post_init__(self):
         require(type(self.enrollment) is NativeReadEnrollment and type(self.credentials) is VsphereNativeCredentialOwner
@@ -42,6 +44,13 @@ class SourceCapacityReadRuntime:
         vm.moid(self.resource_pool_id, 'resgroup')
         object.__setattr__(self, 'directory', private_path(self.directory, directory=True))
         object.__setattr__(self, 'ca_file', Path(self.ca_file))
+        if self.backing_reader is not None:
+            from .vmware_source_backing import SourceBackingReadRuntime
+            require(type(self.backing_reader) is SourceBackingReadRuntime
+                and self.backing_reader.enrollment is self.enrollment
+                and self.backing_reader.credentials is self.credentials
+                and self.backing_reader.ca_file == self.ca_file,
+                'The retained-backing reader must use this exact independently enrolled native custody')
 
     def _selected(self, bundle, pool, selected, *, cursor=None):
         require(isinstance(bundle, ResourceBundle) and type(pool) is PoolDemand and pool in bundle.pools
@@ -61,10 +70,19 @@ class SourceCapacityReadRuntime:
             'Only the complete exact originally approved source VM selectors may be accounted')
         return expected
 
-    def _read(self, bundle, pool, selected, *, cursor=None):
+    def _read(self, bundle, pool, selected, *, cursor=None, retained_facts=None):
         selected = self._selected(bundle, pool, selected, cursor=cursor)
         options = {'cursor': cursor} if cursor is not None else {}
         facts, native_ids, cpu, memory, storage = [], set(), 0, 0, 0
+        retained = {}
+        if retained_facts is not None:
+            require(type(retained_facts) is list and len(retained_facts) == len(selected),
+                'The complete exact original retained VM observations are required')
+            for fact in retained_facts:
+                binding = NativeBinding(**fact['binding'])
+                require(binding in selected and binding.native_id not in retained,
+                    'The original retained source contains a foreign or duplicate VM')
+                retained[binding.native_id] = fact['native']
         for binding in selected:
             def exchange(path):
                 self.enrollment.require_current(**options)
@@ -94,6 +112,22 @@ class SourceCapacityReadRuntime:
                 'The actual source occupancy is incomplete, changing or unavailable')
             vm.devices(hardware['device'])
             disks = [row for row in hardware['device'] if row['_typeName'] == 'VirtualDisk']
+            detached = []
+            if retained_facts is not None:
+                original = retained[binding.native_id]['config']
+                require(all(config.get(key) == original.get(key) for key in ('uuid', 'instanceUuid', 'template'))
+                    and hardware['numCPU'] == original['hardware']['numCPU']
+                    and hardware['memoryMB'] == original['hardware']['memoryMB'],
+                    'The originally charged source VM identity or compute footprint changed')
+                vm.devices(original['hardware']['device'])
+                originals = {row['key']: row for row in original['hardware']['device']
+                    if row['_typeName'] == 'VirtualDisk'}
+                require(all(row['key'] in originals and row == originals[row['key']] for row in disks),
+                    'An attached disk differs from the exact originally charged native backing')
+                detached = [row for key, row in originals.items() if key not in {disk['key'] for disk in disks}]
+                require(not detached or self.backing_reader is not None,
+                    'Detached original storage needs its separately enrolled complete current backing reader')
+            detached_facts = [self.backing_reader.observe(binding, disk, cursor=cursor) for disk in detached]
             datastore_ids = {row['backing']['datastore']['value'] for row in disks}
             datastores = {}
             for identity in sorted(datastore_ids):
@@ -105,12 +139,15 @@ class SourceCapacityReadRuntime:
                 datastores[identity] = summary
             second = {key: exchange(base + key) for key in ('config', 'runtime', 'resourcePool', 'snapshot')}
             require(first == second, 'The actual source native configuration changed during capacity observation')
-            disk_ids = {row['backing']['uuid'] for row in disks}
+            disk_ids = {row['backing']['uuid'] for row in disks + detached}
             require(not (native_ids & (disk_ids | {binding.native_id})), 'A shared native VM/backing cannot be double counted')
             native_ids |= disk_ids | {binding.native_id}
             cpu += hardware['numCPU']; memory += hardware['memoryMB'] * 1024**2
-            storage += sum(row['capacityInBytes'] for row in disks)
-            facts.append(dict(binding=asdict(binding), native=first, datastores=datastores))
+            storage += sum(row['capacityInBytes'] for row in disks + detached)
+            fact = dict(binding=asdict(binding), native=first, datastores=datastores)
+            if detached_facts:
+                fact['detached_backings'] = detached_facts
+            facts.append(fact)
         units = ResourceUnits.from_bytes(vcpu=cpu, memory_bytes=memory, storage_bytes=storage)
         require(all(asdict(pool.retained_source)[key] <= asdict(units)[key] <= pool.total(current=False)[key]
             for key in ('vcpu', 'memory_mb', 'storage_gb')),
@@ -150,18 +187,34 @@ class SourceCapacityReadRuntime:
             'The original native retained-source occupancy changed; preserve all earlier charges')
 
     def require_accounted(self, cursor, bundle, pool, receipt, original_plan):
-        """Re-read exact original occupancy; an absent retained disk stays held.
+        """Re-read exact original occupancy, including selected detached files.
 
         Current power alone does not alter CPU/RAM or retained storage charges.
-        A detached backing requires its own complete native datastore evidence;
-        this bounded first reader never substitutes an older receipt for it.
+        The old observation selects exact files; fresh native UUID, capacity and
+        extent reads supply presence. It never supplies cleanup/refund authority.
         """
         require(receipt.get('status') == 'CONFIRMED' and original_plan['metadata']['planDigest'] == bundle.admitted.plan_digest,
             'Only the exact independently confirmed original source charge may continue')
         selected = tuple(NativeBinding(row['sourceBinding']['platformFamily'], row['sourceBinding']['endpointId'],
             row['sourceBinding']['nativeScopeId'], 'vm', row['sourceBinding']['nativeId'])
             for row in original_plan['spec']['machineMappings'])
-        ids, units, facts = self._read(bundle, pool, selected, cursor=cursor)
+        reference = receipt.get('evidence_ref')
+        require(type(reference) is str and c.HEX.fullmatch(reference), 'Original source evidence custody is unavailable')
+        record = load_private(self.directory / (reference + '.json'))
+        require(canonical_record_digest(record) == reference
+            and record['format'] == 'hosting-vsphere-source-capacity-observation/1'
+            and (record['job_id'], record['selection_digest'], record['bundle_digest'], record['reservation_id']) ==
+                (bundle.admitted.job_id, bundle.selection_digest, bundle.digest, receipt['reservation_id'])
+            and record['pool_id'] == pool.catalog['pool_id'] and record['scope'] == asdict(pool.scope)
+            and record['reader_subject'] == self.enrollment.subject
+            and record['reader_grant_id'] == self.enrollment.command.grant.grant_id
+            and len(record['selected_source_bindings']) == len(selected)
+            and {NativeBinding(**row) for row in record['selected_source_bindings']} == set(selected)
+            and set(record['native_ids']) == set(receipt['native_ids'])
+            and all(record['units'][key] <= receipt['units'][key] for key in receipt['units'])
+            and record['cleanup_observed'] is False,
+            'The retained selector differs from the exact original independently confirmed source charge')
+        ids, units, facts = self._read(bundle, pool, selected, cursor=cursor, retained_facts=record['facts'])
         require(set(receipt['native_ids']) == set(ids)
             and all(asdict(units)[key] <= receipt['units'][key] for key in ('vcpu', 'memory_mb', 'storage_gb')),
             'A retained source native identity is missing or its charged footprint changed; keep the original charge held')

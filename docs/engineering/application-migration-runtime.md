@@ -168,11 +168,47 @@ acceptance continues to require its selected prepared/bootstrap state.
 This owner enables a management path over an existing approved isolated policy.
 It does not create network infrastructure, compile production policy, admit
 application traffic or certify positive/negative datapath behavior. Those owners
-and native campaigns remain separate requirements. The original source accounting
-reader also holds detached backings until their own complete native datastore
-accounting is supplied; a retained old receipt cannot establish current storage.
+and native campaigns remain separate requirements. Detached source storage uses
+the separate current native accounting owner described below; a retained old
+receipt cannot establish current storage.
 
 Primary protocol: [Neutron port update and revision constraints](https://docs.openstack.org/api-ref/network/v2/).
+
+### Current retained source-backing accounting
+
+`SourceCapacityReadRuntime` can enroll a concrete `SourceBackingReadRuntime` over
+the same independent read grant, revocable native credential owner and pinned CA.
+The confirmed original capacity receipt authenticates its original observation
+digest, complete VM/disk identities, units, native scope and reader custody. Its
+disk records select paths; their old timestamps provide no current occupancy.
+Current VM reads must retain the exact native VM identity, CPU/RAM and attached
+original disk devices. An unexpected or replaced attached disk remains held.
+
+For each missing original disk, the file reader makes two fresh native sweeps:
+`QueryVirtualDiskUuidEx`, an exact-directory `SearchDatastore_Task` for the
+primary VMDK, and another exact search for its sole flat extent. Returned task
+identities/completion, datastore ID/path, UUID, native virtual capacity, explicit
+thin/encryption facts and current file sizes/modification times must agree.
+Searches never recurse or use glob selectors. A running, failed or ambiguous
+search does not establish presence and is not resubmitted. Current mTLS/B10,
+native session user, VM/datastore datacenter lineage and exact effective native
+privileges are checked before each exchange. CA replacement blocks contact.
+
+This bounded owner supports unencrypted, unshared persistent flat base VMDKs on
+VMFS under the pinned vSphere8.0.3.0 API. VMware requires `Datastore.FileManagement`
+for its UUID query, in addition to `Datastore.Browse` for search. Commission that
+native permission on the sole selected datastore; the independently enrolled
+reader exposes no file mutation operation. VM privileges remain the read profile.
+Snapshot chains, other backing formats and incomplete metadata remain held.
+
+The detached disk stays in the original native identity set and full provisioned
+storage charge, rounded upward in the existing decimal owner units. The receipt
+is neither rekeyed nor released. This accounting proves file presence/capacity;
+the separate B11 credential, late-task and persistent attachment exclusions still
+own source-writer safety. No file cleanup or native qualification is inferred.
+
+Primary protocols: [native UUID query](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/VcenterVStorageObjectManager/moId/QueryVirtualDiskUuidEx/post/) and
+[exact-directory datastore search](https://developer.broadcom.com/xapis/virtual-infrastructure-json-api/latest/sdk/vim25/release/HostDatastoreBrowser/moId/SearchDatastore_Task/post/).
 
 `recovery_projection` still presents conservative read-only choices from the
 original activation intent. The implemented pre-write source-return path requires
@@ -285,8 +321,9 @@ worker/cgroup/staging custody, actual metadata/consistency acceptance and measur
 limits. B32–B35 native acceptance remains open for isolated rehearsal, persistent
 writer fencing, final sync, traffic/write admission and useful pre/post-write
 recovery. The implemented power/management-bootstrap owners need commissioned
-readers and native policy/reachability qualification; production policy and
-retained detached source-backing accounting remain implementation work. B36
+readers and native policy/reachability qualification. The current detached-backing
+owner needs exact native commissioning; production policy remains implementation
+work. B36
 still requires administrator acceptance of complete portal/CLI actions. B37
 native mutation remains held until minimum operating controls and independently
 authorized site/application inputs are present.

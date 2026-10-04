@@ -91,12 +91,16 @@ class VsphereNativeCredentialOwner:
     def acquire(self, authority, *, native_id, origin, ca_file):
         return self.acquire_session(authority, native_id=native_id, origin=origin, ca_file=ca_file).token
 
-    def acquire_session(self, authority, *, native_id, origin, ca_file, cursor=None):
+    def acquire_session(self, authority, *, native_id, origin, ca_file, cursor=None, datastore_id=None):
         scope, selected, purpose = self._binding(authority)
         require(selected in {None, native_id} and purpose in _PRIVILEGES
             and scope.native_scope_id == self.profile.datacenter_id and origin == self.profile.origin,
             'The native VM, vCenter or datacenter differs from the actually commissioned credential owner')
         vm.moid(native_id, 'vm')
+        if datastore_id is not None:
+            require(type(authority) is NativeReadEnrollment and purpose == 'DISCOVER_READ',
+                'Only the separately enrolled source file reader can request exact datastore observation privileges')
+            vm.moid(datastore_id, 'datastore')
         require(cursor is None or type(authority) is NativeReadEnrollment,
             'Only an independently enrolled read may use the existing scoped observation transaction')
         options = {'cursor': cursor} if cursor is not None else {}
@@ -138,32 +142,39 @@ class VsphereNativeCredentialOwner:
         current = exchange('GET', vm.PREFIX + 'SessionManager/' + self.profile.session_manager_id + '/currentSession')
         require(isinstance(current, dict) and current.get('userName') == self.profile.principal
             and current.get('key') == session, 'Actual native session user or identity differs from the current enrolled credential')
-        parent = exchange('GET', vm.resource_target({'moid': native_id}, 'parent'))
-        visited = set()
-        for _ in range(16):
-            require(isinstance(parent, dict) and set(parent) <= {'_typeName', 'type', 'value'}
-                and parent.get('type') in {'Folder', 'Datacenter'} and isinstance(parent.get('value'), str),
-                'The exact native VM has no unambiguous datacenter lineage')
-            identity = (parent['type'], parent['value']); require(identity not in visited, 'Cyclic native VM parent lineage')
-            visited.add(identity)
-            if parent['type'] == 'Datacenter':
-                require(parent['value'] == self.profile.datacenter_id, 'The actual native VM belongs to another datacenter')
-                break
-            require(re.fullmatch('group-[A-Za-z]?[1-9][0-9]{0,15}', parent['value']),
-                'Invalid exact native folder reference')
-            parent = exchange('GET', vm.PREFIX + 'Folder/' + parent['value'] + '/parent')
-        else:
-            raise ValueError('The bounded native VM parent lineage did not reach its datacenter')
-        privileges = exchange('POST', vm.PREFIX + 'AuthorizationManager/' + self.profile.authorization_manager_id +
-            '/FetchUserPrivilegeOnEntities', {'entities': [{'type': 'VirtualMachine', 'value': native_id}],
-                'userName': self.profile.principal}, response_type=list)
-        require(isinstance(privileges, list) and len(privileges) == 1
-            and privileges[0].get('entity', {}).get('type') == 'VirtualMachine'
-            and privileges[0]['entity'].get('value') == native_id
-            and isinstance(privileges[0].get('privileges'), list)
-            and set(privileges[0]['privileges']) == _PRIVILEGES[purpose]
-            and len(privileges[0]['privileges']) == len(_PRIVILEGES[purpose]),
-            'Actual effective native privileges differ from the exact bounded enrolled operation profile')
+        entities = [('VirtualMachine', native_id, _PRIVILEGES[purpose])]
+        if datastore_id is not None:
+            # VMware requires FileManagement even for QueryVirtualDiskUuidEx.
+            # Check it on this sole selected datastore, never on the VM or a
+            # datacenter-wide mutation role. The fixed reader has no file writer.
+            entities.append(('Datastore', datastore_id, _BASE | {'Datastore.Browse', 'Datastore.FileManagement'}))
+        for kind, entity_id, required_privileges in entities:
+            parent = exchange('GET', vm.PREFIX + kind + '/' + entity_id + '/parent')
+            visited = set()
+            for _ in range(16):
+                require(isinstance(parent, dict) and set(parent) <= {'_typeName', 'type', 'value'}
+                    and parent.get('type') in {'Folder', 'Datacenter'} and isinstance(parent.get('value'), str),
+                    'The exact native entity has no unambiguous datacenter lineage')
+                identity = (parent['type'], parent['value']); require(identity not in visited, 'Cyclic native parent lineage')
+                visited.add(identity)
+                if parent['type'] == 'Datacenter':
+                    require(parent['value'] == self.profile.datacenter_id, 'The actual native entity belongs to another datacenter')
+                    break
+                require(re.fullmatch('group-[A-Za-z]?[1-9][0-9]{0,15}', parent['value']),
+                    'Invalid exact native folder reference')
+                parent = exchange('GET', vm.PREFIX + 'Folder/' + parent['value'] + '/parent')
+            else:
+                raise ValueError('The bounded native parent lineage did not reach its datacenter')
+            privileges = exchange('POST', vm.PREFIX + 'AuthorizationManager/' + self.profile.authorization_manager_id +
+                '/FetchUserPrivilegeOnEntities', {'entities': [{'type': kind, 'value': entity_id}],
+                    'userName': self.profile.principal}, response_type=list)
+            require(isinstance(privileges, list) and len(privileges) == 1
+                and privileges[0].get('entity', {}).get('type') == kind
+                and privileges[0]['entity'].get('value') == entity_id
+                and isinstance(privileges[0].get('privileges'), list)
+                and set(privileges[0]['privileges']) == required_privileges
+                and len(privileges[0]['privileges']) == len(required_privileges),
+                'Actual effective native privileges differ from the exact bounded enrolled operation profile')
         _current, current_deadline = authority.require_current(**options)
         expires_at = min(material.expires_at, deadline, current_deadline)
         require(expires_at > utcnow(), 'The native session expired before contact admission')
