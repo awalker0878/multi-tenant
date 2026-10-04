@@ -11,9 +11,37 @@
     "laravel/framework": "^13.0"
   },
   "config": {
-    "allow-plugins": false,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    },
     "sort-packages": true
   },
   "minimum-stability": "stable",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "require-dev": {
+    "deptrac/deptrac": "^4.0",
+    "larastan/larastan": "^3.0",
+    "laravel/pint": "^1.0",
+    "mockery/mockery": "^1.6",
+    "pestphp/pest": "^4.4",
+    "pestphp/pest-plugin-laravel": "^4.0",
+    "phpstan/phpstan": "^2.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "pest",
+    "test:format": "pint --test",
+    "test:types": "phpstan analyse --no-progress --memory-limit=1G",
+    "test:architecture": "deptrac analyse --no-cache --fail-on-uncovered",
+    "test:canaries": "python3 tools/verify_quality_canaries.py"
+  }
 }

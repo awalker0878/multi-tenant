@@ -5,8 +5,16 @@ on:
     branches: [greenfield/enterprise-microservices-plan]
     paths:
       - spikes/compatibility/php/**
+      - spikes/compatibility/frontend/**
+      - spikes/compatibility/run-integration.py
       - .github/workflows/p00-php-compatibility.yml
   workflow_dispatch:
+    inputs:
+      dependency_mode:
+        description: Install the lock, or explicitly resolve a new experimental tuple
+        type: choice
+        options: [install, resolve]
+        default: install
 
 permissions:
   contents: read
@@ -17,9 +25,9 @@ concurrency:
 
 jobs:
   php-compatibility:
-    name: Resolve and replay the PHP compatibility lock
+    name: Laravel HTTP, quality tools and Chromium integration
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       COMPOSER_NO_INTERACTION: '1'
       COMPOSER_PROCESS_TIMEOUT: '300'
@@ -29,193 +37,38 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Copy inputs outside the checkout
-        id: prepare
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/p00-php/evidence"
-          cp spikes/compatibility/php/composer.json spikes/compatibility/php/smoke.php "$RUNNER_TEMP/p00-php/"
-          if [ -f spikes/compatibility/php/composer.lock ]; then
-            cp spikes/compatibility/php/composer.lock "$RUNNER_TEMP/p00-php/"
-          fi
-
       - name: Set up PHP and Composer
-        id: runtime
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2, resolved 2026-10-04
         with:
-          php-version: '8.5'
-          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, pdo_sqlite, session, tokenizer, xml
+          php-version: '8.5.11'
+          extensions: ctype, curl, dom, fileinfo, filter, hash, mbstring, openssl, pcre, pdo, pdo_sqlite, session, tokenizer, xml, xmlwriter
           coverage: none
-          tools: composer:v2
+          tools: composer:2.10.3
         env:
           fail-fast: 'true'
 
-      - name: Resolve, validate, smoke and reinstall from the same lock
-        id: probe
-        shell: python
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6, resolved 2026-10-04
+        with:
+          node-version: '24.19.0'
+
+      - name: Resolve, clean-install and execute the isolated probe
         env:
           COMPOSER_HOME: ${{ runner.temp }}/p00-composer-home
           COMPOSER_CACHE_DIR: ${{ runner.temp }}/p00-composer-cache
-        run: |
-          import datetime
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
-          import shutil
-          import subprocess
-          import sys
-          import time
+          # Initial quality-tool experiment; switch push default to install with its measured lock.
+          P00_DEPENDENCY_MODE: ${{ inputs.dependency_mode || 'resolve' }}
+        run: >-
+          python3 spikes/compatibility/run-integration.py
+          --workspace "$GITHUB_WORKSPACE"
+          --output "$RUNNER_TEMP/p00-integration"
+          --dependency-mode "$P00_DEPENDENCY_MODE"
 
-          root = Path(os.environ['RUNNER_TEMP']) / 'p00-php'
-          evidence = root / 'evidence'
-          evidence.mkdir(parents=True, exist_ok=True)
-          commands = []
-          state = {'result': 'RUNNING', 'commands': commands}
-          lock = root / 'composer.lock'
-
-          def digest(path):
-              return hashlib.sha256(path.read_bytes()).hexdigest()
-
-          def save():
-              (evidence / 'probe.json').write_text(json.dumps(state, indent=2) + '\n')
-
-          def run(label, argv, timeout=300):
-              started = time.monotonic()
-              entry = {
-                  'label': label, 'command': argv,
-                  'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                  'log': label + '.log',
-              }
-              commands.append(entry)
-              save()
-              with (evidence / entry['log']).open('w') as output:
-                  try:
-                      process = subprocess.run(
-                          argv, cwd=root, stdout=output, stderr=subprocess.STDOUT,
-                          timeout=timeout, check=False,
-                      )
-                      entry['exit_code'] = process.returncode
-                  except subprocess.TimeoutExpired:
-                      entry['exit_code'] = 124
-                      output.write('\nCommand exceeded the bounded timeout.\n')
-                  except OSError as error:
-                      entry['exit_code'] = 127
-                      output.write(str(error) + '\n')
-              entry['duration_seconds'] = round(time.monotonic() - started, 3)
-              save()
-              print(f"{label}: exit {entry['exit_code']}", flush=True)
-              print((evidence / entry['log']).read_text(), flush=True)
-              if entry['exit_code'] != 0:
-                  raise RuntimeError(f"{label} failed with exit {entry['exit_code']}")
-
-          php_runtime = (
-              'echo json_encode(["php"=>PHP_VERSION,"extensions"=>get_loaded_extensions()],'
-              'JSON_THROW_ON_ERROR).PHP_EOL;'
-          )
-          package_snapshot = (
-              'require "vendor/autoload.php"; $packages=[]; '
-              'foreach (Composer\\InstalledVersions::getInstalledPackages() as $name) {'
-              '$packages[$name]=["version"=>Composer\\InstalledVersions::getPrettyVersion($name),'
-              '"reference"=>Composer\\InstalledVersions::getReference($name)];}'
-              'ksort($packages); echo json_encode($packages,JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT).PHP_EOL;'
-          )
-          flags = ['--no-interaction', '--prefer-dist', '--no-plugins', '--no-scripts', '--no-progress']
-
-          try:
-              state['input_lock_sha256'] = digest(lock) if lock.exists() else None
-              state['dependency_action'] = 'install' if lock.exists() else 'update'
-              save()
-              run('php-runtime', ['php', '-r', php_runtime], timeout=30)
-              run('composer-version', ['composer', '--version', '--no-ansi'], timeout=30)
-              run('initial-dependencies', ['composer', state['dependency_action'], *flags])
-              state['resolved_lock_sha256'] = digest(lock)
-              if state['input_lock_sha256'] and state['input_lock_sha256'] != state['resolved_lock_sha256']:
-                  raise RuntimeError('Install changed the supplied lock')
-              run('validate', ['composer', 'validate', '--strict', '--no-interaction', '--no-plugins'])
-              run('platform', ['composer', 'check-platform-reqs', '--no-interaction', '--no-plugins'])
-              run('smoke-initial', ['php', 'smoke.php'], timeout=60)
-              run('packages-initial', ['php', '-r', package_snapshot], timeout=30)
-              shutil.rmtree(root / 'vendor')
-              run('clean-install', ['composer', 'install', *flags])
-              run('validate-clean', ['composer', 'validate', '--strict', '--no-interaction', '--no-plugins'])
-              run('platform-clean', ['composer', 'check-platform-reqs', '--no-interaction', '--no-plugins'])
-              run('smoke-clean', ['php', 'smoke.php'], timeout=60)
-              run('packages-clean', ['php', '-r', package_snapshot], timeout=30)
-              state['replayed_lock_sha256'] = digest(lock)
-              if state['resolved_lock_sha256'] != state['replayed_lock_sha256']:
-                  raise RuntimeError('Clean install changed the resolved lock')
-              first = json.loads((evidence / 'packages-initial.log').read_text())
-              second = json.loads((evidence / 'packages-clean.log').read_text())
-              if first != second:
-                  raise RuntimeError('Clean install changed installed versions or references')
-              state['packages'] = second
-              state['result'] = 'PASS'
-          except Exception as error:
-              state['result'] = 'FAIL'
-              state['failure'] = str(error)
-          finally:
-              save()
-          sys.exit(0 if state['result'] == 'PASS' else 1)
-
-      - name: Bind results and artifacts to source inputs
-        if: always()
-        shell: python
-        env:
-          PREPARE_OUTCOME: ${{ steps.prepare.outcome }}
-          RUNTIME_OUTCOME: ${{ steps.runtime.outcome }}
-          PROBE_OUTCOME: ${{ steps.probe.outcome }}
-        run: |
-          import datetime
-          import hashlib
-          import json
-          import os
-          from pathlib import Path
-          import shutil
-
-          root = Path(os.environ['RUNNER_TEMP']) / 'p00-php'
-          evidence = root / 'evidence'
-          evidence.mkdir(parents=True, exist_ok=True)
-          workspace = Path(os.environ['GITHUB_WORKSPACE'])
-          paths = [
-              '.github/workflows/p00-php-compatibility.yml',
-              'spikes/compatibility/php/composer.json',
-              'spikes/compatibility/php/smoke.php',
-              'spikes/compatibility/php/composer.lock',
-          ]
-          bindings = {}
-          for relative in paths:
-              path = workspace / relative
-              bindings[relative] = hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
-          probe_path = evidence / 'probe.json'
-          probe = json.loads(probe_path.read_text()) if probe_path.is_file() else {'result': 'NOT_RUN'}
-          for name in ['composer.json', 'composer.lock', 'smoke.php']:
-              source = root / name
-              if source.is_file():
-                  shutil.copyfile(source, evidence / name)
-          report = {
-              'schema_version': 1,
-              'scope': 'P00.03 disposable PHP dependency and SQLite smoke; no deployed service or native qualification',
-              'recorded_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'source_sha': os.environ['GITHUB_SHA'],
-              'source_ref': os.environ['GITHUB_REF'],
-              'repository': os.environ['GITHUB_REPOSITORY'],
-              'run_id': os.environ['GITHUB_RUN_ID'],
-              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
-              'runner_os': os.environ['RUNNER_OS'],
-              'runner_arch': os.environ['RUNNER_ARCH'],
-              'source_sha256': bindings,
-              'step_outcomes': {name.lower(): os.environ[name] for name in ['PREPARE_OUTCOME', 'RUNTIME_OUTCOME', 'PROBE_OUTCOME']},
-              'probe': probe,
-          }
-          (evidence / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
-
-      - name: Retain lock, source bindings and actual command logs
+      - name: Retain locks, source bindings and actual command logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4, resolved 2026-10-04
         with:
-          name: p00-php-compatibility-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/p00-php/evidence/
+          name: p00-integration-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/p00-integration/evidence/
           if-no-files-found: error
           retention-days: 14

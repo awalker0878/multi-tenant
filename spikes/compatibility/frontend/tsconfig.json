@@ -10,5 +10,11 @@
     "noEmit": true,
     "types": ["vite/client", "node"]
   },
-  "include": ["resources/js/**/*.ts", "resources/js/**/*.vue", "vite.config.ts"]
+  "include": [
+    "resources/js/**/*.ts",
+    "resources/js/**/*.vue",
+    "tests/browser/**/*.ts",
+    "playwright.config.ts",
+    "vite.config.ts"
+  ]
 }
