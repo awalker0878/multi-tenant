@@ -10,7 +10,7 @@ Baseline: 2026-10-04. Branch: `greenfield/enterprise-microservices-plan`.
 
 | Phase | Outcome | Work | Verification | Native qualification | Operating acceptance | Gate | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P00 | Product and architecture baseline | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G00: NOT_REVIEWED | 0 / 0 |
+| P00 | Product and architecture baseline | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | G00: NOT_REVIEWED | 0 / 0 |
 | P01 | Delivery and runtime foundation | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G01: NOT_REVIEWED | 0 / 0 |
 | P02 | Identity, tenancy and governance | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G02: NOT_REVIEWED | 0 / 0 |
 | P03 | Application catalogue and workspace | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | G03: NOT_REVIEWED | 0 / 0 |
@@ -29,12 +29,12 @@ Package state is independent of phase roll-up. Detailed work appears in the [pha
 
 | Package | Output | Owner role | Work | Verification | Native qualification | Operating acceptance | Evidence / blockers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| P00.01 | Scope and journeys | Product | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P00.02 | Domain and ownership | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P00.03 | Technical decisions | Engineering/SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P00.04 | Qualification design | Quality/platform owners | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P00.05 | Operating requirements | SRE/security | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
-| P00.06 | Delivery decomposition | Leads | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.01 | Scope and journeys | Product | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.02 | Domain and ownership | Architecture | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.03 | Technical decisions | Engineering/SRE | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.04 | Qualification design | Quality/platform owners | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.05 | Operating requirements | SRE/security | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
+| P00.06 | Delivery decomposition | Leads | IN_PROGRESS | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.01 | Repository scaffolding | Engineering | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.02 | Local and integration runtime | SRE | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |
 | P01.03 | Contracts and messaging | Architecture | NOT_STARTED | NOT_RUN | NOT_STARTED | NOT_STARTED | 0 / 0 |

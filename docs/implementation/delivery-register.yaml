@@ -24,7 +24,7 @@ phases:
   - P00.06
   gate_id: G00
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -281,7 +281,7 @@ work_packages:
   title: Scope and journeys
   owner_role: Product
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -299,7 +299,7 @@ work_packages:
   title: Domain and ownership
   owner_role: Architecture
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -324,7 +324,7 @@ work_packages:
   title: Technical decisions
   owner_role: Engineering/SRE
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -352,7 +352,7 @@ work_packages:
   title: Qualification design
   owner_role: Quality/platform owners
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -372,7 +372,7 @@ work_packages:
   title: Operating requirements
   owner_role: SRE/security
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -395,7 +395,7 @@ work_packages:
   title: Delivery decomposition
   owner_role: Leads
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1542,7 +1542,7 @@ requirements:
   - G00
   - G01
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -1710,7 +1710,7 @@ requirements:
   - G05
   - G07
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -2537,7 +2537,7 @@ requirements:
   - G05
   - G10
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -2611,7 +2611,7 @@ requirements:
   - G04
   - G10
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED
@@ -2678,7 +2678,7 @@ requirements:
   - G10
   - G11
   status:
-    work: NOT_STARTED
+    work: IN_PROGRESS
     verification: NOT_RUN
     native_qualification: NOT_STARTED
     operational_acceptance: NOT_STARTED

@@ -1,6 +1,6 @@
-# Next work — begin P00 implementation work
+# Next work — P00 baseline and compatibility work
 
-Active branch: `greenfield/enterprise-microservices-plan`. The previous Laravel foundation remains reference material only. This branch contains proposed product and delivery specifications; application implementation and qualification have not started. [Canonical delivery state](docs/implementation/delivery-register.yaml) owns status; [progress](docs/implementation/progress.md) and [traceability](docs/implementation/traceability.md) are generated views.
+Active branch: `greenfield/enterprise-microservices-plan`. The previous Laravel foundation remains reference material only. The requested `implementation/all-waves` source branch is pinned for this review at `a2963d8d43e25f08d70fbd99b0e5e19ab5c9828e`; current documentation, stack and ADR-024 take precedence. P00 execution has started: scope/domain review, an isolated compatibility attempt and route/operating-baseline review are underway. Product application implementation and native qualification have not started. [Canonical delivery state](docs/implementation/delivery-register.yaml) owns status; [progress](docs/implementation/progress.md) and [traceability](docs/implementation/traceability.md) are generated views.
 
 ## Read and start here
 
