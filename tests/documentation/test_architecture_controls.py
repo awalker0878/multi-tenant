@@ -133,26 +133,142 @@ class ArchitectureControlsTest(unittest.TestCase):
         self.write("workers/inventory/src/inventory_worker/execute.py", "from inventory.application import Collect\n")
         self.assertFails("cross-context code import")
 
-    def test_php_precheck_accepts_own_domain_and_rejects_external_context(self):
-        self.write("services/governance/src/Contexts/Governance/Application/Read.php", "<?php\nnamespace Product\\Contexts\\Governance\\Application;\nuse Product\\Contexts\\Governance\\Domain\\Grant;\n")
+    def test_php_eloquent_domain_and_framework_action_are_allowed(self):
+        self.write("services/governance/app/Domain/Access/Grant.php", """<?php
+namespace App\\Domain\\Access;
+use Illuminate\\Database\\Eloquent\\Model;
+class Grant extends Model { public function revoke(): void {} }
+""")
+        self.write("services/governance/app/Application/Access/Actions/RevokeGrant.php", """<?php
+namespace App\\Application\\Access\\Actions;
+use App\\Domain\\Access\\Grant;
+use Illuminate\\Support\\Facades\\DB;
+use Illuminate\\Support\\Facades\\Gate;
+class RevokeGrant { public function handle(int $id): void { Gate::authorize('revoke', Grant::findOrFail($id)); } }
+""")
+        result = self.check()
+        self.assertEqual([], result.errors)
+        self.assertEqual(2, result.php_sources)
+
+    def test_php_services_have_independent_local_app_namespaces(self):
+        for service in ("governance", "catalogue"):
+            self.write(f"services/{service}/app/Application/Access/Actions/ReadGrant.php", """<?php
+namespace App\\Application\\Access\\Actions;
+use App\\Domain\\Access\\Grant;
+class ReadGrant { public function handle(): void {} }
+""")
+            self.write(f"services/{service}/composer.json", json.dumps({"autoload": {"psr-4": {"App\\": "app/"}}}))
         self.assertEqual([], self.check().errors)
-        self.write("services/governance/src/Contexts/Governance/Application/Read.php", "<?php\nnamespace Product\\Contexts\\Governance\\Application;\nuse Product\\Contexts\\Catalogue\\Domain\\Application;\n")
+
+    def test_php_standard_laravel_entrypoints_are_allowed(self):
+        entries = {
+            "Http/Controllers/GrantController": "use App\\Domain\\Access\\Grant;",
+            "Console/Commands/ExpireGrants": "use App\\Application\\Access\\Actions\\RevokeGrant;",
+            "Jobs/RevokeGrantJob": "use App\\Application\\Access\\Actions\\RevokeGrant;",
+            "Listeners/GrantRevokedListener": "use App\\Application\\Access\\Actions\\RevokeGrant;",
+            "Policies/GrantPolicy": "use App\\Domain\\Access\\Grant;",
+            "Providers/AppServiceProvider": "use App\\Infrastructure\\Billing\\Gateway;",
+        }
+        for location, imports in entries.items():
+            namespace = "App\\" + location.rsplit("/", 1)[0].replace("/", "\\")
+            self.write(f"services/governance/app/{location}.php", f"<?php\nnamespace {namespace};\n{imports}\n")
+        self.assertEqual([], self.check().errors)
+
+    def test_php_cross_capability_domain_collaboration_is_allowed(self):
+        self.write("services/governance/app/Domain/Access/Grant.php", "<?php\nnamespace App\\Domain\\Access;\nuse App\\Domain\\Tenancy\\Tenant;\n")
+        self.assertEqual([], self.check().errors)
+
+    def test_php_domain_cannot_import_application(self):
+        self.write("services/governance/app/Domain/Access/Grant.php", "<?php\nnamespace App\\Domain\\Access;\nuse App\\Application\\Access\\Actions\\RevokeGrant;\n")
+        self.assertFails("inverted layer dependency domain -> application")
+
+    def test_php_domain_cannot_import_infrastructure(self):
+        self.write("services/governance/app/Domain/Access/Grant.php", "<?php\nnamespace App\\Domain\\Access;\nuse App\\Infrastructure\\Billing\\Gateway;\n")
+        self.assertFails("inverted layer dependency domain -> infrastructure")
+
+    def test_php_application_cannot_import_infrastructure(self):
+        self.write("services/governance/app/Application/Access/Actions/RevokeGrant.php", "<?php\nnamespace App\\Application\\Access\\Actions;\nuse App\\Infrastructure\\Billing\\Gateway;\n")
+        self.assertFails("inverted layer dependency application -> infrastructure")
+
+    def test_php_domain_cannot_import_delivery(self):
+        self.write("services/governance/app/Domain/Access/Grant.php", "<?php\nnamespace App\\Domain\\Access;\nuse App\\Http\\Controllers\\GrantController;\n")
+        self.assertFails("inverted layer dependency domain -> delivery")
+
+    def test_php_application_cannot_import_delivery(self):
+        self.write("services/governance/app/Application/Access/Actions/RevokeGrant.php", "<?php\nnamespace App\\Application\\Access\\Actions;\nuse App\\Policies\\GrantPolicy;\n")
+        self.assertFails("inverted layer dependency application -> delivery")
+
+    def test_php_shared_package_cannot_import_private_app(self):
+        self.write("packages/technical/php/src/Leak.php", "<?php\nnamespace Product\\Technical;\nuse App\\Domain\\Access\\Grant;\n")
         self.assertFails("cross-context code import")
 
-    def test_php_framework_precheck(self):
-        self.write("services/governance/src/Contexts/Governance/Domain/Grant.php", "<?php\nnamespace Product\\Contexts\\Governance\\Domain;\nuse Illuminate\\Database\\Eloquent\\Model;\n")
-        self.assertFails("external or unresolved import")
+    def test_php_private_service_namespace_is_rejected(self):
+        self.write("services/governance/app/Application/Access/Actions/Read.php", "<?php\nnamespace App\\Application\\Access\\Actions;\nuse Product\\Contexts\\Catalogue\\Domain\\Application;\n")
+        self.assertFails("private service import bypasses")
+
+    def test_php_source_cannot_claim_foreign_namespace(self):
+        self.write("services/governance/app/Domain/Access/Grant.php", "<?php\nnamespace Foreign\\Domain\\Access;\n")
+        self.assertFails("namespace does not match")
+
+    def test_php_registry_cannot_hide_domain_in_host_roots(self):
+        self.registry["services"][0]["host_roots"].append("app/Domain")
+        self.assertFails("host root hides context source")
+
+    def test_php_packages_cannot_claim_local_app_namespace(self):
+        self.registry["packages"][0]["namespace"] = "App\\"
+        self.assertFails("cannot claim service-local")
+
+    def test_php_capability_directory_is_required(self):
+        self.write("services/governance/app/Domain/Grant.php", "<?php\nnamespace App\\Domain;\n")
+        self.assertFails("requires a capability directory")
+
+    def test_php_declared_generated_client_is_allowed_in_infrastructure(self):
+        self.write("services/governance/app/Infrastructure/Catalogue/Gateway.php", "<?php\nnamespace App\\Infrastructure\\Catalogue;\nuse Product\\Contracts\\Catalogue\\Client;\n")
+        self.assertEqual([], self.check().errors)
+
+    def test_php_framework_allowance_does_not_allow_generated_client_in_core(self):
+        self.write("services/governance/app/Application/Access/Actions/Read.php", "<?php\nnamespace App\\Application\\Access\\Actions;\nuse Product\\Contracts\\Catalogue\\Client;\n")
+        self.assertFails("core layer cannot import")
+
+    def test_php_core_cannot_import_laravel_transport_dependencies(self):
+        imports = [
+            "Illuminate\\Http\\Request", "Illuminate\\Foundation\\Http\\FormRequest",
+            "Illuminate\\Console\\Command", "Illuminate\\Support\\Facades\\Http",
+            "Illuminate\\Support\\Facades\\Request", "Illuminate\\Support\\Facades\\Response",
+            "Illuminate\\Support\\Facades\\Route",
+        ]
+        for layer in ("Domain", "Application"):
+            for dependency in imports:
+                with self.subTest(layer=layer, dependency=dependency):
+                    self.write(f"services/governance/app/{layer}/Access/Transport.php", f"<?php\nnamespace App\\{layer}\\Access;\nuse {dependency};\n")
+                    self.assertFails("transport dependency is forbidden")
+                    (self.root / f"services/governance/app/{layer}/Access/Transport.php").unlink()
+
+    def test_php_transport_dependencies_are_allowed_in_adapters(self):
+        self.write("services/governance/app/Infrastructure/Catalogue/Gateway.php", "<?php\nnamespace App\\Infrastructure\\Catalogue;\nuse Illuminate\\Support\\Facades\\Http;\n")
+        self.write("services/governance/app/Http/Controllers/GrantController.php", "<?php\nnamespace App\\Http\\Controllers;\nuse Illuminate\\Http\\Request;\n")
+        self.assertEqual([], self.check().errors)
+
+    def test_php_undeclared_shared_package_import_is_rejected(self):
+        service = next(s for s in self.registry["services"] if s["id"] == "governance")
+        service["allowed_packages"] = []
+        self.write("services/governance/app/Infrastructure/Catalogue/Gateway.php", "<?php\nnamespace App\\Infrastructure\\Catalogue;\nuse Product\\Contracts\\Catalogue\\Client;\n")
+        self.assertFails("undeclared shared package import")
+
+    def test_composer_requires_standard_local_app_mapping(self):
+        self.write("services/governance/composer.json", json.dumps({"autoload": {"psr-4": {"App\\": "src/"}}}))
+        self.assertFails("PSR-4 mapping required")
 
     def test_composer_path_dependency_cannot_cross_services(self):
         self.write("services/governance/composer.json", json.dumps({
-            "autoload": {"psr-4": {"Product\\Contexts\\Governance\\": "src/Contexts/Governance/"}},
+            "autoload": {"psr-4": {"App\\": "app/"}},
             "repositories": [{"type": "path", "url": "../catalogue"}],
         }))
         self.assertFails("cross-service local dependency")
 
     def test_composer_path_dependency_accepts_declared_package(self):
         self.write("services/governance/composer.json", json.dumps({
-            "autoload": {"psr-4": {"Product\\Contexts\\Governance\\": "src/Contexts/Governance/"}},
+            "autoload": {"psr-4": {"App\\": "app/"}},
             "repositories": [{"type": "path", "url": "../../packages/generated/php"}],
         }))
         self.assertEqual([], self.check().errors)
@@ -182,7 +298,7 @@ class ArchitectureControlsTest(unittest.TestCase):
         service = next(s for s in self.registry["services"] if s["id"] == "governance")
         service["allowed_packages"] = []
         self.write("services/governance/composer.json", json.dumps({
-            "autoload": {"psr-4": {"Product\\Contexts\\Governance\\": "src/Contexts/Governance/"}},
+            "autoload": {"psr-4": {"App\\": "app/"}},
             "require": {"product/contracts-php": "^1.0"},
         }))
         self.assertFails("undeclared shared package dependency")
@@ -193,7 +309,7 @@ class ArchitectureControlsTest(unittest.TestCase):
 
     def test_composer_autoload_cannot_escape(self):
         self.write("services/governance/composer.json", json.dumps({
-            "autoload": {"psr-4": {"Product\\Contexts\\Governance\\": "src/Contexts/Governance/", "Foreign\\": "../catalogue/src/"}},
+            "autoload": {"psr-4": {"App\\": "app/", "Foreign\\": "../catalogue/src/"}},
         }))
         self.assertFails("autoload source escapes")
 

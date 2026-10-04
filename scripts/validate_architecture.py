@@ -2,7 +2,10 @@
 """Check declared ownership, source placement, manifests and static import boundaries.
 
 Python imports are checked with ast. PHP receives a conservative lexical precheck,
-not type analysis: Deptrac/PHPStan must enforce its resolved graph in product CI.
+not type analysis: Pest architecture tests/Deptrac/PHPStan enforce its resolved
+graph and Action handle() convention in product CI. PHP App namespaces are local
+to each independent Laravel service; Eloquent/facades are allowed except transport
+dependencies forbidden by the pragmatic DDD convention.
 No check here proves authorization, behavior, data isolation or deployed topology.
 """
 
@@ -26,20 +29,31 @@ except ImportError:  # Registry-only checks also run with the documentation Pyth
 
 
 LAYERS = {
-    "domain": set(), "application": {"domain"},
-    "infrastructure": {"domain", "application"},
-    "interfaces": {"domain", "application"},
+    "php": {
+        "domain": set(), "application": {"domain"},
+        "infrastructure": {"domain", "application"},
+        "delivery": {"domain", "application", "infrastructure"},
+    },
+    "python": {
+        "domain": set(), "application": {"domain"},
+        "infrastructure": {"domain", "application"},
+        "interfaces": {"domain", "application"},
+    },
+}
+PHP_DELIVERY_DIRECTORIES = {
+    "Broadcasting", "Console", "Events", "Exceptions", "Http", "Jobs",
+    "Listeners", "Mail", "Notifications", "Policies", "Providers", "Rules", "View",
+}
+PHP_TRANSPORT_NAMESPACES = {
+    "Illuminate\\Http", "Illuminate\\Foundation\\Http", "Illuminate\\Console",
+    "Illuminate\\Support\\Facades\\Http", "Illuminate\\Support\\Facades\\Request",
+    "Illuminate\\Support\\Facades\\Response", "Illuminate\\Support\\Facades\\Route",
 }
 SOURCE_EXTENSIONS = {".php", ".py", ".ts", ".tsx", ".js", ".jsx", ".vue"}
 MANIFEST_NAMES = {"composer.json", "pyproject.toml", "package.json"}
 # These are documentation tooling, not product source. Any new support root must
 # be reviewed here; arbitrary nested build/dist/vendor folders do not hide code.
 SUPPORT_ROOTS = {"scripts", "tests/documentation"}
-PHP_BUILTINS = {"Closure", "DateTime", "DateTimeImmutable", "DateTimeInterface", "DateInterval",
-                "DateTimeZone", "Exception", "Throwable", "RuntimeException", "LogicException",
-                "InvalidArgumentException", "DomainException", "ValueError", "TypeError",
-                "Stringable", "JsonSerializable", "Iterator", "IteratorAggregate", "Traversable",
-                "Countable", "ArrayAccess", "Generator", "UnitEnum", "BackedEnum"}
 PHP_STRIP = re.compile(r"/\*.*?\*/|//[^\n]*|\#[^\n]*|'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"", re.S)
 PHP_NAMES = re.compile(r"(?<![\w\\])\\?[A-Za-z_]\w*(?:\\[A-Za-z_]\w*)+\\?")
 
@@ -126,7 +140,7 @@ class Validator:
         except (OSError, yaml.YAMLError) as exc:
             self.error(f"Cannot load context registry: {exc}")
             return
-        if not isinstance(data, dict) or data.get("schema_version") != 1:
+        if not isinstance(data, dict) or data.get("schema_version") != 2:
             self.error("Unsupported context registry schema_version")
             return
         self.policies = data.get("layer_policies", {})
@@ -135,13 +149,18 @@ class Validator:
             return
         for language in ("php", "python"):
             policy = self.policies.get(language, {})
-            if not isinstance(policy, dict) or set(policy) != set(LAYERS):
-                self.error(f"{language}: exactly four named layers are required")
+            if not isinstance(policy, dict) or set(policy) != set(LAYERS[language]):
+                self.error(f"{language}: declared layers must match its language convention")
                 continue
             graph = {}
             for name, layer in policy.items():
                 expected = name.title() if language == "php" else name
-                if not isinstance(layer, dict) or layer.get("directory") != expected:
+                if language == "php" and name == "delivery":
+                    directories = layer.get("directories") if isinstance(layer, dict) else None
+                    if not isinstance(directories, list) or any(not isinstance(item, str) for item in directories) or len(directories) != len(set(directories)) or set(directories) != PHP_DELIVERY_DIRECTORIES:
+                        self.error("php/delivery: standard Laravel directory registration is required")
+                        continue
+                elif not isinstance(layer, dict) or layer.get("directory") != expected:
                     self.error(f"{language}/{name}: invalid layer directory")
                     continue
                 deps = layer.get("depends_on")
@@ -149,7 +168,7 @@ class Validator:
                     self.error(f"{language}/{name}: depends_on must be a list of layer IDs")
                     continue
                 graph[name] = set(deps)
-                if len(deps) != len(set(deps)) or set(deps) != LAYERS[name]:
+                if len(deps) != len(set(deps)) or set(deps) != LAYERS[language][name]:
                     self.error(f"{language}/{name}: prohibited layer dependency direction")
             if cyclic(graph):
                 self.error(f"{language}: layer dependency cycle")
@@ -189,6 +208,8 @@ class Validator:
                     source = self.path(context.get("source_root"), f"{ident} context")
                     if source == path or not under(source, path):
                         self.error(f"{ident}: context source must be inside its service root")
+                    if language == "php" and (context.get("source_root") != f"{record['root']}/app" or context.get("namespace") != "App\\"):
+                        self.error(f"{ident}: Laravel services require local App\\ namespace rooted at app/")
                     host_roots = record.get("host_roots", [])
                     if not isinstance(host_roots, list):
                         self.error(f"{ident}: host_roots must be a list")
@@ -198,20 +219,24 @@ class Validator:
                             self.error(f"{ident}: invalid host root")
                             continue
                         hp = self.path(f"{record['root']}/{host}", f"{ident} host")
-                        if not under(hp, path) or under(source, hp):
+                        if not under(hp, path) or under(source, hp) or language == "php" and under(hp, source):
                             self.error(f"{ident}: host root hides context source: {host}")
-                        if language == "php" and (host == "app" or host.startswith("app/") and host not in {"app/Providers", "app/Http/Middleware"}):
-                            self.error(f"{ident}: app/ is only for providers and transport middleware")
                     symbol = context.get("namespace" if language == "php" else "module")
                 else:
                     symbol = record.get("namespace" if language == "php" else "module")
                 if not isinstance(symbol, str) or not symbol:
                     self.error(f"{ident}: missing import namespace/module")
                 else:
-                    symbols.append((ident, language, symbol))
+                    # App\\ is resolved per service Composer root, never globally.
+                    if not (kind == "services" and language == "php"):
+                        symbols.append((ident, language, symbol))
+                    elif symbol != "App\\":
+                        self.error(f"{ident}: unexpected Laravel namespace")
                 if kind == "packages":
                     if record.get("kind") not in {"technical", "generated"}:
                         self.error(f"{ident}: shared domain packages are forbidden")
+                    if language == "php" and isinstance(symbol, str) and (symbol.rstrip("\\") == "App" or symbol.startswith("App\\")):
+                        self.error(f"{ident}: shared packages cannot claim service-local App\\ namespace")
                 if kind in {"services", "packages"} and not isinstance(record.get("package_name"), str):
                     self.error(f"{ident}: missing package_name")
         if not {"console", "governance", "catalogue", "inventory", "planning", "lifecycle", "assurance"} <= set(self.services):
@@ -268,7 +293,9 @@ class Validator:
             if record["language"] == "python" and parts == ("__init__.py",):
                 return "domain"  # Root initializer must not smuggle composition into every import.
             for name, config in self.policies[record["language"]].items():
-                if parts[0] == config["directory"]:
+                if parts[0] in config.get("directories", [config.get("directory")]):
+                    if record["language"] == "php" and name in {"domain", "application"} and len(parts) < 3:
+                        self.error(f"{path.relative_to(self.root)}: Domain/Application source requires a capability directory")
                     return name
         for host in record["host_roots"]:
             if under(path, self.root / record["root"] / host):
@@ -276,16 +303,19 @@ class Validator:
         self.error(f"{path.relative_to(self.root)}: source is outside registered layers/host roots")
         return "unknown"
 
-    def import_target(self, name, language):
+    def import_target(self, name, language, importing_record):
         for record in self.records:
             if record["language"] != language:
                 continue
+            if language == "php" and record["kind_group"] == "services" and record["id"] != importing_record["id"]:
+                continue  # A service's App\\ namespace only exists inside its own artifact.
             where = record["context"] if record["kind_group"] == "services" else record
             prefix = where.get("namespace" if language == "php" else "module", "").rstrip("\\")
             sep = "\\" if language == "php" else "."
             if name == prefix or name.startswith(prefix + sep):
                 rest = name[len(prefix):].lstrip(sep).split(sep)[0]
-                layer = next((key for key, cfg in self.policies.get(language, {}).items() if cfg["directory"] == rest), "host")
+                layer = next((key for key, cfg in self.policies.get(language, {}).items()
+                              if rest in cfg.get("directories", [cfg.get("directory")])), "host")
                 return record, layer
         return None, None
 
@@ -298,11 +328,25 @@ class Validator:
 
     def check_import(self, name, path, record, source_layer):
         language = record["language"]
-        target, target_layer = self.import_target(name.lstrip("\\"), language)
+        name = name.lstrip("\\")
+        target, target_layer = self.import_target(name, language, record)
         label = str(path.relative_to(self.root))
         if language == "python" and name.split(".")[0] in {"apps", "services", "workers", "packages"}:
             self.error(f"{label}: import bypasses registered namespace/module: {name}")
             return
+        if language == "php":
+            if source_layer in {"domain", "application"} and any(name == prefix or name.startswith(prefix + "\\") for prefix in PHP_TRANSPORT_NAMESPACES):
+                self.error(f"{label}: transport dependency is forbidden in Domain/Application: {name}")
+            if name == "App" or name.startswith("App\\"):
+                if record["kind_group"] != "services":
+                    self.error(f"{label}: cross-context code import of service-local App\\ is forbidden: {name}")
+                    return
+            if name.startswith(("Product\\Contexts\\", "Services\\", "Apps\\", "Workers\\")):
+                self.error(f"{label}: private service import bypasses local App\\ namespace: {name}")
+                return
+            if name.startswith("Product\\") and not target:
+                self.error(f"{label}: unregistered shared/private namespace import: {name}")
+                return
         if target:
             if target["kind_group"] == "packages":
                 allowed = record.get("dependencies", record.get("allowed_packages", []))
@@ -313,11 +357,11 @@ class Validator:
             elif target["id"] != record["id"]:
                 if not self.owns_source(record, target):
                     self.error(f"{label}: cross-context code import is forbidden: {name}")
-            elif source_layer != "host" and target_layer != source_layer and target_layer not in LAYERS.get(source_layer, set()):
+            elif source_layer != "host" and target_layer != source_layer and target_layer not in LAYERS[language].get(source_layer, set()):
                 self.error(f"{label}: inverted layer dependency {source_layer} -> {target_layer}: {name}")
-        elif source_layer in {"domain", "application"}:
-            top = name.lstrip("\\").split("\\" if language == "php" else ".")[0]
-            allowed = PHP_BUILTINS if language == "php" else sys.stdlib_module_names | {"__future__"}
+        elif language == "python" and source_layer in {"domain", "application"}:
+            top = name.split(".")[0]
+            allowed = sys.stdlib_module_names | {"__future__"}
             if top not in allowed:
                 self.error(f"{label}: core layer has an external or unresolved import: {name}")
 
@@ -388,8 +432,9 @@ class Validator:
             self.check_import(name, path, record, layer)
         if record["kind_group"] == "services" and layer not in {"host", "unknown"}:
             declaration = re.search(r"\bnamespace\s+([\w\\]+)\s*[;{]", code)
-            expected = record["context"]["namespace"] + self.policies["php"][layer]["directory"]
-            if not declaration or not (declaration[1] == expected or declaration[1].startswith(expected + "\\")):
+            parent = path.parent.relative_to(self.root / record["context"]["source_root"])
+            expected = record["context"]["namespace"] + "\\".join(parent.parts)
+            if not declaration or declaration[1] != expected:
                 self.error(f"{path.relative_to(self.root)}: namespace does not match owning context/layer")
 
     def local_reference(self, value, manifest, record):

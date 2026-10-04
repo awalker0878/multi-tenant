@@ -1,11 +1,16 @@
-schema_version: 1
+schema_version: 2
 # Architecture declarations are reviewed code. They do not prove runtime isolation.
+# Each PHP service is an independent Laravel application. Repeated App\ namespaces
+# resolve locally; Domain/Application capability folders are not service contexts.
 layer_policies:
   php:
     domain: {directory: Domain, depends_on: []}
     application: {directory: Application, depends_on: [domain]}
     infrastructure: {directory: Infrastructure, depends_on: [domain, application]}
-    interfaces: {directory: Interfaces, depends_on: [domain, application]}
+    # Standard Laravel adapters remain in app/, outside capability directories.
+    delivery:
+      directories: [Broadcasting, Console, Events, Exceptions, Http, Jobs, Listeners, Mail, Notifications, Policies, Providers, Rules, View]
+      depends_on: [domain, application, infrastructure]
   python:
     domain: {directory: domain, depends_on: []}
     application: {directory: application, depends_on: [domain]}
@@ -18,24 +23,24 @@ services:
     language: php
     root: apps/console
     composition_only: true
-    context: {id: console, source_root: apps/console/src/Contexts/Console, namespace: 'Product\Contexts\Console\'}
-    host_roots: [app/Providers, app/Http/Middleware, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public]
+    context: {id: console, source_root: apps/console/app, namespace: 'App\'}
+    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, resources, public]
     allowed_packages: [php-contracts, php-technical, typescript-contracts, typescript-technical]
   - id: governance
     package_name: product/governance
     owner_role: governance-maintainer
     language: php
     root: services/governance
-    context: {id: governance, source_root: services/governance/src/Contexts/Governance, namespace: 'Product\Contexts\Governance\'}
-    host_roots: [app/Providers, app/Http/Middleware, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    context: {id: governance, source_root: services/governance/app, namespace: 'App\'}
+    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
     allowed_packages: [php-contracts, php-technical]
   - id: catalogue
     package_name: product/catalogue
     owner_role: catalogue-maintainer
     language: php
     root: services/catalogue
-    context: {id: catalogue, source_root: services/catalogue/src/Contexts/Catalogue, namespace: 'Product\Contexts\Catalogue\'}
-    host_roots: [app/Providers, app/Http/Middleware, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    context: {id: catalogue, source_root: services/catalogue/app, namespace: 'App\'}
+    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
     allowed_packages: [php-contracts, php-technical]
   - id: inventory
     package_name: product-inventory
@@ -66,8 +71,8 @@ services:
     owner_role: assurance-maintainer
     language: php
     root: services/assurance
-    context: {id: assurance, source_root: services/assurance/src/Contexts/Assurance, namespace: 'Product\Contexts\Assurance\'}
-    host_roots: [app/Providers, app/Http/Middleware, bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
+    context: {id: assurance, source_root: services/assurance/app, namespace: 'App\'}
+    host_roots: [bootstrap, config, routes, database/migrations, database/factories, database/seeders, tests, public]
     allowed_packages: [php-contracts, php-technical]
 workers:
   - id: inventory-workers
