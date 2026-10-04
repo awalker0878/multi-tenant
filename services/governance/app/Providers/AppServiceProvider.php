@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Application\Foundation\Contracts\DependencyProbe;
+use App\Application\Foundation\Contracts\HealthCredential;
+use App\Infrastructure\Foundation\MountedHealthCredential;
+use App\Infrastructure\Foundation\PostgresDependencyProbe;
 use Illuminate\Support\ServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
 {
-    // Bind service-owned dependency contracts here as their behavior is implemented.
+    public function register(): void
+    {
+        $this->app->bind(HealthCredential::class, MountedHealthCredential::class);
+        $this->app->bind(DependencyProbe::class, PostgresDependencyProbe::class);
+    }
 }
