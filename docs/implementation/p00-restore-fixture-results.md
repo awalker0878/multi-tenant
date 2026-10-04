@@ -1,6 +1,6 @@
 # P00 database and attachment restore fixture
 
-Prepared 2026-10-04. The [executable fixture](../../spikes/compatibility/restore/README.md) implements a real PostgreSQL database and attachment capture/restore experiment for P00.04. Local Python syntax and CLI validation have passed. A Docker execution result is not claimed until the source-bound runner artifact is retained and reviewed below. Installed VMware/OpenStack facts and all native RF experiments remain **NOT RUN**.
+Prepared 2026-10-04. The [executable fixture](../../spikes/compatibility/restore/README.md) implements a real PostgreSQL database and attachment capture/restore experiment for P00.04. The first remote execution failed at archive copy after real PostgreSQL startup, schema/seed and the source writer denial succeeded. The correction streams the archive directly to the host with separate diagnostic logging; successful restoration is not claimed until a corrected run passes. Installed VMware/OpenStack facts and all native RF experiments remain **NOT RUN**.
 
 ## Candidate and actual scope
 
@@ -27,11 +27,13 @@ The image runs as its observed non-root PostgreSQL user with no network, no publ
 
 Execution status is taken from the retained `report.json`, not from this procedure. The report binds the source/workflow hashes and immutable image input, commands/log hashes, positive observations and exact negative diagnostics. Every actual captured bundle is retained as a JSON envelope containing the original binary archive and file bytes, with its external manifest digest. No failed execution is silently converted into success; preserve failed run evidence before fixing the runner and execute again at the corrected source revision.
 
-Resolve and replay runs, source revisions, artifact digest, evidence IDs, measured PostgreSQL versions, command/check counts and any failures are to be recorded from the real CI artifacts when available. This paragraph records the current unexecuted state; it is not an owner input requirement or permission gate for running the candidate.
+Run `37233785398`, source `ae634e325aa1e88bbcd8b35bf8d790e9e7d04f2b`, measured PostgreSQL 18.6 and reached the initial archive transfer. `pg_dump` exited zero, but the following `docker cp` could not find `/tmp/capture-1.dump`; cleanup succeeded. The observed copy failure is retained without asserting an unproven cause. The corrected runner streams binary `pg_dump` stdout directly into the host bundle, captures stderr separately, and records the archive header, exact byte count and hash. Its bounded process handling and lossless stdout evidence also retain partial output if export fails. Host Python identity is now recorded alongside the Docker and database tool inventory.
+
+Corrected resolve/replay revisions, artifact digests, evidence IDs and outcomes are recorded from actual CI artifacts when available. The initial failure does not establish a restore or recovery pass.
 
 ## P00 consequence
 
-Successful execution can add E1 bounded fixture evidence and reduce the untested synthetic data/recovery work. It cannot close G00.04, approve ADR-014, fill an installed platform tuple, identify accountable reviewers or manufacture lab authority. The [initial-route procedure](../qualification/feasibility/initial-route.md), [route review](p00-route-and-operations-review.md) and [decision/input review](p00-decision-and-input-review.md) retain the exact native and accountable-input obligations. Native F02/F04–F07 and the actual RF experiment results remain separately recorded.
+Successful execution can add E2 real-dependency fixture evidence and reduce the untested synthetic data/recovery work. It cannot close G00.04, approve ADR-014, fill an installed platform tuple, identify accountable reviewers or manufacture lab authority. The [initial-route procedure](../qualification/feasibility/initial-route.md), [route review](p00-route-and-operations-review.md) and [decision/input review](p00-decision-and-input-review.md) retain the exact native and accountable-input obligations. Native F02/F04–F07 and the actual RF experiment results remain separately recorded.
 
 The preferred proposal remains `application_rebuild_restore`. The experiment makes its state-preservation requirements executable while preserving current context, service and code-control direction. Historical implementation remains reference material only.
 

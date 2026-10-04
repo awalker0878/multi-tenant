@@ -4,15 +4,18 @@ from __future__ import annotations
 
 import argparse
 import base64
+from contextlib import ExitStack
 import datetime as dt
 import hashlib
 import json
 import os
 from pathlib import Path
+import platform
 import re
 import shutil
 import signal
 import subprocess
+import sys
 import time
 import uuid
 
@@ -90,6 +93,7 @@ def main() -> int:
         "source_sha": os.getenv("GITHUB_SHA"), "source_ref": os.getenv("GITHUB_REF"),
         "run_id": os.getenv("GITHUB_RUN_ID"), "run_attempt": os.getenv("GITHUB_RUN_ATTEMPT"),
         "candidate": candidate, "source_sha256": {}, "commands": [], "checks": [], "boundaries": [],
+        "orchestrator_runtime": {"python": sys.version, "executable": sys.executable, "platform": platform.platform()},
     }
     for path in sorted(source.rglob("*")):
         if path.is_file() and "__pycache__" not in path.parts:
@@ -100,12 +104,12 @@ def main() -> int:
     container_name = "p00-restore-" + token
     container_started = False
     gates: dict[str, bool] = {}
-    dump_sequence = 0
 
     def save() -> None:
         write_json(evidence / "report.json", state)
 
     def command(label: str, argv: list[str], *, stdin: str | None = None, input_file: Path | None = None,
+                output_file: Path | None = None,
                 timeout: int = 120, expected: str | None = None, cleanup: bool = False) -> str:
         index = len(state["commands"]) + 1
         entry = {"label": label, "command": argv, "log": f"{index:03d}-{label}.log", "started_at": now()}
@@ -117,10 +121,13 @@ def main() -> int:
         state["commands"].append(entry)
         save()
         started = time.monotonic()
-        with (evidence / entry["log"]).open("wb") as log:
+        with ExitStack() as stack:
+            log = stack.enter_context((evidence / entry["log"]).open("wb"))
+            stdout = log if output_file is None else stack.enter_context(output_file.open("wb"))
             try:
                 proc = subprocess.Popen(argv, stdin=subprocess.PIPE if stdin is not None or input_file is not None else subprocess.DEVNULL,
-                                        stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+                                        stdout=stdout, stderr=subprocess.STDOUT if output_file is None else log,
+                                        start_new_session=True)
                 try:
                     data = input_file.read_bytes() if input_file is not None else None if stdin is None else stdin.encode()
                     proc.communicate(data, timeout=timeout)
@@ -135,6 +142,11 @@ def main() -> int:
                 log.write((str(error) + "\n").encode())
         entry["duration_seconds"] = round(time.monotonic() - started, 3)
         entry["log_sha256"] = sha(evidence / entry["log"])
+        if output_file is not None:
+            encoded = entry["log"].removesuffix(".log") + "-stdout.base64.txt"
+            (evidence / encoded).write_text(base64.b64encode(output_file.read_bytes()).decode() + "\n")
+            entry["stdout_artifact"] = {"sha256": sha(output_file), "bytes": output_file.stat().st_size,
+                                        "base64_evidence": encoded, "complete": entry["exit_code"] == 0}
         result = (evidence / entry["log"]).read_bytes().decode("utf-8", errors="replace")
         if expected is not None:
             entry["expected_diagnostic"] = expected
@@ -194,7 +206,6 @@ def main() -> int:
         return current
 
     def capture(database: str, files: Path, name: str) -> tuple[Path, str, dict]:
-        nonlocal dump_sequence
         if gates.get(database) is not False:
             raise RuntimeError("CAPTURE_REQUIRES_QUIESCED_FIXTURE_WRITER")
         # The only attachment writer is this synchronous runner. No writes occur between
@@ -203,11 +214,10 @@ def main() -> int:
         bundle.mkdir()
         captured = snapshot(database, name + "-snapshot")
         write_json(bundle / "snapshot.json", captured)
-        dump_sequence += 1
-        remote_dump = f"/tmp/capture-{dump_sequence}.dump"
         command(name + "-pg-dump", ["docker", "exec", container_name, "pg_dump", "--username", "postgres",
-                                   "--dbname", database, "--format=custom", "--no-owner", "--no-acl", "--file", remote_dump])
-        command(name + "-copy-dump", ["docker", "cp", container_name + ":" + remote_dump, str(bundle / "database.dump")])
+                                   "--dbname", database, "--format=custom", "--no-owner", "--no-acl"],
+                output_file=bundle / "database.dump")
+        check(name + "-postgres-archive-header", (bundle / "database.dump").read_bytes()[:5].hex(), "5047444d50")
         shutil.copytree(files, bundle / "attachments")
         write_json(bundle / "configuration.json", {
             "fixture": "Permit Desk synthetic state only", "image_reference": state["image"]["reference"],

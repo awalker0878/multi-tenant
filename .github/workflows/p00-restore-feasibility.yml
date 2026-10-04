@@ -34,8 +34,8 @@ jobs:
 
       - name: Run real dependency fixture and retain observations
         env:
-          # Initial candidate discovery; ordinary pushes switch to replay with the measured lock.
-          P00_FIXTURE_MODE: ${{ inputs.fixture_mode || 'resolve' }}
+          # Ordinary pushes replay the measured input; explicit resolve records a candidate update.
+          P00_FIXTURE_MODE: ${{ inputs.fixture_mode || 'replay' }}
         run: >-
           python3 spikes/compatibility/restore/run.py
           --workspace "$GITHUB_WORKSPACE"
