@@ -53,7 +53,9 @@ SOURCE_EXTENSIONS = {".php", ".py", ".ts", ".tsx", ".js", ".jsx", ".vue"}
 MANIFEST_NAMES = {"composer.json", "pyproject.toml", "package.json"}
 # These are documentation tooling, not product source. Any new support root must
 # be reviewed here; arbitrary nested build/dist/vendor folders do not hide code.
-SUPPORT_ROOTS = {"scripts", "tests/documentation"}
+SUPPORT_ROOTS = {"scripts", "tests/documentation", "spikes/compatibility"}
+# P00.03 is an isolated, non-product experiment. Its exact root is excluded;
+# no other spike directory or deployable source gains this exemption.
 PHP_STRIP = re.compile(r"/\*.*?\*/|//[^\n]*|\#[^\n]*|'(?:\\.|[^'\\])*'|\"(?:\\.|[^\"\\])*\"", re.S)
 PHP_NAMES = re.compile(r"(?<![\w\\])\\?[A-Za-z_]\w*(?:\\[A-Za-z_]\w*)+\\?")
 

@@ -43,6 +43,18 @@ class ArchitectureControlsTest(unittest.TestCase):
         self.assertEqual(0, result.sources)
         self.assertEqual(7, result.services)
 
+    def test_compatibility_spike_is_separate_from_product_source(self):
+        self.write("spikes/compatibility/python/smoke.py", "import json\n")
+        self.write("spikes/compatibility/frontend/package.json", "{}")
+        result = self.check()
+        self.assertEqual([], result.errors)
+        self.assertEqual(0, result.sources)
+        self.assertEqual(0, result.manifests)
+
+    def test_other_spikes_cannot_bypass_product_registration(self):
+        self.write("spikes/unregistered/main.py", "pass\n")
+        self.assertFails("unregistered source")
+
     def test_valid_python_imports_and_relative_imports(self):
         self.write("services/inventory/src/inventory/domain/model.py", "from dataclasses import dataclass\n")
         self.write("services/inventory/src/inventory/application/read.py", "from ..domain.model import Model\n")
