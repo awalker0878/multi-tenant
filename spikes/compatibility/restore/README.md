@@ -1,19 +1,19 @@
 # Permit Desk capture and restore experiment
 
-This P00.04 experiment uses a real disposable PostgreSQL server and real attachment files to test the proposed `application_rebuild_restore` consistency and recovery boundaries. It is a synthetic data fixture, not the Permit Desk web application or a VMware/OpenStack integration. See the [results and scope](../../../docs/implementation/p00-restore-fixture-results.md).
+This P00.04 experiment uses a real disposable PostgreSQL server and real attachment files to test the proposed `application_rebuild_restore` consistency and recovery boundaries. It is a synthetic data fixture, not the Permit Desk web application or a VMware/OpenStack integration. Locked replay passed on 2026-10-04 in run `37234051654` at source `fcb9fe0ea9bde275b09dfc8c0547e89021edafc9`: 76 commands met their expectations, all 138 checks passed and three complete captures were retained. Four commands intentionally returned their required PostgreSQL rejection. See the [results, immutable evidence and scope](../../../docs/implementation/p00-restore-fixture-results.md).
 
 Run on a disposable Linux/amd64 host with Python 3, Docker and Docker Buildx. The only connected download is the declared official PostgreSQL candidate image. The server runs with its observed non-root PostgreSQL UID, no network, no published ports, no TCP listener, a read-only root filesystem and disposable memory-backed data directories. It uses local trust authentication only inside that isolated container; no credential or native endpoint input exists.
 
 ```sh
 python3 spikes/compatibility/restore/run.py \
-  --workspace "$PWD" --output /tmp/p00-restore-resolve --mode resolve
+  --workspace "$PWD" --output /tmp/p00-restore-replay --mode replay
 ```
 
-The first resolution records the actual registry index and Linux/amd64 child digests in `evidence/inputs.lock.json`. Review and commit that measured file as `spikes/compatibility/restore/inputs.lock.json`, then replay with an unused output directory:
+The committed [input lock](inputs.lock.json) records the measured registry index and Linux/amd64 child digests resolved in run `37233785398`. The corrected passing run consumed that lock. Use the normal locked replay above with an unused output directory. When explicitly evaluating a changed candidate, resolve it into another unused output directory, then review and commit its measured `evidence/inputs.lock.json` before adopting that lock:
 
 ```sh
 python3 spikes/compatibility/restore/run.py \
-  --workspace "$PWD" --output /tmp/p00-restore-replay --mode replay
+  --workspace "$PWD" --output /tmp/p00-restore-resolve --mode resolve
 ```
 
 `--lock /absolute/path/to/inputs.lock.json` selects another explicit measured lock. Replay rejects changed candidate bytes, platform, registry/repository or mutable image references; it does not silently re-resolve a tag. Archive tool and server versions must match the declared PostgreSQL patch. The image is a fixture candidate, not an accepted operated database baseline.
@@ -37,7 +37,7 @@ The selected post-write technique is clean-database forward recovery from the st
 
 ## Evidence and limits
 
-`evidence/report.json` records source/workflow hashes, GitHub revision/run identity when present, timings, exact commands, SQL, exit codes, specific negative expectations, logical observations, runtime inventory, write boundaries and cleanup. Raw logs retain their original bytes. Each `*-bundle.json` is a text evidence envelope containing the complete binary PostgreSQL archive and other bundle files encoded as base64, with their original manifest/digests. Decode only into a new isolated directory and verify the manifest before restoration. The original working directories are not required to recover the captured bytes.
+`evidence/report.json` records host Python identity, source/workflow hashes, GitHub revision/run identity when present, timings, exact commands, SQL, exit codes, specific negative expectations, logical observations, runtime inventory, write boundaries and cleanup. Raw logs retain their original bytes. Binary `pg_dump` stdout streams directly into the host bundle with stderr recorded separately; each archive also has standalone base64 evidence, byte count and SHA-256. The first run failed when `docker cp` could not find an archive after `pg_dump` exited zero. Its [failed report](../results/restore/run-37233785398/report.json) is retained separately without asserting a proven cause; the streaming correction passed all restore and recovery observations. Each `*-bundle.json` is a text evidence envelope containing the complete binary PostgreSQL archive and other bundle files encoded as base64, with their original manifest/digests. Decode only into a new isolated directory and verify the manifest before restoration. The original working directories are not required to recover the captured bytes.
 
 The synthetic seed and logical comparisons are deterministic. PostgreSQL custom archives contain run metadata, so separate captures are not expected to have identical archive bytes. Their actual hashes are recorded individually. Command timing and small fixture byte counts describe this run only; they are not accepted outage, bandwidth or production capacity measurements.
 
