@@ -1,0 +1,98 @@
+name: Planning foundation
+
+on:
+  push:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - services/planning/**
+      - .github/workflows/p01-planning-foundation.yml
+  pull_request:
+    branches: [greenfield/enterprise-microservices-plan]
+    paths:
+      - services/planning/**
+      - .github/workflows/p01-planning-foundation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: planning-foundation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  planning-package:
+    name: Locked Planning package and isolated installation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: services/planning
+    env:
+      UV_PYTHON_DOWNLOADS: never
+    steps:
+      - name: Check out source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Set up measured interpreter
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12.14'
+      - name: Set up measured package tool
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        with:
+          version: '0.12.19'
+          enable-cache: false
+      - name: Install independently owned lock
+        run: uv sync --locked --group build --no-managed-python --no-editable
+      - name: Check source and installed command behavior
+        run: |
+          uv run --locked --no-sync ruff check src tests
+          uv run --locked --no-sync ruff format --check src tests
+          uv run --locked --no-sync mypy
+          uv run --locked --no-sync pytest -q
+      - name: Build wheel using locked build tools
+        run: uv build --no-build-isolation --wheel
+      - name: Install only the wheel into an empty runtime
+        run: |
+          uv venv --no-managed-python --python 3.12.14 "$RUNNER_TEMP/planning-runtime"
+          uv pip install --python "$RUNNER_TEMP/planning-runtime/bin/python" --no-index --no-deps dist/*.whl
+      - name: Prove runtime isolation and reject unavailable readiness
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import zipfile
+
+          wheel, = Path('dist').glob('*.whl')
+          with zipfile.ZipFile(wheel) as archive:
+              assert all(name.startswith(('planning/', 'product_planning-0.1.0.dev0.dist-info/')) for name in archive.namelist())
+              metadata, = [name for name in archive.namelist() if name.endswith('/METADATA')]
+              assert 'Requires-Dist:' not in archive.read(metadata).decode()
+          runtime = Path(os.environ['RUNNER_TEMP']) / 'planning-runtime'
+          env = {key: value for key, value in os.environ.items() if key != 'PYTHONPATH'}
+          def run(*args):
+              return subprocess.run([str(runtime / 'bin/python'), '-I', *args], cwd=runtime, env=env, text=True, capture_output=True, timeout=10)
+          imported = run('-c', 'import planning; print(planning.__file__)')
+          assert imported.returncode == 0, imported.stderr
+          assert Path(imported.stdout.strip()).is_relative_to(runtime), imported.stdout
+          live = run('-m', 'planning.bootstrap.health', 'liveness')
+          assert live.returncode == 0, live.stderr
+          assert json.loads(live.stdout)['scope'] == 'process_bootstrap'
+          ready = run('-m', 'planning.bootstrap.health', 'readiness')
+          assert ready.returncode == 1, ready.stderr
+          assert json.loads(ready.stdout)['status'] == 'not_ready'
+          invalid = run('-m', 'planning.bootstrap.health', 'readiness', '--force')
+          assert invalid.returncode == 2 and not invalid.stdout
+          print('Owned wheel installed without runtime dependencies; isolated import/liveness passed; readiness and unsupported input rejected.')
+          PY
+      - name: Retain development wheel
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: planning-development-wheel-${{ github.sha }}
+          path: services/planning/dist/*.whl
+          if-no-files-found: error
+          retention-days: 14
