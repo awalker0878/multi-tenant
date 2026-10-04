@@ -26,6 +26,9 @@ from .lifecycle import LifecycleCommandGuard
 from .remote_app import ApplicationGuestRuntime
 from .source_exclusion import require_previous_writer
 
+_UUID = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+_REQUEST_ID = re.compile(r'req-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+
 
 def _endpoint(value):
     parsed = urlsplit(value)
@@ -90,7 +93,8 @@ class OpenStackApplicationClient:
                 'The selected Keystone authority or actual trust bundle changed')
         self.server_id = guard.binding.native_id
         self.volume_id = self.selected['volume_id']
-        require(re.fullmatch(r'[0-9a-f-]{36}', self.server_id), 'The exact existing Nova server UUID is required')
+        require(_UUID.fullmatch(self.server_id) and _UUID.fullmatch(self.volume_id),
+                'The exact existing Nova server and retained Cinder volume UUIDs are required')
         self.tls = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         self.tls.minimum_version = ssl.TLSVersion.TLSv1_2
         self.tls.verify_flags |= ssl.VERIFY_X509_STRICT
@@ -101,7 +105,7 @@ class OpenStackApplicationClient:
             self.runtime.previous_exclusion, self.selected['previous_owner'])
         return self.authority.require_current()
 
-    def _http(self, endpoint, method, suffix, body, headers, accepted, expires):
+    def _http(self, endpoint, method, suffix, body, headers, accepted, expires, *, retain_native_response=False):
         self._current()
         parsed = _endpoint(endpoint)
         remaining = min(self.authority.timeout(30), (expires-utcnow()).total_seconds())
@@ -111,15 +115,32 @@ class OpenStackApplicationClient:
         try:
             path = parsed.path.rstrip('/') + suffix
             connection.request(method, path, body=None if body is None else encoded(body),
-                headers={'Accept': 'application/json', 'Content-Type': 'application/json'} | headers)
+                headers={'Accept': 'application/json', 'Content-Type': 'application/json',
+                         'Accept-Encoding': 'identity', 'Connection': 'close'} | headers)
             response = connection.getresponse(); raw = response.read(2**20+1)
+            lengths = response.headers.get_all('Content-Length', [])
+            require(len(lengths) == 1 and lengths[0].isdigit() and int(lengths[0]) == len(raw)
+                    and not response.headers.get_all('Transfer-Encoding', [])
+                    and response.headers.get_all('Content-Encoding', []) in ([], ['identity'])
+                    and all(len(response.headers.get_all(name, [])) <= 1
+                            for name in ('Content-Type', 'X-OpenStack-Request-Id', 'X-Subject-Token')),
+                    'The native reply has ambiguous framing or original identity headers')
             require(response.status in accepted and len(raw) <= 2**20
                     and (not raw or response.headers.get_content_type() == 'application/json'),
                     'The exact native exchange failed or returned unbounded data')
             result = strict_loads(raw) if raw else None
             retained_headers = {key.lower(): value for key, value in response.getheaders()
                                 if key.lower() in {'x-openstack-request-id', 'x-subject-token'}}
-            self._current()
+            if retain_native_response:
+                require(method in {'POST', 'DELETE'} and endpoint in
+                        {self.selected['compute_endpoint'], self.selected['volume_endpoint']}
+                        and _REQUEST_ID.fullmatch(retained_headers.get('x-openstack-request-id', '')),
+                        'An authentic native request identity is required for the original effect receipt')
+                # Retain a genuine late reply before the caller's next current
+                # check. Revocation must stop readback/acceptance, never erase
+                # the identity of an effect that the native service accepted.
+            else:
+                self._current()
             return result, retained_headers
         finally:
             connection.close()
@@ -147,12 +168,13 @@ class OpenStackApplicationClient:
                 and token.get('project', {}).get('id') == grant.operation_scope.native_scope_id
                 and token.get('system') is None and token.get('domain') is None
                 and isinstance(token.get('roles'), list)
-                and {role.get('name') for role in token['roles']} == {'member'}
+                and [role.get('name') for role in token['roles']] == ['member']
                 and headers.get('x-subject-token'),
                 'Actual native authentication differs from the exact enrolled project-member role')
         for service_type, field in (('compute', 'compute_endpoint'), ('volumev3', 'volume_endpoint')):
             endpoints = [endpoint for service in token.get('catalog', []) if service.get('type') == service_type
-                for endpoint in service.get('endpoints', []) if endpoint.get('region') == self.selected['region']
+                for endpoint in service.get('endpoints', [])
+                if endpoint.get('region_id', endpoint.get('region')) == self.selected['region']
                 and endpoint.get('interface') == self.selected['interface']]
             require(len(endpoints) == 1 and endpoints[0]['url'].rstrip('/') == self.selected[field].rstrip('/'),
                     'The actual service catalogue differs from the commissioned native project endpoints')
@@ -166,7 +188,8 @@ class OpenStackApplicationClient:
         token, expires = self._credential()
         headers = {'X-Auth-Token': token,
             'OpenStack-API-Version': 'compute 2.89' if service == 'compute' else 'volume 3.70'}
-        return self._http(self.selected[service + '_endpoint'], method, suffix, body, headers, set(accepted), expires)
+        return self._http(self.selected[service + '_endpoint'], method, suffix, body, headers,
+                          set(accepted), expires, retain_native_response=method != 'GET')
 
     def snapshot(self, *, attached, powered=False):
         server, _ = self.request('compute', 'GET', '/servers/' + self.server_id)

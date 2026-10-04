@@ -152,8 +152,6 @@ class ApplicationLifecycleRunner:
         log.append('NATIVE_START_STARTED', dict(original_native_snapshot_digest=canonical_record_digest(before)))
         request_id = client.start()
         log.append('NATIVE_START_RETURNED', dict(native_request_id=request_id))
-        guard.runtime.registry.task_accepted(guard.runtime.context, guard.row['operation_id'],
-            guard.runtime.identity.subject, request_id)
         after = client.snapshot(attached=True, powered=True)
         require(client.snapshot(attached=True, powered=True) == after,
             'The original target server or volume changed during independent power readback')
@@ -353,12 +351,11 @@ class ApplicationLifecycleRunner:
                                                      volume_id=client.volume_id))
         task_id = client.detach(before)
         log.append('TARGET_DISK_TASK_RETURNED', dict(native_request_id=task_id))
-        guard.runtime.registry.task_accepted(guard.runtime.context, guard.row['operation_id'],
-                                            guard.runtime.identity.subject, task_id)
         after = client.snapshot(attached=False)
         require(client.snapshot(attached=False) == after,
                 'The original retained target volume or powered-off VM changed during exclusion readback')
-        persistent = dict(state='NATIVE_DATA_VOLUME_DETACHED_PERSISTENTLY', native_task_id=task_id,
+        persistent = dict(state='NATIVE_DATA_VOLUME_DETACHED_PERSISTENTLY', native_task_id=None,
+            native_request_id=task_id,
             original_shutdown_request_id=shutdown, volume_id=client.volume_id, original_snapshot=original,
             before_detach=before, retained_detached_snapshot=after, observed_at=utcnow().isoformat())
         observed = dict(status='TARGET_COMMITTED_DATA_FENCED_AND_CAPTURED' if committed else

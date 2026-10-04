@@ -345,7 +345,6 @@ class ApplicationRecoveryRunner:
                         request_id = client.start()
                         log.append('NATIVE_START_RETURNED', dict(native_request_id=request_id))
                         after = client.snapshot(attached=True, powered=True)
-                    runtime.registry.task_accepted(runtime.context, guard.row['operation_id'], runtime.identity.subject, request_id)
                     require(client.snapshot(attached=True, powered=phase == 'TARGET_START') == after,
                         'The retained target volume or VM changed during repair readback')
                     self.original_capture(member_id, detached=False)

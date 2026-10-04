@@ -128,7 +128,7 @@ class NativeTls:
                 for key,value in spec.get('headers',[]):self.send_header(key,value)
                 try:self.end_headers();self.wfile.write(data);self.wfile.flush()
                 except (OSError,ssl.SSLError):pass
-            do_GET=do_POST=do_PUT=exchange
+            do_GET=do_POST=do_PUT=do_DELETE=exchange
             def log_message(self,*args):pass
         self.routes={};self.requests=[]
         self.server=ThreadingHTTPServer(('127.0.0.1',0),Handler)
