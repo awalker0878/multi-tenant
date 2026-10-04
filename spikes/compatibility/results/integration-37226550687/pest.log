@@ -1,0 +1,252 @@
+
+   PASS  Tests\Unit\SampleTest
+  ✓ it rejects invalid state and stale revision before changing attribu… 0.01s  
+
+   FAIL  Tests\Feature\CompatibilityHttpTest
+  ! it boots Laravel and returns an initial Inertia HTML page → file_ge… 0.11s  
+  ! it returns Inertia JSON with the component props URL and asset vers… 0.01s  
+  ! it requires a fresh page when the Inertia asset version differs → f… 0.01s  
+  ⨯ it redirects web validation errors and shares them through Inertia   0.01s  
+  ⨯ it redirects a valid synthetic form to its Inertia page              0.01s  
+
+   FAIL  Tests\Feature\SampleAuthorizationTest
+  ⨯ it requires authentication for sample reads and writes               0.03s  
+  ! it returns only the actor tenant and explicitly presented fields →…  0.01s  
+  ⨯ it rejects denied readers and malformed commands without writes      0.01s  
+  ⨯ it does not reveal or mutate another tenant sample                   0.01s  
+  ! it authorizes the explicit actor when the Action is called without…  0.01s  
+  ⨯ it commits the authorized transition and its local audit together    0.01s  
+  ⨯ it rejects stale and repeated transitions without adding an audit    0.01s  
+  ! it rolls back the first write when the second local write fails → f… 0.01s  
+
+   PASS  Tests\Architecture\PragmaticBoundariesTest
+  ✓ the architecture suite inspects implemented spike classes            0.02s  
+  ✓ domain does not depend on orchestration or delivery                  0.57s  
+  ✓ application does not depend on concrete infrastructure or delivery   0.01s  
+  ✓ actions expose a public non-static handle method
+  ✓ domain models may use eloquent under the selected convention
+  ✓ the spike resolves only its own application source
+  ────────────────────────────────────────────────────────────────────────────  
+   WARNINGS  Tests\Feature\CompatibilityHttpTest > it boots Laravel and retu…   
+  file_get_contents(/home/runner/work/_temp/p00-integration/php/.env): Failed to open stream: No such file or directory
+
+  at vendor/vlucas/phpdotenv/src/Store/File/Reader.php:73
+     69▕      */
+     70▕     private static function readFromFile(string $path, ?string $encoding = null)
+     71▕     {
+     72▕         /** @var Option<string> */
+  ➜  73▕         $content = Option::fromValue(@\file_get_contents($path), false);
+     74▕ 
+     75▕         return $content->flatMap(static function (string $content) use ($encoding) {
+     76▕             return Str::utf8($content, $encoding)->mapError(static function (string $error) {
+     77▕                 throw new InvalidEncodingException($error);
+
+      [2m+7 vendor frames [22m
+  8   tests/TestCase.php:17
+
+  ────────────────────────────────────────────────────────────────────────────  
+   WARNINGS  Tests\Feature\CompatibilityHttpTest > it returns Inertia JSON w…   
+  file_get_contents(/home/runner/work/_temp/p00-integration/php/.env): Failed to open stream: No such file or directory
+
+  at vendor/vlucas/phpdotenv/src/Store/File/Reader.php:73
+     69▕      */
+     70▕     private static function readFromFile(string $path, ?string $encoding = null)
+     71▕     {
+     72▕         /** @var Option<string> */
+  ➜  73▕         $content = Option::fromValue(@\file_get_contents($path), false);
+     74▕ 
+     75▕         return $content->flatMap(static function (string $content) use ($encoding) {
+     76▕             return Str::utf8($content, $encoding)->mapError(static function (string $error) {
+     77▕                 throw new InvalidEncodingException($error);
+
+      [2m+7 vendor frames [22m
+  8   tests/TestCase.php:17
+
+  ────────────────────────────────────────────────────────────────────────────  
+   WARNINGS  Tests\Feature\CompatibilityHttpTest > it requires a fresh page…    
+  file_get_contents(/home/runner/work/_temp/p00-integration/php/.env): Failed to open stream: No such file or directory
+
+  at vendor/vlucas/phpdotenv/src/Store/File/Reader.php:73
+     69▕      */
+     70▕     private static function readFromFile(string $path, ?string $encoding = null)
+     71▕     {
+     72▕         /** @var Option<string> */
+  ➜  73▕         $content = Option::fromValue(@\file_get_contents($path), false);
+     74▕ 
+     75▕         return $content->flatMap(static function (string $content) use ($encoding) {
+     76▕             return Str::utf8($content, $encoding)->mapError(static function (string $error) {
+     77▕                 throw new InvalidEncodingException($error);
+
+      [2m+7 vendor frames [22m
+  8   tests/TestCase.php:17
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CompatibilityHttpTest > it redirects web validation…   
+  Expected response status code [201, 301, 302, 303, 307, 308] but received 419.
+Failed asserting that false is true.
+
+  at tests/Feature/CompatibilityHttpTest.php:33
+     29▕ });
+     30▕ 
+     31▕ it('redirects web validation errors and shares them through Inertia', function (): void {
+     32▕     $response = $this->from('/compatibility')->post('/compatibility/validate', ['name' => ''], ['X-Inertia' => 'true'])
+  ➜  33▕         ->assertRedirect('/compatibility')
+     34▕         ->assertSessionHasErrors('name');
+     35▕ 
+     36▕     // Preserve browser session continuity instead of relying on an in-process bag.
+     37▕     $cookie = $response->getCookie('p00_compatibility_session');
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\CompatibilityHttpTest > it redirects a valid synthe…   
+  Expected response status code [201, 301, 302, 303, 307, 308] but received 419.
+Failed asserting that false is true.
+
+  at tests/Feature/CompatibilityHttpTest.php:49
+     45▕ });
+     46▕ 
+     47▕ it('redirects a valid synthetic form to its Inertia page', function (): void {
+     48▕     $response = $this->post('/compatibility/validate', ['name' => 'P00 probe'], ['X-Inertia' => 'true'])
+  ➜  49▕         ->assertRedirect('/compatibility')
+     50▕         ->assertSessionHas('notice', 'Compatibility request accepted');
+     51▕ 
+     52▕     $cookie = $response->getCookie('p00_compatibility_session');
+     53▕     expect($cookie)->not->toBeNull();
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SampleAuthorizationTest > it requires authenticatio…   
+  Expected response status code [401] but received 419.
+Failed asserting that 419 is identical to 401.
+
+  at tests/Feature/SampleAuthorizationTest.php:16
+     12▕ it('requires authentication for sample reads and writes', function (): void {
+     13▕     $sample = $this->sample();
+     14▕ 
+     15▕     $this->getJson('/samples')->assertUnauthorized();
+  ➜  16▕     $this->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 1])->assertUnauthorized();
+     17▕     $this->assertDatabaseCount('compatibility_audits', 0);
+     18▕ });
+     19▕ 
+     20▕ it('returns only the actor tenant and explicitly presented fields', function (): void {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   WARNINGS  Tests\Feature\SampleAuthorizationTest > it returns only the act…   
+  file_get_contents(/home/runner/work/_temp/p00-integration/php/.env): Failed to open stream: No such file or directory
+
+  at vendor/vlucas/phpdotenv/src/Store/File/Reader.php:73
+     69▕      */
+     70▕     private static function readFromFile(string $path, ?string $encoding = null)
+     71▕     {
+     72▕         /** @var Option<string> */
+  ➜  73▕         $content = Option::fromValue(@\file_get_contents($path), false);
+     74▕ 
+     75▕         return $content->flatMap(static function (string $content) use ($encoding) {
+     76▕             return Str::utf8($content, $encoding)->mapError(static function (string $error) {
+     77▕                 throw new InvalidEncodingException($error);
+
+      [2m+7 vendor frames [22m
+  8   tests/TestCase.php:17
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SampleAuthorizationTest > it rejects denied readers…   
+  Expected response status code [403] but received 419.
+Failed asserting that 419 is identical to 403.
+
+  at tests/Feature/SampleAuthorizationTest.php:41
+     37▕     $sample = $this->sample();
+     38▕ 
+     39▕     $this->actingAs($this->actor(role: 'none'))->getJson('/samples')->assertForbidden();
+     40▕     $this->actingAs($this->actor(role: 'reader'))
+  ➜  41▕         ->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 1])->assertForbidden();
+     42▕     $this->actingAs($this->actor())
+     43▕         ->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 0])->assertUnprocessable()->assertJsonValidationErrors('expected_revision');
+     44▕ 
+     45▕     $this->assertDatabaseHas('compatibility_samples', ['id' => $sample->id, 'status' => 'pending', 'revision' => 1]);
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SampleAuthorizationTest > it does not reveal or mut…   
+  Expected response status code [404] but received 419.
+Failed asserting that 419 is identical to 404.
+
+  at tests/Feature/SampleAuthorizationTest.php:52
+     48▕ 
+     49▕ it('does not reveal or mutate another tenant sample', function (): void {
+     50▕     $sample = $this->sample('tenant-b');
+     51▕ 
+  ➜  52▕     $this->actingAs($this->actor())->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 1])->assertNotFound();
+     53▕ 
+     54▕     expect(Gate::forUser($this->actor())->allows('approve', $sample))->toBeFalse();
+     55▕     $this->assertDatabaseHas('compatibility_samples', ['id' => $sample->id, 'status' => 'pending', 'revision' => 1]);
+     56▕     $this->assertDatabaseCount('compatibility_audits', 0);
+
+  ────────────────────────────────────────────────────────────────────────────  
+   WARNINGS  Tests\Feature\SampleAuthorizationTest > it authorizes the expli…   
+  file_get_contents(/home/runner/work/_temp/p00-integration/php/.env): Failed to open stream: No such file or directory
+
+  at vendor/vlucas/phpdotenv/src/Store/File/Reader.php:73
+     69▕      */
+     70▕     private static function readFromFile(string $path, ?string $encoding = null)
+     71▕     {
+     72▕         /** @var Option<string> */
+  ➜  73▕         $content = Option::fromValue(@\file_get_contents($path), false);
+     74▕ 
+     75▕         return $content->flatMap(static function (string $content) use ($encoding) {
+     76▕             return Str::utf8($content, $encoding)->mapError(static function (string $error) {
+     77▕                 throw new InvalidEncodingException($error);
+
+      [2m+7 vendor frames [22m
+  8   tests/TestCase.php:17
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SampleAuthorizationTest > it commits the authorized…   
+  Expected response status code [201, 301, 302, 303, 307, 308] but received 419.
+Failed asserting that false is true.
+
+  at tests/Feature/SampleAuthorizationTest.php:72
+     68▕ 
+     69▕ it('commits the authorized transition and its local audit together', function (): void {
+     70▕     $sample = $this->sample();
+     71▕ 
+  ➜  72▕     $this->actingAs($this->actor())->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 1])->assertRedirect('/samples');
+     73▕ 
+     74▕     $this->assertDatabaseHas('compatibility_samples', ['id' => $sample->id, 'status' => 'approved', 'revision' => 2]);
+     75▕     $this->assertDatabaseHas('compatibility_audits', ['sample_id' => $sample->id, 'revision' => 2, 'actor_id' => 100]);
+     76▕ });
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\SampleAuthorizationTest > it rejects stale and repe…   
+  Expected response status code [409] but received 419.
+Failed asserting that 419 is identical to 409.
+
+  at tests/Feature/SampleAuthorizationTest.php:82
+     78▕ it('rejects stale and repeated transitions without adding an audit', function (): void {
+     79▕     $sample = $this->sample();
+     80▕     $this->actingAs($this->actor());
+     81▕ 
+  ➜  82▕     $this->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 2])->assertConflict();
+     83▕     $this->assertDatabaseHas('compatibility_samples', ['id' => $sample->id, 'status' => 'pending', 'revision' => 1]);
+     84▕     $this->assertDatabaseCount('compatibility_audits', 0);
+     85▕ 
+     86▕     $this->postJson('/samples/'.$sample->id.'/approve', ['expected_revision' => 1])->assertRedirect('/samples');
+
+  ────────────────────────────────────────────────────────────────────────────  
+   WARNINGS  Tests\Feature\SampleAuthorizationTest > it rolls back the first…   
+  file_get_contents(/home/runner/work/_temp/p00-integration/php/.env): Failed to open stream: No such file or directory
+
+  at vendor/vlucas/phpdotenv/src/Store/File/Reader.php:73
+     69▕      */
+     70▕     private static function readFromFile(string $path, ?string $encoding = null)
+     71▕     {
+     72▕         /** @var Option<string> */
+  ➜  73▕         $content = Option::fromValue(@\file_get_contents($path), false);
+     74▕ 
+     75▕         return $content->flatMap(static function (string $content) use ($encoding) {
+     76▕             return Str::utf8($content, $encoding)->mapError(static function (string $error) {
+     77▕                 throw new InvalidEncodingException($error);
+
+      [2m+7 vendor frames [22m
+  8   tests/TestCase.php:17
+
+
+  Tests:    7 failed, 6 warnings, 7 passed (154 assertions)
+  Duration: 0.91s
+

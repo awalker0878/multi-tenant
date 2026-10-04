@@ -16,6 +16,11 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        $this->assertTrue(
+            $this->app->environment('testing'),
+            'HTTP kernel tests require APP_ENV=testing; browser serving uses a separate local process.',
+        );
+
         // HTTP-kernel tests do not claim that JavaScript executes; browser CI does.
         $this->withoutVite();
 

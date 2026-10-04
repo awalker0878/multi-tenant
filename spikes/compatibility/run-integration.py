@@ -37,6 +37,9 @@ def main() -> int:
     excluded = shutil.ignore_patterns("vendor", "node_modules", ".cache", "test-results", "__pycache__", "build")
     shutil.copytree(probe / "php", php, ignore=excluded)
     shutil.copytree(probe / "frontend", frontend, ignore=excluded)
+    # Dotenv's safe loader still emits a suppressed PHP warning for a missing file;
+    # PHPUnit reports it. This disposable file contains no credentials or settings.
+    (php / ".env").write_text("# P00 fixture; configuration is supplied by the test runner.\n")
     for relative in ["bootstrap/cache", "storage/framework/cache", "storage/framework/sessions", "storage/framework/views", "storage/logs"]:
         (php / relative).mkdir(parents=True, exist_ok=True)
     state = {
@@ -63,7 +66,7 @@ def main() -> int:
 
     environment = os.environ.copy()
     environment.update({
-        "APP_ENV": "local", "APP_DEBUG": "false", "APP_URL": "http://127.0.0.1:8000",
+        "APP_ENV": "testing", "APP_DEBUG": "false", "APP_URL": "http://127.0.0.1:8000",
         "APP_KEY": "base64:" + "MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA=",
         "P00_BASE_URL": "http://127.0.0.1:8000",
         "PLAYWRIGHT_JSON_OUTPUT_FILE": str(evidence / "browser.json"),
@@ -153,7 +156,7 @@ def main() -> int:
         run("npm-audit", ["npm", "audit", "--json", "--audit-level=low"], frontend)
         shutil.copytree(frontend / "public/build", php / "public/build", dirs_exist_ok=True)
         server_log = (evidence / "http-server.log").open("w")
-        server = subprocess.Popen(["php", "artisan", "serve", "--host=127.0.0.1", "--port=8000", "--no-reload"], cwd=php, env=environment, stdout=server_log, stderr=subprocess.STDOUT, start_new_session=True)
+        server = subprocess.Popen(["php", "artisan", "serve", "--host=127.0.0.1", "--port=8000", "--no-reload"], cwd=php, env={**environment, "APP_ENV": "local"}, stdout=server_log, stderr=subprocess.STDOUT, start_new_session=True)
         deadline = time.monotonic() + 30
         while True:
             if time.monotonic() >= deadline:

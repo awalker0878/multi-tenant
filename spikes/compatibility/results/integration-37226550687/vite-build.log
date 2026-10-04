@@ -1,0 +1,15 @@
+
+> p00-frontend-compatibility@0.0.0 build
+> vite build
+
+[36mvite v8.3.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 563 modules transformed.
+rendering chunks...
+computing gzip size...
+public/build/manifest.json                       0.52 kB │ gzip:  0.22 kB
+public/build/assets/app-BoZQBhN6.css             6.08 kB │ gzip:  2.03 kB
+public/build/assets/Compatibility-D_yVkEXg.js    1.35 kB │ gzip:  0.77 kB
+public/build/assets/app-CP-jyg2t.js            172.12 kB │ gzip: 58.81 kB
+
+[32m✓ built in 233ms[39m

@@ -60,3 +60,7 @@ Remote evidence must bind the tested commit, lock and source hashes, runtime inv
 ## Limits and remaining decisions
 
 This single synthetic flow does not establish the managed-browser support matrix, accessibility conformance, production SSO/session behavior, CSP policy, SSR, reverse-proxy behavior, PostgreSQL compatibility, concurrency safety, native platform execution or a restricted-network installation path. Firefox, WebKit, managed Chrome/Edge and assistive technologies remain untested. The endpoint owners still need to supply the supported fleet and policies; later product journeys require their own tests. G00.03 and ADR-003 remain subject to their other integration, tooling, runtime and owner-decision evidence.
+
+## First successful browser execution
+
+[Run 37226550687](https://github.com/awalker0878/multi-tenant/actions/runs/37226550687) at source `41d6bd28928eda76f2a82c0f5d539c2040a0c179` passed the corrected browser test without retries or skips. Its [JSON result](../../spikes/compatibility/results/integration-37226550687/browser.json) and [command output](../../spikes/compatibility/results/integration-37226550687/browser.log) record the actual Chromium execution against the Laravel server in `APP_ENV=local`. The full experiment still failed its independent Pest check; browser success does not conceal that outcome or satisfy product authentication, managed-fleet or G00 acceptance.
