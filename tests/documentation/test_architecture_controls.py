@@ -91,6 +91,21 @@ class ArchitectureControlsTest(unittest.TestCase):
         self.write("services/unregistered/src/main.py", "pass\n")
         self.assertFails("unregistered source")
 
+    def test_console_build_configs_are_explicit_frontend_hosts(self):
+        self.write("apps/console/vite.config.ts", "export default {};\n")
+        self.write("apps/console/playwright.config.ts", "export default {};\n")
+        result = self.check()
+        self.assertEqual([], result.errors)
+        self.assertEqual(2, result.frontend_sources)
+
+    def test_console_config_registration_does_not_allow_arbitrary_root_source(self):
+        self.write("apps/console/unregistered.ts", "export default {};\n")
+        self.assertFails("outside registered layers/host roots")
+
+    def test_other_php_services_cannot_host_frontend_build_source(self):
+        self.write("services/governance/config/vite.config.ts", "export default {};\n")
+        self.assertFails("source language differs from registered owner")
+
     def test_source_cannot_escape_to_unscanned_top_level_directory(self):
         self.write("unregistered/escape.py", "pass\n")
         self.assertFails("unregistered source")
