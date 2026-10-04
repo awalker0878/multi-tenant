@@ -1,0 +1,10 @@
+[Unit]
+Description=Scheduled control-application backup
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 UTC
+RandomizedDelaySec=120s
+Persistent=yes
+
+[Install]
+WantedBy=timers.target

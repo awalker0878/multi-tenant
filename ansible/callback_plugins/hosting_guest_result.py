@@ -5,7 +5,7 @@ import sys
 from ansible.plugins.callback import CallbackBase
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from tools.run_files import encoded, utcnow, write_new
+from provisioner.execution.run_files import encoded, utcnow, write_new
 
 
 class CallbackModule(CallbackBase):

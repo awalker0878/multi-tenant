@@ -5,7 +5,9 @@ import unittest
 from tests.test_native_readback import context
 from tests.test_vsphere_observe import Client
 from tests.test_vsphere_task_observe import manifest, task_body
-from tools import readback_core as c, recovery_review as rr, vsphere_task_observe as t
+from provisioner.execution import readback_core as c
+from provisioner.execution import recovery_review as rr
+from provisioner.execution import vsphere_task_observe as t
 
 
 def fixture():
@@ -85,7 +87,7 @@ class VsphereRecoveryTests(unittest.TestCase):
             reseal(report, x)
             with self.subTest(mutate=mutate): self.assertEqual(rr.review(m, report, x)['result'], 'HOLD_INVALID_EVIDENCE')
     def test_snapshot_alone_cannot_enter_completion_review(self):
-        from tools import vsphere_observe as vm
+        from provisioner.execution import vsphere_observe as vm
         m, _, _ = fixture(); m = t.vm_manifest(m)
         report = c.observe(m, Client(m), vm, interval=0)
         self.assertEqual(rr.review(m, report, context(m, report))['result'], 'HOLD_INVALID_EVIDENCE')

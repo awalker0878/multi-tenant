@@ -242,15 +242,82 @@ def _observation(record: dict, problems: list[dict]) -> None:
 
 def _plan(record: dict, problems: list[dict], workload: dict | None) -> None:
     meta, spec = record['metadata'], record['spec']
+    driver = spec.get('execution', {}).get('driver')
+    same_location_purpose = (
+        driver == 'windows-server-2022-existing-services/1' and 'windowsServices' in spec
+        and spec['route']['method'] == 'EXISTING_GUEST_SERVICES'
+        or driver == 'application-postwrite-recovery/1' and 'applicationRecovery' in spec
+        and spec['applicationRecovery']['mode'] == 'FORWARD_REPAIR'
+        and spec['route']['method'] == 'REBUILD_RESTORE'
+        and (spec['source']['platformFamily'], spec['destination']['platformFamily']) == ('openstack', 'openstack'))
     if meta['planDigest'] != plan_digest(record):
         _problem(problems, '$.metadata.planDigest', 'Plan digest does not bind this exact revision')
-    if _scope_key(spec['source']) == _scope_key(spec['destination']):
+    if _scope_key(spec['source']) == _scope_key(spec['destination']) and not same_location_purpose:
         _problem(problems, '$.spec.destination', 'Source and destination locations are identical')
     for name in ('source', 'destination'):
         if not _scope_tenant_matches(spec[name], meta):
             _problem(problems, f'$.spec.{name}', 'Scope lies outside plan organization or tenant')
     if spec['route']['method'] == 'SAME_PLATFORM_RELOCATION' and spec['source']['platformFamily'] != spec['destination']['platformFamily']:
         _problem(problems, '$.spec.route.method', 'Native relocation requires the same platform family')
+    if 'execution' in spec:
+        selected = spec['execution']
+        expected = ('vmware', 'openstack', 'REBUILD_RESTORE')
+        actual = (spec['source']['platformFamily'], spec['destination']['platformFamily'],
+                  spec['route']['method'])
+        if selected['driver'] == 'openstack-linux-rebuild/1' and actual != expected:
+            _problem(problems, '$.spec.execution',
+                     'The selected executor requires the directed VMware to OpenStack rebuild route')
+        if selected['driver'] == 'openstack-linux-application-database/1' and actual != (
+                'vmware', 'openstack', 'APPLICATION_NATIVE'):
+            _problem(problems, '$.spec.execution',
+                     'The selected database executor requires the directed VMware to OpenStack application method')
+        if selected['driver'] in {'openstack-linux-application-staging/1',
+                                  'openstack-linux-application-cutover/1'} and actual != expected:
+            _problem(problems, '$.spec.execution', 'The staged application requires the exact directed rebuild route')
+    if (('applicationStaging' in spec) != (driver == 'openstack-linux-application-staging/1')
+            or ('applicationStagedCutover' in spec and driver not in {
+                'openstack-linux-application-cutover/1', 'openstack-linux-application-database/1'})
+            or (driver == 'openstack-linux-application-cutover/1' and 'applicationStagedCutover' not in spec)
+            or len({'applicationStaging', 'applicationStagedCutover', 'resourceRecovery',
+                    'applicationRecovery', 'windowsServices', 'coldCapture'}.intersection(spec)) > 1):
+        _problem(problems, '$.spec.execution', 'Staging, current cutover and resource recovery need separate approved purposes')
+    if (('windowsServices' in spec) != (driver == 'windows-server-2022-existing-services/1')
+            or (spec['route']['method'] == 'EXISTING_GUEST_SERVICES') != ('windowsServices' in spec)):
+        _problem(problems, '$.spec.windowsServices', 'Existing services require their fixed operational driver and purpose')
+    if 'windowsServices' in spec and (spec['source'] != spec['destination']
+            or spec['sourceSnapshotId'] != spec['destinationSnapshotId']
+            or spec['route']['guestProfile'] != 'windows-server-2022'
+            or len(spec['selectedMachineIds']) != 1 or spec['selectedDatasetIds']
+            or any(m['machineId'] != m['targetMachineId'] for m in spec['machineMappings'])):
+        _problem(problems, '$.spec.windowsServices', 'Existing services must preserve the current observed VM and its location')
+    if ('applicationRecovery' in spec) != (driver == 'application-postwrite-recovery/1'):
+        _problem(problems, '$.spec.applicationRecovery', 'Post-write repair requires a separate application recovery driver')
+    if 'applicationRecovery' in spec:
+        recovery = spec['applicationRecovery']
+        if (recovery['originalPlanDigest'] == meta['planDigest'] or recovery['mode'] != 'FORWARD_REPAIR'
+                or not ((spec['source']['platformFamily'], spec['destination']['platformFamily']) ==
+                            ('vmware', 'openstack') or spec['source'] == spec['destination']
+                            and (spec['source']['platformFamily'], spec['destination']['platformFamily']) ==
+                                ('openstack', 'openstack'))
+                or spec['route']['method'] != 'REBUILD_RESTORE'
+                or spec['route']['guestProfile'] != 'linux-ubuntu-2404'
+                or (spec['source'] == spec['destination'] and
+                    spec['sourceSnapshotId'] != spec['destinationSnapshotId'])
+                or (spec['source'] == spec['destination'] and
+                    any(m['machineId'] != m['targetMachineId'] for m in spec['machineMappings']))):
+            _problem(problems, '$.spec.applicationRecovery', 'Only a new approved forward repair of the current existing target has an effect owner')
+    if ('coldCapture' in spec) != (driver == 'vmware-openstack-cold-capture/1'):
+        _problem(problems, '$.spec.coldCapture', 'Partial cold capture requires its own selected purpose')
+    if 'coldCapture' in spec and (spec['source']['platformFamily'], spec['destination']['platformFamily'],
+            spec['route']['method']) != ('vmware', 'openstack', 'COLD_VM_CONVERSION'):
+        _problem(problems, '$.spec.coldCapture', 'Cold capture is limited to the selected VMware snapshot and OpenStack image path')
+    if 'resourceRecovery' in spec:
+        recovery = spec['resourceRecovery']
+        if ('execution' not in spec or recovery['originalOperationIds'] != sorted(recovery['originalOperationIds'])
+                or recovery['actions'] != sorted(recovery['actions'])
+                or meta['planDigest'] == recovery['originalPlanDigest']):
+            _problem(problems, '$.spec.resourceRecovery',
+                     'Recovery requires a new exact plan, sorted original intents/actions and retained original selection')
     mappings = spec['machineMappings']
     _duplicates([m['machineId'] for m in mappings], '$.spec.machineMappings', problems)
     _duplicates([m['targetMachineId'] for m in mappings], '$.spec.machineMappings', problems)

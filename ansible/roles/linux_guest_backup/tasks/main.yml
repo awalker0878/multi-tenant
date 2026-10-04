@@ -28,22 +28,31 @@
         mode: '0700'
       loop: [/etc/hosting-backup, /var/lib/hosting-backup, /var/lib/hosting-backup/runs]
 
-    - name: Create the owned executable package directory
+    - name: Create the owned executable package directories
       ansible.builtin.file:
-        path: /usr/local/lib/hosting/tools
+        path: '/usr/local/lib/hosting/{{ item }}'
         state: directory
         owner: root
         group: root
         mode: '0755'
+      loop: [provisioner, provisioner/domain, provisioner/execution]
 
     - name: Install the exact reviewed backup implementation
       ansible.builtin.copy:
-        src: '{{ playbook_dir }}/../../../tools/{{ item }}'
-        dest: '/usr/local/lib/hosting/tools/{{ item }}'
+        src: '{{ playbook_dir }}/../../../{{ item }}'
+        dest: '/usr/local/lib/hosting/{{ item }}'
         owner: root
         group: root
         mode: '0644'
-      loop: [__init__.py, restic_run.py, run_files.py, neutron_observe.py]
+      loop:
+        - provisioner/__init__.py
+        - provisioner/domain/__init__.py
+        - provisioner/domain/errors.py
+        - provisioner/execution/__init__.py
+        - provisioner/execution/restic_run.py
+        - provisioner/execution/run_files.py
+        - provisioner/execution/neutron_observe.py
+        - provisioner/execution/readback_core.py
 
     - name: Install the bound export configuration
       ansible.builtin.copy:

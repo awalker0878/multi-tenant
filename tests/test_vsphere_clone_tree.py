@@ -13,8 +13,13 @@ from tests.test_nutanix_vm_observe import uid
 from tests.test_vsphere_observe import ref
 from tests.test_vsphere_task_tree import manifest as tree_manifest, Client as TreeClient
 from tests.test_vsphere_recovery import reseal
-from tools import readback_core as c, recovery_review as rr, qualify_target as q
-from tools import vsphere_task_observe as task, vsphere_task_tree_observe as tree, vsphere_observe as vm
+from provisioner.execution import readback_cli
+from provisioner.execution import readback_core as c
+from provisioner.execution import recovery_review as rr
+from provisioner.execution import qualify_target as q
+from provisioner.execution import vsphere_task_observe as task
+from provisioner.execution import vsphere_task_tree_observe as tree
+from provisioner.execution import vsphere_observe as vm
 
 
 def manifest(origin='https://vcenter.example.invalid'):
@@ -83,7 +88,7 @@ class CloneTreeTests(unittest.TestCase):
                 return {'body': {'type': 'TaskHistoryCollector', 'value': 'collector-1'}}
             f.post_routes[create] = collector; f.post_routes[read] = lambda _: {'body': pages.pop(0)}
             folder = Path(tmp); path = folder / 'manifest.json'; path.write_text(json.dumps(m)); output = folder / 'report.json'
-            result = subprocess.run([sys.executable, str(q.ROOT / 'tools/vsphere_task_tree_observe.py'), str(path),
+            result = subprocess.run([*readback_cli.module_command(tree, []), str(path),
                 '--read-authorized-target', '--expected-origin', f.origin, '--ca-file', str(f.directory / 'ca.pem'),
                 '--output', str(output), '--interval', '0'], capture_output=True, text=True,
                 env=dict(os.environ, VCENTER_SESSION='fixture-session'), timeout=20)

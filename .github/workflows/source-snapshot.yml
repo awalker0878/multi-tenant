@@ -1,0 +1,31 @@
+name: Revision source snapshot
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: source-snapshot-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Archive tracked sources without Git metadata or runner credentials
+        run: |
+          mkdir -p /tmp/hosting-source-snapshot
+          git rev-parse HEAD > /tmp/hosting-source-snapshot/revision.txt
+          git archive --format=tar.gz HEAD > /tmp/hosting-source-snapshot/source.tar.gz
+          cd /tmp/hosting-source-snapshot
+          sha256sum revision.txt source.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: source-snapshot-${{ github.event.pull_request.head.sha || github.sha }}
+          path: /tmp/hosting-source-snapshot/
+          retention-days: 1
+          if-no-files-found: error

@@ -1,6 +1,6 @@
 {
   "family": "recovery",
-  "version": "7",
+  "version": "13",
   "description": "Recovery profiles state the recovery expectation attached to an environment.",
   "default": "standard",
   "requestDefaults": {
@@ -11,21 +11,42 @@
   "profiles": [
     {
       "profile": "standard",
-      "version": "1",
+      "version": "2",
       "rank": 1,
       "status": "IMPLEMENTED_INTERNAL_IPV4_OZ_RZ",
       "description": "Declared recovery with an isolated backup binding and a recovery-zone domain.",
-      "requires": {"services": ["backup"], "recovery_zone": "RZ"},
-      "limits": ["Declared recovery is not an exercised restore; recovery evidence remains external"]
+      "requires": {
+        "services": [
+          "backup"
+        ],
+        "recovery_zone": "RZ",
+        "capabilities": [
+          "backup_restore"
+        ]
+      },
+      "limits": [
+        "Declared recovery is not an exercised restore; recovery evidence remains external"
+      ]
     },
     {
       "profile": "enhanced",
-      "version": "1",
+      "version": "2",
       "rank": 2,
       "status": "DEFERRED_NOT_IMPLEMENTED",
       "description": "Cross-site recovery with independent recovery capacity.",
-      "requires": {"services": ["backup"], "recovery_zone": "RZ", "independent_site": true},
-      "limits": ["Deferred: no independent recovery site inventory or recovery campaign exists"]
+      "requires": {
+        "services": [
+          "backup"
+        ],
+        "recovery_zone": "RZ",
+        "independent_site": true,
+        "capabilities": [
+          "backup_restore"
+        ]
+      },
+      "limits": [
+        "Deferred: no independent recovery site inventory or recovery campaign exists"
+      ]
     }
   ]
 }

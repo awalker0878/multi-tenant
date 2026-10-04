@@ -1,7 +1,7 @@
 from __future__ import annotations
 from copy import deepcopy
 import unittest
-from scripts import check_platform_capabilities as c
+from provisioner.qualification import registry as c
 
 
 class CapabilityRegistryTests(unittest.TestCase):

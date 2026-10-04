@@ -35,8 +35,8 @@ Map trust dependencies and authority, actual credential rotation/revocation, app
 Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [lab/mtls_fixture.py](../../lab/mtls_fixture.py)
-- [tools/nsx_observe.py](../../tools/nsx_observe.py)
-- [tools/nutanix_observe.py](../../tools/nutanix_observe.py)
+- [provisioner/execution/nsx_observe.py](../../provisioner/execution/nsx_observe.py)
+- [provisioner/execution/nutanix_observe.py](../../provisioner/execution/nutanix_observe.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

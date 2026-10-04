@@ -1,6 +1,6 @@
 # Reviewed guest execution
 
-`tools/guest_run.py` and `tools/guest_apply.py` execute the selected Ubuntu profile
+`provisioner/execution/guest_run.py` and `provisioner/execution/guest_apply.py` execute the selected Ubuntu profile
 from a private, exactly reviewed bundle. They connect successful workload outputs
 to the existing native Ansible playbook, preserving guest identity, certificate
 SSH, service-file ownership and restricted bootstrap. They do not create a VM,
@@ -28,7 +28,10 @@ operator's trusted custody; a string does not authenticate or establish that fac
 
 ## Prepare without guest contact
 
-Use the exact clean published checkout. Install `requirements-dev.txt` into the
+Use the exact clean published checkout. An installed command requires an explicit
+`--source-root`; its package and reviewed asset bytes must match that checkout.
+Missing source selection or a changed runtime stops before artifact creation or
+controller dispatch. Install `requirements-dev.txt` into the
 accepted Python environment; pass its absolute interpreter path and the approved
 SSH executable. Preparation records their digests, interpreter version/prefix and
 the installed Ansible/Jinja2/PyYAML/MarkupSafe package content digests. This detects
@@ -51,7 +54,7 @@ with 0600 files outside Git and refuses overwrite or unsafe paths. Use current
 private workload execution receipts where available:
 
 ```sh
-python tools/guest_run.py \
+python -m provisioner.execution.guest_run --source-root /opt/hosting/source \
   --workload-run /private/operator/workload-run \
   --access /private/operator/guest-access.json \
   --references /private/operator/references.json \
@@ -79,6 +82,30 @@ The user certificate is bound in the bundle; the native SSH client/server still
 validate the key, signature, principals, validity and image trust at connection.
 Preparation does not contact a guest or issue authority.
 
+### Sealed guest-gate dependencies
+
+The source manifest includes the actual package-owned WSD compiler, component
+map, package initializers and error model, plus `hosting_resources` and its
+reviewed source-root markers. The Ansible filter loads these copies from the
+private bundle, not from the preparing checkout or an installed editable package.
+Guest inventory, services and file-export capture use their package-owned
+implementations from the sealed copy. The bundle contains no tools directory.
+The old composition build script is no longer a guest runtime dependency.
+Every added source byte participates in the existing bundle digest and is
+rechecked against the clean reviewed revision before controller dispatch.
+
+`tests/test_guest_source_closure.py` imports the pure guest gate in a fresh
+interpreter with site packages disabled. It verifies that every hosting owner
+comes from the bundle, that missing package owners fail rather than falling back,
+and that a modified compiler copy is rejected before the controller is launched.
+The separate real-Ansible/SSH-fixture test remains required; isolated imports
+alone do not prove controller dispatch or native guest configuration.
+
+Prepare and review a new bundle after this source change. Do not edit a previous
+bundle, reuse its approval or reinterpret historical execution receipts. This
+closes the guest filter's copied dependency set, not the remaining B05 installed
+execution/state migration or native service-acceptance work.
+
 ## Review and execute the exact bundle
 
 Review `bundle.json`, the selected mode, original/rebound access, source/runtime
@@ -104,7 +131,7 @@ must remain for the entire requested timeout. Both modes contact guests and need
 the explicit execution flag:
 
 ```sh
-python tools/guest_apply.py --bundle /private/operator/guest-check \
+python -m provisioner.execution.guest_apply --source-root /opt/hosting/source --bundle /private/operator/guest-check \
   --approval /private/operator/guest-check-approval.json \
   --ledger /private/operator/guest-ledger --execute
 ```

@@ -12,7 +12,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The hosting contract SHALL be vendor neutral and SHALL NOT require consumers to specify vendor-specific identifiers or topology objects.",
     "verification_procedures": [
@@ -39,7 +39,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Routine tenant and workload lifecycle operations SHOULD NOT require changes to physical leaf or spine configuration.",
     "verification_procedures": [
@@ -66,7 +66,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: All inter-zone paths SHALL be explicit and SHALL traverse the applicable ZIP/security edge.",
     "verification_procedures": [
@@ -93,7 +93,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Management/OOB traffic SHALL be separated from tenant operational traffic and SHALL have independently controlled access paths.",
     "verification_procedures": [
@@ -120,7 +120,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every implementation SHALL publish its offered service classes, supported information categories, excluded capabilities and required qualification evidence before accepting a production request.",
     "verification_procedures": [
@@ -147,7 +147,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Tenant identity, security-zone identity, workload lifecycle, and platform realization are separate concepts.",
     "verification_procedures": [
@@ -174,7 +174,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A VPC, VRF, Tier-1 gateway, or Neutron router is an implementation mechanism, not the enterprise definition of a security zone.",
     "verification_procedures": [
@@ -201,7 +201,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Routes are derived from authorized intent",
     "verification_procedures": [
@@ -228,7 +228,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: workload owners do not provide arbitrary route tables, BGP peers, route targets, or prefix imports/exports.",
     "verification_procedures": [
@@ -255,7 +255,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Shared services are exposed through explicit service bindings",
     "verification_procedures": [
@@ -281,7 +281,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: broad reachability to a common-services supernet is not the default.",
     "verification_procedures": [
@@ -307,7 +307,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Portability means equivalent required outcomes and conformance, not identical topology.",
     "verification_procedures": [
@@ -334,7 +334,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A deployment is not Service Ready until realized state and security controls are verified.",
     "verification_procedures": [
@@ -361,7 +361,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Failure of an admission or control-plane dependency SHALL fail new changes closed",
     "verification_procedures": [
@@ -388,7 +388,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: failure SHALL NOT silently create a security bypass.",
     "verification_procedures": [
@@ -415,7 +415,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The service contract SHALL remain stable when a supported platform is replaced, provided the replacement platform passes the required conformance profile.",
     "verification_procedures": [
@@ -442,7 +442,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Platform-specific extensions MAY be offered, but they SHALL be declared as capabilities and SHALL NOT redefine the portable core semantics.",
     "verification_procedures": [
@@ -775,7 +775,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Each WSD SHALL record confidentiality, integrity and availability separately and SHALL reference the exact adopted SecurityProfile, AssuranceProfile, AvailabilityProfile, RecoveryProfile and PlacementProfile.",
     "verification_procedures": [
@@ -803,7 +803,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Profile resolution SHALL be immutable and authorized",
     "verification_procedures": [
@@ -830,7 +830,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: a consumer SHALL NOT lower mandatory requirements by editing a profile, forging a status field or choosing an unsupported category.",
     "verification_procedures": [
@@ -857,7 +857,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Each platform qualification and material WSD change SHALL include a threat/failure analysis that identifies trust boundaries, privileged actors, dependency failures, residual risks and applicable tests.",
     "verification_procedures": [
@@ -885,7 +885,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every network SHALL resolve to one Security Domain Instance, one logical domain, one zone class, one address authority and one accountable owner",
     "verification_procedures": [
@@ -913,7 +913,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: shared-domain lifecycle SHALL use explicit dependency references.",
     "verification_procedures": [
@@ -941,7 +941,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider service consumption, platform control, privileged management and OOB transport SHALL be modeled separately",
     "verification_procedures": [
@@ -969,7 +969,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: a shared service SHALL NOT create implicit authority over another plane.",
     "verification_procedures": [
@@ -997,7 +997,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Cross-tenant routing SHALL be denied by default even when two tenants use the same zone class.",
     "verification_procedures": [
@@ -1025,7 +1025,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Tenant administrators SHALL NOT have authority to modify provider management, security-edge infrastructure, physical fabric, or another tenant namespace.",
     "verification_procedures": [
@@ -1052,7 +1052,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Tenant ownership, entitlements and role bindings SHALL be versioned and auditable",
     "verification_procedures": [
@@ -1080,7 +1080,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: suspension SHALL specify permitted recovery/containment actions and SHALL NOT imply indiscriminate workload deletion.",
     "verification_procedures": [
@@ -1108,7 +1108,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every managed workload SHALL belong to a WSD or an explicitly documented equivalent lifecycle object.",
     "verification_procedures": [
@@ -1135,7 +1135,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The WSD SHALL contain security and connectivity intent",
     "verification_procedures": [
@@ -1162,7 +1162,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: it SHALL NOT contain vendor-specific infrastructure identifiers in the consumer contract.",
     "verification_procedures": [
@@ -1189,7 +1189,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A WSD SHALL declare compute, storage, identity, backup, recovery, exposure and evidence dependencies in addition to network intent",
     "verification_procedures": [
@@ -1216,7 +1216,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: unresolved mandatory dependencies SHALL block Service Ready.",
     "verification_procedures": [
@@ -1243,7 +1243,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A Security Domain Instance SHALL contain only networks authorized to share its routing/security authority.",
     "verification_procedures": [
@@ -1270,7 +1270,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Sharing a zone class SHALL NOT imply reachability between independent Security Domain Instances.",
     "verification_procedures": [
@@ -1298,7 +1298,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Dedicated Security Domain Instances SHOULD be available for workloads whose assurance profile or threat model requires stronger isolation than shared logical segmentation.",
     "verification_procedures": [
@@ -1325,7 +1325,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Each Security Domain Instance SHALL reference a logical domain and a qualified site/platform realization",
     "verification_procedures": [
@@ -1353,7 +1353,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: membership and sharing changes SHALL be assessed as security-significant changes.",
     "verification_procedures": [
@@ -1381,7 +1381,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Internal instance zoneClass SHALL be limited to PAZ, OZ, RZ, HRZ or provider-controlled MZ",
     "verification_procedures": [
@@ -1409,7 +1409,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: external PZ/REZ relationships SHALL use ExternalDomain with explicit authority and trust metadata.",
     "verification_procedures": [
@@ -1437,7 +1437,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every requested adjacency SHALL be evaluated against the versioned zone policy before allocation",
     "verification_procedures": [
@@ -1464,7 +1464,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: being permitted to create a ZIP SHALL NOT grant any traffic by default.",
     "verification_procedures": [
@@ -1490,7 +1490,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: All inter-zone network paths SHALL traverse the applicable ZIP/security edge.",
     "verification_procedures": [
@@ -1516,7 +1516,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A ZIP SHALL identify exactly two authorized adjacent endpoints, each an internal domain instance or approved external/management domain, and SHALL NOT create a general-purpose third-zone transit path.",
     "verification_procedures": [
@@ -1542,7 +1542,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Default inter-zone policy SHALL be deny",
     "verification_procedures": [
@@ -1569,7 +1569,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: allowed flows SHALL be generated from approved Flow Intentions and Service Bindings.",
     "verification_procedures": [
@@ -1596,7 +1596,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: ZIP management traffic SHALL be segregated from operational traffic.",
     "verification_procedures": [
@@ -1622,7 +1622,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distinct security services",
     "verification_procedures": [
@@ -1649,7 +1649,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: shared virtualization SHALL only be used where the applicable assurance analysis supports it.",
     "verification_procedures": [
@@ -1676,7 +1676,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: two zone authorities",
     "verification_procedures": [
@@ -1703,7 +1703,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: joint approval",
     "verification_procedures": [
@@ -1730,7 +1730,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: required security functions",
     "verification_procedures": [
@@ -1757,7 +1757,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: management authority",
     "verification_procedures": [
@@ -1784,7 +1784,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: heightened posture",
     "verification_procedures": [
@@ -1811,7 +1811,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: session-revocation behavior",
     "verification_procedures": [
@@ -1838,7 +1838,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: current evidence",
     "verification_procedures": [
@@ -1865,7 +1865,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A distributed or shared-infrastructure ZIP SHALL be qualified against the same required security outcomes as a dedicated edge",
     "verification_procedures": [
@@ -1892,7 +1892,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: any unsupported mandatory function SHALL make that realization ineligible.",
     "verification_procedures": [
@@ -1919,8 +1919,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Tenant workload networks SHALL have no direct route to infrastructure management interfaces.",
     "verification_procedures": [
@@ -1946,8 +1946,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Administrative access SHALL originate from an authorized management access path and traverse management-specific security controls.",
     "verification_procedures": [
@@ -1973,8 +1973,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Automation identities used to manage tenant workloads SHALL be separated from identities able to modify the physical fabric, security edge, or management foundation.",
     "verification_procedures": [
@@ -2000,8 +2000,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: controlled",
     "verification_procedures": [
@@ -2027,8 +2027,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: strongly authenticated",
     "verification_procedures": [
@@ -2054,8 +2054,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: logged",
     "verification_procedures": [
@@ -2081,8 +2081,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: time-bounded",
     "verification_procedures": [
@@ -2108,8 +2108,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: tested",
     "verification_procedures": [
@@ -2135,8 +2135,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The implementation SHALL document independent MZ semantics, OOB transport dependencies, remote-management boundary and privileged identity controls",
     "verification_procedures": [
@@ -2163,8 +2163,8 @@
     "implementation_disposition": "EXTERNAL_NATIVE_FOUNDATION_REQUIRED",
     "artifacts": [
       "docs/engineering/TAD.md",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: tenant-facing APIs SHALL NOT expose infrastructure administration.",
     "verification_procedures": [
@@ -2302,8 +2302,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2331,8 +2331,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2361,8 +2361,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2391,8 +2391,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2422,8 +2422,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2453,8 +2453,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2484,8 +2484,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2515,8 +2515,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2546,8 +2546,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -2577,7 +2577,7 @@
     "enforcement_location": "Authoritative address/name allocation and native DNS/DHCP lifecycle services",
     "implementation_disposition": "PARTIAL_DNS_EXTERNAL_IPAM_REQUIRED",
     "artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every managed network SHALL have an authoritative IPAM record and owner.",
@@ -2603,7 +2603,7 @@
     "enforcement_location": "Authoritative address/name allocation and native DNS/DHCP lifecycle services",
     "implementation_disposition": "PARTIAL_DNS_EXTERNAL_IPAM_REQUIRED",
     "artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Overlapping address space SHALL be an explicit exception or migration pattern, not the standard tenancy model.",
@@ -2629,7 +2629,7 @@
     "enforcement_location": "Authoritative address/name allocation and native DNS/DHCP lifecycle services",
     "implementation_disposition": "PARTIAL_DNS_EXTERNAL_IPAM_REQUIRED",
     "artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Address release SHOULD include quarantine/reuse controls appropriate to DNS, logging, firewall state, and incident-response requirements.",
@@ -2655,7 +2655,7 @@
     "enforcement_location": "Authoritative address/name allocation and native DNS/DHCP lifecycle services",
     "implementation_disposition": "PARTIAL_DNS_EXTERNAL_IPAM_REQUIRED",
     "artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Address allocation, DNS/DHCP registration and release SHALL use idempotent operation identities, conflict detection and a dependency-aware quarantine policy",
@@ -2683,7 +2683,7 @@
     "enforcement_location": "Authoritative address/name allocation and native DNS/DHCP lifecycle services",
     "implementation_disposition": "PARTIAL_DNS_EXTERNAL_IPAM_REQUIRED",
     "artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: IPAM failure SHALL NOT cause guessed allocations.",
@@ -2711,7 +2711,7 @@
     "enforcement_location": "Every offered native domain/edge/service/recovery path and local neighbour/control protocols",
     "implementation_disposition": "NATIVE_IMPLEMENTATION_AND_QUALIFICATION_OPEN",
     "artifacts": [
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "lab/run_namespace_lab.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Security semantics SHALL be equivalent across IPv4 and IPv6 unless an explicit, approved protocol-specific exception exists.",
@@ -2738,7 +2738,7 @@
     "enforcement_location": "Every offered native domain/edge/service/recovery path and local neighbour/control protocols",
     "implementation_disposition": "NATIVE_IMPLEMENTATION_AND_QUALIFICATION_OPEN",
     "artifacts": [
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "lab/run_namespace_lab.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Conformance testing SHALL include IPv6 negative-path tests before a platform is certified for dual-stack service.",
@@ -2765,7 +2765,7 @@
     "enforcement_location": "Every offered native domain/edge/service/recovery path and local neighbour/control protocols",
     "implementation_disposition": "NATIVE_IMPLEMENTATION_AND_QUALIFICATION_OPEN",
     "artifacts": [
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "lab/run_namespace_lab.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every offered address-family mode SHALL define local protocol controls, ICMPv6/PMTU treatment, transition-path restrictions and complete service/recovery dependencies",
@@ -2792,7 +2792,7 @@
     "enforcement_location": "Every offered native domain/edge/service/recovery path and local neighbour/control protocols",
     "implementation_disposition": "NATIVE_IMPLEMENTATION_AND_QUALIFICATION_OPEN",
     "artifacts": [
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "lab/run_namespace_lab.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: unsupported family combinations SHALL be rejected.",
@@ -2821,7 +2821,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Consumers SHALL NOT receive broad routing to a shared-services supernet solely because they consume one shared service.",
     "verification_procedures": [
@@ -2848,7 +2848,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Where useful, shared services SHOULD expose zone-aligned endpoints so that consumption does not force unnecessary cross-zone routing.",
     "verification_procedures": [
@@ -2875,7 +2875,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: direction",
     "verification_procedures": [
@@ -2903,7 +2903,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: endpoint identity",
     "verification_procedures": [
@@ -2931,7 +2931,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: authentication",
     "verification_procedures": [
@@ -2959,7 +2959,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: allowed scope",
     "verification_procedures": [
@@ -2987,7 +2987,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: availability",
     "verification_procedures": [
@@ -3015,7 +3015,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: failure behavior",
     "verification_procedures": [
@@ -3043,7 +3043,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: management separation",
     "verification_procedures": [
@@ -3071,7 +3071,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: revoked",
     "verification_procedures": [
@@ -3099,7 +3099,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A workload SHALL NOT obtain direct public ingress by attaching its internal Security Domain directly to a public network.",
     "verification_procedures": [
@@ -3126,7 +3126,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Public exposure SHALL be represented by an Exposure object with owner, protocol, endpoint, certificate/DNS dependencies, logging, security profile, and lifecycle state.",
     "verification_procedures": [
@@ -3153,7 +3153,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Internet egress SHALL be deny-by-default and enabled only through an approved egress profile.",
     "verification_procedures": [
@@ -3180,7 +3180,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Egress telemetry SHALL permit attribution to the originating tenant/WSD and should preserve useful source identity where operationally feasible.",
     "verification_procedures": [
@@ -3207,7 +3207,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Exposure SHALL remain disabled until current-generation boundary, certificate, backend, logging and authorization gates pass",
     "verification_procedures": [
@@ -3235,7 +3235,7 @@
     "artifacts": [
       "docs/engineering/TAD.md",
       "lab/run_namespace_lab.py",
-      "tools/dns_change.py"
+      "provisioner/execution/dns_change.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: exposure revocation SHALL enforce the approved existing-session policy.",
     "verification_procedures": [
@@ -3374,7 +3374,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment record covering forwarding authority, isolation, MTU, HA, capacity and cleanup",
     "verification_procedures": [
@@ -3402,7 +3402,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: consumers SHALL NOT choose its native topology identifiers.",
     "verification_procedures": [
@@ -3430,7 +3430,7 @@
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/route_record_review.py"
+      "provisioner/execution/route_record_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A shared attachment SHALL be prohibited unless direct connected, neighbor, gateway and NAT/PBR paths preserve the required domain isolation and ZIP enforcement in normal and failure states.",
     "verification_procedures": [
@@ -4065,7 +4065,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Human",
     "verification_procedures": [
@@ -4093,7 +4093,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: workload",
     "verification_procedures": [
@@ -4121,7 +4121,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: automation identities",
     "verification_procedures": [
@@ -4149,7 +4149,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: role or group inheritance",
     "verification_procedures": [
@@ -4177,7 +4177,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Privileged access SHALL use the approved hardened path, strong authentication, least privilege and time-bound delegation",
     "verification_procedures": [
@@ -4205,7 +4205,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: emergency and supplier access SHALL be logged, tested and revoked after use.",
     "verification_procedures": [
@@ -4233,7 +4233,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Credential and session revocation SHALL be verified at the consuming service within the approved propagation interval, including cached tokens and delegated grants.",
     "verification_procedures": [
@@ -4261,7 +4261,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: at rest",
     "verification_procedures": [
@@ -4289,7 +4289,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: in transit",
     "verification_procedures": [
@@ -4317,7 +4317,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: algorithms/modes",
     "verification_procedures": [
@@ -4345,7 +4345,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: endpoint identity validation",
     "verification_procedures": [
@@ -4373,7 +4373,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: module/operating-environment evidence",
     "verification_procedures": [
@@ -4401,7 +4401,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: exceptions",
     "verification_procedures": [
@@ -4429,7 +4429,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Key use",
     "verification_procedures": [
@@ -4457,7 +4457,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: administration",
     "verification_procedures": [
@@ -4485,7 +4485,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: recovery",
     "verification_procedures": [
@@ -4513,7 +4513,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: destruction",
     "verification_procedures": [
@@ -4541,7 +4541,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: retained-data recovery",
     "verification_procedures": [
@@ -4569,7 +4569,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: KMS/trust-service outage behavior SHALL be tested and SHALL NOT enable plaintext fallback",
     "verification_procedures": [
@@ -4597,7 +4597,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: cryptographic inventory, certificate rotation and algorithm-transition plans SHALL be maintained.",
     "verification_procedures": [
@@ -5665,7 +5665,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Every applicable infrastructure/application control and recovery dependency SHALL have a provider, tenant or shared responsibility assignment and evidence owner",
     "verification_procedures": [
@@ -5692,7 +5692,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: unresolved mandatory responsibilities SHALL block Service Ready.",
     "verification_procedures": [
@@ -6423,7 +6423,7 @@
     "artifacts": [
       "terraform/modules/nutanix-domain/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: New Nutanix automation SHOULD use current supported v2/v4-backed provider resources where those resources satisfy the requirement",
     "verification_procedures": [
@@ -6450,7 +6450,7 @@
     "artifacts": [
       "terraform/modules/nutanix-domain/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: legacy resources require an explicit compatibility rationale.",
     "verification_procedures": [
@@ -6477,7 +6477,7 @@
     "artifacts": [
       "terraform/modules/nutanix-domain/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Nutanix VPC internal routing SHALL NOT be used to bypass a required inter-zone ZIP.",
     "verification_procedures": [
@@ -6505,7 +6505,7 @@
     "artifacts": [
       "terraform/modules/nutanix-domain/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider-managed categories/metadata used for security SHALL be protected from tenant modification.",
     "verification_procedures": [
@@ -6532,7 +6532,7 @@
     "artifacts": [
       "terraform/modules/nutanix-domain/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The Nutanix profile SHALL qualify the actual AOS/Prism/Flow/provider tuple and external-attachment behavior",
     "verification_procedures": [
@@ -6561,7 +6561,7 @@
     "artifacts": [
       "terraform/modules/nutanix-domain/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
-      "tools/nutanix_observe.py"
+      "provisioner/execution/nutanix_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: unresolved licensing, routing, policy precedence or asynchronous realization limitations SHALL block the affected capability.",
     "verification_procedures": [
@@ -6590,7 +6590,7 @@
     "artifacts": [
       "terraform/modules/nsx-domain/main.tf.json",
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: An NSX implementation SHALL keep tenant/project policy distinct from provider/global management and security policy.",
     "verification_procedures": [
@@ -6618,7 +6618,7 @@
     "artifacts": [
       "terraform/modules/nsx-domain/main.tf.json",
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Gateway policy used for zone transitions SHALL be generated from portable Flow/ZIP intent rather than manually duplicated per workload.",
     "verification_procedures": [
@@ -6646,7 +6646,7 @@
     "artifacts": [
       "terraform/modules/nsx-domain/main.tf.json",
       "terraform/modules/nsx-gateway-quarantine/main.tf.json",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The NSX profile SHALL identify actual routing and enforcement components, global/project authority and policy precedence, and SHALL qualify their behavior on the selected product/provider tuple rather than equating a Tier-1 or project with a ZIP.",
     "verification_procedures": [
@@ -6675,7 +6675,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Default OpenStack security-group behaviour SHALL be reviewed and normalized to the secure-by-default service baseline.",
     "verification_procedures": [
@@ -6703,7 +6703,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider networks and external-router capabilities SHALL remain provider controlled and SHALL not become unrestricted tenant escape paths.",
     "verification_procedures": [
@@ -6731,7 +6731,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations",
     "verification_procedures": [
@@ -6760,7 +6760,7 @@
     "artifacts": [
       "terraform/modules/openstack-domain/main.tf.json",
       "terraform/modules/openstack-workload/main.tf.json",
-      "tools/neutron_observe.py"
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.",
     "verification_procedures": [
@@ -6925,10 +6925,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: The portable API SHALL be versioned and backward-compatibility rules SHALL be published.",
     "verification_procedures": [
@@ -6953,10 +6953,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Vendor identifiers, VLAN/VNI/VRF details, route targets, raw firewall rules and raw next-hop routes SHALL NOT be part of the normal consumer contract.",
     "verification_procedures": [
@@ -6981,10 +6981,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: immutable IDs",
     "verification_procedures": [
@@ -7010,10 +7010,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: idempotent create",
     "verification_procedures": [
@@ -7039,10 +7039,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: optimistic concurrency",
     "verification_procedures": [
@@ -7068,10 +7068,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: typed/closed schemas",
     "verification_procedures": [
@@ -7097,10 +7097,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: authorized references",
     "verification_procedures": [
@@ -7126,10 +7126,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: authoritative service-owned status",
     "verification_procedures": [
@@ -7155,10 +7155,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Admission policy SHALL be provider independent wherever the rule expresses an architectural invariant.",
     "verification_procedures": [
@@ -7184,10 +7184,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Provider-specific plan checks SHOULD validate that the adapter compiled the intent into the expected native constructs.",
     "verification_procedures": [
@@ -7213,8 +7213,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -7244,8 +7244,8 @@
     "enforcement_location": "Authorized route/flow design plus native RIB/FIB, edge session policy and lifecycle writer",
     "implementation_disposition": "PARTIAL_CANDIDATE_NATIVE_SOURCE",
     "artifacts": [
-      "tools/route_audit.py",
-      "tools/route_record_review.py",
+      "provisioner/execution/route_audit.py",
+      "provisioner/execution/route_record_review.py",
       "terraform/modules/nsx-route/main.tf.json",
       "terraform/modules/nutanix-route/main.tf.json",
       "terraform/modules/openstack-route/main.tf.json"
@@ -7275,10 +7275,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: If security admission, IPAM, route authority, or mandatory policy validation is unavailable, new provisioning SHALL stop rather than inventing or bypassing required state.",
     "verification_procedures": [
@@ -7304,10 +7304,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: journaled",
     "verification_procedures": [
@@ -7334,10 +7334,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: idempotent",
     "verification_procedures": [
@@ -7364,10 +7364,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: eligible capacity/addresses",
     "verification_procedures": [
@@ -7394,10 +7394,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: deny before attachment/exposure",
     "verification_procedures": [
@@ -7424,10 +7424,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: current-generation evidence",
     "verification_procedures": [
@@ -7454,10 +7454,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: authorization",
     "verification_procedures": [
@@ -7484,10 +7484,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Retries SHALL distinguish transient, permanent and conflict failures, use bounded backoff/deadlines and preserve resource identity",
     "verification_procedures": [
@@ -7513,10 +7513,10 @@
     "enforcement_location": "Existing authorized service interface and scoped execution workflow before native side effects; native plan/readback layer",
     "implementation_disposition": "PARTIAL_OFFLINE_AND_SERVICE_CLIENT_CHECKS",
     "artifacts": [
-      "tools/input_review.py",
-      "tools/plan_review.py",
-      "tools/dns_change.py",
-      "tools/recovery_review.py"
+      "provisioner/execution/input_review.py",
+      "provisioner/execution/plan_review.py",
+      "provisioner/execution/dns_change.py",
+      "provisioner/execution/recovery_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: uncertain outcomes SHALL be discovered and reconciled rather than duplicated.",
     "verification_procedures": [
@@ -8029,7 +8029,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A change that modifies inter-zone policy, external exposure, route authority, management access, or assurance profile SHALL receive a higher change classification than an ordinary workload scale operation.",
     "verification_procedures": [
@@ -8055,7 +8055,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: An approval SHALL bind the immutable plan and all security-relevant input/policy/state/dependency digests",
     "verification_procedures": [
@@ -8081,7 +8081,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: stale, changed or expired artifacts SHALL be rejected at apply.",
     "verification_procedures": [
@@ -8107,7 +8107,7 @@
     "implementation_disposition": "PARTIAL_REPOSITORY_WORKFLOW",
     "artifacts": [
       ".github/workflows/validate.yml",
-      "tools/plan_review.py"
+      "provisioner/execution/plan_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Privileged software/provider/module supply chains SHALL use approved sources, integrity verification, revocation and a compromise-response procedure covering already-executed artifacts and credentials.",
     "verification_procedures": [
@@ -8135,7 +8135,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Static privileged provider credentials SHALL NOT be embedded in Terraform source code.",
     "verification_procedures": [
@@ -8161,7 +8161,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Automation identities SHALL use least privilege and separate duties by control domain.",
     "verification_procedures": [
@@ -8189,7 +8189,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Credential rotation, revocation, and break-glass recovery SHALL be tested as part of the platform operational profile.",
     "verification_procedures": [
@@ -8217,7 +8217,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Where supported and verified, sensitive values SHOULD use ephemeral/write-only mechanisms",
     "verification_procedures": [
@@ -8244,7 +8244,7 @@
     "artifacts": [
       "lab/mtls_fixture.py",
       "docs/SERVICE_IDENTITY.md",
-      "tools/nsx_observe.py"
+      "provisioner/execution/nsx_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: all remaining secret-bearing plan/state/log artifacts SHALL be classified, encrypted, access-controlled and tested for unintended disclosure.",
     "verification_procedures": [
@@ -8269,10 +8269,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Security-significant drift SHALL generate an actionable event and update technical conformance/readiness conditions until resolved or accepted",
     "verification_procedures": [
@@ -8298,10 +8298,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: formal authorization records SHALL remain separately attributable and immutable.",
     "verification_procedures": [
@@ -8327,10 +8327,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Emergency changes SHALL be reconciled back into the source of truth after the incident or maintenance action.",
     "verification_procedures": [
@@ -8355,10 +8355,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Incident containment overrides SHALL take precedence over ordinary reconciliation until explicitly released or handled by their approved expiry policy",
     "verification_procedures": [
@@ -8384,10 +8384,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: automated repair SHALL NOT silently undo containment.",
     "verification_procedures": [
@@ -8415,7 +8415,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Assurance profile selection SHALL be based on system security requirements and risk analysis rather than tenant preference alone.",
     "verification_procedures": [
@@ -8442,7 +8442,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Assurance profiles SHALL define explicit isolation for compute, storage, routing, edge, management, backup and keys, with measurable verification and exception rules",
     "verification_procedures": [
@@ -8471,7 +8471,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: “dedicated” SHALL identify its actual resource scope.",
     "verification_procedures": [
@@ -8500,7 +8500,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: A production profile SHALL have approved parameter values, owners, applicable test sets and evidence freshness limits",
     "verification_procedures": [
@@ -8528,7 +8528,7 @@
     "artifacts": [
       "docs/architecture/RAD.md",
       "docs/engineering/TAD.md",
-      "tools/input_review.py"
+      "provisioner/execution/input_review.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: incomplete or expired profiles SHALL be ineligible for new production placement.",
     "verification_procedures": [
@@ -9282,10 +9282,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Emergency containment SHALL be possible without requiring a physical-fabric redesign or broad outage to unrelated tenants.",
     "verification_procedures": [
@@ -9310,10 +9310,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Incident procedures SHALL define authority, scoped containment, evidence custody, coordination, recovery acceptance and reconciliation of emergency changes",
     "verification_procedures": [
@@ -9340,10 +9340,10 @@
     "enforcement_location": "Effective native runtime, incident owner and separately authorized current-generation recovery/repair process",
     "implementation_disposition": "PARTIAL_READBACK_REVIEW_NO_REPAIR",
     "artifacts": [
-      "tools/recovery_review.py",
-      "tools/nsx_observe.py",
-      "tools/nutanix_observe.py",
-      "tools/neutron_observe.py"
+      "provisioner/execution/recovery_review.py",
+      "provisioner/execution/nsx_observe.py",
+      "provisioner/execution/nutanix_observe.py",
+      "provisioner/execution/neutron_observe.py"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: containment release SHALL be explicit and attributable.",
     "verification_procedures": [
@@ -9722,7 +9722,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Migration connectivity SHALL be time-bound unless explicitly converted to an approved steady-state connection.",
@@ -9749,7 +9749,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: Migration flows SHALL traverse an approved security edge when they cross security-domain boundaries.",
@@ -9775,7 +9775,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: data/application consistency",
@@ -9803,7 +9803,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: identity/key dependencies",
@@ -9831,7 +9831,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: equivalent security outcomes",
@@ -9859,7 +9859,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: fencing/cutover",
@@ -9887,7 +9887,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: rollback feasibility",
@@ -9915,7 +9915,7 @@
     "enforcement_location": "Accepted temporary transfer interfaces, data-consistency/writer fencing and identity/DNS/route cutover",
     "implementation_disposition": "DOCUMENTED_TRANSITION_NATIVE_EXECUTION_OPEN",
     "artifacts": [
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/DNS_LIFECYCLE.md"
     ],
     "required_configuration": "Site engineering must name the actual native object/role/service and its accepted settings for: transition teardown",

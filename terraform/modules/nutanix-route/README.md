@@ -13,7 +13,7 @@ are retired. Never combine an aggregate route owner with competing route resourc
 reviewed retirement change handles dependencies. In particular OpenStack next-hop
 changes replace this resource. Do not work around this with an unreviewed destroy.
 
-Run the original input screen **and** `tools/route_record_review.py` against the
+Run the original input screen **and** `provisioner/execution/route_record_review.py` against the
 actual engineering route record before planning. A matching record is not signature
 verification or permission to apply. No default route, tenant exposure or allow
 policy is installed. A complete network remains unavailable until independently

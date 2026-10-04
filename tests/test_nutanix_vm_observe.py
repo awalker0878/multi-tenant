@@ -3,7 +3,8 @@ from copy import deepcopy
 import json
 import unittest
 from lab.native_readback_fixture import Fixture
-from tools import nutanix_vm_observe as ahv, readback_core as c
+from provisioner.execution import readback_core as c
+from provisioner.execution import nutanix_vm_observe as ahv
 
 
 def uid(number):

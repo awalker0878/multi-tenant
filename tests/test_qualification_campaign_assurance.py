@@ -10,9 +10,9 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_qualification_campaign_assurance as assurance
+from provisioner.qualification import campaign as assurance
 from scripts import check_qualification_campaign_readiness as readiness
-from scripts import check_target_selection_assurance as target
+from provisioner.qualification import target_selection as target
 
 ROOT = Path(__file__).resolve().parents[1]
 AS_OF = datetime(2026, 9, 19, 16, 30, tzinfo=timezone.utc)
@@ -344,7 +344,7 @@ class QualificationCampaignAssuranceTests(unittest.TestCase):
 
     def test_cli_empty_index_grants_no_authority(self):
         run = subprocess.run([
-            sys.executable, str(ROOT / 'scripts/check_qualification_campaign_assurance.py'),
+            sys.executable, '-m', 'provisioner.qualification.campaign',
             '--as-of', '2026-09-19T16:30:00Z'
         ], capture_output=True, text=True, timeout=10)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)

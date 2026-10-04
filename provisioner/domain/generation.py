@@ -31,7 +31,7 @@ LEDGER_FORMAT = 'hosting-wsd-generation-ledger/1'
 #: The delivery scope contract, exactly as `hosting-delivery/1` names it.
 SCOPE_KEYS = ('environment_key', 'site_key', 'platform', 'tenant_key', 'wsd_key')
 
-#: Mirrors `tools.readback_core.ID`, which `tools/delivery_run.validate` enforces.
+#: Mirrors `provisioner.execution.readback_core.ID`, which `provisioner.execution.delivery_run.validate` enforces.
 #: `tests/provisioning/unit/test_generation.py` compares the two, so the delivery
 #: contract stays the owner and this copy cannot drift unnoticed.
 SCOPE_IDENTIFIER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$')

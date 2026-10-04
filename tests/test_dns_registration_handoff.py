@@ -9,9 +9,9 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_dns_registration_preflight as preflight
-from scripts import check_dns_registration_records as dnsrecords
-from scripts import check_ipam_allocation_records as ipam
+from provisioner.allocations import dns_preflight as preflight
+from provisioner.allocations import dns_evidence as dnsrecords
+from provisioner.allocations import ipam_evidence as ipam
 from tests.test_ipam_allocation_handoff import allocation_index, allocation_record
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -96,7 +96,7 @@ class DNSRecordTests(unittest.TestCase):
         result=dnsrecords.validate(dnsrecords.load(),ipam_index=ipam.load(),as_of=AS_OF)
         self.assertEqual(result['record_count'],0)
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_dns_registration_records.py'),
+            sys.executable,'-m','provisioner.allocations.dns_evidence',
             '--as-of','2026-09-18T18:00:00Z'],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)
@@ -250,7 +250,7 @@ class DNSPreflightTests(unittest.TestCase):
 
     def test_cli_can_assert_current_ipam_hold(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_dns_registration_preflight.py'),str(INTENT),
+            sys.executable,'-m','provisioner.allocations.dns_preflight',str(INTENT),
             '--as-of','2026-09-18T18:00:00Z','--expected-status',preflight.HOLD_IPAM],
             capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)

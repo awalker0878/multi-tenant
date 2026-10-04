@@ -1,13 +1,13 @@
 # Remote edge and backup execution
 
 The `remote_owner` delivery stage dispatches an exact, privately staged job to
-its accepted owner machine over certificate SSH. `tools/owner_worker.py` is the
+its accepted owner machine over certificate SSH. `provisioner/execution/owner_worker.py` is the
 forced command on that host. It invokes the existing edge or restic executor
 and returns its fixed receipt/manifest artifacts. Native credentials and source
 exports stay on the owner host. The worker accepts no arbitrary command,
 upload, executable argument list, recursive remote job or shell session.
 
-`tools/remote_owner.py` is the coordinator side of that transport: it validates
+`provisioner/execution/remote_owner.py` is the coordinator side of that transport: it validates
 the target and job and dispatches over certificate SSH using only a fixed forced
 command and the staged job digest.
 
@@ -55,7 +55,7 @@ AllowTcpForwarding no
 AllowStreamLocalForwarding no
 PermitTunnel no
 X11Forwarding no
-ForceCommand /opt/hosting-python/bin/python -I /opt/hosting-source/tools/owner_worker.py --spool /var/lib/hosting-owner/spool --ledger /var/lib/hosting-owner/ledger
+ForceCommand /opt/hosting-python/bin/python -I -B -m provisioner.execution.owner_worker --source-root /opt/hosting-source --spool /var/lib/hosting-owner/spool --ledger /var/lib/hosting-owner/ledger
 ```
 
 Restrict the accepted account and listening address in that dedicated service.

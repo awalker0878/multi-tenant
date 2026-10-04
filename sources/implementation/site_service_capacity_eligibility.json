@@ -10,8 +10,8 @@
     "CAP-002"
   ],
   "capacity_index": "sources/capabilities/site_service_capacity_index.json",
-  "index_checker": "scripts/check_site_service_capacity.py",
-  "eligibility_checker": "scripts/check_site_service_eligibility.py",
+  "index_checker": "provisioner/allocations/capacity_evidence.py",
+  "eligibility_checker": "provisioner/allocations/site_eligibility.py",
   "engineering": "docs/engineering/site-service-capacity-eligibility.md",
   "current_service_envelopes": 0,
   "authority": {

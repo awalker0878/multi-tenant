@@ -5,7 +5,8 @@ import unittest
 from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_observe import manifest as vm_manifest, ref
 from tests.test_nutanix_vm_observe import uid
-from tools import vsphere_network_observe as n, readback_core as c
+from provisioner.execution import readback_core as c
+from provisioner.execution import vsphere_network_observe as n
 
 
 def manifest(origin='https://vc.example.test'):

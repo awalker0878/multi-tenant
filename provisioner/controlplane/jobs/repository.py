@@ -19,6 +19,7 @@ from uuid import uuid4
 from provisioner.controlplane.authority.model import AuthorizedPlan, PlanScope
 from provisioner.controlplane.persistence import TenantContext, canonical_record_digest
 from provisioner.domain.enterprise_records import validate_record
+from .progress import APPLICATION_HOLD_CODES
 
 _KEY = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 _EVENT_TYPE = re.compile(r'^[A-Z][A-Z0-9_]{0,47}$')
@@ -135,10 +136,11 @@ def _digest(value: dict) -> str:
 def _progress_detail(detail: dict) -> None:
     """Projection metadata only; raw errors, URLs and secrets belong nowhere here."""
     if (not isinstance(detail, dict) or not set(detail) <=
-            {'stepId', 'phase', 'reasonCode', 'evidenceDigest', 'completed', 'total'}
+            {'stepId', 'phase', 'reasonCode', 'holdCode', 'evidenceDigest', 'completed', 'total'}
             or any(not isinstance(detail[key], str) or detail[key] not in allowed
                    for key, allowed in (('stepId', _STEPS), ('phase', _PHASES),
-                                        ('reasonCode', _REASONS)) if key in detail)
+                                        ('reasonCode', _REASONS),
+                                        ('holdCode', APPLICATION_HOLD_CODES)) if key in detail)
             or ('evidenceDigest' in detail and
                 (not isinstance(detail['evidenceDigest'], str) or
                  _DIGEST.fullmatch(detail['evidenceDigest']) is None))
@@ -255,6 +257,91 @@ class JobRepository:
 
     def submit(self, context, authorization: AuthorizedPlan, *,
                idempotency_key: str) -> Job:
+        self._submission_input(context, authorization, idempotency_key)
+        with self._connect() as connection, connection.cursor() as cursor:
+            return self.submit_in_transaction(cursor, context, authorization,
+                                              idempotency_key=idempotency_key)
+
+    def submit_in_transaction(self, cursor, context,
+                              authorization: AuthorizedPlan, *,
+                              idempotency_key: str) -> Job:
+        """Reuse atomic B09 admission inside a trusted enclosing owner transaction.
+
+        The caller owns commit/rollback. This method retains all original plan,
+        workload, authority, idempotency and outbox checks; it never starts a
+        workflow. No transport may supply a cursor or authorization value.
+        """
+        self._submission_input(context, authorization, idempotency_key)
+        _tenant(cursor, context)
+        cursor.execute('SELECT clock_timestamp()')
+        now = cursor.fetchone()[0]
+        if authorization.expires_at.tzinfo is None or authorization.expires_at <= now:
+            raise AdmissionRefused('Authorization has expired')
+        cursor.execute(
+            'SELECT revision, record_digest, record_json '
+            'FROM hosting_controlplane.enterprise_records '
+            'WHERE organization_id = %s AND tenant_id = %s '
+            "AND record_kind = 'MigrationPlan' AND record_id = %s FOR SHARE",
+            (context.organization_id, context.tenant_id, authorization.plan_id))
+        selected_plan = _ensure_plan(cursor.fetchone(), context, authorization)
+        _ensure_workload(cursor, context, selected_plan)
+        # This check MUST lock the authoritative revocation/approval row.
+        self._authority.revalidate_admission(cursor, authorization, now)
+        job_id = uuid4().hex
+        cursor.execute(
+            'INSERT INTO hosting_controlplane.operation_jobs '
+            '(organization_id, tenant_id, job_id, idempotency_key, plan_id, '
+            'plan_revision, plan_digest, source_scope, destination_scope, '
+            'actor_subject, approval_ids, revocation_epoch) '
+            'VALUES (%s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb, '
+            '%s, %s::jsonb, %s) '
+            'ON CONFLICT DO NOTHING RETURNING job_id',
+            (context.organization_id, context.tenant_id, job_id,
+             idempotency_key, authorization.plan_id,
+             authorization.plan_revision, authorization.plan_digest,
+             json.dumps(asdict(authorization.source)),
+             json.dumps(asdict(authorization.destination)),
+             authorization.actor_subject,
+             json.dumps(authorization.approval_ids), authorization.revocation_epoch))
+        inserted = cursor.fetchone()
+        if inserted is None:
+            cursor.execute(
+                f'SELECT {_JOB_SELECT} FROM hosting_controlplane.operation_jobs '
+                'WHERE organization_id = %s AND tenant_id = %s '
+                'AND idempotency_key = %s FOR UPDATE',
+                (context.organization_id, context.tenant_id, idempotency_key))
+            existing = cursor.fetchone()
+            if existing is None:
+                raise AdmissionConflict('The exact plan has another idempotency key')
+            job = _job(existing)
+            if (job.plan_id, job.plan_revision, job.plan_digest,
+                    job.source, job.destination, job.actor_subject,
+                    job.approval_ids, job.revocation_epoch) != (
+                    authorization.plan_id, authorization.plan_revision,
+                    authorization.plan_digest, authorization.source,
+                    authorization.destination, authorization.actor_subject,
+                    authorization.approval_ids, authorization.revocation_epoch):
+                raise AdmissionConflict('Idempotency key was used for another submission')
+            return job
+        cursor.execute(
+            'INSERT INTO hosting_controlplane.job_events '
+            '(organization_id, tenant_id, job_id, sequence, event_key, event_type, status) '
+            "VALUES (%s, %s, %s, 1, 'admitted', 'JOB_ADMITTED', 'QUEUED')",
+            (context.organization_id, context.tenant_id, job_id))
+        cursor.execute(
+            'INSERT INTO hosting_controlplane.job_outbox '
+            '(organization_id, tenant_id, outbox_id, job_id, event_type, payload) '
+            "VALUES (%s, %s, %s, %s, 'START_WORKFLOW', %s::jsonb)",
+            (context.organization_id, context.tenant_id, uuid4().hex,
+             job_id, json.dumps(_payload(authorization, job_id))))
+        cursor.execute(
+            f'SELECT {_JOB_SELECT} FROM hosting_controlplane.operation_jobs '
+            'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s',
+            (context.organization_id, context.tenant_id, job_id))
+        return _job(cursor.fetchone())
+
+    @staticmethod
+    def _submission_input(context, authorization, idempotency_key):
         if not isinstance(authorization, AuthorizedPlan):
             raise AdmissionRefused('Trusted authorization is required')
         if (context.organization_id, context.tenant_id) != (
@@ -264,75 +351,6 @@ class JobRepository:
             raise ValueError('Idempotency key must be a stable 1–128 character identifier')
         if not authorization.actor_subject or not authorization.approval_ids:
             raise AdmissionRefused('An authenticated actor and approvals are required')
-        with self._connect() as connection:
-            with connection.cursor() as cursor:
-                _tenant(cursor, context)
-                cursor.execute('SELECT clock_timestamp()')
-                now = cursor.fetchone()[0]
-                if authorization.expires_at.tzinfo is None or authorization.expires_at <= now:
-                    raise AdmissionRefused('Authorization has expired')
-                cursor.execute(
-                    'SELECT revision, record_digest, record_json '
-                    'FROM hosting_controlplane.enterprise_records '
-                    'WHERE organization_id = %s AND tenant_id = %s '
-                    "AND record_kind = 'MigrationPlan' AND record_id = %s FOR SHARE",
-                    (context.organization_id, context.tenant_id, authorization.plan_id))
-                selected_plan = _ensure_plan(cursor.fetchone(), context, authorization)
-                _ensure_workload(cursor, context, selected_plan)
-                # This check MUST lock the authoritative revocation/approval row.
-                self._authority.revalidate_admission(cursor, authorization, now)
-                job_id = uuid4().hex
-                cursor.execute(
-                    'INSERT INTO hosting_controlplane.operation_jobs '
-                    '(organization_id, tenant_id, job_id, idempotency_key, plan_id, '
-                    'plan_revision, plan_digest, source_scope, destination_scope, '
-                    'actor_subject, approval_ids, revocation_epoch) '
-                    'VALUES (%s, %s, %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb, '
-                    '%s, %s::jsonb, %s) '
-                    'ON CONFLICT DO NOTHING RETURNING job_id',
-                    (context.organization_id, context.tenant_id, job_id,
-                     idempotency_key, authorization.plan_id,
-                     authorization.plan_revision, authorization.plan_digest,
-                     json.dumps(asdict(authorization.source)),
-                     json.dumps(asdict(authorization.destination)),
-                     authorization.actor_subject,
-                     json.dumps(authorization.approval_ids), authorization.revocation_epoch))
-                inserted = cursor.fetchone()
-                if inserted is None:
-                    cursor.execute(
-                        f'SELECT {_JOB_SELECT} FROM hosting_controlplane.operation_jobs '
-                        'WHERE organization_id = %s AND tenant_id = %s '
-                        'AND idempotency_key = %s FOR UPDATE',
-                        (context.organization_id, context.tenant_id, idempotency_key))
-                    existing = cursor.fetchone()
-                    if existing is None:
-                        raise AdmissionConflict('The exact plan has another idempotency key')
-                    job = _job(existing)
-                    if (job.plan_id, job.plan_revision, job.plan_digest,
-                            job.source, job.destination, job.actor_subject,
-                            job.approval_ids, job.revocation_epoch) != (
-                            authorization.plan_id, authorization.plan_revision,
-                            authorization.plan_digest, authorization.source,
-                            authorization.destination, authorization.actor_subject,
-                            authorization.approval_ids, authorization.revocation_epoch):
-                        raise AdmissionConflict('Idempotency key was used for another submission')
-                    return job
-                cursor.execute(
-                    'INSERT INTO hosting_controlplane.job_events '
-                    '(organization_id, tenant_id, job_id, sequence, event_key, event_type, status) '
-                    "VALUES (%s, %s, %s, 1, 'admitted', 'JOB_ADMITTED', 'QUEUED')",
-                    (context.organization_id, context.tenant_id, job_id))
-                cursor.execute(
-                    'INSERT INTO hosting_controlplane.job_outbox '
-                    '(organization_id, tenant_id, outbox_id, job_id, event_type, payload) '
-                    "VALUES (%s, %s, %s, %s, 'START_WORKFLOW', %s::jsonb)",
-                    (context.organization_id, context.tenant_id, uuid4().hex,
-                     job_id, json.dumps(_payload(authorization, job_id))))
-                cursor.execute(
-                    f'SELECT {_JOB_SELECT} FROM hosting_controlplane.operation_jobs '
-                    'WHERE organization_id = %s AND tenant_id = %s AND job_id = %s',
-                    (context.organization_id, context.tenant_id, job_id))
-                return _job(cursor.fetchone())
 
     def get(self, context, job_id: str) -> Job | None:
         with self._connect() as connection:
@@ -490,6 +508,8 @@ class JobRepository:
                 selected_plan = _ensure_plan(cursor.fetchone(), context, job)
                 _ensure_workload(cursor, context, selected_plan)
                 self._authority.revalidate_start(cursor, job, now)
+                from provisioner.migration.wave_schedule import require_wave_window
+                require_wave_window(cursor, job, now, starting=True)
                 return job
 
     def record_start_attempt(self, context, message: OutboxMessage, *,

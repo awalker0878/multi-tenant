@@ -326,43 +326,69 @@ class EnterpriseRecordStore:
                verified_transition: VerifiedWsdTransition | None = None,
                verified_cutover: VerifiedBindingCutover | None = None,
                plan: dict | None = None) -> StoredRecord:
+        with self._session(ctx) as connection:
+            return self.update_in_transaction(connection, ctx, record, expected_revision,
+                audit, verified_transition=verified_transition,
+                verified_cutover=verified_cutover, plan=plan)
+
+    def update_in_transaction(self, connection, ctx: TenantContext, record: dict,
+               expected_revision: int, audit: AuditContext, *,
+               verified_transition: VerifiedWsdTransition | None = None,
+               verified_cutover: VerifiedBindingCutover | None = None,
+               plan: dict | None = None) -> StoredRecord:
+        """Use the existing owner in an already scoped, live atomic transaction.
+
+        The caller must establish independent approval/evidence in this same
+        transaction. Record identity, optimistic revision, history and audit
+        checks are exactly those used by ``update``.
+        """
+        import psycopg
+        if (not isinstance(connection, psycopg.Connection) or connection.autocommit
+                or connection.info.transaction_status != psycopg.pq.TransactionStatus.INTRANS
+                or not isinstance(ctx, TenantContext)):
+            raise ValueError('A live trusted PostgreSQL record-owner transaction is required')
+        role = connection.execute('SELECT rolsuper, rolbypassrls FROM pg_catalog.pg_roles '
+                                 'WHERE rolname = current_user').fetchone()
+        scoped = connection.execute("SELECT current_setting('app.organization_id', true), "
+                                    "current_setting('app.tenant_id', true)").fetchone()
+        if role is None or role[0] or role[1] or scoped != (ctx.organization_id, ctx.tenant_id):
+            raise ValueError('The record-owner transaction must enforce its exact tenant row security')
         kind, record_id = self._identity(ctx, record)
         if kind not in _VERSIONED:
             raise ValueError('This record kind is immutable')
         if (not isinstance(expected_revision, int) or isinstance(expected_revision, bool)
                 or expected_revision < 1):
-            raise ValueError('Expected revision must be positive')
+            raise RevisionConflict('Expected revision must be positive')
         if record['metadata']['revision'] != expected_revision + 1:
             raise RevisionConflict('Revision must advance by one')
         raw, digest = _encode(record)
-        with self._session(ctx) as connection:
-            previous = self._load(connection, ctx, kind, record_id)
-            if previous is None:
-                raise RecordNotFound('No record is visible in this tenant')
-            if previous.revision != expected_revision:
-                raise RevisionConflict('Record revision has changed')
-            if kind == 'Workload':
-                problems = validate_workload_successor(
-                    previous.record, record, verified_transition=verified_transition,
-                    verified_cutover=verified_cutover, plan=plan)
-                if problems:
-                    raise RecordValidationError(problems)
-            else:
-                self._check_links(connection, ctx, record)
-            row = connection.execute(
-                'UPDATE hosting_controlplane.enterprise_records '
-                'SET revision = %s, record_json = %s::jsonb, record_digest = %s, '
-                'updated_at = clock_timestamp() '
-                'WHERE organization_id = %s AND tenant_id = %s '
-                'AND record_kind = %s AND record_id = %s AND revision = %s '
-                'RETURNING revision',
-                (expected_revision + 1, raw, digest, ctx.organization_id, ctx.tenant_id,
-                 kind, record_id, expected_revision)).fetchone()
-            if row is None:
-                raise RevisionConflict('Record revision changed during update')
-            self._append_history(connection, ctx, kind, record_id, row[0], raw, digest)
-            self._audit(connection, ctx, audit, 'RECORD_UPDATE', kind, record_id,
-                        row[0], digest)
+        previous = self._load(connection, ctx, kind, record_id)
+        if previous is None:
+            raise RecordNotFound('No record is visible in this tenant')
+        if previous.revision != expected_revision:
+            raise RevisionConflict('Record revision has changed')
+        if kind == 'Workload':
+            problems = validate_workload_successor(
+                previous.record, record, verified_transition=verified_transition,
+                verified_cutover=verified_cutover, plan=plan)
+            if problems:
+                raise RecordValidationError(problems)
+        else:
+            self._check_links(connection, ctx, record)
+        row = connection.execute(
+            'UPDATE hosting_controlplane.enterprise_records '
+            'SET revision = %s, record_json = %s::jsonb, record_digest = %s, '
+            'updated_at = clock_timestamp() '
+            'WHERE organization_id = %s AND tenant_id = %s '
+            'AND record_kind = %s AND record_id = %s AND revision = %s '
+            'RETURNING revision',
+            (expected_revision + 1, raw, digest, ctx.organization_id, ctx.tenant_id,
+             kind, record_id, expected_revision)).fetchone()
+        if row is None:
+            raise RevisionConflict('Record revision changed during update')
+        self._append_history(connection, ctx, kind, record_id, row[0], raw, digest)
+        self._audit(connection, ctx, audit, 'RECORD_UPDATE', kind, record_id,
+                    row[0], digest)
         return StoredRecord(record, row[0], digest)
 
     @staticmethod
@@ -395,6 +421,9 @@ class EnterpriseRecordStore:
         if not _ID_PATTERN.fullmatch(workload_id) or not _ID_PATTERN.fullmatch(worker_id):
             raise ValueError('Invalid workload or worker identity')
         with self._session(ctx) as connection:
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            with connection.cursor() as cursor:
+                require_write_admission(cursor,ctx,security_domain_id=security_domain_id,workload_id=workload_id)
             workload = self._load(connection, ctx, 'Workload', workload_id, lock=True)
             if workload is None:
                 raise RecordNotFound('No workload is visible in this tenant')
@@ -444,6 +473,9 @@ class EnterpriseRecordStore:
                           ttl_seconds: int, audit: AuditContext) -> OwnerLease:
         self._ttl(ttl_seconds)
         with self._session(ctx) as connection:
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            with connection.cursor() as cursor:
+                require_write_admission(cursor,ctx,security_domain_id=lease.security_domain_id,workload_id=lease.workload_id)
             workload = self._load(connection, ctx, 'Workload', lease.workload_id)
             if workload is None or (lease.organization_id, lease.tenant_id) != (
                     ctx.organization_id, ctx.tenant_id):

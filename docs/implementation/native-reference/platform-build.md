@@ -36,7 +36,7 @@ that same capability; ordinary tenant consumption does require accepted offered 
 | Domain | Administrative project/role/category scope, independent VPC/routing instances, owned overlay subnets and external attachment design | [Domain realization](../../engineering/platform-build/3-nutanix-realize-a-tenant-and-its-workload-domains.md); `nutanix-domain` is not an external security-edge build |
 | Workload | Accepted image, identity, placement/storage and mandatory policy; verify actual NIC connection separately from power state | [Workload module](../../../terraform/modules/nutanix-workload/README.md); a task success does not establish quarantine |
 | Approved paths | Qualified domain-specific external handoffs and origin-specific service replies; routed/NAT behaviour explicitly selected | [Exact route module](../../../terraform/modules/nutanix-route/README.md); it does not create/qualify the receiving firewall or a full routing service |
-| Observe | Exact resource, current VPC/subnet fields, task identity and selected version token; then actual traffic and policy evidence | [Nutanix readback](../../../tools/nutanix_observe.py) is not full Flow/VM/storage inventory, child-task traversal, data-path or HA qualification |
+| Observe | Exact resource, current VPC/subnet fields, task identity and selected version token; then actual traffic and policy evidence | [Nutanix readback](../../../provisioner/execution/nutanix_observe.py) is not full Flow/VM/storage inventory, child-task traversal, data-path or HA qualification |
 
 A native `tenantId`, a Prism project and the enterprise tenant identity are not assumed
 interchangeable. Show the actual mapping and delegated mutation limits. Record shared
@@ -50,7 +50,7 @@ CVM, storage and management dependencies even when guest placement is separated.
 | Domain | Tenant authority, Tier-1/segment realization and isolated upstream routing; review connected/distributed shortcuts | [Lifecycle realization](../../engineering/platform-build/5-vmware-nsx-bind-domain-workload-and-policy-lifecycles.md); a shared unrestricted upstream is not the reference boundary |
 | Workload | Accepted template, eligible resource pools, disks and network identity with effective quarantine before connection | [vSphere workload module](../../../terraform/modules/vsphere-workload/README.md); do not infer an unsupported power-state switch |
 | Approved paths | Owned gateway policy and upstream edge paths, explicit IPv4/IPv6 handling and origin-specific returns | [Gateway quarantine](../../../terraform/modules/nsx-gateway-quarantine/README.md) and [exact route](../../../terraform/modules/nsx-route/README.md) are bounded components, not complete ZIP equivalence |
-| Observe | Selected Policy configuration, revision and intent realization, plus the actual enforcement locations and traffic | [NSX observer](../../../tools/nsx_observe.py) does not prove all transport-node rules, dynamic membership or alternate forwarding paths |
+| Observe | Selected Policy configuration, revision and intent realization, plus the actual enforcement locations and traffic | [NSX observer](../../../provisioner/execution/nsx_observe.py) does not prove all transport-node rules, dynamic membership or alternate forwarding paths |
 
 Do not assume a configuration revision equals the expected intent version. Distinguish
 aggregate realization, runtime state and observed packet behaviour. Test same-host
@@ -64,7 +64,7 @@ paths, upstream routing, policy priority, group ownership and return traffic exp
 | Domain | Independent project/domain routing scope, provider-owned mandatory controls, port security and approved source identities | [Network-mutation ownership](../../engineering/platform-build/7-openstack-protect-mandatory-network-mutation.md); additive tenant allow groups do not create a mandatory deny hierarchy |
 | Workload | Accepted image/flavour, boot/data volume ownership, explicit security-group association and eligible placement | [Workload module](../../../terraform/modules/openstack-workload/README.md); preserve retained data, and observe actual port/guest behaviour |
 | Approved paths | Provider-controlled external attachments and qualified security-edge handoffs, with symmetric owned replies | [Exact route module](../../../terraform/modules/openstack-route/README.md); no complete external gateway/firewall service is provided |
-| Observe | Exact owned Neutron network/router/subnet/port/group configuration and tenant binding | [Neutron observer](../../../tools/neutron_observe.py) is not full compute/storage inventory or enforcement/failover proof |
+| Observe | Exact owned Neutron network/router/subnet/port/group configuration and tenant binding | [Neutron observer](../../../provisioner/execution/neutron_observe.py) is not full compute/storage inventory or enforcement/failover proof |
 
 Test the real delegated role against attempts to replace mandatory groups, alter port
 security, source identities or external attachments. Do not write directly into a network

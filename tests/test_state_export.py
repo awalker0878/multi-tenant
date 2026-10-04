@@ -6,8 +6,9 @@ from unittest.mock import patch
 from urllib.parse import urlsplit
 
 from tests import test_state_project as p
-from tools import state_export as d,readback_core as c
-from tools.run_files import digest,load_private
+from provisioner.execution import readback_core as c
+from provisioner.execution import state_export as d
+from provisioner.execution.run_files import digest,load_private
 
 
 class StateExportTests(unittest.TestCase):

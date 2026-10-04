@@ -14,8 +14,10 @@ from tests.test_vmware_network_campaign import assets_at as port_assets_at
 from tests.nsx_domain_fixture import scenario
 from tests.test_target_campaign import window
 from tests.test_nutanix_task_tree import reseal
-from tools import qualify_target as q, nsx_domain_switch_observe as combined, readback_core as c
-from tools.run_files import digest, encoded, write_new, load_private, utcnow
+from provisioner.execution import readback_core as c
+from provisioner.execution import qualify_target as q
+from provisioner.execution import nsx_domain_switch_observe as combined
+from provisioner.execution.run_files import digest, encoded, write_new, load_private, utcnow
 
 
 def inputs(nsx_origin='https://nsx.example.test', vc_origin='https://vc.example.test'):
@@ -90,7 +92,7 @@ class DomainCampaignTests(unittest.TestCase):
                 events.append(name); return original(assets, name, report, started, current)
             original = q.check_campaign_report
             with patch.object(q, 'check_campaign_report', side_effect=record), \
-                 patch.object(q, 'ssh_probe', side_effect=lambda *args: events.append('traffic') or {'status': 'HEALTHY'}):
+                 patch.object(q, 'ssh_probe', side_effect=lambda *args, command_guard=None: events.append('traffic') or {'status': 'HEALTHY'}):
                 self.assertEqual(execute(folder, data), 0)
             order = ['native_manifest', 'portgroup_manifest', 'workload_manifest', 'portgroup_manifest', 'native_manifest']
             self.assertEqual(events, order + ['traffic'] + order)
@@ -121,7 +123,7 @@ class DomainCampaignTests(unittest.TestCase):
         with Fixture() as nf, Fixture() as vf, tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp); data, domain_inputs = inputs(nf.origin, vf.origin)
             routes(nf, vf, data); assets_at(folder, data, domain_inputs, nf, vf)
-            def probe(*args):
+            def probe(*args, command_guard=None):
                 nf.routes['/policy/api/v1'+data[2]['resources'][3]['path']]['body']['rules'][0]['disabled'] = True
                 return {'status': 'HEALTHY'}
             with patch.object(q, 'ssh_probe', side_effect=probe): self.assertEqual(execute(folder, data), 2)

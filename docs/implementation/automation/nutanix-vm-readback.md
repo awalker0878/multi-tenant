@@ -1,6 +1,6 @@
 # Nutanix AHV VM snapshot readback
 
-`tools/nutanix_vm_observe.py` reads only explicitly enumerated VM UUIDs from
+`provisioner/execution/nutanix_vm_observe.py` reads only explicitly enumerated VM UUIDs from
 `GET /api/vmm/v4.2/ahv/config/vms/{extId}`. Its wire profile follows the
 [vmm-go-client/v4.2.2 SDK](https://github.com/nutanix/ntnx-api-golang-clients/tree/vmm-go-client/v4.2.2/vmm-go-client),
 pinned by the Nutanix 2.4.2 Terraform provider. There is no API negotiation,
@@ -35,7 +35,7 @@ in the API do not establish actual guest addressing or service reachability.
 Offline validation performs no network contact:
 
 ```sh
-python tools/nutanix_vm_observe.py /private/ahv-manifest.json
+python -m provisioner.execution.nutanix_vm_observe /private/ahv-manifest.json
 ```
 
 For an authorized observation, inject scoped read-only `NUTANIX_USERNAME` and
@@ -43,7 +43,7 @@ For an authorized observation, inject scoped read-only `NUTANIX_USERNAME` and
 set `contact_enabled: true`, and provide the accepted origin and CA explicitly:
 
 ```sh
-python tools/nutanix_vm_observe.py /private/ahv-manifest.json \
+python -m provisioner.execution.nutanix_vm_observe /private/ahv-manifest.json \
   --read-authorized-target --expected-origin https://actual-prism-host \
   --ca-file /private/prism-ca.pem --output /private/new-ahv-observation.json
 ```

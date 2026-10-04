@@ -10,10 +10,13 @@ from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
 from tests.test_flow_lifecycle import fixture as lifecycle_fixture
 from tests import test_nutanix_flow_activity as fixtures
-from tools import nutanix_flow_terraform_recovery as flow, terraform_recovery_review as review
-from tools import nutanix_flow_activity_observe as activity, lifecycle_transition as lifecycle, readback_core as c
-from tools.run_files import digest, encoded, write_new, load_private
-from tools.terraform_run import select_scope
+from provisioner.execution import nutanix_flow_terraform_recovery as flow
+from provisioner.execution import terraform_recovery_review as review
+from provisioner.execution import readback_core as c
+from provisioner.execution import lifecycle_transition as lifecycle
+from provisioner.execution import nutanix_flow_activity_observe as activity
+from provisioner.execution.run_files import digest, encoded, write_new, load_private
+from provisioner.execution.terraform_run import select_scope
 
 
 def scenario(origin, stage='bootstrap', *, expired=False):
@@ -189,7 +192,11 @@ class HeldFlowTests(unittest.TestCase):
         self.assertEqual((self.folder/'head.json').read_bytes(), before)
 
     def test_cli_reviews_offline_without_ledger_release(self):
-        contacts = len(self.f.requests); args = [sys.executable, str(Path(review.__file__))]
+        contacts = len(self.f.requests)
+        args = [sys.executable, '-I', '-B', '-c',
+                'import runpy,sys; sys.path.insert(0,sys.argv.pop(1)); '
+                'runpy.run_module("provisioner.execution.terraform_recovery_review",run_name="__main__",alter_sys=True)',
+                str(Path(review.__file__).resolve().parents[2]), '--source-root', str(review.ROOT)]
         for key, value in dict(bundle=self.operation, ledger=self.ledger, manifest=self.base/'manifest',
                                readback=self.base/'readback', context=self.base/'context', output=self.base/'cli-review').items():
             args += ['--'+key, str(value)]

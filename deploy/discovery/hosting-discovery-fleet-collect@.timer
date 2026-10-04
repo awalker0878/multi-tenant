@@ -1,0 +1,11 @@
+[Unit]
+Description=Reconcile preauthorized enrolled fleet discovery batch %i
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+RandomizedDelaySec=30
+Unit=hosting-discovery-fleet-collect@%i.service
+
+[Install]
+WantedBy=timers.target

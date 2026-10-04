@@ -15,9 +15,15 @@
           "image_id": "44444444-4444-4444-8444-444444444444"
         },
         "by_flavor_class": {
-          "small": {"flavor_id": "mock-flavor-small"},
-          "medium": {"flavor_id": "mock-flavor-medium"},
-          "large": {"flavor_id": "mock-flavor-large"}
+          "small": {
+            "flavor_id": "mock-flavor-small"
+          },
+          "medium": {
+            "flavor_id": "mock-flavor-medium"
+          },
+          "large": {
+            "flavor_id": "mock-flavor-large"
+          }
         },
         "by_storage_class": {}
       },
@@ -25,13 +31,24 @@
         {
           "cell": "cell-01",
           "capabilities": [
-            "network_domain",
-            "ipv4",
-            "gateway_policy",
-            "distributed_firewall",
             "audit_logging",
+            "backup_restore",
+            "boot_volume",
+            "cpu_topology",
+            "data_volumes",
             "dedicated_edge_context",
-            "native_load_balancer"
+            "disk_order",
+            "distributed_firewall",
+            "dns_registration",
+            "gateway_policy",
+            "identity_join",
+            "ipv4",
+            "log_forwarding",
+            "native_load_balancer",
+            "network_domain",
+            "storage_placement",
+            "time_sync",
+            "vm_create"
           ],
           "clusters": [
             {
@@ -39,10 +56,18 @@
               "role": "workload",
               "zone": "OZ",
               "trust": "internal-trust",
-              "service_classes": ["standard", "protected-b"],
-              "eligible_tenants": ["tenant-01"],
+              "service_classes": [
+                "standard",
+                "protected-b"
+              ],
+              "eligible_tenants": [
+                "tenant-01"
+              ],
               "dedicated_wsd": null,
-              "host_ids": ["host-oz-01", "host-oz-02"],
+              "host_ids": [
+                "host-oz-01",
+                "host-oz-02"
+              ],
               "native": {
                 "compute_availability_zone": "mock-compute-oz",
                 "storage_availability_zone": "mock-storage-oz",
@@ -55,6 +80,14 @@
                 "memory_gib_committed": 64,
                 "storage_gib_total": 4096,
                 "storage_gib_committed": 512
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             },
             {
@@ -62,10 +95,18 @@
               "role": "workload",
               "zone": "RZ",
               "trust": "internal-trust",
-              "service_classes": ["standard", "protected-b"],
-              "eligible_tenants": ["tenant-01"],
+              "service_classes": [
+                "standard",
+                "protected-b"
+              ],
+              "eligible_tenants": [
+                "tenant-01"
+              ],
               "dedicated_wsd": null,
-              "host_ids": ["host-rz-01", "host-rz-02"],
+              "host_ids": [
+                "host-rz-01",
+                "host-rz-02"
+              ],
               "native": {
                 "compute_availability_zone": "mock-compute-rz",
                 "storage_availability_zone": "mock-storage-rz",
@@ -78,23 +119,55 @@
                 "memory_gib_committed": 64,
                 "storage_gib_total": 4096,
                 "storage_gib_committed": 512
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             }
           ]
         },
         {
           "cell": "cell-02",
-          "capabilities": ["network_domain", "ipv4", "gateway_policy", "audit_logging"],
+          "capabilities": [
+            "audit_logging",
+            "backup_restore",
+            "boot_volume",
+            "cpu_topology",
+            "data_volumes",
+            "disk_order",
+            "dns_registration",
+            "gateway_policy",
+            "identity_join",
+            "ipv4",
+            "log_forwarding",
+            "network_domain",
+            "storage_placement",
+            "time_sync",
+            "vm_create"
+          ],
           "clusters": [
             {
               "id": "cluster-oz-02",
               "role": "workload",
               "zone": "OZ",
               "trust": "internal-trust",
-              "service_classes": ["standard", "protected-b"],
-              "eligible_tenants": ["tenant-01"],
+              "service_classes": [
+                "standard",
+                "protected-b"
+              ],
+              "eligible_tenants": [
+                "tenant-01"
+              ],
               "dedicated_wsd": null,
-              "host_ids": ["host-oz-11", "host-oz-12"],
+              "host_ids": [
+                "host-oz-11",
+                "host-oz-12"
+              ],
               "native": {
                 "compute_availability_zone": "mock-compute-oz-2",
                 "storage_availability_zone": "mock-storage-oz-2",
@@ -107,6 +180,14 @@
                 "memory_gib_committed": 32,
                 "storage_gib_total": 2048,
                 "storage_gib_committed": 256
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             },
             {
@@ -114,10 +195,18 @@
               "role": "workload",
               "zone": "RZ",
               "trust": "internal-trust",
-              "service_classes": ["standard", "protected-b"],
-              "eligible_tenants": ["tenant-01"],
+              "service_classes": [
+                "standard",
+                "protected-b"
+              ],
+              "eligible_tenants": [
+                "tenant-01"
+              ],
               "dedicated_wsd": null,
-              "host_ids": ["host-rz-11", "host-rz-12"],
+              "host_ids": [
+                "host-rz-11",
+                "host-rz-12"
+              ],
               "native": {
                 "compute_availability_zone": "mock-compute-rz-2",
                 "storage_availability_zone": "mock-storage-rz-2",
@@ -130,6 +219,14 @@
                 "memory_gib_committed": 32,
                 "storage_gib_total": 2048,
                 "storage_gib_committed": 256
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             }
           ]
@@ -163,7 +260,10 @@
       "binding_class": "dns-internal",
       "site": "site-01",
       "endpoints": {
-        "resolvers": ["198.51.100.53", "198.51.101.53"],
+        "resolvers": [
+          "198.51.100.53",
+          "198.51.101.53"
+        ],
         "zone": "internal.invalid"
       }
     },
@@ -172,7 +272,10 @@
       "binding_class": "ntp-internal",
       "site": "site-01",
       "endpoints": {
-        "sources": ["198.51.100.123", "198.51.101.123"]
+        "sources": [
+          "198.51.100.123",
+          "198.51.101.123"
+        ]
       }
     },
     {
@@ -181,7 +284,10 @@
       "site": "site-01",
       "endpoints": {
         "realm": "INTERNAL.INVALID",
-        "servers": ["198.51.100.10", "198.51.101.10"]
+        "servers": [
+          "198.51.100.10",
+          "198.51.101.10"
+        ]
       }
     },
     {
@@ -189,7 +295,10 @@
       "binding_class": "logging-protected",
       "site": "site-01",
       "endpoints": {
-        "collectors": ["198.51.100.20", "198.51.101.20"]
+        "collectors": [
+          "198.51.100.20",
+          "198.51.101.20"
+        ]
       }
     },
     {

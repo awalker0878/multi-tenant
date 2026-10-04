@@ -1,0 +1,21 @@
+[
+  "docs/operations/control-application/1-operating-the-selected-slice.md",
+  "docs/operations/control-application/2-campaign-pilot-and-release.md",
+  "docs/operations/retained-state-conversion-rehearsal.md",
+  "docs/engineering/discovery-service-scheduling.md",
+  "docs/engineering/discovery-monitor-service.md",
+  "docs/engineering/application-migration-runtime.md",
+  "docs/engineering/job-bound-resource-transactions.md",
+  "docs/engineering/planned-openstack-creation.md",
+  "docs/engineering/application-worker-composition.md",
+  "docs/operations/directed-mobility-expansion.md",
+  "docs/engineering/discovery-fleet-and-oncall-owners.md",
+  "docs/operations/current-command-authority.md",
+  "docs/operations/control-application/3-controlled-ha-and-restore-drills.md",
+  "docs/operations/control-application/4-original-final-code-evidence-intake.md",
+  "docs/operations/control-application/5-final-code-commissioning-dossier.md",
+  "docs/operations/retained-state-authenticated-handover.md",
+  "docs/provisioning/enterprise-wave-pools.md",
+  "docs/provisioning/installed-runtime-identity.md",
+  "docs/engineering/enrolled-resource-service-recovery.md"
+]

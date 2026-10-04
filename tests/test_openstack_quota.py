@@ -13,8 +13,9 @@ import unittest
 from unittest.mock import patch
 
 from lab.native_readback_fixture import credentials
-from tools import openstack_quota as d,readback_core as c
-from tools.run_files import digest,encoded,load_private,utcnow
+from provisioner.execution import readback_core as c
+from provisioner.execution import openstack_quota as d
+from provisioner.execution.run_files import digest,encoded,load_private,utcnow
 
 PROJECT='1'*32
 CALLER='2'*32

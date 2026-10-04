@@ -1,0 +1,11 @@
+[Unit]
+Description=Retain freshness checks and deliver alerts for %i
+
+[Timer]
+OnCalendar=*-*-* *:0/5:00 UTC
+Persistent=true
+AccuracySec=1s
+Unit=hosting-discovery-monitor@%i.service
+
+[Install]
+WantedBy=timers.target

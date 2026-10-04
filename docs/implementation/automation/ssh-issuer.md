@@ -2,7 +2,7 @@
 
 [Automation home](README.md) · [Identity and independent recovery](../../architecture/shared-services/3-identity-certificates-keys-and-independent-recovery.md) · [Worker installation](owner-installation.md) · [Worker revocation](owner-revocations.md)
 
-`tools/ssh_issuer.py` signs Ed25519 user certificates on an independently accepted
+`provisioner/execution/ssh_issuer.py` signs Ed25519 user certificates on an independently accepted
 issuer host. Each profile owns one CA, one principal, an explicit IPv4 source
 scope and one retained serial/revocation ledger. It invokes the accepted local
 OpenSSH signer, then verifies the certificate signature, trusted CA, subject,
@@ -73,8 +73,8 @@ the accepted issuer policy or the original request.
 Validate private accepted inputs before requesting a native operation:
 
 ```bash
-python tools/ssh_issuer.py --config /private/issuer.json --request /private/request.json
-python tools/ssh_issuer.py --config /private/issuer.json --request /private/request.json \
+python -m provisioner.execution.ssh_issuer --source-root /opt/hosting-source --config /private/issuer.json --request /private/request.json
+python -m provisioner.execution.ssh_issuer --source-root /opt/hosting-source --config /private/issuer.json --request /private/request.json \
   --authority /private/authority.json --execute
 ```
 
@@ -103,7 +103,7 @@ missing retained records hold further work.
 Issuer revocation writes `SUBJECT_REVOKED` before publishing its receipt. Even a
 lost receipt cannot permit later renewal. The receipt supplies the sorted union
 of denied subject keys. Independently authorize and apply those keys with
-`tools/owner_revocations.py` for each relevant endpoint. Issuer denial alone does
+`provisioner/execution/owner_revocations.py` for each relevant endpoint. Issuer denial alone does
 not invalidate an already issued certificate at SSH servers. Endpoint denial
 affects new authentication; neither operation terminates existing sessions or
 fences their native tasks.

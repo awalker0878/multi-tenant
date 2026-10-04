@@ -7,6 +7,7 @@ graft terraform
 graft ansible
 graft config
 graft docs
+include .hosting-root
 recursive-include provisioner/controlplane/api/portal *.html *.js *.css
 recursive-include provisioner/controlplane/persistence/migrations *.sql
 global-exclude *.pyc

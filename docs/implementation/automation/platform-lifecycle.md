@@ -19,7 +19,7 @@ route advertisement, HA placement, image credential or site inventory is inferre
 
 ## Exact saved-plan contract
 
-`tools/lifecycle_transition.py` creates a `hosting-platform-transition/1` record
+`provisioner/execution/lifecycle_transition.py` creates a `hosting-platform-transition/1` record
 from a successful private execution completed within 24 hours. Supported scopes
 are Nutanix domains/workloads and VMware domains. Existing OpenStack transition records
 remain accepted by the saved-plan executor through the same validation dispatch.
@@ -37,7 +37,7 @@ and `withdrawal`. These reference independently accepted site records; they are
 not cryptographic signatures or an approval service.
 
 ```sh
-python tools/lifecycle_transition.py --prior-run /private/prior-run \
+python -m provisioner.execution.lifecycle_transition --prior-run /private/prior-run \
   --inputs /private/bootstrap-inputs.json --acceptance /private/acceptance.json \
   --stage bootstrap --output /private/transition.json
 ```

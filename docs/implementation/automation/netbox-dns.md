@@ -2,7 +2,7 @@
 
 The [reference profile](reference-realization.md) connects a confirmed IPv4
 [NetBox allocation](netbox-ipam.md) to the existing [RFC 2136/TSIG writer](../../DNS_LIFECYCLE.md).
-`tools/netbox_dns.py` registers one initial A or PTR record in one accepted zone
+`provisioner/execution/netbox_dns.py` registers one initial A or PTR record in one accepted zone
 and supports its [exact owned withdrawal](netbox-dns-retirement.md).
 It checks native IPAM state and preserves a durable, write-once attempt. It does
 not allocate addresses, confirm VM bindings, authorize activation or complete the
@@ -24,7 +24,7 @@ time; a changed identity, status or revision blocks DNS use.
 
 For this adapter, the DNS job and scope use the allocation's `tenant_key` as
 `tenant_id`. Set `resource_id` to `ipam-` plus the first 48 hexadecimal characters
-of `tools.netbox_ipam.refs(allocation)['hosting_owner']`. That owner hash covers
+of `provisioner.allocations.netbox_ipam.refs(allocation)['hosting_owner']`. That owner hash covers
 the full environment/site/platform/tenant/WSD scope and member. It is deterministic
 ownership metadata, not a credential or grant of authority.
 
@@ -37,14 +37,14 @@ adoption and reuse remain outside this interface. Deletion uses the separate
 withdrawal action with the exact original registration and retained markers.
 
 ```sh
-python tools/netbox_dns.py --action register \
+python -m provisioner.execution.netbox_dns --action register \
   --allocation /private/operator/allocation.json \
   --confirmation /private/operator/confirmed.json \
   --job /private/operator/dns-job.json --scope /private/operator/dns-scope.json
 ```
 
 This command makes no service contact. It returns `VALIDATED_NO_CONTACT` and
-`binding_sha256`: SHA-256 of `tools.run_files.encoded` applied to an object with
+`binding_sha256`: SHA-256 of `provisioner.execution.run_files.encoded` applied to an object with
 `allocation`, `confirmation`, `job` and `scope` containing those exact four parsed
 inputs. This is distinct from the DNS writer's compact JSON hashes.
 

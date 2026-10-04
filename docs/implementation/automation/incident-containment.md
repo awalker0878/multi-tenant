@@ -1,25 +1,25 @@
 # Delegated edge incident containment
 
-`tools/edge_contain.py` withdraws an adopted Linux/nftables edge boundary using
+`provisioner/execution/edge_contain.py` withdraws an adopted Linux/nftables edge boundary using
 separate incident authority and the existing edge owner's shared ledger. It can
 remove scoped exposure, install the owned deny boundary if absent, and observe
 containment after a lost reply. It cannot introduce an allow, change routes or
 interfaces, clear another owner's hold, or authorize reactivation.
 
-`tools/delivery_containment.py` carries the optional predelegated containment
+`provisioner/execution/delivery_containment.py` carries the optional predelegated containment
 that runs independently of forward-stage success when a delivery stage fails.
 
 ## Authority and execution
 
 Use the exact [edge specification](edge-activation.md). Authority has
 `format: hosting-edge-containment-authority/1`, `spec_sha256` (SHA256 over
-`tools.run_files.encoded(spec)`), `incident_id`, `valid_from`, `valid_until`,
+`provisioner.execution.run_files.encoded(spec)`), `incident_id`, `valid_from`, `valid_until`,
 `change_ref` and `boundary_acceptance_ref`. The window is at most one hour.
 This separate delegation permits withdrawal of the owned boundary regardless of
 its current allows; it does not approve a new boundary or production readiness.
 
 ```sh
-python tools/edge_contain.py --spec /private/edge.json \
+python -m provisioner.execution.edge_contain --spec /private/edge.json \
   --authority /private/incident-authority.json --nft /usr/sbin/nft \
   --ledger /private/edge-ledger --output /private/incident-run --execute
 ```
@@ -54,7 +54,7 @@ The [delivery runner](delivery-runner.md) accepts
 | Field | Contract |
 | --- | --- |
 | `format` | `hosting-delivery-containment/1` |
-| `plan_sha256` | `tools.readback_core.digest` of the exact delivery plan |
+| `plan_sha256` | `provisioner.execution.readback_core.digest` of the exact delivery plan |
 | `trigger_steps` | Explicit unique step IDs whose failure requires withdrawal |
 | `spec`, `authority` | Each has an absolute private `path` and SHA256 of its file bytes |
 | `nft`, `nft_sha256` | Absolute accepted executable and its file digest |

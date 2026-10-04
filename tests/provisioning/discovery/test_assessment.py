@@ -5,6 +5,7 @@ import unittest
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
+from provisioner.domain.capability_properties import contract_digest
 from provisioner.controlplane.authority.model import PlanScope
 from provisioner.controlplane.discovery.assessment import (
     AssessmentEngine, AssessmentScopeAccess, DestinationOption, ReviewedFinding,
@@ -49,7 +50,14 @@ def source_snapshot(*, captured_at: datetime = NOW - timedelta(hours=1),
         facts = fact_set(vcpuCount=4, memorySizeBytes=8_000,
                          diskCapacityBytes=20_000, guestProfile='linux-uefi',
                          networkMode='routed-ipv4', dataMode='offline-disks',
-                         measuredTransferBytes=10_000)
+                         measuredTransferBytes=10_000,
+                         # Explicit synthetic evidence, not inferred native support.
+                         architecture='x86_64', firmware='uefi',
+                         secureBootEnabled=False, vtpmEnabled=False,
+                         storageEncrypted=False, sharedDisks=False,
+                         passthroughDevices=[], memoryStateRequired=False,
+                         capabilityPropertySchemaDigest=contract_digest(),
+                         requiredCapabilities=[], capabilityRequirements=[])
     return DiscoveryResult('source-campaign', 'a' * 64, SOURCE.scope,
                            captured_at, 'COMPLETE' if complete else 'PARTIAL',
                            (DiscoveryObject(VM, facts),), (),
@@ -66,7 +74,14 @@ def target_snapshot(installation: InstalledTuple, *,
                   supportedGuestProfiles=['linux-uefi'],
                   supportedNetworkModes=['routed-ipv4'],
                   supportedDataModes=['offline-disks'],
-                  measuredTransferBytesPerSecond=200)
+                  measuredTransferBytesPerSecond=200,
+                  capabilityPropertySchemaDigest=contract_digest(),
+                  observedCapabilities=['cpu_topology', 'vm_create', 'secure_boot', 'guest_drivers'],
+                  capabilityProperties={
+                      'cpu_topology.architecture': 'x86_64',
+                      'vm_create.firmware': 'uefi',
+                      'secure_boot.enabled': False,
+                      'guest_drivers.verified': True})
     if capacity is not None:
         values = capacity
     return (DiscoveryResult(installation.scope.site_id + '-campaign', 'f' * 64,

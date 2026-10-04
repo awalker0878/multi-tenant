@@ -19,7 +19,7 @@ Security semantics SHALL be equivalent across IPv4 and IPv6 unless an explicit, 
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Security semantics SHALL be equivalent across IPv4 and IPv6 unless an explicit, approved protocol-specific exception exists.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-002, CT-031, CT-032
 
@@ -42,7 +42,7 @@ Conformance testing SHALL include IPv6 negative-path tests before a platform is 
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Conformance testing SHALL include IPv6 negative-path tests before a platform is certified for dual-stack service.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-002, CT-003, CT-031
 
@@ -65,7 +65,7 @@ Every offered address-family mode SHALL define local protocol controls, ICMPv6/P
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Complete source obligation; all applicable clauses must be satisfied: Every offered address-family mode SHALL define local protocol controls, ICMPv6/PMTU treatment, transition-path restrictions and complete service/recovery dependencies; unsupported family combinations SHALL be rejected.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-018, CT-031, CT-032
 
@@ -83,7 +83,7 @@ Every offered address-family mode SHALL define local protocol controls, ICMPv6/P
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: Every offered address-family mode SHALL define local protocol controls, ICMPv6/PMTU treatment, transition-path restrictions and complete service/recovery dependencies
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-018, CT-031, CT-032
 
@@ -101,7 +101,7 @@ Every offered address-family mode SHALL define local protocol controls, ICMPv6/P
 
 **Artifact or required operating record:** Accepted physical LLD, route/port/MTU/failure schedule and native configuration from the selected network owner — specifically: unsupported family combinations SHALL be rejected.
 
-**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [tools/route_audit.py](../../../tools/route_audit.py)
+**Available related source:** [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md) · [provisioner/execution/route_audit.py](../../../provisioner/execution/route_audit.py)
 
 **Verification:** Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure. Baseline procedures: CT-018, CT-031, CT-032
 

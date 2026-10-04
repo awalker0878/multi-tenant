@@ -3,8 +3,9 @@ from __future__ import annotations
 
 from provisioner.adapters import base as adapters
 from provisioner.domain.request import digest
+from provisioner.domain.capability_properties import contract_digest, entails, merge_requirements, parse_requirements
 
-FORMAT = 'hosting-portable-policy-realization/1'
+FORMAT = 'hosting-portable-policy-realization/2'
 
 CONTROL_OUTCOMES = {
     'network_domain': 'isolated workload security domain',
@@ -26,11 +27,29 @@ def compile(capsule: dict, target_plan) -> dict:
     The result carries outcomes and the target adapter surfaces, not native rule IDs.
     Qualification decides whether the target may claim the outcome.
     """
+    if capsule.get('format') != 'hosting-portable-policy-capsule/2':
+        raise ValueError('Capability properties require a current policy capsule')
+    if (capsule['requirements']['capability_property_schema_digest'] != contract_digest()
+            or target_plan.resolution.capability_property_schema_digest != contract_digest()):
+        raise ValueError('Capability property interpretation changed; reassessment required')
     adapter = adapters.get(target_plan.desired_state.platform)
     required = tuple(capsule['requirements']['capabilities'])
     capability = adapter.capability_contract(required=required)
+    source_constraints = parse_requirements(
+        capsule['requirements']['capability_constraints'], list(required))
+    try:
+        constraints = merge_requirements(source_constraints, target_plan.resolution.capability_constraints)
+        property_conflict = []
+    except ValueError:
+        constraints = source_constraints
+        property_conflict = ['CAPABILITY_PROPERTY_CONFLICT']
+    # Even compatible requirements need target-plan enforcement. A weaker
+    # target profile must not silently erase source obligations at migration.
+    target_constraints = target_plan.resolution.capability_constraints
+    property_conflict.extend('SOURCE_PROPERTY_NOT_ENFORCED:' + r.property
+                             for r in source_constraints if not entails(target_constraints, r))
     controls = []
-    blockers = list(capability['blockers'])
+    blockers = list(capability['blockers']) + property_conflict
     for name in required:
         controls.append({
             'capability': name,
@@ -60,6 +79,7 @@ def compile(capsule: dict, target_plan) -> dict:
             'security_edge': adapter.security_edge_contract(),
         },
         'controls': controls,
+        'capability_constraints': [r.to_dict() for r in constraints],
         'services': {
             name: {
                 'required_profile': source_profiles[name],

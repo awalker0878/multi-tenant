@@ -30,14 +30,14 @@
       "interface": "tools/old_compile.py",
       "kind": "path",
       "reason": "Superseded compiler wrapper. There is exactly one compiler entry point.",
-      "replacement": "tools/compile_wsd.py",
+      "replacement": "provisioner/compiler/wsd.py",
       "enforcement": "the path must not exist"
     },
     {
       "interface": "tools/compile_wsd_v2.py",
       "kind": "path",
       "reason": "A second compiler wrapper would duplicate native field ownership.",
-      "replacement": "tools/compile_wsd.py",
+      "replacement": "provisioner/compiler/wsd.py",
       "enforcement": "the path must not exist"
     },
     {
@@ -101,6 +101,692 @@
       "kind": "path",
       "reason": "The provisioner must not restate native field shapes; it re-exports the compiler's.",
       "replacement": "provisioner/adapters/base.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_platform_capabilities.py",
+      "kind": "path",
+      "reason": "Runtime owner moved into the installed qualification package; all known imports and commands were migrated without a compatibility wrapper.",
+      "replacement": "provisioner/qualification/registry.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_platform_qualification.py",
+      "kind": "path",
+      "reason": "Runtime owner moved into the installed qualification package; all known imports and commands were migrated without a compatibility wrapper.",
+      "replacement": "provisioner/qualification/native.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_version_source_provenance.py",
+      "kind": "path",
+      "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
+      "replacement": "provisioner/qualification/provenance.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_qualification_campaign_assurance.py",
+      "kind": "path",
+      "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
+      "replacement": "provisioner/qualification/campaign.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_target_selection_assurance.py",
+      "kind": "path",
+      "reason": "Qualification dependency moved into the installed package; all callers migrated without a compatibility wrapper or import-path mutation.",
+      "replacement": "provisioner/qualification/target_selection.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/compile_wsd.py",
+      "kind": "path",
+      "reason": "The actual compiler is package-owned; all callers migrated, with no forwarding file, path mutation or build-script/native-observer dependency.",
+      "replacement": "provisioner/compiler/wsd.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_catalog.py",
+      "kind": "path",
+      "reason": "The complete catalog reader is package-owned; all runtime, validation and test consumers migrated without a forwarding module.",
+      "replacement": "provisioner/execution/terraform_catalog.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_reservation_records.py",
+      "kind": "path",
+      "reason": "The exported reservation-evidence implementation is package-owned; all in-tree callers and commands migrated with no forwarding module.",
+      "replacement": "provisioner/allocations/reservation_evidence.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_ipam_allocation_records.py",
+      "kind": "path",
+      "reason": "The exported IPAM allocation-evidence implementation is package-owned; all in-tree callers and commands migrated with no forwarding module.",
+      "replacement": "provisioner/allocations/ipam_evidence.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_dns_registration_records.py",
+      "kind": "path",
+      "reason": "The complete DNS registration evidence reader is package-owned; all runtime, preflight, CI and test consumers migrated without a forwarding module.",
+      "replacement": "provisioner/allocations/dns_evidence.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/check_release.py",
+      "kind": "path",
+      "reason": "The complete source-integrity verifier is package-owned; all executable consumers migrated without a forwarding module. Historical manifests remain immutable.",
+      "replacement": "provisioner/execution/source_integrity.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_site_service_capacity.py",
+      "kind": "path",
+      "reason": "The site/service capacity evidence owner moved into the installed allocation package. All known consumers migrated without a forwarding module.",
+      "replacement": "provisioner/allocations/capacity_evidence.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_site_service_eligibility.py",
+      "kind": "path",
+      "reason": "The site eligibility evaluator moved into the installed allocation package. All known consumers migrated without a forwarding module.",
+      "replacement": "provisioner/allocations/site_eligibility.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_reservation_preflight.py",
+      "kind": "path",
+      "reason": "The reservation preflight evaluator moved into the installed allocation package. All known consumers migrated without a forwarding module.",
+      "replacement": "provisioner/allocations/reservation_preflight.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_ipam_allocation_preflight.py",
+      "kind": "path",
+      "reason": "The IPAM preflight evaluator moved into the installed allocation package. All known consumers migrated without a forwarding module.",
+      "replacement": "provisioner/allocations/ipam_preflight.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "scripts/check_dns_registration_preflight.py",
+      "kind": "path",
+      "reason": "The DNS preflight evaluator moved into the installed allocation package. All known consumers migrated without a forwarding module.",
+      "replacement": "provisioner/allocations/dns_preflight.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/guest_probe.py",
+      "kind": "path",
+      "reason": "The fixed guest probe is package-owned; its active caller and tests migrated without a forwarding module.",
+      "replacement": "provisioner/execution/guest_probe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/route_audit.py",
+      "kind": "path",
+      "reason": "The offline routed-topology model is package-owned; all active callers migrated without a forwarding module.",
+      "replacement": "provisioner/execution/route_audit.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/check_package.py",
+      "kind": "path",
+      "reason": "Redundant repository-gate wrapper; the actual current gate is scripts/check_repository.py and no live caller requires a forwarding command.",
+      "replacement": "scripts/check_repository.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/input_review.py",
+      "kind": "path",
+      "reason": "Read-only implementation-input review moved into the installed execution package; all callers migrated without a forwarding module.",
+      "replacement": "provisioner/execution/input_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/neutron_observe.py",
+      "kind": "path",
+      "reason": "Implementation and all active consumers moved into the installed execution package without an alias.",
+      "replacement": "provisioner/execution/neutron_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/readback_core.py",
+      "kind": "path",
+      "reason": "Implementation and all active consumers moved into the installed execution package without an alias.",
+      "replacement": "provisioner/execution/readback_core.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/route_record_review.py",
+      "kind": "path",
+      "reason": "Implementation and all active consumers moved into the installed execution package without an alias.",
+      "replacement": "provisioner/execution/route_record_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/run_files.py",
+      "kind": "path",
+      "reason": "Implementation and all active consumers moved into the installed execution package without an alias.",
+      "replacement": "provisioner/execution/run_files.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/flow_policy.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/flow_policy.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/lifecycle_transition.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/lifecycle_transition.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/openstack_transition.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/openstack_transition.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/plan_review.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/plan_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_apply.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/terraform_apply.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_run.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/terraform_run.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/wsd_handoff.py",
+      "kind": "path",
+      "reason": "Actual execution/lifecycle implementation and all current callers migrated to the installed package; no alias is retained.",
+      "replacement": "provisioner/execution/wsd_handoff.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/dataset_acceptance.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/dataset_acceptance.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/delivery_containment.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/delivery_containment.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/delivery_run.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/delivery_run.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/delivery_steps.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/delivery_steps.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/dns_change.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/dns_change.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/dns_propagation.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/dns_propagation.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/edge_boot.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/edge_boot.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/edge_contain.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/edge_contain.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/edge_install.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/edge_install.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/execution_journal.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/execution_journal.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/guest_apply.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/guest_apply.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/guest_inventory.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/guest_inventory.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/guest_run.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/guest_run.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/guest_services.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/guest_services.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/netbox_dns.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/netbox_dns.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nft_edge.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nft_edge.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nsx_domain_binding.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nsx_domain_binding.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nsx_domain_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nsx_domain_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nsx_domain_switch_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nsx_domain_switch_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nsx_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nsx_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nsx_segment_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nsx_segment_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nsx_terraform_recovery.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nsx_terraform_recovery.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_entity_activity.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_entity_activity.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_flow_activity_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_flow_activity_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_flow_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_flow_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_flow_terraform_recovery.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_flow_terraform_recovery.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_task_tree.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_task_tree.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_terraform_recovery.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_terraform_recovery.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_vm_activity_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_vm_activity_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_vm_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_vm_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/nutanix_vm_task_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/nutanix_vm_task_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/openstack_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/openstack_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/openstack_quota.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/openstack_quota.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/operations_alerts.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/operations_alerts.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/operations_review.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/operations_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/owner_install.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/owner_install.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/owner_revocations.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/owner_revocations.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/owner_worker.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/owner_worker.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/qualify_target.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/qualify_target.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/readback_cli.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/readback_cli.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/recovery_review.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/recovery_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/remote_owner.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/remote_owner.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/restic_run.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/restic_run.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/restic_transfer.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/restic_transfer.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/retirement.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/retirement.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/runtime_build.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/runtime_build.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/ssh_issuer.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/ssh_issuer.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/state_backend.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/state_backend.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/state_export.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/state_export.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/state_project.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/state_project.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/terraform_recovery_review.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/terraform_recovery_review.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vmware_network_binding.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vmware_network_binding.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_clone_source.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_clone_source.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_history.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_history.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_network_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_network_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_port_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_port_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_power.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_power.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_recovery_devices.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_recovery_devices.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_task_activity.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_task_activity.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_task_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_task_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/vsphere_task_tree_observe.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and all active callers use that owner.",
+      "replacement": "provisioner/execution/vsphere_task_tree_observe.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/capacity.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and active callers use that owner.",
+      "replacement": "provisioner/allocations/capacity_owner.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/capacity_demand.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and active callers use that owner.",
+      "replacement": "provisioner/allocations/capacity_demand.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/netbox_ipam.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and active callers use that owner.",
+      "replacement": "provisioner/allocations/netbox_ipam.py",
+      "enforcement": "the path must not exist"
+    },
+    {
+      "interface": "tools/service_http.py",
+      "kind": "path",
+      "reason": "The installed package owns this executor and active callers use that owner.",
+      "replacement": "provisioner/execution/service_http.py",
       "enforcement": "the path must not exist"
     }
   ]

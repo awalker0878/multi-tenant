@@ -2,7 +2,7 @@
 
 **Purpose:** bind DNS registration lifecycle evidence to a confirmed authoritative IPAM allocation without making this repository an IPAM or DNS authority.
 
-The existing `tools/dns_change.py` remains the separately scoped RFC 2136/TSIG mutation mechanism. This package does not invoke it. It only validates exported DNS lifecycle evidence and decides whether an immutable registration intent is ready to be handed to the DNS owner.
+The existing `provisioner/execution/dns_change.py` remains the separately scoped RFC 2136/TSIG mutation mechanism. This package does not invoke it. It only validates exported DNS lifecycle evidence and decides whether an immutable registration intent is ready to be handed to the DNS owner.
 
 The separate [NetBox execution adapter](../implementation/automation/netbox-dns.md)
 connects confirmed native IPv4 allocations to initial A/PTR registration. Its
@@ -58,7 +58,7 @@ Retirement preserves the DNS owner marker/tombstone boundary until name/address 
 
 ## Preflight
 
-`scripts/check_dns_registration_preflight.py` accepts only opaque registration scope. It rejects caller-supplied FQDN or address fields because those values must come from the authoritative name/IPAM owners after handoff.
+`provisioner/allocations/dns_preflight.py` accepts only opaque registration scope. It rejects caller-supplied FQDN or address fields because those values must come from the authoritative name/IPAM owners after handoff.
 
 Ready state is:
 
@@ -73,7 +73,7 @@ The preflight always keeps `may_write_dns`, `may_delete_dns`, `may_release_name`
 Because the active IPAM and DNS indexes contain no confirmed allocation/registration records, the repository example remains held:
 
 ```sh
-python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED
+python -m provisioner.allocations.dns_preflight examples/dns_registration_intent.json.example --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED
 ```
 
 Local wire tests continue to prove only the bounded RFC2136/TSIG implementation against the disposable loopback authority. They do not qualify BIND, Windows DNS, appliances, DNSSEC, recursion, secondary convergence or production ACLs.

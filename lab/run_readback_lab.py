@@ -11,7 +11,10 @@ import sys
 if __package__ in (None,''):
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from lab.native_readback_fixture import Fixture, responses
-from tools import readback_core as c, nsx_observe as nsx, nutanix_observe as nut, recovery_review as rr
+from provisioner.execution import readback_core as c
+from provisioner.execution import nsx_observe as nsx
+from provisioner.execution import nutanix_observe as nut
+from provisioner.execution import recovery_review as rr
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -78,8 +81,8 @@ def campaign():
         case('stop-runner-is-not-proof-of-fencing','nutanix','READBACK_MATCH_NOT_QUALIFIED',context_change=lambda x:x['writer_fence'].update(state='UNVERIFIED'),expected_review='HOLD_WRITER_NOT_FENCED')
         case('incident-containment-survives-readback','nsx','READBACK_MATCH_NOT_QUALIFIED',context_change=lambda x:x.update(containment='ACTIVE'),expected_review='KEEP_INCIDENT_CONTAINMENT')
         case('new-generation-needs-new-review','nsx','READBACK_MATCH_NOT_QUALIFIED',context_change=lambda x:x.update(current_generation=5),expected_review='HOLD_SUPERSEDED_CHANGE')
-    files=['tools/readback_core.py','tools/nsx_observe.py','tools/nutanix_observe.py','tools/readback_cli.py',
-           'tools/recovery_review.py','lab/native_readback_fixture.py','lab/run_readback_lab.py']
+    files=['provisioner/execution/readback_core.py','provisioner/execution/nsx_observe.py','provisioner/execution/nutanix_observe.py','provisioner/execution/readback_cli.py',
+           'provisioner/execution/recovery_review.py','lab/native_readback_fixture.py','lab/run_readback_lab.py']
     return {'kind':'LOCAL_NATIVE_READBACK_PROTOCOL_CAMPAIGN','status':'PASSED_LOCAL_HTTPS_FIXTURE' if all(r['result']=='PASSED' for r in rows) else 'FAILED',
         'completed_at':c.now(),'passed':sum(r['result']=='PASSED' for r in rows),'failed':sum(r['result']!='PASSED' for r in rows),
         'source_sha256':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in files},'cases':rows,

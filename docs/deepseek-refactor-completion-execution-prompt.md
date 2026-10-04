@@ -71,12 +71,12 @@ Before implementing a new mechanism, inspect the existing implementation.
 In particular, reuse and integrate where applicable:
 
 - tools/compile_wsd.py
-- tools/wsd_handoff.py
+- provisioner/execution/wsd_handoff.py
 - tools/delivery_run.py
 - tools/delivery_steps.py
 - tools/execution_journal.py
-- tools/terraform_run.py
-- tools/terraform_apply.py
+- provisioner/execution/terraform_run.py
+- provisioner/execution/terraform_apply.py
 - existing capacity/reservation machinery
 - existing IPAM/NetBox machinery
 - existing DNS lifecycle machinery

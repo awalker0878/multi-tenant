@@ -11,13 +11,16 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime
-from typing import Callable
+from typing import Callable, TYPE_CHECKING
 
 from provisioner.domain.enterprise_records import validate_record
 
 from .model import (ApprovalSnapshot, AuthorizedPlan, FrozenPlan, PlanApproval,
                     PlanScope, WorkerGrant)
 from .service import AuthorityDenied, _valid_approvals
+
+if TYPE_CHECKING:
+    from provisioner.controlplane.jobs.repository import Job
 
 
 def _json(value):
@@ -197,9 +200,24 @@ def revalidate_admission(cursor, decision: AuthorizedPlan, at: datetime) -> None
     _revalidate(cursor, decision, at)
 
 
-def revalidate_start(cursor, job, at: datetime) -> None:
-    """Called before outbox dispatch; a worker rechecks before every mutation."""
-    _revalidate(cursor, job, at)
+def revalidate_start(cursor, binding: AuthorizedPlan | Job, at: datetime) -> None:
+    """Recheck current authority at the explicit plan or admitted-job boundary.
+
+    The historical pre-admission AuthorizedPlan check proves only its current
+    plan/approval binding: it is not a persisted job or start permission.
+    Outbox, workflow and native-effect owners reload a Job from B09 and must
+    use that typed branch, which always checks its current wave affiliation.
+    Arbitrary job-shaped values cannot omit an ID to skip the wave lookup.
+    """
+    from provisioner.controlplane.jobs.repository import Job
+    if isinstance(binding, AuthorizedPlan):
+        _revalidate(cursor, binding, at)
+        return
+    if not isinstance(binding, Job):
+        raise AuthorityDenied('An exact authorized plan or persisted B09 job is required')
+    _revalidate(cursor, binding, at)
+    from provisioner.migration.wave_schedule import require_wave_window
+    require_wave_window(cursor, binding, at)
 
 
 class PostgresAuthority:

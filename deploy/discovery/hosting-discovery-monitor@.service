@@ -1,0 +1,22 @@
+[Unit]
+Description=Authorized freshness monitor %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=hosting-discovery-monitor
+Group=hosting-discovery-monitor
+UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1 PYTHONSAFEPATH=1
+EnvironmentFile=/etc/hosting/discovery/monitors/%i.env
+ExecStart=/opt/hosting/bin/hosting-discovery-monitor cycle --config /etc/hosting/discovery/monitors/%i.json
+TimeoutStartSec=60min
+KillMode=control-group
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX

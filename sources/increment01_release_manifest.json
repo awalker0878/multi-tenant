@@ -72,7 +72,7 @@
     "tools/check_local.py": "3ddb318353c2169842bb051b55d0cfd0db940073410a9c713b43f8398a9cc4ac",
     "tools/check_package.py": "09e129dd81a5869c991439c6bdee2085c68270a57f9df11e718cd41f2f9e3e0d",
     "tools/input_review.py": "5b4af0132bd49854b0675bd8c3834a6c13a0e803ca10e01569c23bb9a21690ef",
-    "tools/plan_review.py": "f0b3340cf37e4e1861e9cecd5ad14534e2e906434b74357e7a3c07908dd500ff",
+    "provisioner/execution/plan_review.py": "f0b3340cf37e4e1861e9cecd5ad14534e2e906434b74357e7a3c07908dd500ff",
     "tools/route_audit.py": "b22a28faede9d0970460ec9276d232054a957b2a9cb1e42246f2722a975bb760",
     "tools/verify_terraform.py": "e2db6f9f1d12f65a7ea8d80e58ce0fab27dcc4ea4730da21cf3cdbac13b5902c"
   },

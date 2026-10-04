@@ -1,6 +1,6 @@
 # Retained-VM power execution
 
-`tools/vsphere_power.py` owns power for an existing VMware VM. Terraform retains
+`provisioner/execution/vsphere_power.py` owns power for an existing VMware VM. Terraform retains
 VM configuration, disk and NIC ownership. NSX retains policy/segment ownership;
 the edge owner retains exposure. This command never creates, replaces, migrates,
 reconfigures or deletes a VM. Its completion is execution evidence, not activation.
@@ -39,7 +39,7 @@ The request is a JSON object with these exact fields:
 
 The separately issued authority has `format` equal to
 `hosting-vsphere-power-authority/1`, `request_sha256` computed using
-`tools.readback_core.digest`, `valid_from`, `valid_until` (at most one hour),
+`provisioner.execution.readback_core.digest`, `valid_from`, `valid_until` (at most one hour),
 `change_ref`, `writer_fence_ref`, `containment_ref`, `placement_ref` and
 `data_quiesce_ref`. The last field is a nonempty reference for power-off and
 JSON null for power-on. References record custody of independently accepted
@@ -50,7 +50,7 @@ Inject the accepted session through `VCENTER_SESSION_TOKEN`; it is never stored
 in the journal. TLS verification is mandatory, with an optional private CA.
 
 ```sh
-python tools/vsphere_power.py --request /private/power.json \
+python -m provisioner.execution.vsphere_power --source-root /opt/hosting-source --request /private/power.json \
   --authority /private/power-authority.json --ledger /private/native-ledger \
   --ca-file /private/vcenter-ca.pem --execute-approved-change
 ```
@@ -77,7 +77,7 @@ results are excluded from the journal.
 Pending tasks and interrupted reads resume without a second power POST:
 
 ```sh
-python tools/vsphere_power.py --request /private/power.json \
+python -m provisioner.execution.vsphere_power --source-root /opt/hosting-source --request /private/power.json \
   --authority /private/current-power-authority.json --ledger /private/native-ledger \
   --ca-file /private/vcenter-ca.pem --resume
 ```
@@ -95,7 +95,7 @@ For a lost response, supply `--resume --reconcile-task /private/task-mapping.jso
 The mapping has `format: hosting-vsphere-power-reconciliation/1`,
 `request_sha256`, `started_event_sha256`, `task_id`, `valid_from`, `valid_until`,
 `task_mapping_ref`, `writer_fence_ref` and `containment_ref`. The start-event
-digest uses `tools.readback_core.digest` over the exact immutable `STARTED`
+digest uses `provisioner.execution.readback_core.digest` over the exact immutable `STARTED`
 event, including sequence and prior-event binding. Preserve the actual accepted
 mapping file with the external recovery record. The command checks its current
 window and the native task's VM, operation, queue chronology, event chain and

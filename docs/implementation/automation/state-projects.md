@@ -1,6 +1,6 @@
 # Bootstrap a private GitLab state project
 
-`tools/state_project.py` creates a dedicated private project in an existing
+`provisioner/execution/state_project.py` creates a dedicated private project in an existing
 accepted GitLab namespace and publishes exact backend configurations for its
 accepted state scopes. It implements the project bootstrap part of W03 using
 the [selected GitLab state service](reference-realization.md#state-service-setup).
@@ -64,14 +64,14 @@ optional CA bundle and shared ledger in owner-only storage outside the checkout.
 A separate `hosting-state-project-authority/1` object has exactly `format`,
 `request_sha256`, `action`, `valid_from`, `valid_until`, `change_ref`,
 `token_sha256` and `ca_sha256`. The request digest is
-`tools.readback_core.digest(request)`. Credential/CA digests bind their complete
+`provisioner.execution.readback_core.digest(request)`. Credential/CA digests bind their complete
 file bytes; absent CA uses null and the system trust roots. Authority lasts at
 most one hour, is checked before each request, and selects either `create` or
 `observe`. Observation never authorizes another POST.
 
 ```sh
-python tools/state_project.py --request /private/state/project.json
-python tools/state_project.py --request /private/state/project.json \
+python -m provisioner.execution.state_project --source-root /opt/hosting-source --request /private/state/project.json
+python -m provisioner.execution.state_project --source-root /opt/hosting-source --request /private/state/project.json \
   --action create --authority /private/state/create-authority.json \
   --token-file /private/state/bootstrap-token --ca-file /private/state/ca.pem \
   --ledger /private/state/owner-ledger --execute
@@ -108,7 +108,7 @@ adoption; the tool does not infer custody from a name.
 
 The receipt status is `PRIVATE_STATE_PROJECT_OBSERVED_REQUIRES_COMMISSIONING`.
 It contains the narrow current project/group observations and a `backends` map
-from exact `state_key` to the real `tools/state_backend.py` output. Persist the
+from exact `state_key` to the real `provisioner/execution/state_backend.py` output. Persist the
 selected map entry as the executor's private `backend.json`, retaining the
 receipt digest and exact scope. No operator has to guess or manually edit the
 native project ID between creation and backend preparation.

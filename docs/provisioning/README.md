@@ -2,8 +2,9 @@
 
 The portable provisioning package (`provisioner/`) turns one reviewed YAML request
 into a deterministic, reviewable internal desired state. It is a **portable,
-provider-neutral front end to the existing compiler** — it does not replace the
-compiler, the Terraform roots, the Ansible roles or the delivery tooling.
+provider-neutral front end with a package-owned native compiler**. The original
+compiler implementation is preserved at `provisioner/compiler/wsd.py`; Terraform
+roots, Ansible roles and the remaining delivery tooling keep their owners.
 
 Pipeline (each stage is a separate owner, in dependency order):
 
@@ -15,10 +16,10 @@ portable WSD request (YAML)
   -> placement                  provisioner/placement
   -> desired state              provisioner/compiler/desired_state.py
   -> realization contract       provisioner/adapters
-  -> existing compile_wsd.py    tools/compile_wsd.py
+  -> package-owned compiler     provisioner/compiler/wsd.py
   -> terraform / ansible        provisioner/execution, provisioner/adapters
   -> hosting-delivery/2         provisioner/execution/handoff.py
-  -> existing delivery runner   tools/delivery_run.py (the only engine)
+  -> existing delivery runner   provisioner/execution/delivery_run.py (the only engine)
   -> delivery and observation   provisioner/execution/delivery.py, provisioner/observation
 ```
 
@@ -35,6 +36,7 @@ that cites it cites every reviewed decision. See
 
 | Document | Covers |
 | --- | --- |
+| [Current enterprise execution plan](../product/enterprise-workload-mobility-execution-plan.md) | B01–B50 delivery sequence, remaining implementation and separate qualification gates |
 | [Provisioning architecture](architecture.md) | Stages, ownership, dependency direction, what CI does not do |
 | [Portable WSD request contract](request-contract.md) | `apiVersion`, `kind`, `metadata`, `spec` field by field |
 | [Profile model](profile-model.md) | Catalogs, implemented vs deferred status, resolution rules |
@@ -50,8 +52,25 @@ that cites it cites every reviewed decision. See
 | [Service-owner boundary](service-owner-boundary.md) | Service bindings and the owners that retain authority |
 | [Plan workflow](plan-workflow.md) | `validate resolve plan mobility-plan mobility-apply status verify evidence apply` |
 | [Supported service-profile matrix](service-profile-matrix.md) | What is implemented, what is deferred, why |
-| [Refactor completion audit](../deepseek-refactor-completion-audit.md) | Ordered completion gates, required regressions, repository-side vs external exit criteria |
-| [DeepSeek completion execution prompt](../deepseek-refactor-completion-execution-prompt.md) | Authoritative execution sequence for closing every repository-side audit gate with small commits |
+| [Installed runtime identity](installed-runtime-identity.md) | Exact protected interpreter, source, wheel and installed receipt before each writer use |
+| [Current command authority](../operations/current-command-authority.md) | Scoped planning, each guarded Linux SSH command and certificate-only Windows command custody |
+| [Fleet discovery and on-call owners](../engineering/discovery-fleet-and-oncall-owners.md) | Global database read budgets, installed collector custody and independently assigned human alert ownership |
+| [Enterprise wave pools](enterprise-wave-pools.md) | One aggregate physical budget and tenant turn over existing B09 wave members and retained uncertain charges |
+| [Cold capture and private images](../operations/cold-capture-and-private-images.md) | Powered-off snapshot export and private Glance disk import; separate from a booted cold migration |
+| [PostgreSQL17 sync and credential closure](../operations/postgresql17-sync-and-credential-closure.md) | Disabled native metadata, original transaction journal, current writer exclusion and immutable credential retirement |
+| [Enrolled resource and service recovery](../engineering/enrolled-resource-service-recovery.md) | Current approved service intents, independently observed outcomes and separate old-credential exclusion |
+| [Authenticated retained-state handover](../operations/retained-state-authenticated-handover.md) | Original retained import, independent proof verification, native reconciliation and owner-epoch interlock |
+| [Controlled HA and restore drills](../operations/control-application/3-controlled-ha-and-restore-drills.md) | Actual commissioned failover and observation-only restoration under current command authority |
+| [Final-code evidence intake](../operations/control-application/4-original-final-code-evidence-intake.md) | Independent raw campaign and pilot originals required by final release preparation |
+| [Final-code commissioning dossier](../operations/control-application/5-final-code-commissioning-dossier.md) | Exact direction, method, profile and tuple acquisition instructions from the sealed installed command |
+
+## Retained refactor history
+
+The [refactor completion audit](../deepseek-refactor-completion-audit.md) and
+[DeepSeek completion execution prompt](../deepseek-refactor-completion-execution-prompt.md)
+are retained specifications for an earlier refactor scope, not current execution
+authorities or evidence that the complete mobility programme is implemented.
+The B01–B50 execution plan above owns the current sequence and outstanding gates.
 
 ## Command line
 

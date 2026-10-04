@@ -35,7 +35,7 @@ Record the actual initiating client, endpoint, forward/reply route chain, author
 Related implementation areas are traceability targets, not proof of complete implementation:
 
 - [lab/run_namespace_lab.py](../../lab/run_namespace_lab.py)
-- [tools/route_audit.py](../../tools/route_audit.py)
+- [provisioner/execution/route_audit.py](../../provisioner/execution/route_audit.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install runtime and wheel build dependencies
-        run: python -m pip install -r requirements-repository.txt 'setuptools>=80,<85' 'wheel>=0.45,<1'
+        run: python -m pip install -r requirements-repository.txt '.[controlplane]' 'setuptools>=80,<85' 'wheel>=0.45,<1'
       - name: Build and exercise the installed wheel outside the checkout
         run: python scripts/check_installed_distribution.py
   controlplane:
@@ -30,6 +30,7 @@ jobs:
     services:
       postgres:
         image: postgres:17
+        command: postgres -c wal_level=logical -c max_replication_slots=16 -c max_wal_senders=16
         env:
           POSTGRES_PASSWORD: ci_migration_only
           POSTGRES_DB: hosting_controlplane_test
@@ -50,7 +51,18 @@ jobs:
       HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN: postgresql://hosting_directory_writer:ci_directory_writer_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_SITE_WORKER_DSN: postgresql://hosting_site_worker:ci_site_worker_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DISCOVERY_DSN: postgresql://hosting_discovery_ingest:ci_discovery_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_ASSESSMENT_DSN: postgresql://hosting_assessment_ingest:ci_assessment_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DSN: postgresql://postgres:ci_migration_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_MONITOR_DSN: postgresql://hosting_discovery_monitor:ci_monitor_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_FLEET_DSN: postgresql://hosting_discovery_fleet:ci_fleet_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_ISOLATED: '1'
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_SETUP_DSN: postgresql://postgres:ci_migration_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_SOURCE_DSN: postgresql://hosting_test_sync_source:ci_sync_source_only@localhost:5432/hosting_test_sync_source
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_TARGET_DSN: postgresql://hosting_test_sync_target:ci_sync_target_only@localhost:5432/hosting_test_sync_target
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_FENCE_DSN: postgresql://hosting_test_sync_fence:ci_sync_fence_only@localhost:5432/hosting_test_sync_source
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_WRITER_DSN: postgresql://hosting_test_sync_writer:ci_sync_writer_only@localhost:5432/hosting_test_sync_source
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_SOURCE_READER_DSN: postgresql://hosting_test_sync_source_reader:ci_sync_source_reader_only@localhost:5432/hosting_test_sync_source
+      HOSTING_TEST_POSTGRES_DATABASE_SYNC_TARGET_READER_DSN: postgresql://hosting_test_sync_target_reader:ci_sync_target_reader_only@localhost:5432/hosting_test_sync_target
       HOSTING_TEST_POSTGRES_ISOLATED: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -63,16 +75,17 @@ jobs:
         run: python -m pip install -r requirements-repository.txt -e '.[controlplane]' 'httpx==0.28.1'
       - name: Prepare disposable PostgreSQL roles and migrations
         run: python -m tests.provisioning.controlplane.prepare_postgres
+      - name: Prepare independently scoped disposable PostgreSQL synchronization engines
+        run: python -m tests.provisioning.mobility.prepare_postgresql_sync
       - name: Run control-plane database and HTTP integration tests
         run: |
-          python -m unittest discover -s tests/provisioning/controlplane -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/authority -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/jobs -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/api -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/worker -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/reconciliation -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/evidence -p 'test_*.py' -v
-          python -m unittest discover -s tests/provisioning/workflow -p 'test_*.py' -v
+          # Keep separate interpreters and report every tenant-isolated suite.
+          # Any failed suite still fails this step and blocks subsequent gates.
+          integration_status=0
+          for suite in controlplane discovery authority jobs api worker reconciliation mobility operations conversion evidence workflow; do
+            python -m unittest discover -s "tests/provisioning/$suite" -p 'test_*.py' -v || integration_status=1
+          done
+          exit "$integration_status"
       - name: Validate the packaged portal browser flow
         run: |
           node --check provisioner/controlplane/api/portal/app.js
@@ -104,6 +117,7 @@ jobs:
       HOSTING_TEST_POSTGRES_ENROLLMENT_DSN: postgresql://hosting_enrollment:ci_enrollment_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DIRECTORY_RESOLVER_DSN: postgresql://hosting_directory_resolver:ci_directory_resolver_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN: postgresql://hosting_directory_writer:ci_directory_writer_only@localhost:5432/hosting_controlplane_test
+      HOSTING_TEST_POSTGRES_MONITOR_DSN: postgresql://hosting_discovery_monitor:ci_monitor_only@localhost:5432/hosting_controlplane_test
       HOSTING_TEST_POSTGRES_ISOLATED: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -147,7 +161,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Confirm current checkout integrity before generated reports
-        run: python tools/check_release.py
+        run: python -m provisioner.execution.source_integrity
       - name: Install repository and local protocol-test dependencies
         run: python -m pip install -r requirements-repository.txt -e '.[controlplane]' 'httpx==0.28.1'
       - name: Repository hygiene and frozen-artifact links
@@ -159,31 +173,31 @@ jobs:
       - name: Native reference planning inputs and original W14 associations
         run: python scripts/commissioning_pack.py check > build/reports/native_reference_planning.json
       - name: Current exact-tuple version, source provenance and lifecycle records
-        run: python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
+        run: python -m provisioner.qualification.provenance --as-of 2026-09-18T22:00:00Z > build/reports/version_source_provenance.json
       - name: Version/source readiness must remain held without a selected supported tuple
         run: python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE > build/reports/version_source_readiness.json
       - name: Current exact-tuple native qualification dossiers
-        run: python scripts/check_platform_qualification.py > build/reports/platform_native_qualification.json
+        run: python -m provisioner.qualification.native > build/reports/platform_native_qualification.json
       - name: Platform capability registry evidence boundary
-        run: python scripts/check_platform_capabilities.py > build/reports/platform_capability_registry.json
+        run: python -m provisioner.qualification.registry > build/reports/platform_capability_registry.json
       - name: Platform-family pre-placement must remain held without native qualification
         run: python scripts/check_platform_family_eligibility.py examples/pre_placement_capability_request.json.example --expected-status HOLD_NO_NATIVE_QUALIFIED_PLATFORM > build/reports/platform_family_eligibility.json
       - name: Current site cell and service-class capacity envelopes
-        run: python scripts/check_site_service_capacity.py > build/reports/site_service_capacity_index.json
+        run: python -m provisioner.allocations.capacity_evidence > build/reports/site_service_capacity_index.json
       - name: Site service-capacity precheck must remain held without commissioned envelopes
-        run: python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
+        run: python -m provisioner.allocations.site_eligibility examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE > build/reports/site_service_capacity_eligibility.json
       - name: Exported reservation records remain external-authority evidence
-        run: python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
+        run: python -m provisioner.allocations.reservation_evidence --as-of 2026-09-18T18:00:00Z > build/reports/reservation_records.json
       - name: Reservation preflight must remain held without eligible envelope
-        run: python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
+        run: python -m provisioner.allocations.reservation_preflight examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE > build/reports/reservation_preflight.json
       - name: Exported IPAM allocations remain authoritative-service evidence
-        run: python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
+        run: python -m provisioner.allocations.ipam_evidence --as-of 2026-09-18T18:00:00Z > build/reports/ipam_allocation_records.json
       - name: IPAM allocation preflight must remain held without parent reservation
-        run: python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
+        run: python -m provisioner.allocations.ipam_preflight examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD > build/reports/ipam_allocation_preflight.json
       - name: Exported DNS registrations remain authoritative-service evidence
-        run: python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
+        run: python -m provisioner.allocations.dns_evidence --as-of 2026-09-18T18:00:00Z > build/reports/dns_registration_records.json
       - name: DNS registration preflight must remain held without confirmed IPAM
-        run: python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
+        run: python -m provisioner.allocations.dns_preflight examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED > build/reports/dns_registration_preflight.json
       - name: Exported backup/restore assurance remains external-service evidence
         run: python scripts/check_backup_restore_assurance.py --as-of 2026-09-18T19:00:00Z > build/reports/backup_restore_assurance.json
       - name: Backup/restore readiness must remain held without current assurance
@@ -237,11 +251,11 @@ jobs:
       - name: Bootstrap service readiness must remain held without current target dependencies
         run: python scripts/check_bootstrap_service_readiness.py examples/bootstrap_service_readiness_intent.json.example --as-of 2026-09-19T14:30:00Z --expected-status HOLD_NO_CURRENT_BOOTSTRAP_SERVICE_ASSURANCE > build/reports/bootstrap_service_readiness.json
       - name: Exported actual-target selection assurance remains non-authoritative
-        run: python scripts/check_target_selection_assurance.py --as-of 2026-09-19T15:30:00Z > build/reports/target_selection_assurance.json
+        run: python -m provisioner.qualification.target_selection --as-of 2026-09-19T15:30:00Z > build/reports/target_selection_assurance.json
       - name: Target-selection readiness must remain held without an actual selected target
         run: python scripts/check_target_selection_readiness.py examples/target_selection_readiness_intent.json.example --as-of 2026-09-19T15:30:00Z --expected-status HOLD_NO_CURRENT_TARGET_SELECTION > build/reports/target_selection_readiness.json
       - name: Exported qualification-campaign evidence remains non-authoritative
-        run: python scripts/check_qualification_campaign_assurance.py --as-of 2026-09-19T16:30:00Z > build/reports/qualification_campaign_assurance.json
+        run: python -m provisioner.qualification.campaign --as-of 2026-09-19T16:30:00Z > build/reports/qualification_campaign_assurance.json
       - name: Qualification-campaign readiness must remain held without native campaign evidence
         run: python scripts/check_qualification_campaign_readiness.py examples/qualification_campaign_readiness_intent.json.example --as-of 2026-09-19T16:30:00Z --expected-status HOLD_NO_CURRENT_QUALIFICATION_CAMPAIGN_EVIDENCE > build/reports/qualification_campaign_readiness.json
       - name: Local regressions and route-model checks
@@ -276,16 +290,18 @@ jobs:
           sudo mkdir -p /run/sshd
       - name: Validate rendered guest configuration with real local engines
         run: sudo "$(command -v python)" lab/run_guest_services_lab.py --require-engines --scratch-root /etc/rsyslog.d
+      - name: Verify protected root source under an actual other-UID worker
+        run: sudo env PYTHONPATH=.:tests "$(command -v python)" -m unittest test_source_integrity.SourceIntegrityTests.test_protected_root_owned_checkout_is_readable_by_worker_without_ambient_git_trust -v
       - name: Recover useful synthetic data using the real restic engine
         run: python lab/run_restic_lab.py
       - name: Export synthetic versioned state over TLS and recover it with real restic
         run: python lab/run_state_protection_lab.py --execute
       - name: Exercise leased edge activation and withdrawal with real local packets
-        run: sudo "$(command -v python)" lab/run_nft_edge_lab.py
+        run: sudo "$(command -v python)" lab/run_protected_source_lab.py --lab nft-edge
       - name: Exercise fixed guest probes with real certificate SSH and TLS
         run: sudo "$(command -v python)" lab/run_target_probe_lab.py --user "$(id -un)"
       - name: Execute a staged owner job through a real forced-command SSH worker
-        run: sudo env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory "GIT_CONFIG_VALUE_0=$PWD" "$(command -v python)" lab/run_owner_worker_lab.py --user "$(id -un)"
+        run: sudo "$(command -v python)" lab/run_protected_source_lab.py --lab owner-worker -- --user "$(id -un)"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
@@ -297,6 +313,7 @@ jobs:
             build/reports/nft_edge_lab.json
             build/reports/target_probe_lab.json
             build/reports/owner_worker_lab.json
+            build/reports/protected_source_*.json
           retention-days: 14
           if-no-files-found: warn
   terraform:
@@ -317,8 +334,10 @@ jobs:
         run: python scripts/check_dependency_locks.py
       - name: Saved-plan execution, stale-state rejection and private artifact permissions
         run: python lab/run_terraform_execution_lab.py
+      - name: Install offline application wheel build dependencies
+        run: python -m pip install 'setuptools>=80,<85' 'wheel>=0.45,<1'
       - name: Build and verify the actual offline execution runtime without network access
-        run: sudo env GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory "GIT_CONFIG_VALUE_0=$PWD" "$(command -v python)" lab/run_runtime_build_lab.py --execute --terraform "$(command -v terraform)"
+        run: sudo "$(command -v python)" lab/run_protected_source_lab.py --lab runtime-build -- --execute --terraform "$(command -v terraform)"
       - name: Backend-disabled validation, module schemas and plan-only provider mocks
         run: python tools/verify_terraform.py --mock-tests
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -330,6 +349,7 @@ jobs:
             build/reports/terraform_validation.json
             build/reports/terraform_execution_lab.json
             build/reports/runtime_build_lab.json
+            build/reports/protected_source_*.json
             build/reports/toolchain-schemas/
             build/reports/toolchain-locks/
           include-hidden-files: true

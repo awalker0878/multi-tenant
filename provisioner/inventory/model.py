@@ -8,12 +8,13 @@ treats a fixture as a placement authority.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from importlib.resources import as_file, files
 from pathlib import Path
 
 from provisioner.domain.request import load as load_document, digest
+from provisioner.domain.capability_properties import validate_observations
 from provisioner.repository import reviewed_source
 
-ROOT = Path(__file__).resolve().parents[2]
 INVENTORY_FORMAT = 'hosting-inventory/1'
 
 AUTHORITATIVE = 'AUTHORITATIVE'
@@ -69,6 +70,11 @@ class Cluster:
     host_ids: tuple[str, ...]
     native: dict
     capacity: Capacity
+    capability_properties: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        object.__setattr__(self, 'capability_properties',
+                           validate_observations(dict(self.capability_properties)))
 
     def supports(self, trust: str, service_class: str, tenant: str, wsd: str) -> bool:
         if self.trust != trust or service_class not in self.service_classes:
@@ -86,7 +92,8 @@ class Cluster:
                 'host_ids': list(self.host_ids), 'native': dict(self.native)}
 
     def to_dict(self) -> dict:
-        return {**self.to_environment(), 'capacity': self.capacity.to_dict()}
+        return {**self.to_environment(), 'capacity': self.capacity.to_dict(),
+                'capability_properties': dict(self.capability_properties)}
 
 
 @dataclass(frozen=True)
@@ -302,7 +309,9 @@ def build(document: dict, origin: str = '<in-memory>') -> Inventory:
                     dedicated_wsd=cluster_raw['dedicated_wsd'],
                     host_ids=tuple(cluster_raw['host_ids']),
                     native=dict(cluster_raw['native']),
-                    capacity=_capacity(cluster_raw['capacity'], cluster_raw['id'])))
+                    capacity=_capacity(cluster_raw['capacity'], cluster_raw['id']),
+                    capability_properties=validate_observations(
+                        cluster_raw.get('capability_properties', {}))))
             cells.append(Cell(cell=cell_raw['cell'],
                               capabilities=tuple(cell_raw['capabilities']),
                               clusters=tuple(sorted(clusters, key=lambda c: c.id))))
@@ -369,4 +378,7 @@ def load(path: Path | str) -> Inventory:
 
 
 def fixture(name: str = 'openstack-reference') -> Inventory:
-    return load(Path(__file__).resolve().parent / 'fixtures' / f'{name}.json')
+    if not name or Path(name).name != name or '/' in name or '\\' in name:
+        raise ValueError('Fixture name must identify one packaged inventory')
+    with as_file(files(__package__).joinpath('fixtures', f'{name}.json')) as path:
+        return load(path)

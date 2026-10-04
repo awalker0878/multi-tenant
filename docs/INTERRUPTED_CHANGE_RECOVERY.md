@@ -61,7 +61,7 @@ failed or extra work, or substitute for live enforcement/fencing evidence.
 
 ## Review the three records together
 
-The [offline reviewer](../tools/recovery_review.py) consumes the accepted manifest,
+The [offline reviewer](../provisioner/execution/recovery_review.py) consumes the accepted manifest,
 the new readback report and an independently controlled interrupted-change context.
 It validates exact source/operation/tenant/domain binding, manifest/report digests,
 time order, observation freshness, expected generations, and the observation history.

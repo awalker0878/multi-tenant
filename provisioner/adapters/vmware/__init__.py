@@ -6,7 +6,8 @@ been explicitly mapped to it.
 """
 from __future__ import annotations
 
-from provisioner.adapters.base import Adapter, _adapter
+from provisioner.adapters.base import (Adapter, WorkloadLifecycle,
+                                       WorkloadLifecycleMode, _adapter)
 
 LIMITS = (
     'VMware/NSX product tuple is unselected in the capability registry',
@@ -21,5 +22,8 @@ LIMITS = (
 REALIZATION_NOTE = ('the workload is realized on the observed NSX quarantine segment instead')
 
 
+WORKLOAD_LIFECYCLE = WorkloadLifecycle(WorkloadLifecycleMode.PER_MEMBER_OWNER, 'vsphere_power')
+
 def adapter() -> Adapter:
-    return _adapter('vmware', 'nsx-route', LIMITS, REALIZATION_NOTE)
+    return _adapter('vmware', 'nsx-route', LIMITS, REALIZATION_NOTE,
+                    workload_lifecycle=WORKLOAD_LIFECYCLE)

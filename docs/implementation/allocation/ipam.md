@@ -19,7 +19,7 @@ Every managed network SHALL have an authoritative IPAM record and owner.
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Every managed network SHALL have an authoritative IPAM record and owner.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-030
 
@@ -42,7 +42,7 @@ Overlapping address space SHALL be an explicit exception or migration pattern, n
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Overlapping address space SHALL be an explicit exception or migration pattern, not the standard tenancy model.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-061
 
@@ -65,7 +65,7 @@ Address release SHOULD include quarantine/reuse controls appropriate to DNS, log
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Address release SHOULD include quarantine/reuse controls appropriate to DNS, logging, firewall state, and incident-response requirements.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-013, CT-030
 
@@ -88,7 +88,7 @@ Address allocation, DNS/DHCP registration and release SHALL use idempotent opera
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Address allocation, DNS/DHCP registration and release SHALL use idempotent operation identities, conflict detection and a dependency-aware quarantine policy; IPAM failure SHALL NOT cause guessed allocations.
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-030, CT-045, CT-046
 
@@ -106,7 +106,7 @@ Address allocation, DNS/DHCP registration and release SHALL use idempotent opera
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Allocation authority and delegated scope
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-030, CT-045, CT-046
 
@@ -124,7 +124,7 @@ Address allocation, DNS/DHCP registration and release SHALL use idempotent opera
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Address lifecycle reconciled with native resource
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-030, CT-045, CT-046
 
@@ -142,7 +142,7 @@ Address allocation, DNS/DHCP registration and release SHALL use idempotent opera
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: DNS and address state reconciled
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-030, CT-045, CT-046
 
@@ -160,7 +160,7 @@ Address allocation, DNS/DHCP registration and release SHALL use idempotent opera
 
 **Artifact or required operating record:** Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: No orphan release or duplicate allocation
 
-**Available related source:** [tools/dns_change.py](../../../tools/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
+**Available related source:** [provisioner/execution/dns_change.py](../../../provisioner/execution/dns_change.py) · [docs/DNS_LIFECYCLE.md](../../DNS_LIFECYCLE.md) · [docs/current/interface-agreements.md](../../current/interface-agreements.md)
 
 **Verification:** Observe exact permitted resource/operation and denied foreign/admin access; verify each origin-specific reply, lifecycle and service-loss behaviour. Baseline procedures: CT-029, CT-030, CT-045, CT-046
 

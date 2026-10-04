@@ -1,98 +1,88 @@
-# Next work: executable product and native release
+# Next work — enterprise workload mobility
 
-The C01–C13 refactor gates describe a completed **planning interface refactor**, not
-an executable provisioning and migration product. The current public `apply` and
-`mobility-apply` paths refuse execution. Generated provisioning steps and mobility
-handoffs leave native lifecycle, cross-scope data transfer, source fencing and useful
-service acceptance incomplete. See the
-[full audit and implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
-for source evidence, 50 sequenced work items, deletion gates and route acceptance.
-The [portable provisioning documents](provisioning/README.md) and
-[refactor completion audit](deepseek-refactor-completion-audit.md) remain historical
-records for the smaller scope they covered.
+The [execution plan](product/enterprise-workload-mobility-execution-plan.md) is the
+single current B01–B50 backlog. The [original audit](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
+and older automation/refactor ledgers remain historical evidence, not parallel
+completion authorities. Do not restart a superseded increment or mark the programme
+complete from its old W/C counts. Use the
+[provisioning implementation index](provisioning/README.md) to locate maintained
+contracts, runtime owners and verification instructions.
 
-## Repository implementation
+## Current checkpoint
 
-| Wave | Work to deliver in the repository | Exit condition |
-| --- | --- | --- |
-| 0, B01–B05 | Fix the delivery-format regression; adopt the product/identity/authority ADRs; define canonical workload/application, plan, transfer and activity contracts; inventory every old consumer/record; package runtime code and remove checkout imports. | Required CI passes at the delivery revision; schemas cover existing multi-VM workloads, same-family moves and unknown facts; deletion register names every retained state conversion. |
-| 1, B06–B13 | Multiuser API, SSO and scoped approvals; product database, outbox and durable workflows; fenced site workers, audit store, console and thin CLI. | One authenticated, restart-safe and idempotent execution authority with revoked/stale grants rejected. |
-| 2, B14–B22 | Read-only platform inventory, application dependency review, safe adoption, destination comparison and current route capability. | An operator can see observed source identities, viable destinations, blockers, unknowns and remediation without implying execution approval. |
-| 3, B23–B29 | Complete provisioning graph from saved plans through native postconditions, guest readiness, service activation, reservations and day-two actions. | A qualified workload reaches useful service through one authorized job and survives interrupted operations without blind replay. |
-| 4, B30–B37 | First real application migration: cross-scope transfer, per-dataset verification, source fencing, final sync, traffic cutover, application acceptance and recovery. | A VMware Linux application migrates to a qualified OpenStack target with one accepted writer and rehearsed recovery. |
-| 5, B38–B43 | Cold VM conversion, same-family relocation, other directed platform routes, application-native sync and scheduled waves. | Each advertised method and direction has independent guest, policy, data and recovery qualification. |
-| 6, B44–B50 | Operations, retained-state conversion, deletion of superseded paths, native qualification and release controls. | No dual mutation path or implicit fallback remains; supported routes have current installed-tuple and operational evidence. |
+The current local implementation and the `implementation/all-waves` branch now
+include installed execution owners, database-backed multi-host discovery budgets,
+signed alert/on-call intake, scoped planning credentials, per-command guest
+authorization, enrolled resource/service dispatch and separately admitted cleanup.
+The selected application route remains VMware → OpenStack rebuild/restore for
+Ubuntu24.04. Separate staging/cutover workflows compose isolated rehearsal,
+persistent source data-disk exclusion, final capture/restore, target power and
+isolated management-port bootstrap, conditional production-policy attachment,
+activation, pre-write source return and
+retained-target post-write repair. The bootstrap uses retained NIC identities,
+conditional Neutron updates, an independent project reader and a separate pinned
+SSH reader before guest effects; it does not qualify the native datapath.
+Production policy attaches one explicitly approved existing stateful group to
+that retained port after final sync and before activation. Pre-write return
+removes it through a separate policy operation before target exclusion. Current
+resource accounting and useful-service/traffic checks re-read the approved policy.
+Current source accounting also reads retained detached base VMDKs through a
+separate pinned native file reader, preserving their original UUIDs and charges.
 
-Product architecture direction is documented in the
-[product mandate](product/decisions/product-mandate.md),
-[workload and security boundary](product/decisions/workload-and-security-boundary.md)
-and [state ownership](product/decisions/state-ownership.md) decisions.
-Implementation status must be measured by executable behavior, tests and native
-qualification separately. A completed document, fixture or contract cannot close an
-unimplemented product path.
+Further implemented increments include selected PostgreSQL17 application-native
+sync, enterprise cross-tenant wave pools, authenticated retained-state import and
+owner-epoch handover, and controlled operating HA/restore owners. The bounded
+Windows service purpose acts on an existing guest. The
+[cold capture purpose](operations/cold-capture-and-private-images.md) exports an
+existing powered-off VMware snapshot into private Glance disk images and ends
+`IMPORTED`; it does not implement a booted cold migration.
 
-## Wave 2 checkpoint: read-only discovery and comparison
+Repository tests, including real disposable PostgreSQL and Temporal integration,
+verify these boundaries separately from native sites. No installed tuple, route,
+operating acceptance, pilot or release is qualified by those tests. The current
+implemented boundary is also recorded in the execution plan's opening table.
 
-Wave 2, B14–B22, is **in progress**. The repository now has exact-scope discovery
-campaign/page/result models, an append-only PostgreSQL inventory schema and guarded
-repository, scoped HTTP generation/object reads, bounded GET-only adapter code for
-VMware, AHV and OpenStack, and comparison-only grouping, adoption, directed route
-and destination assessment models. The [operator guide](product/wave2-operator-guide.md)
-describes the available reads and the evidence each status needs. The thin CLI
-has read-only generation/object commands. The portal now shows the latest
-authorized generation and paged observed identities; the comparison engine is
-not a production assessment API.
+## Remaining work, in dependency order
 
-These pieces do not close B14–B22. The current repository does not deploy an
-authenticated site discovery campaign admission/ingest service, independently
-verify issuer/collector provenance against enterprise IAM and PKI, or qualify
-installed source and destination product tuples. The storage writer refuses
-publication without a dedicated ingest role and an independently configured
-verifier. VMware's bounded visible VM list cannot prove full privilege or
-folder coverage. Native reconciliation, application owner review, selected
-capacity and policy/security/recovery evidence, operator comparison UI/CLI,
-and the proposed estate-scale latency benchmark remain acceptance work. No
-discovery, adoption proposal or `ELIGIBLE` comparison grants plan approval or
-native provisioning/migration authority.
+1. Commission the exact installed service/interpreter, retained stores and native
+   worker identities. Qualify Wave2 custody, alert receiver/on-call ownership,
+   omitted inventory facts and measured estate scale under the multi-host budgets.
+2. Commission the implemented planning, guest, IPAM/service and recovery owners
+   with actual scoped credentials and independent target/policy observations;
+   obtain Linux/service acceptance. A revoked old job requires a newly approved
+   recovery admission and independently excluded old credentials for cleanup.
+3. Commission the implemented isolated management/bootstrap owner and its
+   independent project/guest readers before subsequent guest contact. Commission
+   the separately scoped production/isolation policy operations, approved existing
+   security groups and current selection-backed occupancy reader. Qualify actual
+   traffic and positive/negative native datapath behavior. Commission current native detached
+   source-backing accounting throughout cutover. Run the selected
+   application campaign against actual isolated guests. Prove
+   rehearsal isolation, source restart/late-writer exclusion, final consistency,
+   traffic/target write admission and useful-service acceptance. Rehearse pre-write
+   source return separately from retained-target post-write forward repair. The
+   current post-write owner does not provide general reverse-sync or rollback.
+4. Qualify the first exact directed route and PostgreSQL17 method. Complete cold
+   target VM creation, boot, guest/driver remediation and cleanup; implement full
+   Windows migration, warm-VM methods, same-family relocation and the remaining
+   AHV/VMware/OpenStack directions separately. Qualify enterprise wave fairness,
+   measured native concurrency and stop behavior; do not infer reciprocal support.
+5. Run actual HA/restore and retained-state native reconciliation/epoch-handover
+   campaigns. Freeze and drain live old writers before their deletion. Rerun
+   affected campaigns on final code, obtain owner-signed pilot acceptance and
+   prepare the supported release under the final-code validators.
 
-To complete the operator comparison path, first establish signed, revocable
-read campaigns with enrolled site mTLS submitters and independently witnessed
-read credentials. Qualify each installed source and destination API tuple and
-persist its expiry and evidence digest separately from a human environment
-declaration. Then normalize full VM and capacity facts from verified,
-generation-pinned observations; persist directed source-exit and
-target-operate route claims and independently reviewed policy, security and
-recovery findings. Only after those durable inputs exist should the scoped
-assessment service expose destination reasons and remediation in the API and
-portal. Finally, run native omission/privilege tests and the 50,000-workload,
-100-endpoint freshness and latency campaign. None of these missing inputs may
-be synthesized from a declared selector or a fixture.
+These gates need independently commissioned site endpoints/product tuples,
+worker/reader credentials, retained originals, actual application acceptance and
+receiving owners. Repository fixtures cannot supply those inputs. Missing code
+for the additional routes in step 4 remains an implementation gap, not native
+qualification and not a completed backlog item.
 
-## Site and organizational release inputs
+## Closure evidence
 
-The following inputs remain necessary alongside repository implementation. The bounded
-contracts and local tools in this table do not make the full workflow executable or
-authorize native target contact. Each selected site and migration route needs current
-evidence from its actual owners.
-
-| Owner | Missing external evidence/input | Why it matters | Existing bounded implementation | Completion condition | Hold point |
-|---|---|---|---|---|---|
-| Toolchain owner | Release-revision Terraform/provider checks, pinned locks and review of any new native engine or provider change. | Terraform and Ansible checks passed at the audited revision, but an earlier passing engine job does not qualify a future changed release or installed target. | `tools/verify_terraform.py`, the module/root catalogue, `terraform/catalog.json` and pinned provider locks provide a bounded validation path. | The exact release revision runs required Terraform/Ansible checks and any new provider schema or plan-only validation; native qualification remains separate. | Before native apply |
-| Platform and security owner | The actual site/cell, installed hardware/product/API/provider/backend/feature/licence tuple, EC/SE and management/OOB realization, permitted disposable campaign scope, data restrictions, credential custody, stop authority and time-bounded target-contact authority. | Target selection is the prerequisite for every native gate; an unselected target would leave any campaign unbound. | The target-selection gate, its schema and its fail-closed validation are implemented and exercised against fixtures. | A recorded decision naming the exact tuple and authorities and reviewed by the owners. | Before native connection or provisioning |
-| Qualification campaign owner | A campaign packet bound to the exact selected change/contact/stop authority, native API/observer/writer scopes, custody/workspace/data restrictions, permitted/prohibited operations, cleanup and contact window, plus retained native attempts, positive controls, artifact hashes, freshness and reviewed not-applicable decisions. | Qualification is the only source of placement eligibility; unbound evidence would let placement outrun its authority. | The campaign gate, its freshness window, packet-to-dossier traceability and the `PlatformProfile` dossier refusal of untraceable or stale evidence are implemented. | The independent qualification authority publishes a dossier the gate accepts with no residual gaps. | Before native qualification publication |
-| Platform observers | The exact installed API/profile, omission/default behavior, native RBAC, version-token semantics and complete accepted task/entity coverage, plus supported VM/Flow/route or composite-task profiles where the chosen service scope requires them. | Reconciliation cannot distinguish a real change from an unread field, so conformance would rest on unproven reads. | The native readback contract, the generation/plan-bound observation binding and the `native-observation` external check are implemented and tested against recorded shapes. | Observations produced by the selected profiles that cover the accepted entity set with the omission/default semantics recorded. | Before relying on native readback |
-| Recovery owner | Real scoped native writer fencing, current containment/quarantine evidence and the same-generation source-of-truth/data-impact/shared-dependency reconciliation decision. | An interrupted mutation cannot be safely resumed or reversed without proven writer exclusion. | The writer-fencing and reconciliation contract, the generation binding and the fail-closed refusal of unbound evidence are implemented. | A recorded fencing and reconciliation decision for the actual platform, with any approved forward repair, compensation or import kept as a separate mutation plan. | Before resuming interrupted mutations |
-| Security/network owner | The actual EC/SE or distributed/shared ZIP realization and current pairwise authority, deny-first policy, native route/bypass, inspection/logging, management separation, HA/failure, capacity and path evidence. | Unproven security-edge behavior would let traffic reach a workload without a qualified treatment. | The security-edge/ZIP assurance gate and its readiness verdicts are implemented and exercised against fixtures. | Current native evidence for the selected realization with no unproven bypass. | Before approved connectivity |
-| Shared-service routing owner | Origin-specific service-reply evidence for every offered service binding and family: endpoint entitlement, forward/reply route ownership, alternate-path/no-transit review, source validation, missing-route/edge-failure/reverse-initiation tests, telemetry, survivor capacity and binding/version revocation. | A binding without a proven reply path is not a usable service. | The service-reply gate, its per-binding and per-family structure and its readiness verdicts are implemented. | Current evidence for every offered binding and family. | Before shared-service use |
-| Shared-service owners | Current authoritative IPAM/DNS, selected address-assignment/DHCP-metadata behavior, resolver/time/trust/artifact/telemetry/service-reply dependencies, restricted management and steady-state transition evidence, plus separate identity/crypto and storage-lifecycle evidence; the backup/restore gate remains the protection record. | Bootstrap services are consumed before steady state, so an unproven dependency blocks the first workload. | The bootstrap, identity/crypto and storage-lifecycle gates and their dependency composition are implemented and tested. | Current evidence for every listed dependency with the temporary-to-steady-state transition recorded. | Before offered service promises |
-| IPv6 engineering | Native IPv6 evidence for the selected site/service/platform/security-edge mode: addressing/local protocols, route/security parity, MTU/PMTU, shared-service dependencies, failure/recovery and operational acceptance, with no-IPv4-fallback evidence for IPv6-only or an independent IPv4 campaign for dual-stack. | The routed laboratory proves the model, not the installed address-family behavior. | The native IPv6 assurance gate and the family-separation rule are implemented and tested. | Current native evidence for the selected mode. | Before native dual-stack/IPv6 offer |
-| Capacity/service owner | The exact approved `PlatformProfile` dossier digest, approval decision and target-bound campaign/site/cell scope for the commissioned envelope. | Capacity must not follow a reused qualification ID whose contents changed. | The commissioning gate, the envelope digest binding and the fail-closed refusal of a moved digest are implemented. | A commissioned envelope pinned to its exact approved qualification state, with re-approval recorded if that state changes. | Before reservation/admission |
-| Reservation owner | External reservations bound to the SHA-256 of the exact commissioned envelope evaluated at reservation time, and downstream IPAM verification that the reconstructed parent-reservation spec still matches the authoritative record. | The same envelope ID with different contents is a reconciliation conflict, not an idempotent retry. | The reservation preflight, the envelope digest binding and the reconciliation-conflict behavior are implemented and tested. | Owner-held reservations that carry and verify the exact envelope digest. | Before authoritative reservation/IPAM use |
-| DNS owner | Each DNS registration bound to the stable confirmed-IPAM allocation/realization digest and the full normalized DNS intent digest. | A reused allocation or registration ID with changed confirmation, name, zone, TTL, observation or owner scope must fail closed rather than appear idempotent. | The DNS registration intent, the immutable binding and the fail-closed mismatch behavior are implemented and tested. | Owner-held registrations that carry and verify both digests. | Before authoritative DNS mutation/use |
-| Operations/authority | Exact-scope G0/G1/G2 prerequisites, initial G4 recovery/operations readiness, current operating authority and a tested reversible G3 withdrawal plan, plus the externally executed exposure change and the recorded live entry/reply, dependency and telemetry evidence. | Production exposure is only safe under separately granted authority. | The production activation assurance gate, its prerequisite structure and its withdrawal/reversal contract are implemented. | Current evidence for every prerequisite and a recorded activation decision; failed or unknown activation is withdrawn. | Before production |
-| Provisioning interface owner | Reviewed authoritative site state to replace the non-authoritative per-platform inventory fixtures, and the qualified product tuples the placement registry leaves empty; also the missing realization for each deferred profile. | Until then placement stays `FIXTURE_NOT_PLACEMENT_AUTHORITY` and no plan is a placement authority. | The fixture-backed placement path, the `FIXTURE_NOT_PLACEMENT_AUTHORITY` verdict, the empty qualified-tuple registry and the deferred-profile refusal are implemented and tested. | Authoritative site state and qualified tuples accepted by the same gate, and a deferred profile promoted only once its realization exists. | Before a plan is treated as a placement authority |
-
-These gates do not close because more files or synthetic fixtures pass.
-[The historical backlog](../sources/implementation_backlog.csv) records the earlier
-evidence dependencies; use the [product implementation plan](product/enterprise-workload-mobility-audit-and-implementation-plan.md)
-for current repository work and release acceptance.
+Record implementation, automated verification, native qualification and operational
+acceptance separately, bound to exact revisions/scopes. Keep unsupported features,
+unknown inventory facts, expired authority and uncertain native outcomes blocked.
+See the [retirement register](implementation/automation/phase0-interface-retirement.md)
+and [current transition record](current/transition-and-as-built.md) before deleting
+an execution path with potentially live work.

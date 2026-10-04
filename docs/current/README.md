@@ -1,18 +1,127 @@
 # Maintained design workspace
 
-**Authority model selected for this corrective release:** converted chapters remain immutable source transcriptions; current design is maintained separately here. The original Word files remain provenance. Source refresh is forbidden from writing here. An ordinary editorial revision to these records passes the current-design structural gate without repeating obsolete source sentences.
+Converted source chapters remain immutable transcriptions; current design is maintained
+separately here. Original Word files remain provenance. These maintained records are
+new syntheses, not recovered missing Word originals. Source refresh must not overwrite
+them. A Git merge and a structural documentation pass are not adoption or site approval.
 
-The records below are newly authored under distinct IDs and remain Proposed. They are not recovered standalone v1.2 Word files and do not record real site acceptance. Update their version, source relationship and change history with material revisions. Use ADR lifecycle records for decisions; a Git merge is not native authorization.
+## Current records — 3 October 2026
 
-| Record | Purpose |
-|---|---|
-| [RAD-M01](RAD-adoption.md) | Baseline applicability, deviations and architecture handoff |
-| [TAD-M01](TAD-infrastructure.md) | Technical components, native realization and ownership |
-| [SOL-M01](internal-hosting-solution.md) | Existing internal reference fixture selected as a solution profile |
-| [SOL-M02](public-hosting-design-profile.md) | New public-extension design profile, not a complete installed service |
-| [ICD-M01](interface-agreements.md) | Producer/consumer interface obligations |
-| [TRANS-M01](transition-and-as-built.md) | Intermediate states, consistency, observed design and acceptance |
+| Record | Version / status | Scope |
+|---|---|---|
+| [RAD-M01](RAD-adoption.md) | 0.16 / Proposed | Workload mobility, tenant/security boundaries, capability and adoption obligations. |
+| [TAD-M01](TAD-infrastructure.md) | 0.40 / Proposed | Control application, discovery, profiles, native realization, custody and recovery owners. |
+| [SOL-M01](internal-hosting-solution.md) | 0.5 / Proposed | Disabled internal reference solution; not installed allocations or service promises. |
+| [SOL-M02](public-hosting-design-profile.md) | 0.5 / Proposed | Deferred public-extension design; no inherited public activation. |
+| [ICD-M01](interface-agreements.md) | 0.39 / Proposed | Producer/consumer authority, versions, observation, retry and recovery obligations. |
+| [TRANS-M01](transition-and-as-built.md) | 0.26 / Proposed | Intermediate states, original evidence, retained-state conversion and acceptance. |
 
-[Source-scope decision inventory](../assurance/source-scope.md) · [Frozen source reading paths](../README.md) · [ADR lifecycle](../adr/README.md)
+TAD-M01 is **version 0.40 (Proposed)**; ICD-M01 is **version 0.39 (Proposed)**.
 
-Run `python scripts/check_documentation.py`: immutable transcription checks and current-design structure are separately reported. Semantic correctness and accepting authority require real review; do not use this gate as an approval service.
+The current review consolidates chronological appendices, corrects stale collector
+selectors and separates completed repository components from unfinished deployment
+and native workflows. Source relationships and version histories remain in the
+maintained-record metadata. Frozen transcriptions and signed evidence are unchanged.
+
+OpenStack selector 4 adds bounded allocation/image/attachment and VM-referenced driver/security metadata observations; the typed
+profile owner validates all ten families and cross-profile obligations. Availability
+catalog 18 describes security-zone composition, not physical HA. Regenerated examples
+stay disabled. No installed tuple, directed route, native capability or operation is
+qualified by these changes. B05 and Wave 2 remain open.
+
+The [package-owned source-integrity verifier](../engineering/source-integrity-runtime.md)
+now replaces the old tools runtime owner without an alias. It pins one current Git
+commit or an explicit export manifest and fails closed when an installed runtime has
+no selected checkout. This is source-byte consistency, not release signing or native
+acceptance.
+
+The [package-owned IPAM evidence reader](../engineering/ipam-evidence-runtime.md)
+replaces its old script owner without an alias while preserving external-authority and
+no-address-value semantics. The separate [job-bound resource transactions](../engineering/job-bound-resource-transactions.md)
+now compose capacity and scoped NetBox ownership; enrolled workflow dispatch and native
+acceptance remain open.
+
+
+The [allocation runtime owners](../engineering/allocation-runtime-owners.md) now keep
+capacity evidence, eligibility, reservation/IPAM/DNS preflight and exported allocation
+evidence inside the installed package. `provisioner` has no top-level `scripts`/`tools`
+imports. Actual execution owners and service composition are package-owned; commissioned
+services and authenticated retained-state conversion remain open.
+
+The [package-owned implementation-input review](../engineering/input-review-runtime.md) now validates non-secret Terraform-root input shape from the installed execution package; it grants no native or allocation authority.
+
+The [package-owned Terraform catalog](../engineering/terraform-catalog-runtime.md)
+now replaces its old tools module without an alias. Strict input and source-path checks
+preserve the current catalog/plan bytes, and clean build staging excludes deleted owners.
+Installed source and service composition are implemented; native planning credentials,
+commissioned workers and authenticated retained-state conversion remain open.
+
+The [saved-plan/lifecycle runtime chain](../engineering/saved-plan-runtime.md) now has
+package-owned implementations and explicit installed source selection/binding.
+Retained-state import and independent native reconciliation remain open.
+
+The [fixed guest probe](../engineering/guest-probe-runtime.md) is now package-owned and the former tools path is retired without an alias. Target qualification still owns campaign orchestration and no native or guest authority is inferred from probe packaging.
+
+The [offline route-audit model](../engineering/route-audit-runtime.md) is also package-owned; planning and test callers no longer depend on a top-level tools implementation. Its model-only status and native-routing limitations are unchanged.
+
+The [reservation-evidence reader](../engineering/reservation-evidence-runtime.md) is
+also package-owned, with its old script and bytecode removed. The unchanged export
+contract remains read only; no current capacity or reservation authority is inferred.
+
+## Detailed current contracts
+
+[Native OpenStack reads](../engineering/openstack-discovery-https.md),
+[VMware reads](../engineering/vmware-discovery-https.md) and
+[AHV reads](../engineering/ahv-discovery-https.md) feed the
+[installed collector](../engineering/discovery-collector-runtime.md) and
+[original publication/recovery](../engineering/discovery-publication-recovery.md).
+
+[Application drafts](../engineering/application-drafts.md),
+[signed owner review](../engineering/application-owner-review.md) and
+[multi-member comparison](../engineering/application-comparison.md) have implemented
+[CLI](../engineering/application-comparison-operator.md) and
+[browser](../engineering/application-comparison-browser.md) paths. The [draft workspace](../engineering/application-draft-browser.md) also creates
+initial proposals from exact stored VM identities with explicit datasets/dependencies
+and revision-one save reconciliation. Saved membership/data/evidence editing now uses
+an explicit source-pinned working copy with expected revision N and exact N+1 recovery;
+independent dependency verification and enterprise owner onboarding/review remain open.
+The [installed offline owner signer](../engineering/application-owner-signing.md) now
+prepares and signs exact-draft decisions with explicit digest confirmation. It neither
+enrolls owners nor submits artifacts; authenticated delivery and deployed custody remain open.
+[Exact-draft browser review inspection](../engineering/application-review-browser.md)
+now uses the existing read API and a shared wire validator with application comparison.
+It reports evaluated-at-time status, not a reusable approval or signature issuance.
+The [installed custodian intake](../engineering/application-review-intake.md) records
+original signed artifacts through the existing assessment writer and emits local receipts.
+It does not supply owner-to-custodian transport, enrollment or continuing review authority.
+These are assessment interfaces, not adoption, reservations or migration permission.
+
+[Batch staging](../engineering/discovery-batch-scheduling.md),
+[freshness inspection](../engineering/discovery-freshness.md),
+[freshness CLI checks](../engineering/discovery-freshness-operator.md) and
+[retained history](../engineering/discovery-freshness-history.md) are bounded implemented
+paths. [Checkpointed scheduling](../engineering/discovery-checkpointed-scheduling.md)
+retains a finite local batch across restarts, while the
+[periodic freshness projection](../engineering/discovery-freshness-monitor.md) reuses
+exact target/time-slot IDs and creates digest-bound alert intents from retained checks.
+No notification is sent. Deployed service scheduling, alert delivery/acknowledgement,
+fleet-global coordination and qualification remain open.
+
+The [B01–B50 execution plan](../product/enterprise-workload-mobility-execution-plan.md)
+remains the sole product backlog; the [current research review](../engineering/platform-capability-review-2026-10-01.md)
+records API semantics and remaining coverage. Update record versions and change history
+for material revisions. Record actual accepting authority only when supplied.
+
+[Source-scope inventory](../assurance/source-scope.md) ·
+[Frozen source reading paths](../README.md) · [ADR lifecycle](../adr/README.md).
+Run `python scripts/check_documentation.py`; source integrity and current-design
+structure are checked separately, not promoted into architectural acceptance.
+
+## Selected application implementation boundary
+
+The current execution plan now records installed owner closure, deployable discovery
+publication/monitoring, live resource transactions, the explicitly selected application
+workflow and operating/conversion tooling. Ubuntu24.04 VMware-to-OpenStack rebuild/restore
+is the only composed direction/profile. Native command exclusion, application rehearsal,
+source fencing, activation and final qualification remain required; no pilot or release
+acceptance is recorded.

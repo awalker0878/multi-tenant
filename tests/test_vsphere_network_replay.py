@@ -3,7 +3,8 @@ from copy import deepcopy
 from datetime import datetime, timezone
 import unittest
 from tests import test_vsphere_network_observe as groups, test_vsphere_port_observe as ports
-from tools import readback_core as c, recovery_review as review
+from provisioner.execution import readback_core as c
+from provisioner.execution import recovery_review as review
 
 
 def reseal(report):

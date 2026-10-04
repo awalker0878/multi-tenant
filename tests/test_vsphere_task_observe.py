@@ -5,8 +5,9 @@ import json
 import unittest
 from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_observe import Client, manifest as vm_manifest, ref
-from tools import readback_core as c, vsphere_task_observe as t
-from tools.run_files import utcnow
+from provisioner.execution import readback_core as c
+from provisioner.execution import vsphere_task_observe as t
+from provisioner.execution.run_files import utcnow
 
 
 def manifest(origin='https://vcenter.example.invalid'):

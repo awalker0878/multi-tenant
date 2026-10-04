@@ -10,8 +10,8 @@ import json
 import subprocess
 import sys
 
-from tools.compile_wsd import STATE
-from tools.guest_inventory import build, gate
+from provisioner.compiler.wsd import STATE
+from provisioner.execution.guest_inventory import build, gate
 
 
 def fixture():
@@ -54,8 +54,8 @@ class GuestInventoryTests(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(ValueError): build(outputs, access, '/private/known_hosts')
 
     def test_cli_accepts_one_receipted_workload_run_without_manual_output_copy(self):
-        from tools.run_files import digest, encoded, utcnow, write_new
-        from tools.compile_wsd import ROOT
+        from provisioner.execution.run_files import digest, encoded, utcnow, write_new
+        from provisioner.compiler.wsd import ROOT
         outputs, access = fixture()
         with tempfile.TemporaryDirectory() as tmp:
             directory = Path(tmp)
@@ -70,7 +70,7 @@ class GuestInventoryTests(unittest.TestCase):
             for name, data in [('inputs.json', inputs), ('bundle.json', bundle), ('outputs.json', outputs),
                                ('result.json', result), ('access.json', access)]:
                 write_new(directory / name, encoded(data))
-            invocation = subprocess.run([sys.executable, str(ROOT / 'tools/guest_inventory.py'),
+            invocation = subprocess.run([sys.executable, '-m', 'provisioner.execution.guest_inventory',
                 str(directory / 'access.json'), '--workload-run', str(directory), '--output', str(directory / 'inventory')],
                 capture_output=True, text=True, timeout=30)
             self.assertEqual(invocation.returncode, 0, invocation.stdout + invocation.stderr)

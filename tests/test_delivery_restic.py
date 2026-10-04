@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
-from tools import delivery_steps as steps, restic_run as restic
-from tools.run_files import digest, encoded, load_private, read_private, replace_private, utcnow, write_new
+from provisioner.execution import delivery_steps as steps
+from provisioner.execution import restic_run as restic
+from provisioner.execution.run_files import digest, encoded, load_private, read_private, replace_private, utcnow, write_new
 import test_delivery_run as harness
 from test_restic_run import fixture
 
@@ -52,7 +53,7 @@ class DeliveryResticTests(unittest.TestCase):
         for name,value in files.items():
             path=self.base/(identity+'-'+name+'.json'); replace_private(path,encoded(value))
             bindings[name]={'path':str(path),'sha256':digest(read_private(path))}
-        from tools import readback_core as c
+        from provisioner.execution import readback_core as c
         packet={'format':'hosting-delivery-step/1','plan_sha256':c.digest(self.plan),'step_id':identity,
                 'dependencies':dependencies or {},'parameters':{'action':action,'restic':str(self.binary),
                 'restic_sha256':self.config['restic_sha256'],'target':str(self.base/'restored') if action=='restore' else None},

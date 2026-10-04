@@ -34,7 +34,7 @@ Issue the producer/consumer interface agreement: endpoint, permitted operation, 
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [tools/dns_change.py](../../tools/dns_change.py)
+- [provisioner/execution/dns_change.py](../../provisioner/execution/dns_change.py)
 - [lab/mtls_fixture.py](../../lab/mtls_fixture.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

@@ -1,6 +1,6 @@
 import copy,json,unittest
 from pathlib import Path
-from tools.input_review import review_inputs
+from provisioner.execution.input_review import review_inputs
 ROOT=Path(__file__).resolve().parents[1]
 
 def config():return json.loads((ROOT/'terraform/stacks/components/openstack-domain/main.tf.json').read_text())

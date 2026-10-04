@@ -1,16 +1,16 @@
 # Review a held Terraform native attempt
 
-`tools/terraform_recovery_review.py` joins the saved execution evidence, current
+`provisioner/execution/terraform_recovery_review.py` joins the saved execution evidence, current
 durable ledger head and supported vSphere/AHV VM, Flow activity or NSX domain observations.
 It writes an immutable private review packet. It never clears the ledger, runs
 Terraform, changes native infrastructure or authorizes replay.
 
 The per-platform reconciliation modules are
-`tools/vsphere_recovery_devices.py` (existing vSphere devices against
+`provisioner/execution/vsphere_recovery_devices.py` (existing vSphere devices against
 pinned-provider plans; it never mutates state),
-`tools/nutanix_terraform_recovery.py` (AHV power/NIC lifecycle plans),
-`tools/nutanix_flow_terraform_recovery.py` (Flow service changes) and
-`tools/nsx_terraform_recovery.py` (NSX domain lifecycle). Each binds to the
+`provisioner/execution/nutanix_terraform_recovery.py` (AHV power/NIC lifecycle plans),
+`provisioner/execution/nutanix_flow_terraform_recovery.py` (Flow service changes) and
+`provisioner/execution/nsx_terraform_recovery.py` (NSX domain lifecycle). Each binds to the
 original held saved plan and none can release a ledger.
 
 ## Existing vSphere VM configuration
@@ -187,7 +187,7 @@ new apply, and a favorable review leaves the ledger held.
 For vSphere, supply the VM/task and native attachment evidence:
 
 ```sh
-python3 tools/terraform_recovery_review.py \
+python3 -m provisioner.execution.terraform_recovery_review --source-root /opt/hosting-source \
   --bundle /private/operator/held-attempt \
   --ledger /private/shared-ledger \
   --manifest /private/operator/vsphere-activity.json \

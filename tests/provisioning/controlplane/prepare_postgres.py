@@ -22,6 +22,9 @@ def main() -> int:
     directory_writer_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DIRECTORY_WRITER_DSN')
     site_worker_dsn = os.environ.get('HOSTING_TEST_POSTGRES_SITE_WORKER_DSN')
     discovery_dsn = os.environ.get('HOSTING_TEST_POSTGRES_DISCOVERY_DSN')
+    assessment_dsn = os.environ.get('HOSTING_TEST_POSTGRES_ASSESSMENT_DSN')
+    monitor_dsn = os.environ.get('HOSTING_TEST_POSTGRES_MONITOR_DSN')
+    fleet_dsn = os.environ.get('HOSTING_TEST_POSTGRES_FLEET_DSN')
     from provisioner.controlplane.persistence.migrate import apply_migrations
 
     with psycopg.connect(admin_dsn, autocommit=True) as connection:
@@ -35,7 +38,7 @@ def main() -> int:
         identities = [dsn for dsn in (
             migration_dsn, runtime_dsn, authority_dsn, enrollment_dsn,
             directory_resolver_dsn, directory_writer_dsn, site_worker_dsn,
-            discovery_dsn) if dsn]
+            discovery_dsn, assessment_dsn, monitor_dsn, fleet_dsn) if dsn]
         roles = []
         for dsn in identities:
             settings = conninfo_to_dict(dsn)
@@ -59,7 +62,11 @@ def main() -> int:
                 connection.execute(sql.SQL('GRANT hosting_site_worker_roles TO {}').format(role))
         connection.execute(sql.SQL('GRANT CREATE ON DATABASE {} TO {}').format(
             sql.Identifier(database), sql.Identifier(roles[0])))
+        connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION pg_catalog.pg_control_system() TO {}').format(
+            sql.Identifier(roles[0])))
         apply_migrations(lambda: psycopg.connect(migration_dsn))
+        from tests.provisioning.operations.isolated_instance import commission_isolated_instance
+        commission_isolated_instance(migration_dsn)
         for role_name in roles[1:]:
             connection.execute(sql.SQL('GRANT USAGE ON SCHEMA hosting_controlplane TO {}').format(
                 sql.Identifier(role_name)))
@@ -79,14 +86,59 @@ def main() -> int:
             'GRANT EXECUTE ON FUNCTION '
             'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
             'GRANT SELECT ON hosting_controlplane.worker_enrollments, '
-            'hosting_controlplane.worker_capabilities TO {}',
+            'hosting_controlplane.worker_capabilities, '
+            'hosting_controlplane.worker_certificate_versions TO {}',
             'GRANT SELECT, INSERT ON hosting_controlplane.worker_grants TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.native_credential_attempts, '
+            'hosting_controlplane.native_credential_wrappings, '
+            'hosting_controlplane.native_credential_leases, '
+            'hosting_controlplane.native_credential_issuance_closures TO {}',
+            'GRANT EXECUTE ON FUNCTION '
+            'hosting_controlplane.lock_native_credential_grant(text,text,text) TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_worker_scope('
             'text, text, text, text, text, text, text, text, text, text) TO {}',
             'GRANT EXECUTE ON FUNCTION '
             'hosting_controlplane.lock_native_worker_scope(text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION '
+            'hosting_controlplane.lock_planned_worker_scope(text, text, text) TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.planned_resource_ownership, '
+            'hosting_controlplane.planned_creation_children TO {}',
             'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_job_scope('
             'text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.migration_wave_job_window('
+            'text, text, text) TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.lock_migration_wave_domain('
+            'text, text, text), hosting_controlplane.migration_wave_release_is_current('
+            'text, text, text, text, timestamptz) TO {}',
+            'GRANT EXECUTE ON FUNCTION hosting_controlplane.migration_wave_pool_turn('
+            'text,text,text,text,text,text,timestamptz),hosting_controlplane.lock_operating_instance(),'
+            'hosting_controlplane.retained_conversion_state(text,text,text),'
+            'hosting_controlplane.retained_conversion_write_is_admitted(text,text,text,text),'
+            'hosting_controlplane.accept_retained_conversion_handover('
+            'text,text,text,text,text,text,text,text,text,text) TO {}',
+            'GRANT SELECT ON hosting_controlplane.operating_instance, '
+            'hosting_controlplane.retained_conversion_keys, '
+            'hosting_controlplane.retained_conversion_key_revocations, '
+            'hosting_controlplane.retained_conversion_proofs, '
+            'hosting_controlplane.retained_conversion_handovers, '
+            'hosting_controlplane.retained_conversion_resolutions TO {}',
+            'GRANT SELECT,INSERT ON hosting_controlplane.retained_conversion_batches, '
+            'hosting_controlplane.retained_conversion_files, '
+            'hosting_controlplane.retained_conversion_bindings, '
+            'hosting_controlplane.retained_conversion_recovery, '
+            'hosting_controlplane.planned_service_bindings, '
+            'hosting_controlplane.resource_recovery_bindings TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.planned_image_inputs, '
+            'hosting_controlplane.planned_image_bindings, '
+            'hosting_controlplane.planned_image_receipts TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.staged_resource_accounting_bindings TO {}',
+            'GRANT SELECT ON hosting_controlplane.migration_wave_domains, '
+            'hosting_controlplane.migration_wave_domain_scopes, '
+            'hosting_controlplane.migration_wave_release_acceptances TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.migration_waves, '
+            'hosting_controlplane.migration_wave_events TO {}',
+            'GRANT SELECT, INSERT, UPDATE ON hosting_controlplane.migration_wave_members, '
+            'hosting_controlplane.migration_wave_resource_claims TO {}',
             'GRANT SELECT, INSERT, UPDATE ON '
             'hosting_controlplane.native_operation_leases, '
             'hosting_controlplane.native_operation_intents TO {}',
@@ -103,10 +155,20 @@ def main() -> int:
             'hosting_controlplane.discovery_generations, '
             'hosting_controlplane.discovery_observations, '
             'hosting_controlplane.discovery_absence_candidates TO {}',
+            'GRANT SELECT ON hosting_controlplane.assessment_inputs TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.application_draft_revisions TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.discovery_freshness_checks TO {}',
+            'GRANT SELECT, INSERT ON hosting_controlplane.discovery_alert_deliveries TO {}',
             'GRANT SELECT ON hosting_controlplane.audit_streams TO {}',
             'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
         ):
             connection.execute(sql.SQL(statement).format(runtime))
+        if fleet_dsn:
+            fleet = sql.Identifier(conninfo_to_dict(fleet_dsn)['user'])
+            connection.execute(sql.SQL('GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.discovery_fleet_admit(text,text,text,text,text), '
+                'hosting_controlplane.discovery_fleet_close(text,text,text,text,text,text), '
+                'hosting_controlplane.discovery_fleet_inspect(text,text,text) TO {}').format(fleet))
         if authority_dsn:
             writer = sql.Identifier(conninfo_to_dict(authority_dsn)['user'])
             for statement in (
@@ -166,12 +228,16 @@ def main() -> int:
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_job_scope(text, text, text) TO {}',
                 'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.migration_wave_job_window(text, text, text) TO {}',
+                'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_authority_scope(text, text, text) TO {}',
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_worker_scope('
                 'text, text, text, text, text, text, text, text, text, text) TO {}',
                 'GRANT EXECUTE ON FUNCTION '
                 'hosting_controlplane.lock_native_worker_scope(text, text, text) TO {}',
+                'GRANT EXECUTE ON FUNCTION '
+                'hosting_controlplane.retained_conversion_write_is_admitted(text,text,text,text) TO {}',
             ):
                 connection.execute(sql.SQL(statement).format(worker))
         if discovery_dsn:
@@ -185,6 +251,28 @@ def main() -> int:
                 'hosting_controlplane.discovery_absence_candidates TO {}',
             ):
                 connection.execute(sql.SQL(statement).format(ingest))
+        if assessment_dsn:
+            reviewer = sql.Identifier(conninfo_to_dict(assessment_dsn)['user'])
+            for statement in (
+                'GRANT SELECT ON hosting_controlplane.environment_registrations TO {}',
+                'GRANT SELECT, INSERT ON hosting_controlplane.assessment_inputs TO {}',
+                'GRANT SELECT ON hosting_controlplane.application_draft_revisions, '
+                'hosting_controlplane.discovery_generations, hosting_controlplane.discovery_observations TO {}',
+                'GRANT INSERT ON hosting_controlplane.audit_events TO {}',
+                'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(reviewer))
+        if monitor_dsn:
+            monitor = sql.Identifier(conninfo_to_dict(monitor_dsn)['user'])
+            for statement in (
+                'GRANT SELECT ON hosting_controlplane.environment_registrations, '
+                'hosting_controlplane.discovery_generations, hosting_controlplane.evidence_entries, '
+                'hosting_controlplane.evidence_streams, hosting_controlplane.audit_streams TO {}',
+                'GRANT SELECT, INSERT ON hosting_controlplane.discovery_freshness_checks, '
+                'hosting_controlplane.discovery_alert_deliveries, hosting_controlplane.audit_events TO {}',
+                'GRANT USAGE ON ALL SEQUENCES IN SCHEMA hosting_controlplane TO {}',
+            ):
+                connection.execute(sql.SQL(statement).format(monitor))
     print('PostgreSQL control-plane test roles and grants are ready')
     return 0
 

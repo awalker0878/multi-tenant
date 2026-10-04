@@ -4,7 +4,8 @@ import json
 import unittest
 from lab.native_readback_fixture import Fixture
 from tests.test_nutanix_vm_observe import uid
-from tools import vsphere_observe as v, readback_core as c
+from provisioner.execution import readback_core as c
+from provisioner.execution import vsphere_observe as v
 
 
 def ref(kind, value): return {'_typeName': 'ManagedObjectReference', 'type': kind, 'value': value}

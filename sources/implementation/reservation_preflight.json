@@ -11,8 +11,8 @@
     "EVID-002"
   ],
   "reservation_index": "sources/capabilities/reservation_record_index.json",
-  "record_checker": "scripts/check_reservation_records.py",
-  "preflight_checker": "scripts/check_reservation_preflight.py",
+  "record_checker": "provisioner/allocations/reservation_evidence.py",
+  "preflight_checker": "provisioner/allocations/reservation_preflight.py",
   "engineering": "docs/engineering/reservation-preflight-and-reconciliation.md",
   "authority": {
     "may_create_reservation": false,

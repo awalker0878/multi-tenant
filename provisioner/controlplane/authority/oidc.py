@@ -221,7 +221,7 @@ class OIDCIdentityProvider:
             if (not isinstance(identity, DirectoryIdentity) or identity.active is not True
                     or (identity.subject, identity.session_id) != (subject, session)
                     or not identity.organization_id or not identity.tenant_id
-                    or identity.kind not in ('HUMAN', 'WORKER')
+                    or identity.kind not in ('HUMAN', 'WORKER', 'SERVICE')
                     or not isinstance(identity.grants, tuple)):
                 raise ValueError('Session is not enrolled or has been revoked')
             for grant in identity.grants:
@@ -233,6 +233,11 @@ class OIDCIdentityProvider:
                         or grant.expires_at.tzinfo is None
                         or grant.expires_at.utcoffset() is None):
                     raise ValueError('Directory returned an invalid scoped role')
+                if identity.kind == 'SERVICE' and (
+                        grant.role != 'DISCOVERY_MONITOR' or not isinstance(grant.scope, PlanScope)):
+                    raise ValueError('Service identity has a non-monitor role')
+                if grant.role == 'DISCOVERY_MONITOR' and identity.kind != 'SERVICE':
+                    raise ValueError('Monitor role requires an enrolled service identity')
             return VerifiedPrincipal(
                 subject, identity.organization_id, identity.tenant_id,
                 identity.kind, issued_at, expires_at, step_up_at, identity.grants)

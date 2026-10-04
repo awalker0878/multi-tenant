@@ -20,7 +20,7 @@ from provisioner.controlplane.authority.model import PlanScope, VerifiedPrincipa
 from provisioner.controlplane.authority.service import (DESTINATION_SECURITY,
     EXECUTION_OPERATOR, MAX_STEP_UP_AGE, SOURCE_SECURITY, AuthorityDenied,
     require_scoped_role)
-from provisioner.controlplane.jobs.repository import _tenant
+from provisioner.controlplane.jobs.repository import _json, _tenant
 from provisioner.controlplane.persistence.store import (NativeBinding,
     OwnerLease, TenantContext)
 from provisioner.controlplane.worker.grants import VerifiedWorkerIdentity
@@ -31,6 +31,7 @@ _MUTATIONS = frozenset({
     'VM_POWER', 'DISK_ATTACH', 'NETWORK_ATTACH',
     'SNAPSHOT_CREATE', 'SNAPSHOT_EXPORT', 'SNAPSHOT_IMPORT',
     'RESTORE_DATA', 'SOURCE_FENCE', 'DESTINATION_ACTIVATE', 'DNS_CHANGE',
+    'GUEST_CONFIG', 'POLICY_APPLY', 'QUOTA_CHANGE', 'NATIVE_CLEANUP',
 })
 _FRESHNESS = timedelta(minutes=5)
 
@@ -197,6 +198,14 @@ def _row(row) -> NativeOperation:
                            row[13], row[14], row[15], row[16], row[17], row[18])
 
 
+def _stored_job_scope(value) -> PlanScope:
+    """Decode B09's persisted dataclass scope, not a canonical plan record."""
+    try:
+        return PlanScope(**_json(value))
+    except (TypeError, ValueError) as exc:
+        raise OperationConflict('The persisted job scope is invalid') from exc
+
+
 _SELECT = ('operation_id, job_id, grant_id, step_id, lease_key, '
            'platform_family, endpoint_id, '
            'native_scope_id, resource_kind, native_id, workload_id, '
@@ -242,10 +251,12 @@ class NativeLeaseAuthority:
             job = cursor.fetchone()
             if job is None or job[0] not in ('STARTED', 'RUNNING'):
                 raise OperationConflict('A started job is required')
-            from provisioner.controlplane.jobs.repository import _json
-            if scope not in (PlanScope.from_record(_json(job[1])),
-                             PlanScope.from_record(_json(job[2]))):
+            if scope not in (_stored_job_scope(job[1]),
+                             _stored_job_scope(job[2])):
                 raise OperationConflict('Scope is not selected by the job')
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            require_write_admission(cursor,ctx,security_domain_id=lease.security_domain_id,
+                                    workload_id=lease.workload_id)
             NativeOperationRegistry._owner(cursor, ctx, lease, live=True)
             NativeOperationRegistry._containment(cursor, lease.binding)
             now = NativeOperationRegistry._clock(cursor)
@@ -310,6 +321,21 @@ class NativeOperationRegistry:
         self._connect = connection_factory
         self._grants = grants
         self._evidence = evidence
+
+    def get(self, ctx: TenantContext, operation_id: str) -> NativeOperation:
+        """Read one original tenant intent without acquiring mutation authority."""
+        if not isinstance(ctx, TenantContext) or not _key(operation_id):
+            raise ValueError('An exact tenant and operation identity are required')
+        with self._connect() as connection, connection.cursor() as cursor:
+            _tenant(cursor, ctx)
+            cursor.execute(
+                f'SELECT {_SELECT} FROM hosting_controlplane.native_operation_intents '
+                'WHERE organization_id = %s AND tenant_id = %s AND operation_id = %s',
+                (ctx.organization_id, ctx.tenant_id, operation_id))
+            row = cursor.fetchone()
+            if row is None:
+                raise OperationConflict('Operation is not visible in this tenant')
+            return _row(row)
 
     @staticmethod
     def _clock(cursor) -> datetime:
@@ -387,10 +413,12 @@ class NativeOperationRegistry:
             job = cursor.fetchone()
             if job is None or job[2] not in ('STARTED', 'RUNNING'):
                 raise OperationConflict('Only a started and current job may prepare native work')
-            from provisioner.controlplane.jobs.repository import _json
-            if scope not in (PlanScope.from_record(_json(job[0])),
-                             PlanScope.from_record(_json(job[1]))):
+            if scope not in (_stored_job_scope(job[0]),
+                             _stored_job_scope(job[1])):
                 raise OperationConflict('Native scope is not selected by this job')
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            require_write_admission(cursor,ctx,security_domain_id=lease.security_domain_id,
+                                    workload_id=lease.workload_id)
             # B10 takes job -> enrollment -> authority -> operation lease ->
             # owner locks. Preserve that order before touching intent rows.
             self._grants.verify_intent(cursor, ctx, grant_id=grant_id, job_id=job_id,
@@ -439,6 +467,9 @@ class NativeOperationRegistry:
         _scope(ctx, scope, lease.binding, lease.security_domain_id)
         with self._connect() as connection, connection.cursor() as cursor:
             _tenant(cursor, ctx)
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            require_write_admission(cursor,ctx,security_domain_id=lease.security_domain_id,
+                                    workload_id=lease.workload_id)
             # Match B10's job -> operation lease -> owner lock order.
             cursor.execute(
                 'SELECT status FROM hosting_controlplane.operation_jobs '
@@ -520,6 +551,95 @@ class NativeOperationRegistry:
                 'updated_at = clock_timestamp() WHERE organization_id = %s '
                 'AND tenant_id = %s AND operation_id = %s',
                 (ctx.organization_id, ctx.tenant_id, operation_id))
+            return True
+
+    def acknowledge_current(self, ctx: TenantContext, lease: OwnerLease,
+                            scope: PlanScope, operation_id: str,
+                            worker_identity: VerifiedWorkerIdentity,
+                            observation: NativeObservation) -> bool:
+        """Resolve a completed current attempt through its independent reader.
+
+        The same original live grant and owner must still authorize the attempt.
+        Unknown work, an uncertain intent or an expired/revoked writer continues
+        through the separately approved fenced recovery path. A subprocess exit,
+        native receipt or a task identifier alone cannot acknowledge completion.
+        """
+        if not isinstance(observation, NativeObservation):
+            raise TypeError('Independent native observation is required')
+        _scope(ctx, scope, lease.binding, lease.security_domain_id)
+        with self._connect() as connection, connection.cursor() as cursor:
+            _tenant(cursor, ctx)
+            from provisioner.controlplane.conversion.handover import require_write_admission
+            require_write_admission(cursor,ctx,security_domain_id=lease.security_domain_id,
+                                    workload_id=lease.workload_id)
+            cursor.execute(
+                f'SELECT {_SELECT} FROM hosting_controlplane.native_operation_intents '
+                'WHERE organization_id = %s AND tenant_id = %s AND operation_id = %s',
+                (ctx.organization_id, ctx.tenant_id, operation_id))
+            previous = cursor.fetchone()
+            if previous is None:
+                raise OperationConflict('Operation is not visible in this tenant')
+            proposed = _row(previous)
+            grant_arguments = dict(grant_id=proposed.grant_id, job_id=proposed.job_id,
+                step_id=proposed.step_id, operation_id=proposed.operation_id,
+                operation_kind=proposed.operation_kind, operation_scope=scope,
+                worker_identity=worker_identity, lease_key=proposed.lease_key,
+                lease_epoch=proposed.owner_epoch)
+            # Same job -> grant/operation lease -> native owner -> intent order
+            # as claim_once; proof collection cannot acquire a competing owner.
+            self._grants.verify_intent(cursor, ctx, **grant_arguments)
+            self._owner(cursor, ctx, lease, live=True)
+            self._containment(cursor, lease.binding)
+            operation = self._get(cursor, ctx, operation_id)
+            self._bound(operation, lease)
+            if operation != proposed:
+                raise OperationConflict('Operation changed during acknowledgment')
+            if (operation.state not in ('IN_FLIGHT', 'TASK_ACCEPTED')
+                    or observation.outcome != 'EFFECT_PRESENT'
+                    or not observation.native_quiesced
+                    or observation.observer_subject == operation.worker_id
+                    or observation.native_task_id != operation.native_task_id
+                    or not _fresh(observation.observed_at, self._clock(cursor))):
+                raise RecoveryHeld('Current acknowledgment requires a fresh independent completed native effect')
+            self._evidence.verify_native_observation(cursor, operation, observation)
+            # An independent read can take time. Recheck the original current
+            # grant and freshness before committing the original resolution.
+            self._grants.verify_intent(cursor, ctx, **grant_arguments)
+            self._owner(cursor, ctx, lease, live=True)
+            if not _fresh(observation.observed_at, self._clock(cursor)):
+                raise RecoveryHeld('Native acknowledgment expired during readback')
+            cursor.execute(
+                'INSERT INTO hosting_controlplane.native_operation_observations '
+                '(organization_id, tenant_id, observation_id, operation_id, '
+                'evidence_digest, observer_subject, native_task_id, outcome, '
+                'native_quiesced, observed_at) VALUES '
+                '(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
+                (ctx.organization_id, ctx.tenant_id, observation.observation_id,
+                 operation_id, observation.evidence_digest, observation.observer_subject,
+                 observation.native_task_id, observation.outcome,
+                 observation.native_quiesced, observation.observed_at))
+            resolution = hashlib.sha256(json.dumps({
+                'format': 'hosting-current-native-acknowledgment/1',
+                'operation_id': operation_id, 'request_digest': operation.request_digest,
+                'grant_id': operation.grant_id, 'owner_epoch': operation.owner_epoch,
+                'observation_id': observation.observation_id,
+                'evidence_digest': observation.evidence_digest,
+                'observer_subject': observation.observer_subject,
+                'native_task_id': observation.native_task_id,
+                'observed_at': observation.observed_at.isoformat(),
+            }, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+            if operation.state == 'IN_FLIGHT':
+                # The existing state machine reserves direct RESOLVED for a
+                # genuinely accepted task. Do not invent a synchronous task ID.
+                cursor.execute(
+                    "UPDATE hosting_controlplane.native_operation_intents SET state='UNCERTAIN', "
+                    'updated_at=clock_timestamp() WHERE organization_id=%s AND tenant_id=%s AND operation_id=%s',
+                    (ctx.organization_id, ctx.tenant_id, operation_id))
+            cursor.execute(
+                "UPDATE hosting_controlplane.native_operation_intents SET state='RESOLVED', "
+                "outcome='EFFECT_PRESENT', resolution_evidence_digest=%s, updated_at=clock_timestamp() "
+                'WHERE organization_id=%s AND tenant_id=%s AND operation_id=%s',
+                (resolution, ctx.organization_id, ctx.tenant_id, operation_id))
             return True
 
     def observe(self, ctx: TenantContext, operation_id: str,

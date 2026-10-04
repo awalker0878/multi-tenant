@@ -1,7 +1,7 @@
 from copy import deepcopy
 import unittest
 from tests.nsx_domain_fixture import scenario
-from tools import nsx_domain_binding as binding
+from provisioner.execution import nsx_domain_binding as binding
 
 
 def fixture(stage='bootstrap'):

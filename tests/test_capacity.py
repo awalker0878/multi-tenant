@@ -8,8 +8,9 @@ import tempfile
 import threading
 import unittest
 from unittest.mock import patch
-from tools import capacity as a, readback_core as c
-from tools.run_files import encoded, utcnow
+from provisioner.execution import readback_core as c
+from provisioner.allocations import capacity_owner as a
+from provisioner.execution.run_files import encoded, utcnow
 
 
 def window():

@@ -5,7 +5,9 @@ import unittest
 from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
 from tests.test_nutanix_task_tree import reseal
-from tools import nsx_observe as nsx, readback_core as c, recovery_review as rr
+from provisioner.execution import readback_core as c
+from provisioner.execution import nsx_observe as nsx
+from provisioner.execution import recovery_review as rr
 
 
 class WitnessTests(unittest.TestCase):

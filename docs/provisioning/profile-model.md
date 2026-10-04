@@ -11,6 +11,7 @@ would otherwise have to live in Python.
 Loader: `provisioner/profiles/loader.py`
 Resolver: `provisioner/profiles/resolver.py`
 Validation: `provisioner/profiles/validation.py`
+Typed requirement fields: `provisioner/profiles/requirements.py`
 
 ## Families
 
@@ -71,6 +72,23 @@ request. `provisioner/profiles/resolver.py` reads the same catalog fields for th
 one case where the choice is only meaningful at resolution time (a recovery profile
 when `recovery.enabled` is true), so both readers share one source of truth.
 
+## Typed fields and cross-profile obligations
+
+One closed requirement-field owner covers all ten catalog families. Required fields
+must exist; booleans are not numbers and strings/floats are not coerced into quantities.
+Relationship sets are bounded, nonempty and unique. Quantities use representation
+bounds, not assumed native platform maxima; address parameters must fit the selected
+family and placement selectors must have an implemented resolver. Capability property
+constraints retain their separate typed semantic owner.
+
+Standalone and full request validation share assurance-required recovery. Availability
+minimum workload counts must fit the compute profile, and recovery must name a selected
+zone. Independent-site recovery remains explicitly unsupported rather than becoming
+implemented through a renamed catalog entry. Availability catalog 18 corrects security
+zone/failure-domain wording; separate domains, HA admission reserves, restart behavior
+and application recovery still need observed qualification. Catalog changes regenerate
+all dependent example fingerprints and require new review of proposed execution plans.
+
 ## Status vocabulary
 
 | Status | Meaning |
@@ -101,7 +119,7 @@ The result is a `Resolution` with no remaining `auto` value: `format`, `compute`
 `lifecycle`, `limits`, `network`, `platform_inputs`, `profiles`, `required_capabilities`,
 `service_class`, `services`, `storage`, `trust`, `zones`, and the reviewed revision
 set it resolved against — `profile_versions`, `catalog_versions`, `catalog_digest`.
-The resolution format is `hosting-profile-resolution/2`.
+The resolution format is `hosting-profile-resolution/3`.
 
 ## Rank
 
@@ -124,3 +142,20 @@ profile that changed and the `version` of its catalog. The golden corpus then ha
 be regenerated, because a plan binds the revision set and the change is visible in
 the desired state, the plan digest and the conformance report. That is the intended
 cost: a reviewed policy change must be visible in review.
+
+## Typed semantic constraints
+
+Profiles may declare bounded `requires.constraints` beneath existing capability
+IDs. Each entry contains exactly `property`, `operator` (`eq`, `gte`, `lte`) and
+`value`. Enumerations and booleans accept equality only; integer inequalities do
+not accept boolean or floating values. Every property must have its capability
+in `requires.capabilities`. All profile constraints intersect and contradictions
+fail before compilation. Resolution format 3 and the complete catalogue digest
+bind the property interpretation to plans.
+
+Placement evaluates each selected cluster's immutable `capability_properties`;
+missing observations cannot be borrowed from another cluster or inferred from a
+platform name. Policy capsule/realization format 2 requires destination constraints
+to entail the source obligations. See the
+[research decision record](../engineering/platform-migration-research.md) for types,
+version changes, known limitations and qualification boundaries.

@@ -9,7 +9,7 @@ import subprocess
 import sys
 import unittest
 
-from scripts import check_version_source_provenance as provenance
+from provisioner.qualification import provenance as provenance
 from scripts import check_version_source_readiness as readiness
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -179,7 +179,7 @@ class ProvenanceRecordTests(unittest.TestCase):
 
     def test_cli_empty_index_grants_no_qualification_authority(self):
         run=subprocess.run([
-            sys.executable,str(ROOT/'scripts/check_version_source_provenance.py'),
+            sys.executable, '-m', 'provisioner.qualification.provenance',
             '--as-of','2026-09-18T22:00:00Z',
         ],capture_output=True,text=True,timeout=10)
         self.assertEqual(run.returncode,0,run.stdout+run.stderr)

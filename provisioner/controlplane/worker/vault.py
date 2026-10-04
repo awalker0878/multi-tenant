@@ -52,10 +52,12 @@ class VaultWrappedCredential:
     creation_path: str
     expires_at: datetime
     grant_id: str
+    issuance_id: str | None = None
 
     def __post_init__(self) -> None:
         if (not self.wrapping_token or not self.creation_path
-                or not _aware(self.expires_at) or not self.grant_id):
+                or not _aware(self.expires_at) or not self.grant_id
+                or (self.issuance_id is not None and not _ID.fullmatch(self.issuance_id))):
             raise ValueError('Invalid wrapped credential')
 
 
@@ -72,7 +74,12 @@ class VaultDynamicCredentialIssuer:
                  agent_token_file: str | Path,
                  roles: tuple[VaultDynamicRole, ...], namespace: str | None = None,
                  client_certificate: str | Path | None = None,
-                 client_key: str | Path | None = None, timeout: float = 5):
+                 client_key: str | Path | None = None, timeout: float = 5,
+                 lease_store=None):
+        from .credential_custody import VaultNativeCredentialLeaseStore
+        if lease_store is not None and type(lease_store) is not VaultNativeCredentialLeaseStore:
+            raise TypeError('Only the existing B10 concrete dynamic-credential custody owner is supported')
+        self._lease_store=lease_store
         parsed = urlsplit(vault_url)
         if (parsed.scheme != 'https' or not parsed.hostname or parsed.username
                 or parsed.password or parsed.path or parsed.query or parsed.fragment
@@ -144,6 +151,7 @@ class VaultDynamicCredentialIssuer:
             headers['X-Vault-Namespace'] = self._namespace
         connection = http.client.HTTPSConnection(self._host, self._port,
                                                  timeout=self._timeout, context=self._tls)
+        issuance_id=self._lease_store.begin(grant,role) if self._lease_store is not None else None
         try:
             connection.request('GET', '/v1/' + role.api_path, headers=headers)
             response = connection.getresponse()
@@ -167,9 +175,9 @@ class VaultDynamicCredentialIssuer:
                     or path not in (role.api_path, '/v1/' + role.api_path)
                     or received_at + timedelta(seconds=ttl) > expires_at):
                 raise GrantDenied('Vault wrapped credential exceeds exact grant')
-            return VaultWrappedCredential(token, path,
-                                          received_at + timedelta(seconds=ttl),
-                                          grant.grant_id)
+            result=VaultWrappedCredential(token,path,received_at+timedelta(seconds=ttl),grant.grant_id,issuance_id)
+            if self._lease_store is not None: self._lease_store.wrapped(result,grant)
+            return result
         except (OSError, TimeoutError, ssl.SSLError, http.client.HTTPException,
                 ValueError, UnicodeError) as exc:
             raise GrantDenied('Vault credential issuance failed') from exc

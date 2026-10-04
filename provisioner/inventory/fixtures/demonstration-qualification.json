@@ -5,15 +5,26 @@
   "boundary": "This document states the qualification assumption that the repository's non-authoritative fixture inventories are planned against, so the portable pipeline can be exercised end to end without native contact. It is not native qualification, not native evidence and not placement authority: it can never authorize a placement, it may only be used with a non-authoritative inventory, and every decision that relies on it records this source and status. Reviewed native qualification must replace it before any real placement.",
   "capability_ids": [
     "audit_logging",
+    "backup_restore",
+    "boot_volume",
+    "cpu_topology",
+    "data_volumes",
     "dedicated_edge_context",
+    "disk_order",
     "distributed_firewall",
+    "dns_registration",
     "dynamic_routing",
     "gateway_policy",
+    "identity_join",
     "ipv4",
     "ipv6",
+    "log_forwarding",
     "native_load_balancer",
     "network_domain",
-    "service_insertion"
+    "service_insertion",
+    "storage_placement",
+    "time_sync",
+    "vm_create"
   ],
   "platforms": {
     "nutanix": {

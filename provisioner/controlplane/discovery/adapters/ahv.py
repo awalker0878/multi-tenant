@@ -15,6 +15,7 @@ independent native qualification gate for the actual installed PC/AOS tuple.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import re
 from typing import Callable, Mapping, Protocol
 from urllib.parse import parse_qs, urlsplit
 from uuid import UUID
@@ -27,9 +28,12 @@ from ..model import (DiscoveryCampaignAuthorization, DiscoveryFact,
 
 
 API_VERSION = 'v4.0'
-COLLECTOR_ID = 'nutanix-ahv-v4.0'
+COLLECTOR_ID = 'nutanix-ahv-v4.0-hardware-3'
 VM_PATH = '/api/vmm/v4.0/ahv/config/vms'
 _MAX_NATIVE_PAGE = 100
+_MAX_INTEGER = 2**63 - 1
+_NATIVE_TYPE = 'vmm.v4.ahv.config.'
+_MAC = re.compile(r'(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}\Z')
 
 
 class AhvGetTransport(Protocol):
@@ -59,7 +63,7 @@ def _uuid(value: object) -> str | None:
 
 
 def _positive(value: object) -> int | None:
-    return value if type(value) is int and value > 0 else None
+    return value if type(value) is int and 0 < value <= _MAX_INTEGER else None
 
 
 def _ref_id(value: object) -> str | None:
@@ -73,70 +77,138 @@ def _field(name: str, raw: object, *, valid: Callable[[object], bool]) -> Discov
             else DiscoveryFact.unknown(name, 'COLLECTION_ERROR'))
 
 
-def _disk_facts(raw: object) -> tuple[DiscoveryFact, DiscoveryFact]:
+def _bounded_fact(name: str, value: object) -> DiscoveryFact:
+    """Retain identity when a device observation exceeds the fact byte budget."""
+    try:
+        return DiscoveryFact.known(name, value)
+    except (ValueError, TypeError):
+        return DiscoveryFact.unknown(name, 'COLLECTION_ERROR')
+
+
+def _disk_facts(raw: object) -> tuple[DiscoveryFact, ...]:
+    names = ('disks', 'diskCapacityBytes', 'diskLayout')
+    def unknown(reason):
+        return tuple(DiscoveryFact.unknown(name, reason) for name in names)
     if raw is None:
-        return (DiscoveryFact.unknown('disks', 'NOT_RETURNED'),
-                DiscoveryFact.unknown('diskCapacityBytes', 'NOT_RETURNED'))
+        return unknown('NOT_RETURNED')
     if not isinstance(raw, list) or len(raw) > 256:
-        return (DiscoveryFact.unknown('disks', 'COLLECTION_ERROR'),
-                DiscoveryFact.unknown('diskCapacityBytes', 'COLLECTION_ERROR'))
-    disks: list[dict] = []
-    ids: set[str] = set()
-    total = 0
-    missing_capacity = False
+        return unknown('COLLECTION_ERROR')
+    disks, layout, ids, slots = [], [], set(), set()
+    total, capacity_reason, layout_reason = 0, None, None
     for disk in raw:
         if not isinstance(disk, dict) or not (disk_id := _uuid(disk.get('extId'))):
-            return (DiscoveryFact.unknown('disks', 'COLLECTION_ERROR'),
-                    DiscoveryFact.unknown('diskCapacityBytes', 'COLLECTION_ERROR'))
+            return unknown('COLLECTION_ERROR')
         if disk_id in ids:
-            return (DiscoveryFact.unknown('disks', 'COLLECTION_ERROR'),
-                    DiscoveryFact.unknown('diskCapacityBytes', 'COLLECTION_ERROR'))
+            return unknown('COLLECTION_ERROR')
         ids.add(disk_id)
-        # backingInfo is a tagged VmDisk or ADSF volume-group union. Only the
-        # VmDisk member has a diskSizeBytes field; a volume group is unknown.
-        vm_disk = disk.get('backingInfo')
-        size = vm_disk.get('diskSizeBytes') if isinstance(vm_disk, dict) else None
-        if _positive(size) is None:
-            missing_capacity = True
-            size = None
+        backing = disk.get('backingInfo')
+        if not isinstance(backing, dict):
+            return unknown('NOT_RETURNED' if backing is None else 'COLLECTION_ERROR')
+        kind = backing.get('$objectType')
+        size, container = None, None
+        if kind == _NATIVE_TYPE + 'VmDisk':
+            size = backing.get('diskSizeBytes')
+            if _positive(size) is None or total + size > _MAX_INTEGER:
+                capacity_reason = 'NOT_RETURNED' if size is None else 'COLLECTION_ERROR'
+                size = None
+            else:
+                total += size
+            container = _ref_id(backing.get('storageContainer'))
+        elif kind == _NATIVE_TYPE + 'ADSFVolumeGroupReference':
+            # A group attachment is not a disk image, even if an untrusted
+            # response also includes the VmDisk member's diskSizeBytes field.
+            capacity_reason = capacity_reason or 'NOT_RETURNED'
         else:
-            total += size
-        container = (vm_disk.get('storageContainer')
-                     if isinstance(vm_disk, dict) else None)
+            return unknown('NOT_RETURNED' if kind is None else 'COLLECTION_ERROR')
         disks.append({'extId': disk_id, 'diskSizeBytes': size,
-                      'storageContainerExtId': _ref_id(container)})
-    return (DiscoveryFact.known('disks', disks),
-            DiscoveryFact.unknown('diskCapacityBytes', 'NOT_RETURNED')
-            if missing_capacity else DiscoveryFact.known('diskCapacityBytes', total))
+                      'storageContainerExtId': container, 'backingType': kind})
+        address = disk.get('diskAddress')
+        if address is None:
+            layout_reason = layout_reason or 'NOT_RETURNED'
+            continue
+        if (not isinstance(address, dict)
+                or address.get('busType') not in ('SCSI', 'IDE', 'PCI', 'SATA', 'SPAPR')
+                or type(address.get('index')) is not int
+                or not 0 <= address['index'] <= _MAX_INTEGER):
+            layout_reason = 'COLLECTION_ERROR'
+            continue
+        slot = (address['busType'], address['index'])
+        if slot in slots:
+            layout_reason = 'COLLECTION_ERROR'
+        slots.add(slot)
+        layout.append({'extId': disk_id, 'busType': slot[0], 'index': slot[1]})
+    # Preserve native array order and explicit bus/index, never dictionary order
+    # or device UUID sorting as the guest's boot/controller order.
+    return (_bounded_fact('disks', disks),
+            DiscoveryFact.unknown('diskCapacityBytes', capacity_reason)
+            if capacity_reason else DiscoveryFact.known('diskCapacityBytes', total),
+            DiscoveryFact.unknown('diskLayout', layout_reason)
+            if layout_reason else _bounded_fact('diskLayout', layout))
 
 
-def _nic_facts(raw: object) -> tuple[DiscoveryFact, DiscoveryFact]:
+def _nic_facts(raw: object) -> tuple[DiscoveryFact, ...]:
+    names = ('nics', 'networkBindings', 'nicHardware')
+    def unknown(reason):
+        return tuple(DiscoveryFact.unknown(name, reason) for name in names)
     if raw is None:
-        return (DiscoveryFact.unknown('nics', 'NOT_RETURNED'),
-                DiscoveryFact.unknown('networkBindings', 'NOT_RETURNED'))
+        return unknown('NOT_RETURNED')
     if not isinstance(raw, list) or len(raw) > 256:
-        return (DiscoveryFact.unknown('nics', 'COLLECTION_ERROR'),
-                DiscoveryFact.unknown('networkBindings', 'COLLECTION_ERROR'))
-    nics: list[dict] = []
-    ids: set[str] = set()
-    missing_network = False
+        return unknown('COLLECTION_ERROR')
+    nics, hardware, ids, macs = [], [], set(), set()
+    missing_network, hardware_reason = False, None
     for nic in raw:
         if not isinstance(nic, dict) or not (nic_id := _uuid(nic.get('extId'))):
-            return (DiscoveryFact.unknown('nics', 'COLLECTION_ERROR'),
-                    DiscoveryFact.unknown('networkBindings', 'COLLECTION_ERROR'))
+            return unknown('COLLECTION_ERROR')
         if nic_id in ids:
-            return (DiscoveryFact.unknown('nics', 'COLLECTION_ERROR'),
-                    DiscoveryFact.unknown('networkBindings', 'COLLECTION_ERROR'))
+            return unknown('COLLECTION_ERROR')
         ids.add(nic_id)
         network = nic.get('networkInfo')
         subnet = network.get('subnet') if isinstance(network, dict) else None
         subnet_id = _ref_id(subnet)
-        if subnet_id is None:
-            missing_network = True
+        missing_network |= subnet_id is None
         nics.append({'extId': nic_id, 'subnetExtId': subnet_id})
-    return (DiscoveryFact.known('nics', nics),
+        backing = nic.get('backingInfo')
+        if backing is None:
+            hardware_reason = hardware_reason or 'NOT_RETURNED'
+            continue
+        if (not isinstance(backing, dict) or
+                backing.get('$objectType') not in (None, _NATIVE_TYPE + 'EmulatedNic')):
+            hardware_reason = 'COLLECTION_ERROR'
+            continue
+        mac = backing.get('macAddress')
+        if (backing.get('model') not in ('VIRTIO', 'E1000')
+                or not isinstance(mac, str) or not _MAC.fullmatch(mac)
+                or type(backing.get('isConnected')) is not bool):
+            hardware_reason = ('NOT_RETURNED' if any(backing.get(k) is None for k in
+                               ('model', 'macAddress', 'isConnected')) else 'COLLECTION_ERROR')
+            continue
+        if mac.lower() in macs:
+            hardware_reason = 'COLLECTION_ERROR'
+        macs.add(mac.lower())
+        # Do not apply SDK request defaults (isConnected=True, numQueues=1)
+        # to an observed response, and do not ingest guest customization/secrets.
+        hardware.append({'extId': nic_id, 'model': backing['model'],
+                         'macAddress': mac.lower(), 'isConnected': backing['isConnected']})
+    return (_bounded_fact('nics', nics),
             DiscoveryFact.unknown('networkBindings', 'NOT_RETURNED')
-            if missing_network else DiscoveryFact.known('networkBindings', nics))
+            if missing_network else _bounded_fact('networkBindings', nics),
+            DiscoveryFact.unknown('nicHardware', hardware_reason)
+            if hardware_reason else _bounded_fact('nicHardware', hardware))
+
+
+def _boot_facts(raw: object) -> tuple[DiscoveryFact, DiscoveryFact]:
+    kind = raw.get('$objectType') if isinstance(raw, dict) else None
+    if kind not in (_NATIVE_TYPE + 'LegacyBoot', _NATIVE_TYPE + 'UefiBoot'):
+        reason = 'NOT_RETURNED' if raw is None else 'COLLECTION_ERROR'
+        return (DiscoveryFact.unknown('firmware', reason),
+                DiscoveryFact.unknown('secureBootEnabled', reason))
+    firmware = 'uefi' if kind.endswith('.UefiBoot') else 'bios'
+    # Firmware type is not a substitute for a returned Secure Boot flag.
+    secure = _field('secureBootEnabled', raw.get('isSecureBootEnabled'),
+                    valid=lambda v: type(v) is bool)
+    if firmware == 'bios':
+        secure = DiscoveryFact.unknown('secureBootEnabled', 'NOT_RETURNED')
+    return DiscoveryFact.known('firmware', firmware), secure
 
 
 def _vm(value: object, scope: PlanScope) -> DiscoveryObject:
@@ -144,8 +216,7 @@ def _vm(value: object, scope: PlanScope) -> DiscoveryObject:
         raise ValueError('VM_ID_UNAVAILABLE')
     if _ref_id(value.get('cluster')) != scope.native_scope_id:
         raise ValueError('VM_OUTSIDE_NATIVE_SCOPE')
-    disks, capacity = _disk_facts(value.get('disks'))
-    nics, networks = _nic_facts(value.get('nics'))
+    vtpm = value.get('vtpmConfig')
     facts = (
         _field('displayName', value.get('name'),
                valid=lambda v: isinstance(v, str) and 0 < len(v) <= 80),
@@ -157,7 +228,23 @@ def _vm(value: object, scope: PlanScope) -> DiscoveryObject:
         _field('memorySizeBytes', value.get('memorySizeBytes'),
                valid=lambda v: _positive(v) is not None),
         DiscoveryFact.known('clusterExtId', scope.native_scope_id),
-        disks, capacity, nics, networks,
+        *_disk_facts(value.get('disks')),
+        *_nic_facts(value.get('nics')),
+        *_boot_facts(value.get('bootConfig')),
+        _field('vtpmEnabled', vtpm.get('isVtpmEnabled') if isinstance(vtpm, dict) else None,
+               valid=lambda v: type(v) is bool),
+        _field('nativeLiveMigrationCapable', value.get('isLiveMigrateCapable'),
+               valid=lambda v: type(v) is bool),
+        _field('numThreadsPerCore',value.get('numThreadsPerCore'),valid=lambda v:_positive(v) is not None),
+        _field('numNumaNodes',value.get('numNumaNodes'),valid=lambda v:type(v) is int and 0<=v<=_MAX_INTEGER),
+        _field('cpuPassthroughEnabled',value.get('isCpuPassthroughEnabled'),valid=lambda v:type(v) is bool),
+        _field('vcpuHardPinningEnabled',value.get('isVcpuHardPinningEnabled'),valid=lambda v:type(v) is bool),
+        _field('cpuHotAddEnabled',value.get('isCpuHotplugEnabled'),valid=lambda v:type(v) is bool),
+        _field('memoryOvercommitEnabled',value.get('isMemoryOvercommitEnabled'),valid=lambda v:type(v) is bool),
+        _field('agentVm',value.get('isAgentVm'),valid=lambda v:type(v) is bool),
+        _field('machineType',value.get('machineType'),valid=lambda v:isinstance(v,str) and 0<len(v)<=128),
+        _field('biosUuid',value.get('biosUuid'),valid=lambda v:_uuid(v) is not None),
+        _field('nativeGenerationUuid',value.get('generationUuid'),valid=lambda v:_uuid(v) is not None),
     )
     return DiscoveryObject(NativeIdentity(scope.endpoint_id, scope.native_scope_id,
                                           'nutanix', 'vm', vm_id), facts)

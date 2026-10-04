@@ -23,7 +23,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.terraform_catalog import entries
+from provisioner.execution.terraform_catalog import entries
 
 
 def plan_only_mock_tests(directory: Path) -> bool:
@@ -72,6 +72,8 @@ def main() -> int:
                       for p in sorted((ROOT / "terraform").rglob("*"))
                       if p.is_file() and ".terraform" not in p.parts}
     source_digests["tools/verify_terraform.py"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    source_digests["provisioner/execution/terraform_catalog.py"] = hashlib.sha256(
+        (ROOT / 'provisioner/execution/terraform_catalog.py').read_bytes()).hexdigest()
     report: dict[str, Any] = {
         "kind": "TERRAFORM_TOOLCHAIN_CHECK",
         "target_infrastructure": "NOT_CONTACTED_BY_THIS_SCRIPT",

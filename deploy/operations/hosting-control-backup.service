@@ -1,0 +1,24 @@
+[Unit]
+Description=Consistent control-application database archive under separate backup custody
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=hosting-backup
+Group=hosting-backup
+EnvironmentFile=/etc/hosting/operations/backup.env
+ExecStart=/opt/hosting/bin/python -m provisioner.controlplane.operations.recovery backup --directory ${HOSTING_BACKUP_DIRECTORY} --new-archive
+StateDirectory=hosting-control-backup
+ReadWritePaths=/var/lib/hosting-control-backup
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=
+UMask=0077
+TimeoutStartSec=3700

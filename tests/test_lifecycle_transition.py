@@ -4,10 +4,10 @@ import json
 import unittest
 from uuid import uuid5, NAMESPACE_URL
 
-from tools import lifecycle_transition as t, terraform_run as run
-from tools.compile_wsd import STATE
-from tools.plan_review import review
-from tools.run_files import digest, encoded, utcnow
+from provisioner.execution import lifecycle_transition as t, terraform_run as run
+from provisioner.compiler.wsd import STATE
+from provisioner.execution.plan_review import review
+from provisioner.execution.run_files import digest, encoded, utcnow
 
 
 def nsx_rules(member, group, stage):

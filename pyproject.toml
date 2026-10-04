@@ -28,13 +28,27 @@ controlplane = [
 [project.scripts]
 hosting = "provisioner.cli.main:main"
 hosting-operator = "provisioner.cli.operator:main"
+hosting-application-review-ingest = "provisioner.controlplane.discovery.review_intake:main"
+hosting-application-review = "provisioner.controlplane.discovery.owner_signing:main"
 hosting-api = "provisioner.controlplane.api.server:main"
 hosting-evidence = "provisioner.controlplane.evidence.runtime:main"
 hosting-site-worker = "provisioner.controlplane.worker.runtime:main"
+hosting-discovery-ingest = "provisioner.controlplane.discovery.runtime:main"
+hosting-discovery-collect = "provisioner.controlplane.discovery.collector_runtime:main"
+hosting-discovery-monitor = "provisioner.controlplane.discovery.monitor_runtime:main"
+hosting-discovery-alert-owner = "provisioner.controlplane.discovery.alert_receiver:main"
+hosting-discovery-fleet = "provisioner.controlplane.discovery.fleet_read_budget:main"
+hosting-workflow = "provisioner.controlplane.workflow.runtime:main"
+hosting-application-runtime = "provisioner.controlplane.workflow.application_runtime:main"
+hosting-conversion = "provisioner.controlplane.conversion.runtime:main"
+hosting-operating-drill = "provisioner.controlplane.operations.drills:main"
+hosting-qualification-intake = "provisioner.qualification.intake:main"
+hosting-commissioning-dossier = "provisioner.qualification.commissioning:main"
 
 [tool.setuptools.packages.find]
-include = ["provisioner*", "tools", "scripts"]
+include = ["provisioner*", "hosting_resources", "tools", "scripts"]
 namespaces = false
 
 [tool.setuptools.package-data]
+hosting_resources = ["runtime-documents.json"]
 provisioner = ["inventory/fixtures/*.json", "schemas/v1/*.json", "controlplane/persistence/migrations/*.sql", "controlplane/api/portal/*.html", "controlplane/api/portal/*.js", "controlplane/api/portal/*.css", "retired_interfaces.json"]

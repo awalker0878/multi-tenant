@@ -20,8 +20,9 @@ from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID, ExtendedKeyUsageOID
-from tools import readback_core as c
-from tools import nsx_observe as nsx, nutanix_observe as nut
+from provisioner.execution import readback_core as c
+from provisioner.execution import nsx_observe as nsx
+from provisioner.execution import nutanix_observe as nut
 
 VPC='11111111-1111-4111-8111-111111111111'
 TASK='ZXJnb24=:22222222-2222-4222-8222-222222222222'

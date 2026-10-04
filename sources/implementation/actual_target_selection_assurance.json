@@ -5,7 +5,7 @@
   "backlog_ids": ["I02"],
   "requirements": ["QUAL-001", "ASSUR-003", "SUP-001"],
   "assurance_index": "sources/capabilities/target_selection_assurance_index.json",
-  "checker": "scripts/check_target_selection_assurance.py",
+  "checker": "provisioner/qualification/target_selection.py",
   "preflight": "scripts/check_target_selection_readiness.py",
   "engineering": "docs/engineering/actual-target-selection-assurance.md",
   "current_records": 0,

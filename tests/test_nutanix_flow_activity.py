@@ -11,13 +11,17 @@ import unittest
 from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
 from tests.test_nutanix_task_tree import reseal
-from tools import recovery_review as rr
+from provisioner.execution import readback_cli
+from provisioner.execution import recovery_review as rr
 from tests import test_nutanix_vm_task_observe as tasks
 from tests.test_nutanix_vm_activity import activity_routes
 from tests.test_nutanix_flow_observe import manifest as snapshot_manifest
 from tests.test_nutanix_vm_observe import uid
-from tools import nutanix_flow_activity_observe as a, nutanix_flow_observe as flow
-from tools import nutanix_entity_activity as activity, nutanix_task_tree as tree, readback_core as c
+from provisioner.execution import nutanix_flow_activity_observe as a
+from provisioner.execution import nutanix_flow_observe as flow
+from provisioner.execution import readback_core as c
+from provisioner.execution import nutanix_entity_activity as activity
+from provisioner.execution import nutanix_task_tree as tree
 
 
 def manifest(origin='https://pc.example.invalid'):
@@ -167,7 +171,7 @@ class FlowActivityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)/'manifest'; out = Path(directory)/'report'
             self.m['contact_enabled'] = True; path.write_text(json.dumps(self.m))
-            args = [sys.executable, str(Path(a.__file__)), str(path)]
+            args = [*readback_cli.module_command(a, []), str(path)]
             p = subprocess.run(args, capture_output=True, text=True)
             self.assertEqual(p.returncode, 0, p.stdout+p.stderr); self.assertFalse(self.f.requests)
             p = subprocess.run(args + ['--read-authorized-target', '--expected-origin', self.f.origin,

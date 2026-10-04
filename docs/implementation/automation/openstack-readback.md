@@ -1,6 +1,6 @@
 # OpenStack workload observations
 
-`tools/openstack_observe.py` performs bounded GET-only readback of explicitly
+`provisioner/execution/openstack_observe.py` performs bounded GET-only readback of explicitly
 enumerated Nova servers, Cinder volumes and Glance images. This complements the
 Neutron collector; it does not establish platform qualification or native RBAC.
 
@@ -35,7 +35,7 @@ report; it contains mismatch paths and observation hashes.
 Validate without network contact:
 
 ```sh
-python tools/openstack_observe.py /private/workloads.json
+python -m provisioner.execution.openstack_observe /private/workloads.json
 ```
 
 For actual contact, provide owner-only token, CA and authority files. Authority
@@ -43,7 +43,7 @@ contains exact `manifest_sha256`, `token_sha256`, `ca_sha256` byte hashes,
 `valid_from`, `valid_until` (at most one hour), and external `change_ref`.
 
 ```sh
-python tools/openstack_observe.py /private/workloads.json \
+python -m provisioner.execution.openstack_observe /private/workloads.json \
   --token /private/read-token --ca /private/site-ca.pem \
   --authority /private/read-authority.json --output /private/new-observation \
   --execute

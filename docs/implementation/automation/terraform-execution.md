@@ -1,11 +1,14 @@
 # Reviewed Terraform execution
 
-`tools/terraform_run.py` prepares a private saved-plan bundle for one registered
+`provisioner/execution/terraform_run.py` prepares a private saved-plan bundle for one registered
 WSD domain or workload root. This is an operator tool for an already selected,
 authorized native target. Hosted PR checks never invoke it against a platform.
 
-`tools/terraform_catalog.py` discovers the explicitly registered writer scopes
-from `terraform/catalog.json` without assuming a fixed count.
+`provisioner.execution.terraform_catalog` reads the explicitly registered writer scopes
+from `terraform/catalog.json` without assuming a fixed count. The former tools module
+is deleted; all consumers use the package owner. Its bounded JSON/path checks and
+clean incremental build behavior are documented in the
+[package catalog contract](../../engineering/terraform-catalog-runtime.md).
 
 ## Plan preparation
 
@@ -56,7 +59,7 @@ bytes are bound by contact authority and the bundle. Ambient TLS overrides are
 not inherited. Credential or trust changes require a new reviewed plan.
 
 ```sh
-python tools/terraform_run.py \
+python -m provisioner.execution.terraform_run \
   --catalog-id nutanix-wsd-domains \
   --inputs /private/operator/inputs.json \
   --backend /private/operator/backend.json \
@@ -91,7 +94,7 @@ change approval; it does not manufacture that approval. The maximum apply window
 and plan age are one hour. Apply from the same clean source revision and binary.
 
 ```sh
-python tools/terraform_apply.py \
+python -m provisioner.execution.terraform_apply \
   --bundle /private/operator/run-001 \
   --approval /private/operator/approved.json \
   --terraform /opt/terraform/bin/terraform \
@@ -157,7 +160,7 @@ generation are checked. Domain inputs must match the current environment intent;
 missing, duplicate, foreign, uncertain or older-than-24-hour runs are rejected.
 
 ```sh
-python tools/wsd_handoff.py \
+python -m provisioner.execution.wsd_handoff \
   --environment /private/operator/environment.json \
   --domain-run /private/operator/tenant-01-domains \
   --domain-run /private/operator/tenant-02-domains \
@@ -173,7 +176,7 @@ authority. The handoff retains the source and execution provenance for each WSD.
 After a separately reviewed workload apply and accepted bootstrap/access handoff:
 
 ```sh
-python tools/guest_inventory.py /private/operator/guest-access.json \
+python -m provisioner.execution.guest_inventory /private/operator/guest-access.json \
   --workload-run /private/operator/tenant-01-workloads \
   --output /private/operator/guest-inventory
 ```

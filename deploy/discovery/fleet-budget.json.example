@@ -1,0 +1,11 @@
+{
+  "format": "hosting-discovery-fleet-budget/1",
+  "fleetId": "commissioned-fleet-1",
+  "workerId": "commissioned-worker-1",
+  "databaseRole": "hosting_discovery_fleet_worker_1",
+  "policyDigest": "REPLACE_WITH_COMMISSIONED_POLICY_SHA256",
+  "databaseCaDigest": "REPLACE_WITH_POSTGRESQL_CA_SHA256",
+  "dsnFile": "/etc/hosting/discovery/fleets/worker-1.dsn",
+  "serviceEnrollmentFile": "/etc/hosting/discovery/fleets/worker-1-service.json",
+  "serviceEnrollmentDigest": "REPLACE_WITH_ACTUAL_MANIFEST_SHA256"
+}

@@ -1,6 +1,6 @@
 # vSphere VM snapshot readback
 
-`tools/vsphere_observe.py` uses the Virtual Infrastructure JSON API with the
+`provisioner/execution/vsphere_observe.py` uses the Virtual Infrastructure JSON API with the
 explicit `8.0.3.0` release schema. It reads only the `config`, `runtime` and
 `resourcePool` properties of enumerated `VirtualMachine` managed object IDs.
 It does not discover VMs, log in, mutate configuration or control power.
@@ -13,10 +13,10 @@ the mapping from managed object ID to BIOS `uuid` (the Terraform VM ID) and
 vCenter `instanceUuid` independently. A VM name or portable tenant label is
 insufficient proof of ownership.
 
-The task-oriented readers share that schema. `tools/vsphere_history.py` runs
+The task-oriented readers share that schema. `provisioner/execution/vsphere_history.py` runs
 scoped task-history queries with session-local collectors only;
-`tools/vsphere_task_activity.py` checks visible task activity on exact VMs, and
-`tools/vsphere_clone_source.py` reads selected template identity and revision
+`provisioner/execution/vsphere_task_activity.py` checks visible task activity on exact VMs, and
+`provisioner/execution/vsphere_clone_source.py` reads selected template identity and revision
 evidence. None mutates source state or adopts a template.
 
 For NSX-backed distributed ports, the separate
@@ -37,7 +37,7 @@ from accepted native evidence, never synthesized to match a fixture.
 Validate without network contact:
 
 ```sh
-python3 tools/vsphere_observe.py /private/site/vsphere-manifest.json
+python3 -m provisioner.execution.vsphere_observe /private/site/vsphere-manifest.json
 ```
 
 For an authorized read, inject the site's short-lived read-only session through
@@ -71,7 +71,7 @@ do not qualify an installed vCenter/ESXi/NSX tuple.
 
 ## Task reconciliation evidence
 
-`tools/vsphere_task_observe.py` adds GETs for enumerated `Task/{moId}/info`
+`provisioner/execution/vsphere_task_observe.py` adds GETs for enumerated `Task/{moId}/info`
 properties. Use profile `vsphere-vi-json-8.0.3.0-vm-tasks` with the same VM
 resources and a `task` object containing `execution_record_ref` and `records`.
 Each record has `moid`, `vm_moid`, `description_id`, `queued_at` and
@@ -96,7 +96,7 @@ readiness. Retain the report with the original execution receipt, approved
 inputs, native task trail and state/backend evidence. An operator must reconcile
 the entire operation before separately authorizing any forward action.
 
-The offline `tools/recovery_review.py` now accepts the exact-task profile. It
+The offline `provisioner/execution/recovery_review.py` now accepts the exact-task profile. It
 requires VM and task coverage, recomputes task outcomes from bounded selected
 witnesses at each sample's time, checks both VM snapshot digests and rejects
 rehashed contradictory summaries. Held existing-VM Terraform review additionally
@@ -114,7 +114,7 @@ must verify their native behavior and the installed API tuple.
 
 ## Bounded task trees and child-history checks
 
-`tools/vsphere_task_tree_observe.py` uses profile
+`provisioner/execution/vsphere_task_tree_observe.py` uses profile
 `vsphere-vi-json-8.0.3.0-task-tree-history`. It retains the accepted VM resources
 and supported power/reconfiguration operations. The `task` object adds
 `task_manager_id` and `coverage_ref`; every task record adds `parent_task_id`

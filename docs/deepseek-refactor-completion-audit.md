@@ -573,7 +573,7 @@ become current, because the commit is a compare-and-set against the record the
 claimant read.
 
 The delivery contract stays the owner of the scope grammar: `SCOPE_IDENTIFIER`
-mirrors `tools.readback_core.ID`, one test compares the two patterns, another reads
+mirrors `provisioner.execution.readback_core.ID`, one test compares the two patterns, another reads
 the scope set out of `tools/delivery_run.py` rather than restating it, and another
 proves the runner accepts this plan's scope and operation identity and refuses `0`,
 `-1`, `True`, `'1'` and `None` exactly as `require_generation` does.
@@ -801,7 +801,7 @@ That is suitable for planning but is not the authoritative reservation integrati
 | Requirement | Where it is satisfied |
 | --- | --- |
 | 1. preserve the pure arithmetic as preflight | `provisioner/allocations/reservations.py` is unchanged and still reports `applied: False`; the `capacity` repository check still states that the reviewed arithmetic holds and names `CAPACITY_OWNER` as the authority |
-| 2. compile a capacity-owner operation from the existing mechanisms and records | `provisioner/allocations/owner.py` emits `hosting-capacity-request/1`, which `tools/capacity.validate_request` accepts unchanged; reconciliation reads the repository's existing exported records through `scripts/check_reservation_records.py` (reached only via `provisioner/repository.py`) |
+| 2. compile a capacity-owner operation from the existing mechanisms and records | `provisioner/allocations/owner.py` emits `hosting-capacity-request/1`, which `tools/capacity.validate_request` accepts unchanged; reconciliation reads the repository's existing exported records through `provisioner/allocations/reservation_evidence.py` (reached only via `provisioner/repository.py`) |
 | 3. bind the request to the exact commissioned envelope/snapshot used during placement | `capacity_view(plan)` binds the inventory digest, status, origin and authority, the site, the platform and every reviewed zone; `binding(plan, envelope_id=..., envelope_record_sha256=...)` binds the view digest, the plan digest, the generation, the operation identity and the envelope |
 | 4. require authoritative confirmation before capacity is held | `CONFIRMED_BY_OWNER` is the only state with `confirmed`/`may_allocate` true and is reachable only from a live exported record; `require_confirmed` refuses otherwise, and the `capacity-confirmation` conformance check is `PASS` only on it |
 | 5. handle uncertain outcomes through observe/reconcile before retry | `HOLD_DISCOVER_RESERVATION_OUTCOME` is derived from an `UNCERTAIN` record or dependency handoff, refuses with `CAPACITY_RESERVATION_UNRESOLVED`, and the check reports `PENDING_EXTERNAL_EVIDENCE` rather than a pass or a definite failure |
@@ -813,7 +813,7 @@ subtests) covers every required case. The mirrored contract is compared against 
 authoritative owner's own source rather than restated: the request key set, the
 request format, the scope keys, the units, the identifier grammar
 (`tools/readback_core.ID`) and the `10 ** 15` unit bound are all read out of
-`tools/capacity.py` and `tools/readback_core.py`, and the compiled request is fed to
+`tools/capacity.py` and `provisioner/execution/readback_core.py`, and the compiled request is fed to
 the real `tools.capacity.validate_request`. A proposal is never a reservation: the
 handoff carries no `confirmed` or `held` key, the status is
 `PROPOSED_NOT_CONFIRMED`, `may_apply`/`may_activate` are always false, and the view
@@ -903,20 +903,20 @@ The repository already contains NetBox/IPAM, IPAM record, DNS registration, and 
 | --- | --- |
 | 1. keep consumer requests free of CIDRs and provider identifiers | no change was needed: `provisioner/domain/request.py` and the schema still accept no prefix, no address and no provider field, and the reviewed request's `spec` is unchanged; the proposed prefix is derived by the repository from the reviewed inventory pool |
 | 2. use the planning allocator only to express intent or a proposed allocation | `provisioner/allocations/addresses.py::address_view` names `PLANNING_PROPOSAL_NOT_AUTHORITATIVE_ALLOCATION` as the authority; the repository `address-intent` conformance check reports the proposal as intent and `hosting apply` never allocates |
-| 3. during controlled execution call the existing authoritative IPAM owner path | the compiled allocation intent is the exact document `scripts/check_ipam_allocation_preflight.py::normalized_spec` accepts, reached only through `provisioner/repository.py::ipam_allocation_preflight`; no second owner path, no second allocator and no parallel IPAM client is added |
+| 3. during controlled execution call the existing authoritative IPAM owner path | the compiled allocation intent is the exact document `provisioner/allocations/ipam_preflight.py::normalized_spec` accepts, reached only through `provisioner/repository.py::ipam_allocation_preflight`; no second owner path, no second allocator and no parallel IPAM client is added |
 | 4. bind the authoritative allocation to WSD identity, generation, parent reservation, site/zone/domain and intent digest | `hosting-address-binding/1` binds `allocation_id`, `operation_id`, `generation`, `plan_digest`, `view_digest`, `reservation_id`, `request_id`, the five delivery scope keys, the zone, the domain, the pool and the allocation intent digest; `parent_spec_sha256`, `allocation_intent_digest` and `registration_intent_digest` are recomputed from the reviewed chain, so a record answering another operation, generation, parent, site, zone, pool or intent is `HOLD_IPAM_IDENTITY_OR_INTENT_CONFLICT` |
 | 5. confirm/observe before using an uncertain result | an `UNCERTAIN` record is `HOLD_DISCOVER_IPAM_OUTCOME` with `next_owner_action = OWNER_DISCOVER_AUTHORITATIVE_OUTCOME` and refuses with `IPAM_ALLOCATION_UNRESOLVED`; `EXISTING_CONFIRMED_IPAM_ALLOCATION` is the only state with `confirmed` true and is reachable only from a live exported record; a malformed or unreadable export is a typed `SCHEMA_VALIDATION_FAILED` refusal rather than a raw `ValueError` |
 | 6. generate DNS registration only from confirmed authoritative allocation state | the registration intent is compiled only from a confirmed allocation scope; the repository `dns-registration` check and `require_registered` are `PASS` only on `EXISTING_REGISTERED_DNS_IDEMPOTENT`, and `HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` refuses with `IPAM_ALLOCATION_UNCONFIRMED` before registration is even considered |
-| 7. bind DNS registration to the confirmed allocation and the complete normalized DNS intent | `hosting-dns-registration-binding/1` adds `registration_id` and the allocation confirmation digest to the allocation binding; `repository.dns_registration_spec` normalizes the intent through `scripts/check_dns_registration_preflight.py`, and `registration_intent_digest` binds the normalized intent |
-| 8. implement retirement release ordering using the existing owner contracts | `require_releasable` refuses `ADDRESS_RELEASE_ORDER_VIOLATION` while a reusable allocation's dependent registration is live, while the exported cleanup is incomplete, and while a `RELEASED` allocation's name is only `TOMBSTONED`; the owner's own `scripts/check_ipam_allocation_records.py` and `scripts/check_dns_registration_records.py` enforce the same ordering |
+| 7. bind DNS registration to the confirmed allocation and the complete normalized DNS intent | `hosting-dns-registration-binding/1` adds `registration_id` and the allocation confirmation digest to the allocation binding; `repository.dns_registration_spec` normalizes the intent through `provisioner/allocations/dns_preflight.py`, and `registration_intent_digest` binds the normalized intent |
+| 8. implement retirement release ordering using the existing owner contracts | `require_releasable` refuses `ADDRESS_RELEASE_ORDER_VIOLATION` while a reusable allocation's dependent registration is live, while the exported cleanup is incomplete, and while a `RELEASED` allocation's name is only `TOMBSTONED`; the owner's own `provisioner/allocations/ipam_evidence.py` and `provisioner/allocations/dns_evidence.py` enforce the same ordering |
 | 9. never release reusable addressing before dependent native state is safely withdrawn | `QUARANTINED_REGISTRATION_STATES` and `WITHDRAWN_REGISTRATION_STATES` gate the release, and a `QUARANTINED`/`RELEASED` allocation must carry a complete cleanup, a `REUSE_NOT_BEFORE` instant and a release that does not predate it |
 
 Regressions: `tests/provisioning/unit/test_address_owner.py` (146 tests) covers every
 required case. The mirrored contract is compared against the authoritative owners'
 own source rather than restated: the intent key sets, formats, families, kinds,
 policies, statuses, record types, observation states and cleanup keys are read out of
-`scripts/check_ipam_allocation_preflight.py`, `scripts/check_dns_registration_preflight.py`,
-`scripts/check_ipam_allocation_records.py` and `scripts/check_dns_registration_records.py`,
+`provisioner/allocations/ipam_preflight.py`, `provisioner/allocations/dns_preflight.py`,
+`provisioner/allocations/ipam_evidence.py` and `provisioner/allocations/dns_evidence.py`,
 and every compiled intent is fed to the real preflight. A proposal is never ownership:
 a missing record is `IPAM_INTENT_READY_EXTERNAL_RESERVE_NOT_EXECUTED`, the handoff
 carries no allocated value, and the reconciliation contains no literal prefix or
@@ -1533,9 +1533,9 @@ as a prefix, so its 420 include the 339 `compatibility` hits.
 | `TODO` | 12 | the term inside the governing prompts and this audit's own requirement text; the "do not create another TODO list" and "remove stale TODO language" prohibitions in `docs/production-deepseek-implementation-plan.md`. No source marker | CURRENT_REQUIRED |
 | `FIXME` | 6 | the same requirement text and prohibitions. No source marker | CURRENT_REQUIRED |
 | `TBD` | 6 | the same requirement text, plus the lowercase `'tbd'` placeholder sentinel in `scripts/adr_lifecycle.py`'s not-recorded vocabulary | CURRENT_REQUIRED |
-| `legacy` | 128 | provider "legacy resource" guidance, the Nutanix `legacyErrorMessage` task field, and prepared-receipt readability in `tools/terraform_apply.py` | CURRENT_REQUIRED, HISTORICAL_ONLY |
+| `legacy` | 128 | provider "legacy resource" guidance, the Nutanix `legacyErrorMessage` task field, and prepared-receipt readability in `provisioner/execution/terraform_apply.py` | CURRENT_REQUIRED, HISTORICAL_ONLY |
 | `deprecated` | 144 | mostly the term list and the NetBox native lifecycle status `deprecated`, which is provider vocabulary the IPAM and DNS owners must write and read | CURRENT_REQUIRED |
-| `compat` | 420 | the `compatibility` evidence block of the version/source-provenance gate, the term list, and the local `compat = record['compatibility']` variable in `scripts/check_version_source_provenance.py` | CURRENT_REQUIRED |
+| `compat` | 420 | the `compatibility` evidence block of the version/source-provenance gate, the term list, and the local `compat = record['compatibility']` variable in `provisioner/qualification/provenance.py` | CURRENT_REQUIRED |
 | `compatibility` | 339 | the same gate's evidence block and the `tools/compatibility` entry in the retired-interface register that records the path as removed | CURRENT_REQUIRED |
 | `obsolete` | 79 | the retirement requirement itself: "remove obsolete routes, DNS and access" in requirements, ADRs and runbooks. No obsolete active path is described | CURRENT_REQUIRED |
 | `superseded` | 212 | the ADR lifecycle state `Superseded`, `provisioner/domain/generation.py`'s `SUPERSEDED` generation state, delivery-runner guards that refuse work a later handoff superseded, and the register's reasons for removed paths | CURRENT_REQUIRED |

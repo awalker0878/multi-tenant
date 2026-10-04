@@ -9,8 +9,8 @@ from unittest.mock import patch
 from tests.test_guest_inventory import fixture
 from tests.test_guest_services import fixture as service_fixture
 from lab.native_readback_fixture import credentials
-from tools import guest_run as g
-from tools.run_files import digest, encoded, load_private, write_new
+from provisioner.execution import guest_run as g
+from provisioner.execution.run_files import digest, encoded, load_private, write_new
 
 SOURCE = {'status': 'HASHES_MATCH', 'commit': 'a'*40}
 
@@ -33,6 +33,16 @@ def prepare(args):
 
 
 class GuestPreparationTests(unittest.TestCase):
+    def test_missing_checkout_or_runtime_mismatch_is_refused_before_artifacts(self):
+        with tempfile.TemporaryDirectory() as folder:
+            args = inputs(Path(folder))
+            with self.assertRaisesRegex(ValueError, 'explicit current source checkout'):
+                g.prepare(args, root=None)
+            with patch.object(g, 'verify_runtime', return_value={'status': 'FAILED_RUNTIME_SOURCE_CHECK'}), \
+                 self.assertRaisesRegex(ValueError, 'Installed guest execution source differs'):
+                g.prepare(args)
+            self.assertFalse(args.output.exists())
+
     def test_private_bundle_has_exact_source_inputs_and_no_copied_ssh_secret(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp); args = inputs(folder); result = prepare(args); directory = args.output

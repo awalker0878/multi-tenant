@@ -14,7 +14,11 @@ from lab.native_readback_fixture import Fixture, TASK, VPC, TENANT
 from lab.nutanix_task_tree_fixture import reset, manifest, responses, CHILD_A, CHILD_B, GRANDCHILD, SUBNET
 from lab.run_readback_lab import operator_context
 from lab.run_task_tree_lab import cli_environment
-from tools import nutanix_observe as native, nutanix_task_tree as tree, readback_core as c, recovery_review as rr
+from provisioner.execution import readback_cli
+from provisioner.execution import readback_core as c
+from provisioner.execution import nutanix_observe as native
+from provisioner.execution import nutanix_task_tree as tree
+from provisioner.execution import recovery_review as rr
 ROOT=Path(__file__).resolve().parents[1]
 
 
@@ -246,7 +250,7 @@ class CLITests(unittest.TestCase):
     def invoke(self,args):
         (self.path/'manifest.json').write_text(json.dumps(self.m))
         env=cli_environment()
-        return subprocess.run([sys.executable,str(ROOT/'tools/nutanix_observe.py'),str(self.path/'manifest.json'),*args],env=env,capture_output=True,text=True,timeout=20)
+        return subprocess.run([*readback_cli.module_command(native, []),str(self.path/'manifest.json'),*args],env=env,capture_output=True,text=True,timeout=20)
     def args(self):return ['--read-authorized-target','--expected-origin',self.f.origin,'--ca-file',str(self.f.directory/'ca.pem'),'--output',str(self.path/'report.json'),'--interval','0']
     def test_default_validation_no_contact(self):
         self.m['contact_enabled']=False;r=self.invoke([]);self.assertEqual(r.returncode,0);self.assertEqual(self.f.requests,[])

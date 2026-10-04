@@ -8,8 +8,11 @@ import unittest
 from unittest.mock import patch
 
 from tests import test_owner_install as fixture
-from tools import owner_install as installer,owner_revocations as d,execution_journal as journal,readback_core as c
-from tools.run_files import digest,encoded,load_private,utcnow
+from provisioner.execution import readback_core as c
+from provisioner.execution import owner_install as installer
+from provisioner.execution import owner_revocations as d
+from provisioner.execution import execution_journal as journal
+from provisioner.execution.run_files import digest,encoded,load_private,utcnow
 key=fixture.key
 
 

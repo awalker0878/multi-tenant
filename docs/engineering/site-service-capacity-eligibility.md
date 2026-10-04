@@ -51,7 +51,7 @@ The next implementation boundary is an accountable time-bounded reservation unde
 Because the active native qualification index and site/service inventory are empty, the example remains held:
 
 ```sh
-python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE
+python -m provisioner.allocations.site_eligibility examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE
 ```
 
 The example quantities and profile references are fixtures only, not site sizing, service commitments or approved thresholds.

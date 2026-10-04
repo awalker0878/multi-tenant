@@ -1,6 +1,6 @@
 # Build the offline execution runtime
 
-`tools/runtime_build.py` builds the repository-pinned Python dependency set and
+`provisioner/execution/runtime_build.py` builds the repository-pinned Python dependency set and
 Terraform executable from accepted local artifacts. It supplies a concrete
 rebuild path for W02/W04 and the [owner installer](owner-installation.md),
 [guest execution](native-guests.md) and [delivery runner](delivery-runner.md).
@@ -22,8 +22,10 @@ interpreter that is itself a virtual environment.
 Privately stage only accepted wheels and the Linux amd64 Terraform ZIP. Do not
 supply source distributions, dependency URLs or arbitrary build scripts. Every
 wheel, including pip and all transitive dependencies, has an exact distribution
-name, version, filename and SHA256. The set must include every pin reachable from
-`requirements-repository.txt`. Repository pins alone are not a complete artifact
+name, version, filename and SHA256. The set must include the exact `hosting-provisioner` version declared in
+`pyproject.toml` and every dependency pin reachable from
+`requirements-repository.txt`. The application wheel must contain the same package
+source and bundled asset bytes as the explicitly selected source checkout. Repository pins alone are not a complete artifact
 approval. Retain the approved complete manifest and artifacts in independently
 recoverable custody, including their source/signature review.
 
@@ -51,14 +53,14 @@ checking their metadata and hashes does not substitute for provenance review.
 
 The separate `hosting-runtime-build-authority/1` object has exactly `format`,
 `config_sha256`, `valid_from`, `valid_until` and `change_ref`. The digest is
-`tools.readback_core.digest(config)`. The timezone-aware interval is current and
+`provisioner.execution.readback_core.digest(config)`. The timezone-aware interval is current and
 at most one hour. No repository template grants this authority.
 
 ```sh
-python tools/runtime_build.py --config /private/runtime/build.json
-python tools/runtime_build.py --config /private/runtime/build.json \
+python -m provisioner.execution.runtime_build --source-root /opt/hosting-source --config /private/runtime/build.json
+python -m provisioner.execution.runtime_build --source-root /opt/hosting-source --config /private/runtime/build.json \
   --authority /private/runtime/authority.json --execute
-python tools/runtime_build.py --config /private/runtime/build.json --verify
+python -m provisioner.execution.runtime_build --source-root /opt/hosting-source --config /private/runtime/build.json --verify
 ```
 
 The default command validates the request without executing an artifact. Explicit
@@ -69,7 +71,12 @@ hash checking, no index, no dependencies resolved by pip, no source builds and
 no cache. A fixed environment sets `PIP_CONFIG_FILE=/dev/null`, disabling all pip
 configuration files; ambient pip, proxy and Python settings are not inherited.
 The actual `pip check` and complete installed-distribution comparison reject
-missing/conflicting dependencies and unexpected packages. Terraform's extracted
+missing/conflicting dependencies and unexpected packages. Before importing the
+installed application, an isolated fixed bootstrap checks its actual location,
+filesystem custody and verifier bytes against the selected source. The installed
+application and bundled assets are then compared with that checkout before a
+completion record can be published. Installers repeat this check using their
+selected interpreter before activating an endpoint or edge service. Terraform's extracted
 bytes, reported version and platform must all match.
 
 Runtime subprocesses use a private umask. Before initial completion, the builder

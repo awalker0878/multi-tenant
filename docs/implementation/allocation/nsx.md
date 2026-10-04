@@ -19,7 +19,7 @@ An NSX implementation SHALL keep tenant/project policy distinct from provider/gl
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: An NSX implementation SHALL keep tenant/project policy distinct from provider/global management and security policy.
 
-**Available related source:** [terraform/modules/nsx-domain](../../../terraform/modules/nsx-domain) · [tools/nsx_observe.py](../../../tools/nsx_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/nsx-domain](../../../terraform/modules/nsx-domain) · [provisioner/execution/nsx_observe.py](../../../provisioner/execution/nsx_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-019, CT-020, CT-066
 
@@ -42,7 +42,7 @@ Gateway policy used for zone transitions SHALL be generated from portable Flow/Z
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Gateway policy used for zone transitions SHALL be generated from portable Flow/ZIP intent rather than manually duplicated per workload.
 
-**Available related source:** [terraform/modules/nsx-domain](../../../terraform/modules/nsx-domain) · [tools/nsx_observe.py](../../../tools/nsx_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/nsx-domain](../../../terraform/modules/nsx-domain) · [provisioner/execution/nsx_observe.py](../../../provisioner/execution/nsx_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-003, CT-007, CT-009
 
@@ -65,7 +65,7 @@ The NSX profile SHALL identify actual routing and enforcement components, global
 
 **Artifact or required operating record:** Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: The NSX profile SHALL identify actual routing and enforcement components, global/project authority and policy precedence, and SHALL qualify their behavior on the selected product/provider tuple rather than equating a Tier-1 or project with a ZIP.
 
-**Available related source:** [terraform/modules/nsx-domain](../../../terraform/modules/nsx-domain) · [tools/nsx_observe.py](../../../tools/nsx_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
+**Available related source:** [terraform/modules/nsx-domain](../../../terraform/modules/nsx-domain) · [provisioner/execution/nsx_observe.py](../../../provisioner/execution/nsx_observe.py) · [docs/current/TAD-infrastructure.md](../../current/TAD-infrastructure.md)
 
 **Verification:** Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths. Baseline procedures: CT-003, CT-015, CT-024, CT-080
 

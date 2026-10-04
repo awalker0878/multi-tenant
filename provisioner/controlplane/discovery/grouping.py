@@ -103,14 +103,14 @@ class GroupCandidate:
     execution_approved: bool = False
 
 
-def proposal_digest(result: DiscoveryResult, draft: GroupDraft,
-                    dependencies: tuple[DependencyAssertion, ...]) -> str:
-    """Exact review input; it is a checksum, not a signature or owner identity."""
+def proposal_document(result: DiscoveryResult, draft: GroupDraft,
+                      dependencies: tuple[DependencyAssertion, ...]) -> dict:
+    """Canonical proposal content; no owner identity or review is established."""
     if not isinstance(result, DiscoveryResult) or not isinstance(draft, GroupDraft):
         raise GroupingHeld('Discovery result and draft are required')
     if not isinstance(dependencies, tuple):
         raise GroupingHeld('Dependency assertions must be immutable')
-    return _hash({
+    return {
         'format': 'hosting-application-group-candidate/1',
         'discoveryDigest': result.digest,
         'scope': vars(result.scope),
@@ -135,7 +135,13 @@ def proposal_digest(result: DiscoveryResult, draft: GroupDraft,
              'observedAt': edge.observed_at.isoformat(),
              'unknownReason': edge.unknown_reason}
             for edge in dependencies],
-    })
+    }
+
+
+def proposal_digest(result: DiscoveryResult, draft: GroupDraft,
+                    dependencies: tuple[DependencyAssertion, ...]) -> str:
+    """Exact review input; a checksum is not a signature or owner identity."""
+    return _hash(proposal_document(result, draft, dependencies))
 
 
 def reviewed_candidate(result: DiscoveryResult, draft: GroupDraft,
@@ -167,6 +173,40 @@ def reviewed_candidate(result: DiscoveryResult, draft: GroupDraft,
             or not _DIGEST.fullmatch(review.proposal_digest)):
         raise GroupingHeld('Current complete observations and exact owner review required')
 
+    unknown = validate_draft(result, draft, dependencies, checked_at=checked_at, max_age=max_age)
+
+    expected = proposal_digest(result, draft, dependencies)
+    if review.proposal_digest != expected:
+        raise GroupingHeld('Owner review does not bind this observation and proposal')
+    digest = _hash({'proposalDigest': expected,
+                    'ownerId': review.owner_id,
+                    'reviewScope': vars(review.scope),
+                    'reviewReference': review.review_reference,
+                    'reviewedAt': review.reviewed_at.isoformat()})
+    return GroupCandidate(draft, result.scope, result.digest, dependencies, review,
+                          digest, tuple(unknown),
+                          'REVIEWED_WITH_UNKNOWNS' if unknown else
+                          'REVIEWED_ASSESSMENT_ONLY')
+
+
+def validate_draft(result: DiscoveryResult, draft: GroupDraft,
+                   dependencies: tuple[DependencyAssertion, ...], *, checked_at: datetime,
+                   max_age: timedelta = timedelta(hours=1)) -> tuple[DependencyAssertion, ...]:
+    """Validate an unreviewed proposal against observed members, even if partial.
+
+    Partial collection is usable for drafting, never complete coverage or owner
+    approval. This function issues no review. The existing reviewed-candidate
+    entry point still separately requires complete inventory and exact review.
+    """
+    if (not isinstance(result, DiscoveryResult) or not isinstance(draft, GroupDraft)
+            or not isinstance(dependencies, tuple) or not _utc(checked_at)
+            or not isinstance(max_age, timedelta) or not timedelta(0) < max_age <= timedelta(days=1)
+            or not result.captured_at <= checked_at <= result.captured_at + max_age
+            or not _id(draft.application_group_id) or not _id(draft.owner_id)
+            or not isinstance(draft.name, str) or not 1 <= len(draft.name) <= 256
+            or draft.name != draft.name.strip()
+            or any(ord(char) < 32 or ord(char) == 127 for char in draft.name)):
+        raise GroupingHeld('Fresh observations and a bounded unreviewed proposal are required')
     if (not isinstance(draft.members, tuple) or not 2 <= len(draft.members) <= 100
             or any(not isinstance(member, GroupMember)
                    or not _id(member.workload_id)
@@ -192,15 +232,15 @@ def reviewed_candidate(result: DiscoveryResult, draft: GroupDraft,
             or len(draft.startup_order) != len(workload_ids)
             or set(draft.startup_order) != set(workload_ids)
             or not isinstance(draft.dataset_ids, tuple)
-            or not draft.dataset_ids
+            or not 1 <= len(draft.dataset_ids) <= 1000
             or len(set(draft.dataset_ids)) != len(draft.dataset_ids)
             or any(not _id(dataset) for dataset in draft.dataset_ids)
             or not isinstance(draft.consistency_groups, tuple)
-            or not draft.consistency_groups
+            or not 1 <= len(draft.consistency_groups) <= 100
             or any(not isinstance(group, ConsistencyProposal)
                    or not _id(group.group_id)
                    or not isinstance(group.dataset_ids, tuple)
-                   or not group.dataset_ids
+                   or not 1 <= len(group.dataset_ids) <= 1000
                    or any(not _id(dataset) for dataset in group.dataset_ids)
                    for group in draft.consistency_groups)):
         raise GroupingHeld('Reviewed startup and dataset grouping are required')
@@ -246,15 +286,4 @@ def reviewed_candidate(result: DiscoveryResult, draft: GroupDraft,
         else:
             raise GroupingHeld('Dependency needs a known or unknown state')
 
-    expected = proposal_digest(result, draft, dependencies)
-    if review.proposal_digest != expected:
-        raise GroupingHeld('Owner review does not bind this observation and proposal')
-    digest = _hash({'proposalDigest': expected,
-                    'ownerId': review.owner_id,
-                    'reviewScope': vars(review.scope),
-                    'reviewReference': review.review_reference,
-                    'reviewedAt': review.reviewed_at.isoformat()})
-    return GroupCandidate(draft, result.scope, result.digest, dependencies, review,
-                          digest, tuple(unknown),
-                          'REVIEWED_WITH_UNKNOWNS' if unknown else
-                          'REVIEWED_ASSESSMENT_ONLY')
+    return tuple(unknown)

@@ -6,7 +6,7 @@ outside the recorded graph and supplies the activity evidence required by the
 [held AHV lifecycle reviewer](terraform-recovery.md). It never submits native
 commands, adopts tasks/state, releases a ledger or establishes writer exclusion.
 
-`tools/nutanix_entity_activity.py` performs the bounded Prism v4.3
+`provisioner/execution/nutanix_entity_activity.py` performs the bounded Prism v4.3
 entity-activity queries shared with the
 [Flow activity observer](nutanix-flow-activity-readback.md). It carries no
 writer-exclusion or recovery authority, and the installed-target filter,
@@ -15,7 +15,7 @@ ordering, count and RBAC completeness must be qualified for each entity kind.
 ## Accepted profile and query
 
 Use `nutanix-ahv-v4.2-prism-v4.3-vm-task-activity` with
-`tools/nutanix_vm_activity_observe.py`. The manifest has the same fields as the
+`provisioner/execution/nutanix_vm_activity_observe.py`. The manifest has the same fields as the
 recorded VM/task profile. Its task graph must still be explicitly enumerated.
 `task.created_after` is also the activity cutoff; `created_before` must be no
 later than observation start. For interrupted-change review, the lower bound
@@ -50,7 +50,7 @@ are excluded from the report.
 Validate without native contact:
 
 ```sh
-python tools/nutanix_vm_activity_observe.py /private/accepted-ahv-activity.json
+python -m provisioner.execution.nutanix_vm_activity_observe /private/accepted-ahv-activity.json
 ```
 
 For an independently authorized read, set the manifest's `contact_enabled: true`,
@@ -58,7 +58,7 @@ inject scoped read-only `NUTANIX_USERNAME` and `NUTANIX_PASSWORD` through the si
 secret service, and provide the exact origin, CA and new private output:
 
 ```sh
-python tools/nutanix_vm_activity_observe.py /private/accepted-ahv-activity.json \
+python -m provisioner.execution.nutanix_vm_activity_observe /private/accepted-ahv-activity.json \
   --read-authorized-target --expected-origin https://actual-prism-host \
   --ca-file /private/prism-ca.pem --output /private/new-ahv-activity-report.json
 ```

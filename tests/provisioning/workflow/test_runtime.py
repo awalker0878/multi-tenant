@@ -7,6 +7,8 @@ from temporalio.common import VersioningBehavior
 from provisioner.controlplane.jobs import StartReceipt
 from provisioner.controlplane.persistence import TenantContext
 from provisioner.controlplane.workflow.approval_gate import GateResult
+from provisioner.controlplane.workflow.application_job import ApplicationJobResult
+from provisioner.controlplane.jobs.repository import _progress_detail
 from provisioner.controlplane.workflow.runtime import (
     _connect, _worker_deployment_config, project_one)
 
@@ -40,6 +42,43 @@ class RuntimeConnectionTests(unittest.TestCase):
 
 
 class GateProjectionTests(unittest.TestCase):
+    def test_verified_application_projects_success_with_final_acceptance_reference(self):
+        receipt = StartReceipt('ns', 'job', 'run', 'job', 'plan', 1, 'a'*64, 'b'*64)
+        events = []
+        jobs = SimpleNamespace(start_run=lambda context, job_id: receipt,
+            append_progress=lambda context, job_id, **event: events.append(event))
+        result = ApplicationJobResult('job', 'plan', 1, 'a'*64, 'c'*64,
+            'SUCCEEDED', 'VERIFY', None, 'd'*64, 12, 12, None, 'e'*64)
+        self.assertTrue(project_one(jobs, SimpleNamespace(completed_job=lambda _: result),
+                                   TenantContext('org', 'tenant'), 'job'))
+        self.assertEqual(events[0]['event_type'], 'APPLICATION_EXECUTION_SUCCEEDED')
+        self.assertEqual(events[0]['status'], 'SUCCEEDED')
+        self.assertEqual(events[0]['detail']['evidenceDigest'], 'd'*64)
+        self.assertNotIn('reasonCode', events[0]['detail'])
+        self.assertNotIn('holdCode', events[0]['detail'])
+        _progress_detail(events[0]['detail'])
+
+    def test_selected_hold_retains_fixed_reason_and_progress_without_authority(self):
+        receipt = StartReceipt('ns', 'job', 'run', 'job', 'plan', 1, 'a'*64, 'b'*64)
+        events = []
+        jobs = SimpleNamespace(start_run=lambda context, job_id: receipt,
+            append_progress=lambda context, job_id, **event: events.append(event))
+        result = ApplicationJobResult('job', 'plan', 1, 'a'*64, 'c'*64, 'HELD',
+            'PROVISION', 'OPERATOR_HOLD', 'd'*64, 3, 10,
+            'GUEST_PER_COMMAND_AUTHORITY_UNAVAILABLE')
+        workflow = SimpleNamespace(completed_job=lambda original: result)
+        self.assertTrue(project_one(jobs, workflow, TenantContext('org', 'tenant'), 'job'))
+        self.assertEqual(events[0]['event_key'], 'temporal-application:run')
+        self.assertEqual(events[0]['status'], 'HELD')
+        detail = events[0]['detail']
+        self.assertEqual(detail['holdCode'], 'GUEST_PER_COMMAND_AUTHORITY_UNAVAILABLE')
+        self.assertEqual((detail['completed'], detail['total']), (3, 10))
+        _progress_detail(detail)
+        with self.assertRaises(ValueError):
+            _progress_detail(detail | {'holdCode': '/private/token'})
+        with self.assertRaises(ValueError):
+            _progress_detail(detail | {'nativeExecutionAuthorized': True})
+
     def test_passing_gate_stays_held_until_native_execution_is_implemented(self):
         receipt = StartReceipt('ns', 'job', 'run', 'job', 'plan', 1,
                                'a' * 64, 'b' * 64)
@@ -55,7 +94,7 @@ class GateProjectionTests(unittest.TestCase):
                 self.events.append(event)
 
         jobs = Jobs()
-        workflow = SimpleNamespace(completed_gate=lambda _: GateResult(
+        workflow = SimpleNamespace(completed_job=lambda _: GateResult(
             'GATE_PASSED', 'job', 'plan', 1, 'a' * 64, 'approval', 'c' * 64))
         self.assertTrue(project_one(jobs, workflow, TenantContext('org', 'tenant'), 'job'))
         self.assertEqual(len(jobs.events), 1)

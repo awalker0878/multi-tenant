@@ -2,6 +2,9 @@
 
 ## Repository audit and full implementation plan
 
+> Historical audit at the revision below. For the corrected current B01–B50 status,
+> dependencies and implementation order, use the [all-wave execution plan](enterprise-workload-mobility-execution-plan.md).
+
 **Repository:** `awalker0878/multi-tenant`  
 **Audited revision:** `e5347986cb736df525c1fc3ace100af26d2d4f27` (`main`)  
 **Audit date:** 26 September 2026  
@@ -71,7 +74,7 @@ Priorities below are delivery priorities. **P1** blocks a supported enterprise r
 
 ### F02 — The generated provisioning graph is not a complete lifecycle (P1)
 
-`provisioner/execution/handoff.py:101–123` defines the ordinary delivery graph. Its bootstrap operation invokes `platform_transition`; `tools/delivery_steps.py:247–256` produces a transition document with `TRANSITION_REQUIRES_EXACT_PLAN_REVIEW`. That draft is not followed by a generated saved-plan/apply/readback chain. Guest planning follows initial workload creation; the graph lacks a complete native bootstrap/power sequence. Activation acceptance records external evidence rather than itself implementing the exposure change. `complete()` and runner step completion accept owner result records, which must not be confused with proof of the required native state.
+`provisioner/execution/handoff.py:101–123` defines the ordinary delivery graph. Its bootstrap operation invokes `platform_transition`; `provisioner/execution/delivery_steps.py:247–256` produces a transition document with `TRANSITION_REQUIRES_EXACT_PLAN_REVIEW`. That draft is not followed by a generated saved-plan/apply/readback chain. Guest planning follows initial workload creation; the graph lacks a complete native bootstrap/power sequence. Activation acceptance records external evidence rather than itself implementing the exposure change. `complete()` and runner step completion accept owner result records, which must not be confused with proof of the required native state.
 
 **Impact:** executing the current generated graph does not establish that workloads moved from prepared/quarantined resources to working guests and verified production connectivity.
 
@@ -95,7 +98,7 @@ The mobility schema carries a source platform but lacks an inventory-bound set o
 
 ### F05 — Cross-platform restore conflicts with the current scope contract (P1)
 
-The mobility graph is scoped to its target (`portability/handoff.py`). Delivery validation requires the restic configuration scope to equal that graph's scope (`tools/delivery_steps.py:83–93`). Restore also requires the original backup receipt scope to equal the restore configuration scope (`tools/restic_run.py:155–166`).
+The mobility graph is scoped to its target (`portability/handoff.py`). Delivery validation requires the restic configuration scope to equal that graph's scope (`provisioner/execution/delivery_steps.py:83–93`). Restore also requires the original backup receipt scope to equal the restore configuration scope (`provisioner/execution/restic_run.py:155–166`).
 
 **Impact:** a correctly identified source backup and a distinct target cannot satisfy both equality conditions. Relabeling the source receipt would erase provenance and is not an acceptable workaround.
 
@@ -127,7 +130,7 @@ The mobility schema permits multiple datasets, but the handoff has a fixed resto
 
 ### F09 — Durability exists locally; enterprise distributed orchestration is missing (P1)
 
-`tools/execution_journal.py:45–59` uses local file locks and explicitly leaves distributed exclusion external. There are meaningful SQLite owner ledgers and local idempotency/transaction protections; it would be incorrect to say the repository has no durable state or reservation implementation.
+`provisioner/execution/execution_journal.py:45–59` uses local file locks and explicitly leaves distributed exclusion external. There are meaningful SQLite owner ledgers and local idempotency/transaction protections; it would be incorrect to say the repository has no durable state or reservation implementation.
 
 **Impact:** a multiworker service needs one coherent job history, cross-worker leases, safe resumption, operation reconciliation and storage recovery beyond local command execution.
 
@@ -159,7 +162,7 @@ The inspected native guest playbook explicitly permits Ubuntu 24.04/systemd. Ter
 
 ### F13 — Compatibility residue survives the no-shim objective (P2)
 
-`provisioner/adapters/base.py:340–363` exposes explicit compatibility projections. `tools/terraform_apply.py:153–155` supplies a default for older receipt content. `provisioner/repository.py` dynamically imports repository scripts and adjusts the import path, coupling the runtime to the checkout layout. These are different problems: compatibility projections/defaults are removal candidates; the repository bridge is packaging debt. Native adapters themselves are necessary, not shims.
+`provisioner/adapters/base.py:340–363` exposes explicit compatibility projections. `provisioner/execution/terraform_apply.py:153–155` supplies a default for older receipt content. `provisioner/repository.py` dynamically imports repository scripts and adjusts the import path, coupling the runtime to the checkout layout. These are different problems: compatibility projections/defaults are removal candidates; the repository bridge is packaging debt. Native adapters themselves are necessary, not shims.
 
 **Disposition:** migrate callers to canonical contracts, perform explicit offline record conversion where records must survive, verify parity, then delete old fields/readers/aliases. Package runtime logic as a normal installable Python application. Do not retain implicit version fallback or a second execution stack.
 
@@ -591,7 +594,7 @@ The release must contain one execution path, one current request contract per ob
 | Current surface | Concrete transition | Deletion gate |
 |---|---|---|
 | Adapter compatibility projections in `provisioner/adapters/base.py` | Move all serializers, compiler callers and tests to the canonical realization contract | Full caller scan is empty; serialized contract tests pass without old fields |
-| Legacy lifecycle defaults in `tools/terraform_apply.py` | Version receipts explicitly; convert retained records through an offline validated importer | Old/missing-version runtime receipts are rejected; conversion counts/digests/native IDs reconcile |
+| Legacy lifecycle defaults in `provisioner/execution/terraform_apply.py` | Version receipts explicitly; convert retained records through an offline validated importer | Old/missing-version runtime receipts are rejected; conversion counts/digests/native IDs reconcile |
 | `provisioner/repository.py` path/import bridge | Move runtime validators and compilers into the installed package; leave build tools as consumers | Service and CLI work outside a checkout; runtime cannot import `scripts.*` |
 | Public refusal-only `apply`/`mobility-apply` implementation | Replace with authorized execution submission through the same application service as the UI | End-to-end approved job runs; unauthorized/stale jobs still refuse |
 | Target-only mobility graph | Replace with source/target-aware durable workflow and per-dataset/VM children | Source capture, target restore, cutover and recovery tested with native IDs |
@@ -920,25 +923,25 @@ All repository links below are pinned to the audited revision. They are the basi
 | Mobility apply handoff | [mobility_apply.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/cli/mobility_apply.py) |
 | CLI and fixture inventory boundary | [main.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/cli/main.py) |
 | Ordinary delivery graph | [handoff.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/handoff.py#L101-L163) |
-| Transition and acceptance dispatch | [delivery_steps.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/delivery_steps.py#L247-L307) |
+| Transition and acceptance dispatch | [delivery_steps.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/delivery_steps.py#L247-L307) |
 | Source and target plan construction | [execution/service.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/service.py#L77-L140) |
 | Source schema / datasets | [workload-mobility.schema.json](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/schemas/v1/workload-mobility.schema.json) |
 | Method and same-platform restrictions | [portability/migration.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/portability/migration.py) |
 | Target-only mobility graph | [portability/handoff.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/portability/handoff.py) |
-| Restore receipt scope | [restic_run.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/restic_run.py#L155-L166) |
-| Delivery scope check | [delivery_steps.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/delivery_steps.py#L83-L93) |
+| Restore receipt scope | [restic_run.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/restic_run.py#L155-L166) |
+| Delivery scope check | [delivery_steps.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/delivery_steps.py#L83-L93) |
 | Cutover contract | [cutover.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/portability/cutover.py) |
 | Policy translation and capability comparison | [policy_translation.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/portability/policy_translation.py), [capabilities.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/portability/capabilities.py) |
 | Recorded approval boundary | [authority.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/authority.py#L39-L86) |
-| Local locking / external exclusion | [execution_journal.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/execution_journal.py#L45-L59) |
-| Real capacity owner implementation | [capacity.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/capacity.py) |
+| Local locking / external exclusion | [execution_journal.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/execution_journal.py#L45-L59) |
+| Real capacity owner implementation | [capacity.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/allocations/capacity_owner.py) |
 | Placement scoring | [resolver.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/placement/resolver.py#L145-L149) |
 | Restricted guest profile | [configure_linux.yml](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/ansible/playbooks/native/configure_linux.yml#L41-L46) |
 | VMware resource/guest shape | [vsphere-workload module](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/terraform/modules/vsphere-workload/main.tf.json) |
 | VMware address explanation | [VMware adapter](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/adapters/vmware/__init__.py) |
-| Restricted lifecycle transitions | [lifecycle_transition.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/lifecycle_transition.py#L95-L103) |
+| Restricted lifecycle transitions | [lifecycle_transition.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/lifecycle_transition.py#L95-L103) |
 | Compatibility projections | [adapters/base.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/adapters/base.py#L340-L363) |
-| Legacy receipt defaults | [terraform_apply.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/tools/terraform_apply.py#L153-L155) |
+| Legacy receipt defaults | [terraform_apply.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/execution/terraform_apply.py#L153-L155) |
 | Runtime repository bridge | [repository.py](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/provisioner/repository.py) |
 | Completion claim requiring correction | [NEXT_WORK.md](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/docs/NEXT_WORK.md) |
 | CI workflow | [validate.yml](https://github.com/awalker0878/multi-tenant/blob/e5347986cb736df525c1fc3ace100af26d2d4f27/.github/workflows/validate.yml) |

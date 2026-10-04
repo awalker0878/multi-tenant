@@ -5,8 +5,6 @@ from provisioner.domain.errors import Diagnostics
 from provisioner.profiles.loader import Catalog
 from provisioner.profiles.resolver import Resolution
 
-IMPLEMENTED_ZONES = ('OZ', 'RZ')
-
 
 def validate(document: dict, resolution: Resolution, catalogs: Catalog) -> Diagnostics:
     """Refuse requests that are schema-valid but semantically impossible."""
@@ -46,12 +44,6 @@ def validate(document: dict, resolution: Resolution, catalogs: Catalog) -> Diagn
                         'A protected service class requires the protected log collection profile',
                         path='$.spec.services.logging',
                         details={'required': 'protected-b', 'actual': resolution.services.get('logging')})
-
-    assurance = catalogs.get('assurance', resolution.profiles['assurance'])
-    if assurance.requires.get('recovery_required') and resolution.profiles.get('recovery') is None:
-        diagnostics.add('POLICY_VIOLATION',
-                        f'Assurance profile {assurance.profile} requires recovery to be enabled',
-                        path='$.spec.recovery.enabled')
 
     placement = spec['placement']
     if spec['platform']['preference'] == 'auto' and placement.get('cell'):

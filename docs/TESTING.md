@@ -1,5 +1,38 @@
 # Test strategy and actual evidence levels
 
+## Installed execution package
+
+Run `python scripts/check_installed_distribution.py` with the declared
+`.[controlplane]` extra and the repository/build dependencies installed. The gate
+imports the actual transaction, migration, workflow, monitoring and recovery owners
+from the built wheel in an isolated interpreter outside the checkout. CI installs
+this extra explicitly because these owners require its pinned Temporal and PostgreSQL
+clients. Passing in a development environment with those clients already present
+does not verify the CI installation command.
+
+The protected-source test copies the actual verifier/bootstrap bytes into its own
+readable package capsule before launching an actual other-UID worker. Its mutable
+custody negative still rejects ambient wildcard Git trust. Local capability skips
+remain explicit; the privileged hosted check must exercise the positive and negative
+cases.
+
+## Capability/profile reconciliation checks
+
+Run `python -m provisioner.qualification.registry` and
+`python -m provisioner.qualification.native`; the former script entry points are
+retired. `tests/test_capability_coverage.py` checks complete per-platform dimension
+coverage, shared vocabulary ownership, digest/format mismatch, unqualified-feature
+refusal, malformed data and evidence-root containment.
+
+`tests/provisioning/policy/test_profile_integrity.py` verifies complete selected
+limitations, strict catalogue input, mandatory workload requirements and rejection
+of a network-capable destination missing VM support. The policy, placement,
+documentation and golden-replay suites must pass together after a profile revision.
+The five-request by three-platform corpus remains synthetic and unauthorized; no
+regenerated digest grants native or production acceptance. Installed-wheel checks
+also verify new qualification owners and absence of their retired imports.
+
+
 ## Service and activation implementation tests
 
 The reference adapter tests verify state-key separation, NetBox conditional-write
@@ -146,7 +179,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 
 ## Completion-corrective release verification
 
-`python tools/check_release.py` checks a clean current Git checkout, not the historical file list. Exported releases require their explicit snapshot manifest. `python scripts/check_documentation.py` adds independently parsed code/tab/break fidelity, ordered table cells, exact ADR rendering/lifecycle, maintained design records and complete test/allocation indexes. `tools/verify_terraform.py --mock-tests` exports schemas from backend-free modules only, validates roots with `-backend=false`, and validates committed locks read-only. Passing that job does not contact native services. Ansible negative checks require genuine failed local assertions, not timeouts. Current CI source hashes and run identity are recorded in reports.
+`python -m provisioner.execution.source_integrity` checks a clean current Git checkout, not the historical file list. Exported releases require their explicit snapshot manifest. `python scripts/check_documentation.py` adds independently parsed code/tab/break fidelity, ordered table cells, exact ADR rendering/lifecycle, maintained design records and complete test/allocation indexes. `tools/verify_terraform.py --mock-tests` exports schemas from backend-free modules only, validates roots with `-backend=false`, and validates committed locks read-only. Passing that job does not contact native services. Ansible negative checks require genuine failed local assertions, not timeouts. Current CI source hashes and run identity are recorded in reports.
 
 ## Routed IPv6 local packet extension
 
@@ -158,7 +191,7 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 
 ## Platform capability registry
 
-`python scripts/check_platform_capabilities.py` validates the machine-readable engineering registry without contacting a platform or performing placement. Repository code, provider locks, documentation and local fixtures may support `CANDIDATE_SOURCE` or `LOCAL_FIXTURE_ONLY` states, but only a selected installed tuple with separately controlled native evidence can become `NATIVE_QUALIFIED`. The current registry intentionally has zero production-eligible platforms.
+`python -m provisioner.qualification.registry` validates the machine-readable engineering registry without contacting a platform or performing placement. Repository code, provider locks, documentation and local fixtures may support `CANDIDATE_SOURCE` or `LOCAL_FIXTURE_ONLY` states, but only a selected installed tuple with separately controlled native evidence can become `NATIVE_QUALIFIED`. The current registry intentionally has zero production-eligible platforms.
 
 
 ## Pre-placement platform-family eligibility
@@ -168,12 +201,12 @@ Run `python scripts/check_documentation.py` to verify full source conversion, ta
 
 ## Native PlatformProfile qualification dossier
 
-`python scripts/check_platform_qualification.py` validates the active exact-tuple qualification index, including owners, applicable tests, tested limits, evidence hashes/freshness, approval validity, matching current version/source provenance and current target-bound campaign evidence. Every dossier evidence reference must match a current campaign packet's latest-passing artifact reference, digest and observation time, and the dossier cannot extend validity beyond campaign freshness. The current index is intentionally empty. `scripts/check_platform_capabilities.py` then refuses any future `NATIVE_QUALIFIED` claim that lacks a current matching dossier for the same tuple/capability/evidence scope. Tests also reject missing campaign support, artifact/digest/time mismatch and evidence-lifetime inflation. Neither check contacts a platform, selects a site, reserves capacity, applies infrastructure or issues production authorization.
+`python -m provisioner.qualification.native` validates the active exact-tuple qualification index, including owners, applicable tests, tested limits, evidence hashes/freshness, approval validity, matching current version/source provenance and current target-bound campaign evidence. Every dossier evidence reference must match a current campaign packet's latest-passing artifact reference, digest and observation time, and the dossier cannot extend validity beyond campaign freshness. The current index is intentionally empty. `provisioner/qualification/registry.py` then refuses any future `NATIVE_QUALIFIED` claim that lacks a current matching dossier for the same tuple/capability/evidence scope. Tests also reject missing campaign support, artifact/digest/time mismatch and evidence-lifetime inflation. Neither check contacts a platform, selects a site, reserves capacity, applies infrastructure or issues production authorization.
 
 
 ## Site/service-class capacity eligibility
 
-`python scripts/check_site_service_capacity.py` validates current commissioned site/cell/service-class envelopes against exact-tuple qualification records, approved profile references, failure-model evidence, owners and time-bounded multi-resource capacity. `python scripts/check_site_service_eligibility.py examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE` confirms the current empty inventory remains fail-closed. The checker compares surviving capacity, operational reserve, existing commitments, unavailable capacity and supplied quota headroom, but never creates a reservation or contacts IPAM/native platforms.
+`python -m provisioner.allocations.capacity_evidence` validates current commissioned site/cell/service-class envelopes against exact-tuple qualification records, approved profile references, failure-model evidence, owners and time-bounded multi-resource capacity. `python -m provisioner.allocations.site_eligibility examples/site_service_capacity_request.json.example --expected-status HOLD_NO_ELIGIBLE_SITE_SERVICE_ENVELOPE` confirms the current empty inventory remains fail-closed. The checker compares surviving capacity, operational reserve, existing commitments, unavailable capacity and supplied quota headroom, but never creates a reservation or contacts IPAM/native platforms.
 
 
 
@@ -181,17 +214,17 @@ Site-capacity tests also pin the exact qualification dossier SHA-256, approval d
 
 ## Reservation preflight and exported records
 
-`python scripts/check_reservation_records.py --as-of 2026-09-18T18:00:00Z` validates exported reservation evidence without becoming the authoritative reservation database. `python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE` confirms the current example remains held. The preflight checks immutable reservation/operation IDs, generation, exact capacity-demand binding, the SHA-256 of the current commissioned envelope, owner/expiry, dependency operation identities and existing conflict/uncertain outcomes. Tests prove that changing envelope contents under the same envelope ID converts an otherwise idempotent HELD reservation into a conflict, and that the exact envelope digest is propagated into the parent reservation spec consumed by the IPAM handoff. IPAM tests also require the reconstructed parent spec SHA to match the authoritative reservation record before a HELD reservation can make allocation intent ready. It cannot create, extend, consume or release reservations, allocate addresses, apply infrastructure or activate service.
+`python -m provisioner.allocations.reservation_evidence --as-of 2026-09-18T18:00:00Z` validates exported reservation evidence without becoming the authoritative reservation database. `python -m provisioner.allocations.reservation_preflight examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE` confirms the current example remains held. The preflight checks immutable reservation/operation IDs, generation, exact capacity-demand binding, the SHA-256 of the current commissioned envelope, owner/expiry, dependency operation identities and existing conflict/uncertain outcomes. Tests prove that changing envelope contents under the same envelope ID converts an otherwise idempotent HELD reservation into a conflict, and that the exact envelope digest is propagated into the parent reservation spec consumed by the IPAM handoff. IPAM tests also require the reconstructed parent spec SHA to match the authoritative reservation record before a HELD reservation can make allocation intent ready. It cannot create, extend, consume or release reservations, allocate addresses, apply infrastructure or activate service.
 
 
 ## Authoritative IPAM allocation handoff
 
-`python scripts/check_ipam_allocation_records.py --as-of 2026-09-18T18:00:00Z` validates exported authoritative-IPAM lifecycle evidence without storing actual allocation values. `python scripts/check_ipam_allocation_preflight.py examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD` asserts the current fail-closed handoff. Tests cover stable operation identity, conflicts, uncertain outcomes, confirmation after realization, the stable confirmed-allocation digest used by DNS, release cleanup, reuse quarantine, overlap-exception references and rejection of caller-supplied address fields. Neither check reserves/releases addresses or writes DNS.
+`python -m provisioner.allocations.ipam_evidence --as-of 2026-09-18T18:00:00Z` validates exported authoritative-IPAM lifecycle evidence without storing actual allocation values. The implementation is package-owned; the retired script import is absent and installed tests refuse working-directory fallback. `python -m provisioner.allocations.ipam_preflight examples/ipam_allocation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_PARENT_RESERVATION_NOT_HELD` asserts the current fail-closed handoff. Tests cover stable operation identity, conflicts, uncertain outcomes, confirmation after realization, the stable confirmed-allocation digest used by DNS, release cleanup, reuse quarantine, overlap-exception references and rejection of caller-supplied address fields. Neither check reserves/releases addresses or writes DNS.
 
 
 ## Authoritative DNS registration handoff
 
-`python scripts/check_dns_registration_records.py --as-of 2026-09-18T18:00:00Z` validates exported DNS registration lifecycle evidence without storing actual names or record values. `python scripts/check_dns_registration_preflight.py examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` verifies that DNS remains held until authoritative IPAM is confirmed. DNS tests also pin every registration to the stable confirmed-IPAM digest and to the SHA-256 of the complete normalized DNS intent. They reject same-allocation-ID confirmation drift and same DNS IDs with changed TTL/zone/owner/scope, while proving later IPAM release lifecycle can retain the original confirmation binding. These checks do not invoke `tools/dns_change.py`, contact DNS, broaden update ACLs or establish recursive/secondary propagation unless independently evidenced.
+`python -m provisioner.allocations.dns_evidence --as-of 2026-09-18T18:00:00Z` validates exported DNS registration lifecycle evidence without storing actual names or record values. `python -m provisioner.allocations.dns_preflight examples/dns_registration_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_IPAM_ALLOCATION_NOT_CONFIRMED` verifies that DNS remains held until authoritative IPAM is confirmed. DNS tests also pin every registration to the stable confirmed-IPAM digest and to the SHA-256 of the complete normalized DNS intent. They reject same-allocation-ID confirmation drift and same DNS IDs with changed TTL/zone/owner/scope, while proving later IPAM release lifecycle can retain the original confirmation binding. These checks do not invoke `tools/dns_change.py`, contact DNS, broaden update ACLs or establish recursive/secondary propagation unless independently evidenced.
 
 
 ## Backup protection and isolated-restore assurance
@@ -208,7 +241,7 @@ Site-capacity tests also pin the exact qualification dossier SHA-256, approval d
 
 ## Version, source provenance and lifecycle assurance
 
-`python scripts/check_version_source_provenance.py --as-of 2026-09-18T22:00:00Z` validates exact product/API/provider/hardware/licence tuples, mandatory current source-review kinds, compatibility evidence and support lifecycle. `python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE` verifies the current empty provenance index remains fail-closed. Native qualification tests also prove that a CURRENT_APPROVED dossier is rejected unless the same exact tuple has one matching CURRENT_SUPPORTED provenance record.
+`python -m provisioner.qualification.provenance --as-of 2026-09-18T22:00:00Z` validates exact product/API/provider/hardware/licence tuples, mandatory current source-review kinds, compatibility evidence and support lifecycle. `python scripts/check_version_source_readiness.py examples/version_source_readiness_intent.json.example --as-of 2026-09-18T22:00:00Z --expected-status HOLD_NO_CURRENT_VERSION_SOURCE_PROVENANCE` verifies the current empty provenance index remains fail-closed. Native qualification tests also prove that a CURRENT_APPROVED dossier is rejected unless the same exact tuple has one matching CURRENT_SUPPORTED provenance record.
 
 ## Bounded extension adoption and qualification assurance
 
@@ -252,8 +285,66 @@ Site-capacity tests also pin the exact qualification dossier SHA-256, approval d
 
 ## Actual target selection for restricted native campaigns
 
-`python scripts/check_target_selection_assurance.py --as-of 2026-09-19T15:30:00Z` validates an externally selected site/cell, exact platform tuple references, security-edge/management/backend choices, restricted campaign scope, credential custody, permitted/prohibited operations, cleanup and time-bounded target-contact authority. `python scripts/check_target_selection_readiness.py examples/target_selection_readiness_intent.json.example --as-of 2026-09-19T15:30:00Z --expected-status HOLD_NO_CURRENT_TARGET_SELECTION` verifies the active empty target-selection index remains fail-closed. Tests reject production authority, expired target-contact authority, open gaps and tuple/scope mismatches while target-selection/contact/credential/native-test/apply/activation authority flags remain false.
+`python -m provisioner.qualification.target_selection --as-of 2026-09-19T15:30:00Z` validates an externally selected site/cell, exact platform tuple references, security-edge/management/backend choices, restricted campaign scope, credential custody, permitted/prohibited operations, cleanup and time-bounded target-contact authority. `python scripts/check_target_selection_readiness.py examples/target_selection_readiness_intent.json.example --as-of 2026-09-19T15:30:00Z --expected-status HOLD_NO_CURRENT_TARGET_SELECTION` verifies the active empty target-selection index remains fail-closed. Tests reject production authority, expired target-contact authority, open gaps and tuple/scope mismatches while target-selection/contact/credential/native-test/apply/activation authority flags remain false.
 
 ## Qualification campaign evidence assurance
 
-`python scripts/check_qualification_campaign_assurance.py --as-of 2026-09-19T16:30:00Z` validates exported campaign scope against a reviewed target selection, exact restricted campaign authorization, explicit assertion applicability, retained attempt chronology, evidence references/hashes/freshness, positive-control dependencies for negative observations and residual-gap state. Tests also prove that attempts after the authorized contact expiry are rejected while evidence collected inside a prior valid window may remain current after contact authority later becomes due; no new target contact is granted. `python scripts/check_qualification_campaign_readiness.py examples/qualification_campaign_readiness_intent.json.example --as-of 2026-09-19T16:30:00Z --expected-status HOLD_NO_CURRENT_QUALIFICATION_CAMPAIGN_EVIDENCE` verifies the active empty campaign index remains fail-closed. Tests preserve failed/blocked historical attempts, require the latest mandatory evidence to be current and passing (or explicitly reviewed not-applicable), reject target/scope drift and embedded qualification/production authority, and keep target-contact/native-test/qualification/registry/apply/activation authority flags false.
+`python -m provisioner.qualification.campaign --as-of 2026-09-19T16:30:00Z` validates exported campaign scope against a reviewed target selection, exact restricted campaign authorization, explicit assertion applicability, retained attempt chronology, evidence references/hashes/freshness, positive-control dependencies for negative observations and residual-gap state. Tests also prove that attempts after the authorized contact expiry are rejected while evidence collected inside a prior valid window may remain current after contact authority later becomes due; no new target contact is granted. `python scripts/check_qualification_campaign_readiness.py examples/qualification_campaign_readiness_intent.json.example --as-of 2026-09-19T16:30:00Z --expected-status HOLD_NO_CURRENT_QUALIFICATION_CAMPAIGN_EVIDENCE` verifies the active empty campaign index remains fail-closed. Tests preserve failed/blocked historical attempts, require the latest mandatory evidence to be current and passing (or explicitly reviewed not-applicable), reject target/scope drift and embedded qualification/production authority, and keep target-contact/native-test/qualification/registry/apply/activation authority flags false.
+
+## Revisioned application drafts
+
+Run:
+
+```sh
+python -m unittest tests.provisioning.discovery.test_application_draft_contract tests.provisioning.discovery.test_grouping tests.provisioning.api.test_application_drafts_http
+```
+ The dedicated disposable PostgreSQL job additionally runs
+`tests.provisioning.controlplane.test_application_drafts_postgres`, covering actual
+API/storage composition, concurrent revisions, exact retries, stale sources,
+authorization after waits, rollback and database constraints. Missing database roles
+must be reported as skips, not a persistence pass. Existing dump/restore and installed-
+package checks include migration 0021 and its actual repository owner. These tests
+never qualify an installed vendor platform or approve application ownership.
+
+
+## Package-owned source attribution and retirement regression repair
+
+The `tools/check_local.py` report uses one `source_snapshot(root)` helper for its
+source digest map. It includes the installed `provisioner` and `hosting_resources`
+packages, plus `pyproject.toml`, `setup.py` and `MANIFEST.in`, as well as the existing
+source families. Tests check real package/build files, preserve attribution of
+still-active tools, and prove a changed package file changes its recorded digest.
+Provider caches and Python bytecode are not captured. This is an unsigned source
+map, not complete artifact provenance or a claim that each file was exercised.
+
+The explicit retirement expectation now includes the package-owned Terraform catalog.
+Its absence and no-legacy-import checks run alongside the existing negative tests;
+the expected set is not derived from the register being tested. The preceding
+`c5a579f` repository CI failure remains a historical failure. See the
+[2 October verification repair](engineering/ci-retirement-repair-2026-10-02.md) for
+its reproduced cause, this increment's scope, and separate final-revision checks.
+
+
+## Process readiness and active discovery exclusion checks
+
+The fixed test helper `tests/provisioning/discovery/process_fixture.py` separates
+bounded interpreter/import setup from the operation under test. Its readiness marker
+is consumed by the fixture, not an API or native client. Children wait for explicit
+activation, allowing two competing processes to be prepared before the first acquires
+its collection claim. Setup/activation waits are at most 30 seconds; the existing
+five-second active collection/exclusion checks and ten-second journal operation
+checks still fail on timeout. No timeout is accepted as successful exclusion.
+
+This corrects a test-startup assumption reproduced on the unchanged `73731f7` source
+in the local environment, where a bare child interpreter took more than five seconds
+to start. Retain the original failed runs; the readiness fix is a new test revision,
+not a retroactive pass. Real signatures, filesystem locks, process termination,
+request counts, exact original-byte recovery and command exit codes are still checked.
+The contending CLI fixture calls the real installed command entry point after setup;
+other fresh-process `-m` command tests remain unchanged. Three helper tests verify
+that readiness does not execute work, accept unexpected startup output or hide a
+failed child operation. The helper is not packaged as an application dependency and
+creates no alternate execution/approval path.
+
+See [checkpointed discovery scheduling](engineering/discovery-checkpointed-scheduling.md)
+for the new B22 tests and the still-open fleet/native acceptance gates.

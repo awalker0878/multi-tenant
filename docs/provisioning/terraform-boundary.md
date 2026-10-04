@@ -45,7 +45,7 @@ The provisioner never restates a provider-specific field name. It asks the revie
 module what it declares and overlays only the inputs it owns:
 
 ```python
-native_variables(platform, phase)  # the adapter's declared_inputs(phase), read from tools/compile_wsd.py
+native_variables(platform, phase)  # the adapter's declared_inputs(phase), read from provisioner/compiler/wsd.py
 PROVISIONER_OWNED_INPUTS           # derived from adapters.COMPUTED_FACTS: boot_disk_gib, data_disk_gib, ipv4_address
 ```
 
@@ -77,7 +77,7 @@ dropping it silently. The plan carries one `REALIZATION_INPUT_UNAVAILABLE` warni
 naming the input and the platform, in the `compilation` layer, and the allocation
 itself still happens — every platform allocates the same distinct addresses. The
 compiler holds no provider-specific branch: the NSX segment mapping is declared as
-data in `tools/compile_wsd.WORKLOAD_NETWORK_BINDING`, keyed by platform, and
+data in `provisioner.compiler.wsd.WORKLOAD_NETWORK_BINDING`, keyed by platform, and
 `compile_environment(document, phase, outputs, phase_bindings)` is named for the phase
 it binds rather than for the platform.
 `tests/provisioning/compiler/test_cross_platform.py` holds the contract, reading the

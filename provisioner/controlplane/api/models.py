@@ -19,6 +19,47 @@ class _StrictModel(BaseModel):
 _ID = r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'
 
 
+class AssessmentSelectionInput(_StrictModel):
+    environment_id: str = Field(alias='environmentId', pattern=_ID)
+    generation: int = Field(ge=1, le=2**63 - 1)
+
+
+class AssessmentDestinationInput(AssessmentSelectionInput):
+    capacity_kind: Literal['pool', 'cluster', 'quota', 'datastore'] | None = Field(
+        default=None, alias='capacityKind')
+    capacity_native_id: str | None = Field(default=None, alias='capacityNativeId',
+                                          min_length=1, max_length=512)
+
+
+class AssessmentRequest(_StrictModel):
+    source: AssessmentSelectionInput
+    workload_native_id: str = Field(alias='workloadNativeId', min_length=1, max_length=512)
+    destinations: list[AssessmentDestinationInput] = Field(min_length=2, max_length=20)
+    method: Literal['REBUILD_RESTORE', 'COLD_VM_CONVERSION',
+                    'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE', 'WARM_VM_TRANSFER']
+    guest_profile: str = Field(alias='guestProfile', pattern=_ID)
+    network_mode: str = Field(alias='networkMode', pattern=_ID)
+    data_mode: str = Field(alias='dataMode', pattern=_ID)
+
+
+class ApplicationMemberProfileInput(_StrictModel):
+    workload_id: str = Field(alias='workloadId', pattern=_ID)
+    guest_profile: str = Field(alias='guestProfile', pattern=_ID)
+
+
+class ApplicationAssessmentRequest(_StrictModel):
+    source: AssessmentSelectionInput
+    application_group_id: str = Field(alias='applicationGroupId', pattern=_ID)
+    draft_revision: int = Field(alias='draftRevision', ge=1, le=2**63-1)
+    draft_record_digest: str = Field(alias='draftRecordDigest', pattern=r'^[0-9a-f]{64}$')
+    member_profiles: list[ApplicationMemberProfileInput] = Field(alias='memberProfiles', min_length=2, max_length=100)
+    destinations: list[AssessmentDestinationInput] = Field(min_length=2, max_length=20)
+    method: Literal['REBUILD_RESTORE', 'COLD_VM_CONVERSION',
+                    'SAME_PLATFORM_RELOCATION', 'APPLICATION_NATIVE', 'WARM_VM_TRANSFER']
+    network_mode: str = Field(alias='networkMode', pattern=_ID)
+    data_mode: str = Field(alias='dataMode', pattern=_ID)
+
+
 class KnownInteger(_StrictModel):
     state: Literal['KNOWN']
     value: int = Field(ge=0)
@@ -279,6 +320,14 @@ class ReviewScope(_StrictModel):
     platform_family: str = Field(alias='platformFamily')
 
 
+class ExecutionReview(_StrictModel):
+    driver: Literal['openstack-linux-rebuild/1', 'openstack-linux-application-staging/1',
+                    'openstack-linux-application-cutover/1', 'openstack-linux-application-database/1',
+                    'application-postwrite-recovery/1', 'windows-server-2022-existing-services/1',
+                    'vmware-openstack-cold-capture/1']
+    artifact_digest: str = Field(alias='artifactDigest', pattern='^[0-9a-f]{64}$')
+
+
 class PlanReview(_StrictModel):
     """Allowlisted decision facts from a current, authority-bound plan."""
     plan_id: str = Field(alias='planId')
@@ -292,6 +341,7 @@ class PlanReview(_StrictModel):
     source: ReviewScope
     destination: ReviewScope
     route_method: str = Field(alias='routeMethod')
+    execution: ExecutionReview | None = None
     selected_machine_count: int = Field(alias='selectedMachineCount', ge=1)
     selected_dataset_count: int = Field(alias='selectedDatasetCount', ge=0)
     max_downtime_seconds: int = Field(alias='maxDowntimeSeconds', ge=0)

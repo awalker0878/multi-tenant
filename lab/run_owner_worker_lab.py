@@ -17,9 +17,14 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from tools import remote_owner,owner_worker,owner_install,owner_revocations,ssh_issuer,readback_core as c
-from tools.check_release import verify
-from tools.run_files import digest,encoded,read_private,utcnow,write_new
+from provisioner.execution import readback_core as c
+from provisioner.execution import remote_owner
+from provisioner.execution import owner_worker
+from provisioner.execution import owner_install
+from provisioner.execution import owner_revocations
+from provisioner.execution import ssh_issuer
+from provisioner.execution.source_integrity import _protected_checkout, verify
+from provisioner.execution.run_files import digest,encoded,read_private,utcnow,write_new
 
 
 def run(user):
@@ -27,6 +32,9 @@ def run(user):
     account=pwd.getpwnam(user)
     if os.geteuid()!=0 or not all((ssh,sshd,keygen)) or account.pw_uid==0:
         raise RuntimeError('Disposable SSH fixture requires root and an existing non-root fixture account')
+    accepted=verify(ROOT)
+    if not _protected_checkout(ROOT) or accepted['status']!='HASHES_MATCH':
+        raise RuntimeError('Protected clean exact source fixture required')
     # StrictModes checks every ancestor of AuthorizedPrincipalsFile. A fixture
     # under world-writable /tmp cannot represent the root-controlled installer.
     with tempfile.TemporaryDirectory(prefix='hosting-worker-lab-',dir='/var/lib') as tmp, \
@@ -58,7 +66,7 @@ else:
         files={}
         for name,value in {'config':config,'credentials':{'password':'fixture','username':'fixture','http_password':'fixture'}}.items():
             path=owner/(name+'.json'); write_new(path,encoded(value)); files[name]={'path':str(path),'sha256':digest(read_private(path))}
-        commit=subprocess.check_output(['git','-c',f'safe.directory={ROOT}','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
+        commit=accepted['commit']
         job={'format':'hosting-owner-job/1','job_id':'capture-01','machine_id':config['machine_id'],
             'source_commit':commit,'scope':config['scope'],'generation':1,'kind':'restic',
             'parameters':{'action':'backup','restic':str(engine),'restic_sha256':config['restic_sha256'],'target':None},
@@ -69,7 +77,24 @@ else:
         wrong=deepcopy(job); wrong['job_id']='wrong-machine'; wrong['machine_id']='0'*32
         write_new(spool/'wrong-machine.json',encoded(wrong))
         for path in [owner,*owner.rglob('*')]: os.chown(path,account.pw_uid,account.pw_gid)
-        def command(argv): return subprocess.check_output(argv,stderr=subprocess.STDOUT,timeout=15,text=True)
+        def command(argv, *, timeout=15): return subprocess.check_output(argv,stderr=subprocess.STDOUT,timeout=timeout,text=True)
+        # Exercise the forced command through an actual installed distribution.
+        # The fixture venv shares only hosted test dependencies; the application
+        # is installed from this checkout's offline wheel and checked under -I.
+        wheels=base/'wheels'; wheels.mkdir(mode=0o755)
+        wheel_source=base/'wheel-source'
+        shutil.copytree(ROOT,wheel_source,ignore=shutil.ignore_patterns(
+            '.git','build','dist','__pycache__','*.egg-info'))
+        command([sys.executable,'-I','-m','pip','wheel','--no-index','--no-deps',
+                 '--no-build-isolation','--wheel-dir',str(wheels),str(wheel_source)],timeout=120)
+        wheel,=wheels.glob('hosting_provisioner-*.whl')
+        runtime=base/'runtime'
+        command([sys.executable,'-I','-m','venv','--system-site-packages',str(runtime)],timeout=60)
+        worker_python=runtime/'bin/python'
+        command([str(worker_python),'-I','-m','pip','install','--no-index','--no-deps',
+                 '--ignore-installed',str(wheel)],timeout=60)
+        from provisioner.execution.runtime_build import verify_application
+        verify_application(worker_python,ROOT,command)
         for name in ('host','ca','ssh_key'):
             command([keygen,'-q','-t','ed25519','-N','','-f',str(base/name)])
         issuer_home=base/'issuer'; issuer_home.mkdir(mode=0o700); (base/'ca').rename(issuer_home/'ca')
@@ -102,7 +127,7 @@ else:
             reservation.bind(('127.0.0.1',0)); port=reservation.getsockname()[1]
         install_config={'format':'hosting-owner-install/1','source_commit':commit,'machine_id':job['machine_id'],
             'account':user,'uid':account.pw_uid,'gid':account.pw_gid,'listen_address':'127.0.0.1','port':port,
-            'principal':user,'source':str(ROOT),'python':sys.executable,'sshd':sshd,'ssh_keygen':keygen,
+            'principal':user,'source':str(ROOT),'python':str(worker_python),'sshd':sshd,'ssh_keygen':keygen,
             'systemctl':'/usr/bin/systemctl','host_private':{'path':str(base/'host'),'sha256':digest((base/'host').read_bytes())},
             'host_public':' '.join((base/'host.pub').read_text().split()[:2]),
             'user_ca':' '.join((base/'ca.pub').read_text().split()[:2]),'revoked_user_keys':[],

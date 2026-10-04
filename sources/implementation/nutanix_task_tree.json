@@ -11,7 +11,7 @@
   "source_files": [
     "tools/nutanix_task_tree.py",
     "tools/nutanix_observe.py",
-    "tools/readback_core.py",
+    "provisioner/execution/readback_core.py",
     "tools/recovery_review.py"
   ],
   "tests": [

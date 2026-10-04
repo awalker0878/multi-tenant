@@ -28,7 +28,7 @@ portable documents the owner needs, and nothing else.
 | --- | --- | --- |
 | `hosting-capacity-view/1` | `capacity_view(plan)` | the commissioned capacity snapshot: inventory digest/status/authority, site, platform and every reviewed zone with its demand, committed-after position and remaining units |
 | `hosting-capacity-binding/1` | `binding(plan, ...)` | the reservation identity: `reservation_id`, `operation_id`, `generation`, `plan_digest`, `view_digest`, the five delivery scope keys and the envelope |
-| `hosting-capacity-request/1` | `request(plan, ...)` | the exact request `tools/capacity.py` already validates: format, owner, reservation and operation identity, generation, scope, pool, units, capabilities |
+| `hosting-capacity-request/1` | `request(plan, ...)` | the exact request `provisioner/allocations/capacity_owner.py` already validates: format, owner, reservation and operation identity, generation, scope, pool, units, capabilities |
 | `hosting-capacity-owner-handoff/1` | `handoff(plan, ...)` | the whole proposal: binding, view, request, per-zone rows, the facts the operator must supply, the limits and a content digest |
 | `hosting-capacity-owner-facts/1` | the operator | the recorded owner facts the repository cannot review: owner id, pool id, capabilities, database path, envelope id and envelope record digest |
 | `hosting-capacity-reconciliation/1` | `reconcile(...)` | what the exported reservation records actually say about this identity |
@@ -56,7 +56,7 @@ refusal is never lost to a rounding artifact.
 
 `reconcile(identity, index, as_of=...)` validates the repository's exported
 reservation evidence with the repository's existing checker
-(`scripts/check_reservation_records.py`, reached only through
+(`provisioner/allocations/reservation_evidence.py`, reached only through
 `provisioner/repository.py`) and classifies the proposal. A missing record is a
 proposal, **never** a confirmation.
 
@@ -71,7 +71,7 @@ proposal, **never** a confirmation.
 | `EXISTING_CONSUMED_RESERVATION` | the owner's record is `CONSUMED` |
 
 The four refusal states deliberately borrow the refusal vocabulary of the preserved
-preflight (`scripts/check_reservation_preflight.py`) so an operator reads one
+preflight (`provisioner/allocations/reservation_preflight.py`) so an operator reads one
 vocabulary. `require_settled`, `require_confirmed` and `require_current` refuse with
 `CAPACITY_RESERVATION_CONFLICT` (a definite no), `CAPACITY_RESERVATION_UNRESOLVED` (the
 owner has not answered yet) or `CAPACITY_RESERVATION_UNCONFIRMED` (the answer is not a

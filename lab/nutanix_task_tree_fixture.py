@@ -7,7 +7,8 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from lab.native_readback_fixture import manifest as single, VPC, TASK, TENANT
-from tools import nutanix_observe as native, nutanix_task_tree as tree
+from provisioner.execution import nutanix_observe as native
+from provisioner.execution import nutanix_task_tree as tree
 
 SUBNET = '44444444-4444-4444-8444-444444444444'
 CHILD_A = 'ZXJnb24=:55555555-5555-4555-8555-555555555555'

@@ -1,5 +1,22 @@
 # Disposable protocol and infrastructure fixtures
 
+Root engine fixtures for the owner SSH endpoint, nft edge and offline runtime
+use a disposable protected checkout:
+
+```sh
+sudo "$(command -v python)" lab/run_protected_source_lab.py --lab owner-worker -- --user "$(id -un)"
+sudo "$(command -v python)" lab/run_protected_source_lab.py --lab nft-edge
+sudo "$(command -v python)" lab/run_protected_source_lab.py --lab runtime-build -- --execute --terraform "$(command -v terraform)"
+```
+
+The launcher requires clean committed source, clones without hard links under
+`/var/lib`, gives that new tree root custody, and verifies it before launching
+the fixed lab in isolated Python. Its reports return to `build/reports` in the
+original checkout. Only the disposable clone is adopted; installer source trust
+and operating/native qualification requirements remain unchanged. The runtime
+fixture also needs installed setuptools/wheel build dependencies and actual
+Python 3.13, Terraform 1.13.5 and Linux network namespace privileges.
+
 The namespace runner keeps the fixed two-tenant worked topology and original
 33 routing/containment/recovery observations. It adds 14 mTLS/resource-identity
 observations on the already permitted processor-01 to data-01 TCP443 path.

@@ -13,7 +13,7 @@ import unittest
 from provisioner.compiler.environment import compile_document
 from provisioner.inventory import model as inventory_model
 from provisioner.placement import eligibility
-from tools import compile_wsd
+from provisioner.compiler import wsd as compile_wsd
 
 from tests.provisioning import support
 

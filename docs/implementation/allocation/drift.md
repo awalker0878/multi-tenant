@@ -19,7 +19,7 @@ Security-significant drift SHALL generate an actionable event and update technic
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Security-significant drift SHALL generate an actionable event and update technical conformance/readiness conditions until resolved or accepted; formal authorization records SHALL remain separately attributable and immutable.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-014, CT-049, CT-057
 
@@ -37,7 +37,7 @@ Security-significant drift SHALL generate an actionable event and update technic
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Security-significant drift SHALL generate an actionable event and update technical conformance/readiness conditions until resolved or accepted
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-014, CT-049, CT-057
 
@@ -55,7 +55,7 @@ Security-significant drift SHALL generate an actionable event and update technic
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: formal authorization records SHALL remain separately attributable and immutable.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-014, CT-049, CT-057
 
@@ -78,7 +78,7 @@ Emergency changes SHALL be reconciled back into the source of truth after the in
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Emergency changes SHALL be reconciled back into the source of truth after the incident or maintenance action.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-014, CT-057
 
@@ -101,7 +101,7 @@ Incident containment overrides SHALL take precedence over ordinary reconciliatio
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Incident containment overrides SHALL take precedence over ordinary reconciliation until explicitly released or handled by their approved expiry policy; automated repair SHALL NOT silently undo containment.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-057, CT-058, CT-066
 
@@ -119,7 +119,7 @@ Incident containment overrides SHALL take precedence over ordinary reconciliatio
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Incident containment overrides SHALL take precedence over ordinary reconciliation until explicitly released or handled by their approved expiry policy
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-057, CT-058, CT-066
 
@@ -137,7 +137,7 @@ Incident containment overrides SHALL take precedence over ordinary reconciliatio
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: automated repair SHALL NOT silently undo containment.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-057, CT-058, CT-066
 

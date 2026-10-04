@@ -3,8 +3,8 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from tools import delivery_containment as d
-from tools.operations_review import OperationsHold
+from provisioner.execution import delivery_containment as d
+from provisioner.execution.operations_review import OperationsHold
 
 
 class DeliveryContainmentGuardTests(unittest.TestCase):

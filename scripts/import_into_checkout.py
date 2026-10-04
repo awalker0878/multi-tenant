@@ -5,7 +5,7 @@ import argparse,hashlib,json,os,shutil,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from tools.check_release import verify
+from provisioner.execution.source_integrity import verify
 REMOTE_FORMS={'https://github.com/awalker0878/multi-tenant.git','https://github.com/awalker0878/multi-tenant','git@github.com:awalker0878/multi-tenant.git','ssh://git@github.com/awalker0878/multi-tenant.git'}
 EXCLUDE={'.git','.venv','__pycache__','build','dist'}
 

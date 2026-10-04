@@ -6,7 +6,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools import compile_wsd, guest_inventory
+from provisioner.compiler import wsd as compile_wsd
+from provisioner.execution import guest_inventory
 
 
 class PrivateHandoffJsonTests(unittest.TestCase):

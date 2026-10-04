@@ -10,7 +10,10 @@ from lab.native_readback_fixture import Fixture
 from lab.run_readback_lab import operator_context
 from tests.nsx_domain_fixture import scenario, responses
 from tests.test_nutanix_task_tree import reseal
-from tools import nsx_domain_observe as domain, readback_core as c, recovery_review as rr
+from provisioner.execution import readback_core as c
+from provisioner.execution import nsx_domain_observe as domain
+from provisioner.execution import readback_cli
+from provisioner.execution import recovery_review as rr
 
 
 class DomainReadbackTests(unittest.TestCase):
@@ -80,7 +83,7 @@ class DomainReadbackTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             manifest = Path(directory)/'manifest.json'; output = Path(directory)/'report.json'
             manifest.write_text(json.dumps(self.m))
-            command = [sys.executable, str(Path(domain.__file__).resolve()), str(manifest)]
+            command = readback_cli.module_command(domain, [str(manifest)])
             result = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
             self.assertEqual(json.loads(result.stdout)['status'], 'INPUT_VALID_NO_CONTACT')
@@ -94,7 +97,7 @@ class DomainReadbackTests(unittest.TestCase):
             self.assertNotIn(self.m['resources'][0]['path'], result.stdout)
 
     def test_disabled_example_validates_without_contact(self):
-        path = Path(domain.__file__).resolve().parents[1]/'examples/nsx_domain_observation.json.example'
+        path = Path(domain.__file__).resolve().parents[2]/'examples/nsx_domain_observation.json.example'
         manifest = c.load(path); domain.validate(manifest)
         self.assertFalse(manifest['contact_enabled']); self.assertTrue(manifest['origin'].endswith('.invalid'))
 

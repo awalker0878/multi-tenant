@@ -8,9 +8,11 @@ import unittest
 from unittest.mock import patch
 from lab.native_readback_fixture import Fixture
 from tests.test_vsphere_observe import Client as SnapshotClient, manifest, ref
-from tools import execution_journal as j, readback_core as c, vsphere_power as p
-from tools import vsphere_observe as vm, vsphere_task_observe as task
-from tools.run_files import encoded, replace_private, utcnow
+from provisioner.execution import readback_core as c
+from provisioner.execution import execution_journal as j, vsphere_power as p
+from provisioner.execution import vsphere_observe as vm
+from provisioner.execution import vsphere_task_observe as task
+from provisioner.execution.run_files import encoded, replace_private, utcnow
 
 
 def request(origin='https://vcenter.example.invalid', desired='poweredOff'):

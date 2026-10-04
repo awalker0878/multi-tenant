@@ -12,7 +12,7 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0,str(ROOT))
 
-from scripts import check_version_source_provenance as provenance
+from provisioner.qualification import provenance as provenance
 
 FORMAT='portable-hosting-version-source-readiness-intent/1'
 STATUS='PLANNING_ONLY_NOT_AUTHORIZED'

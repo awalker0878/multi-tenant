@@ -7,7 +7,7 @@ recursive resolver selection, persistent journal bounds, collector TLS assets an
 the log-forwarding action. Select it only where these files are assigned to this
 role by the image and service owners.
 
-`tools/guest_services.py` owns the controller-side contract for this profile. It
+`provisioner/execution/guest_services.py` owns the controller-side contract for this profile. It
 validates the closed `services` object — ownership assignment, resolver bounds,
 account separation, certificate/key algorithms and asset hashes — before any
 guest contact. The [guest inventory](native-guests.md) requires the complete

@@ -9,7 +9,11 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
-from tools import readback_core as c, nsx_observe as nsx, nutanix_observe as nut, recovery_review as rr
+from provisioner.execution import readback_cli
+from provisioner.execution import readback_core as c
+from provisioner.execution import nsx_observe as nsx
+from provisioner.execution import nutanix_observe as nut
+from provisioner.execution import recovery_review as rr
 from lab.native_readback_fixture import Fixture, manifest, responses, VPC, EP
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -185,13 +189,13 @@ class ManifestAndJournalTests(unittest.TestCase):
             m=manifest(platform,'https://management.invalid');m['contact_enabled']=False
             with tempfile.TemporaryDirectory() as d:
                 p=Path(d,'m.json');p.write_text(json.dumps(m))
-                out=subprocess.run([sys.executable,str(ROOT/'tools'/f'{platform}_observe.py'),str(p)],capture_output=True,text=True)
+                out=subprocess.run(readback_cli.module_command(nsx if platform=='nsx' else nut,[str(p)]),capture_output=True,text=True)
                 self.assertEqual(out.returncode,0,out.stdout);self.assertFalse(json.loads(out.stdout)['target_contacted'])
     def test_explicit_read_flag_still_needs_contact_enabled(self):
         m=manifest('nsx','https://management.invalid');m['contact_enabled']=False
         with tempfile.TemporaryDirectory() as d:
             p=Path(d,'m.json');p.write_text(json.dumps(m))
-            out=subprocess.run([sys.executable,str(ROOT/'tools/nsx_observe.py'),str(p),'--read-authorized-target'],capture_output=True,text=True)
+            out=subprocess.run([*readback_cli.module_command(nsx, []),str(p),'--read-authorized-target'],capture_output=True,text=True)
             self.assertEqual(out.returncode,2)
     def test_new_journal_is_private_and_incomplete_until_written(self):
         with tempfile.TemporaryDirectory() as d:

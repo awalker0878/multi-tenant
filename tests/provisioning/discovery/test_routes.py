@@ -34,6 +34,20 @@ def proof(side: str, selected: InstalledTuple, digest: str) -> QualificationEvid
 
 
 class DirectedRouteTests(unittest.TestCase):
+    def test_site_or_domain_alias_cannot_turn_a_same_native_scope_into_a_move(self):
+        for metadata in ({'site_id': 'relabeled-site'}, {'security_domain_id': 'relabeled-wsd'}):
+            alias = replace(SOURCE, scope=replace(SOURCE.scope, **metadata),
+                            product_tuple_id='another-label', product_tuple_digest='f' * 64)
+            with self.subTest(metadata=metadata), self.assertRaises(ValueError):
+                replace(KEY, destination=alias, method='SAME_PLATFORM_RELOCATION')
+
+    def test_same_platform_relocation_is_not_a_cross_family_method(self):
+        with self.assertRaises(ValueError):
+            replace(KEY, method='SAME_PLATFORM_RELOCATION')
+        same_family = replace(TARGET, scope=replace(TARGET.scope, platform_family='vmware'))
+        route = replace(KEY, destination=same_family, method='SAME_PLATFORM_RELOCATION')
+        self.assertEqual(RouteCatalogue().evaluate(route, as_of=NOW).status, 'UNKNOWN')
+
     def test_exact_direction_and_destination_only(self):
         catalogue = RouteCatalogue((RouteClaim(
             KEY, 'NATIVE_QUALIFIED', (proof('SOURCE_EXIT', SOURCE, '1'),

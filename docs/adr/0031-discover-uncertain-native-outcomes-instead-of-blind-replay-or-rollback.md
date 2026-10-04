@@ -34,10 +34,10 @@ Record actual writer exclusion, task identity, current generations, reservations
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [tools/recovery_review.py](../../tools/recovery_review.py)
-- [tools/nsx_observe.py](../../tools/nsx_observe.py)
-- [tools/nutanix_observe.py](../../tools/nutanix_observe.py)
-- [tools/dns_change.py](../../tools/dns_change.py)
+- [provisioner/execution/recovery_review.py](../../provisioner/execution/recovery_review.py)
+- [provisioner/execution/nsx_observe.py](../../provisioner/execution/nsx_observe.py)
+- [provisioner/execution/nutanix_observe.py](../../provisioner/execution/nutanix_observe.py)
+- [provisioner/execution/dns_change.py](../../provisioner/execution/dns_change.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

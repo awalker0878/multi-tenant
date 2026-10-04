@@ -9,7 +9,7 @@ adopts state, clears an execution ledger or grants activation authority.
 ## Accepted scope
 
 Use the explicit profile `nutanix-ahv-v4.2-prism-v4.3-task-tree` with
-`tools/nutanix_vm_task_observe.py`. The installed product tuple and observation
+`provisioner/execution/nutanix_vm_task_observe.py`. The installed product tuple and observation
 role must support **both** the VMM v4.2 VM interface and Prism v4.3 task interface.
 The separate readers' SDK references describe these wire contracts; composing
 them does not establish installed compatibility. There is no version negotiation
@@ -40,7 +40,7 @@ supported operation labels; synthetic fixture labels are not vendor contracts.
 Without contact, validate the private accepted manifest:
 
 ```sh
-python tools/nutanix_vm_task_observe.py /private/accepted-ahv-tasks.json
+python -m provisioner.execution.nutanix_vm_task_observe /private/accepted-ahv-tasks.json
 ```
 
 For an independently authorized read, set `contact_enabled: true`, inject scoped
@@ -48,7 +48,7 @@ read-only `NUTANIX_USERNAME` and `NUTANIX_PASSWORD` through the site's secret
 system, and provide the exact accepted origin, CA and a new private output:
 
 ```sh
-python tools/nutanix_vm_task_observe.py /private/accepted-ahv-tasks.json \
+python -m provisioner.execution.nutanix_vm_task_observe /private/accepted-ahv-tasks.json \
   --read-authorized-target --expected-origin https://actual-prism-host \
   --ca-file /private/prism-ca.pem --output /private/new-ahv-task-readback.json
 ```

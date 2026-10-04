@@ -16,7 +16,21 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from tools.route_audit import Topology, load_json
+from provisioner.execution.route_audit import Topology, load_json
+
+
+def source_snapshot(root: Path) -> dict[str, str]:
+    """Hash implemented source in either owner location; this is not a release signature."""
+    snapshot = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+                for directory in ('provisioner', 'hosting_resources', 'tools', 'tests', 'lab', 'terraform', 'scripts', 'ansible', 'config', '.github')
+                for p in (root/directory).rglob('*') if p.is_file()
+                and '__pycache__' not in p.parts and '.terraform' not in p.parts}
+    for name in ('pyproject.toml', 'setup.py', 'MANIFEST.in', '.gitattributes', '.gitignore', '.editorconfig', '.terraform-version',
+                 'requirements-runtime.txt', 'requirements-test.txt',
+                 'requirements-repository.txt', 'requirements-dev.txt', 'Makefile',
+                 'sources/artifact_catalog.json'):
+        snapshot[name] = hashlib.sha256((root/name).read_bytes()).hexdigest()
+    return snapshot
 
 
 def main() -> int:
@@ -36,15 +50,7 @@ def main() -> int:
             recorded_toolchain = load_json(path).get('status', 'INVALID_REPORT')
         except (ValueError, OSError, AttributeError):
             recorded_toolchain = 'INVALID_REPORT'
-    snapshot = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
-                for directory in ('tools', 'tests', 'lab', 'terraform', 'scripts', 'ansible', 'config', '.github')
-                for p in (ROOT/directory).rglob('*') if p.is_file()
-                and '__pycache__' not in p.parts and '.terraform' not in p.parts}
-    for name in ('.gitattributes', '.gitignore', '.editorconfig', '.terraform-version',
-                 'requirements-runtime.txt', 'requirements-test.txt',
-                 'requirements-repository.txt', 'requirements-dev.txt', 'Makefile',
-                 'sources/artifact_catalog.json'):
-        snapshot[name] = hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
+    snapshot = source_snapshot(ROOT)
     (quality/'tested_source_manifest.json').write_text(json.dumps(snapshot, indent=2)+'\n')
     report = {
         'status': 'PASSED_LOCAL_ONLY' if result.wasSuccessful() and not model['failed'] else 'FAILED_LOCAL',

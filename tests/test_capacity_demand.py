@@ -5,9 +5,11 @@ from pathlib import Path
 import sys
 import unittest
 from unittest.mock import patch
-import test_capacity as harness
-from tools import capacity,capacity_demand as demand,delivery_run as delivery,delivery_steps as steps,readback_core as c
-from tools.run_files import digest,encoded,load_private,read_private,replace_private,write_new
+from tests import test_capacity as harness
+from provisioner.execution import readback_core as c
+from provisioner.allocations import capacity_owner as capacity, capacity_demand as demand
+from provisioner.execution import delivery_run as delivery, delivery_steps as steps
+from provisioner.execution.run_files import digest,encoded,load_private,read_private,replace_private,write_new
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -84,7 +86,7 @@ class CapacityDemandTests(unittest.TestCase):
         binary=Path(sys.executable).resolve()
         self.offer('plan',waiting['dependencies'],{'catalog_id':'openstack-wsd-workloads','terraform':str(binary),
             'terraform_sha256':digest(binary.read_bytes())},{'inputs':changed,'backend':{},'environment':{},'authority':{},'cloud':{}})
-        from tools import terraform_run
+        from provisioner.execution import terraform_run
         with patch.object(terraform_run,'prepare',side_effect=AssertionError('native contact')) as native:
             with self.assertRaises(ValueError): self.run_delivery()
         self.assertEqual(native.call_count,0)

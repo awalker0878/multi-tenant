@@ -34,8 +34,8 @@ Maintain copy lineage, remaining obligations, disposal method/evidence, key depe
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [tools/dns_change.py](../../tools/dns_change.py)
-- [tools/recovery_review.py](../../tools/recovery_review.py)
+- [provisioner/execution/dns_change.py](../../provisioner/execution/dns_change.py)
+- [provisioner/execution/recovery_review.py](../../provisioner/execution/recovery_review.py)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.
 

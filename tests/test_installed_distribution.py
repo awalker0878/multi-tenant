@@ -1,0 +1,806 @@
+"""Build and exercise the real wheel with no checkout on the import path.
+
+These tests intentionally use a fresh virtual environment and an unrelated
+working directory. Import-only tests in the source tree cannot detect missing
+wheel resources or accidental resolution of files at site-packages root.
+"""
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+import site
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+import venv
+import zipfile
+
+
+ROOT = Path(__file__).resolve().parents[1]
+B05_EXECUTION_OWNERS = (
+    'guest_inventory', 'guest_run', 'guest_apply', 'guest_services', 'restic_run', 'restic_transfer',
+    'vsphere_observe', 'vsphere_task_observe', 'vsphere_history', 'vsphere_task_tree_observe',
+    'vsphere_port_observe', 'vsphere_network_observe', 'vsphere_clone_source', 'vsphere_task_activity',
+    'nutanix_vm_observe', 'nutanix_observe', 'nutanix_vm_task_observe', 'nutanix_vm_activity_observe',
+    'nutanix_flow_observe', 'nutanix_flow_activity_observe', 'nutanix_entity_activity', 'nutanix_task_tree',
+    'readback_cli', 'nsx_observe', 'nsx_segment_observe', 'nsx_domain_observe', 'nsx_domain_switch_observe',
+    'nsx_domain_binding', 'vmware_network_binding', 'recovery_review', 'openstack_observe', 'qualify_target',
+    'execution_journal', 'dataset_acceptance', 'vsphere_power', 'dns_change',
+    'dns_propagation', 'openstack_quota', 'operations_review', 'operations_alerts',
+    'delivery_run', 'delivery_steps', 'delivery_containment', 'edge_contain',
+    'nft_edge', 'netbox_dns', 'owner_worker', 'remote_owner',
+    'retirement', 'runtime_build', 'owner_install', 'owner_revocations',
+    'edge_install', 'edge_boot', 'state_backend', 'state_export',
+    'state_project', 'ssh_issuer', 'terraform_recovery_review', 'nutanix_terraform_recovery',
+    'nutanix_flow_terraform_recovery', 'nsx_terraform_recovery', 'vsphere_recovery_devices', 'service_http',
+)
+
+
+class InstalledDistributionTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.workspace = tempfile.TemporaryDirectory(prefix='hosting-installed-')
+        cls.addClassCleanup(cls.workspace.cleanup)
+        cls.base = Path(cls.workspace.name)
+        cls.source = cls.base / 'source'
+        shutil.copytree(ROOT, cls.source, ignore=shutil.ignore_patterns(
+            '.git', '.venv', '__pycache__', '.pytest_cache', 'build', 'dist',
+            '*.egg-info'))
+        cls.work = cls.base / 'operator'
+        cls.work.mkdir()
+        cls.env = {key: value for key, value in os.environ.items()
+                   if not key.startswith(('PYTHON', 'PIP_'))}
+        # Destructive-output regressions use only this disposable source copy.
+        cls.unsafe_build_results = []
+        protected = {name: (cls.source / name).read_bytes() for name in
+                     ('setup.py', 'provisioner/execution/terraform_catalog.py', 'provisioner/execution/source_integrity.py', 'provisioner/execution/guest_probe.py', 'provisioner/execution/route_audit.py', 'terraform/catalog.json')}
+        for output in (cls.source, cls.base, cls.source / 'provisioner'):
+            result = subprocess.run([sys.executable, 'setup.py', 'build_py', '--build-lib', str(output)],
+                cwd=cls.source, env=cls.env, text=True, stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, timeout=120)
+            if (result.returncode == 0 or any((cls.source / name).read_bytes() != raw
+                                            for name, raw in protected.items())):
+                raise AssertionError('Unsafe build destination was not refused before source mutation')
+            cls.unsafe_build_results.append(result.stdout)
+        cls.staging = cls.base / 'incremental-build'
+        cls.retired = ('profiles', 'policy', 'sources', 'terraform', 'ansible',
+                       'config', 'docs', 'provisioner/_assets')
+        for relative in (*cls.retired, 'hosting_resources/_assets/obsolete'):
+            path = cls.staging / relative / 'stale.json'
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('{}', encoding='utf-8')
+        cls.retired_python = ('tools/flow_policy.py', 'tools/flow_policy.pyc',
+                              'tools/__pycache__/flow_policy.cpython-313.pyc',
+                              'tools/lifecycle_transition.py', 'tools/lifecycle_transition.pyc',
+                              'tools/__pycache__/lifecycle_transition.cpython-313.pyc',
+                              'tools/openstack_transition.py', 'tools/openstack_transition.pyc',
+                              'tools/__pycache__/openstack_transition.cpython-313.pyc',
+                              'tools/plan_review.py', 'tools/plan_review.pyc',
+                              'tools/__pycache__/plan_review.cpython-313.pyc',
+                              'tools/terraform_apply.py', 'tools/terraform_apply.pyc',
+                              'tools/__pycache__/terraform_apply.cpython-313.pyc',
+                              'tools/terraform_run.py', 'tools/terraform_run.pyc',
+                              'tools/__pycache__/terraform_run.cpython-313.pyc',
+                              'tools/wsd_handoff.py', 'tools/wsd_handoff.pyc',
+                              'tools/__pycache__/wsd_handoff.cpython-313.pyc',
+                              'tools/readback_core.py', 'tools/readback_core.pyc',
+                              'tools/__pycache__/readback_core.cpython-313.pyc',
+                              'tools/neutron_observe.py', 'tools/neutron_observe.pyc',
+                              'tools/__pycache__/neutron_observe.cpython-313.pyc',
+                              'tools/run_files.py', 'tools/run_files.pyc',
+                              'tools/__pycache__/run_files.cpython-313.pyc',
+                              'tools/route_record_review.py', 'tools/route_record_review.pyc',
+                              'tools/__pycache__/route_record_review.cpython-313.pyc',
+                              'tools/terraform_catalog.py', 'tools/terraform_catalog.pyc',
+                              'tools/__pycache__/terraform_catalog.cpython-313.pyc',
+                              'tools/check_release.py', 'tools/check_release.pyc',
+                              'tools/__pycache__/check_release.cpython-313.pyc',
+                              'scripts/check_reservation_records.py', 'scripts/check_reservation_records.pyc',
+                              'scripts/__pycache__/check_reservation_records.cpython-313.pyc',
+                              'scripts/check_ipam_allocation_records.py', 'scripts/check_ipam_allocation_records.pyc',
+                              'scripts/__pycache__/check_ipam_allocation_records.cpython-313.pyc',
+                              'scripts/check_dns_registration_records.py', 'scripts/check_dns_registration_records.pyc',
+                              'scripts/__pycache__/check_dns_registration_records.cpython-313.pyc',
+                              'scripts/check_site_service_capacity.py', 'scripts/check_site_service_capacity.pyc', 'scripts/__pycache__/check_site_service_capacity.cpython-313.pyc',
+                              'scripts/check_site_service_eligibility.py', 'scripts/check_site_service_eligibility.pyc', 'scripts/__pycache__/check_site_service_eligibility.cpython-313.pyc',
+                              'scripts/check_reservation_preflight.py', 'scripts/check_reservation_preflight.pyc', 'scripts/__pycache__/check_reservation_preflight.cpython-313.pyc',
+                              'scripts/check_ipam_allocation_preflight.py', 'scripts/check_ipam_allocation_preflight.pyc', 'scripts/__pycache__/check_ipam_allocation_preflight.cpython-313.pyc',
+                              'scripts/check_dns_registration_preflight.py', 'scripts/check_dns_registration_preflight.pyc', 'scripts/__pycache__/check_dns_registration_preflight.cpython-313.pyc',
+                              'tools/guest_probe.py', 'tools/guest_probe.pyc',
+                              'tools/__pycache__/guest_probe.cpython-313.pyc',
+                              'tools/route_audit.py', 'tools/route_audit.pyc',
+                              'tools/__pycache__/route_audit.cpython-313.pyc',
+                              'tools/check_package.py', 'tools/check_package.pyc',
+                              'tools/__pycache__/check_package.cpython-313.pyc')
+        cls.retired_python += tuple(relative for name in (*B05_EXECUTION_OWNERS, 'capacity', 'capacity_demand', 'netbox_ipam') for relative in (
+            'tools/' + name + '.py', 'tools/' + name + '.pyc',
+            'tools/__pycache__/' + name + '.cpython-313.pyc'))
+        for relative in cls.retired_python:
+            path = cls.staging / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'retired owner must not be packaged')
+        cls.run_checked([sys.executable, 'setup.py', 'build_py', '--build-lib',
+                         str(cls.staging)], cwd=cls.source)
+        cls.run_checked([sys.executable, 'setup.py', 'sdist', '--dist-dir',
+                         str(cls.base / 'dist')], cwd=cls.source)
+        archive, = (cls.base / 'dist').glob('*.tar.gz')
+        cls.run_checked([sys.executable, '-m', 'pip', '--disable-pip-version-check',
+                         'wheel', '--no-build-isolation', '--no-deps',
+                         '--wheel-dir', str(cls.base / 'dist'), str(archive)])
+        cls.wheel, = (cls.base / 'dist').glob('*.whl')
+        cls.environment = cls.base / 'environment'
+        # Runtime dependencies come from the test runner's environment; the
+        # project itself must be installed solely from the freshly built wheel.
+        # A nested venv's --system-site-packages points at the base interpreter,
+        # not an outer venv such as CI/test tooling.  Add only dependency roots
+        # that do not already contain this project, so isolated child imports can
+        # see PyYAML/httpx/etc. without resolving provisioner from the checkout.
+        venv.EnvBuilder(with_pip=True, system_site_packages=True).create(cls.environment)
+        cls.python = (cls.environment / ('Scripts/python.exe' if os.name == 'nt'
+                                         else 'bin/python'))
+        dependency_roots = []
+        for candidate in [*site.getsitepackages(), site.getusersitepackages()]:
+            root = Path(candidate).resolve()
+            if (root.is_dir() and root not in dependency_roots
+                    and not (root / 'provisioner').exists()
+                    and not (root / 'hosting_resources').exists()):
+                dependency_roots.append(root)
+        nested_sites = json.loads(subprocess.check_output(
+            [str(cls.python), '-I', '-c',
+             'import json,site; print(json.dumps(site.getsitepackages()))'],
+            text=True, env=cls.env, timeout=30))
+        dependency_link = Path(nested_sites[0]) / 'hosting-test-runner-dependencies.pth'
+        dependency_link.write_text(''.join(str(root) + '\n' for root in dependency_roots),
+                                   encoding='utf-8')
+        cls.run_checked([str(cls.python), '-I', '-m', 'pip', '--disable-pip-version-check',
+                         'install', '--no-deps', '--ignore-installed', str(cls.wheel)])
+        shutil.copyfile(ROOT / 'examples/requests/internal-production.yaml',
+                        cls.work / 'request.yaml')
+        # Even the build tree is gone before any installed runtime is exercised.
+        shutil.rmtree(cls.source)
+
+    @classmethod
+    def run_checked(cls, command, *, cwd=None):
+        result = subprocess.run(command, cwd=cwd or cls.work, env=cls.env, text=True,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                timeout=120)
+        if result.returncode:
+            raise AssertionError(f'{command!r} failed ({result.returncode}):\n{result.stdout}')
+        return result.stdout
+
+    def probe(self, source):
+        return json.loads(self.run_checked([str(self.python), '-I', '-c', source]))
+
+    def test_installed_readback_and_route_review_work_without_legacy_imports(self):
+        result = self.probe(r"""
+import importlib.abc
+import importlib.util
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+import sys
+class RejectLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('legacy import: '+fullname)
+sys.meta_path.insert(0, RejectLegacy())
+from provisioner.execution import neutron_observe as neutron, readback_core as core, run_files as files, route_record_review as route
+assert not any(x == 'tools' or x.startswith('tools.') for x in sys.modules)
+assert core.identifier('operation-1') == 'operation-1'
+inputs = {'tenant_key': 'tenant-a', 'domain_key': 'domain-a', 'route_key': 'route-a',
+ 'destination_cidr': '10.30.0.0/24', 'engineering_record_ref': 'ENG-1',
+ 'attachment_acceptance_ref': 'ATTACH-1', 'router_id': 'router-1',
+ 'next_hop_address': '10.20.0.1', 'allow_restricted_build': True,
+ 'test_authorization_ref': 'TEST-1'}
+now = datetime.now(timezone.utc)
+record = {'module': 'openstack-route', 'route': {k: inputs[k] for k in route.COMMON | route.FIELDS['openstack-route']},
+ 'valid_from': (now-timedelta(minutes=1)).isoformat(),
+ 'valid_until': (now+timedelta(minutes=1)).isoformat(), 'attachment_cidr': '10.20.0.0/24'}
+accepted = route.review('openstack-route', inputs, record, now=now)
+assert accepted['status'] == 'RECORD_MATCH_NOT_AUTHORIZED'
+record['route']['router_id'] = 'foreign-router'
+assert route.review('openstack-route', inputs, record, now=now)['status'] == 'BLOCKED'
+private = Path.cwd() / 'installed-private-operator'
+private.mkdir(mode=0o700)
+packet = private / 'packet.json'
+files.write_new(packet, files.encoded({'operation_id':'operation-1','value':True}))
+assert files.load_private(packet)['value'] is True
+try:
+    files.write_new(packet, b'{}')
+except FileExistsError:
+    pass
+else:
+    raise AssertionError('immutable start overwritten')
+try:
+    neutron.strict_loads('{"duplicate":1,"duplicate":2}')
+except ValueError:
+    pass
+else:
+    raise AssertionError('duplicate input accepted')
+print(json.dumps({'status':'PASSED','nativeContact':False}))
+""")
+        self.assertEqual(result, {'status': 'PASSED', 'nativeContact': False})
+
+    def test_installed_execution_owners_refuse_missing_checkout_before_effects(self):
+        reviewed = self.base / 'source-binding'
+        shutil.copytree(ROOT, reviewed, ignore=shutil.ignore_patterns(
+            '.git', '.venv', '__pycache__', '.pytest_cache', 'build', 'dist', '*.egg-info'))
+        result = self.probe(r"""
+import importlib.abc
+import json
+from pathlib import Path
+import sys
+from types import SimpleNamespace
+from unittest.mock import patch
+class RejectLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('legacy import: '+fullname)
+sys.meta_path.insert(0, RejectLegacy())
+from provisioner.execution import (terraform_run as run, terraform_apply as apply,
+    wsd_handoff, lifecycle_transition, openstack_transition, flow_policy, plan_review)
+from provisioner.execution.run_files import OperatorError
+assert run.ROOT is None and apply.ROOT is None
+from provisioner.execution.source_integrity import verify_runtime
+reviewed = Path(FIXTURE_SOURCE_ROOT)
+runtime_binding = verify_runtime(reviewed)
+assert runtime_binding['status'] == 'RUNTIME_SOURCES_MATCH', runtime_binding
+from provisioner.execution.runtime_build import verify_application
+import subprocess
+from functools import partial
+selected_runtime = verify_application(sys.executable, reviewed,
+    partial(subprocess.check_output, text=True, timeout=30))
+assert selected_runtime['status'] == 'RUNTIME_SOURCES_MATCH'
+# Identical bytes with writable installed custody cannot activate a daemon.
+from provisioner.execution import source_integrity
+installed_verifier=Path(source_integrity.__file__)
+mode=installed_verifier.stat().st_mode & 0o777
+try:
+    installed_verifier.chmod(mode | 0o022)
+    try: verify_application(sys.executable, reviewed, partial(subprocess.check_output, text=True, stderr=subprocess.PIPE, timeout=30))
+    except subprocess.CalledProcessError: pass
+    else: raise AssertionError('Writable installed application custody accepted')
+finally:
+    installed_verifier.chmod(mode)
+# A different verifier cannot supply its own claim of source consistency.
+bootstrap=reviewed/'provisioner/execution/source_integrity.py'
+bootstrap_bytes=bootstrap.read_bytes()
+try:
+    bootstrap.write_bytes(bootstrap_bytes+b'\n# foreign verification bootstrap\n')
+    try: verify_application(sys.executable, reviewed, partial(subprocess.check_output, text=True, stderr=subprocess.PIPE, timeout=30))
+    except subprocess.CalledProcessError: pass
+    else: raise AssertionError('Different installed verifier accepted')
+finally:
+    bootstrap.write_bytes(bootstrap_bytes)
+changed = reviewed / 'provisioner/execution/flow_policy.py'
+original = changed.read_bytes()
+try:
+    changed.write_bytes(original+b'\n# changed fixture source\n')
+    assert verify_runtime(reviewed)['status'] == 'FAILED_RUNTIME_SOURCE_CHECK'
+    with patch.object(run, 'verify', return_value={'status':'HASHES_MATCH'}), \
+         patch.object(run, 'read_private') as private, patch.object(run, 'command') as native:
+        try:
+            run.prepare(SimpleNamespace(read_authorized_target=True), root=reviewed)
+        except OperatorError as error:
+            assert str(error) == 'Running package differs from the selected source checkout'
+        else:
+            raise AssertionError('mismatched installed implementation accepted')
+        private.assert_not_called()
+        native.assert_not_called()
+finally:
+    changed.write_bytes(original)
+for owner, invoke in ((run, lambda: run.prepare(SimpleNamespace(read_authorized_target=True))),
+                      (apply, lambda: apply.apply(SimpleNamespace())),
+                      (apply, lambda: apply.validate_bundle(None, None, None))):
+    with patch.object(owner, 'verify') as source, patch.object(owner, 'read_private') as inputs:
+        try:
+            invoke()
+        except OperatorError as error:
+            assert str(error) == 'An explicit current source checkout is required'
+        else:
+            raise AssertionError('installed effect accepted absent checkout')
+        source.assert_not_called()
+        inputs.assert_not_called()
+# Verify that both existing operator CLIs pass the explicit checkout to their
+# own implementation. A fixture intercepts the call before any source or target I/O.
+from contextlib import redirect_stdout
+import io
+source = Path.cwd() / 'explicit-reviewed-source'
+for owner, function, arguments in (
+    (run, 'prepare', ['--catalog-id', 'nutanix-wsd-domains', '--inputs', 'inputs',
+        '--backend', 'backend', '--authority', 'authority', '--environment', 'env',
+        '--output', 'output', '--terraform', 'terraform']),
+    (apply, 'apply', ['--bundle', 'operation', '--approval', 'approval',
+        '--ledger', 'ledger', '--terraform', 'terraform'])):
+    with patch.object(sys, 'argv', ['operator', *arguments, '--source-root', str(source)]), \
+         patch.object(owner, function, return_value={'status':'FIXTURE_ONLY'}) as effect, \
+         redirect_stdout(io.StringIO()):
+        assert owner.main() == 0
+        assert effect.call_args.kwargs == {'root':source}
+plan = {'format_version':'1.2','resource_changes':[{'address':'module.domain',
+ 'mode':'managed','type':'openstack_networking_network_v2',
+ 'provider_name':'registry.terraform.io/terraform-provider-openstack/openstack',
+ 'change':{'actions':['create'],'after_unknown':{},'after':{
+ 'admin_state_up':False,'shared':False,'external':False,'port_security_enabled':True}}}]}
+assert plan_review.review(plan)['status'] != 'BLOCKED'
+plan['resource_changes'][0]['change']['after']['shared'] = True
+assert plan_review.review(plan)['status'] == 'BLOCKED'
+assert all(not x.startswith('tools.') and x != 'tools' for x in sys.modules)
+print(json.dumps({'status':'PASSED','nativeContact':False}))
+""".replace("FIXTURE_SOURCE_ROOT", repr(str(reviewed))))
+        self.assertEqual(result, {'status': 'PASSED', 'nativeContact': False})
+
+    def test_wheel_owns_all_data_without_shared_top_level_directories(self):
+        with zipfile.ZipFile(self.wheel) as wheel:
+            members = wheel.namelist()
+        self.assertIn('provisioner/execution/terraform_catalog.py', members)
+        self.assertIn('provisioner/execution/input_review.py', members)
+        self.assertIn('provisioner/execution/flow_policy.py', members)
+        self.assertFalse(any(name.startswith('tools/flow_policy.') for name in members))
+        self.assertIn('provisioner/execution/lifecycle_transition.py', members)
+        self.assertFalse(any(name.startswith('tools/lifecycle_transition.') for name in members))
+        self.assertIn('provisioner/execution/openstack_transition.py', members)
+        self.assertFalse(any(name.startswith('tools/openstack_transition.') for name in members))
+        self.assertIn('provisioner/execution/plan_review.py', members)
+        self.assertFalse(any(name.startswith('tools/plan_review.') for name in members))
+        self.assertIn('provisioner/execution/terraform_apply.py', members)
+        self.assertFalse(any(name.startswith('tools/terraform_apply.') for name in members))
+        self.assertIn('provisioner/execution/terraform_run.py', members)
+        self.assertFalse(any(name.startswith('tools/terraform_run.') for name in members))
+        self.assertIn('provisioner/execution/wsd_handoff.py', members)
+        self.assertFalse(any(name.startswith('tools/wsd_handoff.') for name in members))
+
+        self.assertIn('provisioner/execution/readback_core.py', members)
+        self.assertFalse(any(name.startswith('tools/readback_core.') for name in members))
+        self.assertIn('provisioner/execution/neutron_observe.py', members)
+        self.assertFalse(any(name.startswith('tools/neutron_observe.') for name in members))
+        self.assertIn('provisioner/execution/run_files.py', members)
+        self.assertFalse(any(name.startswith('tools/run_files.') for name in members))
+        self.assertIn('provisioner/execution/route_record_review.py', members)
+        self.assertFalse(any(name.startswith('tools/route_record_review.') for name in members))
+
+        self.assertIn('provisioner/execution/source_integrity.py', members)
+        self.assertIn('provisioner/execution/guest_probe.py', members)
+        self.assertIn('provisioner/execution/route_audit.py', members)
+        self.assertIn('provisioner/allocations/reservation_evidence.py', members)
+        self.assertIn('provisioner/allocations/ipam_evidence.py', members)
+        self.assertIn('provisioner/allocations/dns_evidence.py', members)
+        self.assertIn('provisioner/allocations/capacity_evidence.py', members)
+        self.assertIn('provisioner/allocations/site_eligibility.py', members)
+        self.assertIn('provisioner/allocations/reservation_preflight.py', members)
+        self.assertIn('provisioner/allocations/ipam_preflight.py', members)
+        self.assertIn('provisioner/allocations/dns_preflight.py', members)
+        self.assertFalse(any(name.startswith('scripts/check_ipam_allocation_records.') for name in members))
+        self.assertFalse(any(name.startswith('scripts/check_dns_registration_records.') for name in members))
+        self.assertFalse(any(name.startswith('scripts/check_reservation_records.') for name in members))
+        self.assertFalse(any(name.startswith('tools/terraform_catalog.') for name in members))
+        self.assertFalse(any(name.startswith('tools/input_review.') for name in members))
+        self.assertFalse(any(name.startswith('tools/check_release.') for name in members))
+        self.assertFalse(any(name.startswith('tools/guest_probe.') for name in members))
+        self.assertFalse(any(name.startswith('tools/route_audit.') for name in members))
+        for name in members:
+            self.assertNotIn(name.split('/')[0],
+                             {'profiles', 'policy', 'sources', 'terraform',
+                              'ansible', 'config', 'docs'})
+        for name in ('profiles/security/catalog.json', 'policy/rules/standards.json',
+                     'sources/capabilities/platform_registry.json',
+                     'terraform/catalog.json', 'ansible/catalog.json',
+                     'config/toolchain.json'):
+            self.assertIn('hosting_resources/_assets/' + name, members)
+
+    def test_incremental_build_removes_retired_and_deleted_resources(self):
+        for relative in (*self.retired, *self.retired_python):
+            self.assertFalse((self.staging / relative).exists(), relative)
+        self.assertFalse((self.staging / 'hosting_resources/_assets/obsolete').exists())
+        self.assertTrue((self.staging / 'hosting_resources/_assets/terraform/catalog.json').is_file())
+
+    def test_build_refuses_source_ancestor_and_package_destinations(self):
+        self.assertEqual(len(self.unsafe_build_results), 3)
+        for result in self.unsafe_build_results:
+            self.assertIn('Runtime build output overlaps source inputs', result)
+
+    def test_installed_planning_loads_owner_modules_and_all_resources(self):
+        result = self.probe('''
+import json, sys
+from pathlib import Path
+before = list(sys.path)
+from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+from provisioner import repository
+from provisioner.cli.main import dispatch
+from provisioner.inventory.model import fixture
+from provisioner.policy.standards import load_rules
+from provisioner.profiles.loader import load_catalogs
+from provisioner.schemas.registry import load_schema
+from provisioner.portability.artifacts import load as artifact_registry
+from provisioner.compiler.artifacts import assert_output_path
+from provisioner.domain.errors import ProvisioningError
+from provisioner.execution.terraform_catalog import entries
+from provisioner.execution import input_review
+code, plan = dispatch(['plan', 'request.yaml'])
+registry = repository.capability_registry()
+eligible, blockers = repository.capability_eligible(registry, 'openstack', {'ipv4'})
+declarations = repository.declared_contracts()
+assert all(repository.native_variables(platform, phase)
+           for platform in ('nutanix', 'vmware', 'openstack')
+           for phase in ('domains', 'workloads'))
+assert repository.reservation_records()['records'] == []
+assert repository.ipam_allocation_records()['records'] == []
+assert repository.dns_registration_records()['records'] == []
+assert load_schema('workload-security-domain')
+assert artifact_registry()['artifacts']
+assert load_rules() and len(load_catalogs().families) == 10
+assert fixture().status == 'FIXTURE_NOT_AUTHORITATIVE'
+assert declarations['reservation_intent']['format']
+assert entries()
+assert callable(input_review.review_inputs)
+assert code == 0, plan
+assert SOURCE_ROOT is None
+assert RESOURCE_ROOT.is_relative_to(Path(sys.prefix))
+assert repository.reviewed_source('request.yaml') == str(Path('request.yaml').resolve())
+assert repository.reviewed_source('<memory>') == '<memory>'
+assert sys.path == before, (before, sys.path)
+assert repository.source_commit()['status'] == 'BLOCKED_NO_CURRENT_CHECKOUT'
+for path in (RESOURCE_ROOT / 'generated', Path(repository.__file__).parent / 'generated'):
+    try:
+        assert_output_path(path)
+    except ProvisioningError as error:
+        assert error.code == 'OUTPUT_PATH_NOT_PRIVATE'
+    else:
+        raise AssertionError('Generated output accepted inside the installation')
+print(json.dumps({'status': plan['status'], 'native_contact': plan['native_contact'],
+                  'capability_eligible': eligible, 'blockers': blockers}))
+''')
+        self.assertFalse(result['native_contact'])
+        self.assertFalse(result['capability_eligible'])
+        self.assertTrue(result['blockers'])
+
+    def test_offline_owner_signing_runs_from_the_installed_distribution(self):
+        from datetime import datetime, timezone
+        from tests.provisioning.discovery.test_application_review import stored_fixture, OwnerFixture
+        from tests.provisioning.discovery.test_owner_signing import fixture_files, prepare_args, sign_args
+        from provisioner.controlplane.discovery.assessment_inputs import parse_evidence
+        # Only the parent builds synthetic inputs. The installed child cannot
+        # import tests or the checkout and does not connect to a native system.
+        stored, _ = stored_fixture()
+        with tempfile.TemporaryDirectory(dir=self.work) as directory:
+            root = Path(directory)
+            fixture = OwnerFixture(root/'policy.json', stored, at=datetime.now(timezone.utc))
+            fixture_files(root, stored, fixture)
+            command = [str(self.python), '-I', '-m',
+                       'provisioner.controlplane.discovery.owner_signing']
+            prepared = json.loads(self.run_checked(command + prepare_args(root, stored)))
+            signed = json.loads(self.run_checked(command + sign_args(root, stored)))
+            self.assertEqual(prepared['evidenceDigest'], signed['evidenceDigest'])
+            self.assertEqual(signed['status'], 'SIGNED_NOT_INGESTED')
+            submission = json.loads((root/'signed.json').read_bytes())
+            fixture.trust.verify(parse_evidence(submission['evidence']),
+                                 tuple(submission['signatures']), datetime.now(timezone.utc))
+            self.assertFalse(signed['executionAuthorized'])
+        result = self.probe("""
+import json, importlib.metadata
+from provisioner.controlplane.discovery import owner_signing
+entry = next(e for e in importlib.metadata.distribution('hosting-provisioner').entry_points
+             if e.name == 'hosting-application-review')
+assert entry.load() is owner_signing.main
+print(json.dumps({'owner': entry.value}))
+""")
+        self.assertEqual(result['owner'], 'provisioner.controlplane.discovery.owner_signing:main')
+
+    def test_route_audit_is_package_owned_without_legacy_imports(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, sys
+from pathlib import Path
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools','scripts'):
+            raise AssertionError('Route audit reached legacy owner: '+fullname)
+blocker=NoLegacy(); sys.meta_path.insert(0, blocker)
+try:
+    from provisioner.execution import route_audit
+    assert Path(route_audit.__file__).is_relative_to(Path(sys.prefix))
+    assert route_audit.DOC_NETS
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('tools.route_audit') is None
+print(json.dumps({'owner':route_audit.__name__,'legacyImports':False,'nativeContact':False}))
+''')
+        self.assertEqual(result['owner'],'provisioner.execution.route_audit')
+        self.assertFalse(result['legacyImports'])
+        self.assertFalse(result['nativeContact'])
+
+    def test_guest_probe_is_package_owned_and_qualifier_uses_that_file(self):
+        result = self.probe('''
+import importlib.util, json, sys
+from pathlib import Path
+from provisioner.execution import guest_probe
+from provisioner.execution import qualify_target
+probe = Path(guest_probe.__file__).resolve()
+assert probe.is_relative_to(Path(sys.prefix))
+assert qualify_target.ROOT is None
+assert Path(qualify_target.guest_probe.__file__).resolve() == probe
+assert importlib.util.find_spec('tools.guest_probe') is None
+print(json.dumps({'owner': guest_probe.__name__, 'probe': str(probe), 'nativeContact': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.execution.guest_probe')
+        self.assertFalse(result['nativeContact'])
+
+    def test_guest_transfer_and_native_readers_have_one_installed_owner(self):
+        names = repr(B05_EXECUTION_OWNERS)
+        result = self.probe('''
+import importlib, importlib.abc, importlib.util, json, subprocess, sys
+from pathlib import Path
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in {'tools', 'scripts'}:
+            raise AssertionError('Package execution reached retired owner: ' + fullname)
+blocker = NoLegacy(); sys.meta_path.insert(0, blocker)
+try:
+    modules = tuple(importlib.import_module('provisioner.execution.' + name) for name in ''' + names + ''')
+    assert all(Path(module.__file__).is_relative_to(Path(sys.prefix)) for module in modules)
+    allocation_modules = tuple(importlib.import_module('provisioner.allocations.' + name) for name in ('capacity_owner', 'capacity_demand', 'netbox_ipam', 'transactions', 'ipam_transactions'))
+    assert all(Path(module.__file__).is_relative_to(Path(sys.prefix)) for module in allocation_modules)
+    live_modules = tuple(importlib.import_module(name) for name in ('provisioner.controlplane.operations.action_gate', 'provisioner.controlplane.operations.health', 'provisioner.controlplane.operations.recovery', 'provisioner.controlplane.operations.runtime', 'provisioner.qualification.action_gate', 'provisioner.qualification.mobility', 'provisioner.qualification.release', 'provisioner.qualification.directed_mobility', 'provisioner.execution.image_sandbox', 'provisioner.controlplane.conversion.contracts', 'provisioner.controlplane.conversion.rehearsal', 'provisioner.migration.application', 'provisioner.migration.activities', 'provisioner.migration.cutover', 'provisioner.migration.cold_descriptor', 'provisioner.migration.resources', 'provisioner.migration.authority', 'provisioner.migration.wave_schedule', 'provisioner.controlplane.workflow.application_selection', 'provisioner.controlplane.workflow.execution_selection', 'provisioner.controlplane.workflow.application_job', 'provisioner.controlplane.reconciliation.planned', 'provisioner.controlplane.reconciliation.planned_terraform', 'provisioner.controlplane.discovery.alert_delivery', 'provisioner.controlplane.discovery.alert_transport', 'provisioner.controlplane.discovery.monitor_runtime', 'provisioner.controlplane.discovery.shared_read_budget'))
+    assert all(Path(module.__file__).is_relative_to(Path(sys.prefix)) for module in live_modules)
+    import hosting_resources
+    assert all(hosting_resources.resource_path(name).is_file() for name in hosting_resources.EXTRA_EVIDENCE_DOCS)
+    from provisioner.execution import guest_run, guest_apply, qualify_target, readback_cli, nsx_observe, delivery_steps, runtime_build, owner_worker, vsphere_power, openstack_quota, delivery_run
+    assert guest_run.ROOT is None and guest_apply.ROOT is None and qualify_target.ROOT is None
+    for call in (lambda: guest_run.prepare(None), lambda: guest_apply.validate_bundle(Path('/not-read'), {})):
+        try: call()
+        except ValueError as error: assert 'explicit current source checkout' in str(error)
+        else: raise AssertionError('Installed guest execution accepted absent source selection')
+    assert all(module.ROOT is None for module in (runtime_build, owner_worker, vsphere_power, openstack_quota, delivery_run))
+    owner_commands = [delivery_steps.child_command(name, ['--help']) for name in sorted(delivery_steps.CHILD_OWNERS)]
+    try: delivery_steps.child_command('tools.nft_edge', [])
+    except ValueError: pass
+    else: raise AssertionError('Legacy delivery child admitted')
+    command = readback_cli.module_command(nsx_observe, [str(Path.cwd() / 'missing-reader-manifest')])
+    assert command[1:4] == ['-I', '-B', '-c']
+finally:
+    sys.meta_path.remove(blocker)
+assert all(importlib.util.find_spec('tools.' + name) is None for name in ''' + names + ''')
+assert all(importlib.util.find_spec('tools.' + name) is None for name in ('capacity', 'capacity_demand', 'netbox_ipam'))
+child = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True,
+                       text=True, cwd=Path.cwd(), timeout=15)
+assert child.returncode == 2, child.stdout + child.stderr
+assert json.loads(child.stdout) == {'status': 'INPUT_OR_OUTPUT_REJECTED', 'may_activate': False}
+for command in owner_commands:
+    result = subprocess.run(command, stdin=subprocess.DEVNULL, capture_output=True, text=True, cwd=Path.cwd(), timeout=15)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert 'usage:' in result.stdout
+print(json.dumps({'owners': len(modules), 'legacyImports': False, 'nativeContact': False}))
+''')
+        self.assertEqual(result['owners'], len(B05_EXECUTION_OWNERS))
+        self.assertFalse(result['legacyImports'])
+        self.assertFalse(result['nativeContact'])
+
+    def test_source_integrity_is_package_owned_and_has_no_checkout_fallback(self):
+        result = self.probe('''
+import importlib.util, json
+from pathlib import Path
+from provisioner.execution import source_integrity
+from hosting_resources import SOURCE_ROOT
+assert SOURCE_ROOT is None
+assert Path(source_integrity.__file__).is_relative_to(Path(__import__("sys").prefix))
+assert importlib.util.find_spec("tools.check_release") is None
+value = source_integrity.verify()
+assert value["status"] == "BLOCKED_NO_CURRENT_CHECKOUT"
+print(json.dumps({"owner": source_integrity.__name__, "status": value["status"]}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.execution.source_integrity')
+        self.assertEqual(result['status'], 'BLOCKED_NO_CURRENT_CHECKOUT')
+
+    def test_catalog_is_independent_of_checkout_tools_and_working_directory(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, sys
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('Catalog reached retired dependency: ' + fullname)
+blocker = NoLegacy()
+sys.meta_path.insert(0, blocker)
+try:
+    from provisioner.execution import terraform_catalog
+    from hosting_resources import SOURCE_ROOT, RESOURCE_ROOT
+    rows = terraform_catalog.entries()
+    assert SOURCE_ROOT is None
+    assert Path(terraform_catalog.__file__).is_relative_to(Path(sys.prefix))
+    assert RESOURCE_ROOT.is_relative_to(Path(sys.prefix))
+    assert rows == json.loads((RESOURCE_ROOT / 'terraform/catalog.json').read_text())['entries']
+    assert sys.path == before
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('tools.terraform_catalog') is None
+assert importlib.util.find_spec('tools.check_release') is None
+print(json.dumps({'entries': len(rows), 'legacyImports': False, 'nativeContact': False}))
+''')
+        self.assertGreater(result['entries'], 0)
+        self.assertFalse(result['legacyImports'])
+        self.assertFalse(result['nativeContact'])
+
+    def test_reservation_evidence_runs_without_legacy_imports_or_checkout(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, os, sys, tempfile
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('Reservation evidence reached a legacy owner: ' + fullname)
+blocker = NoLegacy()
+sys.meta_path.insert(0, blocker)
+try:
+    from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+    from provisioner import repository
+    from provisioner.allocations import reservation_evidence as records
+    assert SOURCE_ROOT is None
+    assert Path(records.__file__).is_relative_to(Path(sys.prefix))
+    assert records.INDEX.is_relative_to(RESOURCE_ROOT)
+    original = records.INDEX.read_bytes()
+    with tempfile.TemporaryDirectory() as directory:
+        previous = Path.cwd()
+        os.chdir(directory)
+        try:
+            forged = Path('sources/capabilities/reservation_record_index.json')
+            forged.parent.mkdir(parents=True)
+            forged.write_text('{"forged": true}')
+            assert repository.reservation_records() == records.load()
+            assert records.validate(records.load())['record_count'] == 0
+            records.INDEX.unlink()
+            try:
+                records.load()
+            except FileNotFoundError:
+                pass
+            else:
+                raise AssertionError('Missing installed index resolved a cwd fallback')
+        finally:
+            records.INDEX.write_bytes(original)
+            os.chdir(previous)
+    assert sys.path == before
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('scripts.check_reservation_records') is None
+print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.allocations.reservation_evidence')
+        self.assertFalse(result['legacyImports'])
+        report = json.loads(self.run_checked([str(self.python), '-I', '-m',
+            'provisioner.allocations.reservation_evidence', '--as-of', '2026-10-02T00:00:00Z']))
+        self.assertEqual(report['status'], 'PASSED_EXPORTED_RESERVATION_RECORDS')
+        self.assertEqual(report['record_count'], 0)
+        self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
+
+    def test_ipam_evidence_runs_without_legacy_imports_or_checkout(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, os, sys, tempfile
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('IPAM evidence reached a legacy owner: ' + fullname)
+blocker = NoLegacy()
+sys.meta_path.insert(0, blocker)
+try:
+    from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+    from provisioner import repository
+    from provisioner.allocations import ipam_evidence as records
+    assert SOURCE_ROOT is None
+    assert Path(records.__file__).is_relative_to(Path(sys.prefix))
+    assert records.INDEX.is_relative_to(RESOURCE_ROOT)
+    original = records.INDEX.read_bytes()
+    with tempfile.TemporaryDirectory() as directory:
+        previous = Path.cwd()
+        os.chdir(directory)
+        try:
+            forged = Path('sources/capabilities/ipam_allocation_index.json')
+            forged.parent.mkdir(parents=True)
+            forged.write_text('{"forged": true}')
+            assert repository.ipam_allocation_records() == records.load()
+            assert records.validate(records.load())['record_count'] == 0
+            records.INDEX.unlink()
+            try:
+                records.load()
+            except FileNotFoundError:
+                pass
+            else:
+                raise AssertionError('Missing installed IPAM index resolved a cwd fallback')
+        finally:
+            records.INDEX.write_bytes(original)
+            os.chdir(previous)
+    assert sys.path == before
+finally:
+    sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('scripts.check_ipam_allocation_records') is None
+print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.allocations.ipam_evidence')
+        self.assertFalse(result['legacyImports'])
+        report = json.loads(self.run_checked([str(self.python), '-I', '-m',
+            'provisioner.allocations.ipam_evidence', '--as-of', '2026-10-02T00:00:00Z']))
+        self.assertEqual(report['status'], 'PASSED_EXPORTED_AUTHORITATIVE_IPAM_RECORDS')
+        self.assertEqual(report['record_count'], 0)
+        self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
+
+    def test_dns_evidence_runs_without_legacy_imports_or_checkout(self):
+        result = self.probe('''
+import importlib.abc, importlib.util, json, os, sys, tempfile
+from pathlib import Path
+before = list(sys.path)
+class NoLegacy(importlib.abc.MetaPathFinder):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.')[0] in ('tools', 'scripts'):
+            raise AssertionError('DNS evidence reached a legacy owner: ' + fullname)
+blocker = NoLegacy(); sys.meta_path.insert(0, blocker)
+try:
+    from hosting_resources import RESOURCE_ROOT, SOURCE_ROOT
+    from provisioner import repository
+    from provisioner.allocations import dns_evidence as records, ipam_evidence
+    assert SOURCE_ROOT is None and records.INDEX.is_relative_to(RESOURCE_ROOT)
+    original = records.INDEX.read_bytes()
+    with tempfile.TemporaryDirectory() as directory:
+        previous = Path.cwd(); os.chdir(directory)
+        try:
+            forged=Path('sources/capabilities/dns_registration_index.json'); forged.parent.mkdir(parents=True); forged.write_text('{"forged": true}')
+            assert repository.dns_registration_records() == records.load()
+            assert records.validate(records.load(),ipam_index=ipam_evidence.load())['record_count'] == 0
+            records.INDEX.unlink()
+            try: records.load()
+            except FileNotFoundError: pass
+            else: raise AssertionError('Missing installed DNS index resolved a cwd fallback')
+        finally:
+            records.INDEX.write_bytes(original); os.chdir(previous)
+    assert sys.path == before
+finally: sys.meta_path.remove(blocker)
+assert importlib.util.find_spec('scripts.check_dns_registration_records') is None
+print(json.dumps({'owner': records.load.__module__, 'legacyImports': False}))
+''')
+        self.assertEqual(result['owner'], 'provisioner.allocations.dns_evidence')
+        self.assertFalse(result['legacyImports'])
+        report = json.loads(self.run_checked([str(self.python), '-I', '-m',
+            'provisioner.allocations.dns_evidence', '--as-of', '2026-10-02T00:00:00Z']))
+        self.assertEqual(report['status'], 'PASSED_EXPORTED_AUTHORITATIVE_DNS_RECORDS')
+        self.assertEqual(report['record_count'], 0)
+        self.assertTrue(all(value is False for key, value in report.items() if key.startswith('may_')))
+
+    def test_missing_packaged_asset_cannot_resolve_a_shared_directory(self):
+        result = self.probe('''
+import json
+from pathlib import Path
+import hosting_resources
+from provisioner.repository import asset_path, document_exists
+root = hosting_resources.RESOURCE_ROOT
+target = root / 'config/toolchain.json'
+shared = Path(hosting_resources.__file__).resolve().parent.parent / 'config/toolchain.json'
+saved = target.read_bytes()
+shared.parent.mkdir(exist_ok=True)
+shared.write_bytes(saved)
+target.unlink()
+try:
+    assert asset_path('config/toolchain.json') == target
+    assert not asset_path('config/toolchain.json').exists()
+    assert not document_exists('../config/toolchain.json')
+    for value in ('../config/toolchain.json', '/config/toolchain.json',
+                  'config\\\\toolchain.json', 'C:/config/toolchain.json',
+                  './config/toolchain.json', 'config//toolchain.json'):
+        try:
+            asset_path(value)
+        except ValueError:
+            continue
+        raise AssertionError('Unsafe resource path accepted: ' + value)
+    print(json.dumps({'refused_fallback': True}))
+finally:
+    target.write_bytes(saved)
+    shared.unlink()
+    shared.parent.rmdir()
+''')
+        self.assertTrue(result['refused_fallback'])
+
+
+if __name__ == '__main__':
+    unittest.main()

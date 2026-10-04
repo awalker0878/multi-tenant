@@ -40,9 +40,18 @@ External reservations such as IPAM remain under their own owners. The repository
 The active site/service envelope inventory and reservation evidence index are empty, so the repository example remains:
 
 ```sh
-python scripts/check_reservation_preflight.py examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE
+python -m provisioner.allocations.reservation_preflight examples/reservation_intent.json.example --as-of 2026-09-18T18:00:00Z --expected-status HOLD_ENVELOPE_NOT_CURRENTLY_ELIGIBLE
 ```
 
 All mutation and activation flags remain false. A future ready result means only that the exact immutable spec may be submitted to the authoritative reservation owner under its accepted interface.
 
 [Provisioning sequence](../architecture/reference/23-tenant-domain-and-workload-provisioning-sequence.md) · [Safe activation](../implementation/provisioning-strategy/4-end-to-end-fixture-provisioning-and-safe-activation.md) · [Concurrency and failure](../implementation/provisioning-strategy/5-concurrency-ownership-and-failed-execution.md) · [Site/service capacity eligibility](site-service-capacity-eligibility.md)
+
+## Installed record reader
+
+The existing exported-record implementation is now package-owned at
+`provisioner.allocations.reservation_evidence`; its former script is retired without
+an alias. [The runtime contract](reservation-evidence-runtime.md) describes bounded
+file input, exact artifact references, installed execution and unchanged evidence
+semantics. This does not implement the external reservation authority or transactional
+reserve/renew/confirm/release workflow.

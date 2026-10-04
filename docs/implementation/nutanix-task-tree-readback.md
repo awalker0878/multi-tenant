@@ -36,7 +36,7 @@ It defaults to no native contact and must not be enabled by changing one Boolean
 ## Validate without contact
 
 ```sh
-python tools/nutanix_observe.py examples/nutanix_task_tree_observation.json.example
+python provisioner/execution/nutanix_observe.py examples/nutanix_task_tree_observation.json.example
 ```
 
 Expected result: `INPUT_VALID_NO_CONTACT`. This checks shape and the six planned exact
@@ -49,7 +49,7 @@ and use the existing explicit contact command. Never put credential values in fi
 command arguments or review comments. A documentation `.invalid` endpoint is refused.
 
 ```sh
-python tools/nutanix_observe.py /secure/accepted-tree.json \
+python provisioner/execution/nutanix_observe.py /secure/accepted-tree.json \
   --read-authorized-target --expected-origin https://pc.site.invalid:9440 \
   --ca-file /secure/approved-ca.pem --output /secure/observation-new.json
 ```

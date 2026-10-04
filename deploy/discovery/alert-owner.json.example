@@ -1,0 +1,17 @@
+{
+  "format": "hosting-discovery-alert-receiver/1",
+  "ownerId": "commissioned-alert-owner",
+  "bindIp": "192.0.2.40",
+  "bindPort": 8443,
+  "maxConnections": 16,
+  "certificateFile": "/etc/hosting/discovery/alerts/owner-1.pem",
+  "keyFile": "/etc/hosting/discovery/alerts/owner-1.key",
+  "receiptKeyFile": "/etc/hosting/discovery/alerts/owner-1-receipts.pem",
+  "receiptPublicKey": "REPLACE_WITH_BASE64_ED25519_OWNER_PUBLIC_KEY",
+  "inboxDirectory": "/var/lib/hosting-discovery/alert-inbox/owner-1",
+  "ownershipFile": "/etc/hosting/discovery/alerts/owner-1-oncall.json",
+  "ownershipPublicKey": "REPLACE_WITH_SEPARATE_BASE64_ED25519_ONCALL_AUTHORITY_KEY",
+  "minimumOwnershipRevision": 1,
+  "serviceEnrollmentFile": "/etc/hosting/discovery/alerts/owner-1-service.json",
+  "serviceEnrollmentDigest": "REPLACE_WITH_ACTUAL_MANIFEST_SHA256"
+}

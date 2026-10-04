@@ -46,11 +46,15 @@ from provisioner.controlplane.persistence.environments import (
 from provisioner.controlplane.discovery.persistence import (
     DiscoveryRepository, StoredGeneration, StoredObservation,
 )
+from provisioner.controlplane.discovery.service import (
+    AssessmentDestination, AssessmentSelection, AssessmentService,
+)
+from provisioner.controlplane.discovery.normalization import NormalizationHeld
 from provisioner.domain.enterprise_records import validate_record
 
 from .body_limit import BodyLimitMiddleware
 from .portal import PortalConfig, mount_portal
-from .models import (AccessPage, ApprovalReceipt, ApprovalRequest,
+from .models import (ApplicationAssessmentRequest, AccessPage, ApprovalReceipt, ApprovalRequest, AssessmentRequest,
                      DiscoveryGenerationPage, DiscoveryGenerationView,
                      EnvironmentCreate, EnvironmentPage, EnvironmentView,
                      ErrorResponse, JobEventPage, JobEventView, JobView,
@@ -206,6 +210,9 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
                jobs: JobRepository, environments: EnvironmentRepository, *,
                evidence_gate: EvidenceMutationGate,
                discovery: DiscoveryRepository | None = None,
+               assessment_inputs=None,
+               application_drafts=None,
+               application_reviews=None,
                max_body_bytes: int = 1024 * 1024,
                clock: Callable[[], datetime] | None = None,
                portal_config: PortalConfig | None = None) -> FastAPI:
@@ -215,6 +222,8 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             or not isinstance(jobs, JobRepository)
             or not isinstance(environments, EnvironmentRepository)
             or discovery is not None and not isinstance(discovery, DiscoveryRepository)
+            or assessment_inputs is not None and (
+                discovery is None or not callable(getattr(assessment_inputs, 'bind', None)))
             or evidence_gate is None
             or not callable(getattr(evidence_gate, 'require', None))):
         raise TypeError('Real record, authority, job and evidence services are required')
@@ -484,6 +493,87 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             'nextAfter': cursor,
         })
 
+    @app.post('/v1/assessments/compare', responses=_ERRORS, tags=['discovery'])
+    def compare_destinations(document: AssessmentRequest,
+                             active: _Session = Depends(session)) -> dict:
+        # Resolve every selection before any inventory is read. No request can
+        # supply its own installed tuple, qualification, principal or findings.
+        visible_environment(active, document.source.environment_id)
+        for target in document.destinations:
+            visible_environment(active, target.environment_id)
+        if assessment_inputs is None:
+            raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
+                            'Independently verified assessment inputs are unavailable')
+        try:
+            service = AssessmentService(discovery_repository(),
+                                        assessment_inputs.bind(active.credential), clock=now)
+            comparison = service.compare(
+                context(active), active.principal.subject,
+                AssessmentSelection(document.source.environment_id,
+                                    document.source.generation),
+                document.workload_native_id,
+                tuple(AssessmentDestination(
+                    AssessmentSelection(target.environment_id, target.generation),
+                    target.capacity_kind, target.capacity_native_id)
+                    for target in document.destinations),
+                method=document.method, guest_profile=document.guest_profile,
+                network_mode=document.network_mode, data_mode=document.data_mode)
+        except (PermissionError, AuthenticationFailed, AuthorityDenied):
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found') from None
+        except NormalizationHeld:
+            raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
+                            'Pinned inventory integrity requires operator review') from None
+        except ValueError:
+            raise _ApiError(422, 'ASSESSMENT_SELECTION_INVALID',
+                            'Assessment selection or route is invalid') from None
+        except (RuntimeError, OSError):
+            raise _ApiError(503, 'ASSESSMENT_UNAVAILABLE',
+                            'Verified assessment inputs are temporarily unavailable') from None
+        return comparison.to_document()
+
+    @app.post('/v1/assessments/applications/compare', responses=_ERRORS, tags=['discovery'])
+    def compare_application(document: ApplicationAssessmentRequest,
+                            active: _Session = Depends(session)) -> dict:
+        from provisioner.controlplane.discovery.application_assessment import (
+            ApplicationAssessmentService, ApplicationMemberProfile)
+        from provisioner.controlplane.discovery.application_reviews import ApplicationReviewUnavailable
+        selections = (document.source, *document.destinations)
+        for selection in selections:
+            visible_environment(active, selection.environment_id)
+        if assessment_inputs is None or application_drafts is None or application_reviews is None:
+            raise _ApiError(503, 'APPLICATION_ASSESSMENT_UNAVAILABLE',
+                            'Signed application assessment is unavailable')
+        try:
+            assessments = AssessmentService(discovery_repository(),
+                assessment_inputs.bind(active.credential), clock=now)
+            service = ApplicationAssessmentService(application_drafts, application_reviews, assessments)
+            result = service.compare(context(active), active.principal.subject,
+                AssessmentSelection(document.source.environment_id, document.source.generation),
+                document.application_group_id, revision=document.draft_revision,
+                record_digest=document.draft_record_digest,
+                profiles=tuple(ApplicationMemberProfile(item.workload_id, item.guest_profile)
+                               for item in document.member_profiles),
+                destinations=tuple(AssessmentDestination(
+                    AssessmentSelection(item.environment_id, item.generation),
+                    item.capacity_kind, item.capacity_native_id) for item in document.destinations),
+                method=document.method, network_mode=document.network_mode, data_mode=document.data_mode)
+            principal = authority.authenticate(active.credential)
+            if (principal.kind != 'HUMAN' or principal.subject != active.principal.subject
+                    or principal.organization_id != active.principal.organization_id
+                    or principal.tenant_id != active.principal.tenant_id):
+                raise PermissionError('Application assessment identity changed')
+            for selection in selections:
+                visible_environment(_Session(principal, active.credential), selection.environment_id)
+            return result
+        except (PermissionError, LookupError, AuthenticationFailed, AuthorityDenied):
+            raise _ApiError(404, 'RESOURCE_NOT_FOUND', 'Resource not found') from None
+        except (ApplicationReviewUnavailable, NormalizationHeld, RuntimeError, OSError):
+            raise _ApiError(503, 'APPLICATION_ASSESSMENT_UNAVAILABLE',
+                            'Pinned application or signed evidence requires review') from None
+        except ValueError:
+            raise _ApiError(422, 'APPLICATION_ASSESSMENT_SELECTION_INVALID',
+                            'Exact application, complete profiles and bounded destinations are required') from None
+
     @app.post('/v1/environments', status_code=201,
               response_model=EnvironmentView, responses=_ERRORS,
               tags=['environments'])
@@ -638,6 +728,9 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
             'source': _review_scope(frozen.source),
             'destination': _review_scope(frozen.destination),
             'routeMethod': spec['route']['method'],
+            'execution': ({'driver': spec['execution']['driver'],
+                           'artifactDigest': spec['execution']['artifactDigest']}
+                          if 'execution' in spec else None),
             'selectedMachineCount': len(spec['selectedMachineIds']),
             'selectedDatasetCount': len(spec['selectedDatasetIds']),
             'maxDowntimeSeconds': spec['maxDowntimeSeconds'],
@@ -712,5 +805,14 @@ def create_app(records: EnterpriseRecordStore, authority: AuthorityService,
         return JobEventPage.model_validate({'items': [_event_view(event) for event in page],
                                             'nextAfter': next_after})
 
+    from .application_drafts import install_routes
+    install_routes(app, repository=application_drafts, authority=authority, reviews=application_reviews,
+                   session=session, environment=visible_environment, context=context,
+                   require_evidence=require_evidence, clock=now, error=_ApiError)
+    from .discovery_freshness import install_routes as install_freshness_routes
+    install_freshness_routes(app, repository=discovery, authority=authority,
+                             session=session, environment=visible_environment,
+                             context=context, require_evidence=require_evidence,
+                             clock=now, error=_ApiError)
     mount_portal(app, portal_config)
     return app

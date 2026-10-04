@@ -5,6 +5,7 @@ import json
 import os
 import unittest
 from copy import deepcopy
+from dataclasses import asdict
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
@@ -80,6 +81,8 @@ class NativeRegistryPostgresTest(unittest.TestCase):
         cls.runtime_dsn = os.environ['HOSTING_TEST_POSTGRES_RUNTIME_DSN']
         apply_migrations(lambda: psycopg.connect(
             os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN']))
+        from tests.provisioning.operations.isolated_instance import commission_isolated_instance
+        commission_isolated_instance(os.environ['HOSTING_TEST_POSTGRES_MIGRATION_DSN'])
 
     def setUp(self):
         suffix = uuid4().hex[:12]
@@ -121,8 +124,9 @@ class NativeRegistryPostgresTest(unittest.TestCase):
                 (self.ctx.organization_id, self.ctx.tenant_id,
                  self.job_id, 'key-' + suffix, self.plan['metadata']['planId'],
                  self.plan['metadata']['planDigest'],
-                 json.dumps(self.plan['spec']['source']),
-                 json.dumps(self.plan['spec']['destination']), 'operator-1'))
+                 json.dumps(asdict(PlanScope.from_record(self.plan['spec']['source']))),
+                 json.dumps(asdict(PlanScope.from_record(self.plan['spec']['destination']))),
+                 'operator-1'))
         self.owner = self.store.acquire_owner_lease(
             self.ctx, self.plan['spec']['source'], self.binding,
             self.workload['metadata']['workloadId'], 'worker-1', 60, self.audit)
@@ -173,6 +177,55 @@ class NativeRegistryPostgresTest(unittest.TestCase):
                 'WHERE platform_family = %s AND endpoint_id = %s '
                 'AND native_scope_id = %s AND resource_kind = %s AND native_id = %s',
                 self.binding.key())
+
+    def current_observation(self, **changes):
+        from dataclasses import replace
+        return replace(NativeObservation('observed-'+uuid4().hex,'a'*64,
+            'independent-reader',None,'EFFECT_PRESENT',True,datetime.now(timezone.utc)),**changes)
+
+    def test_current_synchronous_effect_resolves_without_invented_task_or_owner_fence(self):
+        self.prepare()
+        self.registry.claim_once(self.ctx,self.owner,self.scope,self.operation_id,self.identity)
+        observation=self.current_observation()
+        self.assertTrue(self.registry.acknowledge_current(self.ctx,self.owner,self.scope,
+            self.operation_id,self.identity,observation))
+        operation=self.registry.get(self.ctx,self.operation_id)
+        self.assertEqual((operation.state,operation.outcome,operation.native_task_id),
+                         ('RESOLVED','EFFECT_PRESENT',None))
+        with self.runtime() as connection:
+            self.tenant_sql(connection)
+            self.assertEqual(connection.execute('SELECT count(*) FROM hosting_controlplane.native_operation_reviews '
+                'WHERE organization_id=%s AND tenant_id=%s AND operation_id=%s',
+                (self.ctx.organization_id,self.ctx.tenant_id,self.operation_id)).fetchone(),(0,))
+        self.assertFalse(self.registry.claim_once(self.ctx,self.owner,self.scope,self.operation_id,self.identity))
+
+    def test_current_acknowledgment_rejects_writer_unknown_active_stale_and_fabricated_task(self):
+        self.prepare()
+        self.registry.claim_once(self.ctx,self.owner,self.scope,self.operation_id,self.identity)
+        for changes in ({'observer_subject':'worker-1'},{'outcome':'NO_EFFECT'},
+                        {'outcome':'UNKNOWN'},{'native_quiesced':False},
+                        {'observed_at':datetime.now(timezone.utc)-timedelta(minutes=6)},
+                        {'native_task_id':'invented-task'}):
+            with self.subTest(changes=changes),self.assertRaises(RecoveryHeld):
+                self.registry.acknowledge_current(self.ctx,self.owner,self.scope,
+                    self.operation_id,self.identity,self.current_observation(**changes))
+        self.evidence.native_current=False
+        with self.assertRaises(RecoveryHeld):
+            self.registry.acknowledge_current(self.ctx,self.owner,self.scope,
+                self.operation_id,self.identity,self.current_observation())
+        self.assertEqual(self.registry.get(self.ctx,self.operation_id).state,'IN_FLIGHT')
+
+    def test_uncertain_or_expired_current_acknowledgment_cannot_replace_fenced_recovery(self):
+        self.prepare()
+        self.registry.claim_once(self.ctx,self.owner,self.scope,self.operation_id,self.identity)
+        self.registry.mark_uncertain(self.ctx,self.operation_id,self.identity.subject)
+        with self.assertRaises(RecoveryHeld):
+            self.registry.acknowledge_current(self.ctx,self.owner,self.scope,
+                self.operation_id,self.identity,self.current_observation())
+        self.expire_owner()
+        with self.assertRaises(OperationConflict):
+            self.registry.acknowledge_current(self.ctx,self.owner,self.scope,
+                self.operation_id,self.identity,self.current_observation())
 
     def test_uncertain_timeout_never_replays_and_blocks_owner_release(self):
         self.assertEqual(self.prepare().state, 'PREPARED')

@@ -34,7 +34,7 @@ Trace affected interfaces, service parameters, dependencies, current state, supp
 
 Related implementation areas are traceability targets, not proof of complete implementation:
 
-- [tools/plan_review.py](../../tools/plan_review.py)
+- [provisioner/execution/plan_review.py](../../provisioner/execution/plan_review.py)
 - [.github/workflows/validate.yml](../../.github/workflows/validate.yml)
 
 Review [the assertion allocation](../implementation/assertion-allocation.md) for enforcement owner, location, evidence class and unimplemented dependencies.

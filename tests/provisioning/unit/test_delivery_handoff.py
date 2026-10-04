@@ -7,11 +7,11 @@ reviewed owner operation is discharged by a declared typed step, that one clean
 source commit and one generation are bound, and that nothing in this repository
 became a second runner, a second journal or a second recovery model.
 
-`tools/delivery_run.py` is the owner of the graph contract and imports `fcntl` at
+`provisioner/execution/delivery_run.py` is the owner of the graph contract and imports `fcntl` at
 module scope through the delivery journal, so it is imported here behind a no-op
 stub for the duration of the import — the pure `validate()` contract does not need
 file locking. The mirrored declarations are compared against the owner's source and
-against `tools.delivery_steps.KINDS`, so a kind, a parameter or a grammar the runner
+against `provisioner.execution.delivery_steps.KINDS`, so a kind, a parameter or a grammar the runner
 adds cannot drift unnoticed.
 """
 from __future__ import annotations
@@ -39,8 +39,8 @@ from tests.provisioning import support
 
 REQUEST = str(support.REQUEST)
 MODULE = 'provisioner.cli'
-DELIVERY_RUNNER = support.ROOT / 'tools' / 'delivery_run.py'
-DELIVERY_STEPS = support.ROOT / 'tools' / 'delivery_steps.py'
+DELIVERY_RUNNER = support.ROOT / 'provisioner' / 'execution' / 'delivery_run.py'
+DELIVERY_STEPS = support.ROOT / 'provisioner' / 'execution' / 'delivery_steps.py'
 COMMIT = 'a' * 40
 
 
@@ -63,7 +63,7 @@ def _run(*arguments: str) -> tuple[int, dict]:
 
 
 def _delivery_runner():
-    """`tools.delivery_run`, importable on a platform without POSIX file locking."""
+    """`provisioner.execution.delivery_run`, importable on a platform without POSIX file locking."""
     try:
         import fcntl  # noqa: F401
     except ImportError:
@@ -72,21 +72,21 @@ def _delivery_runner():
         stub.flock = lambda *arguments, **options: None
         sys.modules['fcntl'] = stub
         try:
-            from tools import delivery_run
+            from provisioner.execution import delivery_run
             return delivery_run
         finally:
             del sys.modules['fcntl']
-    from tools import delivery_run
+    from provisioner.execution import delivery_run
     return delivery_run
 
 
 def _delivery_steps():
-    from tools import delivery_steps
+    from provisioner.execution import delivery_steps
     return delivery_steps
 
 
 def _literal_set(pattern: str) -> set:
-    """The set literal `tools/delivery_steps.py` accepts at one predicate.
+    """The set literal `provisioner/execution/delivery_steps.py` accepts at one predicate.
 
     The runner owns these sets. Reading them out of its source keeps the mirror
     honest without restating the contract a second time.
@@ -100,7 +100,7 @@ def _literal_set(pattern: str) -> set:
 def _module_literal(relative: str, name: str) -> set:
     """A module-level set constant, read from the module's source.
 
-    `tools.netbox_ipam` and `tools.netbox_dns` import `fcntl` at module scope, so
+    `provisioner.allocations.netbox_ipam` and `provisioner.execution.netbox_dns` import `fcntl` at module scope, so
     their declarations are read the same way the runner's are.
     """
     source = (support.ROOT / relative).read_text(encoding='utf-8')
@@ -122,7 +122,7 @@ class MirroredContractTest(unittest.TestCase):
                 self.assertEqual(handoff._declared_parameters(kind), set(entry[0]))
 
     def test_the_identifier_grammar_is_the_declared_grammar(self):
-        from tools import readback_core
+        from provisioner.execution import readback_core
         self.assertEqual(handoff.IDENTIFIER.pattern, readback_core.ID.pattern)
 
     def test_the_graph_and_step_keys_are_the_ones_the_runner_requires(self):
@@ -151,9 +151,9 @@ class MirroredContractTest(unittest.TestCase):
 
     def test_every_mirrored_action_set_is_the_declared_action_set(self):
         self.assertEqual(handoff.IPAM_ACTIONS,
-                         _module_literal('tools/netbox_ipam.py', 'ACTIONS'))
+                         _module_literal('provisioner/allocations/netbox_ipam.py', 'ACTIONS'))
         self.assertEqual(handoff.DNS_ACTIONS,
-                         _module_literal('tools/netbox_dns.py', 'ACTIONS'))
+                         _module_literal('provisioner/execution/netbox_dns.py', 'ACTIONS'))
         self.assertEqual(handoff.CAPACITY_ACTIONS,
                          _literal_set(r"values\['action'\] in (\{[^}]*\}),"
                                       r"'Unknown capacity transition'"))
@@ -212,7 +212,7 @@ class SequenceTest(unittest.TestCase):
                  'backup-retention': 'restic',
                  'native-qualification': 'target_campaign',
                  'production-authorization': 'acceptance',
-                 'guest-configuration': 'guest_plan'}
+                 'guest-configuration': 'guest_apply'}
         self.assertEqual(sorted(handoff.OPERATION_STEPS), sorted(kinds))
         for operation, step_id in sorted(handoff.OPERATION_STEPS.items()):
             with self.subTest(operation=operation):
@@ -398,7 +398,10 @@ class GraphTest(unittest.TestCase):
                 self.assertEqual(graph['scope']['platform'], platform)
                 self.assertEqual(graph['scope'], plan.identity.scope)
                 self.assertEqual(graph['operation_id'], plan.operation_id)
-                self.assertEqual(graph['steps'], self.graph['steps'])
+                self.assertEqual(graph['steps'], [step.to_dict() for step in handoff.sequence(plan)])
+                if platform == 'vmware':
+                    self.assertTrue(any(step['kind'] == 'vsphere_power' for step in graph['steps']))
+                    self.assertFalse(any(step['id'] == 'workload-bootstrap' for step in graph['steps']))
 
     def test_the_review_projection_names_the_coverage(self):
         review = handoff.review(self.graph)
@@ -644,12 +647,54 @@ class NoBypassTest(unittest.TestCase):
                 self.assertNotIn('import tools', text)
                 self.assertNotIn('import scripts', text)
 
-    def test_no_module_under_provisioner_owns_a_journal(self):
+    def test_delivery_journal_has_one_package_owner_and_no_portable_writer(self):
+        # B05 moves the existing owner, rather than banning its new package path.
+        # Discovery, allocation and conversion locks serve different contracts;
+        # a flock anywhere in the package is not a competing delivery journal.
+        owner = self.PACKAGE / 'execution' / 'execution_journal.py'
+        self.assertTrue(owner.is_file())
+        self.assertFalse((support.ROOT / 'tools' / 'execution_journal.py').exists())
+        journal_owners = []
+        format_owners = []
         for path in sorted(self.PACKAGE.rglob('*.py')):
+            tree = ast.parse(path.read_text(encoding='utf-8'))
+            if any(isinstance(node, ast.ClassDef) and node.name == 'Journal'
+                   for node in ast.walk(tree)):
+                journal_owners.append(path)
+            if any(isinstance(node, ast.Constant)
+                   and node.value == 'hosting-execution-event/1'
+                   for node in ast.walk(tree)):
+                format_owners.append(path)
+        self.assertEqual(journal_owners, [owner])
+        self.assertEqual(format_owners, [owner])
+        portable = [self.PACKAGE / 'execution' / name for name in ('handoff.py', 'service.py')]
+        portable.extend(path for directory in ('domain', 'compiler', 'placement', 'adapters')
+                        for path in (self.PACKAGE / directory).rglob('*.py'))
+        for path in sorted(portable):
             text = path.read_text(encoding='utf-8')
             with self.subTest(module=str(path.relative_to(self.PACKAGE))):
                 self.assertNotIn('execution_journal', text)
                 self.assertNotIn('flock', text)
+
+        batch = (self.PACKAGE / 'controlplane' / 'discovery' / 'batch_journal.py').read_text()
+        self.assertIn('grants no collection authority', batch)
+        self.assertIn('enterprise scheduler', batch)
+        self.assertIn('is not', batch)
+        self.assertNotIn('execution_authorized = True', batch.lower())
+        # The saved-plan owner retains its separate original uncertainty ledger.
+        text = (self.PACKAGE / 'execution' / 'terraform_apply.py').read_text()
+        self.assertIn("'STARTED_OUTCOME_UNKNOWN'", text)
+        self.assertIn("'APPLIED_REQUIRES_NATIVE_ACCEPTANCE'", text)
+        self.assertIn('Explicit native mutation opt-in required', text)
+        module = ast.parse(text)
+        calls = [node for node in ast.walk(module)
+                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                 and isinstance(node.func.value, ast.Name)
+                 and node.func.value.id == 'fcntl' and node.func.attr == 'flock']
+        owned = next(node for node in module.body
+                     if isinstance(node, ast.FunctionDef) and node.name == 'scope_ledger')
+        self.assertEqual(len(calls), 1)
+        self.assertTrue(all(owned.lineno <= node.lineno <= owned.end_lineno for node in calls))
 
     def test_the_repository_declares_no_execution_authority(self):
         self.assertEqual(authority_module.EXECUTION_AUTHORITY, 'EXTERNAL_ONLY')
@@ -673,32 +718,24 @@ class NoBypassTest(unittest.TestCase):
                 self.assertIn(term, source)
 
     def test_every_command_still_routes_through_the_shared_service(self):
+        from tests.provisioning.unit import test_architecture as architecture
         for path in sorted((self.PACKAGE / 'cli').glob('*.py')):
-            if path.name in ('__init__.py', '__main__.py', 'main.py',
-                             'support.py', 'operator.py'):
+            if path.name in architecture.TRANSPORT_MODULES | architecture.API_ONLY_COMMANDS:
                 continue
             with self.subTest(command=path.name):
                 self.assertIn('execution.service',
                               path.read_text(encoding='utf-8'))
 
     def test_operator_command_cannot_bypass_the_control_api(self):
-        path = self.PACKAGE / 'cli' / 'operator.py'
-        self.assertTrue(path.is_file())
-        tree = ast.parse(path.read_text(encoding='utf-8'))
-        imported = set()
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                imported.update(alias.name for alias in node.names)
-            elif isinstance(node, ast.ImportFrom) and not node.level:
-                imported.add(node.module or '')
-        self.assertIn('httpx', imported)
-        for name in imported:
-            with self.subTest(imports=name):
-                self.assertFalse(name.startswith(('provisioner.execution',
-                                                  'provisioner.repository',
-                                                  'provisioner.adapters',
-                                                  'provisioner.controlplane',
-                                                  'tools', 'scripts', 'psycopg')))
+        from tests.provisioning.unit import test_architecture as architecture
+        for name in sorted(architecture.API_ONLY_COMMANDS):
+            path = self.PACKAGE / 'cli' / name
+            self.assertTrue(path.is_file())
+            with self.subTest(module=name):
+                self.assertEqual(architecture._api_client_import_violations(
+                    path, 'provisioner.cli.' + path.stem), [])
+        self.assertIn('httpx', architecture._absolute_imports(
+            self.PACKAGE / 'cli' / 'operator.py'))
 
 
 if __name__ == '__main__':

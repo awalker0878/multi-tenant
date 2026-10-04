@@ -15,9 +15,10 @@ from typing import Literal
 
 from provisioner.controlplane.authority.model import PlanScope
 
+from .compatibility import check_compatibility
 from .model import DiscoveryFact, DiscoveryObject, DiscoveryResult, NativeIdentity
 from .routes import (METHODS, InstalledTuple, RouteCatalogue, RouteKey,
-                     _utc)
+                     _utc, native_scope_key)
 
 
 _ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
@@ -46,9 +47,11 @@ class AssessmentScopeAccess:
     def __post_init__(self) -> None:
         if (not isinstance(self.scope, PlanScope)
                 or self.purpose not in ('SOURCE_READ', 'DESTINATION_READ')
-                or not all(isinstance(value, str) and _ID.fullmatch(value)
-                           for value in (self.actor_subject,
-                                         self.authorization_reference))
+                or not isinstance(self.actor_subject, str)
+                or not 1 <= len(self.actor_subject) <= 512
+                or any(ord(char) < 32 or ord(char) == 127 for char in self.actor_subject)
+                or not isinstance(self.authorization_reference, str)
+                or not _ID.fullmatch(self.authorization_reference)
                 or not _utc(self.observed_at) or not _utc(self.expires_at)
                 or self.expires_at <= self.observed_at):
             raise ValueError('Invalid exact-scope read selection')
@@ -267,9 +270,10 @@ class AssessmentEngine:
                 or not isinstance(destinations, tuple) or len(destinations) < 2
                 or any(not isinstance(option, DestinationOption)
                        for option in destinations)
-                or len({_option_key(option) for option in destinations})
+                or len({native_scope_key(option.installation.scope) for option in destinations})
                 != len(destinations)
-                or any(option.installation == source for option in destinations)
+                or any(native_scope_key(option.installation.scope) == native_scope_key(source.scope)
+                       for option in destinations)
                 or not all(isinstance(value, str) and _ID.fullmatch(value)
                            for value in (method, guest_profile, network_mode, data_mode))
                 or not _utc(as_of)
@@ -334,6 +338,11 @@ class AssessmentEngine:
         if method not in METHODS:
             add('BLOCKER', 'METHOD_UNSUPPORTED', 'The migration method is unsupported.',
                 'Choose a supported method and qualify an exact directed route.')
+        elif (method == 'SAME_PLATFORM_RELOCATION'
+              and source.scope.platform_family != option.installation.scope.platform_family):
+            add('BLOCKER', 'RELOCATION_REQUIRES_SAME_PLATFORM',
+                'Native relocation is not cross-hypervisor migration.',
+                'Select and qualify a directed conversion or rebuild route.')
         else:
             key = RouteKey(source, option.installation, method, guest, network, data)
             route = self.routes.evaluate(key, as_of=as_of)
@@ -448,6 +457,9 @@ class AssessmentEngine:
                     add('BLOCKER', code,
                         'The destination does not support the selected profile or mode.',
                         'Choose a supported route or an independently qualified destination.')
+
+        for severity, code, reason, remediation in check_compatibility(selected, target, method):
+            add(severity, code, reason, remediation)
 
         findings = {control: [finding for finding in option.findings
                               if finding.control == control]

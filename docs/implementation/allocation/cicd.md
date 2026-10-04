@@ -19,7 +19,7 @@ A change that modifies inter-zone policy, external exposure, route authority, ma
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: A change that modifies inter-zone policy, external exposure, route authority, management access, or assurance profile SHALL receive a higher change classification than an ordinary workload scale operation.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-048, CT-058
 
@@ -42,7 +42,7 @@ An approval SHALL bind the immutable plan and all security-relevant input/policy
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: An approval SHALL bind the immutable plan and all security-relevant input/policy/state/dependency digests; stale, changed or expired artifacts SHALL be rejected at apply.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-042, CT-048
 
@@ -60,7 +60,7 @@ An approval SHALL bind the immutable plan and all security-relevant input/policy
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Approval binds immutable plan
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-042, CT-048
 
@@ -78,7 +78,7 @@ An approval SHALL bind the immutable plan and all security-relevant input/policy
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Input/profile/policy hashes bound
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-042, CT-048
 
@@ -96,7 +96,7 @@ An approval SHALL bind the immutable plan and all security-relevant input/policy
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Current state/dependency generation bound
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-042, CT-048
 
@@ -114,7 +114,7 @@ An approval SHALL bind the immutable plan and all security-relevant input/policy
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Stale or changed approval refused
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-042, CT-048
 
@@ -132,7 +132,7 @@ An approval SHALL bind the immutable plan and all security-relevant input/policy
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Expired approval refused
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-042, CT-048
 

@@ -1,6 +1,6 @@
 # Nutanix Flow policy readback
 
-`tools/nutanix_flow_observe.py` reads exact policy IDs through microseg v4.2. It
+`provisioner/execution/nutanix_flow_observe.py` reads exact policy IDs through microseg v4.2. It
 compares a reviewed native snapshot and strong ETag, then independently checks the
 restricted policy shape. A matching snapshot is not proof of enforcement,
 realization, task completion, or readiness to activate.
@@ -13,7 +13,7 @@ accepted native UUIDs. `services` uses the lifecycle bootstrap rule map: directi
 TCP/UDP protocol, one port, and one remote IPv4 address per named service. Empty
 services means the prepared policy with its two retained deny rules.
 
-The restricted policy shape is validated by `tools/flow_policy.py`, which checks
+The restricted policy shape is validated by `provisioner/execution/flow_policy.py`, which checks
 the exact Terraform Flow rule specifications for the owned policy.
 
 `expected` is the reviewed API policy object with native rule IDs and direct
@@ -29,7 +29,7 @@ native shapes remain held for engineering review.
 Validate without contact:
 
 ```sh
-python3 tools/nutanix_flow_observe.py /private/site/flow-manifest.json
+python3 -m provisioner.execution.nutanix_flow_observe /private/site/flow-manifest.json
 ```
 
 After scoped read authorization, use `--read-authorized-target`,

@@ -12,7 +12,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.catalog_artifacts import collect
 from tools.verify_terraform import plan_only_mock_tests
-from tools.terraform_catalog import entries as terraform_entries
+from provisioner.execution.terraform_catalog import entries as terraform_entries
 EXCLUDED={'.git','.venv','__pycache__','build','dist','.pytest_cache','.mypy_cache','.ruff_cache'}
 
 class UniqueLoader(yaml.SafeLoader):

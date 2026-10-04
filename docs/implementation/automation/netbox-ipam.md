@@ -1,7 +1,7 @@
 # NetBox address lifecycle
 
 The [reference decision](reference-realization.md) selects the NetBox 4.7 REST
-interface for exact IPv4 allocations. `tools/netbox_ipam.py` performs reserve,
+interface for exact IPv4 allocations. `provisioner/allocations/netbox_ipam.py` performs reserve,
 confirm, read-only reconcile, retire, quarantine and release operations. Retire
 changes the native status to `deprecated`; it never deletes the record. Quarantine
 declares the accepted reuse boundary over completed dependent cleanup, and release
@@ -34,7 +34,7 @@ search or automatic substitution occurs. The immutable request hash binds all of
 these fields to the native object and the durable ledger.
 
 The authority contains `request_sha256` (SHA-256 of sorted, two-space-indented
-JSON plus newline, as encoded by `tools.run_files.encoded`), exact `action`,
+JSON plus newline, as encoded by `provisioner.execution.run_files.encoded`), exact `action`,
 `valid_from`, `valid_until` (at most one hour), `change_ref`, `cleanup_ref`, and
 `token_sha256`/`ca_sha256` of the exact private credential/trust files. The CA hash
 is null when using system trust. `cleanup_ref` must identify separately accepted
@@ -57,8 +57,8 @@ Duplicate JSON keys, unknown categories, missing categories and unknown states s
 before NetBox contact.
 
 ```sh
-python tools/netbox_ipam.py /private/operator/allocation.json --action reserve
-python tools/netbox_ipam.py /private/operator/allocation.json --action reserve \
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action reserve
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action reserve \
   --authority /private/operator/ipam-authority.json \
   --token-file /private/operator/netbox-token --ca-bundle /private/operator/ca.pem \
   --ledger /private/operator/ipam-ledger --output /private/operator/reserved.json \
@@ -129,9 +129,9 @@ outcome of this tool. The release receipt carries `request_sha256`,
 complete cleanup block for the change record.
 
 ```sh
-python tools/netbox_ipam.py /private/operator/allocation.json --action quarantine \
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action quarantine \
   --release-evidence /private/operator/reuse-quarantine.json
-python tools/netbox_ipam.py /private/operator/allocation.json --action quarantine \
+python -m provisioner.allocations.netbox_ipam /private/operator/allocation.json --action quarantine \
   --release-evidence /private/operator/reuse-quarantine.json \
   --authority /private/operator/ipam-authority.json \
   --token-file /private/operator/netbox-token --ca-bundle /private/operator/ca.pem \

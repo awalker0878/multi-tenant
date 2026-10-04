@@ -20,13 +20,24 @@
         {
           "cell": "cell-01",
           "capabilities": [
-            "network_domain",
-            "ipv4",
-            "gateway_policy",
-            "distributed_firewall",
             "audit_logging",
+            "backup_restore",
+            "boot_volume",
+            "cpu_topology",
+            "data_volumes",
             "dedicated_edge_context",
-            "native_load_balancer"
+            "disk_order",
+            "distributed_firewall",
+            "dns_registration",
+            "gateway_policy",
+            "identity_join",
+            "ipv4",
+            "log_forwarding",
+            "native_load_balancer",
+            "network_domain",
+            "storage_placement",
+            "time_sync",
+            "vm_create"
           ],
           "clusters": [
             {
@@ -57,6 +68,14 @@
                 "memory_gib_committed": 64,
                 "storage_gib_total": 4096,
                 "storage_gib_committed": 512
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             },
             {
@@ -87,6 +106,14 @@
                 "memory_gib_committed": 64,
                 "storage_gib_total": 4096,
                 "storage_gib_committed": 512
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             }
           ]
@@ -94,10 +121,21 @@
         {
           "cell": "cell-02",
           "capabilities": [
-            "network_domain",
-            "ipv4",
+            "audit_logging",
+            "backup_restore",
+            "boot_volume",
+            "cpu_topology",
+            "data_volumes",
+            "disk_order",
+            "dns_registration",
             "gateway_policy",
-            "audit_logging"
+            "identity_join",
+            "ipv4",
+            "log_forwarding",
+            "network_domain",
+            "storage_placement",
+            "time_sync",
+            "vm_create"
           ],
           "clusters": [
             {
@@ -128,6 +166,14 @@
                 "memory_gib_committed": 32,
                 "storage_gib_total": 2048,
                 "storage_gib_committed": 256
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             },
             {
@@ -158,6 +204,14 @@
                 "memory_gib_committed": 32,
                 "storage_gib_total": 2048,
                 "storage_gib_committed": 256
+              },
+              "capability_properties": {
+                "network_domain.routing_isolation": "independent-context",
+                "gateway_policy.enforcement": "enforce",
+                "gateway_policy.default_action": "deny",
+                "distributed_firewall.enforcement": "enforce",
+                "distributed_firewall.scope": "all-workload-nics",
+                "cpu_topology.architecture": "x86_64"
               }
             }
           ]

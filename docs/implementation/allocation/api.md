@@ -19,7 +19,7 @@ The portable API SHALL be versioned and backward-compatibility rules SHALL be pu
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: The portable API SHALL be versioned and backward-compatibility rules SHALL be published.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-016, CT-070
 
@@ -42,7 +42,7 @@ Vendor identifiers, VLAN/VNI/VRF details, route targets, raw firewall rules and 
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Vendor identifiers, VLAN/VNI/VRF details, route targets, raw firewall rules and raw next-hop routes SHALL NOT be part of the normal consumer contract.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-017, CT-019
 
@@ -65,7 +65,7 @@ Where a consumer-facing provisioning API is provided, it SHALL enforce immutable
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Complete source obligation; all applicable clauses must be satisfied: Where a consumer-facing provisioning API is provided, it SHALL enforce immutable IDs, idempotent create, optimistic concurrency, typed/closed schemas, authorized references and authoritative service-owned status; stale or unauthorized updates SHALL fail before side effects. These controls MAY be implemented by an existing qualified service interface.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-017, CT-046, CT-070
 
@@ -83,7 +83,7 @@ Where a consumer-facing provisioning API is provided, it SHALL enforce immutable
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: Where a consumer-facing provisioning API is provided, it SHALL enforce immutable IDs, idempotent create, optimistic concurrency, typed/closed schemas, authorized references and authoritative service-owned status
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-017, CT-046, CT-070
 
@@ -101,7 +101,7 @@ Where a consumer-facing provisioning API is provided, it SHALL enforce immutable
 
 **Artifact or required operating record:** Immutable reviewed artifact/input/state/approval records, scoped credentials and actual authoritative native writer/fencing mechanism — specifically: stale or unauthorized updates SHALL fail before side effects. These controls MAY be implemented by an existing qualified service interface.
 
-**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [tools/recovery_review.py](../../../tools/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
+**Available related source:** [terraform/stacks/components](../../../terraform/stacks/components) · [tools/verify_terraform.py](../../../tools/verify_terraform.py) · [provisioner/execution/recovery_review.py](../../../provisioner/execution/recovery_review.py) · [docs/INTERRUPTED_CHANGE_RECOVERY.md](../../INTERRUPTED_CHANGE_RECOVERY.md)
 
 **Verification:** Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority. Baseline procedures: CT-017, CT-046, CT-070
 

@@ -315,8 +315,8 @@ class AddressDocumentationTest(unittest.TestCase):
         text = self.DOC.read_text(encoding='utf-8')
         self.assertIn('provisioner/allocations/addresses.py', text)
         self.assertIn('provisioner/repository.py', text)
-        self.assertIn('scripts/check_ipam_allocation_preflight.py', text)
-        self.assertIn('scripts/check_dns_registration_preflight.py', text)
+        self.assertIn('provisioner/allocations/ipam_preflight.py', text)
+        self.assertIn('provisioner/allocations/dns_preflight.py', text)
 
     def test_the_document_is_indexed_and_states_its_limit(self):
         self.assertIn('(address-allocation-model.md)',

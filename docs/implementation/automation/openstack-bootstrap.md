@@ -46,17 +46,17 @@ execution completed within 24 hours; it cannot authenticate those external
 acceptances, refresh stale receipts, or freeze native concurrent writers.
 
 ```sh
-python tools/openstack_transition.py --prior-run /private/prepared-domain-run \
+python -m provisioner.execution.openstack_transition --prior-run /private/prepared-domain-run \
   --inputs /private/bootstrap-domain-inputs.json \
   --acceptance /private/bootstrap-acceptance.json --stage bootstrap \
   --output /private/domain-transition.json
 ```
 
-Prepare the next exact saved plan with `tools/terraform_run.py`, passing the new
+Prepare the next exact saved plan with `provisioner/execution/terraform_run.py`, passing the new
 inputs, fresh contact authority and `--transition /private/domain-transition.json`
 along with the normal backend, cloud, CA and other arguments. The transition is
 sealed into the bundle and revalidated before apply. Obtain approval of that
-exact bundle and all findings, then use `tools/terraform_apply.py`. Repeat for
+exact bundle and all findings, then use `provisioner/execution/terraform_apply.py`. Repeat for
 the workload scope using its own prior outputs and transition file.
 
 Only updates to existing network/router/port administrative state and VM power

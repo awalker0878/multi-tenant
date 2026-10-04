@@ -1,0 +1,27 @@
+[Unit]
+Description=Exact-scope retained workflow progress projector (%i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=hosting-project
+Group=hosting-project
+EnvironmentFile=/etc/hosting/workflow/project-%i.env
+ExecStart=/opt/hosting/bin/python -m provisioner.controlplane.workflow.runtime project --organization-id ${HOSTING_ORGANIZATION_ID} --tenant-id ${HOSTING_TENANT_ID}
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+KillMode=control-group
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+CapabilityBoundingSet=
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

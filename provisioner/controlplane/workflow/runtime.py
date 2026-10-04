@@ -1,7 +1,8 @@
 """Installed-package Temporal worker, outbox dispatcher and result projector.
 
 Each dispatcher/projector instance is bound to one verified tenant context.
-The worker handles a read-only approval gate and has no native platform API.
+Existing gate histories keep their original workflow type. The separately
+selected application graph requires explicit installed runtime composition.
 """
 from __future__ import annotations
 
@@ -11,6 +12,8 @@ import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 import psycopg
@@ -27,6 +30,13 @@ from provisioner.controlplane.jobs.repository import _tenant
 from provisioner.controlplane.persistence import TenantContext
 
 from .admitted_job import AdmittedMigrationJob
+from .application_job import ApplicationJobResult, OpenStackApplicationMigration
+from .application_staging_job import ApplicationStagingResult, OpenStackApplicationStaging
+from .application_cutover_job import OpenStackStagedApplicationCutover
+from .resource_recovery_job import ResourceRecoveryResult, SelectedResourceRecovery
+from .application_recovery_job import ApplicationRecoveryResult, SelectedApplicationPostwriteRecovery
+from .windows_service_job import WindowsServiceResult, SelectedWindowsExistingServices
+from .cold_capture_job import ColdCaptureResult, SelectedColdCapture
 from .approval_activity import PostgresApprovalVerifier
 from .temporal_adapter import TemporalConnection, TemporalWorkflowStarter
 
@@ -70,32 +80,91 @@ def _worker_deployment_config() -> WorkerDeploymentConfig:
         default_versioning_behavior=VersioningBehavior.PINNED)
 
 
-async def _worker(settings: TemporalConnection) -> None:
+async def _worker(settings: TemporalConnection, *, application_components=None) -> None:
     deployment = _worker_deployment_config()
     verifier = PostgresApprovalVerifier(_connect, authority_postgres)
+    from .application_runtime import application_execution_enabled, build_application_worker_components
+    if application_components is None and application_execution_enabled():
+        evidence_config = EvidenceRuntimeConfig.from_environment()
+        if evidence_config.postgres_dsn != _required('HOSTING_WORKFLOW_POSTGRES_DSN'):
+            raise ValueError('Application workflow and evidence database roles must match')
+        application_components = build_application_worker_components(_connect, build_gate(evidence_config))
+    workflows, activities = [AdmittedMigrationJob], [verifier.verify_job]
+    if application_components is not None:
+        from .application_runtime import ApplicationWorkerComponents
+        if not isinstance(application_components, ApplicationWorkerComponents):
+            raise TypeError('Actual installed application worker components required')
+        application_components.settings.require_current()
+        seal = getattr(application_components.planned_leases, 'seal_for_worker', None)
+        if callable(seal):
+            seal()
+        workflows.extend((OpenStackApplicationMigration, OpenStackApplicationStaging,
+                          OpenStackStagedApplicationCutover, SelectedResourceRecovery,
+                          SelectedApplicationPostwriteRecovery, SelectedWindowsExistingServices,
+                          SelectedColdCapture))
+        activities.extend(application_components.activities)
     client = await Client.connect(settings.target_host, namespace=settings.namespace,
                                   tls=settings.tls())
     with ThreadPoolExecutor(max_workers=8) as executor:
         worker = Worker(client, task_queue=settings.task_queue,
-                        workflows=[AdmittedMigrationJob],
-                        activities=[verifier.verify_job], activity_executor=executor,
+                        workflows=workflows,
+                        activities=activities, activity_executor=executor,
                         deployment_config=deployment)
         await worker.run()
 
 
-def _pending_jobs(context: TenantContext, *, limit: int = 32) -> tuple[str, ...]:
+@dataclass(frozen=True)
+class ProjectionCursor:
+    """Immutable job ordering key; status changes never move the scan boundary."""
+    created_at: datetime
+    job_id: str
+
+    def __post_init__(self):
+        if (not isinstance(self.created_at, datetime)
+                or self.created_at.tzinfo is None
+                or not isinstance(self.job_id, str) or not self.job_id):
+            raise ValueError('Projection cursor requires an exact timestamp and job ID')
+
+
+@dataclass(frozen=True)
+class ProjectionBatch:
+    checked: int
+    progressed: bool
+    next_cursor: ProjectionCursor | None
+    upper_bound: ProjectionCursor | None
+
+
+def _pending_jobs(context: TenantContext, *, limit: int = 32,
+                  after: ProjectionCursor | None = None,
+                  through: ProjectionCursor | None = None,
+                  newest_first: bool = False) -> tuple[ProjectionCursor, ...]:
+    if type(limit) is not int or not 1 <= limit <= 128:
+        raise ValueError('Projection page size must be between 1 and 128')
+    if (any(value is not None and not isinstance(value, ProjectionCursor)
+            for value in (after, through)) or type(newest_first) is not bool):
+        raise TypeError('Immutable projection ordering keys are required')
+    query = (
+        'SELECT j.job_id, j.created_at FROM hosting_controlplane.operation_jobs j '
+        'JOIN hosting_controlplane.job_outbox o '
+        'ON (j.organization_id, j.tenant_id, j.job_id) = '
+        '(o.organization_id, o.tenant_id, o.job_id) '
+        'WHERE j.organization_id = %s AND j.tenant_id = %s '
+        "AND j.status = 'STARTED' AND o.delivered_at IS NOT NULL "
+        'AND o.start_run_id IS NOT NULL ')
+    parameters = [context.organization_id, context.tenant_id]
+    if after is not None:
+        query += 'AND (j.created_at, j.job_id) > (%s, %s) '
+        parameters.extend((after.created_at, after.job_id))
+    if through is not None:
+        query += 'AND (j.created_at, j.job_id) <= (%s, %s) '
+        parameters.extend((through.created_at, through.job_id))
+    query += ('ORDER BY j.created_at DESC, j.job_id DESC LIMIT %s' if newest_first
+              else 'ORDER BY j.created_at, j.job_id LIMIT %s')
+    parameters.append(limit)
     with _connect() as connection, connection.cursor() as cursor:
         _tenant(cursor, context)
-        cursor.execute(
-            'SELECT j.job_id FROM hosting_controlplane.operation_jobs j '
-            'JOIN hosting_controlplane.job_outbox o '
-            'ON (j.organization_id, j.tenant_id, j.job_id) = '
-            '(o.organization_id, o.tenant_id, o.job_id) '
-            'WHERE j.organization_id = %s AND j.tenant_id = %s '
-            "AND j.status = 'STARTED' AND o.delivered_at IS NOT NULL "
-            'AND o.start_run_id IS NOT NULL ORDER BY j.created_at LIMIT %s',
-            (context.organization_id, context.tenant_id, limit))
-        return tuple(row[0] for row in cursor.fetchall())
+        cursor.execute(query, tuple(parameters))
+        return tuple(ProjectionCursor(row[1], row[0]) for row in cursor.fetchall())
 
 
 def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
@@ -108,9 +177,43 @@ def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
     receipt = jobs.start_run(context, job_id)
     if receipt is None:
         return False
-    result = workflow.completed_gate(receipt)
+    result = workflow.completed_job(receipt)
     if result is None:
         return False
+    if isinstance(result, (ApplicationJobResult, ApplicationStagingResult, ResourceRecoveryResult,
+                           ApplicationRecoveryResult, WindowsServiceResult, ColdCaptureResult)):
+        phase = {'CAPTURE': 'TRANSFER', 'IMPORT': 'PROVISION'}.get(result.phase, result.phase)
+        detail = {'stepId': {'APPROVAL': 'approval-gate', 'PREPARE': 'prepare',
+            'PROVISION': 'provision', 'TRANSFER': 'transfer', 'CUTOVER': 'cutover',
+            'VERIFY': 'verify', 'RECONCILE': 'reconcile', 'CLEANUP': 'cleanup'}[phase], 'phase': phase,
+            'completed': result.completed, 'total': result.total}
+        if result.reason_code is not None:
+            detail['reasonCode'] = result.reason_code
+        if result.evidence_digest is not None:
+            detail['evidenceDigest'] = result.evidence_digest
+        if getattr(result, 'hold_code', None) is not None:
+            detail['holdCode'] = result.hold_code
+        if isinstance(result, ApplicationStagingResult):
+            event = 'APPLICATION_TARGETS_STAGED' if result.status == 'STAGED' else 'APPLICATION_STAGING_HELD'
+            projected_status = 'SUCCEEDED' if result.status == 'STAGED' else 'HELD'
+        elif isinstance(result, ResourceRecoveryResult):
+            event = 'RESOURCE_RECOVERY_SUCCEEDED' if result.status == 'SUCCEEDED' else 'RESOURCE_RECOVERY_HELD'
+            projected_status = result.status
+        elif isinstance(result, ApplicationRecoveryResult):
+            event = 'APPLICATION_RECOVERY_SUCCEEDED' if result.status == 'SUCCEEDED' else 'APPLICATION_RECOVERY_HELD'
+            projected_status = result.status
+        elif isinstance(result, WindowsServiceResult):
+            event = 'WINDOWS_SERVICE_POSTCONDITIONS_OBSERVED' if result.service_postconditions_observed else 'WINDOWS_SERVICE_HELD'
+            projected_status = 'HELD'
+        elif isinstance(result, ColdCaptureResult):
+            event = 'COLD_BYTES_IMPORTED' if result.status == 'IMPORTED' else 'COLD_CAPTURE_HELD'
+            projected_status = 'SUCCEEDED' if result.status == 'IMPORTED' else 'HELD'
+        else:
+            event = 'APPLICATION_EXECUTION_SUCCEEDED' if result.status == 'SUCCEEDED' else 'APPLICATION_EXECUTION_HELD'
+            projected_status = result.status
+        jobs.append_progress(context, job_id, event_key=f'temporal-application:{receipt.run_id}',
+            event_type=event, status=projected_status, detail=detail)
+        return True
     passed = result.status == 'GATE_PASSED'
     jobs.append_progress(
         context, job_id, event_key=f'temporal-gate:{receipt.run_id}',
@@ -119,6 +222,37 @@ def project_one(jobs: JobRepository, workflow: TemporalWorkflowStarter,
         detail={'stepId': 'approval-gate', 'phase': 'APPROVAL',
                 'reasonCode': 'OPERATOR_HOLD' if passed else 'UNKNOWN'})
     return True
+
+
+def project_batch(jobs: JobRepository, workflow: TemporalWorkflowStarter,
+                  context: TenantContext, *, after: ProjectionCursor | None = None,
+                  through: ProjectionCursor | None = None,
+                  limit: int = 32) -> ProjectionBatch:
+    """Check every job in one bounded, fair keyset page.
+
+    An unfinished workflow is not a progress result and cannot monopolize the
+    oldest page. Each pass freezes the current greatest ordering key so new
+    arrivals cannot indefinitely postpone wrapping to earlier unfinished jobs.
+    These bounds only schedule readback; they carry no workflow completion or
+    native execution authority and can safely reset on restart.
+    """
+    if (after is None) != (through is None):
+        raise ValueError('A projection continuation requires both pass ordering keys')
+    if after is None:
+        latest = _pending_jobs(context, limit=1, newest_first=True)
+        if not latest:
+            return ProjectionBatch(0, False, None, None)
+        through = latest[0]
+    pending = _pending_jobs(context, limit=limit, after=after, through=through)
+    progressed = False
+    for candidate in pending:
+        # Evaluate every row even when an earlier projection made progress.
+        if project_one(jobs, workflow, context, candidate.job_id):
+            progressed = True
+    continuation = (pending[-1] if len(pending) == limit
+                    and pending[-1] != through else None)
+    return ProjectionBatch(len(pending), progressed, continuation,
+                           through if continuation is not None else None)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -137,7 +271,6 @@ def main(argv: list[str] | None = None) -> int:
         parser.error('dispatch and project require exact organization and tenant IDs')
     context = TenantContext(args.organization_id, args.tenant_id)
     jobs = JobRepository(_connect, authority_postgres)
-    workflow = TemporalWorkflowStarter(settings)
     try:
         evidence_config = EvidenceRuntimeConfig.from_environment()
         if evidence_config.postgres_dsn != _required('HOSTING_WORKFLOW_POSTGRES_DSN'):
@@ -146,6 +279,15 @@ def main(argv: list[str] | None = None) -> int:
         gate.require(context)
     except Exception:
         raise SystemExit('Workflow signed evidence configuration is unavailable') from None
+    selector = None
+    if args.mode == 'dispatch':
+        from .application_runtime import (application_execution_enabled, build_application_worker_components,
+                                          selected_application_runtime_required)
+        if application_execution_enabled():
+            selector = build_application_worker_components(_connect, gate).selector
+        else:
+            selector = lambda admitted: selected_application_runtime_required(_connect, admitted)
+    workflow = TemporalWorkflowStarter(settings, application_selector=selector)
     if args.mode == 'dispatch':
         if not args.dispatcher_id:
             parser.error('dispatch requires a stable dispatcher ID')
@@ -154,6 +296,8 @@ def main(argv: list[str] | None = None) -> int:
             namespace=settings.namespace,
             start_history_retention_seconds=int(_required('HOSTING_TEMPORAL_START_RETENTION_SECONDS')),
             evidence_guard=gate.require)
+    projection_cursor = None
+    projection_bound = None
     try:
         while True:
             if args.mode == 'dispatch':
@@ -161,8 +305,11 @@ def main(argv: list[str] | None = None) -> int:
                 busy = result is not None
             else:
                 gate.require(context)
-                busy = any(project_one(jobs, workflow, context, job_id)
-                           for job_id in _pending_jobs(context))
+                batch = project_batch(jobs, workflow, context, after=projection_cursor,
+                                      through=projection_bound)
+                busy = batch.progressed
+                projection_cursor = batch.next_cursor
+                projection_bound = batch.upper_bound
             if args.once:
                 return 0
             if not busy:

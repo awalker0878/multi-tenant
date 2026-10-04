@@ -1972,7 +1972,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Cross-tenant routing SHALL be denied by default even when two tenants use the same zone class.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -1998,7 +1998,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Tenant administrators SHALL NOT have authority to modify provider management, security-edge infrastructure, physical fabric, or another tenant namespace.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2023,7 +2023,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Tenant cannot mutate provider management",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2048,7 +2048,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Tenant cannot mutate security-edge infrastructure",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2073,7 +2073,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Tenant cannot mutate fabric",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2098,7 +2098,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Tenant cannot mutate another tenant",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2123,7 +2123,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Tenant ownership, entitlements and role bindings SHALL be versioned and auditable; suspension SHALL specify permitted recovery/containment actions and SHALL NOT imply indiscriminate workload deletion.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2149,7 +2149,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Tenant ownership, entitlements and role bindings SHALL be versioned and auditable",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2175,7 +2175,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: suspension SHALL specify permitted recovery/containment actions and SHALL NOT imply indiscriminate workload deletion.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2526,7 +2526,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A Security Domain Instance SHALL contain only networks authorized to share its routing/security authority.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2551,7 +2551,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Sharing a zone class SHALL NOT imply reachability between independent Security Domain Instances.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2577,7 +2577,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Dedicated Security Domain Instances SHOULD be available for workloads whose assurance profile or threat model requires stronger isolation than shared logical segmentation.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2602,7 +2602,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Each Security Domain Instance SHALL reference a logical domain and a qualified site/platform realization; membership and sharing changes SHALL be assessed as security-significant changes.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2628,7 +2628,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Each Security Domain Instance SHALL reference a logical domain and a qualified site/platform realization",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2654,7 +2654,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: membership and sharing changes SHALL be assessed as security-significant changes.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2680,7 +2680,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Internal instance zoneClass SHALL be limited to PAZ, OZ, RZ, HRZ or provider-controlled MZ; external PZ/REZ relationships SHALL use ExternalDomain with explicit authority and trust metadata.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2706,7 +2706,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Internal instance zoneClass SHALL be limited to PAZ, OZ, RZ, HRZ or provider-controlled MZ",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2732,7 +2732,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: external PZ/REZ relationships SHALL use ExternalDomain with explicit authority and trust metadata.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2758,7 +2758,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Every requested adjacency SHALL be evaluated against the versioned zone policy before allocation; being permitted to create a ZIP SHALL NOT grant any traffic by default.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2783,7 +2783,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Every requested adjacency SHALL be evaluated against the versioned zone policy before allocation",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2808,7 +2808,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: being permitted to create a ZIP SHALL NOT grant any traffic by default.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2833,7 +2833,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: All inter-zone network paths SHALL traverse the applicable ZIP/security edge.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2858,7 +2858,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A ZIP SHALL identify exactly two authorized adjacent endpoints, each an internal domain instance or approved external/management domain, and SHALL NOT create a general-purpose third-zone transit path.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2883,7 +2883,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Default inter-zone policy SHALL be deny; allowed flows SHALL be generated from approved Flow Intentions and Service Bindings.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2909,7 +2909,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Default inter-zone policy SHALL be deny",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2935,7 +2935,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: allowed flows SHALL be generated from approved Flow Intentions and Service Bindings.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2961,7 +2961,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: ZIP management traffic SHALL be segregated from operational traffic.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -2986,7 +2986,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Data-path ZIPs and management-path ZIPs SHALL be governed and deployed as distinct security services; shared virtualization SHALL only be used where the applicable assurance analysis supports it.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3012,7 +3012,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Separate data-path security service",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3038,7 +3038,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Separate management-path security service",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3064,7 +3064,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Shared virtualization is covered by actual assurance analysis",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3090,7 +3090,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Each ZIP SHALL record its two zone authorities, joint approval, required security functions, management authority, heightened posture, session-revocation behavior and current evidence.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3116,7 +3116,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Exactly the adjacent zone authorities",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3142,7 +3142,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Joint approval",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3168,7 +3168,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Required security functions",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3194,7 +3194,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Management authority",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3220,7 +3220,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Heightened posture",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3246,7 +3246,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Existing-session withdrawal behaviour",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3272,7 +3272,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Current attributable evidence",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3298,7 +3298,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A distributed or shared-infrastructure ZIP SHALL be qualified against the same required security outcomes as a dedicated edge; any unsupported mandatory function SHALL make that realization ineligible.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3324,7 +3324,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: A distributed or shared-infrastructure ZIP SHALL be qualified against the same required security outcomes as a dedicated edge",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3350,7 +3350,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: any unsupported mandatory function SHALL make that realization ineligible.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3742,7 +3742,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A platform SHALL provide an isolated routing/policy mechanism capable of realizing the Security Domain semantics required by the applicable conformance profile.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3768,7 +3768,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Native routing MAY be used within one authorized Security Domain Instance; communication between independent security domains SHALL follow the approved boundary/ZIP realization and its policy.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3794,7 +3794,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Native routing MAY be used within one authorized Security Domain Instance",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3820,7 +3820,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: communication between independent security domains SHALL follow the approved boundary/ZIP realization and its policy.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3846,7 +3846,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Before a workload is attached, the adapter SHALL normalize permissive native defaults and enforce the mandatory baseline on all supported NIC, router, gateway and workload-attachment paths.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3872,7 +3872,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Routes, route imports/exports, and BGP adjacencies SHALL be provider-controlled outputs of authorized intent.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3897,7 +3897,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A generalized shared transit VRF SHALL NOT be used as a default inter-zone routing mechanism.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3923,7 +3923,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Temporary migration or transition routes SHALL have explicit scope, approval, expiry, telemetry, and automated teardown.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3949,7 +3949,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Route purpose and bounded scope",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -3975,7 +3975,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Approval",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4001,7 +4001,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Expiry",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4027,7 +4027,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Telemetry",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4053,7 +4053,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Teardown of expired transitional path",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4079,7 +4079,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Route compilation SHALL validate connected routes, recursive next hops, summaries, NAT/PBR interactions and all enabled address families; realized forwarding SHALL be compared with the approved graph before exposure.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4106,7 +4106,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Native connected routes",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4133,7 +4133,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Recursive next-hop resolution",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4160,7 +4160,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Summaries",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4187,7 +4187,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: NAT interaction",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4214,7 +4214,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Policy-based routing interaction",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4241,7 +4241,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Every offered address family",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4268,7 +4268,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Realized forwarding agrees with approved topology before exposure",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4294,7 +4294,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Every managed network SHALL have an authoritative IPAM record and owner.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4319,7 +4319,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Overlapping address space SHALL be an explicit exception or migration pattern, not the standard tenancy model.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4344,7 +4344,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Address release SHOULD include quarantine/reuse controls appropriate to DNS, logging, firewall state, and incident-response requirements.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4369,7 +4369,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Address allocation, DNS/DHCP registration and release SHALL use idempotent operation identities, conflict detection and a dependency-aware quarantine policy; IPAM failure SHALL NOT cause guessed allocations.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4396,7 +4396,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Allocation authority and delegated scope",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4423,7 +4423,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Address lifecycle reconciled with native resource",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4450,7 +4450,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: DNS and address state reconciled",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4477,7 +4477,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: No orphan release or duplicate allocation",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4506,7 +4506,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -4532,7 +4532,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -4558,7 +4558,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -4584,7 +4584,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -4610,7 +4610,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -4634,7 +4634,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Consumers SHALL NOT receive broad routing to a shared-services supernet solely because they consume one shared service.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4659,7 +4659,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Where useful, shared services SHOULD expose zone-aligned endpoints so that consumption does not force unnecessary cross-zone routing.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4684,7 +4684,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Complete source obligation; all applicable clauses must be satisfied: Each ServiceProfile SHALL define direction, endpoint identity, authentication, allowed scope, availability, failure behavior and management separation; bindings SHALL be revoked when their entitlement or service version expires.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4710,7 +4710,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: Each ServiceProfile SHALL define direction, endpoint identity, authentication, allowed scope, availability, failure behavior and management separation",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4736,7 +4736,7 @@
     "implementation_disposition": "EXTERNAL_AUTHORITATIVE_SERVICE_WITH_CANDIDATE_DNS_INTEGRATION",
     "required_artifact_or_record": "Accepted service binding, resource entitlement, authoritative allocation/TTL/retention record and native API/transport ACL — specifically: bindings SHALL be revoked when their entitlement or service version expires.",
     "candidate_artifacts": [
-      "tools/dns_change.py",
+      "provisioner/execution/dns_change.py",
       "docs/DNS_LIFECYCLE.md",
       "docs/current/interface-agreements.md"
     ],
@@ -4763,7 +4763,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A workload SHALL NOT obtain direct public ingress by attaching its internal Security Domain directly to a public network.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4788,7 +4788,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Public exposure SHALL be represented by an Exposure object with owner, protocol, endpoint, certificate/DNS dependencies, logging, security profile, and lifecycle state.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4813,7 +4813,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Internet egress SHALL be deny-by-default and enabled only through an approved egress profile.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4838,7 +4838,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Egress telemetry SHALL permit attribution to the originating tenant/WSD and should preserve useful source identity where operationally feasible.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4941,7 +4941,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: WSD-to-WSD and tier-to-tier communication inside a shared Security Domain Instance SHALL be denied unless an approved policy explicitly permits it.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4966,7 +4966,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Platform metadata used for security policy SHALL be managed, validated, and protected from unauthorized tenant modification.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -4991,7 +4991,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: The platform SHALL prevent unapproved NIC, source-identity, privileged-workload and label changes from bypassing mandatory segmentation; effective policy SHALL be verified for same-host and cross-host traffic.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5018,7 +5018,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: The platform SHALL prevent unapproved NIC, source-identity, privileged-workload and label changes from bypassing mandatory segmentation",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5045,7 +5045,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: effective policy SHALL be verified for same-host and cross-host traffic.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5072,7 +5072,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment record covering forwarding authority, isolation, MTU, HA, capacity and cleanup; consumers SHALL NOT choose its native topology identifiers.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5099,7 +5099,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Every domain-to-boundary attachment SHALL have a provider-owned EdgeAttachment record covering forwarding authority, isolation, MTU, HA, capacity and cleanup",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5126,7 +5126,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: consumers SHALL NOT choose its native topology identifiers.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5153,7 +5153,7 @@
     "required_artifact_or_record": "Exact accepted native rule/route/attachment configuration and authority record for the assertion; packet/control-plane observations from both sides — specifically: Complete source obligation; all applicable clauses must be satisfied: A shared attachment SHALL be prohibited unless direct connected, neighbor, gateway and NAT/PBR paths preserve the required domain isolation and ZIP enforcement in normal and failure states.",
     "candidate_artifacts": [
       "terraform/modules",
-      "tools/route_audit.py",
+      "provisioner/execution/route_audit.py",
       "docs/NATIVE_READBACK.md"
     ],
     "verification_method": "Use the named CT procedure with healthy endpoints; inspect native connected/distributed alternatives, effective rules and forward/reply behaviour, including relevant failure.",
@@ -5180,7 +5180,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5205,7 +5205,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5229,7 +5229,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5254,7 +5254,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5279,7 +5279,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5304,7 +5304,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5331,7 +5331,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -5358,7 +5358,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -6902,7 +6902,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -6927,7 +6927,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -6952,7 +6952,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -6977,7 +6977,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7002,7 +7002,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7027,7 +7027,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7054,7 +7054,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7080,7 +7080,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7106,7 +7106,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7132,7 +7132,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7158,7 +7158,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7184,7 +7184,7 @@
     "candidate_artifacts": [
       "docs/current/TAD-infrastructure.md",
       "docs/current/interface-agreements.md",
-      "tools/route_audit.py"
+      "provisioner/execution/route_audit.py"
     ],
     "verification_method": "Inspect real route imports, port/overlay ownership, packet sizes and positive/negative paths for every offered family and declared failure.",
     "reference_tests": [
@@ -7364,7 +7364,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: New Nutanix automation SHOULD use current supported v2/v4-backed provider resources where those resources satisfy the requirement; legacy resources require an explicit compatibility rationale.",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7389,7 +7389,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: New Nutanix automation SHOULD use current supported v2/v4-backed provider resources where those resources satisfy the requirement",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7414,7 +7414,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: legacy resources require an explicit compatibility rationale.",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7439,7 +7439,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Nutanix VPC internal routing SHALL NOT be used to bypass a required inter-zone ZIP.",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7465,7 +7465,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Provider-managed categories/metadata used for security SHALL be protected from tenant modification.",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7490,7 +7490,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: The Nutanix profile SHALL qualify the actual AOS/Prism/Flow/provider tuple and external-attachment behavior; unresolved licensing, routing, policy precedence or asynchronous realization limitations SHALL block the affected capability.",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7517,7 +7517,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: The Nutanix profile SHALL qualify the actual AOS/Prism/Flow/provider tuple and external-attachment behavior",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7544,7 +7544,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: unresolved licensing, routing, policy precedence or asynchronous realization limitations SHALL block the affected capability.",
     "candidate_artifacts": [
       "terraform/modules/nutanix-domain",
-      "tools/nutanix_observe.py",
+      "provisioner/execution/nutanix_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7571,7 +7571,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: An NSX implementation SHALL keep tenant/project policy distinct from provider/global management and security policy.",
     "candidate_artifacts": [
       "terraform/modules/nsx-domain",
-      "tools/nsx_observe.py",
+      "provisioner/execution/nsx_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7597,7 +7597,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Gateway policy used for zone transitions SHALL be generated from portable Flow/ZIP intent rather than manually duplicated per workload.",
     "candidate_artifacts": [
       "terraform/modules/nsx-domain",
-      "tools/nsx_observe.py",
+      "provisioner/execution/nsx_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7623,7 +7623,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: The NSX profile SHALL identify actual routing and enforcement components, global/project authority and policy precedence, and SHALL qualify their behavior on the selected product/provider tuple rather than equating a Tier-1 or project with a ZIP.",
     "candidate_artifacts": [
       "terraform/modules/nsx-domain",
-      "tools/nsx_observe.py",
+      "provisioner/execution/nsx_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7650,7 +7650,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Default OpenStack security-group behaviour SHALL be reviewed and normalized to the secure-by-default service baseline.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7676,7 +7676,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: Provider networks and external-router capabilities SHALL remain provider controlled and SHALL not become unrestricted tenant escape paths.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7702,7 +7702,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: Complete source obligation; all applicable clauses must be satisfied: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations; native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7729,7 +7729,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: The OpenStack profile SHALL record distribution, service/API versions, Neutron backend/extensions and provider authority over external/port-security operations",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7756,7 +7756,7 @@
     "required_artifact_or_record": "Selected supported native version tuple, scoped privilege definitions and exact build artifacts; actual effective-state evidence — specifically: native routing or editable security groups SHALL NOT be assumed to satisfy all ZIP functions.",
     "candidate_artifacts": [
       "terraform/modules/openstack-domain",
-      "tools/neutron_observe.py",
+      "provisioner/execution/neutron_observe.py",
       "docs/current/TAD-infrastructure.md"
     ],
     "verification_method": "Exercise the applicable vendor CT/RA addendum using real delegated identities, native state and positive/negative/failure data paths.",
@@ -7970,7 +7970,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -7996,7 +7996,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8022,7 +8022,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8049,7 +8049,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8076,7 +8076,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8236,7 +8236,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8263,7 +8263,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8291,7 +8291,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8318,7 +8318,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8345,7 +8345,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8372,7 +8372,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8398,7 +8398,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8424,7 +8424,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8450,7 +8450,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8477,7 +8477,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8504,7 +8504,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8531,7 +8531,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8558,7 +8558,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8584,7 +8584,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8610,7 +8610,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8636,7 +8636,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8662,7 +8662,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8688,7 +8688,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8714,7 +8714,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8740,7 +8740,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8766,7 +8766,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8792,7 +8792,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -8818,7 +8818,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9289,7 +9289,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9315,7 +9315,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9341,7 +9341,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9367,7 +9367,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9393,7 +9393,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9419,7 +9419,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9445,7 +9445,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9717,7 +9717,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9744,7 +9744,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9771,7 +9771,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9798,7 +9798,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9824,7 +9824,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9851,7 +9851,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",
@@ -9878,7 +9878,7 @@
     "candidate_artifacts": [
       "terraform/stacks/components",
       "tools/verify_terraform.py",
-      "tools/recovery_review.py",
+      "provisioner/execution/recovery_review.py",
       "docs/INTERRUPTED_CHANGE_RECOVERY.md"
     ],
     "verification_method": "Review exact source and current state; execute accepted operation/uncertainty/containment tests without treating a local status as authority.",

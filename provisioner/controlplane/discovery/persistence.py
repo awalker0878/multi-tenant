@@ -167,11 +167,6 @@ class DiscoveryRepository:
             raise TypeError('An immutable discovery campaign is required')
         self._require_scope(ctx, campaign.scope, environment_id)
         with self._session(ctx, write=True) as connection:
-            # The database clock, not the caller's clock or signed issue time,
-            # decides whether a campaign can still be registered.
-            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
-            if not campaign.issued_at <= checked_at < campaign.expires_at:
-                raise ValueError('Discovery campaign is outside its validity window')
             environment = connection.execute(
                 'SELECT 1 FROM hosting_controlplane.environment_registrations '
                 'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
@@ -180,6 +175,15 @@ class DiscoveryRepository:
                 self._scope_args(ctx, campaign.scope, environment_id)).fetchone()
             if environment is None:
                 raise ValueError('No exact declared environment selector exists')
+            # A competing admission may hold this lock past expiry or revocation.
+            # Check live authority only after the serialization wait has finished.
+            key = hashlib.sha256(_json(('campaign', ctx.organization_id,
+                                       ctx.tenant_id, campaign.campaign_id)).encode()).digest()
+            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
+                               (int.from_bytes(key[:8], 'big', signed=True),))
+            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
+            if not campaign.issued_at <= checked_at < campaign.expires_at:
+                raise ValueError('Discovery campaign is outside its validity window')
             # The verifier must independently recheck active enrollment and the
             # campaign issuer now. A constructible evidence object is not passed
             # by a web caller and is not accepted without this callback.
@@ -188,6 +192,16 @@ class DiscoveryRepository:
                     or proof.authorization_digest != campaign.digest()
                     or proof.result_digest is not None):
                 raise ValueError('Campaign verifier did not bind exact authorization')
+            # Live authority is checked even when identical bytes already exist.
+            existing = connection.execute(
+                'SELECT environment_id, authorization_digest '
+                'FROM hosting_controlplane.discovery_campaigns '
+                'WHERE organization_id = %s AND tenant_id = %s AND campaign_id = %s',
+                (ctx.organization_id, ctx.tenant_id, campaign.campaign_id)).fetchone()
+            if existing is not None:
+                if existing != (environment_id, campaign.digest()):
+                    raise DiscoveryConflict('Campaign identity has different content or scope')
+                return
             try:
                 connection.execute(
                     'INSERT INTO hosting_controlplane.discovery_campaigns '
@@ -251,7 +265,6 @@ class DiscoveryRepository:
         if rebuilt.digest != result.digest:
             raise ValueError('Discovery result digest is stale')
         with self._session(ctx, write=True) as connection:
-            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
             row = connection.execute(
                 'SELECT site_id, security_domain_id, endpoint_id, native_scope_id, '
                 'platform_family, authority_reference, collector_id, allowed_kinds, '
@@ -265,6 +278,14 @@ class DiscoveryRepository:
             if row is None:
                 raise ValueError('Campaign was not registered for this environment')
             campaign = self._campaign_from_row(ctx, result.campaign_id, row)
+            # Serialize all campaigns for this scope before reading trusted time
+            # or verifying live authority. A lock wait must not preserve stale
+            # enrollment, witness, revocation or campaign validity decisions.
+            key = hashlib.sha256(_json(self._scope_args(
+                ctx, campaign.scope, environment_id)).encode('utf-8')).digest()
+            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
+                               (int.from_bytes(key[:8], 'big', signed=True),))
+            checked_at = connection.execute('SELECT clock_timestamp()').fetchone()[0]
             if (campaign.scope != result.scope
                     or result.authorization_digest != campaign.digest()
                     or not campaign.issued_at <= result.captured_at <= checked_at
@@ -279,13 +300,21 @@ class DiscoveryRepository:
                     or proof.authorization_digest != campaign.digest()
                     or proof.result_digest != result.digest):
                 raise ValueError('Result verifier did not bind exact provenance')
-            # Serialize per exact scope, including competing campaigns. The
-            # hashed advisory key can collide only by conservatively serializing
-            # unrelated scopes; the tenant/environment SQL key remains exact.
-            key = hashlib.sha256(_json(self._scope_args(
-                ctx, campaign.scope, environment_id)).encode('utf-8')).digest()
-            connection.execute('SELECT pg_advisory_xact_lock(%s::bigint)',
-                               (int.from_bytes(key[:8], 'big', signed=True),))
+            # A response lost after commit must not create another generation.
+            # Changed bytes under the same campaign remain a hard conflict.
+            existing = connection.execute(
+                'SELECT generation, campaign_id, authorization_digest, result_digest, '
+                'captured_at, completeness, collection_errors, missing_privileges, '
+                'object_count FROM hosting_controlplane.discovery_generations '
+                'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
+                'AND site_id = %s AND security_domain_id = %s AND endpoint_id = %s '
+                'AND native_scope_id = %s AND platform_family = %s AND campaign_id = %s',
+                (*self._scope_args(ctx, campaign.scope, environment_id),
+                 campaign.campaign_id)).fetchone()
+            if existing is not None:
+                if existing[2] != campaign.digest() or existing[3] != result.digest:
+                    raise DiscoveryConflict('Campaign result has different immutable content')
+                return self._generation_row(environment_id, campaign.scope, existing)
             generation = connection.execute(
                 'SELECT COALESCE(MAX(generation), 0) + 1 '
                 'FROM hosting_controlplane.discovery_generations '
@@ -416,6 +445,23 @@ class DiscoveryRepository:
                 'AND native_scope_id = %s AND platform_family = %s '
                 'ORDER BY generation DESC LIMIT 1',
                 self._scope_args(ctx, scope, environment_id)).fetchone()
+        return self._generation_row(environment_id, scope, row) if row else None
+
+    def get_generation(self, ctx: TenantContext, scope: PlanScope,
+                       environment_id: str, generation: int) -> StoredGeneration | None:
+        """Read one exact generation without silently advancing a saved selection."""
+        self._require_scope(ctx, scope, environment_id)
+        if type(generation) is not int or generation < 1:
+            raise ValueError('An exact positive generation is required')
+        with self._session(ctx) as connection:
+            row = connection.execute(
+                'SELECT generation, campaign_id, authorization_digest, result_digest, '
+                'captured_at, completeness, collection_errors, missing_privileges, '
+                'object_count FROM hosting_controlplane.discovery_generations '
+                'WHERE organization_id = %s AND tenant_id = %s AND environment_id = %s '
+                'AND site_id = %s AND security_domain_id = %s AND endpoint_id = %s '
+                'AND native_scope_id = %s AND platform_family = %s AND generation = %s',
+                (*self._scope_args(ctx, scope, environment_id), generation)).fetchone()
         return self._generation_row(environment_id, scope, row) if row else None
 
     def list_observations(self, ctx: TenantContext, scope: PlanScope,

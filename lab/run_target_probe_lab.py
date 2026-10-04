@@ -17,8 +17,8 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from lab.native_readback_fixture import Fixture
-from tools.qualify_target import ssh_probe
-from tools.run_files import digest, utcnow
+from provisioner.execution.qualify_target import ssh_probe
+from provisioner.execution.run_files import digest, utcnow
 
 
 def run(user):

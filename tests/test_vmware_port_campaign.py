@@ -13,8 +13,10 @@ from tests.test_vsphere_port_observe import manifest as port_manifest, Client as
 from tests.test_vsphere_observe import Client as VmClient
 from tests.test_nsx_segment_observe import Client as NsxClient
 from tests.test_target_campaign import window
-from tools import qualify_target as q, vmware_network_binding as binding, vsphere_port_observe as ports
-from tools.run_files import digest, encoded, write_new
+from provisioner.execution import qualify_target as q
+from provisioner.execution import vmware_network_binding as binding
+from provisioner.execution import vsphere_port_observe as ports
+from provisioner.execution.run_files import digest, encoded, write_new
 
 
 def inputs(*origins):

@@ -4,7 +4,7 @@ import json
 import unittest
 from tests.test_vsphere_task_observe import manifest, task_body
 from tests.test_vsphere_observe import ref
-from tools import vsphere_task_observe as t
+from provisioner.execution import vsphere_task_observe as t
 
 
 class CloneTaskTests(unittest.TestCase):
